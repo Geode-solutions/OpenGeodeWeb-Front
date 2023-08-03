@@ -1,0 +1,45 @@
+{
+  "name": "@geode/opengeodeweb-front",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.6",
+    "nuxt": "^3.6.5",
+    "vuetify": "^3.3.11"
+  },
+  "overrides": {
+    "vue": "latest"
+  },
+  "description": "OpenSource Vue/Vuetify framework for web applications",
+  "version": "0.0.1",
+  "main": "index.js",
+  "dependencies": {
+    "@mdi/font": "^7.2.96",
+    "@pinia/nuxt": "^0.4.11",
+    "@vueuse/core": "^10.3.0",
+    "nuxt": "^3.6.5",
+    "pinia": "^2.1.6",
+    "sass": "^1.64.2",
+    "vuetify": "^3.3.11"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Front.git"
+  },
+  "keywords": [
+    "vue",
+    "vuetify"
+  ],
+  "author": "@geode",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Geode-solutions/OpenGeodeWeb-Front/issues"
+  },
+  "homepage": "https://github.com/Geode-solutions/OpenGeodeWeb-Front#readme"
+}
