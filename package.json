@@ -1,6 +1,6 @@
 {
   "name": "@geode/opengeodeweb-front",
-  "private": true,
+  "private": false,
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
