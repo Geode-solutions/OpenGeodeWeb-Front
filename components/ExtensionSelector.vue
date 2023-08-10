@@ -11,25 +11,21 @@
 </template>
 
 <script setup>
-import geode_objects from '@assets/geode_objects';
+const stepper_tree = inject('stepper_tree')
+const { geode_object, route_prefix } = stepper_tree
 
 const props = defineProps({
-  geode_object: { type: String, required: true, validator (value) { return geode_objects.keys().includes(value) } },
-  route_prefix: { type: String, required: true },
   variable_to_update: { type: String, required: true },
   variable_to_increment: { type: String, required: true },
 })
-
-const { geode_object, route_prefix, variable_to_update, variable_to_increment } = props
+const { variable_to_update, variable_to_increment } = props
 
 const file_extensions = ref([])
 
 
 async function get_output_file_extensions () {
-
   const params = new FormData()
   params.append('geode_object', geode_object)
-
   await api_fetch(`${route_prefix}/output_file_extensions`, { method: 'POST', body: params },
     {
       'response_function': (response) => {
@@ -40,7 +36,6 @@ async function get_output_file_extensions () {
 }
 
 function set_output_extension (extension) {
-  const stepper_tree = inject('stepper_tree')
   stepper_tree[variable_to_update] = extension
   stepper_tree[variable_to_increment]++
 }
