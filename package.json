@@ -16,8 +16,8 @@
     "vue": "latest"
   },
   "description": "OpenSource Vue/Vuetify framework for web applications",
-  "version": "0.0.2",
-  "main": "index",
+  "version": "0.0.3",
+  "main": "index.js",
   "dependencies": {
     "@mdi/font": "^7.2.96",
     "@pinia/nuxt": "^0.4.11",
