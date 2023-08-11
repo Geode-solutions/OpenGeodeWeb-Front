@@ -6,16 +6,15 @@
 
 <script setup>
 const stepper_tree = inject('stepper_tree')
+const { route_prefix } = stepper_tree
 
 const props = defineProps({
   multiple: { type: Boolean, required: true },
   label: { type: String, required: true },
-  route_prefix: { type: String, required: true },
   variable_to_update: { type: String, required: true },
   variable_to_increment: { type: String, required: true },
-
 })
-const { multiple, label, route_prefix, variable_to_update, variable_to_increment } = props.component_options
+const { multiple, label, variable_to_update, variable_to_increment } = props
 
 const accept = ref('')
 const files = ref([])

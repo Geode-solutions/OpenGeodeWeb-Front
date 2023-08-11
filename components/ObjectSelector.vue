@@ -9,8 +9,8 @@
       </v-card>
     </v-col>
   </v-row>
-  <v-row v-else>
-    <v-card class="card ma-2" variant="tonal" elevation="5" rounded>
+  <v-row v-else class="pa-5">
+    <v-card class="card" variant="tonal" elevation="5" rounded>
       <v-card-text>
         This file format isn't supported! Please check the <a href="https://docs.geode-solutions.com/formats/"
           target="_blank">
@@ -21,17 +21,17 @@
 </template>
 
 <script setup>
-import geode_objects from '@assets/geode_objects';
+import geode_objects from '@/assets/geode_objects'
+
+const stepper_tree = inject('stepper_tree')
+const { files, route_prefix } = stepper_tree
 
 const props = defineProps({
-  geode_object: { type: String, required: true, validator (value) { return geode_objects.keys().includes(value) } },
-  route_prefix: { type: String, required: true },
-  files: { type: Array, required: true },
   variable_to_update: { type: String, required: true },
   variable_to_increment: { type: String, required: true },
 })
 
-const { geode_objects, route_prefix, files } = props
+const { variable_to_update, variable_to_increment } = props
 
 const allowed_objects = ref([])
 
@@ -48,7 +48,6 @@ async function get_allowed_objects () {
 }
 
 function set_geode_object (geode_object) {
-  const stepper_tree = inject('stepper_tree')
   stepper_tree[variable_to_update] = geode_object
   stepper_tree[variable_to_increment]++
 }
