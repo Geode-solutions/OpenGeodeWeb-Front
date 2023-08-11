@@ -2,15 +2,14 @@
   "name": "@geode/opengeodeweb-front",
   "private": false,
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "release:major": "npm version $(semver $npm_package_version -i major) && npm publish --tag latest",
+    "release:minor": "npm version $(semver $npm_package_version -i minor) && npm publish --tag latest",
+    "release:patch": "npm version $(semver $npm_package_version -i patch) && npm publish --tag latest",
+    "release:beta": "npm version $(semver $npm_package_version -i prerelease --preid $(npm whoami) ) && npm publish --tag rc"
   },
   "devDependencies": {
+    "semver": "^7.5.4",
     "@types/node": "^20.4.9",
-    "nuxt": "^3.6.5",
     "vuetify": "^3.3.12"
   },
   "overrides": {
@@ -23,7 +22,6 @@
     "@mdi/font": "^7.2.96",
     "@pinia/nuxt": "^0.4.11",
     "@vueuse/core": "^10.3.0",
-    "nuxt": "^3.6.5",
     "pinia": "^2.1.6",
     "sass": "^1.65.1",
     "vuetify": "^3.3.12"
