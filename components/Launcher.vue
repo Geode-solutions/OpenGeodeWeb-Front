@@ -5,7 +5,7 @@
         <h4 class="pb-3">
           Please complete the recaptcha to launch the app
         </h4>
-        <vue-recaptcha ref="recaptcha" :sitekey="config.public.SITE_KEY" :loadRecaptchaScript="true"
+        <vue-recaptcha ref="recaptcha" :sitekey="site_key" :loadRecaptchaScript="true"
           @expired="is_captcha_validated = false" @verify="submit_recaptcha" align-self="center" />
       </v-col>
       <v-col v-if="!is_cloud_running && is_connexion_launched">
@@ -21,6 +21,12 @@ import { VueRecaptcha } from "vue-recaptcha"
 // const ws_link_store = use_ws_link_store()
 const cloud_store = use_cloud_store()
 const { is_cloud_running, is_captcha_validated, is_connexion_launched } = storeToRefs(cloud_store)
+
+const props = defineProps({
+  site_key: { type: String, required: true }
+})
+
+const { site_key } = toRefs(props)
 
 watch(is_captcha_validated, async (value) => {
   if (value === true) {

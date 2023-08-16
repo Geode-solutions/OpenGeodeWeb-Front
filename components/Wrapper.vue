@@ -5,7 +5,7 @@
         <Header :tool_name="tool_name" :cards_list="cards_list" />
       </v-col>
       <v-col v-if="!is_cloud_running">
-        <Launcher />
+        <Launcher :site_key="site_key" />
       </v-col>
       <v-col v-if="is_cloud_running">
         <Stepper />
@@ -22,9 +22,10 @@ const cloud_store = use_cloud_store()
 const { is_cloud_running } = storeToRefs(cloud_store)
 
 const props = defineProps({
-  cards_list: { type: Array, required: true }
+  cards_list: { type: Array, required: true },
+  site_key: { type: String, required: true }
 })
-const { cards_list } = props
+const { cards_list, site_key } = props
 
 const stepper_tree = inject('stepper_tree')
 const { tool_name, route_prefix } = stepper_tree
