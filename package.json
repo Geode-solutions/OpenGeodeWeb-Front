@@ -8,22 +8,22 @@
     "release:beta": "npm version $(semver $npm_package_version -i prerelease --preid $(npm whoami) ) && npm publish --tag rc"
   },
   "devDependencies": {
-    "@types/node": "^20.4.9",
-    "semver": "^7.5.4",
-    "vuetify": "^3.3.12"
+    "nuxt": "^3.6.5"
   },
   "overrides": {
     "vue": "latest"
   },
   "description": "OpenSource Vue/Vuetify framework for web applications",
+  "type": "module",
   "version": "0.0.7",
-  "main": "index.js",
+  "main": "./nuxt.config.js",
   "dependencies": {
     "@mdi/font": "^7.2.96",
     "@pinia/nuxt": "^0.4.11",
+    "@types/node": "^20.4.9",
     "@vueuse/core": "^10.3.0",
-    "nuxt": "^3.6.5",
     "pinia": "^2.1.6",
+    "semver": "^7.5.4",
     "sass": "^1.65.1",
     "vuetify": "^3.3.12"
   },
