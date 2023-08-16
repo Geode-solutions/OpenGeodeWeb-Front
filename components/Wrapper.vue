@@ -2,16 +2,16 @@
   <v-container>
     <v-row class="flex-column">
       <v-col>
-        <ToolsHeader :tool_name="tool_name" :cards_list="cards_list" />
+        <Header :tool_name="tool_name" :cards_list="cards_list" />
       </v-col>
       <v-col v-if="!is_cloud_running">
-        <ToolsLauncher />
+        <Launcher />
       </v-col>
       <v-col v-if="is_cloud_running">
-        <ToolsStepper />
+        <Stepper />
       </v-col>
       <v-col v-if="is_cloud_running">
-        <ToolsPackagesVersions :route_prefix="route_prefix" />
+        <PackagesVersions :route_prefix="route_prefix" />
       </v-col>
     </v-row>
   </v-container>
