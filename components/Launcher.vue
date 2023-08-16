@@ -18,14 +18,14 @@
 <script setup>
 import { VueRecaptcha } from "vue-recaptcha"
 
-const ws_link_store = use_ws_link_store()
+// const ws_link_store = use_ws_link_store()
 const cloud_store = use_cloud_store()
 const { is_cloud_running, is_captcha_validated, is_connexion_launched } = storeToRefs(cloud_store)
 
 watch(is_captcha_validated, async (value) => {
   if (value === true) {
     await cloud_store.create_connexion()
-    await ws_link_store.ws_connect()
+    // await ws_link_store.ws_connect()
   }
 })
 
