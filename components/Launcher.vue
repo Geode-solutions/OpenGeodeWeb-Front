@@ -44,7 +44,7 @@ watch(is_cloud_running, (value, oldValue) => {
 onMounted(() => {
   if (process.client) {
     const config = useRuntimeConfig()
-    if (config.public.NODE_ENV !== 'production') {
+    if ((config.public.NODE_ENV !== 'production') || (config.public.SITE_URL.includes('.netlify.app'))) {
       cloud_store.$patch({ is_captcha_validated: true })
     }
   }
