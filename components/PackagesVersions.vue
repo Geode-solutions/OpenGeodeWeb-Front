@@ -21,6 +21,7 @@ const props = defineProps({
 })
 const { tool_route } = props
 
+const cloud_store = use_cloud_store()
 const { is_cloud_running } = storeToRefs(cloud_store)
 
 
