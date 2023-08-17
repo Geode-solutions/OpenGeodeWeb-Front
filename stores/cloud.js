@@ -9,6 +9,25 @@ export const use_cloud_store = defineStore('cloud', {
     is_connexion_launched: false,
     request_counter: 0
   }),
+  getters: {
+    geode_url: (state) => {
+      const public_runtime_config = useRuntimeConfig().public
+      var geode_url = `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}`
+      if (process.env.NODE_ENV == 'production') {
+        geode_url = geode_url + `/${state.ID}`
+        // /!\ ADD /geode LATER /!\
+      }
+      return geode_url
+    },
+    viewer_url: (state) => {
+      const public_runtime_config = useRuntimeConfig().public
+      var viewer_url = `${public_runtime_config.VIEWER_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.VIEWER_PORT}`
+      if (process.env.NODE_ENV == 'production') {
+        viewer_url = viewer_url + `/${state.ID}/viewer`
+      }
+      return viewer_url
+    },
+  },
   actions: {
     async create_connexion () {
       if (this.is_connexion_launched) { return }
