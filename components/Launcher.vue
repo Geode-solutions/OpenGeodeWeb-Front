@@ -35,16 +35,10 @@ watch(is_captcha_validated, async (value) => {
   }
 })
 
-watch(is_cloud_running, (value, oldValue) => {
-  if (value === false && oldValue == true) {
-    cloud_store.$patch({ internal_error: true })
-  }
-})
-
 onMounted(() => {
   if (process.client) {
     const config = useRuntimeConfig()
-    if ((config.public.NODE_ENV !== 'production') || (config.public.SITE_URL.includes('.netlify.app'))) {
+    if (config.public.NODE_ENV !== 'production') {
       cloud_store.$patch({ is_captcha_validated: true })
     }
   }
