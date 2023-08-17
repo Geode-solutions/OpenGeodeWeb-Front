@@ -19,17 +19,15 @@
 const props = defineProps({
   route_prefix: { type: String, required: true }
 })
-const { tool_route } = props
+const { route_prefix } = props
 
 const cloud_store = use_cloud_store()
 const { is_cloud_running } = storeToRefs(cloud_store)
 
-
 const packages_versions = ref([])
 
 async function get_packages_versions () {
-  const route = `${tool_route}/versions`
-  await api_fetch(route, { method: 'GET' }, {
+  await api_fetch(`${route_prefix}/versions`, { method: 'GET' }, {
     'response_function': (response) => {
       packages_versions.value = response._data.versions
     }
