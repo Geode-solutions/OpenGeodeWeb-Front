@@ -19,10 +19,11 @@
       </v-col>
     </v-row>
     <Transition name="slide-fade">
-      <v-row v-if="step_index == current_step_index">
+      <v-col v-if="step_index == current_step_index">
         <component :is="steps[step_index].component.component_name"
           v-bind="steps[step_index].component.component_options" />
-      </v-row>
+        <v-btn v-if="skippable()" @click="skipStep()" color="primary">Skip step</v-btn>
+      </v-col>
     </Transition>
   </v-card>
 </template>
@@ -34,6 +35,18 @@ const props = defineProps({
 const { step_index } = props
 const stepper_tree = inject('stepper_tree')
 const { current_step_index, steps } = toRefs(stepper_tree)
+
+function skippable () {
+  if (stepper_tree.steps[step_index].component.skippable !== undefined) {
+    return(stepper_tree.steps[step_index].component.skippable)
+  } else {
+    return(false)
+  }
+}
+
+function skipStep() {
+  stepper_tree.current_step_index++ 
+}
 
 function set_current_step (step_index) {
   stepper_tree.current_step_index = step_index
