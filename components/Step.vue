@@ -38,10 +38,8 @@ const { current_step_index, steps } = toRefs(stepper_tree)
 
 function skippable () {
   if (stepper_tree.steps[step_index].component.skippable !== undefined) {
-    console.log("not undefined")
     return(stepper_tree.steps[step_index].component.skippable)
   } else {
-    console.log("undefined")
     return(false)
   }
 }
