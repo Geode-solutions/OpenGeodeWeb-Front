@@ -15,7 +15,7 @@
   },
   "description": "OpenSource Vue/Vuetify framework for web applications",
   "type": "module",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "main": "./nuxt.config.js",
   "dependencies": {
     "@mdi/font": "^7.2.96",
