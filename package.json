@@ -15,18 +15,19 @@
   },
   "description": "OpenSource Vue/Vuetify framework for web applications",
   "type": "module",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "main": "./nuxt.config.js",
   "dependencies": {
     "@mdi/font": "^7.2.96",
     "@pinia/nuxt": "^0.4.11",
     "@types/node": "^20.5.0",
+    "@vueuse/components": "^10.3.0",
     "@vueuse/core": "^10.3.0",
     "pinia": "^2.1.6",
-    "semver": "^7.5.4",
     "sass": "^1.65.1",
-    "vuetify": "^3.3.13",
-    "vue-recaptcha": "^2.0.3"
+    "semver": "^7.5.4",
+    "vue-recaptcha": "^2.0.3",
+    "vuetify": "^3.3.13"
   },
   "repository": {
     "type": "git",
