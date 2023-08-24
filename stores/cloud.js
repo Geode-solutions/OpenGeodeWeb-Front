@@ -14,9 +14,9 @@ export const use_cloud_store = defineStore('cloud', {
       const public_runtime_config = useRuntimeConfig().public
       var geode_url = `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}`
       if (process.env.NODE_ENV == 'production') {
-        geode_url = geode_url + `/${state.ID}`
-        // /!\ ADD /geode LATER /!\
+        geode_url = geode_url + `/${state.ID}/geode`
       }
+      console.log("geode_url",geode_url)
       return geode_url
     },
     viewer_url: (state) => {
@@ -25,6 +25,7 @@ export const use_cloud_store = defineStore('cloud', {
       if (process.env.NODE_ENV == 'production') {
         viewer_url = viewer_url + `/${state.ID}/viewer`
       }
+      viewer_url = viewer_url + '/ws'
       return viewer_url
     },
   },
@@ -36,8 +37,7 @@ export const use_cloud_store = defineStore('cloud', {
       if (ID === null || typeof ID === 'undefined') {
         return this.create_backend()
       } else {
-        const config = useRuntimeConfig()
-        const { data, error } = await useFetch(`${config.public.API_URL}/${ID}/ping`, { method: 'POST' })
+        const { data, error } = await useFetch(`${this.geode_url}/ping`, { method: 'POST' })
         console.log("error", error)
         if (data.value !== null) {
           this.ID = ID
@@ -51,7 +51,8 @@ export const use_cloud_store = defineStore('cloud', {
     async create_backend () {
       const errors_store = use_errors_store()
       const config = useRuntimeConfig()
-      const { data, error } = await useFetch(`${config.public.API_URL}${config.public.SITE_BRANCH}/tools/createbackend`, { method: 'POST' })
+      const public_runtime_config = config.public
+      const { data, error } = await useFetch(`${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}/createbackend`, { method: 'POST' })
       if (data.value !== null) {
         this.ID = data.value.ID
         localStorage.setItem('ID', data.value.ID)
@@ -68,8 +69,7 @@ export const use_cloud_store = defineStore('cloud', {
     },
     async do_ping () {
       const errors_store = use_errors_store()
-      const config = useRuntimeConfig()
-      const { data, error } = await useFetch(`${config.public.API_URL}/${this.ID}/ping`, { method: 'POST' })
+      const { data, error } = await useFetch(`${this.geode_url}/ping`, { method: 'POST' })
       if (data.value !== null) {
         this.is_cloud_running = true
       } else {

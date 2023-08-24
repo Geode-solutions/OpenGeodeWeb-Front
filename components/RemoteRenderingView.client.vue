@@ -6,15 +6,15 @@
 
 <script setup>
 import vtkRemoteView from '@kitware/vtk.js/Rendering/Misc/RemoteView';
-import { vElementSize } from '@vueuse/components'
+import { useElementSize } from '@vueuse/core'
 
-const app_store = use_app_store()
-const { picking_mode } = storeToRefs(app_store)
+const viewer_store = use_viewer_store()
+const { picking_mode } = storeToRefs(viewer_store)
 
 function get_x_y (event) {
   if (picking_mode.value === true) {
     const { offsetX, offsetY } = event
-    app_store.set_picked_point(offsetX, offsetY)
+    viewer_store.set_picked_point(offsetX, offsetY)
   }
 }
 
@@ -27,7 +27,7 @@ const viewer = ref(null)
 const { width, height } = useElementSize(viewer)
 
 function resize () {
-  view.getCanvasView().setSize(0, 0) // hack to fit full size
+  view.getCanvasView().setSize(1, 1)
   view.resize();
 }
 
