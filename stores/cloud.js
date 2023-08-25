@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { use_errors_store } from './errors'
+import { use_websocket_store } from './websocket'
 
 export const use_cloud_store = defineStore('cloud', {
   state: () => ({
@@ -31,6 +32,7 @@ export const use_cloud_store = defineStore('cloud', {
   },
   actions: {
     async create_connexion () {
+      const websocket_store = use_websocket_store()
       if (this.is_connexion_launched) { return }
       this.is_connexion_launched = true
       const ID = localStorage.getItem('ID')
@@ -42,6 +44,7 @@ export const use_cloud_store = defineStore('cloud', {
         if (data.value !== null) {
           this.ID = ID
           this.is_cloud_running = true
+          websocket_store.ws_connect()
           return this.ping_task()
         } else {
           return this.create_backend()
@@ -49,6 +52,7 @@ export const use_cloud_store = defineStore('cloud', {
       }
     },
     async create_backend () {
+      const websocket_store = use_websocket_store()
       const errors_store = use_errors_store()
       const config = useRuntimeConfig()
       const public_runtime_config = config.public
@@ -57,6 +61,7 @@ export const use_cloud_store = defineStore('cloud', {
         this.ID = data.value.ID
         localStorage.setItem('ID', data.value.ID)
         this.is_cloud_running = true
+        websocket_store.ws_connect()
         return this.ping_task()
       } else {
         console.log("error : ", error)
