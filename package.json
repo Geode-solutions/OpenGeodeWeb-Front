@@ -23,7 +23,7 @@
   },
   "description": "OpenSource Vue/Vuetify framework for web applications",
   "type": "module",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "main": "./nuxt.config.js",
   "dependencies": {
     "@kitware/vtk.js": "^28.8.0",
