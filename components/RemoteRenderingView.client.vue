@@ -1,7 +1,10 @@
 <template>
-  <v-col v-element-size="resize" style="overflow: hidden; position: relative; z-index: 1; height: 100%; width: 100%"
-    ref="viewer" class="viewer" @click="get_x_y" @keydown.esc="app_store.toggle_picking_mode(false)">
-  </v-col>
+  <div style="position: relative;">
+    <view-toolbar />
+    <v-col v-element-size="resize" style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%"
+      ref="viewer" @click="get_x_y" @keydown.esc="app_store.toggle_picking_mode(false)">
+    </v-col>
+  </div>
 </template>
 
 <script setup>
@@ -10,8 +13,10 @@ import { useElementSize } from '@vueuse/core'
 
 const viewer_store = use_viewer_store()
 const { picking_mode } = storeToRefs(viewer_store)
+const websocket_store = use_websocket_store()
+const { client, is_client_created } = storeToRefs(websocket_store)
 
-function get_x_y (event) {
+function get_x_y(event) {
   if (picking_mode.value === true) {
     const { offsetX, offsetY } = event
     viewer_store.set_picked_point(offsetX, offsetY)
@@ -19,14 +24,13 @@ function get_x_y (event) {
 }
 
 const props = defineProps({
-  viewId: { type: String, default: '-1' },
-  client: { type: Object, required: true }
+  viewId: { type: String, default: '-1' }
 })
 
 const viewer = ref(null)
 const { width, height } = useElementSize(viewer)
 
-function resize () {
+function resize() {
   view.getCanvasView().setSize(1, 1)
   view.resize();
 }
@@ -41,7 +45,7 @@ watch(width, value => {
 watch(height, value => {
   resize()
 })
-const { client, viewId } = toRefs(props)
+const { viewId } = toRefs(props)
 const connected = ref(false)
 
 const view = vtkRemoteView.newInstance({ rpcWheelEvent: 'viewport.mouse.zoom.wheel' })
@@ -72,16 +76,13 @@ onMounted(async () => {
   }
 })
 
-function connect () {
+function connect() {
+  if (!is_client_created.value) { return }
+  console.log('connecting', client.value)
   const session = client.value.getConnection().getSession()
   view.setSession(session)
   view.setViewId(viewId.value)
   connected.value = true
   view.render()
 }
-function handleClick (event) {
-  onClick(event)
-}
-
-
 </script>
