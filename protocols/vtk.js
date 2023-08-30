@@ -1,5 +1,5 @@
 /* eslint-disable arrow-body-style */
-export default function createMethods (session) {
+function createMethods (session) {
   return {
     create_object_pipeline: (params) => session.call('create_object_pipeline', [params]),
     create_visualization: () => session.call('create_visualization', []),
@@ -14,3 +14,5 @@ export default function createMethods (session) {
     update_data: (params) => session.call('update_data', [params])
   };
 }
+
+export default createMethods
