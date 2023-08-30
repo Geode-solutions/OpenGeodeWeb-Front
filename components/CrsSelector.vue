@@ -29,12 +29,12 @@ watch(selected_crs, (new_value) => {
   set_crs(crs)
 })
 
-function set_crs (crs_value) {
+function set_crs(crs_value) {
   stepper_tree[variable_to_update] = crs_value
   stepper_tree[variable_to_increment]++
 }
 
-function get_selected_crs (crs_code) {
+function get_selected_crs(crs_code) {
   for (let i = 0; i <= crs_list.value.length; i++) {
     if (crs_list.value[i]['code'] == crs_code) {
       return crs_list.value[i]
@@ -42,7 +42,7 @@ function get_selected_crs (crs_code) {
   }
 }
 
-async function get_crs_table () {
+async function get_crs_table() {
   let params = new FormData()
   params.append('geode_object', geode_object)
   toggle_loading()
