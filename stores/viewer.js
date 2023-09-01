@@ -70,6 +70,24 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
+    async set_color(params) {
+      const websocket_store = use_websocket_store()
+      if (websocket_store.client) {
+        use_websocket_store().client
+          .getRemote()
+          .vtk.set_color(params)
+          .catch(console.error);
+      }
+    },
+    async set_vertex_attribute(params) {
+      const websocket_store = use_websocket_store()
+      if (websocket_store.client) {
+        use_websocket_store().client
+          .getRemote()
+          .vtk.set_vertex_attribute(params)
+          .catch(console.error);
+      }
+    },
     async apply_textures(params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
