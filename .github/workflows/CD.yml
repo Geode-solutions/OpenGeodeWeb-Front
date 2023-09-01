@@ -18,6 +18,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: npm publish --access public 
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
