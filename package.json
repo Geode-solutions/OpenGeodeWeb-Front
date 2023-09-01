@@ -2,10 +2,6 @@
   "name": "@geode/opengeodeweb-front",
   "private": false,
   "scripts": {
-    "release:major": "npm version $(semver $npm_package_version -i major) && npm publish --tag latest",
-    "release:minor": "npm version $(semver $npm_package_version -i minor) && npm publish --tag latest",
-    "release:patch": "npm version $(semver $npm_package_version -i patch) && npm publish --tag latest",
-    "release:beta": "npm version $(semver $npm_package_version -i prerelease --preid $(npm whoami) ) && npm publish --tag rc",
     "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore ."
   },
   "devDependencies": {
