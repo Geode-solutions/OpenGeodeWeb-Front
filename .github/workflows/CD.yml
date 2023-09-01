@@ -13,11 +13,11 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
       - run: |
           git config --global user.email "contact@geode-solutions.com"
           git config --global user.name "Geode-solutions"
-      - run: npm version patch
+          npm ci
+          npm run semantic-release
       - run: npm publish --access public 
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
