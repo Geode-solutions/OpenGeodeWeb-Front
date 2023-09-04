@@ -1,8 +1,8 @@
 <template>
   <div style="position: relative;">
     <view-toolbar />
-    <v-col v-element-size="resize" style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%"
-      ref="viewer" @click="get_x_y" @keydown.esc="app_store.toggle_picking_mode(false)">
+    <v-col style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%" ref="viewer"
+      @click="get_x_y" @keydown.esc="app_store.toggle_picking_mode(false)">
     </v-col>
   </div>
 </template>

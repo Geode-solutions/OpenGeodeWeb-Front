@@ -44,12 +44,13 @@ onMounted(() => {
   }
 })
 
-async function submit_recaptcha (token) {
+async function submit_recaptcha(token) {
   try {
     const response = await $fetch.raw(`/.netlify/functions/recaptcha?token=${token}`)
     cloud_store.$patch({ is_captcha_validated: response.status == 200 })
     recaptcha.reset()
   } catch (error) {
+    console.error(error)
   }
 }
 </script>

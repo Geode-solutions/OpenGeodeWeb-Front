@@ -1,7 +1,6 @@
-export async function api_fetch (request_url, request_options, { request_error_function, response_function, response_error_function } = {}) {
+export function api_fetch (request_url, request_options, { request_error_function, response_function, response_error_function } = {}) {
   const errors_store = use_errors_store()
   const cloud_store = use_cloud_store()
-
   return useFetch(request_url,
     {
       baseURL: cloud_store.geode_url,
