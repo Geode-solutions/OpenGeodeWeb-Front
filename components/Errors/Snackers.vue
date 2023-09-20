@@ -6,9 +6,8 @@
       <v-col cols="auto">
         <v-tooltip location="left">
           <span>
-            {{ error.code }}<br />
-            {{ error.route }}<br />
-            {{ error.description }}
+            error: {{ error.code }} {{ error.name }}<br />
+            ressource: {{ error.route }}
             <br>
           </span>
           <template #activator="{ props }">
@@ -19,7 +18,18 @@
         </v-tooltip>
       </v-col>
       <v-col cols="9" class="text-no-wrap overflow-hidden">
-        {{ error.name }}
+        <v-tooltip location="top">
+          <span>
+            {{ error.description }}
+            <br>
+          </span>
+          <template #activator="{ props }">
+            <div v-bind="props">
+              {{ error.description }}
+            </div>
+          </template>
+        </v-tooltip>
+
       </v-col>
       <v-spacer />
       <v-col cols="auto">
