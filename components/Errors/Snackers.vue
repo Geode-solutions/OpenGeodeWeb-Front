@@ -29,7 +29,6 @@
             </div>
           </template>
         </v-tooltip>
-
       </v-col>
       <v-spacer />
       <v-col cols="auto">
