@@ -1,8 +1,8 @@
 <template>
-  <div style="position: relative;">
+  <div style="position: relative; ">
     <view-toolbar />
     <v-col style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%" ref="viewer"
-      @click="get_x_y" @keydown.esc="app_store.toggle_picking_mode(false)">
+      @click="get_x_y" @keydown.esc="app_store.toggle_picking_mode(false)" class="pa-0">
     </v-col>
   </div>
 </template>
@@ -16,7 +16,7 @@ const { picking_mode } = storeToRefs(viewer_store)
 const websocket_store = use_websocket_store()
 const { client, is_client_created } = storeToRefs(websocket_store)
 
-function get_x_y(event) {
+function get_x_y (event) {
   if (picking_mode.value === true) {
     const { offsetX, offsetY } = event
     viewer_store.set_picked_point(offsetX, offsetY)
@@ -30,8 +30,8 @@ const props = defineProps({
 const viewer = ref(null)
 const { width, height } = useElementSize(viewer)
 
-function resize() {
-  view.getCanvasView().setSize(1, 1)
+function resize () {
+  view.getCanvasView().setSize(0, 0)
   view.resize();
 }
 
@@ -76,7 +76,7 @@ onMounted(async () => {
   }
 })
 
-function connect() {
+function connect () {
   if (!is_client_created.value) { return }
   console.log('connecting', client.value)
   const session = client.value.getConnection().getSession()

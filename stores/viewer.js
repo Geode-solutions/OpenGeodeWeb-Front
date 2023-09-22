@@ -6,17 +6,17 @@ export const use_viewer_store = defineStore('viewer', {
     picked_point: { x: null, y: null }
   }),
   actions: {
-    toggle_picking_mode(value) {
+    toggle_picking_mode (value) {
       this.picking_mode = value
     },
-    async set_picked_point(x, y) {
+    async set_picked_point (x, y) {
       const response = await get_point_position({ x, y })
       const { x: world_x, y: world_y } = response
       this.picked_point.x = world_x
       this.picked_point.y = world_y
       this.picking_mode = false
     },
-    async create_object_pipeline(params) {
+    async create_object_pipeline (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         use_websocket_store().client
@@ -25,7 +25,16 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
-    async reset_camera() {
+    async delete_object_pipeline (params) {
+      const websocket_store = use_websocket_store()
+      if (websocket_store.client) {
+        use_websocket_store().client
+          .getRemote()
+          .vtk.delete_object_pipeline(params)
+          .catch(console.error);
+      }
+    },
+    async reset_camera () {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         use_websocket_store().client
@@ -34,7 +43,7 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
-    async toggle_object_visibility(params) {
+    async toggle_object_visibility (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         use_websocket_store().client
@@ -43,7 +52,7 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
-    async toggle_edge_visibility(params) {
+    async toggle_edge_visibility (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         use_websocket_store().client
@@ -52,7 +61,7 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
-    async toggle_point_visibility(params) {
+    async toggle_point_visibility (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         use_websocket_store().client
@@ -61,7 +70,7 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
-    async point_size(params) {
+    async point_size (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         use_websocket_store().client
@@ -70,7 +79,7 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
-    async set_color(params) {
+    async set_color (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         use_websocket_store().client
@@ -79,7 +88,7 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
-    async set_vertex_attribute(params) {
+    async set_vertex_attribute (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         use_websocket_store().client
@@ -88,7 +97,7 @@ export const use_viewer_store = defineStore('viewer', {
           .catch(console.error);
       }
     },
-    async apply_textures(params) {
+    async apply_textures (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         websocket_store.$patch({ busy: true })
@@ -99,7 +108,7 @@ export const use_viewer_store = defineStore('viewer', {
         websocket_store.$patch({ busy: false })
       }
     },
-    async get_point_position(params) {
+    async get_point_position (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         websocket_store.$patch({ busy: true })
@@ -111,7 +120,7 @@ export const use_viewer_store = defineStore('viewer', {
         return response
       }
     },
-    async update_data(params) {
+    async update_data (params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         websocket_store.$patch({ busy: true })
@@ -123,7 +132,7 @@ export const use_viewer_store = defineStore('viewer', {
         return response
       }
     },
-    async reset() {
+    async reset () {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
         websocket_store.$patch({ busy: true })
