@@ -37,7 +37,6 @@ function resize () {
 
 watch(picking_mode, value => {
   const cursor = value == true ? 'crosshair' : 'pointer'
-  console.log('toggle')
   view.getCanvasView().setCursor(cursor)
 })
 watch(width, value => {
