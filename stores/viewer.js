@@ -10,7 +10,7 @@ export const use_viewer_store = defineStore('viewer', {
       this.picking_mode = value
     },
     async set_picked_point (x, y) {
-      const response = await get_point_position({ x, y })
+      const response = await this.get_point_position({ x, y })
       const { x: world_x, y: world_y } = response
       this.picked_point.x = world_x
       this.picked_point.y = world_y
