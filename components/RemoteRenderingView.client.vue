@@ -1,5 +1,5 @@
 <template>
-  <div style="position: relative; ">
+  <div style="position: relative; width: 100%; height: 100%;">
     <view-toolbar />
     <v-col style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%" ref="viewer"
       @click="get_x_y" @keydown.esc="app_store.toggle_picking_mode(false)" class="pa-0">
