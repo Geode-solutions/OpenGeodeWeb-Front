@@ -6,7 +6,6 @@ export const use_cloud_store = defineStore('cloud', {
     is_captcha_validated: false,
     is_cloud_running: false,
     is_connexion_launched: false,
-    request_counter: 0
   }),
   getters: {
     geode_url: (state) => {
@@ -26,9 +25,6 @@ export const use_cloud_store = defineStore('cloud', {
       viewer_url = viewer_url + '/ws'
       return viewer_url
     },
-    api_busy: (state) => {
-      return state.request_counter > 0
-    }
   },
   actions: {
     async create_connexion () {
@@ -64,7 +60,6 @@ export const use_cloud_store = defineStore('cloud', {
         errors_store.server_error = true
       }
     },
-
     ping_task () {
       setInterval(() => this.do_ping(), 10 * 1000)
     },
@@ -76,15 +71,6 @@ export const use_cloud_store = defineStore('cloud', {
       } else {
         errors_store.server_error = true
         console.log("error : ", error)
-      }
-    },
-
-    mutations: {
-      start_request (state) {
-        state.request_counter++
-      },
-      stop_request (state) {
-        state.request_counter--
       }
     }
   }
