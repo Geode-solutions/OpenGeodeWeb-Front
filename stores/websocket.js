@@ -16,9 +16,14 @@ export const use_websocket_store = defineStore('websocket', {
   state: () => ({
     client: {},
     config: null,
-    busy: false,
+    request_counter: 0,
     is_client_created: false
   }),
+  getters: {
+    websocket_busy: (state) => {
+      return state.request_counter > 0
+    }
+  },
   actions: {
     ws_connect () {
       const config = { application: 'cone' };
@@ -91,4 +96,10 @@ export const use_websocket_store = defineStore('websocket', {
       }
     },
   },
+  start_request (state) {
+    state.request_counter++
+  },
+  stop_request (state) {
+    state.request_counter--
+  }
 })

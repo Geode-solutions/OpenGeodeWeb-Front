@@ -26,6 +26,9 @@ export const use_cloud_store = defineStore('cloud', {
       viewer_url = viewer_url + '/ws'
       return viewer_url
     },
+    api_busy: (state) => {
+      return state.request_counter > 0
+    }
   },
   actions: {
     async create_connexion () {
