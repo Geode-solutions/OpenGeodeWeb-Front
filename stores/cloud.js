@@ -32,7 +32,7 @@ export const use_cloud_store = defineStore('cloud', {
     async create_connexion () {
       if (this.is_connexion_launched) { return }
       this.is_connexion_launched = true
-      if (ID === '' || ID === null || typeof ID === 'undefined') {
+      if (this.ID === '' || this.ID === null || typeof this.ID === 'undefined') {
         return this.create_backend()
       } else {
         const { data, error } = await useFetch(`${this.geode_url}/ping`, { method: 'POST' })
