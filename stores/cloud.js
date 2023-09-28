@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
+import { useStorage } from '@vueuse/core'
 
 export const use_cloud_store = defineStore('cloud', {
   state: () => ({
-    ID: '',
+    ID: useStorage('ID', ''),
     is_captcha_validated: false,
     is_cloud_running: false,
     is_connexion_launched: false,
@@ -31,14 +32,12 @@ export const use_cloud_store = defineStore('cloud', {
     async create_connexion () {
       if (this.is_connexion_launched) { return }
       this.is_connexion_launched = true
-      const ID = localStorage.getItem('ID')
-      if (ID === null || typeof ID === 'undefined') {
+      if (this.ID === '' || this.ID === null || typeof this.ID === 'undefined') {
         return this.create_backend()
       } else {
         const { data, error } = await useFetch(`${this.geode_url}/ping`, { method: 'POST' })
         console.log("error", error)
         if (data.value !== null) {
-          this.ID = ID
           this.is_cloud_running = true
           return this.ping_task()
         } else {
