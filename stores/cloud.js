@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
+import { useStorage } from '@vueuse/core'
 
 export const use_cloud_store = defineStore('cloud', {
   state: () => ({
-    ID: '',
+    ID: useStorage('ID', ''),
     is_captcha_validated: false,
     is_cloud_running: false,
     is_connexion_launched: false,
@@ -25,19 +26,28 @@ export const use_cloud_store = defineStore('cloud', {
       viewer_url = viewer_url + '/ws'
       return viewer_url
     },
+    is_cloud_running: (state) => {
+      const geode_store = use_geode_store()
+      const websocket_store = use_websocket_store()
+      return state.is_cloud_running
+    },
+    is_cloud_busy: () => {
+      const geode_store = use_geode_store()
+      const websocket_store = use_websocket_store()
+      return geode_store.api_busy() && websocket_store.websocket_busy()
+    }
+
   },
   actions: {
     async create_connexion () {
       if (this.is_connexion_launched) { return }
       this.is_connexion_launched = true
-      const ID = localStorage.getItem('ID')
-      if (ID === null || typeof ID === 'undefined') {
+      if (this.ID === '' || this.ID === null || typeof this.ID === 'undefined') {
         return this.create_backend()
       } else {
         const { data, error } = await useFetch(`${this.geode_url}/ping`, { method: 'POST' })
         console.log("error", error)
         if (data.value !== null) {
-          this.ID = ID
           this.is_cloud_running = true
           return this.ping_task()
         } else {
@@ -60,6 +70,7 @@ export const use_cloud_store = defineStore('cloud', {
         errors_store.server_error = true
       }
     },
+
     ping_task () {
       setInterval(() => this.do_ping(), 10 * 1000)
     },
