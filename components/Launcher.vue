@@ -22,11 +22,7 @@ const websocket_store = use_websocket_store()
 const cloud_store = use_cloud_store()
 const { is_cloud_running, is_captcha_validated, is_connexion_launched } = storeToRefs(cloud_store)
 
-const props = defineProps({
-  site_key: { type: String, required: true }
-})
-
-const { site_key } = toRefs(props)
+const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
 
 watch(is_captcha_validated, async (value) => {
   if (value === true && process.client) {
@@ -44,7 +40,7 @@ onMounted(() => {
   }
 })
 
-async function submit_recaptcha(token) {
+async function submit_recaptcha (token) {
   try {
     const response = await $fetch.raw(`/.netlify/functions/recaptcha?token=${token}`)
     cloud_store.$patch({ is_captcha_validated: response.status == 200 })
