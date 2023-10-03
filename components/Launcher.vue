@@ -8,7 +8,7 @@
         <vue-recaptcha ref="recaptcha" :sitekey="site_key" :loadRecaptchaScript="true"
           @expired="is_captcha_validated = false" @verify="submit_recaptcha" align-self="center" />
       </v-col>
-      <v-col v-if="!is_cloud_running && is_connexion_launched">
+      <v-col v-if="!cloud_store.is_running">
         <Loading />
       </v-col>
     </v-row>
@@ -20,7 +20,7 @@ import { VueRecaptcha } from "vue-recaptcha"
 
 const websocket_store = use_websocket_store()
 const cloud_store = use_cloud_store()
-const { is_cloud_running, is_captcha_validated, is_connexion_launched } = storeToRefs(cloud_store)
+const { is_captcha_validated } = storeToRefs(cloud_store)
 
 const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
 

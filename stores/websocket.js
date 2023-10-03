@@ -16,23 +16,32 @@ export const use_websocket_store = defineStore('websocket', {
     client: {},
     config: null,
     request_counter: 0,
-    is_client_created: false
+    is_running: false
   }),
   getters: {
-    websocket_busy: (state) => {
+    base_url: () => {
+      const cloud_store = use_cloud_store()
+      const public_runtime_config = useRuntimeConfig().public
+      var viewer_url = `${public_runtime_config.VIEWER_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.VIEWER_PORT}`
+      if (process.env.NODE_ENV == 'production') {
+        viewer_url = viewer_url + `/${cloud_store.ID}/viewer`
+      }
+      viewer_url = viewer_url + '/ws'
+      return viewer_url
+    },
+    is_busy: (state) => {
       return state.request_counter > 0
     }
   },
   actions: {
     ws_connect () {
       const config = { application: 'cone' };
-      const cloud_store = use_cloud_store()
-      config.sessionURL = cloud_store.viewer_url
+      config.sessionURL = this.base_url
 
       const { client } = this
-      if (this.is_client_created && client.isConnected()) {
+      if (this.is_running && client.isConnected()) {
         client.disconnect(-1);
-        this.is_client_created = false;
+        this.is_running = false;
       }
       let clientToConnect = client;
       if (_.isEmpty(clientToConnect)) {
@@ -74,7 +83,7 @@ export const use_websocket_store = defineStore('websocket', {
           // Now that the client is ready let's setup the server for us
           this.ws_initialize_server()
           this.client.getRemote().vtk.reset().catch(console.error);
-          this.is_client_created = true;
+          this.is_running = true;
         })
         .catch((error) => {
           console.error(error);
@@ -94,11 +103,11 @@ export const use_websocket_store = defineStore('websocket', {
         this.client.getRemote().vtk.reset_camera().catch(console.error);
       }
     },
-  },
-  start_request () {
-    this.request_counter++
-  },
-  stop_request () {
-    this.request_counter--
+    start_request () {
+      this.request_counter++
+    },
+    stop_request () {
+      this.request_counter--
+    }
   }
 })

@@ -14,7 +14,7 @@ import { useElementSize } from '@vueuse/core'
 const viewer_store = use_viewer_store()
 const { picking_mode } = storeToRefs(viewer_store)
 const websocket_store = use_websocket_store()
-const { client, is_client_created } = storeToRefs(websocket_store)
+const { client } = storeToRefs(websocket_store)
 
 function get_x_y (event) {
   if (picking_mode.value === true) {
@@ -77,7 +77,7 @@ onMounted(async () => {
 })
 
 function connect () {
-  if (!is_client_created.value) { return }
+  if (!websocket_store.is_running) { return }
   console.log('connecting', client.value)
   const session = client.value.getConnection().getSession()
   view.setSession(session)
