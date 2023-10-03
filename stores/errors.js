@@ -1,5 +1,3 @@
-import { defineStore } from 'pinia'
-
 export const use_errors_store = defineStore('errors', {
   state: () => ({
     errors: [],

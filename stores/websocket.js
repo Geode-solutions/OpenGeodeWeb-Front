@@ -1,4 +1,3 @@
-import { defineStore } from 'pinia'
 import _ from 'lodash'
 
 import vtkWSLinkClient from '@kitware/vtk.js/IO/Core/WSLinkClient'
@@ -96,10 +95,10 @@ export const use_websocket_store = defineStore('websocket', {
       }
     },
   },
-  start_request (state) {
-    state.request_counter++
+  start_request () {
+    this.request_counter++
   },
-  stop_request (state) {
-    state.request_counter--
+  stop_request () {
+    this.request_counter--
   }
 })
