@@ -4,13 +4,13 @@
       <v-col>
         <Header :tool_name="tool_name" :cards_list="cards_list" />
       </v-col>
-      <v-col v-if="!is_cloud_running">
+      <v-col v-if="!cloud_store.is_running">
         <Launcher />
       </v-col>
-      <v-col v-if="is_cloud_running">
+      <v-col v-if="cloud_store.is_running">
         <Stepper />
       </v-col>
-      <v-col v-if="is_cloud_running">
+      <v-col v-if="cloud_store.is_running">
         <PackagesVersions :route_prefix="route_prefix" />
       </v-col>
     </v-row>
@@ -19,7 +19,6 @@
 
 <script setup>
 const cloud_store = use_cloud_store()
-const { is_cloud_running } = storeToRefs(cloud_store)
 
 const props = defineProps({
   cards_list: { type: Array, required: true },

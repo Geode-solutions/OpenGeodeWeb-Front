@@ -1,35 +1,23 @@
-import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 
 export const use_cloud_store = defineStore('cloud', {
   state: () => ({
     ID: useStorage('ID', ''),
     is_captcha_validated: false,
-    is_cloud_running: false,
     is_connexion_launched: false,
-    request_counter: 0
   }),
   getters: {
-    geode_url: (state) => {
-      const public_runtime_config = useRuntimeConfig().public
-      var geode_url = `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}`
-      if (process.env.NODE_ENV == 'production') {
-        geode_url = geode_url + `/${state.ID}/geode`
-      }
-      return geode_url
+    is_running: () => {
+      return use_geode_store().is_running && use_websocket_store().is_running
     },
-    viewer_url: (state) => {
-      const public_runtime_config = useRuntimeConfig().public
-      var viewer_url = `${public_runtime_config.VIEWER_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.VIEWER_PORT}`
-      if (process.env.NODE_ENV == 'production') {
-        viewer_url = viewer_url + `/${state.ID}/viewer`
-      }
-      viewer_url = viewer_url + '/ws'
-      return viewer_url
-    },
+    is_busy: () => {
+      return use_geode_store().is_busy || use_websocket_store().is_busy
+    }
+
   },
   actions: {
     async create_connexion () {
+      const geode_store = use_geode_store()
       if (this.is_connexion_launched) { return }
       this.is_connexion_launched = true
       if (this.ID === '' || this.ID === null || typeof this.ID === 'undefined') {
@@ -38,14 +26,15 @@ export const use_cloud_store = defineStore('cloud', {
         const { data, error } = await useFetch(`${this.geode_url}/ping`, { method: 'POST' })
         console.log("error", error)
         if (data.value !== null) {
-          this.is_cloud_running = true
-          return this.ping_task()
+          geode_store.is_running = true
+          return geode_store.ping_task()
         } else {
           return this.create_backend()
         }
       }
     },
     async create_backend () {
+      const geode_store = use_geode_store()
       const errors_store = use_errors_store()
       const config = useRuntimeConfig()
       const public_runtime_config = config.public
@@ -53,35 +42,12 @@ export const use_cloud_store = defineStore('cloud', {
       if (data.value !== null) {
         this.ID = data.value.ID
         localStorage.setItem('ID', data.value.ID)
-        this.is_cloud_running = true
-        return this.ping_task()
+        geode_store.is_running = true
+        return geode_store.ping_task()
       } else {
         console.log("error : ", error)
         errors_store.server_error = true
       }
     },
-
-    ping_task () {
-      setInterval(() => this.do_ping(), 10 * 1000)
-    },
-    async do_ping () {
-      const errors_store = use_errors_store()
-      const { data, error } = await useFetch(`${this.geode_url}/ping`, { method: 'POST' })
-      if (data.value !== null) {
-        this.is_cloud_running = true
-      } else {
-        errors_store.server_error = true
-        console.log("error : ", error)
-      }
-    },
-
-    mutations: {
-      start_request (state) {
-        state.request_counter++
-      },
-      stop_request (state) {
-        state.request_counter--
-      }
-    }
   }
 })

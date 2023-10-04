@@ -22,7 +22,6 @@ const props = defineProps({
 const { route_prefix } = props
 
 const cloud_store = use_cloud_store()
-const { is_cloud_running } = storeToRefs(cloud_store)
 
 const packages_versions = ref([])
 
@@ -34,20 +33,20 @@ async function get_packages_versions () {
   })
 }
 
-watch(is_cloud_running, (value) => {
+watch(cloud_store.is_running, (value) => {
   if (value === true) {
     get_packages_versions()
   }
 })
 
 onMounted(() => {
-  if (is_cloud_running.value === true) {
+  if (cloud_store.is_running === true) {
     get_packages_versions()
   }
 })
 
 onActivated(() => {
-  if (is_cloud_running.value === true) {
+  if (cloud_store.is_running === true) {
     get_packages_versions()
   }
 })
