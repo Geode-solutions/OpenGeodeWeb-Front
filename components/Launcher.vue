@@ -8,7 +8,7 @@
         <vue-recaptcha ref="recaptcha" :sitekey="site_key" :loadRecaptchaScript="true"
           @expired="is_captcha_validated = false" @verify="submit_recaptcha" align-self="center" />
       </v-col>
-      <v-col v-else-if="!cloud_store.is_running && !cloud_store.is_connexion_launched">
+      <v-col v-else-if="!cloud_store.is_running && cloud_store.is_connexion_launched">
         <Loading />
       </v-col>
     </v-row>

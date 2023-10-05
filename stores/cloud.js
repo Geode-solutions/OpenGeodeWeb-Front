@@ -12,8 +12,7 @@ export const use_cloud_store = defineStore('cloud', {
     },
     is_busy: () => {
       return use_geode_store().is_busy || use_websocket_store().is_busy
-    }
-
+    },
   },
   actions: {
     async create_connexion () {
