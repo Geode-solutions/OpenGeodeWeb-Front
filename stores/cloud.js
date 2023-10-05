@@ -23,7 +23,7 @@ export const use_cloud_store = defineStore('cloud', {
       if (this.ID === '' || this.ID === null || typeof this.ID === 'undefined') {
         return this.create_backend()
       } else {
-        const { data, error } = await useFetch(`${this.geode_url}/ping`, { method: 'POST' })
+        const { data, error } = await useFetch(`${geode_store.base_url}/ping`, { method: 'POST' })
         console.log("error", error)
         if (data.value !== null) {
           geode_store.is_running = true

@@ -24,9 +24,9 @@ export const use_websocket_store = defineStore('websocket', {
       const public_runtime_config = useRuntimeConfig().public
       var viewer_url = `${public_runtime_config.VIEWER_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.VIEWER_PORT}`
       if (process.env.NODE_ENV == 'production') {
-        viewer_url = viewer_url + `/${cloud_store.ID}/viewer`
+        viewer_url += `/${cloud_store.ID}/viewer`
       }
-      viewer_url = viewer_url + '/ws'
+      viewer_url += '/ws'
       return viewer_url
     },
     is_busy: (state) => {
@@ -90,7 +90,6 @@ export const use_websocket_store = defineStore('websocket', {
         });
     },
     ws_initialize_server () {
-
       if (!_.isEmpty(this.client)) {
         this.client
           .getRemote()
