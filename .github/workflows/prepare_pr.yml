@@ -5,7 +5,7 @@ on:
     branches:
       - next
 
-jobs:  
+jobs:
   prepare:
-    uses: Geode-solutions/actions/.github/workflows/web/prepare-pr.yml@master
+    uses: Geode-solutions/actions/.github/workflows/web-prepare-pr.yml@master
     secrets: inherit
