@@ -1,8 +1,8 @@
-import { useStorage } from '@vueuse/core'
+import { useStorage } from "@vueuse/core"
 
-export const use_cloud_store = defineStore('cloud', {
+export const use_cloud_store = defineStore("cloud", {
   state: () => ({
-    ID: useStorage('ID', ''),
+    ID: useStorage("ID", ""),
     is_captcha_validated: false,
     is_connexion_launched: false,
   }),
@@ -15,14 +15,22 @@ export const use_cloud_store = defineStore('cloud', {
     },
   },
   actions: {
-    async create_connexion () {
+    async create_connexion() {
       const geode_store = use_geode_store()
-      if (this.is_connexion_launched) { return }
+      if (this.is_connexion_launched) {
+        return
+      }
       this.is_connexion_launched = true
-      if (this.ID === '' || this.ID === null || typeof this.ID === 'undefined') {
+      if (
+        this.ID === "" ||
+        this.ID === null ||
+        typeof this.ID === "undefined"
+      ) {
         return this.create_backend()
       } else {
-        const { data, error } = await useFetch(`${geode_store.base_url}/ping`, { method: 'POST' })
+        const { data, error } = await useFetch(`${geode_store.base_url}/ping`, {
+          method: "POST",
+        })
         console.log("error", error)
         if (data.value !== null) {
           geode_store.is_running = true
@@ -32,15 +40,18 @@ export const use_cloud_store = defineStore('cloud', {
         }
       }
     },
-    async create_backend () {
+    async create_backend() {
       const geode_store = use_geode_store()
       const errors_store = use_errors_store()
       const config = useRuntimeConfig()
       const public_runtime_config = config.public
-      const { data, error } = await useFetch(`${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}${public_runtime_config.SITE_BRANCH}/${public_runtime_config.PROJECT}/createbackend`, { method: 'POST' })
+      const { data, error } = await useFetch(
+        `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}${public_runtime_config.SITE_BRANCH}/${public_runtime_config.PROJECT}/createbackend`,
+        { method: "POST" },
+      )
       if (data.value !== null) {
         this.ID = data.value.ID
-        localStorage.setItem('ID', data.value.ID)
+        localStorage.setItem("ID", data.value.ID)
         geode_store.is_running = true
         return geode_store.ping_task()
       } else {
@@ -48,5 +59,5 @@ export const use_cloud_store = defineStore('cloud', {
         errors_store.server_error = true
       }
     },
-  }
+  },
 })
