@@ -7,5 +7,5 @@ jobs:
   check-branch-protection:
     uses: Geode-solutions/actions/.github/workflows/branch-protection.yml@master
     with:
-      branch_from: 'next'
-      branch_to: 'master'
+      branch_from: "next"
+      branch_to: "master"
