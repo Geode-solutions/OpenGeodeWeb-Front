@@ -34,7 +34,7 @@ export const use_websocket_store = defineStore("websocket", {
   },
   actions: {
     ws_connect() {
-      const config = { application: "cone" }
+      const config = { application: "Geode" }
       config.sessionURL = this.base_url
 
       const { client } = this
