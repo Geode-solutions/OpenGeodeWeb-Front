@@ -8,6 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Run prettier
+        run: |
+          npm install prettier
+          npx prettier . --check
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
         id: semantic
