@@ -51,46 +51,46 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  step_index: { type: Number, required: true },
-})
-const { step_index } = props
-const stepper_tree = inject('stepper_tree')
-const { current_step_index, steps } = toRefs(stepper_tree)
+  const props = defineProps({
+    step_index: { type: Number, required: true },
+  })
+  const { step_index } = props
+  const stepper_tree = inject("stepper_tree")
+  const { current_step_index, steps } = toRefs(stepper_tree)
 
-function skippable() {
-  if (stepper_tree.steps[step_index].component.skippable !== undefined) {
-    return stepper_tree.steps[step_index].component.skippable
-  } else {
-    return false
+  function skippable() {
+    if (stepper_tree.steps[step_index].component.skippable !== undefined) {
+      return stepper_tree.steps[step_index].component.skippable
+    } else {
+      return false
+    }
   }
-}
 
-function skipStep() {
-  stepper_tree.current_step_index++
-}
+  function skipStep() {
+    stepper_tree.current_step_index++
+  }
 
-function set_current_step(step_index) {
-  stepper_tree.current_step_index = step_index
-}
+  function set_current_step(step_index) {
+    stepper_tree.current_step_index = step_index
+  }
 </script>
 
 <style>
-.card {
-  border-radius: 15px;
-}
+  .card {
+    border-radius: 15px;
+  }
 
-.slide-fade-enter-active {
-  transition: all 0.5s ease-out;
-}
+  .slide-fade-enter-active {
+    transition: all 0.5s ease-out;
+  }
 
-.slide-fade-leave-active {
-  transition: all 0.5s ease-in;
-}
+  .slide-fade-leave-active {
+    transition: all 0.5s ease-in;
+  }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateX(50px);
-  opacity: 0;
-}
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
+    transform: translateX(50px);
+    opacity: 0;
+  }
 </style>

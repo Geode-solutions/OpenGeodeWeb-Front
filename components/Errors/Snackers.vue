@@ -55,18 +55,18 @@
 </template>
 
 <script setup>
-const errors_store = use_errors_store()
-const { errors } = storeToRefs(errors_store)
+  const errors_store = use_errors_store()
+  const { errors } = storeToRefs(errors_store)
 
-const show = true
+  const show = true
 
-function calc_margin(index) {
-  return index * 60 + 8 + 'px'
-}
+  function calc_margin(index) {
+    return index * 60 + 8 + "px"
+  }
 </script>
 
 <style scoped>
-.v-snackbar :deep(.v-snackbar__content) {
-  width: 100%;
-}
+  .v-snackbar :deep(.v-snackbar__content) {
+    width: 100%;
+  }
 </style>

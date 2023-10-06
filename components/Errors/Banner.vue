@@ -43,16 +43,16 @@
 </template>
 
 <script setup>
-const errors_store = use_errors_store()
-const { server_error } = storeToRefs(errors_store)
+  const errors_store = use_errors_store()
+  const { server_error } = storeToRefs(errors_store)
 
-function reload() {
-  window.location.reload()
-}
+  function reload() {
+    window.location.reload()
+  }
 </script>
 
 <style scoped>
-.v-btn {
-  text-transform: unset !important;
-}
+  .v-btn {
+    text-transform: unset !important;
+  }
 </style>

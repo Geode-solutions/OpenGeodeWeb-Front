@@ -1,7 +1,7 @@
 export function api_fetch(
   request_url,
   request_options,
-  { request_error_function, response_function, response_error_function } = {}
+  { request_error_function, response_function, response_error_function } = {},
 ) {
   const errors_store = use_errors_store()
   const geode_store = use_geode_store()
@@ -15,7 +15,7 @@ export function api_fetch(
       // MUST STAY HERE FOR EASIER DEBUG
       // console.log('onRequestError', error)
       errors_store.add_error({
-        code: '',
+        code: "",
         route: request_url,
         name: error.message,
         description: error.stack,

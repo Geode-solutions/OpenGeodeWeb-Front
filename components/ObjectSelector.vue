@@ -27,47 +27,47 @@
 </template>
 
 <script setup>
-import geode_objects from '@/assets/geode_objects'
+  import geode_objects from "@/assets/geode_objects"
 
-const stepper_tree = inject('stepper_tree')
-const { files, route_prefix } = stepper_tree
+  const stepper_tree = inject("stepper_tree")
+  const { files, route_prefix } = stepper_tree
 
-const props = defineProps({
-  variable_to_update: { type: String, required: true },
-  variable_to_increment: { type: String, required: true },
-})
+  const props = defineProps({
+    variable_to_update: { type: String, required: true },
+    variable_to_increment: { type: String, required: true },
+  })
 
-const { variable_to_update, variable_to_increment } = props
+  const { variable_to_update, variable_to_increment } = props
 
-const allowed_objects = ref([])
+  const allowed_objects = ref([])
 
-async function get_allowed_objects() {
-  const params = new FormData()
-  params.append('filename', files[0].name)
+  async function get_allowed_objects() {
+    const params = new FormData()
+    params.append("filename", files[0].name)
 
-  await api_fetch(
-    `${route_prefix}/allowed_objects`,
-    { method: 'POST', body: params },
-    {
-      response_function: (response) => {
-        allowed_objects.value = response._data.allowed_objects
+    await api_fetch(
+      `${route_prefix}/allowed_objects`,
+      { method: "POST", body: params },
+      {
+        response_function: (response) => {
+          allowed_objects.value = response._data.allowed_objects
+        },
       },
-    }
-  )
-}
+    )
+  }
 
-function set_geode_object(geode_object) {
-  stepper_tree[variable_to_update] = geode_object
-  stepper_tree[variable_to_increment]++
-}
+  function set_geode_object(geode_object) {
+    stepper_tree[variable_to_update] = geode_object
+    stepper_tree[variable_to_increment]++
+  }
 
-onMounted(() => {
-  get_allowed_objects()
-})
+  onMounted(() => {
+    get_allowed_objects()
+  })
 </script>
 
 <style scoped>
-.card {
-  border-radius: 15px;
-}
+  .card {
+    border-radius: 15px;
+  }
 </style>

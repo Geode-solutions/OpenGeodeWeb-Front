@@ -1,4 +1,4 @@
-import vtk from './vtk'
+import vtk from "./vtk"
 
 export default {
   vtk,

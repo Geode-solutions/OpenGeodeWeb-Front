@@ -18,13 +18,13 @@
 </template>
 
 <script setup>
-const cloud_store = use_cloud_store()
+  const cloud_store = use_cloud_store()
 
-const props = defineProps({
-  cards_list: { type: Array, required: true },
-})
-const { cards_list } = props
+  const props = defineProps({
+    cards_list: { type: Array, required: true },
+  })
+  const { cards_list } = props
 
-const stepper_tree = inject('stepper_tree')
-const { tool_name, route_prefix } = stepper_tree
+  const stepper_tree = inject("stepper_tree")
+  const { tool_name, route_prefix } = stepper_tree
 </script>

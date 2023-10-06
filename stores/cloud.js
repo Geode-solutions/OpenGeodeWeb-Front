@@ -1,8 +1,8 @@
-import { useStorage } from '@vueuse/core'
+import { useStorage } from "@vueuse/core"
 
-export const use_cloud_store = defineStore('cloud', {
+export const use_cloud_store = defineStore("cloud", {
   state: () => ({
-    ID: useStorage('ID', ''),
+    ID: useStorage("ID", ""),
     is_captcha_validated: false,
     is_connexion_launched: false,
   }),
@@ -22,16 +22,16 @@ export const use_cloud_store = defineStore('cloud', {
       }
       this.is_connexion_launched = true
       if (
-        this.ID === '' ||
+        this.ID === "" ||
         this.ID === null ||
-        typeof this.ID === 'undefined'
+        typeof this.ID === "undefined"
       ) {
         return this.create_backend()
       } else {
         const { data, error } = await useFetch(`${geode_store.base_url}/ping`, {
-          method: 'POST',
+          method: "POST",
         })
-        console.log('error', error)
+        console.log("error", error)
         if (data.value !== null) {
           geode_store.is_running = true
           return geode_store.ping_task()
@@ -47,15 +47,15 @@ export const use_cloud_store = defineStore('cloud', {
       const public_runtime_config = config.public
       const { data, error } = await useFetch(
         `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}${public_runtime_config.SITE_BRANCH}/${public_runtime_config.PROJECT}/createbackend`,
-        { method: 'POST' }
+        { method: "POST" },
       )
       if (data.value !== null) {
         this.ID = data.value.ID
-        localStorage.setItem('ID', data.value.ID)
+        localStorage.setItem("ID", data.value.ID)
         geode_store.is_running = true
         return geode_store.ping_task()
       } else {
-        console.log('error : ', error)
+        console.log("error : ", error)
         errors_store.server_error = true
       }
     },

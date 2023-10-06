@@ -1,4 +1,4 @@
-export const use_viewer_store = defineStore('viewer', {
+export const use_viewer_store = defineStore("viewer", {
   state: () => ({
     picking_mode: false,
     picked_point: { x: null, y: null },

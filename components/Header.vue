@@ -39,8 +39,8 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  tool_name: { type: String, required: true },
-  cards_list: { type: Object, required: true },
-})
+  const props = defineProps({
+    tool_name: { type: String, required: true },
+    cards_list: { type: Object, required: true },
+  })
 </script>

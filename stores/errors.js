@@ -1,4 +1,4 @@
-export const use_errors_store = defineStore('errors', {
+export const use_errors_store = defineStore("errors", {
   state: () => ({
     errors: [],
     server_error: false,

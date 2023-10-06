@@ -1,16 +1,16 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import vtkWSLinkClient from '@kitware/vtk.js/IO/Core/WSLinkClient'
-import SmartConnect from 'wslink/src/SmartConnect'
+import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
+import SmartConnect from "wslink/src/SmartConnect"
 
-import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry'
-import { connectImageStream } from '@kitware/vtk.js/Rendering/Misc/RemoteView'
-import protocols from '@/protocols'
+import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
+import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
+import protocols from "@/protocols"
 
 // Bind vtkWSLinkClient to our SmartConnect
 vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
-export const use_websocket_store = defineStore('websocket', {
+export const use_websocket_store = defineStore("websocket", {
   state: () => ({
     client: {},
     config: null,
@@ -22,10 +22,10 @@ export const use_websocket_store = defineStore('websocket', {
       const cloud_store = use_cloud_store()
       const public_runtime_config = useRuntimeConfig().public
       var viewer_url = `${public_runtime_config.VIEWER_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.VIEWER_PORT}`
-      if (process.env.NODE_ENV == 'production') {
+      if (process.env.NODE_ENV == "production") {
         viewer_url += `/${cloud_store.ID}/viewer`
       }
-      viewer_url += '/ws'
+      viewer_url += "/ws"
       return viewer_url
     },
     is_busy: (state) => {
@@ -34,7 +34,7 @@ export const use_websocket_store = defineStore('websocket', {
   },
   actions: {
     ws_connect() {
-      const config = { application: 'cone' }
+      const config = { application: "cone" }
       config.sessionURL = this.base_url
 
       const { client } = this
