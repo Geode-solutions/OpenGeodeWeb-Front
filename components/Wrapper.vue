@@ -27,5 +27,4 @@ const { cards_list } = props
 
 const stepper_tree = inject('stepper_tree')
 const { tool_name, route_prefix } = stepper_tree
-
 </script>

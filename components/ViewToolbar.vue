@@ -4,10 +4,13 @@
       <v-tooltip location="left">
         Reset camera
         <template #activator="{ props }">
-          <v-btn @click.stop=reset_camera density="comfortable" v-bind="props" icon>
-            <v-icon size="32">
-              mdi-cube-scan
-            </v-icon>
+          <v-btn
+            @click.stop="reset_camera"
+            density="comfortable"
+            v-bind="props"
+            icon
+          >
+            <v-icon size="32"> mdi-cube-scan </v-icon>
           </v-btn>
         </template>
       </v-tooltip>
@@ -17,7 +20,7 @@
 
 <script setup>
 const viewer_store = use_viewer_store()
-function reset_camera () {
+function reset_camera() {
   viewer_store.reset_camera()
 }
 </script>

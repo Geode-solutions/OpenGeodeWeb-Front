@@ -8,15 +8,14 @@ import { connectImageStream } from '@kitware/vtk.js/Rendering/Misc/RemoteView'
 import protocols from '@/protocols'
 
 // Bind vtkWSLinkClient to our SmartConnect
-vtkWSLinkClient.setSmartConnectClass(SmartConnect);
-
+vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
 export const use_websocket_store = defineStore('websocket', {
   state: () => ({
     client: {},
     config: null,
     request_counter: 0,
-    is_running: false
+    is_running: false,
   }),
   getters: {
     base_url: () => {
@@ -31,82 +30,79 @@ export const use_websocket_store = defineStore('websocket', {
     },
     is_busy: (state) => {
       return state.request_counter > 0
-    }
+    },
   },
   actions: {
-    ws_connect () {
-      const config = { application: 'cone' };
+    ws_connect() {
+      const config = { application: 'cone' }
       config.sessionURL = this.base_url
 
       const { client } = this
       if (this.is_running && client.isConnected()) {
-        client.disconnect(-1);
-        this.is_running = false;
+        client.disconnect(-1)
+        this.is_running = false
       }
-      let clientToConnect = client;
+      let clientToConnect = client
       if (_.isEmpty(clientToConnect)) {
-        clientToConnect = vtkWSLinkClient.newInstance({ protocols });
+        clientToConnect = vtkWSLinkClient.newInstance({ protocols })
       }
 
       // Connect to busy store
       clientToConnect.onBusyChange((count) => {
         this.buzy = count
-      });
-      clientToConnect.beginBusy();
+      })
+      clientToConnect.beginBusy()
 
       // Error
       clientToConnect.onConnectionError((httpReq) => {
         const message =
           (httpReq && httpReq.response && httpReq.response.error) ||
-          `Connection error`;
-        console.error(message);
-        console.log(httpReq);
-      });
+          `Connection error`
+        console.error(message)
+        console.log(httpReq)
+      })
 
       // Close
       clientToConnect.onConnectionClose((httpReq) => {
         const message =
           (httpReq && httpReq.response && httpReq.response.error) ||
-          `Connection close`;
-        console.error(message);
-        console.log(httpReq);
-      });
+          `Connection close`
+        console.error(message)
+        console.log(httpReq)
+      })
 
       // Connect
       clientToConnect
         .connect(config)
         .then((validClient) => {
-          connectImageStream(validClient.getConnection().getSession());
+          connectImageStream(validClient.getConnection().getSession())
           this.client = validClient
-          clientToConnect.endBusy();
+          clientToConnect.endBusy()
 
           // Now that the client is ready let's setup the server for us
           this.ws_initialize_server()
-          this.client.getRemote().vtk.reset().catch(console.error);
-          this.is_running = true;
+          this.client.getRemote().vtk.reset().catch(console.error)
+          this.is_running = true
         })
         .catch((error) => {
-          console.error(error);
-        });
+          console.error(error)
+        })
     },
-    ws_initialize_server () {
+    ws_initialize_server() {
       if (!_.isEmpty(this.client)) {
-        this.client
-          .getRemote()
-          .vtk.create_visualization()
-          .catch(console.error);
+        this.client.getRemote().vtk.create_visualization().catch(console.error)
       }
     },
-    reset_camera () {
+    reset_camera() {
       if (!_.isEmpty(this.client)) {
-        this.client.getRemote().vtk.reset_camera().catch(console.error);
+        this.client.getRemote().vtk.reset_camera().catch(console.error)
       }
     },
-    start_request () {
+    start_request() {
       this.request_counter++
     },
-    stop_request () {
+    stop_request() {
       this.request_counter--
-    }
-  }
+    },
+  },
 })

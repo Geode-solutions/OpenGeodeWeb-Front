@@ -1,7 +1,7 @@
 export const use_geode_store = defineStore('geode', {
   state: () => ({
     request_counter: 0,
-    is_running: false
+    is_running: false,
   }),
   getters: {
     base_url: () => {
@@ -16,27 +16,29 @@ export const use_geode_store = defineStore('geode', {
     },
     is_busy: (state) => {
       return state.request_counter > 0
-    }
+    },
   },
   actions: {
-    ping_task () {
+    ping_task() {
       setInterval(() => this.do_ping(), 10 * 1000)
     },
-    async do_ping () {
+    async do_ping() {
       const errors_store = use_errors_store()
-      const { data, error } = await useFetch(`${this.base_url}/ping`, { method: 'POST' })
+      const { data, error } = await useFetch(`${this.base_url}/ping`, {
+        method: 'POST',
+      })
       if (data.value !== null) {
         this.is_running = true
       } else {
         errors_store.server_error = true
-        console.log("error : ", error)
+        console.log('error : ', error)
       }
     },
-    start_request () {
+    start_request() {
       this.request_counter++
     },
-    stop_request () {
+    stop_request() {
       this.request_counter--
-    }
-  }
+    },
+  },
 })

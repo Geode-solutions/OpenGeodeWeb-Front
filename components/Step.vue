@@ -2,27 +2,49 @@
   <v-card class="pa-5 card" elevation="5">
     <v-row align="center" @click="set_current_step(step_index)">
       <v-col cols="auto">
-        <v-icon v-if="current_step_index > step_index" icon="mdi-check-circle" color="grey" />
-        <v-icon v-else-if="current_step_index == step_index" :icon="`mdi-numeric-${step_index + 1}-circle`"
-          color="primary" />
-        <v-icon v-else :icon="`mdi-numeric-${step_index + 1}-circle`" color="grey" />
+        <v-icon
+          v-if="current_step_index > step_index"
+          icon="mdi-check-circle"
+          color="grey"
+        />
+        <v-icon
+          v-else-if="current_step_index == step_index"
+          :icon="`mdi-numeric-${step_index + 1}-circle`"
+          color="primary"
+        />
+        <v-icon
+          v-else
+          :icon="`mdi-numeric-${step_index + 1}-circle`"
+          color="grey"
+        />
       </v-col>
       <v-col cols="auto">
         <p class="font-weight-bold">
           {{ steps[step_index].step_title }}
         </p>
       </v-col>
-      <v-col v-if="steps[step_index].chips.length && (current_step_index >= step_index)">
-        <v-chip v-for="(chip, chip_index) in steps[step_index].chips" :key="chip_index">
+      <v-col
+        v-if="
+          steps[step_index].chips.length && current_step_index >= step_index
+        "
+      >
+        <v-chip
+          v-for="(chip, chip_index) in steps[step_index].chips"
+          :key="chip_index"
+        >
           {{ chip }}
         </v-chip>
       </v-col>
     </v-row>
     <Transition name="slide-fade">
       <v-col v-if="step_index == current_step_index">
-        <component :is="steps[step_index].component.component_name"
-          v-bind="steps[step_index].component.component_options" />
-        <v-btn v-if="skippable()" @click="skipStep()" color="primary">Skip step</v-btn>
+        <component
+          :is="steps[step_index].component.component_name"
+          v-bind="steps[step_index].component.component_options"
+        />
+        <v-btn v-if="skippable()" @click="skipStep()" color="primary"
+          >Skip step</v-btn
+        >
       </v-col>
     </Transition>
   </v-card>
@@ -30,25 +52,25 @@
 
 <script setup>
 const props = defineProps({
-  step_index: { type: Number, required: true }
+  step_index: { type: Number, required: true },
 })
 const { step_index } = props
 const stepper_tree = inject('stepper_tree')
 const { current_step_index, steps } = toRefs(stepper_tree)
 
-function skippable () {
+function skippable() {
   if (stepper_tree.steps[step_index].component.skippable !== undefined) {
-    return(stepper_tree.steps[step_index].component.skippable)
+    return stepper_tree.steps[step_index].component.skippable
   } else {
-    return(false)
+    return false
   }
 }
 
 function skipStep() {
-  stepper_tree.current_step_index++ 
+  stepper_tree.current_step_index++
 }
 
-function set_current_step (step_index) {
+function set_current_step(step_index) {
   stepper_tree.current_step_index = step_index
 }
 </script>

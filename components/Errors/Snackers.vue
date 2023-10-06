@@ -1,14 +1,22 @@
 <template>
-  <v-snackbar :style="{ 'margin-bottom': calc_margin(index) }" v-for="(error, index) in errors" :key="index"
-    v-model="show" color="error" location="bottom right" transition="slide-x-reverse-transition" max-width="30%"
-    height="20px">
+  <v-snackbar
+    :style="{ 'margin-bottom': calc_margin(index) }"
+    v-for="(error, index) in errors"
+    :key="index"
+    v-model="show"
+    color="error"
+    location="bottom right"
+    transition="slide-x-reverse-transition"
+    max-width="30%"
+    height="20px"
+  >
     <v-row dense class="flex-nowrap">
       <v-col cols="auto">
         <v-tooltip location="left">
           <span>
             error: {{ error.code }} {{ error.name }}<br />
             ressource: {{ error.route }}
-            <br>
+            <br />
           </span>
           <template #activator="{ props }">
             <v-icon v-bind="props" color="white" class="justify-right">
@@ -21,7 +29,7 @@
         <v-tooltip location="top">
           <span>
             {{ error.description }}
-            <br>
+            <br />
           </span>
           <template #activator="{ props }">
             <div v-bind="props">
@@ -32,7 +40,13 @@
       </v-col>
       <v-spacer />
       <v-col cols="auto">
-        <v-btn icon flat size="20" @click="errors_store.delete_error(index)" color="error">
+        <v-btn
+          icon
+          flat
+          size="20"
+          @click="errors_store.delete_error(index)"
+          color="error"
+        >
           <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
       </v-col>
@@ -46,8 +60,8 @@ const { errors } = storeToRefs(errors_store)
 
 const show = true
 
-function calc_margin (index) {
-  return (index * 60) + 8 + 'px'
+function calc_margin(index) {
+  return index * 60 + 8 + 'px'
 }
 </script>
 
