@@ -7,7 +7,6 @@ module.exports = {
   },
   extends: [
     "eslint:recommended",
-    "@nuxtjs/eslint-config",
     "plugin:vue/vue3-recommended",
     "plugin:vuetify/recommended",
     "plugin:nuxt/recommended",
