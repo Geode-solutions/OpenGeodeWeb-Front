@@ -8,14 +8,7 @@
         align="center"
       >
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
-        <vue-recaptcha
-          ref="recaptcha"
-          :sitekey="site_key"
-          :loadRecaptchaScript="true"
-          @expired="is_captcha_validated = false"
-          @verify="submit_recaptcha"
-          align-self="center"
-        />
+        <Recaptcha />
       </v-col>
       <v-col
         v-else-if="!cloud_store.is_running && cloud_store.is_connexion_launched"
@@ -27,15 +20,9 @@
 </template>
 
 <script setup>
-  import { VueRecaptcha } from "vue-recaptcha"
-
   const websocket_store = use_websocket_store()
   const cloud_store = use_cloud_store()
   const { is_captcha_validated } = storeToRefs(cloud_store)
-
-  const props = defineProps({
-    site_key: { type: String, required: true },
-  })
 
   watch(is_captcha_validated, async (value) => {
     if (value === true && process.client) {
@@ -43,25 +30,4 @@
       await websocket_store.ws_connect()
     }
   })
-
-  onMounted(() => {
-    if (process.client) {
-      const config = useRuntimeConfig()
-      if (config.public.NODE_ENV !== "production") {
-        cloud_store.$patch({ is_captcha_validated: true })
-      }
-    }
-  })
-
-  async function submit_recaptcha(token) {
-    try {
-      const response = await $fetch.raw(
-        `/.netlify/functions/recaptcha?token=${token}`,
-      )
-      cloud_store.$patch({ is_captcha_validated: response.status == 200 })
-      recaptcha.reset()
-    } catch (error) {
-      console.error(error)
-    }
-  }
 </script>
