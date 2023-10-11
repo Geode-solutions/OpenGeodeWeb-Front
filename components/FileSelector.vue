@@ -40,18 +40,15 @@
     accept.value = extensions
   }
 
-  async function get_allowed_files() {
-    const route = `${route_prefix}/allowed_files`
-    await api_fetch(
-      route,
-      { method: "GET" },
-      {
-        response_function: (response) => {
-          fill_extensions(response)
-        },
-      },
-    )
-  }
+async function get_allowed_files () {
+  const route = `${route_prefix}/allowed_files`
+  await api_fetch(FileSelector_json.id, params,
+    {
+      'response_function': (response) => {
+        fill_extensions(response)
+      }
+    })
+}
 
   onMounted(async () => {
     await get_allowed_files()

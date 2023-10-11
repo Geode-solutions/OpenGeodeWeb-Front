@@ -1,0 +1,14 @@
+{
+    "$id": "/workflows/stepper",
+    "type": "object",
+    "properties": {
+      "steps": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    },
+    "required": ["steps"]
+  }
+  
