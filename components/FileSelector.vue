@@ -9,8 +9,9 @@
     chips
     counter
     show-size
-    @click:clear="stepper_tree.files = []"
+    @click:clear="clear()"
   />
+  <v-btn @click="upload_files()" color="primary"> Upload file(s)</v-btn>
 </template>
 
 <script setup>
@@ -32,6 +33,10 @@
     stepper_tree[variable_to_update] = value
     stepper_tree[variable_to_increment]++
   })
+
+  function clear() {
+    stepper_tree[variable_to_update] = []
+  }
 
   function fill_extensions(response) {
     const extensions = response._data.extensions
