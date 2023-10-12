@@ -4,13 +4,10 @@
       <v-tooltip location="left">
         Reset camera
         <template #activator="{ props }">
-          <v-btn
-            @click.stop="reset_camera"
-            density="comfortable"
-            v-bind="props"
-            icon
-          >
-            <v-icon size="32"> mdi-cube-scan </v-icon>
+          <v-btn @click.stop=reset_camera density="comfortable" v-bind="props" icon>
+            <v-icon size="32">
+              mdi-cube-scan
+            </v-icon>
           </v-btn>
         </template>
       </v-tooltip>
@@ -19,19 +16,19 @@
 </template>
 
 <script setup>
-  const viewer_store = use_viewer_store()
-  function reset_camera() {
-    viewer_store.reset_camera()
-  }
+const viewer_store = use_viewer_store()
+function reset_camera () {
+  viewer_store.reset_camera()
+}
 </script>
 
 <style module>
-  .floatToolbar {
-    position: absolute;
-    z-index: 2;
-    right: 20px;
-    top: 20px;
-    background-color: rgba(0, 0, 0, 0.4);
-    border-radius: 16px;
-  }
+.floatToolbar {
+  position: absolute;
+  z-index: 2;
+  right: 20px;
+  top: 20px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+}
 </style>

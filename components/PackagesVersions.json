@@ -1,0 +1,21 @@
+{
+  "$id": "/workflows/package_versions",
+  "type": "object",
+  "properties": {
+    "packages_versions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "package": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": ["packages_versions"]
+}

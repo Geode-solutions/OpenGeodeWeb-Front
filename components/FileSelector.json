@@ -1,0 +1,16 @@
+{
+  "$id": "/workflows/file_input",
+  "type": "object",
+  "properties": {
+    "accept": {
+      "type": "string"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["accept", "files"]
+}

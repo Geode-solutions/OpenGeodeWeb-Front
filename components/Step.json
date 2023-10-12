@@ -1,46 +1,45 @@
 {
-    "$id": "/workflows/step_component",
-    "type": "object",
-    "properties": {
-      "step_index": {
-        "type": "number"
-      },
-      "steps": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "step_title": {
+  "$id": "/workflows/step_component",
+  "type": "object",
+  "properties": {
+    "step_index": {
+      "type": "number"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step_title": {
+            "type": "string"
+          },
+          "chips": {
+            "type": "array",
+            "items": {
               "type": "string"
-            },
-            "chips": {
-              "type": "array",
-              "items": {
+            }
+          },
+          "component": {
+            "type": "object",
+            "properties": {
+              "component_name": {
                 "type": "string"
+              },
+              "component_options": {
+                "type": "object"
+              },
+              "skippable": {
+                "type": "boolean"
               }
             },
-            "component": {
-              "type": "object",
-              "properties": {
-                "component_name": {
-                  "type": "string"
-                },
-                "component_options": {
-                  "type": "object"
-                },
-                "skippable": {
-                  "type": "boolean"
-                }
-              },
-              "required": ["component_name", "component_options"]
-            }
+            "required": ["component_name", "component_options"]
           }
         }
-      },
-      "current_step_index": {
-        "type": "number"
       }
     },
-    "required": ["step_index", "steps", "current_step_index"]
-  }
-  
+    "current_step_index": {
+      "type": "number"
+    }
+  },
+  "required": ["step_index", "steps", "current_step_index"]
+}

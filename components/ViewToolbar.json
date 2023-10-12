@@ -1,11 +1,10 @@
 {
-    "$id": "/components/float_toolbar",
-    "type": "object",
-    "properties": {
-      "reset_camera": {
-        "type": "function"
-      }
-    },
-    "required": ["reset_camera"]
-  }
-  
+  "$id": "/components/float_toolbar",
+  "type": "object",
+  "properties": {
+    "reset_camera": {
+      "type": "function"
+    }
+  },
+  "required": ["reset_camera"]
+}

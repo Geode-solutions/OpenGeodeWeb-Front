@@ -1,0 +1,13 @@
+{
+  "$id": "/components/main_view",
+  "type": "object",
+  "properties": {
+    "cards_list": {
+      "type": "array"
+    },
+    "site_key": {
+      "type": "string"
+    }
+  },
+  "required": ["cards_list", "site_key"]
+}

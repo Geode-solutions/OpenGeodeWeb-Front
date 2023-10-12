@@ -1,0 +1,24 @@
+{
+  "$id": "/workflows/tool_cards",
+  "type": "object",
+  "properties": {
+    "tool_name": {
+      "type": "string"
+    },
+    "cards_list": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": ["tool_name", "cards_list"]
+}

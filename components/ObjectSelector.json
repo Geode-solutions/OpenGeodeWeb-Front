@@ -1,0 +1,13 @@
+{
+  "$id": "/workflows/allowed_objects_selection",
+  "type": "object",
+  "properties": {
+    "allowed_objects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["allowed_objects"]
+}

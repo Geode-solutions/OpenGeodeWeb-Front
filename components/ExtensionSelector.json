@@ -1,0 +1,13 @@
+{
+  "$id": "/workflows/file_extension_selection",
+  "type": "object",
+  "properties": {
+    "file_extensions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["file_extensions"]
+}
