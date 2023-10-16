@@ -1,40 +1,67 @@
 <template>
-  <v-file-input
-    v-model="files"
-    :multiple="multiple"
-    :label="label"
-    :accept="accept"
-    :rules="[(value) => !!value || 'The file is mandatory']"
-    color="primary"
-    chips
-    counter
-    show-size
-    @click:clear="clear()"
-  />
-  <v-btn @click="upload_files()" color="primary"> Upload file(s)</v-btn>
+  <v-row>
+    <v-col class="pa-0">
+      <v-file-input
+        v-model="files"
+        :multiple="multiple"
+        :label="label"
+        :accept="accept"
+        :rules="[(value) => !!value || 'The file is mandatory']"
+        color="primary"
+        chips
+        counter
+        show-size
+        @click:clear="clear()"
+      />
+    </v-col>
+  </v-row>
+  <v-row>
+    <v-col cols="auto">
+      <v-btn
+        @click="upload_files(files)"
+        color="primary"
+        :disabled="!files.length && !files_uploaded"
+        :loading="loading"
+        class="pa-2"
+      >
+        Upload file(s)</v-btn
+      >
+    </v-col>
+  </v-row>
 </template>
 
 <script setup>
+  import { useToggle } from "@vueuse/core"
+
   const stepper_tree = inject("stepper_tree")
   const { route_prefix } = stepper_tree
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     label: { type: String, required: true },
-    variable_to_update: { type: String, required: true },
-    variable_to_increment: { type: String, required: true },
+    variable_to_update: { type: String, required: false },
+    variable_to_increment: { type: String, required: false },
+    mandatory_files: { type: Array, required: false, default: [] },
+    additional_files: { type: Array, required: false, default: [] },
   })
-  const { multiple, label, variable_to_update, variable_to_increment } = props
+  const {
+    multiple,
+    label,
+    variable_to_update,
+    variable_to_increment,
+    mandatory_files,
+    additional_files,
+  } = props
 
   const accept = ref("")
   const files = ref([])
+  const loading = ref(false)
+  const files_uploaded = ref(false)
 
-  watch(files, (value) => {
-    stepper_tree[variable_to_update] = value
-    stepper_tree[variable_to_increment]++
-  })
+  const toggle_loading = useToggle(loading)
 
   function clear() {
+    files.value = []
     stepper_tree[variable_to_update] = []
   }
 
@@ -58,7 +85,63 @@
     )
   }
 
+  async function upload_files(response_function = {}) {
+    return new Promise((resolve, reject) => {
+      for (const file of files.value) {
+        console.log(file.name)
+        const reader = new FileReader()
+        reader.onload = async function (event) {
+          const params = new FormData()
+          params.append("file", event.target.result)
+          params.append("filename", file.name)
+          params.append("filesize", file.size)
+          toggle_loading()
+          await api_fetch(
+            `${route_prefix}/upload_file`,
+            { method: "POST", body: params },
+            {
+              request_error_function: () => {
+                toggle_loading()
+                reject()
+              },
+              response_function: () => {
+                if (response_function) {
+                  response_function(response)
+                }
+                toggle_loading()
+                resolve()
+              },
+              response_error_function: () => {
+                toggle_loading()
+                reject()
+              },
+            },
+          )
+        }
+        reader.readAsDataURL(file)
+      }
+      files_uploaded.value = true
+    })
+  }
+
+  watch(files_uploaded, (value) => {
+    if (value) {
+      stepper_tree[variable_to_update] = files.value
+      stepper_tree[variable_to_increment]++
+    }
+  })
+
   onMounted(async () => {
-    await get_allowed_files()
+    if (mandatory_files.length !== 0 || additional_files.length !== 0) {
+      accept.value = "*"
+    } else {
+      await get_allowed_files()
+    }
   })
 </script>
+
+<style scoped>
+  .v-btn {
+    text-transform: unset !important;
+  }
+</style>

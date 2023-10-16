@@ -10,9 +10,7 @@
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
         <Recaptcha />
       </v-col>
-      <v-col
-        v-else-if="!cloud_store.is_running && cloud_store.is_connexion_launched"
-      >
+      <v-col v-else-if="!is_running && is_connexion_launched">
         <Loading />
       </v-col>
     </v-row>
@@ -22,7 +20,8 @@
 <script setup>
   const websocket_store = use_websocket_store()
   const cloud_store = use_cloud_store()
-  const { is_captcha_validated } = storeToRefs(cloud_store)
+  const { is_captcha_validated, is_connexion_launched, is_running } =
+    storeToRefs(cloud_store)
 
   watch(is_captcha_validated, async (value) => {
     if (value === true && process.client) {

@@ -1,5 +1,6 @@
 <template>
-  <v-row v-if="allowed_objects.length" class="justify-left">
+  <FetchingData v-if="loading" />
+  <v-row v-else-if="allowed_objects.length" class="justify-left">
     <v-col v-for="object in allowed_objects" :key="object" cols="2" md="2">
       <v-card v-ripple class="card ma-2" hover elevation="5" rounded>
         <v-img
@@ -28,6 +29,7 @@
 
 <script setup>
   import geode_objects from "@/assets/geode_objects"
+  import { useToggle } from "@vueuse/core"
 
   const stepper_tree = inject("stepper_tree")
   const { files, route_prefix } = stepper_tree
@@ -39,17 +41,21 @@
 
   const { variable_to_update, variable_to_increment } = props
 
+  const loading = ref(false)
   const allowed_objects = ref([])
+
+  const toggle_loading = useToggle(loading)
 
   async function get_allowed_objects() {
     const params = new FormData()
     params.append("filename", files[0].name)
-
+    loading.value = true
     await api_fetch(
       `${route_prefix}/allowed_objects`,
       { method: "POST", body: params },
       {
         response_function: (response) => {
+          toggle_loading()
           allowed_objects.value = response._data.allowed_objects
         },
       },

@@ -1,5 +1,6 @@
 <template>
-  <v-row class="justify-left">
+  <FetchingData v-if="loading" />
+  <v-row v-else class="justify-left">
     <v-col
       v-for="file_extension in file_extensions"
       :key="file_extension"
@@ -20,6 +21,8 @@
 </template>
 
 <script setup>
+  import { useToggle } from "@vueuse/core"
+
   const stepper_tree = inject("stepper_tree")
   const { geode_object, route_prefix } = stepper_tree
 
@@ -29,17 +32,28 @@
   })
   const { variable_to_update, variable_to_increment } = props
 
+  const loading = ref(true)
   const file_extensions = ref([])
+
+  const toggle_loading = useToggle(loading)
 
   async function get_output_file_extensions() {
     const params = new FormData()
     params.append("geode_object", geode_object)
+    loading.value = true
     await api_fetch(
       `${route_prefix}/output_file_extensions`,
       { method: "POST", body: params },
       {
+        request_error_function: () => {
+          toggle_loading()
+        },
         response_function: (response) => {
+          toggle_loading()
           file_extensions.value = response._data.output_file_extensions
+        },
+        response_error_function: () => {
+          toggle_loading()
         },
       },
     )
