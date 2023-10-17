@@ -27,7 +27,6 @@
       <v-col cols="12">
         <FileSelector
           :multiple="multiple"
-          :label="label"
           :variable_to_update="variable_to_update"
           :variable_to_increment="variable_to_increment"
           :mandatory_files="mandatory_files"
@@ -55,7 +54,6 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    label: { type: String, required: true },
     geode_object: { type: String, required: true },
     files: { type: Array, required: true },
     variable_to_update: { type: String, required: false },
@@ -65,7 +63,6 @@
 
   const {
     multiple,
-    label,
     geode_object,
     files,
     variable_to_update,
@@ -88,6 +85,7 @@
     has_missing_files.value = false
     mandatory_files.value = []
     additional_files.value = []
+    toggle_loading()
     for (const file of files) {
       const reader = new FileReader()
       reader.onload = async function (event) {
@@ -99,30 +97,24 @@
           `${route_prefix}/missing_files`,
           { method: "POST", body: params },
           {
-            request_error_function: () => {
-              toggle_loading()
-            },
             response_function: (response) => {
-              toggle_loading()
-              if (!response._data.has_missing_files) {
-                skip_step()
-              }
               has_missing_files.value = response._data.has_missing_files
-              mandatory_files.value = response._data.mandatory_files
-              additional_files.value = response._data.additional_files
-            },
-            response_error_function: () => {
-              toggle_loading()
+              mandatory_files.value.push(response._data.mandatory_files)
+              additional_files.value.push(response._data.additional_files)
             },
           },
         )
       }
       reader.readAsDataURL(file)
     }
+    toggle_loading()
+    if (!has_missing_files.value) {
+      skip_step()
+    }
   }
 
   onMounted(async () => {
-    await missing_files()
+    missing_files()
   })
 </script>
 

@@ -32,7 +32,7 @@
   })
   const { variable_to_update, variable_to_increment } = props
 
-  const loading = ref(true)
+  const loading = ref(false)
   const file_extensions = ref([])
 
   const toggle_loading = useToggle(loading)
@@ -40,23 +40,17 @@
   async function get_output_file_extensions() {
     const params = new FormData()
     params.append("geode_object", geode_object)
-    loading.value = true
+    toggle_loading()
     await api_fetch(
       `${route_prefix}/output_file_extensions`,
       { method: "POST", body: params },
       {
-        request_error_function: () => {
-          toggle_loading()
-        },
         response_function: (response) => {
-          toggle_loading()
           file_extensions.value = response._data.output_file_extensions
-        },
-        response_error_function: () => {
-          toggle_loading()
         },
       },
     )
+    toggle_loading()
   }
 
   function set_output_extension(extension) {

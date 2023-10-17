@@ -49,17 +49,17 @@
   async function get_allowed_objects() {
     const params = new FormData()
     params.append("filename", files[0].name)
-    loading.value = true
+    toggle_loading()
     await api_fetch(
       `${route_prefix}/allowed_objects`,
       { method: "POST", body: params },
       {
         response_function: (response) => {
-          toggle_loading()
           allowed_objects.value = response._data.allowed_objects
         },
       },
     )
+    toggle_loading()
   }
 
   function set_geode_object(geode_object) {

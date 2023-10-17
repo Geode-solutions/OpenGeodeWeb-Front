@@ -38,21 +38,12 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    label: { type: String, required: true },
     variable_to_update: { type: String, required: false },
     variable_to_increment: { type: String, required: false },
-    mandatory_files: { type: Array, required: false, default: [] },
-    additional_files: { type: Array, required: false, default: [] },
   })
-  const {
-    multiple,
-    label,
-    variable_to_update,
-    variable_to_increment,
-    mandatory_files,
-    additional_files,
-  } = props
+  const { multiple, variable_to_update, variable_to_increment } = props
 
+  const label = multiple ? "Please select file(s)" : "Please select a file"
   const accept = ref("")
   const files = ref([])
   const loading = ref(false)
@@ -87,32 +78,29 @@
 
   async function upload_files(response_function = {}) {
     return new Promise((resolve, reject) => {
+      toggle_loading()
       for (const file of files.value) {
-        console.log(file.name)
         const reader = new FileReader()
         reader.onload = async function (event) {
           const params = new FormData()
           params.append("file", event.target.result)
           params.append("filename", file.name)
           params.append("filesize", file.size)
-          toggle_loading()
+
           await api_fetch(
             `${route_prefix}/upload_file`,
             { method: "POST", body: params },
             {
               request_error_function: () => {
-                toggle_loading()
                 reject()
               },
               response_function: () => {
                 if (response_function) {
                   response_function(response)
                 }
-                toggle_loading()
                 resolve()
               },
               response_error_function: () => {
-                toggle_loading()
                 reject()
               },
             },
@@ -120,6 +108,7 @@
         }
         reader.readAsDataURL(file)
       }
+      toggle_loading()
       files_uploaded.value = true
     })
   }
@@ -135,7 +124,7 @@
     if (mandatory_files.length !== 0 || additional_files.length !== 0) {
       accept.value = "*"
     } else {
-      await get_allowed_files()
+      get_allowed_files()
     }
   })
 </script>
