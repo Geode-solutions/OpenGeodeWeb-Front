@@ -1,33 +1,9 @@
 <template>
-  <v-row>
-    <v-col class="pa-0">
-      <v-file-input
-        v-model="files"
-        :multiple="multiple"
-        :label="label"
-        :accept="accept"
-        :rules="[(value) => !!value || 'The file is mandatory']"
-        color="primary"
-        chips
-        counter
-        show-size
-        @click:clear="clear()"
-      />
-    </v-col>
-  </v-row>
-  <v-row>
-    <v-col cols="auto">
-      <v-btn
-        @click="upload_files(files)"
-        color="primary"
-        :disabled="!files.length && !files_uploaded"
-        :loading="loading"
-        class="pa-2"
-      >
-        Upload file(s)</v-btn
-      >
-    </v-col>
-  </v-row>
+  <FetchingData v-if="loading" />
+  <FileUploader
+    v-bind="{ multiple, accept }"
+    @files_value="files_value_event"
+  />
 </template>
 
 <script setup>
@@ -38,22 +14,20 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    variable_to_update: { type: String, required: false },
-    variable_to_increment: { type: String, required: false },
+    variable_to_update: { type: String, required: true },
+    variable_to_increment: { type: String, required: true },
   })
   const { multiple, variable_to_update, variable_to_increment } = props
 
-  const label = multiple ? "Please select file(s)" : "Please select a file"
   const accept = ref("")
-  const files = ref([])
   const loading = ref(false)
-  const files_uploaded = ref(false)
 
   const toggle_loading = useToggle(loading)
 
-  function clear() {
-    files.value = []
-    stepper_tree[variable_to_update] = []
+  function files_value_event(value) {
+    console.log("value", value)
+    stepper_tree[variable_to_update] = value
+    stepper_tree[variable_to_increment]++
   }
 
   function fill_extensions(response) {
@@ -65,6 +39,7 @@
 
   async function get_allowed_files() {
     const route = `${route_prefix}/allowed_files`
+    toggle_loading()
     await api_fetch(
       route,
       { method: "GET" },
@@ -74,58 +49,10 @@
         },
       },
     )
+    toggle_loading()
   }
-
-  async function upload_files(response_function = {}) {
-    return new Promise((resolve, reject) => {
-      toggle_loading()
-      for (const file of files.value) {
-        const reader = new FileReader()
-        reader.onload = async function (event) {
-          const params = new FormData()
-          params.append("file", event.target.result)
-          params.append("filename", file.name)
-          params.append("filesize", file.size)
-
-          await api_fetch(
-            `${route_prefix}/upload_file`,
-            { method: "POST", body: params },
-            {
-              request_error_function: () => {
-                reject()
-              },
-              response_function: () => {
-                if (response_function) {
-                  response_function(response)
-                }
-                resolve()
-              },
-              response_error_function: () => {
-                reject()
-              },
-            },
-          )
-        }
-        reader.readAsDataURL(file)
-      }
-      toggle_loading()
-      files_uploaded.value = true
-    })
-  }
-
-  watch(files_uploaded, (value) => {
-    if (value) {
-      stepper_tree[variable_to_update] = files.value
-      stepper_tree[variable_to_increment]++
-    }
-  })
-
   onMounted(async () => {
-    if (mandatory_files.length !== 0 || additional_files.length !== 0) {
-      accept.value = "*"
-    } else {
-      get_allowed_files()
-    }
+    get_allowed_files()
   })
 </script>
 

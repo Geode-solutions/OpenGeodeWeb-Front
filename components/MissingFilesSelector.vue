@@ -25,13 +25,9 @@
     </v-row>
     <v-row>
       <v-col cols="12">
-        <FileSelector
-          :multiple="multiple"
-          :variable_to_update="variable_to_update"
-          :variable_to_increment="variable_to_increment"
-          :mandatory_files="mandatory_files"
-          :additional_files="additional_files"
-          ref="file_selector"
+        <FileUploader
+          v-bind="{ multiple, accept }"
+          @files_value="files_value_event"
         />
       </v-col>
     </v-row>
@@ -58,7 +54,6 @@
     files: { type: Array, required: true },
     variable_to_update: { type: String, required: false },
     variable_to_increment: { type: String, required: false },
-    response_function: { type: Function, required: false },
   })
 
   const {
@@ -69,16 +64,28 @@
     variable_to_increment,
   } = props
 
-  const file_selector = ref(null)
-  const loading = ref(true)
+  const accept = ref("")
+  const loading = ref(false)
   const has_missing_files = ref(false)
   const mandatory_files = ref([])
   const additional_files = ref([])
-
   const toggle_loading = useToggle(loading)
+
+  function files_value_event(value) {
+    console.log("value", value)
+    stepper_tree[variable_to_update] = value
+    stepper_tree[variable_to_increment]++
+  }
 
   function skip_step() {
     stepper_tree[variable_to_increment] += 1
+  }
+
+  function fill_extensions(mandatory_files, additional_files) {
+    const extensions = response._data.extensions
+      .map((extension) => "." + extension)
+      .join(",")
+    accept.value = extensions
   }
 
   async function missing_files() {
@@ -87,28 +94,25 @@
     additional_files.value = []
     toggle_loading()
     for (const file of files) {
-      const reader = new FileReader()
-      reader.onload = async function (event) {
-        const params = new FormData()
-        params.append("geode_object", geode_object)
-        params.append("filename", file.name)
-        loading.value = true
-        await api_fetch(
-          `${route_prefix}/missing_files`,
-          { method: "POST", body: params },
-          {
-            response_function: (response) => {
-              has_missing_files.value = response._data.has_missing_files
-              mandatory_files.value.push(response._data.mandatory_files)
-              additional_files.value.push(response._data.additional_files)
-            },
+      const params = new FormData()
+      params.append("geode_object", geode_object)
+      params.append("filename", file.name)
+      await api_fetch(
+        `${route_prefix}/missing_files`,
+        { method: "POST", body: params },
+        {
+          response_function: (response) => {
+            console.log(response)
+            has_missing_files.value = response._data.has_missing_files
+            mandatory_files.value += response._data.mandatory_files
+            additional_files.value += response._data.additional_files
           },
-        )
-      }
-      reader.readAsDataURL(file)
+        },
+      )
     }
     toggle_loading()
     if (!has_missing_files.value) {
+      console.log("skip_step")
       skip_step()
     }
   }
@@ -117,9 +121,3 @@
     missing_files()
   })
 </script>
-
-<style scoped>
-  .v-btn {
-    text-transform: unset !important;
-  }
-</style>

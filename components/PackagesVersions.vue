@@ -25,6 +25,7 @@
   const { route_prefix } = props
 
   const cloud_store = use_cloud_store()
+  const { is_running } = storeToRefs(cloud_store)
 
   const packages_versions = ref([])
 
@@ -40,20 +41,20 @@
     )
   }
 
-  watch(cloud_store.is_running, (value) => {
+  watch(is_running, (value) => {
     if (value === true) {
       get_packages_versions()
     }
   })
 
   onMounted(() => {
-    if (cloud_store.is_running === true) {
+    if (is_running.value === true) {
       get_packages_versions()
     }
   })
 
   onActivated(() => {
-    if (cloud_store.is_running === true) {
+    if (is_running.value === true) {
       get_packages_versions()
     }
   })
