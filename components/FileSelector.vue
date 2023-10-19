@@ -25,16 +25,10 @@
   const toggle_loading = useToggle(loading)
 
   function files_value_event(value) {
-    console.log("value", value)
     stepper_tree[variable_to_update] = value
-    stepper_tree[variable_to_increment]++
-  }
-
-  function fill_extensions(response) {
-    const extensions = response._data.extensions
-      .map((extension) => "." + extension)
-      .join(",")
-    accept.value = extensions
+    if (value.length) {
+      stepper_tree[variable_to_increment]++
+    }
   }
 
   async function get_allowed_files() {
@@ -45,13 +39,15 @@
       { method: "GET" },
       {
         response_function: (response) => {
-          fill_extensions(response)
+          accept.value = response._data.extensions
+            .map((extension) => "." + extension)
+            .join(",")
         },
       },
     )
     toggle_loading()
   }
-  onMounted(async () => {
+  onMounted(() => {
     get_allowed_files()
   })
 </script>

@@ -53,21 +53,29 @@
 
   async function upload_files() {
     toggle_loading()
+    const promise_array = []
     for (const file of files.value) {
-      const reader = new FileReader()
-      reader.onload = async function (event) {
-        const params = new FormData()
-        params.append("file", event.target.result)
-        params.append("filename", file.name)
-        params.append("filesize", file.size)
+      const promise = new Promise(function (resolve) {
+        const reader = new FileReader()
 
-        await api_fetch(`${route_prefix}/upload_file`, {
-          method: "POST",
-          body: params,
-        })
-      }
-      reader.readAsDataURL(file)
+        reader.onload = async function (event) {
+          const params = new FormData()
+          params.append("file", event.target.result)
+          params.append("filename", file.name)
+          params.append("filesize", file.size)
+
+          await api_fetch(`${route_prefix}/upload_file`, {
+            method: "POST",
+            body: params,
+          })
+          resolve()
+        }
+
+        reader.readAsDataURL(file)
+      })
+      promise_array.push(promise)
     }
+    await Promise.all(promise_array)
     toggle_loading()
     files_uploaded.value = true
     emit("files_value", files.value)

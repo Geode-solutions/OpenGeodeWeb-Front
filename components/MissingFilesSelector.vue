@@ -72,20 +72,8 @@
   const toggle_loading = useToggle(loading)
 
   function files_value_event(value) {
-    console.log("value", value)
     stepper_tree[variable_to_update] = value
-    stepper_tree[variable_to_increment]++
-  }
-
-  function skip_step() {
-    stepper_tree[variable_to_increment] += 1
-  }
-
-  function fill_extensions(mandatory_files, additional_files) {
-    const extensions = response._data.extensions
-      .map((extension) => "." + extension)
-      .join(",")
-    accept.value = extensions
+    missing_files()
   }
 
   async function missing_files() {
@@ -102,22 +90,33 @@
         { method: "POST", body: params },
         {
           response_function: (response) => {
-            console.log(response)
             has_missing_files.value = response._data.has_missing_files
-            mandatory_files.value += response._data.mandatory_files
-            additional_files.value += response._data.additional_files
+            mandatory_files.value = [].concat(
+              mandatory_files.value,
+              response._data.mandatory_files,
+            )
+            additional_files.value = [].concat(
+              additional_files.value,
+              response._data.additional_files,
+            )
+            const files_list = [].concat(
+              mandatory_files.value,
+              additional_files.value,
+            )
+            accept.value = files_list
+              .map((filename) => "." + filename.split(".").pop())
+              .join(",")
+            if (!has_missing_files.value) {
+              stepper_tree[variable_to_increment]++
+            }
           },
         },
       )
     }
     toggle_loading()
-    if (!has_missing_files.value) {
-      console.log("skip_step")
-      skip_step()
-    }
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     missing_files()
   })
 </script>

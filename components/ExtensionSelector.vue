@@ -4,7 +4,7 @@
     <v-col
       v-for="file_extension in file_extensions"
       :key="file_extension"
-      cols="2"
+      cols="auto"
     >
       <v-card
         class="card ma-2"
