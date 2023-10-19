@@ -31,9 +31,7 @@
 </template>
 
 <script setup>
-  import { useToggle } from "@vueuse/core"
-
-  const emit = defineEmits(["files_value"])
+  const emit = defineEmits(["files_uploaded"])
 
   const stepper_tree = inject("stepper_tree")
   const { route_prefix } = stepper_tree
@@ -70,7 +68,6 @@
           })
           resolve()
         }
-
         reader.readAsDataURL(file)
       })
       promise_array.push(promise)
@@ -78,12 +75,12 @@
     await Promise.all(promise_array)
     toggle_loading()
     files_uploaded.value = true
-    emit("files_value", files.value)
+    emit("files_uploaded", files.value)
   }
 
   function clear() {
     files.value = []
-    emit("files_value", files.value)
+    emit("files_uploaded", files.value)
   }
 
   watch(files, () => {

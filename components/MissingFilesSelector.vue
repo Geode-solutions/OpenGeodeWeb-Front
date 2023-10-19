@@ -14,7 +14,7 @@
       <v-col cols="auto" class="pa-0">
         <v-icon color="accent" icon="mdi-file-document-plus-outline" />
       </v-col>
-      <p class="pa-1">Additional files :</p>
+      <p class="pa-1">Additional files:</p>
       <v-col
         v-for="additional_file in additional_files"
         cols="auto"
@@ -43,8 +43,6 @@
 </template>
 
 <script setup>
-  import { useToggle } from "@vueuse/core"
-
   const stepper_tree = inject("stepper_tree")
   const { route_prefix } = stepper_tree
 

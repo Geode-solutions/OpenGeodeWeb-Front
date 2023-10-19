@@ -29,7 +29,6 @@
 
 <script setup>
   import geode_objects from "@/assets/geode_objects"
-  import { useToggle } from "@vueuse/core"
 
   const stepper_tree = inject("stepper_tree")
   const { files, route_prefix } = stepper_tree

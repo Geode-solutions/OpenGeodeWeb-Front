@@ -24,8 +24,6 @@
 </template>
 
 <script setup>
-  import { useToggle } from "@vueuse/core"
-
   const stepper_tree = inject("stepper_tree")
   const { geode_object, route_prefix } = stepper_tree
 
@@ -72,7 +70,6 @@
         response_function: (response) => {
           crs_list.value = response._data.crs_list
         },
-        response_error_function: () => {},
       },
     )
     toggle_loading()

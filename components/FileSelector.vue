@@ -2,13 +2,11 @@
   <FetchingData v-if="loading" />
   <FileUploader
     v-bind="{ multiple, accept }"
-    @files_value="files_value_event"
+    @files_uploaded="files_uploaded_event"
   />
 </template>
 
 <script setup>
-  import { useToggle } from "@vueuse/core"
-
   const stepper_tree = inject("stepper_tree")
   const { route_prefix } = stepper_tree
 
@@ -24,8 +22,9 @@
 
   const toggle_loading = useToggle(loading)
 
-  function files_value_event(value) {
+  function files_uploaded_event(value) {
     stepper_tree[variable_to_update] = value
+    console.log(value.length)
     if (value.length) {
       stepper_tree[variable_to_increment]++
     }
