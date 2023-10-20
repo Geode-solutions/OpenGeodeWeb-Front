@@ -1,3 +1,5 @@
+import { defineStore } from 'pinia'
+
 export const use_geode_store = defineStore("geode", {
   state: () => ({
     request_counter: 0,

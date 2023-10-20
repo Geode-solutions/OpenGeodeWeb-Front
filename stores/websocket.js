@@ -1,3 +1,5 @@
+import { defineStore } from 'pinia'
+
 import _ from "lodash"
 
 import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"

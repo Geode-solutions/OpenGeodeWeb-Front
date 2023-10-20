@@ -1,21 +1,7 @@
 {
-  "$id": "/workflows/package_versions",
+  "$id": "/tools/file_converter/versions",
+  "method": "GET",
   "type": "object",
-  "properties": {
-    "packages_versions": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "package": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          }
-        }
-      }
-    }
-  },
-  "required": ["packages_versions"]
+  "properties": {},
+  "additionalProperties": false
 }
