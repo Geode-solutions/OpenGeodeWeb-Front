@@ -1,4 +1,5 @@
 <template>
+  <FetchingData v-if="loading" />
   <v-row
     v-for="item in geode_objects_and_output_extensions"
     :key="item.geode_object"
@@ -49,10 +50,14 @@
   const { variable_to_update, variable_to_increment } = props
 
   const geode_objects_and_output_extensions = ref([])
+  const loading = ref(false)
+
+  const toggle_loading = useToggle(loading)
 
   async function get_output_file_extensions() {
     const params = new FormData()
     params.append("input_geode_object", input_geode_object)
+    toggle_loading()
     await api_fetch(
       `${route_prefix}/output_file_extensions`,
       { method: "POST", body: params },
@@ -63,6 +68,7 @@
         },
       },
     )
+    toggle_loading()
   }
 
   function set_variables(geode_object, output_extension) {

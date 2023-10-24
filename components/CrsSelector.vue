@@ -24,8 +24,6 @@
 </template>
 
 <script setup>
-  import { useToggle } from "@vueuse/core"
-
   const stepper_tree = inject("stepper_tree")
   const { input_geode_object, route_prefix } = stepper_tree
 
@@ -68,18 +66,13 @@
       `${route_prefix}/geographic_coordinate_systems`,
       { method: "POST", body: params },
       {
-        request_error_function: () => {
-          toggle_loading()
-        },
+        request_error_function: () => {},
         response_function: (response) => {
-          toggle_loading()
           crs_list.value = response._data.crs_list
-        },
-        response_error_function: () => {
-          toggle_loading()
         },
       },
     )
+    toggle_loading()
   }
 
   const headers = [

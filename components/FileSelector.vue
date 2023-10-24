@@ -1,15 +1,8 @@
 <template>
-  <v-file-input
-    v-model="files"
-    :multiple="multiple"
-    :label="label"
-    :accept="accept"
-    :rules="[(value) => !!value || 'The file is mandatory']"
-    color="primary"
-    chips
-    counter
-    show-size
-    @click:clear="stepper_tree.files = []"
+  <FetchingData v-if="loading" />
+  <FileUploader
+    v-bind="{ multiple, accept }"
+    @files_uploaded="files_uploaded_event"
   />
 </template>
 
@@ -19,41 +12,47 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    label: { type: String, required: true },
     variable_to_update: { type: String, required: true },
     variable_to_increment: { type: String, required: true },
   })
-  const { multiple, label, variable_to_update, variable_to_increment } = props
+  const { multiple, variable_to_update, variable_to_increment } = props
 
   const accept = ref("")
-  const files = ref([])
+  const loading = ref(false)
 
-  watch(files, (value) => {
+  const toggle_loading = useToggle(loading)
+
+  function files_uploaded_event(value) {
     stepper_tree[variable_to_update] = value
-    stepper_tree[variable_to_increment]++
-  })
-
-  function fill_extensions(response) {
-    const extensions = response._data.extensions
-      .map((extension) => "." + extension)
-      .join(",")
-    accept.value = extensions
+    console.log(value.length)
+    if (value.length) {
+      stepper_tree[variable_to_increment]++
+    }
   }
 
   async function get_allowed_files() {
     const route = `${route_prefix}/allowed_files`
+    toggle_loading()
     await api_fetch(
       route,
       { method: "GET" },
       {
         response_function: (response) => {
-          fill_extensions(response)
+          accept.value = response._data.extensions
+            .map((extension) => "." + extension)
+            .join(",")
         },
       },
     )
+    toggle_loading()
   }
-
-  onMounted(async () => {
-    await get_allowed_files()
+  onMounted(() => {
+    get_allowed_files()
   })
 </script>
+
+<style scoped>
+  .v-btn {
+    text-transform: unset !important;
+  }
+</style>
