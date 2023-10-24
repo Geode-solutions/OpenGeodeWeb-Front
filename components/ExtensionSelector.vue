@@ -1,27 +1,46 @@
 <template>
-  <v-row class="justify-left">
-    <v-col
-      v-for="file_extension in file_extensions"
-      :key="file_extension"
-      cols="2"
-    >
-      <v-card
-        class="card ma-2"
-        hover
-        elevation="5"
-        @click="set_output_extension(file_extension)"
-      >
-        <v-card-title align="center">
-          {{ file_extension }}
-        </v-card-title>
-      </v-card>
-    </v-col>
+  <v-row
+    v-for="item in geode_objects_and_output_extensions"
+    :key="item.geode_object"
+    class="justify - left"
+  >
+    <v-card class="card ma-2 pa-2" elevation="5" width="100%">
+      <v-tooltip :text="`Export as a ${item.geode_object}`" location="bottom">
+        <template v-slot:activator="{ props }">
+          <v-card-title v-bind="props">
+            {{ item.geode_object }}
+          </v-card-title>
+        </template>
+      </v-tooltip>
+      <v-card-text>
+        <v-row>
+          <v-col
+            v-for="output_extension in item.output_extensions"
+            :key="output_extension"
+            cols="auto"
+            class="pa-0"
+          >
+            <v-card
+              class="card ma-2"
+              color="primary"
+              hover
+              elevation="5"
+              @click="set_variables(item.geode_object, output_extension)"
+            >
+              <v-card-title align="center">
+                {{ output_extension }}
+              </v-card-title>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
   </v-row>
 </template>
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { geode_object, route_prefix } = stepper_tree
+  const { input_geode_object, route_prefix } = stepper_tree
 
   const props = defineProps({
     variable_to_update: { type: String, required: true },
@@ -29,24 +48,26 @@
   })
   const { variable_to_update, variable_to_increment } = props
 
-  const file_extensions = ref([])
+  const geode_objects_and_output_extensions = ref([])
 
   async function get_output_file_extensions() {
     const params = new FormData()
-    params.append("geode_object", geode_object)
+    params.append("input_geode_object", input_geode_object)
     await api_fetch(
       `${route_prefix}/output_file_extensions`,
       { method: "POST", body: params },
       {
         response_function: (response) => {
-          file_extensions.value = response._data.output_file_extensions
+          geode_objects_and_output_extensions.value =
+            response._data.geode_objects_and_output_extensions
         },
       },
     )
   }
 
-  function set_output_extension(extension) {
-    stepper_tree[variable_to_update] = extension
+  function set_variables(geode_object, output_extension) {
+    stepper_tree[variable_to_update]["output_geode_object"] = geode_object
+    stepper_tree[variable_to_update]["output_extension"] = output_extension
     stepper_tree[variable_to_increment]++
   }
 

@@ -27,7 +27,7 @@
   import { useToggle } from "@vueuse/core"
 
   const stepper_tree = inject("stepper_tree")
-  const { geode_object, route_prefix } = stepper_tree
+  const { input_geode_object, route_prefix } = stepper_tree
 
   const props = defineProps({
     variable_to_update: { type: String, required: true },
