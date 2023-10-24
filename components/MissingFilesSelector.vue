@@ -48,7 +48,7 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    geode_object: { type: String, required: true },
+    input_geode_object: { type: String, required: true },
     files: { type: Array, required: true },
     variable_to_update: { type: String, required: false },
     variable_to_increment: { type: String, required: false },
@@ -56,7 +56,7 @@
 
   const {
     multiple,
-    geode_object,
+    input_geode_object,
     files,
     variable_to_update,
     variable_to_increment,
@@ -81,7 +81,7 @@
     toggle_loading()
     for (const file of files) {
       const params = new FormData()
-      params.append("geode_object", geode_object)
+      params.append("input_geode_object", input_geode_object)
       params.append("filename", file.name)
       await api_fetch(
         `${route_prefix}/missing_files`,
