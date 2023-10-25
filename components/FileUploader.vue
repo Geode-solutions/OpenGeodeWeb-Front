@@ -40,7 +40,7 @@
     multiple: { type: Boolean, required: true },
     accept: { type: String, required: true },
   })
-  const { multiple, accept } = props
+  const { multiple, accept } = toRefs(props)
 
   const label = multiple ? "Please select file(s)" : "Please select a file"
   const files = ref([])

@@ -24,7 +24,6 @@
 
   function files_uploaded_event(value) {
     stepper_tree[variable_to_update] = value
-    console.log(value.length)
     if (value.length) {
       stepper_tree[variable_to_increment]++
     }

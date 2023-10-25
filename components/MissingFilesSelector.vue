@@ -27,7 +27,7 @@
       <v-col cols="12">
         <FileUploader
           v-bind="{ multiple, accept }"
-          @files_value="files_value_event"
+          @files_uploaded="files_uploaded"
         />
       </v-col>
     </v-row>
@@ -69,8 +69,9 @@
   const additional_files = ref([])
   const toggle_loading = useToggle(loading)
 
-  function files_value_event(value) {
+  function files_uploaded(value) {
     stepper_tree[variable_to_update] = value
+    console.log("files_uploaded")
     missing_files()
   }
 

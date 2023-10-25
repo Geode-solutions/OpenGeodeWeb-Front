@@ -60,7 +60,7 @@
 
   async function get_crs_table() {
     let params = new FormData()
-    params.append("geode_object", geode_object)
+    params.append("input_geode_object", input_geode_object)
     toggle_loading()
     await api_fetch(
       `${route_prefix}/geographic_coordinate_systems`,
