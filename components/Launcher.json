@@ -15,5 +15,10 @@
       "type": "string"
     }
   },
-  "required": ["is_captcha_validated", "is_cloud_running", "is_connexion_launched", "site_key"]
+  "required": [
+    "is_captcha_validated",
+    "is_cloud_running",
+    "is_connexion_launched",
+    "site_key"
+  ]
 }

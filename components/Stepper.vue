@@ -7,7 +7,6 @@
 </template>
 
 <script setup>
-const stepper_tree = inject('stepper_tree')
-const { steps } = stepper_tree
-
+  const stepper_tree = inject("stepper_tree")
+  const { steps } = stepper_tree
 </script>
