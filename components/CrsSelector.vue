@@ -27,7 +27,7 @@
   import { useToggle } from "@vueuse/core"
 
   const stepper_tree = inject("stepper_tree")
-  const { geode_object, route_prefix } = stepper_tree
+  const { geode_object } = stepper_tree
 
   const props = defineProps({
     variable_to_update: { type: String, required: true },
@@ -69,18 +69,12 @@
     await api_fetch(
       { schema, params },
       {
-        request_error_function: () => {
-          toggle_loading()
-        },
         response_function: (response) => {
-          toggle_loading()
           crs_list.value = response._data.crs_list
-        },
-        response_error_function: () => {
-          toggle_loading()
         },
       },
     )
+    toggle_loading()
   }
 
   const headers = [

@@ -38,7 +38,6 @@
     </v-row>
     <Transition name="slide-fade">
       <v-col v-if="step_index == current_step_index">
-        {{ steps[step_index].component.component_options }}
         <component
           :is="steps[step_index].component.component_name"
           v-bind="steps[step_index].component.component_options"

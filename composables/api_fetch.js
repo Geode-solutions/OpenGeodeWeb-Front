@@ -13,6 +13,8 @@ export function api_fetch(
 
   const ajv = new Ajv();
   console.log("schema", schema);
+
+  ajv.addKeyword("method")
   const valid = ajv.validate(schema, body);
   console.log("valid", schema.$id, valid);
   if (!valid) {
@@ -29,11 +31,16 @@ export function api_fetch(
   console.log(geode_store.base_url);
   console.log(schema.$id);
 
-  const request_options = {method: schema.method}
+  const request_options = {method: schema["method"]}
   console.log("body", body)
   if (!_.isEmpty(body)){
     request_options.body=body
   }
+
+  if (schema.max_retry) {
+    request_options.max_retry = schema.max_retry;
+  }
+
   console.log("request_options", request_options)
   console.log("schema.$id", schema.$id)
   return useFetch(schema.$id,{
@@ -45,7 +52,7 @@ export function api_fetch(
       // Log the error to a proper logging library
       errors_store.add_error({
         code: error.code,
-        route: request_url,
+        route: schema.$id,
         name: error.message,
         description: error.stack,
       });
@@ -68,7 +75,7 @@ export function api_fetch(
       geode_store.stop_request();
       errors_store.add_error({
         code: response.status,
-        route: request_url,
+        route: schema.$id,
         name: response._data.name,
         description: response._data.description,
       });

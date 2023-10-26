@@ -50,7 +50,7 @@
 
   onMounted(() => {
     console.log("mounted", is_running)
-    if (is_running.value === true) {
+    if (is_running.value) {
       console.log("mounted ??")
       get_packages_versions()
     }

@@ -1,38 +1,9 @@
 {
-  "$id": "/workflows/crs_selection",
+  "$id": "/tools/crs_selector/geographic_coordinate_systems",
   "type": "object",
   "properties": {
-    "search": {
+    "geode_object": {
       "type": "string"
-    },
-    "data_table_loading": {
-      "type": "boolean"
-    },
-    "crs_list": {
-      "type": "array",
-      "items": {
-        "$id": "/workflows/crs",
-        "type": "object",
-        "properties": {
-          "authority": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": ["authority", "code", "name"]
-      }
-    },
-    "selected_crs": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
     }
-  },
-  "required": ["search", "data_table_loading", "crs_list", "selected_crs"]
+  }
 }

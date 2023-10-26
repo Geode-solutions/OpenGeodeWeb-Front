@@ -17,7 +17,10 @@
     <v-card class="card" variant="tonal" elevation="5" rounded>
       <v-card-text>
         This file format isn't supported! Please check the
-        <a href="https://docs.geode-solutions.com/formats/" target="_blank">
+        <a
+          href="https://docs.geode-solutions.com/guides/formats/"
+          target="_blank"
+        >
           supported file formats documentation</a
         >
         for more information
