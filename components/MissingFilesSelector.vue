@@ -50,17 +50,9 @@
     multiple: { type: Boolean, required: true },
     input_geode_object: { type: String, required: true },
     files: { type: Array, required: true },
-    variable_to_update: { type: String, required: false },
-    variable_to_increment: { type: String, required: false },
   })
 
-  const {
-    multiple,
-    input_geode_object,
-    files,
-    variable_to_update,
-    variable_to_increment,
-  } = props
+  const { multiple, input_geode_object, files } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -70,7 +62,7 @@
   const toggle_loading = useToggle(loading)
 
   function files_uploaded(value) {
-    stepper_tree[variable_to_update] = value
+    stepper_tree["additional_files"] = value
     console.log("files_uploaded")
     missing_files()
   }
@@ -106,7 +98,7 @@
               .map((filename) => "." + filename.split(".").pop())
               .join(",")
             if (!has_missing_files.value) {
-              stepper_tree[variable_to_increment]++
+              stepper_tree["current_step_index"]++
             }
           },
         },

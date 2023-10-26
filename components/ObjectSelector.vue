@@ -31,14 +31,13 @@
   import geode_objects from "@/assets/geode_objects"
 
   const stepper_tree = inject("stepper_tree")
-  const { files, route_prefix } = stepper_tree
+  const { route_prefix } = stepper_tree
 
   const props = defineProps({
-    variable_to_update: { type: String, required: true },
-    variable_to_increment: { type: String, required: true },
+    files: { type: Array, required: true },
   })
 
-  const { variable_to_update, variable_to_increment } = props
+  const { files } = props
 
   const loading = ref(false)
   const allowed_objects = ref([])
@@ -62,8 +61,8 @@
   }
 
   function set_geode_object(geode_object) {
-    stepper_tree[variable_to_update] = geode_object
-    stepper_tree[variable_to_increment]++
+    stepper_tree["input_geode_object"] = geode_object
+    stepper_tree["current_step_index"]++
   }
 
   onMounted(() => {

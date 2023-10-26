@@ -41,13 +41,12 @@
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { input_geode_object, route_prefix } = stepper_tree
+  const { route_prefix } = stepper_tree
 
   const props = defineProps({
-    variable_to_update: { type: String, required: true },
-    variable_to_increment: { type: String, required: true },
+    input_geode_object: { type: String, required: true },
   })
-  const { variable_to_update, variable_to_increment } = props
+  const { input_geode_object } = props
 
   const geode_objects_and_output_extensions = ref([])
   const loading = ref(false)
@@ -72,9 +71,9 @@
   }
 
   function set_variables(geode_object, output_extension) {
-    stepper_tree[variable_to_update]["output_geode_object"] = geode_object
-    stepper_tree[variable_to_update]["output_extension"] = output_extension
-    stepper_tree[variable_to_increment]++
+    stepper_tree["output_geode_object"] = geode_object
+    stepper_tree["output_extension"] = output_extension
+    stepper_tree["current_step_index"]++
   }
 
   onMounted(() => {

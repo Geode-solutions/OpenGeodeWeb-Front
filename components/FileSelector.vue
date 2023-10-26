@@ -12,10 +12,8 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    variable_to_update: { type: String, required: true },
-    variable_to_increment: { type: String, required: true },
   })
-  const { multiple, variable_to_update, variable_to_increment } = props
+  const { multiple } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -23,9 +21,9 @@
   const toggle_loading = useToggle(loading)
 
   function files_uploaded_event(value) {
-    stepper_tree[variable_to_update] = value
+    stepper_tree["files"] = value
     if (value.length) {
-      stepper_tree[variable_to_increment]++
+      stepper_tree["current_step_index"]++
     }
   }
 

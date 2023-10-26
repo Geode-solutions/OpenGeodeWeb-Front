@@ -25,14 +25,14 @@
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { input_geode_object, route_prefix } = stepper_tree
+  const { route_prefix } = stepper_tree
 
   const props = defineProps({
+    input_geode_object: { type: String, required: true },
     variable_to_update: { type: String, required: true },
-    variable_to_increment: { type: String, required: true },
   })
 
-  const { variable_to_update, variable_to_increment } = props
+  const { input_geode_object, variable_to_update } = props
 
   const search = ref("")
   const data_table_loading = ref(false)
@@ -47,7 +47,7 @@
 
   function set_crs(crs_value) {
     stepper_tree[variable_to_update] = crs_value
-    stepper_tree[variable_to_increment]++
+    stepper_tree["current_step_index"]++
   }
 
   function get_selected_crs(crs_code) {
