@@ -6,13 +6,29 @@
     <v-col>
       <v-row class="justify-center">
         <v-col v-for="(card, i) in cards_list" :key="i" cols="11" md="5">
-          <v-card class="card" hover elevation="5" :href="card.href" rounded target="_blank">
-            <v-card-title primary-title class="justify-center text-h6" align="center">
+          <v-card
+            class="card"
+            hover
+            elevation="5"
+            :href="card.href"
+            rounded
+            target="_blank"
+          >
+            <v-card-title
+              primary-title
+              class="justify-center text-h6"
+              align="center"
+            >
               {{ card.title }}
             </v-card-title>
             <v-row class="justify-center pa-2">
               <v-col cols="auto">
-                <v-icon :icon="card.icon" color="primary" size="70" class="justify-center" />
+                <v-icon
+                  :icon="card.icon"
+                  color="primary"
+                  size="70"
+                  class="justify-center"
+                />
               </v-col>
             </v-row>
           </v-card>
@@ -23,8 +39,8 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  tool_name: { type: String, required: true },
-  cards_list: { type: Object, required: true }
-})
+  const props = defineProps({
+    tool_name: { type: String, required: true },
+    cards_list: { type: Object, required: true },
+  })
 </script>
