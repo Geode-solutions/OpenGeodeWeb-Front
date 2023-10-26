@@ -10,12 +10,12 @@ export function api_fetch(
 
   const body = params || {}
 
-  const ajv = new Ajv();
-  console.log("schema", schema);
+  const ajv = new Ajv()
+  console.log("schema", schema)
 
   ajv.addKeyword("method")
-  const valid = ajv.validate(schema, body);
-  console.log("valid", schema.$id, valid);
+  const valid = ajv.validate(schema, body)
+  console.log("valid", schema.$id, valid)
   if (!valid) {
     errors_store.add_error({
       code: "400",
@@ -30,14 +30,14 @@ export function api_fetch(
   console.log(geode_store.base_url)
   console.log(schema.$id)
 
-  const request_options = {method: schema["method"]}
+  const request_options = { method: schema["method"] }
   console.log("body", body)
   if (!_.isEmpty(body)) {
     request_options.body = body
   }
 
   if (schema.max_retry) {
-    request_options.max_retry = schema.max_retry;
+    request_options.max_retry = schema.max_retry
   }
 
   console.log("request_options", request_options)
