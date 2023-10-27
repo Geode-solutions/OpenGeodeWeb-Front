@@ -8,7 +8,6 @@ export function api_fetch(
   const errors_store = use_errors_store()
   const geode_store = use_geode_store()
 
-
   const body = params || {}
 
   const ajv = new Ajv()
