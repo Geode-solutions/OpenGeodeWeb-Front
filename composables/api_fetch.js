@@ -16,7 +16,6 @@ export function api_fetch(
   ajv.addKeyword("method")
   ajv.addKeyword("max_retry")
   const valid = ajv.validate(schema, body)
-  console.log("valid", schema.$id, valid)
   if (!valid) {
     errors_store.add_error({
       code: "400",
@@ -30,7 +29,6 @@ export function api_fetch(
   geode_store.start_request()
 
   const request_options = { method: schema["method"] }
-  console.log("body", body)
   if (!_.isEmpty(body)) {
     request_options.body = body
   }
@@ -39,14 +37,12 @@ export function api_fetch(
     request_options.max_retry = schema.max_retry
   }
 
-  console.log("request_options", request_options)
   return useFetch(schema.$id, {
     baseURL: geode_store.base_url,
     ...request_options,
     onRequestError({ error }) {
-      console.log("onRequestError", error)
+      // console.log("onRequestError", error)
       geode_store.stop_request()
-      // Log the error to a proper logging library
       errors_store.add_error({
         code: error.code,
         route: schema.$id,
@@ -58,17 +54,16 @@ export function api_fetch(
       }
     },
     onResponse({ response }) {
-      console.log(response)
+      // console.log(response)
       if (response.ok) {
         geode_store.stop_request()
-        // Log the response to a proper logging library
         if (response_function) {
           response_function(response)
         }
       }
     },
     onResponseError({ response }) {
-      console.log(response)
+      // console.log(response)
       geode_store.stop_request()
       errors_store.add_error({
         code: response.status,
