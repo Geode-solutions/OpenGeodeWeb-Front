@@ -8,13 +8,7 @@
         align="center"
       >
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
-        <vue-recaptcha
-          ref="recaptcha"
-          :sitekey="site_key"
-          :loadRecaptchaScript="true"
-          @expired="is_captcha_validated = false"
-          align-self="center"
-        />
+        <Recaptcha />
       </v-col>
       <v-col
         v-else-if="!cloud_store.is_running && cloud_store.is_connexion_launched"

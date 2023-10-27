@@ -8,12 +8,13 @@ export function api_fetch(
   const errors_store = use_errors_store()
   const geode_store = use_geode_store()
 
+
   const body = params || {}
 
   const ajv = new Ajv()
-  console.log("schema", schema)
 
   ajv.addKeyword("method")
+  ajv.addKeyword("max_retry")
   const valid = ajv.validate(schema, body)
   console.log("valid", schema.$id, valid)
   if (!valid) {
@@ -27,8 +28,6 @@ export function api_fetch(
   }
 
   geode_store.start_request()
-  console.log(geode_store.base_url)
-  console.log(schema.$id)
 
   const request_options = { method: schema["method"] }
   console.log("body", body)
@@ -41,7 +40,6 @@ export function api_fetch(
   }
 
   console.log("request_options", request_options)
-  console.log("schema.$id", schema.$id)
   return useFetch(schema.$id, {
     baseURL: geode_store.base_url,
     ...request_options,

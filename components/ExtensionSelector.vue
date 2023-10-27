@@ -21,7 +21,7 @@
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { geode_object, route_prefix } = stepper_tree
+  const { geode_object } = stepper_tree
 
   const props = defineProps({
     variable_to_update: { type: String, required: true },
