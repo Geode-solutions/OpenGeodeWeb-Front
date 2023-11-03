@@ -1,3 +1,5 @@
+import _ from "lodash"
+
 export function upload_file(
   { route, params },
   { request_error_function, response_function, response_error_function } = {},
@@ -51,4 +53,4 @@ export function upload_file(
   })
 }
 
-export default api_fetch
+export default upload_file

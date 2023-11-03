@@ -34,7 +34,6 @@
       { schema },
       {
         response_function: (response) => {
-          console.log("response", response)
           packages_versions.value = response._data.versions
         },
       },
@@ -42,22 +41,18 @@
   }
 
   watch(is_running, (value) => {
-    console.log("watch", value)
     if (value === true) {
       get_packages_versions()
     }
   })
 
   onMounted(() => {
-    console.log("mounted", is_running)
     if (is_running.value) {
-      console.log("mounted ??")
       get_packages_versions()
     }
   })
 
   onActivated(() => {
-    console.log("onActivated", is_running)
     if (is_running.value === true) {
       get_packages_versions()
     }
