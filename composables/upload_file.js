@@ -21,7 +21,6 @@ export function upload_file(
     ...request_options,
     onRequestError({ error }) {
       geode_store.stop_request()
-      console.log("onRequestError", response)
       errors_store.add_error({
         code: error.code,
         route: route,
@@ -42,7 +41,6 @@ export function upload_file(
     },
     onResponseError({ response }) {
       geode_store.stop_request()
-      console.log("onResponseError", response)
       errors_store.add_error({
         code: response.status,
         route: route,

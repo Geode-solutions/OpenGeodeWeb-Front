@@ -1,5 +1,3 @@
-import { defineStore } from "pinia"
-
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
     picking_mode: false,
