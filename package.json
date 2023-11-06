@@ -22,10 +22,10 @@
   "version": "0.0.0-semantically-released",
   "main": "./nuxt.config.js",
   "dependencies": {
-    "@kitware/vtk.js": "^28.13.1",
+    "@kitware/vtk.js": "^29.1.0",
     "@mdi/font": "^7.3.67",
     "@pinia/nuxt": "^0.5.1",
-    "@types/node": "^20.8.9",
+    "@types/node": "^20.8.10",
     "@vueuse/components": "^10.5.0",
     "@vueuse/core": "^10.5.0",
     "ajv": "^8.12.0",
