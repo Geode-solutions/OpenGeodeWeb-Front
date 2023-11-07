@@ -14,6 +14,7 @@ export const use_viewer_store = defineStore("viewer", {
       this.picked_point.y = world_y
       this.picking_mode = false
     },
+
     async create_object_pipeline(params) {
       const websocket_store = use_websocket_store()
       if (websocket_store.client) {
