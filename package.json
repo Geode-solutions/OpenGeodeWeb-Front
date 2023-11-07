@@ -22,7 +22,7 @@
   "version": "0.0.0-semantically-released",
   "main": "./nuxt.config.js",
   "dependencies": {
-    "@kitware/vtk.js": "^29.1.0",
+    "@kitware/vtk.js": "^29.1.1",
     "@mdi/font": "^7.3.67",
     "@pinia/nuxt": "^0.5.1",
     "@types/node": "^20.8.10",
