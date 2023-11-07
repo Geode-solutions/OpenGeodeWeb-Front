@@ -21,22 +21,21 @@
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { geode_object, route_prefix } = stepper_tree
+  const { geode_object } = stepper_tree
 
   const props = defineProps({
     variable_to_update: { type: String, required: true },
     variable_to_increment: { type: String, required: true },
+    schema: { type: Object, required: true },
   })
-  const { variable_to_update, variable_to_increment } = props
+  const { variable_to_update, variable_to_increment, schema } = props
 
   const file_extensions = ref([])
 
   async function get_output_file_extensions() {
-    const params = new FormData()
-    params.append("geode_object", geode_object)
+    const params = { geode_object: geode_object }
     await api_fetch(
-      `${route_prefix}/output_file_extensions`,
-      { method: "POST", body: params },
+      { schema, params },
       {
         response_function: (response) => {
           file_extensions.value = response._data.output_file_extensions

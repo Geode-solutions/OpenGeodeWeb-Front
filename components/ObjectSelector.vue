@@ -17,7 +17,10 @@
     <v-card class="card" variant="tonal" elevation="5" rounded>
       <v-card-text>
         This file format isn't supported! Please check the
-        <a href="https://docs.geode-solutions.com/formats/" target="_blank">
+        <a
+          href="https://docs.geode-solutions.com/guides/formats/"
+          target="_blank"
+        >
           supported file formats documentation</a
         >
         for more information
@@ -30,24 +33,22 @@
   import geode_objects from "@/assets/geode_objects"
 
   const stepper_tree = inject("stepper_tree")
-  const { files, route_prefix } = stepper_tree
+  const { files } = stepper_tree
 
   const props = defineProps({
     variable_to_update: { type: String, required: true },
     variable_to_increment: { type: String, required: true },
+    schema: { type: Object, required: true },
   })
 
-  const { variable_to_update, variable_to_increment } = props
+  const { variable_to_update, variable_to_increment, schema } = props
 
   const allowed_objects = ref([])
 
   async function get_allowed_objects() {
-    const params = new FormData()
-    params.append("filename", files[0].name)
-
+    const params = { filename: files[0].name }
     await api_fetch(
-      `${route_prefix}/allowed_objects`,
-      { method: "POST", body: params },
+      { schema, params },
       {
         response_function: (response) => {
           allowed_objects.value = response._data.allowed_objects

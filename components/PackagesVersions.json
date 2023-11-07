@@ -1,0 +1,7 @@
+{
+  "$id": "/tools/file_converter/versions",
+  "method": "GET",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}

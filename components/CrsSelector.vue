@@ -27,14 +27,15 @@
   import { useToggle } from "@vueuse/core"
 
   const stepper_tree = inject("stepper_tree")
-  const { geode_object, route_prefix } = stepper_tree
+  const { geode_object } = stepper_tree
 
   const props = defineProps({
     variable_to_update: { type: String, required: true },
     variable_to_increment: { type: String, required: true },
+    schema: { type: Object, required: true },
   })
 
-  const { variable_to_update, variable_to_increment } = props
+  const { variable_to_update, variable_to_increment, schema } = props
 
   const search = ref("")
   const data_table_loading = ref(false)
@@ -61,25 +62,19 @@
   }
 
   async function get_crs_table() {
-    let params = new FormData()
-    params.append("geode_object", geode_object)
+    let params = {
+      geode_object: geode_object,
+    }
     toggle_loading()
     await api_fetch(
-      `${route_prefix}/geographic_coordinate_systems`,
-      { method: "POST", body: params },
+      { schema, params },
       {
-        request_error_function: () => {
-          toggle_loading()
-        },
         response_function: (response) => {
-          toggle_loading()
           crs_list.value = response._data.crs_list
-        },
-        response_error_function: () => {
-          toggle_loading()
         },
       },
     )
+    toggle_loading()
   }
 
   const headers = [

@@ -15,15 +15,16 @@
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { route_prefix } = stepper_tree
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     label: { type: String, required: true },
     variable_to_update: { type: String, required: true },
     variable_to_increment: { type: String, required: true },
+    schema: { type: Object, required: true },
   })
-  const { multiple, label, variable_to_update, variable_to_increment } = props
+  const { multiple, label, variable_to_update, variable_to_increment, schema } =
+    props
 
   const accept = ref("")
   const files = ref([])
@@ -41,10 +42,8 @@
   }
 
   async function get_allowed_files() {
-    const route = `${route_prefix}/allowed_files`
     await api_fetch(
-      route,
-      { method: "GET" },
+      { schema },
       {
         response_function: (response) => {
           fill_extensions(response)

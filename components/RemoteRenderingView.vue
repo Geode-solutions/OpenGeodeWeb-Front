@@ -1,21 +1,23 @@
 <template>
-  <div style="position: relative; width: 100%; height: 100%">
-    <view-toolbar />
-    <v-col
-      style="
-        overflow: hidden;
-        position: relative;
-        z-index: 0;
-        height: 100%;
-        width: 100%;
-      "
-      ref="viewer"
-      @click="get_x_y"
-      @keydown.esc="app_store.toggle_picking_mode(false)"
-      class="pa-0"
-    >
-    </v-col>
-  </div>
+  <ClientOnly>
+    <div style="position: relative; width: 100%; height: 100%">
+      <view-toolbar />
+      <v-col
+        style="
+          overflow: hidden;
+          position: relative;
+          z-index: 0;
+          height: 100%;
+          width: 100%;
+        "
+        ref="viewer"
+        @click="get_x_y"
+        @keydown.esc="app_store.toggle_picking_mode(false)"
+        class="pa-0"
+      >
+      </v-col>
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -25,7 +27,7 @@
   const viewer_store = use_viewer_store()
   const { picking_mode } = storeToRefs(viewer_store)
   const websocket_store = use_websocket_store()
-  const { client } = storeToRefs(websocket_store)
+  const { client, is_running } = storeToRefs(websocket_store)
 
   function get_x_y(event) {
     if (picking_mode.value === true) {
@@ -89,7 +91,7 @@
   })
 
   function connect() {
-    if (!websocket_store.is_running) {
+    if (!is_running.value) {
       return
     }
     console.log("connecting", client.value)
