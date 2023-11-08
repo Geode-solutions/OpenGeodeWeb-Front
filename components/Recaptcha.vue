@@ -1,18 +1,19 @@
 <template>
-  <vue-recaptcha
-    ref="recaptcha"
-    :sitekey="site_key"
-    :loadRecaptchaScript="true"
-    @expired="is_captcha_validated = false"
-    @verify="submit_recaptcha"
-    align-self="center"
-  />
+  <ClientOnly>
+    <vue-recaptcha
+      ref="recaptcha"
+      :sitekey="site_key"
+      :loadRecaptchaScript="true"
+      @expired="is_captcha_validated = false"
+      @verify="submit_recaptcha"
+      align-self="center"
+    />
+  </ClientOnly>
 </template>
 
 <script setup>
   import { VueRecaptcha } from "vue-recaptcha"
 
-  const websocket_store = use_websocket_store()
   const cloud_store = use_cloud_store()
   const { is_captcha_validated } = storeToRefs(cloud_store)
 
