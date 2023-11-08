@@ -20,44 +20,21 @@
 </template>
 
 <script setup>
-    import { VueRecaptcha } from "vue-recaptcha"
-    const websocket_store = use_websocket_store()
-    const cloud_store = use_cloud_store()
-    const { is_captcha_validated } = storeToRefs(cloud_store)
+  import { VueRecaptcha } from "vue-recaptcha"
+  const websocket_store = use_websocket_store()
+  const cloud_store = use_cloud_store()
+  const { is_captcha_validated } = storeToRefs(cloud_store)
 
-    const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
+  const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
 
-    watch(is_captcha_validated, async (value) => {
-      if (value === true && process.client) {
-        await cloud_store.create_connexion()
-        await websocket_store.ws_connect()
-      }
-    })
-
-    onMounted(() => {
-  <<<<<<< HEAD
-      console.log("onMounted", useRuntimeConfig())
-    })
-  =======
-      if (process.client) {
-        console.log("useRuntimeConfig()", useRuntimeConfig())
-        const config = useRuntimeConfig()
-        if (config.public.NODE_ENV !== "production") {
-          cloud_store.$patch({ is_captcha_validated: true })
-        }
-      }
-    })
-
-    async function submit_recaptcha(token) {
-      try {
-        const response = await $fetch.raw(
-          `/.netlify/functions/recaptcha?token=${token}`,
-        )
-        cloud_store.$patch({ is_captcha_validated: response.status == 200 })
-        recaptcha.reset()
-      } catch (error) {
-        console.error(error)
-      }
+  watch(is_captcha_validated, async (value) => {
+    if (value === true && process.client) {
+      await cloud_store.create_connexion()
+      await websocket_store.ws_connect()
     }
-  >>>>>>> 96ad5440029efa83fba9a0825d38e5ca6625e9ae
+  })
+
+  onMounted(() => {
+    console.log("onMounted", useRuntimeConfig())
+  })
 </script>
