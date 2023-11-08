@@ -1,12 +1,14 @@
 <template>
-  <vue-recaptcha
-    ref="recaptcha"
-    :sitekey="site_key"
-    :loadRecaptchaScript="true"
-    @expired="is_captcha_validated = false"
-    @verify="submit_recaptcha"
-    align-self="center"
-  />
+  <ClientOnly>
+    <vue-recaptcha
+      ref="recaptcha"
+      :sitekey="site_key"
+      :loadRecaptchaScript="true"
+      @expired="is_captcha_validated = false"
+      @verify="submit_recaptcha"
+      align-self="center"
+    />
+  </ClientOnly>
 </template>
 
 <script setup>

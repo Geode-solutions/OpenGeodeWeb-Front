@@ -8,7 +8,7 @@
         align="center"
       >
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
-        <Recaptcha />
+        <!-- <Recaptcha /> -->
       </v-col>
       <v-col
         v-else-if="!cloud_store.is_running && cloud_store.is_connexion_launched"
@@ -20,6 +20,7 @@
 </template>
 
 <script setup>
+  import { VueRecaptcha } from "vue-recaptcha"
   const websocket_store = use_websocket_store()
   const cloud_store = use_cloud_store()
   const { is_captcha_validated } = storeToRefs(cloud_store)
@@ -29,5 +30,9 @@
       await cloud_store.create_connexion()
       await websocket_store.ws_connect()
     }
+  })
+
+  onMounted(() => {
+    console.log("onMounted", useRuntimeConfig())
   })
 </script>
