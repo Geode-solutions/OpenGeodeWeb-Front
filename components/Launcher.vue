@@ -8,7 +8,7 @@
         align="center"
       >
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
-        <Recaptcha />
+        <Recaptcha :site_key="site_key" />
       </v-col>
       <v-col
         v-else-if="!cloud_store.is_running && cloud_store.is_connexion_launched"
@@ -23,6 +23,8 @@
   const websocket_store = use_websocket_store()
   const cloud_store = use_cloud_store()
   const { is_captcha_validated } = storeToRefs(cloud_store)
+
+  const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
 
   watch(is_captcha_validated, async (value) => {
     if (value === true && process.client) {

@@ -16,7 +16,10 @@
   const cloud_store = use_cloud_store()
   const { is_captcha_validated } = storeToRefs(cloud_store)
 
-  const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
+  const props = defineProps({
+    site_key: { type: String, required: true },
+  })
+  const { site_key } = props
 
   onMounted(() => {
     if (process.client) {
