@@ -1,9 +1,0 @@
-{
-  "$id": "/tools/crs_selector/geographic_coordinate_systems",
-  "type": "object",
-  "properties": {
-    "geode_object": {
-      "type": "string"
-    }
-  }
-}

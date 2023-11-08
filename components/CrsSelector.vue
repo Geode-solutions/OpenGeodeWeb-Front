@@ -62,9 +62,7 @@
   }
 
   async function get_crs_table() {
-    let params = {
-      geode_object: geode_object,
-    }
+    const params = { geode_object: geode_object }
     toggle_loading()
     await api_fetch(
       { schema, params },
