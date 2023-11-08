@@ -45,6 +45,7 @@
 
   onMounted(() => {
     if (process.client) {
+      console.log("useRuntimeConfig()", useRuntimeConfig())
       const config = useRuntimeConfig()
       if (config.public.NODE_ENV !== "production") {
         cloud_store.$patch({ is_captcha_validated: true })
