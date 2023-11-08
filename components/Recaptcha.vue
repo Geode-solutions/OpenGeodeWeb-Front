@@ -2,7 +2,7 @@
   <ClientOnly>
     <vue-recaptcha
       ref="recaptcha"
-      :site-key="site_key"
+      :sitekey="site_key"
       :loadRecaptchaScript="true"
       @expired="is_captcha_validated = false"
       @verify="submit_recaptcha"
@@ -19,6 +19,7 @@
   const { is_captcha_validated } = storeToRefs(cloud_store)
 
   const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
+  console.log("site_key", site_key)
 
   onMounted(() => {
     if (process.client) {
