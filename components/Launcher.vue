@@ -32,4 +32,9 @@
       await websocket_store.ws_connect()
     }
   })
+
+  onMounted(async () => {
+    console.log("useRuntimeConfig()", useRuntimeConfig())
+    console.log("site_key", site_key)
+  })
 </script>

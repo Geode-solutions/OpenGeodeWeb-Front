@@ -22,6 +22,7 @@
   const { site_key } = props
 
   onMounted(() => {
+    console.log("recaptcha mounted", site_key)
     if (process.client) {
       const config = useRuntimeConfig()
       if (config.public.NODE_ENV !== "production") {
