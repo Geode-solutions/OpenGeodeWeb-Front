@@ -2,7 +2,7 @@
   <ClientOnly>
     <vue-recaptcha
       ref="recaptcha"
-      :sitekey="6Lce72wgAAAAAOXrHyDxRQBhk6NDTD80MrXOlgbC"
+      sitekey="6Lce72wgAAAAAOXrHyDxRQBhk6NDTD80MrXOlgbC"
       :loadRecaptchaScript="true"
       @expired="is_captcha_validated = false"
       @verify="submit_recaptcha"
@@ -18,7 +18,12 @@
   const cloud_store = use_cloud_store()
   const { is_captcha_validated } = storeToRefs(cloud_store)
 
-  const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
+  const props = defineProps({
+    site_key: { type: String, required: true },
+  })
+  const { site_key } = props
+
+  // const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
   console.log("site_key", site_key)
 
   onMounted(() => {

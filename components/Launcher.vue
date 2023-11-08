@@ -8,7 +8,7 @@
         align="center"
       >
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
-        <Recaptcha />
+        <Recaptcha site_key="6Lce72wgAAAAAOXrHyDxRQBhk6NDTD80MrXOlgbC" />
       </v-col>
       <v-col
         v-else-if="!cloud_store.is_running && cloud_store.is_connexion_launched"
