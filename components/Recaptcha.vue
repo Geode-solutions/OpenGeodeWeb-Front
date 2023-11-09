@@ -14,7 +14,6 @@
 <script setup>
   import { VueRecaptcha } from "vue-recaptcha"
 
-  const websocket_store = use_websocket_store()
   const cloud_store = use_cloud_store()
   const { is_captcha_validated } = storeToRefs(cloud_store)
 
@@ -23,7 +22,6 @@
   })
   const { site_key } = props
 
-  // const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
   console.log("site_key", site_key)
 
   onMounted(() => {
