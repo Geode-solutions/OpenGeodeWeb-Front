@@ -19,20 +19,19 @@
 </template>
 
 <script setup>
-  const props = defineProps({
-    route_prefix: { type: String, required: true },
-  })
-  const { route_prefix } = props
-
   const cloud_store = use_cloud_store()
   const { is_running } = storeToRefs(cloud_store)
 
+  const props = defineProps({
+    schema: { type: Object, required: true },
+  })
+  const { schema } = props
+
   const packages_versions = ref([])
 
-  async function get_packages_versions() {
-    await api_fetch(
-      `${route_prefix}/versions`,
-      { method: "GET" },
+  function get_packages_versions() {
+    api_fetch(
+      { schema },
       {
         response_function: (response) => {
           packages_versions.value = response._data.versions
@@ -48,7 +47,7 @@
   })
 
   onMounted(() => {
-    if (is_running.value === true) {
+    if (is_running.value) {
       get_packages_versions()
     }
   })

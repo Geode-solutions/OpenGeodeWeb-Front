@@ -11,7 +11,7 @@
         <Stepper />
       </v-col>
       <v-col v-if="is_running">
-        <PackagesVersions :route_prefix="route_prefix" />
+        <PackagesVersions :schema="versions_schema" />
       </v-col>
     </v-row>
   </v-container>
@@ -22,10 +22,11 @@
   const { is_running } = storeToRefs(cloud_store)
 
   const props = defineProps({
+    versions_schema: { type: Object, required: true },
     cards_list: { type: Array, required: true },
   })
-  const { cards_list } = props
+  const { cards_list, versions_schema } = props
 
   const stepper_tree = inject("stepper_tree")
-  const { tool_name, route_prefix } = stepper_tree
+  const { tool_name } = stepper_tree
 </script>

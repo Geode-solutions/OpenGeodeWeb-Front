@@ -41,12 +41,12 @@
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { route_prefix } = stepper_tree
 
   const props = defineProps({
     input_geode_object: { type: String, required: true },
+    schema: { type: Object, required: true },
   })
-  const { input_geode_object } = props
+  const { input_geode_object, schema } = props
 
   const geode_objects_and_output_extensions = ref([])
   const loading = ref(false)
@@ -54,12 +54,10 @@
   const toggle_loading = useToggle(loading)
 
   async function get_output_file_extensions() {
-    const params = new FormData()
-    params.append("input_geode_object", input_geode_object)
     toggle_loading()
+    const params = { input_geode_object }
     await api_fetch(
-      `${route_prefix}/output_file_extensions`,
-      { method: "POST", body: params },
+      { schema, params },
       {
         response_function: (response) => {
           geode_objects_and_output_extensions.value =

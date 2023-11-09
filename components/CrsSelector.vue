@@ -25,14 +25,13 @@
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { route_prefix } = stepper_tree
-
   const props = defineProps({
     input_geode_object: { type: String, required: true },
     variable_to_update: { type: String, required: true },
+    schema: { type: Object, required: true },
   })
 
-  const { input_geode_object, variable_to_update } = props
+  const { input_geode_object, variable_to_update, schema } = props
 
   const search = ref("")
   const data_table_loading = ref(false)
@@ -59,14 +58,11 @@
   }
 
   async function get_crs_table() {
-    let params = new FormData()
-    params.append("input_geode_object", input_geode_object)
+    const params = { input_geode_object }
     toggle_loading()
     await api_fetch(
-      `${route_prefix}/geographic_coordinate_systems`,
-      { method: "POST", body: params },
+      { schema, params },
       {
-        request_error_function: () => {},
         response_function: (response) => {
           crs_list.value = response._data.crs_list
         },

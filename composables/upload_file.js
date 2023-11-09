@@ -1,50 +1,29 @@
-import Ajv from "ajv"
-import _ from "lodash"
-
-export function api_fetch(
-  { schema, params },
+export function upload_file(
+  { route, files },
   { request_error_function, response_function, response_error_function } = {},
 ) {
   const errors_store = use_errors_store()
   const geode_store = use_geode_store()
 
-  const body = params || {}
+  const body = new FormData()
+  for (let i = 0; i < files.length; i++) {
+    body.append("content", files[i])
+  }
 
-  const ajv = new Ajv()
-
-  ajv.addKeyword("method")
-  ajv.addKeyword("max_retry")
-  const valid = ajv.validate(schema, body)
-  if (!valid) {
-    errors_store.add_error({
-      code: "400",
-      route: schema.$id,
-      name: "Bad request",
-      description: ajv.errorsText(),
-    })
-    return
+  const request_options = {
+    method: "PUT",
+    body: body,
   }
 
   geode_store.start_request()
-
-  const request_options = { method: schema["method"] }
-  if (!_.isEmpty(body)) {
-    request_options.body = body
-  }
-
-  if (schema.max_retry) {
-    request_options.max_retry = schema.max_retry
-  }
-
-  return useFetch(schema.$id, {
+  return useFetch(route, {
     baseURL: geode_store.base_url,
     ...request_options,
     onRequestError({ error }) {
-      // console.log("onRequestError", error)
       geode_store.stop_request()
       errors_store.add_error({
         code: error.code,
-        route: schema.$id,
+        route: route,
         name: error.message,
         description: error.stack,
       })
@@ -53,7 +32,6 @@ export function api_fetch(
       }
     },
     onResponse({ response }) {
-      // console.log(response)
       if (response.ok) {
         geode_store.stop_request()
         if (response_function) {
@@ -62,11 +40,10 @@ export function api_fetch(
       }
     },
     onResponseError({ response }) {
-      // console.log(response)
       geode_store.stop_request()
       errors_store.add_error({
         code: response.status,
-        route: schema.$id,
+        route: route,
         name: response._data.name,
         description: response._data.description,
       })
@@ -77,4 +54,4 @@ export function api_fetch(
   })
 }
 
-export default api_fetch
+export default upload_file
