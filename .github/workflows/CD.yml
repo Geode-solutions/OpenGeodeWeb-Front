@@ -1,7 +1,7 @@
 name: Publish Package to npmjs
 on:
   push:
-    branches: [ next, master ]
+    branches: [next, master]
 
 jobs:
   build:
@@ -14,3 +14,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Merge master -> next
+        if: github.ref == 'ref/head/master'
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: master
+          target_branch: next
+          github_token: ${{ github.token }}
