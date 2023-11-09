@@ -8,7 +8,15 @@
         align="center"
       >
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
-        <Recaptcha site_key="6Lce72wgAAAAAOXrHyDxRQBhk6NDTD80MrXOlgbC" />
+        <!-- <Recaptcha site_key="6Lce72wgAAAAAOXrHyDxRQBhk6NDTD80MrXOlgbC" /> -->
+        <vue-recaptcha
+          ref="recaptcha"
+          sitekey="6Lce72wgAAAAAOXrHyDxRQBhk6NDTD80MrXOlgbC"
+          :loadRecaptchaScript="true"
+          @expired="is_captcha_validated = false"
+          @verify="submit_recaptcha"
+          align-self="center"
+        />
       </v-col>
       <v-col
         v-else-if="!cloud_store.is_running && cloud_store.is_connexion_launched"
@@ -37,4 +45,16 @@
   onMounted(() => {
     console.log("onMounted", useRuntimeConfig())
   })
+
+  async function submit_recaptcha(token) {
+    try {
+      const response = await $fetch.raw(
+        `/.netlify/functions/recaptcha?token=${token}`,
+      )
+      cloud_store.$patch({ is_captcha_validated: response.status == 200 })
+      recaptcha.reset()
+    } catch (error) {
+      console.error(error)
+    }
+  }
 </script>
