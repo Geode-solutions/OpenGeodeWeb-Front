@@ -50,9 +50,10 @@
     multiple: { type: Boolean, required: true },
     input_geode_object: { type: String, required: true },
     files: { type: Array, required: true },
+    schema: { type: Object, required: true },
   })
 
-  const { multiple, input_geode_object, files } = props
+  const { multiple, input_geode_object, files, schema } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -73,12 +74,9 @@
     additional_files.value = []
     toggle_loading()
     for (const file of files) {
-      const params = new FormData()
-      params.append("input_geode_object", input_geode_object)
-      params.append("filename", file.name)
+      const params = { input_geode_object, filename: file.name }
       await api_fetch(
-        `${route_prefix}/missing_files`,
-        { method: "POST", body: params },
+        { schema, params },
         {
           response_function: (response) => {
             has_missing_files.value = response._data.has_missing_files

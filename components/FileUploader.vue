@@ -33,9 +33,6 @@
 <script setup>
   const emit = defineEmits(["files_uploaded"])
 
-  const stepper_tree = inject("stepper_tree")
-  const { route_prefix } = stepper_tree
-
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     accept: { type: String, required: true },
@@ -51,31 +48,16 @@
 
   async function upload_files() {
     toggle_loading()
-    const promise_array = []
-    for (const file of files.value) {
-      const promise = new Promise(function (resolve) {
-        const reader = new FileReader()
-
-        reader.onload = async function (event) {
-          const params = new FormData()
-          params.append("file", event.target.result)
-          params.append("filename", file.name)
-          params.append("filesize", file.size)
-
-          await api_fetch(`${route_prefix}/upload_file`, {
-            method: "POST",
-            body: params,
-          })
-          resolve()
-        }
-        reader.readAsDataURL(file)
-      })
-      promise_array.push(promise)
-    }
-    await Promise.all(promise_array)
+    await upload_file(
+      { route: `tools/upload_file`, files },
+      {
+        response_function: () => {
+          files_uploaded.value = true
+          emit("files_uploaded", files.value)
+        },
+      },
+    )
     toggle_loading()
-    files_uploaded.value = true
-    emit("files_uploaded", files.value)
   }
 
   function clear() {

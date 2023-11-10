@@ -37,10 +37,11 @@
 
   const props = defineProps({
     files: { type: Array, required: true },
+    key: { type: String, required: false, default: null },
     schema: { type: Object, required: true },
   })
 
-  const { files, schema } = props
+  const { files, key, schema } = props
 
   const loading = ref(false)
   const allowed_objects = ref([])
@@ -48,7 +49,7 @@
   const toggle_loading = useToggle(loading)
 
   async function get_allowed_objects() {
-    const params = { filename: files[0].name }
+    const params = { filename: files[0].name, key }
     toggle_loading()
     await api_fetch(
       { schema, params },

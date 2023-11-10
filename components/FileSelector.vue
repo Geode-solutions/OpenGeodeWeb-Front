@@ -1,6 +1,7 @@
 <template>
   <FetchingData v-if="loading" />
   <FileUploader
+    v-else
     v-bind="{ multiple, accept }"
     @files_uploaded="files_uploaded_event"
   />
@@ -11,10 +12,11 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
+    key: { type: String, required: false, default: "" },
     schema: { type: Object, required: true },
   })
 
-  const { multiple, schema } = props
+  const { multiple, key, schema } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -30,8 +32,9 @@
 
   async function get_allowed_files() {
     toggle_loading()
+    const params = { key }
     await api_fetch(
-      { schema },
+      { schema, params },
       {
         response_function: (response) => {
           accept.value = response._data.extensions
