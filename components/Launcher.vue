@@ -31,8 +31,4 @@
       await websocket_store.ws_connect()
     }
   })
-
-  onMounted(() => {
-    console.log("onMounted", useRuntimeConfig())
-  })
 </script>

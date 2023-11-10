@@ -64,7 +64,6 @@
 
   function files_uploaded(value) {
     stepper_tree["additional_files"] = value
-    console.log("files_uploaded")
     missing_files()
   }
 
