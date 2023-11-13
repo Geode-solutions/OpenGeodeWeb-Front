@@ -44,7 +44,6 @@
 
 <script setup>
   const stepper_tree = inject("stepper_tree")
-  const { route_prefix } = stepper_tree
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },

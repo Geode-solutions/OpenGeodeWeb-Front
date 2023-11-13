@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-5 card" elevation="5">
+  <v-card class="pa-5">
     <v-row align="center" @click="set_current_step(step_index)">
       <v-col cols="auto">
         <v-icon
@@ -60,11 +60,7 @@
   }
 </script>
 
-<style>
-  .card {
-    border-radius: 15px;
-  }
-
+<style scoped>
   .slide-fade-enter-active {
     transition: all 0.5s ease-out;
   }

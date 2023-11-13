@@ -49,9 +49,3 @@
     get_allowed_files()
   })
 </script>
-
-<style scoped>
-  .v-btn {
-    text-transform: unset !important;
-  }
-</style>

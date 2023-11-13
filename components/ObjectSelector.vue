@@ -2,7 +2,7 @@
   <FetchingData v-if="loading" />
   <v-row v-else-if="allowed_objects.length" class="justify-left">
     <v-col v-for="object in allowed_objects" :key="object" cols="2" md="2">
-      <v-card v-ripple class="card ma-2" hover elevation="5" rounded>
+      <v-card v-ripple class="card ma-2" hover rounded>
         <v-img
           :src="geode_objects[object].image"
           cover
@@ -15,7 +15,7 @@
     </v-col>
   </v-row>
   <v-row v-else class="pa-5">
-    <v-card class="card" variant="tonal" elevation="5" rounded>
+    <v-card class="card" variant="tonal" rounded>
       <v-card-text>
         This file format isn't supported! Please check the
         <a
@@ -71,9 +71,3 @@
     get_allowed_objects()
   })
 </script>
-
-<style scoped>
-  .card {
-    border-radius: 15px;
-  }
-</style>

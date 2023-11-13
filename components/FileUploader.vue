@@ -69,9 +69,3 @@
     files_uploaded.value = false
   })
 </script>
-
-<style scoped>
-  .v-btn {
-    text-transform: unset !important;
-  }
-</style>

@@ -3,9 +3,9 @@
   <v-row
     v-for="item in geode_objects_and_output_extensions"
     :key="item.geode_object"
-    class="justify - left"
+    class="justify-left"
   >
-    <v-card class="card ma-2 pa-2" elevation="5" width="100%">
+    <v-card class="card ma-2 pa-2" width="100%">
       <v-tooltip :text="`Export as a ${item.geode_object}`" location="bottom">
         <template v-slot:activator="{ props }">
           <v-card-title v-bind="props">
@@ -25,7 +25,6 @@
               class="card ma-2"
               color="primary"
               hover
-              elevation="5"
               @click="set_variables(item.geode_object, output_extension)"
             >
               <v-card-title align="center">
@@ -78,9 +77,3 @@
     get_output_file_extensions()
   })
 </script>
-
-<style scoped>
-  .card {
-    border-radius: 15px;
-  }
-</style>

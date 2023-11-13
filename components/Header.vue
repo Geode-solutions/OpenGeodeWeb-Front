@@ -6,14 +6,7 @@
     <v-col>
       <v-row class="justify-center">
         <v-col v-for="(card, i) in cards_list" :key="i" cols="11" md="5">
-          <v-card
-            class="card"
-            hover
-            elevation="5"
-            :href="card.href"
-            rounded
-            target="_blank"
-          >
+          <v-card class="card" hover :href="card.href" rounded target="_blank">
             <v-card-title
               primary-title
               class="justify-center text-h6"
