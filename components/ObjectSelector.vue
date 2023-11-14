@@ -33,7 +33,7 @@
 <script setup>
   import geode_objects from "@/assets/geode_objects"
 
-  const stepper_tree = inject("stepper_tree")
+  const emit = defineEmits(["update_values", "increment_current_step"])
 
   const props = defineProps({
     files: { type: Array, required: true },
@@ -63,8 +63,10 @@
   }
 
   function set_geode_object(geode_object) {
-    stepper_tree["input_geode_object"] = geode_object
-    stepper_tree["current_step_index"]++
+    if (geode_object != "") {
+      emit("update_values", { input_geode_object: geode_object })
+      emit("increment_current_step")
+    }
   }
 
   onMounted(() => {

@@ -39,7 +39,11 @@
 </template>
 
 <script setup>
-  const stepper_tree = inject("stepper_tree")
+  const emit = defineEmits([
+    "update_values",
+    "increment_current_step",
+    "decrement_current_step",
+  ])
 
   const props = defineProps({
     input_geode_object: { type: String, required: true },
@@ -68,9 +72,14 @@
   }
 
   function set_variables(geode_object, output_extension) {
-    stepper_tree["output_geode_object"] = geode_object
-    stepper_tree["output_extension"] = output_extension
-    stepper_tree["current_step_index"]++
+    if (geode_object != "" && output_extension != "") {
+      const keys_values_object = {
+        output_geode_object: geode_object,
+        output_extension,
+      }
+      emit("update_values", keys_values_object)
+      emit("increment_current_step")
+    }
   }
 
   onMounted(() => {

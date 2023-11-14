@@ -24,14 +24,19 @@
 </template>
 
 <script setup>
-  const stepper_tree = inject("stepper_tree")
+  const emit = defineEmits([
+    "update_values",
+    "increment_current_step",
+    "decrement_current_step",
+  ])
+
   const props = defineProps({
     input_geode_object: { type: String, required: true },
-    variable_to_update: { type: String, required: true },
+    key_to_update: { type: String, required: true },
     schema: { type: Object, required: true },
   })
 
-  const { input_geode_object, variable_to_update, schema } = props
+  const { input_geode_object, key_to_update, schema } = props
 
   const search = ref("")
   const data_table_loading = ref(false)
@@ -41,13 +46,12 @@
 
   watch(selected_crs, (new_value) => {
     const crs = get_selected_crs(new_value[0])
-    set_crs(crs)
+    const keys_values_object = {
+      [key_to_update]: crs,
+    }
+    emit("update_values", keys_values_object)
+    emit("increment_current_step")
   })
-
-  function set_crs(crs_value) {
-    stepper_tree[variable_to_update] = crs_value
-    stepper_tree["current_step_index"]++
-  }
 
   function get_selected_crs(crs_code) {
     for (let i = 0; i <= crs_list.value.length; i++) {

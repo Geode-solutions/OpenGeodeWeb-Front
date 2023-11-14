@@ -41,6 +41,9 @@
         <component
           :is="steps[step_index].component.component_name"
           v-bind="steps[step_index].component.component_options"
+          @update_values="update_values_event"
+          @increment_current_step="increment_current_step()"
+          @decrement_current_step="decrement_current_step()"
         />
       </v-col>
     </Transition>
@@ -57,6 +60,22 @@
 
   function set_current_step(step_index) {
     stepper_tree.current_step_index = step_index
+  }
+
+  function update_values_event(keys_values_object) {
+    console.log("update_values_event", keys_values_object)
+    for (const [key, value] of Object.entries(keys_values_object)) {
+      console.log(key, value)
+      stepper_tree[key] = value
+    }
+  }
+
+  function increment_current_step() {
+    stepper_tree.current_step_index++
+  }
+
+  function decrement_current_step() {
+    stepper_tree.current_step_index--
   }
 </script>
 

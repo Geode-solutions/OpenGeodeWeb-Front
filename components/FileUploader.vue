@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-  const emit = defineEmits(["files_uploaded"])
+  const emit = defineEmits(["files_uploaded", "decrement_current_step"])
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },

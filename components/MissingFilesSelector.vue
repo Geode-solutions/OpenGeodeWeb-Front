@@ -6,7 +6,7 @@
         <v-icon color="warning" icon="mdi-file-document-alert-outline" />
       </v-col>
       <p class="pa-1">Mandatory files:</p>
-      <v-col v-for="mandatory_file in mandatory_files" class="pa-0">
+      <v-col v-for="mandatory_file in mandatory_files" cols="auto" class="pa-0">
         <v-chip>{{ mandatory_file }}</v-chip>
       </v-col>
     </v-row>
@@ -43,7 +43,11 @@
 </template>
 
 <script setup>
-  const stepper_tree = inject("stepper_tree")
+  const emit = defineEmits([
+    "update_values",
+    "increment_current_step",
+    "decrement_current_step",
+  ])
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
@@ -62,7 +66,7 @@
   const toggle_loading = useToggle(loading)
 
   function files_uploaded(value) {
-    stepper_tree["additional_files"] = value
+    emit("update_values", { additional_files: value })
     missing_files()
   }
 
@@ -94,7 +98,7 @@
               .map((filename) => "." + filename.split(".").pop())
               .join(",")
             if (!has_missing_files.value) {
-              stepper_tree["current_step_index"]++
+              emit("increment_current_step")
             }
           },
         },

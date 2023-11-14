@@ -8,7 +8,11 @@
 </template>
 
 <script setup>
-  const stepper_tree = inject("stepper_tree")
+  const emit = defineEmits([
+    "update_values",
+    "increment_current_step",
+    "decrement_current_step",
+  ])
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
@@ -24,9 +28,9 @@
   const toggle_loading = useToggle(loading)
 
   function files_uploaded_event(value) {
-    stepper_tree["files"] = value
     if (value.length) {
-      stepper_tree["current_step_index"]++
+      emit("update_values", { files: value })
+      emit("increment_current_step")
     }
   }
 
