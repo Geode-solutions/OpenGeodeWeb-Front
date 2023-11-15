@@ -18,7 +18,7 @@
   <v-row>
     <v-col cols="auto">
       <v-btn
-        @click="upload_files(files)"
+        @click="upload_files()"
         color="primary"
         :disabled="!files.length && !files_uploaded"
         :loading="loading"
@@ -36,8 +36,9 @@
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     accept: { type: String, required: true },
+    route: { type: String, required: true },
   })
-  const { multiple, accept } = toRefs(props)
+  const { multiple, accept, route } = toRefs(props)
 
   const label = multiple ? "Please select file(s)" : "Please select a file"
   const files = ref([])
@@ -49,7 +50,7 @@
   async function upload_files() {
     toggle_loading()
     await upload_file(
-      { route: `tools/upload_file`, files },
+      { route, files: multiple ? files.value : [files.value[0]] },
       {
         response_function: () => {
           files_uploaded.value = true

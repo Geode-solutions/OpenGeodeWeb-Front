@@ -26,7 +26,7 @@
     <v-row>
       <v-col cols="12">
         <FileUploader
-          v-bind="{ multiple, accept }"
+          v-bind="{ multiple, accept, route }"
           @files_uploaded="files_uploaded"
         />
       </v-col>
@@ -53,10 +53,11 @@
     multiple: { type: Boolean, required: true },
     input_geode_object: { type: String, required: true },
     files: { type: Array, required: true },
+    route: { type: String, required: true },
     schema: { type: Object, required: true },
   })
 
-  const { multiple, input_geode_object, files, schema } = props
+  const { multiple, input_geode_object, files, route, schema } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -98,6 +99,7 @@
               .map((filename) => "." + filename.split(".").pop())
               .join(",")
             if (!has_missing_files.value) {
+              console.log("MISSING FILESSELECTOR increment_current_step")
               emit("increment_current_step")
             }
           },
