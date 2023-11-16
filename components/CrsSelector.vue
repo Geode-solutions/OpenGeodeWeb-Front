@@ -24,18 +24,19 @@
 </template>
 
 <script setup>
-  import { useToggle } from "@vueuse/core"
-
-  const stepper_tree = inject("stepper_tree")
-  const { geode_object } = stepper_tree
+  const emit = defineEmits([
+    "update_values",
+    "increment_step",
+    "decrement_step",
+  ])
 
   const props = defineProps({
-    variable_to_update: { type: String, required: true },
-    variable_to_increment: { type: String, required: true },
+    input_geode_object: { type: String, required: true },
+    key_to_update: { type: String, required: true },
     schema: { type: Object, required: true },
   })
 
-  const { variable_to_update, variable_to_increment, schema } = props
+  const { input_geode_object, key_to_update, schema } = props
 
   const search = ref("")
   const data_table_loading = ref(false)
@@ -45,13 +46,12 @@
 
   watch(selected_crs, (new_value) => {
     const crs = get_selected_crs(new_value[0])
-    set_crs(crs)
+    const keys_values_object = {
+      [key_to_update]: crs,
+    }
+    emit("update_values", keys_values_object)
+    emit("increment_step")
   })
-
-  function set_crs(crs_value) {
-    stepper_tree[variable_to_update] = crs_value
-    stepper_tree[variable_to_increment]++
-  }
 
   function get_selected_crs(crs_code) {
     for (let i = 0; i <= crs_list.value.length; i++) {
@@ -62,7 +62,7 @@
   }
 
   async function get_crs_table() {
-    const params = { geode_object: geode_object }
+    const params = { input_geode_object }
     toggle_loading()
     await api_fetch(
       { schema, params },
