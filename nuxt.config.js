@@ -3,5 +3,5 @@ export default defineNuxtConfig({
     dirs: ["stores"],
   },
 
-  modules: [["@pinia/nuxt", { autoImports: ["defineStore"] }]],
+  modules: [["@pinia/nuxt", { autoImports: ["defineStore"] }], "@vueuse/nuxt"],
 })

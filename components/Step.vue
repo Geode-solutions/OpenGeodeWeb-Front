@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-5 card" elevation="5">
+  <v-card class="pa-5">
     <v-row align="center" @click="set_current_step(step_index)">
       <v-col cols="auto">
         <v-icon
@@ -41,10 +41,10 @@
         <component
           :is="steps[step_index].component.component_name"
           v-bind="steps[step_index].component.component_options"
+          @update_values="update_values_event"
+          @increment_step="increment_step()"
+          @decrement_step="decrement_step()"
         />
-        <v-btn v-if="skippable()" @click="skipStep()" color="primary"
-          >Skip step</v-btn
-        >
       </v-col>
     </Transition>
   </v-card>
@@ -58,28 +58,28 @@
   const stepper_tree = inject("stepper_tree")
   const { current_step_index, steps } = toRefs(stepper_tree)
 
-  function skippable() {
-    if (stepper_tree.steps[step_index].component.skippable !== undefined) {
-      return stepper_tree.steps[step_index].component.skippable
-    } else {
-      return false
-    }
-  }
-
-  function skipStep() {
-    stepper_tree.current_step_index++
-  }
-
   function set_current_step(step_index) {
     stepper_tree.current_step_index = step_index
   }
-</script>
 
-<style>
-  .card {
-    border-radius: 15px;
+  function update_values_event(keys_values_object) {
+    console.log("update_values_event", keys_values_object)
+    for (const [key, value] of Object.entries(keys_values_object)) {
+      console.log(key, value)
+      stepper_tree[key] = value
+    }
   }
 
+  function increment_step() {
+    stepper_tree.current_step_index++
+  }
+
+  function decrement_step() {
+    stepper_tree.current_step_index--
+  }
+</script>
+
+<style scoped>
   .slide-fade-enter-active {
     transition: all 0.5s ease-out;
   }

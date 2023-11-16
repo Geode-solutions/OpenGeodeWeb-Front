@@ -94,7 +94,6 @@
     if (!is_running.value) {
       return
     }
-    console.log("connecting", client.value)
     const session = client.value.getConnection().getSession()
     view.setSession(session)
     view.setViewId(viewId.value)

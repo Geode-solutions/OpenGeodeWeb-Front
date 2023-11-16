@@ -22,8 +22,6 @@
   })
   const { site_key } = props
 
-  console.log("site_key", site_key)
-
   onMounted(() => {
     if (process.client) {
       const config = useRuntimeConfig()

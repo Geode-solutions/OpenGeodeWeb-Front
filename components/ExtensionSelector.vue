@@ -1,61 +1,88 @@
 <template>
-  <v-row class="justify-left">
-    <v-col
-      v-for="file_extension in file_extensions"
-      :key="file_extension"
-      cols="2"
-    >
-      <v-card
-        class="card ma-2"
-        hover
-        elevation="5"
-        @click="set_output_extension(file_extension)"
-      >
-        <v-card-title align="center">
-          {{ file_extension }}
-        </v-card-title>
-      </v-card>
-    </v-col>
+  <FetchingData v-if="loading" />
+  <v-row
+    v-for="item in geode_objects_and_output_extensions"
+    :key="item.geode_object"
+    class="justify-left"
+  >
+    <v-card class="card ma-2 pa-2" width="100%">
+      <v-tooltip :text="`Export as a ${item.geode_object}`" location="bottom">
+        <template v-slot:activator="{ props }">
+          <v-card-title v-bind="props">
+            {{ item.geode_object }}
+          </v-card-title>
+        </template>
+      </v-tooltip>
+      <v-card-text>
+        <v-row>
+          <v-col
+            v-for="output_extension in item.output_extensions"
+            :key="output_extension"
+            cols="auto"
+            class="pa-0"
+          >
+            <v-card
+              class="card ma-2"
+              color="primary"
+              hover
+              @click="set_variables(item.geode_object, output_extension)"
+            >
+              <v-card-title align="center">
+                {{ output_extension }}
+              </v-card-title>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
   </v-row>
 </template>
 
 <script setup>
-  const stepper_tree = inject("stepper_tree")
-  const { geode_object } = stepper_tree
+  const emit = defineEmits([
+    "update_values",
+    "increment_step",
+    "decrement_step",
+  ])
 
   const props = defineProps({
-    variable_to_update: { type: String, required: true },
-    variable_to_increment: { type: String, required: true },
+    input_geode_object: { type: String, required: true },
     schema: { type: Object, required: true },
   })
-  const { variable_to_update, variable_to_increment, schema } = props
+  const { input_geode_object, schema } = props
 
-  const file_extensions = ref([])
+  const geode_objects_and_output_extensions = ref([])
+  const loading = ref(false)
+
+  const toggle_loading = useToggle(loading)
 
   async function get_output_file_extensions() {
-    const params = { geode_object: geode_object }
+    toggle_loading()
+    const params = { input_geode_object }
     await api_fetch(
       { schema, params },
       {
         response_function: (response) => {
-          file_extensions.value = response._data.output_file_extensions
+          geode_objects_and_output_extensions.value =
+            response._data.geode_objects_and_output_extensions
         },
       },
     )
+    toggle_loading()
   }
 
-  function set_output_extension(extension) {
-    stepper_tree[variable_to_update] = extension
-    stepper_tree[variable_to_increment]++
+  function set_variables(geode_object, output_extension) {
+    if (geode_object != "" && output_extension != "") {
+      const keys_values_object = {
+        output_geode_object: geode_object,
+        output_extension,
+      }
+      emit("update_values", keys_values_object)
+      emit("increment_step")
+    }
   }
 
   onMounted(() => {
     get_output_file_extensions()
   })
 </script>
-
-<style scoped>
-  .card {
-    border-radius: 15px;
-  }
-</style>

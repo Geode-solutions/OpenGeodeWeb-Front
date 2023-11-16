@@ -1,58 +1,56 @@
 <template>
-  <v-file-input
-    v-model="files"
-    :multiple="multiple"
-    :label="label"
-    :accept="accept"
-    :rules="[(value) => !!value || 'The file is mandatory']"
-    color="primary"
-    chips
-    counter
-    show-size
-    @click:clear="stepper_tree.files = []"
+  <FetchingData v-if="loading" />
+  <FileUploader
+    v-else
+    v-bind="{ multiple, accept, route }"
+    @files_uploaded="files_uploaded_event"
   />
 </template>
 
 <script setup>
-  const stepper_tree = inject("stepper_tree")
+  const emit = defineEmits([
+    "update_values",
+    "increment_step",
+    "decrement_step",
+  ])
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    label: { type: String, required: true },
-    variable_to_update: { type: String, required: true },
-    variable_to_increment: { type: String, required: true },
+    key: { type: String, required: false, default: "" },
+    route: { type: String, required: false, default: "" },
     schema: { type: Object, required: true },
   })
-  const { multiple, label, variable_to_update, variable_to_increment, schema } =
-    props
+
+  const { multiple, key, route, schema } = props
 
   const accept = ref("")
-  const files = ref([])
+  const loading = ref(false)
 
-  watch(files, (value) => {
-    stepper_tree[variable_to_update] = value
-    stepper_tree[variable_to_increment]++
-  })
+  const toggle_loading = useToggle(loading)
 
-  function fill_extensions(response) {
-    const extensions = response._data.extensions
-      .map((extension) => "." + extension)
-      .join(",")
-    accept.value = extensions
+  function files_uploaded_event(value) {
+    if (value.length) {
+      emit("update_values", { files: value })
+      emit("increment_step")
+    }
   }
 
   async function get_allowed_files() {
+    toggle_loading()
+    const params = { key }
     await api_fetch(
-      { schema },
+      { schema, params },
       {
         response_function: (response) => {
-          fill_extensions(response)
+          accept.value = response._data.extensions
+            .map((extension) => "." + extension)
+            .join(",")
         },
       },
     )
+    toggle_loading()
   }
-
-  onMounted(async () => {
-    await get_allowed_files()
+  onMounted(() => {
+    get_allowed_files()
   })
 </script>
