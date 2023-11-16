@@ -45,8 +45,8 @@
 <script setup>
   const emit = defineEmits([
     "update_values",
-    "increment_current_step",
-    "decrement_current_step",
+    "increment_step",
+    "decrement_step",
   ])
 
   const props = defineProps({
@@ -99,8 +99,8 @@
               .map((filename) => "." + filename.split(".").pop())
               .join(",")
             if (!has_missing_files.value) {
-              console.log("MISSING FILESSELECTOR increment_current_step")
-              emit("increment_current_step")
+              console.log("MISSING FILESSELECTOR increment_step")
+              emit("increment_step")
             }
           },
         },

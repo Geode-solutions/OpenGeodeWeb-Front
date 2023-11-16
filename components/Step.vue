@@ -42,8 +42,8 @@
           :is="steps[step_index].component.component_name"
           v-bind="steps[step_index].component.component_options"
           @update_values="update_values_event"
-          @increment_current_step="increment_current_step()"
-          @decrement_current_step="decrement_current_step()"
+          @increment_step="increment_step()"
+          @decrement_step="decrement_step()"
         />
       </v-col>
     </Transition>
@@ -70,11 +70,11 @@
     }
   }
 
-  function increment_current_step() {
+  function increment_step() {
     stepper_tree.current_step_index++
   }
 
-  function decrement_current_step() {
+  function decrement_step() {
     stepper_tree.current_step_index--
   }
 </script>

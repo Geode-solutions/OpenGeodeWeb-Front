@@ -33,7 +33,7 @@
 <script setup>
   import geode_objects from "@/assets/geode_objects"
 
-  const emit = defineEmits(["update_values", "increment_current_step"])
+  const emit = defineEmits(["update_values", "increment_step"])
 
   const props = defineProps({
     files: { type: Array, required: true },
@@ -65,7 +65,7 @@
   function set_geode_object(geode_object) {
     if (geode_object != "") {
       emit("update_values", { input_geode_object: geode_object })
-      emit("increment_current_step")
+      emit("increment_step")
     }
   }
 

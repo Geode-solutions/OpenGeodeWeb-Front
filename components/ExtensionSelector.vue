@@ -41,8 +41,8 @@
 <script setup>
   const emit = defineEmits([
     "update_values",
-    "increment_current_step",
-    "decrement_current_step",
+    "increment_step",
+    "decrement_step",
   ])
 
   const props = defineProps({
@@ -78,7 +78,7 @@
         output_extension,
       }
       emit("update_values", keys_values_object)
-      emit("increment_current_step")
+      emit("increment_step")
     }
   }
 
