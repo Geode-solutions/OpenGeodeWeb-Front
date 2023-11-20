@@ -3,8 +3,15 @@
   "type": "object",
   "method": "POST",
   "properties": {
-    "key": { "type": ["string", "null"] }
+    "key": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
   },
-  "required": ["key"],
+  "required": [
+    "key"
+  ],
   "additionalProperties": false
 }
