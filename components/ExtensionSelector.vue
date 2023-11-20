@@ -16,21 +16,32 @@
       <v-card-text>
         <v-row>
           <v-col
-            v-for="output_extension in item.output_extensions"
-            :key="output_extension"
+            v-for="output in item.outputs"
+            :key="output.extension"
             cols="auto"
             class="pa-0"
           >
-            <v-card
-              class="card ma-2"
-              color="primary"
-              hover
-              @click="set_variables(item.geode_object, output_extension)"
+            <v-tooltip
+              :disabled="output.is_saveable"
+              text="Data not saveable with this file extension"
+              location="bottom"
             >
-              <v-card-title align="center">
-                {{ output_extension }}
-              </v-card-title>
-            </v-card>
+              <template v-slot:activator="{ props }">
+                <span v-bind="props">
+                  <v-card
+                    class="card ma-2"
+                    :color="output.is_saveable ? 'primary' : 'grey'"
+                    hover
+                    @click="set_variables(item.geode_object, output.extension)"
+                    :disabled="!output.is_saveable"
+                  >
+                    <v-card-title align="center">
+                      {{ output.extension }}
+                    </v-card-title>
+                  </v-card>
+                </span>
+              </template>
+            </v-tooltip>
           </v-col>
         </v-row>
       </v-card-text>
