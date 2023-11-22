@@ -63,9 +63,7 @@
   }
 
   function update_values_event(keys_values_object) {
-    console.log("update_values_event", keys_values_object)
     for (const [key, value] of Object.entries(keys_values_object)) {
-      console.log(key, value)
       stepper_tree[key] = value
     }
   }

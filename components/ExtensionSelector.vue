@@ -58,9 +58,10 @@
 
   const props = defineProps({
     input_geode_object: { type: String, required: true },
+    filenames: { type: Array, required: true },
     schema: { type: Object, required: true },
   })
-  const { input_geode_object, schema } = props
+  const { input_geode_object, filenames, schema } = props
 
   const geode_objects_and_output_extensions = ref([])
   const loading = ref(false)
@@ -69,7 +70,7 @@
 
   async function get_output_file_extensions() {
     toggle_loading()
-    const params = { input_geode_object }
+    const params = { input_geode_object, filenames }
     await api_fetch(
       { schema, params },
       {
