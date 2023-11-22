@@ -11,8 +11,8 @@
   import schema from "@geode/opengeodeweb-front/assets/schemas/FileSelector.json"
   const emit = defineEmits([
     "update_values",
-    "increment_current_step",
-    "decrement_current_step",
+    "increment_step",
+    "decrement_step",
   ])
 
   const props = defineProps({
@@ -31,7 +31,7 @@
   function files_uploaded_event(value) {
     if (value.length) {
       emit("update_values", { files: value })
-      emit("increment_current_step")
+      emit("increment_step")
     }
   }
 
