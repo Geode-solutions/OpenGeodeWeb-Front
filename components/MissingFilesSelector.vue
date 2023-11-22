@@ -43,6 +43,8 @@
 </template>
 
 <script setup>
+  import FetchingData from "@/components/FetchingData.vue"
+  import FileUploader from "@/components/FileUploader.vue"
   const emit = defineEmits([
     "update_values",
     "increment_step",

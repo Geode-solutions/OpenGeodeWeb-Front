@@ -31,6 +31,7 @@
 </template>
 
 <script setup>
+  import FetchingData from "@/components/FetchingData.vue"
   import geode_objects from "@/assets/geode_objects"
 
   const emit = defineEmits(["update_values", "increment_step"])

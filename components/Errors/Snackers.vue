@@ -55,6 +55,7 @@
 </template>
 
 <script setup>
+  import { use_errors_store } from "@/stores/errors"
   const errors_store = use_errors_store()
   const { errors } = storeToRefs(errors_store)
 

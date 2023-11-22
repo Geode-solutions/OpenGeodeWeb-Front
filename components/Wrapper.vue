@@ -18,6 +18,13 @@
 </template>
 
 <script setup>
+  import Header from "@components/Header.vue"
+  import Launcher from "@components/Launcher.vue"
+  import Stepper from "@components/Stepper.vue"
+  import PackagesVersions from "@components/PackagesVersions.vue"
+  import { use_cloud_store } from "@/stores/cloud"
+  import { storeToRefs } from "pinia"
+
   const cloud_store = use_cloud_store()
   const { is_running } = storeToRefs(cloud_store)
 

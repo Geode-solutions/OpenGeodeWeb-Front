@@ -50,6 +50,7 @@
 </template>
 
 <script setup>
+  import FetchingData from "@/components/FetchingData.vue"
   const emit = defineEmits([
     "update_values",
     "increment_step",

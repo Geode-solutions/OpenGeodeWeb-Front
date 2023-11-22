@@ -19,6 +19,8 @@
 </template>
 
 <script setup>
+  import { use_viewer_store } from "@/stores/viewer"
+
   const viewer_store = use_viewer_store()
   function reset_camera() {
     viewer_store.reset_camera()
