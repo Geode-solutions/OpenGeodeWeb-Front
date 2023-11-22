@@ -32,7 +32,7 @@
 
 <script setup>
   import geode_objects from "@/assets/geode_objects"
-  import schema from "@/assets/schemas/ObjectSelector.json"
+  import schema from "@geode/opengeodeweb-front/assets/schemas/ObjectSelector.json"
 
   const emit = defineEmits(["update_values", "increment_step"])
 
