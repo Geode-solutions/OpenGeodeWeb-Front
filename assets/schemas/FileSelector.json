@@ -4,14 +4,9 @@
   "method": "POST",
   "properties": {
     "key": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     }
   },
-  "required": [
-    "key"
-  ],
+  "required": ["key"],
   "additionalProperties": false
 }
