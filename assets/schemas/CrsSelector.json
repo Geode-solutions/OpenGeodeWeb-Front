@@ -7,8 +7,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "input_geode_object"
-  ],
+  "required": ["input_geode_object"],
   "additionalProperties": false
 }
