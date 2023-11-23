@@ -32,16 +32,16 @@
 
 <script setup>
   import geode_objects from "@/assets/geode_objects"
+  import schema from "@geode/opengeodeweb-front/assets/schemas/ObjectSelector.json"
 
   const emit = defineEmits(["update_values", "increment_step"])
 
   const props = defineProps({
     files: { type: Array, required: true },
     key: { type: String, required: false, default: null },
-    schema: { type: Object, required: true },
   })
 
-  const { files, key, schema } = props
+  const { files, key } = props
 
   const loading = ref(false)
   const allowed_objects = ref([])

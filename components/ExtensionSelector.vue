@@ -50,6 +50,7 @@
 </template>
 
 <script setup>
+  import schema from "@geode/opengeodeweb-front/assets/schemas/ExtensionSelector.json"
   const emit = defineEmits([
     "update_values",
     "increment_step",
@@ -58,9 +59,8 @@
 
   const props = defineProps({
     input_geode_object: { type: String, required: true },
-    schema: { type: Object, required: true },
   })
-  const { input_geode_object, schema } = props
+  const { input_geode_object } = props
 
   const geode_objects_and_output_extensions = ref([])
   const loading = ref(false)

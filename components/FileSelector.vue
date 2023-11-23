@@ -8,6 +8,7 @@
 </template>
 
 <script setup>
+  import schema from "@geode/opengeodeweb-front/assets/schemas/FileSelector.json"
   const emit = defineEmits([
     "update_values",
     "increment_step",
@@ -18,10 +19,9 @@
     multiple: { type: Boolean, required: true },
     key: { type: String, required: false, default: "" },
     route: { type: String, required: false, default: "" },
-    schema: { type: Object, required: true },
   })
 
-  const { multiple, key, route, schema } = props
+  const { multiple, key, route } = props
 
   const accept = ref("")
   const loading = ref(false)
