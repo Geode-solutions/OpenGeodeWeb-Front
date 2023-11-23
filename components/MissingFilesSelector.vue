@@ -45,6 +45,8 @@
 <script setup>
   import FetchingData from "@/components/FetchingData.vue"
   import FileUploader from "@/components/FileUploader.vue"
+  import schema from "@geode/opengeodeweb-front/assets/schemas/MissingFilesSelector.json"
+
   const emit = defineEmits([
     "update_values",
     "increment_step",
@@ -56,10 +58,9 @@
     input_geode_object: { type: String, required: true },
     files: { type: Array, required: true },
     route: { type: String, required: true },
-    schema: { type: Object, required: true },
   })
 
-  const { multiple, input_geode_object, files, route, schema } = props
+  const { multiple, input_geode_object, files, route } = props
 
   const accept = ref("")
   const loading = ref(false)
