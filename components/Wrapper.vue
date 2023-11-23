@@ -18,10 +18,10 @@
 </template>
 
 <script setup>
-  import Header from "@components/Header.vue"
-  import Launcher from "@components/Launcher.vue"
-  import Stepper from "@components/Stepper.vue"
-  import PackagesVersions from "@components/PackagesVersions.vue"
+  import Header from "@/components/Header.vue"
+  import Launcher from "@/components/Launcher.vue"
+  import Stepper from "@/components/Stepper.vue"
+  import PackagesVersions from "@/components/PackagesVersions.vue"
   import { use_cloud_store } from "@/stores/cloud"
   import { storeToRefs } from "pinia"
 

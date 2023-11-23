@@ -1,6 +1,7 @@
 import { useStorage } from "@vueuse/core"
-import { use_errors_store } from "@stores/errors"
-import { use_geode_store } from "@stores/geode"
+import { use_errors_store } from "@/stores/errors"
+import { use_geode_store } from "@/stores/geode"
+import { use_websocket_store } from "@/stores/websocket"
 
 export const use_cloud_store = defineStore("cloud", {
   state: () => ({
