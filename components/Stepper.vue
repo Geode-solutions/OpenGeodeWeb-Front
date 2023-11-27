@@ -7,7 +7,6 @@
 </template>
 
 <script setup>
-  import Step from "@/components/Step.vue"
   const stepper_tree = inject("stepper_tree")
   const { steps } = stepper_tree
 </script>

@@ -50,7 +50,6 @@
 </template>
 
 <script setup>
-  import FetchingData from "@/components/FetchingData.vue"
   import schema from "@geode/opengeodeweb-front/assets/schemas/ExtensionSelector.json"
 
   const emit = defineEmits([

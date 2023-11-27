@@ -31,7 +31,6 @@
 </template>
 
 <script setup>
-  import FetchingData from "@/components/FetchingData.vue"
   import geode_objects from "@/assets/geode_objects"
   import schema from "@geode/opengeodeweb-front/assets/schemas/ObjectSelector.json"
 

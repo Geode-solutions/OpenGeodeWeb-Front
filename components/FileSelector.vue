@@ -8,8 +8,6 @@
 </template>
 
 <script setup>
-  import FetchingData from "@/components/FetchingData.vue"
-  import FileUploader from "@/components/FileUploader.vue"
   import schema from "@geode/opengeodeweb-front/assets/schemas/FileSelector.json"
 
   const emit = defineEmits([
