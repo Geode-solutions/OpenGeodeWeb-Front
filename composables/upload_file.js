@@ -1,6 +1,3 @@
-import { use_errors_store } from "@/stores/errors"
-import { use_geode_store } from "@/stores/geode"
-
 export function upload_file(
   { route, files },
   { request_error_function, response_function, response_error_function } = {},

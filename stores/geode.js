@@ -1,6 +1,3 @@
-import { use_cloud_store } from "@/stores/cloud"
-import { use_errors_store } from "@/stores/errors"
-
 export const use_geode_store = defineStore("geode", {
   state: () => ({
     request_counter: 0,

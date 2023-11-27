@@ -1,5 +1,3 @@
-import { use_cloud_store } from "@/stores/cloud"
-
 export default function (function_to_run) {
   const cloud_store = use_cloud_store()
   const { is_running } = storeToRefs(cloud_store)
