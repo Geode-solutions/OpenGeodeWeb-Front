@@ -43,6 +43,8 @@
 </template>
 
 <script setup>
+  import schema from "@/assets/schemas/MissingFilesSelector.json"
+
   const emit = defineEmits([
     "update_values",
     "increment_step",
@@ -54,10 +56,9 @@
     input_geode_object: { type: String, required: true },
     filenames: { type: Array, required: true },
     route: { type: String, required: true },
-    schema: { type: Object, required: true },
   })
 
-  const { multiple, input_geode_object, filenames, route, schema } = props
+  const { multiple, input_geode_object, files, route } = props
 
   const accept = ref("")
   const loading = ref(false)

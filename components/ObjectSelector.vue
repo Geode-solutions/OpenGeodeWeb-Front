@@ -32,16 +32,16 @@
 
 <script setup>
   import geode_objects from "@/assets/geode_objects"
+  import schema from "@/assets/schemas/ObjectSelector.json"
 
   const emit = defineEmits(["update_values", "increment_step"])
 
   const props = defineProps({
     filenames: { type: Array, required: true },
     key: { type: String, required: false, default: null },
-    schema: { type: Object, required: true },
   })
 
-  const { filenames, key, schema } = props
+  const { filenames, key } = props
 
   const loading = ref(false)
   const allowed_objects = ref([])

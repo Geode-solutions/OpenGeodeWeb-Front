@@ -13,7 +13,6 @@
 
 <script setup>
   import { VueRecaptcha } from "vue-recaptcha"
-
   const cloud_store = use_cloud_store()
   const { is_captcha_validated } = storeToRefs(cloud_store)
 

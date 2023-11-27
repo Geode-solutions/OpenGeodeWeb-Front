@@ -24,6 +24,7 @@
 </template>
 
 <script setup>
+  import schema from "@/assets/schemas/CrsSelector.json"
   const emit = defineEmits([
     "update_values",
     "increment_step",
@@ -33,10 +34,9 @@
   const props = defineProps({
     input_geode_object: { type: String, required: true },
     key_to_update: { type: String, required: true },
-    schema: { type: Object, required: true },
   })
 
-  const { input_geode_object, key_to_update, schema } = props
+  const { input_geode_object, key_to_update } = props
 
   const search = ref("")
   const data_table_loading = ref(false)
