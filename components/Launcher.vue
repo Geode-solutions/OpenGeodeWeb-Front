@@ -18,9 +18,6 @@
 </template>
 
 <script setup>
-  import { use_websocket_store } from "@/stores/websocket"
-  import { use_cloud_store } from "@/stores/cloud"
-
   const websocket_store = use_websocket_store()
   const cloud_store = use_cloud_store()
   const { is_captcha_validated, is_connexion_launched, is_running } =
