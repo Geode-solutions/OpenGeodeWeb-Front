@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-  import schema from "@geode/opengeodeweb-front/assets/schemas/MissingFilesSelector.json"
+  import schema from "@/assets/schemas/MissingFilesSelector.json"
 
   const emit = defineEmits([
     "update_values",

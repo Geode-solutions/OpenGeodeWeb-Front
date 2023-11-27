@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-  import schema from "@geode/opengeodeweb-front/assets/schemas/ExtensionSelector.json"
+  import schema from "@/assets/schemas/ExtensionSelector.json"
 
   const emit = defineEmits([
     "update_values",
