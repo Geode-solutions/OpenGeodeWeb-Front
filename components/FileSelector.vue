@@ -8,7 +8,8 @@
 </template>
 
 <script setup>
-  import schema from "@geode/opengeodeweb-front/assets/schemas/FileSelector.json"
+  import schema from "@/assets/schemas/FileSelector.json"
+
   const emit = defineEmits([
     "update_values",
     "increment_step",

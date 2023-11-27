@@ -1,3 +1,5 @@
+import { use_websocket_store } from "@/stores/websocket"
+
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
     picking_mode: false,

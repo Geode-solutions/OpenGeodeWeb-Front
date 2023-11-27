@@ -18,6 +18,8 @@
 </template>
 
 <script setup>
+  import { use_cloud_store } from "@/stores/cloud"
+
   const cloud_store = use_cloud_store()
   const { is_running } = storeToRefs(cloud_store)
 
