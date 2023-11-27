@@ -18,7 +18,6 @@
 </template>
 
 <script setup>
-  import { storeToRefs } from "pinia"
   import { use_websocket_store } from "@/stores/websocket"
   import { use_cloud_store } from "@/stores/cloud"
 
