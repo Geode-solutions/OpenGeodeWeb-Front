@@ -58,7 +58,7 @@
     route: { type: String, required: true },
   })
 
-  const { multiple, input_geode_object, files, route } = props
+  const { multiple, input_geode_object, filenames, route } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -85,8 +85,6 @@
           has_missing_files.value = response._data.has_missing_files
           mandatory_files.value = response._data.mandatory_files
           additional_files.value = response._data.additional_files
-
-          console.log("response", response)
 
           const files_list = [].concat(
             mandatory_files.value,
