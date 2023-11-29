@@ -3,13 +3,18 @@
   "type": "object",
   "method": "POST",
   "properties": {
-    "filename": {
-      "type": "string"
+    "filenames": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "minItems": 1
     },
     "key": {
       "type": ["string", "null"]
     }
   },
-  "required": ["filename", "key"],
+  "required": ["filenames", "key"],
   "additionalProperties": false
 }

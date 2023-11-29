@@ -5,8 +5,16 @@
   "properties": {
     "input_geode_object": {
       "type": "string"
+    },
+    "filenames": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "minItems": 1
     }
   },
-  "required": ["input_geode_object"],
+  "required": ["input_geode_object", "filenames"],
   "additionalProperties": false
 }
