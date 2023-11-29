@@ -58,7 +58,7 @@
     route: { type: String, required: true },
   })
 
-  const { multiple, input_geode_object, files, route } = props
+  const { multiple, input_geode_object, filenames, route } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -77,33 +77,25 @@
     mandatory_files.value = []
     additional_files.value = []
     toggle_loading()
-    for (const file of files) {
-      const params = { input_geode_object, filename: file.name }
-      await api_fetch(
-        { schema, params },
-        {
-          response_function: (response) => {
-            has_missing_files.value = response._data.has_missing_files
-            mandatory_files.value = [].concat(
-              mandatory_files.value,
-              response._data.mandatory_files,
-            )
-            additional_files.value = [].concat(
-              additional_files.value,
-              response._data.additional_files,
-            )
-            const files_list = [].concat(
-              mandatory_files.value,
-              additional_files.value,
-            )
-            accept.value = files_list
-              .map((filename) => "." + filename.split(".").pop())
-              .join(",")
-            if (!has_missing_files.value) {
-              console.log("MISSING FILESSELECTOR increment_step")
-              emit("increment_step")
-            }
-          },
+    const params = { input_geode_object, filenames }
+    await api_fetch(
+      { schema, params },
+      {
+        response_function: (response) => {
+          has_missing_files.value = response._data.has_missing_files
+          mandatory_files.value = response._data.mandatory_files
+          additional_files.value = response._data.additional_files
+
+          const files_list = [].concat(
+            mandatory_files.value,
+            additional_files.value,
+          )
+          accept.value = files_list
+            .map((filename) => "." + filename.split(".").pop())
+            .join(",")
+          if (!has_missing_files.value) {
+            emit("increment_step")
+          }
         },
       )
     }
