@@ -9,7 +9,12 @@ describe("Errors Store", () => {
   it("add_error", () => {
     const errors_store = use_errors_store()
     expect(errors_store.errors.length).toBe(0)
-    errors_store.add_error({ message: "test", code: 400 })
+    errors_store.add_error({
+      code: 500,
+      route: "/test",
+      name: "test message",
+      description: "test description",
+    })
     expect(errors_store.errors.length).toBe(1)
   })
 
