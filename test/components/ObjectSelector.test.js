@@ -1,10 +1,13 @@
-// import { describe, it } from "vitest"
+/**
+ * @vitest-environment happy-dom
+ */
+import { describe, expect, it, vi } from "vitest"
 import { mount } from "@vue/test-utils"
-import ErrorBanner from "../../components/Errors/Banner.vue"
+import Toto from "../../components/Toto.vue"
 
-describe("ObjectSelector", () => {
+describe("ErrorBanner", () => {
   it("Renders properly", () => {
-    const wrapper = mount(ErrorBanner)
+    const wrapper = mount(Toto)
     expect(wrapper.html()).toMatchSnapshot()
   })
 })

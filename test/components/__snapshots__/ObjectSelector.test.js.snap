@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ErrorBanner > Renders properly 1`] = `"<h1>Coucou</h1>"`;

@@ -54,7 +54,7 @@
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     input_geode_object: { type: String, required: true },
-    files: { type: Array, required: true },
+    filenames: { type: Array, required: true },
     route: { type: String, required: true },
   })
 
@@ -97,8 +97,9 @@
             emit("increment_step")
           }
         },
-      )
-    }
+      },
+    )
+
     toggle_loading()
   }
 
