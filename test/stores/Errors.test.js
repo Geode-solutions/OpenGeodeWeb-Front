@@ -1,5 +1,5 @@
 import { setActivePinia, createPinia } from "pinia"
-import { use_errors_store } from "../../../stores/errors"
+import { use_errors_store } from "../../stores/errors"
 
 describe("Errors Store", () => {
   beforeEach(() => {
