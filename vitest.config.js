@@ -6,11 +6,7 @@ export default defineVitestConfig({
     environment: "jsdom",
     server: {
       deps: {
-        optimizer: {
-          web: {
-            include: ["vuetify"],
-          },
-        },
+        include: ["vuetify"],
       },
     },
   },

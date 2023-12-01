@@ -41,7 +41,7 @@
     key: { type: String, required: false, default: null },
   })
 
-  const { files, key } = props
+  const { filenames, key } = props
 
   const loading = ref(false)
   const allowed_objects = ref([])

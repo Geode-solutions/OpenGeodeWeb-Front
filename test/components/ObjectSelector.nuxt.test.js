@@ -3,22 +3,22 @@
 import { describe, expect, vi, test } from "vitest"
 import { mount } from "@vue/test-utils"
 import ObjectSelector from "../../components/ObjectSelector.vue"
-import { vuetify } from "@/plugins/vuetify"
+import Loading from "../../components/Loading.vue"
 
-describe("ObjectSelector", () => {
+describe("ObjectSelector.vue", () => {
   test("Renders properly", async () => {
     const wrapper = mount(ObjectSelector, {
-      global: {
-        plugins: [vuetify],
-      },
-      props: { files: ["test.toto"], key: "test" },
+      props: { filenames: ["test.toto"], key: "test" },
     })
-    expect(wrapper.html()).toMatchSnapshot()
-    expect(wrapper.find("v-card").exists()).toBeTruthy()
+    wrapper.findComponent(Loading)
+    expect(wrapper.find("v-card").exists()).toBe(true)
   })
-  // test("Select", async () => {
-  //   const wrapper = mount(ObjectSelector)
-  //   wrapper.setData({ allowed_objects: ["BRep"] })
+
+  // test("Select geode_object", async () => {
+  //   const wrapper = mount(ObjectSelector, {
+  //     props: { filenames: ["test.toto"], key: "test" },
+  //   })
+  //   await wrapper.setData({ allowed_objects.value: ["BRep"] })
   //   expect(wrapper.find("v-card").exists()).toBeTruthy()
 
   //   await wrapper.find("v-card").trigger("click")

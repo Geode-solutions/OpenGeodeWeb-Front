@@ -11,13 +11,26 @@ export default defineNuxtConfig({
     },
   },
 
-  imports: {
-    dirs: ["stores"],
-  },
-
   modules: [
     ["@pinia/nuxt", { autoImports: ["defineStore"] }],
     "@vueuse/nuxt",
     "nuxt-vitest",
   ],
+  imports: {
+    dirs: ["stores"],
+  },
+
+  // ** Global CSS
+  css: ["vuetify/lib/styles/main.sass"],
+
+  // ** Build configuration
+  build: {
+    transpile: ["vuetify"],
+  },
+
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => ["md-linedivider"].includes(tag),
+    },
+  },
 })

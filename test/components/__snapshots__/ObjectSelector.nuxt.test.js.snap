@@ -7,25 +7,3 @@ exports[`ObjectSelector > Renders properly 1`] = `
   </v-card>
 </v-row>"
 `;
-
-exports[`ObjectSelector > Renders properly 2`] = `
-DOMWrapper {
-  "isDisabled": [Function],
-  "wrapperElement": <v-card
-    class="card"
-    rounded=""
-    variant="tonal"
-  >
-    <v-card-text>
-       This file format isn't supported! Please check the 
-      <a
-        href="https://docs.geode-solutions.com/guides/formats/"
-        target="_blank"
-      >
-         supported file formats documentation
-      </a>
-       for more information 
-    </v-card-text>
-  </v-card>,
-}
-`;
