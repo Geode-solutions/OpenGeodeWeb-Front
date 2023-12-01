@@ -37,7 +37,7 @@
   const emit = defineEmits(["update_values", "increment_step"])
 
   const props = defineProps({
-    files: { type: Array, required: true },
+    filenames: { type: Array, required: true },
     key: { type: String, required: false, default: null },
   })
 
@@ -49,7 +49,7 @@
   const toggle_loading = useToggle(loading)
 
   async function get_allowed_objects() {
-    const params = { filename: files[0].name, key }
+    const params = { filenames, key }
     toggle_loading()
     await api_fetch(
       { schema, params },
