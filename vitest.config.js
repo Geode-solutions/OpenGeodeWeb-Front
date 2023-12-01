@@ -3,12 +3,12 @@ import { defineVitestConfig } from "nuxt-vitest/config"
 export default defineVitestConfig({
   test: {
     globals: true,
-    environment: "nuxt",
+    environment: "jsdom",
     server: {
       deps: {
         optimizer: {
           web: {
-            inline: ["vuetify"],
+            include: ["vuetify"],
           },
         },
       },
