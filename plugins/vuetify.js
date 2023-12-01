@@ -22,9 +22,7 @@ const light_theme = {
 
 export default defineNuxtPlugin((nuxtApp) => {
   const vuetify = createVuetify({
-    components: {
-      ...components,
-    },
+    components,
     directives,
     theme: {
       defaultTheme: "light_theme",
