@@ -2,20 +2,15 @@
 
 import { describe, expect, vi, test } from "vitest"
 import { mount } from "@vue/test-utils"
-import ObjectSelector from "../../components/ObjectSelector.vue"
-import FetchingData from "../../components/FetchingData.vue"
-import vuetify from "../plugins/vuetify"
+import ObjectSelector from "@/components/ObjectSelector.vue"
+import FetchingData from "@/components/FetchingData.vue"
+import vuetify from "@/plugins/vuetify"
+import VueToastificationPlugin from "vue-toastification"
 
 describe("ObjectSelector.vue", () => {
   test("Renders properly", async () => {
     const wrapper = mount(ObjectSelector, {
       props: { filenames: ["test.toto"], key: "test" },
-      global: {
-        components: {
-          FetchingData,
-        },
-        plugins: [vuetify],
-      },
     })
     wrapper.findComponent(FetchingData)
     expect(wrapper.find("v-card").exists()).toBe(true)
@@ -24,11 +19,13 @@ describe("ObjectSelector.vue", () => {
   test("Select geode_object", async () => {
     const wrapper = mount(ObjectSelector, {
       props: { filenames: ["test.toto"], key: "test" },
+      global: {
+        plugins: [vuetify],
+      },
     })
-    await wrapper.setData({ allowed_objects: ["BRep"] })
-    expect(wrapper.find("v-card").exists()).toBeTruthy()
+    expect(wrapper.find("v-card").exists()).toBe(true)
 
-    await wrapper.find("v-card").trigger("click")
+    await wrpper.find("v-card").trigger("click")
     expect(wrapper.emitted().update_values).toEqual({
       input_geode_object: "BRep",
     })
