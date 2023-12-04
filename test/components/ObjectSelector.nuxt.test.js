@@ -3,27 +3,34 @@
 import { describe, expect, vi, test } from "vitest"
 import { mount } from "@vue/test-utils"
 import ObjectSelector from "../../components/ObjectSelector.vue"
-import Loading from "../../components/Loading.vue"
+import FetchingData from "../../components/FetchingData.vue"
+import vuetify from "../plugins/vuetify"
 
 describe("ObjectSelector.vue", () => {
   test("Renders properly", async () => {
     const wrapper = mount(ObjectSelector, {
       props: { filenames: ["test.toto"], key: "test" },
+      global: {
+        components: {
+          FetchingData,
+        },
+        plugins: [vuetify],
+      },
     })
-    wrapper.findComponent(Loading)
+    wrapper.findComponent(FetchingData)
     expect(wrapper.find("v-card").exists()).toBe(true)
   })
 
-  // test("Select geode_object", async () => {
-  //   const wrapper = mount(ObjectSelector, {
-  //     props: { filenames: ["test.toto"], key: "test" },
-  //   })
-  //   await wrapper.setData({ allowed_objects.value: ["BRep"] })
-  //   expect(wrapper.find("v-card").exists()).toBeTruthy()
+  test("Select geode_object", async () => {
+    const wrapper = mount(ObjectSelector, {
+      props: { filenames: ["test.toto"], key: "test" },
+    })
+    await wrapper.setData({ allowed_objects: ["BRep"] })
+    expect(wrapper.find("v-card").exists()).toBeTruthy()
 
-  //   await wrapper.find("v-card").trigger("click")
-  //   expect(wrapper.emitted().update_values).toEqual({
-  //     input_geode_object: "BRep",
-  //   })
-  // })
+    await wrapper.find("v-card").trigger("click")
+    expect(wrapper.emitted().update_values).toEqual({
+      input_geode_object: "BRep",
+    })
+  })
 })

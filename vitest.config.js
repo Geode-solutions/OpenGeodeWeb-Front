@@ -6,8 +6,13 @@ export default defineVitestConfig({
     environment: "jsdom",
     server: {
       deps: {
-        include: ["vuetify"],
+        inline: ["vuetify"],
       },
+    },
+  },
+  resolve: {
+    alias: {
+      "@": ".",
     },
   },
 })
