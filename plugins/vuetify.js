@@ -1,6 +1,4 @@
 import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 
 import "@mdi/font/css/materialdesignicons.css"
 import colors from "vuetify/lib/util/colors"
@@ -20,35 +18,33 @@ const light_theme = {
   },
 }
 
-export default defineNuxtPlugin((nuxtApp) => {
-  const vuetify = createVuetify({
-    components,
-    directives,
-    theme: {
-      defaultTheme: "light_theme",
-      themes: {
-        light_theme,
-      },
+export const vuetify = createVuetify({
+  theme: {
+    defaultTheme: "light_theme",
+    themes: {
+      light_theme,
     },
-    defaultAssets: false,
-    icons: {
-      defaultSet: "mdi",
+  },
+  defaultAssets: false,
+  icons: {
+    defaultSet: "mdi",
+  },
+  ssr: true,
+  defaults: {
+    VBtn: {
+      style: "text-transform: none;",
     },
-    ssr: true,
-    defaults: {
-      VBtn: {
-        style: "text-transform: none;",
-      },
-      VCard: {
-        elevation: 5,
-        style: "border-radius: 15px;",
-      },
-      VExpansionPanel: {
-        elevation: 5,
-        style: "border-radius: 15px;",
-      },
+    VCard: {
+      elevation: 5,
+      style: "border-radius: 15px;",
     },
-  })
+    VExpansionPanel: {
+      elevation: 5,
+      style: "border-radius: 15px;",
+    },
+  },
+})
 
+export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(vuetify)
 })
