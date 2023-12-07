@@ -49,15 +49,29 @@
 
   async function upload_files() {
     toggle_loading()
-    await upload_file(
-      { route, files: multiple ? files.value : [files.value[0]] },
-      {
-        response_function: () => {
-          files_uploaded.value = true
-          emit("files_uploaded", files.value)
-        },
-      },
-    )
+    var promise_array = []
+    for (const file of files.value) {
+      const promise = new Promise((resolve, reject) => {
+        upload_file(
+          { route, file },
+          {
+            request_error_function: () => {
+              reject()
+            },
+            response_function: () => {
+              resolve()
+            },
+            response_error_function: () => {
+              reject()
+            },
+          },
+        )
+      })
+      promise_array.push(promise)
+    }
+    await Promise.all(promise_array)
+    files_uploaded.value = true
+    emit("files_uploaded", files.value)
     toggle_loading()
   }
 

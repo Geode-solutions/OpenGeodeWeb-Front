@@ -49,16 +49,33 @@
   const toggle_loading = useToggle(loading)
 
   async function get_allowed_objects() {
-    const params = { filenames, key }
     toggle_loading()
-    await api_fetch(
-      { schema, params },
-      {
-        response_function: (response) => {
-          allowed_objects.value = response._data.allowed_objects
-        },
-      },
-    )
+    allowed_objects.value = []
+    var promise_array = []
+    for (const filename of filenames) {
+      const params = { filename, key }
+      const promise = new Promise((resolve, reject) => {
+        api_fetch(
+          { schema, params },
+          {
+            request_error_function: () => {
+              reject()
+            },
+            response_function: (response) => {
+              console.log(response._data.allowed_objects)
+              allowed_objects.value = response._data.allowed_objects
+
+              resolve()
+            },
+            response_error_function: () => {
+              reject()
+            },
+          },
+        )
+      })
+      promise_array.push(promise)
+    }
+    await Promise.all(promise_array)
     toggle_loading()
   }
 

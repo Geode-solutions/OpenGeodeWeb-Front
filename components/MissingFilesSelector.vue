@@ -73,32 +73,41 @@
   }
 
   async function missing_files() {
+    toggle_loading()
     has_missing_files.value = false
     mandatory_files.value = []
     additional_files.value = []
-    toggle_loading()
-    const params = { input_geode_object, filenames }
-    await api_fetch(
-      { schema, params },
-      {
-        response_function: (response) => {
-          has_missing_files.value = response._data.has_missing_files
-          mandatory_files.value = response._data.mandatory_files
-          additional_files.value = response._data.additional_files
 
-          const files_list = [].concat(
-            mandatory_files.value,
-            additional_files.value,
-          )
-          accept.value = files_list
-            .map((filename) => "." + filename.split(".").pop())
-            .join(",")
-          if (!has_missing_files.value) {
-            emit("increment_step")
-          }
+    for (const filename of filenames) {
+      const params = { input_geode_object, filename }
+      await api_fetch(
+        { schema, params },
+        {
+          request_error_function: () => {
+            resolve()
+          },
+          response_function: (response) => {
+            has_missing_files.value = response._data.has_missing_files
+            mandatory_files.value = response._data.mandatory_files
+            additional_files.value = response._data.additional_files
+
+            const files_list = [].concat(
+              mandatory_files.value,
+              additional_files.value,
+            )
+            accept.value = files_list
+              .map((filename) => "." + filename.split(".").pop())
+              .join(",")
+            if (!has_missing_files.value) {
+              emit("increment_step")
+            }
+          },
+          response_error_function: () => {
+            resolve()
+          },
         },
-      },
-    )
+      )
+    }
 
     toggle_loading()
   }

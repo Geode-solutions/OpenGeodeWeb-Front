@@ -72,16 +72,31 @@
 
   async function get_output_file_extensions() {
     toggle_loading()
-    const params = { input_geode_object, filenames }
-    await api_fetch(
-      { schema, params },
-      {
-        response_function: (response) => {
-          geode_objects_and_output_extensions.value =
-            response._data.geode_objects_and_output_extensions
-        },
-      },
-    )
+    geode_objects_and_output_extensions.vaue = {}
+    var promise_array = []
+    for (const filename of filenames) {
+      const params = { input_geode_object, filename }
+      const promise = new Promise((resolve, reject) => {
+        api_fetch(
+          { schema, params },
+          {
+            request_error_function: () => {
+              reject()
+            },
+            response_function: (response) => {
+              geode_objects_and_output_extensions.value =
+                response._data.geode_objects_and_output_extensions
+              resolve()
+            },
+            response_error_function: () => {
+              reject()
+            },
+          },
+        )
+      })
+      promise_array.push(promise)
+    }
+    await Promise.all(promise_array)
     toggle_loading()
   }
 
