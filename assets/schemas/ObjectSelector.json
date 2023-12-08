@@ -4,8 +4,7 @@
   "method": "POST",
   "properties": {
     "filename": {
-      "type": "string",
-      "not": { "type": "null" }
+      "type": "string"
     },
     "key": {
       "type": ["string", "null"]
