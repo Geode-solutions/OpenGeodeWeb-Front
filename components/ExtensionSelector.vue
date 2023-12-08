@@ -2,16 +2,16 @@
   <FetchingData v-if="loading" />
   <v-row
     v-for="(
-      output_extensions, geode_object
+      output_extensions, output_geode_object
     ) in geode_objects_and_output_extensions"
     :key="geode_object"
     class="justify-left"
   >
     <v-card class="card ma-2 pa-2" width="100%">
-      <v-tooltip :text="`Export as a ${geode_object}`" location="bottom">
+      <v-tooltip :text="`Export as a ${output_geode_object}`" location="bottom">
         <template v-slot:activator="{ props }">
           <v-card-title v-bind="props">
-            {{ geode_object }}
+            {{ output_geode_object }}
           </v-card-title>
         </template>
       </v-tooltip>
@@ -52,6 +52,7 @@
 </template>
 
 <script setup>
+  import _ from "lodash"
   import schema from "@/assets/schemas/ExtensionSelector.json"
 
   const emit = defineEmits([
@@ -84,8 +85,28 @@
               reject()
             },
             response_function: (response) => {
-              geode_objects_and_output_extensions.value =
-                response._data.geode_objects_and_output_extensions
+              console.log(filename)
+              data = response._data.geode_objects_and_output_extensions
+              if (_.isEmpty(geode_objects_and_output_extensions.value)) {
+                geode_objects_and_output_extensions.value = data
+              } else {
+                for (const [geode_object, geode_object_value] of Object.entries(
+                  data,
+                )) {
+                  console.log(geode_object)
+                  for (const [
+                    output_extension,
+                    output_extension_value,
+                  ] of Object.entries(geode_object_value)) {
+                    console.log(output_extension)
+                    if (!output_extension_value["is_saveable"]) {
+                      geode_objects_and_output_extensions.value[geode_object][
+                        output_extension
+                      ]["is_saveable"] = false
+                    }
+                  }
+                }
+              }
               resolve()
             },
             response_error_function: () => {
@@ -100,10 +121,10 @@
     toggle_loading()
   }
 
-  function set_variables(geode_object, output_extension) {
-    if (geode_object != "" && output_extension != "") {
+  function set_variables(output_geode_object, output_extension) {
+    if (output_geode_object != "" && output_extension != "") {
       const keys_values_object = {
-        output_geode_object: geode_object,
+        output_geode_object,
         output_extension,
       }
       emit("update_values", keys_values_object)

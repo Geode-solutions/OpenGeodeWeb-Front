@@ -62,9 +62,13 @@
               reject()
             },
             response_function: (response) => {
-              console.log(response._data.allowed_objects)
-              allowed_objects.value = response._data.allowed_objects
-
+              if (allowed_objects.value.length === 0) {
+                allowed_objects.value = response._data.allowed_objects
+              } else {
+                allowed_objects.value.filter((value) =>
+                  response._data.allowed_objects.includes(value),
+                )
+              }
               resolve()
             },
             response_error_function: () => {

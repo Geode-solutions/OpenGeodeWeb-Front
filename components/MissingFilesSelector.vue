@@ -77,38 +77,48 @@
     has_missing_files.value = false
     mandatory_files.value = []
     additional_files.value = []
+    var promise_array = []
 
     for (const filename of filenames) {
       const params = { input_geode_object, filename }
-      await api_fetch(
-        { schema, params },
-        {
-          request_error_function: () => {
-            resolve()
+      const promise = new Promise((resolve, reject) => {
+        api_fetch(
+          { schema, params },
+          {
+            request_error_function: () => {
+              reject()
+            },
+            response_function: (response) => {
+              has_missing_files.value = response._data.has_missing_files
+                ? true
+                : has_missing_files.value
+              mandatory_files.value = [].concat(
+                mandatory_files.value,
+                response._data.mandatory_files,
+              )
+              additional_files.value = [].concat(
+                additional_files.value,
+                response._data.additional_files,
+              )
+              resolve()
+            },
+            response_error_function: () => {
+              reject()
+            },
           },
-          response_function: (response) => {
-            has_missing_files.value = response._data.has_missing_files
-            mandatory_files.value = response._data.mandatory_files
-            additional_files.value = response._data.additional_files
-
-            const files_list = [].concat(
-              mandatory_files.value,
-              additional_files.value,
-            )
-            accept.value = files_list
-              .map((filename) => "." + filename.split(".").pop())
-              .join(",")
-            if (!has_missing_files.value) {
-              emit("increment_step")
-            }
-          },
-          response_error_function: () => {
-            resolve()
-          },
-        },
-      )
+        )
+      })
+      promise_array.push(promise)
     }
-
+    await Promise.all(promise_array)
+    if (!has_missing_files.value) {
+      emit("increment_step")
+    } else {
+      accept.value = []
+        .concat(mandatory_files.value, additional_files.value)
+        .map((filename) => "." + filename.split(".").pop())
+        .join(",")
+    }
     toggle_loading()
   }
 
