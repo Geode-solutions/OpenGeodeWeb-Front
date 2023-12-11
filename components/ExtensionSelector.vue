@@ -4,7 +4,7 @@
     v-for="(
       output_extensions, output_geode_object
     ) in geode_objects_and_output_extensions"
-    :key="geode_object"
+    :key="output_geode_object"
     class="justify-left"
   >
     <v-card class="card ma-2 pa-2" width="100%">
