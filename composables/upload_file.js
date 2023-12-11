@@ -1,14 +1,12 @@
 export function upload_file(
-  { route, files },
+  { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
   const errors_store = use_errors_store()
   const geode_store = use_geode_store()
 
   const body = new FormData()
-  for (let i = 0; i < files.length; i++) {
-    body.append("content", files[i])
-  }
+  body.append("file", file)
 
   const request_options = {
     method: "PUT",
