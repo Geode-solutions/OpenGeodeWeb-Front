@@ -34,7 +34,9 @@
                     class="card ma-2"
                     :color="extension.is_saveable ? 'primary' : 'grey'"
                     hover
-                    @click="set_variables(geode_object, output_extension)"
+                    @click="
+                      set_variables(output_geode_object, output_extension)
+                    "
                     :disabled="!extension.is_saveable"
                   >
                     <v-card-title align="center">
@@ -85,20 +87,17 @@
               reject()
             },
             response_function: (response) => {
-              console.log(filename)
-              data = response._data.geode_objects_and_output_extensions
+              const data = response._data.geode_objects_and_output_extensions
               if (_.isEmpty(geode_objects_and_output_extensions.value)) {
                 geode_objects_and_output_extensions.value = data
               } else {
                 for (const [geode_object, geode_object_value] of Object.entries(
                   data,
                 )) {
-                  console.log(geode_object)
                   for (const [
                     output_extension,
                     output_extension_value,
                   ] of Object.entries(geode_object_value)) {
-                    console.log(output_extension)
                     if (!output_extension_value["is_saveable"]) {
                       geode_objects_and_output_extensions.value[geode_object][
                         output_extension
