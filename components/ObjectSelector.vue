@@ -31,6 +31,7 @@
 </template>
 
 <script setup>
+  import { toRaw } from "vue"
   import geode_objects from "@/assets/geode_objects"
   import schema from "@/assets/schemas/ObjectSelector.json"
 
@@ -62,11 +63,11 @@
               reject()
             },
             response_function: (response) => {
-              if (allowed_objects.value.length === 0) {
+              if (allowed_objects.value.length == 0) {
                 allowed_objects.value = response._data.allowed_objects
               } else {
-                allowed_objects.value.filter((value) =>
-                  response._data.allowed_objects.includes(value),
+                allowed_objects.value = toRaw(allowed_objects.value).filter(
+                  (value) => response._data.allowed_objects.includes(value),
                 )
               }
               resolve()
@@ -83,9 +84,9 @@
     toggle_loading()
   }
 
-  function set_geode_object(geode_object) {
-    if (geode_object != "") {
-      emit("update_values", { input_geode_object: geode_object })
+  function set_geode_object(input_geode_object) {
+    if (input_geode_object != "") {
+      emit("update_values", { input_geode_object })
       emit("increment_step")
     }
   }
