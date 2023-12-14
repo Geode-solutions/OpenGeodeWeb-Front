@@ -1,17 +1,35 @@
 <template>
   <FetchingData v-if="loading" />
-  <v-row v-else-if="allowed_objects.length" class="justify-left">
-    <v-col v-for="object in allowed_objects" :key="object" cols="2" md="2">
-      <v-card v-ripple class="card ma-2" hover rounded>
-        <v-img
-          :src="geode_objects[object].image"
-          cover
-          @click="set_geode_object(object)"
-        />
-        <v-tooltip activator="parent" location="bottom">
-          {{ geode_objects[object].tooltip }}
-        </v-tooltip>
-      </v-card>
+  <v-row v-else-if="Object.keys(allowed_objects).length" class="justify-left">
+    <v-col v-for="(value, key) in allowed_objects" :key="key" cols="2" md="2">
+      <v-tooltip
+        :disabled="value.is_saveable"
+        text="Data not loadable with this class"
+        location="bottom"
+      >
+        <template v-slot:activator="{ props }">
+          <span v-bind="props">
+            <v-card
+              v-ripple
+              class="card ma-2"
+              hover
+              rounded
+              :disabled="!value['is_saveable']"
+              :elevation="value['is_saveable'] ? 5 : 3"
+            >
+              <v-img
+                :src="geode_objects[key].image"
+                cover
+                @click="set_geode_object(key)"
+                :class="!value['is_saveable'] ? 'disabled' : ''"
+              />
+              <v-tooltip activator="parent" location="bottom">
+                {{ geode_objects[key].tooltip }}
+              </v-tooltip>
+            </v-card>
+          </span>
+        </template>
+      </v-tooltip>
     </v-col>
   </v-row>
   <v-row v-else class="pa-5">
@@ -29,14 +47,11 @@
     </v-card>
   </v-row>
 </template>
-
 <script setup>
   import { toRaw } from "vue"
   import geode_objects from "@/assets/geode_objects"
   import schema from "@/assets/schemas/ObjectSelector.json"
-
   const emit = defineEmits(["update_values", "increment_step"])
-
   const props = defineProps({
     filenames: { type: Array, required: true },
     key: { type: String, required: false, default: null },
@@ -90,8 +105,16 @@
       emit("increment_step")
     }
   }
-
   onMounted(() => {
     get_allowed_objects()
   })
 </script>
+<style scoped>
+  .disabled {
+    filter: opacity(0.7);
+    cursor: pointer;
+  }
+  .disabled div {
+    cursor: not-allowed;
+  }
+</style>
