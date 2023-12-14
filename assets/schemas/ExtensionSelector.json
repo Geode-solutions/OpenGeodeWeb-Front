@@ -10,9 +10,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "input_geode_object",
-    "filename"
-  ],
+  "required": ["input_geode_object", "filename"],
   "additionalProperties": false
 }
