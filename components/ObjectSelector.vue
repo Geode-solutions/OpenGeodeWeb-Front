@@ -31,17 +31,18 @@
 </template>
 
 <script setup>
+  import { toRaw } from "vue"
   import geode_objects from "@/assets/geode_objects"
+  import schema from "@/assets/schemas/ObjectSelector.json"
 
   const emit = defineEmits(["update_values", "increment_step"])
 
   const props = defineProps({
-    files: { type: Array, required: true },
+    filenames: { type: Array, required: true },
     key: { type: String, required: false, default: null },
-    schema: { type: Object, required: true },
   })
 
-  const { files, key, schema } = props
+  const { filenames, key } = props
 
   const loading = ref(false)
   const allowed_objects = ref([])
@@ -49,22 +50,43 @@
   const toggle_loading = useToggle(loading)
 
   async function get_allowed_objects() {
-    const params = { filename: files[0].name, key }
     toggle_loading()
-    await api_fetch(
-      { schema, params },
-      {
-        response_function: (response) => {
-          allowed_objects.value = response._data.allowed_objects
-        },
-      },
-    )
+    allowed_objects.value = []
+    var promise_array = []
+    for (const filename of filenames) {
+      const params = { filename, key }
+      const promise = new Promise((resolve, reject) => {
+        api_fetch(
+          { schema, params },
+          {
+            request_error_function: () => {
+              reject()
+            },
+            response_function: (response) => {
+              if (allowed_objects.value.length == 0) {
+                allowed_objects.value = response._data.allowed_objects
+              } else {
+                allowed_objects.value = toRaw(allowed_objects.value).filter(
+                  (value) => response._data.allowed_objects.includes(value),
+                )
+              }
+              resolve()
+            },
+            response_error_function: () => {
+              reject()
+            },
+          },
+        )
+      })
+      promise_array.push(promise)
+    }
+    await Promise.all(promise_array)
     toggle_loading()
   }
 
-  function set_geode_object(geode_object) {
-    if (geode_object != "") {
-      emit("update_values", { input_geode_object: geode_object })
+  function set_geode_object(input_geode_object) {
+    if (input_geode_object != "") {
+      emit("update_values", { input_geode_object })
       emit("increment_step")
     }
   }

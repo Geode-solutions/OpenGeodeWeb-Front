@@ -7,7 +7,7 @@ import SmartConnect from "wslink/src/SmartConnect"
 
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
-import protocols from "@/protocols"
+import protocols from "@/utils"
 
 // Bind vtkWSLinkClient to our SmartConnect
 vtkWSLinkClient.setSmartConnectClass(SmartConnect)
