@@ -15,7 +15,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Merge master -> next
-        if: github.ref == 'ref/head/master'
+        if: github.ref == 'refs/heads/master'
         uses: devmasx/merge-branch@master
         with:
           type: now
