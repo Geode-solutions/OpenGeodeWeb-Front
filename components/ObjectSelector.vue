@@ -81,6 +81,7 @@
               reject()
             },
             response_function: (response) => {
+              console.log("response", response)
               if (toRaw(allowed_objects.value).length == 0) {
                 allowed_objects.value = response._data.allowed_objects
               } else {
