@@ -81,8 +81,6 @@
               reject()
             },
             response_function: (response) => {
-              console.log("efijsnegingf")
-              console.log(toRaw(allowed_objects.value).length == 0)
               if (toRaw(allowed_objects.value).length == 0) {
                 allowed_objects.value = response._data.allowed_objects
               } else {
