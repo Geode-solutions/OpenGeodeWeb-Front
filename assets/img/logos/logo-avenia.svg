@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="4.7018571cm"
+   height="2cm"
+   viewBox="0 0 177.708 75.59055"
+   version="1.1"
+   id="svg26"
+   sodipodi:docname="logo-avenia.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata30">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1848"
+     inkscape:window-height="1016"
+     id="namedview28"
+     showgrid="false"
+     units="cm"
+     scale-x="1.5"
+     inkscape:zoom="5.5229042"
+     inkscape:cx="85.341728"
+     inkscape:cy="14.226149"
+     inkscape:window-x="72"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg26" />
+  <defs
+     id="defs7">
+    <linearGradient
+       id="linear-gradient"
+       x1="1289.274"
+       y1="51.600681"
+       x2="1262.3896"
+       y2="16.83749"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="scale(0.80142781,1.247773)">
+      <stop
+         offset="0.012"
+         stop-color="#ffea00"
+         id="stop2" />
+      <stop
+         offset="0.958"
+         stop-color="#007b80"
+         id="stop4" />
+    </linearGradient>
+  </defs>
+  <g
+     id="Groupe_1784"
+     data-name="Groupe 1784"
+     transform="translate(-933.117,-5.184212)">
+    <g
+       id="Groupe_40"
+       data-name="Groupe 40"
+       transform="translate(985.99,23.818)">
+      <g
+         id="Groupe_39"
+         data-name="Groupe 39"
+         transform="translate(0,7.889)">
+        <path
+           id="Tracé_27"
+           data-name="Tracé 27"
+           d="m 1188.294,67.984 h 4.727 V 87.9 h -4.646 l -0.242,-2.909 c -1.131,2.343 -4.242,3.474 -6.464,3.515 -5.9,0.041 -10.261,-3.6 -10.261,-10.585 0,-6.868 4.565,-10.464 10.383,-10.424 a 7.311,7.311 0 0 1 6.343,3.232 z m -11.958,9.939 a 5.705,5.705 0 0 0 5.9,6.061 c 7.757,0 7.757,-12.08 0,-12.08 a 5.672,5.672 0 0 0 -5.9,6.019 z"
+           transform="translate(-1171.407,-67.378)"
+           inkscape:connector-curvature="0"
+           style="fill:#00594d" />
+        <path
+           id="Tracé_28"
+           data-name="Tracé 28"
+           d="m 1299.22,69.5 -8.484,20.039 H 1285.4 L 1276.88,69.5 h 5.373 l 2.747,6.589 3.07,8.4 3.03,-8.323 2.747,-6.666 z"
+           transform="translate(-1253.477,-68.938)"
+           inkscape:connector-curvature="0"
+           style="fill:#00594d" />
+        <path
+           id="Tracé_29"
+           data-name="Tracé 29"
+           d="m 1386.8,79.277 c 0.323,2.465 2.464,4.242 5.939,4.242 a 8.217,8.217 0 0 0 5.332,-1.859 l 3.151,3.111 A 12.234,12.234 0 0 1 1392.654,88 c -6.868,0 -10.948,-4.242 -10.948,-10.626 0,-6.061 4.12,-10.424 10.584,-10.424 6.666,0 10.827,4.121 10.059,12.322 z m 10.827,-4.08 c -0.323,-2.586 -2.343,-3.879 -5.171,-3.879 -2.666,0 -4.848,1.293 -5.575,3.879 z"
+           transform="translate(-1335.044,-66.955)"
+           inkscape:connector-curvature="0"
+           style="fill:#00594d" />
+        <path
+           id="Tracé_30"
+           data-name="Tracé 30"
+           d="M 1506.1,88.47 V 78.047 c 0,-3.03 -1.656,-5.333 -4.807,-5.333 -3.03,0 -5.09,2.545 -5.09,5.576 v 10.18 h -4.888 V 68.512 h 4.4 l 0.323,2.707 a 8.982,8.982 0 0 1 6.544,-2.99 c 4.687,0 8.444,3.515 8.444,9.777 V 88.47 Z"
+           transform="translate(-1420.332,-67.946)"
+           inkscape:connector-curvature="0"
+           style="fill:#00594d" />
+        <path
+           id="Tracé_31"
+           data-name="Tracé 31"
+           d="m 1599.287,69.322 v 20 h 4.929 v -20 z"
+           transform="translate(-1504.347,-68.797)"
+           inkscape:connector-curvature="0"
+           style="fill:#00594d" />
+        <path
+           id="Tracé_32"
+           data-name="Tracé 32"
+           d="m 1653.5,67.984 h 4.727 V 87.9 h -4.646 l -0.242,-2.909 c -1.131,2.343 -4.242,3.474 -6.464,3.515 -5.9,0.041 -10.262,-3.6 -10.262,-10.585 0,-6.868 4.565,-10.464 10.383,-10.424 a 7.31,7.31 0 0 1 6.342,3.232 z m -11.958,9.939 a 5.705,5.705 0 0 0 5.9,6.061 c 7.757,0 7.757,-12.08 0,-12.08 a 5.672,5.672 0 0 0 -5.901,6.019 z"
+           transform="translate(-1533.39,-67.378)"
+           inkscape:connector-curvature="0"
+           style="fill:#00594d" />
+      </g>
+      <path
+         id="Tracé_33"
+         data-name="Tracé 33"
+         d="m 1603.1,34.28 c 0,3.838 -5.818,3.838 -5.818,0 0,-3.838 5.818,-3.838 5.818,0 z"
+         transform="translate(-1502.788,-31.401)"
+         inkscape:connector-curvature="0"
+         style="fill:#17b6a4" />
+    </g>
+    <g
+       id="Groupe_41"
+       data-name="Groupe 41"
+       transform="translate(933.117,21.656)">
+      <path
+         id="Tracé_34"
+         data-name="Tracé 34"
+         d="m 1006.715,120.792 c 0,-0.313 0.01,-0.623 0.021,-0.933 0,-0.072 0,-0.145 0.01,-0.217 0.013,-0.31 0.021,-0.62 0.021,-0.933 0,0 0,-0.009 0,-0.014 a 9.117,9.117 0 0 1 -2.733,6.533 9.433,9.433 0 0 1 -2.961,1.993 9.058,9.058 0 0 1 -7.175,0 9.411,9.411 0 0 1 -2.961,-1.993 9.123,9.123 0 0 1 -2.736,-6.528 c 0,0 0,0.009 0,0.014 a 21.562,21.562 0 0 0 15.434,20.665 21.509,21.509 0 0 0 8.237,-4.594 21.46,21.46 0 0 1 -5.156,-13.993 z"
+         transform="translate(-975.98,-97.164)"
+         inkscape:connector-curvature="0"
+         style="fill:#00594d" />
+      <path
+         id="Tracé_35"
+         data-name="Tracé 35"
+         d="M 954.622,28.617 A 21.451,21.451 0 0 0 948.511,25.68 21.550659,21.550659 0 0 0 960.774,67 21.562,21.562 0 0 1 945.34,46.332 V 46.3 c 0,-0.08 0,-0.16 0,-0.24 a 9.083,9.083 0 0 1 0.681,-3.206 9.18,9.18 0 0 1 2.05,-3.046 9.087,9.087 0 0 1 3.075,-2.05 9.346,9.346 0 0 1 12.072,5.1 9.1,9.1 0 0 1 0.68,3.206 21.519,21.519 0 0 0 -9.276,-17.447 z"
+         transform="translate(-933.117,-24.787)"
+         inkscape:connector-curvature="0"
+         style="fill:#17b6a4" />
+      <path
+         id="Tracé_36"
+         data-name="Tracé 36"
+         d="m 1025.03,29.213 a 21.567,21.567 0 0 0 -22.538,-6.664 21.559,21.559 0 0 1 15.39,20.384 c 0,0.08 0,0.16 0,0.24 V 43.2 c 0,0.313 -0.01,0.624 -0.021,0.933 0,0.072 0,0.144 -0.01,0.217 -0.013,0.309 -0.021,0.62 -0.021,0.933 a 21.576,21.576 0 0 0 12.356,19.491 V 43.2 a 21.46,21.46 0 0 0 -5.157,-13.987 z"
+         transform="translate(-987.099,-21.656)"
+         inkscape:connector-curvature="0"
+         style="fill:url(#linear-gradient)" />
+      <path
+         id="Tracé_37"
+         data-name="Tracé 37"
+         d="m 1071.729,123.18 c 0,-0.072 0.01,-0.144 0.01,-0.217 0,0.072 -0.01,0.144 -0.01,0.217 z"
+         transform="translate(-1040.973,-100.485)"
+         inkscape:connector-curvature="0"
+         style="fill:#4fdde1" />
+      <path
+         id="Tracé_38"
+         data-name="Tracé 38"
+         d="m 988.2,117.787 v 0.015 c 0,-0.085 0,-0.17 0,-0.255 0,0.08 0,0.16 0,0.24 z"
+         transform="translate(-975.98,-96.27)"
+         inkscape:connector-curvature="0"
+         style="fill:#ffffff" />
+      <path
+         id="Tracé_39"
+         data-name="Tracé 39"
+         d="m 1071.855,117.787 c 0,-0.08 0,-0.16 0,-0.24 0,0.085 0,0.17 0,0.255 z"
+         transform="translate(-1041.069,-96.27)"
+         inkscape:connector-curvature="0"
+         style="fill:#ffffff" />
+    </g>
+  </g>
+</svg>
