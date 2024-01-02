@@ -15,11 +15,6 @@ export default defineNuxtConfig({
     ["@pinia/nuxt", { autoImports: ["defineStore"] }],
     "@vueuse/nuxt",
     "@nuxt/test-utils/module",
-    // async (options, nuxt) => {
-    //   nuxt.hooks.hook("vite:extendConfig", (config) =>
-    //     config.plugins.push(vuetify()),
-    //   )
-    // },
   ],
   imports: {
     dirs: ["stores"],
