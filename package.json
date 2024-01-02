@@ -2,7 +2,8 @@
   "name": "@geode/opengeodeweb-front",
   "scripts": {
     "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.2",
