@@ -1,6 +1,7 @@
 import { setActivePinia, createPinia } from "pinia"
-import { use_geode_store } from "../../stores/geode"
-import { use_cloud_store } from "../../stores/cloud"
+import { use_geode_store } from "@/stores/geode"
+import { use_cloud_store } from "@/stores/cloud"
+import { describe, it, expect, beforeEach } from "vitest"
 
 describe("Geode Store", () => {
   beforeEach(() => {

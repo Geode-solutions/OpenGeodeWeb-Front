@@ -1,20 +1,7 @@
-import { defineVitestConfig } from "nuxt-vitest/config"
-import vuetify from "vite-plugin-vuetify"
+import { defineVitestConfig } from "@nuxt/test-utils/config"
 
 export default defineVitestConfig({
-  plugins: [vuetify()],
   test: {
-    globals: true,
-    environment: "jsdom",
-    server: {
-      deps: {
-        inline: ["vuetify"],
-      },
-    },
-  },
-  resolve: {
-    alias: {
-      "@": ".",
-    },
+    environment: "nuxt",
   },
 })

@@ -1,5 +1,3 @@
-import vuetify from "vite-plugin-vuetify"
-
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
@@ -16,12 +14,12 @@ export default defineNuxtConfig({
   modules: [
     ["@pinia/nuxt", { autoImports: ["defineStore"] }],
     "@vueuse/nuxt",
-    "nuxt-vitest",
-    async (options, nuxt) => {
-      nuxt.hooks.hook("vite:extendConfig", (config) =>
-        config.plugins.push(vuetify()),
-      )
-    },
+    "@nuxt/test-utils/module",
+    // async (options, nuxt) => {
+    //   nuxt.hooks.hook("vite:extendConfig", (config) =>
+    //     config.plugins.push(vuetify()),
+    //   )
+    // },
   ],
   imports: {
     dirs: ["stores"],
@@ -40,4 +38,6 @@ export default defineNuxtConfig({
       isCustomElement: (tag) => ["md-linedivider"].includes(tag),
     },
   },
+
+  testUtils: {},
 })
