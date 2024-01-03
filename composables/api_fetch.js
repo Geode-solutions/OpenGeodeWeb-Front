@@ -17,7 +17,7 @@ export function api_fetch(
   const valid = ajv.validate(schema, body)
   if (!valid) {
     errors_store.add_error({
-      code: "400",
+      code: 400,
       route: schema.$id,
       name: "Bad request",
       description: ajv.errorsText(),
@@ -40,7 +40,6 @@ export function api_fetch(
     baseURL: geode_store.base_url,
     ...request_options,
     onRequestError({ error }) {
-      // console.log("onRequestError", error)
       geode_store.stop_request()
       errors_store.add_error({
         code: error.code,
@@ -53,7 +52,6 @@ export function api_fetch(
       }
     },
     onResponse({ response }) {
-      // console.log(response)
       if (response.ok) {
         geode_store.stop_request()
         if (response_function) {
@@ -62,7 +60,6 @@ export function api_fetch(
       }
     },
     onResponseError({ response }) {
-      // console.log(response)
       geode_store.stop_request()
       errors_store.add_error({
         code: response.status,
