@@ -73,7 +73,7 @@
     background-color: var(--vc-clr-white);
     color: var(--vc-clr-white);
     font-size: 20px;
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -81,7 +81,7 @@
 
   .carousel__slide {
     display: flex;
-    padding: 10px;
+    padding: 15px;
     align-items: center;
     justify-content: center;
   }
@@ -89,6 +89,6 @@
   .carousel__prev,
   .carousel__next {
     box-sizing: content-box;
-    border: 5px solid white;
+    border: 5px solid red;
   }
 </style>
