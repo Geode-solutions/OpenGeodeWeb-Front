@@ -17,8 +17,70 @@
             mdi-emoticon-excited-outline
           </v-icon>
           <br />
+          <Carousel :items="users_list" />
         </v-card-text>
       </v-card>
     </v-col>
   </v-row>
 </template>
+
+<script setup>
+  import ying_yang from "@/assets/img/energy_sobriety/ying_yang.png"
+  import chemin from "@/assets/img/energy_sobriety/chemin.png"
+  import vert from "@/assets/img/energy_sobriety/vert.png"
+  import lampadaire from "@/assets/img/energy_sobriety/lampadaire.png"
+  import collegue from "@/assets/img/energy_sobriety/collegue.png"
+  import sobene from "@/assets/img/energy_sobriety/sobene.png"
+  import etincelle from "@/assets/img/energy_sobriety/etincelle.png"
+  import geste from "@/assets/img/energy_sobriety/geste.png"
+  import socle from "@/assets/img/energy_sobriety/socle.png"
+  import derniere from "@/assets/img/energy_sobriety/derniere.png"
+  import salon from "@/assets/img/energy_sobriety/salon.png"
+
+  const users_list = [
+    {
+      name: "YING YANG",
+      logo: ying_yang,
+    },
+    {
+      name: "CHEMIN",
+      logo: chemin,
+    },
+    {
+      name: "SOBRIETE ENERGETIQUE",
+      logo: sobene,
+    },
+    {
+      name: "VERT",
+      logo: vert,
+    },
+    {
+      name: "LAMPADAIRE",
+      logo: lampadaire,
+    },
+    {
+      name: "COLLEGUE",
+      logo: collegue,
+    },
+    {
+      name: "ETINCELLE",
+      logo: etincelle,
+    },
+    {
+      name: "GESTE",
+      logo: geste,
+    },
+    {
+      name: "SOCLE",
+      logo: socle,
+    },
+    {
+      name: "DERNIERE",
+      logo: derniere,
+    },
+    {
+      name: "SALON",
+      logo: salon,
+    },
+  ]
+</script>
