@@ -23,11 +23,8 @@ describe("api_fetch.js", () => {
     await api_fetch({ schema, params })
     expect(errors_store.errors.length).toBe(1)
   })
+
   test("Ajv validation", async () => {
-    registerEndpoint("/test/", {
-      method: "POST",
-      handler: () => ({ test: "test-field" }),
-    })
     const schema = {
       $id: "/test",
       type: "object",
@@ -41,7 +38,12 @@ describe("api_fetch.js", () => {
       additionalProperties: false,
     }
     const params = { test: "test" }
-    await api_fetch({ schema, params })
+    registerEndpoint("/test", {
+      method: schema.method,
+      handler: () => ({ test: "toto" }),
+    })
+    const reponse = await api_fetch({ schema, params })
     expect(errors_store.errors.length).toBe(0)
+    expect(reponse._data.test).toBe("toto")
   })
 })

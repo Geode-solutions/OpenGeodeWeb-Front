@@ -3,7 +3,7 @@
   <v-row v-else-if="Object.keys(allowed_objects).length" class="justify-left">
     <v-col v-for="(value, key) in allowed_objects" :key="key" cols="2" md="2">
       <v-tooltip
-        :disabled="value.is_saveable"
+        :disabled="value.is_loadable"
         :text="
           value['is_loadable']
             ? geode_objects[key].tooltip
