@@ -18,13 +18,13 @@
               class="card ma-2"
               hover
               rounded
+              @click="set_geode_object(key)"
               :disabled="!value['is_loadable']"
               :elevation="value['is_loadable'] ? 5 : 3"
             >
               <v-img
                 :src="geode_objects[key].image"
                 cover
-                @click="set_geode_object(key)"
                 :class="!value['is_loadable'] ? 'disabled' : ''"
               />
             </v-card>
@@ -34,7 +34,12 @@
     </v-col>
   </v-row>
   <v-row v-else class="pa-5">
-    <v-card class="card" variant="tonal" rounded>
+    <v-card
+      class="card"
+      variant="tonal"
+      rounded
+      @click="console.log('other card')"
+    >
       <v-card-text>
         This file format isn't supported! Please check the
         <a
@@ -74,13 +79,18 @@
     for (const filename of filenames) {
       const params = { filename, key }
       const promise = new Promise((resolve, reject) => {
+        console.log("params", params)
         api_fetch(
           { schema, params },
           {
-            request_error_function: () => {
+            request_error_function: (error) => {
+              console.log(error)
+              console.log("request_error_function")
               reject()
             },
             response_function: (response) => {
+              console.log("response_function")
+              console.log(response)
               if (toRaw(allowed_objects.value).length == 0) {
                 allowed_objects.value = response._data.allowed_objects
               } else {
@@ -88,9 +98,11 @@
                   (value) => response._data.allowed_objects.includes(value),
                 )
               }
+              console.log("response_function")
               resolve()
             },
             response_error_function: () => {
+              console.log("response_error_function")
               reject()
             },
           },
@@ -98,11 +110,14 @@
       })
       promise_array.push(promise)
     }
+    console.log("begin allowed", promise_array.length)
     await Promise.all(promise_array)
+    console.log("end allowed")
     toggle_loading()
   }
 
   function set_geode_object(input_geode_object) {
+    console.log("set_geode_object")
     if (input_geode_object != "") {
       emit("update_values", { input_geode_object })
       emit("increment_step")
@@ -110,7 +125,9 @@
   }
 
   onMounted(() => {
+    console.log("mounted")
     get_allowed_objects()
+    console.log("mounted end", allowed_objects.value)
   })
 </script>
 

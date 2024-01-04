@@ -22,9 +22,8 @@ export function api_fetch(
       name: "Bad request",
       description: ajv.errorsText(),
     })
-    return
+    throw new Error(schema.$id.concat(": ", ajv.errorsText()))
   }
-
   geode_store.start_request()
 
   const request_options = { method: schema["method"] }
@@ -35,7 +34,7 @@ export function api_fetch(
   if (schema.max_retry) {
     request_options.max_retry = schema.max_retry
   }
-
+  console.log("test")
   return useFetch(schema.$id, {
     baseURL: geode_store.base_url,
     ...request_options,

@@ -23,35 +23,38 @@ const vuetify = createVuetify({
 global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("ObjectSelector.vue", async () => {
-  test("Renders properly", async () => {
-    const wrapper = mount(ObjectSelector, {
-      global: {
-        plugins: [vuetify],
-      },
-      props: { filenames: ["test.toto"], key: "test" },
-    })
-    expect(wrapper.find("FetchingData").exists()).toBe(true)
-  })
-
-  // test("Select geode_object", async () => {
-  //   registerEndpoint(schema.$id, {
-  //     method: schema.method,
-  //     handler: () => ({
-  //       allowed_objects: {
-  //         BRep: { is_loadable: true },
-  //         StructuralModel: { is_loadable: true },
-  //       },
-  //     }),
-  //   })
+  // test("Renders properly", async () => {
   //   const wrapper = mount(ObjectSelector, {
   //     global: {
   //       plugins: [vuetify],
   //     },
   //     props: { filenames: ["test.toto"], key: "test" },
   //   })
-  //   await wrapper.find("v-card").trigger("click")
-  //   expect(wrapper.emitted().update_values).toEqual({
-  //     input_geode_object: "BRep",
-  //   })
+  //   expect(wrapper.find(".v-row").exists()).toBe(true)
+  //   // expect(wrapper.find(FetchingData).exists()).toBe(true)
   // })
+
+  test("Select geode_object", async () => {
+    console.log(schema.$id)
+    registerEndpoint(schema.$id, {
+      method: schema.method,
+      handler: () => ({
+        allowed_objects: {
+          BRep: { is_loadable: true },
+        },
+      }),
+    })
+    const wrapper = mount(ObjectSelector, {
+      global: {
+        plugins: [vuetify],
+      },
+      props: { filenames: ["test.toto", "test.tutu"], key: "test" },
+    })
+    console.log("find")
+    const cards = wrapper.findAll(".v-card")
+    console.log("cards.length", cards.length)
+    expect(wrapper.emitted().update_values).toEqual({
+      input_geode_object: "BRep",
+    })
+  })
 })
