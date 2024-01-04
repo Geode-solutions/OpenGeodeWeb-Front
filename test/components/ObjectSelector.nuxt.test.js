@@ -1,9 +1,9 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test } from "vitest"
-import { mount } from "@vue/test-utils"
+import { mount, flushPromises, shallowMount } from "@vue/test-utils"
 // import vuetify from "vite-plugin-vuetify"
-import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -41,18 +41,26 @@ describe("ObjectSelector.vue", async () => {
       handler: () => ({
         allowed_objects: {
           BRep: { is_loadable: true },
+          StructuralModel: { is_loadable: true },
         },
       }),
     })
-    const wrapper = mount(ObjectSelector, {
+    console.log("mountSuspended")
+    const wrapper = await mountSuspended(ObjectSelector, {
       global: {
         plugins: [vuetify],
       },
       props: { filenames: ["test.toto", "test.tutu"], key: "test" },
     })
-    console.log("find")
-    const cards = wrapper.findAll(".v-card")
-    console.log("cards.length", cards.length)
+    console.log("wrapper")
+
+    // await wrapper.vm.get_allowed_objects()
+    // console.log(wrapper.vm)
+    // const compo = wrapper.findComponent(ObjectSelector)
+    // console.log(wrapper.vm)
+
+    // const cards = wrapper.findAll(".v-card")
+    // console.log("cards.length", cards.length)
     expect(wrapper.emitted().update_values).toEqual({
       input_geode_object: "BRep",
     })
