@@ -55,9 +55,9 @@
 </template>
 
 <script setup>
-  import { toRaw } from "vue"
   import geode_objects from "@/assets/geode_objects"
   import schema from "@/assets/schemas/ObjectSelector.json"
+  // import _ from "lodash"
 
   const emit = defineEmits(["update_values", "increment_step"])
 
@@ -73,36 +73,24 @@
   const toggle_loading = useToggle(loading)
 
   async function get_allowed_objects() {
+    console.log("get_allowed_objects")
     toggle_loading()
-    allowed_objects.value = []
+    allowed_objects.value = {}
     var promise_array = []
     for (const filename of filenames) {
       const params = { filename, key }
+      console.log(params)
       const promise = new Promise((resolve, reject) => {
-        console.log("params", params)
         api_fetch(
           { schema, params },
           {
-            request_error_function: (error) => {
-              console.log(error)
-              console.log("request_error_function")
+            request_error_function: () => {
               reject()
             },
             response_function: (response) => {
-              console.log("response_function")
-              console.log(response)
-              if (toRaw(allowed_objects.value).length == 0) {
-                allowed_objects.value = response._data.allowed_objects
-              } else {
-                allowed_objects.value = toRaw(allowed_objects.value).filter(
-                  (value) => response._data.allowed_objects.includes(value),
-                )
-              }
-              console.log("response_function")
-              resolve()
+              resolve(response._data.allowed_objects)
             },
             response_error_function: () => {
-              console.log("response_error_function")
               reject()
             },
           },
@@ -110,24 +98,39 @@
       })
       promise_array.push(promise)
     }
-    console.log("begin allowed", promise_array.length)
-    await Promise.all(promise_array)
-    console.log("end allowed")
-    toggle_loading()
+    const values = await Promise.all(promise_array)
+    console.log("values", values)
+    var common_keys = _.intersection(keys, keys)
+    for (const value of values) {
+      const keys = Object.keys(value)
+      // var common_keys = _.intersection(keys, keys)
+      console.log("common_keys", keys)
+    }
+    // console.log("common_keys", common_keys)
+    // var final_object = {}
+    // for (const key of common_keys) {
+    //   for (const value of values) {
+    //     if (value[key].is_loadable == false) {
+    //       final_object[key].is_loadable = false
+    //     }
+    //     var common_keys = _.intersection(value.keys)
+    //   }
+    // }
+    // allowed_objects.value = final_object
+    // toggle_loading()
+    // console.log("mounted end", allowed_objects.value)
   }
 
   function set_geode_object(input_geode_object) {
-    console.log("set_geode_object")
     if (input_geode_object != "") {
       emit("update_values", { input_geode_object })
       emit("increment_step")
     }
   }
 
-  onMounted(() => {
-    console.log("mounted")
+  onMounted(async () => {
+    console.log("onMounted")
     get_allowed_objects()
-    console.log("mounted end", allowed_objects.value)
   })
 </script>
 
