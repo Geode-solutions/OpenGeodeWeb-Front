@@ -100,25 +100,25 @@
     }
     const values = await Promise.all(promise_array)
     console.log("values", values)
-    var common_keys = _.intersection(keys, keys)
-    for (const value of values) {
-      const keys = Object.keys(value)
-      // var common_keys = _.intersection(keys, keys)
-      console.log("common_keys", keys)
+    const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
+    const common_keys = all_keys.filter(
+      (i) => !values.some((j) => !Object.keys(j).includes(i)),
+    )
+
+    console.log(common_keys)
+
+    var final_object = {}
+    for (const key of common_keys) {
+      for (const value of values) {
+        if (value[key].is_loadable == false) {
+          final_object[key] = { is_loadable: false }
+        }
+      }
     }
-    // console.log("common_keys", common_keys)
-    // var final_object = {}
-    // for (const key of common_keys) {
-    //   for (const value of values) {
-    //     if (value[key].is_loadable == false) {
-    //       final_object[key].is_loadable = false
-    //     }
-    //     var common_keys = _.intersection(value.keys)
-    //   }
-    // }
-    // allowed_objects.value = final_object
-    // toggle_loading()
-    // console.log("mounted end", allowed_objects.value)
+    console.log(final_object)
+    allowed_objects.value = final_object
+    toggle_loading()
+    console.log("mounted end", allowed_objects.value)
   }
 
   function set_geode_object(input_geode_object) {
