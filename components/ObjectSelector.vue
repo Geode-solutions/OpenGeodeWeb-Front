@@ -34,12 +34,7 @@
     </v-col>
   </v-row>
   <v-row v-else class="pa-5">
-    <v-card
-      class="card"
-      variant="tonal"
-      rounded
-      @click="console.log('other card')"
-    >
+    <v-card class="card" variant="tonal" rounded>
       <v-card-text>
         This file format isn't supported! Please check the
         <a
@@ -57,7 +52,6 @@
 <script setup>
   import geode_objects from "@/assets/geode_objects"
   import schema from "@/assets/schemas/ObjectSelector.json"
-  // import _ from "lodash"
 
   const emit = defineEmits(["update_values", "increment_step"])
 
@@ -65,21 +59,21 @@
     filenames: { type: Array, required: true },
     key: { type: String, required: false, default: null },
   })
-
   const { filenames, key } = props
 
   const loading = ref(false)
-  const allowed_objects = ref({})
+  const allowed_objects = ref({
+    BRep: { is_loadable: true },
+    StructuralModel: { is_loadable: true },
+  })
   const toggle_loading = useToggle(loading)
 
   async function get_allowed_objects() {
-    console.log("get_allowed_objects")
     toggle_loading()
     allowed_objects.value = {}
     var promise_array = []
     for (const filename of filenames) {
       const params = { filename, key }
-      console.log(params)
       const promise = new Promise((resolve, reject) => {
         api_fetch(
           { schema, params },
@@ -99,26 +93,22 @@
       promise_array.push(promise)
     }
     const values = await Promise.all(promise_array)
-    console.log("values", values)
     const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
     const common_keys = all_keys.filter(
       (i) => !values.some((j) => !Object.keys(j).includes(i)),
     )
-
-    console.log(common_keys)
-
     var final_object = {}
     for (const key of common_keys) {
       for (const value of values) {
         if (value[key].is_loadable == false) {
           final_object[key] = { is_loadable: false }
+        } else {
+          final_object[key] = { is_loadable: true }
         }
       }
     }
-    console.log(final_object)
     allowed_objects.value = final_object
     toggle_loading()
-    console.log("mounted end", allowed_objects.value)
   }
 
   function set_geode_object(input_geode_object) {
@@ -128,10 +118,8 @@
     }
   }
 
-  onMounted(async () => {
-    console.log("onMounted")
-    get_allowed_objects()
-  })
+  await get_allowed_objects()
+  console.log("allowed_objects", allowed_objects.value)
 </script>
 
 <style scoped>

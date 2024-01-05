@@ -11,11 +11,7 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: [
-    ["@pinia/nuxt", { autoImports: ["defineStore"] }],
-    "@vueuse/nuxt",
-    "@nuxt/test-utils/module",
-  ],
+  modules: [["@pinia/nuxt", { autoImports: ["defineStore"] }], "@vueuse/nuxt"],
   imports: {
     dirs: ["stores"],
   },
