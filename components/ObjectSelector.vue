@@ -62,10 +62,7 @@
   const { filenames, key } = props
 
   const loading = ref(false)
-  const allowed_objects = ref({
-    BRep: { is_loadable: true },
-    StructuralModel: { is_loadable: true },
-  })
+  const allowed_objects = ref({})
   const toggle_loading = useToggle(loading)
 
   async function get_allowed_objects() {
@@ -107,6 +104,7 @@
         }
       }
     }
+
     allowed_objects.value = final_object
     toggle_loading()
   }
@@ -119,7 +117,6 @@
   }
 
   await get_allowed_objects()
-  console.log("allowed_objects", allowed_objects.value)
 </script>
 
 <style scoped>
