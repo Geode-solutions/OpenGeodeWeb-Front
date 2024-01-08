@@ -6,15 +6,10 @@
     "input_geode_object": {
       "type": "string"
     },
-    "filenames": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "uniqueItems": true,
-      "minItems": 1
+    "filename": {
+      "type": "string"
     }
   },
-  "required": ["input_geode_object", "filenames"],
+  "required": ["input_geode_object", "filename"],
   "additionalProperties": false
 }

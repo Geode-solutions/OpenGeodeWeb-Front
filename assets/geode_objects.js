@@ -1,109 +1,109 @@
-import brep from "@/assets/img/geode_objects/BRep.svg"
-import cross_section from "@/assets/img/geode_objects/cross_section.svg"
-import edged_curve2d from "@/assets/img/geode_objects/edged_curve2d.svg"
-import edged_curve3d from "@/assets/img/geode_objects/edged_curve3d.svg"
-import edged_curve from "@/assets/img/geode_objects/edged_curve.svg"
-import hybrid_solid from "@/assets/img/geode_objects/hybrid_solid.svg"
-import point_set2d from "@/assets/img/geode_objects/point_set2d.svg"
-import point_set3d from "@/assets/img/geode_objects/point_set3d.svg"
-import polygonal_surface2d from "@/assets/img/geode_objects/polygonal_surface2d.svg"
-import polygonal_surface3d from "@/assets/img/geode_objects/polygonal_surface3d.svg"
-import polyhedral_solid from "@/assets/img/geode_objects/polyhedral_solid.svg"
-import raster_image2d from "@/assets/img/geode_objects/raster_image2d.svg"
-import raster_image3d from "@/assets/img/geode_objects/raster_image3d.svg"
-import regular_grid2d from "@/assets/img/geode_objects/regular_grid2d.svg"
-import regular_grid3d from "@/assets/img/geode_objects/regular_grid3d.svg"
-import section from "@/assets/img/geode_objects/section.svg"
-import structural_model from "@/assets/img/geode_objects/structural_model.svg"
-import tetrahedral_solid from "@/assets/img/geode_objects/tetrahedral_solid.svg"
-import triangulated_surface2d from "@/assets/img/geode_objects/triangulated_surface2d.svg"
-import triangulated_surface3d from "@/assets/img/geode_objects/triangulated_surface3d.svg"
-import vertex_set from "@/assets/img/geode_objects/vertex_set.svg"
+import BRep from "@/assets/img/geode_objects/BRep.svg"
+import CrossSection from "@/assets/img/geode_objects/CrossSection.svg"
+import EdgedCurve2D from "@/assets/img/geode_objects/EdgedCurve2D.svg"
+import EdgedCurve3D from "@/assets/img/geode_objects/EdgedCurve3D.svg"
+import Graph from "@/assets/img/geode_objects/Graph.svg"
+import HybridSolid3D from "@/assets/img/geode_objects/HybridSolid3D.svg"
+import PointSet2D from "@/assets/img/geode_objects/PointSet2D.svg"
+import PointSet3D from "@/assets/img/geode_objects/PointSet3D.svg"
+import PolygonalSurface2D from "@/assets/img/geode_objects/PolygonalSurface2D.svg"
+import PolygonalSurface3D from "@/assets/img/geode_objects/PolygonalSurface3D.svg"
+import PolyhedralSolid3D from "@/assets/img/geode_objects/PolyhedralSolid3D.svg"
+import RasterImage2D from "@/assets/img/geode_objects/RasterImage2D.svg"
+import RasterImage3D from "@/assets/img/geode_objects/RasterImage3D.svg"
+import RegularGrid2D from "@/assets/img/geode_objects/RegularGrid2D.svg"
+import RegularGrid3D from "@/assets/img/geode_objects/RegularGrid3D.svg"
+import Section from "@/assets/img/geode_objects/Section.svg"
+import StructuralModel from "@/assets/img/geode_objects/StructuralModel.svg"
+import TetrahedralSolid3D from "@/assets/img/geode_objects/TetrahedralSolid3D.svg"
+import TriangulatedSurface2D from "@/assets/img/geode_objects/TriangulatedSurface2D.svg"
+import TriangulatedSurface3D from "@/assets/img/geode_objects/TriangulatedSurface3D.svg"
+import VertexSet from "@/assets/img/geode_objects/VertexSet.svg"
 
 const geode_objects = {
   BRep: {
     tooltip: "BRep",
-    image: brep,
+    image: BRep,
   },
   CrossSection: {
     tooltip: "CrossSection",
-    image: cross_section,
+    image: CrossSection,
   },
   EdgedCurve2D: {
     tooltip: "EdgedCurve2D",
-    image: edged_curve2d,
+    image: EdgedCurve2D,
   },
   EdgedCurve3D: {
     tooltip: "EdgedCurve3D",
-    image: edged_curve3d,
+    image: EdgedCurve3D,
   },
   Graph: {
     tooltip: "Graph",
-    image: edged_curve,
+    image: Graph,
   },
   HybridSolid3D: {
     tooltip: "HybridSolid3D",
-    image: hybrid_solid,
+    image: HybridSolid3D,
   },
   PointSet2D: {
     tooltip: "PointSet2D",
-    image: point_set2d,
+    image: PointSet2D,
   },
   PointSet3D: {
     tooltip: "PointSet3D",
-    image: point_set3d,
+    image: PointSet3D,
   },
   PolygonalSurface2D: {
     tooltip: "PolygonalSurface2D",
-    image: polygonal_surface2d,
+    image: PolygonalSurface2D,
   },
   PolygonalSurface3D: {
     tooltip: "PolygonalSurface3D",
-    image: polygonal_surface3d,
+    image: PolygonalSurface3D,
   },
   PolyhedralSolid3D: {
     tooltip: "PolyhedralSolid3D",
-    image: polyhedral_solid,
+    image: PolyhedralSolid3D,
   },
   RasterImage2D: {
     tooltip: "RasterImage2D",
-    image: raster_image2d,
+    image: RasterImage2D,
   },
   RasterImage3D: {
     tooltip: "RasterImage3D",
-    image: raster_image3d,
+    image: RasterImage3D,
   },
   RegularGrid2D: {
     tooltip: "RegularGrid2D",
-    image: regular_grid2d,
+    image: RegularGrid2D,
   },
   RegularGrid3D: {
     tooltip: "RegularGrid3D",
-    image: regular_grid3d,
+    image: RegularGrid3D,
   },
   Section: {
     tooltip: "Section",
-    image: section,
+    image: Section,
   },
   StructuralModel: {
     tooltip: "StructuralModel",
-    image: structural_model,
+    image: StructuralModel,
   },
   TetrahedralSolid3D: {
     tooltip: "TetrahedralSolid3D",
-    image: tetrahedral_solid,
+    image: TetrahedralSolid3D,
   },
   TriangulatedSurface2D: {
     tooltip: "TriangulatedSurface2D",
-    image: triangulated_surface2d,
+    image: TriangulatedSurface2D,
   },
   TriangulatedSurface3D: {
     tooltip: "TriangulatedSurface3D",
-    image: triangulated_surface3d,
+    image: TriangulatedSurface3D,
   },
   VertexSet: {
     tooltip: "VertexSet",
-    image: vertex_set,
+    image: VertexSet,
   },
 }
 
