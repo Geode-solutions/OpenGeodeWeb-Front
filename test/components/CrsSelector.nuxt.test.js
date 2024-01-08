@@ -42,11 +42,6 @@ describe("CrsSelector.vue", async () => {
     // console.log("v_data_table items", v_data_table._children)
     const input = await wrapper.find("input")
     console.log("input", input)
-
-    const tr = v_data_table.find(".tr")
-    console.log("tr", tr)
-
-    const td = v_data_table.find(".td")
     console.log("td", td)
     await input.trigger("click")
     console.log("emitted", wrapper.emitted())
