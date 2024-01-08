@@ -1,7 +1,6 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test } from "vitest"
-import { mount, flushPromises, shallowMount } from "@vue/test-utils"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 
 import { createVuetify } from "vuetify"
@@ -22,34 +21,16 @@ const vuetify = createVuetify({
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-describe("ObjectSelector.vue", async () => {
-  test("Renders properly", async () => {
-    // registerEndpoint(schema.$id, {
-    //   method: schema.method,
-    //   handler: () => ({
-    //     allowed_objects: {
-    //       StructuralModel: { is_loadable: true },
-    //     },
-    //   }),
-    // })
-    const wrapper = await mountSuspended(ObjectSelector, {
-      global: {
-        plugins: [vuetify],
-      },
-      props: { filenames: ["test.toto"], key: "test" },
-    })
-    expect(wrapper.find(".v-card").exists()).toBe(true)
-  })
-
-  test("Select geode_objects", async () => {
-    for (const [geode_object, value] of Object.entries(geode_objects)) {
+for (const [geode_object, value] of Object.entries(geode_objects)) {
+  describe("ObjectSelector.vue", async () => {
+    test(`BRep`, async () => {
+      var response = {
+        allowed_objects: {},
+      }
+      response["allowed_objects"][geode_object] = { is_loadable: true }
       registerEndpoint(schema.$id, {
         method: schema.method,
-        handler: () => ({
-          allowed_objects: {
-            geode_object: { is_loadable: true },
-          },
-        }),
+        handler: () => response,
       })
       const wrapper = await mountSuspended(ObjectSelector, {
         global: {
@@ -66,32 +47,6 @@ describe("ObjectSelector.vue", async () => {
       expect(wrapper.emitted().update_values[0][0]).toEqual({
         input_geode_object: geode_object,
       })
-    }
+    })
   })
-
-  // test("Select StructuralModel geode_object", async () => {
-  //   registerEndpoint(schema.$id, {
-  //     method: schema.method,
-  //     handler: () => ({
-  //       allowed_objects: {
-  //         BRep: { is_loadable: true },
-  //         StructuralModel: { is_loadable: true },
-  //       },
-  //     }),
-  //   })
-  //   const wrapper = await mountSuspended(ObjectSelector, {
-  //     global: {
-  //       plugins: [vuetify],
-  //     },
-  //     props: { filenames: ["test.toto", "test.tutu"], key: "test" },
-  //   })
-  //   const v_cards = await wrapper.findAll(".v-card")
-  //   expect(v_cards.length).toEqual(2)
-  //   await v_cards[1].trigger("click")
-  //   expect(wrapper.emitted()).toHaveProperty("update_values")
-  //   expect(wrapper.emitted().update_values).toHaveLength(1)
-  //   expect(wrapper.emitted().update_values[0][0]).toEqual({
-  //     input_geode_object: "BRep",
-  //   })
-  // })
-})
+}

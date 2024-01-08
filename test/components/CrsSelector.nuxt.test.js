@@ -10,7 +10,6 @@ import * as directives from "vuetify/directives"
 import CrsSelector from "@/components/CrsSelector.vue"
 import schema from "@/assets/schemas/CrsSelector.json"
 
-// import vuetify from "@/plugins/vuetify"
 const vuetify = createVuetify({
   components,
   directives,
@@ -18,74 +17,49 @@ const vuetify = createVuetify({
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-describe("ObjectSelector.vue", async () => {
-  test("Renders properly", async () => {
+describe("CrsSelector.vue", async () => {
+  test(`BRep`, async () => {
     registerEndpoint(schema.$id, {
       method: schema.method,
       handler: () => ({
-        allowed_objects: {
-          BRep: { is_loadable: true },
-        },
+        crs_list: [
+          {
+            authority: "EPSG",
+            code: "2000",
+            name: "Anguilla 1957 / British West Indies Grid",
+          },
+        ],
       }),
     })
     const wrapper = await mountSuspended(CrsSelector, {
       global: {
         plugins: [vuetify],
       },
-      props: { filenames: ["test.toto"], key: "test" },
+      props: { input_geode_object: "BRep", key_to_update: "crs" },
     })
-    expect(wrapper.find(".v-card").exists()).toBe(true)
-  })
+    const v_data_table = await wrapper.findComponent(components.VDataTable)
+    console.log("v_data_table", v_data_table)
+    // console.log("v_data_table items", v_data_table._children)
+    const input = await wrapper.find("input")
+    console.log("input", input)
 
-  test("Select Brep geode_object", async () => {
-    registerEndpoint(schema.$id, {
-      method: schema.method,
-      handler: () => ({
-        allowed_objects: {
-          BRep: { is_loadable: true },
-          StructuralModel: { is_loadable: true },
-        },
-      }),
-    })
-    const wrapper = await mountSuspended(ObjectSelector, {
-      global: {
-        plugins: [vuetify],
-      },
-      props: { filenames: ["test.toto", "test.tutu"], key: "test" },
-    })
-    const v_card = wrapper.find(".v-card")
-    expect(v_card.find("img").attributes("src")).toContain("/BRep.svg")
-    await v_card.trigger("click")
-    expect(wrapper.emitted()).toHaveProperty("update_values")
+    const tr = v_data_table.find(".tr")
+    console.log("tr", tr)
+
+    const td = v_data_table.find(".td")
+    console.log("td", td)
+    await input.trigger("click")
+    console.log("emitted", wrapper.emitted())
+    // expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
-      input_geode_object: "BRep",
-    })
-  })
-
-  test("Select StructuralModel geode_object", async () => {
-    registerEndpoint(schema.$id, {
-      method: schema.method,
-      handler: () => ({
-        allowed_objects: {
-          BRep: { is_loadable: true },
-          StructuralModel: { is_loadable: true },
+      key_to_update: {
+        crs: {
+          authority: "EPSG",
+          code: "2000",
+          name: "Anguilla 1957 / British West Indies Grid",
         },
-      }),
-    })
-    const wrapper = await mountSuspended(ObjectSelector, {
-      global: {
-        plugins: [vuetify],
       },
-      props: { filenames: ["test.toto", "test.tutu"], key: "test" },
-    })
-    const v_cards = await wrapper.findAll(".v-card")
-    expect(v_cards.length).toEqual(2)
-    await v_cards[1].trigger("click")
-    expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
-      input_geode_object: "BRep",
     })
   })
 })
