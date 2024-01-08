@@ -86,7 +86,5 @@
     { title: "Name", align: "end", key: "name" },
   ]
 
-  onMounted(() => {
-    get_crs_table()
-  })
+  await get_crs_table()
 </script>
