@@ -1,10 +1,5 @@
-import { createVuetify } from "vuetify"
-
-import "@mdi/font/css/materialdesignicons.css"
-import "vuetify/styles"
-
-export const vuetify = createVuetify({
-  defaultAssets: false,
+export const vuetify = {
+  defaultAssets: true,
   icons: {
     defaultSet: "mdi",
   },
@@ -22,8 +17,4 @@ export const vuetify = createVuetify({
       style: "border-radius: 15px;",
     },
   },
-})
-
-export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.use(vuetify)
-})
+}
