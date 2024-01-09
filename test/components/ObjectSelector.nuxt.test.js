@@ -8,9 +8,7 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
 import ObjectSelector from "@/components/ObjectSelector.vue"
-
 import schema from "@/assets/schemas/ObjectSelector.json"
-
 import geode_objects from "@/assets/geode_objects"
 
 // import vuetify from "@/plugins/vuetify"
