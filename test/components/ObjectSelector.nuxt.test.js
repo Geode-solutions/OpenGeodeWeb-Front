@@ -18,7 +18,7 @@ const vuetify = createVuetify({
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-// for (const [geode_object, value] of Object.entries(geode_objects)) {
+// for (const [geode_object] of Object.entries(geode_objects)) {
 const geode_object = "BRep"
 describe("ObjectSelector.vue", async () => {
   test(`BRep`, async () => {
