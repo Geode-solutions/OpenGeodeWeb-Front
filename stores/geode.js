@@ -26,14 +26,15 @@ export const use_geode_store = defineStore("geode", {
     },
     async do_ping() {
       const errors_store = use_errors_store()
-      const { data, error } = await useFetch(`${this.base_url}/ping`, {
+      const { data } = await useFetch(`${this.base_url}/ping`, {
         method: "POST",
       })
       if (data.value !== null) {
         this.is_running = true
+        return
       } else {
-        errors_store.server_error = true
-        console.log("error : ", error)
+        errors_store.$patch({ server_error: true })
+        return
       }
     },
     start_request() {

@@ -6,6 +6,7 @@ export function upload_file(
   const geode_store = use_geode_store()
 
   const body = new FormData()
+  console.log("typeof file", typeof file)
   body.append("file", file)
 
   const request_options = {
