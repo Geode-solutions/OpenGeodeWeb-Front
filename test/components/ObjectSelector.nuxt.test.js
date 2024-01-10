@@ -38,7 +38,7 @@ describe("ObjectSelector.vue", async () => {
     })
     const v_card = wrapper.findComponent(components.VCard)
     const v_img = v_card.findComponent(components.VImg)
-    expect(v_img.vm.src).toContain(`/${geode_object}.svg`)
+    expect(v_img.vm.src).toContain(`${geode_object}.svg`)
     await v_card.trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
