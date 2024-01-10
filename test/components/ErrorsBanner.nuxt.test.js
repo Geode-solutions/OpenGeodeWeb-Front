@@ -1,6 +1,6 @@
 // @vitest-environment nuxt
 
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -14,20 +14,33 @@ const vuetify = createVuetify({
 })
 
 describe("ErrorsBanner.vue", async () => {
-  test(`Test delete error`, async () => {
+  test(`Test reload`, async () => {
     const wrapper = mount(ErrorsBanner, {
       global: {
         plugins: [vuetify],
       },
     })
-
+    const reload_spy = vi.spyOn(wrapper.vm, "reload")
     const errors_store = use_errors_store()
     await errors_store.$patch({ server_error: true })
     expect(errors_store.server_error).toBe(true)
     const v_btn = wrapper.findAll(".v-btn")
-    console.log("v_btn", v_btn)
-    await v_btn[1].trigger("click")
-    console.log("server_error", errors_store.server_error)
-    expect(errors_store.server_error).toBe(false)
-  })
+    await v_btn[0].trigger("click")
+
+    expect(reload_spy).toHaveBeenCalledTimes(1)
+  }),
+    test(`Test delete error`, async () => {
+      const wrapper = mount(ErrorsBanner, {
+        global: {
+          plugins: [vuetify],
+        },
+      })
+
+      const errors_store = use_errors_store()
+      await errors_store.$patch({ server_error: true })
+      expect(errors_store.server_error).toBe(true)
+      const v_btn = wrapper.findAll(".v-btn")
+      await v_btn[1].trigger("click")
+      expect(errors_store.server_error).toBe(false)
+    })
 })
