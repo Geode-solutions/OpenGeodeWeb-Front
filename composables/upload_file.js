@@ -5,8 +5,11 @@ export function upload_file(
   const errors_store = use_errors_store()
   const geode_store = use_geode_store()
 
+  if ((!file) instanceof File) {
+    throw new Error("file must be a instance of File")
+  }
+
   const body = new FormData()
-  console.log("typeof file", typeof file)
   body.append("file", file)
 
   const request_options = {
