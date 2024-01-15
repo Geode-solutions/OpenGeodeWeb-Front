@@ -87,26 +87,8 @@
               reject()
             },
             response_function: (response) => {
-              const data = response._data.geode_objects_and_output_extensions
-              if (_.isEmpty(geode_objects_and_output_extensions.value)) {
-                geode_objects_and_output_extensions.value = data
-              } else {
-                for (const [geode_object, geode_object_value] of Object.entries(
-                  data,
-                )) {
-                  for (const [
-                    output_extension,
-                    output_extension_value,
-                  ] of Object.entries(geode_object_value)) {
-                    if (!output_extension_value["is_saveable"]) {
-                      geode_objects_and_output_extensions.value[geode_object][
-                        output_extension
-                      ]["is_saveable"] = false
-                    }
-                  }
-                }
-              }
-              resolve()
+              console.log(response._data.geode_objects_and_output_extensions)
+              resolve(response._data.geode_objects_and_output_extensions)
             },
             response_error_function: () => {
               reject()
@@ -116,7 +98,26 @@
       })
       promise_array.push(promise)
     }
-    await Promise.all(promise_array)
+    const values = await Promise.all(promise_array)
+
+    const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
+    const common_keys = all_keys.filter(
+      (i) => !values.some((j) => !Object.keys(j).includes(i)),
+    )
+    var final_object = {}
+    for (const key of common_keys) {
+      final_object[key] = {}
+      for (const value of values) {
+        for (const extension of Object.keys(value[key])) {
+          if (value[key][extension].is_saveable == false) {
+            final_object[key][extension] = { is_saveable: false }
+          } else {
+            final_object[key][extension] = { is_saveable: true }
+          }
+        }
+      }
+    }
+    geode_objects_and_output_extensions.value = final_object
     toggle_loading()
   }
 
@@ -131,7 +132,5 @@
     }
   }
 
-  onMounted(() => {
-    get_output_file_extensions()
-  })
+  await get_output_file_extensions()
 </script>
