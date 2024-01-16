@@ -40,14 +40,12 @@ describe("CrsSelector.vue", async () => {
       props: { input_geode_object: "BRep", key_to_update },
     })
     const td = await wrapper.find("td")
-    console.log("td", td)
-
-    await td.trigger("click")
+    const imput = await td.find("input")
+    await imput.trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
-      [key]: crs_list,
+      [key_to_update]: crs_list[0],
     })
   })
 })
-// }
