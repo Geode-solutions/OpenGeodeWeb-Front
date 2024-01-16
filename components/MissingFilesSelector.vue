@@ -89,18 +89,7 @@
               reject()
             },
             response_function: (response) => {
-              has_missing_files.value = response._data.has_missing_files
-                ? true
-                : has_missing_files.value
-              mandatory_files.value = [].concat(
-                mandatory_files.value,
-                response._data.mandatory_files,
-              )
-              additional_files.value = [].concat(
-                additional_files.value,
-                response._data.additional_files,
-              )
-              resolve()
+              resolve(response._data)
             },
             response_error_function: () => {
               reject()
@@ -110,7 +99,20 @@
       })
       promise_array.push(promise)
     }
-    await Promise.all(promise_array)
+    const values = await Promise.all(promise_array)
+    for (const value of values) {
+      has_missing_files.value = value.has_missing_files
+        ? true
+        : has_missing_files.value
+      mandatory_files.value = [].concat(
+        mandatory_files.value,
+        value.mandatory_files,
+      )
+      additional_files.value = [].concat(
+        additional_files.value,
+        value.additional_files,
+      )
+    }
     if (!has_missing_files.value) {
       emit("increment_step")
     } else {
@@ -122,7 +124,5 @@
     toggle_loading()
   }
 
-  onMounted(() => {
-    missing_files()
-  })
+  await missing_files()
 </script>
