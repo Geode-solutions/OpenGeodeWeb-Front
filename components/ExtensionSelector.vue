@@ -98,40 +98,29 @@
       promise_array.push(promise)
     }
     const values = await Promise.all(promise_array)
-    console.log("1")
     const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
-    console.log("2")
     const common_keys = all_keys.filter(
       (i) => !values.some((j) => !Object.keys(j).includes(i)),
     )
-    console.log("3")
     var final_object = {}
     for (const key of common_keys) {
-      console.log("4")
       final_object[key] = {}
       for (const value of values) {
-        console.log("5")
         for (const extension of Object.keys(value[key])) {
-          console.log("6")
           if (value[key][extension].is_saveable == false) {
-            console.log("7")
             final_object[key][extension] = { is_saveable: false }
           } else {
-            console.log("8")
             final_object[key][extension] = { is_saveable: true }
           }
         }
       }
     }
-    console.log("final_object", final_object)
     geode_objects_and_output_extensions.value = final_object
     toggle_loading()
   }
 
   function set_variables(output_geode_object, output_extension) {
-    console.log("set_variables 1")
     if (output_geode_object != "" && output_extension != "") {
-      console.log("set_variables")
       const keys_values_object = {
         output_geode_object,
         output_extension,
