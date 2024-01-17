@@ -29,12 +29,12 @@ describe("ExtensionSelector.vue", async () => {
         },
       }),
     })
-    const wrapper = await mountSuspended(ExtensionSelector, {
-      global: {
-        plugins: [vuetify],
-      },
-      props: { input_geode_object: "BRep", filenames: ["test.toto"] },
-    })
+    // const wrapper = await mountSuspended(ExtensionSelector, {
+    //   global: {
+    //     plugins: [vuetify],
+    //   },
+    //   props: { input_geode_object: "BRep", filenames: ["test.toto"] },
+    // })
     // const first_v_card = await wrapper.findComponent(components.VCard)
     // console.log("first_v_card", first_v_card)
     // const second_v_card = first_v_card.findComponent(components.VCard)

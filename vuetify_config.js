@@ -1,4 +1,4 @@
-export const vuetify = {
+const vuetify = {
   defaultAssets: true,
   icons: {
     defaultSet: "mdi",
@@ -18,3 +18,5 @@ export const vuetify = {
     },
   },
 }
+
+export default vuetify
