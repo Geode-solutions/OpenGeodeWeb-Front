@@ -2,6 +2,7 @@
 
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
+import { flushPromises } from "@vue/test-utils"
 
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -17,12 +18,10 @@ const vuetify = createVuetify({
 global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("FileUploader.vue", async () => {
-  test(`BRep`, async () => {
+  test(`Upload file`, async () => {
     registerEndpoint("/upload", {
       method: "PUT",
-      handler: () => ({
-        extensions: ["1", "2", "3"],
-      }),
+      handler: () => ({}),
     })
     const wrapper = await mountSuspended(FileUploader, {
       global: {
@@ -32,9 +31,12 @@ describe("FileUploader.vue", async () => {
     })
     const v_file_input = wrapper.findComponent(components.VFileInput)
     await v_file_input.trigger("click")
-    // console.log(wrapper.emitted())
-    // expect(wrapper.emitted().files_uploaded[0][0]).toEqual({
-    //   files,
-    // })
+    const files = [new File(["fake_file"], "fake_file.txt")]
+    await v_file_input.setValue(files)
+    await v_file_input.trigger("change")
+    const v_btn = wrapper.findComponent(components.VBtn)
+    await v_btn.trigger("click")
+    await flushPromises()
+    expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
   })
 })

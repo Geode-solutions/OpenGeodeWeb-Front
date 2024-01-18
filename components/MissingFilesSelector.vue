@@ -73,6 +73,7 @@
   }
 
   async function missing_files() {
+    console.log("missing_files")
     toggle_loading()
     has_missing_files.value = false
     mandatory_files.value = []
@@ -89,6 +90,7 @@
               reject()
             },
             response_function: (response) => {
+              // console.log(response._data)
               resolve(response._data)
             },
             response_error_function: () => {

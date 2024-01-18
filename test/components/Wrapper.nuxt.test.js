@@ -7,7 +7,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import Step from "@/components/Step.vue"
+import Stepper from "@/components/Stepper.vue"
 import ObjectSelector from "@/components/ObjectSelector.vue"
 
 const vuetify = createVuetify({
@@ -18,7 +18,7 @@ const vuetify = createVuetify({
 global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("Step.vue", async () => {
-  test(`BRep`, async () => {
+  test(`Mount`, async () => {
     const input_geode_object = ref("BRep")
     const files = ref([])
     const stepper_tree = reactive({
@@ -46,12 +46,12 @@ describe("Step.vue", async () => {
         },
       ],
     })
-    const wrapper = mount(Step, {
+    const wrapper = mount(Stepper, {
       global: {
         plugins: [vuetify],
         provide: { stepper_tree },
       },
-      props: { step_index: 0 },
+      props: { versions_schema: {}, cards_list: [] },
     })
     expect(wrapper.exists()).toBe(true)
   })
