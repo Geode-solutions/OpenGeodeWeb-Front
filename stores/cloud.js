@@ -33,6 +33,7 @@ export const use_cloud_store = defineStore("cloud", {
         })
         console.log("error", error)
         if (data.value !== null) {
+          console.log("geode_store.is_running = true")
           geode_store.is_running = true
           return geode_store.ping_task()
         } else {
@@ -41,6 +42,7 @@ export const use_cloud_store = defineStore("cloud", {
       }
     },
     async create_backend() {
+      console.log("create backend")
       const geode_store = use_geode_store()
       const errors_store = use_errors_store()
       const config = useRuntimeConfig()

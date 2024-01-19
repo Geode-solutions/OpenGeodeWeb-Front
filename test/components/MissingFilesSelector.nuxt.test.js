@@ -47,7 +47,6 @@ describe("MissingFilesSelector.vue", async () => {
     })
     await flushPromises()
     await wrapper.vm.$nextTick()
-    console.log("wrapper", wrapper.html())
 
     // const VContainer = wrapper.findComponent(components.VContainer)
     // console.log("VContainer", VContainer)
