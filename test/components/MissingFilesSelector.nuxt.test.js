@@ -48,25 +48,22 @@ describe("MissingFilesSelector.vue", async () => {
     await flushPromises()
     await wrapper.vm.$nextTick()
 
-    // const VContainer = wrapper.findComponent(components.VContainer)
-    // console.log("VContainer", VContainer)
+    const file_uploader = wrapper.findComponent(FileUploader)
+    console.log("file_uploader", file_uploader)
+    expect(file_uploader.exists()).toBe(true)
 
-    // const file_uploader = wrapper.findComponent(FileUploader)
-    // console.log("file_uploader", file_uploader)
-    // expect(file_uploader.exists()).toBe(true)
-
-    // const v_file_input = file_uploader.findComponent(components.VFileInput)
-    // await v_file_input.trigger("click")
-    // const files = [new File(["fake_file"], "fake_file.txt")]
-    // await v_file_input.setValue(files)
-    // await v_file_input.trigger("change")
-    // const v_btn = wrapper.findComponent(components.VBtn)
-    // await v_btn.trigger("click")
-    // await flushPromises()
-    // expect(wrapper.emitted()).toHaveProperty("update_values")
-    // expect(wrapper.emitted().update_values).toHaveLength(1)
-    // expect(wrapper.emitted().update_values[0][0]).toEqual({
-    //   additional_files: files,
-    // })
+    const v_file_input = file_uploader.findComponent(components.VFileInput)
+    await v_file_input.trigger("click")
+    const files = [new File(["fake_file"], "fake_file.txt")]
+    await v_file_input.setValue(files)
+    await v_file_input.trigger("change")
+    const v_btn = wrapper.findComponent(components.VBtn)
+    await v_btn.trigger("click")
+    await flushPromises()
+    expect(wrapper.emitted()).toHaveProperty("update_values")
+    expect(wrapper.emitted().update_values).toHaveLength(1)
+    expect(wrapper.emitted().update_values[0][0]).toEqual({
+      additional_files: files,
+    })
   })
 })
