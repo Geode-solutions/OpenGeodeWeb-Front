@@ -7,7 +7,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import Stepper from "@/components/Stepper.vue"
+import Wrapper from "@/components/Wrapper.vue"
 import ObjectSelector from "@/components/ObjectSelector.vue"
 
 const vuetify = createVuetify({
@@ -46,12 +46,12 @@ describe("Step.vue", async () => {
         },
       ],
     })
-    const wrapper = mount(Stepper, {
+    const wrapper = mount(Wrapper, {
       global: {
         plugins: [vuetify],
         provide: { stepper_tree },
       },
-      props: { versions_schema: {}, cards_list: [] },
+      props: { versions_schema: {} },
     })
     expect(wrapper.exists()).toBe(true)
   })

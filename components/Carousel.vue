@@ -60,10 +60,6 @@
     transition: 1000,
     wrapAround: true,
   })
-
-  onMounted(() => {
-    console.log(carrousel_settings)
-  })
 </script>
 
 <style scoped>

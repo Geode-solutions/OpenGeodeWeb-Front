@@ -57,4 +57,5 @@
       get_packages_versions()
     }
   })
+  await get_packages_versions()
 </script>

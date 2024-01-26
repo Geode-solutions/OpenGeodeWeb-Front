@@ -6,11 +6,9 @@ export const use_geode_store = defineStore("geode", {
   getters: {
     base_url: () => {
       const cloud_store = use_cloud_store()
+      const api_url = cloud_store.api_url
+      var geode_url = `${api_url}`
       const public_runtime_config = useRuntimeConfig().public
-      if (public_runtime_config.NODE_ENV == "test") {
-        return ""
-      }
-      var geode_url = `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}`
       if (public_runtime_config.NODE_ENV == "production") {
         geode_url += `/${cloud_store.ID}/geode`
       }

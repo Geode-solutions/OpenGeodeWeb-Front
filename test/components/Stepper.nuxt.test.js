@@ -1,7 +1,7 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test } from "vitest"
-import { mount } from "@vue/test-utils"
+import { mountSuspended } from "@vue/test-utils"
 
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -9,6 +9,7 @@ import * as directives from "vuetify/directives"
 
 import Stepper from "@/components/Stepper.vue"
 import ObjectSelector from "@/components/ObjectSelector.vue"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 const vuetify = createVuetify({
   components,
@@ -17,7 +18,7 @@ const vuetify = createVuetify({
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-describe("Step.vue", async () => {
+describe("Stepper.vue", async () => {
   test(`Mount`, async () => {
     const input_geode_object = ref("BRep")
     const files = ref([])
@@ -46,7 +47,7 @@ describe("Step.vue", async () => {
         },
       ],
     })
-    const wrapper = mount(Stepper, {
+    const wrapper = await mountSuspended(Stepper, {
       global: {
         plugins: [vuetify],
         provide: { stepper_tree },
