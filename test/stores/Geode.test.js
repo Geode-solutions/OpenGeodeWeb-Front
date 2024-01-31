@@ -24,7 +24,6 @@ describe("Geode Store", () => {
     const geode_store = use_geode_store()
     const cloud_store = use_cloud_store()
     cloud_store.$patch({ ID: "123456" })
-    // expect(geode_store.base_url).toBe("http://localhost:5000/123456/geode")
     geode_store.start_request()
     expect(geode_store.request_counter).toBe(1)
   })

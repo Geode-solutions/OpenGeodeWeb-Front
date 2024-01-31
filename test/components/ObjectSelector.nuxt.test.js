@@ -48,4 +48,3 @@ describe("ObjectSelector.vue", async () => {
     })
   })
 })
-// }
