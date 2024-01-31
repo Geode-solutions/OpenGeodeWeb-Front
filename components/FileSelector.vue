@@ -51,7 +51,6 @@
     )
     toggle_loading()
   }
-  onMounted(() => {
-    get_allowed_files()
-  })
+
+  await get_allowed_files()
 </script>

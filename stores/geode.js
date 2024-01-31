@@ -6,9 +6,10 @@ export const use_geode_store = defineStore("geode", {
   getters: {
     base_url: () => {
       const cloud_store = use_cloud_store()
+      const api_url = cloud_store.api_url
+      var geode_url = `${api_url}`
       const public_runtime_config = useRuntimeConfig().public
-      var geode_url = `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}`
-      if (process.env.NODE_ENV == "production") {
+      if (public_runtime_config.NODE_ENV == "production") {
         geode_url += `/${cloud_store.ID}/geode`
       }
       return geode_url
@@ -23,14 +24,15 @@ export const use_geode_store = defineStore("geode", {
     },
     async do_ping() {
       const errors_store = use_errors_store()
-      const { data, error } = await useFetch(`${this.base_url}/ping`, {
+      const { data } = await useFetch(`${this.base_url}/ping`, {
         method: "POST",
       })
       if (data.value !== null) {
         this.is_running = true
+        return
       } else {
-        errors_store.server_error = true
-        console.log("error : ", error)
+        errors_store.$patch({ server_error: true })
+        return
       }
     },
     start_request() {
