@@ -7,6 +7,7 @@ export default defineNuxtConfig({
       GEODE_PORT: process.env.NODE_ENV === "production" ? "443" : "5000",
       SITE_BRANCH:
         process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
+      PROJECT: process.env.NODE_ENV === "production" ? process.env.PROJECT : "",
       NODE_ENV: process.env.NODE_ENV,
     },
   },
