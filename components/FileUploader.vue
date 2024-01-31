@@ -18,13 +18,12 @@
   <v-row>
     <v-col cols="auto">
       <v-btn
-        @click="upload_files()"
+        @click="upload_files"
         color="primary"
         :disabled="!files.length && !files_uploaded"
         :loading="loading"
         class="pa-2"
-      >
-        Upload file(s)</v-btn
+        >Upload file(s)</v-btn
       >
     </v-col>
   </v-row>

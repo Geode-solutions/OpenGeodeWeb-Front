@@ -27,7 +27,7 @@
       <v-col cols="12">
         <FileUploader
           v-bind="{ multiple, accept, route }"
-          @files_uploaded="files_uploaded"
+          @files_uploaded="files_uploaded_event"
         />
       </v-col>
     </v-row>
@@ -36,7 +36,7 @@
         v-if="!mandatory_files.length && additional_files.length"
         cols="auto"
       >
-        <v-btn @click="skip_step()" color="warning"> Skip step </v-btn>
+        <v-btn @click="emit('increment_step')" color="warning">Skip step</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -67,7 +67,7 @@
   const additional_files = ref([])
   const toggle_loading = useToggle(loading)
 
-  function files_uploaded(value) {
+  function files_uploaded_event(value) {
     emit("update_values", { additional_files: value })
     missing_files()
   }
