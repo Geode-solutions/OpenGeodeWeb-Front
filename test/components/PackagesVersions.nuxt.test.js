@@ -1,8 +1,7 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test } from "vitest"
-import { flushPromises, mount } from "@vue/test-utils"
-import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -17,7 +16,7 @@ const vuetify = createVuetify({
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-describe("Launcher.vue", async () => {
+describe("PackagesVersions.vue", async () => {
   test(`Mount`, async () => {
     const schema = {
       $id: "/versions",
@@ -26,7 +25,6 @@ describe("Launcher.vue", async () => {
       properties: {},
       additionalProperties: false,
     }
-
     registerEndpoint(schema.$id, {
       method: schema.method,
       handler: () => ({
@@ -38,13 +36,12 @@ describe("Launcher.vue", async () => {
         ],
       }),
     })
-    const wrapper = mount(PackagesVersions, {
+    const wrapper = await mountSuspended(PackagesVersions, {
       global: {
         plugins: [vuetify],
       },
-      props: { schema: schema },
+      props: { schema },
     })
-
     expect(wrapper.exists()).toBe(true)
   })
 })

@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeEach } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import { flushPromises } from "@vue/test-utils"
 
 const cloud_store = use_cloud_store()
-const errors_store = use_errors_store()
 const geode_store = use_geode_store()
 const websocket_store = use_websocket_store()
 
@@ -30,23 +30,19 @@ describe("Cloud Store", () => {
   describe("actions", () => {
     describe("create_backend", async () => {
       test("test without end-point", async () => {
-        //   expect(geode_store.is_running).toBe(false)
-        //   await cloud_store.create_connexion()
-        //   expect(geode_store.is_running).toBe(false)
-        //   expect(errors_store.server_error).toBe(true)
+        expect(geode_store.is_running).toBe(false)
+        await cloud_store.create_backend()
+        expect(geode_store.is_running).toBe(false)
       })
-      //   test("test with end-point", async () => {
-      //     expect(geode_store.is_running).toBe(false)
-      //     registerEndpoint("/undefined/createbackend", {
-      //       method: "POST",
-      //       handler: () => {
-      //         return { ID: "123456" }
-      //       },
-      //     })
-      //     await cloud_store.create_connexion()
-      //     expect(geode_store.is_running).toBe(true)
-      //     expect(cloud_store.ID).toBe("123456")
-      //   })
+      test("test with end-point", async () => {
+        expect(geode_store.is_running).toBe(false)
+        registerEndpoint("/createbackend", {
+          method: "POST",
+          handler: () => ({ ID: "123456" }),
+        })
+        await cloud_store.create_backend()
+        await flushPromises()
+      })
     })
   })
 })

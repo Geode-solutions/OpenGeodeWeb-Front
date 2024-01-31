@@ -1,4 +1,4 @@
-import { useStorage } from "@vueuse/core"
+import { useFetch, useStorage } from "@vueuse/core"
 
 export const use_cloud_store = defineStore("cloud", {
   state: () => ({
@@ -36,7 +36,6 @@ export const use_cloud_store = defineStore("cloud", {
       ) {
         return this.create_backend()
       } else {
-        console.log("base_url", geode_store.base_url)
         const { data, error } = await useFetch(`${geode_store.base_url}/ping`, {
           method: "POST",
         })
@@ -51,13 +50,12 @@ export const use_cloud_store = defineStore("cloud", {
     async create_backend() {
       const geode_store = use_geode_store()
       const errors_store = use_errors_store()
-      const config = useRuntimeConfig()
-      const public_runtime_config = config.public
-      // var url =
-      //   this.api_url +
-      //   `${public_runtime_config.SITE_BRANCH}/${public_runtime_config.PROJECT}/createbackend`
-      var url = "/undefined/createbackend"
-      console.log("createbackend", url)
+      const public_runtime_config = useRuntimeConfig().public
+      const url = this.api_url.concat(
+        public_runtime_config.PROJECT,
+        public_runtime_config.SITE_BRANCH,
+        "/createbackend",
+      )
       const { data, error } = await useFetch(url, {
         method: "POST",
       })

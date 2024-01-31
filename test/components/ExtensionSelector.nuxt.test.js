@@ -9,6 +9,7 @@ import * as directives from "vuetify/directives"
 
 import ExtensionSelector from "@/components/ExtensionSelector.vue"
 import schema from "@/assets/schemas/ExtensionSelector.json"
+import { flushPromises } from "@vue/test-utils"
 
 const vuetify = createVuetify({
   components,
@@ -18,9 +19,10 @@ const vuetify = createVuetify({
 global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("ExtensionSelector.vue", async () => {
-  test(`BRep`, async () => {
+  test(`Select geode_object & extension`, async () => {
     const output_geode_object = "BRep"
     const output_extension = "msh"
+
     registerEndpoint(schema.$id, {
       method: schema.method,
       handler: () => ({
@@ -29,24 +31,21 @@ describe("ExtensionSelector.vue", async () => {
         },
       }),
     })
-    // const wrapper = await mountSuspended(ExtensionSelector, {
-    //   global: {
-    //     plugins: [vuetify],
-    //   },
-    //   props: { input_geode_object: "BRep", filenames: ["test.toto"] },
-    // })
-    // const first_v_card = await wrapper.findComponent(components.VCard)
-    // console.log("first_v_card", first_v_card)
-    // const second_v_card = first_v_card.findComponent(components.VCard)
-    // console.log("second_v_card", second_v_card)
-
-    // await second_v_card.trigger("click")
-    // expect(wrapper.emitted()).toHaveProperty("update_values")
-    // expect(wrapper.emitted().update_values).toHaveLength(1)
-    // expect(wrapper.emitted().update_values[0][0]).toEqual({
-    //   output_geode_object,
-    //   output_extension,
-    // })
+    const wrapper = await mountSuspended(ExtensionSelector, {
+      global: {
+        plugins: [vuetify],
+      },
+      props: { input_geode_object: "BRep", filenames: ["test.toto"] },
+    })
+    await nextTick()
+    expect(wrapper.exists()).toBe(true)
+    const v_card = await wrapper.findAllComponents(components.VCard)
+    await v_card[1].trigger("click")
+    expect(wrapper.emitted()).toHaveProperty("update_values")
+    expect(wrapper.emitted().update_values).toHaveLength(1)
+    expect(wrapper.emitted().update_values[0][0]).toEqual({
+      output_geode_object,
+      output_extension,
+    })
   })
 })
-// }

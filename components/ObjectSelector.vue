@@ -78,7 +78,6 @@
               reject()
             },
             response_function: (response) => {
-              console.log(response)
               resolve(response._data.allowed_objects)
             },
             response_error_function: () => {

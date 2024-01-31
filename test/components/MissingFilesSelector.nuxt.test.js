@@ -22,16 +22,12 @@ global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("MissingFilesSelector.vue", async () => {
   test(`Select file`, async () => {
-    const has_missing_files = false
-    const mandatory_files = ["fake_file.txt"]
-    const additional_files = ["fake_file_2.txt"]
-
     registerEndpoint(schema.$id, {
       method: schema.method,
       handler: () => ({
-        has_missing_files,
-        mandatory_files,
-        additional_files,
+        has_missing_files: true,
+        mandatory_files: ["fake_file.txt"],
+        additional_files: ["fake_file_2.txt"],
       }),
     })
     const wrapper = await mountSuspended(MissingFilesSelector, {
@@ -42,14 +38,11 @@ describe("MissingFilesSelector.vue", async () => {
         multiple: false,
         input_geode_object: "BRep",
         filenames: ["fake_file.txt"],
-        route: "/upload",
+        route: "/upload_file",
       },
     })
-    await flushPromises()
-    await wrapper.vm.$nextTick()
 
     const file_uploader = wrapper.findComponent(FileUploader)
-    console.log("file_uploader", file_uploader)
     expect(file_uploader.exists()).toBe(true)
 
     const v_file_input = file_uploader.findComponent(components.VFileInput)
@@ -57,7 +50,12 @@ describe("MissingFilesSelector.vue", async () => {
     const files = [new File(["fake_file"], "fake_file.txt")]
     await v_file_input.setValue(files)
     await v_file_input.trigger("change")
-    const v_btn = wrapper.findComponent(components.VBtn)
+    const v_btn = file_uploader.findComponent(components.VBtn)
+
+    registerEndpoint("/upload_file", {
+      method: "PUT",
+      handler: () => ({}),
+    })
     await v_btn.trigger("click")
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
