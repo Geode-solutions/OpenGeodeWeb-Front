@@ -15,9 +15,6 @@ function createMethods(session) {
     "toggle_point_visibility",
     "update_data",
   ]
-
-  functions_array.sort()
-
   var functions_object = {}
   for (const function_name of functions_array) {
     functions_object[function_name] = (params) =>
