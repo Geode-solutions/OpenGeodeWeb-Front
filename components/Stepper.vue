@@ -1,6 +1,10 @@
 <template>
   <v-card class="card">
-    <div v-for="(step, index) in steps" :key="index" class="pa-3">
+    <div
+      v-for="(step, index) in steps"
+      :key="index"
+      class="pa-3"
+    >
       <Step :step_index="index" />
     </div>
   </v-card>

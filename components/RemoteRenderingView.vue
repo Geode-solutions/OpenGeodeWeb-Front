@@ -3,6 +3,7 @@
     <div style="position: relative; width: 100%; height: 100%">
       <view-toolbar />
       <v-col
+        ref="viewer"
         style="
           overflow: hidden;
           position: relative;
@@ -10,12 +11,10 @@
           height: 100%;
           width: 100%;
         "
-        ref="viewer"
+        class="pa-0"
         @click="get_x_y"
         @keydown.esc="app_store.toggle_picking_mode(false)"
-        class="pa-0"
-      >
-      </v-col>
+      />
     </div>
   </ClientOnly>
 </template>

@@ -1,6 +1,9 @@
 <template>
   <v-card class="pa-5">
-    <v-row align="center" @click="set_current_step(step_index)">
+    <v-row
+      align="center"
+      @click="set_current_step(step_index)"
+    >
       <v-col cols="auto">
         <v-icon
           v-if="current_step_index > step_index"

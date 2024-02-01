@@ -1,7 +1,16 @@
 <template>
-  <Transition name="slide-fade" class="pa-0">
-    <v-row align="center" class="pa-0">
-      <v-col cols="auto" class="pa-0">
+  <Transition
+    name="slide-fade"
+    class="pa-0"
+  >
+    <v-row
+      align="center"
+      class="pa-0"
+    >
+      <v-col
+        cols="auto"
+        class="pa-0"
+      >
         <v-progress-circular
           :size="22"
           :width="3"
