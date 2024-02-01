@@ -59,7 +59,15 @@
 </template>
 
 <script setup>
-  import schema from "@/assets/schemas/ExtensionSelector.json"
+  import _ from "lodash"
+  import schemas from "@geode/opengeodeweb-back/schemas.json"
+  console.log("schemas", schemas)
+
+  const schema = schemas["opengeodeweb_back"]["allowed_files"]
+  console.log("schema", schema)
+
+  const json_data = schemas
+  console.log("json_data", json_data)
 
   const emit = defineEmits([
     "update_values",

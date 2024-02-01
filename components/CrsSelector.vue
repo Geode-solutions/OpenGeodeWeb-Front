@@ -24,7 +24,8 @@
 </template>
 
 <script setup>
-  import schema from "@/assets/schemas/CrsSelector.json"
+  // import schema from "@geode/opengeodeweb-back/schemas.json"
+  console.log("testestetstest", schema["opengeodeweb-back"])
   const emit = defineEmits([
     "update_values",
     "increment_step",

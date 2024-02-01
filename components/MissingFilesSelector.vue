@@ -26,8 +26,8 @@
     <v-row>
       <v-col cols="12">
         <FileUploader
-          v-bind="{ multiple, accept, route }"
-          @files_uploaded="files_uploaded_event"
+          v-bind="{ multiple, accept }"
+          @files_uploaded="files_uploaded"
         />
       </v-col>
     </v-row>
@@ -43,7 +43,14 @@
 </template>
 
 <script setup>
-  import schema from "@/assets/schemas/MissingFilesSelector.json"
+  import schemas from "@geode/opengeodeweb-back/schemas.json"
+  console.log("schemas", schemas)
+
+  const schema = schemas["opengeodeweb_back"]["missing_files"]
+  console.log("schema", schema)
+
+  const json_data = schemas
+  console.log("json_data", json_data)
 
   const emit = defineEmits([
     "update_values",
@@ -55,10 +62,9 @@
     multiple: { type: Boolean, required: true },
     input_geode_object: { type: String, required: true },
     filenames: { type: Array, required: true },
-    route: { type: String, required: true },
   })
 
-  const { multiple, input_geode_object, filenames, route } = props
+  const { multiple, input_geode_object, filenames } = props
 
   const accept = ref("")
   const loading = ref(false)
