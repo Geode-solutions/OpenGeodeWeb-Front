@@ -1,18 +1,13 @@
 <template>
   <v-container class="justify">
-    <v-row
-      align-content="center"
-      align="center"
-    >
+    <v-row align-content="center" align="center">
       <v-col
         v-if="!is_captcha_validated"
         class="align"
         cols="12"
         align-self="center"
       >
-        <h4 class="pb-3">
-          Please complete the recaptcha to launch the app
-        </h4>
+        <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
         <Recaptcha :site_key="site_key" />
       </v-col>
       <v-col v-else-if="!is_running && is_connexion_launched">

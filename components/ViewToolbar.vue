@@ -1,8 +1,5 @@
 <template>
-  <v-row
-    dense
-    :class="[$style.floatToolbar, 'flex-column']"
-  >
+  <v-row dense :class="[$style.floatToolbar, 'flex-column']">
     <v-col>
       <v-tooltip location="left">
         Reset camera
@@ -13,9 +10,7 @@
             icon
             @click.stop="reset_camera"
           >
-            <v-icon size="32">
-              mdi-cube-scan
-            </v-icon>
+            <v-icon size="32"> mdi-cube-scan </v-icon>
           </v-btn>
         </template>
       </v-tooltip>

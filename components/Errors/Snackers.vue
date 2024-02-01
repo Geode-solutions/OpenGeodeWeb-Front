@@ -10,36 +10,26 @@
     max-width="30%"
     height="20px"
   >
-    <v-row
-      dense
-      class="flex-nowrap"
-    >
+    <v-row dense class="flex-nowrap">
       <v-col cols="auto">
         <v-tooltip location="left">
           <span>
-            error: {{ error.code }} {{ error.name }}<br>
+            error: {{ error.code }} {{ error.name }}<br />
             ressource: {{ error.route }}
-            <br>
+            <br />
           </span>
           <template #activator="{ props }">
-            <v-icon
-              v-bind="props"
-              color="white"
-              class="justify-right"
-            >
+            <v-icon v-bind="props" color="white" class="justify-right">
               mdi-information-outline
             </v-icon>
           </template>
         </v-tooltip>
       </v-col>
-      <v-col
-        cols="9"
-        class="text-no-wrap overflow-hidden"
-      >
+      <v-col cols="9" class="text-no-wrap overflow-hidden">
         <v-tooltip location="top">
           <span>
             {{ error.description }}
-            <br>
+            <br />
           </span>
           <template #activator="{ props }">
             <div v-bind="props">
@@ -57,11 +47,7 @@
           color="error"
           @click="errors_store.delete_error(index)"
         >
-          <v-icon
-            icon="mdi-close"
-            size="20"
-            color="white"
-          />
+          <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
       </v-col>
     </v-row>

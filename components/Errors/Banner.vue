@@ -6,43 +6,24 @@
     position="fixed"
   >
     <v-row>
-      <v-col
-        cols="auto"
-        class="text-white text-center"
-      >
+      <v-col cols="auto" class="text-white text-center">
         <v-tooltip location="end">
           <span>
             We turn off our server automatically after 5 minutes of inactivity
           </span>
           <template #activator="{ props }">
-            <v-icon
-              v-bind="props"
-              color="white"
-              class="justify-right"
-            >
+            <v-icon v-bind="props" color="white" class="justify-right">
               mdi-information-outline
             </v-icon>
           </template>
         </v-tooltip>
       </v-col>
-      <v-col
-        cols="auto"
-        class="text-white font-weight-bold"
-      >
+      <v-col cols="auto" class="text-white font-weight-bold">
         Server timed out due to inactivity, please reload this page or click
         here:
       </v-col>
-      <v-col
-        class="align-items"
-        cols="auto"
-      >
-        <v-btn
-          color="grey"
-          density="compact"
-          @click="reload()"
-        >
-          Reload
-        </v-btn>
+      <v-col class="align-items" cols="auto">
+        <v-btn color="grey" density="compact" @click="reload()"> Reload </v-btn>
       </v-col>
       <v-spacer />
       <v-col cols="auto">
@@ -54,11 +35,7 @@
           class=".align-center"
           @click="errors_store.delete_server_error()"
         >
-          <v-icon
-            icon="mdi-close"
-            size="20"
-            color="white"
-          />
+          <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
       </v-col>
     </v-row>
