@@ -24,9 +24,7 @@
   import { useElementSize } from "@vueuse/core"
 
   const viewer_store = use_viewer_store()
-  const { picking_mode } = storeToRefs(viewer_store)
-  const websocket_store = use_websocket_store()
-  const { client, is_running } = storeToRefs(websocket_store)
+  const { client, is_running, picking_mode } = storeToRefs(viewer_store)
 
   function get_x_y(event) {
     if (picking_mode.value === true) {

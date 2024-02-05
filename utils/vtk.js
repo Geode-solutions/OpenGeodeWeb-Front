@@ -1,25 +1,26 @@
 /* eslint-disable arrow-body-style */
+import schemas from "./schemas.json"
+import _ from "lodash"
+
 function createMethods(session) {
-  const functions_array = [
-    "apply_textures",
-    "create_object_pipeline",
-    "create_visualization",
-    "get_point_position",
-    "point_size",
-    "reset",
-    "reset_camera",
-    "set_color",
-    "set_vertex_attribute",
-    "toggle_edge_visibility",
-    "toggle_object_visibility",
-    "toggle_point_visibility",
-    "update_data",
-  ]
+  const ogw_viewer = schemas.opengeodeweb_viewer
+
   var functions_object = {}
-  for (const function_name of functions_array) {
-    functions_object[function_name] = (params) =>
-      session.call(function_name, [params])
+  for (const function_name of Object.keys(ogw_viewer)) {
+    console.log("function_name", function_name)
+    console.log("properties", ogw_viewer[function_name].properties)
+
+    if (_.isEmpty(ogw_viewer[function_name].properties)) {
+      functions_object[function_name] = () =>
+        session.call(ogw_viewer[function_name].route)
+    } else {
+      functions_object[function_name] = (params) =>
+        session.call(ogw_viewer[function_name].route, [params])
+    }
   }
+
+  console.log("functions_object", functions_object)
+
   return functions_object
 }
 

@@ -16,10 +16,10 @@ export const use_cloud_store = defineStore("cloud", {
       return api_url
     },
     is_running: () => {
-      return use_geode_store().is_running && use_websocket_store().is_running
+      return use_geode_store().is_running && use_viewer_store().is_running
     },
     is_busy: () => {
-      return use_geode_store().is_busy || use_websocket_store().is_busy
+      return use_geode_store().is_busy || use_viewer_store().is_busy
     },
   },
   actions: {

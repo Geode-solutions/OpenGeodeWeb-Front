@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-  const websocket_store = use_websocket_store()
+  const viewer_store = use_viewer_store()
   const cloud_store = use_cloud_store()
   const { is_captcha_validated, is_connexion_launched, is_running } =
     storeToRefs(cloud_store)
@@ -28,7 +28,7 @@
   watch(is_captcha_validated, async (value) => {
     if (value === true && process.client) {
       await cloud_store.create_connexion()
-      await websocket_store.ws_connect()
+      await viewer_store.ws_connect()
     }
   })
 </script>
