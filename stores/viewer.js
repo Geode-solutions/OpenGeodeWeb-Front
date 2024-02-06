@@ -3,7 +3,7 @@ import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import SmartConnect from "wslink/src/SmartConnect"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
-import protocols from "@/utils"
+import schemas from "@/utils/schemas.json"
 
 vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
@@ -53,7 +53,7 @@ export const use_viewer_store = defineStore("viewer", {
       }
       let clientToConnect = client
       if (_.isEmpty(clientToConnect)) {
-        clientToConnect = vtkWSLinkClient.newInstance({ protocols })
+        clientToConnect = vtkWSLinkClient.newInstance()
       }
 
       // Connect to busy store
@@ -89,11 +89,12 @@ export const use_viewer_store = defineStore("viewer", {
           clientToConnect.endBusy()
 
           // Now that the client is ready let's setup the server for us
-          this.client
-            .getRemote()
-            .vtk.create_visualization()
-            .catch(console.error)
-          this.client.getRemote().vtk.reset().catch(console.error)
+          viewer_call({
+            schema: schemas.opengeodeweb_viewer.create_visualization,
+          })
+          viewer_call({
+            schema: schemas.opengeodeweb_viewer.reset,
+          })
           this.is_running = true
         })
         .catch((error) => {

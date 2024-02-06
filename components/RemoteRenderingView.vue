@@ -22,6 +22,7 @@
 <script setup>
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize } from "@vueuse/core"
+  import schemas from "@/utils/schemas.json"
 
   const viewer_store = use_viewer_store()
   const { client, is_running, picking_mode } = storeToRefs(viewer_store)
@@ -30,6 +31,10 @@
     if (picking_mode.value === true) {
       const { offsetX, offsetY } = event
       viewer_store.set_picked_point(offsetX, offsetY)
+      viewer_call({
+        schema: schemas.opengeodeweb_viewer.set_picked_point,
+        params: { offsetX, offsetY },
+      })
     }
   }
 
