@@ -9,13 +9,10 @@
 
 <script setup>
   import schemas from "@geode/opengeodeweb-back/schemas.json"
-  console.log("schemas", schemas)
 
-  const schema = schemas["opengeodeweb_back"]["allowed_files"]
-  console.log("schema", schema)
+  const schema = schemas.opengeodeweb_back.allowed_files
 
   const json_data = schemas
-  console.log("json_data", json_data)
 
   const emit = defineEmits([
     "update_values",

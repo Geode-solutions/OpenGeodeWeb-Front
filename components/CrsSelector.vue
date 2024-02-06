@@ -24,8 +24,9 @@
 </template>
 
 <script setup>
-  // import schema from "@geode/opengeodeweb-back/schemas.json"
-  console.log("testestetstest", schema["opengeodeweb-back"])
+  import schemas from "@geode/opengeodeweb-back/schemas.json"
+  const schema = schemas.opengeodeweb_back.geographic_coordinate_systems
+
   const emit = defineEmits([
     "update_values",
     "increment_step",
@@ -65,6 +66,7 @@
   async function get_crs_table() {
     const params = { input_geode_object }
     toggle_loading()
+    console.log("schema", schema.methods)
     await api_fetch(
       { schema, params },
       {

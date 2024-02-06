@@ -31,9 +31,8 @@
 
 <script setup>
   import schemas from "@geode/opengeodeweb-back/schemas.json"
-  console.log("schemas", schemas)
+  const schema = schemas.opengeodeweb_back.upload_file
 
-  const schema = schemas["opengeodeweb_back"]["upload_file"]
   const emit = defineEmits(["files_uploaded", "decrement_step"])
 
   const props = defineProps({

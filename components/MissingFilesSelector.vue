@@ -44,13 +44,8 @@
 
 <script setup>
   import schemas from "@geode/opengeodeweb-back/schemas.json"
-  console.log("schemas", schemas)
 
-  const schema = schemas["opengeodeweb_back"]["missing_files"]
-  console.log("schema", schema)
-
-  const json_data = schemas
-  console.log("json_data", json_data)
+  const schema = schemas.opengeodeweb_back.missing_files
 
   const emit = defineEmits([
     "update_values",

@@ -5,6 +5,7 @@ export function api_fetch(
   { schema, params },
   { request_error_function, response_function, response_error_function } = {},
 ) {
+  // console.log("api_fetch", schema.route, schema.methods)
   const errors_store = use_errors_store()
   const geode_store = use_geode_store()
 
@@ -26,9 +27,19 @@ export function api_fetch(
     throw new Error(schema.$id.concat(": ", ajv.errorsText()))
   }
   geode_store.start_request()
-  const indexOf = schema["methods"].indexOf("OPTIONS")
-  const splice = schema["methods"].splice(indexOf, 1)
+  var methods = []
+  for (const method of schema.methods) {
+    console.log("method", method)
+    methods.push(method)
+  }
+  console.log("methods", methods)
+
+  const indexOf = methods.indexOf("OPTIONS")
+  // console.log("indexOf", indexOf)
+  const splice = methods.splice(indexOf, 1)
+  // console.log("splice", splice)
   const method = splice[0]
+  // console.log("splice", splice)
 
   const request_options = {
     method: method,
