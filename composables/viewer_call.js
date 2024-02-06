@@ -4,17 +4,24 @@ export function viewer_call(
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  console.log("viewer_call schema", schema)
+  // console.log("function_name", function_name)
+  console.log("schema", schema)
+
   const errors_store = use_errors_store()
   const viewer_store = use_viewer_store()
 
+  console.log("schema", schema)
+
   const ajv = new Ajv()
+  ajv.addKeyword("route")
   const valid = ajv.validate(schema, params)
+
+  console.log("valid", valid)
 
   if (!valid) {
     errors_store.add_error({
       code: 400,
-      route: schema.$id,
+      route: schema.route,
       name: "Bad request",
       description: ajv.errorsText(),
     })
@@ -25,10 +32,10 @@ export function viewer_call(
 
   if (client) {
     viewer_store.start_request()
-    client.getRemote()
-    session
-      .call(function_name, [params])
-      .vtk[schema["$id"]](params)
+    client
+      .getConnection()
+      .getSession()
+      .call(schema.route, params)
       .then((response) => {
         if (response_function) {
           response_function(response)
