@@ -4,19 +4,12 @@ export function viewer_call(
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  // console.log("function_name", function_name)
-  console.log("schema", schema)
-
   const errors_store = use_errors_store()
   const viewer_store = use_viewer_store()
-
-  console.log("schema", schema)
 
   const ajv = new Ajv()
   ajv.addKeyword("route")
   const valid = ajv.validate(schema, params)
-
-  console.log("valid", valid)
 
   if (!valid) {
     errors_store.add_error({
