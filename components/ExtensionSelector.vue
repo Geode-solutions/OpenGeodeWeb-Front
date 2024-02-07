@@ -61,7 +61,6 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-back/schemas.json"
   const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
-  const json_data = schemas
   const emit = defineEmits([
     "update_values",
     "increment_step",

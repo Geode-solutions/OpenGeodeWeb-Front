@@ -35,11 +35,8 @@ export function api_fetch(
   console.log("methods", methods)
 
   const indexOf = methods.indexOf("OPTIONS")
-  // console.log("indexOf", indexOf)
   const splice = methods.splice(indexOf, 1)
-  // console.log("splice", splice)
   const method = splice[0]
-  // console.log("splice", splice)
 
   const request_options = {
     method: method,
