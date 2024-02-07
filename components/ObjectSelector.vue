@@ -52,7 +52,7 @@
   import geode_objects from "@/assets/geode_objects"
   import schemas from "@geode/opengeodeweb-back/schemas.json"
 
-  const schema = schemas["opengeodeweb_back"]["allowed_objects"]
+  const schema = schemas.opengeodeweb_back.allowed_objects
 
   const emit = defineEmits(["update_values", "increment_step"])
 
