@@ -11,19 +11,20 @@ import * as directives from "vuetify/directives"
 import MissingFilesSelector from "@/components/MissingFilesSelector.vue"
 import FileUploader from "@/components/FileUploader.vue"
 
-import schema from "@/assets/schemas/MissingFilesSelector.json"
+import schemas from "@geode/opengeodeweb-back/schemas.json"
+
+const missing_files_schema = schemas.opengeodeweb_back.missing_files
+const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-global.ResizeObserver = require("resize-observer-polyfill")
-
 describe("MissingFilesSelector.vue", async () => {
   test(`Select file`, async () => {
-    registerEndpoint(schema.$id, {
-      method: schema.method,
+    registerEndpoint(missing_files_schema.$id, {
+      method: missing_files_schema.methods[0],
       handler: () => ({
         has_missing_files: true,
         mandatory_files: ["fake_file.txt"],
@@ -38,7 +39,6 @@ describe("MissingFilesSelector.vue", async () => {
         multiple: false,
         input_geode_object: "BRep",
         filenames: ["fake_file.txt"],
-        route: "/upload_file",
       },
     })
 
@@ -52,8 +52,8 @@ describe("MissingFilesSelector.vue", async () => {
     await v_file_input.trigger("change")
     const v_btn = file_uploader.findComponent(components.VBtn)
 
-    registerEndpoint("/upload_file", {
-      method: "PUT",
+    registerEndpoint(upload_file_schema.$id, {
+      method: upload_file_schema.methods[1],
       handler: () => ({}),
     })
     await v_btn.trigger("click")

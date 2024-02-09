@@ -9,17 +9,16 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
 import ObjectSelector from "@/components/ObjectSelector.vue"
-import schema from "@/assets/schemas/ObjectSelector.json"
-import geode_objects from "@/assets/geode_objects"
+
+import schemas from "@geode/opengeodeweb-back/schemas.json"
+
+const allowed_objects = schemas.opengeodeweb_back.allowed_objects
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-global.ResizeObserver = require("resize-observer-polyfill")
-
-// for (const [geode_object] of Object.entries(geode_objects)) {
 const geode_object = "BRep"
 describe("ObjectSelector.vue", async () => {
   test(`BRep`, async () => {
@@ -27,8 +26,8 @@ describe("ObjectSelector.vue", async () => {
       allowed_objects: {},
     }
     response["allowed_objects"][geode_object] = { is_loadable: true }
-    registerEndpoint(schema.$id, {
-      method: schema.method,
+    registerEndpoint(allowed_objects.$id, {
+      method: allowed_objects.methods[0],
       handler: () => response,
     })
     const wrapper = await mountSuspended(ObjectSelector, {

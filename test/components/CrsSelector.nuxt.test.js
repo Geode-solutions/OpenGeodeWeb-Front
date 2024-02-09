@@ -8,14 +8,15 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
 import CrsSelector from "@/components/CrsSelector.vue"
-import schema from "@/assets/schemas/CrsSelector.json"
+import schemas from "@geode/opengeodeweb-back/schemas.json"
+
+const crs_selector_schema =
+  schemas.opengeodeweb_back.geographic_coordinate_systems
 
 const vuetify = createVuetify({
   components,
   directives,
 })
-
-global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("CrsSelector.vue", async () => {
   test(`BRep`, async () => {
@@ -26,8 +27,8 @@ describe("CrsSelector.vue", async () => {
         name: "Anguilla 1957 / British West Indies Grid",
       },
     ]
-    registerEndpoint(schema.$id, {
-      method: schema.method,
+    registerEndpoint(crs_selector_schema.$id, {
+      method: crs_selector_schema.methods.filter((m) => m !== "OPTIONS")[0],
       handler: () => ({
         crs_list,
       }),
@@ -40,8 +41,10 @@ describe("CrsSelector.vue", async () => {
       props: { input_geode_object: "BRep", key_to_update },
     })
     const td = await wrapper.find("td")
-    const imput = await td.find("input")
-    await imput.trigger("click")
+    await wrapper.vm.$nextTick()
+    const input = await td.find("input")
+    console.log("toto", input)
+    await input.trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({

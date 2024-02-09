@@ -10,19 +10,21 @@ import * as directives from "vuetify/directives"
 
 import FileSelector from "@/components/FileSelector.vue"
 import FileUploader from "@/components/FileUploader.vue"
-import schema from "@/assets/schemas/FileSelector.json"
+
+import schemas from "@geode/opengeodeweb-back/schemas.json"
+
+const allowed_files_schema = schemas.opengeodeweb_back.allowed_files
+const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-global.ResizeObserver = require("resize-observer-polyfill")
-
 describe("FileSelector.vue", async () => {
   test(`Select file`, async () => {
-    registerEndpoint(schema.$id, {
-      method: schema.method,
+    registerEndpoint(allowed_files_schema.$id, {
+      method: allowed_files_schema.methods[0],
       handler: () => ({
         extensions: ["1", "2", "3"],
       }),
@@ -36,8 +38,8 @@ describe("FileSelector.vue", async () => {
 
     const file_uploader = wrapper.findComponent(FileUploader)
 
-    registerEndpoint("/upload", {
-      method: "PUT",
+    registerEndpoint(upload_file_schema.$id, {
+      method: upload_file_schema.methods[1],
       handler: () => ({}),
     })
 

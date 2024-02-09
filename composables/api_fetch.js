@@ -12,7 +12,8 @@ export function api_fetch(
 
   const ajv = new Ajv()
 
-  ajv.addKeyword("method")
+  ajv.addKeyword("methods")
+  ajv.addKeyword("route")
   ajv.addKeyword("max_retry")
   const valid = ajv.validate(schema, body)
   if (!valid) {
@@ -25,8 +26,10 @@ export function api_fetch(
     throw new Error(schema.$id.concat(": ", ajv.errorsText()))
   }
   geode_store.start_request()
-
-  const request_options = { method: schema["method"] }
+  const method = schema.methods.filter((m) => m !== "OPTIONS")[0]
+  const request_options = {
+    method: method,
+  }
   if (!_.isEmpty(body)) {
     request_options.body = body
   }

@@ -10,17 +10,19 @@ import * as directives from "vuetify/directives"
 
 import FileUploader from "@/components/FileUploader.vue"
 
+import schemas from "@geode/opengeodeweb-back/schemas.json"
+
+const upload_file_schema = schemas.opengeodeweb_back.upload_file
+
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-global.ResizeObserver = require("resize-observer-polyfill")
-
 describe("FileUploader.vue", async () => {
   test(`Upload file`, async () => {
-    registerEndpoint("/upload", {
-      method: "PUT",
+    registerEndpoint(upload_file_schema.$id, {
+      method: upload_file_schema.methods[0],
       handler: () => ({}),
     })
     const wrapper = await mountSuspended(FileUploader, {
@@ -35,6 +37,12 @@ describe("FileUploader.vue", async () => {
     await v_file_input.setValue(files)
     await v_file_input.trigger("change")
     const v_btn = wrapper.findComponent(components.VBtn)
+
+    registerEndpoint(upload_file_schema.$id, {
+      method: upload_file_schema.methods[1],
+      handler: () => ({}),
+    })
+
     await v_btn.trigger("click")
     await flushPromises()
     expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
