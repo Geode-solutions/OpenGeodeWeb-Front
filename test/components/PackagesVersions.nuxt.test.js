@@ -14,19 +14,17 @@ const vuetify = createVuetify({
   directives,
 })
 
-global.ResizeObserver = require("resize-observer-polyfill")
-
 describe("PackagesVersions.vue", async () => {
   test(`Mount`, async () => {
     const schema = {
       $id: "/versions",
-      method: "GET",
+      methods: ["GET"],
       type: "object",
       properties: {},
       additionalProperties: false,
     }
     registerEndpoint(schema.$id, {
-      method: schema.method,
+      method: schema.methods[0],
       handler: () => ({
         versions: [
           {

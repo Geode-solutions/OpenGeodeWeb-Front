@@ -26,14 +26,7 @@ export function api_fetch(
     throw new Error(schema.$id.concat(": ", ajv.errorsText()))
   }
   geode_store.start_request()
-  var methods = []
-  for (const method of schema.methods) {
-    methods.push(method)
-  }
-  const indexOf = methods.indexOf("OPTIONS")
-  const splice = methods.splice(indexOf, 1)
-  const method = splice[0]
-
+  const method = schema.methods.filter((m) => m !== "OPTIONS")[0]
   const request_options = {
     method: method,
   }

@@ -7,7 +7,7 @@ describe("api_fetch.js", () => {
   const schema = {
     $id: "/test",
     type: "object",
-    method: "POST",
+    methods: ["POST"],
     properties: {
       test: {
         type: "string",
@@ -16,16 +16,18 @@ describe("api_fetch.js", () => {
     required: ["test"],
     additionalProperties: false,
   }
+  var params
+
   beforeEach(async () => {
     await errors_store.$patch({ errors: [] })
   })
 
   test("Ajv wrong params", async () => {
     registerEndpoint(schema.$id, {
-      method: schema.method,
+      method: schema.methods[0],
       handler: () => ({ return: "toto" }),
     })
-    const params = {}
+    params = {}
     try {
       await api_fetch({ schema, params })
     } catch (error) {
@@ -37,64 +39,32 @@ describe("api_fetch.js", () => {
     expect(errors_store.errors[0].code).toBe(400)
   })
 
-  // test("onRequestError", async () => {
-  //   const schema = {
-  //     $id: "/test",
-  //     type: "object",
-  //     method: "POST",
-  //     properties: {
-  //       test: {
-  //         type: "string",
-  //       },
-  //     },
-  //     required: ["test"],
-  //     additionalProperties: false,
-  //   }
-  //   registerEndpoint(schema.$id, {
-  //     method: schema.method,
-  //     handler: async () => {
-  //       setTimeout(() => {}, 100 * 1000)
-  //     },
-  //   })
-  //   const params = { test: "test" }
-  //   var request_error_value
-  //   await api_fetch(
-  //     { schema, params },
-  //     {
-  //       request_error_function: () => {
-  //         request_error_value = "error"
-  //       },
-  //     },
-  //   )
-  //   expect(errors_store.errors.length).toBe(1)
-  //   expect(errors_store.errors[0].code).toBe(404)
-  //   expect(request_error_value).toBe("error")
-  // })
-
   test("onResponse", async () => {
-    registerEndpoint(schema.$id, {
-      method: schema.method,
-      handler: () => ({ return: "toto" }),
-    })
-    const params = { test: "test" }
     var response_value
-    await api_fetch(
-      { schema, params },
-      {
-        response_function: (response) => {
-          response_value = response._data.return
+    for (var i = 0; i < 3; i++) {
+      registerEndpoint(schema.$id, {
+        method: schema.methods[0],
+        handler: () => ({ return: "toto" }),
+      })
+      params = { test: "test" }
+      await api_fetch(
+        { schema, params },
+        {
+          response_function: (response) => {
+            response_value = response._data.return
+          },
         },
-      },
-    )
-    expect(errors_store.errors.length).toBe(0)
-    expect(response_value).toBe("toto")
+      )
+      expect(errors_store.errors.length).toBe(0)
+      expect(response_value).toBe("toto")
+    }
   })
 
   test("onResponseError", async () => {
     const schema = {
       $id: "/toto",
       type: "object",
-      method: "POST",
+      methods: ["POST"],
       properties: {
         test: {
           type: "string",
@@ -103,7 +73,7 @@ describe("api_fetch.js", () => {
       required: ["test"],
       additionalProperties: false,
     }
-    const params = { test: "test" }
+    params = { test: "test" }
     var response_error_value
     await api_fetch(
       { schema, params },
