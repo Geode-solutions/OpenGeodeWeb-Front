@@ -2,14 +2,15 @@
   <FetchingData v-if="loading" />
   <FileUploader
     v-else
-    v-bind="{ multiple, accept, route }"
+    v-bind="{ multiple, accept }"
     @files_uploaded="files_uploaded_event"
   />
 </template>
 
 <script setup>
-  import schema from "@/assets/schemas/FileSelector.json"
+  import schemas from "@geode/opengeodeweb-back/schemas.json"
 
+  const schema = schemas.opengeodeweb_back.allowed_files
   const emit = defineEmits([
     "update_values",
     "increment_step",
@@ -19,10 +20,9 @@
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     key: { type: String, required: false, default: "" },
-    route: { type: String, required: false, default: "" },
   })
 
-  const { multiple, key, route } = props
+  const { multiple, key } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -51,7 +51,6 @@
     )
     toggle_loading()
   }
-  onMounted(() => {
-    get_allowed_files()
-  })
+
+  await get_allowed_files()
 </script>

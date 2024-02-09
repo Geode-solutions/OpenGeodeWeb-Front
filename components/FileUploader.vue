@@ -18,27 +18,28 @@
   <v-row>
     <v-col cols="auto">
       <v-btn
-        @click="upload_files()"
+        @click="upload_files"
         color="primary"
         :disabled="!files.length && !files_uploaded"
         :loading="loading"
         class="pa-2"
-      >
-        Upload file(s)</v-btn
+        >Upload file(s)</v-btn
       >
     </v-col>
   </v-row>
 </template>
 
 <script setup>
+  import schemas from "@geode/opengeodeweb-back/schemas.json"
+  const schema = schemas.opengeodeweb_back.upload_file
+
   const emit = defineEmits(["files_uploaded", "decrement_step"])
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     accept: { type: String, required: true },
-    route: { type: String, required: true },
   })
-  const { multiple, accept, route } = toRefs(props)
+  const { multiple, accept } = toRefs(props)
 
   const label = multiple ? "Please select file(s)" : "Please select a file"
   const files = ref([])
@@ -53,7 +54,7 @@
     for (const file of files.value) {
       const promise = new Promise((resolve, reject) => {
         upload_file(
-          { route, file },
+          { route: schema.$id, file },
           {
             request_error_function: () => {
               reject()

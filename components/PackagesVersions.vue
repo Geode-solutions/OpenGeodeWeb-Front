@@ -29,32 +29,33 @@
 
   const packages_versions = ref([])
 
-  function get_packages_versions() {
-    api_fetch(
-      { schema },
-      {
-        response_function: (response) => {
-          packages_versions.value = response._data.versions
+  async function get_packages_versions() {
+    const array_promise = []
+
+    const promise = new Promise((resolve, reject) => {
+      api_fetch(
+        { schema },
+        {
+          request_error_function: () => {
+            reject()
+          },
+          response_function: (response) => {
+            packages_versions.value = response._data.versions
+            resolve()
+          },
+          response_error_function: () => {
+            reject()
+          },
         },
-      },
-    )
+      )
+    })
+    array_promise.push(promise)
+    await Promise.all(array_promise)
   }
 
-  watch(is_running, (value) => {
-    if (value === true) {
-      get_packages_versions()
-    }
+  watch(is_running, () => {
+    get_packages_versions()
   })
 
-  onMounted(() => {
-    if (is_running.value) {
-      get_packages_versions()
-    }
-  })
-
-  onActivated(() => {
-    if (is_running.value === true) {
-      get_packages_versions()
-    }
-  })
+  await get_packages_versions()
 </script>

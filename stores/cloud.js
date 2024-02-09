@@ -1,4 +1,4 @@
-import { useStorage } from "@vueuse/core"
+import { useFetch, useStorage } from "@vueuse/core"
 
 export const use_cloud_store = defineStore("cloud", {
   state: () => ({
@@ -7,6 +7,14 @@ export const use_cloud_store = defineStore("cloud", {
     is_connexion_launched: false,
   }),
   getters: {
+    api_url: () => {
+      const public_runtime_config = useRuntimeConfig().public
+      if (public_runtime_config.NODE_ENV == "test") {
+        return ""
+      }
+      var api_url = `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}`
+      return api_url
+    },
     is_running: () => {
       return use_geode_store().is_running && use_websocket_store().is_running
     },
@@ -31,7 +39,6 @@ export const use_cloud_store = defineStore("cloud", {
         const { data, error } = await useFetch(`${geode_store.base_url}/ping`, {
           method: "POST",
         })
-        console.log("error", error)
         if (data.value !== null) {
           geode_store.is_running = true
           return geode_store.ping_task()
@@ -43,16 +50,20 @@ export const use_cloud_store = defineStore("cloud", {
     async create_backend() {
       const geode_store = use_geode_store()
       const errors_store = use_errors_store()
-      const config = useRuntimeConfig()
-      const public_runtime_config = config.public
-      const { data, error } = await useFetch(
-        `${public_runtime_config.GEODE_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.GEODE_PORT}${public_runtime_config.SITE_BRANCH}/${public_runtime_config.PROJECT}/createbackend`,
-        { method: "POST" },
+      const public_runtime_config = useRuntimeConfig().public
+      const url = this.api_url.concat(
+        public_runtime_config.PROJECT,
+        public_runtime_config.SITE_BRANCH,
+        "/createbackend",
       )
+      const { data, error } = await useFetch(url, {
+        method: "POST",
+      })
       if (data.value !== null) {
+        console.log("DATA", data)
         this.ID = data.value.ID
         localStorage.setItem("ID", data.value.ID)
-        geode_store.is_running = true
+        geode_store.$patch({ is_running: true })
         return geode_store.ping_task()
       } else {
         console.log("error : ", error)

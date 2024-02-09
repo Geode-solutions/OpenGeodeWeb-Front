@@ -3,7 +3,6 @@
   <v-row v-else-if="Object.keys(allowed_objects).length" class="justify-left">
     <v-col v-for="(value, key) in allowed_objects" :key="key" cols="2" md="2">
       <v-tooltip
-        :disabled="value.is_saveable"
         :text="
           value['is_loadable']
             ? geode_objects[key].tooltip
@@ -18,13 +17,13 @@
               class="card ma-2"
               hover
               rounded
+              @click="set_geode_object(key)"
               :disabled="!value['is_loadable']"
               :elevation="value['is_loadable'] ? 5 : 3"
             >
               <v-img
                 :src="geode_objects[key].image"
                 cover
-                @click="set_geode_object(key)"
                 :class="!value['is_loadable'] ? 'disabled' : ''"
               />
             </v-card>
@@ -50,9 +49,10 @@
 </template>
 
 <script setup>
-  import { toRaw } from "vue"
   import geode_objects from "@/assets/geode_objects"
-  import schema from "@/assets/schemas/ObjectSelector.json"
+  import schemas from "@geode/opengeodeweb-back/schemas.json"
+
+  const schema = schemas.opengeodeweb_back.allowed_objects
 
   const emit = defineEmits(["update_values", "increment_step"])
 
@@ -60,7 +60,6 @@
     filenames: { type: Array, required: true },
     key: { type: String, required: false, default: null },
   })
-
   const { filenames, key } = props
 
   const loading = ref(false)
@@ -69,7 +68,7 @@
 
   async function get_allowed_objects() {
     toggle_loading()
-    allowed_objects.value = []
+    allowed_objects.value = {}
     var promise_array = []
     for (const filename of filenames) {
       const params = { filename, key }
@@ -81,14 +80,7 @@
               reject()
             },
             response_function: (response) => {
-              if (toRaw(allowed_objects.value).length == 0) {
-                allowed_objects.value = response._data.allowed_objects
-              } else {
-                allowed_objects.value = toRaw(allowed_objects.value).filter(
-                  (value) => response._data.allowed_objects.includes(value),
-                )
-              }
-              resolve()
+              resolve(response._data.allowed_objects)
             },
             response_error_function: () => {
               reject()
@@ -98,7 +90,23 @@
       })
       promise_array.push(promise)
     }
-    await Promise.all(promise_array)
+    const values = await Promise.all(promise_array)
+    const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
+    const common_keys = all_keys.filter(
+      (i) => !values.some((j) => !Object.keys(j).includes(i)),
+    )
+    var final_object = {}
+    for (const key of common_keys) {
+      for (const value of values) {
+        if (value[key].is_loadable == false) {
+          final_object[key] = { is_loadable: false }
+        } else {
+          final_object[key] = { is_loadable: true }
+        }
+      }
+    }
+
+    allowed_objects.value = final_object
     toggle_loading()
   }
 
@@ -109,9 +117,7 @@
     }
   }
 
-  onMounted(() => {
-    get_allowed_objects()
-  })
+  await get_allowed_objects()
 </script>
 
 <style scoped>

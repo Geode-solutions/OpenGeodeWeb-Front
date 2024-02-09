@@ -27,7 +27,7 @@
     items: { type: Array, required: true },
   })
 
-  const { name } = toRefs(useDisplay())
+  const { name } = useDisplay()
   const nb_items_to_display = ref(3)
   watch(
     name,
@@ -59,10 +59,6 @@
     pauseAutoplayOnHover: true,
     transition: 1000,
     wrapAround: true,
-  })
-
-  onMounted(() => {
-    console.log(carrousel_settings)
   })
 </script>
 
