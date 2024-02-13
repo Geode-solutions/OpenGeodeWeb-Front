@@ -8,23 +8,24 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
 import ExtensionSelector from "@/components/ExtensionSelector.vue"
-import schema from "@/assets/schemas/ExtensionSelector.json"
-import { flushPromises } from "@vue/test-utils"
+
+import schemas from "@geode/opengeodeweb-back/schemas.json"
+
+const geode_objects_and_output_extensions =
+  schemas.opengeodeweb_back.geode_objects_and_output_extensions
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-global.ResizeObserver = require("resize-observer-polyfill")
-
 describe("ExtensionSelector.vue", async () => {
   test(`Select geode_object & extension`, async () => {
     const output_geode_object = "BRep"
     const output_extension = "msh"
 
-    registerEndpoint(schema.$id, {
-      method: schema.method,
+    registerEndpoint(geode_objects_and_output_extensions.$id, {
+      method: geode_objects_and_output_extensions.methods[0],
       handler: () => ({
         geode_objects_and_output_extensions: {
           BRep: { msh: { is_saveable: true } },
