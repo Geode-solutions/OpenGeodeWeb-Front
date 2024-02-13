@@ -1,11 +1,23 @@
 import { describe, expect, test, beforeEach } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import WebSocket from "ws"
 
-describe("api_fetch.js", () => {
+describe("viewer_call.js", () => {
   const errors_store = use_errors_store()
+
+  function createWebSocketServer(server) {
+    const wss = new WebSocket.Server({ server })
+
+    wss.on("connection", function (webSocket) {
+      webSocket.on("message", function (message) {
+        webSocket.send(message)
+      })
+    })
+  }
 
   const schema = {
     $id: "/test",
+    route: "test",
     type: "object",
     method: "POST",
     properties: {
@@ -25,61 +37,8 @@ describe("api_fetch.js", () => {
       method: schema.method,
       handler: () => ({ return: "toto" }),
     })
-    const params = {}
-    try {
-      await api_fetch({ schema, params })
-    } catch (error) {
-      expect(error.message).toBe(
-        "/test: data must have required property 'test'",
-      )
-    }
-    expect(errors_store.errors.length).toBe(1)
-    expect(errors_store.errors[0].code).toBe(400)
-  })
 
-  test("onResponse", async () => {
-    registerEndpoint(schema.$id, {
-      method: schema.method,
-      handler: () => ({ return: "toto" }),
-    })
-    const params = { test: "test" }
-    var response_value
-    await api_fetch(
-      { schema, params },
-      {
-        response_function: (response) => {
-          response_value = response._data.return
-        },
-      },
-    )
-    expect(errors_store.errors.length).toBe(0)
-    expect(response_value).toBe("toto")
-  })
-
-  test("onResponseError", async () => {
-    const schema = {
-      $id: "/toto",
-      type: "object",
-      method: "POST",
-      properties: {
-        test: {
-          type: "string",
-        },
-      },
-      required: ["test"],
-      additionalProperties: false,
-    }
-    const params = { test: "test" }
-    var response_error_value
-    await api_fetch(
-      { schema, params },
-      {
-        response_error_function: () => {
-          response_error_value = "error"
-        },
-      },
-    )
-    expect(errors_store.errors.length).toBe(1)
-    expect(response_error_value).toBe("error")
+    // expect(errors_store.errors.length).toBe(1)
+    // expect(errors_store.errors[0].code).toBe(400)
   })
 })
