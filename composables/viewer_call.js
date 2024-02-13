@@ -1,4 +1,5 @@
 import Ajv from "ajv"
+import _ from "lodash"
 
 export function viewer_call(
   { schema, params = {} },
@@ -18,10 +19,16 @@ export function viewer_call(
       name: "Bad request",
       description: ajv.errorsText(),
     })
-    throw new Error(schema.$id.concat(": ", ajv.errorsText()))
+    throw new Error(schema.route.concat(": ", ajv.errorsText()))
   }
 
   const client = viewer_store.client
+
+  console.log("viewer_call", schema.route, params)
+
+  if (!_.isEmpty(schema.properties)) {
+    params = [params]
+  }
 
   if (client) {
     viewer_store.start_request()
@@ -35,11 +42,12 @@ export function viewer_call(
         }
       })
       .catch((response) => {
+        console.log("error : ", response)
         errors_store.add_error({
-          code: response.status,
-          route: schema.$id,
-          name: response._data.name,
-          description: response._data.description,
+          code: response.code,
+          route: schema.route,
+          name: response.data.message,
+          description: response.data.exception,
         })
         if (response_error_function) {
           response_error_function(response)
