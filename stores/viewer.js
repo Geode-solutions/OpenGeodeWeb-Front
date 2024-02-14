@@ -43,7 +43,7 @@ export const use_viewer_store = defineStore("viewer", {
       this.picking_mode = false
     },
     ws_connect() {
-      const config = { application: "Geode" }
+      const config = { application: "Viewer" }
       config.sessionURL = this.base_url
 
       const { client } = this

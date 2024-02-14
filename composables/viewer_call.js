@@ -1,33 +1,31 @@
-import Ajv from "ajv"
 import _ from "lodash"
 
 export function viewer_call(
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
+  console.log("viewer_call", schema.route, params)
   const errors_store = use_errors_store()
   const viewer_store = use_viewer_store()
 
-  const ajv = new Ajv()
-  ajv.addKeyword("route")
-  const valid = ajv.validate(schema, params)
+  const { valid, error } = validate_schema(schema, params)
 
   if (!valid) {
     errors_store.add_error({
       code: 400,
       route: schema.route,
       name: "Bad request",
-      description: ajv.errorsText(),
+      description: error,
     })
-    throw new Error(schema.route.concat(": ", ajv.errorsText()))
+    throw new Error(schema.route.concat(": ", error))
   }
 
   const client = viewer_store.client
 
-  console.log("viewer_call", schema.route, params)
-
   if (!_.isEmpty(schema.properties)) {
     params = [params]
+  } else {
+    params = []
   }
 
   if (client) {
@@ -36,24 +34,35 @@ export function viewer_call(
       .getConnection()
       .getSession()
       .call(schema.route, params)
-      .then((response) => {
-        if (response_function) {
-          response_function(response)
-        }
-      })
-      .catch((response) => {
-        console.log("error : ", response)
-        errors_store.add_error({
-          code: response.code,
-          route: schema.route,
-          name: response.data.message,
-          description: response.data.exception,
-        })
+      .then(
+        (value) => {
+          if (response_function) {
+            console.log("response_function", value)
+            response_function(value)
+          }
+        },
+        (reason) => {
+          if (request_error_function) {
+            console.log("request_error_function", reason)
+            request_error_function(reason)
+          }
+        },
+      )
+      .catch((error) => {
+        console.log("error : ", error)
+        // errors_store.add_error({
+        //   code: error.code,
+        //   route: schema.route,
+        //   name: error.data.message,
+        //   description: error.data.exception,
+        // })
         if (response_error_function) {
-          response_error_function(response)
+          response_error_function(error)
         }
       })
-    viewer_store.stop_request()
+      .finally(() => {
+        viewer_store.stop_request()
+      })
   }
 }
 

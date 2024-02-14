@@ -1,4 +1,3 @@
-import Ajv from "ajv"
 import _ from "lodash"
 
 export function api_fetch(
@@ -10,22 +9,20 @@ export function api_fetch(
 
   const body = params || {}
 
-  const ajv = new Ajv()
+  const { valid, error } = validate_schema(schema, body)
 
-  ajv.addKeyword("methods")
-  ajv.addKeyword("route")
-  ajv.addKeyword("max_retry")
-  const valid = ajv.validate(schema, body)
   if (!valid) {
     errors_store.add_error({
       code: 400,
       route: schema.$id,
       name: "Bad request",
-      description: ajv.errorsText(),
+      description: error,
     })
-    throw new Error(schema.$id.concat(": ", ajv.errorsText()))
+    throw new Error(schema.$id.concat(": ", error))
   }
+
   geode_store.start_request()
+
   const method = schema.methods.filter((m) => m !== "OPTIONS")[0]
   const request_options = {
     method: method,
