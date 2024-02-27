@@ -86,7 +86,7 @@
       "additionalProperties": false
     },
     "reset": {
-      "rpc": "reset",
+      "rpc": "/reset",
       "type": "object",
       "properties": {},
       "required": [],
