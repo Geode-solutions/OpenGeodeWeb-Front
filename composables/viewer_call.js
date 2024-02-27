@@ -34,7 +34,7 @@ export function viewer_call(
       client
         .getConnection()
         .getSession()
-        .call(schema.route, params)
+        .call(schema.rpc, params)
         .then(
           (value) => {
             if (response_function) {
