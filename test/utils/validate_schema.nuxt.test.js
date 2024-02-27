@@ -6,33 +6,30 @@ describe("validate_schema.js", () => {
     type: "object",
     methods: ["POST"],
     properties: {
-      test: {
+      var_1: {
         type: "string",
       },
+      var_2: {
+        type: "integer",
+        minimum: 0,
+        maximum: 10,
+      },
     },
-    required: ["test"],
+    required: ["var_1", "var_2"],
     additionalProperties: false,
   }
   var params
 
   test("Ajv wrong params", async () => {
     params = {}
-    var { valid, error } = validate_schema(schema, params, [
-      "methods",
-      "route",
-      "max_retry",
-    ])
+    var { valid, error } = validate_schema(schema, params)
     expect(valid).toBe(false)
-    expect(error).toBe("data must have required property 'test'")
+    expect(error).toBe("data must have required property 'var_1'")
   })
 
   test("Good params", async () => {
-    params = { test: "test" }
-    var { valid, error } = validate_schema(schema, params, [
-      "methods",
-      "route",
-      "max_retry",
-    ])
+    params = { var_1: "test", var_2: 5 }
+    var { valid, error } = validate_schema(schema, params)
     expect(valid).toBe(true)
     expect(error).toBe("No errors")
   })
