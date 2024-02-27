@@ -1,7 +1,7 @@
 {
   "opengeodeweb_viewer": {
     "apply_textures": {
-      "rpc": "/toggle_object_visibility",
+      "rpc": "toggle_object_visibility",
       "type": "object",
       "properties": {
         "id": {
@@ -19,7 +19,7 @@
       "additionalProperties": false
     },
     "create_object_pipeline": {
-      "rpc": "/create_object_pipeline",
+      "rpc": "create_object_pipeline",
       "type": "object",
       "properties": {
         "id": {
@@ -33,14 +33,14 @@
       "additionalProperties": false
     },
     "create_visualization": {
-      "rpc": "/create_visualization",
+      "rpc": "create_visualization",
       "type": "object",
       "properties": {},
       "required": [],
       "additionalProperties": false
     },
     "delete_object_pipeline": {
-      "rpc": "/delete_object_pipeline",
+      "rpc": "delete_object_pipeline",
       "type": "object",
       "properties": {
         "id": {
@@ -51,7 +51,7 @@
       "additionalProperties": false
     },
     "get_point_position": {
-      "rpc": "/get_point_position",
+      "rpc": "get_point_position",
       "type": "object",
       "properties": {
         "x": {
@@ -65,7 +65,7 @@
       "additionalProperties": false
     },
     "point_size": {
-      "rpc": "/point_size",
+      "rpc": "point_size",
       "type": "object",
       "properties": {
         "id": {
@@ -79,21 +79,21 @@
       "additionalProperties": false
     },
     "reset_camera": {
-      "rpc": "/reset_camera",
+      "rpc": "reset_camera",
       "type": "object",
       "properties": {},
       "required": [],
       "additionalProperties": false
     },
     "reset": {
-      "rpc": "/reset",
+      "rpc": "reset",
       "type": "object",
       "properties": {},
       "required": [],
       "additionalProperties": false
     },
     "set_color": {
-      "rpc": "/set_color",
+      "rpc": "set_color",
       "type": "object",
       "properties": {
         "id": {
@@ -119,7 +119,7 @@
       "additionalProperties": false
     },
     "set_vertex_attribute": {
-      "rpc": "/set_vertex_attribute",
+      "rpc": "set_vertex_attribute",
       "type": "object",
       "properties": {
         "id": {
@@ -133,7 +133,7 @@
       "additionalProperties": false
     },
     "toggle_edge_visibility": {
-      "rpc": "/toggle_edge_visibility",
+      "rpc": "toggle_edge_visibility",
       "type": "object",
       "properties": {
         "id": {
@@ -147,7 +147,7 @@
       "additionalProperties": false
     },
     "toggle_object_visibility": {
-      "rpc": "/toggle_object_visibility",
+      "rpc": "toggle_object_visibility",
       "type": "object",
       "properties": {
         "id": {
