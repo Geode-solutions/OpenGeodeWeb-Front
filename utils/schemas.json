@@ -1,0 +1,164 @@
+{
+  "opengeodeweb_viewer": {
+    "apply_textures": {
+      "rpc": "toggle_object_visibility",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "textures": {
+          "type": "array",
+          "elements": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["id", "textures"],
+      "additionalProperties": false
+    },
+    "create_object_pipeline": {
+      "rpc": "create_object_pipeline",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "file_name": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "file_name"],
+      "additionalProperties": false
+    },
+    "create_visualization": {
+      "rpc": "create_visualization",
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "delete_object_pipeline": {
+      "rpc": "delete_object_pipeline",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+    "get_point_position": {
+      "rpc": "get_point_position",
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "integer"
+        },
+        "y": {
+          "type": "integer"
+        }
+      },
+      "required": ["x", "y"],
+      "additionalProperties": false
+    },
+    "point_size": {
+      "rpc": "point_size",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number"
+        }
+      },
+      "required": ["id", "size"],
+      "additionalProperties": false
+    },
+    "reset_camera": {
+      "rpc": "reset_camera",
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "reset": {
+      "rpc": "reset",
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "set_color": {
+      "rpc": "set_color",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "red": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "green": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "blue": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
+      },
+      "required": ["id", "red", "green", "blue"],
+      "additionalProperties": false
+    },
+    "set_vertex_attribute": {
+      "rpc": "set_vertex_attribute",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    },
+    "toggle_edge_visibility": {
+      "rpc": "toggle_edge_visibility",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "visibility": {
+          "type": "boolean"
+        }
+      },
+      "required": ["id", "visibility"],
+      "additionalProperties": false
+    },
+    "toggle_object_visibility": {
+      "rpc": "toggle_object_visibility",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "is_visible": {
+          "type": "boolean"
+        }
+      },
+      "required": ["id", "is_visible"],
+      "additionalProperties": false
+    }
+  }
+}

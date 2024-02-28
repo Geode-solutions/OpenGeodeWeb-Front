@@ -1,11 +1,11 @@
 <template>
-  <v-container justify="space-around">
+  <v-container class="justify">
     <v-row align-content="center" align="center">
       <v-col
         v-if="!is_captcha_validated"
+        class="align"
         cols="12"
         align-self="center"
-        align="center"
       >
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
         <Recaptcha :site_key="site_key" />
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-  const websocket_store = use_websocket_store()
+  const viewer_store = use_viewer_store()
   const cloud_store = use_cloud_store()
   const { is_captcha_validated, is_connexion_launched, is_running } =
     storeToRefs(cloud_store)
@@ -28,7 +28,7 @@
   watch(is_captcha_validated, async (value) => {
     if (value === true && process.client) {
       await cloud_store.create_connexion()
-      await websocket_store.ws_connect()
+      await viewer_store.ws_connect()
     }
   })
 </script>

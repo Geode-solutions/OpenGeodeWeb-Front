@@ -5,10 +5,10 @@
         Reset camera
         <template #activator="{ props }">
           <v-btn
-            @click.stop="reset_camera"
             density="comfortable"
             v-bind="props"
             icon
+            @click.stop="reset_camera"
           >
             <v-icon size="32"> mdi-cube-scan </v-icon>
           </v-btn>
@@ -19,9 +19,12 @@
 </template>
 
 <script setup>
-  const viewer_store = use_viewer_store()
+  import schemas from "@/utils/schemas.json"
+
   function reset_camera() {
-    viewer_store.reset_camera()
+    viewer_call({
+      schema: schemas.opengeodeweb_viewer.reset_camera,
+    })
   }
 </script>
 

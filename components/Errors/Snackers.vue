@@ -1,9 +1,9 @@
 <template>
   <v-snackbar
-    :style="{ 'margin-bottom': calc_margin(index) }"
     v-for="(error, index) in errors"
     :key="index"
     v-model="show"
+    :style="{ 'margin-bottom': calc_margin(index) }"
     color="error"
     location="bottom right"
     transition="slide-x-reverse-transition"
@@ -42,10 +42,10 @@
       <v-col cols="auto">
         <v-btn
           icon
-          flat
+          variant="flat"
           size="20"
-          @click="errors_store.delete_error(index)"
           color="error"
+          @click="errors_store.delete_error(index)"
         >
           <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
