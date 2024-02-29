@@ -19,10 +19,10 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    key: { type: String, required: false, default: "" },
+    supported_feature: { type: String, required: false, default: "" },
   })
 
-  const { multiple, key } = props
+  const { multiple, supported_feature } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -38,7 +38,7 @@
 
   async function get_allowed_files() {
     toggle_loading()
-    const params = { key }
+    const params = { supported_feature }
     await api_fetch(
       { schema, params },
       {

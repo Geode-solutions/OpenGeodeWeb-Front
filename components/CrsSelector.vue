@@ -66,13 +66,11 @@
   async function get_crs_table() {
     const params = { input_geode_object }
     toggle_loading()
-    console.log("get_crs_table")
     await api_fetch(
       { schema, params },
       {
         response_function: (response) => {
           crs_list.value = response._data.crs_list
-          console.log("crs_list", response._data.crs_list)
         },
       },
     )

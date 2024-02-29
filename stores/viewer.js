@@ -43,63 +43,63 @@ export const use_viewer_store = defineStore("viewer", {
       this.picking_mode = false
     },
     ws_connect() {
-      const config = { application: "Viewer" }
-      config.sessionURL = this.base_url
+      if (process.env.NODE_ENV != "test") {
+        const config = { application: "Viewer" }
+        config.sessionURL = this.base_url
 
-      const { client } = this
-      if (this.is_running && client.isConnected()) {
-        client.disconnect(-1)
-        this.is_running = false
-      }
-      let clientToConnect = client
-      if (_.isEmpty(clientToConnect)) {
-        clientToConnect = vtkWSLinkClient.newInstance()
-      }
+        const { client } = this
+        if (this.is_running && client.isConnected()) {
+          client.disconnect(-1)
+          this.is_running = false
+        }
+        let clientToConnect = client
+        if (_.isEmpty(clientToConnect)) {
+          clientToConnect = vtkWSLinkClient.newInstance()
+        }
 
-      // Connect to busy store
-      clientToConnect.onBusyChange((count) => {
-        this.buzy = count
-      })
-      clientToConnect.beginBusy()
-
-      // Error
-      clientToConnect.onConnectionError((httpReq) => {
-        const message =
-          (httpReq && httpReq.response && httpReq.response.error) ||
-          `Connection error`
-        console.error(message)
-        console.log(httpReq)
-      })
-
-      // Close
-      clientToConnect.onConnectionClose((httpReq) => {
-        const message =
-          (httpReq && httpReq.response && httpReq.response.error) ||
-          `Connection close`
-        console.error(message)
-        console.log(httpReq)
-      })
-
-      // Connect
-      clientToConnect
-        .connect(config)
-        .then((validClient) => {
-          connectImageStream(validClient.getConnection().getSession())
-          this.client = validClient
-          clientToConnect.endBusy()
-
-          // Now that the client is ready let's setup the server for us
-          viewer_call({
-            schema: schemas.opengeodeweb_viewer.create_visualization,
-          })
-          viewer_call({
-            schema: schemas.opengeodeweb_viewer.reset,
-          })
-          this.is_running = true
+        // Connect to busy store
+        clientToConnect.onBusyChange((count) => {
+          this.buzy = count
         })
-        .catch((error) => {
-          console.error(error)
+        clientToConnect.beginBusy()
+
+        // Error
+        clientToConnect.onConnectionError((httpReq) => {
+          const message =
+            (httpReq && httpReq.response && httpReq.response.error) ||
+            `Connection error`
+          console.error(message)
         })
+
+        // Close
+        clientToConnect.onConnectionClose((httpReq) => {
+          const message =
+            (httpReq && httpReq.response && httpReq.response.error) ||
+            `Connection close`
+          console.error(message)
+        })
+
+        // Connect
+        clientToConnect
+          .connect(config)
+          .then((validClient) => {
+            connectImageStream(validClient.getConnection().getSession())
+            this.client = validClient
+            clientToConnect.endBusy()
+
+            // Now that the client is ready let's setup the server for us
+            viewer_call({
+              schema: schemas.opengeodeweb_viewer.create_visualization,
+            })
+            viewer_call({
+              schema: schemas.opengeodeweb_viewer.reset,
+            })
+            this.is_running = true
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+      }
     },
     start_request() {
       this.request_counter++
