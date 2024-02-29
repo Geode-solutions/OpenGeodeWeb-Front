@@ -29,7 +29,7 @@ describe("FileUploader.vue", async () => {
       global: {
         plugins: [vuetify],
       },
-      props: { multiple: false, accept: "*.txt", route: "/upload" },
+      props: { multiple: false, accept: "*.txt" },
     })
     const v_file_input = wrapper.findComponent(components.VFileInput)
     await v_file_input.trigger("click")

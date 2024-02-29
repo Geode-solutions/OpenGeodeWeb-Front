@@ -69,7 +69,6 @@
   const toggle_loading = useToggle(loading)
 
   function files_uploaded_event(value) {
-    console.log("update_values")
     emit("update_values", { additional_files: value })
     missing_files()
   }

@@ -4,7 +4,6 @@ export function viewer_call(
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  console.log("viewer_call", schema.route, params)
   const errors_store = use_errors_store()
   const viewer_store = use_viewer_store()
 
@@ -38,26 +37,23 @@ export function viewer_call(
         .then(
           (value) => {
             if (response_function) {
-              console.log("response_function", value)
               response_function(value)
             }
             resolve()
           },
           (reason) => {
             if (request_error_function) {
-              console.log("request_error_function", reason)
               request_error_function(reason)
             }
             reject()
           },
         )
         .catch((error) => {
-          console.log("error : ", error)
           errors_store.add_error({
             code: error.code,
             route: schema.route,
-            name: error.data.message,
-            description: error.data.exception,
+            name: error.message,
+            description: error.message,
           })
           if (response_error_function) {
             response_error_function(error)

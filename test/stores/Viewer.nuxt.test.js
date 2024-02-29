@@ -7,11 +7,11 @@ describe("Viewer Store", () => {
   })
   describe("getters", () => {
     test("base_url", () => {
-      const geode_store = use_geode_store()
+      const viewer_store = use_geode_store()
       const cloud_store = use_cloud_store()
       cloud_store.$patch({ ID: "123456" })
-      geode_store.start_request()
-      expect(geode_store.request_counter).toBe(1)
+      viewer_store.start_request()
+      expect(viewer_store.request_counter).toBe(1)
     })
     test("is_busy", () => {
       const viewer_store = use_viewer_store()

@@ -58,9 +58,9 @@
 
   const props = defineProps({
     filenames: { type: Array, required: true },
-    key: { type: String, required: false, default: null },
+    supported_feature: { type: String, required: false, default: null },
   })
-  const { filenames, key } = props
+  const { filenames, supported_feature } = props
 
   const loading = ref(false)
   const allowed_objects = ref({})
@@ -71,7 +71,7 @@
     allowed_objects.value = {}
     var promise_array = []
     for (const filename of filenames) {
-      const params = { filename, key }
+      const params = { filename, supported_feature }
       const promise = new Promise((resolve, reject) => {
         api_fetch(
           { schema, params },

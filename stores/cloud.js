@@ -60,13 +60,11 @@ export const use_cloud_store = defineStore("cloud", {
         method: "POST",
       })
       if (data.value !== null) {
-        console.log("DATA", data)
         this.ID = data.value.ID
         localStorage.setItem("ID", data.value.ID)
         geode_store.$patch({ is_running: true })
         return geode_store.ping_task()
       } else {
-        console.log("error : ", error)
         errors_store.server_error = true
       }
     },
