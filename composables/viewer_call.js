@@ -52,8 +52,8 @@ export function viewer_call(
           errors_store.add_error({
             code: error.code,
             route: schema.route,
-            name: error.data.message,
-            description: error.data.exception,
+            name: error.message,
+            description: error.message,
           })
           if (response_error_function) {
             response_error_function(error)
