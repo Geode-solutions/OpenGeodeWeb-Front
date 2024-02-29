@@ -19,7 +19,7 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    supported_feature: { type: String, required: false, default: "" },
+    supported_feature: { type: String, required: false, default: null },
   })
 
   const { multiple, supported_feature } = props
