@@ -3,7 +3,7 @@ import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import SmartConnect from "wslink/src/SmartConnect"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
-import schemas from "@/utils/schemas.json"
+import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
 vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
