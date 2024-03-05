@@ -4,9 +4,7 @@ import SmartConnect from "wslink/src/SmartConnect"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
 import schemas from "@/utils/schemas.json"
-
 vtkWSLinkClient.setSmartConnectClass(SmartConnect)
-
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
     client: {},

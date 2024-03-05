@@ -2,7 +2,7 @@
   <ClientOnly>
     <vue-recaptcha
       ref="recaptcha"
-      sitekey="6Lce72wgAAAAAOXrHyDxRQBhk6NDTD80MrXOlgbC"
+      :sitekey="site_key"
       :load-recaptcha-script="true"
       align-self="center"
       @expired="is_captcha_validated = false"
