@@ -1,5 +1,3 @@
-import _ from "lodash"
-
 export function viewer_call(
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
@@ -21,19 +19,13 @@ export function viewer_call(
 
   const client = viewer_store.client
 
-  if (!_.isEmpty(schema.properties)) {
-    params = [params]
-  } else {
-    params = []
-  }
-
   let promise = new Promise((resolve, reject) => {
     if (client) {
       viewer_store.start_request()
       client
         .getConnection()
         .getSession()
-        .call(schema.rpc, params)
+        .call(schema.rpc, [params])
         .then(
           (value) => {
             if (response_function) {
