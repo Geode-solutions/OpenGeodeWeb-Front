@@ -1,7 +1,8 @@
 import _ from "lodash"
 import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
-import schemas from "@/utils/schemas.json"
+import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
+import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({

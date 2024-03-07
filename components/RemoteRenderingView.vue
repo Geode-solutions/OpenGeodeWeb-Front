@@ -22,7 +22,7 @@
 <script setup>
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize } from "@vueuse/core"
-  import schemas from "@/utils/schemas.json"
+  import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
   const viewer_store = use_viewer_store()
   const { client, is_running, picking_mode } = storeToRefs(viewer_store)
