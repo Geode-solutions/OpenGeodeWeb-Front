@@ -52,8 +52,8 @@ export const use_cloud_store = defineStore("cloud", {
       const errors_store = use_errors_store()
       const public_runtime_config = useRuntimeConfig().public
       const url = this.api_url.concat(
-        public_runtime_config.PROJECT,
         public_runtime_config.SITE_BRANCH,
+        public_runtime_config.PROJECT,
         "/createbackend",
       )
       const { data, error } = await useFetch(url, {
