@@ -43,7 +43,6 @@ describe("CrsSelector.vue", async () => {
     const td = await wrapper.find("td")
     await wrapper.vm.$nextTick()
     const input = await td.find("input")
-    console.log("toto", input)
     await input.trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)

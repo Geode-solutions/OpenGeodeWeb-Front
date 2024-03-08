@@ -3,6 +3,7 @@
     <div style="position: relative; width: 100%; height: 100%">
       <view-toolbar />
       <v-col
+        ref="viewer"
         style="
           overflow: hidden;
           position: relative;
@@ -10,12 +11,10 @@
           height: 100%;
           width: 100%;
         "
-        ref="viewer"
+        class="pa-0"
         @click="get_x_y"
         @keydown.esc="app_store.toggle_picking_mode(false)"
-        class="pa-0"
-      >
-      </v-col>
+      />
     </div>
   </ClientOnly>
 </template>
@@ -23,16 +22,19 @@
 <script setup>
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize } from "@vueuse/core"
+  import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
   const viewer_store = use_viewer_store()
-  const { picking_mode } = storeToRefs(viewer_store)
-  const websocket_store = use_websocket_store()
-  const { client, is_running } = storeToRefs(websocket_store)
+  const { client, is_running, picking_mode } = storeToRefs(viewer_store)
 
   function get_x_y(event) {
     if (picking_mode.value === true) {
       const { offsetX, offsetY } = event
       viewer_store.set_picked_point(offsetX, offsetY)
+      viewer_call({
+        schema: schemas.opengeodeweb_viewer.set_picked_point,
+        params: { offsetX, offsetY },
+      })
     }
   }
 

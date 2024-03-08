@@ -33,7 +33,7 @@ describe("FileSelector.vue", async () => {
       global: {
         plugins: [vuetify],
       },
-      props: { multiple: false, key: "test", route: "/upload" },
+      props: { multiple: false, supported_feature: "test" },
     })
 
     const file_uploader = wrapper.findComponent(FileUploader)

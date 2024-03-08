@@ -2,11 +2,11 @@
   <ClientOnly>
     <vue-recaptcha
       ref="recaptcha"
-      sitekey="6Lce72wgAAAAAOXrHyDxRQBhk6NDTD80MrXOlgbC"
-      :loadRecaptchaScript="true"
+      :sitekey="site_key"
+      :load-recaptcha-script="true"
+      align-self="center"
       @expired="is_captcha_validated = false"
       @verify="submit_recaptcha"
-      align-self="center"
     />
   </ClientOnly>
 </template>

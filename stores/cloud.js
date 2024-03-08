@@ -16,10 +16,10 @@ export const use_cloud_store = defineStore("cloud", {
       return api_url
     },
     is_running: () => {
-      return use_geode_store().is_running && use_websocket_store().is_running
+      return use_geode_store().is_running && use_viewer_store().is_running
     },
     is_busy: () => {
-      return use_geode_store().is_busy || use_websocket_store().is_busy
+      return use_geode_store().is_busy || use_viewer_store().is_busy
     },
   },
   actions: {
@@ -52,21 +52,19 @@ export const use_cloud_store = defineStore("cloud", {
       const errors_store = use_errors_store()
       const public_runtime_config = useRuntimeConfig().public
       const url = this.api_url.concat(
-        public_runtime_config.PROJECT,
         public_runtime_config.SITE_BRANCH,
+        public_runtime_config.PROJECT,
         "/createbackend",
       )
       const { data, error } = await useFetch(url, {
         method: "POST",
       })
       if (data.value !== null) {
-        console.log("DATA", data)
         this.ID = data.value.ID
         localStorage.setItem("ID", data.value.ID)
         geode_store.$patch({ is_running: true })
         return geode_store.ping_task()
       } else {
-        console.log("error : ", error)
         errors_store.server_error = true
       }
     },

@@ -34,7 +34,7 @@ describe("ObjectSelector.vue", async () => {
       global: {
         plugins: [vuetify],
       },
-      props: { filenames: ["test.toto"], key: "test" },
+      props: { filenames: ["test.toto"], supported_feature: "test" },
     })
     const v_card = wrapper.findComponent(components.VCard)
     const v_img = v_card.findComponent(components.VImg)
