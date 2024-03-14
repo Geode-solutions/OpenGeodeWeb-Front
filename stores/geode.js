@@ -8,10 +8,11 @@ export const use_geode_store = defineStore("geode", {
       const cloud_store = use_cloud_store()
       const api_url = cloud_store.api_url
       var geode_url = `${api_url}`
-      const public_runtime_config = useRuntimeConfig().public
-      if (public_runtime_config.NODE_ENV == "production") {
-        geode_url += `/${cloud_store.ID}/geode`
-      }
+      console.log("cloud_store.ID", cloud_store.ID)
+      // const public_runtime_config = useRuntimeConfig().public
+      // if (public_runtime_config.NODE_ENV == "production") {
+      geode_url += `/${cloud_store.ID}/geode`
+      // }
       return geode_url
     },
     is_busy: (state) => {

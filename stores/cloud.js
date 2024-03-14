@@ -56,11 +56,17 @@ export const use_cloud_store = defineStore("cloud", {
         public_runtime_config.PROJECT,
         "/createbackend",
       )
-      const { data, error } = await useFetch(url, {
+      const response = await useFetch(url, {
         method: "POST",
       })
+
+      console.log("response", response)
+      console.log("value", response.data.value)
+
       if (data.value !== null) {
         this.ID = data.value.ID
+        console.log("data.value.ID", data.value.ID)
+        console.log("this.ID", this.ID)
         localStorage.setItem("ID", data.value.ID)
         geode_store.$patch({ is_running: true })
         return geode_store.ping_task()
