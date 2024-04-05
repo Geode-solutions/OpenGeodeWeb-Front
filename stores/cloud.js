@@ -59,6 +59,8 @@ export const use_cloud_store = defineStore("cloud", {
       const { data, error } = await useFetch(url, {
         method: "POST",
       })
+
+      console.log("data", data)
       if (data.value !== null) {
         this.ID = data.value.ID
         localStorage.setItem("ID", data.value.ID)
