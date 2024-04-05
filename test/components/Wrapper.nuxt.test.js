@@ -1,7 +1,7 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test } from "vitest"
-import { mount } from "@vue/test-utils"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -46,7 +46,7 @@ describe("Step.vue", async () => {
         },
       ],
     })
-    const wrapper = mount(Wrapper, {
+    const wrapper = await mountSuspended(Wrapper, {
       global: {
         plugins: [vuetify],
         provide: { stepper_tree },
