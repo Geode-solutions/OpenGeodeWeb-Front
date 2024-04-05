@@ -1,7 +1,8 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test, vi } from "vitest"
-import { flushPromises, mount } from "@vue/test-utils"
+import { flushPromises } from "@vue/test-utils"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -21,7 +22,7 @@ global.ResizeObserver = require("resize-observer-polyfill")
 describe("Launcher.vue", async () => {
   test(`Mount`, async () => {
     const spy_cloud_store = vi.spyOn(cloud_store, "create_connexion")
-    const wrapper = mount(Launcher, {
+    const wrapper = await mountSuspended(Launcher, {
       global: {
         plugins: [vuetify],
       },
