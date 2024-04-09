@@ -34,7 +34,7 @@ export const use_cloud_store = defineStore("cloud", {
       ) {
         return this.create_backend()
       } else {
-        const { data, error } = await useFetch(`${geode_store.base_url}/ping`, {
+        const { data } = await useFetch(`${geode_store.base_url}/ping`, {
           method: "POST",
         })
         if (data.value !== null) {
@@ -54,11 +54,10 @@ export const use_cloud_store = defineStore("cloud", {
         public_runtime_config.PROJECT,
         "/createbackend",
       )
-      const { data, error } = await useFetch(url, {
+      const { data } = await useFetch(url, {
         method: "POST",
       })
 
-      console.log("data", data)
       if (data.value !== null) {
         this.ID = data.value.ID
         localStorage.setItem("ID", data.value.ID)
