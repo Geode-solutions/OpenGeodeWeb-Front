@@ -32,4 +32,10 @@ export default defineNuxtConfig({
   },
 
   testUtils: {},
+
+  vite: {
+    optimizeDeps: {
+      include: ["fast-deep-equal", "seedrandom", "lodash", "ajv", "globalthis"],
+    },
+  },
 })
