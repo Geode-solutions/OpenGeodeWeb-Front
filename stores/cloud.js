@@ -1,5 +1,3 @@
-import { useFetch, useStorage } from "@vueuse/core"
-
 export const use_cloud_store = defineStore("cloud", {
   state: () => ({
     ID: useStorage("ID", ""),
