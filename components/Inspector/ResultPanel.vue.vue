@@ -9,26 +9,19 @@
         <v-expansion-panel-title>
           <v-row align="center">
             <v-col cols="auto">
-              <v-icon v-if="result.value == 'error'" color="error" size="25">
-                mdi-alert-circle-outline
-              </v-icon>
-              <v-icon
-                v-else-if="result.value == true"
-                color="primary"
-                size="25"
-              >
+              <v-icon v-if="result.nb_issues == 0" color="primary" size="25">
                 mdi-check-circle-outline
               </v-icon>
-              <v-icon v-else-if="result.value == false" color="error" size="25">
-                mdi-close-circle
-              </v-icon>
+              <v-icon v-else color="error" size="25"> mdi-close-circle </v-icon>
             </v-col>
             <v-col>
               {{ result.title }}
             </v-col>
           </v-row>
         </v-expansion-panel-title>
-        <v-expansion-panel-text>
+        <v-expansion-panel-text
+          :disabled="result.nb_issues == 0 || result.children"
+        >
           <InspectorResultPanel
             v-if="result.children"
             v-bind="{
@@ -36,8 +29,16 @@
               fetch_results: false,
             }"
           />
-          <v-container v-else-if="result.nb_issues > 0">
-            Invalid = {{ check.list_invalidities }}
+          <v-container v-if="result.nb_issues > 0">
+            <v-col>
+              <v-row
+                v-for="(issue, index) in result.issues"
+                :key="index"
+                class="pa-0"
+              >
+                {{ issue }}
+              </v-row>
+            </v-col>
           </v-container>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -46,6 +47,7 @@
 </template>
 
 <script setup>
+  import InspectorResultPanel from "./ResultPanel.vue"
   import schemas from "@geode/opengeodeweb-back/schemas.json"
   const schema = schemas.opengeodeweb_back.inspect_file
 
