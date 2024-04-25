@@ -2,7 +2,7 @@
   <v-container class="pa-2">
     <v-expansion-panels v-model="opened_panels" multiple elevation="5">
       <v-expansion-panel
-        v-for="(result, index) in inspection_results"
+        v-for="(result, index) in props.inspection_results"
         :key="index"
         class="card"
       >
@@ -19,15 +19,14 @@
             </v-col>
           </v-row>
         </v-expansion-panel-title>
-        <v-expansion-panel-text
-          :disabled="result.nb_issues == 0 || result.children"
-        >
+        <v-expansion-panel-text>
           <InspectorResultPanel
             v-if="result.children"
             v-bind="{
               inspection_results: result.children,
-              fetch_results: false,
+              index_to_update: props.index_array.concat(index),
             }"
+            @update_inspection_results="update_inspection_results()"
           />
           <v-container v-if="result.nb_issues > 0">
             <v-col>
@@ -48,46 +47,62 @@
 
 <script setup>
   import InspectorResultPanel from "./ResultPanel.vue"
-  import schemas from "@geode/opengeodeweb-back/schemas.json"
-  const schema = schemas.opengeodeweb_back.inspect_file
 
   const emit = defineEmits([
     "update_values",
     "increment_step",
     "decrement_step",
+    "update_inspection_results",
   ])
 
+  const stepper_tree = inject("stepper_tree")
+
   const props = defineProps({
-    inspection_results: { type: Array, required: false },
-    input_geode_object: { type: String, required: false },
-    filename: { type: String, required: false },
-    fetch_results: { type: Boolean, required: false, default: true },
+    inspection_results: { type: Array, required: true },
+    // input_geode_object: { type: String, required: false },
+    // filename: { type: String, required: false },
+    // fetch_results: { type: Boolean, required: false, default: true },
+    index_array: { type: Array, required: false },
   })
-  const { inspection_results, input_geode_object, filename, fetch_results } =
-    props
+
   const opened_panels = ref([])
 
-  onMounted(() => {
-    if (fetch_results) {
-      fetch_inspection_results()
+  onMounted(async () => {
+    if (props.fetch_results) {
+      await fetch_inspection_results(props.input_geode_object, props.filename)
+    }
+    console.log("inspection_results", props.inspection_results)
+    for (let i = 0; i < props.inspection_results.length; i++) {
+      if (props.inspection_results[i].nb_issues > 0) {
+        emit("update_inspection_results", { index_to_update })
+      }
     }
     opened_panels.value = Array.from(Array(inspection_results.length).keys())
   })
 
-  async function fetch_inspection_results(input_geode_object, filename) {
-    const params = {
-      input_geode_object,
-      filename,
-    }
-    await api_fetch(
-      { schema, params },
-      {
-        response_error_function: () => {},
-        response_function: (response) => {
-          inspection_results.value = response._data.inspection_results
-        },
-        response_error_function: () => {},
-      },
-    )
+  function update_inspection_results(index_to_update) {
+    console.log("emit", index_to_update)
+    emit("update_inspection_results", {
+      index_to_update: props.index_to_update,
+    })
   }
+
+  // async function fetch_inspection_results(input_geode_object, filename) {
+  //   const params = {
+  //     input_geode_object,
+  //     filename,
+  //   }
+  //   await api_fetch(
+  //     { schema, params },
+  //     {
+  //       response_error_function: () => {},
+  //       response_function: (response) => {
+  //         emit("update_values", {
+  //           inspection_results: response._data.inspection_results,
+  //         })
+  //       },
+  //       response_error_function: () => {},
+  //     },
+  //   )
+  // }
 </script>
