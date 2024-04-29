@@ -46,7 +46,8 @@
 </template>
 
 <script setup>
-  import InspectorResultPanel from "./ResultPanel.vue"
+  import schemas from "@geode/opengeodeweb-back/schemas.json"
+  const schema = schemas.opengeodeweb_back.inspect_file
 
   const emit = defineEmits([
     "update_values",
@@ -62,7 +63,6 @@
     // input_geode_object: { type: String, required: false },
     // filename: { type: String, required: false },
     // fetch_results: { type: Boolean, required: false, default: true },
-    index_array: { type: Array, required: false },
   })
 
   const opened_panels = ref([])
@@ -79,13 +79,6 @@
     }
     opened_panels.value = Array.from(Array(inspection_results.length).keys())
   })
-
-  function update_inspection_results(index_to_update) {
-    console.log("emit", index_to_update)
-    emit("update_inspection_results", {
-      index_to_update: props.index_to_update,
-    })
-  }
 
   // async function fetch_inspection_results(input_geode_object, filename) {
   //   const params = {
