@@ -24,7 +24,7 @@
             v-if="result.children"
             :inspection_result="result.children"
           />
-          <v-container v-if="result.nb_issues > 0">
+          <v-container v-if="result.issues">
             <v-col>
               <v-row
                 v-for="(issue, index) in result.issues"
@@ -50,6 +50,6 @@
   onMounted(async () => {
     opened_panels.value = props.inspection_result
       .map((result, i) => (result.nb_issues > 0 ? i : -1))
-      .filter((index) => index !== false)
+      .filter((index) => index !== -1)
   })
 </script>

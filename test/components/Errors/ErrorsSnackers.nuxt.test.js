@@ -1,7 +1,7 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test } from "vitest"
-import { flushPromises, mount } from "@vue/test-utils"
+import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
@@ -11,16 +11,30 @@ import ErrorsSnackers from "@/components/Errors/Snackers.vue"
 const vuetify = createVuetify({
   components,
   directives,
+  layout: {
+    name: "custom",
+    render(h, children) {
+      return h("div", {}, children)
+    },
+  },
 })
 
 describe("ErrorsSnackers.vue", async () => {
   test(`Test delete error`, async () => {
-    const wrapper = await mount(ErrorsSnackers, {
-      global: {
-        plugins: [vuetify],
+    const wrapper = mount(
+      {
+        template: "<v-layout><ErrorsSnackers/></v-layout>",
       },
-    })
-    console.log("wrapper", wrapper.componentVM)
+      {
+        props: {},
+        global: {
+          components: {
+            ErrorsSnackers,
+          },
+          plugins: [vuetify],
+        },
+      },
+    )
 
     const errors_store = use_errors_store()
     const error = {
@@ -30,12 +44,8 @@ describe("ErrorsSnackers.vue", async () => {
       description: "Test desription",
     }
     await errors_store.add_error(error)
-    await flushPromises()
     expect(errors_store.errors.length).toBe(1)
-    console.log("errors_store.errors", errors_store.errors)
     const v_btn = await wrapper.findComponent(components.VBtn)
-    console.log("v_btn", v_btn)
-
     await v_btn.trigger("click")
     expect(errors_store.errors.length).toBe(0)
   })

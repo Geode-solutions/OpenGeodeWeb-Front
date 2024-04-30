@@ -24,8 +24,8 @@
     "decrement_step",
   ])
   const props = defineProps({
-    input_geode_object: { type: String, required: false },
-    filename: { type: String, required: false },
+    input_geode_object: { type: String, required: true },
+    filename: { type: String, required: true },
   })
   const loading = ref(false)
   const toggle_loading = useToggle(loading)

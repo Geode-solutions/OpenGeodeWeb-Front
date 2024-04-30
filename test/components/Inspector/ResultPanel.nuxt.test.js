@@ -50,7 +50,6 @@ describe("Inspector/ResultPanel.vue", async () => {
       {
         title: "Brep inspection",
         nb_issues: 0,
-        children: [],
       },
     ]
     const wrapper = await mountSuspended(InspectorResultPanel, {
