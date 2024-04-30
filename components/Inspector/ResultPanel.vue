@@ -22,9 +22,7 @@
         <v-expansion-panel-text>
           <InspectorResultPanel
             v-if="result.children"
-            v-bind="{
-              inspection_result: result.children,
-            }"
+            :inspection_result="result.children"
           />
           <v-container v-if="result.nb_issues > 0">
             <v-col>
@@ -44,12 +42,6 @@
 </template>
 
 <script setup>
-  const emit = defineEmits([
-    "update_values",
-    "increment_step",
-    "decrement_step",
-  ])
-
   const props = defineProps({
     inspection_result: { type: Array, required: true },
   })
