@@ -20,8 +20,7 @@ describe("Inspector/ResultPanel.vue", async () => {
       {
         title: "Brep inspection",
         nb_issues: 26,
-        children: [
-        ],
+        children: [],
       },
     ]
 
@@ -46,14 +45,12 @@ describe("Inspector/ResultPanel.vue", async () => {
     ).toStrictEqual(inspection_result[0].children)
   })
 
-
   test(`Test without issues`, async () => {
     const inspection_result = [
       {
         title: "Brep inspection",
         nb_issues: 0,
-        children: [
-        ],
+        children: [],
       },
     ]
     const wrapper = await mountSuspended(InspectorResultPanel, {
