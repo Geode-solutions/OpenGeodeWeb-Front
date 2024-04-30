@@ -1,7 +1,7 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test } from "vitest"
-import { mount } from "@vue/test-utils"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -14,43 +14,59 @@ const vuetify = createVuetify({
   directives,
 })
 
-const inpection_result = [
-  {
-    title: "Brep inspection",
-    nb_issues: 27,
-    children: [
-      {
-        title: "Model topology inspection",
-        nb_issues: 25,
-        children: [
-          { title: "test topology 1", nb_issues: 25 },
-          { title: "test topology 2", nb_issues: 0 },
-        ],
-      },
-      {
-        title: "Meshes inspection",
-        nb_issues: 2,
-        children: [
-          { title: "test meshes 1", nb_issues: 1 },
-          { title: "test meshes 2", nb_issues: 1 },
-        ],
-      },
-    ],
-  },
-]
-
 describe("Inspector/ResultPanel.vue", async () => {
-  test(`Test render`, async () => {
-    const wrapper = mount(InspectorResultPanel, {
+  test(`Test with issues`, async () => {
+    const inspection_result = [
+      {
+        title: "Brep inspection",
+        nb_issues: 26,
+        children: [
+        ],
+      },
+    ]
+
+    const wrapper = await mountSuspended(InspectorResultPanel, {
       global: {
         plugins: [vuetify],
       },
-      props: { inpection_result },
+      props: { inspection_result },
     })
 
-    const v_expansion_panels = wrapper.findComponent(
-      components.VExpansionPanels,
+    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.componentVM.opened_panels._value).toStrictEqual([0])
+    expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
+      inspection_result,
     )
-    console.log("v_expansion_panels", v_expansion_panels)
+
+    const child_result_panel_wrapper =
+      await wrapper.findComponent(InspectorResultPanel)
+    expect(child_result_panel_wrapper.exists()).toBe(true)
+    expect(
+      child_result_panel_wrapper.componentVM.props.inspection_result,
+    ).toStrictEqual(inspection_result[0].children)
+  })
+
+
+  test(`Test without issues`, async () => {
+    const inspection_result = [
+      {
+        title: "Brep inspection",
+        nb_issues: 0,
+        children: [
+        ],
+      },
+    ]
+    const wrapper = await mountSuspended(InspectorResultPanel, {
+      global: {
+        plugins: [vuetify],
+      },
+      props: { inspection_result },
+    })
+
+    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.componentVM.opened_panels._value).toStrictEqual([])
+    expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
+      inspection_result,
+    )
   })
 })
