@@ -1,7 +1,7 @@
 // @vitest-environment nuxt
 
 import { describe, expect, test } from "vitest"
-import { mount } from "@vue/test-utils"
+import { flushPromises, mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
@@ -20,6 +20,7 @@ describe("ErrorsSnackers.vue", async () => {
         plugins: [vuetify],
       },
     })
+    console.log("wrapper", wrapper.componentVM)
 
     const errors_store = use_errors_store()
     const error = {
@@ -29,8 +30,12 @@ describe("ErrorsSnackers.vue", async () => {
       description: "Test desription",
     }
     await errors_store.add_error(error)
+    await flushPromises()
     expect(errors_store.errors.length).toBe(1)
-    const v_btn = wrapper.findComponent(components.VBtn)
+    console.log("errors_store.errors", errors_store.errors)
+    const v_btn = await wrapper.findComponent(components.VBtn)
+    console.log("v_btn", v_btn)
+
     await v_btn.trigger("click")
     expect(errors_store.errors.length).toBe(0)
   })
