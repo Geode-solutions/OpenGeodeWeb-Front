@@ -11,12 +11,6 @@ import ErrorsSnackers from "@/components/Errors/Snackers.vue"
 const vuetify = createVuetify({
   components,
   directives,
-  layout: {
-    name: "custom",
-    render(h, children) {
-      return h("div", {}, children)
-    },
-  },
 })
 
 describe("ErrorsSnackers.vue", async () => {

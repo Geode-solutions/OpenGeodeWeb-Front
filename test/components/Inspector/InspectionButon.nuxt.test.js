@@ -2,7 +2,6 @@
 
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-import { mount } from "@vue/test-utils"
 import { flushPromises } from "@vue/test-utils"
 
 import { createVuetify } from "vuetify"
