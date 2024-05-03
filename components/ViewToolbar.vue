@@ -1,19 +1,15 @@
 <template>
   <v-row dense :class="[$style.floatToolbar, 'flex-column']">
     <v-col>
-      <v-tooltip location="left">
-        Reset camera
-        <template #activator="{ props }">
-          <v-btn
-            density="comfortable"
-            v-bind="props"
-            icon
-            @click.stop="reset_camera"
-          >
-            <v-icon size="32"> mdi-cube-scan </v-icon>
-          </v-btn>
-        </template>
-      </v-tooltip>
+      <v-btn
+        density="comfortable"
+        v-bind="props"
+        icon
+        @click.stop="reset_camera"
+        v-tooltip:left="'Reset camera'"
+      >
+        <v-icon icon="mdi-cube-scan" size="32" />
+      </v-btn>
     </v-col>
   </v-row>
 </template>
