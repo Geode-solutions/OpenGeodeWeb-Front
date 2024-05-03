@@ -11,8 +11,7 @@ import ExtensionSelector from "@/components/ExtensionSelector.vue"
 
 import schemas from "@geode/opengeodeweb-back/schemas.json"
 
-const geode_objects_and_output_extensions =
-  schemas.opengeodeweb_back.geode_objects_and_output_extensions
+const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
 
 const vuetify = createVuetify({
   components,
@@ -24,8 +23,8 @@ describe("ExtensionSelector.vue", async () => {
     const output_geode_object = "BRep"
     const output_extension = "msh"
 
-    registerEndpoint(geode_objects_and_output_extensions.$id, {
-      method: geode_objects_and_output_extensions.methods[0],
+    registerEndpoint(schema.$id, {
+      method: schema.methods[0],
       handler: () => ({
         geode_objects_and_output_extensions: {
           BRep: { msh: { is_saveable: true } },
@@ -44,7 +43,7 @@ describe("ExtensionSelector.vue", async () => {
     // await v_card[1].trigger("click")
     // expect(wrapper.emitted()).toHaveProperty("update_values")
     // expect(wrapper.emitted().update_values).toHaveLength(1)
-    // expect(wrapper.emitted().update_values[0][0]).toEqual({
+    // expect(wrapper.emitted().update_values[0][0]).toStrictEqual({
     //   output_geode_object,
     //   output_extension,
     // })

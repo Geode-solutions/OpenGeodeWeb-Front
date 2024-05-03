@@ -39,7 +39,7 @@
                       :color="extension.is_saveable ? 'primary' : 'grey'"
                       hover
                       @click="
-                        set_variables(output_geode_object, output_extension)
+                        update_values(output_geode_object, output_extension)
                       "
                       :disabled="!extension.is_saveable"
                     >
@@ -123,13 +123,12 @@
     toggle_loading()
   }
 
-  function set_variables(output_geode_object, output_extension) {
+  function update_values(output_geode_object, output_extension) {
     if (output_geode_object != "" && output_extension != "") {
-      const keys_values_object = {
+      emit("update_values", {
         output_geode_object,
         output_extension,
-      }
-      emit("update_values", keys_values_object)
+      })
       emit("increment_step")
     }
   }

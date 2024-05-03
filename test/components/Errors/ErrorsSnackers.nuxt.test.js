@@ -15,11 +15,20 @@ const vuetify = createVuetify({
 
 describe("ErrorsSnackers.vue", async () => {
   test(`Test delete error`, async () => {
-    const wrapper = await mount(ErrorsSnackers, {
-      global: {
-        plugins: [vuetify],
+    const wrapper = mount(
+      {
+        template: "<v-layout><ErrorsSnackers/></v-layout>",
       },
-    })
+      {
+        props: {},
+        global: {
+          components: {
+            ErrorsSnackers,
+          },
+          plugins: [vuetify],
+        },
+      },
+    )
 
     const errors_store = use_errors_store()
     const error = {
@@ -30,7 +39,7 @@ describe("ErrorsSnackers.vue", async () => {
     }
     await errors_store.add_error(error)
     expect(errors_store.errors.length).toBe(1)
-    const v_btn = wrapper.findComponent(components.VBtn)
+    const v_btn = await wrapper.findComponent(components.VBtn)
     await v_btn.trigger("click")
     expect(errors_store.errors.length).toBe(0)
   })
