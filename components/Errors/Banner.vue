@@ -7,16 +7,16 @@
   >
     <v-row>
       <v-col cols="auto" class="text-white text-center">
-        <v-tooltip location="end">
-          <span>
-            We turn off our server automatically after 5 minutes of inactivity
-          </span>
-          <template #activator="{ props }">
-            <v-icon v-bind="props" color="white" class="justify-right">
-              mdi-information-outline
-            </v-icon>
-          </template>
-        </v-tooltip>
+        <v-icon
+          v-bind="props"
+          color="white"
+          class="justify-right"
+          v-tooltip:bottom="
+            'We turn off our server automatically after 5 minutes of inactivity'
+          "
+        >
+          mdi-information-outline
+        </v-icon>
       </v-col>
       <v-col cols="auto" class="text-white font-weight-bold">
         Server timed out due to inactivity, please reload this page or click

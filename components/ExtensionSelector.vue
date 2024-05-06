@@ -9,16 +9,12 @@
       class="justify-left"
     >
       <v-card class="card ma-2 pa-2" width="100%">
-        <v-tooltip
-          :text="`Export as a ${output_geode_object}`"
-          location="bottom"
+        <v-card-title
+          v-tooltip:bottom="`Export as a ${output_geode_object}`"
+          v-bind="props"
         >
-          <template v-slot:activator="{ props }">
-            <v-card-title v-bind="props">
-              {{ output_geode_object }}
-            </v-card-title>
-          </template>
-        </v-tooltip>
+          {{ output_geode_object }}
+        </v-card-title>
         <v-card-text>
           <v-row>
             <v-col
@@ -111,10 +107,8 @@
       final_object[key] = {}
       for (const value of values) {
         for (const extension of Object.keys(value[key])) {
-          if (value[key][extension].is_saveable == false) {
-            final_object[key][extension] = { is_saveable: false }
-          } else {
-            final_object[key][extension] = { is_saveable: true }
+          final_object[key][extension] = {
+            is_saveable: value[key][extension].is_saveable,
           }
         }
       }
