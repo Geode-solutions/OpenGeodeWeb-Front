@@ -52,7 +52,7 @@
     "semver": "^7.6.0",
     "vue-recaptcha": "^2.0.3",
     "vue3-carousel": "^0.3.3",
-    "vuetify": "^3.6.3"
+    "vuetify": "^3.6.8"
   },
   "repository": {
     "type": "git",
