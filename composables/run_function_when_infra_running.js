@@ -1,4 +1,4 @@
-export default async function (function_to_run) {
+export function run_function_when_infra_running(function_to_run) {
   const infra_store = use_infra_store()
   const { is_running } = storeToRefs(infra_store)
   if (is_running.value) {
@@ -11,3 +11,6 @@ export default async function (function_to_run) {
     })
   }
 }
+
+
+export default run_function_when_infra_running
