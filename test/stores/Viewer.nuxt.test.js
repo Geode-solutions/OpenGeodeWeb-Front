@@ -8,8 +8,8 @@ describe("Viewer Store", () => {
   describe("getters", () => {
     test("base_url", () => {
       const viewer_store = use_geode_store()
-      const cloud_store = use_cloud_store()
-      cloud_store.$patch({ ID: "123456" })
+      const infra_store = use_infra_store()
+      infra_store.$patch({ ID: "123456" })
       viewer_store.start_request()
       expect(viewer_store.request_counter).toBe(1)
     })

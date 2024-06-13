@@ -15,22 +15,22 @@
 //   directives,
 // })
 
-// const cloud_store = use_cloud_store()
+// const infra_store = use_infra_store()
 
 // global.ResizeObserver = require("resize-observer-polyfill")
 
 // describe("Launcher.vue", async () => {
 //   test(`Mount`, async () => {
-//     const spy_cloud_store = vi.spyOn(cloud_store, "create_connexion")
+//     const spy_infra_store = vi.spyOn(infra_store, "create_connexion")
 //     const wrapper = await mountSuspended(Launcher, {
 //       global: {
 //         plugins: [vuetify],
 //       },
 //     })
 //     expect(wrapper.exists()).toBe(true)
-//     await cloud_store.$patch({ is_captcha_validated: true })
+//     await infra_store.$patch({ is_captcha_validated: true })
 //     flushPromises()
-//     expect(spy_cloud_store).toHaveBeenCalled()
+//     expect(spy_infra_store).toHaveBeenCalled()
 //   })
 // })
 describe("Fake", async () => {

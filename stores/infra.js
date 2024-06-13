@@ -9,9 +9,7 @@ export const use_infra_store = defineStore("infra", {
   }),
   getters: {
     is_cloud() {
-      const is_cloud = !isElectron() || !process.env.NODE_ENV === "development"
-      console.log("is_cloud", is_cloud)
-      return is_cloud
+      return !isElectron() && !process.env.NODE_ENV === "development"
     },
     domain_name() {
       if (this.is_cloud){ return "api.geode-solutions.com" }

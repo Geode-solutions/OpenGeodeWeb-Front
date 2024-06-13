@@ -58,6 +58,7 @@ export function api_fetch(
       }
     },
     onResponseError({ response }) {
+      console.log("onResponseError", response)
       geode_store.stop_request()
       errors_store.add_error({
         code: response.status,

@@ -55,6 +55,8 @@ describe("api_fetch.js", () => {
           },
         },
       )
+      console.log("errors_store", errors_store)
+      console.log("response_value", response_value)
       expect(errors_store.errors.length).toBe(0)
       expect(response_value).toBe("toto")
     }

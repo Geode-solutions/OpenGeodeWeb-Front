@@ -19,15 +19,15 @@
 
 <script setup>
   const viewer_store = use_viewer_store()
-  const cloud_store = use_cloud_store()
+  const infra_store = use_infra_store()
   const { is_captcha_validated, is_connexion_launched, is_running } =
-    storeToRefs(cloud_store)
+    storeToRefs(infra_store)
 
   const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
 
   watch(is_captcha_validated, async (value) => {
     if (value === true && process.client) {
-      await cloud_store.create_connexion()
+      await infra_store.create_connexion()
       await viewer_store.ws_connect()
     }
   })
