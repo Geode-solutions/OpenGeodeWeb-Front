@@ -12,5 +12,4 @@ export function run_function_when_infra_running(function_to_run) {
   }
 }
 
-
 export default run_function_when_infra_running
