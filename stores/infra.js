@@ -1,5 +1,5 @@
 import { useStorage } from "@vueuse/core"
-import isElectron from 'is-electron';
+import isElectron from "is-electron"
 
 export const use_infra_store = defineStore("infra", {
   state: () => ({
@@ -12,8 +12,11 @@ export const use_infra_store = defineStore("infra", {
       return !isElectron() && !process.env.NODE_ENV === "development"
     },
     domain_name() {
-      if (this.is_cloud){ return "api.geode-solutions.com" }
-      else { return "localhost" }
+      if (this.is_cloud) {
+        return "api.geode-solutions.com"
+      } else {
+        return "localhost"
+      }
     },
 
     api_url() {
@@ -62,10 +65,9 @@ export const use_infra_store = defineStore("infra", {
       const viewer_store = use_viewer_store()
       const errors_store = use_errors_store()
 
-
-      if (isElectron()){
-        await window.electronAPI.run_back(geode_store.PORT);
-        await window.electronAPI.run_viewer(viewer_store.PORT);
+      if (isElectron()) {
+        await window.electronAPI.run_back(geode_store.PORT)
+        await window.electronAPI.run_viewer(viewer_store.PORT)
         // geode_store.$patch({ is_running: true })
         // viewer_store.$patch({ is_running: true })
         return
@@ -88,7 +90,6 @@ export const use_infra_store = defineStore("infra", {
           errors_store.server_error = true
         }
       }
-      
     },
   },
 })
