@@ -13,7 +13,7 @@ export const use_infra_store = defineStore("infra", {
     },
     domain_name() {
       if (this.is_cloud) {
-        return "api.geode-solutions.com"
+        return useRuntimeConfig().public.API_URL
       } else {
         return "localhost"
       }
