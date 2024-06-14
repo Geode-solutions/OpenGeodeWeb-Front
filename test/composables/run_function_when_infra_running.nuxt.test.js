@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach, vi } from "vitest"
 
-describe("api_fetch.js", () => {
+describe("run_function_when_infra_running", () => {
   const geode_store = use_geode_store()
   const viewer_store = use_viewer_store()
 
@@ -16,13 +16,13 @@ describe("api_fetch.js", () => {
     await geode_store.$patch({ is_running: true })
     await viewer_store.$patch({ is_running: true })
 
-    await runFunctionIfCloudRunning(dumb_obj.dumb_method)
+    await run_function_when_infra_running(dumb_obj.dumb_method)
     expect(spy).toHaveBeenCalled()
   })
 
   test("is_running false", async () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method")
-    runFunctionIfCloudRunning(dumb_obj.dumb_method)
+    run_function_when_infra_running(dumb_obj.dumb_method)
     await geode_store.$patch({ is_running: true })
     await viewer_store.$patch({ is_running: true })
     expect(spy).toHaveBeenCalled()

@@ -15,8 +15,8 @@
 </template>
 
 <script setup>
-  const cloud_store = use_cloud_store()
-  const { is_running } = storeToRefs(cloud_store)
+  const infra_store = use_infra_store()
+  const { is_running } = storeToRefs(infra_store)
 
   const props = defineProps({
     versions_schema: { type: Object, required: true },
