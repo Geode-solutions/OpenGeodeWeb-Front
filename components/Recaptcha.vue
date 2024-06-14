@@ -13,8 +13,8 @@
 
 <script setup>
   import { VueRecaptcha } from "vue-recaptcha"
-  const cloud_store = use_cloud_store()
-  const { is_captcha_validated } = storeToRefs(cloud_store)
+  const infra_store = use_infra_store()
+  const { is_captcha_validated } = storeToRefs(infra_store)
 
   const props = defineProps({
     site_key: { type: String, required: true },
@@ -25,7 +25,7 @@
     if (process.client) {
       const config = useRuntimeConfig()
       if (config.public.NODE_ENV !== "production") {
-        cloud_store.$patch({ is_captcha_validated: true })
+        infra_store.$patch({ is_captcha_validated: true })
       }
     }
   })
@@ -35,7 +35,7 @@
       const response = await $fetch.raw(
         `/.netlify/functions/recaptcha?token=${token}`,
       )
-      cloud_store.$patch({ is_captcha_validated: response.status == 200 })
+      infra_store.$patch({ is_captcha_validated: response.status == 200 })
       recaptcha.reset()
     } catch (error) {
       console.error(error)

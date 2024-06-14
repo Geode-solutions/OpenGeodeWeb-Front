@@ -1,10 +1,7 @@
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      VIEWER_PROTOCOL: process.env.NODE_ENV === "production" ? "wss" : "ws",
-      GEODE_PROTOCOL: process.env.NODE_ENV === "production" ? "https" : "http",
-      VIEWER_PORT: process.env.NODE_ENV === "production" ? "443" : "1234",
-      GEODE_PORT: process.env.NODE_ENV === "production" ? "443" : "5000",
+      API_URL: "api.geode-solutions.com",
       SITE_BRANCH:
         process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
       PROJECT: process.env.NODE_ENV === "production" ? process.env.PROJECT : "",
@@ -35,7 +32,14 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      include: ["fast-deep-equal", "seedrandom", "lodash", "ajv", "globalthis"],
+      include: [
+        "is-electron",
+        "fast-deep-equal",
+        "seedrandom",
+        "lodash",
+        "ajv",
+        "globalthis",
+      ],
     },
   },
 })

@@ -1,6 +1,6 @@
 import { setActivePinia, createPinia } from "pinia"
 import { use_geode_store } from "@/stores/geode"
-import { use_cloud_store } from "@/stores/cloud"
+import { use_infra_store } from "@/stores/infra"
 import { describe, test, expect, beforeEach } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
@@ -12,9 +12,7 @@ describe("Geode Store", () => {
   globalThis.useRuntimeConfig = () => {
     return {
       public: {
-        GEODE_PROTOCOL: "http",
         API_URL: "localhost",
-        GEODE_PORT: "5000",
         NODE_ENV: "production",
       },
     }
@@ -22,8 +20,8 @@ describe("Geode Store", () => {
 
   test("base_url", () => {
     const geode_store = use_geode_store()
-    const cloud_store = use_cloud_store()
-    cloud_store.$patch({ ID: "123456" })
+    const infra_store = use_infra_store()
+    infra_store.$patch({ ID: "123456" })
     geode_store.start_request()
     expect(geode_store.request_counter).toBe(1)
   })
