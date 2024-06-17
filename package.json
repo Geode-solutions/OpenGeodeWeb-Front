@@ -28,7 +28,7 @@
     "vite-plugin-vuetify": "^2.0.3",
     "vitest": "^1.6.0",
     "vitest-environment-nuxt": "^1.0.0",
-    "wslink": "^1.12.4"
+    "wslink": "1.12.4"
   },
   "overrides": {
     "vue": "latest"
@@ -40,7 +40,7 @@
   "dependencies": {
     "@geode/opengeodeweb-back": "4.2.1",
     "@geode/opengeodeweb-viewer": "0.1.2",
-    "@kitware/vtk.js": "^30.3.1",
+    "@kitware/vtk.js": "30.3.1",
     "@mdi/font": "^7.4.47",
     "@pinia/nuxt": "^0.5.1",
     "@types/node": "^20.14.2",
