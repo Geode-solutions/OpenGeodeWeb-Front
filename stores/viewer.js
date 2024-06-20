@@ -58,7 +58,6 @@ export const use_viewer_store = defineStore("viewer", {
       if (_.isEmpty(clientToConnect)) {
         clientToConnect = vtkWSLinkClient.newInstance()
       }
-
       // Connect to busy store
       clientToConnect.onBusyChange((count) => {
         this.buzy = count
