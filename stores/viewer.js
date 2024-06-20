@@ -6,9 +6,28 @@ import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
+    client: {},
+    config: null,
+    is_running: false,
     picking_mode: false,
     picked_point: { x: null, y: null },
+    request_counter: 0,
   }),
+  getters: {
+    base_url: () => {
+      const cloud_store = use_cloud_store()
+      const public_runtime_config = useRuntimeConfig().public
+      var viewer_url = `${public_runtime_config.VIEWER_PROTOCOL}://${public_runtime_config.API_URL}:${public_runtime_config.VIEWER_PORT}`
+      if (process.env.NODE_ENV == "production") {
+        viewer_url += `/${cloud_store.ID}/viewer`
+      }
+      viewer_url += "/ws"
+      return viewer_url
+    },
+    is_busy: (state) => {
+      return state.request_counter > 0
+    },
+  },
   actions: {
     toggle_picking_mode(value) {
       this.picking_mode = value
@@ -20,27 +39,24 @@ export const use_viewer_store = defineStore("viewer", {
       this.picked_point.y = world_y
       this.picking_mode = false
     },
-
-    async create_object_pipeline(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.create_object_pipeline(params)
-          .catch(console.error)
-        websocket_store.stop_request()
+    async ws_connect() {
+      if (process.env.NODE_ENV == "test") {
+        return
       }
-    },
-    async delete_object_pipeline(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.delete_object_pipeline(params)
-          .catch(console.error)
-        websocket_store.stop_request()
+      const SmartConnect = await import("wslink/src/SmartConnect")
+      vtkWSLinkClient.setSmartConnectClass(SmartConnect)
+
+      const config = { application: "Viewer" }
+      config.sessionURL = this.base_url
+
+      const { client } = this
+      if (this.is_running && client.isConnected()) {
+        client.disconnect(-1)
+        this.is_running = false
+      }
+      let clientToConnect = client
+      if (_.isEmpty(clientToConnect)) {
+        clientToConnect = vtkWSLinkClient.newInstance()
       }
 
       // Connect to busy store
@@ -54,6 +70,7 @@ export const use_viewer_store = defineStore("viewer", {
         const message =
           (httpReq && httpReq.response && httpReq.response.error) ||
           `Connection error`
+        console.error(message)
       })
 
       // Close
@@ -61,6 +78,7 @@ export const use_viewer_store = defineStore("viewer", {
         const message =
           (httpReq && httpReq.response && httpReq.response.error) ||
           `Connection close`
+        console.error(message)
       })
 
       // Connect
@@ -86,133 +104,16 @@ export const use_viewer_store = defineStore("viewer", {
             resolve()
           })
           .catch((error) => {
+            console.error(error)
             reject(error)
           })
       })
     },
-    async reset_camera() {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.reset_camera()
-          .catch(console.error)
-        websocket_store.stop_request()
-      }
+    start_request() {
+      this.request_counter++
     },
-    async toggle_object_visibility(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.toggle_object_visibility(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-      }
-    },
-    async toggle_edge_visibility(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.toggle_edge_visibility(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-      }
-    },
-    async toggle_point_visibility(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.toggle_point_visibility(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-      }
-    },
-    async point_size(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.point_size(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-      }
-    },
-    async set_color(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.set_color(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-      }
-    },
-    async set_vertex_attribute(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.set_vertex_attribute(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-      }
-    },
-    async apply_textures(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        websocket_store.client
-          .getRemote()
-          .vtk.apply_textures(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-      }
-    },
-    async get_point_position(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        const response = await websocket_store.client
-          .getRemote()
-          .vtk.get_point_position(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-        return response
-      }
-    },
-    async update_data(params) {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        const response = await websocket_store.client
-          .getRemote()
-          .vtk.update_data(params)
-          .catch(console.error)
-        websocket_store.stop_request()
-        return response
-      }
-    },
-    async reset() {
-      const websocket_store = use_websocket_store()
-      if (websocket_store.client) {
-        websocket_store.start_request()
-        const response = await websocket_store.client
-          .getRemote()
-          .vtk.reset()
-          .catch(console.error)
-        websocket_store.stop_request()
-        return response
-      }
+    stop_request() {
+      this.request_counter--
     },
   },
 })
