@@ -1,3 +1,9 @@
+import _ from "lodash"
+import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
+import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
+import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
+import schemas from "@geode/opengeodeweb-viewer/schemas.json"
+
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
     picking_mode: false,
@@ -36,6 +42,53 @@ export const use_viewer_store = defineStore("viewer", {
           .catch(console.error)
         websocket_store.stop_request()
       }
+
+      // Connect to busy store
+      clientToConnect.onBusyChange((count) => {
+        this.buzy = count
+      })
+      clientToConnect.beginBusy()
+
+      // Error
+      clientToConnect.onConnectionError((httpReq) => {
+        const message =
+          (httpReq && httpReq.response && httpReq.response.error) ||
+          `Connection error`
+      })
+
+      // Close
+      clientToConnect.onConnectionClose((httpReq) => {
+        const message =
+          (httpReq && httpReq.response && httpReq.response.error) ||
+          `Connection close`
+      })
+
+      // Connect
+      const { connectImageStream } = await import(
+        "@kitware/vtk.js/Rendering/Misc/RemoteView"
+      )
+      return new Promise((resolve, reject) => {
+        clientToConnect
+          .connect(config)
+          .then((validClient) => {
+            connectImageStream(validClient.getConnection().getSession())
+            this.client = validClient
+            clientToConnect.endBusy()
+
+            // Now that the client is ready let's setup the server for us
+            viewer_call({
+              schema: schemas.opengeodeweb_viewer.create_visualization,
+            })
+            viewer_call({
+              schema: schemas.opengeodeweb_viewer.reset,
+            })
+            this.is_running = true
+            resolve()
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     },
     async reset_camera() {
       const websocket_store = use_websocket_store()
