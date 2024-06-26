@@ -88,16 +88,16 @@ export const use_viewer_store = defineStore("viewer", {
       return new Promise((resolve, reject) => {
         clientToConnect
           .connect(config)
-          .then(async (validClient) => {
+          .then((validClient) => {
             connectImageStream(validClient.getConnection().getSession())
             this.client = validClient
             clientToConnect.endBusy()
 
             // Now that the client is ready let's setup the server for us
-            await viewer_call({
+            viewer_call({
               schema: schemas.opengeodeweb_viewer.create_visualization,
             })
-            await viewer_call({
+            viewer_call({
               schema: schemas.opengeodeweb_viewer.reset,
             })
             this.is_running = true
