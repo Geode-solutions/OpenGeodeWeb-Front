@@ -85,25 +85,29 @@ export const use_viewer_store = defineStore("viewer", {
       const { connectImageStream } = await import(
         "@kitware/vtk.js/Rendering/Misc/RemoteView"
       )
-      clientToConnect
-        .connect(config)
-        .then((validClient) => {
-          connectImageStream(validClient.getConnection().getSession())
-          this.client = validClient
-          clientToConnect.endBusy()
+      return new Promise((resolve, reject) => {
+        clientToConnect
+          .connect(config)
+          .then((validClient) => {
+            connectImageStream(validClient.getConnection().getSession())
+            this.client = validClient
+            clientToConnect.endBusy()
 
-          // Now that the client is ready let's setup the server for us
-          viewer_call({
-            schema: schemas.opengeodeweb_viewer.create_visualization,
+            // Now that the client is ready let's setup the server for us
+            viewer_call({
+              schema: schemas.opengeodeweb_viewer.create_visualization,
+            })
+            viewer_call({
+              schema: schemas.opengeodeweb_viewer.reset,
+            })
+            this.is_running = true
+            resolve()
           })
-          viewer_call({
-            schema: schemas.opengeodeweb_viewer.reset,
+          .catch((error) => {
+            console.error(error)
+            reject(error)
           })
-          this.is_running = true
-        })
-        .catch((error) => {
-          console.error(error)
-        })
+      })
     },
     start_request() {
       this.request_counter++

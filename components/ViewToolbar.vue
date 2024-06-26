@@ -3,7 +3,6 @@
     <v-col>
       <v-btn
         density="comfortable"
-        v-bind="props"
         icon
         @click.stop="reset_camera"
         v-tooltip:left="'Reset camera'"
