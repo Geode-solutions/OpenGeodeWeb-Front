@@ -82,13 +82,15 @@
     }
   })
 
-  if (process.client) {
-    window.addEventListener("resize", resize)
-    await nextTick()
-    view.setContainer(viewer.value.$el)
-    connect()
-    resize()
-  }
+  onMounted(async () => {
+    if (process.client) {
+      window.addEventListener("resize", resize)
+      await nextTick()
+      view.setContainer(viewer.value.$el)
+      connect()
+      resize()
+    }
+  })
 
   function connect() {
     if (!is_running.value) {
