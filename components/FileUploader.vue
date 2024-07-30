@@ -39,7 +39,9 @@
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     accept: { type: String, required: true },
+    files: { type: Array, required: false, default: [] },
   })
+
   const { multiple, accept } = toRefs(props)
 
   const label = multiple ? "Please select file(s)" : "Please select a file"
@@ -75,6 +77,11 @@
     files_uploaded.value = true
     emit("files_uploaded", files.value)
     toggle_loading()
+  }
+
+  if (props.files.length) {
+    files.value = props.files
+    upload_files()
   }
 
   function clear() {

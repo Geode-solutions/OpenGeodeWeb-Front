@@ -2,7 +2,7 @@
   <FetchingData v-if="loading" />
   <FileUploader
     v-else
-    v-bind="{ multiple, accept }"
+    v-bind="{ multiple, accept, files }"
     @files_uploaded="files_uploaded_event"
   />
 </template>
@@ -20,6 +20,7 @@
   const props = defineProps({
     multiple: { type: Boolean, required: true },
     supported_feature: { type: String, required: false, default: null },
+    files: { type: Array, required: false, default: [] },
   })
 
   const { multiple, supported_feature } = props
