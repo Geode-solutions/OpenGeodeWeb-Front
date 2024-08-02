@@ -52,6 +52,5 @@
     )
     toggle_loading()
   }
-
   await get_allowed_files()
 </script>
