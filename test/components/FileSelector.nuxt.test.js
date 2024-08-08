@@ -57,4 +57,35 @@ describe("FileSelector.vue", async () => {
       files,
     })
   })
+
+
+  test(`Files prop`, async () => {
+    registerEndpoint(allowed_files_schema.$id, {
+      method: allowed_files_schema.methods[0],
+      handler: () => ({
+        extensions: ["1", "2", "3"],
+      }),
+    })
+
+    const files = [new File(["fake_file"], "fake_file.txt")]
+
+    const wrapper = await mountSuspended(FileSelector, {
+      global: {
+        plugins: [vuetify],
+      },
+      props: { multiple: false, supported_feature: "test", files : files },
+    })
+    registerEndpoint(upload_file_schema.$id, {
+      method: upload_file_schema.methods[1],
+      handler: () => ({}),
+    })
+
+    await flushPromises()
+
+    expect(wrapper.emitted()).toHaveProperty("update_values")
+    expect(wrapper.emitted().update_values).toHaveLength(1)
+    expect(wrapper.emitted().update_values[0][0]).toEqual({
+      files,
+    })
+  })
 })
