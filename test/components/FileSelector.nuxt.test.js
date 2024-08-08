@@ -58,7 +58,6 @@ describe("FileSelector.vue", async () => {
     })
   })
 
-
   test(`Files prop`, async () => {
     registerEndpoint(allowed_files_schema.$id, {
       method: allowed_files_schema.methods[0],
@@ -73,7 +72,7 @@ describe("FileSelector.vue", async () => {
       global: {
         plugins: [vuetify],
       },
-      props: { multiple: false, supported_feature: "test", files : files },
+      props: { multiple: false, supported_feature: "test", files: files },
     })
     registerEndpoint(upload_file_schema.$id, {
       method: upload_file_schema.methods[1],
