@@ -2,7 +2,7 @@ import { describe, expect, test, beforeEach } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
 describe("api_fetch.js", () => {
-  const errors_store = use_errors_store()
+  const feedback_store = use_feedback_store()
 
   const schema = {
     $id: "/test",
@@ -19,7 +19,7 @@ describe("api_fetch.js", () => {
   var params
 
   beforeEach(async () => {
-    await errors_store.$patch({ errors: [] })
+    await feedback_store.$patch({ feedbacks: [] })
   })
 
   test("Ajv wrong params", async () => {
@@ -35,8 +35,8 @@ describe("api_fetch.js", () => {
         "/test: data must have required property 'test'",
       )
     }
-    expect(errors_store.errors.length).toBe(1)
-    expect(errors_store.errors[0].code).toBe(400)
+    expect(feedback_store.feedbacks.length).toBe(1)
+    expect(feedback_store.feedbacks[0].code).toBe(400)
   })
 
   test("onResponse", async () => {
@@ -55,7 +55,7 @@ describe("api_fetch.js", () => {
           },
         },
       )
-      expect(errors_store.errors.length).toBe(0)
+      expect(feedback_store.feedbacks.length).toBe(0)
       expect(response_value).toBe("toto")
     }
   })
@@ -83,7 +83,7 @@ describe("api_fetch.js", () => {
         },
       },
     )
-    expect(errors_store.errors.length).toBe(1)
+    expect(feedback_store.feedbacks.length).toBe(1)
     expect(response_error_value).toBe("error")
   })
 })

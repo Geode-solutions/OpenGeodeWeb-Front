@@ -30,17 +30,22 @@ describe("ErrorsSnackers.vue", async () => {
       },
     )
 
-    const errors_store = use_errors_store()
+
+    console.log("wrapper", wrapper)
+
+    const feedback_store = use_feedback_store()
     const error = {
+      type: "error",
       code: 404,
       route: "/test",
       name: "Test message",
       description: "Test desription",
     }
-    await errors_store.add_error(error)
-    expect(errors_store.errors.length).toBe(1)
+    await feedback_store.add_feedback(error)
+    expect(feedback_store.feedbacks.length).toBe(1)
     const v_btn = await wrapper.findComponent(components.VBtn)
+    console.log("v_btn", v_btn)
     await v_btn.trigger("click")
-    expect(errors_store.errors.length).toBe(0)
+    expect(feedback_store.feedbacks.length).toBe(0)
   })
 })

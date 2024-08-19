@@ -24,7 +24,7 @@ export const use_geode_store = defineStore("geode", {
       setInterval(() => this.do_ping(), 10 * 1000)
     },
     async do_ping() {
-      const errors_store = use_errors_store()
+      const feedback_store = use_feedback_store()
       const { data } = await useFetch(`${this.base_url}/ping`, {
         method: "POST",
       })
@@ -32,7 +32,7 @@ export const use_geode_store = defineStore("geode", {
         this.is_running = true
         return
       } else {
-        errors_store.$patch({ server_error: true })
+        feedback_store.$patch({ server_error: true })
         return
       }
     },

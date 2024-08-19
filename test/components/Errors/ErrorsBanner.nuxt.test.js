@@ -21,9 +21,9 @@ describe("ErrorsBanner.vue", async () => {
       },
     })
     const reload_spy = vi.spyOn(wrapper.vm, "reload")
-    const errors_store = use_errors_store()
-    await errors_store.$patch({ server_error: true })
-    expect(errors_store.server_error).toBe(true)
+    const feedback_store = use_feedback_store()
+    await feedback_store.$patch({ server_error: true })
+    expect(feedback_store.server_error).toBe(true)
     const v_btn = wrapper.findAll(".v-btn")
     await v_btn[0].trigger("click")
 
@@ -36,11 +36,11 @@ describe("ErrorsBanner.vue", async () => {
         },
       })
 
-      const errors_store = use_errors_store()
-      await errors_store.$patch({ server_error: true })
-      expect(errors_store.server_error).toBe(true)
+      const feedback_store = use_feedback_store()
+      await feedback_store.$patch({ server_error: true })
+      expect(feedback_store.server_error).toBe(true)
       const v_btn = wrapper.findAll(".v-btn")
       await v_btn[1].trigger("click")
-      expect(errors_store.server_error).toBe(false)
+      expect(feedback_store.server_error).toBe(false)
     })
 })

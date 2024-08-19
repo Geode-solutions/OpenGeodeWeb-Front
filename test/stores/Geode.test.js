@@ -28,11 +28,11 @@ describe("Geode Store", () => {
 
   test("do_ping", async () => {
     const geode_store = use_geode_store()
-    const errors_store = use_errors_store()
+    const feedback_store = use_feedback_store()
     await geode_store.do_ping()
 
     expect(geode_store.is_running).toBe(false)
-    expect(errors_store.server_error).toBe(true)
+    expect(feedback_store.server_error).toBe(true)
 
     registerEndpoint("/ping", {
       method: "POST",
