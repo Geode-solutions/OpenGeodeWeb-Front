@@ -21,11 +21,13 @@ export const use_infra_store = defineStore("infra", {
 
     api_url() {
       const geode_store = use_geode_store()
-      const public_runtime_config = useRuntimeConfig().public
-      if (public_runtime_config.NODE_ENV == "test") {
-        return ""
-      }
       var api_url = `${geode_store.PROTOCOL}://${this.domain_name}:${geode_store.PORT}`
+      if (this.is_cloud) {
+        if (this.ID == "") {
+          throw new Error("ID must not be empty in cloud mode")
+        }
+        api_url += `/${this.ID}`
+      }
       return api_url
     },
     is_running() {
@@ -68,8 +70,6 @@ export const use_infra_store = defineStore("infra", {
       if (isElectron()) {
         await window.electronAPI.run_back(geode_store.PORT)
         await window.electronAPI.run_viewer(viewer_store.PORT)
-        // geode_store.$patch({ is_running: true })
-        // viewer_store.$patch({ is_running: true })
         return
       } else {
         const public_runtime_config = useRuntimeConfig().public

@@ -11,7 +11,7 @@ export const use_geode_store = defineStore("geode", {
       const api_url = infra_store.api_url
       var geode_url = `${api_url}`
       if (infra_store.is_cloud) {
-        geode_url += `/${infra_store.ID}/geode`
+        geode_url += `/geode`
       }
       return geode_url
     },
@@ -25,16 +25,31 @@ export const use_geode_store = defineStore("geode", {
     },
     async do_ping() {
       const errors_store = use_errors_store()
-      const { data } = await useFetch(`${this.base_url}/ping`, {
-        method: "POST",
+      const infra_store = use_infra_store()
+      return new Promise((resolve, reject) => {
+        useFetch("/ping", {
+          baseURL: infra_store.api_url,
+          method: "POST",
+          onRequestError({ error }) {
+            console.log("onRequestError", error)
+            errors_store.$patch({ server_error: true })
+            reject(error)
+          },
+          onResponse({ response }) {
+            if (response.ok) {
+              console.log("PATCH onResponse", response)
+              this.is_running = true
+              resolve(response)
+            }
+          },
+          onResponseError({ response }) {
+            console.log("onResponseError", response)
+            
+            errors_store.$patch({ server_error: true })
+            reject(response)
+          },
+        })
       })
-      if (data.value !== null) {
-        this.is_running = true
-        return
-      } else {
-        errors_store.$patch({ server_error: true })
-        return
-      }
     },
     start_request() {
       this.request_counter++
