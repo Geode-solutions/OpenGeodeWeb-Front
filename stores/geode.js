@@ -24,7 +24,7 @@ export const use_geode_store = defineStore("geode", {
       setInterval(() => this.do_ping(), 10 * 1000)
     },
     async do_ping() {
-      const errors_store = use_errors_store()
+      const feedback_store = use_feedback_store()
       const infra_store = use_infra_store()
       return new Promise((resolve, reject) => {
         useFetch("/ping", {
@@ -45,7 +45,7 @@ export const use_geode_store = defineStore("geode", {
           onResponseError({ response }) {
             console.log("onResponseError", response)
             
-            errors_store.$patch({ server_error: true })
+            feedback_store.$patch({ server_error: true })
             reject(response)
           },
         })

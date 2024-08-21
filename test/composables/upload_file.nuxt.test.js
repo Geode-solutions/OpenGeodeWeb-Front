@@ -5,9 +5,9 @@ import schemas from "@geode/opengeodeweb-back/schemas.json"
 const schema = schemas.opengeodeweb_back.upload_file
 
 describe("upload_file.js", () => {
-  const errors_store = use_errors_store()
+  const feedback_store = use_feedback_store()
   beforeEach(async () => {
-    await errors_store.$patch({ errors: [] })
+    await feedback_store.$patch({ errors: [] })
   })
 
   test("Throw error", async () => {
@@ -33,7 +33,7 @@ describe("upload_file.js", () => {
         },
       },
     )
-    expect(errors_store.errors.length).toBe(0)
+    expect(feedback_store.feedbacks.length).toBe(0)
     expect(response_value).toBe("ok")
   })
 })

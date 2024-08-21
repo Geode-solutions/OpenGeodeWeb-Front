@@ -2,7 +2,7 @@ export async function upload_file(
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  const errors_store = use_errors_store()
+  const feedback_store = use_feedback_store()
   const geode_store = use_geode_store()
   if (!(file instanceof File)) {
     throw new Error("file must be a instance of File")
@@ -22,7 +22,8 @@ export async function upload_file(
     ...request_options,
     onRequestError({ error }) {
       geode_store.stop_request()
-      errors_store.add_error({
+      feedback_store.add_feedback({
+        type: "error",
         code: error.code,
         route: route,
         name: error.message,
@@ -42,7 +43,8 @@ export async function upload_file(
     },
     onResponseError({ response }) {
       geode_store.stop_request()
-      errors_store.add_error({
+      feedback_store.add_feedback({
+        type: "error",
         code: response.status,
         route: route,
         name: response._data.name,
