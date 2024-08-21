@@ -30,7 +30,6 @@ describe("FeedBackSnackers.vue", async () => {
       },
     )
 
-
     console.log("wrapper", wrapper)
 
     const feedback_store = use_feedback_store()
