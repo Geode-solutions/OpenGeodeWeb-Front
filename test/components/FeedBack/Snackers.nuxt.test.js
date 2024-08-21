@@ -6,24 +6,24 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import ErrorsSnackers from "@/components/Errors/Snackers.vue"
+import FeedBackSnackers from "@/components/FeedBack/Snackers.vue"
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-describe("ErrorsSnackers.vue", async () => {
+describe("FeedBackSnackers.vue", async () => {
   test(`Test delete error`, async () => {
     const wrapper = mount(
       {
-        template: "<v-layout><ErrorsSnackers/></v-layout>",
+        template: "<v-layout><FeedBackSnackers/></v-layout>",
       },
       {
         props: {},
         global: {
           components: {
-            ErrorsSnackers,
+            FeedBackSnackers,
           },
           plugins: [vuetify],
         },

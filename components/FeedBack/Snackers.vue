@@ -2,13 +2,13 @@
   <v-snackbar
     v-for="(feedback, index) in feedback_store.feedbacks"
     :key="feedback"
+    v-model="show"
     :style="{ 'margin-bottom': calc_margin(index) }"
     :color="feedback.type"
     location="bottom right"
     transition="slide-x-reverse-transition"
-    width="200px"
+    max-width="200px"
     height="20px"
-    z-index="99999"
   >
     <v-row dense class="flex-nowrap">
       <v-col cols="auto">
@@ -61,6 +61,7 @@
 
 <script setup>
   const feedback_store = use_feedback_store()
+  const show = true
 
   function calc_margin(index) {
     return index * 60 + 8 + "px"

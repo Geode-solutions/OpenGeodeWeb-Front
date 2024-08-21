@@ -6,16 +6,16 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import ErrorsBanner from "@/components/Errors/Banner.vue"
+import FeedBackErrorBanner from "@/components/FeedBack/ErrorBanner.vue"
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-describe("ErrorsBanner.vue", async () => {
+describe("FeedBackErrorBanner.vue", async () => {
   test(`Test reload`, async () => {
-    const wrapper = mount(ErrorsBanner, {
+    const wrapper = mount(FeedBackErrorBanner, {
       global: {
         plugins: [vuetify],
       },
@@ -30,7 +30,7 @@ describe("ErrorsBanner.vue", async () => {
     expect(reload_spy).toHaveBeenCalledTimes(1)
   }),
     test(`Test delete error`, async () => {
-      const wrapper = mount(ErrorsBanner, {
+      const wrapper = mount(FeedBackErrorBanner, {
         global: {
           plugins: [vuetify],
         },
