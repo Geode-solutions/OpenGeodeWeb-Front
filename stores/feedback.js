@@ -13,7 +13,6 @@ export const use_feedback_store = defineStore("feedback", {
         description,
       })
     },
-
     add_success(description) {
       this.feedbacks.push({
         type: "success",
