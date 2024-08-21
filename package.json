@@ -29,6 +29,7 @@
     "vite-plugin-vuetify": "^2.0.3",
     "vitest": "^1.6.0",
     "vitest-environment-nuxt": "^1.0.0",
+    "vuetify": "^3.6.9",
     "wslink": "1.12.4"
   },
   "overrides": {
@@ -53,8 +54,7 @@
     "sass": "^1.77.5",
     "semver": "^7.6.2",
     "vue-recaptcha": "^2.0.3",
-    "vue3-carousel": "^0.3.3",
-    "vuetify": "^3.6.9"
+    "vue3-carousel": "^0.3.3"
   },
   "repository": {
     "type": "git",
