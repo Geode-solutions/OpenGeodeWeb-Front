@@ -63,7 +63,7 @@ export const use_infra_store = defineStore("infra", {
     async create_backend() {
       const geode_store = use_geode_store()
       const viewer_store = use_viewer_store()
-      const errors_store = use_errors_store()
+      const feedback_store = use_feedback_store()
 
       if (isElectron()) {
         await window.electronAPI.run_back(geode_store.PORT)
@@ -87,7 +87,7 @@ export const use_infra_store = defineStore("infra", {
           geode_store.$patch({ is_running: true })
           return geode_store.ping_task()
         } else {
-          errors_store.server_error = true
+          feedback_store.server_error = true
         }
       }
     },

@@ -4,7 +4,7 @@ export function api_fetch(
   { schema, params },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  const errors_store = use_errors_store()
+  const feedback_store = use_feedback_store()
   const geode_store = use_geode_store()
 
   const body = params || {}
@@ -12,7 +12,8 @@ export function api_fetch(
   const { valid, error } = validate_schema(schema, body)
 
   if (!valid) {
-    errors_store.add_error({
+    feedback_store.add_feedback({
+      type: "error",
       code: 400,
       route: schema.$id,
       name: "Bad request",
@@ -39,7 +40,8 @@ export function api_fetch(
     ...request_options,
     onRequestError({ error }) {
       geode_store.stop_request()
-      errors_store.add_error({
+      feedback_store.add_feedback({
+        type: "error",
         code: error.code,
         route: schema.$id,
         name: error.message,
@@ -59,7 +61,8 @@ export function api_fetch(
     },
     onResponseError({ response }) {
       geode_store.stop_request()
-      errors_store.add_error({
+      feedback_store.add_feedback({
+        type: "error",
         code: response.status,
         route: schema.$id,
         name: response._data.name,
