@@ -1,5 +1,4 @@
 import _ from "lodash"
-import { type } from "os"
 
 export function api_fetch(
   { schema, params },
