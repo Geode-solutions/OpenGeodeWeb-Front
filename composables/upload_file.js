@@ -22,12 +22,7 @@ export async function upload_file(
     ...request_options,
     onRequestError({ error }) {
       geode_store.stop_request()
-      feedback_store.add_error(
-        error.code,
-        route,
-        error.message,
-        error.stack
-      )
+      feedback_store.add_error(error.code, route, error.message, error.stack)
       if (request_error_function) {
         request_error_function(error)
       }
