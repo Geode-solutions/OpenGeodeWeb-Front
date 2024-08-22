@@ -8,13 +8,7 @@ export function viewer_call(
   const { valid, error } = validate_schema(schema, params)
 
   if (!valid) {
-    feedback_store.add_feedback({
-      type: "error",
-      code: 400,
-      route: schema.route,
-      name: "Bad request",
-      description: error,
-    })
+    feedback_store.add_error(400, schema.route, "Bad request", error)
     throw new Error(schema.route.concat(": ", error))
   }
 
@@ -42,13 +36,12 @@ export function viewer_call(
           },
         )
         .catch((error) => {
-          feedback_store.add_feedback({
-            type: "error",
-            code: error.code,
-            route: schema.route,
-            name: error.message,
-            description: error.message,
-          })
+          feedback_store.add_error(
+            error.code,
+            schema.route,
+            error.message,
+            error.message,
+          )
           if (response_error_function) {
             response_error_function(error)
           }

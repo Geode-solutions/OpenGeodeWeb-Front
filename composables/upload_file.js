@@ -22,13 +22,7 @@ export async function upload_file(
     ...request_options,
     onRequestError({ error }) {
       geode_store.stop_request()
-      feedback_store.add_feedback({
-        type: "error",
-        code: error.code,
-        route: route,
-        name: error.message,
-        description: error.stack,
-      })
+      feedback_store.add_error(error.code, route, error.message, error.stack)
       if (request_error_function) {
         request_error_function(error)
       }
@@ -43,13 +37,12 @@ export async function upload_file(
     },
     onResponseError({ response }) {
       geode_store.stop_request()
-      feedback_store.add_feedback({
-        type: "error",
-        code: response.status,
-        route: route,
-        name: response._data.name,
-        description: response._data.description,
-      })
+      feedback_store.add_error(
+        response.status,
+        route,
+        response._data.name,
+        response._data.description,
+      )
       if (response_error_function) {
         response_error_function(response)
       }

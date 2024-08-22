@@ -33,14 +33,12 @@ describe("FeedBackSnackers.vue", async () => {
     console.log("wrapper", wrapper)
 
     const feedback_store = use_feedback_store()
-    const error = {
-      type: "error",
-      code: 404,
-      route: "/test",
-      name: "Test message",
-      description: "Test desription",
-    }
-    await feedback_store.add_feedback(error)
+    await feedback_store.add_error(
+      404,
+      "/test",
+      "Test message",
+      "Test desription",
+    )
     expect(feedback_store.feedbacks.length).toBe(1)
     const v_btn = await wrapper.findComponent(components.VBtn)
     console.log("v_btn", v_btn)

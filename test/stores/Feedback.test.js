@@ -7,16 +7,17 @@ describe("Feedback store", () => {
     setActivePinia(createPinia())
   })
 
-  it("add_feedback", () => {
+  it("add_error", () => {
     const feedback_store = use_feedback_store()
     expect(feedback_store.feedbacks.length).toBe(0)
-    feedback_store.add_feedback({
-      type: "error",
-      code: 500,
-      route: "/test",
-      name: "test message",
-      description: "test description",
-    })
+    feedback_store.add_error(500, "/test", "test message", "test description")
+    expect(feedback_store.feedbacks.length).toBe(1)
+  })
+
+  it("add_success", () => {
+    const feedback_store = use_feedback_store()
+    expect(feedback_store.feedbacks.length).toBe(0)
+    feedback_store.add_success(500, "/test", "test message", "test description")
     expect(feedback_store.feedbacks.length).toBe(1)
   })
 

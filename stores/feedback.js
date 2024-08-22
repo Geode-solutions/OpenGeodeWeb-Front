@@ -4,8 +4,20 @@ export const use_feedback_store = defineStore("feedback", {
     server_error: false,
   }),
   actions: {
-    add_feedback(feedback) {
-      this.feedbacks.push(feedback)
+    add_error(code, route, name, description) {
+      this.feedbacks.push({
+        type: "error",
+        code,
+        route,
+        name,
+        description,
+      })
+    },
+    add_success(description) {
+      this.feedbacks.push({
+        type: "success",
+        description,
+      })
     },
     delete_feedback(feedback_index) {
       this.feedbacks.splice(feedback_index, 1)
