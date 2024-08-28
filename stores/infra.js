@@ -18,18 +18,6 @@ export const use_infra_store = defineStore("infra", {
         return "localhost"
       }
     },
-
-    api_url() {
-      const geode_store = use_geode_store()
-      var api_url = `${geode_store.PROTOCOL}://${this.domain_name}:${geode_store.PORT}`
-      if (this.is_cloud) {
-        if (this.ID == "") {
-          throw new Error("ID must not be empty in cloud mode")
-        }
-        api_url += `/${this.ID}`
-      }
-      return api_url
-    },
     is_running() {
       return use_geode_store().is_running && use_viewer_store().is_running
     },

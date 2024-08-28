@@ -7,6 +7,8 @@ import { flushPromises } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
 
 import MissingFilesSelector from "@/components/MissingFilesSelector.vue"
 import FileUploader from "@/components/FileUploader.vue"
@@ -22,6 +24,11 @@ const vuetify = createVuetify({
 })
 
 describe("MissingFilesSelector.vue", async () => {
+  const pinia = createTestingPinia()
+  setActivePinia(pinia)
+  const geode_store = use_geode_store()
+  geode_store.base_url = ""
+
   test(`Select file`, async () => {
     registerEndpoint(missing_files_schema.$id, {
       method: missing_files_schema.methods[0],
@@ -33,7 +40,7 @@ describe("MissingFilesSelector.vue", async () => {
     })
     const wrapper = await mountSuspended(MissingFilesSelector, {
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, pinia],
       },
       props: {
         multiple: false,

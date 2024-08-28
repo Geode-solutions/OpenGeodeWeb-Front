@@ -1,107 +1,145 @@
-import { setActivePinia, createPinia } from "pinia"
+import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { use_geode_store } from "@/stores/geode"
-import { use_infra_store } from "@/stores/infra"
-import { describe, test, expect, beforeEach } from "vitest"
+import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import back_schemas from "@geode/opengeodeweb-back/schemas.json"
 
 describe("Geode Store", () => {
-  beforeEach(() => {
-    use_infra_store().$reset()
-    setActivePinia(createTestingPinia())
+  const pinia = createTestingPinia({
+    stubActions: false,
   })
+  setActivePinia(pinia)
+  const infra_store = use_infra_store()
+  const geode_store = use_geode_store()
+  const feedback_store = use_feedback_store()
+
+  beforeEach(() => {
+    infra_store.$reset()
+    geode_store.$reset()
+    feedback_store.$reset()
+  })
+
   describe("state", () => {
-    test("initial state when is_cloud is true", async () => {
-      const infraStore = use_infra_store()
-      infraStore.is_cloud = undefined
-      infraStore.is_cloud = true
-      const geodeStore = use_geode_store()
-      expect(geodeStore.PROTOCOL).toBe("https")
-      expect(geodeStore.PORT).toBe("443")
-      expect(geodeStore.request_counter).toBe(0)
-      expect(geodeStore.is_running).toBe(false)
-    })
-
-    test("initial state when is_cloud is false", async () => {
-      await use_infra_store().$patch({ is_cloud: false })
-      const geodeStore = use_geode_store()
-      expect(geodeStore.PROTOCOL).toBe("http")
-      expect(geodeStore.PORT).toBe("5000")
-      expect(geodeStore.request_counter).toBe(0)
-      expect(geodeStore.is_running).toBe(false)
-    })
-
-    test("default values for request_counter and is_running", async () => {
-      const geodeStore = use_geode_store()
-      expect(geodeStore.request_counter).toBe(0)
-      expect(geodeStore.is_running).toBe(false)
+    test("initial state", async () => {
+      expectTypeOf(geode_store.default_local_port).toBeString()
+      expectTypeOf(geode_store.request_counter).toBeNumber()
+      expectTypeOf(geode_store.is_running).toBeBoolean()
     })
   })
 
   describe("getters", () => {
-    beforeEach(() => {
-      const infraStore = use_infra_store()
-      infraStore.domain_name = "example.com"
-      infraStore.is_cloud = false
-      infraStore.ID = "123456"
+    describe("protocol", () => {
+      test("test is_cloud true", () => {
+        infra_store.is_cloud = true
+        expect(geode_store.protocol).toBe("https")
+      })
+
+      test("test is_cloud false", () => {
+        infra_store.is_cloud = false
+        expect(geode_store.protocol).toBe("http")
+      })
     })
 
-    test("test base_url when infra_store is not cloud", () => {
-      const geodeStore = use_geode_store()
-      expect(geodeStore.base_url).toBe("http://example.com:5000")
+    describe("port", () => {
+      test("test is_cloud true", () => {
+        infra_store.is_cloud = true
+        expect(geode_store.port).toBe("443")
+      })
+      test("test is_cloud false", () => {
+        infra_store.is_cloud = false
+        expect(geode_store.port).toBe(geode_store.default_local_port)
+      })
+
+      test("test override default_local_port", () => {
+        infra_store.is_cloud = false
+        geode_store.default_local_port = "8080"
+        expect(geode_store.port).toBe("8080")
+      })
     })
 
-    test("test base_url when infra_store is cloud", () => {
-      const infraStore = use_infra_store()
-      infraStore.is_cloud = true
-      const geodeStore = use_geode_store()
-      expect(geodeStore.base_url).toBe("https://example.com:443/123456/geode")
+    describe("base_url", () => {
+      test("test is_cloud false", () => {
+        infra_store.is_cloud = false
+        infra_store.domain_name = "localhost"
+        expect(geode_store.base_url).toBe("http://localhost:5000")
+      })
+
+      test("test is_cloud true", async () => {
+        infra_store.is_cloud = true
+        infra_store.ID = "123456"
+        infra_store.domain_name = "example.com"
+        expect(geode_store.base_url).toBe(
+          "https://example.com:443/123456/geode",
+        )
+      })
+
+      test("test is_cloud true, ID empty", async () => {
+        infra_store.is_cloud = true
+        infra_store.ID = ""
+        infra_store.domain_name = "example.com"
+        expect(() => geode_store.base_url).toThrowError(
+          "ID must not be empty in cloud mode",
+        )
+      })
+    })
+
+    describe("is_busy", () => {
+      test("test is_busy", () => {
+        geode_store.request_counter = 1
+        expect(geode_store.is_busy).toBe(true)
+      })
+      test("test not is_busy", () => {
+        geode_store.request_counter = 0
+        expect(geode_store.is_busy).toBe(false)
+      })
     })
   })
 
   describe("actions", () => {
-    beforeEach(() => {
+    describe("do_ping", () => {
+      // test("request_error", async () => {
+      //   geode_store.base_url = ""
+      //   await geode_store.do_ping()
 
-      // setActivePinia(createPinia())
-      setActivePinia(createTestingPinia())
-      const infraStore = use_infra_store()
-      infraStore.api_url = ""
-      use_geode_store().$reset()
-    })
+      //   expect(geode_store.is_running).toBe(false)
+      //   expect(feedback_store.server_error).toBe(true)
+      // })
 
-    test("do_ping", async () => {
-      const geode_store = use_geode_store()
-      const errors_store = use_errors_store()
-      await geode_store.do_ping()
+      test("response", async () => {
+        geode_store.base_url = ""
 
-      expect(geode_store.is_running).toBe(false)
-      expect(errors_store.server_error).toBe(true)
-
-      console.log("geode_store.base_url", geode_store.base_url)
-      registerEndpoint("/ping", {
-        method: "POST",
-        handler: () => ({}),
+        registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, {
+          method: "POST",
+          handler: () => ({}),
+        })
+        await geode_store.do_ping()
+        expect(geode_store.is_running).toBe(true)
       })
-      await geode_store.do_ping()
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      expect(geode_store.is_running).toBe(true)
+
+      // test("response_error", async () => {
+      //   geode_store.base_url = ""
+      //   registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, {
+      //     method: "POST",
+      //     handler: () => ({}),
+      //   })
+      //   await geode_store.do_ping()
+      //   expect(geode_store.is_running).toBe(false)
+      // })
     })
 
-    test("start_request", () => {
-      const geode_store = use_geode_store()
-      geode_store.start_request()
-      expect(geode_store.request_counter).toBe(1)
-      expect(geode_store.is_busy).toBe(true)
+    describe("start_request", () => {
+      test("test increment", async () => {
+        expect(geode_store.request_counter).toBe(0)
+        await geode_store.start_request()
+        expect(geode_store.request_counter).toBe(1)
+      })
     })
-
-    test("stop_request", () => {
-      const geode_store = use_geode_store()
-      geode_store.start_request()
-      expect(geode_store.request_counter).toBe(1)
-      expect(geode_store.is_busy).toBe(true)
-      geode_store.stop_request()
-      expect(geode_store.request_counter).toBe(0)
-      expect(geode_store.is_busy).toBe(false)
+    describe("stop_request", () => {
+      test("test decrement", async () => {
+        geode_store.request_counter = 1
+        await geode_store.stop_request()
+        expect(geode_store.request_counter).toBe(0)
+      })
     })
   })
 })

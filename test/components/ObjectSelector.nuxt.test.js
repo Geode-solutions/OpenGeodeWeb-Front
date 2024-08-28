@@ -7,6 +7,8 @@ import { flushPromises } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
 
 import ObjectSelector from "@/components/ObjectSelector.vue"
 
@@ -21,6 +23,11 @@ const vuetify = createVuetify({
 
 const geode_object = "BRep"
 describe("ObjectSelector.vue", async () => {
+  const pinia = createTestingPinia()
+  setActivePinia(pinia)
+  const geode_store = use_geode_store()
+  geode_store.base_url = ""
+
   test(`BRep`, async () => {
     var response = {
       allowed_objects: {},
@@ -32,7 +39,7 @@ describe("ObjectSelector.vue", async () => {
     })
     const wrapper = await mountSuspended(ObjectSelector, {
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, pinia],
       },
       props: { filenames: ["test.toto"], supported_feature: "test" },
     })
