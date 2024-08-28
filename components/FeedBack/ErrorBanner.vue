@@ -1,6 +1,6 @@
 <template>
   <v-banner
-    v-if="server_error"
+    v-if="feedback_store.server_error"
     elevation="2"
     style="background-color: grey; z-index: 9999"
     position="fixed"
@@ -44,7 +44,6 @@
 
 <script setup>
   const feedback_store = use_feedback_store()
-  const { server_error } = storeToRefs(feedback_store)
 
   function reload() {
     window.location.reload()

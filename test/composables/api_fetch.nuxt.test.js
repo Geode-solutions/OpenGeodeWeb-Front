@@ -97,7 +97,6 @@ describe("api_fetch", () => {
       handler: () => ({ return: "toto" }),
     })
     await api_fetch({ schema, params }, { request_error_function })
-    console.log("length", feedback_store.feedbacks.length)
     // expect(feedback_store.feedbacks.length).toBe(1)
     await request_error_function()
     // expect(spy).toHaveBeenCalledTimes(1)
