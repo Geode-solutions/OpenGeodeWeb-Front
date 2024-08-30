@@ -1,9 +1,9 @@
-import { describe, test, expect, beforeEach } from "vitest"
+import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-describe("Cloud Store", () => {
+describe("Infra Store", () => {
   const pinia = createTestingPinia({
     stubActions: false,
   })
@@ -44,6 +44,17 @@ describe("Cloud Store", () => {
       test("test is_cloud false", () => {
         infra_store.is_cloud = true
         expect(infra_store.domain_name).toBe("api.geode-solutions.com")
+      })
+    })
+
+    describe("lambda_url", () => {
+      test("test is cloud true", () => {
+        useRuntimeConfig().public.SITE_BRANCH = "/test"
+        useRuntimeConfig().public.PROJECT = "/project"
+        infra_store.is_cloud = true
+        expect(infra_store.lambda_url).toBe(
+          "https://api.geode-solutions.com:443/test/project/createbackend",
+        )
       })
     })
     describe("is_running", () => {
@@ -93,22 +104,28 @@ describe("Cloud Store", () => {
     })
   })
 
-  // describe("actions", () => {
-  //   describe("create_backend", async () => {
-  //     test("test without end-point", async () => {
-  //       expect(geode_store.is_running).toBe(false)
-  //       await infra_store.create_backend()
-  //       expect(geode_store.is_running).toBe(false)
-  //     })
-  //     test("test with end-point", async () => {
-  //       expect(geode_store.is_running).toBe(false)
-  //       registerEndpoint("/createbackend", {
-  //         method: "POST",
-  //         handler: () => ({ ID: "123456" }),
-  //       })
-  //       await infra_store.create_backend()
-  //       await flushPromises()
-  //     })
-  //   })
-  // })
+  describe("actions", () => {
+    describe("create_connexion", async () => {
+      test("test without end-point", async () => {
+        await infra_store.create_connexion()
+        expect(infra_store.is_connexion_launched).toBe(true)
+        expect(feedback_store.server_error).toBe(true)
+      })
+    })
+    describe("create_backend", async () => {
+      test("test without end-point", async () => {
+        await infra_store.create_backend()
+        expect(geode_store.is_running).toBe(false)
+        expect(feedback_store.server_error).toBe(true)
+      })
+      test("test with end-point", async () => {
+        registerEndpoint(infra_store.lambda_url, {
+          method: "POST",
+          handler: () => ({ ID: "123456" }),
+        })
+        await infra_store.create_backend()
+        expect(geode_store.is_running).toBe(true)
+      })
+    })
+  })
 })

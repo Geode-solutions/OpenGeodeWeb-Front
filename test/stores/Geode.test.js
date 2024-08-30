@@ -97,34 +97,30 @@ describe("Geode Store", () => {
 
   describe("actions", () => {
     describe("do_ping", () => {
-      // test("request_error", async () => {
-      //   geode_store.base_url = ""
-      //   await geode_store.do_ping()
+      test("request_error", async () => {
+        geode_store.base_url = ""
+        geode_store.is_running = true
+        try {
+          await geode_store.do_ping()
+        } catch (e) {
+          console.log(e)
+        }
 
-      //   expect(geode_store.is_running).toBe(false)
-      //   expect(feedback_store.server_error).toBe(true)
-      // })
+        expect(geode_store.is_running).toBe(false)
+        expect(feedback_store.server_error).toBe(true)
+        expect(feedback_store.feedbacks.length).toBe(1)
+      })
 
       test("response", async () => {
         geode_store.base_url = ""
-
         registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, {
           method: "POST",
           handler: () => ({}),
         })
         await geode_store.do_ping()
         expect(geode_store.is_running).toBe(true)
+        expect(feedback_store.server_error).toBe(false)
       })
-
-      // test("response_error", async () => {
-      //   geode_store.base_url = ""
-      //   registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, {
-      //     method: "POST",
-      //     handler: () => ({}),
-      //   })
-      //   await geode_store.do_ping()
-      //   expect(geode_store.is_running).toBe(false)
-      // })
     })
 
     describe("start_request", () => {

@@ -9,7 +9,10 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: [["@pinia/nuxt", { autoImports: ["defineStore"] }], "@vueuse/nuxt"],
+  modules: [
+    ["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }],
+    "@vueuse/nuxt",
+  ],
   imports: {
     dirs: ["stores"],
   },

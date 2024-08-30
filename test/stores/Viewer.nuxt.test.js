@@ -1,6 +1,6 @@
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { describe, test, expect, beforeEach } from "vitest"
+import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
 
 describe("Viewer Store", () => {
   const pinia = createTestingPinia({
@@ -61,7 +61,7 @@ describe("Viewer Store", () => {
       test("test is_cloud false", () => {
         infra_store.is_cloud = false
         infra_store.domain_name = "localhost"
-        expect(viewer_store.base_url).toBe("ws://localhost:1234")
+        expect(viewer_store.base_url).toBe("ws://localhost:1234/ws")
       })
 
       test("test is_cloud true", async () => {
@@ -69,7 +69,7 @@ describe("Viewer Store", () => {
         infra_store.ID = "123456"
         infra_store.domain_name = "example.com"
         expect(viewer_store.base_url).toBe(
-          "wss://example.com:443/123456/viewer",
+          "wss://example.com:443/123456/viewer/ws",
         )
       })
 

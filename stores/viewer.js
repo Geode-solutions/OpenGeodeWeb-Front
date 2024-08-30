@@ -21,22 +21,23 @@ export const use_viewer_store = defineStore("viewer", {
         return "ws"
       }
     },
-    port() {
+    port(state) {
       if (use_infra_store().is_cloud) {
         return "443"
       } else {
-        return this.default_local_port
+        return state.default_local_port
       }
     },
-    base_url() {
+    base_url(state) {
       const infra_store = use_infra_store()
-      var viewer_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
+      let viewer_url = `${state.protocol}://${infra_store.domain_name}:${state.port}`
       if (infra_store.is_cloud) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }
         viewer_url += `/${infra_store.ID}/viewer`
       }
+      viewer_url += "/ws"
       return viewer_url
     },
     is_busy(state) {
