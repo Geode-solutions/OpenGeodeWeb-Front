@@ -29,9 +29,8 @@ export function api_fetch(
   if (schema.max_retry) {
     request_options.max_retry = schema.max_retry
   }
-
   return new Promise((resolve, reject) => {
-    return useFetch(schema.$id, {
+    useFetch(schema.$id, {
       baseURL: geode_store.base_url,
       ...request_options,
       async onRequestError({ error }) {

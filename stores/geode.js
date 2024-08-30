@@ -45,37 +45,19 @@ export const use_geode_store = defineStore("geode", {
       await api_fetch(
         { schema: back_schemas.opengeodeweb_back.ping, params: {} },
         {
-          request_error_function: () => {
-            feedback_store.$patch({ server_error: true })
+          request_error_function: async () => {
+            await feedback_store.$patch({ server_error: true })
+            this.is_running = false
           },
-          response_function: () => {
+          response_function: async () => {
             this.is_running = true
           },
-          response_error_function: () => {
-            feedback_store.$patch({ server_error: true })
+          response_error_function: async () => {
+            await feedback_store.$patch({ server_error: true })
+            this.is_running = false
           },
         },
       )
-      // return new Promise((resolve, reject) => {
-      //   useFetch(schemas.opengeodeweb_back.ping, {
-      //     baseURL: this.base_url,
-      //     method: "POST",
-      //     onRequestError({ error }) {
-      //       feedback_store.$patch({ server_error: true })
-      //       reject(error)
-      //     },
-      //     onResponse({ response }) {
-      //       if (response.ok) {
-      //         this.is_running = true
-      //         resolve(response)
-      //       }
-      //     },
-      //     onResponseError({ response }) {
-      //       feedback_store.$patch({ server_error: true })
-      //       reject(response)
-      //     },
-      //   })
-      // })
     },
     start_request() {
       this.request_counter++

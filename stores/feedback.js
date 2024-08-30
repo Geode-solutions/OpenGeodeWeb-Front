@@ -23,9 +23,7 @@ export const use_feedback_store = defineStore("feedback", {
       await this.feedbacks.splice(feedback_index, 1)
     },
     async delete_server_error() {
-      console.group("delete_server_error")
-      this.$patch({ server_error: false })
-      // this.server_error = false
+      this.server_error = false
     },
   },
 })
