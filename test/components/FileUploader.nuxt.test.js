@@ -7,6 +7,8 @@ import { flushPromises } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
 
 import FileUploader from "@/components/FileUploader.vue"
 
@@ -20,6 +22,11 @@ const vuetify = createVuetify({
 })
 
 describe("FileUploader.vue", async () => {
+  const pinia = createTestingPinia()
+  setActivePinia(pinia)
+  const geode_store = use_geode_store()
+  geode_store.base_url = ""
+
   test(`Upload file`, async () => {
     registerEndpoint(upload_file_schema.$id, {
       method: upload_file_schema.methods[0],
@@ -27,7 +34,7 @@ describe("FileUploader.vue", async () => {
     })
     const wrapper = await mountSuspended(FileUploader, {
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, pinia],
       },
       props: { multiple: false, accept: "*.txt" },
     })

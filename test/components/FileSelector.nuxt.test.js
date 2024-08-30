@@ -8,6 +8,9 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
+
 import FileSelector from "@/components/FileSelector.vue"
 import FileUploader from "@/components/FileUploader.vue"
 
@@ -22,6 +25,11 @@ const vuetify = createVuetify({
 })
 
 describe("FileSelector.vue", async () => {
+  const pinia = createTestingPinia()
+  setActivePinia(pinia)
+  const geode_store = use_geode_store()
+  geode_store.base_url = ""
+
   test(`Select file`, async () => {
     registerEndpoint(allowed_files_schema.$id, {
       method: allowed_files_schema.methods[0],
@@ -31,7 +39,7 @@ describe("FileSelector.vue", async () => {
     })
     const wrapper = await mountSuspended(FileSelector, {
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, pinia],
       },
       props: { multiple: false, supported_feature: "test" },
     })
@@ -70,7 +78,7 @@ describe("FileSelector.vue", async () => {
 
     const wrapper = await mountSuspended(FileSelector, {
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, pinia],
       },
       props: { multiple: false, supported_feature: "test", files: files },
     })

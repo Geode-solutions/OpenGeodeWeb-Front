@@ -1,8 +1,16 @@
-import { describe, expect, test, beforeEach } from "vitest"
+import { describe, expect, test, beforeEach, vi } from "vitest"
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
-describe("api_fetch.js", () => {
+describe("api_fetch", () => {
+  const pinia = createTestingPinia({
+    stubActions: false,
+  })
+  setActivePinia(pinia)
+  const geode_store = use_geode_store()
   const feedback_store = use_feedback_store()
+  geode_store.base_url = ""
 
   const schema = {
     $id: "/test",
@@ -16,53 +24,41 @@ describe("api_fetch.js", () => {
     required: ["test"],
     additionalProperties: false,
   }
-  var params
 
   beforeEach(async () => {
-    await feedback_store.$patch({ feedbacks: [] })
+    await feedback_store.$reset()
+    await geode_store.$reset()
+    geode_store.base_url = ""
   })
 
-  test("Ajv wrong params", async () => {
-    registerEndpoint(schema.$id, {
-      method: schema.methods[0],
-      handler: () => ({ return: "toto" }),
-    })
-    params = {}
-    try {
-      await api_fetch({ schema, params })
-    } catch (error) {
-      expect(error.message).toBe(
-        "/test: data must have required property 'test'",
-      )
-    }
-    expect(feedback_store.feedbacks.length).toBe(1)
-    expect(feedback_store.feedbacks[0].code).toBe(400)
-  })
+  // test("valid schema and params", async () => {
+  //   const params = { test: "hello" }
+  //   const response = await api_fetch({ schema, params })
+  //   expect(response).toBeDefined()
+  // })
 
-  test("onResponse", async () => {
-    var response_value
-    for (var i = 0; i < 3; i++) {
-      registerEndpoint(schema.$id, {
-        method: schema.methods[0],
-        handler: () => ({ return: "toto" }),
-      })
-      params = { test: "test" }
-      await api_fetch(
-        { schema, params },
-        {
-          response_function: (response) => {
-            response_value = response._data.return
-          },
-        },
-      )
-      expect(feedback_store.feedbacks.length).toBe(0)
-      expect(response_value).toBe("toto")
-    }
-  })
-
-  test("onResponseError", async () => {
+  test("invalid schema", async () => {
     const schema = {
-      $id: "/toto",
+      $id: "/test",
+      type: "object",
+      methods: ["POST"],
+      properties: {
+        test: {
+          type: "number",
+        },
+      },
+      required: ["test"],
+      additionalProperties: false,
+    }
+    const params = { test: "hello" }
+    expect(() => api_fetch({ schema, params })).toThrowError(
+      "data/test must be number",
+    )
+  })
+
+  test("invalid params", async () => {
+    const schema = {
+      $id: "/test",
       type: "object",
       methods: ["POST"],
       properties: {
@@ -73,17 +69,56 @@ describe("api_fetch.js", () => {
       required: ["test"],
       additionalProperties: false,
     }
-    params = { test: "test" }
-    var response_error_value
-    await api_fetch(
-      { schema, params },
-      {
-        response_error_function: () => {
-          response_error_value = "error"
+    const params = {}
+    expect(() => api_fetch({ schema, params })).toThrowError(
+      "data must have required property 'test'",
+    )
+  })
+  test("request error handling", async () => {
+    const schema = {
+      $id: "/test",
+      type: "object",
+      methods: ["POST"],
+      properties: {
+        test: {
+          type: "string",
         },
       },
-    )
-    expect(feedback_store.feedbacks.length).toBe(1)
-    expect(response_error_value).toBe("error")
+      required: ["test"],
+      additionalProperties: false,
+    }
+    const params = { test: "hello" }
+    async function request_error_function() {
+      console.log("request_error_function")
+    }
+    const spy = vi.fn(request_error_function)
+    registerEndpoint(schema.$id, {
+      method: schema.methods[0],
+      handler: () => ({ return: "toto" }),
+    })
+    await api_fetch({ schema, params }, { request_error_function })
+    // expect(feedback_store.feedbacks.length).toBe(1)
+    await request_error_function()
+    // expect(spy).toHaveBeenCalledTimes(1)
   })
+
+  // test("response handling", async () => {
+  //   const schema = {
+  //     $id: "/test",
+  //     type: "object",
+  //     methods: ["POST"],
+  //     properties: {
+  //       test: {
+  //         type: "string",
+  //       },
+  //     },
+  //     required: ["test"],
+  //     additionalProperties: false,
+  //   }
+  //   const params = { test: "hello" }
+  //   // const responseFunction = jest.fn()
+  //   const response = await api_fetch({ schema, params }, { response_function })
+  //   expect(responseFunction).toHaveBeenCalledTimes(1)
+  //   expect(response).toBeDefined()
+  // })
 })

@@ -4,8 +4,8 @@ export const use_feedback_store = defineStore("feedback", {
     server_error: false,
   }),
   actions: {
-    add_error(code, route, name, description) {
-      this.feedbacks.push({
+    async add_error(code, route, name, description) {
+      await this.feedbacks.push({
         type: "error",
         code,
         route,
@@ -13,16 +13,16 @@ export const use_feedback_store = defineStore("feedback", {
         description,
       })
     },
-    add_success(description) {
-      this.feedbacks.push({
+    async add_success(description) {
+      await this.feedbacks.push({
         type: "success",
         description,
       })
     },
-    delete_feedback(feedback_index) {
-      this.feedbacks.splice(feedback_index, 1)
+    async delete_feedback(feedback_index) {
+      await this.feedbacks.splice(feedback_index, 1)
     },
-    delete_server_error() {
+    async delete_server_error() {
       this.server_error = false
     },
   },
