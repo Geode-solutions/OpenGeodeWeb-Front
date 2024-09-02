@@ -5,8 +5,7 @@ import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
-    PROTOCOL: use_infra_store().is_cloud ? "wss" : "ws",
-    PORT: use_infra_store().is_cloud ? "443" : "1234",
+    default_local_port: "1234",
     client: {},
     config: null,
     is_running: false,
@@ -15,10 +14,27 @@ export const use_viewer_store = defineStore("viewer", {
     request_counter: 0,
   }),
   getters: {
+    protocol() {
+      if (use_infra_store().is_cloud) {
+        return "wss"
+      } else {
+        return "ws"
+      }
+    },
+    port(state) {
+      if (use_infra_store().is_cloud) {
+        return "443"
+      } else {
+        return state.default_local_port
+      }
+    },
     base_url(state) {
       const infra_store = use_infra_store()
-      var viewer_url = `${state.PROTOCOL}://${infra_store.domain_name}:${state.PORT}`
+      let viewer_url = `${state.protocol}://${infra_store.domain_name}:${state.port}`
       if (infra_store.is_cloud) {
+        if (infra_store.ID == "") {
+          throw new Error("ID must not be empty in cloud mode")
+        }
         viewer_url += `/${infra_store.ID}/viewer`
       }
       viewer_url += "/ws"

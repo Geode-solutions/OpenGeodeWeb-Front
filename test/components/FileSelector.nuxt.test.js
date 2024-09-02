@@ -8,6 +8,9 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
+
 import FileSelector from "@/components/FileSelector.vue"
 import FileUploader from "@/components/FileUploader.vue"
 
@@ -22,6 +25,11 @@ const vuetify = createVuetify({
 })
 
 describe("FileSelector.vue", async () => {
+  const pinia = createTestingPinia()
+  setActivePinia(pinia)
+  const geode_store = use_geode_store()
+  geode_store.base_url = ""
+
   test(`Select file`, async () => {
     registerEndpoint(allowed_files_schema.$id, {
       method: allowed_files_schema.methods[0],
@@ -31,7 +39,7 @@ describe("FileSelector.vue", async () => {
     })
     const wrapper = await mountSuspended(FileSelector, {
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, pinia],
       },
       props: { multiple: false, supported_feature: "test" },
     })
@@ -51,6 +59,36 @@ describe("FileSelector.vue", async () => {
     const v_btn = wrapper.findComponent(components.VBtn)
     await v_btn.trigger("click")
     await flushPromises()
+    expect(wrapper.emitted()).toHaveProperty("update_values")
+    expect(wrapper.emitted().update_values).toHaveLength(1)
+    expect(wrapper.emitted().update_values[0][0]).toEqual({
+      files,
+    })
+  })
+
+  test(`Files prop`, async () => {
+    registerEndpoint(allowed_files_schema.$id, {
+      method: allowed_files_schema.methods[0],
+      handler: () => ({
+        extensions: ["1", "2", "3"],
+      }),
+    })
+
+    const files = [new File(["fake_file"], "fake_file.txt")]
+
+    const wrapper = await mountSuspended(FileSelector, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: { multiple: false, supported_feature: "test", files: files },
+    })
+    registerEndpoint(upload_file_schema.$id, {
+      method: upload_file_schema.methods[1],
+      handler: () => ({}),
+    })
+
+    await flushPromises()
+
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({

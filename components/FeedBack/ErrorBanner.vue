@@ -1,8 +1,8 @@
 <template>
   <v-banner
-    v-if="server_error"
+    v-if="feedback_store.server_error"
     elevation="2"
-    style="background-color: grey; z-index: 100"
+    style="background-color: grey; z-index: 9999"
     position="fixed"
   >
     <v-row>
@@ -33,7 +33,7 @@
           size="20"
           color="grey"
           class=".align-center"
-          @click="errors_store.delete_server_error()"
+          @click="feedback_store.delete_server_error()"
         >
           <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
@@ -43,8 +43,7 @@
 </template>
 
 <script setup>
-  const errors_store = use_errors_store()
-  const { server_error } = storeToRefs(errors_store)
+  const feedback_store = use_feedback_store()
 
   function reload() {
     window.location.reload()

@@ -3,6 +3,8 @@
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
@@ -19,7 +21,12 @@ const vuetify = createVuetify({
 })
 
 describe("CrsSelector.vue", async () => {
-  test(`BRep`, async () => {
+  const pinia = createTestingPinia()
+  setActivePinia(pinia)
+  const geode_store = use_geode_store()
+  geode_store.base_url = ""
+
+  test(`Default behavior`, async () => {
     const crs_list = [
       {
         authority: "EPSG",
@@ -36,7 +43,7 @@ describe("CrsSelector.vue", async () => {
     const key_to_update = "key"
     const wrapper = await mountSuspended(CrsSelector, {
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, pinia],
       },
       props: { input_geode_object: "BRep", key_to_update },
     })

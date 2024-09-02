@@ -1,21 +1,21 @@
 <template>
   <v-snackbar
-    v-for="(error, index) in errors"
-    :key="index"
+    v-for="(feedback, index) in feedback_store.feedbacks"
+    :key="feedback"
     v-model="show"
     :style="{ 'margin-bottom': calc_margin(index) }"
-    color="error"
+    :color="feedback.type"
     location="bottom right"
     transition="slide-x-reverse-transition"
-    max-width="30%"
+    max-width="200px"
     height="20px"
   >
     <v-row dense class="flex-nowrap">
       <v-col cols="auto">
-        <v-tooltip location="left">
+        <v-tooltip v-if="feedback.type === 'error'" location="left">
           <span>
-            error: {{ error.code }} {{ error.name }}<br />
-            ressource: {{ error.route }}
+            error: {{ feedback.code }} {{ feedback.name }}<br />
+            ressource: {{ feedback.route }}
             <br />
           </span>
           <template #activator="{ props }">
@@ -24,16 +24,21 @@
             </v-icon>
           </template>
         </v-tooltip>
+        <v-tooltip v-else-if="feedback.type === 'success'" location="left">
+          <v-icon color="white" class="justify-right">
+            mdi-check-circle-outline
+          </v-icon>
+        </v-tooltip>
       </v-col>
       <v-col cols="9" class="text-no-wrap overflow-hidden">
         <v-tooltip location="top">
           <span>
-            {{ error.description }}
+            {{ feedback.description }}
             <br />
           </span>
           <template #activator="{ props }">
             <div v-bind="props">
-              {{ error.description }}
+              {{ feedback.description }}
             </div>
           </template>
         </v-tooltip>
@@ -44,8 +49,8 @@
           icon
           variant="flat"
           size="20"
-          color="error"
-          @click="errors_store.delete_error(index)"
+          :color="feedback.type"
+          @click="feedback_store.delete_feedback(index)"
         >
           <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
@@ -55,9 +60,7 @@
 </template>
 
 <script setup>
-  const errors_store = use_errors_store()
-  const { errors } = storeToRefs(errors_store)
-
+  const feedback_store = use_feedback_store()
   const show = true
 
   function calc_margin(index) {
