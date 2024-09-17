@@ -11,20 +11,20 @@ export const use_infra_store = defineStore("infra", {
     is_cloud() {
       return !isElectron() && !process.env.NODE_ENV === "development"
     },
-    domain_name(state) {
-      if (state.is_cloud) {
+    domain_name() {
+      if (this.is_cloud) {
         return useRuntimeConfig().public.API_URL
       } else {
         return "localhost"
       }
     },
-    lambda_url(state) {
+    lambda_url() {
       const geode_store = use_geode_store()
       const public_runtime_config = useRuntimeConfig().public
       const url =
         geode_store.protocol +
         "://" +
-        state.domain_name +
+        this.domain_name +
         ":" +
         geode_store.port +
         public_runtime_config.SITE_BRANCH +
