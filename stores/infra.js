@@ -9,6 +9,9 @@ export const use_infra_store = defineStore("infra", {
   }),
   getters: {
     is_cloud() {
+      console.log("is_cloud")
+      console.log("TEST isElectron()", isElectron())
+      console.log("TEST process.env.NODE_ENV", process.env.NODE_ENV)
       return !isElectron() && !process.env.NODE_ENV === "development"
     },
     domain_name() {
