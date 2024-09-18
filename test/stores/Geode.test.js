@@ -102,7 +102,7 @@ describe("Geode Store", () => {
         try {
           await geode_store.do_ping()
         } catch (e) {
-          console.log("e",e)
+          console.log("e", e)
         }
         expect(geode_store.is_running).toBe(false)
         expect(feedback_store.server_error).toBe(true)
