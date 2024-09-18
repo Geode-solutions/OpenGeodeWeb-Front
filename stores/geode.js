@@ -46,7 +46,7 @@ export const use_geode_store = defineStore("geode", {
     },
     async do_ping() {
       const feedback_store = use_feedback_store()
-      return new Promise(async (resolve, reject) => {
+      return new Promise((resolve, reject) => {
         useFetch(back_schemas.opengeodeweb_back.ping.$id, {
           baseURL: this.base_url,
           method: back_schemas.opengeodeweb_back.ping.methods[0],
