@@ -9,6 +9,7 @@
     transition="slide-x-reverse-transition"
     max-width="200px"
     height="20px"
+    timeout="10000"
   >
     <v-row dense class="flex-nowrap">
       <v-col cols="auto">

@@ -40,8 +40,8 @@ export const use_viewer_store = defineStore("viewer", {
       viewer_url += "/ws"
       return viewer_url
     },
-    is_busy(state) {
-      return state.request_counter > 0
+    is_busy() {
+      return this.request_counter > 0
     },
   },
   actions: {
