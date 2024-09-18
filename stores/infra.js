@@ -9,7 +9,9 @@ export const use_infra_store = defineStore("infra", {
   }),
   getters: {
     is_cloud() {
-      return !isElectron() && !process.env.NODE_ENV === "development"
+      return (
+        !isElectron() && useRuntimeConfig().public.NODE_ENV === "production"
+      )
     },
     domain_name() {
       if (this.is_cloud) {
@@ -41,21 +43,11 @@ export const use_infra_store = defineStore("infra", {
   },
   actions: {
     async create_connexion() {
-      const geode_store = use_geode_store()
       if (this.is_connexion_launched) {
         return
       }
       this.is_connexion_launched = true
-      if (["", null].includes(this.ID) || typeof this.ID === "undefined") {
-        return this.create_backend()
-      } else {
-        try {
-          await geode_store.do_ping()
-          return geode_store.ping_task()
-        } catch (e) {
-          return this.create_backend()
-        }
-      }
+      return this.create_backend()
     },
     async create_backend() {
       const geode_store = use_geode_store()

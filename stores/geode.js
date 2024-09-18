@@ -32,32 +32,39 @@ export const use_geode_store = defineStore("geode", {
       }
       return geode_url
     },
-    is_busy(state) {
-      return state.request_counter > 0
+    is_busy() {
+      return this.request_counter > 0
     },
   },
   actions: {
     ping_task() {
-      setInterval(() => this.do_ping(), 10 * 1000)
+      setInterval(() => {
+        if (this.is_running) {
+          this.do_ping()
+        }
+      }, 10 * 1000)
     },
     async do_ping() {
       const feedback_store = use_feedback_store()
-      await api_fetch(
-        { schema: back_schemas.opengeodeweb_back.ping, params: {} },
-        {
-          request_error_function: async () => {
+      return new Promise((resolve, reject) => {
+        useFetch(back_schemas.opengeodeweb_back.ping.$id, {
+          baseURL: this.base_url,
+          method: back_schemas.opengeodeweb_back.ping.methods[0],
+          async onRequestError() {
             await feedback_store.$patch({ server_error: true })
             this.is_running = false
+            reject()
           },
-          response_function: async () => {
-            this.is_running = true
+          async onResponse() {
+            resolve()
           },
-          response_error_function: async () => {
+          async onResponseError() {
             await feedback_store.$patch({ server_error: true })
             this.is_running = false
+            reject()
           },
-        },
-      )
+        })
+      })
     },
     start_request() {
       this.request_counter++
