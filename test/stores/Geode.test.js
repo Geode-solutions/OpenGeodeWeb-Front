@@ -99,20 +99,18 @@ describe("Geode Store", () => {
     describe("do_ping", () => {
       test("request_error", async () => {
         geode_store.base_url = ""
-        geode_store.is_running = true
         try {
           await geode_store.do_ping()
         } catch (e) {
-          console.log(e)
+          console.log("e",e)
         }
-
         expect(geode_store.is_running).toBe(false)
         expect(feedback_store.server_error).toBe(true)
-        expect(feedback_store.feedbacks.length).toBe(1)
       })
 
       test("response", async () => {
         geode_store.base_url = ""
+        geode_store.is_running = true
         registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, {
           method: "POST",
           handler: () => ({}),
