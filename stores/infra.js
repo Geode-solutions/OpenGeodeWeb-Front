@@ -61,7 +61,6 @@ export const use_infra_store = defineStore("infra", {
           viewer_store.port,
         )
         viewer_store.$patch({ default_local_port: viewer_port })
-        return
       } else {
         const { data, error } = await useFetch(this.lambda_url, {
           method: "POST",
@@ -69,12 +68,13 @@ export const use_infra_store = defineStore("infra", {
         if (data.value !== null) {
           this.ID = data.value.ID
           localStorage.setItem("ID", data.value.ID)
-          geode_store.$patch({ is_running: true })
-          return geode_store.ping_task()
         } else {
           feedback_store.server_error = true
+          return
         }
       }
+      geode_store.$patch({ is_running: true })
+      return geode_store.ping_task()
     },
   },
 })
