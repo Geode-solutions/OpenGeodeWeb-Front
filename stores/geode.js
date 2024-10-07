@@ -50,16 +50,22 @@ export const use_geode_store = defineStore("geode", {
         useFetch(back_schemas.opengeodeweb_back.ping.$id, {
           baseURL: this.base_url,
           method: back_schemas.opengeodeweb_back.ping.methods[0],
-          async onRequestError() {
-            await feedback_store.$patch({ server_error: true })
+          async onRequestError({ error }) {
+            console.log("onRequestError", error)
+            feedback_store.$patch({ server_error: true })
             this.is_running = false
             reject()
           },
-          async onResponse() {
-            resolve()
+
+          async onResponse({ response }) {
+            if (response.ok) {
+              console.log("onResponse", response)
+              resolve()
+            }
           },
-          async onResponseError() {
-            await feedback_store.$patch({ server_error: true })
+          async onResponseError({ response }) {
+            console.log("onResponseError", response)
+            feedback_store.$patch({ server_error: true })
             this.is_running = false
             reject()
           },
