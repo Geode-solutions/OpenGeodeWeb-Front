@@ -64,7 +64,7 @@ describe("Viewer Store", () => {
         expect(viewer_store.base_url).toBe("ws://localhost:1234/ws")
       })
 
-      test("test is_cloud true", async () => {
+      test("test is_cloud true", () => {
         infra_store.is_cloud = true
         infra_store.ID = "123456"
         infra_store.domain_name = "example.com"
@@ -73,7 +73,7 @@ describe("Viewer Store", () => {
         )
       })
 
-      test("test is_cloud true, ID empty", async () => {
+      test("test is_cloud true, ID empty", () => {
         infra_store.is_cloud = true
         infra_store.ID = ""
         infra_store.domain_name = "example.com"
@@ -95,7 +95,7 @@ describe("Viewer Store", () => {
   })
   describe("actions", () => {
     // MISSING TEST ws_connect()
-    describe("toggle_picking_mode", async () => {
+    describe("toggle_picking_mode", () => {
       test("test true", async () => {
         await viewer_store.toggle_picking_mode(true)
         expect(viewer_store.picking_mode).toBe(true)
