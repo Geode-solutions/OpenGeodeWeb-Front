@@ -13,11 +13,11 @@ export const use_geode_store = defineStore("geode", {
       }
       return "http"
     },
-    port(state) {
+    port() {
       if (use_infra_store().is_cloud) {
         return "443"
       }
-      return state.default_local_port
+      return this.default_local_port
     },
     base_url() {
       const infra_store = use_infra_store()
@@ -30,8 +30,8 @@ export const use_geode_store = defineStore("geode", {
       }
       return geode_url
     },
-    is_busy(state) {
-      return state.request_counter > 0
+    is_busy() {
+      return this.request_counter > 0
     },
   },
   actions: {
