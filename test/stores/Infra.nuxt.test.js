@@ -105,14 +105,14 @@ describe("Infra Store", () => {
   })
 
   describe("actions", () => {
-    describe("create_connexion", async () => {
+    describe("create_connexion", () => {
       test("test without end-point", async () => {
         await infra_store.create_connexion()
         expect(infra_store.is_connexion_launched).toBe(true)
         expect(feedback_store.server_error).toBe(true)
       })
     })
-    describe("create_backend", async () => {
+    describe("create_backend", () => {
       test("test without end-point", async () => {
         await infra_store.create_backend()
         expect(geode_store.is_running).toBe(false)

@@ -4,7 +4,7 @@ import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import back_schemas from "@geode/opengeodeweb-back/schemas.json"
 
-describe("Geode Store", async () => {
+describe("Geode Store", () => {
   const pinia = createTestingPinia({
     stubActions: false,
   })
@@ -20,7 +20,7 @@ describe("Geode Store", async () => {
   })
 
   describe("state", () => {
-    test("initial state", async () => {
+    test("initial state", () => {
       expectTypeOf(geode_store.default_local_port).toBeString()
       expectTypeOf(geode_store.request_counter).toBeNumber()
       expectTypeOf(geode_store.is_running).toBeBoolean()
@@ -59,18 +59,11 @@ describe("Geode Store", async () => {
 
     describe("base_url", () => {
       test("test is_cloud false", () => {
-        console.log("is_cloud")
         infra_store.is_cloud = false
-        console.log("is_cloud")
         infra_store.domain_name = "localhost"
-        console.log("is_cloud")
-        const url = geode_store.port
-        console.log("port", url)
-        const url2 = geode_store.base_url
-        console.log("base_url", url2)
         expect(geode_store.base_url).toBe("http://localhost:5000")
       })
-      test("test is_cloud true", async () => {
+      test("test is_cloud true", () => {
         infra_store.is_cloud = true
         infra_store.ID = "123456"
         infra_store.domain_name = "example.com"
@@ -78,7 +71,7 @@ describe("Geode Store", async () => {
           "https://example.com:443/123456/geode",
         )
       })
-      test("test is_cloud true, ID empty", async () => {
+      test("test is_cloud true, ID empty", () => {
         infra_store.is_cloud = true
         infra_store.ID = ""
         infra_store.domain_name = "example.com"
@@ -100,8 +93,8 @@ describe("Geode Store", async () => {
     })
   })
 
-  describe("actions", async () => {
-    describe("do_ping", async () => {
+  describe("actions", () => {
+    describe("do_ping", () => {
       const getFakeCall = vi.fn()
       registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, getFakeCall)
 

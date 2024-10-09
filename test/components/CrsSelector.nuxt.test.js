@@ -20,7 +20,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-describe("CrsSelector.vue", async () => {
+describe("CrsSelector.vue", () => {
   const pinia = createTestingPinia()
   setActivePinia(pinia)
   const geode_store = use_geode_store()
