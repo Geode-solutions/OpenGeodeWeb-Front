@@ -59,15 +59,15 @@ describe("Geode Store", async () => {
 
     describe("base_url", () => {
       test("test is_cloud false", () => {
-      console.log("is_cloud")
-      infra_store.is_cloud = false
-      console.log("is_cloud")
+        console.log("is_cloud")
+        infra_store.is_cloud = false
+        console.log("is_cloud")
         infra_store.domain_name = "localhost"
-      console.log("is_cloud")
-      const url = geode_store.port
-      console.log("port", url)
-      const url2 = geode_store.base_url
-      console.log("base_url", url2)
+        console.log("is_cloud")
+        const url = geode_store.port
+        console.log("port", url)
+        const url2 = geode_store.base_url
+        console.log("base_url", url2)
         expect(geode_store.base_url).toBe("http://localhost:5000")
       })
       test("test is_cloud true", async () => {
