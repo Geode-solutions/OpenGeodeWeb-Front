@@ -4,7 +4,7 @@ import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import back_schemas from "@geode/opengeodeweb-back/schemas.json"
 
-describe("Geode Store", () => {
+describe("Geode Store", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
   })
@@ -52,33 +52,40 @@ describe("Geode Store", () => {
 
       test("test override default_local_port", () => {
         infra_store.is_cloud = false
-        geode_store.default_local_port = "8080"
-        expect(geode_store.port).toBe("8080")
+        geode_store.default_local_port = "12"
+        expect(geode_store.port).toBe("12")
       })
     })
 
     describe("base_url", () => {
-      // test("test is_cloud false", () => {
-      //   infra_store.is_cloud = false
-      //   infra_store.domain_name = "localhost"
-      //   expect(geode_store.base_url).toBe("http://localhost:5000")
-      // })
-      // test("test is_cloud true", async () => {
-      //   infra_store.is_cloud = true
-      //   infra_store.ID = "123456"
-      //   infra_store.domain_name = "example.com"
-      //   expect(geode_store.base_url).toBe(
-      //     "https://example.com:443/123456/geode",
-      //   )
-      // })
-      // test("test is_cloud true, ID empty", async () => {
-      //   infra_store.is_cloud = true
-      //   infra_store.ID = ""
-      //   infra_store.domain_name = "example.com"
-      //   expect(() => geode_store.base_url).toThrowError(
-      //     "ID must not be empty in cloud mode",
-      //   )
-      // })
+      test("test is_cloud false", () => {
+      console.log("is_cloud")
+      infra_store.is_cloud = false
+      console.log("is_cloud")
+        infra_store.domain_name = "localhost"
+      console.log("is_cloud")
+      const url = geode_store.port
+      console.log("port", url)
+      const url2 = geode_store.base_url
+      console.log("base_url", url2)
+        expect(geode_store.base_url).toBe("http://localhost:5000")
+      })
+      test("test is_cloud true", async () => {
+        infra_store.is_cloud = true
+        infra_store.ID = "123456"
+        infra_store.domain_name = "example.com"
+        expect(geode_store.base_url).toBe(
+          "https://example.com:443/123456/geode",
+        )
+      })
+      test("test is_cloud true, ID empty", async () => {
+        infra_store.is_cloud = true
+        infra_store.ID = ""
+        infra_store.domain_name = "example.com"
+        expect(() => geode_store.base_url).toThrowError(
+          "ID must not be empty in cloud mode",
+        )
+      })
     })
 
     describe("is_busy", () => {
@@ -93,51 +100,30 @@ describe("Geode Store", () => {
     })
   })
 
-  describe("actions", () => {
-    describe("do_ping", () => {
-
-      // beforeEach(() => {
-      //   infra_store.$reset()
-      //   geode_store.$reset()
-      //   feedback_store.$reset()
-      // })
-
-
-      geode_store.base_url = ""
+  describe("actions", async () => {
+    describe("do_ping", async () => {
       const getFakeCall = vi.fn()
       registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, getFakeCall)
 
-      // test("request_error", async () => {
-      //   geode_store.base_url = ""
-      //   getFakeCall.mockImplementation(() => {
-      //     throw createError({
-      //       status: 404,
-      //     })
-      //   })
-
-      //   await geode_store.do_ping()
-      //   expect(geode_store.is_running).toBe(false)
-      //   expect(feedback_store.server_error).toBe(true)
-      // })
-
       test("response", async () => {
         geode_store.base_url = ""
-        getFakeCall.mockImplementation(() => ({ test: 123 }));
+        getFakeCall.mockImplementation(() => ({}))
         await geode_store.do_ping()
         expect(geode_store.is_running).toBe(true)
         expect(feedback_store.server_error).toBe(false)
       })
-      // test("response_error", async () => {
-      //   geode_store.base_url = ""
-      //   getFakeCall.mockImplementation(() => {
-      //     throw createError({
-      //       status: 500,
-      //     })
-      //   })
-      //   await geode_store.do_ping()
-      //   expect(geode_store.is_running).toBe(false)
-      //   expect(feedback_store.server_error).toBe(true)
-      // })
+      test("response_error", async () => {
+        geode_store.base_url = ""
+        getFakeCall.mockImplementation(() => {
+          throw createError({
+            status: 500,
+          })
+        })
+
+        await geode_store.do_ping()
+        expect(geode_store.is_running).toBe(false)
+        expect(feedback_store.server_error).toBe(true)
+      })
     })
 
     describe("start_request", () => {

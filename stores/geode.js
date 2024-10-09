@@ -10,20 +10,18 @@ export const use_geode_store = defineStore("geode", {
     protocol() {
       if (use_infra_store().is_cloud) {
         return "https"
-      } else {
-        return "http"
       }
+      return "http"
     },
-    port() {
+    port(state) {
       if (use_infra_store().is_cloud) {
         return "443"
-      } else {
-        return this.default_local_port
       }
+      return state.default_local_port
     },
     base_url() {
       const infra_store = use_infra_store()
-      var geode_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
+      let geode_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
       if (infra_store.is_cloud) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
@@ -32,8 +30,8 @@ export const use_geode_store = defineStore("geode", {
       }
       return geode_url
     },
-    is_busy() {
-      return this.request_counter > 0
+    is_busy(state) {
+      return state.request_counter > 0
     },
   },
   actions: {
@@ -44,32 +42,26 @@ export const use_geode_store = defineStore("geode", {
         }
       }, 10 * 1000)
     },
-    async do_ping() {
+    do_ping() {
+      const geode_store = this
       const feedback_store = use_feedback_store()
-      return new Promise((resolve, reject) => {
-        useFetch(back_schemas.opengeodeweb_back.ping.$id, {
-          baseURL: this.base_url,
-          method: back_schemas.opengeodeweb_back.ping.methods[0],
-          async onRequestError({ error }) {
-            console.log("onRequestError", error)
-            feedback_store.$patch({ server_error: true })
-            this.is_running = false
-            reject()
-          },
-
-          async onResponse({ response }) {
-            if (response.ok) {
-              console.log("onResponse", response)
-              resolve()
-            }
-          },
-          async onResponseError({ response }) {
-            console.log("onResponseError", response)
-            feedback_store.$patch({ server_error: true })
-            this.is_running = false
-            reject()
-          },
-        })
+      return useFetch(back_schemas.opengeodeweb_back.ping.$id, {
+        baseURL: this.base_url,
+        method: back_schemas.opengeodeweb_back.ping.methods[0],
+        onRequestError({ error }) {
+          feedback_store.server_error = true
+          geode_store.is_running = false
+        },
+        onResponse({ response }) {
+          if (response.ok) {
+            feedback_store.server_error = false
+            geode_store.is_running = true
+          }
+        },
+        onResponseError({ response }) {
+          feedback_store.server_error = true
+          geode_store.is_running = false
+        },
       })
     },
     start_request() {
