@@ -55,7 +55,7 @@
             color="white"
             text
             @click="takeScreenshot()"
-            >Load</v-btn
+            >Screenshot</v-btn
           >
         </v-card-actions>
       </v-card>
@@ -64,29 +64,29 @@
 </template>
 
 <script setup>
-const emit = defineEmits(["close"]);
-import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json";
+  const emit = defineEmits(["close"])
+  import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
-const props = defineProps({
-  show_dialog: { type: Boolean, required: true },
-});
+  const props = defineProps({
+    show_dialog: { type: Boolean, required: true },
+  })
 
-const filename = ref("");
-const output_extension = ref("png");
-const include_background = ref(true);
+  const filename = ref("")
+  const output_extension = ref("png")
+  const include_background = ref(true)
 
-async function takeScreenshot() {
-  console.log("screenshot");
+  async function takeScreenshot() {
+    console.log("screenshot")
 
-  await viewer_call({
-    schema: viewer_schemas.opengeodeweb_viewer.take_screenshot,
-    params: {
-      filename: filename.value,
-      output_extension: output_extension.value,
-      include_background: include_background.value,
-    },
-  });
+    await viewer_call({
+      schema: viewer_schemas.opengeodeweb_viewer.take_screenshot,
+      params: {
+        filename: filename.value,
+        output_extension: output_extension.value,
+        include_background: include_background.value,
+      },
+    })
 
-  emit("close");
-}
+    emit("close")
+  }
 </script>
