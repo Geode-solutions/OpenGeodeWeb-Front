@@ -22,7 +22,7 @@
               <v-col cols="4">
                 <v-select
                   v-model="output_extension"
-                  :items="['png', 'jpg']"
+                  :items="output_extensions"
                   label="Extension"
                   required
                 />
@@ -33,6 +33,7 @@
               <v-col cols="12">
                 <v-switch
                   v-model="include_background"
+                  :disabled="output_extension !== 'png'"
                   label="Include background"
                   inset
                 ></v-switch>
@@ -52,6 +53,7 @@
           <v-btn
             variant="outlined"
             class="mb-4"
+            :disabled="!filename || !output_extension"
             color="white"
             text
             @click="takeScreenshot()"
@@ -64,6 +66,8 @@
 </template>
 
 <script setup>
+  import fileDownload from "js-file-download"
+
   const emit = defineEmits(["close"])
   import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
@@ -71,22 +75,38 @@
     show_dialog: { type: Boolean, required: true },
   })
 
+  const output_extensions =
+    viewer_schemas.opengeodeweb_viewer.take_screenshot.properties
+      .output_extension.enum
   const filename = ref("")
   const output_extension = ref("png")
   const include_background = ref(true)
 
   async function takeScreenshot() {
-    console.log("screenshot")
-
-    await viewer_call({
-      schema: viewer_schemas.opengeodeweb_viewer.take_screenshot,
-      params: {
-        filename: filename.value,
-        output_extension: output_extension.value,
-        include_background: include_background.value,
+    await viewer_call(
+      {
+        schema: viewer_schemas.opengeodeweb_viewer.take_screenshot,
+        params: {
+          filename: filename.value,
+          output_extension: output_extension.value,
+          include_background: include_background.value,
+        },
       },
-    })
-
+      {
+        response_function: async (response) => {
+          fileDownload(
+            response.blob,
+            filename.value + "." + output_extension.value,
+          )
+        },
+      },
+    )
     emit("close")
   }
+
+  watch(output_extension, (value) => {
+    if (value !== "png") {
+      include_background.value = true
+    }
+  })
 </script>
