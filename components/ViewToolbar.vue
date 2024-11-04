@@ -1,26 +1,60 @@
 <template>
-  <v-row dense :class="[$style.floatToolbar, 'flex-column']">
-    <v-col>
-      <v-btn
-        density="comfortable"
-        icon
-        @click.stop="reset_camera"
-        v-tooltip:left="'Reset camera'"
-      >
-        <v-icon icon="mdi-cube-scan" size="32" />
-      </v-btn>
-    </v-col>
-  </v-row>
+  <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
+    <v-row
+      v-for="camera_option in camera_options"
+      :key="camera_option.icon"
+      dense
+    >
+      <v-col>
+        <v-btn
+          density="comfortable"
+          icon
+          @click.stop="camera_option.action"
+          v-tooltip:left="camera_option.tooltip"
+        >
+          <v-icon :icon="camera_option.icon" size="32" />
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
+  <Screenshot
+    :show_dialog="take_screenshot"
+    :offset_top="offset_top"
+    :offset_left="offset_left"
+    @close="take_screenshot = false"
+  />
 </template>
 
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
-  function reset_camera() {
-    viewer_call({
-      schema: schemas.opengeodeweb_viewer.reset_camera,
-    })
-  }
+  const offset_top = ref(0)
+  const offset_left = ref(0)
+
+  const take_screenshot = ref(false)
+
+  const camera_options = [
+    {
+      tooltip: "Reset camera",
+      icon: "mdi-cube-scan",
+      action: () => {
+        viewer_call({
+          schema: schemas.opengeodeweb_viewer.reset_camera,
+        })
+      },
+    },
+    {
+      tooltip: "Take a screenshot",
+      icon: "mdi-camera",
+      action: (event) => {
+        console.log("event", event)
+        offset_top.value = event.y
+        offset_left.value = event.x
+        console.log("offset", offset_top.value, offset_left.value)
+        take_screenshot.value = !take_screenshot.value
+      },
+    },
+  ]
 </script>
 
 <style module>
@@ -29,7 +63,6 @@
     z-index: 2;
     right: 20px;
     top: 20px;
-    background-color: rgba(0, 0, 0, 0.4);
-    border-radius: 16px;
+    background-color: rgba(0, 0, 0, 0);
   }
 </style>
