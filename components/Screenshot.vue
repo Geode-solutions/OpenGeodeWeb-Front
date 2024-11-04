@@ -68,12 +68,8 @@
 
   const props = defineProps({
     show_dialog: { type: Boolean, required: true },
-    offset_top: { type: Number, required: true },
-    offset_left: { type: Number, required: true },
     width: { type: Number, required: false, default: 400 },
   })
-
-  console.log("props", props)
 
   const output_extensions =
     viewer_schemas.opengeodeweb_viewer.take_screenshot.properties
@@ -109,28 +105,13 @@
       include_background.value = true
     }
   })
-
-  const top = computed(() => {
-    console.log("props.offset_top", props.offset_top)
-
-    return props.offset_top + "px"
-  })
-  const right = computed(() => {
-    console.log("props.offset_left", props.offset_left)
-    console.log("props.width", props.width)
-
-    return "200px" // Change this value to adjust the position relative to the mdi-camera icon
-  })
-
-  console.log("top", top)
-  console.log("left", left)
 </script>
 
 <style scoped>
   .screenshot_menu {
     position: absolute;
     z-index: 2;
-    right: v-bind("right");
-    top: v-bind("top");
+    top: 90px;
+    right: 55px;
   }
 </style>

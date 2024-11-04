@@ -17,19 +17,11 @@
       </v-col>
     </v-row>
   </v-container>
-  <Screenshot
-    :show_dialog="take_screenshot"
-    :offset_top="offset_top"
-    :offset_left="offset_left"
-    @close="take_screenshot = false"
-  />
+  <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
 </template>
 
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/schemas.json"
-
-  const offset_top = ref(0)
-  const offset_left = ref(0)
 
   const take_screenshot = ref(false)
 
@@ -46,11 +38,7 @@
     {
       tooltip: "Take a screenshot",
       icon: "mdi-camera",
-      action: (event) => {
-        console.log("event", event)
-        offset_top.value = event.y
-        offset_left.value = event.x
-        console.log("offset", offset_top.value, offset_left.value)
+      action: () => {
         take_screenshot.value = !take_screenshot.value
       },
     },
