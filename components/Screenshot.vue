@@ -5,7 +5,7 @@
     class="screenshot_menu"
     border="md"
   >
-    <v-card color="#3c9983" class="pa-0">
+    <v-card color="bg-primary" class="pa-0">
       <v-card-title>
         <h3 class="mt-4">Take a screenshot</h3>
       </v-card-title>
@@ -44,7 +44,7 @@
           text
           @click="emit('close')"
           class="ml-8 mb-4"
-          >Cancel</v-btn
+          >Close</v-btn
         >
         <v-btn
           variant="outlined"
