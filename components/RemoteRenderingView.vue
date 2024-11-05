@@ -13,6 +13,7 @@
         "
       >
         <slot name="tree-object"></slot>
+        <slot name="context-menu"></slot>
       </div>
       <v-col
         ref="viewer"
