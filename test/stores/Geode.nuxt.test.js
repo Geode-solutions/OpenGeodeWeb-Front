@@ -1,6 +1,6 @@
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
+import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import back_schemas from "@geode/opengeodeweb-back/schemas.json"
 
@@ -20,7 +20,7 @@ describe("Geode Store", () => {
   })
 
   describe("state", () => {
-    test("initial state", async () => {
+    test("initial state", () => {
       expectTypeOf(geode_store.default_local_port).toBeString()
       expectTypeOf(geode_store.request_counter).toBeNumber()
       expectTypeOf(geode_store.is_running).toBeBoolean()
@@ -52,8 +52,8 @@ describe("Geode Store", () => {
 
       test("test override default_local_port", () => {
         infra_store.is_cloud = false
-        geode_store.default_local_port = "8080"
-        expect(geode_store.port).toBe("8080")
+        geode_store.default_local_port = "12"
+        expect(geode_store.port).toBe("12")
       })
     })
 
@@ -63,8 +63,7 @@ describe("Geode Store", () => {
         infra_store.domain_name = "localhost"
         expect(geode_store.base_url).toBe("http://localhost:5000")
       })
-
-      test("test is_cloud true", async () => {
+      test("test is_cloud true", () => {
         infra_store.is_cloud = true
         infra_store.ID = "123456"
         infra_store.domain_name = "example.com"
@@ -72,8 +71,7 @@ describe("Geode Store", () => {
           "https://example.com:443/123456/geode",
         )
       })
-
-      test("test is_cloud true, ID empty", async () => {
+      test("test is_cloud true, ID empty", () => {
         infra_store.is_cloud = true
         infra_store.ID = ""
         infra_store.domain_name = "example.com"
@@ -97,27 +95,27 @@ describe("Geode Store", () => {
 
   describe("actions", () => {
     describe("do_ping", () => {
-      test("request_error", async () => {
-        geode_store.base_url = ""
-        try {
-          await geode_store.do_ping()
-        } catch (e) {
-          console.log("e", e)
-        }
-        expect(geode_store.is_running).toBe(false)
-        expect(feedback_store.server_error).toBe(true)
-      })
+      const getFakeCall = vi.fn()
+      registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, getFakeCall)
 
       test("response", async () => {
         geode_store.base_url = ""
-        geode_store.is_running = true
-        registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, {
-          method: "POST",
-          handler: () => ({}),
-        })
+        getFakeCall.mockImplementation(() => ({}))
         await geode_store.do_ping()
         expect(geode_store.is_running).toBe(true)
         expect(feedback_store.server_error).toBe(false)
+      })
+      test("response_error", async () => {
+        geode_store.base_url = ""
+        getFakeCall.mockImplementation(() => {
+          throw createError({
+            status: 500,
+          })
+        })
+
+        await geode_store.do_ping()
+        expect(geode_store.is_running).toBe(false)
+        expect(feedback_store.server_error).toBe(true)
       })
     })
 

@@ -4,6 +4,8 @@ import EdgedCurve2D from "@/assets/img/geode_objects/EdgedCurve2D.svg"
 import EdgedCurve3D from "@/assets/img/geode_objects/EdgedCurve3D.svg"
 import Graph from "@/assets/img/geode_objects/Graph.svg"
 import HybridSolid3D from "@/assets/img/geode_objects/HybridSolid3D.svg"
+import ImplicitCrossSection from "@/assets/img/geode_objects/ImplicitCrossSection.svg"
+import ImplicitStructuralModel from "@/assets/img/geode_objects/ImplicitStructuralModel.svg"
 import LightRegularGrid2D from "@/assets/img/geode_objects/LightRegularGrid2D.svg"
 import LightRegularGrid3D from "@/assets/img/geode_objects/LightRegularGrid3D.svg"
 import PointSet2D from "@/assets/img/geode_objects/PointSet2D.svg"
@@ -46,6 +48,14 @@ const geode_objects = {
   HybridSolid3D: {
     tooltip: "HybridSolid3D",
     image: HybridSolid3D,
+  },
+  ImplicitCrossSection: {
+    tooltip: "ImplicitCrossSection",
+    image: ImplicitCrossSection,
+  },
+  ImplicitStructuralModel: {
+    tooltip: "ImplicitStructuralModel",
+    image: ImplicitStructuralModel,
   },
   LightRegularGrid2D: {
     tooltip: "LightRegularGrid2D",
