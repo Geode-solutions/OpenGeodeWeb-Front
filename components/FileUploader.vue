@@ -44,7 +44,7 @@
 
   const { multiple, accept } = toRefs(props)
 
-  const label = multiple ? "Please select file(s)" : "Please select a file"
+  const label = multiple ? "Please select file(s) to import" : "Please select a file to import"
   const files = ref([])
   const loading = ref(false)
   const files_uploaded = ref(false)
@@ -81,7 +81,6 @@
 
   if (props.files.length) {
     files.value = props.files
-    upload_files()
   }
 
   function clear() {

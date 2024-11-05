@@ -88,11 +88,6 @@ describe("FileSelector.vue", async () => {
     })
 
     await flushPromises()
-
-    expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
-      files,
-    })
+    expect(wrapper.componentVM.files).toEqual(files)
   })
 })
