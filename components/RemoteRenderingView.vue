@@ -26,7 +26,9 @@
         class="pa-0"
         @click="get_x_y"
         @keydown.esc="app_store.toggle_picking_mode(false)"
-      />
+      >
+        <slot name="ui"></slot>
+      </v-col>
     </div>
   </ClientOnly>
 </template>

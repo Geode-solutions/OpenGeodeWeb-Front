@@ -40,8 +40,8 @@
   "version": "0.0.0-semantically-released",
   "main": "./nuxt.config.js",
   "dependencies": {
-    "@geode/opengeodeweb-back": "5.3.0",
-    "@geode/opengeodeweb-viewer": "0.2.0",
+    "@geode/opengeodeweb-back": "5.3.1",
+    "@geode/opengeodeweb-viewer": "0.3.0",
     "@kitware/vtk.js": "30.3.1",
     "@mdi/font": "^7.4.47",
     "@pinia/nuxt": "^0.5.4",
@@ -50,6 +50,7 @@
     "@vueuse/nuxt": "^11.0.3",
     "ajv": "^8.17.1",
     "is-electron": "^2.2.2",
+    "js-file-download": "^0.4.12",
     "pinia": "^2.2.2",
     "sass": "^1.77.8",
     "semver": "^7.6.3",
