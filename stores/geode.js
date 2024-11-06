@@ -10,20 +10,18 @@ export const use_geode_store = defineStore("geode", {
     protocol() {
       if (use_infra_store().is_cloud) {
         return "https"
-      } else {
-        return "http"
       }
+      return "http"
     },
     port() {
       if (use_infra_store().is_cloud) {
         return "443"
-      } else {
-        return this.default_local_port
       }
+      return this.default_local_port
     },
     base_url() {
       const infra_store = use_infra_store()
-      var geode_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
+      let geode_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
       if (infra_store.is_cloud) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
@@ -44,7 +42,8 @@ export const use_geode_store = defineStore("geode", {
         }
       }, 10 * 1000)
     },
-    async do_ping() {
+    do_ping() {
+      const geode_store = this
       const feedback_store = use_feedback_store()
       const geode_store = use_geode_store()
       return new Promise((resolve, reject) => {
