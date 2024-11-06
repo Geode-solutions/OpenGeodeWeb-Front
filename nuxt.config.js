@@ -36,12 +36,13 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
-        "is-electron",
-        "fast-deep-equal",
-        "seedrandom",
-        "lodash",
         "ajv",
+        "fast-deep-equal",
         "globalthis",
+        "is-electron",
+        "js-file-download",
+        "lodash",
+        "seedrandom",
       ],
     },
   },
