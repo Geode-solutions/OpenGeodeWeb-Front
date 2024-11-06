@@ -5,7 +5,7 @@
     class="screenshot_menu"
     border="md"
   >
-    <v-card color="bg-primary" class="pa-0">
+    <v-card class="bg-primary pa-0">
       <v-card-title>
         <h3 class="mt-4">Take a screenshot</h3>
       </v-card-title>
