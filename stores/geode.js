@@ -46,13 +46,14 @@ export const use_geode_store = defineStore("geode", {
     },
     async do_ping() {
       const feedback_store = use_feedback_store()
+      const geode_store = use_geode_store()
       return new Promise((resolve, reject) => {
         useFetch(back_schemas.opengeodeweb_back.ping.$id, {
-          baseURL: this.base_url,
+          baseURL: geode_store.base_url,
           method: back_schemas.opengeodeweb_back.ping.methods[0],
           async onRequestError() {
             await feedback_store.$patch({ server_error: true })
-            this.is_running = false
+            geode_store.is_running = false
             reject()
           },
           async onResponse() {
@@ -60,7 +61,7 @@ export const use_geode_store = defineStore("geode", {
           },
           async onResponseError() {
             await feedback_store.$patch({ server_error: true })
-            this.is_running = false
+            geode_store.is_running = false
             reject()
           },
         })
