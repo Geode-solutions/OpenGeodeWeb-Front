@@ -2,6 +2,18 @@
   <ClientOnly>
     <div style="position: relative; width: 100%; height: 100%">
       <view-toolbar />
+      <div
+        style="
+          position: absolute;
+          z-index: 2;
+          left: 0;
+          top: 0;
+          background-color: transparent;
+          border-radius: 16px;
+        "
+      >
+        <slot name="tree-object"></slot>
+      </div>
       <v-col
         ref="viewer"
         style="
@@ -103,3 +115,14 @@
     view.render()
   }
 </script>
+
+<style scoped>
+  .list {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    background-color: transparent;
+    border-radius: 16px;
+  }
+</style>
