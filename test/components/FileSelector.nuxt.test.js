@@ -54,6 +54,7 @@ describe("FileSelector.vue", async () => {
     const v_file_input = file_uploader.findComponent(components.VFileInput)
     await v_file_input.trigger("click")
     const files = [new File(["fake_file"], "fake_file.txt")]
+    const auto_upload = false
     await v_file_input.setValue(files)
     await v_file_input.trigger("change")
     const v_btn = wrapper.findComponent(components.VBtn)
@@ -63,6 +64,7 @@ describe("FileSelector.vue", async () => {
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
       files,
+      auto_upload,
     })
   })
 

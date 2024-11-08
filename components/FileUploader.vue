@@ -40,6 +40,7 @@
     multiple: { type: Boolean, required: true },
     accept: { type: String, required: true },
     files: { type: Array, required: false, default: [] },
+    auto_upload: { type: Boolean, required: true },
   })
 
   const { multiple, accept } = toRefs(props)
@@ -81,8 +82,9 @@
     toggle_loading()
   }
 
-  if (props.files.length) {
+  if (props.files.length && props.auto_upload) {
     files.value = props.files
+    upload_files()
   }
 
   function clear() {
