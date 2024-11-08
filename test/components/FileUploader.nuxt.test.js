@@ -27,31 +27,47 @@ describe("FileUploader.vue", async () => {
   const geode_store = use_geode_store()
   geode_store.base_url = ""
 
-  test(`Upload file`, async () => {
-    registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[0],
-      handler: () => ({}),
-    })
-    const wrapper = await mountSuspended(FileUploader, {
-      global: {
-        plugins: [vuetify, pinia],
-      },
-      props: { multiple: false, accept: "*.txt" },
-    })
-    const v_file_input = wrapper.findComponent(components.VFileInput)
-    await v_file_input.trigger("click")
-    const files = [new File(["fake_file"], "fake_file.txt")]
-    await v_file_input.setValue(files)
-    await v_file_input.trigger("change")
-    const v_btn = wrapper.findComponent(components.VBtn)
+  registerEndpoint(upload_file_schema.$id, {
+    method: upload_file_schema.methods[0],
+    handler: () => ({}),
+  })
+  registerEndpoint(upload_file_schema.$id, {
+    method: upload_file_schema.methods[1],
+    handler: () => ({}),
+  })
 
-    registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[1],
-      handler: () => ({}),
+  const files = [new File(["fake_file"], "fake_file.txt")]
+
+  describe(`Upload file`, async () => {
+    test(`prop auto_upload false`, async () => {
+      const wrapper = await mountSuspended(FileUploader, {
+        global: {
+          plugins: [vuetify, pinia],
+        },
+        props: { multiple: false, accept: "*.txt" },
+      })
+
+      const v_file_input = wrapper.findComponent(components.VFileInput)
+      await v_file_input.trigger("click")
+
+      await v_file_input.setValue(files)
+      await v_file_input.trigger("change")
+      const v_btn = wrapper.findComponent(components.VBtn)
+
+      await v_btn.trigger("click")
+      await flushPromises()
+      expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
     })
 
-    await v_btn.trigger("click")
-    await flushPromises()
-    expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
+    test(`prop auto_upload true`, async () => {
+      const wrapper = await mountSuspended(FileUploader, {
+        global: {
+          plugins: [vuetify, pinia],
+        },
+        props: { multiple: false, accept: "*.txt", files, auto_upload: true },
+      })
+      await flushPromises()
+      expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
+    })
   })
 })
