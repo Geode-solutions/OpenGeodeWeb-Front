@@ -1,6 +1,6 @@
 // @vitest-environment nuxt
 
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
 
@@ -68,7 +68,7 @@ describe("FileSelector.vue", async () => {
     })
   })
 
-  test(`Files prop`, async () => {
+  describe(`Files prop`, () => {
     registerEndpoint(allowed_files_schema.$id, {
       method: allowed_files_schema.methods[0],
       handler: () => ({
@@ -76,20 +76,57 @@ describe("FileSelector.vue", async () => {
       }),
     })
 
-    const files = [new File(["fake_file"], "fake_file.txt")]
-
-    const wrapper = await mountSuspended(FileSelector, {
-      global: {
-        plugins: [vuetify, pinia],
-      },
-      props: { multiple: false, supported_feature: "test", files: files },
-    })
     registerEndpoint(upload_file_schema.$id, {
       method: upload_file_schema.methods[1],
       handler: () => ({}),
     })
 
-    await flushPromises()
-    expect(wrapper.componentVM.files).toEqual(files)
+    const files = [new File(["fake_file"], "fake_file.txt")]
+    test("auto_upload true", async () => {
+      const auto_upload = true
+      const wrapper = await mountSuspended(FileSelector, {
+        global: {
+          plugins: [vuetify, pinia],
+        },
+        props: {
+          multiple: false,
+          supported_feature: "test",
+          files: files,
+          auto_upload,
+        },
+      })
+
+      await flushPromises()
+      expect(wrapper.componentVM.files).toEqual(files)
+      expect(wrapper.emitted()).toHaveProperty("update_values")
+      expect(wrapper.emitted().update_values).toHaveLength(1)
+      expect(wrapper.emitted().update_values[0][0]).toEqual({
+        files,
+        auto_upload: false,
+      })
+    })
+
+    test("auto_upload false", async () => {
+      const auto_upload = false
+      const wrapper = await mountSuspended(FileSelector, {
+        global: {
+          plugins: [vuetify, pinia],
+        },
+        props: {
+          multiple: false,
+          supported_feature: "test",
+          files: files,
+          auto_upload,
+        },
+      })
+
+      await flushPromises()
+
+      const file_uploader = wrapper.findComponent(FileUploader)
+      console.log("wrapper", wrapper)
+      expect(wrapper.vm.files).toEqual(files)
+      const upload_files = vi.spyOn(file_uploader.vm, "upload_files")
+      expect(upload_files).not.toHaveBeenCalled()
+    })
   })
 })

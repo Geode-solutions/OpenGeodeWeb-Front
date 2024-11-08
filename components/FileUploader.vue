@@ -82,9 +82,11 @@
     toggle_loading()
   }
 
-  if (props.files.length && props.auto_upload) {
+  if (props.files.length) {
     files.value = props.files
-    upload_files()
+    if (props.auto_upload) {
+      upload_files()
+    }
   }
 
   function clear() {
