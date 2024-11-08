@@ -40,7 +40,7 @@
     multiple: { type: Boolean, required: true },
     accept: { type: String, required: true },
     files: { type: Array, required: false, default: [] },
-    auto_upload: { type: Boolean, required: true },
+    auto_upload: { type: Boolean, required: false, default: false },
   })
 
   const { multiple, accept } = toRefs(props)
