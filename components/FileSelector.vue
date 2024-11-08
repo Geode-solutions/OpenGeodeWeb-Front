@@ -2,7 +2,7 @@
   <FetchingData v-if="loading" />
   <FileUploader
     v-else
-    v-bind="{ multiple, accept, files }"
+    v-bind="{ multiple, accept, files, auto_upload }"
     @files_uploaded="files_uploaded_event"
   />
 </template>
@@ -21,10 +21,10 @@
     multiple: { type: Boolean, required: true },
     supported_feature: { type: String, required: false, default: null },
     files: { type: Array, required: false, default: [] },
+    auto_upload: { type: Boolean, required: false, default: true },
   })
 
-  const { multiple, supported_feature } = props
-
+  const { auto_upload, multiple, supported_feature } = props
   const accept = ref("")
   const loading = ref(false)
 
@@ -32,7 +32,7 @@
 
   function files_uploaded_event(value) {
     if (value.length) {
-      emit("update_values", { files: value })
+      emit("update_values", { files: value, auto_upload: false })
       emit("increment_step")
     }
   }
