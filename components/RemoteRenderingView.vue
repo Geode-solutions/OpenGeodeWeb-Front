@@ -36,7 +36,7 @@
 <script setup>
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize } from "@vueuse/core"
-  import schemas from "@geode/opengeodeweb-viewer/schemas.json"
+  import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
   const viewer_store = use_viewer_store()
   const { client, is_running, picking_mode } = storeToRefs(viewer_store)
@@ -46,8 +46,8 @@
       const { offsetX, offsetY } = event
       viewer_store.set_picked_point(offsetX, offsetY)
       viewer_call({
-        schema: schemas.opengeodeweb_viewer.set_picked_point,
-        params: { offsetX, offsetY },
+        schema: viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
+        params: { x: offsetX, y: offsetY },
       })
     }
   }
