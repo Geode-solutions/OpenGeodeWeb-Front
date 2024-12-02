@@ -72,7 +72,7 @@
   })
 
   const output_extensions =
-    viewer_schemas.opengeodeweb_viewer.take_screenshot.properties
+    viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties
       .output_extension.enum
   const filename = ref("")
   const output_extension = ref("png")
@@ -81,7 +81,7 @@
   async function takeScreenshot() {
     await viewer_call(
       {
-        schema: viewer_schemas.opengeodeweb_viewer.take_screenshot,
+        schema: viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot,
         params: {
           filename: filename.value,
           output_extension: output_extension.value,

@@ -31,7 +31,7 @@
       icon: "mdi-cube-scan",
       action: () => {
         viewer_call({
-          schema: schemas.opengeodeweb_viewer.reset_camera,
+          schema: schemas.opengeodeweb_viewer.viewer.reset_camera,
         })
       },
     },

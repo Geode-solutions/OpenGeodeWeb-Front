@@ -20,7 +20,7 @@ export function viewer_call(
       client
         .getConnection()
         .getSession()
-        .call(schema.rpc, [params])
+        .call(schema.$id, [params])
         .then(
           (value) => {
             if (response_function) {

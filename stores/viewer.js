@@ -111,10 +111,10 @@ export const use_viewer_store = defineStore("viewer", {
 
             // Now that the client is ready let's setup the server for us
             viewer_call({
-              schema: schemas.opengeodeweb_viewer.create_visualization,
+              schema: schemas.opengeodeweb_viewer.viewer.create_visualization,
             })
             viewer_call({
-              schema: schemas.opengeodeweb_viewer.reset,
+              schema: schemas.opengeodeweb_viewer.viewer.reset,
             })
             this.is_running = true
             resolve()
