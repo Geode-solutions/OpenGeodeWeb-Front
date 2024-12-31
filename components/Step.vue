@@ -42,17 +42,15 @@
         </v-chip>
       </v-col>
     </v-row>
-    <Transition name="slide-fade" mode="out-in">
-      <component
-        v-if="step_index == current_step_index"
-        :key="step_index"
-        :is="steps[step_index].component.component_name"
-        v-bind="steps[step_index].component.component_options"
-        @update_values="update_values_event"
-        @increment_step="increment_step"
-        @decrement_step="decrement_step"
-      />
-    </Transition>
+    <component
+      v-if="step_index == current_step_index"
+      :key="step_index"
+      :is="steps[step_index].component.component_name"
+      v-bind="steps[step_index].component.component_options"
+      @update_values="update_values_event"
+      @increment_step="increment_step"
+      @decrement_step="decrement_step"
+    />
   </v-stepper-content>
 </template>
 
