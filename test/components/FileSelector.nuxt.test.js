@@ -97,7 +97,7 @@ describe("FileSelector.vue", async () => {
       })
 
       await flushPromises()
-      expect(wrapper.componentVM.files).toEqual(files)
+      expect(wrapper.componentVM.props.files).toEqual(files)
       expect(wrapper.emitted()).toHaveProperty("update_values")
       expect(wrapper.emitted().update_values).toHaveLength(1)
       expect(wrapper.emitted().update_values[0][0]).toEqual({
@@ -123,8 +123,7 @@ describe("FileSelector.vue", async () => {
       await flushPromises()
 
       const file_uploader = wrapper.findComponent(FileUploader)
-      console.log("wrapper", wrapper)
-      expect(wrapper.vm.files).toEqual(files)
+      expect(wrapper.vm.props.files).toEqual(files)
       const upload_files = vi.spyOn(file_uploader.vm, "upload_files")
       expect(upload_files).not.toHaveBeenCalled()
     })
