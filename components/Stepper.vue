@@ -1,7 +1,7 @@
 <template>
   <v-stepper-vertical v-model="current_step_index" class="stepper-container">
     <v-stepper-items>
-      <Step v-for="(step, index) in steps" :key="index" :step_index="index" />
+      <Step v-for="(step, index) in steps" :key="step" :step_index="index" />
     </v-stepper-items>
   </v-stepper-vertical>
 </template>
