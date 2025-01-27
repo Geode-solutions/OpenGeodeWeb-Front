@@ -2,10 +2,10 @@
   <v-stepper-content :step="step_index + 1">
     <v-row
       align="center"
-      class="step-container"
+      class="mb-4 py-2"
       @click="set_current_step(step_index)"
     >
-      <v-col cols="auto" class="icon-container">
+      <v-col cols="auto" class="d-flex justify-center align-center">
         <v-icon
           v-if="current_step_index > step_index"
           icon="mdi-check-circle"
@@ -22,25 +22,29 @@
           color="grey"
         />
       </v-col>
-      <v-col class="title-container">
-        <p class="step-title font-weight-bold">
+      <v-col>
+        <p class="m-0 font-weight-bold">
           {{ steps[step_index].step_title }}
         </p>
       </v-col>
-      <v-col
+      <v-chip-group
         v-if="
           steps[step_index].chips.length && current_step_index >= step_index
         "
-        class="chips-container"
+        column
+        class="d-flex flex-wrap ma-2 overflow-y-auto"
+        multiple
+        style="max-height: 150px"
       >
         <v-chip
           v-for="(chip, chip_index) in steps[step_index].chips"
           :key="chip_index"
-          class="step-chip"
+          class="ma-1"
+          :title="chip"
         >
-          {{ chip }}
+          {{ truncate(chip, 50) }}
         </v-chip>
-      </v-col>
+      </v-chip-group>
     </v-row>
     <component
       v-if="step_index == current_step_index"
@@ -55,6 +59,13 @@
 </template>
 
 <script setup>
+  function truncate(text, maxLength) {
+    if (text.length > maxLength) {
+      return text.slice(0, maxLength) + "..."
+    }
+    return text
+  }
+
   const props = defineProps({
     step_index: { type: Number, required: true },
   })
@@ -80,33 +91,3 @@
     stepper_tree.current_step_index--
   }
 </script>
-
-<style scoped>
-  .step-container {
-    margin-bottom: 16px;
-    padding: 8px;
-  }
-
-  .icon-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .title-container {
-    margin-left: 8px;
-  }
-
-  .step-title {
-    margin: 0;
-  }
-
-  .chips-container {
-    display: flex;
-    gap: 4px;
-  }
-
-  .step-chip {
-    background-color: #f5f5f5;
-  }
-</style>
