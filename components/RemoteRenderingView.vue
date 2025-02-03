@@ -2,18 +2,7 @@
   <ClientOnly>
     <div style="position: relative; width: 100%; height: calc(100vh - 80px)">
       <view-toolbar />
-      <div
-        style="
-          position: absolute;
-          z-index: 2;
-          left: 0;
-          top: 0;
-          background-color: transparent;
-          border-radius: 16px;
-        "
-      >
-        <slot name="tree-object"></slot>
-      </div>
+      <slot name="ui"></slot>
       <v-col
         ref="viewer"
         style="
@@ -26,9 +15,7 @@
         class="pa-0"
         @click="get_x_y"
         @keydown.esc="app_store.toggle_picking_mode(false)"
-      >
-        <slot name="ui"></slot>
-      </v-col>
+      />
     </div>
   </ClientOnly>
 </template>

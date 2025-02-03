@@ -1,7 +1,11 @@
 <template>
-  <v-card class="pa-5">
-    <v-row align="center" @click="set_current_step(step_index)">
-      <v-col cols="auto">
+  <v-stepper-content :step="step_index + 1">
+    <v-row
+      align="center"
+      class="mb-4 py-2"
+      @click="set_current_step(step_index)"
+    >
+      <v-col cols="auto" class="d-flex justify-center align-center">
         <v-icon
           v-if="current_step_index > step_index"
           icon="mdi-check-circle"
@@ -18,43 +22,54 @@
           color="grey"
         />
       </v-col>
-      <v-col cols="auto">
-        <p class="font-weight-bold">
+      <v-col>
+        <p class="m-0 font-weight-bold">
           {{ steps[step_index].step_title }}
         </p>
       </v-col>
-      <v-col
+      <v-chip-group
         v-if="
           steps[step_index].chips.length && current_step_index >= step_index
         "
+        column
+        class="d-flex flex-wrap ma-2 overflow-y-auto"
+        multiple
+        style="max-height: 150px"
       >
         <v-chip
           v-for="(chip, chip_index) in steps[step_index].chips"
           :key="chip_index"
+          class="ma-1"
+          :title="chip"
         >
-          {{ chip }}
+          {{ truncate(chip, 50) }}
         </v-chip>
-      </v-col>
+      </v-chip-group>
     </v-row>
-    <Transition name="slide-fade">
-      <v-col v-if="step_index == current_step_index">
-        <component
-          :is="steps[step_index].component.component_name"
-          v-bind="steps[step_index].component.component_options"
-          @update_values="update_values_event"
-          @increment_step="increment_step()"
-          @decrement_step="decrement_step()"
-        />
-      </v-col>
-    </Transition>
-  </v-card>
+    <component
+      v-if="step_index == current_step_index"
+      :key="step_index"
+      :is="steps[step_index].component.component_name"
+      v-bind="steps[step_index].component.component_options"
+      @update_values="update_values_event"
+      @increment_step="increment_step"
+      @decrement_step="decrement_step"
+    />
+  </v-stepper-content>
 </template>
 
 <script setup>
+  function truncate(text, maxLength) {
+    if (text.length > maxLength) {
+      return text.slice(0, maxLength) + "..."
+    }
+    return text
+  }
+
   const props = defineProps({
     step_index: { type: Number, required: true },
   })
-  const { step_index } = props
+
   const stepper_tree = inject("stepper_tree")
   const { current_step_index, steps } = toRefs(stepper_tree)
 
@@ -76,19 +91,3 @@
     stepper_tree.current_step_index--
   }
 </script>
-
-<style scoped>
-  .slide-fade-enter-active {
-    transition: all 0.5s ease-out;
-  }
-
-  .slide-fade-leave-active {
-    transition: all 0.5s ease-in;
-  }
-
-  .slide-fade-enter-from,
-  .slide-fade-leave-to {
-    transform: translateX(50px);
-    opacity: 0;
-  }
-</style>
