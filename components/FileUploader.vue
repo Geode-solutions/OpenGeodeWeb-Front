@@ -2,12 +2,14 @@
   <v-row>
     <v-col class="pa-0">
       <v-file-input
-        v-model="files"
-        :multiple="multiple"
+        v-model="internal_files"
+        :multiple="props.multiple"
         :label="label"
-        :accept="accept"
+        :accept="props.accept"
         :rules="[(value) => !!value || 'The file is mandatory']"
         color="primary"
+        :hide-input="props.mini"
+        :hide-details="props.mini"
         chips
         counter
         show-size
@@ -15,11 +17,11 @@
       />
     </v-col>
   </v-row>
-  <v-row>
+  <v-row v-if="!props.auto_upload">
     <v-col cols="auto">
       <v-btn
         color="primary"
-        :disabled="!files.length && !files_uploaded"
+        :disabled="!internal_files.length && !files_uploaded"
         :loading="loading"
         class="pa-2"
         @click="upload_files"
@@ -41,14 +43,13 @@
     accept: { type: String, required: true },
     files: { type: Array, required: false, default: [] },
     auto_upload: { type: Boolean, required: false, default: false },
+    mini: { type: Boolean, required: false, default: false },
   })
 
-  const { multiple, accept } = toRefs(props)
-
-  const label = multiple
+  const label = props.multiple
     ? "Please select file(s) to import"
     : "Please select a file to import"
-  const files = ref([])
+  const internal_files = ref([])
   const loading = ref(false)
   const files_uploaded = ref(false)
 
@@ -57,7 +58,7 @@
   async function upload_files() {
     toggle_loading()
     var promise_array = []
-    for (const file of files.value) {
+    for (const file of internal_files.value) {
       const promise = new Promise((resolve, reject) => {
         upload_file(
           { route: schema.$id, file },
@@ -78,23 +79,35 @@
     }
     await Promise.all(promise_array)
     files_uploaded.value = true
-    emit("files_uploaded", files.value)
+    emit("files_uploaded", internal_files.value)
     toggle_loading()
   }
 
   if (props.files.length) {
-    files.value = props.files
+    internal_files.value = props.files
     if (props.auto_upload) {
       upload_files()
     }
   }
 
   function clear() {
-    files.value = []
-    emit("files_uploaded", files.value)
+    internal_files.value = []
+    emit("files_uploaded", internal_files.value)
   }
 
-  watch(files, () => {
+  watch(internal_files, (value) => {
     files_uploaded.value = false
+    if (props.auto_upload) {
+      if (props.multiple.value == false) {
+        internal_files.value = [value]
+      }
+      upload_files()
+    }
   })
 </script>
+
+<style scoped>
+  .div.v-input__details {
+    display: none;
+  }
+</style>
