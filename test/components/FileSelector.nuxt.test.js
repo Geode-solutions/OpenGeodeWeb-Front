@@ -41,7 +41,7 @@ describe("FileSelector.vue", async () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { multiple: false, supported_feature: "test" },
+      props: { multiple: false, supported_feature: "test", auto_upload: false },
     })
 
     const file_uploader = wrapper.findComponent(FileUploader)
