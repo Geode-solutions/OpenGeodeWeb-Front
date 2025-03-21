@@ -6,6 +6,7 @@
         class="align"
         cols="12"
         align-self="center"
+        style="z-index: 1000"
       >
         <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
         <Recaptcha :site_key="site_key" />
