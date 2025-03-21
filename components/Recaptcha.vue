@@ -7,7 +7,6 @@
       align-self="center"
       @expired="is_captcha_validated = false"
       @verify="submit_recaptcha"
-      style="z-index: 100"
     />
   </ClientOnly>
 </template>
