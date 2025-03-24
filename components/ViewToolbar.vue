@@ -24,6 +24,7 @@
   import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
   const take_screenshot = ref(false)
+  const grid_scale = ref(false)
 
   const camera_options = [
     {
@@ -40,6 +41,25 @@
       icon: "mdi-camera",
       action: () => {
         take_screenshot.value = !take_screenshot.value
+      },
+    },
+    {
+      tooltip: "Toggle grid scale",
+      icon: "mdi-ruler-square",
+      action: () => {
+        viewer_call(
+          {
+            schema: schemas.opengeodeweb_viewer.viewer.grid_scale,
+            params: {
+              visibility: !grid_scale.value,
+            },
+          },
+          {
+            response_function: () => {
+              grid_scale.value = !grid_scale.value
+            },
+          },
+        )
       },
     },
   ]
