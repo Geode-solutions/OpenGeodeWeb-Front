@@ -48,6 +48,7 @@ export const use_geode_store = defineStore("geode", {
       return useFetch(back_schemas.opengeodeweb_back.ping.$id, {
         baseURL: this.base_url,
         method: back_schemas.opengeodeweb_back.ping.methods[0],
+        body: {},
         onRequestError({ error }) {
           feedback_store.server_error = true
           geode_store.is_running = false
