@@ -1,10 +1,11 @@
 import back_schemas from "@geode/opengeodeweb-back/schemas.json"
+import Status from "../utils/status"
 
 export const use_geode_store = defineStore("geode", {
   state: () => ({
     default_local_port: "5000",
     request_counter: 0,
-    is_running: false,
+    status: Status.NOT_CONNECTED,
   }),
   getters: {
     protocol() {
@@ -37,7 +38,7 @@ export const use_geode_store = defineStore("geode", {
   actions: {
     ping_task() {
       setInterval(() => {
-        if (this.is_running) {
+        if (this.status == Status.CONNECTED) {
           this.do_ping()
         }
       }, 10 * 1000)
@@ -51,17 +52,17 @@ export const use_geode_store = defineStore("geode", {
         body: {},
         onRequestError({ error }) {
           feedback_store.server_error = true
-          geode_store.is_running = false
+          geode_store.status = Status.NOT_CONNECTED
         },
         onResponse({ response }) {
           if (response.ok) {
             feedback_store.server_error = false
-            geode_store.is_running = true
+            geode_store.status = Status.CONNECTED
           }
         },
         onResponseError({ response }) {
           feedback_store.server_error = true
-          geode_store.is_running = false
+          geode_store.status = Status.NOT_CONNECTED
         },
       })
     },
@@ -71,5 +72,8 @@ export const use_geode_store = defineStore("geode", {
     stop_request() {
       this.request_counter--
     },
+  },
+  share: {
+    omit: ["status"],
   },
 })
