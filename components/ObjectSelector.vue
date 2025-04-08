@@ -26,7 +26,6 @@
               :disabled="!value['is_loadable']"
               :elevation="value['is_loadable'] ? 5 : 3"
             >
-              {{ index }}
               <v-img
                 :src="geode_objects[key].image"
                 cover
