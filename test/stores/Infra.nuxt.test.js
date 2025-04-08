@@ -2,6 +2,7 @@ import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
+import Status from "../utils/status"
 
 describe("Infra Store", () => {
   const pinia = createTestingPinia({
@@ -23,7 +24,7 @@ describe("Infra Store", () => {
     test("initial state", () => {
       expectTypeOf(infra_store.ID).toBeString()
       expectTypeOf(infra_store.is_captcha_validated).toBeBoolean()
-      expectTypeOf(infra_store.is_connexion_launched).toBeBoolean()
+      expectTypeOf(infra_store.status).toBeString()
     })
   })
   describe("getters", () => {
@@ -57,26 +58,26 @@ describe("Infra Store", () => {
         )
       })
     })
-    describe("is_running", () => {
+    describe("status", () => {
       test("test geode false & viewer false", () => {
-        geode_store.$patch({ is_running: false })
-        viewer_store.$patch({ is_running: false })
-        expect(infra_store.is_running).toBe(false)
+        geode_store.$patch({ status: Status.NOT_CONNECTED })
+        viewer_store.$patch({ status: Status.NOT_CONNECTED })
+        expect(infra_store.microservices_connected).toBe(false)
       })
       test("test geode true & viewer false", () => {
-        geode_store.$patch({ is_running: true })
-        viewer_store.$patch({ is_running: false })
-        expect(infra_store.is_running).toBe(false)
+        geode_store.$patch({ status: Status.CONNECTED })
+        viewer_store.$patch({ status: Status.NOT_CONNECTED })
+        expect(infra_store.microservices_connected).toBe(false)
       })
       test("test geode false & viewer true", () => {
-        geode_store.$patch({ is_running: false })
-        viewer_store.$patch({ is_running: true })
-        expect(infra_store.is_running).toBe(false)
+        geode_store.$patch({ status: Status.NOT_CONNECTED })
+        viewer_store.$patch({ status: Status.CONNECTED })
+        expect(infra_store.microservices_connected).toBe(false)
       })
       test("test geode true & viewer true", () => {
-        geode_store.$patch({ is_running: true })
-        viewer_store.$patch({ is_running: true })
-        expect(infra_store.is_running).toBe(true)
+        geode_store.$patch({ status: Status.CONNECTED })
+        viewer_store.$patch({ status: Status.CONNECTED })
+        expect(infra_store.microservices_connected).toBe(true)
       })
     })
 
@@ -84,38 +85,39 @@ describe("Infra Store", () => {
       test("test geode false & viewer false", () => {
         geode_store.$patch({ request_counter: 0 })
         viewer_store.$patch({ request_counter: 0 })
-        expect(infra_store.is_busy).toBe(false)
+        expect(infra_store.microservices_busy).toBe(false)
       })
       test("test geode true & viewer false", () => {
         geode_store.$patch({ request_counter: 1 })
         viewer_store.$patch({ request_counter: 0 })
-        expect(infra_store.is_busy).toBe(true)
+        expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode false & viewer true", () => {
         geode_store.$patch({ request_counter: 0 })
         viewer_store.$patch({ request_counter: 1 })
-        expect(infra_store.is_busy).toBe(true)
+        expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode true & viewer true", () => {
         geode_store.$patch({ request_counter: 1 })
         viewer_store.$patch({ request_counter: 1 })
-        expect(infra_store.is_busy).toBe(true)
+        expect(infra_store.microservices_busy).toBe(true)
       })
     })
   })
 
   describe("actions", () => {
-    describe("create_connexion", () => {
+    describe("create_backend", () => {
       test("test without end-point", async () => {
-        await infra_store.create_connexion()
-        expect(infra_store.is_connexion_launched).toBe(true)
+        await infra_store.create_backend()
+        expect(infra_store.status).toBe(Status.NOT_CONNECTED)
         expect(feedback_store.server_error).toBe(true)
       })
     })
     describe("create_backend", () => {
       test("test without end-point", async () => {
         await infra_store.create_backend()
-        expect(geode_store.is_running).toBe(false)
+        console.log("geode_store.status", geode_store.status)
+        expect(geode_store.status).toBe(Status.NOT_CONNECTED)
         expect(feedback_store.server_error).toBe(true)
       })
       test("test with end-point", async () => {
@@ -124,7 +126,7 @@ describe("Infra Store", () => {
           handler: () => ({ ID: "123456" }),
         })
         await infra_store.create_backend()
-        expect(geode_store.is_running).toBe(true)
+        expect(geode_store.status).toBe(Status.CONNECTED)
       })
     })
   })

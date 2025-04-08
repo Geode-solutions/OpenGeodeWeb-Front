@@ -56,79 +56,81 @@ export const use_viewer_store = defineStore("viewer", {
       this.picked_point.y = world_y
       this.picking_mode = false
     },
-    async connect() {
-      if (process.env.NODE_ENV == "test") {
-        return
-      }
-      navigator.locks.request("viewer.connect", async (lock) => {
+    async ws_connect() {
+      if (process.env.NODE_ENV == "test") return
+      console.log("ws_connect 1", this.status)
+      if (this.status === Status.CONNECTED) return
+      console.log("ws_connect 2", this.status)
+
+      navigator.locks.request("viewer.ws_connect", async (lock) => {
+        console.log("VIEWER STATUS", this.status)
+        if (this.status === Status.CONNECTED) return
+        console.log("VIEWER LOCK GRANTED !", lock)
         this.status = Status.CONNECTING
-        if (lock) {
-          this.status = Status.CONNECTING
-          const SmartConnect = await import("wslink/src/SmartConnect")
-          vtkWSLinkClient.setSmartConnectClass(SmartConnect)
+        const SmartConnect = await import("wslink/src/SmartConnect")
+        vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
-          const config = { application: "Viewer" }
-          config.sessionURL = this.base_url
+        const config = { application: "Viewer" }
+        config.sessionURL = this.base_url
 
-          const { client } = this
-          if (this.is_running && client.isConnected()) {
-            client.disconnect(-1)
-            this.is_running = false
-          }
-          let clientToConnect = client
-          if (_.isEmpty(clientToConnect)) {
-            clientToConnect = vtkWSLinkClient.newInstance()
-          }
-
-          // Connect to busy store
-          clientToConnect.onBusyChange((count) => {
-            this.buzy = count
-          })
-          clientToConnect.beginBusy()
-
-          // Error
-          clientToConnect.onConnectionError((httpReq) => {
-            const message =
-              (httpReq && httpReq.response && httpReq.response.error) ||
-              `Connection error`
-            console.error(message)
-          })
-
-          // Close
-          clientToConnect.onConnectionClose((httpReq) => {
-            const message =
-              (httpReq && httpReq.response && httpReq.response.error) ||
-              `Connection close`
-            console.error(message)
-          })
-
-          // Connect
-          const { connectImageStream } = await import(
-            "@kitware/vtk.js/Rendering/Misc/RemoteView"
-          )
-          return new Promise((resolve, reject) => {
-            clientToConnect
-              .connect(config)
-              .then((validClient) => {
-                connectImageStream(validClient.getConnection().getSession())
-                this.client = validClient
-                clientToConnect.endBusy()
-
-                // Now that the client is ready let's setup the server for us
-                viewer_call({
-                  schema:
-                    schemas.opengeodeweb_viewer.viewer.reset_visualization,
-                })
-                this.status = Status.CONNECTED
-                resolve()
-              })
-              .catch((error) => {
-                console.error(error)
-                this.status = Status.NOT_CONNECTED
-                reject(error)
-              })
-          })
+        const { client } = this
+        console.log("client", client)
+        if (this.status === Status.CONNECTED && client.isConnected()) {
+          client.disconnect(-1)
+          this.status = Status.NOT_CONNECTED
         }
+        let clientToConnect = client
+        if (_.isEmpty(clientToConnect)) {
+          clientToConnect = vtkWSLinkClient.newInstance()
+        }
+
+        // Connect to busy store
+        clientToConnect.onBusyChange((count) => {
+          this.buzy = count
+        })
+        clientToConnect.beginBusy()
+
+        // Error
+        clientToConnect.onConnectionError((httpReq) => {
+          const message =
+            (httpReq && httpReq.response && httpReq.response.error) ||
+            `Connection error`
+          console.error(message)
+        })
+
+        // Close
+        clientToConnect.onConnectionClose((httpReq) => {
+          const message =
+            (httpReq && httpReq.response && httpReq.response.error) ||
+            `Connection close`
+          console.error(message)
+        })
+
+        // Connect
+        const { connectImageStream } = await import(
+          "@kitware/vtk.js/Rendering/Misc/RemoteView"
+        )
+        return new Promise((resolve, reject) => {
+          clientToConnect
+            .connect(config)
+            .then((validClient) => {
+              connectImageStream(validClient.getConnection().getSession())
+              this.client = validClient
+              clientToConnect.endBusy()
+
+              // Now that the client is ready let's setup the server for us
+              viewer_call({
+                schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
+              })
+              this.status = Status.CONNECTED
+              resolve()
+            })
+            .catch((error) => {
+              console.error(error)
+              this.status = Status.NOT_CONNECTED
+              reject(error)
+            })
+        })
       })
     },
     start_request() {

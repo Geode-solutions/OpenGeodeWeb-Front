@@ -21,7 +21,7 @@
 
 // describe("Launcher.vue", async () => {
 //   test(`Mount`, async () => {
-//     const spy_infra_store = vi.spyOn(infra_store, "create_connexion")
+//     const spy_infra_store = vi.spyOn(infra_store, "create_backend")
 //     const wrapper = await mountSuspended(Launcher, {
 //       global: {
 //         plugins: [vuetify],

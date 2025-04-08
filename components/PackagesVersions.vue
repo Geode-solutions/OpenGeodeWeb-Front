@@ -20,7 +20,6 @@
 
 <script setup>
   const infra_store = use_infra_store()
-  const { is_running } = storeToRefs(infra_store)
 
   const props = defineProps({
     schema: { type: Object, required: true },
@@ -53,7 +52,7 @@
     await Promise.all(array_promise)
   }
 
-  watch(is_running, () => {
+  watch(infra_store.status, () => {
     get_packages_versions()
   })
 
