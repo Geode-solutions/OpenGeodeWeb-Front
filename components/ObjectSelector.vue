@@ -1,7 +1,12 @@
 <template>
   <FetchingData v-if="loading" />
   <v-row v-else-if="Object.keys(allowed_objects).length" class="justify-left">
-    <v-col v-for="(value, key) in allowed_objects" :key="key" cols="2" md="4">
+    <v-col
+      v-for="(value, key, index) in allowed_objects"
+      :key="key"
+      cols="3"
+      md="4"
+    >
       <v-tooltip
         :text="
           value['is_loadable']
@@ -21,6 +26,7 @@
               :disabled="!value['is_loadable']"
               :elevation="value['is_loadable'] ? 5 : 3"
             >
+              {{ index }}
               <v-img
                 :src="geode_objects[key].image"
                 cover
@@ -107,6 +113,9 @@
     }
 
     allowed_objects.value = final_object
+    if (Object.keys(allowed_objects.value).length == 1) {
+      set_geode_object(Object.keys(allowed_objects.value)[0])
+    }
     toggle_loading()
   }
 
