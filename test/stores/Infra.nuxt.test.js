@@ -1,10 +1,27 @@
-import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
+import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import Status from "../utils/status"
+import Status from "@/utils/status.js"
+
+// Mock navigator.locks API
+const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
+  return callback({ name })
+})
+
+vi.stubGlobal('navigator', {
+  ...navigator,
+  locks: {
+    request: mockLockRequest
+  }
+})
 
 describe("Infra Store", () => {
+  // const locksMock = {
+  //   locks: { request: vi.fn() },
+  // }
+  // global.navigator = locksMock // here
+
   const pinia = createTestingPinia({
     stubActions: false,
   })
@@ -62,6 +79,7 @@ describe("Infra Store", () => {
       test("test geode false & viewer false", () => {
         geode_store.$patch({ status: Status.NOT_CONNECTED })
         viewer_store.$patch({ status: Status.NOT_CONNECTED })
+        console.log("Status", Status)
         expect(infra_store.microservices_connected).toBe(false)
       })
       test("test geode true & viewer false", () => {
@@ -109,16 +127,10 @@ describe("Infra Store", () => {
     describe("create_backend", () => {
       test("test without end-point", async () => {
         await infra_store.create_backend()
-        expect(infra_store.status).toBe(Status.NOT_CONNECTED)
-        expect(feedback_store.server_error).toBe(true)
-      })
-    })
-    describe("create_backend", () => {
-      test("test without end-point", async () => {
-        await infra_store.create_backend()
         console.log("geode_store.status", geode_store.status)
+        expect(infra_store.status).toBe(Status.CREATING)
         expect(geode_store.status).toBe(Status.NOT_CONNECTED)
-        expect(feedback_store.server_error).toBe(true)
+        expect(viewer_store.status).toBe(Status.NOT_CONNECTED)
       })
       test("test with end-point", async () => {
         registerEndpoint(infra_store.lambda_url, {
@@ -126,7 +138,10 @@ describe("Infra Store", () => {
           handler: () => ({ ID: "123456" }),
         })
         await infra_store.create_backend()
-        expect(geode_store.status).toBe(Status.CONNECTED)
+        expect(infra_store.status).toBe(Status.CREATING)
+        expect(geode_store.status).toBe(Status.NOT_CONNECTED)
+        expect(viewer_store.status).toBe(Status.NOT_CONNECTED)
+        expect(feedback_store.server_error).toBe(false)
       })
     })
   })

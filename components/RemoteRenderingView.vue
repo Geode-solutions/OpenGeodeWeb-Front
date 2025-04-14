@@ -24,7 +24,7 @@
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize, useWindowSize } from "@vueuse/core"
   import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
-  import Status from "../utils/status"
+  import Status from "@/utils/status.js"
 
   const viewer_store = use_viewer_store()
   const viewer = ref(null)

@@ -2,7 +2,7 @@ import _ from "lodash"
 import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/schemas.json"
-import Status from "../utils/status"
+import Status from "@/utils/status.js"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({

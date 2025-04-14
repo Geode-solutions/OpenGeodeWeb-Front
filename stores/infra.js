@@ -1,6 +1,6 @@
 import { useStorage } from "@vueuse/core"
 import isElectron from "is-electron"
-import Status from "../utils/status"
+import Status from "@/utils/status.js"
 
 export const use_infra_store = defineStore("infra", {
   state: () => ({
@@ -49,12 +49,13 @@ export const use_infra_store = defineStore("infra", {
     async create_backend() {
       console.log("create_backend", this.status)
       if (this.status === Status.CREATED) return
+      console.log("NAVIGATOR", navigator)
       navigator.locks.request("infra.create_backend", async (lock) => {
-        console.log("create_backend lock", this.status)
+        console.log("PASSED IN LOCK", this.status)
+        this.status = Status.CREATING
         if (this.status === Status.CREATED) return
         console.log("INFRA LOCK GRANTED !", lock)
         console.log("INFRA STATUS", this.status)
-        this.status = Status.CREATING
         const geode_store = use_geode_store()
         const viewer_store = use_viewer_store()
         const feedback_store = use_feedback_store()
@@ -69,13 +70,13 @@ export const use_infra_store = defineStore("infra", {
           const { data, error } = await useFetch(this.lambda_url, {
             method: "POST",
           })
-          if (data.value !== null) {
-            this.ID = data.value.ID
-            localStorage.setItem("ID", data.value.ID)
-          } else {
+          if (error.value || !data.value) {
+            this.status = Status.NOT_CREATED
             feedback_store.server_error = true
             return
           }
+          this.ID = data.value.ID
+          localStorage.setItem("ID", data.value.ID)
         }
         this.status = Status.CREATED
         return this.create_connection()

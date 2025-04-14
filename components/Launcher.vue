@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-  import Status from "../utils/status"
+  import Status from "@/utils/status.js"
 
   const viewer_store = use_viewer_store()
   const infra_store = use_infra_store()

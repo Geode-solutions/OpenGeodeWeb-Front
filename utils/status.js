@@ -7,4 +7,4 @@ const Status = {
   CONNECTED: "CONNECTED",
 }
 
-export default { Status }
+export default Status
