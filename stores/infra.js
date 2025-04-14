@@ -47,15 +47,11 @@ export const use_infra_store = defineStore("infra", {
   },
   actions: {
     async create_backend() {
-      console.log("create_backend", this.status)
       if (this.status === Status.CREATED) return
-      console.log("NAVIGATOR", navigator)
       navigator.locks.request("infra.create_backend", async (lock) => {
-        console.log("PASSED IN LOCK", this.status)
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return
-        console.log("INFRA LOCK GRANTED !", lock)
-        console.log("INFRA STATUS", this.status)
+        console.log("LOCK GRANTED !", lock)
         const geode_store = use_geode_store()
         const viewer_store = use_viewer_store()
         const feedback_store = use_feedback_store()

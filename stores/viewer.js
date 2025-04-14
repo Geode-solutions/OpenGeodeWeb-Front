@@ -58,10 +58,7 @@ export const use_viewer_store = defineStore("viewer", {
     },
     async ws_connect() {
       if (process.env.NODE_ENV == "test") return
-      console.log("ws_connect 1", this.status)
       if (this.status === Status.CONNECTED) return
-      console.log("ws_connect 2", this.status)
-
       navigator.locks.request("viewer.ws_connect", async (lock) => {
         console.log("VIEWER STATUS", this.status)
         if (this.status === Status.CONNECTED) return

@@ -9,19 +9,14 @@ const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
   return callback({ name })
 })
 
-vi.stubGlobal('navigator', {
+vi.stubGlobal("navigator", {
   ...navigator,
   locks: {
-    request: mockLockRequest
-  }
+    request: mockLockRequest,
+  },
 })
 
 describe("Infra Store", () => {
-  // const locksMock = {
-  //   locks: { request: vi.fn() },
-  // }
-  // global.navigator = locksMock // here
-
   const pinia = createTestingPinia({
     stubActions: false,
   })

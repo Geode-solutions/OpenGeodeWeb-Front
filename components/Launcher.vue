@@ -30,7 +30,7 @@
   watch(is_captcha_validated, async (value) => {
     if (value === true && process.client) {
       await infra_store.create_backend()
-      await viewer_store.connect()
+      await viewer_store.ws_connect()
     }
   })
 </script>
