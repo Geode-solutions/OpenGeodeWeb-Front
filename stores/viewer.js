@@ -65,15 +65,21 @@ export const use_viewer_store = defineStore("viewer", {
       const config = { application: "Viewer" }
       config.sessionURL = this.base_url
 
-      const { client } = this
-      if (this.is_running && client.isConnected()) {
-        client.disconnect(-1)
-        this.is_running = false
-      }
-      let clientToConnect = client
-      if (_.isEmpty(clientToConnect)) {
-        clientToConnect = vtkWSLinkClient.newInstance()
-      }
+        const { client } = this
+        console.log("client", client)
+        console.log("status", this.status)
+        if (this.status === Status.CONNECTED && client.isConnected()) {
+          console.log("disconnect")
+
+          client.disconnect(-1)
+          this.status = Status.NOT_CONNECTED
+        }
+        let clientToConnect = client
+        if (_.isEmpty(clientToConnect)) {
+          console.log("isEmpty")
+
+          clientToConnect = vtkWSLinkClient.newInstance()
+        }
 
       // Connect to busy store
       clientToConnect.onBusyChange((count) => {
@@ -97,29 +103,34 @@ export const use_viewer_store = defineStore("viewer", {
         console.error(message)
       })
 
-      // Connect
-      const { connectImageStream } = await import(
-        "@kitware/vtk.js/Rendering/Misc/RemoteView"
-      )
-      return new Promise((resolve, reject) => {
-        clientToConnect
-          .connect(config)
-          .then((validClient) => {
-            connectImageStream(validClient.getConnection().getSession())
-            this.client = validClient
-            clientToConnect.endBusy()
+        // Connect
+        const { connectImageStream } = await import(
+          "@kitware/vtk.js/Rendering/Misc/RemoteView"
+        )
+        console.log("before connect")
+        const viewer_store = this
+        return new Promise((resolve, reject) => {
+          clientToConnect
+            .connect(config)
+            .then((validClient) => {
+              console.log("validClient", validClient)
+              connectImageStream(validClient.getConnection().getSession())
+              viewer_store.client = validClient
+              clientToConnect.endBusy()
 
-            // Now that the client is ready let's setup the server for us
-            viewer_call({
-              schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
+              // Now that the client is ready let's setup the server for us
+              viewer_call({
+                schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
+              })
+              viewer_store.status = Status.CONNECTED
+              resolve()
             })
-            this.is_running = true
-            resolve()
-          })
-          .catch((error) => {
-            console.error(error)
-            reject(error)
-          })
+            .catch((error) => {
+              console.error(error)
+              viewer_store.status = Status.NOT_CONNECTED
+              reject(error)
+            })
+        })
       })
     },
     start_request() {
