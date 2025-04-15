@@ -19,13 +19,13 @@
 </template>
 
 <script setup>
-  const infra_store = use_infra_store()
+  import Status from "@/utils/status.js"
 
   const props = defineProps({
     schema: { type: Object, required: true },
   })
-  const { schema } = props
 
+  const geode_store = use_geode_store()
   const packages_versions = ref([])
 
   async function get_packages_versions() {
@@ -33,7 +33,7 @@
 
     const promise = new Promise((resolve, reject) => {
       api_fetch(
-        { schema },
+        { schema: props.schema },
         {
           request_error_function: () => {
             reject()
@@ -52,8 +52,8 @@
     await Promise.all(array_promise)
   }
 
-  watch(infra_store.status, () => {
-    get_packages_versions()
+  watch(geode_store.status, (value) => {
+    if (value == Status.CONNECTED) get_packages_versions()
   })
 
   await get_packages_versions()
