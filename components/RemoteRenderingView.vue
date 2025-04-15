@@ -24,17 +24,16 @@
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize, useWindowSize } from "@vueuse/core"
   import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
+  import Status from "@/utils/status.js"
 
   const viewer_store = use_viewer_store()
-  const { client, is_running, picking_mode } = storeToRefs(viewer_store)
-
   const viewer = ref(null)
   const { width, height } = useElementSize(viewer)
 
   const { width: windowWidth, height: windowHeight } = useWindowSize()
 
   function get_x_y(event) {
-    if (picking_mode.value === true) {
+    if (viewer_store.picking_mode.value === true) {
       const { offsetX, offsetY } = event
       viewer_store.set_picked_point(offsetX, offsetY)
       viewer_call({
@@ -70,7 +69,7 @@
     resize()
   })
 
-  watch(picking_mode, (value) => {
+  watch(viewer_store.picking_mode, (value) => {
     const cursor = value ? "crosshair" : "pointer"
     view.getCanvasView().setCursor(cursor)
   })
@@ -79,7 +78,7 @@
     resize()
   })
 
-  watch(client, () => {
+  watch(viewer_store.client, () => {
     connect()
   })
 
@@ -91,10 +90,10 @@
   })
 
   function connect() {
-    if (!is_running.value) {
+    if (!viewer_store.status !== Status.CONNECTED) {
       return
     }
-    const session = client.value.getConnection().getSession()
+    const session = viewer_store.client.value.getConnection().getSession()
     view.setSession(session)
     view.setViewId(viewId.value)
     connected.value = true

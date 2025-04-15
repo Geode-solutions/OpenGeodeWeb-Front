@@ -2,16 +2,17 @@ import _ from "lodash"
 import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/schemas.json"
+import Status from "@/utils/status.js"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
     default_local_port: "1234",
     client: {},
     config: null,
-    is_running: false,
     picking_mode: false,
     picked_point: { x: null, y: null },
     request_counter: 0,
+    status: Status.NOT_CONNECTED,
   }),
   getters: {
     protocol() {
@@ -56,14 +57,18 @@ export const use_viewer_store = defineStore("viewer", {
       this.picking_mode = false
     },
     async ws_connect() {
-      if (process.env.NODE_ENV == "test") {
-        return
-      }
-      const SmartConnect = await import("wslink/src/SmartConnect")
-      vtkWSLinkClient.setSmartConnectClass(SmartConnect)
+      if (process.env.NODE_ENV == "test") return
+      if (this.status === Status.CONNECTED) return
+      navigator.locks.request("viewer.ws_connect", async (lock) => {
+        console.log("VIEWER STATUS", this.status)
+        if (this.status === Status.CONNECTED) return
+        console.log("VIEWER LOCK GRANTED !", lock)
+        this.status = Status.CONNECTING
+        const SmartConnect = await import("wslink/src/SmartConnect")
+        vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
-      const config = { application: "Viewer" }
-      config.sessionURL = this.base_url
+        const config = { application: "Viewer" }
+        config.sessionURL = this.base_url
 
         const { client } = this
         console.log("client", client)
@@ -81,27 +86,27 @@ export const use_viewer_store = defineStore("viewer", {
           clientToConnect = vtkWSLinkClient.newInstance()
         }
 
-      // Connect to busy store
-      clientToConnect.onBusyChange((count) => {
-        this.buzy = count
-      })
-      clientToConnect.beginBusy()
+        // Connect to busy store
+        clientToConnect.onBusyChange((count) => {
+          this.buzy = count
+        })
+        clientToConnect.beginBusy()
 
-      // Error
-      clientToConnect.onConnectionError((httpReq) => {
-        const message =
-          (httpReq && httpReq.response && httpReq.response.error) ||
-          `Connection error`
-        console.error(message)
-      })
+        // Error
+        clientToConnect.onConnectionError((httpReq) => {
+          const message =
+            (httpReq && httpReq.response && httpReq.response.error) ||
+            `Connection error`
+          console.error(message)
+        })
 
-      // Close
-      clientToConnect.onConnectionClose((httpReq) => {
-        const message =
-          (httpReq && httpReq.response && httpReq.response.error) ||
-          `Connection close`
-        console.error(message)
-      })
+        // Close
+        clientToConnect.onConnectionClose((httpReq) => {
+          const message =
+            (httpReq && httpReq.response && httpReq.response.error) ||
+            `Connection close`
+          console.error(message)
+        })
 
         // Connect
         const { connectImageStream } = await import(
@@ -139,5 +144,8 @@ export const use_viewer_store = defineStore("viewer", {
     stop_request() {
       this.request_counter--
     },
+  },
+  share: {
+    omit: ["status", "client"],
   },
 })
