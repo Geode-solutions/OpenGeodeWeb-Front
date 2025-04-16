@@ -52,9 +52,12 @@
     await Promise.all(array_promise)
   }
 
-  watch(geode_store.status, (value) => {
-    if (value == Status.CONNECTED) get_packages_versions()
-  })
+  watch(
+    () => geode_store.status,
+    (value) => {
+      if (value == Status.CONNECTED) get_packages_versions()
+    },
+  )
 
   await get_packages_versions()
 </script>
