@@ -97,7 +97,7 @@
   )
 
   function connect() {
-    if (!viewer_store.status !== Status.CONNECTED) {
+    if (viewer_store.status !== Status.CONNECTED) {
       return
     }
     const session = viewer_store.client.value.getConnection().getSession()

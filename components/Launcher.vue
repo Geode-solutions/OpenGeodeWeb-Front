@@ -26,16 +26,16 @@
 
   watch(
     () => infra_store.is_captcha_validated,
-    async (value, oldValue) => {
+    (value, oldValue) => {
       if (value && !oldValue && process.client) {
-        await infra_store.create_backend()
+        infra_store.create_backend()
       }
     },
   )
 
-  onMounted(async () => {
+  onMounted(() => {
     if (infra_store.is_captcha_validated) {
-      await infra_store.create_backend()
+      infra_store.create_backend()
     }
   })
 </script>

@@ -6,7 +6,7 @@ export const use_infra_store = defineStore("infra", {
   state: () => ({
     ID: useStorage("ID", ""),
     is_captcha_validated:
-      is_cloud() || process.env.NODE_ENV === "development" ? true : false,
+      !this.is_cloud() || process.env.NODE_ENV === "development",
     status: Status.NOT_CREATED,
   }),
   getters: {
