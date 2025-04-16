@@ -100,7 +100,7 @@
     if (viewer_store.status !== Status.CONNECTED) {
       return
     }
-    const session = viewer_store.client.value.getConnection().getSession()
+    const session = viewer_store.client.getConnection().getSession()
     view.setSession(session)
     view.setViewId(props.viewId)
     connected.value = true
