@@ -14,7 +14,7 @@
         "
         class="pa-0"
         @click="get_x_y"
-        @keydown.esc="app_store.toggle_picking_mode(false)"
+        @keydown.esc="viewer_store.toggle_picking_mode(false)"
       />
     </div>
   </ClientOnly>
@@ -25,10 +25,12 @@
   import { useElementSize, useWindowSize } from "@vueuse/core"
   import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
 
-  const viewer_store = use_viewer_store()
-  const { client, is_running, picking_mode } = storeToRefs(viewer_store)
+  const props = defineProps({
+    viewId: { type: String, default: "-1" },
+  })
 
-  const viewer = ref(null)
+  const viewer_store = use_viewer_store()
+  const viewer = useTemplateRef("viewer")
   const { width, height } = useElementSize(viewer)
 
   const { width: windowWidth, height: windowHeight } = useWindowSize()
@@ -44,13 +46,7 @@
     }
   }
 
-  const props = defineProps({
-    viewId: { type: String, default: "-1" },
-  })
-
-  const { viewId } = toRefs(props)
   const connected = ref(false)
-
   const view = vtkRemoteView.newInstance({
     rpcWheelEvent: "viewport.mouse.zoom.wheel",
   })
@@ -70,25 +66,34 @@
     resize()
   })
 
-  watch(picking_mode, (value) => {
-    const cursor = value ? "crosshair" : "pointer"
-    view.getCanvasView().setCursor(cursor)
-  })
+  watch(
+    () => viewer_store.picking_mode,
+    (value) => {
+      const cursor = value ? "crosshair" : "pointer"
+      view.getCanvasView().setCursor(cursor)
+    },
+  )
 
   watch([width, height], () => {
     resize()
   })
 
-  watch(client, () => {
-    connect()
-  })
+  watch(
+    () => viewer_store.client,
+    () => {
+      connect()
+    },
+  )
 
-  watch(viewId, (id) => {
-    if (connected.value) {
-      view.setViewId(id)
-      view.render()
-    }
-  })
+  watch(
+    () => props.viewId,
+    (id) => {
+      if (connected.value) {
+        view.setViewId(id)
+        view.render()
+      }
+    },
+  )
 
   function connect() {
     if (!is_running.value) {
@@ -96,7 +101,7 @@
     }
     const session = client.value.getConnection().getSession()
     view.setSession(session)
-    view.setViewId(viewId.value)
+    view.setViewId(props.viewId)
     connected.value = true
     view.render()
   }

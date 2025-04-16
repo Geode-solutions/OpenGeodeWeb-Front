@@ -4,8 +4,9 @@ import isElectron from "is-electron"
 export const use_infra_store = defineStore("infra", {
   state: () => ({
     ID: useStorage("ID", ""),
-    is_captcha_validated: false,
-    is_connexion_launched: false,
+    is_captcha_validated:
+      is_cloud() || process.env.NODE_ENV === "development" ? true : false,
+    status: Status.NOT_CREATED,
   }),
   getters: {
     is_cloud() {
