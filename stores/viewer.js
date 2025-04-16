@@ -60,7 +60,6 @@ export const use_viewer_store = defineStore("viewer", {
       if (process.env.NODE_ENV == "test") return
       if (this.status === Status.CONNECTED) return
       navigator.locks.request("viewer.ws_connect", async (lock) => {
-        console.log("VIEWER STATUS", this.status)
         if (this.status === Status.CONNECTED) return
         console.log("VIEWER LOCK GRANTED !", lock)
         this.status = Status.CONNECTING
@@ -71,18 +70,12 @@ export const use_viewer_store = defineStore("viewer", {
         config.sessionURL = this.base_url
 
         const { client } = this
-        console.log("client", client)
-        console.log("status", this.status)
         if (this.status === Status.CONNECTED && client.isConnected()) {
-          console.log("disconnect")
-
           client.disconnect(-1)
           this.status = Status.NOT_CONNECTED
         }
         let clientToConnect = client
         if (_.isEmpty(clientToConnect)) {
-          console.log("isEmpty")
-
           clientToConnect = vtkWSLinkClient.newInstance()
         }
 
@@ -112,13 +105,11 @@ export const use_viewer_store = defineStore("viewer", {
         const { connectImageStream } = await import(
           "@kitware/vtk.js/Rendering/Misc/RemoteView"
         )
-        console.log("before connect")
         const viewer_store = this
         return new Promise((resolve, reject) => {
           clientToConnect
             .connect(config)
             .then((validClient) => {
-              console.log("validClient", validClient)
               connectImageStream(validClient.getConnection().getSession())
               viewer_store.client = validClient
               clientToConnect.endBusy()
