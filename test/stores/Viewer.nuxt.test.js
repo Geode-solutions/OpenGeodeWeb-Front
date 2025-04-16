@@ -18,13 +18,13 @@ describe("Viewer Store", () => {
     test("initial state", () => {
       expectTypeOf(viewer_store.default_local_port).toBeString()
       expectTypeOf(viewer_store.client).toEqualTypeOf({})
-      expectTypeOf(viewer_store.is_running).toBeBoolean()
       expectTypeOf(viewer_store.picking_mode).toBeBoolean()
       expectTypeOf(viewer_store.picked_point).toEqualTypeOf({
         x: null,
         y: null,
       })
       expectTypeOf(viewer_store.picked_point).toBeNumber()
+      expectTypeOf(viewer_store.status).toBeString()
     })
   })
 
