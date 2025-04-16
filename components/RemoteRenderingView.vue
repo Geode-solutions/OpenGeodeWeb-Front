@@ -24,6 +24,7 @@
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize, useWindowSize } from "@vueuse/core"
   import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
+  import Status from "@/utils/status.js"
 
   const props = defineProps({
     viewId: { type: String, default: "-1" },
@@ -36,7 +37,7 @@
   const { width: windowWidth, height: windowHeight } = useWindowSize()
 
   function get_x_y(event) {
-    if (picking_mode.value === true) {
+    if (viewer_store.picking_mode.value === true) {
       const { offsetX, offsetY } = event
       viewer_store.set_picked_point(offsetX, offsetY)
       viewer_call({
@@ -96,10 +97,10 @@
   )
 
   function connect() {
-    if (!is_running.value) {
+    if (!viewer_store.status !== Status.CONNECTED) {
       return
     }
-    const session = client.value.getConnection().getSession()
+    const session = viewer_store.client.value.getConnection().getSession()
     view.setSession(session)
     view.setViewId(props.viewId)
     connected.value = true

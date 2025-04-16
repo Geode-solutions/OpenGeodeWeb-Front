@@ -1,22 +1,23 @@
 <template>
   <v-container>
     <v-row class="flex-column">
-      <v-col v-if="!is_running">
-        <Launcher />
-      </v-col>
-      <v-col v-if="is_running">
-        <Stepper />
-      </v-col>
-      <v-col v-if="is_running">
-        <PackagesVersions :schema="versions_schema" />
-      </v-col>
+      <template v-if="!infra_store.microservices_connected">
+        <v-col>
+          <Launcher />
+        </v-col>
+      </template>
+      <template v-else>
+        <v-col>
+          <Stepper />
+        </v-col>
+        <v-col> <PackagesVersions :schema="versions_schema" /> </v-col>
+      </template>
     </v-row>
   </v-container>
 </template>
 
 <script setup>
   const infra_store = use_infra_store()
-  const { is_running } = storeToRefs(infra_store)
 
   const props = defineProps({
     versions_schema: { type: Object, required: true },

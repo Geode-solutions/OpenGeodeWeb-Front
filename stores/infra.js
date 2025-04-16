@@ -1,5 +1,6 @@
 import { useStorage } from "@vueuse/core"
 import isElectron from "is-electron"
+import Status from "@/utils/status.js"
 
 export const use_infra_store = defineStore("infra", {
   state: () => ({
@@ -35,47 +36,53 @@ export const use_infra_store = defineStore("infra", {
         "/createbackend"
       return url
     },
-    is_running() {
-      return use_geode_store().is_running && use_viewer_store().is_running
+    microservices_connected() {
+      return (
+        use_geode_store().status == Status.CONNECTED &&
+        use_viewer_store().status == Status.CONNECTED
+      )
     },
-    is_busy() {
+    microservices_busy() {
       return use_geode_store().is_busy || use_viewer_store().is_busy
     },
   },
   actions: {
-    async create_connexion() {
-      if (this.is_connexion_launched) {
-        return
-      }
-      this.is_connexion_launched = true
-      return this.create_backend()
-    },
     async create_backend() {
-      const geode_store = use_geode_store()
-      const viewer_store = use_viewer_store()
-      const feedback_store = use_feedback_store()
-
-      if (isElectron()) {
-        const back_port = await window.electronAPI.run_back(geode_store.port)
-        geode_store.$patch({ default_local_port: back_port })
-        const viewer_port = await window.electronAPI.run_viewer(
-          viewer_store.port,
-        )
-        viewer_store.$patch({ default_local_port: viewer_port })
-      } else {
-        const { data, error } = await useFetch(this.lambda_url, {
-          method: "POST",
-        })
-        if (data.value !== null) {
+      if (this.status === Status.CREATED) return
+      navigator.locks.request("infra.create_backend", async (lock) => {
+        this.status = Status.CREATING
+        if (this.status === Status.CREATED) return
+        console.log("LOCK GRANTED !", lock)
+        const geode_store = use_geode_store()
+        const viewer_store = use_viewer_store()
+        const feedback_store = use_feedback_store()
+        if (isElectron()) {
+          const back_port = await window.electronAPI.run_back(geode_store.port)
+          geode_store.$patch({ default_local_port: back_port })
+          const viewer_port = await window.electronAPI.run_viewer(
+            viewer_store.port,
+          )
+          viewer_store.$patch({ default_local_port: viewer_port })
+        } else {
+          const { data, error } = await useFetch(this.lambda_url, {
+            method: "POST",
+          })
+          if (error.value || !data.value) {
+            this.status = Status.NOT_CREATED
+            feedback_store.server_error = true
+            return
+          }
           this.ID = data.value.ID
           localStorage.setItem("ID", data.value.ID)
-        } else {
-          feedback_store.server_error = true
-          return
         }
-      }
-      geode_store.$patch({ is_running: true })
-      return geode_store.ping_task()
+        this.status = Status.CREATED
+        return this.create_connection()
+      })
+    },
+    async create_connection() {
+      await use_viewer_store().ws_connect()
+      await use_geode_store().do_ping()
+      return
     },
   },
 })

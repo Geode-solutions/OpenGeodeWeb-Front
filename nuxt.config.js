@@ -39,6 +39,7 @@ export default defineNuxtConfig({
         "ajv",
         "fast-deep-equal",
         "globalthis",
+        "h3",
         "is-electron",
         "js-file-download",
         "lodash",
