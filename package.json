@@ -54,6 +54,7 @@
     "pinia": "^2.2.2",
     "sass": "^1.77.8",
     "semver": "^7.6.3",
+    "uuid": "^11.1.0",
     "vue-recaptcha": "^2.0.3",
     "vue3-carousel": "^0.3.3"
   },
