@@ -5,8 +5,7 @@ import Status from "@/utils/status.js"
 export const use_infra_store = defineStore("infra", {
   state: () => ({
     ID: useStorage("ID", ""),
-    is_captcha_validated:
-      !this.is_cloud() || process.env.NODE_ENV === "development",
+    is_captcha_validated: false,
     status: Status.NOT_CREATED,
   }),
   getters: {
