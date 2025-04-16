@@ -51,7 +51,7 @@
           variant="flat"
           size="20"
           :color="feedback.type"
-          @click="feedback_store.delete_feedback(index)"
+          @click="feedback_store.delete_feedback(feedback.id)"
         >
           <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
