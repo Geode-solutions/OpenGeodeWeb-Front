@@ -32,10 +32,4 @@
       }
     },
   )
-
-  onMounted(() => {
-    if (infra_store.is_captcha_validated) {
-      infra_store.create_backend()
-    }
-  })
 </script>
