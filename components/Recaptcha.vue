@@ -22,7 +22,7 @@
   onMounted(() => {
     if (process.client) {
       const config = useRuntimeConfig()
-      if (config.public.NODE_ENV !== "production" || !infra_store.is_cloud) {
+      if (config.public.NODE_ENV !== "production") {
         infra_store.$patch({ is_captcha_validated: true })
       }
     }
