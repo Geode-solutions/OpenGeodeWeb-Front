@@ -66,7 +66,7 @@ describe("Inspector/InspectionButton.vue", async () => {
 
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toStrictEqual({
+    expect(wrapper.emitted().update_values).toStrictEqual({
       inspection_result: [inspection_result],
     })
     expect(wrapper.emitted()).toHaveProperty("increment_step")
