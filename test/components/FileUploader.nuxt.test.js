@@ -56,6 +56,7 @@ describe("FileUploader.vue", async () => {
 
       await v_btn.trigger("click")
       await flushPromises()
+      console.log("TEST WRAPPER EMITTED", wrapper.emitted())
       expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
     })
 
