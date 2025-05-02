@@ -53,7 +53,7 @@ describe("CrsSelector.vue", () => {
     await input.trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values).toEqual({
+    expect(wrapper.emitted().update_values[0][0]).toEqual({
       [key_to_update]: crs_list[0],
     })
   })

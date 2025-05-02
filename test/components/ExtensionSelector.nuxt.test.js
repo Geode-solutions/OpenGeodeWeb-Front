@@ -50,7 +50,7 @@ describe("ExtensionSelector.vue", async () => {
     await v_card[1].trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values).toStrictEqual({
+    expect(wrapper.emitted().update_values[0][0]).toStrictEqual({
       output_geode_object,
       output_extension,
     })
