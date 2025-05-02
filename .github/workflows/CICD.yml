@@ -12,7 +12,6 @@ jobs:
       - name: Unit tests
         run: |
           npm i
-          cat package-lock.json
           npm run test
 
   build:
