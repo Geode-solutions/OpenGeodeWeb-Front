@@ -22,6 +22,9 @@ export async function upload_file(
   return useFetch(route, {
     baseURL: geode_store.base_url,
     ...request_options,
+    onRequest({ request }) {
+      console.log("onRequest", request)
+    },
     onRequestError({ error }) {
       console.log("onRequestError", error)
       geode_store.stop_request()
