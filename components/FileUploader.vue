@@ -66,12 +66,15 @@
           { route: schema.$id, file },
           {
             request_error_function: () => {
+              console.log("upload_files request_error_function")
               reject()
             },
             response_function: () => {
+              console.log("upload_files response_function")
               resolve()
             },
             response_error_function: () => {
+              console.log("upload_files response_error_function")
               reject()
             },
           },
@@ -79,7 +82,9 @@
       })
       promise_array.push(promise)
     }
+    console.log("upload_files before await")
     await Promise.all(promise_array)
+    console.log("upload_files after await")
     files_uploaded.value = true
     emit("files_uploaded", internal_files.value)
 
