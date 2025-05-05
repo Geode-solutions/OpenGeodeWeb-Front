@@ -65,6 +65,7 @@ describe("MissingFilesSelector.vue", async () => {
     })
     await v_btn.trigger("click")
     await flushPromises()
+    console.log("wrapper.emitted()", wrapper.emitted())
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
