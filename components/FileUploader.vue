@@ -56,9 +56,11 @@
   const toggle_loading = useToggle(loading)
 
   async function upload_files() {
+    console.log("upload_files")
     toggle_loading()
     var promise_array = []
     for (const file of internal_files.value) {
+      console.log("upload_files", file)
       const promise = new Promise((resolve, reject) => {
         upload_file(
           { route: schema.$id, file },
@@ -80,6 +82,8 @@
     await Promise.all(promise_array)
     files_uploaded.value = true
     emit("files_uploaded", internal_files.value)
+
+    console.log("emitted", internal_files.value)
     toggle_loading()
   }
 
