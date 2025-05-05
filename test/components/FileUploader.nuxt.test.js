@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
@@ -55,6 +53,7 @@ describe("FileUploader.vue", async () => {
       const v_btn = wrapper.findComponent(components.VBtn)
 
       await v_btn.trigger("click")
+      await flushPromises()
       await flushPromises()
       expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
     })

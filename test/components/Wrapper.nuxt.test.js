@@ -1,6 +1,4 @@
-// // @vitest-environment nuxt
-
-// import { describe, expect, test } from "vitest"
+// // import { describe, expect, test } from "vitest"
 // import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 // import { createVuetify } from "vuetify"

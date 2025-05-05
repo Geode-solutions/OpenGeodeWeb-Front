@@ -72,25 +72,14 @@
     var promise_array = []
     for (const filename of filenames) {
       const params = { filename, supported_feature }
-      const promise = new Promise((resolve, reject) => {
-        api_fetch(
-          { schema, params },
-          {
-            request_error_function: () => {
-              reject()
-            },
-            response_function: (response) => {
-              resolve(response._data.allowed_objects)
-            },
-            response_error_function: () => {
-              reject()
-            },
-          },
-        )
-      })
+      const promise = api_fetch({ schema, params })
       promise_array.push(promise)
     }
-    const values = await Promise.all(promise_array)
+    const responses = await Promise.all(promise_array)
+    let values = []
+    for (const response of responses) {
+      values.push(response.data.value.allowed_objects)
+    }
     const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
     const common_keys = all_keys.filter(
       (i) => !values.some((j) => !Object.keys(j).includes(i)),
@@ -119,7 +108,6 @@
       emit("increment_step")
     }
   }
-
   await get_allowed_objects()
 </script>
 

@@ -26,4 +26,4 @@ logs
 .pytest_cache
 __snapshots__
 coverage
-package-lock.json
+# package-lock.json

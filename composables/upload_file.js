@@ -1,7 +1,10 @@
+import { useAppConfig } from "nuxt/app"
+
 export async function upload_file(
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
+  console.log("upload_file", route, file)
   const feedback_store = use_feedback_store()
   const geode_store = use_geode_store()
   if (!(file instanceof File)) {
@@ -17,10 +20,14 @@ export async function upload_file(
   }
 
   geode_store.start_request()
-  return useFetch(route, {
+  return $fetch(route, {
     baseURL: geode_store.base_url,
     ...request_options,
+    onRequest({ request }) {
+      console.log("onRequest", request)
+    },
     onRequestError({ error }) {
+      console.log("onRequestError", error)
       geode_store.stop_request()
       feedback_store.add_error(error.code, route, error.message, error.stack)
       if (request_error_function) {
@@ -28,6 +35,7 @@ export async function upload_file(
       }
     },
     onResponse({ response }) {
+      console.log("onResponse", response)
       if (response.ok) {
         geode_store.stop_request()
         if (response_function) {
@@ -36,6 +44,7 @@ export async function upload_file(
       }
     },
     onResponseError({ response }) {
+      console.log("onResponseError", response)
       geode_store.stop_request()
       feedback_store.add_error(
         response.status,

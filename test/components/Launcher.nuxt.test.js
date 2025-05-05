@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
