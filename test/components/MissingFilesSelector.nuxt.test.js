@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
@@ -64,6 +62,7 @@ describe("MissingFilesSelector.vue", async () => {
       handler: () => ({}),
     })
     await v_btn.trigger("click")
+    await flushPromises()
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)

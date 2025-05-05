@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"

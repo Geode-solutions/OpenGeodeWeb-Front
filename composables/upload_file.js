@@ -1,3 +1,5 @@
+import { useAppConfig } from "nuxt/app"
+
 export async function upload_file(
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
@@ -18,8 +20,7 @@ export async function upload_file(
   }
 
   geode_store.start_request()
-  console.log("upload_file start request")
-  return useFetch(route, {
+  return $fetch(route, {
     baseURL: geode_store.base_url,
     ...request_options,
     onRequest({ request }) {
