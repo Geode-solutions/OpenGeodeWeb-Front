@@ -2,6 +2,7 @@ export async function upload_file(
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
+  console.log("upload_file", route, file)
   const feedback_store = use_feedback_store()
   const geode_store = use_geode_store()
   if (!(file instanceof File)) {
@@ -17,6 +18,7 @@ export async function upload_file(
   }
 
   geode_store.start_request()
+  console.log("upload_file start request")
   return useFetch(route, {
     baseURL: geode_store.base_url,
     ...request_options,

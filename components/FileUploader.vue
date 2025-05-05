@@ -56,7 +56,7 @@
   const toggle_loading = useToggle(loading)
 
   async function upload_files() {
-    console.log("upload_files")
+    console.log("upload_files", schema)
     toggle_loading()
     var promise_array = []
     for (const file of internal_files.value) {
