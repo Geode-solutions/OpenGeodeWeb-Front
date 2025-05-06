@@ -25,17 +25,17 @@
 </template>
 
 <script setup>
-  import ying_yang from "@/assets/img/energy_sobriety/ying_yang.png"
-  import chemin from "@/assets/img/energy_sobriety/chemin.png"
-  import vert from "@/assets/img/energy_sobriety/vert.png"
-  import lampadaire from "@/assets/img/energy_sobriety/lampadaire.png"
-  import collegue from "@/assets/img/energy_sobriety/collegue.png"
-  import sobene from "@/assets/img/energy_sobriety/sobene.png"
-  import etincelle from "@/assets/img/energy_sobriety/etincelle.png"
-  import geste from "@/assets/img/energy_sobriety/geste.png"
-  import socle from "@/assets/img/energy_sobriety/socle.png"
-  import derniere from "@/assets/img/energy_sobriety/derniere.png"
-  import salon from "@/assets/img/energy_sobriety/salon.png"
+  import ying_yang from "@ogw_f/assets/img/energy_sobriety/ying_yang.png"
+  import chemin from "@ogw_f/assets/img/energy_sobriety/chemin.png"
+  import vert from "@ogw_f/assets/img/energy_sobriety/vert.png"
+  import lampadaire from "@ogw_f/assets/img/energy_sobriety/lampadaire.png"
+  import collegue from "@ogw_f/assets/img/energy_sobriety/collegue.png"
+  import sobene from "@ogw_f/assets/img/energy_sobriety/sobene.png"
+  import etincelle from "@ogw_f/assets/img/energy_sobriety/etincelle.png"
+  import geste from "@ogw_f/assets/img/energy_sobriety/geste.png"
+  import socle from "@ogw_f/assets/img/energy_sobriety/socle.png"
+  import derniere from "@ogw_f/assets/img/energy_sobriety/derniere.png"
+  import salon from "@ogw_f/assets/img/energy_sobriety/salon.png"
 
   const users_list = [
     {

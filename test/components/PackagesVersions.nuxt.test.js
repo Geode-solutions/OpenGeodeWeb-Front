@@ -8,7 +8,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import PackagesVersions from "@/components/PackagesVersions.vue"
+import PackagesVersions from "@ogw_f/components/PackagesVersions.vue"
 
 const vuetify = createVuetify({
   components,

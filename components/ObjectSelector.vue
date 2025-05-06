@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-  import geode_objects from "@/assets/geode_objects"
+  import geode_objects from "@ogw_f/assets/geode_objects"
   import schemas from "@geode/opengeodeweb-back/schemas.json"
 
   const schema = schemas.opengeodeweb_back.allowed_objects

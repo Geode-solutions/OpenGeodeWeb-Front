@@ -2,7 +2,7 @@ import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import Status from "@/utils/status.js"
+import Status from "@ogw_f/utils/status.js"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {

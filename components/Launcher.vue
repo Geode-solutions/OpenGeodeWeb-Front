@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-  import Status from "@/utils/status.js"
+  import Status from "@ogw_f/utils/status.js"
 
   const infra_store = use_infra_store()
   const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
