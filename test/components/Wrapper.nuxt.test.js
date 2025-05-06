@@ -5,8 +5,8 @@
 // import * as components from "vuetify/components"
 // import * as directives from "vuetify/directives"
 
-// // import Wrapper from "@/components/Wrapper.vue"
-// import ObjectSelector from "@/components/ObjectSelector.vue"
+// // import Wrapper from "@ogw_f/components/Wrapper.vue"
+// import ObjectSelector from "@ogw_f/components/ObjectSelector.vue"
 
 // const vuetify = createVuetify({
 //   components,

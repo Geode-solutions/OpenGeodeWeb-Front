@@ -9,8 +9,8 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import FileSelector from "@/components/FileSelector.vue"
-import FileUploader from "@/components/FileUploader.vue"
+import FileSelector from "@ogw_f/components/FileSelector.vue"
+import FileUploader from "@ogw_f/components/FileUploader.vue"
 
 import schemas from "@geode/opengeodeweb-back/schemas.json"
 

@@ -1,6 +1,6 @@
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { use_feedback_store } from "@/stores/feedback"
+import { use_feedback_store } from "@ogw_f/stores/feedback"
 import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
 
 describe("Feedback Store", () => {

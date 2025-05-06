@@ -17,6 +17,10 @@ export default defineNuxtConfig({
     dirs: ["stores"],
   },
 
+  alias: {
+    "@ogw_f": __dirname,
+  },
+
   // ** Global CSS
   css: ["vuetify/lib/styles/main.sass"],
 

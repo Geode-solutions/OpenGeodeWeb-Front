@@ -8,7 +8,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import InspectorInspectionButton from "@/components/Inspector/InspectionButton.vue"
+import InspectorInspectionButton from "@ogw_f/components/Inspector/InspectionButton.vue"
 import schemas from "@geode/opengeodeweb-back/schemas.json"
 const schema = schemas.opengeodeweb_back.inspect_file
 
