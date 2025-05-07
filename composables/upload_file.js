@@ -20,11 +20,7 @@ export async function upload_file(
   return $fetch(route, {
     baseURL: geode_store.base_url,
     ...request_options,
-    onRequest({ request }) {
-      console.log("onRequest", request)
-    },
     onRequestError({ error }) {
-      console.log("onRequestError", error)
       geode_store.stop_request()
       feedback_store.add_error(error.code, route, error.message, error.stack)
       if (request_error_function) {
@@ -32,7 +28,6 @@ export async function upload_file(
       }
     },
     onResponse({ response }) {
-      console.log("onResponse", response)
       if (response.ok) {
         geode_store.stop_request()
         if (response_function) {
@@ -41,7 +36,6 @@ export async function upload_file(
       }
     },
     onResponseError({ response }) {
-      console.log("onResponseError", response)
       geode_store.stop_request()
       feedback_store.add_error(
         response.status,
