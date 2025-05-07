@@ -1,6 +1,6 @@
 import { useStorage } from "@vueuse/core"
 import isElectron from "is-electron"
-import Status from "@/utils/status.js"
+import Status from "@ogw_f/utils/status.js"
 
 export const use_infra_store = defineStore("infra", {
   state: () => ({

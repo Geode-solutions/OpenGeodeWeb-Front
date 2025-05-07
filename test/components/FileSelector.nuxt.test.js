@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test, vi } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
@@ -11,8 +9,8 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import FileSelector from "@/components/FileSelector.vue"
-import FileUploader from "@/components/FileUploader.vue"
+import FileSelector from "@ogw_f/components/FileSelector.vue"
+import FileUploader from "@ogw_f/components/FileUploader.vue"
 
 import schemas from "@geode/opengeodeweb-back/schemas.json"
 
@@ -60,6 +58,7 @@ describe("FileSelector.vue", async () => {
     const v_btn = wrapper.findComponent(components.VBtn)
     await v_btn.trigger("click")
     await flushPromises()
+    await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
@@ -83,7 +82,6 @@ describe("FileSelector.vue", async () => {
 
     const files = [new File(["fake_file"], "fake_file.txt")]
     test("auto_upload true", async () => {
-      const auto_upload = true
       const wrapper = await mountSuspended(FileSelector, {
         global: {
           plugins: [vuetify, pinia],
@@ -92,7 +90,7 @@ describe("FileSelector.vue", async () => {
           multiple: false,
           supported_feature: "test",
           files: files,
-          auto_upload,
+          auto_upload: true,
         },
       })
 
@@ -107,7 +105,6 @@ describe("FileSelector.vue", async () => {
     })
 
     test("auto_upload false", async () => {
-      const auto_upload = false
       const wrapper = await mountSuspended(FileSelector, {
         global: {
           plugins: [vuetify, pinia],
@@ -116,7 +113,7 @@ describe("FileSelector.vue", async () => {
           multiple: false,
           supported_feature: "test",
           files: files,
-          auto_upload,
+          auto_upload: false,
         },
       })
 

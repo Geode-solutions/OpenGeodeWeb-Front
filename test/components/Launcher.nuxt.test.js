@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
@@ -8,7 +6,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import Launcher from "@/components/Launcher.vue"
+import Launcher from "@ogw_f/components/Launcher.vue"
 
 const vuetify = createVuetify({
   components,

@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
@@ -10,7 +8,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import ObjectSelector from "@/components/ObjectSelector.vue"
+import ObjectSelector from "@ogw_f/components/ObjectSelector.vue"
 
 import schemas from "@geode/opengeodeweb-back/schemas.json"
 
@@ -74,7 +72,11 @@ describe("ObjectSelector.vue", async () => {
     const v_card = wrapper.findComponent(components.VCard)
     const v_img = v_card.findComponent(components.VImg)
     expect(v_img.vm.src).toContain(`${geode_object_1}.svg`)
+    await flushPromises()
+    await flushPromises()
     await v_card.trigger("click")
+    await flushPromises()
+    await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({

@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, vi } from "vitest"
-import Status from "@/utils/status.js"
+import Status from "@ogw_f/utils/status.js"
 
 describe("run_function_when_microservices_connected", () => {
   const geode_store = use_geode_store()

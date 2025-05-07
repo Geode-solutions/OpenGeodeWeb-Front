@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 
@@ -9,7 +7,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import CrsSelector from "@/components/CrsSelector.vue"
+import CrsSelector from "@ogw_f/components/CrsSelector.vue"
 import schemas from "@geode/opengeodeweb-back/schemas.json"
 
 const crs_selector_schema =

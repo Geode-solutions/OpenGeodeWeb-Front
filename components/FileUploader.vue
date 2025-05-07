@@ -80,6 +80,7 @@
     await Promise.all(promise_array)
     files_uploaded.value = true
     emit("files_uploaded", internal_files.value)
+
     toggle_loading()
   }
 

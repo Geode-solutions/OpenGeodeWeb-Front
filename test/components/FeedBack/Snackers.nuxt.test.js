@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
@@ -7,7 +5,7 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createTestingPinia } from "@pinia/testing"
 
-import FeedBackSnackers from "@/components/FeedBack/Snackers.vue"
+import FeedBackSnackers from "@ogw_f/components/FeedBack/Snackers.vue"
 
 const vuetify = createVuetify({
   components,

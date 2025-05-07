@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
@@ -7,7 +5,7 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createTestingPinia } from "@pinia/testing"
 
-import FeedBackErrorBanner from "@/components/FeedBack/ErrorBanner.vue"
+import FeedBackErrorBanner from "@ogw_f/components/FeedBack/ErrorBanner.vue"
 
 const vuetify = createVuetify({
   components,

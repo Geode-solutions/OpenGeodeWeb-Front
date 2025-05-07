@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-  import Status from "@/utils/status.js"
+  import Status from "@ogw_f/utils/status.js"
 
   const props = defineProps({
     schema: { type: Object, required: true },

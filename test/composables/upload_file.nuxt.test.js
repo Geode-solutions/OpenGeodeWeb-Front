@@ -2,7 +2,7 @@ import { describe, expect, test, beforeEach } from "vitest"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import { upload_file } from "@/composables/upload_file"
+import { upload_file } from "@ogw_f/composables/upload_file"
 import schemas from "@geode/opengeodeweb-back/schemas.json"
 const schema = schemas.opengeodeweb_back.upload_file
 
