@@ -69,5 +69,6 @@ describe("MissingFilesSelector.vue", async () => {
     expect(wrapper.emitted().update_values[0][0]).toEqual({
       additional_files: files,
     })
+    expect(wrapper.emitted().increment_step).toHaveLength(1)
   })
 })
