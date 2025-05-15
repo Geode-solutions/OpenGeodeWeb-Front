@@ -70,7 +70,7 @@
 
   function files_uploaded_event(value) {
     emit("update_values", { additional_files: value })
-    missing_files()
+    emit("increment_step")
   }
 
   async function missing_files() {

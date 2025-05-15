@@ -3,7 +3,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import back_schemas from "@geode/opengeodeweb-back/schemas.json"
-import Status from "../utils/status"
+import Status from "@ogw_f/utils/status"
 
 describe("Geode Store", () => {
   const pinia = createTestingPinia({
