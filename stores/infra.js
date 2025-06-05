@@ -48,7 +48,7 @@ export const use_infra_store = defineStore("infra", {
   actions: {
     async create_backend() {
       if (this.status === Status.CREATED) return
-      navigator.locks.request("infra.create_backend", async (lock) => {
+      return navigator.locks.request("infra.create_backend", async (lock) => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return
         console.log("LOCK GRANTED !", lock)

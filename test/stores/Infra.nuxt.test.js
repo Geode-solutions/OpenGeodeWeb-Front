@@ -27,6 +27,7 @@ describe("Infra Store", () => {
   const feedback_store = use_feedback_store()
 
   beforeEach(() => {
+    console.log("BEFORE EACH")
     infra_store.$reset()
     geode_store.$reset()
     feedback_store.$reset()
@@ -123,7 +124,7 @@ describe("Infra Store", () => {
       test("test without end-point", async () => {
         await infra_store.create_backend()
         console.log("geode_store.status", geode_store.status)
-        expect(infra_store.status).toBe(Status.CREATING)
+        expect(infra_store.status).toBe(Status.NOT_CREATED)
         expect(geode_store.status).toBe(Status.NOT_CONNECTED)
         expect(viewer_store.status).toBe(Status.NOT_CONNECTED)
       })
@@ -133,10 +134,10 @@ describe("Infra Store", () => {
           handler: () => ({ ID: "123456" }),
         })
         await infra_store.create_backend()
-        expect(infra_store.status).toBe(Status.CREATING)
+        expect(infra_store.status).toBe(Status.CREATED)
         expect(geode_store.status).toBe(Status.NOT_CONNECTED)
         expect(viewer_store.status).toBe(Status.NOT_CONNECTED)
-        expect(feedback_store.server_error).toBe(false)
+        expect(feedback_store.server_error).toBe(true)
       })
     })
   })
