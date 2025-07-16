@@ -1,13 +1,18 @@
 <template>
-  <v-sheet :width="width + 'px'" class="z-scaling-menu" border="md">
-    <v-card class="bg-primary pa-0">
-      <v-card-title>
-        <h3 class="mt-4">Z Scaling Control</h3>
+  <v-sheet
+    :width="width + 'px'"
+    class="z-scaling-menu"
+    elevation="10"
+    rounded="lg"
+  >
+    <v-card class="bg-primary pa-4" elevation="0">
+      <v-card-title class="d-flex justify-space-between align-center">
+        <h3 class="text-h5 font-weight-bold">Z Scaling Control</h3>
       </v-card-title>
-      <v-card-text class="pa-0">
+      <v-card-text class="pt-4">
         <v-container>
           <v-row>
-            <v-col cols="12" class="py-0">
+            <v-col cols="12" class="py-2">
               <v-slider
                 v-model="zScale"
                 :min="0.1"
@@ -15,36 +20,36 @@
                 :step="0.2"
                 label="Z Scale"
                 thumb-label
+                color="white"
+                track-color="white"
               ></v-slider>
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12" class="py-0">
+            <v-col cols="12" class="py-2">
               <v-text-field
-                v-model="zScale"
+                v-model.number="zScale"
                 type="number"
                 label="Z Scale Value"
+                outlined
+                dense
+                hide-details
+                step="0.1"
+                class="custom-number-input"
               ></v-text-field>
             </v-col>
           </v-row>
         </v-container>
       </v-card-text>
-      <v-card-actions justify-center>
-        <v-btn
-          variant="outlined"
-          color="white"
-          text
-          @click="emit('close')"
-          class="ml-8 mb-4"
-        >
+      <v-card-actions class="justify-center pb-4">
+        <v-btn variant="text" color="white" @click="emit('close')" class="px-4">
           Close
         </v-btn>
         <v-btn
           variant="outlined"
-          class="mb-4"
           color="white"
-          text
           @click="updateZScaling"
+          class="px-4"
         >
           Apply
         </v-btn>
@@ -54,26 +59,23 @@
 </template>
 
 <script setup>
-  import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
-
+  const hybridViewerStore = useHybridViewerStore()
   const emit = defineEmits(["close"])
-
   const props = defineProps({
     width: { type: Number, required: false, default: 400 },
   })
 
-  const zScale = ref(1.0)
+  const zScale = ref(hybridViewerStore.zScale)
+
+  watch(
+    () => hybridViewerStore.zScale,
+    (newVal) => {
+      zScale.value = newVal
+    },
+  )
 
   async function updateZScaling() {
-    const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling
-    console.log("schema", schema, "z_scale", zScale.value)
-    await viewer_call({
-      schema,
-      params: {
-        z_scale: zScale.value,
-      },
-    })
-
+    await hybridViewerStore.setZScaling(zScale.value)
     emit("close")
   }
 </script>
@@ -84,5 +86,17 @@
     z-index: 2;
     top: 90px;
     right: 55px;
+    border-radius: 12px !important;
+  }
+
+  .custom-number-input :deep(.v-input__control) {
+    min-height: 48px;
+  }
+
+  .v-btn {
+    border-radius: 8px;
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: normal;
   }
 </style>
