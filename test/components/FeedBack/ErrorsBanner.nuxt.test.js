@@ -13,7 +13,7 @@ const vuetify = createVuetify({
 })
 
 describe("FeedBackErrorBanner.vue", async () => {
-  ;(test(`Test reload`, async () => {
+  test(`Test reload`, async () => {
     const wrapper = mount(FeedBackErrorBanner, {
       global: {
         plugins: [createTestingPinia(), vuetify],
@@ -48,5 +48,5 @@ describe("FeedBackErrorBanner.vue", async () => {
       const v_btn = wrapper.findAll(".v-btn")
       await v_btn[1].trigger("click")
       expect(feedback_store.server_error).toBe(false)
-    }))
+    })
 })
