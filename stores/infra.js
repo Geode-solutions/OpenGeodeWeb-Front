@@ -10,9 +10,7 @@ export const use_infra_store = defineStore("infra", {
   }),
   getters: {
     is_cloud() {
-      return (
-        !isElectron() && useRuntimeConfig().public.NODE_ENV === "production"
-      )
+      return !isElectron() && useRuntimeConfig().public.APP_ENV === "production"
     },
     domain_name() {
       if (this.is_cloud) {

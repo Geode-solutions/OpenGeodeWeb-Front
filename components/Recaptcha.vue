@@ -20,9 +20,8 @@
   })
 
   onMounted(() => {
-    if (process.client) {
-      const config = useRuntimeConfig()
-      if (config.public.NODE_ENV !== "production" || !infra_store.is_cloud) {
+    if (import.meta.client) {
+      if (process.env.NODE_ENV !== "production" || !infra_store.is_cloud) {
         infra_store.$patch({ is_captcha_validated: true })
       }
     }

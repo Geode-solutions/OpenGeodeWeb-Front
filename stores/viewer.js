@@ -6,7 +6,7 @@ import Status from "@ogw_f/utils/status.js"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
-    default_local_port: "1234",
+    port: "443",
     client: {},
     config: null,
     picking_mode: false,
@@ -20,13 +20,6 @@ export const use_viewer_store = defineStore("viewer", {
         return "wss"
       } else {
         return "ws"
-      }
-    },
-    port() {
-      if (use_infra_store().is_cloud) {
-        return "443"
-      } else {
-        return this.default_local_port
       }
     },
     base_url() {

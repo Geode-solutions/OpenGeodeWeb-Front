@@ -1,29 +1,24 @@
 import back_schemas from "@geode/opengeodeweb-back/schemas.json"
 import Status from "@ogw_f/utils/status.js"
+import appMode from "@ogw_f/utils/app_mode.js"
 
 export const use_geode_store = defineStore("geode", {
   state: () => ({
-    default_local_port: "5000",
+    port: "443",
     request_counter: 0,
     status: Status.NOT_CONNECTED,
   }),
   getters: {
     protocol() {
-      if (use_infra_store().is_cloud) {
+      if (use_infra_store().app_mode == appMode.CLOUD) {
         return "https"
       }
       return "http"
     },
-    port() {
-      if (use_infra_store().is_cloud) {
-        return "443"
-      }
-      return this.default_local_port
-    },
     base_url() {
       const infra_store = use_infra_store()
       let geode_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
-      if (infra_store.is_cloud) {
+      if (infra_store.app_mode == appMode.CLOUD) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }
