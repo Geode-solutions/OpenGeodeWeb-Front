@@ -14,7 +14,7 @@
           <v-row>
             <v-col cols="12" class="py-2">
               <v-slider
-                v-model="localZScale"
+                v-model="zScale"
                 :min="1"
                 :max="10"
                 :step="0.2"
@@ -22,13 +22,13 @@
                 thumb-label
                 color="white"
                 track-color="white"
-              ></v-slider>
+              />
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12" class="py-2">
               <v-text-field
-                v-model.number="localZScale"
+                v-model.number="zScale"
                 type="number"
                 label="Z Scale Value"
                 outlined
@@ -37,7 +37,7 @@
                 step="0.1"
                 class="custom-number-input"
                 :min="1"
-              ></v-text-field>
+              />
             </v-col>
           </v-row>
         </v-container>
@@ -54,7 +54,7 @@
         <v-btn
           variant="outlined"
           color="white"
-          @click="updateZScaling"
+          @click="$emit('close')"
           class="px-4"
         >
           Apply
@@ -65,26 +65,10 @@
 </template>
 
 <script setup>
+  const zScale = defineModel({ type: Number, default: 1 })
   const props = defineProps({
-    modelValue: Number,
-    width: { type: Number, required: false, default: 400 },
+    width: { type: Number, default: 400 },
   })
-
-  const emit = defineEmits(["update:modelValue", "close"])
-
-  const localZScale = ref(Math.max(props.modelValue, 1))
-
-  watch(
-    () => props.modelValue,
-    (newVal) => {
-      localZScale.value = Math.max(newVal, 1)
-    },
-  )
-
-  function updateZScaling() {
-    emit("update:modelValue", localZScale.value)
-    emit("close")
-  }
 </script>
 
 <style scoped>
