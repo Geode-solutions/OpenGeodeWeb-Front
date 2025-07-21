@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid"
 
 
-export const use_feedback_store = define("feedback", () => {
+export const use_feedback_store = defineStore("feedback", () => {
   const feedbacks = ref([]);
   const server_error = ref(false);
   const feedbacks_timeout_miliseconds = ref(5000);
