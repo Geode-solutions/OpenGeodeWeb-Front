@@ -14,8 +14,8 @@
           <v-row>
             <v-col cols="12" class="py-2">
               <v-slider
-                v-model="zScale"
-                :min="0.1"
+                v-model="localZScale"
+                :min="1"
                 :max="10"
                 :step="0.2"
                 label="Z Scale"
@@ -28,7 +28,7 @@
           <v-row>
             <v-col cols="12" class="py-2">
               <v-text-field
-                v-model.number="zScale"
+                v-model.number="localZScale"
                 type="number"
                 label="Z Scale Value"
                 outlined
@@ -36,13 +36,19 @@
                 hide-details
                 step="0.1"
                 class="custom-number-input"
+                :min="1"
               ></v-text-field>
             </v-col>
           </v-row>
         </v-container>
       </v-card-text>
       <v-card-actions class="justify-center pb-4">
-        <v-btn variant="text" color="white" @click="emit('close')" class="px-4">
+        <v-btn
+          variant="text"
+          color="white"
+          @click="$emit('close')"
+          class="px-4"
+        >
           Close
         </v-btn>
         <v-btn
@@ -59,23 +65,24 @@
 </template>
 
 <script setup>
-  const hybridViewerStore = useHybridViewerStore()
-  const emit = defineEmits(["close"])
   const props = defineProps({
+    modelValue: Number,
     width: { type: Number, required: false, default: 400 },
   })
 
-  const zScale = ref(hybridViewerStore.zScale)
+  const emit = defineEmits(["update:modelValue", "close"])
+
+  const localZScale = ref(Math.max(props.modelValue, 1))
 
   watch(
-    () => hybridViewerStore.zScale,
+    () => props.modelValue,
     (newVal) => {
-      zScale.value = newVal
+      localZScale.value = Math.max(newVal, 1)
     },
   )
 
-  async function updateZScaling() {
-    await hybridViewerStore.setZScaling(zScale.value)
+  function updateZScaling() {
+    emit("update:modelValue", localZScale.value)
     emit("close")
   }
 </script>
