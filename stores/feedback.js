@@ -42,4 +42,14 @@ export const use_feedback_store = define("feedback", () => {
   async function delete_server_error() {
     server_error.value = false
   }
+
+  return {
+    feedbacks,
+    server_error,
+    feedbacks_timeout_miliseconds,
+    add_error,
+    add_success,
+    delete_feedback,
+    delete_server_error,
+  };
 });
