@@ -3,6 +3,7 @@ import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 import Status from "@ogw_f/utils/status.js"
+import appMode from "@ogw_f/utils/app_mode.js"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
@@ -16,7 +17,7 @@ export const use_viewer_store = defineStore("viewer", {
   }),
   getters: {
     protocol() {
-      if (use_infra_store().is_cloud) {
+      if (use_infra_store().app_mode == appMode.CLOUD) {
         return "wss"
       } else {
         return "ws"
