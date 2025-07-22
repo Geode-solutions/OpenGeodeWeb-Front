@@ -1,17 +1,17 @@
-import eslintRecommended from 'eslint/conf/eslint-recommended.js'
-import vue from 'eslint-plugin-vue'
-import vuetify from 'eslint-plugin-vuetify'
-import nuxt from 'eslint-plugin-nuxt'
+import eslintRecommended from "eslint/conf/eslint-recommended.js"
+import vue from "eslint-plugin-vue"
+import vuetify from "eslint-plugin-vuetify"
+import nuxt from "eslint-plugin-nuxt"
 
 export default [
   {
-    files: ['**/*.{js,ts,vue}'],
+    files: ["**/*.{js,ts,vue}"],
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: 'module',
+      sourceType: "module",
       globals: {
-        window: 'readonly',
-        document: 'readonly',
+        window: "readonly",
+        document: "readonly",
         // ajoute d'autres globals si nécessaire
       },
     },
