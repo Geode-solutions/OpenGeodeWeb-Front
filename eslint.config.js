@@ -1,4 +1,3 @@
-import eslintRecommended from "eslint/conf/eslint-recommended.js"
 import vue from "eslint-plugin-vue"
 import vuetify from "eslint-plugin-vuetify"
 import nuxt from "eslint-plugin-nuxt"
@@ -21,7 +20,6 @@ export default [
       nuxt,
     },
     rules: {
-      ...eslintRecommended.rules,
       ...vue.configs.recommended.rules,
       ...vuetify.configs.recommended.rules,
       ...nuxt.configs.recommended.rules,
