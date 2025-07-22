@@ -11,7 +11,7 @@ import { createTestingPinia } from "@pinia/testing"
 import MissingFilesSelector from "@ogw_f/components/MissingFilesSelector.vue"
 import FileUploader from "@ogw_f/components/FileUploader.vue"
 
-import schemas from "@geode/opengeodeweb-back/schemas.json"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 const missing_files_schema = schemas.opengeodeweb_back.missing_files
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
