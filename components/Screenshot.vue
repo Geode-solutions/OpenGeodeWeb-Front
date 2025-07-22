@@ -62,7 +62,7 @@
 
 <script setup>
   import fileDownload from "js-file-download"
-  import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
+  import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
   const emit = defineEmits(["close"])
 
