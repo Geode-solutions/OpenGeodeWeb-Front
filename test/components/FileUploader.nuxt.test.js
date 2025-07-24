@@ -10,7 +10,7 @@ import { createTestingPinia } from "@pinia/testing"
 
 import FileUploader from "@ogw_f/components/FileUploader.vue"
 
-import schemas from "@geode/opengeodeweb-back/schemas.json"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 

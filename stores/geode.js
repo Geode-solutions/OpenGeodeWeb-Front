@@ -1,4 +1,4 @@
-import back_schemas from "@geode/opengeodeweb-back/schemas.json"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import Status from "@ogw_f/utils/status.js"
 
 export const use_geode_store = defineStore("geode", {

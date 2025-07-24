@@ -8,7 +8,7 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
 import CrsSelector from "@ogw_f/components/CrsSelector.vue"
-import schemas from "@geode/opengeodeweb-back/schemas.json"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 const crs_selector_schema =
   schemas.opengeodeweb_back.geographic_coordinate_systems

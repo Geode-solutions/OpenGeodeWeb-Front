@@ -10,7 +10,7 @@ import { createTestingPinia } from "@pinia/testing"
 
 import ObjectSelector from "@ogw_f/components/ObjectSelector.vue"
 
-import schemas from "@geode/opengeodeweb-back/schemas.json"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 const allowed_objects = schemas.opengeodeweb_back.allowed_objects
 
