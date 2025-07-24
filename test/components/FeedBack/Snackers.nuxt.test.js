@@ -1,3 +1,5 @@
+// @vitest-environment nuxt
+vi.stubGlobal("visualViewport", new EventTarget())
 import { describe, expect, test } from "vitest"
 import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
