@@ -1,10 +1,9 @@
 import back_schemas from "@geode/opengeodeweb-back/schemas.json"
 import Status from "@ogw_f/utils/status.js"
-import appMode from "@ogw_f/utils/app_mode.js"
 
 export const use_geode_store = defineStore("geode", {
   state: () => ({
-    port: "443",
+    port: "99",
     request_counter: 0,
     status: Status.NOT_CONNECTED,
   }),

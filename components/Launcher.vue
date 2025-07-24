@@ -24,10 +24,15 @@
   const infra_store = use_infra_store()
   const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
 
+  if (import.meta.client) {
+    if (infra_store.is_captcha_validated) {
+      infra_store.create_backend()
+    }
+  }
   watch(
     () => infra_store.is_captcha_validated,
     (value, oldValue) => {
-      if (value && !oldValue && process.client) {
+      if (value && !oldValue && import.meta.client) {
         infra_store.create_backend()
       }
     },

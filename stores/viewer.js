@@ -3,11 +3,10 @@ import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/schemas.json"
 import Status from "@ogw_f/utils/status.js"
-import appMode from "@ogw_f/utils/app_mode.js"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
-    port: "443",
+    port: "99",
     client: {},
     config: null,
     picking_mode: false,

@@ -1,12 +1,12 @@
 import isElectron from "is-electron"
 
-const appMode = {
+export const appMode = {
   DESKTOP: "DESKTOP",
   BROWSER: "BROWSER",
   CLOUD: "CLOUD",
 }
 
-function getAppMode() {
+export function getAppMode() {
   if (isElectron()) {
     return appMode.DESKTOP
   }
