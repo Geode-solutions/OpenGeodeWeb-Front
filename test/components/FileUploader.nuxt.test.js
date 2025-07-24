@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
@@ -10,9 +8,9 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import FileUploader from "@/components/FileUploader.vue"
+import FileUploader from "@ogw_f/components/FileUploader.vue"
 
-import schemas from "@geode/opengeodeweb-back/schemas.json"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
@@ -55,6 +53,7 @@ describe("FileUploader.vue", async () => {
       const v_btn = wrapper.findComponent(components.VBtn)
 
       await v_btn.trigger("click")
+      await flushPromises()
       await flushPromises()
       expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
     })

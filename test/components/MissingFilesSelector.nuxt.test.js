@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
@@ -10,10 +8,10 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import MissingFilesSelector from "@/components/MissingFilesSelector.vue"
-import FileUploader from "@/components/FileUploader.vue"
+import MissingFilesSelector from "@ogw_f/components/MissingFilesSelector.vue"
+import FileUploader from "@ogw_f/components/FileUploader.vue"
 
-import schemas from "@geode/opengeodeweb-back/schemas.json"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 const missing_files_schema = schemas.opengeodeweb_back.missing_files
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
@@ -65,10 +63,12 @@ describe("MissingFilesSelector.vue", async () => {
     })
     await v_btn.trigger("click")
     await flushPromises()
+    await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
       additional_files: files,
     })
+    expect(wrapper.emitted().increment_step).toHaveLength(1)
   })
 })

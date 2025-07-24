@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
@@ -7,7 +5,7 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createTestingPinia } from "@pinia/testing"
 
-import FeedBackErrorBanner from "@/components/FeedBack/ErrorBanner.vue"
+import FeedBackErrorBanner from "@ogw_f/components/FeedBack/ErrorBanner.vue"
 
 const vuetify = createVuetify({
   components,
@@ -15,7 +13,7 @@ const vuetify = createVuetify({
 })
 
 describe("FeedBackErrorBanner.vue", async () => {
-  test(`Test reload`, async () => {
+  ;(test(`Test reload`, async () => {
     const wrapper = mount(FeedBackErrorBanner, {
       global: {
         plugins: [createTestingPinia(), vuetify],
@@ -50,5 +48,5 @@ describe("FeedBackErrorBanner.vue", async () => {
       const v_btn = wrapper.findAll(".v-btn")
       await v_btn[1].trigger("click")
       expect(feedback_store.server_error).toBe(false)
-    })
+    }))
 })

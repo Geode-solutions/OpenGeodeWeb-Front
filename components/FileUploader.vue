@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-  import schemas from "@geode/opengeodeweb-back/schemas.json"
+  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   const schema = schemas.opengeodeweb_back.upload_file
 
   const emit = defineEmits(["files_uploaded", "decrement_step"])
@@ -80,6 +80,7 @@
     await Promise.all(promise_array)
     files_uploaded.value = true
     emit("files_uploaded", internal_files.value)
+
     toggle_loading()
   }
 

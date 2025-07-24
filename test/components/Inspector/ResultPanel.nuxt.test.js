@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
@@ -7,7 +5,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import InspectorResultPanel from "@/components/Inspector/ResultPanel.vue"
+import InspectorResultPanel from "@ogw_f/components/Inspector/ResultPanel.vue"
 
 const vuetify = createVuetify({
   components,

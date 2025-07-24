@@ -3,14 +3,14 @@
     <v-col cols="12" class="ma-3">
       <v-card loading>
         <v-card-title class="text-center">
-          Cloud instance is starting...
+          Microservices are starting...
         </v-card-title>
         <v-card-subtitle class="text-center">
           Why do you have to wait?
         </v-card-subtitle>
         <v-card-text class="text-center">
-          We start our server only on demand... and this takes a few minutes
-          before you can use our free app.
+          We start our microservices only on demand... and this takes a few
+          minutes before you can use our free app.
           <br />
           This is aligned with our energy sobriety policy. So be patient
           <v-icon color="primary" size="20">
@@ -25,17 +25,17 @@
 </template>
 
 <script setup>
-  import ying_yang from "@/assets/img/energy_sobriety/ying_yang.png"
-  import chemin from "@/assets/img/energy_sobriety/chemin.png"
-  import vert from "@/assets/img/energy_sobriety/vert.png"
-  import lampadaire from "@/assets/img/energy_sobriety/lampadaire.png"
-  import collegue from "@/assets/img/energy_sobriety/collegue.png"
-  import sobene from "@/assets/img/energy_sobriety/sobene.png"
-  import etincelle from "@/assets/img/energy_sobriety/etincelle.png"
-  import geste from "@/assets/img/energy_sobriety/geste.png"
-  import socle from "@/assets/img/energy_sobriety/socle.png"
-  import derniere from "@/assets/img/energy_sobriety/derniere.png"
-  import salon from "@/assets/img/energy_sobriety/salon.png"
+  import ying_yang from "@ogw_f/assets/img/energy_sobriety/ying_yang.png"
+  import chemin from "@ogw_f/assets/img/energy_sobriety/chemin.png"
+  import vert from "@ogw_f/assets/img/energy_sobriety/vert.png"
+  import lampadaire from "@ogw_f/assets/img/energy_sobriety/lampadaire.png"
+  import collegue from "@ogw_f/assets/img/energy_sobriety/collegue.png"
+  import sobene from "@ogw_f/assets/img/energy_sobriety/sobene.png"
+  import etincelle from "@ogw_f/assets/img/energy_sobriety/etincelle.png"
+  import geste from "@ogw_f/assets/img/energy_sobriety/geste.png"
+  import socle from "@ogw_f/assets/img/energy_sobriety/socle.png"
+  import derniere from "@ogw_f/assets/img/energy_sobriety/derniere.png"
+  import salon from "@ogw_f/assets/img/energy_sobriety/salon.png"
 
   const users_list = [
     {

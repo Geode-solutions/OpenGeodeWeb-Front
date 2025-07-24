@@ -1,7 +1,7 @@
 <template>
   <FetchingData v-if="loading" />
   <v-row v-else-if="Object.keys(allowed_objects).length" class="justify-left">
-    <v-col v-for="(value, key) in allowed_objects" :key="key" cols="2" md="4">
+    <v-col v-for="(value, key) in allowed_objects" :key="key" cols="3" md="4">
       <v-tooltip
         :text="
           value['is_loadable']
@@ -49,8 +49,8 @@
 </template>
 
 <script setup>
-  import geode_objects from "@/assets/geode_objects"
-  import schemas from "@geode/opengeodeweb-back/schemas.json"
+  import geode_objects from "@ogw_f/assets/geode_objects"
+  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
   const schema = schemas.opengeodeweb_back.allowed_objects
 
@@ -72,25 +72,14 @@
     var promise_array = []
     for (const filename of filenames) {
       const params = { filename, supported_feature }
-      const promise = new Promise((resolve, reject) => {
-        api_fetch(
-          { schema, params },
-          {
-            request_error_function: () => {
-              reject()
-            },
-            response_function: (response) => {
-              resolve(response._data.allowed_objects)
-            },
-            response_error_function: () => {
-              reject()
-            },
-          },
-        )
-      })
+      const promise = api_fetch({ schema, params })
       promise_array.push(promise)
     }
-    const values = await Promise.all(promise_array)
+    const responses = await Promise.all(promise_array)
+    let values = []
+    for (const response of responses) {
+      values.push(response.data.value.allowed_objects)
+    }
     const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
     const common_keys = all_keys.filter(
       (i) => !values.some((j) => !Object.keys(j).includes(i)),
@@ -107,6 +96,9 @@
     }
 
     allowed_objects.value = final_object
+    if (Object.keys(allowed_objects.value).length == 1) {
+      set_geode_object(Object.keys(allowed_objects.value)[0])
+    }
     toggle_loading()
   }
 
@@ -116,7 +108,6 @@
       emit("increment_step")
     }
   }
-
   await get_allowed_objects()
 </script>
 

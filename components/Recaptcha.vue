@@ -2,12 +2,11 @@
   <ClientOnly>
     <vue-recaptcha
       ref="recaptcha"
-      :sitekey="site_key"
+      :sitekey="props.site_key"
       :load-recaptcha-script="true"
       align-self="center"
-      @expired="is_captcha_validated = false"
+      @expired="infra_store.is_captcha_validated = false"
       @verify="submit_recaptcha"
-      style="z-index: 100"
     />
   </ClientOnly>
 </template>
@@ -15,17 +14,15 @@
 <script setup>
   import { VueRecaptcha } from "vue-recaptcha"
   const infra_store = use_infra_store()
-  const { is_captcha_validated } = storeToRefs(infra_store)
 
   const props = defineProps({
     site_key: { type: String, required: true },
   })
-  const { site_key } = props
 
   onMounted(() => {
     if (process.client) {
       const config = useRuntimeConfig()
-      if (config.public.NODE_ENV !== "production") {
+      if (config.public.NODE_ENV !== "production" || !infra_store.is_cloud) {
         infra_store.$patch({ is_captcha_validated: true })
       }
     }

@@ -2,7 +2,8 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import back_schemas from "@geode/opengeodeweb-back/schemas.json"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import Status from "@ogw_f/utils/status"
 
 describe("Geode Store", () => {
   const pinia = createTestingPinia({
@@ -23,7 +24,7 @@ describe("Geode Store", () => {
     test("initial state", () => {
       expectTypeOf(geode_store.default_local_port).toBeString()
       expectTypeOf(geode_store.request_counter).toBeNumber()
-      expectTypeOf(geode_store.is_running).toBeBoolean()
+      expectTypeOf(geode_store.status).toBeString()
     })
   })
 
@@ -102,7 +103,7 @@ describe("Geode Store", () => {
         geode_store.base_url = ""
         getFakeCall.mockImplementation(() => ({}))
         await geode_store.do_ping()
-        expect(geode_store.is_running).toBe(true)
+        expect(geode_store.status).toBe(Status.CONNECTED)
         expect(feedback_store.server_error).toBe(false)
       })
       test("response_error", async () => {
@@ -114,7 +115,7 @@ describe("Geode Store", () => {
         })
 
         await geode_store.do_ping()
-        expect(geode_store.is_running).toBe(false)
+        expect(geode_store.status).toBe(Status.NOT_CONNECTED)
         expect(feedback_store.server_error).toBe(true)
       })
     })

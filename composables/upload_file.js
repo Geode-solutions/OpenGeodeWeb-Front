@@ -17,7 +17,7 @@ export async function upload_file(
   }
 
   geode_store.start_request()
-  return useFetch(route, {
+  return $fetch(route, {
     baseURL: geode_store.base_url,
     ...request_options,
     onRequestError({ error }) {

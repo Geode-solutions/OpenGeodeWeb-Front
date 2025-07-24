@@ -1,6 +1,6 @@
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { use_feedback_store } from "@/stores/feedback"
+import { use_feedback_store } from "@ogw_f/stores/feedback"
 import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
 
 describe("Feedback Store", () => {
@@ -34,11 +34,32 @@ describe("Feedback Store", () => {
       })
     })
 
+    describe("add_error", () => {
+      test("test feedbacks_timeout", () => {
+        feedback_store.feedbacks_timeout_miliseconds = 500
+        feedback_store.add_error(
+          500,
+          "/test",
+          "test message",
+          "test description",
+        )
+        expect(feedback_store.feedbacks.length).toBe(1)
+        setTimeout(() => {
+          expect(feedback_store.feedbacks.length).toBe(0)
+        }, 1000)
+      })
+    })
+
     describe("add_success", () => {
       test("test add_success", () => {
+        feedback_store.feedbacks_timeout_miliseconds = 500
         feedback_store.add_success("test description")
         expect(feedback_store.feedbacks.length).toBe(1)
         expect(feedback_store.feedbacks[0].type).toBe("success")
+
+        setTimeout(() => {
+          expect(feedback_store.feedbacks.length).toBe(0)
+        }, 1000)
       })
     })
     describe("delete_feedback", () => {

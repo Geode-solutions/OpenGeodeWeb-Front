@@ -14,7 +14,7 @@
         "
         class="pa-0"
         @click="get_x_y"
-        @keydown.esc="app_store.toggle_picking_mode(false)"
+        @keydown.esc="viewer_store.toggle_picking_mode(false)"
       />
     </div>
   </ClientOnly>
@@ -23,18 +23,21 @@
 <script setup>
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize, useWindowSize } from "@vueuse/core"
-  import viewer_schemas from "@geode/opengeodeweb-viewer/schemas.json"
+  import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+  import Status from "@ogw_f/utils/status.js"
+
+  const props = defineProps({
+    viewId: { type: String, default: "-1" },
+  })
 
   const viewer_store = use_viewer_store()
-  const { client, is_running, picking_mode } = storeToRefs(viewer_store)
-
-  const viewer = ref(null)
+  const viewer = useTemplateRef("viewer")
   const { width, height } = useElementSize(viewer)
 
   const { width: windowWidth, height: windowHeight } = useWindowSize()
 
   function get_x_y(event) {
-    if (picking_mode.value === true) {
+    if (viewer_store.picking_mode.value === true) {
       const { offsetX, offsetY } = event
       viewer_store.set_picked_point(offsetX, offsetY)
       viewer_call({
@@ -44,13 +47,7 @@
     }
   }
 
-  const props = defineProps({
-    viewId: { type: String, default: "-1" },
-  })
-
-  const { viewId } = toRefs(props)
   const connected = ref(false)
-
   const view = vtkRemoteView.newInstance({
     rpcWheelEvent: "viewport.mouse.zoom.wheel",
   })
@@ -70,33 +67,42 @@
     resize()
   })
 
-  watch(picking_mode, (value) => {
-    const cursor = value ? "crosshair" : "pointer"
-    view.getCanvasView().setCursor(cursor)
-  })
+  watch(
+    () => viewer_store.picking_mode,
+    (value) => {
+      const cursor = value ? "crosshair" : "pointer"
+      view.getCanvasView().setCursor(cursor)
+    },
+  )
 
   watch([width, height], () => {
     resize()
   })
 
-  watch(client, () => {
-    connect()
-  })
+  watch(
+    () => viewer_store.client,
+    () => {
+      connect()
+    },
+  )
 
-  watch(viewId, (id) => {
-    if (connected.value) {
-      view.setViewId(id)
-      view.render()
-    }
-  })
+  watch(
+    () => props.viewId,
+    (id) => {
+      if (connected.value) {
+        view.setViewId(id)
+        view.render()
+      }
+    },
+  )
 
   function connect() {
-    if (!is_running.value) {
+    if (viewer_store.status !== Status.CONNECTED) {
       return
     }
-    const session = client.value.getConnection().getSession()
+    const session = viewer_store.client.getConnection().getSession()
     view.setSession(session)
-    view.setViewId(viewId.value)
+    view.setViewId(props.viewId)
     connected.value = true
     view.render()
   }

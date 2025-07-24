@@ -1,5 +1,3 @@
-// @vitest-environment nuxt
-
 import { describe, expect, test } from "vitest"
 import { mountSuspended } from "@vue/test-utils"
 
@@ -7,8 +5,8 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import Stepper from "@/components/Stepper.vue"
-import ObjectSelector from "@/components/ObjectSelector.vue"
+import Stepper from "@ogw_f/components/Stepper.vue"
+import ObjectSelector from "@ogw_f/components/ObjectSelector.vue"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 const vuetify = createVuetify({

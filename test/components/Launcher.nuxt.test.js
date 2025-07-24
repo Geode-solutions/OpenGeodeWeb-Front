@@ -1,38 +1,45 @@
-// // @vitest-environment nuxt
+import { describe, expect, test, vi } from "vitest"
+import { flushPromises } from "@vue/test-utils"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 
-// import { describe, expect, test, vi } from "vitest"
-// import { flushPromises } from "@vue/test-utils"
-// import { mountSuspended } from "@nuxt/test-utils/runtime"
+import { createVuetify } from "vuetify"
+import * as components from "vuetify/components"
+import * as directives from "vuetify/directives"
 
-// import { createVuetify } from "vuetify"
-// import * as components from "vuetify/components"
-// import * as directives from "vuetify/directives"
+import Launcher from "@ogw_f/components/Launcher.vue"
 
-// import Launcher from "@/components/Launcher.vue"
+const vuetify = createVuetify({
+  components,
+  directives,
+})
 
-// const vuetify = createVuetify({
-//   components,
-//   directives,
-// })
+const infra_store = use_infra_store()
 
-// const infra_store = use_infra_store()
+// Mock navigator.locks API
+const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
+  return callback({ name })
+})
 
-// global.ResizeObserver = require("resize-observer-polyfill")
+vi.stubGlobal("navigator", {
+  ...navigator,
+  locks: {
+    request: mockLockRequest,
+  },
+})
 
-// describe("Launcher.vue", async () => {
-//   test(`Mount`, async () => {
-//     const spy_infra_store = vi.spyOn(infra_store, "create_connexion")
-//     const wrapper = await mountSuspended(Launcher, {
-//       global: {
-//         plugins: [vuetify],
-//       },
-//     })
-//     expect(wrapper.exists()).toBe(true)
-//     await infra_store.$patch({ is_captcha_validated: true })
-//     flushPromises()
-//     expect(spy_infra_store).toHaveBeenCalled()
-//   })
-// })
-describe("Fake", async () => {
-  test(`Fake`, async () => {})
+global.ResizeObserver = require("resize-observer-polyfill")
+
+describe("Launcher.vue", async () => {
+  test(`Mount`, async () => {
+    const spy_infra_store = vi.spyOn(infra_store, "create_backend")
+    const wrapper = await mountSuspended(Launcher, {
+      global: {
+        plugins: [vuetify],
+      },
+    })
+    expect(wrapper.exists()).toBe(true)
+    await infra_store.$patch({ is_captcha_validated: true })
+    flushPromises()
+    expect(spy_infra_store).toHaveBeenCalled()
+  })
 })

@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-  import schemas from "@geode/opengeodeweb-back/schemas.json"
+  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
   const schema = schemas.opengeodeweb_back.missing_files
 
@@ -70,7 +70,7 @@
 
   function files_uploaded_event(value) {
     emit("update_values", { additional_files: value })
-    missing_files()
+    emit("increment_step")
   }
 
   async function missing_files() {
