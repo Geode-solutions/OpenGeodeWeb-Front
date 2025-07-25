@@ -5,16 +5,15 @@ export const use_infra_store = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
     ID: useStorage("ID", ""),
-    is_captcha_validated: true,
+    is_captcha_validated: this.app_mode == appMode.appMode.CLOUD ? false : true,
     status: Status.NOT_CREATED,
   }),
   getters: {
     domain_name() {
-      if (this.app_mode == appMode.CLOUD) {
+      if (this.app_mode == appMode.appMode.CLOUD) {
         return useRuntimeConfig().public.API_URL
-      } else {
-        return "localhost"
       }
+      return "localhost"
     },
     lambda_url() {
       const geode_store = use_geode_store()
@@ -44,6 +43,7 @@ export const use_infra_store = defineStore("infra", {
     async create_backend() {
       console.log("create_backend")
       if (this.status === Status.CREATED) return
+      console.log("1")
       return navigator.locks.request("infra.create_backend", async (lock) => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return
@@ -52,14 +52,15 @@ export const use_infra_store = defineStore("infra", {
         const geode_store = use_geode_store()
         const viewer_store = use_viewer_store()
         const feedback_store = use_feedback_store()
-        if (this.app_mode == appMode.CLOUD) {
+        if (this.app_mode == appMode.appMode.DESKTOP) {
           const back_port = await window.electronAPI.run_back(geode_store.port)
           geode_store.$patch({ default_local_port: back_port })
           const viewer_port = await window.electronAPI.run_viewer(
             viewer_store.port,
           )
           viewer_store.$patch({ default_local_port: viewer_port })
-        } else {
+        }
+        if (this.app_mode == appMode.appMode.CLOUD) {
           const { data, error } = await useFetch(this.lambda_url, {
             method: "POST",
           })

@@ -16,7 +16,7 @@ export const use_viewer_store = defineStore("viewer", {
   }),
   getters: {
     protocol() {
-      if (use_infra_store().app_mode == appMode.CLOUD) {
+      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
         return "wss"
       } else {
         return "ws"
@@ -24,12 +24,16 @@ export const use_viewer_store = defineStore("viewer", {
     },
     base_url() {
       const infra_store = use_infra_store()
+
       let viewer_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
-      if (infra_store.is_cloud) {
+      if (infra_store.app_mode == appMode.appMode.CLOUD) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }
         viewer_url += `/${infra_store.ID}/viewer`
+      }
+      if (infra_store.app_mode == appMode.appMode.BROWSER) {
+        viewer_url += `/viewer`
       }
       viewer_url += "/ws"
       return viewer_url

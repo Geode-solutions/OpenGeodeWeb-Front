@@ -7,6 +7,7 @@ export const appMode = {
 }
 
 export function getAppMode() {
+  console.log("getAppMode process.env", process.env)
   if (isElectron()) {
     return appMode.DESKTOP
   }
