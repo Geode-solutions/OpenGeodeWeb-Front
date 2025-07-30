@@ -28,52 +28,60 @@ describe("Geode Store", () => {
     })
   })
 
+
   describe("getters", () => {
     describe("protocol", () => {
-      test("test is_cloud true", () => {
-        infra_store.is_cloud = true
+      test("test app_mode CLOUD", () => {
+        infra_store.app_mode = appMode.appMode.CLOUD
         expect(geode_store.protocol).toBe("https")
       })
-
-      test("test is_cloud false", () => {
-        infra_store.is_cloud = false
+      test("test app_mode BROWSER", () => {
+        infra_store.app_mode = appMode.appMode.BROWSER
+        expect(geode_store.protocol).toBe("http")
+      })
+      test("test app_mode DESKTOP", () => {
+        infra_store.app_mode = appMode.appMode.DESKTOP
         expect(geode_store.protocol).toBe("http")
       })
     })
 
     describe("port", () => {
-      test("test is_cloud true", () => {
-        infra_store.is_cloud = true
+      test("test app_mode CLOUD", () => {
+        infra_store.app_mode = appMode.appMode.CLOUD
         expect(geode_store.port).toBe("443")
       })
-      test("test is_cloud false", () => {
-        infra_store.is_cloud = false
+      test("test app_mode BROWSER", () => {
+        infra_store.app_mode = appMode.appMode.BROWSER
+        expect(geode_store.port).toBe(geode_store.default_local_port)
+      })
+      test("test app_mode DESKTOP", () => {
+        infra_store.app_mode = appMode.appMode.DESKTOP
         expect(geode_store.port).toBe(geode_store.default_local_port)
       })
 
       test("test override default_local_port", () => {
-        infra_store.is_cloud = false
+        infra_store.app_mode = appMode.appMode.DESKTOP
         geode_store.default_local_port = "12"
         expect(geode_store.port).toBe("12")
       })
     })
 
     describe("base_url", () => {
-      test("test is_cloud false", () => {
-        infra_store.is_cloud = false
+      test("test app_mode BROWSER", () => {
+        infra_store.app_mode = appMode.appMode.BROWSER
         infra_store.domain_name = "localhost"
         expect(geode_store.base_url).toBe("http://localhost:5000")
       })
-      test("test is_cloud true", () => {
-        infra_store.is_cloud = true
+      test("test app_mode CLOUD", () => {
+        infra_store.app_mode = appMode.appMode.CLOUD
         infra_store.ID = "123456"
         infra_store.domain_name = "example.com"
         expect(geode_store.base_url).toBe(
           "https://example.com:443/123456/geode",
         )
       })
-      test("test is_cloud true, ID empty", () => {
-        infra_store.is_cloud = true
+      test("test app_mode CLOUD, ID empty", () => {
+        infra_store.app_mode = appMode.appMode.CLOUD
         infra_store.ID = ""
         infra_store.domain_name = "example.com"
         expect(() => geode_store.base_url).toThrowError(
