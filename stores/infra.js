@@ -5,7 +5,7 @@ export const use_infra_store = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
     ID: useStorage("ID", ""),
-    is_captcha_validated: this.app_mode == appMode.appMode.CLOUD ? false : true,
+    is_captcha_validated: true,
     status: Status.NOT_CREATED,
   }),
   getters: {
@@ -41,40 +41,33 @@ export const use_infra_store = defineStore("infra", {
   },
   actions: {
     async create_backend() {
-      console.log("create_backend")
+      console.log("create_backend this.app_mode", this.app_mode)
       if (this.status === Status.CREATED) return
-      console.log("1")
       return navigator.locks.request("infra.create_backend", async (lock) => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return
         console.log("LOCK GRANTED !", lock)
-        // if (this.app_mode != appMode.BROWSER) {
-        const geode_store = use_geode_store()
-        const viewer_store = use_viewer_store()
-        const feedback_store = use_feedback_store()
         if (this.app_mode == appMode.appMode.DESKTOP) {
-          const back_port = await window.electronAPI.run_back(geode_store.port)
+          const viewer_store = use_viewer_store()
+          const geode_store = use_geode_store()
+          const back_port = await window.electronAPI.run_back(geode_store.default_local_port)
           geode_store.$patch({ default_local_port: back_port })
-          const viewer_port = await window.electronAPI.run_viewer(
-            viewer_store.port,
-          )
+          const viewer_port = await window.electronAPI.run_viewer(viewer_store.default_local_port)
           viewer_store.$patch({ default_local_port: viewer_port })
-        }
-        if (this.app_mode == appMode.appMode.CLOUD) {
+        } else if (this.app_mode == appMode.appMode.CLOUD) {
           const { data, error } = await useFetch(this.lambda_url, {
             method: "POST",
           })
           if (error.value || !data.value) {
             this.status = Status.NOT_CREATED
+            const feedback_store = use_feedback_store()
             feedback_store.server_error = true
             return
           }
           this.ID = data.value.ID
           localStorage.setItem("ID", data.value.ID)
         }
-        // }
         this.status = Status.CREATED
-        console.log("this.status", this.status)
         return this.create_connection()
       })
     },

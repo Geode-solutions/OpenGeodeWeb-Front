@@ -7,11 +7,10 @@ export const appMode = {
 }
 
 export function getAppMode() {
-  console.log("getAppMode process.env", process.env)
   if (isElectron()) {
     return appMode.DESKTOP
   }
-  if (process.env.BROWSER === true) {
+  if (useRuntimeConfig().public.BROWSER === "true") {
     return appMode.BROWSER
   }
   return appMode.CLOUD

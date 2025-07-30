@@ -3,7 +3,7 @@ import Status from "@ogw_f/utils/status.js"
 
 export const use_geode_store = defineStore("geode", {
   state: () => ({
-    port: "443",
+    default_local_port: "5000",
     request_counter: 0,
     status: Status.NOT_CONNECTED,
   }),
@@ -14,6 +14,15 @@ export const use_geode_store = defineStore("geode", {
       }
       return "http"
     },
+    port() {
+      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
+        return "443"
+      }
+      if (useRuntimeConfig().public.GEODE_PORT) {
+        return useRuntimeConfig().public.GEODE_PORT
+      }
+      return this.default_local_port
+    },
     base_url() {
       const infra_store = use_infra_store()
       let geode_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
@@ -22,9 +31,6 @@ export const use_geode_store = defineStore("geode", {
           throw new Error("ID must not be empty in cloud mode")
         }
         geode_url += `/${infra_store.ID}/geode`
-      }
-      if (infra_store.app_mode == appMode.appMode.BROWSER) {
-        geode_url += `/geode`
       }
       return geode_url
     },

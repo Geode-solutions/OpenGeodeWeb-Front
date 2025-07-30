@@ -3,10 +3,11 @@ import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_f/utils/status.js"
+import { useRuntimeConfig } from "nuxt/app"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
-    port: "99",
+    default_local_port: "1234",
     client: {},
     config: null,
     picking_mode: false,
@@ -22,18 +23,23 @@ export const use_viewer_store = defineStore("viewer", {
         return "ws"
       }
     },
+    port() {
+      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
+        return "443"
+      }
+      if (useRuntimeConfig().public.VIEWER_PORT) {
+        return useRuntimeConfig().public.VIEWER_PORT
+      }
+      return this.default_local_port
+    },
     base_url() {
       const infra_store = use_infra_store()
-
       let viewer_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
       if (infra_store.app_mode == appMode.appMode.CLOUD) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }
         viewer_url += `/${infra_store.ID}/viewer`
-      }
-      if (infra_store.app_mode == appMode.appMode.BROWSER) {
-        viewer_url += `/viewer`
       }
       viewer_url += "/ws"
       return viewer_url
