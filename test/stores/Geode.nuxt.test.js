@@ -28,7 +28,6 @@ describe("Geode Store", () => {
     })
   })
 
-
   describe("getters", () => {
     describe("protocol", () => {
       test("test app_mode CLOUD", () => {
