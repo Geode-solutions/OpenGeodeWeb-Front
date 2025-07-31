@@ -23,7 +23,7 @@
     if (import.meta.client) {
       if (
         process.env.NODE_ENV !== "production" ||
-        !infra_store.app_mode !== appMode.appMode.CLOUD
+        infra_store.app_mode !== appMode.appMode.CLOUD
       ) {
         infra_store.$patch({ is_captcha_validated: true })
       }
