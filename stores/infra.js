@@ -6,7 +6,7 @@ export const use_infra_store = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
     ID: useStorage("ID", ""),
-    is_captcha_validated: getCaptchaState(),
+    is_captcha_validated: false,
     status: Status.NOT_CREATED,
   }),
   getters: {
