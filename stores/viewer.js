@@ -16,23 +16,26 @@ export const use_viewer_store = defineStore("viewer", {
   }),
   getters: {
     protocol() {
-      if (use_infra_store().is_cloud) {
+      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
         return "wss"
       } else {
         return "ws"
       }
     },
     port() {
-      if (use_infra_store().is_cloud) {
+      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
         return "443"
-      } else {
-        return this.default_local_port
       }
+      const VIEWER_PORT = useRuntimeConfig().public.VIEWER_PORT
+      if (VIEWER_PORT != null && VIEWER_PORT !== "") {
+        return VIEWER_PORT
+      }
+      return this.default_local_port
     },
     base_url() {
       const infra_store = use_infra_store()
       let viewer_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
-      if (infra_store.is_cloud) {
+      if (infra_store.app_mode == appMode.appMode.CLOUD) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }

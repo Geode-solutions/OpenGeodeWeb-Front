@@ -40,22 +40,23 @@ describe("Infra Store", () => {
     })
   })
   describe("getters", () => {
-    describe("is_cloud", () => {
+    describe("app_mode", () => {
       test("test type", () => {
-        expectTypeOf(infra_store.is_cloud).toBeBoolean()
+        expectTypeOf(infra_store.app_mode).toBeString()
       })
     })
 
     describe("domain_name", () => {
-      test("test type", () => {
-        expectTypeOf(infra_store.is_cloud).toBeString()
-      })
-      test("test is_cloud false", () => {
-        infra_store.is_cloud = false
+      test("test app_mode BROWSER", () => {
+        infra_store.app_mode = appMode.appMode.BROWSER
         expect(infra_store.domain_name).toBe("localhost")
       })
-      test("test is_cloud false", () => {
-        infra_store.is_cloud = true
+      test("test app_mode DESKTOP", () => {
+        infra_store.app_mode = appMode.appMode.DESKTOP
+        expect(infra_store.domain_name).toBe("localhost")
+      })
+      test("test app_mode CLOUD", () => {
+        infra_store.app_mode = appMode.appMode.CLOUD
         expect(infra_store.domain_name).toBe("api.geode-solutions.com")
       })
     })
@@ -64,7 +65,7 @@ describe("Infra Store", () => {
       test("test is cloud true", () => {
         useRuntimeConfig().public.SITE_BRANCH = "/test"
         useRuntimeConfig().public.PROJECT = "/project"
-        infra_store.is_cloud = true
+        infra_store.app_mode = appMode.appMode.CLOUD
         expect(infra_store.lambda_url).toBe(
           "https://api.geode-solutions.com:443/test/project/createbackend",
         )

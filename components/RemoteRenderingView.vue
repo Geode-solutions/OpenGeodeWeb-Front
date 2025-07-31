@@ -108,7 +108,7 @@
   }
 
   onMounted(async () => {
-    if (process.client) {
+    if (import.meta.client) {
       window.addEventListener("resize", resize)
       await nextTick()
       view.setContainer(viewer.value.$el)
