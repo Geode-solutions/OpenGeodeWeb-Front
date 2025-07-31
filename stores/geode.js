@@ -18,8 +18,9 @@ export const use_geode_store = defineStore("geode", {
       if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
         return "443"
       }
-      if (useRuntimeConfig().public.GEODE_PORT) {
-        return useRuntimeConfig().public.GEODE_PORT
+      const GEODE_PORT = useRuntimeConfig().public.GEODE_PORT
+      if (GEODE_PORT != null && GEODE_PORT !== "") {
+        return GEODE_PORT
       }
       return this.default_local_port
     },

@@ -3,7 +3,6 @@ import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_f/utils/status.js"
-import { useRuntimeConfig } from "nuxt/app"
 
 export const use_viewer_store = defineStore("viewer", {
   state: () => ({
@@ -27,8 +26,9 @@ export const use_viewer_store = defineStore("viewer", {
       if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
         return "443"
       }
-      if (useRuntimeConfig().public.VIEWER_PORT) {
-        return useRuntimeConfig().public.VIEWER_PORT
+      const VIEWER_PORT = useRuntimeConfig().public.VIEWER_PORT
+      if (VIEWER_PORT != null && VIEWER_PORT !== "") {
+        return VIEWER_PORT
       }
       return this.default_local_port
     },

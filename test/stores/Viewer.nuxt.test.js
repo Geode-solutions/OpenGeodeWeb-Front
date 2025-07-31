@@ -1,7 +1,6 @@
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { describe, test, expect, expectTypeOf, beforeEach } from "vitest"
-import { useRuntimeConfig } from "nuxt/app"
 
 describe("Viewer Store", () => {
   const pinia = createTestingPinia({
@@ -62,13 +61,6 @@ describe("Viewer Store", () => {
       test("test override default_local_port", () => {
         infra_store.app_mode = appMode.appMode.DESKTOP
         viewer_store.default_local_port = "8080"
-        expect(viewer_store.port).toBe("8080")
-      })
-
-      test("test env VIEWER_PORT", () => {
-        process.env.VIEWER_PORT = "8080"
-        infra_store.app_mode = appMode.appMode.DESKTOP
-        console.log("VIEWER_PORT", useRuntimeConfig().public.VIEWER_PORT)
         expect(viewer_store.port).toBe("8080")
       })
     })

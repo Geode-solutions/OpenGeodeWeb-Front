@@ -1,11 +1,12 @@
 import { useStorage } from "@vueuse/core"
 import Status from "@ogw_f/utils/status.js"
+import getCaptchaState from "@ogw_f/utils/captcha_state.js"
 
 export const use_infra_store = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
     ID: useStorage("ID", ""),
-    is_captcha_validated: true,
+    is_captcha_validated: getCaptchaState(),
     status: Status.NOT_CREATED,
   }),
   getters: {
