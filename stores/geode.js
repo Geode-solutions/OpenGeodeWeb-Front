@@ -9,21 +9,25 @@ export const use_geode_store = defineStore("geode", {
   }),
   getters: {
     protocol() {
-      if (use_infra_store().is_cloud) {
+      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
         return "https"
       }
       return "http"
     },
     port() {
-      if (use_infra_store().is_cloud) {
+      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
         return "443"
+      }
+      const GEODE_PORT = useRuntimeConfig().public.GEODE_PORT
+      if (GEODE_PORT != null && GEODE_PORT !== "") {
+        return GEODE_PORT
       }
       return this.default_local_port
     },
     base_url() {
       const infra_store = use_infra_store()
       let geode_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
-      if (infra_store.is_cloud) {
+      if (infra_store.app_mode == appMode.appMode.CLOUD) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }

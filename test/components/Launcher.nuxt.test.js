@@ -31,7 +31,7 @@ global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("Launcher.vue", async () => {
   test(`Mount`, async () => {
-    const spy_infra_store = vi.spyOn(infra_store, "create_backend")
+    const spy_create_backend = vi.spyOn(infra_store, "create_backend")
     const wrapper = await mountSuspended(Launcher, {
       global: {
         plugins: [vuetify],
@@ -40,6 +40,6 @@ describe("Launcher.vue", async () => {
     expect(wrapper.exists()).toBe(true)
     await infra_store.$patch({ is_captcha_validated: true })
     flushPromises()
-    expect(spy_infra_store).toHaveBeenCalled()
+    expect(spy_create_backend).toHaveBeenCalled()
   })
 })

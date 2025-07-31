@@ -8,6 +8,11 @@ export function viewer_call(
   const { valid, error } = validate_schema(schema, params)
 
   if (!valid) {
+    if (process.env.NODE_ENV === "development") {
+      console.log("Bad request", error, schema, params)
+      console.log("schema", schema)
+      console.log("params", params)
+    }
     feedback_store.add_error(400, schema.route, "Bad request", error)
     throw new Error(schema.route.concat(": ", error))
   }

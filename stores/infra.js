@@ -1,25 +1,19 @@
 import { useStorage } from "@vueuse/core"
-import isElectron from "is-electron"
 import Status from "@ogw_f/utils/status.js"
 
 export const use_infra_store = defineStore("infra", {
   state: () => ({
+    app_mode: getAppMode(),
     ID: useStorage("ID", ""),
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
   }),
   getters: {
-    is_cloud() {
-      return (
-        !isElectron() && useRuntimeConfig().public.NODE_ENV === "production"
-      )
-    },
     domain_name() {
-      if (this.is_cloud) {
+      if (this.app_mode == appMode.appMode.CLOUD) {
         return useRuntimeConfig().public.API_URL
-      } else {
-        return "localhost"
       }
+      return "localhost"
     },
     lambda_url() {
       const geode_store = use_geode_store()
@@ -47,27 +41,30 @@ export const use_infra_store = defineStore("infra", {
   },
   actions: {
     async create_backend() {
+      console.log("create_backend this.app_mode", this.app_mode)
       if (this.status === Status.CREATED) return
       return navigator.locks.request("infra.create_backend", async (lock) => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return
         console.log("LOCK GRANTED !", lock)
-        const geode_store = use_geode_store()
-        const viewer_store = use_viewer_store()
-        const feedback_store = use_feedback_store()
-        if (isElectron()) {
-          const back_port = await window.electronAPI.run_back(geode_store.port)
+        if (this.app_mode == appMode.appMode.DESKTOP) {
+          const viewer_store = use_viewer_store()
+          const geode_store = use_geode_store()
+          const back_port = await window.electronAPI.run_back(
+            geode_store.default_local_port,
+          )
           geode_store.$patch({ default_local_port: back_port })
           const viewer_port = await window.electronAPI.run_viewer(
-            viewer_store.port,
+            viewer_store.default_local_port,
           )
           viewer_store.$patch({ default_local_port: viewer_port })
-        } else {
+        } else if (this.app_mode == appMode.appMode.CLOUD) {
           const { data, error } = await useFetch(this.lambda_url, {
             method: "POST",
           })
           if (error.value || !data.value) {
             this.status = Status.NOT_CREATED
+            const feedback_store = use_feedback_store()
             feedback_store.server_error = true
             return
           }
@@ -79,6 +76,7 @@ export const use_infra_store = defineStore("infra", {
       })
     },
     async create_connection() {
+      console.log("create_connection")
       await use_viewer_store().ws_connect()
       await use_geode_store().do_ping()
       return

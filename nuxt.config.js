@@ -5,7 +5,9 @@ export default defineNuxtConfig({
       SITE_BRANCH:
         process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
       PROJECT: process.env.NODE_ENV === "production" ? process.env.PROJECT : "",
-      NODE_ENV: process.env.NODE_ENV,
+      BROWSER: process.env.BROWSER ?? false,
+      GEODE_PORT: process.env.GEODE_PORT ?? null,
+      VIEWER_PORT: process.env.VIEWER_PORT ?? null,
     },
   },
 
