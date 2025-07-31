@@ -19,6 +19,16 @@
     site_key: { type: String, required: true },
   })
 
+  onMounted(() => {
+    if (import.meta.client) {
+      if (
+        process.env.NODE_ENV !== "production" ||
+        !infra_store.app_mode !== appMode.appMode.CLOUD
+      ) {
+        infra_store.$patch({ is_captcha_validated: true })
+      }
+    }
+  })
   async function submit_recaptcha(token) {
     try {
       const response = await $fetch.raw(
