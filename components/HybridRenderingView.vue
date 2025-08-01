@@ -21,21 +21,21 @@
 </template>
 
 <script setup>
-const container = useTemplateRef("viewer");
-const hybridViewerStore = useHybridViewerStore();
+  const container = useTemplateRef("viewer")
+  const hybridViewerStore = useHybridViewerStore()
 
-const { windowWidth, windowHeight } = useWindowSize();
-const { width, height } = useElementSize(container);
+  const { windowWidth, windowHeight } = useWindowSize()
+  const { width, height } = useElementSize(container)
 
-watch([windowWidth, windowHeight, height, width], () => {
-  hybridViewerStore.resize(width.value, height.value);
-});
+  watch([windowWidth, windowHeight, height, width], () => {
+    hybridViewerStore.resize(width.value, height.value)
+  })
 
-onMounted(async () => {
-  if (import.meta.client) {
-    await hybridViewerStore.initHybridViewer();
-    await nextTick();
-    hybridViewerStore.setContainer(container);
-  }
-});
+  onMounted(async () => {
+    if (import.meta.client) {
+      await hybridViewerStore.initHybridViewer()
+      await nextTick()
+      hybridViewerStore.setContainer(container)
+    }
+  })
 </script>

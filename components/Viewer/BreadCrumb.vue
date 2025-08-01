@@ -37,25 +37,25 @@
 </template>
 
 <script setup>
-const treeviewStore = use_treeview_store();
+  const treeviewStore = use_treeview_store()
 
-const selectedTree = computed(() => treeviewStore.selectedTree);
+  const selectedTree = computed(() => treeviewStore.selectedTree)
 
-const goBackToFileTree = () => {
-  treeviewStore.displayFileTree();
-};
+  const goBackToFileTree = () => {
+    treeviewStore.displayFileTree()
+  }
 
-const model_id = computed(() => treeviewStore.model_id);
+  const model_id = computed(() => treeviewStore.model_id)
 
-const metaDatas = computed(() =>
-  useDataBaseStore().itemMetaDatas(model_id.value)
-);
+  const metaDatas = computed(() =>
+    useDataBaseStore().itemMetaDatas(model_id.value),
+  )
 </script>
 
 <style scoped>
-.breadcrumb-container {
-  max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-}
+  .breadcrumb-container {
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 </style>
