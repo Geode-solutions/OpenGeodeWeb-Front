@@ -27,81 +27,81 @@
 </template>
 
 <script setup>
-import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+  import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-const hybridViewerStore = useHybridViewerStore();
-const take_screenshot = ref(false);
-const showZScaling = ref(false);
-const grid_scale = ref(false);
-const zScale = ref(hybridViewerStore.zScale);
+  const hybridViewerStore = useHybridViewerStore()
+  const take_screenshot = ref(false)
+  const showZScaling = ref(false)
+  const grid_scale = ref(false)
+  const zScale = ref(hybridViewerStore.zScale)
 
-watch(
-  () => hybridViewerStore.zScale,
-  (newVal) => {
-    zScale.value = newVal;
+  watch(
+    () => hybridViewerStore.zScale,
+    (newVal) => {
+      zScale.value = newVal
+    },
+  )
+
+  const handleZScalingClose = async () => {
+    await hybridViewerStore.setZScaling(zScale.value)
+    showZScaling.value = false
   }
-);
 
-const handleZScalingClose = async () => {
-  await hybridViewerStore.setZScaling(zScale.value);
-  showZScaling.value = false;
-};
-
-const camera_options = [
-  {
-    tooltip: "Reset camera",
-    icon: "mdi-cube-scan",
-    action: () => {
-      const { genericRenderWindow } = storeToRefs(hybridViewerStore);
-      const renderWindow = genericRenderWindow.value.value.getRenderWindow();
-      const renderer = renderWindow.getRenderers()[0];
-      renderer.resetCamera();
-      renderWindow.render();
-      hybridViewerStore.syncRemoteCamera();
+  const camera_options = [
+    {
+      tooltip: "Reset camera",
+      icon: "mdi-cube-scan",
+      action: () => {
+        const { genericRenderWindow } = storeToRefs(hybridViewerStore)
+        const renderWindow = genericRenderWindow.value.value.getRenderWindow()
+        const renderer = renderWindow.getRenderers()[0]
+        renderer.resetCamera()
+        renderWindow.render()
+        hybridViewerStore.syncRemoteCamera()
+      },
     },
-  },
-  {
-    tooltip: "Take a screenshot",
-    icon: "mdi-camera",
-    action: () => {
-      take_screenshot.value = !take_screenshot.value;
+    {
+      tooltip: "Take a screenshot",
+      icon: "mdi-camera",
+      action: () => {
+        take_screenshot.value = !take_screenshot.value
+      },
     },
-  },
-  {
-    tooltip: "Toggle grid scale",
-    icon: "mdi-ruler-square",
-    action: () => {
-      viewer_call(
-        {
-          schema: schemas.opengeodeweb_viewer.viewer.grid_scale,
-          params: {
-            visibility: !grid_scale.value,
+    {
+      tooltip: "Toggle grid scale",
+      icon: "mdi-ruler-square",
+      action: () => {
+        viewer_call(
+          {
+            schema: schemas.opengeodeweb_viewer.viewer.grid_scale,
+            params: {
+              visibility: !grid_scale.value,
+            },
           },
-        },
-        {
-          response_function: () => {
-            grid_scale.value = !grid_scale.value;
+          {
+            response_function: () => {
+              grid_scale.value = !grid_scale.value
+            },
           },
-        }
-      );
+        )
+      },
     },
-  },
-  {
-    tooltip: "Z Scaling Control",
-    icon: "mdi-sort",
-    action: () => {
-      showZScaling.value = !showZScaling.value;
+    {
+      tooltip: "Z Scaling Control",
+      icon: "mdi-sort",
+      action: () => {
+        showZScaling.value = !showZScaling.value
+      },
     },
-  },
-];
+  ]
 </script>
 
 <style module>
-.floatToolbar {
-  position: absolute;
-  z-index: 2;
-  right: 20px;
-  top: 20px;
-  background-color: rgba(0, 0, 0, 0);
-}
+  .floatToolbar {
+    position: absolute;
+    z-index: 2;
+    right: 20px;
+    top: 20px;
+    background-color: rgba(0, 0, 0, 0);
+  }
 </style>

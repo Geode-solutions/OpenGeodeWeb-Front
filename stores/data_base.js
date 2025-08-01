@@ -1,20 +1,20 @@
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 export const useDataBaseStore = defineStore("dataBase", () => {
-  const treeview_store = use_treeview_store();
-  const hybridViewerStore = useHybridViewerStore();
+  const treeview_store = use_treeview_store()
+  const hybridViewerStore = useHybridViewerStore()
 
   /** State **/
-  const db = reactive({});
+  const db = reactive({})
 
   /** Getters **/
   function itemMetaDatas(id) {
-    return db[id];
+    return db[id]
   }
 
   function formatedMeshComponents(id) {
-    const { mesh_components } = itemMetaDatas(id);
-    const formated_mesh_components = ref([]);
+    const { mesh_components } = itemMetaDatas(id)
+    const formated_mesh_components = ref([])
 
     for (const [category, uuids] of Object.entries(mesh_components)) {
       formated_mesh_components.value.push({
@@ -25,19 +25,19 @@ export const useDataBaseStore = defineStore("dataBase", () => {
           title: uuid,
           category,
         })),
-      });
+      })
     }
-    return formated_mesh_components.value;
+    return formated_mesh_components.value
   }
 
   function meshComponentType(id, uuid) {
-    const { mesh_components } = itemMetaDatas(id);
+    const { mesh_components } = itemMetaDatas(id)
 
-    if (mesh_components["Corner"]?.includes(uuid)) return "corner";
-    else if (mesh_components["Line"]?.includes(uuid)) return "line";
-    else if (mesh_components["Surface"]?.includes(uuid)) return "surface";
-    else if (mesh_components["Block"]?.includes(uuid)) return "block";
-    return null;
+    if (mesh_components["Corner"]?.includes(uuid)) return "corner"
+    else if (mesh_components["Line"]?.includes(uuid)) return "line"
+    else if (mesh_components["Surface"]?.includes(uuid)) return "surface"
+    else if (mesh_components["Block"]?.includes(uuid)) return "block"
+    return null
   }
 
   /** Actions **/
@@ -50,26 +50,26 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       viewable_filename,
       displayed_name,
       vtk_js: { binary_light_viewable },
-    }
+    },
   ) {
-    db[id] = value;
+    db[id] = value
 
     if (value.object_type === "model") {
-      await fetchMeshComponents(id);
-      await fetchUuidToFlatIndexDict(id);
+      await fetchMeshComponents(id)
+      await fetchUuidToFlatIndexDict(id)
     }
     treeview_store.addItem(
       value.geode_object,
       value.displayed_name,
       id,
-      value.object_type
-    );
+      value.object_type,
+    )
 
-    hybridViewerStore.addItem(id, value.vtk_js);
+    hybridViewerStore.addItem(id, value.vtk_js)
   }
 
   async function fetchMeshComponents(id) {
-    const { native_filename, geode_object } = itemMetaDatas(id);
+    const { native_filename, geode_object } = itemMetaDatas(id)
     await api_fetch(
       {
         schema: back_schemas.opengeodeweb_back.models.mesh_components,
@@ -81,11 +81,11 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       {
         response_function: async (response) => {
           if (response._data?.uuid_dict) {
-            db[id].mesh_components = response._data.uuid_dict;
+            db[id].mesh_components = response._data.uuid_dict
           }
         },
-      }
-    );
+      },
+    )
   }
 
   async function fetchUuidToFlatIndexDict(id) {
@@ -97,38 +97,38 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       {
         response_function: async (response) => {
           if (response._data?.uuid_to_flat_index) {
-            db[id]["uuid_to_flat_index"] = response._data.uuid_to_flat_index;
+            db[id]["uuid_to_flat_index"] = response._data.uuid_to_flat_index
           }
         },
-      }
-    );
+      },
+    )
   }
 
   function getCornersUuids(id) {
-    const { mesh_components } = itemMetaDatas(id);
-    return Object.values(mesh_components["Corner"]);
+    const { mesh_components } = itemMetaDatas(id)
+    return Object.values(mesh_components["Corner"])
   }
 
   function getLinesUuids(id) {
-    const { mesh_components } = itemMetaDatas(id);
-    return Object.values(mesh_components["Line"]);
+    const { mesh_components } = itemMetaDatas(id)
+    return Object.values(mesh_components["Line"])
   }
   function getSurfacesUuids(id) {
-    const { mesh_components } = itemMetaDatas(id);
-    return Object.values(mesh_components["Surface"]);
+    const { mesh_components } = itemMetaDatas(id)
+    return Object.values(mesh_components["Surface"])
   }
   function getBlocksUuids(id) {
-    const { mesh_components } = itemMetaDatas(id);
-    return Object.values(mesh_components["Block"]);
+    const { mesh_components } = itemMetaDatas(id)
+    return Object.values(mesh_components["Block"])
   }
 
   function getFlatIndexes(id, mesh_component_ids) {
-    const { uuid_to_flat_index } = itemMetaDatas(id);
+    const { uuid_to_flat_index } = itemMetaDatas(id)
 
     const flat_indexes = mesh_component_ids.map(
-      (mesh_component_id) => uuid_to_flat_index[mesh_component_id] || null
-    );
-    return flat_indexes.filter((index) => index !== null);
+      (mesh_component_id) => uuid_to_flat_index[mesh_component_id] || null,
+    )
+    return flat_indexes.filter((index) => index !== null)
   }
 
   return {
@@ -144,5 +144,5 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
-  };
-});
+  }
+})
