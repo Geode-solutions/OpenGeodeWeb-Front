@@ -6,9 +6,9 @@
 </template>
 
 <script setup>
-import HybridSolidPoints from "@ogw_f/assets/viewer_svgs/solid_points.svg";
+  import HybridSolidPoints from "@ogw_f/assets/viewer_svgs/solid_points.svg"
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
 </script>

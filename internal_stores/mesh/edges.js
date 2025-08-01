@@ -1,22 +1,22 @@
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges;
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 
 export function useMeshEdgesStyle() {
   /** State **/
-  const dataStyleStore = useDataStyleStore();
+  const dataStyleStore = useDataStyleStore()
 
   /** Getters **/
   function edgesVisibility(id) {
-    return dataStyleStore.styles[id].edges.visibility;
+    return dataStyleStore.styles[id].edges.visibility
   }
   function edgesActiveColoring(id) {
-    return dataStyleStore.styles[id].edges.coloring.active;
+    return dataStyleStore.styles[id].edges.coloring.active
   }
   function edgesColor(id) {
-    return dataStyleStore.styles[id].edges.coloring.color;
+    return dataStyleStore.styles[id].edges.coloring.color
   }
   function edgesSize(id) {
-    return dataStyleStore.styles[id].edges.size;
+    return dataStyleStore.styles[id].edges.size
   }
 
   /** Actions **/
@@ -28,30 +28,30 @@ export function useMeshEdgesStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.visibility = visibility;
+          dataStyleStore.styles[id].edges.visibility = visibility
           console.log(
             "setEdgesVisibility",
-            dataStyleStore.styles[id].edges.visibility
-          );
+            dataStyleStore.styles[id].edges.visibility,
+          )
         },
-      }
-    );
+      },
+    )
   }
   function setEdgesActiveColoring(id, type) {
     if (type == "color")
-      setEdgesColor(id, dataStyleStore.styles[id].edges.coloring.color);
+      setEdgesColor(id, dataStyleStore.styles[id].edges.coloring.color)
     else if (type == "vertex") {
-      const vertex = dataStyleStore.styles[id].edges.coloring.vertex;
-      if (vertex !== null) setEdgesVertexAttribute(id, vertex);
+      const vertex = dataStyleStore.styles[id].edges.coloring.vertex
+      if (vertex !== null) setEdgesVertexAttribute(id, vertex)
     } else if (type == "edges") {
-      const edges = dataStyleStore.styles[id].edges.coloring.edges;
-      if (edges !== null) setEdgesEdgeAttribute(id, edges);
-    } else throw new Error("Unknown edges coloring type: " + type);
-    dataStyleStore.styles[id].edges.coloring.active = type;
+      const edges = dataStyleStore.styles[id].edges.coloring.edges
+      if (edges !== null) setEdgesEdgeAttribute(id, edges)
+    } else throw new Error("Unknown edges coloring type: " + type)
+    dataStyleStore.styles[id].edges.coloring.active = type
     console.log(
       "setEdgesActiveColoring",
-      dataStyleStore.styles[id].edges.coloring.active
-    );
+      dataStyleStore.styles[id].edges.coloring.active,
+    )
   }
 
   function setEdgesColor(id, color) {
@@ -62,14 +62,14 @@ export function useMeshEdgesStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.coloring.color = color;
+          dataStyleStore.styles[id].edges.coloring.color = color
           console.log(
             "setEdgesColor",
-            dataStyleStore.styles[id].edges.coloring.color
-          );
+            dataStyleStore.styles[id].edges.coloring.color,
+          )
         },
-      }
-    );
+      },
+    )
   }
   function setEdgesSize(id, size) {
     viewer_call(
@@ -79,16 +79,16 @@ export function useMeshEdgesStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.size = size;
-          console.log("setEdgesSize", dataStyleStore.styles[id].edges.size);
+          dataStyleStore.styles[id].edges.size = size
+          console.log("setEdgesSize", dataStyleStore.styles[id].edges.size)
         },
-      }
-    );
+      },
+    )
   }
 
   function applyEdgesStyle(id, style) {
-    setEdgesVisibility(id, style.visibility);
-    setEdgesActiveColoring(id, style.coloring.active);
+    setEdgesVisibility(id, style.visibility)
+    setEdgesActiveColoring(id, style.coloring.active)
     // setEdgesSize(id, style.size);
   }
 
@@ -102,5 +102,5 @@ export function useMeshEdgesStyle() {
     setEdgesColor,
     setEdgesSize,
     applyEdgesStyle,
-  };
+  }
 }

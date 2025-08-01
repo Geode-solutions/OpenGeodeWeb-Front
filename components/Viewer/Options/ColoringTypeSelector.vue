@@ -57,69 +57,69 @@
 </template>
 
 <script setup>
-const coloring_style_key = defineModel("coloring_style_key");
+  const coloring_style_key = defineModel("coloring_style_key")
 
-const color = defineModel("color");
-const textures = defineModel("textures");
-const vertex_attribute = defineModel("vertex_attribute");
-// const edge_attribute = defineModel("edge_attribute");
-const polygon_attribute = defineModel("polygon_attribute");
-const polyhedron_attribute = defineModel("polyhedron_attribute");
+  const color = defineModel("color")
+  const textures = defineModel("textures")
+  const vertex_attribute = defineModel("vertex_attribute")
+  // const edge_attribute = defineModel("edge_attribute");
+  const polygon_attribute = defineModel("polygon_attribute")
+  const polyhedron_attribute = defineModel("polyhedron_attribute")
 
-const props = defineProps({
-  id: { type: String, required: true },
-});
+  const props = defineProps({
+    id: { type: String, required: true },
+  })
 
-const has_color = computed(() => (color.value !== undefined ? true : false));
-const has_textures = computed(() =>
-  textures.value !== undefined ? true : false
-);
-const has_vertex = computed(() =>
-  vertex_attribute.value !== undefined ? true : false
-);
-const has_polygons = computed(() =>
-  polygon_attribute.value !== undefined ? true : false
-);
-const has_polyhedra = computed(() =>
-  polyhedron_attribute.value !== undefined ? true : false
-);
+  const has_color = computed(() => (color.value !== undefined ? true : false))
+  const has_textures = computed(() =>
+    textures.value !== undefined ? true : false,
+  )
+  const has_vertex = computed(() =>
+    vertex_attribute.value !== undefined ? true : false,
+  )
+  const has_polygons = computed(() =>
+    polygon_attribute.value !== undefined ? true : false,
+  )
+  const has_polyhedra = computed(() =>
+    polyhedron_attribute.value !== undefined ? true : false,
+  )
 
-const color_dict = { name: "Color", value: "color" };
-const textures_dict = { name: "Textures", value: "textures" };
-const vertex_dict = { name: "Vertex attribute", value: "vertex" };
-// const edge_dict = { name: "Edge attribute", value: "edge" };
-const polygon_dict = { name: "Polygon attribute", value: "polygon" };
-const polyhedron_dict = {
-  name: "Polyhedron attribute",
-  value: "polyhedron",
-};
-const coloring_styles = computed(() => {
-  let array = [];
-  if (has_color.value) array.push(color_dict);
-  if (has_textures.value) array.push(textures_dict);
-  if (has_vertex.value) array.push(vertex_dict);
-  // if (has_edges.value) array.push(edge_dict);
-  if (has_polygons.value) array.push(polygon_dict);
-  if (has_polyhedra.value) array.push(polyhedron_dict);
+  const color_dict = { name: "Color", value: "color" }
+  const textures_dict = { name: "Textures", value: "textures" }
+  const vertex_dict = { name: "Vertex attribute", value: "vertex" }
+  // const edge_dict = { name: "Edge attribute", value: "edge" };
+  const polygon_dict = { name: "Polygon attribute", value: "polygon" }
+  const polyhedron_dict = {
+    name: "Polyhedron attribute",
+    value: "polyhedron",
+  }
+  const coloring_styles = computed(() => {
+    let array = []
+    if (has_color.value) array.push(color_dict)
+    if (has_textures.value) array.push(textures_dict)
+    if (has_vertex.value) array.push(vertex_dict)
+    // if (has_edges.value) array.push(edge_dict);
+    if (has_polygons.value) array.push(polygon_dict)
+    if (has_polyhedra.value) array.push(polyhedron_dict)
 
-  const labels = array.map((coloring) => {
-    return coloring.name;
-  });
-  const values = array.map((coloring) => {
-    return coloring.value;
-  });
+    const labels = array.map((coloring) => {
+      return coloring.name
+    })
+    const values = array.map((coloring) => {
+      return coloring.value
+    })
 
-  return { labels, values };
-});
+    return { labels, values }
+  })
 
-const coloring_style_label = ref(
-  coloring_styles.value.labels[
-    coloring_styles.value.values.indexOf(coloring_style_key.value)
-  ]
-);
+  const coloring_style_label = ref(
+    coloring_styles.value.labels[
+      coloring_styles.value.values.indexOf(coloring_style_key.value)
+    ],
+  )
 
-watch(coloring_style_label, (value) => {
-  coloring_style_key.value =
-    coloring_styles.value.values[coloring_styles.value.labels.indexOf(value)];
-});
+  watch(coloring_style_label, (value) => {
+    coloring_style_key.value =
+      coloring_styles.value.values[coloring_styles.value.labels.indexOf(value)]
+  })
 </script>

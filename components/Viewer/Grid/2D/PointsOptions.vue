@@ -6,9 +6,9 @@
 </template>
 
 <script setup>
-import Grid2D_Points from "@ogw_f/assets/viewer_svgs/grid_2d_points.svg";
+  import Grid2D_Points from "@ogw_f/assets/viewer_svgs/grid_2d_points.svg"
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
 </script>

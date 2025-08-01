@@ -6,9 +6,9 @@
 </template>
 
 <script setup>
-import PolygonalSurfacePoints from "@ogw_f/assets/viewer_svgs/surface_points.svg";
+  import PolygonalSurfacePoints from "@ogw_f/assets/viewer_svgs/surface_points.svg"
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
 </script>

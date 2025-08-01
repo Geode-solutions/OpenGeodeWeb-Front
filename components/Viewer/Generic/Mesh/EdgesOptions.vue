@@ -18,31 +18,31 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-  btn_image: { type: String, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+    btn_image: { type: String, required: true },
+  })
 
-const id = toRef(() => props.itemProps.id);
+  const id = toRef(() => props.itemProps.id)
 
-const dataStyleStore = useDataStyleStore();
+  const dataStyleStore = useDataStyleStore()
 
-const visibility = computed({
-  get: () => dataStyleStore.edgesVisibility(id.value),
-  set: (newValue) => dataStyleStore.setEdgesVisibility(id.value, newValue),
-});
-const size = computed({
-  get: () => dataStyleStore.edgesSize(id.value),
-  set: (newValue) => dataStyleStore.setEdgesSize(id.value, newValue),
-});
-const coloring_style_key = computed({
-  get: () => dataStyleStore.edgesActiveColoring(id.value),
-  set: (newValue) => {
-    dataStyleStore.setEdgesActiveColoring(id.value, newValue);
-  },
-});
-const color = computed({
-  get: () => dataStyleStore.edgesColor(id.value),
-  set: (newValue) => dataStyleStore.setEdgesColor(id.value, newValue),
-});
+  const visibility = computed({
+    get: () => dataStyleStore.edgesVisibility(id.value),
+    set: (newValue) => dataStyleStore.setEdgesVisibility(id.value, newValue),
+  })
+  const size = computed({
+    get: () => dataStyleStore.edgesSize(id.value),
+    set: (newValue) => dataStyleStore.setEdgesSize(id.value, newValue),
+  })
+  const coloring_style_key = computed({
+    get: () => dataStyleStore.edgesActiveColoring(id.value),
+    set: (newValue) => {
+      dataStyleStore.setEdgesActiveColoring(id.value, newValue)
+    },
+  })
+  const color = computed({
+    get: () => dataStyleStore.edgesColor(id.value),
+    set: (newValue) => dataStyleStore.setEdgesColor(id.value, newValue),
+  })
 </script>

@@ -7,9 +7,9 @@
 </template>
 
 <script setup>
-import TriangulatedSurfaceEdgesTriangles from "@ogw_f/assets/viewer_svgs/surface_triangles.svg";
+  import TriangulatedSurfaceEdgesTriangles from "@ogw_f/assets/viewer_svgs/surface_triangles.svg"
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
 </script>

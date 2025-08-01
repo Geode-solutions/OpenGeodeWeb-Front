@@ -7,9 +7,9 @@
 </template>
 
 <script setup>
-import Grid3D_Facets from "@ogw_f/assets/viewer_svgs/grid_3d_facets.svg";
+  import Grid3D_Facets from "@ogw_f/assets/viewer_svgs/grid_3d_facets.svg"
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
 </script>

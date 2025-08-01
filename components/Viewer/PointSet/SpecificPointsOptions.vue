@@ -40,34 +40,35 @@
 </template>
 
 <script setup>
-const dataStyleStore = useDataStyleStore();
+  const dataStyleStore = useDataStyleStore()
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-  btn_image: { type: String, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+    btn_image: { type: String, required: true },
+  })
 
-const id = toRef(() => props.itemProps.id);
+  const id = toRef(() => props.itemProps.id)
 
-const visibility = computed({
-  get: () => dataStyleStore.pointsVisibility(id.value),
-  set: (newValue) => dataStyleStore.setPointsVisibility(id.value, newValue),
-});
-const size = computed({
-  get: () => dataStyleStore.pointsSize(id.value),
-  set: (newValue) => dataStyleStore.setPointsSize(id.value, newValue),
-});
-const coloring_style_key = computed({
-  get: () => dataStyleStore.pointsActiveColoring(id.value),
-  set: (newValue) => dataStyleStore.setPointsActiveColoring(id.value, newValue),
-});
-const color = computed({
-  get: () => dataStyleStore.pointsColor(id.value),
-  set: (newValue) => dataStyleStore.setPointsColor(id.value, newValue),
-});
-const vertex_attribute = computed({
-  get: () => dataStyleStore.pointsVertexAttribute(id.value),
-  set: (newValue) =>
-    dataStyleStore.setPointsVertexAttribute(id.value, newValue),
-});
+  const visibility = computed({
+    get: () => dataStyleStore.pointsVisibility(id.value),
+    set: (newValue) => dataStyleStore.setPointsVisibility(id.value, newValue),
+  })
+  const size = computed({
+    get: () => dataStyleStore.pointsSize(id.value),
+    set: (newValue) => dataStyleStore.setPointsSize(id.value, newValue),
+  })
+  const coloring_style_key = computed({
+    get: () => dataStyleStore.pointsActiveColoring(id.value),
+    set: (newValue) =>
+      dataStyleStore.setPointsActiveColoring(id.value, newValue),
+  })
+  const color = computed({
+    get: () => dataStyleStore.pointsColor(id.value),
+    set: (newValue) => dataStyleStore.setPointsColor(id.value, newValue),
+  })
+  const vertex_attribute = computed({
+    get: () => dataStyleStore.pointsVertexAttribute(id.value),
+    set: (newValue) =>
+      dataStyleStore.setPointsVertexAttribute(id.value, newValue),
+  })
 </script>

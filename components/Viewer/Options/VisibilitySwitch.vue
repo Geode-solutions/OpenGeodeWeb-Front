@@ -10,5 +10,5 @@
 </template>
 
 <script setup>
-const visibility = defineModel();
+  const visibility = defineModel()
 </script>

@@ -36,81 +36,81 @@
 </template>
 
 <script setup>
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+  import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-const dataBaseStore = useDataBaseStore();
+  const dataBaseStore = useDataBaseStore()
 
-const emit = defineEmits(["update_value"]);
+  const emit = defineEmits(["update_value"])
 
-const props = defineProps({
-  id: { type: String, required: true },
-  texture_name: { type: String, required: true },
-  texture_file_name: { type: String, required: true },
-});
+  const props = defineProps({
+    id: { type: String, required: true },
+    texture_name: { type: String, required: true },
+    texture_file_name: { type: String, required: true },
+  })
 
-const texture_name = ref("");
-texture_name.value = props.texture_name;
+  const texture_name = ref("")
+  texture_name.value = props.texture_name
 
-const texture_file_name = ref("");
-texture_file_name.value = props.texture_file_name;
+  const texture_file_name = ref("")
+  texture_file_name.value = props.texture_file_name
 
-const texture_coordinates = ref([]);
+  const texture_coordinates = ref([])
 
-const meta_data = computed(() => {
-  return dataBaseStore.itemMetaDatas(props.id);
-});
+  const meta_data = computed(() => {
+    return dataBaseStore.itemMetaDatas(props.id)
+  })
 
-onMounted(() => {
-  getTextureCoordinates();
-});
+  onMounted(() => {
+    getTextureCoordinates()
+  })
 
-function getTextureCoordinates() {
-  api_fetch(
-    {
-      schema: back_schemas.opengeodeweb_back.texture_coordinates,
-      params: {
-        input_geode_object: meta_data.value.geode_object,
-        filename: meta_data.value.native_filename,
-      },
-    },
-    {
-      response_function: (response) => {
-        texture_coordinates.value = response._data.texture_coordinates;
-      },
-    }
-  );
-}
-
-async function files_uploaded_event(value) {
-  if (value.length) {
-    await api_fetch(
+  function getTextureCoordinates() {
+    api_fetch(
       {
-        schema: back_schemas.opengeodeweb_back.save_viewable_file,
+        schema: back_schemas.opengeodeweb_back.texture_coordinates,
         params: {
-          input_geode_object: "RasterImage2D",
-          filename: value[0].name,
+          input_geode_object: meta_data.value.geode_object,
+          filename: meta_data.value.native_filename,
         },
       },
       {
-        response_function: async (response) => {
-          texture_file_name.value = response._data.viewable_file_name;
+        response_function: (response) => {
+          texture_coordinates.value = response._data.texture_coordinates
         },
-      }
-    );
+      },
+    )
   }
-}
 
-watch(texture_name, (value) => {
-  emit("update_value", { key: "texture_name", value });
-});
+  async function files_uploaded_event(value) {
+    if (value.length) {
+      await api_fetch(
+        {
+          schema: back_schemas.opengeodeweb_back.save_viewable_file,
+          params: {
+            input_geode_object: "RasterImage2D",
+            filename: value[0].name,
+          },
+        },
+        {
+          response_function: async (response) => {
+            texture_file_name.value = response._data.viewable_file_name
+          },
+        },
+      )
+    }
+  }
 
-watch(texture_file_name, (value) => {
-  emit("update_value", { key: "texture_file_name", value });
-});
+  watch(texture_name, (value) => {
+    emit("update_value", { key: "texture_name", value })
+  })
+
+  watch(texture_file_name, (value) => {
+    emit("update_value", { key: "texture_file_name", value })
+  })
 </script>
 
 <style>
-.v-input__details {
-  display: none;
-}
+  .v-input__details {
+    display: none;
+  }
 </style>
