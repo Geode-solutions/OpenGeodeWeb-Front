@@ -1,15 +1,12 @@
 # Nuxt dev/build outputs
 .output
-.data
 .nuxt
 .nitro
 .cache
-build
 dist
 
-
 # Node dependencies
-/node_modules 
+node_modules
 
 # Logs
 logs
@@ -24,21 +21,9 @@ logs
 .env
 .env.*
 !.env.example
-# Other
-/build
-/dist-electron
-/electron-server/back/dist
-/electron-server/viewer/dist
-/electron-server/back/venv
-/electron-server/viewer/venv
-/release
-/uploads
-vease-back*
-vease-viewer*
 
-# Playwright
-node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+# Other
+.pytest_cache
+__snapshots__
+coverage
+# package-lock.json
