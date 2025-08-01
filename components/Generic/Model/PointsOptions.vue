@@ -30,24 +30,24 @@
 </template>
 
 <script setup>
-import SurfacePoints from "@ogw_f/assets/viewer_svgs/surface_points.svg";
+  import SurfacePoints from "@ogw_f/assets/viewer_svgs/surface_points.svg"
 
-const dataStyleStore = useDataStyleStore();
+  const dataStyleStore = useDataStyleStore()
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-  btn_image: { type: String, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+    btn_image: { type: String, required: true },
+  })
 
-const id = toRef(() => props.itemProps.id);
+  const id = toRef(() => props.itemProps.id)
 
-const visibility = computed({
-  get: () => dataStyleStore.modelPointsVisibility(id.value),
-  set: (newValue) =>
-    dataStyleStore.setModelPointsVisibility(id.value, newValue),
-});
-const size = computed({
-  get: () => dataStyleStore.modelPointsSize(id.value),
-  set: (newValue) => dataStyleStore.setModelPointsSize(id.value, newValue),
-});
+  const visibility = computed({
+    get: () => dataStyleStore.modelPointsVisibility(id.value),
+    set: (newValue) =>
+      dataStyleStore.setModelPointsVisibility(id.value, newValue),
+  })
+  const size = computed({
+    get: () => dataStyleStore.modelPointsSize(id.value),
+    set: (newValue) => dataStyleStore.setModelPointsSize(id.value, newValue),
+  })
 </script>

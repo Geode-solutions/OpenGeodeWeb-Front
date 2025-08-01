@@ -6,9 +6,9 @@
 </template>
 
 <script setup>
-import Grid2D_Edges from "@ogw_f/assets/viewer_svgs/grid_2d_edges.svg";
+  import Grid2D_Edges from "@ogw_f/assets/viewer_svgs/grid_2d_edges.svg"
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
 </script>

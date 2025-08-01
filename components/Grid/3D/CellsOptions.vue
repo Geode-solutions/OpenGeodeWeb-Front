@@ -7,9 +7,9 @@
 </template>
 
 <script setup>
-import Grid3DCells from "@ogw_f/assets/viewer_svgs/grid_3d_cells.svg";
+  import Grid3DCells from "@ogw_f/assets/viewer_svgs/grid_3d_cells.svg"
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
 </script>

@@ -6,9 +6,9 @@
 </template>
 
 <script setup>
-import SolidEdges from "@ogw_f/assets/viewer_svgs/solid_edges.svg";
+  import SolidEdges from "@ogw_f/assets/viewer_svgs/solid_edges.svg"
 
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
 </script>

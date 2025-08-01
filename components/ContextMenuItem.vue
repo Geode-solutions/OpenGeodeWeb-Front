@@ -34,55 +34,57 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  itemProps: { type: Object, required: true },
-  tooltip: { type: String, required: true },
-  btn_image: { type: String, required: true },
-});
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+    tooltip: { type: String, required: true },
+    btn_image: { type: String, required: true },
+  })
 
-const display_options = ref(false);
+  const display_options = ref(false)
 
-function toggleOptions() {
-  display_options.value = !display_options.value;
-}
+  function toggleOptions() {
+    display_options.value = !display_options.value
+  }
 </script>
 
 <style scoped>
-.menu-item {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
+  .menu-item {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
 
-.menu-options {
-  position: absolute;
-  top: 50%;
-  left: 430%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  z-index: 10;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-  min-width: 150px;
-  max-width: 320px;
-  padding: 8px 0;
-  overflow: hidden;
-}
+  .menu-options {
+    position: absolute;
+    top: 50%;
+    left: 430%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    z-index: 10;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    max-width: 320px;
+    padding: 8px 0;
+    overflow: hidden;
+  }
 
-.menu-options ::v-deep(v-list-item) {
-  padding: 10px 16px;
-  white-space: nowrap; /* Empêche les retours à la ligne */
-}
+  .menu-options ::v-deep(v-list-item) {
+    padding: 10px 16px;
+    white-space: nowrap; /* Empêche les retours à la ligne */
+  }
 
-.menu-options ::v-deep(v-list-item:hover) {
-  background-color: #f5f5f5;
-  cursor: pointer;
-}
+  .menu-options ::v-deep(v-list-item:hover) {
+    background-color: #f5f5f5;
+    cursor: pointer;
+  }
 </style>

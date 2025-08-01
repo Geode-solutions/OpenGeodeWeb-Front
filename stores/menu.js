@@ -1,97 +1,97 @@
 // PointSet components
-import PointSetPointsOptions from "@ogw_f/components/Viewer/PointSet/PointsOptions.vue";
+import PointSetPointsOptions from "@ogw_f/components/Viewer/PointSet/PointsOptions.vue"
 
 // EdgedCurve components
-import EdgedCurvePointsOptions from "@ogw_f/components/Viewer/EdgedCurve/PointsOptions.vue";
-import EdgedCurveEdgesOptions from "@ogw_f/components/Viewer/EdgedCurve/EdgesOptions.vue";
+import EdgedCurvePointsOptions from "@ogw_f/components/Viewer/EdgedCurve/PointsOptions.vue"
+import EdgedCurveEdgesOptions from "@ogw_f/components/Viewer/EdgedCurve/EdgesOptions.vue"
 
 // PolygonalSurface components
-import PolygonalSurfacePointsOptions from "@ogw_f/components/Viewer/PolygonalSurface/PointsOptions.vue";
-import PolygonalSurfaceEdgesOptions from "@ogw_f/components/Viewer/PolygonalSurface/EdgesOptions.vue";
-import PolygonalSurfacePolygonsOptions from "@ogw_f/components/Viewer/PolygonalSurface/PolygonsOptions.vue";
+import PolygonalSurfacePointsOptions from "@ogw_f/components/Viewer/PolygonalSurface/PointsOptions.vue"
+import PolygonalSurfaceEdgesOptions from "@ogw_f/components/Viewer/PolygonalSurface/EdgesOptions.vue"
+import PolygonalSurfacePolygonsOptions from "@ogw_f/components/Viewer/PolygonalSurface/PolygonsOptions.vue"
 
 // TriangulatedSurface components
-import TriangulatedSurfacePointsOptions from "@ogw_f/components/Viewer/TriangulatedSurface/PointsOptions.vue";
-import TriangulatedSurfaceEdgesOptions from "@ogw_f/components/Viewer/TriangulatedSurface/EdgesOptions.vue";
-import TriangulatedSurfaceTrianglesOptions from "@ogw_f/components/Viewer/TriangulatedSurface/TrianglesOptions.vue";
+import TriangulatedSurfacePointsOptions from "@ogw_f/components/Viewer/TriangulatedSurface/PointsOptions.vue"
+import TriangulatedSurfaceEdgesOptions from "@ogw_f/components/Viewer/TriangulatedSurface/EdgesOptions.vue"
+import TriangulatedSurfaceTrianglesOptions from "@ogw_f/components/Viewer/TriangulatedSurface/TrianglesOptions.vue"
 
 // Grid 2D components
-import Grid2DPointsOptions from "@ogw_f/components/Viewer/Grid/2D/PointsOptions.vue";
-import Grid2DEdgesOptions from "@ogw_f/components/Viewer/Grid/2D/EdgesOptions.vue";
-import Grid2DCellsOptions from "@ogw_f/components/Viewer/Grid/2D/CellsOptions.vue";
+import Grid2DPointsOptions from "@ogw_f/components/Viewer/Grid/2D/PointsOptions.vue"
+import Grid2DEdgesOptions from "@ogw_f/components/Viewer/Grid/2D/EdgesOptions.vue"
+import Grid2DCellsOptions from "@ogw_f/components/Viewer/Grid/2D/CellsOptions.vue"
 
 // Grid 3D components
-import Grid3DPointsOptions from "@ogw_f/components/Viewer/Grid/3D/PointsOptions.vue";
-import Grid3DEdgesOptions from "@ogw_f/components/Viewer/Grid/3D/EdgesOptions.vue";
-import Grid3DFacetsOptions from "@ogw_f/components/Viewer/Grid/3D/FacetsOptions.vue";
-import Grid3DCellsOptions from "@ogw_f/components/Viewer/Grid/3D/CellsOptions.vue";
+import Grid3DPointsOptions from "@ogw_f/components/Viewer/Grid/3D/PointsOptions.vue"
+import Grid3DEdgesOptions from "@ogw_f/components/Viewer/Grid/3D/EdgesOptions.vue"
+import Grid3DFacetsOptions from "@ogw_f/components/Viewer/Grid/3D/FacetsOptions.vue"
+import Grid3DCellsOptions from "@ogw_f/components/Viewer/Grid/3D/CellsOptions.vue"
 
 // Solid components
-import SolidPointsOptions from "@ogw_f/components/Viewer/Solid/PointsOptions.vue";
-import SolidEdgesOptions from "@ogw_f/components/Viewer/Solid/EdgesOptions.vue";
-import SolidPolygonsOptions from "@ogw_f/components/Viewer/Solid/PolygonsOptions.vue";
-import SolidPolyhedraOptions from "@ogw_f/components/Viewer/Solid/PolyhedraOptions.vue";
+import SolidPointsOptions from "@ogw_f/components/Viewer/Solid/PointsOptions.vue"
+import SolidEdgesOptions from "@ogw_f/components/Viewer/Solid/EdgesOptions.vue"
+import SolidPolygonsOptions from "@ogw_f/components/Viewer/Solid/PolygonsOptions.vue"
+import SolidPolyhedraOptions from "@ogw_f/components/Viewer/Solid/PolyhedraOptions.vue"
 
 // TetrahedralSolid components
-import TetrahedralSolidTrianglesOptions from "@ogw_f/components/Viewer/TetrahedralSolid/TrianglesOptions.vue";
-import TetrahedralSolidTetrahedraOptions from "@ogw_f/components/Viewer/TetrahedralSolid/TetrahedraOptions.vue";
+import TetrahedralSolidTrianglesOptions from "@ogw_f/components/Viewer/TetrahedralSolid/TrianglesOptions.vue"
+import TetrahedralSolidTetrahedraOptions from "@ogw_f/components/Viewer/TetrahedralSolid/TetrahedraOptions.vue"
 
 // Model components
-import ModelEdgesOptions from "@ogw_f/components/Viewer/Generic/Model/EdgesOptions.vue";
-import ModelPointsOptions from "@ogw_f/components/Viewer/Generic/Model/PointsOptions.vue";
+import ModelEdgesOptions from "@ogw_f/components/Viewer/Generic/Model/EdgesOptions.vue"
+import ModelPointsOptions from "@ogw_f/components/Viewer/Generic/Model/PointsOptions.vue"
 
-const PointSet_menu = [PointSetPointsOptions];
+const PointSet_menu = [PointSetPointsOptions]
 
-const EdgedCurve_menu = [EdgedCurvePointsOptions, EdgedCurveEdgesOptions];
+const EdgedCurve_menu = [EdgedCurvePointsOptions, EdgedCurveEdgesOptions]
 
 const PolygonalSurface_menu = [
   PolygonalSurfacePointsOptions,
   PolygonalSurfaceEdgesOptions,
   PolygonalSurfacePolygonsOptions,
-];
+]
 
 const TriangulatedSurface_menu = [
   TriangulatedSurfacePointsOptions,
   TriangulatedSurfaceEdgesOptions,
   TriangulatedSurfaceTrianglesOptions,
-];
+]
 
 const Grid2D_menu = [
   Grid2DPointsOptions,
   Grid2DEdgesOptions,
   Grid2DCellsOptions,
-];
+]
 const Grid3D_menu = [
   Grid3DPointsOptions,
   Grid3DEdgesOptions,
   Grid3DFacetsOptions,
   Grid3DCellsOptions,
-];
+]
 
 const Solid_menu = [
   SolidPointsOptions,
   SolidEdgesOptions,
   SolidPolygonsOptions,
   SolidPolyhedraOptions,
-];
+]
 
 const TetrahedralSolid_menu = [
   SolidPointsOptions,
   SolidEdgesOptions,
   TetrahedralSolidTrianglesOptions,
   TetrahedralSolidTetrahedraOptions,
-];
+]
 
-const BRep_menu = [ModelEdgesOptions, ModelPointsOptions];
+const BRep_menu = [ModelEdgesOptions, ModelPointsOptions]
 
-const CrossSection_menu = [ModelEdgesOptions, ModelPointsOptions];
+const CrossSection_menu = [ModelEdgesOptions, ModelPointsOptions]
 
-const ImplicitCrossSection_menu = [ModelEdgesOptions, ModelPointsOptions];
-const ImplicitStructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
+const ImplicitCrossSection_menu = [ModelEdgesOptions, ModelPointsOptions]
+const ImplicitStructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions]
 
-const Section_menu = [ModelEdgesOptions, ModelPointsOptions];
+const Section_menu = [ModelEdgesOptions, ModelPointsOptions]
 
-const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
+const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions]
 
 const menusData = {
   mesh: {
@@ -119,52 +119,52 @@ const menusData = {
     Section: Section_menu,
     StructuralModel: StructuralModel_menu,
   },
-};
+}
 
 export const useMenuStore = defineStore("menu", () => {
-  const menus = ref(menusData);
-  const display_menu = ref(false);
-  const current_id = ref(null);
-  const menuX = ref(0);
-  const menuY = ref(0);
-  const containerWidth = ref(window.innerWidth);
-  const containerHeight = ref(window.innerHeight);
+  const menus = ref(menusData)
+  const display_menu = ref(false)
+  const current_id = ref(null)
+  const menuX = ref(0)
+  const menuY = ref(0)
+  const containerWidth = ref(window.innerWidth)
+  const containerHeight = ref(window.innerHeight)
 
   function getMenuItems(objectType, geodeObject) {
     if (!objectType || !geodeObject || !menus.value[objectType]) {
-      return [];
+      return []
     }
-    return menus.value[objectType][geodeObject] || [];
-  };
+    return menus.value[objectType][geodeObject] || []
+  }
 
   function closeMenu() {
-    display_menu.value = false;
-    current_id.value = null;
+    display_menu.value = false
+    current_id.value = null
   }
 
   async function openMenu(id, x, y, containerWidth, containerHeight) {
-    await closeMenu();
-    current_id.value = id;
+    await closeMenu()
+    current_id.value = id
 
     if (x !== undefined && y !== undefined) {
-      menuX.value = x;
-      menuY.value = y;
+      menuX.value = x
+      menuY.value = y
     }
 
-    if (containerWidth) containerWidth.value = containerWidth;
-    if (containerHeight) containerHeight.value = containerHeight;
+    if (containerWidth) containerWidth.value = containerWidth
+    if (containerHeight) containerHeight.value = containerHeight
 
-    display_menu.value = true;
+    display_menu.value = true
   }
 
   function showItemsWithDelay() {
-    const DELAY = 50;
-    const items = getMenuItems();
+    const DELAY = 50
+    const items = getMenuItems()
     items.forEach((item, index) => {
       setTimeout(() => {
-        item.visible = true;
-      }, index * DELAY);
-    });
+        item.visible = true
+      }, index * DELAY)
+    })
   }
 
   return {
@@ -178,5 +178,5 @@ export const useMenuStore = defineStore("menu", () => {
     closeMenu,
     openMenu,
     showItemsWithDelay,
-  };
-});
+  }
+})

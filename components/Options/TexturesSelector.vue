@@ -39,29 +39,29 @@
 </template>
 
 <script setup>
-const textures = defineModel();
+  const textures = defineModel()
 
-const internal_textures = ref([]);
+  const internal_textures = ref([])
 
-const props = defineProps({
-  id: { type: String, required: true },
-});
+  const props = defineProps({
+    id: { type: String, required: true },
+  })
 
-onMounted(() => {
-  if (textures.value != null) {
-    internal_textures.value = textures.value;
-  } else {
-    internal_textures.value = [{ texture_name: "", texture_file_name: "" }];
+  onMounted(() => {
+    if (textures.value != null) {
+      internal_textures.value = textures.value
+    } else {
+      internal_textures.value = [{ texture_name: "", texture_file_name: "" }]
+    }
+  })
+
+  function update_value_event($event, index) {
+    internal_textures.value[index][$event.key] = $event.value
+    const filtered = internal_textures.value.filter((texture) => {
+      return texture.texture_name != "" && texture.texture_file_name != ""
+    })
+    if (filtered.length != 0) {
+      textures.value = filtered
+    }
   }
-});
-
-function update_value_event($event, index) {
-  internal_textures.value[index][$event.key] = $event.value;
-  const filtered = internal_textures.value.filter((texture) => {
-    return texture.texture_name != "" && texture.texture_file_name != "";
-  });
-  if (filtered.length != 0) {
-    textures.value = filtered;
-  }
-}
 </script>

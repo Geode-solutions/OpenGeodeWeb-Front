@@ -1,28 +1,28 @@
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons;
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 
 export function useMeshPolygonsStyle() {
   /** State **/
-  const dataStyleStore = useDataStyleStore();
+  const dataStyleStore = useDataStyleStore()
 
   /** Getters **/
   function polygonsVisibility(id) {
-    return dataStyleStore.styles[id].polygons.visibility;
+    return dataStyleStore.styles[id].polygons.visibility
   }
   function polygonsActiveColoring(id) {
-    return dataStyleStore.styles[id].polygons.coloring.active;
+    return dataStyleStore.styles[id].polygons.coloring.active
   }
   function polygonsColor(id) {
-    return dataStyleStore.styles[id].polygons.coloring.color;
+    return dataStyleStore.styles[id].polygons.coloring.color
   }
   function polygonsTextures(id) {
-    return dataStyleStore.styles[id].polygons.coloring.textures;
+    return dataStyleStore.styles[id].polygons.coloring.textures
   }
   function polygonsPolygonAttribute(id) {
-    return dataStyleStore.styles[id].polygons.coloring.polygon;
+    return dataStyleStore.styles[id].polygons.coloring.polygon
   }
   function polygonsVertexAttribute(id) {
-    return dataStyleStore.styles[id].polygons.coloring.vertex;
+    return dataStyleStore.styles[id].polygons.coloring.vertex
   }
 
   /** Actions **/
@@ -34,37 +34,37 @@ export function useMeshPolygonsStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.visibility = visibility;
+          dataStyleStore.styles[id].polygons.visibility = visibility
           console.log(
             "setPolygonsVisibility",
-            dataStyleStore.styles[id].polygons.visibility
-          );
+            dataStyleStore.styles[id].polygons.visibility,
+          )
         },
-      }
-    );
+      },
+    )
   }
   function setPolygonsActiveColoring(id, type) {
-    console.log("setPolygonsActiveColoring", id, type);
+    console.log("setPolygonsActiveColoring", id, type)
     if (type == "color") {
-      setPolygonsColor(id, dataStyleStore.styles[id].polygons.coloring.color);
+      setPolygonsColor(id, dataStyleStore.styles[id].polygons.coloring.color)
     } else if (type == "textures") {
-      const textures = dataStyleStore.styles[id].polygons.coloring.textures;
-      if (textures !== null) setPolygonsTextures(id, textures);
+      const textures = dataStyleStore.styles[id].polygons.coloring.textures
+      if (textures !== null) setPolygonsTextures(id, textures)
     } else if (type == "vertex") {
-      const vertex = dataStyleStore.styles[id].polygons.coloring.vertex;
+      const vertex = dataStyleStore.styles[id].polygons.coloring.vertex
       if (vertex !== null) {
-        console.log("vertex", vertex);
-        setPolygonsVertexAttribute(id, vertex);
+        console.log("vertex", vertex)
+        setPolygonsVertexAttribute(id, vertex)
       }
     } else if (type == "polygon") {
-      const polygon = dataStyleStore.styles[id].polygons.coloring.polygon;
-      if (polygon !== null) setPolygonsPolygonAttribute(id, polygon);
-    } else throw new Error("Unknown polygons coloring type: " + type);
-    dataStyleStore.styles[id].polygons.coloring.active = type;
+      const polygon = dataStyleStore.styles[id].polygons.coloring.polygon
+      if (polygon !== null) setPolygonsPolygonAttribute(id, polygon)
+    } else throw new Error("Unknown polygons coloring type: " + type)
+    dataStyleStore.styles[id].polygons.coloring.active = type
     console.log(
       "setPolygonsActiveColoring",
-      dataStyleStore.styles[id].polygons.coloring.active
-    );
+      dataStyleStore.styles[id].polygons.coloring.active,
+    )
   }
   function setPolygonsColor(id, color) {
     viewer_call(
@@ -74,14 +74,14 @@ export function useMeshPolygonsStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.coloring.color = color;
+          dataStyleStore.styles[id].polygons.coloring.color = color
           console.log(
             "setPolygonsColor",
-            dataStyleStore.styles[id].polygons.coloring.color
-          );
+            dataStyleStore.styles[id].polygons.coloring.color,
+          )
         },
-      }
-    );
+      },
+    )
   }
   function setPolygonsTextures(id, textures) {
     viewer_call(
@@ -91,14 +91,14 @@ export function useMeshPolygonsStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.coloring.textures = textures;
+          dataStyleStore.styles[id].polygons.coloring.textures = textures
           console.log(
             "setPolygonsTextures",
-            dataStyleStore.styles[id].polygons.coloring.textures
-          );
+            dataStyleStore.styles[id].polygons.coloring.textures,
+          )
         },
-      }
-    );
+      },
+    )
   }
   function setPolygonsVertexAttribute(id, vertex_attribute) {
     viewer_call(
@@ -108,14 +108,14 @@ export function useMeshPolygonsStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.coloring.vertex = vertex_attribute;
+          dataStyleStore.styles[id].polygons.coloring.vertex = vertex_attribute
           console.log(
             "setPolygonsVertexAttribute",
-            dataStyleStore.styles[id].polygons.coloring.vertex
-          );
+            dataStyleStore.styles[id].polygons.coloring.vertex,
+          )
         },
-      }
-    );
+      },
+    )
   }
   function setPolygonsPolygonAttribute(id, polygon_attribute) {
     viewer_call(
@@ -126,19 +126,19 @@ export function useMeshPolygonsStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].polygons.coloring.polygon =
-            polygon_attribute;
+            polygon_attribute
           console.log(
             "setPolygonsPolygonAttribute",
-            dataStyleStore.styles[id].polygons.coloring.polygon
-          );
+            dataStyleStore.styles[id].polygons.coloring.polygon,
+          )
         },
-      }
-    );
+      },
+    )
   }
 
   function applyPolygonsStyle(id, style) {
-    setPolygonsVisibility(id, style.visibility);
-    setPolygonsActiveColoring(id, style.coloring.active);
+    setPolygonsVisibility(id, style.visibility)
+    setPolygonsActiveColoring(id, style.coloring.active)
   }
 
   return {
@@ -155,5 +155,5 @@ export function useMeshPolygonsStyle() {
     setPolygonsVertexAttribute,
     setPolygonsPolygonAttribute,
     applyPolygonsStyle,
-  };
+  }
 }
