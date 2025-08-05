@@ -98,7 +98,11 @@ describe("ObjectSelector.vue", async () => {
       method: allowed_objects.methods[0],
       handler: () => response,
     })
-    const object_priority_schema = schemas.opengeodeweb_back.object_priority
+    
+    const object_priority_schema = {
+      $id: "object_priority",
+      methods: ["POST"]
+    }
     registerEndpoint(object_priority_schema.$id, {
       method: object_priority_schema.methods[0],
       handler: ({ body }) => {
