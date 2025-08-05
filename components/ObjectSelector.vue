@@ -94,8 +94,38 @@
         }
       }
     }
-
-    allowed_objects.value = final_object
+    if (Object.keys(final_object).length > 0) {
+      const max_loadability_score = Math.max(
+        ...Object.values(final_object).map(obj => obj.is_loadable ? 1 : 0)
+      )
+      
+      const best_objects = Object.fromEntries(
+        Object.entries(final_object).filter(
+          ([object_name, object_info]) => (object_info.is_loadable ? 1 : 0) === max_loadability_score
+        )
+      )
+      
+      if (Object.keys(best_objects).length > 1) {
+        const priorities = {}
+        for (const object_name of Object.keys(best_objects)) {
+          const priority_response = await api_fetch({
+            schema: schemas.opengeodeweb_back.object_priority,
+            params: { object_name, filename: filenames[0] }
+          })
+          priorities[object_name] = priority_response.data.value.priority
+        }
+        
+        const best_object_name = Object.keys(best_objects).reduce((a, b) => 
+          priorities[a] > priorities[b] ? a : b
+        )
+        
+        allowed_objects.value = { [best_object_name]: final_object[best_object_name] }
+      } else {
+        allowed_objects.value = best_objects
+      }
+    } else {
+      allowed_objects.value = final_object
+    }
     if (Object.keys(allowed_objects.value).length == 1) {
       set_geode_object(Object.keys(allowed_objects.value)[0])
     }
