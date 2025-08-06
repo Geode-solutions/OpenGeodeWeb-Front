@@ -69,62 +69,80 @@
   async function get_allowed_objects() {
     toggle_loading()
     allowed_objects.value = {}
-    const responses = await Promise.all(
-      filenames.map((filename) =>
-        api_fetch({ schema, params: { filename, supported_feature } }),
+    const promise_array = []
+    for (const filename of filenames) {
+      const params = { filename, supported_feature }
+      const promise = api_fetch({ schema, params })
+      promise_array.push(promise)
+    }
+    const api_responses = await Promise.all(promise_array)
+    const allowed_objects_list = []
+    for (const api_response of api_responses) {
+      allowed_objects_list.push(api_response.data.value.allowed_objects)
+    }
+    const all_keys = [
+      ...new Set(
+        allowed_objects_list.flatMap((allowed_object_map) =>
+          Object.keys(allowed_object_map),
+        ),
+      ),
+    ]
+    const common_keys = all_keys.filter(
+      (candidate_key) =>
+        !allowed_objects_list.some(
+          (allowed_object_map) =>
+            !Object.prototype.hasOwnProperty.call(allowed_object_map, candidate_key),
+        ),
+    )
+    const final_object = {}
+    for (const key of common_keys) {
+      const load_score_list = allowed_objects_list.map(
+        (allowed_object_map) => allowed_object_map[key].is_loadable,
       )
-    )
-    const values = responses.map((r) => r.data.value.allowed_objects)
-    const allKeys = [...new Set(values.flatMap((v) => Object.keys(v)))]
-    const commonKeys = allKeys.filter(
-      (key) => !values.some((obj) => !Object.prototype.hasOwnProperty.call(obj, key)),
-    )
-    const finalObject = {}
-    for (const key of commonKeys) {
-      const loadScores = values.map((obj) => obj[key].is_loadable)
-      const priorities = values
-        .map((obj) => obj[key].object_priority)
-        .filter((p) => p !== undefined && p !== null)
-      finalObject[key] = { is_loadable: Math.min(...loadScores) }
-      if (priorities.length) {
-        finalObject[key].object_priority = Math.max(...priorities)
+      const priority_list = allowed_objects_list
+        .map((allowed_object_map) => allowed_object_map[key].object_priority)
+        .filter((priority_value) => priority_value !== undefined && priority_value !== null)
+      final_object[key] = { is_loadable: Math.min(...load_score_list) }
+      if (priority_list.length) {
+        final_object[key].object_priority = Math.max(...priority_list)
       }
     }
-    allowed_objects.value = finalObject
-    let alreadySelected = false
-    const objectKeys = Object.keys(finalObject)
-    if (objectKeys.length) {
-      const highestLoadScore = Math.max(
-        ...objectKeys.map((key) => finalObject[key].is_loadable)
+    allowed_objects.value = final_object
+    let already_selected = false
+    const object_keys = Object.keys(final_object)
+    if (object_keys.length) {
+      const highest_load_score = Math.max(
+        ...object_keys.map((k) => final_object[k].is_loadable),
       )
-      if (highestLoadScore > 0) {
-        const bestScoreObjects = objectKeys.filter(
-          (key) => finalObject[key].is_loadable === highestLoadScore
+      if (highest_load_score > 0) {
+        const best_score_objects = object_keys.filter(
+          (k) => final_object[k].is_loadable === highest_load_score,
         )
-        if (bestScoreObjects.length === 1) {
-          set_geode_object(bestScoreObjects[0])
-          alreadySelected = true
+        if (best_score_objects.length === 1) {
+          set_geode_object(best_score_objects[0])
+          already_selected = true
         } else {
-          const highestPriority = Math.max(
-            ...bestScoreObjects.map(
-              (key) => finalObject[key].object_priority ?? -Infinity
-            )
+          const highest_priority = Math.max(
+            ...best_score_objects.map(
+              (k) => final_object[k].object_priority ?? -Infinity,
+            ),
           )
-          const bestPriorityObjects = bestScoreObjects.filter(
-            (key) => finalObject[key].object_priority === highestPriority
+          const best_priority_objects = best_score_objects.filter(
+            (k) => final_object[k].object_priority === highest_priority,
           )
-          if (highestPriority !== -Infinity && bestPriorityObjects.length === 1) {
-            set_geode_object(bestPriorityObjects[0])
-            alreadySelected = true
+          if (highest_priority !== -Infinity && best_priority_objects.length === 1) {
+            set_geode_object(best_priority_objects[0])
+            already_selected = true
           }
         }
       }
     }
-    if (!alreadySelected && objectKeys.length === 1) {
-      set_geode_object(objectKeys[0])
+    if (!already_selected && object_keys.length === 1) {
+      set_geode_object(object_keys[0])
     }
     toggle_loading()
   }
+
 
   function set_geode_object(input_geode_object) {
     if (input_geode_object != "") {
