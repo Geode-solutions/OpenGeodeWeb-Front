@@ -101,40 +101,77 @@ function select_geode_object(object_map) {
   return
 }
 
-
-async function get_allowed_objects() {
-  toggle_loading()
-  allowed_objects.value = {}
-  const promise_array = filenames.map((filename) => {
-    const params = { filename, supported_feature }
-    return api_fetch({ schema, params })
-  })
-  const responses = await Promise.all(promise_array)
-  const allowed_objects_list = responses.map(
-    (response) => response.data.value.allowed_objects,
-  )
-  const all_keys = [...new Set(allowed_objects_list.flatMap(Object.keys))]
-  const common_keys = all_keys.filter((key) =>
-    allowed_objects_list.every((obj) => key in obj),
-  )
-  const final_object = {}
-  for (const key of common_keys) {
-    const load_scores = allowed_objects_list.map((obj) => obj[key].is_loadable)
-    const priorities = allowed_objects_list
-      .map((obj) => obj[key].object_priority)
-      .filter((p) => p !== undefined && p !== null)
-    final_object[key] = { is_loadable: Math.min(...load_scores) }
-    if (priorities.length) {
-      final_object[key].object_priority = Math.max(...priorities)
+  function select_geode_object(object_map) {
+    const object_keys = Object.keys(object_map)
+    if (!object_keys.length) {
+      return null
     }
+    const highest_load_score = Math.max(
+      ...object_keys.map((key) => object_map[key].is_loadable),
+    )
+    if (highest_load_score <= 0) {
+      return null
+    }
+    const best_score_objects = object_keys.filter(
+      (key) => object_map[key].is_loadable === highest_load_score,
+    )
+    if (best_score_objects.length === 1) {
+      return best_score_objects[0]
+    }
+    const highest_priority = Math.max(
+      ...best_score_objects.map(
+        (key) => object_map[key].object_priority ?? -Infinity,
+      ),
+    )
+    const best_priority_objects = best_score_objects.filter(
+      (key) => object_map[key].object_priority === highest_priority,
+    )
+    if (highest_priority !== -Infinity && best_priority_objects.length === 1) {
+      return best_priority_objects[0]
+    }
+    return null
   }
-  allowed_objects.value = final_object
-  const selected_object = select_geode_object(final_object)
-  if (selected_object) {
-    set_geode_object(selected_object)
+
+  async function get_allowed_objects() {
+    toggle_loading()
+    allowed_objects.value = {}
+    const promise_array = filenames.map((filename) => {
+      const params = { filename, supported_feature }
+      return api_fetch({ schema, params })
+    })
+    const responses = await Promise.all(promise_array)
+    const allowed_objects_list = responses.map(
+      (response) => response.data.value.allowed_objects,
+    )
+    const all_keys = [...new Set(allowed_objects_list.flatMap(Object.keys))]
+    const common_keys = all_keys.filter((key) =>
+      allowed_objects_list.every((obj) => key in obj),
+    )
+    const final_object = {}
+    for (const key of common_keys) {
+      const load_scores = allowed_objects_list.map(
+        (obj) => obj[key].is_loadable,
+      )
+      const priorities = allowed_objects_list
+        .map((obj) => obj[key].object_priority)
+        .filter((p) => p !== undefined && p !== null)
+      final_object[key] = { is_loadable: Math.min(...load_scores) }
+      if (priorities.length) {
+        final_object[key].object_priority = Math.max(...priorities)
+      }
+    }
+    allowed_objects.value = final_object
+    let already_selected = false
+    const selected_object = select_geode_object(final_object)
+    if (selected_object) {
+      set_geode_object(selected_object)
+      already_selected = true
+    }
+    if (!already_selected && Object.keys(final_object).length === 1) {
+      set_geode_object(Object.keys(final_object)[0])
+    }
+    toggle_loading()
   }
-  toggle_loading()
-}
 
   function set_geode_object(input_geode_object) {
     if (input_geode_object != "") {
