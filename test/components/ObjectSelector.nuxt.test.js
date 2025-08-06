@@ -84,7 +84,7 @@ describe("ObjectSelector.vue", async () => {
     })
   })
 
-  test(`test object_priority when is_loadablescores equal`, async () => {
+  test(`test object_priority when is_loadable scores equal`, async () => {
     var response = { allowed_objects: {} }
     const geode_object_1 = "BRep"
     const geode_object_2 = "EdgedCurve3D"
