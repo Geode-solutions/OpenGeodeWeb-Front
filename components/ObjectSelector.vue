@@ -91,7 +91,10 @@
       (candidate_key) =>
         !allowed_objects_list.some(
           (allowed_object_map) =>
-            !Object.prototype.hasOwnProperty.call(allowed_object_map, candidate_key),
+            !Object.prototype.hasOwnProperty.call(
+              allowed_object_map,
+              candidate_key,
+            ),
         ),
     )
     const final_object = {}
@@ -101,7 +104,10 @@
       )
       const priority_list = allowed_objects_list
         .map((allowed_object_map) => allowed_object_map[key].object_priority)
-        .filter((priority_value) => priority_value !== undefined && priority_value !== null)
+        .filter(
+          (priority_value) =>
+            priority_value !== undefined && priority_value !== null,
+        )
       final_object[key] = { is_loadable: Math.min(...load_score_list) }
       if (priority_list.length) {
         final_object[key].object_priority = Math.max(...priority_list)
@@ -130,7 +136,10 @@
           const best_priority_objects = best_score_objects.filter(
             (k) => final_object[k].object_priority === highest_priority,
           )
-          if (highest_priority !== -Infinity && best_priority_objects.length === 1) {
+          if (
+            highest_priority !== -Infinity &&
+            best_priority_objects.length === 1
+          ) {
             set_geode_object(best_priority_objects[0])
             already_selected = true
           }
@@ -142,7 +151,6 @@
     }
     toggle_loading()
   }
-
 
   function set_geode_object(input_geode_object) {
     if (input_geode_object != "") {
