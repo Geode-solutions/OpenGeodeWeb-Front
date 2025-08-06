@@ -69,65 +69,59 @@
   async function get_allowed_objects() {
     toggle_loading()
     allowed_objects.value = {}
-    var promise_array = []
-    for (const filename of filenames) {
-      const params = { filename, supported_feature }
-      const promise = api_fetch({ schema, params })
-      promise_array.push(promise)
-    }
-    const responses = await Promise.all(promise_array)
-    let values = []
-    for (const response of responses) {
-      values.push(response.data.value.allowed_objects)
-    }
-    const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
-    const common_keys = all_keys.filter(
-      (i) => !values.some((j) => !Object.keys(j).includes(i)),
+    const responses = await Promise.all(
+      filenames.map((filename) =>
+        api_fetch({ schema, params: { filename, supported_feature } }),
+      )
     )
-    var final_object = {}
-    for (const key of common_keys) {
-      for (const value of values) {
-        if (value[key].is_loadable == false) {
-          final_object[key] = { is_loadable: false }
+    const values = responses.map((r) => r.data.value.allowed_objects)
+    const allKeys = [...new Set(values.flatMap((v) => Object.keys(v)))]
+    const commonKeys = allKeys.filter(
+      (key) => !values.some((obj) => !Object.prototype.hasOwnProperty.call(obj, key)),
+    )
+    const finalObject = {}
+    for (const key of commonKeys) {
+      const loadScores = values.map((obj) => obj[key].is_loadable)
+      const priorities = values
+        .map((obj) => obj[key].object_priority)
+        .filter((p) => p !== undefined && p !== null)
+      finalObject[key] = { is_loadable: Math.min(...loadScores) }
+      if (priorities.length) {
+        finalObject[key].object_priority = Math.max(...priorities)
+      }
+    }
+    allowed_objects.value = finalObject
+    let alreadySelected = false
+    const objectKeys = Object.keys(finalObject)
+    if (objectKeys.length) {
+      const highestLoadScore = Math.max(
+        ...objectKeys.map((key) => finalObject[key].is_loadable)
+      )
+      if (highestLoadScore > 0) {
+        const bestScoreObjects = objectKeys.filter(
+          (key) => finalObject[key].is_loadable === highestLoadScore
+        )
+        if (bestScoreObjects.length === 1) {
+          set_geode_object(bestScoreObjects[0])
+          alreadySelected = true
         } else {
-          final_object[key] = { is_loadable: true }
+          const highestPriority = Math.max(
+            ...bestScoreObjects.map(
+              (key) => finalObject[key].object_priority ?? -Infinity
+            )
+          )
+          const bestPriorityObjects = bestScoreObjects.filter(
+            (key) => finalObject[key].object_priority === highestPriority
+          )
+          if (highestPriority !== -Infinity && bestPriorityObjects.length === 1) {
+            set_geode_object(bestPriorityObjects[0])
+            alreadySelected = true
+          }
         }
       }
     }
-    if (Object.keys(final_object).length > 0) {
-      const max_loadability_score = Math.max(
-        ...Object.values(final_object).map(obj => obj.is_loadable ? 1 : 0)
-      )
-      
-      const best_objects = Object.fromEntries(
-        Object.entries(final_object).filter(
-          ([object_name, object_info]) => (object_info.is_loadable ? 1 : 0) === max_loadability_score
-        )
-      )
-      
-      if (Object.keys(best_objects).length > 1) {
-        const priorities = {}
-        for (const object_name of Object.keys(best_objects)) {
-          const priority_response = await api_fetch({
-            schema: schemas.opengeodeweb_back.object_priority,
-            params: { object_name, filename: filenames[0] }
-          })
-          priorities[object_name] = priority_response.data.value.priority
-        }
-        
-        const best_object_name = Object.keys(best_objects).reduce((a, b) => 
-          priorities[a] > priorities[b] ? a : b
-        )
-        
-        allowed_objects.value = { [best_object_name]: final_object[best_object_name] }
-      } else {
-        allowed_objects.value = best_objects
-      }
-    } else {
-      allowed_objects.value = final_object
-    }
-    if (Object.keys(allowed_objects.value).length == 1) {
-      set_geode_object(Object.keys(allowed_objects.value)[0])
+    if (!alreadySelected && objectKeys.length === 1) {
+      set_geode_object(objectKeys[0])
     }
     toggle_loading()
   }
