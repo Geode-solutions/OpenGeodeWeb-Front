@@ -88,8 +88,14 @@ describe("ObjectSelector.vue", async () => {
     var response = { allowed_objects: {} }
     const geode_object_1 = "BRep"
     const geode_object_2 = "EdgedCurve3D"
-    response["allowed_objects"][geode_object_1] = { is_loadable: 1.0, object_priority: 2 }
-    response["allowed_objects"][geode_object_2] = { is_loadable: 1.0, object_priority: 1 }
+    response["allowed_objects"][geode_object_1] = {
+      is_loadable: 1.0,
+      object_priority: 2,
+    }
+    response["allowed_objects"][geode_object_2] = {
+      is_loadable: 1.0,
+      object_priority: 1,
+    }
     registerEndpoint(allowed_objects.$id, {
       method: allowed_objects.methods[0],
       handler: () => response,
