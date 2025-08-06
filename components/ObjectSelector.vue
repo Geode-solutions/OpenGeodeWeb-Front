@@ -69,19 +69,16 @@
   function select_geode_object(object_map) {
     const object_keys = Object.keys(object_map)
     if (!object_keys.length) {
-      return
+      return undefined
     }
-    if (
-      object_keys.length === 1 &&
-      object_map[object_keys[0]].is_loadable > 0
-    ) {
+    if (object_keys.length === 1 && object_map[object_keys[0]].is_loadable > 0) {
       return object_keys[0]
     }
     const highest_load_score = Math.max(
       ...object_keys.map((key) => object_map[key].is_loadable),
     )
     if (highest_load_score <= 0) {
-      return
+      return undefined
     }
     const best_score_objects = object_keys.filter(
       (key) => object_map[key].is_loadable === highest_load_score,
@@ -100,7 +97,7 @@
     if (highest_priority !== -Infinity && best_priority_objects.length === 1) {
       return best_priority_objects[0]
     }
-    return
+    return undefined
   }
 
 
