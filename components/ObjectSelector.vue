@@ -135,7 +135,6 @@ async function get_allowed_objects() {
   if (selected_object) {
     set_geode_object(selected_object)
   }
-
   toggle_loading()
 }
 
