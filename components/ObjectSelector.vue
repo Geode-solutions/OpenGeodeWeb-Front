@@ -66,40 +66,42 @@
   const allowed_objects = ref({})
   const toggle_loading = useToggle(loading)
 
-
   function select_geode_object(object_map) {
-  const object_keys = Object.keys(object_map)
-  if (!object_keys.length) {
+    const object_keys = Object.keys(object_map)
+    if (!object_keys.length) {
+      return
+    }
+    if (
+      object_keys.length === 1 &&
+      object_map[object_keys[0]].is_loadable > 0
+    ) {
+      return object_keys[0]
+    }
+    const highest_load_score = Math.max(
+      ...object_keys.map((key) => object_map[key].is_loadable),
+    )
+    if (highest_load_score <= 0) {
+      return
+    }
+    const best_score_objects = object_keys.filter(
+      (key) => object_map[key].is_loadable === highest_load_score,
+    )
+    if (best_score_objects.length === 1) {
+      return best_score_objects[0]
+    }
+    const highest_priority = Math.max(
+      ...best_score_objects.map(
+        (key) => object_map[key].object_priority ?? -Infinity,
+      ),
+    )
+    const best_priority_objects = best_score_objects.filter(
+      (key) => object_map[key].object_priority === highest_priority,
+    )
+    if (highest_priority !== -Infinity && best_priority_objects.length === 1) {
+      return best_priority_objects[0]
+    }
     return
   }
-  if (object_keys.length === 1 && object_map[object_keys[0]].is_loadable > 0) {
-    return object_keys[0]
-  }
-  const highest_load_score = Math.max(
-    ...object_keys.map((key) => object_map[key].is_loadable),
-  )
-  if (highest_load_score <= 0) {
-    return
-  }
-  const best_score_objects = object_keys.filter(
-    (key) => object_map[key].is_loadable === highest_load_score,
-  )
-  if (best_score_objects.length === 1) {
-    return best_score_objects[0]
-  }
-  const highest_priority = Math.max(
-    ...best_score_objects.map(
-      (key) => object_map[key].object_priority ?? -Infinity,
-    ),
-  )
-  const best_priority_objects = best_score_objects.filter(
-    (key) => object_map[key].object_priority === highest_priority,
-  )
-  if (highest_priority !== -Infinity && best_priority_objects.length === 1) {
-    return best_priority_objects[0]
-  }
-  return
-}
 
 
 async function get_allowed_objects() {
