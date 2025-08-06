@@ -71,7 +71,10 @@
     if (!object_keys.length) {
       return undefined
     }
-    if (object_keys.length === 1 && object_map[object_keys[0]].is_loadable > 0) {
+    if (
+      object_keys.length === 1 &&
+      object_map[object_keys[0]].is_loadable > 0
+    ) {
       return object_keys[0]
     }
     const highest_load_score = Math.max(
