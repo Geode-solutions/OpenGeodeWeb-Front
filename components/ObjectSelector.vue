@@ -72,12 +72,13 @@
     const responses = await Promise.all(
       filenames.map((filename) =>
         api_fetch({ schema, params: { filename, supported_feature } }),
-      )
+      ),
     )
     const values = responses.map((r) => r.data.value.allowed_objects)
     const allKeys = [...new Set(values.flatMap((v) => Object.keys(v)))]
     const commonKeys = allKeys.filter(
-      (key) => !values.some((obj) => !Object.prototype.hasOwnProperty.call(obj, key)),
+      (key) =>
+        !values.some((obj) => !Object.prototype.hasOwnProperty.call(obj, key)),
     )
     const finalObject = {}
     for (const key of commonKeys) {
@@ -95,11 +96,11 @@
     const objectKeys = Object.keys(finalObject)
     if (objectKeys.length) {
       const highestLoadScore = Math.max(
-        ...objectKeys.map((key) => finalObject[key].is_loadable)
+        ...objectKeys.map((key) => finalObject[key].is_loadable),
       )
       if (highestLoadScore > 0) {
         const bestScoreObjects = objectKeys.filter(
-          (key) => finalObject[key].is_loadable === highestLoadScore
+          (key) => finalObject[key].is_loadable === highestLoadScore,
         )
         if (bestScoreObjects.length === 1) {
           set_geode_object(bestScoreObjects[0])
@@ -107,13 +108,16 @@
         } else {
           const highestPriority = Math.max(
             ...bestScoreObjects.map(
-              (key) => finalObject[key].object_priority ?? -Infinity
-            )
+              (key) => finalObject[key].object_priority ?? -Infinity,
+            ),
           )
           const bestPriorityObjects = bestScoreObjects.filter(
-            (key) => finalObject[key].object_priority === highestPriority
+            (key) => finalObject[key].object_priority === highestPriority,
           )
-          if (highestPriority !== -Infinity && bestPriorityObjects.length === 1) {
+          if (
+            highestPriority !== -Infinity &&
+            bestPriorityObjects.length === 1
+          ) {
             set_geode_object(bestPriorityObjects[0])
             alreadySelected = true
           }
