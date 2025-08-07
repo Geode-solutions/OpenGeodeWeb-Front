@@ -139,7 +139,7 @@
     toggle_loading()
   }
 
-  function set_geode_object(input_geode_object) {    
+  function set_geode_object(input_geode_object) {
     if (input_geode_object) {
       emit("update_values", { input_geode_object })
       emit("increment_step")
