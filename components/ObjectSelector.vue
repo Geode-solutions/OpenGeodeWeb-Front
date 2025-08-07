@@ -69,7 +69,7 @@
   function select_geode_object(object_map) {
     const object_keys = Object.keys(object_map)
     if (!object_keys.length) {
-      return undefined
+      return ''
     }
     if (
       object_keys.length === 1 &&
@@ -81,7 +81,7 @@
       ...object_keys.map((key) => object_map[key].is_loadable),
     )
     if (highest_load_score <= 0) {
-      return undefined
+      return ''
     }
     const best_score_objects = object_keys.filter(
       (key) => object_map[key].is_loadable === highest_load_score,
@@ -100,7 +100,7 @@
     if (highest_priority !== -Infinity && best_priority_objects.length === 1) {
       return best_priority_objects[0]
     }
-    return undefined
+    return ''
   }
 
   async function get_allowed_objects() {
@@ -125,7 +125,7 @@
       )
       const priorities = allowed_objects_list
         .map((obj) => obj[key].object_priority)
-        .filter((p) => p !== undefined && p !== null)
+        .filter((p) => p !== '' && p !== null)
       final_object[key] = { is_loadable: Math.min(...load_scores) }
       if (priorities.length) {
         final_object[key].object_priority = Math.max(...priorities)
@@ -139,8 +139,8 @@
     toggle_loading()
   }
 
-  function set_geode_object(input_geode_object) {
-    if (input_geode_object != "") {
+  function set_geode_object(input_geode_object) {    
+    if (input_geode_object) {
       emit("update_values", { input_geode_object })
       emit("increment_step")
     }
