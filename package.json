@@ -38,8 +38,8 @@
   "version": "0.0.0",
   "main": "./nuxt.config.js",
   "dependencies": {
-    "@geode/opengeodeweb-back": "5.8.7",
-    "@geode/opengeodeweb-viewer": "1.10.1",
+    "@geode/opengeodeweb-back": "latest",
+    "@geode/opengeodeweb-viewer": "latest",
     "@kitware/vtk.js": "33.3.0",
     "@mdi/font": "7.4.47",
     "@pinia/nuxt": "0.5.4",
