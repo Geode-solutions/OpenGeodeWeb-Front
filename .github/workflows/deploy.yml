@@ -6,4 +6,6 @@ on:
 jobs:
   deploy:
     uses: Geode-solutions/actions/.github/workflows/js-deploy.yml@master
+    with:
+      repos: ${{ vars.REPOS }}
     secrets: inherit
