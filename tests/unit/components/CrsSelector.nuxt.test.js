@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 
 import { setActivePinia } from "pinia"

@@ -1,7 +1,11 @@
-import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
+// Global imports
+
+// Third party imports
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
+import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
+// Local imports
 import Status from "@ogw_f/utils/status.js"
 
 // Mock navigator.locks API
@@ -19,18 +23,15 @@ vi.stubGlobal("navigator", {
 describe("Infra Store", () => {
   const pinia = createTestingPinia({
     stubActions: false,
+    createSpy: vi.fn,
   })
-  setActivePinia(pinia)
   const infra_store = use_infra_store()
   const geode_store = use_geode_store()
   const viewer_store = use_viewer_store()
   const feedback_store = use_feedback_store()
 
   beforeEach(() => {
-    infra_store.$reset()
-    geode_store.$reset()
-    feedback_store.$reset()
-    viewer_store.$reset()
+    setActivePinia(pinia)
   })
   describe("state", () => {
     test("initial state", () => {

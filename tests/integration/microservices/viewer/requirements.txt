@@ -22,8 +22,14 @@ attrs==25.3.0
     # via
     #   aiohttp
     #   opengeodeweb-viewer
+contourpy==1.3.3
+    # via matplotlib
+cycler==0.12.1
+    # via matplotlib
 fastjsonschema==2.21.1
     # via opengeodeweb-viewer
+fonttools==4.59.0
+    # via matplotlib
 frozenlist==1.7.0
     # via
     #   aiohttp
@@ -33,22 +39,42 @@ idna==3.10
     # via
     #   opengeodeweb-viewer
     #   yarl
+kiwisolver==1.4.8
+    # via matplotlib
+matplotlib==3.10.5
+    # via vtk
 multidict==6.6.3
     # via
     #   aiohttp
     #   opengeodeweb-viewer
     #   yarl
-opengeodeweb-viewer==1.10.1
+numpy==2.3.2
+    # via
+    #   contourpy
+    #   matplotlib
+opengeodeweb-viewer[gpu]==1.10.1
     # via -r requirements.in
+packaging==25.0
+    # via matplotlib
+pillow==11.3.0
+    # via matplotlib
 propcache==0.3.2
     # via
     #   aiohttp
     #   opengeodeweb-viewer
     #   yarl
+pyparsing==3.2.3
+    # via matplotlib
+python-dateutil==2.9.0.post0
+    # via matplotlib
+six==1.17.0
+    # via python-dateutil
 typing-extensions==4.14.1
     # via
     #   aiosignal
     #   opengeodeweb-viewer
+vtk==9.3.1
+    # via opengeodeweb-viewer
 websocket-client==1.8.0
     # via opengeodeweb-viewer
 wslink==1.12.4
