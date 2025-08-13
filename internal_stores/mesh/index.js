@@ -10,6 +10,7 @@ export default function useMeshStyle() {
   const edgesStyleStore = useMeshEdgesStyle()
   const polygonsStyleStore = useMeshPolygonsStyle()
   const polyhedraStyleStore = useMeshPolyhedraStyle()
+  const hybridViewerStore = useHybridViewerStore()
 
   function setMeshVisibility(id, visibility) {
     viewer_call(
@@ -20,6 +21,7 @@ export default function useMeshStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].visibility = visibility
+          hybridViewerStore.setVisibility(id, visibility)
           console.log("setMeshVisibility", dataStyleStore.styles[id].visibility)
         },
       },

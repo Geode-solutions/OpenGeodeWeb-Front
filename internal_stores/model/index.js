@@ -16,6 +16,7 @@ export default function useModelStyle() {
   const blocksStyleStore = useBlocksStyle()
   const modelEdgesStore = useModelEdgesStyle()
   const modelPointsStore = useModelPointsStyle()
+  const hybridViewerStore = useHybridViewerStore()
 
   /** Getters **/
   function modelVisibility(id) {
@@ -70,6 +71,7 @@ export default function useModelStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].visibility = visibility
+          hybridViewerStore.setVisibility(id, visibility)
           console.log("setModelVisibility", visibility)
         },
       },
