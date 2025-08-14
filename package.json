@@ -6,7 +6,8 @@
     "tests:unit": "npm run tests --project unit",
     "tests:integration": "npm run tests --project integration",
     "coverage": "vitest run --coverage",
-    "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write"
+    "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
+    "build": ""
   },
   "devDependencies": {
     "@nuxt/test-utils": "3.18.0",
@@ -39,11 +40,11 @@
   },
   "description": "OpenSource Vue/Vuetify framework for web applications",
   "type": "module",
-  "version": "0.0.0-semantically-released",
+  "version": "0.0.0",
   "main": "./nuxt.config.js",
   "dependencies": {
-    "@geode/opengeodeweb-back": "5.8.7",
-    "@geode/opengeodeweb-viewer": "1.10.1",
+    "@geode/opengeodeweb-back": "latest",
+    "@geode/opengeodeweb-viewer": "latest",
     "@kitware/vtk.js": "33.3.0",
     "@mdi/font": "7.4.47",
     "@pinia/nuxt": "0.5.4",
