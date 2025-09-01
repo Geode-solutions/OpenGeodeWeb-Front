@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest"
-import { mountSuspended } from "@vue/test-utils"
 
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
