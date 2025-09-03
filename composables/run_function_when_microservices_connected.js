@@ -1,5 +1,5 @@
 export function run_function_when_microservices_connected(function_to_run) {
-  const infra_store = use_infra_store()
+  const infra_store = useInfraStore()
   const { microservices_connected } = storeToRefs(infra_store)
   if (microservices_connected.value) {
     function_to_run()

@@ -13,7 +13,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-const infra_store = use_infra_store()
+const infra_store = useInfraStore()
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {

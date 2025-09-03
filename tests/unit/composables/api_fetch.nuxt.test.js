@@ -8,8 +8,8 @@ describe("api_fetch", () => {
     stubActions: false,
   })
   setActivePinia(pinia)
-  const geode_store = use_geode_store()
-  const feedback_store = use_feedback_store()
+  const geode_store = useGeodeStore()
+  const feedback_store = useFeedbackStore()
   geode_store.base_url = ""
 
   const schema = {

@@ -25,10 +25,10 @@ describe("Infra Store", () => {
     stubActions: false,
     createSpy: vi.fn,
   })
-  const infra_store = use_infra_store()
-  const geode_store = use_geode_store()
-  const viewer_store = use_viewer_store()
-  const feedback_store = use_feedback_store()
+  const infra_store = useInfraStore()
+  const geode_store = useGeodeStore()
+  const viewer_store = useInfraStore()
+  const feedback_store = useFeedbackStore()
 
   beforeEach(() => {
     setActivePinia(pinia)

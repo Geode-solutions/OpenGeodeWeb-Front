@@ -1,13 +1,13 @@
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { use_feedback_store } from "@ogw_f/stores/feedback"
+import { useFeedbackStore } from "@ogw_f/stores/feedback"
 
 describe("Feedback Store", () => {
   const pinia = createTestingPinia({
     stubActions: false,
   })
   setActivePinia(pinia)
-  const feedback_store = use_feedback_store()
+  const feedback_store = useFeedbackStore()
 
   beforeEach(() => {
     feedback_store.$reset()

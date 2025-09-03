@@ -48,7 +48,7 @@ describe("FeedBackSnackers.vue", async () => {
         },
       },
     )
-    const feedback_store = use_feedback_store()
+    const feedback_store = useFeedbackStore()
     expect(feedback_store.feedbacks.length).toBe(1)
     const v_btn = await wrapper.findComponent(components.VBtn)
     await v_btn.trigger("click")

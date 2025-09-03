@@ -22,7 +22,7 @@ const vuetify = createVuetify({
 describe("ObjectSelector.vue", async () => {
   const pinia = createTestingPinia()
   setActivePinia(pinia)
-  const geode_store = use_geode_store()
+  const geode_store = useGeodeStore()
   geode_store.base_url = ""
 
   test(`test loadable with one class`, async () => {

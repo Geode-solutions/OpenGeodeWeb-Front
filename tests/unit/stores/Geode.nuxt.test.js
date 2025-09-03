@@ -10,9 +10,9 @@ describe("Geode Store", () => {
     stubActions: false,
   })
   setActivePinia(pinia)
-  const infra_store = use_infra_store()
-  const geode_store = use_geode_store()
-  const feedback_store = use_feedback_store()
+  const infra_store = useInfraStore()
+  const geode_store = useGeodeStore()
+  const feedback_store = useFeedbackStore()
 
   beforeEach(() => {
     infra_store.$reset()

@@ -1,7 +1,7 @@
 import { useStorage } from "@vueuse/core"
 import Status from "@ogw_f/utils/status.js"
 
-export const use_infra_store = defineStore("infra", {
+export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
     ID: useStorage("ID", ""),
@@ -16,7 +16,7 @@ export const use_infra_store = defineStore("infra", {
       return "localhost"
     },
     lambda_url() {
-      const geode_store = use_geode_store()
+      const geode_store = useGeodeStore()
       const public_runtime_config = useRuntimeConfig().public
       const url =
         geode_store.protocol +
@@ -31,12 +31,12 @@ export const use_infra_store = defineStore("infra", {
     },
     microservices_connected() {
       return (
-        use_geode_store().status == Status.CONNECTED &&
-        use_viewer_store().status == Status.CONNECTED
+        useGeodeStore().status == Status.CONNECTED &&
+        useViewerStore().status == Status.CONNECTED
       )
     },
     microservices_busy() {
-      return use_geode_store().is_busy || use_viewer_store().is_busy
+      return useGeodeStore().is_busy || useViewerStore().is_busy
     },
   },
   actions: {
@@ -48,8 +48,8 @@ export const use_infra_store = defineStore("infra", {
         if (this.status === Status.CREATED) return
         console.log("LOCK GRANTED !", lock)
         if (this.app_mode == appMode.appMode.DESKTOP) {
-          const viewer_store = use_viewer_store()
-          const geode_store = use_geode_store()
+          const viewer_store = useViewerStore()
+          const geode_store = useGeodeStore()
           const back_port = await window.electronAPI.run_back(
             geode_store.default_local_port,
           )
@@ -64,7 +64,7 @@ export const use_infra_store = defineStore("infra", {
           })
           if (error.value || !data.value) {
             this.status = Status.NOT_CREATED
-            const feedback_store = use_feedback_store()
+            const feedback_store = useFeedbackStore()
             feedback_store.server_error = true
             return
           }
@@ -77,8 +77,8 @@ export const use_infra_store = defineStore("infra", {
     },
     async create_connection() {
       console.log("create_connection")
-      await use_viewer_store().ws_connect()
-      await use_geode_store().do_ping()
+      await useViewerStore().ws_connect()
+      await useGeodeStore().do_ping()
       return
     },
   },

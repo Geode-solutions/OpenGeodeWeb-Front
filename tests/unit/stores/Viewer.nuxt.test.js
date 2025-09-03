@@ -23,8 +23,8 @@ describe("Viewer Store", () => {
     stubActions: false,
     createSpy: vi.fn,
   })
-  const infra_store = use_infra_store()
-  const viewer_store = use_viewer_store()
+  const infra_store = useInfraStore()
+  const viewer_store = useInfraStore()
 
   beforeEach(() => {
     setActivePinia(pinia)

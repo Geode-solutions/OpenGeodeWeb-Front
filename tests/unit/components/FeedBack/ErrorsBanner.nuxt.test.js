@@ -25,7 +25,7 @@ describe("FeedBackErrorBanner.vue", async () => {
       },
     })
     const reload_spy = vi.spyOn(wrapper.vm, "reload")
-    const feedback_store = use_feedback_store()
+    const feedback_store = useFeedbackStore()
     await feedback_store.$patch({ server_error: true })
     expect(feedback_store.server_error).toBe(true)
     const v_btn = wrapper.findAll(".v-btn")
@@ -50,7 +50,7 @@ describe("FeedBackErrorBanner.vue", async () => {
         },
       })
 
-      const feedback_store = use_feedback_store()
+      const feedback_store = useFeedbackStore()
       const v_btn = wrapper.findAll(".v-btn")
       await v_btn[1].trigger("click")
       expect(feedback_store.server_error).toBe(false)

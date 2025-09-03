@@ -21,7 +21,7 @@ describe("PackagesVersions.vue", async () => {
       createSpy: vi.fn,
     })
     setActivePinia(pinia)
-    const geode_store = use_geode_store()
+    const geode_store = useGeodeStore()
     geode_store.base_url = ""
 
     const schema = {

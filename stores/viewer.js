@@ -4,7 +4,7 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_f/utils/status.js"
 
-export const use_viewer_store = defineStore("viewer", {
+export const useViewerStore = defineStore("viewer", {
   state: () => ({
     default_local_port: "1234",
     client: {},
@@ -16,14 +16,14 @@ export const use_viewer_store = defineStore("viewer", {
   }),
   getters: {
     protocol() {
-      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
+      if (useInfraStore().app_mode == appMode.appMode.CLOUD) {
         return "wss"
       } else {
         return "ws"
       }
     },
     port() {
-      if (use_infra_store().app_mode == appMode.appMode.CLOUD) {
+      if (useInfraStore().app_mode == appMode.appMode.CLOUD) {
         return "443"
       }
       const VIEWER_PORT = useRuntimeConfig().public.VIEWER_PORT
@@ -33,7 +33,7 @@ export const use_viewer_store = defineStore("viewer", {
       return this.default_local_port
     },
     base_url() {
-      const infra_store = use_infra_store()
+      const infra_store = useInfraStore()
       let viewer_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
       if (infra_store.app_mode == appMode.appMode.CLOUD) {
         if (infra_store.ID == "") {
@@ -125,7 +125,7 @@ export const use_viewer_store = defineStore("viewer", {
               resolve()
             })
             .catch((error) => {
-              console.error(error)
+              console.error("error", error)
               viewer_store.status = Status.NOT_CONNECTED
               reject(error)
             })

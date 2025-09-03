@@ -22,7 +22,7 @@ const vuetify = createVuetify({
 describe("FileUploader.vue", async () => {
   const pinia = createTestingPinia()
   setActivePinia(pinia)
-  const geode_store = use_geode_store()
+  const geode_store = useGeodeStore()
   geode_store.base_url = ""
 
   registerEndpoint(upload_file_schema.$id, {
