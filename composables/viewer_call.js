@@ -2,8 +2,8 @@ export function viewer_call(
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  const feedback_store = use_feedback_store()
-  const viewer_store = use_viewer_store()
+  const feedback_store = useFeedbackStore()
+  const viewer_store = useViewerStore()
 
   const { valid, error } = validate_schema(schema, params)
 
@@ -19,7 +19,7 @@ export function viewer_call(
 
   const client = viewer_store.client
 
-  let promise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     if (client) {
       viewer_store.start_request()
       client
@@ -57,7 +57,6 @@ export function viewer_call(
         })
     }
   })
-  return promise
 }
 
 export default viewer_call
