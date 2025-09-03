@@ -2,9 +2,9 @@
   "name": "@geode/opengeodeweb-front",
   "scripts": {
     "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
-    "tests": "vitest --config ./tests/vitest.config.js",
-    "tests:unit": "npm run tests --project unit",
-    "tests:integration": "npm run tests --project integration",
+    "test": "vitest --config ./tests/vitest.config.js",
+    "test:unit": "npm run tests --project unit",
+    "test:integration": "npm run test --project integration",
     "coverage": "vitest run --coverage",
     "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
     "build": ""
@@ -25,6 +25,7 @@
     "eslint-plugin-vuetify": "2.5.2",
     "happy-dom": "17.4.6",
     "jsdom": "26.1.0",
+    "msw": "2.11.1",
     "nuxt": "3.13.2",
     "playwright-core": "1.52.0",
     "prettier": "3.3.3",
