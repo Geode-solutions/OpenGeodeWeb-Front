@@ -1,6 +1,6 @@
 // @vitest-environment nuxt
 vi.stubGlobal("visualViewport", new EventTarget())
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -42,6 +42,7 @@ describe("FeedBackSnackers.vue", async () => {
                 },
               },
               stubActions: false,
+              createSpy: vi.fn,
             }),
             vuetify,
           ],

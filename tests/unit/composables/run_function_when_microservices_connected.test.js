@@ -3,7 +3,7 @@ import Status from "@ogw_f/utils/status.js"
 
 describe("run_function_when_microservices_connected", () => {
   const geode_store = useGeodeStore()
-  const viewer_store = useInfraStore()
+  const viewer_store = useViewerStore()
 
   const dumb_obj = { dumb_method: () => true }
 
