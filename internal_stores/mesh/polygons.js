@@ -27,7 +27,7 @@ export function useMeshPolygonsStyle() {
 
   /** Actions **/
   function setPolygonsVisibility(id, visibility) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_polygons_schemas.visibility,
         params: { id, visibility },
@@ -67,7 +67,7 @@ export function useMeshPolygonsStyle() {
     )
   }
   function setPolygonsColor(id, color) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_polygons_schemas.color,
         params: { id, color },
@@ -84,7 +84,7 @@ export function useMeshPolygonsStyle() {
     )
   }
   function setPolygonsTextures(id, textures) {
-    viewer_call(
+    return viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.mesh.apply_textures,
         params: { id, textures },
@@ -101,7 +101,7 @@ export function useMeshPolygonsStyle() {
     )
   }
   function setPolygonsVertexAttribute(id, vertex_attribute) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_polygons_schemas.vertex_attribute,
         params: { id, ...vertex_attribute },
@@ -118,7 +118,7 @@ export function useMeshPolygonsStyle() {
     )
   }
   function setPolygonsPolygonAttribute(id, polygon_attribute) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_polygons_schemas.polygon_attribute,
         params: { id, ...polygon_attribute },

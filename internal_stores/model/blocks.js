@@ -15,7 +15,7 @@ export function useBlocksStyle() {
   /** Actions **/
   function setBlockVisibility(id, block_ids, visibility) {
     const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
-    viewer_call(
+    return viewer_call(
       {
         schema: blocks_schemas.visibility,
         params: { id, block_ids: block_flat_indexes, visibility },

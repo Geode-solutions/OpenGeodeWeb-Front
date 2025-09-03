@@ -21,7 +21,7 @@ export function useMeshEdgesStyle() {
 
   /** Actions **/
   function setEdgesVisibility(id, visibility) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_edges_schemas.visibility,
         params: { id, visibility },
@@ -37,31 +37,30 @@ export function useMeshEdgesStyle() {
       },
     )
   }
-  function setEdgesActiveColoring(id, type) {
-    if (type == "color")
-      setEdgesColor(id, dataStyleStore.styles[id].edges.coloring.color)
-    else if (type == "vertex") {
-      const vertex = dataStyleStore.styles[id].edges.coloring.vertex
-      if (vertex !== null) setEdgesVertexAttribute(id, vertex)
-    } else if (type == "edges") {
-      const edges = dataStyleStore.styles[id].edges.coloring.edges
-      if (edges !== null) setEdgesEdgeAttribute(id, edges)
+  async function setEdgesActiveColoring(id, type) {
+    const coloring = dataStyleStore.styles[id].edges.coloring
+    if (type == "color") {
+      setEdgesColor(id, coloring.color)
+      // else if (type == "vertex") {
+      //   const vertex = coloring.vertex
+      // if (vertex !== null) setEdgesVertexAttribute(id, vertex)
+      // } else if (type == "edges") {
+      //   const edges = coloring.edges
+      //   if (edges !== null) setEdgesEdgeAttribute(id, edges)
     } else throw new Error("Unknown edges coloring type: " + type)
-    dataStyleStore.styles[id].edges.coloring.active = type
-    console.log(
-      "setEdgesActiveColoring",
-      dataStyleStore.styles[id].edges.coloring.active,
-    )
+    coloring.active = type
+    console.log("setEdgesActiveColoring", coloring.active)
   }
 
   function setEdgesColor(id, color) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_edges_schemas.color,
         params: { id, color },
       },
       {
         response_function: () => {
+          console.log("response_function", id, color)
           dataStyleStore.styles[id].edges.coloring.color = color
           console.log(
             "setEdgesColor",
@@ -71,16 +70,16 @@ export function useMeshEdgesStyle() {
       },
     )
   }
-  function setEdgesSize(id, size) {
-    viewer_call(
+  function setEdgesWidth(id, width) {
+    return viewer_call(
       {
-        schema: mesh_edges_schemas.size,
-        params: { id, size },
+        schema: mesh_edges_schemas.width,
+        params: { id, width },
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.size = size
-          console.log("setEdgesSize", dataStyleStore.styles[id].edges.size)
+          dataStyleStore.styles[id].edges.width = width
+          console.log("setEdgesWidth", dataStyleStore.styles[id].edges.width)
         },
       },
     )
@@ -89,7 +88,7 @@ export function useMeshEdgesStyle() {
   function applyEdgesStyle(id, style) {
     setEdgesVisibility(id, style.visibility)
     setEdgesActiveColoring(id, style.coloring.active)
-    // setEdgesSize(id, style.size);
+    // setEdgesWidth(id, style.size);
   }
 
   return {
@@ -100,7 +99,7 @@ export function useMeshEdgesStyle() {
     setEdgesVisibility,
     setEdgesActiveColoring,
     setEdgesColor,
-    setEdgesSize,
+    setEdgesWidth,
     applyEdgesStyle,
   }
 }

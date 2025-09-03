@@ -9,14 +9,14 @@ export function useModelEdgesStyle() {
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    if (!dataStyleStore.styles[id]) {
-      dataStyleStore.styles[id] = {}
-    }
-    if (!dataStyleStore.styles[id].edges) {
-      dataStyleStore.styles[id].edges = {}
-    }
+    // if (!dataStyleStore.styles[id]) {
+    //   dataStyleStore.styles[id] = {}
+    // }
+    // if (!dataStyleStore.styles[id].edges) {
+    //   dataStyleStore.styles[id].edges = {}
+    // }
 
-    viewer_call(
+    return viewer_call(
       {
         schema: model_edges_schemas.visibility,
         params: { id, visibility },

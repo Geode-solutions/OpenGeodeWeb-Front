@@ -24,7 +24,7 @@ export function useMeshPointsStyle() {
 
   /** Actions **/
   function setPointsVisibility(id, visibility) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_points_schemas.visibility,
         params: { id, visibility },
@@ -42,7 +42,7 @@ export function useMeshPointsStyle() {
   }
 
   function setPointsColor(id, color) {
-    viewer_call(
+    return viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.mesh.points.color,
         params: { id, color },
@@ -59,7 +59,7 @@ export function useMeshPointsStyle() {
     )
   }
   function setPointsVertexAttribute(id, vertex_attribute) {
-    viewer_call(
+    return viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.mesh.points.vertex_attribute,
         params: { id, ...vertex_attribute },
@@ -76,7 +76,7 @@ export function useMeshPointsStyle() {
     )
   }
   function setPointsSize(id, size) {
-    viewer_call(
+    return viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.mesh.points.size,
         params: { id, size },
