@@ -120,7 +120,7 @@ async function run_script(
       }
       console.log(data)
     })
-
+    child.stderr.setEncoding("utf8")
     child.stderr.on("data", (data) => {
       console.log(data)
     })
@@ -133,7 +133,6 @@ async function run_script(
       console.log("Child Process killed")
     })
     child.name = command.replace(/^.*[\\/]/, "")
-    return child
   })
 }
 
