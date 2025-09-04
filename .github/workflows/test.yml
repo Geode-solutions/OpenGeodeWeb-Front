@@ -6,8 +6,6 @@ on:
       - master
       - next
 
-
-
 jobs:
   test-integration:
     runs-on: ubuntu-latest
