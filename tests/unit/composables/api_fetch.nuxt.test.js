@@ -6,6 +6,7 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime"
 describe("api_fetch", () => {
   const pinia = createTestingPinia({
     stubActions: false,
+    createSpy: vi.fn,
   })
   setActivePinia(pinia)
   const geode_store = useGeodeStore()

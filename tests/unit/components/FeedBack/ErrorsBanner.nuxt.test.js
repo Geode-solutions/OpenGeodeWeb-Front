@@ -6,6 +6,7 @@ import * as directives from "vuetify/directives"
 import { createTestingPinia } from "@pinia/testing"
 
 import FeedBackErrorBanner from "@ogw_f/components/FeedBack/ErrorBanner.vue"
+import { setActivePinia } from "pinia"
 
 const vuetify = createVuetify({
   components,
@@ -14,14 +15,14 @@ const vuetify = createVuetify({
 
 describe("FeedBackErrorBanner.vue", async () => {
   test(`Test reload`, async () => {
+    const pinia = createTestingPinia({
+      stubActions: false,
+      createSpy: vi.fn,
+    })
+    setActivePinia(pinia)
     const wrapper = mount(FeedBackErrorBanner, {
       global: {
-        plugins: [
-          createTestingPinia({
-            createSpy: vi.fn,
-          }),
-          vuetify,
-        ],
+        plugins: [pinia, vuetify],
       },
     })
     const reload_spy = vi.spyOn(wrapper.vm, "reload")

@@ -6,14 +6,15 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
+
 import Launcher from "@ogw_f/components/Launcher.vue"
 
 const vuetify = createVuetify({
   components,
   directives,
 })
-
-const infra_store = useInfraStore()
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
@@ -31,6 +32,12 @@ global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("Launcher.vue", async () => {
   test(`Mount`, async () => {
+    const pinia = createTestingPinia({
+      stubActions: false,
+      createSpy: vi.fn,
+    })
+    setActivePinia(pinia)
+    const infra_store = useInfraStore()
     const spy_create_backend = vi.spyOn(infra_store, "create_backend")
     const wrapper = await mountSuspended(Launcher, {
       global: {

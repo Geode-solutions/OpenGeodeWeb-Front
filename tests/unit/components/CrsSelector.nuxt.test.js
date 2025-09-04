@@ -1,5 +1,6 @@
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 
+import { describe, expect, test, vi } from "vitest"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { createVuetify } from "vuetify"
@@ -18,7 +19,10 @@ const vuetify = createVuetify({
 })
 
 describe("CrsSelector.vue", () => {
-  const pinia = createTestingPinia()
+  const pinia = createTestingPinia({
+    stubActions: false,
+    createSpy: vi.fn,
+  })
   setActivePinia(pinia)
   const geode_store = useGeodeStore()
   geode_store.base_url = ""

@@ -2,25 +2,13 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 
 export function useMeshEdgesStyle() {
-  /** State **/
   const dataStyleStore = useDataStyleStore()
 
-  /** Getters **/
   function edgesVisibility(id) {
     return dataStyleStore.styles[id].edges.visibility
   }
-  function edgesActiveColoring(id) {
-    return dataStyleStore.styles[id].edges.coloring.active
-  }
-  function edgesColor(id) {
-    return dataStyleStore.styles[id].edges.coloring.color
-  }
-  function edgesSize(id) {
-    return dataStyleStore.styles[id].edges.size
-  }
-
-  /** Actions **/
   function setEdgesVisibility(id, visibility) {
+    const edges_style = dataStyleStore.styles[id].edges
     return viewer_call(
       {
         schema: mesh_edges_schemas.visibility,
@@ -28,14 +16,15 @@ export function useMeshEdgesStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.visibility = visibility
-          console.log(
-            "setEdgesVisibility",
-            dataStyleStore.styles[id].edges.visibility,
-          )
+          edges_style.visibility = visibility
+          console.log(`${setEdgesVisibility.name} ${edges_style.visibility}`)
         },
       },
     )
+  }
+
+  function edgesActiveColoring(id) {
+    return dataStyleStore.styles[id].edges.coloring.active
   }
   async function setEdgesActiveColoring(id, type) {
     const coloring = dataStyleStore.styles[id].edges.coloring
@@ -49,10 +38,14 @@ export function useMeshEdgesStyle() {
       //   if (edges !== null) setEdgesEdgeAttribute(id, edges)
     } else throw new Error("Unknown edges coloring type: " + type)
     coloring.active = type
-    console.log("setEdgesActiveColoring", coloring.active)
+    console.log(`${setEdgesActiveColoring.name} ${coloring.active}`)
   }
 
+  function edgesColor(id) {
+    return dataStyleStore.styles[id].edges.coloring.color
+  }
   function setEdgesColor(id, color) {
+    const coloring_style = dataStyleStore.styles[id].edges.coloring
     return viewer_call(
       {
         schema: mesh_edges_schemas.color,
@@ -60,17 +53,20 @@ export function useMeshEdgesStyle() {
       },
       {
         response_function: () => {
-          console.log("response_function", id, color)
-          dataStyleStore.styles[id].edges.coloring.color = color
+          coloring_style.color = color
           console.log(
-            "setEdgesColor",
-            dataStyleStore.styles[id].edges.coloring.color,
+            `${setEdgesColor.name} ${JSON.stringify(coloring_style.color)}`,
           )
         },
       },
     )
   }
+
+  function edgesWidth(id) {
+    return dataStyleStore.styles[id].edges.size
+  }
   function setEdgesWidth(id, width) {
+    const edges_style = dataStyleStore.styles[id].edges
     return viewer_call(
       {
         schema: mesh_edges_schemas.width,
@@ -78,8 +74,8 @@ export function useMeshEdgesStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.width = width
-          console.log("setEdgesWidth", dataStyleStore.styles[id].edges.width)
+          edges_style.width = width
+          console.log(`${setEdgesWidth.name} ${edges_style.width}`)
         },
       },
     )
@@ -88,18 +84,18 @@ export function useMeshEdgesStyle() {
   function applyEdgesStyle(id, style) {
     setEdgesVisibility(id, style.visibility)
     setEdgesActiveColoring(id, style.coloring.active)
-    // setEdgesWidth(id, style.size);
+    // setEdgesWidth(id, style.width);
   }
 
   return {
-    edgesVisibility,
+    applyEdgesStyle,
     edgesActiveColoring,
     edgesColor,
-    edgesSize,
-    setEdgesVisibility,
+    edgesVisibility,
+    edgesWidth,
     setEdgesActiveColoring,
     setEdgesColor,
+    setEdgesVisibility,
     setEdgesWidth,
-    applyEdgesStyle,
   }
 }

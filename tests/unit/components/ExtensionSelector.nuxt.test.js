@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 
 import { createVuetify } from "vuetify"
@@ -19,7 +19,10 @@ const vuetify = createVuetify({
 })
 
 describe("ExtensionSelector.vue", async () => {
-  const pinia = createTestingPinia()
+  const pinia = createTestingPinia({
+    stubActions: false,
+    createSpy: vi.fn,
+  })
   setActivePinia(pinia)
   const geode_store = useGeodeStore()
   geode_store.base_url = ""

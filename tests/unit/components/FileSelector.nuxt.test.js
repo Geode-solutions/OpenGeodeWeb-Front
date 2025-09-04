@@ -23,7 +23,10 @@ const vuetify = createVuetify({
 })
 
 describe("FileSelector.vue", async () => {
-  const pinia = createTestingPinia()
+  const pinia = createTestingPinia({
+    stubActions: false,
+    createSpy: vi.fn,
+  })
   setActivePinia(pinia)
   const geode_store = useGeodeStore()
   geode_store.base_url = ""

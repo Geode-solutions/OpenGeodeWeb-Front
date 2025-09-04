@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach } from "vitest"
+import { describe, expect, test, beforeEach, vi } from "vitest"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
@@ -6,19 +6,17 @@ import { upload_file } from "@ogw_f/composables/upload_file"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 const schema = schemas.opengeodeweb_back.upload_file
 
-describe("upload_file.js", () => {
+beforeEach(async () => {
   const pinia = createTestingPinia({
     stubActions: false,
+    createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const infra_store = useInfraStore()
-  const geode_store = useGeodeStore()
-  const feedback_store = useFeedbackStore()
+})
 
+describe("upload_file.js", () => {
   beforeEach(() => {
-    infra_store.$reset()
-    geode_store.$reset()
-    feedback_store.$reset()
+    const geode_store = useGeodeStore()
     geode_store.base_url = ""
   })
 
@@ -31,6 +29,7 @@ describe("upload_file.js", () => {
   })
 
   test("onResponse", async () => {
+    const feedback_store = useFeedbackStore()
     registerEndpoint(schema.$id, {
       method: "PUT",
       handler: () => ({ test: "ok" }),

@@ -1,20 +1,20 @@
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { useFeedbackStore } from "@ogw_f/stores/feedback"
+import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 
-describe("Feedback Store", () => {
+beforeEach(async () => {
   const pinia = createTestingPinia({
     stubActions: false,
+    createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const feedback_store = useFeedbackStore()
+})
 
-  beforeEach(() => {
-    feedback_store.$reset()
-  })
-
+describe("Feedback Store", () => {
   describe("state", () => {
     test("initial state", () => {
+      const feedback_store = useFeedbackStore()
       expectTypeOf(feedback_store.feedbacks).toEqualTypeOf([])
       expectTypeOf(feedback_store.server_error).toBeBoolean()
     })
@@ -22,6 +22,7 @@ describe("Feedback Store", () => {
   describe("actions", () => {
     describe("add_error", () => {
       test("test add_error", () => {
+        const feedback_store = useFeedbackStore()
         feedback_store.add_error(
           500,
           "/test",
@@ -35,6 +36,7 @@ describe("Feedback Store", () => {
 
     describe("add_error", () => {
       test("test feedbacks_timeout", () => {
+        const feedback_store = useFeedbackStore()
         feedback_store.feedbacks_timeout_miliseconds = 500
         feedback_store.add_error(
           500,
@@ -51,6 +53,7 @@ describe("Feedback Store", () => {
 
     describe("add_success", () => {
       test("test add_success", () => {
+        const feedback_store = useFeedbackStore()
         feedback_store.feedbacks_timeout_miliseconds = 500
         feedback_store.add_success("test description")
         expect(feedback_store.feedbacks.length).toBe(1)
@@ -63,6 +66,7 @@ describe("Feedback Store", () => {
     })
     describe("delete_feedback", () => {
       test("test", () => {
+        const feedback_store = useFeedbackStore()
         feedback_store.delete_feedback(0)
         expect(feedback_store.feedbacks.length).toBe(0)
       })
@@ -70,6 +74,7 @@ describe("Feedback Store", () => {
 
     describe("delete_server_error", () => {
       test("test", () => {
+        const feedback_store = useFeedbackStore()
         feedback_store.$patch({ server_error: true })
         feedback_store.delete_server_error()
         expect(feedback_store.server_error).toBe(false)

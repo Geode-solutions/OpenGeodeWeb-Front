@@ -5,8 +5,8 @@ export default defineVitestConfig({
     projects: [
       {
         name: "unit",
-        root: "./tests/unit",
         environment: "nuxt",
+        include: ["tests/unit/**/*.test.js"],
         server: {
           deps: {
             inline: ["vuetify"],
@@ -15,7 +15,7 @@ export default defineVitestConfig({
       },
       {
         name: "integration",
-        root: "./tests/integration",
+        include: ["tests/integration/**/*.test.js"],
         environment: "nuxt",
         server: {
           deps: {
