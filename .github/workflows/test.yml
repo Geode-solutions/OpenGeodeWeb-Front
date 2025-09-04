@@ -26,7 +26,7 @@ jobs:
           cd ./tests/integration/microservices/viewer
           python3 -m venv venv
           source venv/bin/activate
-          pip install -r requirements.txt
+          pip install --extra-index-url https://wheels.vtk.org -r requirements.txt
       - name: Install and run tests
         run: |
           npm i
