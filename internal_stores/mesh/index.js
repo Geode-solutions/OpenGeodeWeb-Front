@@ -10,15 +10,17 @@ export default function useMeshStyle() {
   const edgesStyleStore = useMeshEdgesStyle()
   const polygonsStyleStore = useMeshPolygonsStyle()
   const polyhedraStyleStore = useMeshPolyhedraStyle()
+  const hybridViewerStore = useHybridViewerStore()
 
   function setMeshVisibility(id, visibility) {
-    viewer_call(
+    return viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.mesh.visibility,
         params: { id, visibility },
       },
       {
         response_function: () => {
+          hybridViewerStore.setVisibility(id, visibility)
           dataStyleStore.styles[id].visibility = visibility
           console.log("setMeshVisibility", dataStyleStore.styles[id].visibility)
         },

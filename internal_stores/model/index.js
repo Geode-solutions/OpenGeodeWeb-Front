@@ -16,6 +16,7 @@ export default function useModelStyle() {
   const blocksStyleStore = useBlocksStyle()
   const modelEdgesStore = useModelEdgesStyle()
   const modelPointsStore = useModelPointsStyle()
+  const hybridViewerStore = useHybridViewerStore()
 
   /** Getters **/
   function modelVisibility(id) {
@@ -62,7 +63,7 @@ export default function useModelStyle() {
   }
 
   function setModelVisibility(id, visibility) {
-    viewer_call(
+    return viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.model.visibility,
         params: { id, visibility },
@@ -70,6 +71,7 @@ export default function useModelStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].visibility = visibility
+          hybridViewerStore.setVisibility(id, visibility)
           console.log("setModelVisibility", visibility)
         },
       },
