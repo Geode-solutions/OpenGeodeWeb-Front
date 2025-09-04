@@ -2,7 +2,7 @@
   "name": "@geode/opengeodeweb-front",
   "scripts": {
     "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
-    "test": "npm run test:unit",
+    "test": "npm run test --project unit",
     "test:unit": "npm run test --project unit",
     "test:integration": "npm run test --project integration",
     "coverage": "vitest run --coverage",
