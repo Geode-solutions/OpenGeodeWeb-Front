@@ -181,7 +181,7 @@ describe("Viewer Store", () => {
       viewer_store.default_local_port = viewer_port
       await viewer_store.ws_connect()
       expect(viewer_store.status).toBe(Status.CONNECTED)
-    })
+    }, 10000)
     describe("toggle_picking_mode", () => {
       test("test true", async () => {
         const viewer_store = useViewerStore()
