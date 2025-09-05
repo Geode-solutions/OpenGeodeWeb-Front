@@ -66,6 +66,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     db[id] = { actor, polydata, mapper }
   }
 
+  async function setVisibility(id, visibility) {
+    db[id].actor.setVisibility(visibility)
+    const renderWindow = genericRenderWindow.value.getRenderWindow()
+    renderWindow.render()
+  }
   async function setZScaling(z_scale) {
     zScale.value = z_scale
     const renderer = genericRenderWindow.value.getRenderer()
@@ -183,6 +188,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     db,
     genericRenderWindow,
     addItem,
+    setVisibility,
     setZScaling,
     syncRemoteCamera,
     initHybridViewer,
