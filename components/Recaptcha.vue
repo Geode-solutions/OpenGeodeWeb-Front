@@ -13,7 +13,7 @@
 
 <script setup>
   import { VueRecaptcha } from "vue-recaptcha"
-  const infra_store = use_infra_store()
+  const infra_store = useInfraStore()
 
   const props = defineProps({
     site_key: { type: String, required: true },

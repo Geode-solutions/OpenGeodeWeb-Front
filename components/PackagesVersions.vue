@@ -25,7 +25,7 @@
     schema: { type: Object, required: true },
   })
 
-  const geode_store = use_geode_store()
+  const geode_store = useGeodeStore()
   const packages_versions = ref([])
 
   async function get_packages_versions() {

@@ -27,7 +27,7 @@ export function useMeshPolyhedraStyle() {
 
   /** Actions **/
   function setPolyhedraVisibility(id, visibility) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_polyhedra_schemas.visibility,
         params: { id, visibility },
@@ -60,7 +60,7 @@ export function useMeshPolyhedraStyle() {
     )
   }
   function setPolyhedraColor(id, color) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_polyhedra_schemas.color,
         params: { id, color },
@@ -78,7 +78,7 @@ export function useMeshPolyhedraStyle() {
   }
 
   function setPolyhedraVertexAttribute(id, vertex_attribute) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_polyhedra_schemas.vertex_attribute,
         params: { id, ...vertex_attribute },
@@ -96,7 +96,7 @@ export function useMeshPolyhedraStyle() {
   }
 
   function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
-    viewer_call(
+    return viewer_call(
       {
         schema: mesh_polyhedra_schemas.polyhedron_attribute,
         params: { id, ...polyhedron_attribute },
@@ -115,8 +115,10 @@ export function useMeshPolyhedraStyle() {
   }
 
   function applyPolyhedraStyle(id, style) {
-    setPolyhedraVisibility(id, style.visibility)
-    setPolyhedraActiveColoring(id, style.coloring.active)
+    return Promise.all([
+      setPolyhedraVisibility(id, style.visibility),
+      setPolyhedraActiveColoring(id, style.coloring.active),
+    ])
   }
 
   return {

@@ -14,7 +14,7 @@ export function useCornersStyle() {
   /** Actions **/
   function setCornerVisibility(id, corner_ids, visibility) {
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
-    viewer_call(
+    return viewer_call(
       {
         schema: corners_schemas.visibility,
         params: { id, block_ids: corner_flat_indexes, visibility },

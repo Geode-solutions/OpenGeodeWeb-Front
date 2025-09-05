@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-  const treeviewStore = use_treeview_store()
+  const treeviewStore = useTreeviewStore()
 
   const selectedTree = computed(() => treeviewStore.selectedTree)
 

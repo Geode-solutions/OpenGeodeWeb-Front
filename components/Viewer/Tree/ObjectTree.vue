@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-  const treeviewStore = use_treeview_store()
+  const treeviewStore = useTreeviewStore()
   const menuStore = useMenuStore()
   const cardContainer = useTemplateRef("cardContainer")
   const containerWidth = ref(window.innerWidth)

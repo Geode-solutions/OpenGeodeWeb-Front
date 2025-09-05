@@ -8,7 +8,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import Status from "@ogw_f/utils/status.js"
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
-  const viewer_store = use_viewer_store()
+  const viewer_store = useViewerStore()
   const db = reactive({})
   const status = ref(Status.NOT_CREATED)
   const camera_options = reactive({})

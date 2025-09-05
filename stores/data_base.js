@@ -1,7 +1,8 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 export const useDataBaseStore = defineStore("dataBase", () => {
-  const treeview_store = use_treeview_store()
+  const treeview_store = useTreeviewStore()
   const hybridViewerStore = useHybridViewerStore()
 
   /** State **/
@@ -41,6 +42,12 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   /** Actions **/
+  async function registerObject(id, file_name, viewer_object) {
+    return viewer_call({
+      schema: viewer_schemas.opengeodeweb_viewer.generic.register,
+      params: { id, file_name, viewer_object },
+    })
+  }
   async function addItem(
     id,
     value = {
@@ -137,6 +144,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     itemMetaDatas,
     meshComponentType,
     formatedMeshComponents,
+    registerObject,
     addItem,
     fetchUuidToFlatIndexDict,
     fetchMeshComponents,

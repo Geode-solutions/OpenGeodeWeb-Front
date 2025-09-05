@@ -21,7 +21,7 @@
 <script setup>
   import Status from "@ogw_f/utils/status.js"
 
-  const infra_store = use_infra_store()
+  const infra_store = useInfraStore()
   const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
 
   watch(

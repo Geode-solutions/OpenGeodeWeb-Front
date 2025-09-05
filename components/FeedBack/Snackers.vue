@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-  const feedback_store = use_feedback_store()
+  const feedback_store = useFeedbackStore()
   const show = true
 
   function calc_margin(index) {

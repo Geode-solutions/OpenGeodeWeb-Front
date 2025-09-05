@@ -30,7 +30,7 @@
     viewId: { type: String, default: "-1" },
   })
 
-  const viewer_store = use_viewer_store()
+  const viewer_store = useViewerStore()
   const viewer = useTemplateRef("viewer")
   const { width, height } = useElementSize(viewer)
 

@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-  const infra_store = use_infra_store()
+  const infra_store = useInfraStore()
 
   const props = defineProps({
     versions_schema: { type: Object, required: true },

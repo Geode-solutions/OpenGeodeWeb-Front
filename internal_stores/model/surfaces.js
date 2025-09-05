@@ -14,7 +14,7 @@ export function useSurfacesStyle() {
   /** Actions **/
   function setSurfaceVisibility(id, surface_ids, visibility) {
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
-    viewer_call(
+    return viewer_call(
       {
         schema: surfaces_schemas.visibility,
         params: { id, block_ids: surface_flat_indexes, visibility },
