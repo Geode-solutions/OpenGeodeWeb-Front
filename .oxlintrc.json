@@ -2,7 +2,7 @@
   "categories": {
     "correctness": "error",
     "suspicious": "error",
-    "pedantic": "warning",
+    "pedantic": "warn",
     "perf": "error",
     "style": "error",
     "restriction": "error"
