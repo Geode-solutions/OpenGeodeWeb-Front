@@ -2,7 +2,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 export const useDataBaseStore = defineStore("dataBase", () => {
-  const treeview_store = use_treeview_store()
+  const treeview_store = useTreeviewStore()
   const hybridViewerStore = useHybridViewerStore()
 
   /** State **/
