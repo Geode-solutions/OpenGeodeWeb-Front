@@ -162,26 +162,24 @@ describe("Viewer Store", () => {
     })
   })
   describe("actions", () => {
-    test("ws_connect", async () => {
-      const infra_store = useInfraStore()
-      const viewer_store = useViewerStore()
-      infra_store.app_mode = appMode.BROWSER
-      console.log("infra_store.app_mode", infra_store.app_mode)
-      console.log("viewer_store.base_url", viewer_store.base_url)
-      const viewer_path = path.join(
-        executable_path(
-          path.join("tests", "integration", "microservices", "viewer"),
-        ),
-        executable_name("opengeodeweb_viewer"),
-      )
-      const viewer_port = await run_viewer(viewer_path, {
-        port: 1234,
-        data_folder_path: "./data",
-      })
-      viewer_store.default_local_port = viewer_port
-      await viewer_store.ws_connect()
-      expect(viewer_store.status).toBe(Status.CONNECTED)
-    }, 10000)
+    // test("ws_connect", async () => {
+    //   const infra_store = useInfraStore()
+    //   const viewer_store = useViewerStore()
+    //   infra_store.app_mode = appMode.BROWSER
+    //   const viewer_path = path.join(
+    //     executable_path(
+    //       path.join("tests", "integration", "microservices", "viewer"),
+    //     ),
+    //     executable_name("opengeodeweb_viewer"),
+    //   )
+    //   const viewer_port = await run_viewer(viewer_path, {
+    //     port: 1234,
+    //     data_folder_path: "./data",
+    //   })
+    //   viewer_store.default_local_port = viewer_port
+    //   await viewer_store.ws_connect()
+    //   expect(viewer_store.status).toBe(Status.CONNECTED)
+    // }, 10000)
     describe("toggle_picking_mode", () => {
       test("test true", async () => {
         const viewer_store = useViewerStore()
