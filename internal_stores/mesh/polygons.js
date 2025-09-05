@@ -137,8 +137,10 @@ export function useMeshPolygonsStyle() {
   }
 
   function applyPolygonsStyle(id, style) {
-    setPolygonsVisibility(id, style.visibility)
-    setPolygonsActiveColoring(id, style.coloring.active)
+    return Promise.all([
+      setPolygonsVisibility(id, style.visibility),
+      setPolygonsActiveColoring(id, style.coloring.active),
+    ])
   }
 
   return {

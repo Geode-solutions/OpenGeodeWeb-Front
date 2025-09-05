@@ -115,8 +115,10 @@ export function useMeshPolyhedraStyle() {
   }
 
   function applyPolyhedraStyle(id, style) {
-    setPolyhedraVisibility(id, style.visibility)
-    setPolyhedraActiveColoring(id, style.coloring.active)
+    return Promise.all([
+      setPolyhedraVisibility(id, style.visibility),
+      setPolyhedraActiveColoring(id, style.coloring.active),
+    ])
   }
 
   return {

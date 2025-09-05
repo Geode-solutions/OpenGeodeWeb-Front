@@ -1,4 +1,3 @@
-// @vitest-environment nuxt
 import path from "path"
 
 import { setActivePinia } from "pinia"
@@ -90,8 +89,8 @@ beforeEach(async () => {
 })
 
 describe("Mesh edges", () => {
-  afterEach(() => {
-    kill_processes()
+  afterEach(async () => {
+    await kill_processes()
   })
 
   describe("Edges visibility", () => {

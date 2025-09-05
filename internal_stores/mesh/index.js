@@ -22,23 +22,29 @@ export default function useMeshStyle() {
         response_function: () => {
           hybridViewerStore.setVisibility(id, visibility)
           dataStyleStore.styles[id].visibility = visibility
-          console.log("setMeshVisibility", dataStyleStore.styles[id].visibility)
         },
       },
     )
   }
 
-  function applyMeshDefaultStyle(id) {
-    const id_style = dataStyleStore.styles[id]
-    for (const [key, value] of Object.entries(id_style)) {
-      if (key == "visibility") setMeshVisibility(id, value)
-      else if (key == "points") pointsStyleStore.applyPointsStyle(id, value)
-      else if (key == "edges") edgesStyleStore.applyEdgesStyle(id, value)
-      else if (key == "polygons")
-        polygonsStyleStore.applyPolygonsStyle(id, value)
-      else if (key == "polyhedra")
-        polyhedraStyleStore.applyPolyhedraStyle(id, value)
-    }
+  async function applyMeshDefaultStyle(id) {
+    return new Promise(async (resolve) => {
+      const id_style = dataStyleStore.styles[id]
+      for (const [key, value] of Object.entries(id_style)) {
+        if (key == "visibility") {
+          await setMeshVisibility(id, value)
+        } else if (key == "points") {
+          await pointsStyleStore.applyPointsStyle(id, value)
+        } else if (key == "edges") {
+          await edgesStyleStore.applyEdgesStyle(id, value)
+        } else if (key == "polygons") {
+          await polygonsStyleStore.applyPolygonsStyle(id, value)
+        } else if (key == "polyhedra") {
+          await polyhedraStyleStore.applyPolyhedraStyle(id, value)
+        }
+      }
+      resolve()
+    })
   }
 
   return {

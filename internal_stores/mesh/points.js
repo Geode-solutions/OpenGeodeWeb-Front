@@ -108,9 +108,11 @@ export function useMeshPointsStyle() {
   }
 
   function applyPointsStyle(id, style) {
-    setPointsVisibility(id, style.visibility)
-    setPointsActiveColoring(id, style.coloring.active)
-    setPointsSize(id, style.size)
+    return Promise.all([
+      setPointsVisibility(id, style.visibility),
+      setPointsActiveColoring(id, style.coloring.active),
+      setPointsSize(id, style.size),
+    ])
   }
 
   return {

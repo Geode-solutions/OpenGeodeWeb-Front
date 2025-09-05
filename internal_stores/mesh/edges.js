@@ -81,10 +81,12 @@ export function useMeshEdgesStyle() {
     )
   }
 
-  function applyEdgesStyle(id, style) {
-    setEdgesVisibility(id, style.visibility)
-    setEdgesActiveColoring(id, style.coloring.active)
-    // setEdgesWidth(id, style.width);
+  async function applyEdgesStyle(id, style) {
+    return Promise.all([
+      setEdgesVisibility(id, style.visibility),
+      setEdgesActiveColoring(id, style.coloring.active),
+      // setEdgesWidth(id, style.width);
+    ])
   }
 
   return {

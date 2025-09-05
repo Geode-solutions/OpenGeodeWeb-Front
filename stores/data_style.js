@@ -12,21 +12,22 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   /** Actions **/
   function addDataStyle(id, geode_object, object_type) {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)
-
     if (object_type === "mesh") {
-      meshStyleStore.applyMeshDefaultStyle(id)
+      return Promise.all([meshStyleStore.applyMeshDefaultStyle(id)])
     } else if (object_type === "model") {
-      modelStyleStore.setMeshComponentsDefaultStyle(id)
-      modelStyleStore.applyModelDefaultStyle(id)
+      return Promise.all([
+        modelStyleStore.setMeshComponentsDefaultStyle(id),
+        modelStyleStore.applyModelDefaultStyle(id),
+      ])
     }
   }
 
   function setVisibility(id, visibility) {
     const object_type = dataBaseStore.itemMetaDatas(id).object_type
     if (object_type === "mesh") {
-      meshStyleStore.setMeshVisibility(id, visibility)
+      return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
     } else if (object_type === "model") {
-      modelStyleStore.setModelVisibility(id, visibility)
+      return Promise.all([modelStyleStore.setModelVisibility(id, visibility)])
     }
   }
 

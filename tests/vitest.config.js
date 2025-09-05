@@ -1,28 +1,33 @@
-import { defineVitestConfig } from "@nuxt/test-utils/config"
+import { defineConfig } from "vitest/config"
+import { defineVitestProject } from "@nuxt/test-utils/config"
 
-export default defineVitestConfig({
+export default defineConfig({
   test: {
     projects: [
-      {
-        name: "unit",
-        environment: "nuxt",
-        include: ["tests/unit/**/*.test.js"],
-        server: {
-          deps: {
-            inline: ["vuetify"],
+      await defineVitestProject({
+        test: {
+          name: "unit",
+          include: ["tests/unit/**/*.test.js"],
+          environment: "nuxt",
+          server: {
+            deps: {
+              inline: ["vuetify"],
+            },
           },
         },
-      },
-      {
-        name: "integration",
-        include: ["tests/integration/**/*.test.js"],
-        environment: "nuxt",
-        server: {
-          deps: {
-            inline: ["vuetify"],
+      }),
+      await defineVitestProject({
+        test: {
+          name: "integration",
+          include: ["tests/integration/**/*.test.js"],
+          environment: "nuxt",
+          server: {
+            deps: {
+              inline: ["vuetify"],
+            },
           },
         },
-      },
+      }),
     ],
   },
 })
