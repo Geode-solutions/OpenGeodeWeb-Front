@@ -8,7 +8,7 @@
         style="overflow: hidden; position: relative; z-index: 0"
         :style="{ height: viewerHeight }"
         @click="get_x_y"
-        @keydown.esc="viewer_store.toggle_picking_mode(false)"
+        @keydown.esc="viewerStore.toggle_picking_mode(false)"
       />
     </div>
   </ClientOnly>
@@ -24,7 +24,7 @@
 
   const container = useTemplateRef("viewer")
   const hybridViewerStore = useHybridViewerStore()
-  const viewer_store = use_viewer_store()
+  const viewerStore = useViewerStore()
   const { windowWidth, windowHeight } = useWindowSize()
   const { width, height } = useElementSize(container)
 
