@@ -33,9 +33,6 @@
   const dataBaseStore = useDataBaseStore()
 
   const vertex_attribute_names = ref([])
-  const meta_data = computed(() => {
-    return dataBaseStore.itemMetaDatas(props.id)
-  })
 
   onMounted(() => {
     getVertexAttributes()
@@ -46,8 +43,7 @@
       {
         schema: back_schemas.opengeodeweb_back.vertex_attribute_names,
         params: {
-          input_geode_object: meta_data.value.geode_object,
-          filename: meta_data.value.native_filename,
+          id: props.id,
         },
       },
       {

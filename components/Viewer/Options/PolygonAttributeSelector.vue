@@ -10,8 +10,6 @@
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-  const dataBaseStore = useDataBaseStore()
-
   const props = defineProps({
     id: { type: String, required: true },
   })
@@ -20,10 +18,6 @@
   const polygon_attribute_name = ref("")
   const polygon_attribute_names = ref([])
   const polygon_attribute = reactive({ name: polygon_attribute_name.value })
-
-  const meta_data = computed(() => {
-    return dataBaseStore.itemMetaDatas(props.id)
-  })
 
   onMounted(() => {
     if (model.value != null) {
@@ -45,8 +39,7 @@
       {
         schema: back_schemas.opengeodeweb_back.polygon_attribute_names,
         params: {
-          input_geode_object: meta_data.value.geode_object,
-          filename: meta_data.value.native_filename,
+          id: props.id,
         },
       },
       {
