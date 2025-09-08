@@ -142,7 +142,7 @@ export const useMenuStore = defineStore("menu", () => {
     current_id.value = null
   }
 
-  async function openMenu(id, x, y, containerWidth, containerHeight) {
+  async function openMenu(id, x, y, width, height) {
     await closeMenu()
     current_id.value = id
 
@@ -151,8 +151,8 @@ export const useMenuStore = defineStore("menu", () => {
       menuY.value = y
     }
 
-    if (containerWidth) containerWidth.value = containerWidth
-    if (containerHeight) containerHeight.value = containerHeight
+    if (containerWidth) containerWidth.value = width
+    if (containerHeight) containerHeight.value = height
 
     display_menu.value = true
   }
