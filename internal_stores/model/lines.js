@@ -18,7 +18,7 @@ export function useLinesStyle() {
   /** Actions **/
   function setLineVisibility(id, line_ids, visibility) {
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
-    viewer_call(
+    return viewer_call(
       {
         schema: lines_schemas.visibility,
         params: { id, block_ids: line_flat_indexes, visibility },
@@ -38,7 +38,7 @@ export function useLinesStyle() {
 
   function setLineColor(id, line_ids, color) {
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
-    viewer_call(
+    return viewer_call(
       {
         schema: lines_schemas.color,
         params: { id, block_ids: line_flat_indexes, color },

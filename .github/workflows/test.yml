@@ -7,6 +7,29 @@ on:
       - next
 
 jobs:
+  test-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Python setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Install python dependencies
+        run: |
+          cd ./tests/integration/microservices/viewer
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --extra-index-url https://wheels.vtk.org -r requirements.txt
+      - name: Install and run tests
+        run: |
+          npm i
+
+          npm run test:integration
   test:
     uses: Geode-solutions/actions/.github/workflows/js-test.yml@master
     with:

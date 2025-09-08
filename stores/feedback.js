@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 
-export const use_feedback_store = defineStore("feedback", {
+export const useFeedbackStore = defineStore("feedback", {
   state: () => ({
     feedbacks: [],
     server_error: false,

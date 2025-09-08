@@ -2,105 +2,102 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 
 export function useMeshEdgesStyle() {
-  /** State **/
   const dataStyleStore = useDataStyleStore()
 
-  /** Getters **/
   function edgesVisibility(id) {
     return dataStyleStore.styles[id].edges.visibility
   }
-  function edgesActiveColoring(id) {
-    return dataStyleStore.styles[id].edges.coloring.active
-  }
-  function edgesColor(id) {
-    return dataStyleStore.styles[id].edges.coloring.color
-  }
-  function edgesSize(id) {
-    return dataStyleStore.styles[id].edges.size
-  }
-
-  /** Actions **/
   function setEdgesVisibility(id, visibility) {
-    viewer_call(
+    const edges_style = dataStyleStore.styles[id].edges
+    return viewer_call(
       {
         schema: mesh_edges_schemas.visibility,
         params: { id, visibility },
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.visibility = visibility
-          console.log(
-            "setEdgesVisibility",
-            dataStyleStore.styles[id].edges.visibility,
-          )
+          edges_style.visibility = visibility
+          console.log(`${setEdgesVisibility.name} ${edges_style.visibility}`)
         },
       },
     )
   }
-  function setEdgesActiveColoring(id, type) {
-    if (type == "color")
-      setEdgesColor(id, dataStyleStore.styles[id].edges.coloring.color)
-    else if (type == "vertex") {
-      const vertex = dataStyleStore.styles[id].edges.coloring.vertex
-      if (vertex !== null) setEdgesVertexAttribute(id, vertex)
-    } else if (type == "edges") {
-      const edges = dataStyleStore.styles[id].edges.coloring.edges
-      if (edges !== null) setEdgesEdgeAttribute(id, edges)
+
+  function edgesActiveColoring(id) {
+    return dataStyleStore.styles[id].edges.coloring.active
+  }
+  async function setEdgesActiveColoring(id, type) {
+    const coloring = dataStyleStore.styles[id].edges.coloring
+    if (type == "color") {
+      setEdgesColor(id, coloring.color)
+      // else if (type == "vertex") {
+      //   const vertex = coloring.vertex
+      // if (vertex !== null) setEdgesVertexAttribute(id, vertex)
+      // } else if (type == "edges") {
+      //   const edges = coloring.edges
+      //   if (edges !== null) setEdgesEdgeAttribute(id, edges)
     } else throw new Error("Unknown edges coloring type: " + type)
-    dataStyleStore.styles[id].edges.coloring.active = type
-    console.log(
-      "setEdgesActiveColoring",
-      dataStyleStore.styles[id].edges.coloring.active,
-    )
+    coloring.active = type
+    console.log(`${setEdgesActiveColoring.name} ${coloring.active}`)
   }
 
+  function edgesColor(id) {
+    return dataStyleStore.styles[id].edges.coloring.color
+  }
   function setEdgesColor(id, color) {
-    viewer_call(
+    const coloring_style = dataStyleStore.styles[id].edges.coloring
+    return viewer_call(
       {
         schema: mesh_edges_schemas.color,
         params: { id, color },
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.coloring.color = color
+          coloring_style.color = color
           console.log(
-            "setEdgesColor",
-            dataStyleStore.styles[id].edges.coloring.color,
+            `${setEdgesColor.name} ${JSON.stringify(coloring_style.color)}`,
           )
         },
       },
     )
   }
-  function setEdgesSize(id, size) {
-    viewer_call(
+
+  function edgesWidth(id) {
+    return dataStyleStore.styles[id].edges.size
+  }
+  function setEdgesWidth(id, width) {
+    const edges_style = dataStyleStore.styles[id].edges
+    return viewer_call(
       {
-        schema: mesh_edges_schemas.size,
-        params: { id, size },
+        schema: mesh_edges_schemas.width,
+        params: { id, width },
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].edges.size = size
-          console.log("setEdgesSize", dataStyleStore.styles[id].edges.size)
+          edges_style.width = width
+          console.log(`${setEdgesWidth.name} ${edges_style.width}`)
         },
       },
     )
   }
 
-  function applyEdgesStyle(id, style) {
-    setEdgesVisibility(id, style.visibility)
-    setEdgesActiveColoring(id, style.coloring.active)
-    // setEdgesSize(id, style.size);
+  async function applyEdgesStyle(id, style) {
+    return Promise.all([
+      setEdgesVisibility(id, style.visibility),
+      setEdgesActiveColoring(id, style.coloring.active),
+      // setEdgesWidth(id, style.width);
+    ])
   }
 
   return {
-    edgesVisibility,
+    applyEdgesStyle,
     edgesActiveColoring,
     edgesColor,
-    edgesSize,
-    setEdgesVisibility,
+    edgesVisibility,
+    edgesWidth,
     setEdgesActiveColoring,
     setEdgesColor,
-    setEdgesSize,
-    applyEdgesStyle,
+    setEdgesVisibility,
+    setEdgesWidth,
   }
 }

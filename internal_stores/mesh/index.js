@@ -13,32 +13,38 @@ export default function useMeshStyle() {
   const hybridViewerStore = useHybridViewerStore()
 
   function setMeshVisibility(id, visibility) {
-    viewer_call(
+    return viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.mesh.visibility,
         params: { id, visibility },
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].visibility = visibility
           hybridViewerStore.setVisibility(id, visibility)
-          console.log("setMeshVisibility", dataStyleStore.styles[id].visibility)
+          dataStyleStore.styles[id].visibility = visibility
         },
       },
     )
   }
 
-  function applyMeshDefaultStyle(id) {
-    const id_style = dataStyleStore.styles[id]
-    for (const [key, value] of Object.entries(id_style)) {
-      if (key == "visibility") setMeshVisibility(id, value)
-      else if (key == "points") pointsStyleStore.applyPointsStyle(id, value)
-      else if (key == "edges") edgesStyleStore.applyEdgesStyle(id, value)
-      else if (key == "polygons")
-        polygonsStyleStore.applyPolygonsStyle(id, value)
-      else if (key == "polyhedra")
-        polyhedraStyleStore.applyPolyhedraStyle(id, value)
-    }
+  async function applyMeshDefaultStyle(id) {
+    return new Promise(async (resolve) => {
+      const id_style = dataStyleStore.styles[id]
+      for (const [key, value] of Object.entries(id_style)) {
+        if (key == "visibility") {
+          await setMeshVisibility(id, value)
+        } else if (key == "points") {
+          await pointsStyleStore.applyPointsStyle(id, value)
+        } else if (key == "edges") {
+          await edgesStyleStore.applyEdgesStyle(id, value)
+        } else if (key == "polygons") {
+          await polygonsStyleStore.applyPolygonsStyle(id, value)
+        } else if (key == "polyhedra") {
+          await polyhedraStyleStore.applyPolyhedraStyle(id, value)
+        }
+      }
+      resolve()
+    })
   }
 
   return {
