@@ -38,8 +38,6 @@
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-  const dataBaseStore = useDataBaseStore()
-
   const emit = defineEmits(["update_value"])
 
   const props = defineProps({
@@ -56,10 +54,6 @@
 
   const texture_coordinates = ref([])
 
-  const meta_data = computed(() => {
-    return dataBaseStore.itemMetaDatas(props.id)
-  })
-
   onMounted(() => {
     getTextureCoordinates()
   })
@@ -69,8 +63,7 @@
       {
         schema: back_schemas.opengeodeweb_back.texture_coordinates,
         params: {
-          input_geode_object: meta_data.value.geode_object,
-          filename: meta_data.value.native_filename,
+          id: props.id,
         },
       },
       {
