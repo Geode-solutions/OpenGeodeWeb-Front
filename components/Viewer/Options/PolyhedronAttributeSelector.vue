@@ -43,7 +43,7 @@
       {
         schema: back_schemas.opengeodeweb_back.polyhedron_attribute_names,
         params: {
-          id: id.props,
+          id: props.id,
         },
       },
       {
