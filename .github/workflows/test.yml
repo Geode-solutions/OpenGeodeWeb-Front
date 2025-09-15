@@ -12,4 +12,5 @@ jobs:
     with:
       repos: ${{ vars.REPOS }}
       integration: true
+      microservices_path: "tests/integration/microservices"
     secrets: inherit
