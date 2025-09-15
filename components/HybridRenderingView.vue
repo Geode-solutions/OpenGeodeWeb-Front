@@ -22,6 +22,8 @@
     },
   })
 
+  const emit = defineEmits(["click"])
+
   const container = useTemplateRef("viewer")
   const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()
