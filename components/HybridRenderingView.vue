@@ -22,6 +22,8 @@
     },
   })
 
+  const emit = defineEmits(["click"])
+
   const container = useTemplateRef("viewer")
   const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()
@@ -62,6 +64,4 @@
   function get_x_y(event) {
     emit("click", event)
   }
-
-  defineEmits(["click"])
 </script>
