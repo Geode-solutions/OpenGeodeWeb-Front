@@ -156,8 +156,6 @@ async function run_back(port, data_folder_path) {
 
 async function run_viewer(viewer_path, args = { port, data_folder_path }) {
   return new Promise(async (resolve, reject) => {
-    console.log("viewer_path", viewer_path)
-    console.log("args.data_folder_path", args.data_folder_path)
     const viewer_port = await get_available_port(args.port)
     const viewer_args = [
       "--port " + viewer_port,
