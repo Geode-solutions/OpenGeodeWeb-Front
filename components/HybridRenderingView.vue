@@ -64,6 +64,4 @@
   function get_x_y(event) {
     emit("click", event)
   }
-
-  defineEmits(["click"])
 </script>
