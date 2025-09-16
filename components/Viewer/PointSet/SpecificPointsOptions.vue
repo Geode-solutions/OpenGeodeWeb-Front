@@ -1,5 +1,5 @@
 <template>
-  <ContextMenuItem
+  <ViewerContextMenuItem
     :itemProps="props.itemProps"
     tooltip="Points options"
     :btn_image="props.btn_image"
@@ -36,7 +36,7 @@
         </v-row>
       </template>
     </template>
-  </ContextMenuItem>
+  </ViewerContextMenuItem>
 </template>
 
 <script setup>
