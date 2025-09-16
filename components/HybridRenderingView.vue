@@ -65,3 +65,9 @@
     emit("click", event)
   }
 </script>
+
+<style scoped>
+  img {
+    pointer-events: none;
+  }
+</style>
