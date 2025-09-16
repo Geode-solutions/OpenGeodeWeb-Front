@@ -66,7 +66,7 @@
   }
 </script>
 
-<style scoped>
+<style>
   img {
     pointer-events: none;
   }
