@@ -1,5 +1,5 @@
 <template>
-  <ContextMenuItem
+  <ViewerContextMenuItem
     :itemProps="itemProps"
     tooltip="Edges options"
     :btn_image="SurfaceEdges"
@@ -7,7 +7,7 @@
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
     </template>
-  </ContextMenuItem>
+  </ViewerContextMenuItem>
 </template>
 
 <script setup>
