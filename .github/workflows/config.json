@@ -1,0 +1,5 @@
+{
+    "node": true,
+    "integration": true,
+    "microservices": "tests/integration/microservices"
+}
