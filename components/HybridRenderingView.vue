@@ -4,9 +4,9 @@
       <VeaseViewToolbar />
       <slot name="ui"></slot>
       <v-col
+        class="pa-0"
         ref="viewer"
-        style="overflow: hidden; position: relative; z-index: 0"
-        :style="{ height: viewerHeight }"
+        style="height: 100%; overflow: hidden; position: relative; z-index: 0"
         @click="get_x_y"
         @keydown.esc="viewerStore.toggle_picking_mode(false)"
       />
@@ -15,13 +15,6 @@
 </template>
 
 <script setup>
-  const props = defineProps({
-    height: {
-      type: String,
-      default: "100%",
-    },
-  })
-
   const emit = defineEmits(["click"])
 
   const container = useTemplateRef("viewer")
@@ -29,8 +22,6 @@
   const viewerStore = useViewerStore()
   const { windowWidth, windowHeight } = useWindowSize()
   const { width, height } = useElementSize(container)
-
-  const viewerHeight = computed(() => props.height)
 
   const debouncedResize = debounce(() => {
     hybridViewerStore.resize(width.value, height.value)
