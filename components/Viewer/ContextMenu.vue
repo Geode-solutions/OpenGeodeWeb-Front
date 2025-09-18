@@ -54,6 +54,46 @@
   const menuX = ref(props.x || menuStore.menuX)
   const menuY = ref(props.y || menuStore.menuY)
 
+  const { pause: pauseDragListeners, resume: resumeDragListeners } =
+    useEventListener(
+      "mousemove",
+      (e) => {
+        if (!isDragging.value) return
+        handleDrag(e)
+      },
+      { passive: true },
+    )
+
+  const { pause: pauseStopListeners, resume: resumeStopListeners } =
+    useEventListener("mouseup", (e) => {
+      if (!isDragging.value) return
+      stopDrag(e)
+    })
+
+  useEventListener(
+    "touchstart",
+    (e) => {
+      startDrag(e.touches[0])
+      e.preventDefault()
+    },
+    { passive: false },
+  )
+
+  useEventListener(
+    "touchmove",
+    (e) => {
+      if (!isDragging.value) return
+      handleDrag(e.touches[0])
+      e.preventDefault()
+    },
+    { passive: false },
+  )
+
+  useEventListener("touchend", (e) => {
+    if (!isDragging.value) return
+    stopDrag(e.changedTouches[0])
+  })
+
   watch(show_menu, (newVal) => {
     if (!newVal && isDragging.value) {
       setTimeout(() => {
@@ -75,8 +115,8 @@
     isDragging.value = true
     dragStartX.value = e.clientX - menuX.value
     dragStartY.value = e.clientY - menuY.value
-    document.addEventListener("mousemove", handleDrag)
-    document.addEventListener("mouseup", stopDrag)
+    resumeDragListeners()
+    resumeStopListeners()
     e.preventDefault()
   }
 
@@ -97,8 +137,8 @@
 
   function stopDrag(e) {
     isDragging.value = false
-    document.removeEventListener("mousemove", handleDrag)
-    document.removeEventListener("mouseup", stopDrag)
+    pauseDragListeners()
+    pauseStopListeners()
     e.stopPropagation()
     menuStore.setMenuPosition(menuX.value, menuY.value)
   }
@@ -134,11 +174,6 @@
       position: "absolute",
     }
   }
-
-  onUnmounted(() => {
-    document.removeEventListener("mousemove", handleDrag)
-    document.removeEventListener("mouseup", stopDrag)
-  })
 </script>
 
 <style scoped>
