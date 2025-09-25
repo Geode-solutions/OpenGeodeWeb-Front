@@ -171,7 +171,7 @@ export {
   executable_path,
   get_available_port,
   kill_processes,
-  register_process as register_children_processes,
+  register_process,
   run_script,
   run_back,
   run_viewer,
