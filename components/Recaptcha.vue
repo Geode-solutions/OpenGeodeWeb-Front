@@ -1,4 +1,4 @@
-<template align="center" justify="center">
+<template align="center" justify="center" style="display: none">
   <VRow>
     <VCol>
       <VForm v-model="valid">
@@ -78,9 +78,6 @@
     $fetch(
       `/.netlify/functions/recaptcha?name=${name.value}&email=${email.value}&launch=${launch.value}`,
       {
-        onRequestError({ error }) {
-          console.log("onRequestError", error)
-        },
         onResponse({ response }) {
           if (response.ok) {
             infra_store.$patch({
@@ -88,7 +85,6 @@
             })
           }
         },
-        onResponseError({ response }) {},
       },
     )
   }

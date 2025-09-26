@@ -1,6 +1,8 @@
 function check_recaptcha_params(name, email, launch) {
-  if (name !== "") return { statusCode: 500 }
-  if (email !== "") return { statusCode: 500 }
-  if (launch !== false) return { statusCode: 500 }
-  return { statusCode: 200 }
+  if (name !== "") return { status: 500 }
+  if (email !== "") return { status: 500 }
+  if (launch !== false) return { status: 500 }
+  return { status: 200 }
 }
+
+export default check_recaptcha_params
