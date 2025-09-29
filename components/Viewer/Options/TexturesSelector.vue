@@ -18,7 +18,7 @@
     <ViewerOptionsTextureItem
       :id="id"
       :texture_name="internal_textures[index].texture_name"
-      :texture_file_name="internal_textures[index].texture_file_name"
+      :texture_id="internal_textures[index].id"
       @update_value="update_value_event($event, index)"
     />
   </v-row>
@@ -31,7 +31,7 @@
         v-tooltip:bottom="'Add a texture'"
         size="20"
         @click="
-          internal_textures.push({ texture_name: '', texture_file_name: '' })
+          internal_textures.push({ texture_name: '', id: '' })
         "
       />
     </v-col>
@@ -51,14 +51,14 @@
     if (textures.value != null) {
       internal_textures.value = textures.value
     } else {
-      internal_textures.value = [{ texture_name: "", texture_file_name: "" }]
+      internal_textures.value = [{ texture_name: "", id: "" }]
     }
   })
 
   function update_value_event($event, index) {
     internal_textures.value[index][$event.key] = $event.value
     const filtered = internal_textures.value.filter((texture) => {
-      return texture.texture_name != "" && texture.texture_file_name != ""
+      return texture.texture_name != "" && texture.id != ""
     })
     if (filtered.length != 0) {
       textures.value = filtered

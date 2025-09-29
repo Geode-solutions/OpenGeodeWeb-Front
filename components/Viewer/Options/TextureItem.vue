@@ -43,14 +43,14 @@
   const props = defineProps({
     id: { type: String, required: true },
     texture_name: { type: String, required: true },
-    texture_file_name: { type: String, required: true },
+    texture_id: { type: String, required: true },
   })
 
   const texture_name = ref("")
   texture_name.value = props.texture_name
 
-  const texture_file_name = ref("")
-  texture_file_name.value = props.texture_file_name
+  const texture_id = ref("")
+  texture_id.value = props.texture_id
 
   const texture_coordinates = ref([])
 
@@ -86,7 +86,7 @@
         },
         {
           response_function: async (response) => {
-            texture_file_name.value = response._data.viewable_file_name
+            texture_id.value = response._data.id
           },
         },
       )
@@ -97,8 +97,8 @@
     emit("update_value", { key: "texture_name", value })
   })
 
-  watch(texture_file_name, (value) => {
-    emit("update_value", { key: "texture_file_name", value })
+  watch(texture_id, (value) => {
+    emit("update_value", { key: "id", value })
   })
 </script>
 
