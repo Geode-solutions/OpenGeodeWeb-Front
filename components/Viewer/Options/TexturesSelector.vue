@@ -30,9 +30,7 @@
         icon="mdi-plus"
         v-tooltip:bottom="'Add a texture'"
         size="20"
-        @click="
-          internal_textures.push({ texture_name: '', id: '' })
-        "
+        @click="internal_textures.push({ texture_name: '', id: '' })"
       />
     </v-col>
   </v-row>
