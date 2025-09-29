@@ -22,6 +22,7 @@ export default function useMeshStyle() {
         response_function: () => {
           hybridViewerStore.setVisibility(id, visibility)
           dataStyleStore.styles[id].visibility = visibility
+          console.log(`${setMeshVisibility.name} ${id} ${visibility}`)
         },
       },
     )
@@ -29,8 +30,8 @@ export default function useMeshStyle() {
 
   async function applyMeshDefaultStyle(id) {
     return new Promise(async (resolve) => {
-      const id_style = dataStyleStore.styles[id]
-      for (const [key, value] of Object.entries(id_style)) {
+      const style = dataStyleStore.getStyle(id)
+      for (const [key, value] of Object.entries(style)) {
         if (key == "visibility") {
           await setMeshVisibility(id, value)
         } else if (key == "points") {

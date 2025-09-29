@@ -2,108 +2,93 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 
 export function useMeshPointsStyle() {
-  /** State **/
   const dataStyleStore = useDataStyleStore()
 
-  /** Getters **/
+  function pointsStyle(id) {
+    return dataStyleStore.getStyle(id).points
+  }
+
   function pointsVisibility(id) {
-    return dataStyleStore.styles[id].points.visibility
+    return pointsStyle(id).visibility
   }
+  function setPointsVisibility(id, visibility) {
+    const points_style = pointsStyle(id)
+    return viewer_call(
+      { schema: mesh_points_schemas.visibility, params: { id, visibility } },
+      {
+        response_function: () => {
+          points_style.visibility = visibility
+          console.log(`${setPointsVisibility.name} ${pointsVisibility(id)}`)
+        },
+      },
+    )
+  }
+
   function pointsActiveColoring(id) {
-    return dataStyleStore.styles[id].points.coloring.active
+    return pointsStyle(id).coloring.active
   }
+  function setPointsActiveColoring(id, type) {
+    const coloring = pointsStyle(id).coloring
+    if (type == "color") dataStyleStore.setPointsColor(id, coloring.color)
+    else if (type == "vertex") {
+      if (coloring.vertex !== null)
+        dataStyleStore.setPointsVertexAttribute(id, coloring.vertex)
+    } else throw new Error("Unknown points coloring type: " + type)
+    coloring.active = type
+    console.log(`${setPointsActiveColoring.name} ${pointsActiveColoring(id)}`)
+  }
+
   function pointsColor(id) {
-    return dataStyleStore.styles[id].points.coloring.color
+    return pointsStyle(id).coloring.color
+  }
+  function setPointsColor(id, color) {
+    const coloring_style = pointsStyle(id).coloring
+    return viewer_call(
+      { schema: mesh_points_schemas.color, params: { id, color } },
+      {
+        response_function: () => {
+          coloring_style.color = color
+          console.log(
+            `${setPointsColor.name} ${JSON.stringify(pointsColor(id))}`,
+          )
+        },
+      },
+    )
   }
   function pointsVertexAttribute(id) {
-    return dataStyleStore.styles[id].points.coloring.vertex
-  }
-  function pointsSize(id) {
-    return dataStyleStore.styles[id].points.size
-  }
-
-  /** Actions **/
-  function setPointsVisibility(id, visibility) {
-    return viewer_call(
-      {
-        schema: mesh_points_schemas.visibility,
-        params: { id, visibility },
-      },
-      {
-        response_function: () => {
-          dataStyleStore.styles[id].points.visibility = visibility
-          console.log(
-            "setPointsVisibility",
-            dataStyleStore.styles[id].points.visibility,
-          )
-        },
-      },
-    )
-  }
-
-  function setPointsColor(id, color) {
-    return viewer_call(
-      {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.points.color,
-        params: { id, color },
-      },
-      {
-        response_function: () => {
-          dataStyleStore.styles[id].points.coloring.color = color
-          console.log(
-            "setPointsColor",
-            dataStyleStore.styles[id].points.coloring.color,
-          )
-        },
-      },
-    )
+    return pointsStyle(id).coloring.vertex
   }
   function setPointsVertexAttribute(id, vertex_attribute) {
+    const coloring_style = pointsStyle(id).coloring
     return viewer_call(
       {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.points.vertex_attribute,
+        schema: mesh_points_schemas.vertex_attribute,
         params: { id, ...vertex_attribute },
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].points.coloring.vertex = vertex_attribute
+          coloring_style.vertex = vertex_attribute
           console.log(
-            "setPointsVertexAttribute",
-            dataStyleStore.styles[id].points.coloring.vertex,
+            `${setPointsVertexAttribute.name} ${pointsVertexAttribute(id)}`,
           )
         },
       },
     )
   }
+
+  function pointsSize(id) {
+    return pointsStyle(id).size
+  }
   function setPointsSize(id, size) {
+    const points_style = pointsStyle(id)
     return viewer_call(
-      {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.points.size,
-        params: { id, size },
-      },
+      { schema: mesh_points_schemas.size, params: { id, size } },
       {
         response_function: () => {
-          dataStyleStore.styles[id].points.size = size
-          console.log("setPointsSize", dataStyleStore.styles[id].points.size)
+          points_style.size = size
+          console.log(`${setPointsSize.name} ${pointsSize(id)}`)
         },
       },
-    )
-  }
-
-  function setPointsActiveColoring(id, type) {
-    if (type == "color")
-      dataStyleStore.setPointsColor(
-        id,
-        dataStyleStore.styles[id].points.coloring.color,
-      )
-    else if (type == "vertex") {
-      const vertex = dataStyleStore.styles[id].points.coloring.vertex
-      if (vertex !== null) dataStyleStore.setPointsVertexAttribute(id, vertex)
-    } else throw new Error("Unknown edges coloring type: " + type)
-    dataStyleStore.styles[id].points.coloring.active = type
-    console.log(
-      "setPointsActiveColoring",
-      dataStyleStore.styles[id].points.coloring.active,
     )
   }
 

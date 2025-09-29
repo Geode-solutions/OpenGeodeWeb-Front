@@ -2,82 +2,65 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const mesh_polyhedra_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra
 
 export function useMeshPolyhedraStyle() {
-  /** State **/
   const dataStyleStore = useDataStyleStore()
 
-  /** Getters **/
+  function polyhedraStyle(id) {
+    return dataStyleStore.getStyle(id).polyhedra
+  }
+
   function polyhedraVisibility(id) {
-    return dataStyleStore.styles[id].polyhedra.visibility
+    return polyhedraStyle(id).visibility
+  }
+  function setPolyhedraVisibility(id, visibility) {
+    const polyhedra_style = polyhedraStyle(id)
+    return viewer_call(
+      { schema: mesh_polyhedra_schemas.visibility, params: { id, visibility } },
+      {
+        response_function: () => {
+          polyhedra_style.visibility = visibility
+          console.log(`${setPolyhedraVisibility.name} ${polyhedra_style.color}`)
+        },
+      },
+    )
   }
   function polyhedraActiveColoring(id) {
-    return dataStyleStore.styles[id].polyhedra.coloring.active
-  }
-  function polyhedraColor(id) {
-    return dataStyleStore.styles[id].polyhedra.coloring.color
-  }
-  function polyhedraVertexAttribute(id) {
-    return dataStyleStore.styles[id].polyhedra.coloring.vertex
-  }
-  function polyhedraPolygonAttribute(id) {
-    return dataStyleStore.styles[id].polyhedra.coloring.polygon
-  }
-  function polyhedraPolyhedronAttribute(id) {
-    return dataStyleStore.styles[id].polyhedra.coloring.polyhedron
-  }
-
-  /** Actions **/
-  function setPolyhedraVisibility(id, visibility) {
-    return viewer_call(
-      {
-        schema: mesh_polyhedra_schemas.visibility,
-        params: { id, visibility },
-      },
-      {
-        response_function: () => {
-          dataStyleStore.styles[id].polyhedra.visibility = visibility
-          console.log(
-            "setPolyhedraVisibility",
-            dataStyleStore.styles[id].polyhedra.visibility,
-          )
-        },
-      },
-    )
+    return polyhedraStyle(id).coloring.active
   }
   function setPolyhedraActiveColoring(id, type) {
-    if (type == "color")
-      setPolyhedraColor(id, dataStyleStore.styles[id].polyhedra.coloring.color)
-    else if (type == "vertex") {
-      const vertex = dataStyleStore.styles[id].polyhedra.coloring.vertex
-      if (vertex !== null) setPolyhedraVertexAttribute(id, vertex)
-    } else if (type == "polyhedron") {
-      const polyhedron = dataStyleStore.styles[id].polyhedra.coloring.polyhedron
-      if (polyhedron !== null) setPolyhedraPolyhedronAttribute(id, polyhedron)
-    } else throw new Error("Unknown polyhedra coloring type: " + type)
-    dataStyleStore.styles[id].polyhedra.coloring.active = type
+    const coloring = polyhedraStyle(id).coloring
+    if (type == "color") setPolyhedraColor(id, coloring.color)
+    else if (type == "vertex" && coloring.vertex !== null)
+      setPolyhedraVertexAttribute(id, coloring.vertex)
+    else if (type == "polyhedron" && coloring.polyhedron !== null)
+      setPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
+    else throw new Error("Unknown polyhedra coloring type: " + type)
+    coloring.active = type
     console.log(
-      "setPolyhedraActiveColoring",
-      dataStyleStore.styles[id].polyhedra.coloring.active,
+      `${setPolyhedraActiveColoring.name} ${polyhedraActiveColoring(id)}`,
     )
   }
+
+  function polyhedraColor(id) {
+    return polyhedraStyle(id).coloring.color
+  }
   function setPolyhedraColor(id, color) {
+    const coloring = polyhedraStyle(id).coloring
     return viewer_call(
-      {
-        schema: mesh_polyhedra_schemas.color,
-        params: { id, color },
-      },
+      { schema: mesh_polyhedra_schemas.color, params: { id, color } },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polyhedra.coloring.color = color
-          console.log(
-            "setPolyhedraColor",
-            dataStyleStore.styles[id].polyhedra.coloring.color,
-          )
+          coloring.color = color
+          console.log(`${setPolyhedraColor.name} ${polyhedraColor(id)}`)
         },
       },
     )
   }
 
+  function polyhedraVertexAttribute(id) {
+    return polyhedraStyle(id).coloring.vertex
+  }
   function setPolyhedraVertexAttribute(id, vertex_attribute) {
+    const coloring_style = polyhedraStyle(id).coloring
     return viewer_call(
       {
         schema: mesh_polyhedra_schemas.vertex_attribute,
@@ -85,17 +68,23 @@ export function useMeshPolyhedraStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polyhedra.coloring.vertex = vertex_attribute
+          coloring_style.vertex = vertex_attribute
           console.log(
-            "setPolyhedraVertexAttribute",
-            dataStyleStore.styles[id].polyhedra.coloring.vertex,
+            `${setPolyhedraVertexAttribute.name} ${polyhedraVertexAttribute(id)}`,
           )
         },
       },
     )
   }
+  function polyhedraPolygonAttribute(id) {
+    return polyhedraStyle(id).coloring.polygon
+  }
 
+  function polyhedraPolyhedronAttribute(id) {
+    return polyhedraStyle(id).coloring.polyhedron
+  }
   function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
+    const coloring = polyhedraStyle(id).coloring
     return viewer_call(
       {
         schema: mesh_polyhedra_schemas.polyhedron_attribute,
@@ -103,11 +92,9 @@ export function useMeshPolyhedraStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polyhedra.coloring.polyhedron =
-            polyhedron_attribute
+          coloring.polyhedron = polyhedron_attribute
           console.log(
-            "setPolyhedraPolyhedronAttribute",
-            dataStyleStore.styles[id].polyhedra.coloring.polyhedron,
+            `${setPolyhedraPolyhedronAttribute.name} ${polyhedraPolyhedronAttribute(id)}`,
           )
         },
       },
