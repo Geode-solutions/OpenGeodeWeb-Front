@@ -54,7 +54,6 @@ afterAll(() => {
 })
 
 const id = "fake_id"
-const file_name = "edged_curve.vtp"
 const geode_object = "EdgedCurve2D"
 const object_type = "mesh"
 
