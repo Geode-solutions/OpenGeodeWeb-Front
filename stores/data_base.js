@@ -42,10 +42,10 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   /** Actions **/
-  function registerObject(id, viewer_object) {
+  async function registerObject(id, file_name, viewer_object) {
     return viewer_call({
       schema: viewer_schemas.opengeodeweb_viewer.generic.register,
-      params: { id, viewer_object },
+      params: { id, file_name, viewer_object },
     })
   }
   async function addItem(
