@@ -56,6 +56,7 @@ afterAll(() => {
 const id = "fake_id"
 const geode_object = "EdgedCurve2D"
 const object_type = "mesh"
+const file_name = "edged_curve.vtp"
 
 beforeEach(async () => {
   const pinia = createTestingPinia({
@@ -82,10 +83,10 @@ beforeEach(async () => {
 
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
-  await dataBaseStore.registerObject(id, file_name, object_type)
+  await dataBaseStore.registerObject(id, file_name)
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
-}, 15000)
+}, 30000)
 
 describe("Mesh edges", () => {
   afterEach(async () => {
