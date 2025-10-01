@@ -42,8 +42,8 @@
 
   const props = defineProps({
     id: { type: String, required: true },
-    texture_name: { type: String, required: true },
     texture_id: { type: String, required: true },
+    texture_name: { type: String, required: true },
   })
 
   const texture_name = ref("")

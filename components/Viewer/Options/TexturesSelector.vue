@@ -49,16 +49,16 @@
     if (textures.value != null) {
       internal_textures.value = textures.value
     } else {
-      internal_textures.value = [{ texture_name: "", id: "" }]
+      internal_textures.value = [{ id: "", texture_name: "" }]
     }
   })
 
   function update_value_event($event, index) {
     internal_textures.value[index][$event.key] = $event.value
     const filtered = internal_textures.value.filter((texture) => {
-      return texture.texture_name != "" && texture.id != ""
+      return texture.texture_name !== "" && texture.id !== ""
     })
-    if (filtered.length != 0) {
+    if (filtered.length !== 0) {
       textures.value = filtered
     }
   }
