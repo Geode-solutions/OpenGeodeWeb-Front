@@ -90,9 +90,7 @@ beforeEach(async () => {
 }, 15000)
 
 const viewer_path = path.join(
-  executable_path(
-    path.join("tests", "integration", "microservices", "viewer"),
-  ),
+  executable_path(path.join("tests", "integration", "microservices", "viewer")),
   executable_name("opengeodeweb_viewer"),
 )
 const viewer_port = await run_viewer(viewer_path, {
