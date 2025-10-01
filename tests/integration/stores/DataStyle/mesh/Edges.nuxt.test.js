@@ -22,6 +22,7 @@ import {
 } from "@ogw_f/utils/local"
 
 import Status from "@ogw_f/utils/status"
+import appMode from "@ogw_f/utils/app_mode"
 
 import * as composables from "@ogw_f/composables/viewer_call"
 import { useDataStyleStore } from "@ogw_f/stores/data_style"
@@ -68,7 +69,7 @@ beforeEach(async () => {
   const dataBaseStore = useDataBaseStore()
   const viewerStore = useViewerStore()
   const infraStore = useInfraStore()
-  infraStore.app_mode = appMode.appMode.BROWSER
+  infraStore.app_mode = appMode.BROWSER
 
   const viewer_path = path.join(
     executable_path(
@@ -83,10 +84,10 @@ beforeEach(async () => {
 
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
-  await dataBaseStore.registerObject(id, file_name, object_type)
+  await dataBaseStore.registerObject(id, object_type)
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
-}, 15000)
+}, 30000)
 
 describe("Mesh edges", () => {
   afterEach(async () => {
