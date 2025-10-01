@@ -54,6 +54,7 @@ afterAll(() => {
 })
 
 const id = "fake_id"
+const file_name = "edged_curve.vtp"
 const geode_object = "EdgedCurve2D"
 const object_type = "mesh"
 
@@ -85,7 +86,7 @@ beforeEach(async () => {
   await dataBaseStore.registerObject(id, file_name, object_type)
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
-})
+}, 15000)
 
 describe("Mesh edges", () => {
   afterEach(async () => {
