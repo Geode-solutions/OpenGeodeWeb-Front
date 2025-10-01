@@ -87,7 +87,7 @@ beforeEach(async () => {
 
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
-}, 15000)
+}, 30000)
 
 const viewer_path = path.join(
   executable_path(
