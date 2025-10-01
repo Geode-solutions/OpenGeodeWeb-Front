@@ -11,6 +11,4 @@ jobs:
     uses: Geode-solutions/actions/.github/workflows/js-test.yml@master
     with:
       repos: ${{ vars.REPOS }}
-      integration: true
-      microservices_path: "tests/integration/microservices"
     secrets: inherit
