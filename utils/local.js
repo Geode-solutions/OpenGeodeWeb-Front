@@ -53,7 +53,6 @@ function create_path(path) {
 
 async function get_available_port(port) {
   const available_port = await getPort({
-    random: true,
     port,
     host: "localhost",
   })
@@ -235,8 +234,10 @@ async function run_browser(
   process.env.BROWSER = true
   process.on("SIGINT", async () => {
     console.log("Shutting down microservices")
-    kill_back(process.env.GEODE_PORT)
-    await kill_viewer(process.env.VIEWER_PORT)
+    await Promise.all([
+      kill_back(process.env.GEODE_PORT),
+      kill_viewer(process.env.VIEWER_PORT),
+    ])
     console.log("Quitting App...")
     process.exit(0)
   })
