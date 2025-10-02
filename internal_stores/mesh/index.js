@@ -28,24 +28,23 @@ export default function useMeshStyle() {
     )
   }
 
-  async function applyMeshDefaultStyle(id) {
-    return new Promise(async (resolve) => {
-      const style = dataStyleStore.getStyle(id)
-      for (const [key, value] of Object.entries(style)) {
-        if (key == "visibility") {
-          await setMeshVisibility(id, value)
-        } else if (key == "points") {
-          await pointsStyleStore.applyPointsStyle(id, value)
-        } else if (key == "edges") {
-          await edgesStyleStore.applyEdgesStyle(id, value)
-        } else if (key == "polygons") {
-          await polygonsStyleStore.applyPolygonsStyle(id, value)
-        } else if (key == "polyhedra") {
-          await polyhedraStyleStore.applyPolyhedraStyle(id, value)
-        }
+  function applyMeshDefaultStyle(id) {
+    const style = dataStyleStore.getStyle(id)
+    const promise_array = []
+    for (const [key, value] of Object.entries(style)) {
+      if (key == "visibility") {
+        promise_array.push(setMeshVisibility(id, value))
+      } else if (key == "points") {
+        promise_array.push(pointsStyleStore.applyPointsStyle(id, value))
+      } else if (key == "edges") {
+        promise_array.push(edgesStyleStore.applyEdgesStyle(id, value))
+      } else if (key == "polygons") {
+        promise_array.push(polygonsStyleStore.applyPolygonsStyle(id, value))
+      } else if (key == "polyhedra") {
+        promise_array.push(polyhedraStyleStore.applyPolyhedraStyle(id, value))
       }
-      resolve()
-    })
+    }
+    return promise_array
   }
 
   return {

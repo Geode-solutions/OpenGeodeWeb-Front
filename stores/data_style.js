@@ -10,15 +10,17 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataBaseStore = useDataBaseStore()
 
   /** Actions **/
-  function addDataStyle(id, geode_object, object_type) {
+  async function addDataStyle(id, geode_object, object_type) {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)
     if (object_type === "mesh") {
-      return Promise.all([meshStyleStore.applyMeshDefaultStyle(id)])
+      return meshStyleStore.applyMeshDefaultStyle(id)
     } else if (object_type === "model") {
       return Promise.all([
         modelStyleStore.setMeshComponentsDefaultStyle(id),
         modelStyleStore.applyModelDefaultStyle(id),
       ])
+    } else {
+      throw new Error("Unknown object type")
     }
   }
 

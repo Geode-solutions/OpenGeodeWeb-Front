@@ -18,7 +18,9 @@ export function useMeshEdgesStyle() {
       {
         response_function: () => {
           edges_style.visibility = visibility
-          console.log(`${setEdgesVisibility.name} ${setEdgesVisibility(id)}`)
+          console.log(
+            `${setEdgesVisibility.name} ${id} ${setEdgesVisibility(id)}`,
+          )
         },
       },
     )
@@ -27,19 +29,19 @@ export function useMeshEdgesStyle() {
   function edgesActiveColoring(id) {
     return edgesStyle(id).coloring.active
   }
-  async function setEdgesActiveColoring(id, type) {
+  function setEdgesActiveColoring(id, type) {
     const coloring = edgesStyle(id).coloring
-    if (type == "color") {
-      setEdgesColor(id, coloring.color)
-      // else if (type == "vertex") {
-      //   const vertex = coloring.vertex
-      // if (vertex !== null) setEdgesVertexAttribute(id, vertex)
-      // } else if (type == "edges") {
-      //   const edges = coloring.edges
-      //   if (edges !== null) setEdgesEdgeAttribute(id, edges)
-    } else throw new Error("Unknown edges coloring type: " + type)
     coloring.active = type
-    console.log(`${setEdgesActiveColoring.name} ${edgesActiveColoring(id)}`)
+    console.log(
+      `${setEdgesActiveColoring.name} ${id} ${edgesActiveColoring(id)}`,
+    )
+    if (type === "color") {
+      return setEdgesColor(id, coloring.color)
+      // } else if (type == "vertex" && coloring.vertex !== null) {
+      //   return setEdgesVertexAttribute(id, coloring.vertex)
+      // } else if (type == "edges" && coloring.edges !== null) {
+      //   return setEdgesEdgeAttribute(id, coloring.edges)
+    } else throw new Error("Unknown edges coloring type: " + type)
   }
 
   function edgesColor(id) {
@@ -52,7 +54,9 @@ export function useMeshEdgesStyle() {
       {
         response_function: () => {
           coloring_style.color = color
-          console.log(`${setEdgesColor.name} ${JSON.stringify(edgesColor(id))}`)
+          console.log(
+            `${setEdgesColor.name} ${id} ${JSON.stringify(edgesColor(id))}`,
+          )
         },
       },
     )
@@ -68,13 +72,13 @@ export function useMeshEdgesStyle() {
       {
         response_function: () => {
           edges_style.width = width
-          console.log(`${setEdgesWidth.name} ${edgesWidth(id)}`)
+          console.log(`${setEdgesWidth.name} ${id} ${edgesWidth(id)}`)
         },
       },
     )
   }
 
-  async function applyEdgesStyle(id, style) {
+  function applyEdgesStyle(id, style) {
     return Promise.all([
       setEdgesVisibility(id, style.visibility),
       setEdgesActiveColoring(id, style.coloring.active),

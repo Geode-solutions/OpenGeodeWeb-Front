@@ -17,7 +17,7 @@ import {
 import {
   executable_name,
   executable_path,
-  kill_viewer,
+  kill_processes,
   run_viewer,
 } from "@ogw_f/utils/local"
 
@@ -32,7 +32,7 @@ import { useInfraStore } from "@ogw_f/stores/infra"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { WebSocket } from "ws"
 
-const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
+const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
   return callback({ name })
@@ -54,8 +54,8 @@ afterAll(() => {
 })
 
 const id = "fake_id"
-const file_name = "hat.vtp"
-const geode_object = "PolygonalSurface3D"
+const file_name = "edged_curve.vtp"
+const geode_object = "EdgedCurve2D"
 const object_type = "mesh"
 
 // beforeEach(async () => {
@@ -89,55 +89,20 @@ const object_type = "mesh"
 //   expect(viewerStore.status).toBe(Status.CONNECTED)
 // }, 20000)
 
-describe("Mesh polygons", () => {
+describe("Mesh", () => {
   // afterEach(async () => {
-  //   const viewerStore = useViewerStore()
-  //   await kill_viewer(viewerStore.default_local_port)
+  //   await kill_processes()
   // })
-  describe("Polygons visibility", () => {
-    test("dumb test", async () => {
-      expect(true).toBe(true)
-    })
+  test("dumb test", async () => {
+    expect(true).toBe(true)
   })
-  // describe("Polygons visibility", () => {
+
+  // describe("Edges visibility", () => {
   //   test("test visibility true", async () => {
   //     const dataStyleStore = useDataStyleStore()
   //     const viewerStore = useViewerStore()
-  //     await dataStyleStore.setPolygonsVisibility(id, true)
-  //     expect(dataStyleStore.polygonsVisibility(id)).toBe(true)
-  //     expect(viewerStore.status).toBe(Status.CONNECTED)
-  //   })
-  // })
-
-  // describe("Polygons active coloring", () => {
-  //   test("test coloring", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const coloringTypes = ["color"]
-  //     for (let i = 0; i < coloringTypes.length; i++) {
-  //       dataStyleStore.setPolygonsActiveColoring(id, coloringTypes[i])
-  //       expect(dataStyleStore.polygonsActiveColoring(id)).toBe(coloringTypes[i])
-  //       expect(viewerStore.status).toBe(Status.CONNECTED)
-  //     }
-  //   })
-  // })
-  // describe("Polygons color", () => {
-  //   test("test red", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const color = { r: 255, g: 0, b: 0 }
-  //     const spy = vi.spyOn(composables, "viewer_call")
-  //     await dataStyleStore.setPolygonsColor(id, color)
-  //     expect(spy).toHaveBeenCalledWith(
-  //       {
-  //         schema: mesh_polygons_schemas.color,
-  //         params: { id, color },
-  //       },
-  //       {
-  //         response_function: expect.any(Function),
-  //       },
-  //     )
-  //     expect(dataStyleStore.polygonsColor(id)).toStrictEqual(color)
+  //     await dataStyleStore.setEdgesVisibility(id, true)
+  //     expect(dataStyleStore.edgesVisibility(id)).toBe(true)
   //     expect(viewerStore.status).toBe(Status.CONNECTED)
   //   })
   // })

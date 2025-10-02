@@ -30,19 +30,19 @@ export function useMeshPolygonsStyle() {
   }
   function setPolygonsActiveColoring(id, type) {
     const coloring = polygonsStyle(id).coloring
-    if (type == "color") {
-      setPolygonsColor(id, coloring.color)
-    } else if (type == "textures" && coloring.textures !== null) {
-      setPolygonsTextures(id, coloring.textures)
-    } else if (type == "vertex" && coloring.vertex !== null) {
-      setPolygonsVertexAttribute(id, coloring.vertex)
-    } else if (type == "polygon" && coloring.polygon !== null) {
-      setPolygonsPolygonAttribute(id, coloring.polygon)
-    } else throw new Error("Unknown polygons coloring type: " + type)
     coloring.active = type
     console.log(
       `${setPolygonsActiveColoring.name} ${id} ${polygonsActiveColoring(id)}`,
     )
+    if (type === "color") {
+      return setPolygonsColor(id, coloring.color)
+    } else if (type === "textures" && coloring.textures !== null) {
+      return setPolygonsTextures(id, coloring.textures)
+    } else if (type === "vertex" && coloring.vertex !== null) {
+      return setPolygonsVertexAttribute(id, coloring.vertex)
+    } else if (type === "polygon" && coloring.polygon !== null) {
+      return setPolygonsPolygonAttribute(id, coloring.polygon)
+    } else throw new Error("Unknown polygons coloring type: " + type)
   }
 
   function polygonsColor(id) {

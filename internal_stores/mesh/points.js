@@ -18,7 +18,9 @@ export function useMeshPointsStyle() {
       {
         response_function: () => {
           points_style.visibility = visibility
-          console.log(`${setPointsVisibility.name} ${pointsVisibility(id)}`)
+          console.log(
+            `${setPointsVisibility.name} ${id} ${pointsVisibility(id)}`,
+          )
         },
       },
     )
@@ -29,13 +31,15 @@ export function useMeshPointsStyle() {
   }
   function setPointsActiveColoring(id, type) {
     const coloring = pointsStyle(id).coloring
-    if (type == "color") dataStyleStore.setPointsColor(id, coloring.color)
-    else if (type == "vertex") {
-      if (coloring.vertex !== null)
-        dataStyleStore.setPointsVertexAttribute(id, coloring.vertex)
-    } else throw new Error("Unknown points coloring type: " + type)
     coloring.active = type
-    console.log(`${setPointsActiveColoring.name} ${pointsActiveColoring(id)}`)
+    console.log(
+      `${setPointsActiveColoring.name} ${id} ${pointsActiveColoring(id)}`,
+    )
+    if (type == "color") {
+      return dataStyleStore.setPointsColor(id, coloring.color)
+    } else if (type == "vertex" && coloring.vertex !== null) {
+      return dataStyleStore.setPointsVertexAttribute(id, coloring.vertex)
+    } else throw new Error("Unknown points coloring type: " + type)
   }
 
   function pointsColor(id) {
@@ -49,7 +53,7 @@ export function useMeshPointsStyle() {
         response_function: () => {
           coloring_style.color = color
           console.log(
-            `${setPointsColor.name} ${JSON.stringify(pointsColor(id))}`,
+            `${setPointsColor.name} ${id} ${JSON.stringify(pointsColor(id))}`,
           )
         },
       },
@@ -69,7 +73,7 @@ export function useMeshPointsStyle() {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
           console.log(
-            `${setPointsVertexAttribute.name} ${pointsVertexAttribute(id)}`,
+            `${setPointsVertexAttribute.name} ${id} ${pointsVertexAttribute(id)}`,
           )
         },
       },
@@ -86,7 +90,7 @@ export function useMeshPointsStyle() {
       {
         response_function: () => {
           points_style.size = size
-          console.log(`${setPointsSize.name} ${pointsSize(id)}`)
+          console.log(`${setPointsSize.name} ${id} ${pointsSize(id)}`)
         },
       },
     )

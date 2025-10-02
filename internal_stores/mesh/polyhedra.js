@@ -28,16 +28,17 @@ export function useMeshPolyhedraStyle() {
   }
   function setPolyhedraActiveColoring(id, type) {
     const coloring = polyhedraStyle(id).coloring
-    if (type == "color") setPolyhedraColor(id, coloring.color)
-    else if (type == "vertex" && coloring.vertex !== null)
-      setPolyhedraVertexAttribute(id, coloring.vertex)
-    else if (type == "polyhedron" && coloring.polyhedron !== null)
-      setPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
-    else throw new Error("Unknown polyhedra coloring type: " + type)
     coloring.active = type
     console.log(
       `${setPolyhedraActiveColoring.name} ${polyhedraActiveColoring(id)}`,
     )
+    if (type === "color") {
+      return setPolyhedraColor(id, coloring.color)
+    } else if (type === "vertex" && coloring.vertex !== null) {
+      return setPolyhedraVertexAttribute(id, coloring.vertex)
+    } else if (type === "polyhedron" && coloring.polyhedron !== null) {
+      return setPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
+    } else throw new Error("Unknown polyhedra coloring type: " + type)
   }
 
   function polyhedraColor(id) {
