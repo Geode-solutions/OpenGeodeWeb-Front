@@ -159,7 +159,6 @@ function kill_back(back_port) {
         back_schemas.opengeodeweb_back.kill.route,
       {
         method: back_schemas.opengeodeweb_back.kill.methods[0],
-        headers: { "Content-Type": "application/json" },
       },
     )
       .then(() => {
