@@ -10,8 +10,8 @@ import pkg from "electron"
 const { app, dialog } = pkg
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" }
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 function venv_script_path(root_path, microservice_path) {
   const venv_path = path.join(root_path, microservice_path, "venv")
