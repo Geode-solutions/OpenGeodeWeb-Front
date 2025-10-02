@@ -22,7 +22,6 @@ import {
 } from "@ogw_f/utils/local"
 
 import Status from "@ogw_f/utils/status"
-import appMode from "@ogw_f/utils/app_mode"
 
 import * as composables from "@ogw_f/composables/viewer_call"
 import { useDataStyleStore } from "@ogw_f/stores/data_style"
@@ -69,40 +68,25 @@ beforeEach(async () => {
   const dataBaseStore = useDataBaseStore()
   const viewerStore = useViewerStore()
   const infraStore = useInfraStore()
+  infraStore.app_mode = appMode.appMode.BROWSER
 
-  infraStore.app_mode = appMode.BROWSER
-
-  vi.spyOn(composables, "viewer_call").mockResolvedValue({ _data: {} })
-  viewerStore.default_local_port = 1234
-  viewerStore.status = Status.CONNECTED
-
-  await dataBaseStore.addItem(id, {
-    object_type,
-    geode_object,
-    native_filename: file_name,
-    viewable_filename: file_name,
-    displayed_name: file_name,
-    vtk_js: { binary_light_viewable: null },
+  const viewer_path = path.join(
+    executable_path(
+      path.join("tests", "integration", "microservices", "viewer"),
+    ),
+    executable_name("opengeodeweb_viewer"),
+  )
+  const viewer_port = await run_viewer(viewer_path, {
+    port: 1234,
+    data_folder_path: path.join(__dirname, "..", "..", "..", "data"),
   })
 
+  viewerStore.default_local_port = viewer_port
+  await viewerStore.ws_connect()
+  await dataBaseStore.registerObject(id, file_name, object_type)
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
-}, 30000)
-
-const viewer_path = path.join(
-  executable_path(path.join("tests", "integration", "microservices", "viewer")),
-  executable_name("opengeodeweb_viewer"),
-)
-const viewer_port = await run_viewer(viewer_path, {
-  port: 1234,
-  data_folder_path: path.join(__dirname, "..", "..", "..", "data"),
-})
-
-viewerStore.default_local_port = viewer_port
-await viewerStore.ws_connect()
-await dataBaseStore.registerObject(id, file_name, object_type)
-await dataStyleStore.addDataStyle(id, geode_object, object_type)
-expect(viewerStore.status).toBe(Status.CONNECTED)
+}, 15000)
 
 describe("Mesh edges", () => {
   afterEach(async () => {
