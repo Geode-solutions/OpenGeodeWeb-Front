@@ -80,7 +80,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       {
         schema: back_schemas.opengeodeweb_back.models.mesh_components,
         params: {
-          id
+          id,
         },
       },
       {
