@@ -54,9 +54,8 @@ afterAll(() => {
 })
 
 const id = "fake_id"
-// const file_name = "edged_curve.vtp"
+const file_name = "test.og_edc2d"
 const geode_object = "EdgedCurve2D"
-const object_type = "mesh"
 
 beforeEach(async () => {
   const pinia = createTestingPinia({
@@ -66,24 +65,41 @@ beforeEach(async () => {
   setActivePinia(pinia)
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
+  const geodeStore = useDataBaseStore()
   const viewerStore = useViewerStore()
   const infraStore = useInfraStore()
   infraStore.app_mode = appMode.appMode.BROWSER
 
+  const back_path = path.join(
+    executable_path(
+      path.join("tests", "integration", "microservices", "back"),
+    ),
+    executable_name("opengeodeweb_back"),
+  )
   const viewer_path = path.join(
     executable_path(
       path.join("tests", "integration", "microservices", "viewer"),
     ),
     executable_name("opengeodeweb_viewer"),
   )
+  const data_folder_path= path.join(__dirname, "..", "..", "..", "data")
+  const back_port = await run_back(back_path, {
+    port: 5000,
+    data_folder_path,
+  })
   const viewer_port = await run_viewer(viewer_path, {
     port: 1234,
-    data_folder_path: path.join(__dirname, "..", "..", "..", "data"),
+    data_folder_path
   })
-
+  geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
   
+  const params= { 
+    input_geode_object: geode_object,
+    filename:file_name,
+  }
+  await api_fetch({ schema: back_schemas.opengeodeweb_back.save_viewable_file, params })
   await dataBaseStore.registerObject(id)
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
