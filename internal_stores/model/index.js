@@ -63,7 +63,7 @@ export default function useModelStyle() {
   }
 
   function setModelVisibility(id, visibility) {
-    viewer_call(
+    return viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.model.visibility,
         params: { id, visibility },

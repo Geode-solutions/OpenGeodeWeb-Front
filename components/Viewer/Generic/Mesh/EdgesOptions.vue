@@ -1,5 +1,5 @@
 <template>
-  <ContextMenuItem
+  <ViewerContextMenuItem
     :itemProps="props.itemProps"
     tooltip="Edges options"
     :btn_image="props.btn_image"
@@ -14,7 +14,7 @@
         />
       </template>
     </template>
-  </ContextMenuItem>
+  </ViewerContextMenuItem>
 </template>
 
 <script setup>

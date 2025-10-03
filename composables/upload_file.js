@@ -2,8 +2,8 @@ export async function upload_file(
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  const feedback_store = use_feedback_store()
-  const geode_store = use_geode_store()
+  const feedback_store = useFeedbackStore()
+  const geode_store = useGeodeStore()
   if (!(file instanceof File)) {
     throw new Error("file must be a instance of File")
   }

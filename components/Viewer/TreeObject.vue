@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-  const treeviewStore = use_treeview_store()
+  const treeviewStore = useTreeviewStore()
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
   const emit = defineEmits(["show-menu"])

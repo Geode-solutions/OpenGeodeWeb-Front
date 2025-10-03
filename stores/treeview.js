@@ -1,4 +1,4 @@
-export const use_treeview_store = defineStore("treeview", () => {
+export const useTreeviewStore = defineStore("treeview", () => {
   const dataStyleStore = useDataStyleStore()
 
   /** State **/
