@@ -83,7 +83,7 @@ beforeEach(async () => {
 
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
-  
+
   await dataBaseStore.registerObject(id)
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
