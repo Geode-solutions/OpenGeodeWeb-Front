@@ -13,8 +13,8 @@ export function viewer_call(
       console.log("schema", schema)
       console.log("params", params)
     }
-    feedback_store.add_error(400, schema.route, "Bad request", error)
-    throw new Error(schema.route.concat(": ", error))
+    feedback_store.add_error(400, schema.$id, "Bad request", error)
+    throw new Error(schema.$id.concat(": "))
   }
 
   const client = viewer_store.client
@@ -45,7 +45,7 @@ export function viewer_call(
       .catch((error) => {
         feedback_store.add_error(
           error.code,
-          schema.route,
+          schema.$id,
           error.message,
           error.message,
         )

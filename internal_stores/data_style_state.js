@@ -14,5 +14,8 @@ export default function useDataStyleState() {
     return selection
   })
 
-  return { styles, objectVisibility, selectedObjects }
+  function getStyle(id) {
+    return styles[id]
+  }
+  return { getStyle, styles, objectVisibility, selectedObjects }
 }
