@@ -110,13 +110,13 @@ async function run_script(
   })
 }
 
-async function run_back(command, args = { port, project_folder_path }) {
+async function run_back(command, args = { port, data_folder_path }) {
   return new Promise(async (resolve, reject) => {
     const back_port = await get_available_port(args.port)
     const back_args = [
       "--port " + back_port,
-      "--data_folder_path " + args.project_folder_path,
-      "--upload_folder_path " + path.join(args.project_folder_path, "uploads"),
+      "--data_folder_path " + args.data_folder_path,
+      "--upload_folder_path " + path.join(args.data_folder_path, "uploads"),
       "--allowed_origin http://localhost:*",
       "--timeout " + 0,
     ]
@@ -215,6 +215,7 @@ async function run_browser(
     viewer: { command, args: { port: 1234, data_folder_path } },
   },
 ) {
+  console.log("microservices_options", microservices_options)
   async function run_microservices() {
     const back_promise = run_back(microservices_options.back.command, {
       ...microservices_options.back.args,
