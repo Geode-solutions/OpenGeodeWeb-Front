@@ -69,7 +69,6 @@ beforeEach(async () => {
   const viewerStore = useViewerStore()
   const infraStore = useInfraStore()
   infraStore.app_mode = appMode.appMode.BROWSER
-
   const viewer_path = path.join(
     executable_path(
       path.join("tests", "integration", "microservices", "viewer"),
@@ -80,7 +79,6 @@ beforeEach(async () => {
     port: 1234,
     data_folder_path: path.join(__dirname, "..", "..", "..", "data"),
   })
-
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
   await dataBaseStore.registerObject(id, file_name, object_type)

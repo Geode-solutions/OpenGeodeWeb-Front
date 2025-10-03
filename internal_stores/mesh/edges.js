@@ -18,9 +18,7 @@ export function useMeshEdgesStyle() {
       {
         response_function: () => {
           edges_style.visibility = visibility
-          console.log(
-            `${setEdgesVisibility.name} ${id} ${setEdgesVisibility(id)}`,
-          )
+          console.log(`${setEdgesVisibility.name} ${id} ${edgesVisibility(id)}`)
         },
       },
     )
