@@ -19,7 +19,7 @@ import {
   executable_path,
   kill_processes,
   run_viewer,
-  run_back
+  run_back,
 } from "@ogw_f/utils/local"
 
 import Status from "@ogw_f/utils/status"
@@ -75,9 +75,7 @@ beforeEach(async () => {
   infraStore.app_mode = appMode.BROWSER
 
   const back_path = path.join(
-    executable_path(
-      path.join("tests", "integration", "microservices", "back"),
-    ),
+    executable_path(path.join("tests", "integration", "microservices", "back")),
     executable_name("opengeodeweb-back"),
   )
   const viewer_path = path.join(
@@ -91,12 +89,12 @@ beforeEach(async () => {
     port: 5000,
     data_folder_path,
   })
-  console.log("Back path:", back_path);
+  console.log("Back path:", back_path)
   const viewer_port = await run_viewer(viewer_path, {
     port: 1234,
     data_folder_path,
   })
-  console.log("Viewer path:", viewer_path);
+  console.log("Viewer path:", viewer_path)
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
@@ -105,10 +103,13 @@ beforeEach(async () => {
     input_geode_object: geode_object,
     filename: file_name,
   }
-  await api_fetch({ schema: back_schemas.opengeodeweb_back.save_viewable_file, params })
-  console.log("api_fetch result:", params);
-  console.log("id from database:", id);
-  
+  await api_fetch({
+    schema: back_schemas.opengeodeweb_back.save_viewable_file,
+    params,
+  })
+  console.log("api_fetch result:", params)
+  console.log("id from database:", id)
+
   await dataBaseStore.registerObject(id, file_name, geode_object)
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
