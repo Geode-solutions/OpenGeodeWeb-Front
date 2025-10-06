@@ -113,10 +113,11 @@ async function run_script(
 async function run_back(command, args = { port, data_folder_path }) {
   return new Promise(async (resolve, reject) => {
     const back_port = await get_available_port(args.port)
+    const upload_folder_path = path.join(args.data_folder_path, "uploads")
     const back_args = [
       "--port " + back_port,
       "--data_folder_path " + args.data_folder_path,
-      "--upload_folder_path " + path.join(args.data_folder_path, "uploads"),
+      "--upload_folder_path " + upload_folder_path,
       "--allowed_origin http://localhost:*",
       "--timeout " + 0,
     ]
@@ -154,9 +155,7 @@ function delete_folder_recursive(data_folder_path) {
 function kill_back(back_port) {
   return new Promise((resolve, reject) => {
     fetch(
-      "http://localhost:" +
-        back_port +
-        back_schemas.opengeodeweb_back.kill.route,
+      "http://localhost:" + back_port + back_schemas.opengeodeweb_back.kill.$id,
       {
         method: back_schemas.opengeodeweb_back.kill.methods[0],
       },
@@ -215,22 +214,19 @@ async function run_browser(
     viewer: { command, args: { port: 1234, data_folder_path } },
   },
 ) {
-  console.log("microservices_options", microservices_options)
-  async function run_microservices() {
-    const back_promise = run_back(microservices_options.back.command, {
-      ...microservices_options.back.args,
-    })
-    const viewer_promise = run_viewer(microservices_options.viewer.command, {
-      ...microservices_options.viewer.args,
-    })
-    const [back_port, viewer_port] = await Promise.all([
-      back_promise,
-      viewer_promise,
-    ])
-    process.env.GEODE_PORT = back_port
-    process.env.VIEWER_PORT = viewer_port
-  }
-  await run_microservices()
+  const back_promise = run_back(microservices_options.back.command, {
+    ...microservices_options.back.args,
+  })
+  const viewer_promise = run_viewer(microservices_options.viewer.command, {
+    ...microservices_options.viewer.args,
+  })
+  const [back_port, viewer_port] = await Promise.all([
+    back_promise,
+    viewer_promise,
+  ])
+  process.env.GEODE_PORT = back_port
+  process.env.VIEWER_PORT = viewer_port
+
   process.env.BROWSER = true
   process.on("SIGINT", async () => {
     console.log("Shutting down microservices")
@@ -242,18 +238,14 @@ async function run_browser(
     process.exit(0)
   })
 
-  console.log("process.argv", process.argv)
-
   const nuxt_port = await get_available_port()
-  console.log("nuxt_port", nuxt_port)
+  process.env.NUXT_PORT = nuxt_port
+  const nuxt_process = child_process.spawn("npm", ["run", script_name], {
+    shell: true,
+  })
   return new Promise((resolve, reject) => {
-    process.env.NUXT_PORT = nuxt_port
-    const nuxt_process = spawn("npm", ["run", script_name], {
-      shell: true,
-    })
     nuxt_process.stdout.on("data", function (data) {
       const output = data.toString()
-      console.log("NUXT OUTPUT", output)
       const portMatch = output.match(
         /Accepting\ connections\ at\ http:\/\/localhost:(\d+)/,
       )
