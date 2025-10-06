@@ -2,7 +2,6 @@
 import fs from "fs"
 import path from "path"
 import child_process from "child_process"
-import { spawn } from "child_process"
 import WebSocket from "ws"
 
 // Third party imports
@@ -188,12 +187,24 @@ function kill_viewer(viewer_port) {
       const message = data.toString()
       console.log("Received from server:", message)
       if (message.includes("hello")) {
-        socket.send(
-          JSON.stringify({
-            id: viewer_schemas.opengeodeweb_viewer.kill.$id,
-            method: viewer_schemas.opengeodeweb_viewer.kill.$id,
-          }),
-        )
+        try {
+          socket.close()
+          resolve()
+        } catch (error) {
+          console.error("WebSocket error:", error)
+          resolve()
+        }
+        // try {
+        //   socket.send(
+        //     JSON.stringify({
+        //       id: viewer_schemas.opengeodeweb_viewer.kill.$id,
+        //       method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+        //     }),
+        //   )
+        // } catch (error) {
+        //   console.error("WebSocket error:", error)
+        //   resolve()
+        // }
       }
     })
     socket.on("close", () => {
@@ -214,18 +225,25 @@ async function run_browser(
     viewer: { command, args: { port: 1234, data_folder_path } },
   },
 ) {
+  console.log("microservices_options", microservices_options)
   const back_promise = run_back(microservices_options.back.command, {
     ...microservices_options.back.args,
   })
+  console.log("back_promise", back_promise)
+
   const viewer_promise = run_viewer(microservices_options.viewer.command, {
     ...microservices_options.viewer.args,
   })
+  console.log("viewer_promise", viewer_promise)
+
   const [back_port, viewer_port] = await Promise.all([
     back_promise,
     viewer_promise,
   ])
   process.env.GEODE_PORT = back_port
   process.env.VIEWER_PORT = viewer_port
+  console.log("back_port", back_port)
+  console.log("viewer_port", viewer_port)
 
   process.env.BROWSER = true
   process.on("SIGINT", async () => {
@@ -239,18 +257,25 @@ async function run_browser(
   })
 
   const nuxt_port = await get_available_port()
+  console.log("nuxt_port", nuxt_port)
+
   process.env.NUXT_PORT = nuxt_port
   const nuxt_process = child_process.spawn("npm", ["run", script_name], {
     shell: true,
   })
+
   return new Promise((resolve, reject) => {
     nuxt_process.stdout.on("data", function (data) {
       const output = data.toString()
       const portMatch = output.match(
         /Accepting\ connections\ at\ http:\/\/localhost:(\d+)/,
       )
+      console.log("output", output)
+      console.log("portMatch", portMatch)
+
       if (portMatch) {
         resolve(portMatch[1])
+        return
       }
     })
   })
