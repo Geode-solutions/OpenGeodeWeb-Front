@@ -86,7 +86,7 @@ beforeEach(async () => {
     ),
     executable_name("opengeodeweb-viewer"),
   )
-  const data_folder_path= path.join(__dirname, "..", "..", "..", "data")
+  const data_folder_path = path.join(__dirname, "..", "..", "..", "data")
   const back_port = await run_back(back_path, {
     port: 5000,
     data_folder_path,
@@ -94,16 +94,16 @@ beforeEach(async () => {
   console.log("Back path:", back_path);
   const viewer_port = await run_viewer(viewer_path, {
     port: 1234,
-    data_folder_path
+    data_folder_path,
   })
   console.log("Viewer path:", viewer_path);
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
-  
-  const params= { 
+
+  const params = {
     input_geode_object: geode_object,
-    filename:file_name,
+    filename: file_name,
   }
   await api_fetch({ schema: back_schemas.opengeodeweb_back.save_viewable_file, params })
   console.log("api_fetch result:", params);
