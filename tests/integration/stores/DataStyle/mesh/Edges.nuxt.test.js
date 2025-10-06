@@ -19,10 +19,12 @@ import {
   executable_path,
   kill_processes,
   run_viewer,
+  run_back
 } from "@ogw_f/utils/local"
 
 import Status from "@ogw_f/utils/status"
 
+// import { api_fetch } from "@ogw_f/utils/api_fetch"
 import * as composables from "@ogw_f/composables/viewer_call"
 import { useDataStyleStore } from "@ogw_f/stores/data_style"
 import { useDataBaseStore } from "@ogw_f/stores/data_base"
@@ -30,6 +32,8 @@ import { useViewerStore } from "@ogw_f/stores/viewer"
 import { useInfraStore } from "@ogw_f/stores/infra"
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import appMode from "@ogw_f/utils/app_mode"
 import { WebSocket } from "ws"
 
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
@@ -68,29 +72,31 @@ beforeEach(async () => {
   const geodeStore = useDataBaseStore()
   const viewerStore = useViewerStore()
   const infraStore = useInfraStore()
-  infraStore.app_mode = appMode.appMode.BROWSER
+  infraStore.app_mode = appMode.BROWSER
 
   const back_path = path.join(
     executable_path(
       path.join("tests", "integration", "microservices", "back"),
     ),
-    executable_name("opengeodeweb_back"),
+    executable_name("opengeodeweb-back"),
   )
   const viewer_path = path.join(
     executable_path(
       path.join("tests", "integration", "microservices", "viewer"),
     ),
-    executable_name("opengeodeweb_viewer"),
+    executable_name("opengeodeweb-viewer"),
   )
   const data_folder_path= path.join(__dirname, "..", "..", "..", "data")
   const back_port = await run_back(back_path, {
     port: 5000,
     data_folder_path,
   })
+  console.log("Back path:", back_path);
   const viewer_port = await run_viewer(viewer_path, {
     port: 1234,
     data_folder_path
   })
+  console.log("Viewer path:", viewer_path);
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
@@ -100,7 +106,10 @@ beforeEach(async () => {
     filename:file_name,
   }
   await api_fetch({ schema: back_schemas.opengeodeweb_back.save_viewable_file, params })
-  await dataBaseStore.registerObject(id)
+  console.log("api_fetch result:", params);
+  console.log("id from database:", id);
+  
+  await dataBaseStore.registerObject(id, file_name, geode_object)
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
 }, 15000)

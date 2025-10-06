@@ -27,4 +27,5 @@ venv
 .pytest_cache
 __snapshots__
 coverage
+*.db
 # package-lock.json

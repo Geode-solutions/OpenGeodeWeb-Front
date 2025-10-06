@@ -121,7 +121,7 @@ propcache~=0.3
     #   aiohttp
     #   opengeodeweb-viewer
     #   yarl
-pyparsing~=3.2
+pyparsing~=3.3
     # via
     #   matplotlib
     #   opengeodeweb-viewer
