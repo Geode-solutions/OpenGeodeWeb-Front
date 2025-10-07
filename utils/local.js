@@ -153,6 +153,8 @@ function delete_folder_recursive(data_folder_path) {
 
 function kill_back(back_port) {
   return new Promise((resolve, reject) => {
+    console.log("back_schemas", back_schemas)
+
     fetch(
       "http://localhost:" +
         back_port +
@@ -191,6 +193,7 @@ function kill_viewer(viewer_port) {
       console.log("Received from server:", message)
       if (message.includes("hello")) {
         try {
+          console.log("viewer_schemas", viewer_schemas)
           socket.send(
             JSON.stringify({
               id: viewer_schemas.opengeodeweb_viewer.kill.$id,
