@@ -154,7 +154,10 @@ function delete_folder_recursive(data_folder_path) {
 function kill_back(back_port) {
   return new Promise((resolve, reject) => {
     fetch(
-      "http://localhost:" + back_port + back_schemas.opengeodeweb_back.kill.$id,
+      "http://localhost:" +
+        back_port +
+        "/" +
+        back_schemas.opengeodeweb_back.kill.$id,
       {
         method: back_schemas.opengeodeweb_back.kill.methods[0],
       },
@@ -188,23 +191,16 @@ function kill_viewer(viewer_port) {
       console.log("Received from server:", message)
       if (message.includes("hello")) {
         try {
-          socket.close()
-          resolve()
+          socket.send(
+            JSON.stringify({
+              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
+              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+            }),
+          )
         } catch (error) {
           console.error("WebSocket error:", error)
           resolve()
         }
-        // try {
-        //   socket.send(
-        //     JSON.stringify({
-        //       id: viewer_schemas.opengeodeweb_viewer.kill.$id,
-        //       method: viewer_schemas.opengeodeweb_viewer.kill.$id,
-        //     }),
-        //   )
-        // } catch (error) {
-        //   console.error("WebSocket error:", error)
-        //   resolve()
-        // }
       }
     })
     socket.on("close", () => {
