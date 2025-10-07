@@ -103,7 +103,7 @@ beforeEach(async () => {
     port: 1234,
     data_folder_path,
   })
-  console.log("back_port", back_port)
+  console.log("Viewer path:", viewer_path)
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
