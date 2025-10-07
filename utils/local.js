@@ -146,7 +146,7 @@ async function run_back(command, args = { port, data_folder_path }) {
       "--timeout " + 0,
     ]
     await run_script(command, back_args, "Serving Flask app")
-    resolve(back_port)
+    resolve({ port: back_port })
   })
 }
 
@@ -156,7 +156,6 @@ async function run_viewer(viewer_path, args = { port, data_folder_path }) {
     const viewer_args = [
       "--port " + viewer_port,
       "--data_folder_path " + args.data_folder_path,
-      "--database_path " + args.data_folder_path,
       "--timeout " + 0,
     ]
     await run_script(viewer_path, viewer_args, "Starting factory")

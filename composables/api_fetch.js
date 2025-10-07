@@ -37,7 +37,7 @@ export function api_fetch(
   return useFetch(schema.$id, {
     baseURL: geode_store.base_url,
     ...request_options,
-    async onRequestError({ error }) {
+    async onRequestError(error) {
       await geode_store.stop_request()
       await feedback_store.add_error(
         error.code,
