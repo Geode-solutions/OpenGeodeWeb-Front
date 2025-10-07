@@ -1,5 +1,5 @@
 import path from "path"
-// import fs from "fs"
+import fs from "fs"
 
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
@@ -76,10 +76,10 @@ beforeEach(async () => {
   const infraStore = useInfraStore()
   infraStore.app_mode = appMode.BROWSER
 
-  // const data_folder_path = path.join(__dirname, "..", "..", "..", "data")
-  // if (!fs.existsSync(data_folder_path)) {
-  //   fs.mkdirSync(data_folder_path, { recursive: true })
-  // }
+  const data_folder_path = path.join(__dirname, "..", "..", "..", "data")
+  if (!fs.existsSync(data_folder_path)) {
+    fs.mkdirSync(data_folder_path, { recursive: true })
+  }
 
   const back_path = path.join(
     executable_path(path.join("tests", "integration", "microservices", "back")),
@@ -118,7 +118,7 @@ beforeEach(async () => {
   })
   id = response.data.value.id
 
-  await dataBaseStore.registerObject(id)
+  await dataBaseStore.registerObject(id, "mesh")
   await dataStyleStore.addDataStyle(id, geode_object, "mesh")
 
   expect(viewerStore.status).toBe(Status.CONNECTED)
