@@ -51,12 +51,45 @@ vi.stubGlobal("navigator", {
   },
 })
 
+let foldersBeforeTests = new Set()
+const data_folder_path = path.join(__dirname, "..", "..", "..", "data")
+
+function getCurrentFolders(dataFolderPath) {
+  if (!fs.existsSync(dataFolderPath)) {
+    return new Set()
+  }
+  const entries = fs.readdirSync(dataFolderPath)
+  const folders = new Set()
+  for (const entry of entries) {
+    const entryPath = path.join(dataFolderPath, entry)
+    if (fs.statSync(entryPath).isDirectory()) {
+      folders.add(entry)
+    }
+  }
+  return folders
+}
+
+function cleanupCreatedFolders(dataFolderPath, foldersBeforeTests) {
+  if (!fs.existsSync(dataFolderPath)) {
+    return
+  }
+  const currentFolders = getCurrentFolders(dataFolderPath)
+  for (const folder of currentFolders) {
+    if (!foldersBeforeTests.has(folder)) {
+      const folderPath = path.join(dataFolderPath, folder)
+      fs.rmSync(folderPath, { recursive: true, force: true })
+    }
+  }
+}
+
 beforeAll(() => {
   global.WebSocket = WebSocket
+  foldersBeforeTests = getCurrentFolders(data_folder_path)
 })
 
 afterAll(() => {
   delete global.WebSocket
+  cleanupCreatedFolders(data_folder_path, foldersBeforeTests)
 })
 
 let id = "fake_id"
@@ -76,7 +109,6 @@ beforeEach(async () => {
   const infraStore = useInfraStore()
   infraStore.app_mode = appMode.BROWSER
 
-  const data_folder_path = path.join(__dirname, "..", "..", "..", "data")
   if (!fs.existsSync(data_folder_path)) {
     fs.mkdirSync(data_folder_path, { recursive: true })
   }
@@ -96,8 +128,6 @@ beforeEach(async () => {
     port: 5000,
     data_folder_path,
   })
-
-  // await new Promise((resolve) => setTimeout(resolve, 5000))
 
   const viewer_port = await run_viewer(viewer_path, {
     port: 1234,
@@ -126,7 +156,7 @@ beforeEach(async () => {
 
 describe("Mesh edges", () => {
   afterEach(async () => {
-    // await kill_processes()
+    await kill_processes()
   })
 
   describe("Edges visibility", () => {
