@@ -2,20 +2,12 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
 
 export function useLinesStyle() {
-  /** State **/
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
 
-  /** Getters **/
   function lineVisibility(id, line_id) {
     return dataStyleStore.styles[id].lines[line_id].visibility
   }
-
-  function linesColor(id) {
-    return dataStyleStore.styles[id].lines.color
-  }
-
-  /** Actions **/
   function setLineVisibility(id, line_ids, visibility) {
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
     return viewer_call(
@@ -30,12 +22,17 @@ export function useLinesStyle() {
               dataStyleStore.styles[id].lines[line_id] = {}
             dataStyleStore.styles[id].lines[line_id].visibility = visibility
           }
-          console.log("setLineVisibility", line_ids, visibility)
+          console.log(
+            `${setLineVisibility.name} ${id} ${lineVisibility(id, line_ids[0])}`,
+          )
         },
       },
     )
   }
 
+  function lineColor(id, line_id) {
+    return dataStyleStore.styles[id].lines[line_id].color
+  }
   function setLineColor(id, line_ids, color) {
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
     return viewer_call(
@@ -50,7 +47,9 @@ export function useLinesStyle() {
               dataStyleStore.styles[id].lines[line_id] = {}
             dataStyleStore.styles[id].lines[line_id].color = color
           }
-          console.log("setLineColor", line_ids, color)
+          console.log(
+            `${setLineColor.name} ${id} ${lineColor(id, line_ids[0])}`,
+          )
         },
       },
     )
@@ -70,12 +69,10 @@ export function useLinesStyle() {
   }
 
   return {
+    applyLinesStyle,
+    lineColor,
     lineVisibility,
-    linesColor,
     setLinesDefaultStyle,
     setLineVisibility,
-    applyLinesStyle,
   }
 }
-
-export default useLinesStyle

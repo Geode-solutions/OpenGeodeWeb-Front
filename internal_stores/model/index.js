@@ -72,10 +72,13 @@ export default function useModelStyle() {
         response_function: () => {
           dataStyleStore.styles[id].visibility = visibility
           hybridViewerStore.setVisibility(id, visibility)
-          console.log("setModelVisibility", visibility)
+          console.log(`${setModelVisibility.name} ${id} ${modelVisibility(id)}`)
         },
       },
     )
+  }
+  function modelColor(id) {
+    return dataStyleStore.styles[id].color
   }
 
   function setModelColor(id, color) {
@@ -87,7 +90,7 @@ export default function useModelStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].color = color
-          console.log("setModelColor", color)
+          console.log(`${setModelColor.name} ${id} ${modelColor(id)}`)
         },
       },
     )
@@ -99,29 +102,36 @@ export default function useModelStyle() {
     component_id,
     visibility,
   ) {
-    switch (component_type) {
-      case "Corner":
-        cornersStyleStore.setCornerVisibility(id, [component_id], visibility)
-        break
-      case "Line":
-        linesStyleStore.setLineVisibility(id, [component_id], visibility)
-        break
-      case "Surface":
-        surfacesStyleStore.setSurfaceVisibility(id, [component_id], visibility)
-        break
-      case "Block":
-        blocksStyleStore.setBlockVisibility(id, [component_id], visibility)
-        break
+    if (component_type === "Corner") {
+      return cornersStyleStore.setCornerVisibility(
+        id,
+        [component_id],
+        visibility,
+      )
+    } else if (component_type === "Line") {
+      return linesStyleStore.setLineVisibility(id, [component_id], visibility)
+    } else if (component_type === "Surface") {
+      return surfacesStyleStore.setSurfaceVisibility(
+        id,
+        [component_id],
+        visibility,
+      )
+    } else if (component_type === "Block") {
+      return blocksStyleStore.setBlockVisibility(id, [component_id], visibility)
     }
   }
 
   function applyModelDefaultStyle(id) {
     const id_style = dataStyleStore.styles[id]
+    const promise_array = []
     for (const [key, value] of Object.entries(id_style)) {
-      if (key === "visibility") setModelVisibility(id, value)
-      else if (key === "edges") modelEdgesStore.applyModelEdgesStyle(id, value)
-      else if (key === "points")
-        modelPointsStore.applyModelPointsStyle(id, value)
+      if (key === "visibility") {
+        promise_array.push(setModelVisibility(id, value))
+      } else if (key === "edges") {
+        promise_array.push(modelEdgesStore.applyModelEdgesStyle(id, value))
+      } else if (key === "points") {
+        promise_array.push(modelPointsStore.applyModelPointsStyle(id, value))
+      }
     }
   }
 

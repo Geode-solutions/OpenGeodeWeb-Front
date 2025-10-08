@@ -4,70 +4,51 @@ const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 export function useMeshPolygonsStyle() {
   const dataStyleStore = useDataStyleStore()
 
-  function polygonsStyle(id) {
+  function meshPolygonsStyle(id) {
     return dataStyleStore.getStyle(id).polygons
   }
 
-  function polygonsVisibility(id) {
-    return polygonsStyle(id).visibility
+  function meshPolygonsVisibility(id) {
+    return meshPolygonsStyle(id).visibility
   }
-  function setPolygonsVisibility(id, visibility) {
-    const polygons_style = polygonsStyle(id)
+  function setMeshPolygonsVisibility(id, visibility) {
+    const polygons_style = meshPolygonsStyle(id)
     return viewer_call(
       { schema: mesh_polygons_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
           polygons_style.visibility = visibility
           console.log(
-            `${setPolygonsVisibility.name} ${id} ${polygonsVisibility(id)}`,
+            `${setMeshPolygonsVisibility.name} ${id} ${meshPolygonsVisibility(id)}`,
           )
         },
       },
     )
   }
-  function polygonsActiveColoring(id) {
-    return polygonsStyle(id).coloring.active
-  }
-  function setPolygonsActiveColoring(id, type) {
-    const coloring = polygonsStyle(id).coloring
-    coloring.active = type
-    console.log(
-      `${setPolygonsActiveColoring.name} ${id} ${polygonsActiveColoring(id)}`,
-    )
-    if (type === "color") {
-      return setPolygonsColor(id, coloring.color)
-    } else if (type === "textures" && coloring.textures !== null) {
-      return setPolygonsTextures(id, coloring.textures)
-    } else if (type === "vertex" && coloring.vertex !== null) {
-      return setPolygonsVertexAttribute(id, coloring.vertex)
-    } else if (type === "polygon" && coloring.polygon !== null) {
-      return setPolygonsPolygonAttribute(id, coloring.polygon)
-    } else throw new Error("Unknown polygons coloring type: " + type)
-  }
 
-  function polygonsColor(id) {
-    return polygonsStyle(id).coloring.color
+  function meshPolygonsColor(id) {
+    return meshPolygonsStyle(id).coloring.color
   }
-  function setPolygonsColor(id, color) {
-    const coloring_style = polygonsStyle(id).coloring
+  function setMeshPolygonsColor(id, color) {
+    const coloring_style = meshPolygonsStyle(id).coloring
     return viewer_call(
       { schema: mesh_polygons_schemas.color, params: { id, color } },
       {
         response_function: () => {
           coloring_style.color = color
           console.log(
-            `${setPolygonsColor.name} ${id} ${JSON.stringify(polygonsColor(id))}`,
+            `${setMeshPolygonsColor.name} ${id} ${JSON.stringify(meshPolygonsColor(id))}`,
           )
         },
       },
     )
   }
 
-  function polygonsTextures(id) {
-    return polygonsStyle(id).coloring.textures
+  function meshPolygonsTextures(id) {
+    return meshPolygonsStyle(id).coloring.textures
   }
-  function setPolygonsTextures(id, textures) {
-    const coloring_style = polygonsStyle(id).coloring
+  function setMeshPolygonsTextures(id, textures) {
+    const coloring_style = meshPolygonsStyle(id).coloring
     return viewer_call(
       {
         schema: mesh_polygons_schemas.apply_textures,
@@ -77,19 +58,19 @@ export function useMeshPolygonsStyle() {
         response_function: () => {
           coloring_style.textures = textures
           console.log(
-            `${setPolygonsTextures.name} ${id} ${polygonsTextures(id)}`,
+            `${setMeshPolygonsTextures.name} ${id} ${meshPolygonsTextures(id)}`,
           )
         },
       },
     )
   }
 
-  function polygonsVertexAttribute(id) {
-    return polygonsStyle(id).coloring.vertex
+  function meshPolygonsVertexAttribute(id) {
+    return meshPolygonsStyle(id).coloring.vertex
   }
 
-  function setPolygonsVertexAttribute(id, vertex_attribute) {
-    const coloring_style = polygonsStyle(id).coloring
+  function setMeshPolygonsVertexAttribute(id, vertex_attribute) {
+    const coloring_style = meshPolygonsStyle(id).coloring
     return viewer_call(
       {
         schema: mesh_polygons_schemas.vertex_attribute,
@@ -99,18 +80,18 @@ export function useMeshPolygonsStyle() {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
           console.log(
-            `${setPolygonsVertexAttribute.name} ${id} ${polygonsVertexAttribute(id)}`,
+            `${setMeshPolygonsVertexAttribute.name} ${id} ${meshPolygonsVertexAttribute(id)}`,
           )
         },
       },
     )
   }
 
-  function polygonsPolygonAttribute(id) {
-    return polygonsStyle(id).coloring.polygon
+  function meshPolygonsPolygonAttribute(id) {
+    return meshPolygonsStyle(id).coloring.polygon
   }
-  function setPolygonsPolygonAttribute(id, polygon_attribute) {
-    const coloring_style = polygonsStyle(id).coloring
+  function setMeshPolygonsPolygonAttribute(id, polygon_attribute) {
+    const coloring_style = meshPolygonsStyle(id).coloring
     return viewer_call(
       {
         schema: mesh_polygons_schemas.polygon_attribute,
@@ -120,33 +101,53 @@ export function useMeshPolygonsStyle() {
         response_function: () => {
           coloring_style.polygon = polygon_attribute
           console.log(
-            `${setPolygonsPolygonAttribute.name} ${id} ${polygonsPolygonAttribute(id)}`,
+            `${setMeshPolygonsPolygonAttribute.name} ${id} ${meshPolygonsPolygonAttribute(id)}`,
           )
         },
       },
     )
   }
 
-  function applyPolygonsStyle(id, style) {
+  function meshPolygonsActiveColoring(id) {
+    return meshPolygonsStyle(id).coloring.active
+  }
+  function setMeshPolygonsActiveColoring(id, type) {
+    const coloring = meshPolygonsStyle(id).coloring
+    coloring.active = type
+    console.log(
+      `${setMeshPolygonsActiveColoring.name} ${id} ${meshPolygonsActiveColoring(id)}`,
+    )
+    if (type === "color") {
+      return setMeshPolygonsColor(id, coloring.color)
+    } else if (type === "textures" && coloring.textures !== null) {
+      return setMeshPolygonsTextures(id, coloring.textures)
+    } else if (type === "vertex" && coloring.vertex !== null) {
+      return setMeshPolygonsVertexAttribute(id, coloring.vertex)
+    } else if (type === "polygon" && coloring.polygon !== null) {
+      return setMeshPolygonsPolygonAttribute(id, coloring.polygon)
+    } else throw new Error("Unknown polygons coloring type: " + type)
+  }
+
+  function applyMeshPolygonsStyle(id, style) {
     return Promise.all([
-      setPolygonsVisibility(id, style.visibility),
-      setPolygonsActiveColoring(id, style.coloring.active),
+      setMeshPolygonsVisibility(id, style.visibility),
+      setMeshPolygonsActiveColoring(id, style.coloring.active),
     ])
   }
 
   return {
-    polygonsVisibility,
-    polygonsActiveColoring,
-    polygonsColor,
-    polygonsTextures,
-    polygonsPolygonAttribute,
-    polygonsVertexAttribute,
-    setPolygonsVisibility,
-    setPolygonsActiveColoring,
-    setPolygonsColor,
-    setPolygonsTextures,
-    setPolygonsVertexAttribute,
-    setPolygonsPolygonAttribute,
-    applyPolygonsStyle,
+    meshPolygonsVisibility,
+    meshPolygonsActiveColoring,
+    meshPolygonsColor,
+    meshPolygonsTextures,
+    meshPolygonsPolygonAttribute,
+    meshPolygonsVertexAttribute,
+    setMeshPolygonsVisibility,
+    setMeshPolygonsActiveColoring,
+    setMeshPolygonsColor,
+    setMeshPolygonsTextures,
+    setMeshPolygonsVertexAttribute,
+    setMeshPolygonsPolygonAttribute,
+    applyMeshPolygonsStyle,
   }
 }
