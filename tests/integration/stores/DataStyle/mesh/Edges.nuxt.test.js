@@ -139,36 +139,36 @@ describe("Mesh edges", () => {
     })
   })
 
-  // describe("Edges active coloring", () => {
-  //   test("test coloring", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const coloringTypes = ["color"]
-  //     for (let i = 0; i < coloringTypes.length; i++) {
-  //       dataStyleStore.setEdgesActiveColoring(id, coloringTypes[i])
-  //       expect(dataStyleStore.edgesActiveColoring(id)).toBe(coloringTypes[i])
-  //       expect(viewerStore.status).toBe(Status.CONNECTED)
-  //     }
-  //   })
-  // })
-  // describe("Edges color", () => {
-  //   test("test red", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const color = { r: 255, g: 0, b: 0 }
-  //     const spy = vi.spyOn(composables, "viewer_call")
-  //     await dataStyleStore.setEdgesColor(id, color)
-  //     expect(spy).toHaveBeenCalledWith(
-  //       {
-  //         schema: mesh_edges_schemas.color,
-  //         params: { id, color },
-  //       },
-  //       {
-  //         response_function: expect.any(Function),
-  //       },
-  //     )
-  //     expect(dataStyleStore.edgesColor(id)).toStrictEqual(color)
-  //     expect(viewerStore.status).toBe(Status.CONNECTED)
-  //   })
-  // })
+  describe("Edges active coloring", () => {
+    test("test coloring", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const coloringTypes = ["color"]
+      for (let i = 0; i < coloringTypes.length; i++) {
+        dataStyleStore.setEdgesActiveColoring(id, coloringTypes[i])
+        expect(dataStyleStore.edgesActiveColoring(id)).toBe(coloringTypes[i])
+        expect(viewerStore.status).toBe(Status.CONNECTED)
+      }
+    })
+  })
+  describe("Edges color", () => {
+    test("test red", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const color = { r: 255, g: 0, b: 0 }
+      const spy = vi.spyOn(composables, "viewer_call")
+      await dataStyleStore.setEdgesColor(id, color)
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: mesh_edges_schemas.color,
+          params: { id, color },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.edgesColor(id)).toStrictEqual(color)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 })
