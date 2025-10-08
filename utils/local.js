@@ -134,21 +134,19 @@ async function run_script(
   })
 }
 
-async function run_back(port, data_folder_path) {
+async function run_back(command, args = { port, data_folder_path }) {
   return new Promise(async (resolve, reject) => {
-    const back_command = path.join(
-      executable_path(path.join("microservices", "back")),
-      executable_name("vease-back"),
-    )
-    const back_port = await get_available_port(port)
+    const back_port = await get_available_port(args.port)
+    const upload_folder_path = path.join(args.data_folder_path, "uploads")
     const back_args = [
       "--port " + back_port,
-      "--data_folder_path " + data_folder_path,
+      "--data_folder_path " + args.data_folder_path,
+      "--upload_folder_path " + upload_folder_path,
       "--allowed_origin http://localhost:*",
       "--timeout " + 0,
     ]
-    await run_script(back_command, back_args, "Serving Flask app")
-    resolve(back_port)
+    await run_script(command, back_args, "Serving Flask app")
+    resolve({ port: back_port })
   })
 }
 
