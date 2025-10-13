@@ -12,6 +12,9 @@ export default function useMeshStyle() {
   const polyhedraStyleStore = useMeshPolyhedraStyle()
   const hybridViewerStore = useHybridViewerStore()
 
+  function meshVisibility(id) {
+    return dataStyleStore.styles[id].visibility
+  }
   function setMeshVisibility(id, visibility) {
     return viewer_call(
       {
@@ -22,32 +25,35 @@ export default function useMeshStyle() {
         response_function: () => {
           hybridViewerStore.setVisibility(id, visibility)
           dataStyleStore.styles[id].visibility = visibility
+          console.log(`${setMeshVisibility.name} ${id} ${meshVisibility(id)}`)
         },
       },
     )
   }
 
-  async function applyMeshDefaultStyle(id) {
-    return new Promise(async (resolve) => {
-      const id_style = dataStyleStore.styles[id]
-      for (const [key, value] of Object.entries(id_style)) {
-        if (key == "visibility") {
-          await setMeshVisibility(id, value)
-        } else if (key == "points") {
-          await pointsStyleStore.applyPointsStyle(id, value)
-        } else if (key == "edges") {
-          await edgesStyleStore.applyEdgesStyle(id, value)
-        } else if (key == "polygons") {
-          await polygonsStyleStore.applyPolygonsStyle(id, value)
-        } else if (key == "polyhedra") {
-          await polyhedraStyleStore.applyPolyhedraStyle(id, value)
-        }
+  function applyMeshDefaultStyle(id) {
+    const style = dataStyleStore.getStyle(id)
+    const promise_array = []
+    for (const [key, value] of Object.entries(style)) {
+      if (key == "visibility") {
+        promise_array.push(setMeshVisibility(id, value))
+      } else if (key == "points") {
+        promise_array.push(pointsStyleStore.applyPointsStyle(id, value))
+      } else if (key == "edges") {
+        promise_array.push(edgesStyleStore.applyEdgesStyle(id, value))
+      } else if (key == "polygons") {
+        promise_array.push(polygonsStyleStore.applyPolygonsStyle(id, value))
+      } else if (key == "polyhedra") {
+        promise_array.push(polyhedraStyleStore.applyPolyhedraStyle(id, value))
+      } else {
+        throw new Error("Unknown key: " + key)
       }
-      resolve()
-    })
+    }
+    return promise_array
   }
 
   return {
+    meshVisibility,
     setMeshVisibility,
     applyMeshDefaultStyle,
     ...useMeshPointsStyle(),
