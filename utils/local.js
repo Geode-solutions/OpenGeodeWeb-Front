@@ -269,9 +269,6 @@ async function run_browser(
       const portMatch = output.match(
         /Accepting\ connections\ at\ http:\/\/localhost:(\d+)/,
       )
-      console.log("output", output)
-      console.log("portMatch", portMatch)
-
       if (portMatch) {
         resolve(portMatch[1])
         return
