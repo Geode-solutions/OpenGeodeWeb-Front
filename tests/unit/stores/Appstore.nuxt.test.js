@@ -60,6 +60,24 @@ describe("AppStore", () => {
       expect(app_store.storeIds).toHaveLength(2)
     })
 
+    test("register mixed stores", () => {
+      const useOptionsStore = defineStore("optionsStore", {
+        state: () => ({ value: 42 }),
+      })
+      const useSetupStore = defineStore("setupStore", () => {
+        const value = ref(100)
+        return { value }
+      })
+
+      useOptionsStore()
+      useSetupStore()
+
+      const app_store = useAppStore()
+      expect(app_store.storeIds).toContain("optionsStore")
+      expect(app_store.storeIds).toContain("setupStore")
+      expect(app_store.storeIds).toHaveLength(2)
+    })
+
     test("not register appStore itself", () => {
       const useTestStore = defineStore("testStore", {
         state: () => ({ value: 42 }),
@@ -295,6 +313,33 @@ describe("AppStore", () => {
         app_store.loadAll(snapshot1)
         expect(config_store.settings.theme).toBe("dark")
         expect(config_store.settings.layout.width).toBe(1200)
+      })
+
+      test("save and restore mixed stores", () => {
+        const useOptionsStore = defineStore("optionsStore", {
+          state: () => ({ counter: 0 }),
+        })
+        const useSetupStore = defineStore("setupStore", () => {
+          const value = ref(100)
+          return { value }
+        })
+
+        const options_store = useOptionsStore()
+        const setup_store = useSetupStore()
+        const app_store = useAppStore()
+
+        options_store.counter = 50
+        setup_store.value = 200
+
+        const snapshot = app_store.saveAll()
+
+        options_store.counter = 0
+        setup_store.value = 0
+
+        app_store.loadAll(snapshot)
+
+        expect(options_store.counter).toBe(50)
+        expect(setup_store.value).toBe(200)
       })
     })
   })
