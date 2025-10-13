@@ -1,56 +1,36 @@
-// Regroupe tous les stores et expose save/load pour snapshot global
+function getAllStores() {
+  const pinia = getActivePinia()
+  if (!pinia) return {}
 
-import { getActivePinia } from "pinia"
-
-// Import des stores existants
-import { useDataBaseStore } from "./data_base.js"
-import { useDataStyleStore } from "./data_style.js"
-import { useFeedbackStore } from "./feedback.js"
-import { useGeodeStore } from "./geode.js"
-import { useHybridViewerStore } from "./hybrid_viewer.js"
-import { useInfraStore } from "./infra.js"
-import { useMenuStore } from "./menu.js"
-import { useTreeviewStore } from "./treeview.js"
-import { useViewerStore } from "./viewer.js"
-
-// Instantiate all stores to ensure they are present in Pinia
-function instantiateStores() {
-  const dataBase = useDataBaseStore()
-  const dataStyle = useDataStyleStore()
-  const feedback = useFeedbackStore()
-  const geode = useGeodeStore()
-  const hybridViewer = useHybridViewerStore()
-  const infra = useInfraStore()
-  const menu = useMenuStore()
-  const treeview = useTreeviewStore()
-  const viewer = useViewerStore()
-
-  // Use map to store stores by id
   const map = {}
-  ;[
-    dataBase,
-    dataStyle,
-    feedback,
-    geode,
-    hybridViewer,
-    infra,
-    menu,
-    treeview,
-    viewer,
-  ].forEach((s) => {
-    map[s.$id] = s
+  const storeMap = pinia._s
+
+  storeMap.forEach((store, id) => {
+    map[id] = store
   })
   return map
 }
 
 export function useAppStore() {
   const pinia = getActivePinia()
+
+  function getStoresById() {
+    return getAllStores()
+  }
+
+  function getStoreIds() {
+    return Object.keys(getStoresById())
+  }
+
   const storesById = instantiateStores()
   const allIds = Object.keys(storesById)
 
   // Save state of all stores to snapshot
   function saveAll() {
     const snapshot = {}
+    const storesById = getStoresById()
+    const allIds = getStoreIds()
+
     for (const id of allIds) {
       const rawState = pinia.state.value[id] ?? {}
       snapshot[id] = JSON.parse(JSON.stringify(rawState))
@@ -60,6 +40,8 @@ export function useAppStore() {
 
   // Reload state of all stores from snapshot
   function loadAll(snapshot) {
+    const storesById = getStoresById()
+
     for (const id of Object.keys(snapshot)) {
       const store = storesById[id]
       if (!store) continue
@@ -69,8 +51,12 @@ export function useAppStore() {
   }
 
   return {
-    stores: storesById,
-    storeIds: allIds,
+    get stores() {
+      return getStoresById()
+    },
+    get storeIds() {
+      return getStoreIds()
+    },
     saveAll,
     loadAll,
   }
