@@ -1,18 +1,28 @@
+import { getActivePinia } from "pinia"
+
 function getAllStores() {
   const pinia = getActivePinia()
   if (!pinia) return {}
 
   const map = {}
-  const storeMap = pinia._s
-
-  storeMap.forEach((store, id) => {
-    map[id] = store
+  pinia._s.forEach((store, id) => {
+    if (id !== "appStore") {
+      map[id] = store
+    }
   })
   return map
 }
 
 export function useAppStore() {
   const pinia = getActivePinia()
+  if (!pinia) {
+    return {
+      stores: {},
+      storeIds: [],
+      saveAll: () => ({}),
+      loadAll: () => {},
+    }
+  }
 
   function getStoresById() {
     return getAllStores()
@@ -22,32 +32,38 @@ export function useAppStore() {
     return Object.keys(getStoresById())
   }
 
-  const storesById = instantiateStores()
-  const allIds = Object.keys(storesById)
-
-  // Save state of all stores to snapshot
   function saveAll() {
     const snapshot = {}
-    const storesById = getStoresById()
     const allIds = getStoreIds()
 
     for (const id of allIds) {
       const rawState = pinia.state.value[id] ?? {}
       snapshot[id] = JSON.parse(JSON.stringify(rawState))
     }
+
+    console.log(`[AppStore] Saved ${allIds.length} stores`)
     return snapshot
   }
 
-  // Reload state of all stores from snapshot
   function loadAll(snapshot) {
+    if (!snapshot || typeof snapshot !== "object") {
+      console.warn("[AppStore] loadAll called with invalid snapshot")
+      return
+    }
+
     const storesById = getStoresById()
 
     for (const id of Object.keys(snapshot)) {
       const store = storesById[id]
-      if (!store) continue
+      if (!store) {
+        console.warn(`[AppStore] Store "${id}" not found`)
+        continue
+      }
       const incoming = snapshot[id] ?? {}
       store.$patch(incoming)
     }
+
+    console.log("[AppStore] Snapshot loaded")
   }
 
   return {
@@ -61,3 +77,5 @@ export function useAppStore() {
     loadAll,
   }
 }
+
+export default useAppStore
