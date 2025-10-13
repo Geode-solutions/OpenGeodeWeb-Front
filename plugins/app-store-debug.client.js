@@ -17,7 +17,7 @@ async function autoInitializeStores() {
       if (storeComposable) {
         const store = storeComposable()
         initialized.push(store.$id)
-        console.log(`Initialized store: ${store.$id}`)
+        // console.log(`Initialized store: ${store.$id}`)
       }
     } catch (error) {
       console.warn(`Error auto-initializing ${fileName}:`, error.message)
@@ -63,7 +63,7 @@ export default defineNuxtPlugin(async () => {
 
   try {
     const initialized = await autoInitializeStores()
-    console.log(`${initialized.length} stores auto-initialized`, initialized)
+    // console.log(`${initialized.length} stores auto-initialized`, initialized)
   } catch (error) {
     console.error("Error auto-initialization:", error)
   }

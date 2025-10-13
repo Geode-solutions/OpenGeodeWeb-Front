@@ -1,270 +1,203 @@
-import { setActivePinia, defineStore, createPinia } from "pinia"
+import { setActivePinia, defineStore } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { beforeEach, describe, expect, test, vi, afterEach } from "vitest"
-import { useAppStore } from "@/stores/app_store"
+import { describe, test, expect, beforeEach, vi } from "vitest"
+import { useAppStore } from "@/stores/app_store.js"
 
-const useTestStore1 = defineStore("testStore1", {
-  state: () => ({
-    counter: 0,
-    name: "Store 1",
-    items: [],
-  }),
-})
-
-const useTestStore2 = defineStore("testStore2", {
-  state: () => ({
-    isActive: false,
-    description: "Test description",
-    settings: {
-      theme: "dark",
-      language: "fr",
-    },
-  }),
+beforeEach(() => {
+  const pinia = createTestingPinia({
+    stubActions: false,
+    createSpy: vi.fn,
+  })
+  setActivePinia(pinia)
 })
 
 describe("AppStore", () => {
-  let pinia
-
-  beforeEach(() => {
-    pinia = createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
-
-    vi.spyOn(console, "log").mockImplementation(() => {})
-    vi.spyOn(console, "warn").mockImplementation(() => {})
-    vi.spyOn(console, "error").mockImplementation(() => {})
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  describe("Store discovery", () => {
-    test("should retrieve all registered stores", () => {
-      useTestStore1()
-      useTestStore2()
-      const appStore = useAppStore()
-
-      expect(appStore.storeIds).toContain("testStore1")
-      expect(appStore.storeIds).toContain("testStore2")
-      expect(appStore.stores.testStore1).toBeDefined()
-      expect(appStore.stores.testStore2).toBeDefined()
-    })
-
-    test("should NOT include appStore itself", () => {
-      useTestStore1()
-      const appStore = useAppStore()
-
-      expect(appStore.storeIds).not.toContain("appStore")
-    })
-
-    test("should count stores correctly", () => {
-      useTestStore1()
-      useTestStore2()
-      const appStore = useAppStore()
-
-      expect(appStore.count).toBe(2)
-    })
-
-    test("should return empty when no stores initialized", () => {
-      const appStore = useAppStore()
-
-      expect(appStore.stores).toEqual({})
-      expect(appStore.storeIds).toEqual([])
-      expect(appStore.count).toBe(0)
-    })
-
-    test("should handle stores created after appStore", () => {
-      const appStore = useAppStore()
-
-      expect(appStore.count).toBe(0)
-
-      useTestStore1()
-
-      expect(appStore.count).toBe(1)
-      expect(appStore.storeIds).toContain("testStore1")
+  describe("state", () => {
+    test("initial state", () => {
+      const app_store = useAppStore()
+      expect(app_store.stores).toEqual({})
+      expect(app_store.storeIds).toEqual([])
     })
   })
 
-  describe("saveAll", () => {
-    test("should save state of all stores", () => {
-      const store1 = useTestStore1()
-      const store2 = useTestStore2()
-
-      store1.$patch({ counter: 42, name: "Modified", items: ["item1"] })
-      store2.$patch({ isActive: true, settings: { theme: "light" } })
-
-      const appStore = useAppStore()
-      const snapshot = appStore.saveAll()
-
-      expect(snapshot.testStore1.counter).toBe(42)
-      expect(snapshot.testStore1.name).toBe("Modified")
-      expect(snapshot.testStore2.isActive).toBe(true)
-      expect(snapshot.testStore2.settings.theme).toBe("light")
-    })
-
-    test("should NOT include appStore in snapshot", () => {
-      useTestStore1()
-      const appStore = useAppStore()
-      const snapshot = appStore.saveAll()
-
-      expect(snapshot.appStore).toBeUndefined()
-    })
-
-    test("should create deep copy (not reference)", () => {
-      const store1 = useTestStore1()
-      store1.$patch({ items: ["original"] })
-
-      const appStore = useAppStore()
-      const snapshot = appStore.saveAll()
-
-      snapshot.testStore1.items.push("modified")
-
-      expect(store1.items).toEqual(["original"])
-      expect(snapshot.testStore1.items).toEqual(["original", "modified"])
-    })
-
-    test("should handle nested objects", () => {
-      const store2 = useTestStore2()
-      store2.$patch({
-        settings: {
-          theme: "custom",
-          nested: { deep: { value: 123 } },
-        },
+  describe("store registration", () => {
+    test("register two stores", () => {
+      const useTestStore1 = defineStore("testStore1", {
+        state: () => ({ count: 0, name: "Store 1" }),
+      })
+      const useTestStore2 = defineStore("testStore2", {
+        state: () => ({ items: ["a", "b"], isActive: true }),
       })
 
-      const appStore = useAppStore()
-      const snapshot = appStore.saveAll()
+      useTestStore1()
+      useTestStore2()
 
-      expect(snapshot.testStore2.settings.nested.deep.value).toBe(123)
+      const app_store = useAppStore()
+      expect(app_store.storeIds).toContain("testStore1")
+      expect(app_store.storeIds).toContain("testStore2")
+      expect(app_store.storeIds).toHaveLength(2)
     })
 
-    test("should return empty object when no stores", () => {
-      const appStore = useAppStore()
-      const snapshot = appStore.saveAll()
+    test("not register appStore itself", () => {
+      const useTestStore = defineStore("testStore", {
+        state: () => ({ value: 42 }),
+      })
+      useTestStore()
 
-      expect(snapshot).toEqual({})
-    })
-  })
-
-  describe("loadAll", () => {
-    test("should load state into stores", () => {
-      const store1 = useTestStore1()
-      const store2 = useTestStore2()
-      const appStore = useAppStore()
-
-      const snapshot = {
-        testStore1: { counter: 99, name: "Loaded", items: ["a", "b"] },
-        testStore2: { isActive: true, settings: { theme: "blue" } },
-      }
-
-      const result = appStore.loadAll(snapshot)
-
-      expect(result.success).toContain("testStore1")
-      expect(result.success).toContain("testStore2")
-      expect(result.errors).toHaveLength(0)
-      expect(store1.counter).toBe(99)
-      expect(store1.name).toBe("Loaded")
-      expect(store2.isActive).toBe(true)
-      expect(store2.settings.theme).toBe("blue")
-    })
-
-    test("should skip non-existent stores", () => {
-      const store1 = useTestStore1()
-      const appStore = useAppStore()
-
-      const snapshot = {
-        testStore1: { counter: 50 },
-        nonExistent: { data: "ignored" },
-      }
-
-      const result = appStore.loadAll(snapshot)
-
-      expect(result.success).toContain("testStore1")
-      expect(result.errors).toHaveLength(1)
-      expect(result.errors[0].id).toBe("nonExistent")
-      expect(store1.counter).toBe(50)
-    })
-
-    test("should handle invalid snapshot", () => {
-      const appStore = useAppStore()
-
-      const result = appStore.loadAll(null)
-
-      expect(result.success).toHaveLength(0)
-      expect(console.warn).toHaveBeenCalled()
-    })
-
-    test("should handle empty snapshot", () => {
-      const store1 = useTestStore1()
-      store1.$patch({ counter: 10 })
-      const appStore = useAppStore()
-
-      const result = appStore.loadAll({})
-
-      expect(result.success).toHaveLength(0)
-      expect(store1.counter).toBe(10)
-    })
-
-    test("should handle partial updates", () => {
-      const store1 = useTestStore1()
-      store1.$patch({ counter: 100, name: "Original", items: ["x"] })
-      const appStore = useAppStore()
-
-      const snapshot = {
-        testStore1: { counter: 200 },
-      }
-
-      appStore.loadAll(snapshot)
-
-      expect(store1.counter).toBe(200)
-      expect(store1.name).toBe("Original")
-      expect(store1.items).toEqual(["x"])
+      const app_store = useAppStore()
+      expect(app_store.storeIds).not.toContain("appStore")
     })
   })
 
-  describe("Integration", () => {
-    test("should save and restore state", () => {
-      const store1 = useTestStore1()
-      const store2 = useTestStore2()
-      const appStore = useAppStore()
+  describe("actions", () => {
+    describe("saveAll", () => {
+      test("save two stores state", () => {
+        const useTestStore1 = defineStore("testStore1", {
+          state: () => ({ count: 5, name: "Test" }),
+        })
+        const useTestStore2 = defineStore("testStore2", {
+          state: () => ({ items: ["x", "y"], isActive: false }),
+        })
 
-      store1.$patch({ counter: 123, name: "Original", items: ["a"] })
-      store2.$patch({ isActive: true, settings: { theme: "dark" } })
+        useTestStore1()
+        useTestStore2()
 
-      const snapshot = appStore.saveAll()
+        const app_store = useAppStore()
+        const snapshot = app_store.saveAll()
 
-      store1.$patch({ counter: 999, name: "Modified" })
-      store2.$patch({ isActive: false })
+        expect(snapshot.testStore1).toEqual({ count: 5, name: "Test" })
+        expect(snapshot.testStore2).toEqual({
+          items: ["x", "y"],
+          isActive: false,
+        })
+      })
 
-      expect(store1.counter).toBe(999)
+      test("create deep copy", () => {
+        const useTestStore = defineStore("testStore", {
+          state: () => ({ nested: { value: "original" } }),
+        })
 
-      appStore.loadAll(snapshot)
+        useTestStore()
+        const app_store = useAppStore()
+        const snapshot = app_store.saveAll()
 
-      expect(store1.counter).toBe(123)
-      expect(store1.name).toBe("Original")
-      expect(store2.isActive).toBe(true)
+        snapshot.testStore.nested.value = "modified"
+
+        const store = app_store.stores.testStore
+        expect(store.$state.nested.value).toBe("original")
+      })
     })
 
-    test("should handle multiple save/load cycles", () => {
-      const store1 = useTestStore1()
-      const appStore = useAppStore()
+    describe("loadAll", () => {
+      test("restore state from snapshot", () => {
+        const useTestStore1 = defineStore("testStore1", {
+          state: () => ({ count: 0 }),
+        })
+        const useTestStore2 = defineStore("testStore2", {
+          state: () => ({ items: [] }),
+        })
 
-      store1.$patch({ counter: 1 })
-      const snapshot1 = appStore.saveAll()
+        const store1 = useTestStore1()
+        const store2 = useTestStore2()
 
-      store1.$patch({ counter: 2 })
-      const snapshot2 = appStore.saveAll()
+        const snapshot = {
+          testStore1: { count: 42 },
+          testStore2: { items: ["a", "b", "c"] },
+        }
 
-      store1.$patch({ counter: 3 })
+        const app_store = useAppStore()
+        app_store.loadAll(snapshot)
 
-      appStore.loadAll(snapshot1)
-      expect(store1.counter).toBe(1)
+        expect(store1.count).toBe(42)
+        expect(store2.items).toEqual(["a", "b", "c"])
+      })
 
-      appStore.loadAll(snapshot2)
-      expect(store1.counter).toBe(2)
+      test("handle partial snapshot", () => {
+        const useTestStore1 = defineStore("testStore1", {
+          state: () => ({ count: 10 }),
+        })
+        const useTestStore2 = defineStore("testStore2", {
+          state: () => ({ value: 20 }),
+        })
+
+        const store1 = useTestStore1()
+        const store2 = useTestStore2()
+
+        const snapshot = { testStore1: { count: 100 } }
+
+        const app_store = useAppStore()
+        app_store.loadAll(snapshot)
+
+        expect(store1.count).toBe(100)
+        expect(store2.value).toBe(20)
+      })
+
+      test("warn on non-existent store", () => {
+        const consoleSpy = vi
+          .spyOn(console, "warn")
+          .mockImplementation(() => {})
+
+        const useTestStore = defineStore("testStore", {
+          state: () => ({ count: 0 }),
+        })
+        useTestStore()
+
+        const snapshot = {
+          testStore: { count: 42 },
+          nonExistent: { value: 999 },
+        }
+
+        const app_store = useAppStore()
+        app_store.loadAll(snapshot)
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          '[AppStore] Store "nonExistent" not found',
+        )
+
+        consoleSpy.mockRestore()
+      })
+
+      test("handle invalid snapshot", () => {
+        const consoleSpy = vi
+          .spyOn(console, "warn")
+          .mockImplementation(() => {})
+
+        const app_store = useAppStore()
+        app_store.loadAll(null)
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[AppStore] loadAll called with invalid snapshot",
+        )
+
+        consoleSpy.mockRestore()
+      })
+    })
+
+    describe("saveAll + loadAll", () => {
+      test("complete save and restore", () => {
+        const useStyleStore = defineStore("dataStyle", {
+          state: () => ({
+            styles: {
+              mesh1: { color: "#ff0000", opacity: 0.8 },
+            },
+          }),
+        })
+
+        const style_store = useStyleStore()
+        const app_store = useAppStore()
+
+        const snapshot1 = app_store.saveAll()
+
+        style_store.styles.mesh1.color = "#0000ff"
+        style_store.styles.mesh1.opacity = 0.5
+
+        const snapshot2 = app_store.saveAll()
+        expect(snapshot2.dataStyle.styles.mesh1.color).toBe("#0000ff")
+
+        app_store.loadAll(snapshot1)
+        expect(style_store.styles.mesh1.color).toBe("#ff0000")
+        expect(style_store.styles.mesh1.opacity).toBe(0.8)
+      })
     })
   })
 })
