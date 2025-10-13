@@ -17,7 +17,6 @@ async function autoInitializeStores() {
       if (storeComposable) {
         const store = storeComposable()
         initialized.push(store.$id)
-        // console.log(`Initialized store: ${store.$id}`)
       }
     } catch (error) {
       console.warn(`Error auto-initializing ${fileName}:`, error.message)
@@ -36,6 +35,7 @@ function exposeDebugHelpers(appStore) {
     console.log("Store IDs :", appStore.storeIds)
     return snapshot
   }
+
   window.__loadAll = (snapshot) => {
     const result = appStore.loadAll(snapshot)
     console.log("Load Result :", result)
@@ -56,6 +56,52 @@ function exposeDebugHelpers(appStore) {
 
     return ids
   }
+
+  window.__trackActions = (storeId = null) => {
+    appStore.trackActions(storeId)
+    if (storeId) {
+      console.log(`Tracking enabled for store: ${storeId}`)
+    } else {
+      console.log(`Tracking enabled for all stores`)
+    }
+  }
+
+  window.__getHistory = (filters = {}) => {
+    const history = appStore.getHistory(filters)
+    console.table(
+      history.map((entry) => ({
+        Store: entry.storeId,
+        Action: entry.action,
+        Params: JSON.stringify(entry.params),
+        Time: entry.timestamp,
+      })),
+    )
+    return history
+  }
+
+  window.__clearHistory = () => {
+    appStore.clearHistory()
+    console.log("History cleared")
+  }
+
+  window.__watchStore = (storeId, actionName = null) => {
+    const filter = { storeId }
+    if (actionName) filter.action = actionName
+
+    return appStore.getHistory(filter)
+  }
+
+  console.log(
+    "[AppStore] Debug helpers available:",
+    "\n  • __appStore - Access app store instance",
+    "\n  • __saveAll() - Save all stores state",
+    "\n  • __loadAll(snapshot) - Load stores state",
+    "\n  • __listStores() - List all registered stores",
+    "\n  • __trackActions(storeId?) - Enable action tracking",
+    "\n  • __getHistory(filters?) - Get action history",
+    "\n  • __clearHistory() - Clear action history",
+    "\n  • __watchStore(storeId, action?) - Watch specific store",
+  )
 }
 
 export default defineNuxtPlugin(async () => {
@@ -63,9 +109,9 @@ export default defineNuxtPlugin(async () => {
 
   try {
     const initialized = await autoInitializeStores()
-    // console.log(`${initialized.length} stores auto-initialized`, initialized)
+    console.log(`[AppStore] ${initialized.length} stores initialized`)
   } catch (error) {
-    console.error("Error auto-initialization:", error)
+    console.error("[AppStore] Error during initialization:", error)
   }
 
   exposeDebugHelpers(appStore)
