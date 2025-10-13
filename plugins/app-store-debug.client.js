@@ -15,11 +15,11 @@ export default defineNuxtPlugin(() => {
     app.loadAll(snapshot)
     console.log("[AppStore] snapshot loadeed.")
   }
-//   window.__safeSaveAll = () => {
-//     const json = JSON.stringify(app.saveAll(), null, 2)
-//     console.log("[AppStore] snapshot JSON:", json)
-//     return json
-//   }
+  //   window.__safeSaveAll = () => {
+  //     const json = JSON.stringify(app.saveAll(), null, 2)
+  //     console.log("[AppStore] snapshot JSON:", json)
+  //     return json
+  //   }
 
   console.log(
     "[AppStore] debug helpers ready: __appStore, __saveAll, __loadAll, __safeSaveAll",
