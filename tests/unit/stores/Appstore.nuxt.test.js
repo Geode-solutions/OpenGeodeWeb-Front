@@ -1,6 +1,7 @@
 import { setActivePinia, defineStore } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { describe, test, expect, beforeEach, vi } from "vitest"
+import { ref, reactive } from "vue"
 import { useAppStore } from "@/stores/app_store.js"
 
 beforeEach(() => {
@@ -21,7 +22,7 @@ describe("AppStore", () => {
   })
 
   describe("store registration", () => {
-    test("register two stores", () => {
+    test("register two stores in options mode", () => {
       const useTestStore1 = defineStore("testStore1", {
         state: () => ({ count: 0, name: "Store 1" }),
       })
@@ -38,6 +39,27 @@ describe("AppStore", () => {
       expect(app_store.storeIds).toHaveLength(2)
     })
 
+    test("register two stores in setup mode", () => {
+      const useTestStore1 = defineStore("setupStore1", () => {
+        const count = ref(0)
+        const name = ref("Setup Store 1")
+        return { count, name }
+      })
+      const useTestStore2 = defineStore("setupStore2", () => {
+        const items = ref(["a", "b"])
+        const isActive = ref(true)
+        return { items, isActive }
+      })
+
+      useTestStore1()
+      useTestStore2()
+
+      const app_store = useAppStore()
+      expect(app_store.storeIds).toContain("setupStore1")
+      expect(app_store.storeIds).toContain("setupStore2")
+      expect(app_store.storeIds).toHaveLength(2)
+    })
+
     test("not register appStore itself", () => {
       const useTestStore = defineStore("testStore", {
         state: () => ({ value: 42 }),
@@ -51,7 +73,7 @@ describe("AppStore", () => {
 
   describe("actions", () => {
     describe("saveAll", () => {
-      test("save two stores state", () => {
+      test("save two stores state in options mode", () => {
         const useTestStore1 = defineStore("testStore1", {
           state: () => ({ count: 5, name: "Test" }),
         })
@@ -72,6 +94,31 @@ describe("AppStore", () => {
         })
       })
 
+      test("save two stores state in setup mode", () => {
+        const useTestStore1 = defineStore("setupStore1", () => {
+          const count = ref(10)
+          const name = ref("Setup Test")
+          return { count, name }
+        })
+        const useTestStore2 = defineStore("setupStore2", () => {
+          const items = ref(["foo", "bar"])
+          const isActive = ref(true)
+          return { items, isActive }
+        })
+
+        useTestStore1()
+        useTestStore2()
+
+        const app_store = useAppStore()
+        const snapshot = app_store.saveAll()
+
+        expect(snapshot.setupStore1).toEqual({ count: 10, name: "Setup Test" })
+        expect(snapshot.setupStore2).toEqual({
+          items: ["foo", "bar"],
+          isActive: true,
+        })
+      })
+
       test("create deep copy", () => {
         const useTestStore = defineStore("testStore", {
           state: () => ({ nested: { value: "original" } }),
@@ -89,7 +136,7 @@ describe("AppStore", () => {
     })
 
     describe("loadAll", () => {
-      test("restore state from snapshot", () => {
+      test("restore state from snapshot in options mode", () => {
         const useTestStore1 = defineStore("testStore1", {
           state: () => ({ count: 0 }),
         })
@@ -110,6 +157,31 @@ describe("AppStore", () => {
 
         expect(store1.count).toBe(42)
         expect(store2.items).toEqual(["a", "b", "c"])
+      })
+
+      test("restore state from snapshot in setup mode", () => {
+        const useTestStore1 = defineStore("setupStore1", () => {
+          const count = ref(0)
+          return { count }
+        })
+        const useTestStore2 = defineStore("setupStore2", () => {
+          const items = ref([])
+          return { items }
+        })
+
+        const store1 = useTestStore1()
+        const store2 = useTestStore2()
+
+        const snapshot = {
+          setupStore1: { count: 99 },
+          setupStore2: { items: ["x", "y", "z"] },
+        }
+
+        const app_store = useAppStore()
+        app_store.loadAll(snapshot)
+
+        expect(store1.count).toBe(99)
+        expect(store2.items).toEqual(["x", "y", "z"])
       })
 
       test("handle partial snapshot", () => {
@@ -174,7 +246,7 @@ describe("AppStore", () => {
     })
 
     describe("saveAll + loadAll", () => {
-      test("complete save and restore", () => {
+      test("complete save and restore in options mode", () => {
         const useStyleStore = defineStore("dataStyle", {
           state: () => ({
             styles: {
@@ -197,6 +269,32 @@ describe("AppStore", () => {
         app_store.loadAll(snapshot1)
         expect(style_store.styles.mesh1.color).toBe("#ff0000")
         expect(style_store.styles.mesh1.opacity).toBe(0.8)
+      })
+
+      test("complete save and restore in setup mode", () => {
+        const useConfigStore = defineStore("configStore", () => {
+          const settings = reactive({
+            theme: "dark",
+            layout: { width: 1200, height: 800 },
+          })
+          return { settings }
+        })
+
+        const config_store = useConfigStore()
+        const app_store = useAppStore()
+
+        const snapshot1 = app_store.saveAll()
+
+        config_store.settings.theme = "light"
+        config_store.settings.layout.width = 1920
+
+        const snapshot2 = app_store.saveAll()
+        expect(snapshot2.configStore.settings.theme).toBe("light")
+        expect(snapshot2.configStore.settings.layout.width).toBe(1920)
+
+        app_store.loadAll(snapshot1)
+        expect(config_store.settings.theme).toBe("dark")
+        expect(config_store.settings.layout.width).toBe(1200)
       })
     })
   })
