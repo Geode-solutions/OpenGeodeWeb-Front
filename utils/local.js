@@ -2,22 +2,15 @@
 import fs from "fs"
 import path from "path"
 import child_process from "child_process"
+import WebSocket from "ws"
 
 // Third party imports
 import pkg from "electron"
 const { app, dialog } = pkg
 import { getPort } from "get-port-please"
-import kill from "tree-kill"
 import isElectron from "is-electron"
-
-import { fileURLToPath } from "url"
-
-const __filename = fileURLToPath(import.meta.url) // get the resolved path to the file
-const __dirname = path.dirname(__filename) // get the name of the directory
-console.log("__dirname", __dirname)
-
-// Global variables
-var processes = []
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" }
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 function venv_script_path(root_path, microservice_path) {
   const venv_path = path.join(root_path, microservice_path, "venv")
@@ -30,15 +23,16 @@ function venv_script_path(root_path, microservice_path) {
   return script_path
 }
 
-function executable_path(microservice_path, root_path = null) {
-  if (root_path != null) return venv_script_path(root_path, microservice_path)
+function executable_path(microservice_path) {
   if (isElectron()) {
     if (app.isPackaged) {
       return process.resourcesPath
+    } else {
+      return venv_script_path(app.getAppPath(), microservice_path)
     }
-    return venv_script_path(app.getAppPath(), microservice_path)
+  } else {
+    return venv_script_path(process.cwd(), microservice_path)
   }
-  return venv_script_path(process.cwd(), microservice_path)
 }
 
 function executable_name(name) {
@@ -50,38 +44,19 @@ function executable_name(name) {
 
 function create_path(path) {
   if (!fs.existsSync(path)) {
-    fs.mkdir(path, (err) => {
-      if (err) {
-        return console.error(err)
-      }
-      console.log(`${path} directory created successfully!`)
-    })
+    fs.mkdirSync(path, { recursive: true })
+    console.log(`${path} directory created successfully!`)
   }
   return path
 }
 
 async function get_available_port(port) {
-  const available_port = await getPort({ port, host: "localhost" })
+  const available_port = await getPort({
+    port,
+    host: "localhost",
+  })
   console.log("available_port", available_port)
   return available_port
-}
-
-async function kill_processes() {
-  console.log("kill_processes", processes)
-  await processes.forEach(async function (proc) {
-    console.log(`Process ${proc} will be killed!`)
-    try {
-      kill(proc)
-    } catch (error) {
-      console.log(`${error} Process ${proc} could not be killed!`)
-    }
-  })
-}
-
-function register_process(proc) {
-  if (!processes.includes(proc.pid)) {
-    processes.push(proc.pid)
-  }
 }
 
 async function run_script(
@@ -98,7 +73,6 @@ async function run_script(
       encoding: "utf8",
       shell: true,
     })
-    register_process(child)
 
     // You can also use a variable to save the output for when the script closes later
     child.stderr.setEncoding("utf8")
@@ -118,7 +92,7 @@ async function run_script(
       }
       console.log(data)
     })
-    child.stderr.setEncoding("utf8")
+
     child.stderr.on("data", (data) => {
       console.log(data)
     })
@@ -131,6 +105,7 @@ async function run_script(
       console.log("Child Process killed")
     })
     child.name = command.replace(/^.*[\\/]/, "")
+    return child
   })
 }
 
@@ -146,11 +121,11 @@ async function run_back(command, args = { port, data_folder_path }) {
       "--timeout " + 0,
     ]
     await run_script(command, back_args, "Serving Flask app")
-    resolve({ port: back_port })
+    resolve(back_port)
   })
 }
 
-async function run_viewer(viewer_path, args = { port, data_folder_path }) {
+async function run_viewer(command, args = { port, data_folder_path }) {
   return new Promise(async (resolve, reject) => {
     const viewer_port = await get_available_port(args.port)
     const viewer_args = [
@@ -158,19 +133,161 @@ async function run_viewer(viewer_path, args = { port, data_folder_path }) {
       "--data_folder_path " + args.data_folder_path,
       "--timeout " + 0,
     ]
-    await run_script(viewer_path, viewer_args, "Starting factory")
+    await run_script(command, viewer_args, "Starting factory")
     resolve(viewer_port)
+  })
+}
+
+function delete_folder_recursive(data_folder_path) {
+  if (!fs.existsSync(data_folder_path)) {
+    console.log(`Folder ${data_folder_path} does not exist.`)
+    return
+  }
+  try {
+    fs.rmSync(data_folder_path, { recursive: true, force: true })
+    console.log(`Deleted folder: ${data_folder_path}`)
+  } catch (err) {
+    console.error(`Error deleting folder ${data_folder_path}:`, err)
+  }
+}
+
+function kill_back(back_port) {
+  return new Promise((resolve, reject) => {
+    console.log("back_schemas", back_schemas)
+
+    fetch(
+      "http://localhost:" +
+        back_port +
+        "/" +
+        back_schemas.opengeodeweb_back.kill.$id,
+      {
+        method: back_schemas.opengeodeweb_back.kill.methods[0],
+      },
+    )
+      .then(() => {
+        console.log("Back not killed")
+        reject()
+      })
+      .catch(() => {
+        console.log("Back closed")
+        resolve()
+      })
+  })
+}
+
+function kill_viewer(viewer_port) {
+  return new Promise((resolve, reject) => {
+    const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
+    socket.on("open", () => {
+      console.log("Connected to WebSocket server")
+      socket.send(
+        JSON.stringify({
+          id: "system:hello",
+          method: "wslink.hello",
+          args: [{ secret: "wslink-secret" }],
+        }),
+      )
+    })
+    socket.on("message", (data) => {
+      const message = data.toString()
+      console.log("Received from server:", message)
+      if (message.includes("hello")) {
+        try {
+          console.log("viewer_schemas", viewer_schemas)
+          socket.send(
+            JSON.stringify({
+              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
+              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+            }),
+          )
+        } catch (error) {
+          console.error("WebSocket error:", error)
+          resolve()
+        }
+      }
+    })
+    socket.on("close", () => {
+      console.log("Disconnected from WebSocket server")
+      resolve()
+    })
+    socket.on("error", (error) => {
+      console.error("WebSocket error:", error)
+      resolve()
+    })
+  })
+}
+
+async function run_browser(
+  script_name,
+  microservices_options = {
+    back: { command, args: { port: 5000, data_folder_path } },
+    viewer: { command, args: { port: 1234, data_folder_path } },
+  },
+) {
+  console.log("microservices_options", microservices_options)
+  const back_promise = run_back(microservices_options.back.command, {
+    ...microservices_options.back.args,
+  })
+  console.log("back_promise", back_promise)
+
+  const viewer_promise = run_viewer(microservices_options.viewer.command, {
+    ...microservices_options.viewer.args,
+  })
+  console.log("viewer_promise", viewer_promise)
+
+  const [back_port, viewer_port] = await Promise.all([
+    back_promise,
+    viewer_promise,
+  ])
+  process.env.GEODE_PORT = back_port
+  process.env.VIEWER_PORT = viewer_port
+  console.log("back_port", back_port)
+  console.log("viewer_port", viewer_port)
+
+  process.env.BROWSER = true
+  process.on("SIGINT", async () => {
+    console.log("Shutting down microservices")
+    await Promise.all([
+      kill_back(process.env.GEODE_PORT),
+      kill_viewer(process.env.VIEWER_PORT),
+    ])
+    console.log("Quitting App...")
+    process.exit(0)
+  })
+
+  const nuxt_port = await get_available_port()
+  console.log("nuxt_port", nuxt_port)
+
+  process.env.NUXT_PORT = nuxt_port
+  const nuxt_process = child_process.spawn("npm", ["run", script_name], {
+    shell: true,
+  })
+
+  return new Promise((resolve, reject) => {
+    nuxt_process.stdout.on("data", function (data) {
+      const output = data.toString()
+      const portMatch = output.match(
+        /Accepting\ connections\ at\ http:\/\/localhost:(\d+)/,
+      )
+      console.log("Nuxt: ", output)
+      if (portMatch) {
+        resolve(portMatch[1])
+        return
+      }
+    })
   })
 }
 
 export {
   create_path,
+  delete_folder_recursive,
   executable_name,
   executable_path,
   get_available_port,
-  kill_processes,
-  register_process,
+  kill_back,
+  kill_viewer,
   run_script,
   run_back,
   run_viewer,
+  run_browser,
 }

@@ -18,7 +18,7 @@ import {
 import {
   executable_name,
   executable_path,
-  kill_processes,
+  kill_viewer,
   run_viewer,
   run_back,
 } from "@ogw_f/utils/local"
@@ -156,7 +156,8 @@ beforeEach(async () => {
 
 describe("Mesh edges", () => {
   afterEach(async () => {
-    await kill_processes()
+    const viewerStore = useViewerStore()
+    await kill_viewer(viewerStore.default_local_port)
   })
 
   describe("Edges visibility", () => {

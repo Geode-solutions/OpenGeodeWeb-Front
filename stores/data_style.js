@@ -13,12 +13,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   function addDataStyle(id, geode_object, object_type) {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)
     if (object_type === "mesh") {
-      return Promise.all([meshStyleStore.applyMeshDefaultStyle(id)])
+      return meshStyleStore.applyMeshDefaultStyle(id)
     } else if (object_type === "model") {
-      return Promise.all([
+      return [
         modelStyleStore.setMeshComponentsDefaultStyle(id),
         modelStyleStore.applyModelDefaultStyle(id),
-      ])
+      ]
     }
   }
 
