@@ -123,15 +123,20 @@ beforeEach(async () => {
     executable_name("opengeodeweb-viewer"),
   )
 
-  const back_port = await run_back(back_path, {
+  const back_promise = run_back(back_path, {
     port: 5000,
     data_folder_path,
   })
 
-  const viewer_port = await run_viewer(viewer_path, {
+  const viewer_promise = run_viewer(viewer_path, {
     port: 1234,
     data_folder_path,
   })
+
+  const [back_port, viewer_port] = await Promise.all([
+    back_promise,
+    viewer_promise,
+  ])
   console.log("Viewer path:", viewer_path)
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
@@ -153,12 +158,16 @@ beforeEach(async () => {
   expect(viewerStore.status).toBe(Status.CONNECTED)
 }, 15000)
 
-describe("Mesh edges", () => {
-  afterEach(async () => {
-    const viewerStore = useViewerStore()
-    await kill_viewer(viewerStore.default_local_port)
-  })
+afterEach(async () => {
+  const viewerStore = useViewerStore()
+  const geodeStore = useGeodeStore()
+  await Promise.all([
+    kill_viewer(viewerStore.default_local_port),
+    kill_back(geodeStore.default_local_port),
+  ])
+})
 
+describe("Mesh edges", () => {
   describe("Edges visibility", () => {
     test("test visibility true", async () => {
       const dataStyleStore = useDataStyleStore()
