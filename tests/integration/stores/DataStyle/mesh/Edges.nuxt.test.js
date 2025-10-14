@@ -18,7 +18,6 @@ import {
 import {
   executable_name,
   executable_path,
-  kill_viewer,
   run_viewer,
   run_back,
 } from "@ogw_f/utils/local"
@@ -124,7 +123,7 @@ beforeEach(async () => {
     executable_name("opengeodeweb-viewer"),
   )
 
-  const { port: back_port } = await run_back(back_path, {
+  const back_port = await run_back(back_path, {
     port: 5000,
     data_folder_path,
   })
