@@ -1,5 +1,4 @@
 import { getActivePinia } from "pinia"
-import { ref } from "vue"
 
 function getAllStores() {
   const pinia = getActivePinia()
@@ -20,17 +19,12 @@ export function useAppStore() {
     return {
       stores: {},
       storeIds: [],
-      actionHistory: [],
       saveAll: () => ({}),
       loadAll: () => {},
-      trackActions: () => {},
-      clearHistory: () => {},
-      getHistory: () => [],
+      saveSelected: () => ({}),
+      loadSelected: () => {},
     }
   }
-
-  const actionHistory = ref([])
-  const maxHistorySize = 100
 
   function getStoresById() {
     return getAllStores()
@@ -38,79 +32,6 @@ export function useAppStore() {
 
   function getStoreIds() {
     return Object.keys(getStoresById())
-  }
-
-  function addToHistory(entry) {
-    actionHistory.value.push({
-      ...entry,
-      timestamp: new Date().toISOString(),
-    })
-
-    if (actionHistory.value.length > maxHistorySize) {
-      actionHistory.value.shift()
-    }
-  }
-
-  function trackActions(storeId = null) {
-    const storesById = getStoresById()
-    const storesToTrack = storeId
-      ? [storesById[storeId]]
-      : Object.values(storesById)
-
-    storesToTrack.forEach((store) => {
-      if (!store) return
-
-      const originalActions = {}
-
-      Object.keys(store).forEach((key) => {
-        if (typeof store[key] === "function" && !key.startsWith("$")) {
-          originalActions[key] = store[key]
-
-          store[key] = function (...args) {
-            const entry = {
-              storeId: store.$id,
-              action: key,
-              params: args,
-            }
-
-            addToHistory(entry)
-            console.log(`[AppStore] ${store.$id}.${key}()`, args)
-
-            return originalActions[key].apply(this, args)
-          }
-        }
-      })
-    })
-
-    console.log(
-      `[AppStore] Tracking enabled for ${storesToTrack.length} store(s)`,
-    )
-  }
-
-  function clearHistory() {
-    actionHistory.value = []
-    console.log("[AppStore] History cleared")
-  }
-
-  function getHistory(filters = {}) {
-    let filtered = actionHistory.value
-
-    if (filters.storeId) {
-      filtered = filtered.filter((entry) => entry.storeId === filters.storeId)
-    }
-
-    if (filters.action) {
-      filtered = filtered.filter((entry) => entry.action === filters.action)
-    }
-
-    if (filters.since) {
-      const sinceDate = new Date(filters.since)
-      filtered = filtered.filter(
-        (entry) => new Date(entry.timestamp) >= sinceDate,
-      )
-    }
-
-    return filtered
   }
 
   function saveAll() {
@@ -147,6 +68,83 @@ export function useAppStore() {
     console.log("[AppStore] Snapshot loaded")
   }
 
+  function saveSelected(storeIds = []) {
+    if (!Array.isArray(storeIds) || storeIds.length === 0) {
+      console.warn("[AppStore] saveSelected: no store IDs provided")
+      return {}
+    }
+
+    const snapshot = {}
+    const savedStores = []
+    const notFoundStores = []
+
+    for (const id of storeIds) {
+      const rawState = pinia.state.value[id]
+
+      if (rawState && Object.keys(rawState).length > 0) {
+        snapshot[id] = JSON.parse(JSON.stringify(rawState))
+        savedStores.push(id)
+      } else {
+        notFoundStores.push(id)
+      }
+    }
+
+    if (notFoundStores.length > 0) {
+      console.warn(
+        `[AppStore] Stores not found or empty: ${notFoundStores.join(", ")}`,
+      )
+    }
+
+    console.log(
+      `[AppStore] Saved ${savedStores.length} selected stores: ${savedStores.join(", ")}`,
+    )
+    return snapshot
+  }
+
+  function loadSelected(snapshot, storeIds = null) {
+    if (!snapshot || typeof snapshot !== "object") {
+      console.warn("[AppStore] loadSelected: invalid snapshot")
+      return
+    }
+
+    const storesById = getStoresById()
+    const idsToLoad = storeIds || Object.keys(snapshot)
+    const loadedStores = []
+    const notFoundInSnapshot = []
+    const notFoundInApp = []
+
+    for (const id of idsToLoad) {
+      if (!snapshot[id]) {
+        notFoundInSnapshot.push(id)
+        continue
+      }
+
+      const store = storesById[id]
+      if (!store) {
+        notFoundInApp.push(id)
+        continue
+      }
+
+      store.$patch(snapshot[id])
+      loadedStores.push(id)
+    }
+
+    if (notFoundInSnapshot.length > 0) {
+      console.warn(
+        `[AppStore] Stores not found in snapshot: ${notFoundInSnapshot.join(", ")}`,
+      )
+    }
+    if (notFoundInApp.length > 0) {
+      console.warn(
+        `[AppStore] Stores not found in application: ${notFoundInApp.join(", ")}`,
+      )
+    }
+
+    console.log(
+      `[AppStore] Loaded ${loadedStores.length} selected stores: ${loadedStores.join(", ")}`,
+    )
+  }
+
   return {
     get stores() {
       return getStoresById()
@@ -154,12 +152,10 @@ export function useAppStore() {
     get storeIds() {
       return getStoreIds()
     },
-    actionHistory,
     saveAll,
     loadAll,
-    trackActions,
-    clearHistory,
-    getHistory,
+    saveSelected,
+    loadSelected,
   }
 }
 
