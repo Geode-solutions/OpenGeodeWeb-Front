@@ -20,6 +20,8 @@ import {
   executable_path,
   run_viewer,
   run_back,
+  kill_viewer,
+  kill_back,
 } from "@ogw_f/utils/local"
 
 import Status from "@ogw_f/utils/status"
