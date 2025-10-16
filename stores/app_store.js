@@ -10,14 +10,15 @@ export const useAppStore = defineStore("appStore", () => {
     let savedCount = 0
 
     for (const store of stores) {
-      if (typeof store.save === "function") {
-        const storeId = store.$id
-        try {
-          snapshot[storeId] = store.save()
-          savedCount++
-        } catch (error) {
-          console.error(`[AppStore] Error saving store "${storeId}":`, error)
-        }
+      if (!store.save) {
+        continue
+      }
+      const storeId = store.$id
+      try {
+        snapshot[storeId] = store.save()
+        savedCount++
+      } catch (error) {
+        console.error(`[AppStore] Error saving store "${storeId}":`, error)
       }
     }
 
@@ -26,7 +27,7 @@ export const useAppStore = defineStore("appStore", () => {
   }
 
   function load(snapshot) {
-    if (!snapshot || typeof snapshot !== "object") {
+    if (!snapshot) {
       console.warn("[AppStore] load called with invalid snapshot")
       return
     }
@@ -35,19 +36,22 @@ export const useAppStore = defineStore("appStore", () => {
     const notFoundStores = []
 
     for (const store of stores) {
+      if (!store.load) {
+        continue
+      }
+
       const storeId = store.$id
 
-      if (typeof store.load === "function") {
-        if (snapshot[storeId]) {
-          try {
-            store.load(snapshot[storeId])
-            loadedCount++
-          } catch (error) {
-            console.error(`[AppStore] Error loading store "${storeId}":`, error)
-          }
-        } else {
-          notFoundStores.push(storeId)
-        }
+      if (!snapshot[storeId]) {
+        notFoundStores.push(storeId)
+        continue
+      }
+
+      try {
+        store.load(snapshot[storeId])
+        loadedCount++
+      } catch (error) {
+        console.error(`[AppStore] Error loading store "${storeId}":`, error)
       }
     }
 
