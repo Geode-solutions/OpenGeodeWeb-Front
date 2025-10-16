@@ -56,7 +56,6 @@
     "is-electron": "2.2.2",
     "js-file-download": "0.4.12",
     "nuxt": "3.13.2",
-    "pidtree": "0.6.0",
     "pinia": "3.0.3",
     "sass": "1.87.0",
     "semver": "7.7.1",
@@ -64,6 +63,7 @@
     "vue-recaptcha": "2.0.3",
     "vue3-carousel": "0.3.4",
     "vuetify": "3.8.12",
+    "ws": "8.18.3",
     "wslink": "1.12.4"
   },
   "repository": {

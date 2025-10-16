@@ -1,5 +1,5 @@
 <template>
-  <ContextMenuItem
+  <ViewerContextMenuItem
     :itemProps="props.itemProps"
     :tooltip="props.tooltip"
     :btn_image="props.btn_image"
@@ -17,7 +17,7 @@
         />
       </template>
     </template>
-  </ContextMenuItem>
+  </ViewerContextMenuItem>
 </template>
 
 <script setup>
