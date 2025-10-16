@@ -1,7 +1,8 @@
-export const useAppStore = defineStore("appStore", () => {
+export const useAppStore = defineStore("app", () => {
   const stores = []
 
   function registerStore(store) {
+    console.log("[AppStore] Registering store", store.$id)
     stores.push(store)
   }
 
