@@ -18,7 +18,6 @@ describe("AppStore", () => {
       const app_store = useAppStore()
       expect(app_store.stores).toEqual({})
       expect(app_store.storeIds).toEqual([])
-      expect(app_store.actionHistory.value).toEqual([])
     })
   })
 
@@ -87,155 +86,6 @@ describe("AppStore", () => {
 
       const app_store = useAppStore()
       expect(app_store.storeIds).not.toContain("appStore")
-    })
-  })
-
-  describe("action tracking", () => {
-    test("track action calls", () => {
-      const useDataStore = defineStore("dataStore", () => {
-        const items = ref([])
-
-        function addItem(item) {
-          items.value.push(item)
-        }
-
-        function removeItem(id) {
-          items.value = items.value.filter((i) => i.id !== id)
-        }
-
-        return { items, addItem, removeItem }
-      })
-
-      const data_store = useDataStore()
-      const app_store = useAppStore()
-
-      app_store.trackActions()
-
-      data_store.addItem({ id: 1, name: "Item 1" })
-      data_store.addItem({ id: 2, name: "Item 2" })
-      data_store.removeItem(1)
-
-      expect(app_store.actionHistory.value).toHaveLength(3)
-      expect(app_store.actionHistory.value[0].action).toBe("addItem")
-      expect(app_store.actionHistory.value[1].action).toBe("addItem")
-      expect(app_store.actionHistory.value[2].action).toBe("removeItem")
-    })
-
-    test("track specific store actions", () => {
-      const useStore1 = defineStore("store1", () => {
-        function action1() {}
-        return { action1 }
-      })
-      const useStore2 = defineStore("store2", () => {
-        function action2() {}
-        return { action2 }
-      })
-
-      const store1 = useStore1()
-      const store2 = useStore2()
-      const app_store = useAppStore()
-
-      app_store.trackActions("store1")
-
-      store1.action1()
-      store2.action2()
-
-      const store1History = app_store.getHistory({ storeId: "store1" })
-      const store2History = app_store.getHistory({ storeId: "store2" })
-
-      expect(store1History).toHaveLength(1)
-      expect(store2History).toHaveLength(0)
-    })
-
-    test("capture action parameters", () => {
-      const useDataStore = defineStore("dataStore", () => {
-        function registerObject(id, fileName, viewerObject) {
-          return { id, fileName, viewerObject }
-        }
-        return { registerObject }
-      })
-
-      const data_store = useDataStore()
-      const app_store = useAppStore()
-
-      app_store.trackActions()
-
-      data_store.registerObject("obj-123", "model.geode", { type: "BRep" })
-
-      const history = app_store.actionHistory.value
-      expect(history).toHaveLength(1)
-      expect(history[0].storeId).toBe("dataStore")
-      expect(history[0].action).toBe("registerObject")
-      expect(history[0].params).toEqual([
-        "obj-123",
-        "model.geode",
-        { type: "BRep" },
-      ])
-      expect(history[0].timestamp).toBeDefined()
-    })
-
-    test("clear history", () => {
-      const useDataStore = defineStore("dataStore", () => {
-        function testAction() {}
-        return { testAction }
-      })
-
-      const data_store = useDataStore()
-      const app_store = useAppStore()
-
-      app_store.trackActions()
-
-      data_store.testAction()
-      data_store.testAction()
-      data_store.testAction()
-
-      expect(app_store.actionHistory.value).toHaveLength(3)
-
-      app_store.clearHistory()
-
-      expect(app_store.actionHistory.value).toHaveLength(0)
-    })
-
-    test("filter history by action name", () => {
-      const useDataStore = defineStore("dataStore", () => {
-        function addItem() {}
-        function removeItem() {}
-        return { addItem, removeItem }
-      })
-
-      const data_store = useDataStore()
-      const app_store = useAppStore()
-
-      app_store.trackActions()
-
-      data_store.addItem()
-      data_store.removeItem()
-      data_store.addItem()
-
-      const addItemHistory = app_store.getHistory({ action: "addItem" })
-      const removeItemHistory = app_store.getHistory({ action: "removeItem" })
-
-      expect(addItemHistory).toHaveLength(2)
-      expect(removeItemHistory).toHaveLength(1)
-    })
-
-    test("filter history by timestamp", () => {
-      const useDataStore = defineStore("dataStore", () => {
-        function testAction() {}
-        return { testAction }
-      })
-
-      const data_store = useDataStore()
-      const app_store = useAppStore()
-
-      app_store.trackActions()
-
-      const now = new Date()
-      data_store.testAction()
-
-      const recentHistory = app_store.getHistory({ since: now.toISOString() })
-
-      expect(recentHistory).toHaveLength(1)
     })
   })
 
@@ -490,6 +340,95 @@ describe("AppStore", () => {
 
         expect(options_store.counter).toBe(50)
         expect(setup_store.value).toBe(200)
+      })
+    })
+
+    describe("saveSelected", () => {
+      test("save specific stores", () => {
+        const useTestStore1 = defineStore("testStore1", {
+          state: () => ({ count: 5 }),
+        })
+        const useTestStore2 = defineStore("testStore2", {
+          state: () => ({ value: 10 }),
+        })
+        const useTestStore3 = defineStore("testStore3", {
+          state: () => ({ name: "test" }),
+        })
+
+        useTestStore1()
+        useTestStore2()
+        useTestStore3()
+
+        const app_store = useAppStore()
+        const snapshot = app_store.saveSelected(["testStore1", "testStore3"])
+
+        expect(snapshot.testStore1).toEqual({ count: 5 })
+        expect(snapshot.testStore2).toBeUndefined()
+        expect(snapshot.testStore3).toEqual({ name: "test" })
+      })
+
+      test("warn on empty store IDs", () => {
+        const consoleSpy = vi
+          .spyOn(console, "warn")
+          .mockImplementation(() => {})
+
+        const app_store = useAppStore()
+        const snapshot = app_store.saveSelected([])
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[AppStore] saveSelected: no store IDs provided",
+        )
+        expect(snapshot).toEqual({})
+
+        consoleSpy.mockRestore()
+      })
+    })
+
+    describe("loadSelected", () => {
+      test("load specific stores from snapshot", () => {
+        const useTestStore1 = defineStore("testStore1", {
+          state: () => ({ count: 0 }),
+        })
+        const useTestStore2 = defineStore("testStore2", {
+          state: () => ({ value: 0 }),
+        })
+
+        const store1 = useTestStore1()
+        const store2 = useTestStore2()
+
+        const snapshot = {
+          testStore1: { count: 100 },
+          testStore2: { value: 200 },
+        }
+
+        const app_store = useAppStore()
+        app_store.loadSelected(snapshot, ["testStore1"])
+
+        expect(store1.count).toBe(100)
+        expect(store2.value).toBe(0)
+      })
+
+      test("load all stores when no IDs specified", () => {
+        const useTestStore1 = defineStore("testStore1", {
+          state: () => ({ count: 0 }),
+        })
+        const useTestStore2 = defineStore("testStore2", {
+          state: () => ({ value: 0 }),
+        })
+
+        const store1 = useTestStore1()
+        const store2 = useTestStore2()
+
+        const snapshot = {
+          testStore1: { count: 100 },
+          testStore2: { value: 200 },
+        }
+
+        const app_store = useAppStore()
+        app_store.loadSelected(snapshot)
+
+        expect(store1.count).toBe(100)
+        expect(store2.value).toBe(200)
       })
     })
   })
