@@ -1,20 +1,8 @@
-import { getActivePinia } from "pinia"
-
-export function useAppStore() {
+export const useAppStore = defineStore("appStore", () => {
   const stores = []
 
   function registerStore(store) {
     stores.push(store)
-  }
-
-  const pinia = getActivePinia()
-  if (!pinia) {
-    return {
-      registerStore,
-      stores: [],
-      save: () => ({}),
-      load: () => {},
-    }
   }
 
   function save() {
@@ -78,6 +66,4 @@ export function useAppStore() {
     save,
     load,
   }
-}
-
-export default useAppStore
+})
