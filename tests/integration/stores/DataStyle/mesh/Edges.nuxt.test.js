@@ -154,7 +154,7 @@ beforeEach(async () => {
   })
   id = response.data.value.id
 
-  await dataBaseStore.registerObject(id, "mesh")
+  await dataBaseStore.registerObject(id)
   await dataStyleStore.addDataStyle(id, geode_object, "mesh")
 
   expect(viewerStore.status).toBe(Status.CONNECTED)
