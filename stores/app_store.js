@@ -1,3 +1,5 @@
+import { getActivePinia } from "pinia"
+
 function getAllStores() {
   const pinia = getActivePinia()
   if (!pinia) return {}
