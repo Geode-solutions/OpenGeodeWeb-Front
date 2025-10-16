@@ -61,8 +61,8 @@ export const useAppStore = defineStore("appStore", () => {
   }
 
   return {
-    registerStore,
     stores,
+    registerStore,
     save,
     load,
   }
