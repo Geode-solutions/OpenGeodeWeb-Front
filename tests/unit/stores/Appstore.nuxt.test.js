@@ -1,10 +1,9 @@
-import { setActivePinia, defineStore } from "pinia"
+import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
-import { describe, test, expect, beforeEach, vi } from "vitest"
-import { ref, reactive } from "vue"
 import { useAppStore } from "@/stores/app_store.js"
+import { setActivePinia } from "pinia"
 
-beforeEach(() => {
+beforeEach(async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -12,423 +11,195 @@ beforeEach(() => {
   setActivePinia(pinia)
 })
 
-describe("AppStore", () => {
+describe("App Store", () => {
   describe("state", () => {
     test("initial state", () => {
       const app_store = useAppStore()
-      expect(app_store.stores).toEqual({})
-      expect(app_store.storeIds).toEqual([])
-    })
-  })
-
-  describe("store registration", () => {
-    test("register two stores in options mode", () => {
-      const useTestStore1 = defineStore("testStore1", {
-        state: () => ({ count: 0, name: "Store 1" }),
-      })
-      const useTestStore2 = defineStore("testStore2", {
-        state: () => ({ items: ["a", "b"], isActive: true }),
-      })
-
-      useTestStore1()
-      useTestStore2()
-
-      const app_store = useAppStore()
-      expect(app_store.storeIds).toContain("testStore1")
-      expect(app_store.storeIds).toContain("testStore2")
-      expect(app_store.storeIds).toHaveLength(2)
-    })
-
-    test("register two stores in setup mode", () => {
-      const useTestStore1 = defineStore("setupStore1", () => {
-        const count = ref(0)
-        const name = ref("Setup Store 1")
-        return { count, name }
-      })
-      const useTestStore2 = defineStore("setupStore2", () => {
-        const items = ref(["a", "b"])
-        const isActive = ref(true)
-        return { items, isActive }
-      })
-
-      useTestStore1()
-      useTestStore2()
-
-      const app_store = useAppStore()
-      expect(app_store.storeIds).toContain("setupStore1")
-      expect(app_store.storeIds).toContain("setupStore2")
-      expect(app_store.storeIds).toHaveLength(2)
-    })
-
-    test("register mixed stores", () => {
-      const useOptionsStore = defineStore("optionsStore", {
-        state: () => ({ value: 42 }),
-      })
-      const useSetupStore = defineStore("setupStore", () => {
-        const value = ref(100)
-        return { value }
-      })
-
-      useOptionsStore()
-      useSetupStore()
-
-      const app_store = useAppStore()
-      expect(app_store.storeIds).toContain("optionsStore")
-      expect(app_store.storeIds).toContain("setupStore")
-      expect(app_store.storeIds).toHaveLength(2)
-    })
-
-    test("not register appStore itself", () => {
-      const useTestStore = defineStore("testStore", {
-        state: () => ({ value: 42 }),
-      })
-      useTestStore()
-
-      const app_store = useAppStore()
-      expect(app_store.storeIds).not.toContain("appStore")
+      expectTypeOf(app_store.stores).toBeArray()
+      expectTypeOf(app_store.save).toBeFunction()
+      expectTypeOf(app_store.load).toBeFunction()
+      expectTypeOf(app_store.registerStore).toBeFunction()
     })
   })
 
   describe("actions", () => {
-    describe("saveAll", () => {
-      test("save two stores state in options mode", () => {
-        const useTestStore1 = defineStore("testStore1", {
-          state: () => ({ count: 5, name: "Test" }),
-        })
-        const useTestStore2 = defineStore("testStore2", {
-          state: () => ({ items: ["x", "y"], isActive: false }),
-        })
-
-        useTestStore1()
-        useTestStore2()
-
+    describe("registerStore", () => {
+      test("register single store", () => {
         const app_store = useAppStore()
-        const snapshot = app_store.saveAll()
+        const mock_store = {
+          $id: "testStore",
+          save: vi.fn().mockImplementation(() => ({ data: "test" })),
+          load: vi.fn().mockImplementation(() => {}),
+        }
 
-        expect(snapshot.testStore1).toEqual({ count: 5, name: "Test" })
-        expect(snapshot.testStore2).toEqual({
-          items: ["x", "y"],
-          isActive: false,
-        })
+        app_store.registerStore(mock_store)
+
+        expect(app_store.stores.length).toBe(1)
+        expect(app_store.stores[0]).toStrictEqual(mock_store)
       })
 
-      test("save two stores state in setup mode", () => {
-        const useTestStore1 = defineStore("setupStore1", () => {
-          const count = ref(10)
-          const name = ref("Setup Test")
-          return { count, name }
-        })
-        const useTestStore2 = defineStore("setupStore2", () => {
-          const items = ref(["foo", "bar"])
-          const isActive = ref(true)
-          return { items, isActive }
-        })
-
-        useTestStore1()
-        useTestStore2()
-
+      test("register multiple stores", () => {
         const app_store = useAppStore()
-        const snapshot = app_store.saveAll()
+        const mock_store_1 = {
+          $id: "userStore",
+          save: vi.fn().mockImplementation(() => {}),
+          load: vi.fn().mockImplementation(() => {}),
+        }
+        const mock_store_2 = {
+          $id: "cartStore",
+          save: vi.fn().mockImplementation(() => {}),
+          load: vi.fn().mockImplementation(() => {}),
+        }
 
-        expect(snapshot.setupStore1).toEqual({ count: 10, name: "Setup Test" })
-        expect(snapshot.setupStore2).toEqual({
-          items: ["foo", "bar"],
-          isActive: true,
-        })
-      })
+        app_store.registerStore(mock_store_1)
+        app_store.registerStore(mock_store_2)
 
-      test("create deep copy", () => {
-        const useTestStore = defineStore("testStore", {
-          state: () => ({ nested: { value: "original" } }),
-        })
-
-        useTestStore()
-        const app_store = useAppStore()
-        const snapshot = app_store.saveAll()
-
-        snapshot.testStore.nested.value = "modified"
-
-        const store = app_store.stores.testStore
-        expect(store.$state.nested.value).toBe("original")
+        expect(app_store.stores.length).toBe(2)
+        expect(app_store.stores[0].$id).toBe("userStore")
+        expect(app_store.stores[1].$id).toBe("cartStore")
       })
     })
 
-    describe("loadAll", () => {
-      test("restore state from snapshot in options mode", () => {
-        const useTestStore1 = defineStore("testStore1", {
-          state: () => ({ count: 0 }),
-        })
-        const useTestStore2 = defineStore("testStore2", {
-          state: () => ({ items: [] }),
-        })
-
-        const store1 = useTestStore1()
-        const store2 = useTestStore2()
-
-        const snapshot = {
-          testStore1: { count: 42 },
-          testStore2: { items: ["a", "b", "c"] },
+    describe("save", () => {
+      test("save stores with save method", () => {
+        const app_store = useAppStore()
+        const mock_store_1 = {
+          $id: "userStore",
+          save: vi.fn().mockImplementation(() => ({
+            name: "toto",
+            email: "toto@titi.com",
+          })),
+          load: vi.fn().mockImplementation(() => {}),
+        }
+        const mock_store_2 = {
+          $id: "cartStore",
+          save: vi.fn().mockImplementation(() => ({ items: [], total: 0 })),
+          load: vi.fn().mockImplementation(() => {}),
         }
 
-        const app_store = useAppStore()
-        app_store.loadAll(snapshot)
+        app_store.registerStore(mock_store_1)
+        app_store.registerStore(mock_store_2)
 
-        expect(store1.count).toBe(42)
-        expect(store2.items).toEqual(["a", "b", "c"])
+        const snapshot = app_store.save()
+
+        expect(mock_store_1.save).toHaveBeenCalledTimes(1)
+        expect(mock_store_2.save).toHaveBeenCalledTimes(1)
+        expect(snapshot).toEqual({
+          userStore: { name: "toto", email: "toto@titi.com" },
+          cartStore: { items: [], total: 0 },
+        })
       })
 
-      test("restore state from snapshot in setup mode", () => {
-        const useTestStore1 = defineStore("setupStore1", () => {
-          const count = ref(0)
-          return { count }
-        })
-        const useTestStore2 = defineStore("setupStore2", () => {
-          const items = ref([])
-          return { items }
-        })
-
-        const store1 = useTestStore1()
-        const store2 = useTestStore2()
-
-        const snapshot = {
-          setupStore1: { count: 99 },
-          setupStore2: { items: ["x", "y", "z"] },
+      test("skip stores without save method", () => {
+        const app_store = useAppStore()
+        const mock_store_1 = {
+          $id: "withSave",
+          save: vi.fn().mockImplementation(() => ({ data: "test" })),
+          load: vi.fn().mockImplementation(() => {}),
+        }
+        const mock_store_2 = {
+          $id: "withoutSave",
+          load: vi.fn().mockImplementation(() => {}),
         }
 
-        const app_store = useAppStore()
-        app_store.loadAll(snapshot)
+        app_store.registerStore(mock_store_1)
+        app_store.registerStore(mock_store_2)
 
-        expect(store1.count).toBe(99)
-        expect(store2.items).toEqual(["x", "y", "z"])
+        const snapshot = app_store.save()
+
+        expect(mock_store_1.save).toHaveBeenCalledTimes(1)
+        expect(snapshot).toEqual({
+          withSave: { data: "test" },
+        })
+        expect(snapshot.withoutSave).toBeUndefined()
       })
 
-      test("handle partial snapshot", () => {
-        const useTestStore1 = defineStore("testStore1", {
-          state: () => ({ count: 10 }),
-        })
-        const useTestStore2 = defineStore("testStore2", {
-          state: () => ({ value: 20 }),
-        })
-
-        const store1 = useTestStore1()
-        const store2 = useTestStore2()
-
-        const snapshot = { testStore1: { count: 100 } }
-
+      test("return empty snapshot when no stores registered", () => {
         const app_store = useAppStore()
-        app_store.loadAll(snapshot)
-
-        expect(store1.count).toBe(100)
-        expect(store2.value).toBe(20)
-      })
-
-      test("warn on non-existent store", () => {
-        const consoleSpy = vi
-          .spyOn(console, "warn")
-          .mockImplementation(() => {})
-
-        const useTestStore = defineStore("testStore", {
-          state: () => ({ count: 0 }),
-        })
-        useTestStore()
-
-        const snapshot = {
-          testStore: { count: 42 },
-          nonExistent: { value: 999 },
-        }
-
-        const app_store = useAppStore()
-        app_store.loadAll(snapshot)
-
-        expect(consoleSpy).toHaveBeenCalledWith(
-          '[AppStore] Store "nonExistent" not found',
-        )
-
-        consoleSpy.mockRestore()
-      })
-
-      test("handle invalid snapshot", () => {
-        const consoleSpy = vi
-          .spyOn(console, "warn")
-          .mockImplementation(() => {})
-
-        const app_store = useAppStore()
-        app_store.loadAll(null)
-
-        expect(consoleSpy).toHaveBeenCalledWith(
-          "[AppStore] loadAll called with invalid snapshot",
-        )
-
-        consoleSpy.mockRestore()
-      })
-    })
-
-    describe("saveAll + loadAll", () => {
-      test("complete save and restore in options mode", () => {
-        const useStyleStore = defineStore("dataStyle", {
-          state: () => ({
-            styles: {
-              mesh1: { color: "#ff0000", opacity: 0.8 },
-            },
-          }),
-        })
-
-        const style_store = useStyleStore()
-        const app_store = useAppStore()
-
-        const snapshot1 = app_store.saveAll()
-
-        style_store.styles.mesh1.color = "#0000ff"
-        style_store.styles.mesh1.opacity = 0.5
-
-        const snapshot2 = app_store.saveAll()
-        expect(snapshot2.dataStyle.styles.mesh1.color).toBe("#0000ff")
-
-        app_store.loadAll(snapshot1)
-        expect(style_store.styles.mesh1.color).toBe("#ff0000")
-        expect(style_store.styles.mesh1.opacity).toBe(0.8)
-      })
-
-      test("complete save and restore in setup mode", () => {
-        const useConfigStore = defineStore("configStore", () => {
-          const settings = reactive({
-            theme: "dark",
-            layout: { width: 1200, height: 800 },
-          })
-          return { settings }
-        })
-
-        const config_store = useConfigStore()
-        const app_store = useAppStore()
-
-        const snapshot1 = app_store.saveAll()
-
-        config_store.settings.theme = "light"
-        config_store.settings.layout.width = 1920
-
-        const snapshot2 = app_store.saveAll()
-        expect(snapshot2.configStore.settings.theme).toBe("light")
-        expect(snapshot2.configStore.settings.layout.width).toBe(1920)
-
-        app_store.loadAll(snapshot1)
-        expect(config_store.settings.theme).toBe("dark")
-        expect(config_store.settings.layout.width).toBe(1200)
-      })
-
-      test("save and restore mixed stores", () => {
-        const useOptionsStore = defineStore("optionsStore", {
-          state: () => ({ counter: 0 }),
-        })
-        const useSetupStore = defineStore("setupStore", () => {
-          const value = ref(100)
-          return { value }
-        })
-
-        const options_store = useOptionsStore()
-        const setup_store = useSetupStore()
-        const app_store = useAppStore()
-
-        options_store.counter = 50
-        setup_store.value = 200
-
-        const snapshot = app_store.saveAll()
-
-        options_store.counter = 0
-        setup_store.value = 0
-
-        app_store.loadAll(snapshot)
-
-        expect(options_store.counter).toBe(50)
-        expect(setup_store.value).toBe(200)
-      })
-    })
-
-    describe("saveSelected", () => {
-      test("save specific stores", () => {
-        const useTestStore1 = defineStore("testStore1", {
-          state: () => ({ count: 5 }),
-        })
-        const useTestStore2 = defineStore("testStore2", {
-          state: () => ({ value: 10 }),
-        })
-        const useTestStore3 = defineStore("testStore3", {
-          state: () => ({ name: "test" }),
-        })
-
-        useTestStore1()
-        useTestStore2()
-        useTestStore3()
-
-        const app_store = useAppStore()
-        const snapshot = app_store.saveSelected(["testStore1", "testStore3"])
-
-        expect(snapshot.testStore1).toEqual({ count: 5 })
-        expect(snapshot.testStore2).toBeUndefined()
-        expect(snapshot.testStore3).toEqual({ name: "test" })
-      })
-
-      test("warn on empty store IDs", () => {
-        const consoleSpy = vi
-          .spyOn(console, "warn")
-          .mockImplementation(() => {})
-
-        const app_store = useAppStore()
-        const snapshot = app_store.saveSelected([])
-
-        expect(consoleSpy).toHaveBeenCalledWith(
-          "[AppStore] saveSelected: no store IDs provided",
-        )
+        const snapshot = app_store.save()
         expect(snapshot).toEqual({})
-
-        consoleSpy.mockRestore()
       })
     })
 
-    describe("loadSelected", () => {
-      test("load specific stores from snapshot", () => {
-        const useTestStore1 = defineStore("testStore1", {
-          state: () => ({ count: 0 }),
-        })
-        const useTestStore2 = defineStore("testStore2", {
-          state: () => ({ value: 0 }),
-        })
-
-        const store1 = useTestStore1()
-        const store2 = useTestStore2()
-
-        const snapshot = {
-          testStore1: { count: 100 },
-          testStore2: { value: 200 },
+    describe("load", () => {
+      test("load stores with load method", () => {
+        const app_store = useAppStore()
+        const mock_store_1 = {
+          $id: "userStore",
+          save: vi.fn().mockImplementation(() => {}),
+          load: vi.fn().mockImplementation(() => {}),
+        }
+        const mock_store_2 = {
+          $id: "cartStore",
+          save: vi.fn().mockImplementation(() => {}),
+          load: vi.fn().mockImplementation(() => {}),
         }
 
-        const app_store = useAppStore()
-        app_store.loadSelected(snapshot, ["testStore1"])
+        app_store.registerStore(mock_store_1)
+        app_store.registerStore(mock_store_2)
 
-        expect(store1.count).toBe(100)
-        expect(store2.value).toBe(0)
+        const snapshot = {
+          userStore: { name: "tata", email: "tata@tutu.com" },
+          cartStore: { items: [{ id: 1 }], total: 50 },
+        }
+
+        app_store.load(snapshot)
+
+        expect(mock_store_1.load).toHaveBeenCalledTimes(1)
+        expect(mock_store_1.load).toHaveBeenCalledWith({
+          name: "tata",
+          email: "tata@tutu.com",
+        })
+        expect(mock_store_2.load).toHaveBeenCalledTimes(1)
+        expect(mock_store_2.load).toHaveBeenCalledWith({
+          items: [{ id: 1 }],
+          total: 50,
+        })
       })
 
-      test("load all stores when no IDs specified", () => {
-        const useTestStore1 = defineStore("testStore1", {
-          state: () => ({ count: 0 }),
-        })
-        const useTestStore2 = defineStore("testStore2", {
-          state: () => ({ value: 0 }),
-        })
-
-        const store1 = useTestStore1()
-        const store2 = useTestStore2()
-
-        const snapshot = {
-          testStore1: { count: 100 },
-          testStore2: { value: 200 },
+      test("skip stores without load method", () => {
+        const app_store = useAppStore()
+        const mock_store_1 = {
+          $id: "withLoad",
+          save: vi.fn().mockImplementation(() => {}),
+          load: vi.fn().mockImplementation(() => {}),
+        }
+        const mock_store_2 = {
+          $id: "withoutLoad",
+          save: vi.fn().mockImplementation(() => {}),
         }
 
-        const app_store = useAppStore()
-        app_store.loadSelected(snapshot)
+        app_store.registerStore(mock_store_1)
+        app_store.registerStore(mock_store_2)
 
-        expect(store1.count).toBe(100)
-        expect(store2.value).toBe(200)
+        const snapshot = {
+          withLoad: { data: "test" },
+          withoutLoad: { data: "ignored" },
+        }
+
+        app_store.load(snapshot)
+
+        expect(mock_store_1.load).toHaveBeenCalledTimes(1)
+        expect(mock_store_2.load).toBeUndefined()
+      })
+
+      test("warn when store not found in snapshot", () => {
+        const app_store = useAppStore()
+        const console_warn_spy = vi
+          .spyOn(console, "warn")
+          .mockImplementation(() => {})
+        const mock_store = {
+          $id: "testStore",
+          load: vi.fn().mockImplementation(() => {}),
+        }
+
+        app_store.registerStore(mock_store)
+        app_store.load({})
+
+        expect(console_warn_spy).toHaveBeenCalledWith(
+          expect.stringContaining("Stores not found in snapshot: testStore"),
+        )
+        console_warn_spy.mockRestore()
       })
     })
   })
