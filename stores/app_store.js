@@ -2,6 +2,15 @@ export const useAppStore = defineStore("app", () => {
   const stores = []
 
   function registerStore(store) {
+    const isAlreadyRegistered = stores.some(
+      (registeredStore) => registeredStore.$id === store.$id,
+    )
+
+    if (isAlreadyRegistered) {
+      console.log(`[AppStore] Store "${store.$id}" already registered, skipping`)
+      return
+    }
+
     console.log("[AppStore] Registering store", store.$id)
     stores.push(store)
   }

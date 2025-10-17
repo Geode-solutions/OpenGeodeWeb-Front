@@ -1,6 +1,4 @@
-import { useAppStore } from "../stores/app_store"
-
-export const autoStoreRegister = ({ store }) => {
+const autoRegister = ({ store }) => {
   if (!store || !store.$id) {
     console.warn("[AutoRegister] Invalid store object received", store)
     return
@@ -11,19 +9,11 @@ export const autoStoreRegister = ({ store }) => {
   }
 
   const appStore = useAppStore()
-
-  const isAlreadyRegistered = appStore.stores.some(
-    (registeredStore) => registeredStore.$id === store.$id,
-  )
-
-  if (!isAlreadyRegistered) {
-    appStore.registerStore(store)
-    console.log(`[AutoRegister] Store "${store.$id}" registered`)
-  } else {
-    console.log(
-      `[AutoRegister] Store "${store.$id}" already registered, skipping`,
-    )
-  }
+  appStore.registerStore(store)
+  console.log(`[AutoRegister] Store "${store.$id}" processed`)
 }
 
-export default autoStoreRegister
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.$pinia.use(autoRegister)
+  console.log("[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front")
+})
