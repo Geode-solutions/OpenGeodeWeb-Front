@@ -23,10 +23,10 @@ export const useAppStore = defineStore("app", () => {
 
     const treeviewStore = useTreeviewStore()
     treeviewStore.addToTree(
-      value.geode_object, 
-      value.displayed_name, 
-      id, 
-      value.object_type
+      value.geode_object,
+      value.displayed_name,
+      id,
+      value.object_type,
     )
 
     const hybridViewerStore = useHybridViewerStore()
