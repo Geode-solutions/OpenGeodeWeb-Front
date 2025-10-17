@@ -18,11 +18,9 @@ export const useAppStore = defineStore("app", () => {
   }
 
   async function addItem(id, value) {
-    // 1. Store in database
     const dataBaseStore = useDataBaseStore()
     await dataBaseStore.addItem(id, value)
 
-    // 2. Add to tree
     const treeviewStore = useTreeviewStore()
     treeviewStore.addToTree(
       value.geode_object, 
@@ -31,7 +29,6 @@ export const useAppStore = defineStore("app", () => {
       value.object_type
     )
 
-    // 3. Add to viewer
     const hybridViewerStore = useHybridViewerStore()
     hybridViewerStore.addToViewer(id, value.vtk_js)
   }
