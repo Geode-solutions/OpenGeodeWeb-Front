@@ -7,7 +7,9 @@ export const useAppStore = defineStore("app", () => {
     )
 
     if (isAlreadyRegistered) {
-      console.log(`[AppStore] Store "${store.$id}" already registered, skipping`)
+      console.log(
+        `[AppStore] Store "${store.$id}" already registered, skipping`,
+      )
       return
     }
 

@@ -15,5 +15,7 @@ const autoRegister = ({ store }) => {
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.$pinia.use(autoRegister)
-  console.log("[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front")
+  console.log(
+    "[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front",
+  )
 })
