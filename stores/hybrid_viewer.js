@@ -18,6 +18,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   let viewStream
   let gridActor = null
 
+  async function addToViewer(id, vtk_js) {
+    if (vtk_js && vtk_js.binary_light_viewable) {
+      await addItem(id, vtk_js)
+    }
+  }
+
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) return
     status.value = Status.CREATING
@@ -187,6 +193,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   return {
     db,
     genericRenderWindow,
+    addToViewer,
     addItem,
     setVisibility,
     setZScaling,

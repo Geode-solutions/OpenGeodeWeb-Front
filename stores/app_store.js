@@ -17,6 +17,22 @@ export const useAppStore = defineStore("app", () => {
     stores.push(store)
   }
 
+  async function addItem(id, value) {
+    const dataBaseStore = useDataBaseStore()
+    await dataBaseStore.addItem(id, value)
+
+    const treeviewStore = useTreeviewStore()
+    treeviewStore.addToTree(
+      value.geode_object,
+      value.displayed_name,
+      id,
+      value.object_type,
+    )
+
+    const hybridViewerStore = useHybridViewerStore()
+    hybridViewerStore.addToViewer(id, value.vtk_js)
+  }
+
   function save() {
     const snapshot = {}
     let savedCount = 0
@@ -79,6 +95,7 @@ export const useAppStore = defineStore("app", () => {
   return {
     stores,
     registerStore,
+    addItem,
     save,
     load,
   }
