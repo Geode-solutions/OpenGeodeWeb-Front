@@ -15,7 +15,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function addToTree(geodeObject, displayedName, id, objectType) {
     dataStyleStore.addDataStyle(id, geodeObject, objectType)
     const child = { title: displayedName, id, object_type: objectType }
-    
+
     for (let i = 0; i < items.value.length; i++) {
       if (items.value[i].title === geodeObject) {
         items.value[i].children.push(child)
