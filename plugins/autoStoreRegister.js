@@ -1,9 +1,4 @@
-const autoRegister = ({ store }) => {
-  if (!store || !store.$id) {
-    console.warn("[AutoRegister] Invalid store object received", store)
-    return
-  }
-
+const autoStoreRegister = ({ store }) => {
   if (store.$id === "app") {
     return
   }
@@ -14,6 +9,6 @@ const autoRegister = ({ store }) => {
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.$pinia.use(autoRegister)
+  nuxtApp.$pinia.use(autoStoreRegister)
   console.log("[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front")
 })
