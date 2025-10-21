@@ -63,6 +63,7 @@
     "vue-recaptcha": "2.0.3",
     "vue3-carousel": "0.3.4",
     "vuetify": "3.8.12",
+    "ws": "8.18.3",
     "wslink": "1.12.4"
   },
   "repository": {

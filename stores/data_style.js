@@ -15,10 +15,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     if (object_type === "mesh") {
       return meshStyleStore.applyMeshDefaultStyle(id)
     } else if (object_type === "model") {
-      return Promise.all([
+      return [
         modelStyleStore.setMeshComponentsDefaultStyle(id),
         modelStyleStore.applyModelDefaultStyle(id),
-      ])
+      ]
     } else {
       throw new Error("Unknown object type")
     }

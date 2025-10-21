@@ -15,6 +15,9 @@ export default function useMeshStyle() {
   const meshPolyhedraStyleStore = useMeshPolyhedraStyle()
   const hybridViewerStore = useHybridViewerStore()
 
+  function meshVisibility(id) {
+    return dataStyleStore.styles[id].visibility
+  }
   function setMeshVisibility(id, visibility) {
     return viewer_call(
       {
@@ -25,7 +28,7 @@ export default function useMeshStyle() {
         response_function: () => {
           hybridViewerStore.setVisibility(id, visibility)
           dataStyleStore.styles[id].visibility = visibility
-          console.log(`${setMeshVisibility.name} ${id} ${visibility}`)
+          console.log(`${setMeshVisibility.name} ${id} ${meshVisibility(id)}`)
         },
       },
     )
@@ -55,6 +58,7 @@ export default function useMeshStyle() {
   }
 
   return {
+    meshVisibility,
     setMeshVisibility,
     applyMeshDefaultStyle,
     ...useMeshPointsStyle(),
