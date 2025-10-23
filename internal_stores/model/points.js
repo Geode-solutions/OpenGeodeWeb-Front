@@ -7,6 +7,10 @@ export function useModelPointsStyle() {
   function modelPointsVisibility(id) {
     return dataStyleStore.styles[id].points.visibility
   }
+  function modelPointsSize(id) {
+    return dataStyleStore.styles[id].points.size
+  }
+
   function setModelPointsVisibility(id, visibility) {
     return viewer_call(
       {
@@ -16,17 +20,12 @@ export function useModelPointsStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].points.visibility = visibility
-          console.log(
-            `${setModelPointsVisibility.name} ${id} ${modelPointsVisibility(id)}`,
-          )
+          console.log("setModelPointsVisibility", visibility)
         },
       },
     )
   }
 
-  function modelPointsSize(id) {
-    return dataStyleStore.styles[id].points.size
-  }
   function setModelPointsSize(id, size) {
     return viewer_call(
       {
@@ -36,7 +35,7 @@ export function useModelPointsStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].points.size = size
-          console.log(`${setModelPointsSize.name} ${id} ${modelPointsSize(id)}`)
+          console.log("setModelPointsSize", size)
         },
       },
     )
@@ -52,11 +51,11 @@ export function useModelPointsStyle() {
   }
 
   return {
-    applyModelPointsStyle,
     modelPointsVisibility,
     modelPointsSize,
     setModelPointsVisibility,
     setModelPointsSize,
+    applyModelPointsStyle,
     setModelPointsDefaultStyle,
   }
 }

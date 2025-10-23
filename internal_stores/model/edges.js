@@ -4,16 +4,11 @@ const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges
 export function useModelEdgesStyle() {
   const dataStyleStore = useDataStyleStore()
 
-  function edgesStyle(id) {
-    return dataStyleStore.getStyle(id).edges
-  }
-
   function modelEdgesVisibility(id) {
-    return edgesStyle(id).visibility
+    return dataStyleStore.styles[id].edges.visibility
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    const edges_style = edgesStyle(id)
     return viewer_call(
       {
         schema: model_edges_schemas.visibility,
@@ -21,10 +16,8 @@ export function useModelEdgesStyle() {
       },
       {
         response_function: () => {
-          edges_style.visibility = visibility
-          console.log(
-            `${setModelEdgesVisibility.name} ${id} ${modelEdgesVisibility(id)}`,
-          )
+          dataStyleStore.styles[id].edges.visibility = visibility
+          console.log("setModelEdgesVisibility", visibility)
         },
       },
     )

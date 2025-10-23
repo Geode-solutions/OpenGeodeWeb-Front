@@ -2,12 +2,16 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 
 export function useSurfacesStyle() {
+  /** State **/
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
 
+  /** Getters **/
   function surfaceVisibility(id, surface_id) {
     return dataStyleStore.styles[id].surfaces[surface_id].visibility
   }
+
+  /** Actions **/
   function setSurfaceVisibility(id, surface_ids, visibility) {
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
     return viewer_call(
@@ -23,12 +27,7 @@ export function useSurfacesStyle() {
             dataStyleStore.styles[id].surfaces[surface_id].visibility =
               visibility
           }
-          console.log(
-            `${setSurfaceVisibility.name} ${id} ${block_ids} ${surfaceVisibility(
-              id,
-              block_ids[0],
-            )}`,
-          )
+          console.log("setSurfaceVisibility", surface_ids, visibility)
         },
       },
     )
@@ -36,7 +35,7 @@ export function useSurfacesStyle() {
 
   function setSurfacesDefaultStyle(id) {
     const surface_ids = dataBaseStore.getSurfacesUuids(id)
-    return setSurfaceVisibility(
+    setSurfaceVisibility(
       id,
       surface_ids,
       dataStyleStore.styles[id].surfaces.visibility,
@@ -45,13 +44,9 @@ export function useSurfacesStyle() {
 
   function applySurfacesStyle(id) {
     const surfaces = dataStyleStore.styles[id].surfaces
-    const promise_array = []
     for (const [surface_id, style] of Object.entries(surfaces)) {
-      promise_array.push(
-        setSurfaceVisibility(id, [surface_id], style.visibility),
-      )
+      setSurfaceVisibility(id, [surface_id], style.visibility)
     }
-    return Promise.all(promise_array)
   }
 
   return {
