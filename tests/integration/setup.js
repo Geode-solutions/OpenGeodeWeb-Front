@@ -96,18 +96,21 @@ vi.stubGlobal("navigator", {
   },
 })
 
-const data_folder_path = path.join(__dirname, "..", "..", "..", "data")
-
 let foldersBeforeTests = new Set()
+
+const data_folder = path.join("tests", "integration", "data")
 beforeAll(() => {
   global.WebSocket = WebSocket
-  foldersBeforeTests = getCurrentFolders(data_folder_path)
+  foldersBeforeTests = getCurrentFolders(data_folder)
   console.log("foldersBeforeTests", foldersBeforeTests)
 })
 
 afterAll(() => {
+  console.log("afterAll")
   delete global.WebSocket
-  cleanupCreatedFolders(data_folder_path, foldersBeforeTests)
+  setTimeout(() => {
+    cleanupCreatedFolders(data_folder, foldersBeforeTests)
+  }, 2000)
 })
 
 export { setupIntegrationTests }

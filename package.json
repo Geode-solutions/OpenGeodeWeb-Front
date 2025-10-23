@@ -5,7 +5,7 @@
     "test": "npm run test:unit",
     "tests": "vitest --config ./tests/vitest.config.js",
     "test:unit": "npm run tests --project unit",
-    "test:integration": "npm run tests --project integration --fileParallelism=false",
+    "test:integration": "npm run tests --project integration",
     "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
     "build": ""
   },

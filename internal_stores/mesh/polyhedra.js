@@ -33,7 +33,7 @@ export function useMeshPolyhedraStyle() {
     const coloring = meshPolyhedraStyle(id).coloring
     coloring.active = type
     console.log(
-      `${setMeshPolyhedraActiveColoring.name} ${meshPolyhedraActiveColoring(id)}`,
+      `${setMeshPolyhedraActiveColoring.name} ${id} ${meshPolyhedraActiveColoring(id)}`,
     )
     if (type === "color") {
       return setMeshPolyhedraColor(id, coloring.color)
@@ -54,7 +54,9 @@ export function useMeshPolyhedraStyle() {
       {
         response_function: () => {
           coloring.color = color
-          console.log(`${setMeshPolyhedraColor.name} ${meshPolyhedraColor(id)}`)
+          console.log(
+            `${setMeshPolyhedraColor.name} ${id} ${meshPolyhedraColor(id)}`,
+          )
         },
       },
     )

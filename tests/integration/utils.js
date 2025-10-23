@@ -2,8 +2,6 @@
 import fs from "fs"
 import path from "path"
 
-let foldersBeforeTests = new Set()
-
 function getCurrentFolders(dataFolderPath) {
   if (!fs.existsSync(dataFolderPath)) {
     return new Set()
@@ -24,10 +22,12 @@ function cleanupCreatedFolders(dataFolderPath, foldersBeforeTests) {
     return
   }
   const currentFolders = getCurrentFolders(dataFolderPath)
+  console.log("getCurrentFolders currentFolders", currentFolders)
   for (const folder of currentFolders) {
     if (!foldersBeforeTests.has(folder)) {
       const folderPath = path.join(dataFolderPath, folder)
       fs.rmSync(folderPath, { recursive: true, force: true })
+      console.log(`Deleted folder: ${folderPath}`)
     }
   }
 }

@@ -12,10 +12,7 @@ export function api_fetch(
   const { valid, error } = validate_schema(schema, body)
 
   if (!valid) {
-    if (
-      process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === "test"
-    ) {
+    if (process.env.NODE_ENV !== "production") {
       console.log("Bad request", error, schema, params)
     }
     feedback_store.add_error(400, schema.$id, "Bad request", error)
