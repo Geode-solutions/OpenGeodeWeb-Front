@@ -50,13 +50,15 @@ export const useInfraStore = defineStore("infra", {
         if (this.app_mode == appMode.appMode.DESKTOP) {
           const viewer_store = useViewerStore()
           const geode_store = useGeodeStore()
-          const back_port = await window.electronAPI.run_back(
-            geode_store.default_local_port,
-          )
+
+          const [back_port, viewer_port] = await Promise.all([
+            window.electronAPI.run_back(),
+            window.electronAPI.run_viewer(),
+          ])
           geode_store.$patch({ default_local_port: back_port })
-          const viewer_port = await window.electronAPI.run_viewer(
-            viewer_store.default_local_port,
-          )
+
+          geode_store.$patch({ default_local_port: back_port })
+          const viewer_port = await window.electronAPI.run_viewer()
           viewer_store.$patch({ default_local_port: viewer_port })
         } else if (this.app_mode == appMode.appMode.CLOUD) {
           const { data, error } = await useFetch(this.lambda_url, {
