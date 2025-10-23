@@ -41,7 +41,7 @@ export default function useMeshStyle() {
       if (key == "visibility") {
         promise_array.push(setMeshVisibility(id, value))
       } else if (key == "points") {
-        promise_array.push(pointsStyleStore.applyPointsStyle(id, value))
+        promise_array.push(pointsStyleStore.applyMeshPointsStyle(id, value))
       } else if (key == "edges") {
         promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id, value))
       } else if (key == "polygons") {
