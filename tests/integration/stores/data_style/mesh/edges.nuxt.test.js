@@ -1,31 +1,48 @@
-// Global imports
+// Node.js imports
 
 // Third party imports
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_f/utils/status"
-import * as composables from "@ogw_f/composables/viewer_call"
-import { useDataStyleStore } from "@ogw_f/stores/data_style"
-import { useViewerStore } from "@ogw_f/stores/viewer"
-import { setupTests } from "../setup.test.js"
-import { kill_viewer } from "@ogw_f/utils/local"
+import Status from "~/utils/status"
+import * as composables from "~/composables/viewer_call"
+import { useDataStyleStore } from "~/stores/data_style"
+import { useViewerStore } from "~/stores/viewer"
+import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
-const id = "fake_id"
-const file_name = "edged_curve.vtp"
+let id, back_port, viewer_port
+const file_name = "test.og_edc2d"
 const geode_object = "EdgedCurve2D"
 const object_type = "mesh"
 
 beforeEach(async () => {
-  await setupTests(id, file_name, geode_object, object_type)
-})
+  ;({ id, back_port, viewer_port } = await setupIntegrationTests(
+    file_name,
+    geode_object,
+    object_type,
+  ))
+  console.log(
+    "beforeEach edges id",
+    id,
+    "back_port",
+    back_port,
+    "viewer_port",
+    viewer_port,
+  )
+}, 25000)
+
 afterEach(async () => {
   const viewerStore = useViewerStore()
-  await kill_viewer(viewerStore.default_local_port)
+  const geodeStore = useGeodeStore()
+
+  console.log("afterEach back_port", back_port)
+  console.log("afterEach viewer_port", viewer_port)
+  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
+
 describe("Mesh edges", () => {
   describe("Edges visibility", () => {
     test("Visibility true", async () => {

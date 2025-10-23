@@ -28,10 +28,10 @@ export function useMeshEdgesStyle() {
   }
 
   function meshEdgesActiveColoring(id) {
-    return edgesStyle(id).coloring.active
+    return meshEdgesStyle(id).coloring.active
   }
   function setMeshEdgesActiveColoring(id, type) {
-    const coloring = edgesStyle(id).coloring
+    const coloring = meshEdgesStyle(id).coloring
     coloring.active = type
     console.log(
       `${setMeshEdgesActiveColoring.name} ${id} ${meshEdgesActiveColoring(id)}`,

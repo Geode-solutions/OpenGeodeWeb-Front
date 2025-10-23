@@ -1,30 +1,36 @@
-// Global imports
+// Node.js imports
 
 // Third party imports
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_f/utils/status"
-import * as composables from "@ogw_f/composables/viewer_call"
-import { useDataStyleStore } from "@ogw_f/stores/data_style"
-import { useViewerStore } from "@ogw_f/stores/viewer"
-import { kill_viewer } from "@ogw_f/utils/local"
-import { setupTests } from "../setup.test.js"
+import Status from "~/utils/status"
+import * as composables from "~/composables/viewer_call"
+import { useDataStyleStore } from "~/stores/data_style"
+import { useViewerStore } from "~/stores/viewer"
+import { kill_back, kill_viewer } from "~/utils/local"
+import { setupIntegrationTests } from "./integration/setup.js"
 
 // Local constants
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
-const id = "fake_id"
-const file_name = "edged_curve.vtp"
+let id
+const file_name = "test.og_edc2d"
 const geode_object = "EdgedCurve2D"
 const object_type = "mesh"
 
 beforeEach(async () => {
-  await setupTests(id, file_name, geode_object, object_type)
-})
+  id = await setupIntegrationTests(file_name, geode_object, object_type)
+  console.log("beforeEach points id", id)
+}, 25000)
+
 afterEach(async () => {
   const viewerStore = useViewerStore()
-  await kill_viewer(viewerStore.default_local_port)
+  const geodeStore = useGeodeStore()
+  await Promise.all([
+    kill_back(geodeStore.default_local_port),
+    kill_viewer(viewerStore.default_local_port),
+  ])
 })
 
 describe("Mesh points", () => {

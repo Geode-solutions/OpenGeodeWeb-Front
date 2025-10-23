@@ -1,0 +1,2385 @@
+
+> @geode/opengeodeweb-front@0.0.0 test:integration
+> npm run tests --project integration --fileParallelism=false
+
+
+> @geode/opengeodeweb-front@0.0.0 tests
+> vitest --config ./tests/vitest.config.js integration
+
+
+ DEV  v3.2.4 /home/julien/Code/OpenGeodeWeb-Front
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+available_port [33m40057[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+available_port [33m39213[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Host: localhost, Port: 39213, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+ * Serving Flask app 'opengeodeweb_back.app'
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:39213
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Host: localhost, Port: 40057, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+ * Serving Flask app 'opengeodeweb_back.app'
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:40057
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+geodeStore.base_url http://localhost:39213
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Traceback (most recent call last):
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/bin/opengeodeweb-viewer", line 8, in <module>
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+    sys.exit(run_server())
+             ^^^^^^^^^^^^
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/opengeodeweb_viewer/vtkw_server.py", line 148, in run_server
+    server.start_webserver(options=args, protocol=Server)
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/wslink/server.py", line 301, in start_webserver
+    return exec_modes[exec_mode]()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/wslink/server.py", line 284, in main_exec
+    loop.run_until_complete(create_coroutine())
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/wslink/backends/aiohttp/__init__.py", line 111, in start
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+    await self._site.start()
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/aiohttp/web_runner.py", line 121, in start
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+    self._server = await loop.create_server(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1572, in create_server
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 98] error while attempting to bind on address ('127.0.0.1', 1234): address already in use
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[2025-10-22 17:09:18.567] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/209f160549a5417a9d791b9d9d3b0463/test.og_edc2d in 1.669746ms
+[2025-10-22 17:09:18.567] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[2025-10-22 17:09:18.569] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/209f160549a5417a9d791b9d9d3b0463/native.og_edc2d in 1.596377ms
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[2025-10-22 17:09:18.570] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/209f160549a5417a9d791b9d9d3b0463/viewable.vtp in 408.094us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[2025-10-22 17:09:18.571] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/209f160549a5417a9d791b9d9d3b0463/light_viewable.vtp in 142.128us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+127.0.0.1 - - [22/Oct/2025 17:09:18] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+id 209f160549a5417a9d791b9d9d3b0463
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.generic.register params={'id': '209f160549a5417a9d791b9d9d3b0463'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': '209f160549a5417a9d791b9d9d3b0463'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Child Process exited with code 1
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setPointsActiveColoring 209f160549a5417a9d791b9d9d3b0463 color
+setMeshEdgesActiveColoring 209f160549a5417a9d791b9d9d3b0463 color
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+beforeEach edges id 209f160549a5417a9d791b9d9d3b0463
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.visibility params={'id': '209f160549a5417a9d791b9d9d3b0463', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setMeshVisibility 209f160549a5417a9d791b9d9d3b0463 true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.points.visibility params={'id': '209f160549a5417a9d791b9d9d3b0463', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.points.color params={'id': '209f160549a5417a9d791b9d9d3b0463', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setPointsVisibility 209f160549a5417a9d791b9d9d3b0463 false
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.points.size params={'id': '209f160549a5417a9d791b9d9d3b0463', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setPointsColor 209f160549a5417a9d791b9d9d3b0463 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.edges.visibility params={'id': '209f160549a5417a9d791b9d9d3b0463', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setPointsSize 209f160549a5417a9d791b9d9d3b0463 10
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.edges.color params={'id': '209f160549a5417a9d791b9d9d3b0463', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setMeshEdgesVisibility 209f160549a5417a9d791b9d9d3b0463 true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.edges.visibility params={'id': '209f160549a5417a9d791b9d9d3b0463', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setMeshEdgesColor 209f160549a5417a9d791b9d9d3b0463 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setMeshEdgesVisibility 209f160549a5417a9d791b9d9d3b0463 true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "c59e58e8f9ca74c25ac90341853d34657"}}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+available_port [33m39807[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stderr | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Connection close
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Host: localhost, Port: 39807, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+ * Serving Flask app 'opengeodeweb_back.app'
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:39807
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+geodeStore.base_url http://localhost:39807
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[2025-10-22 17:09:20.776] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/d6b2172dd4544829b4fdb3f5e10bcc3a/test.og_edc2d in 862.112us
+[2025-10-22 17:09:20.776] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[2025-10-22 17:09:20.777] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/d6b2172dd4544829b4fdb3f5e10bcc3a/native.og_edc2d in 797.504us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[2025-10-22 17:09:20.778] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/d6b2172dd4544829b4fdb3f5e10bcc3a/viewable.vtp in 355.319us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[2025-10-22 17:09:20.778] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/d6b2172dd4544829b4fdb3f5e10bcc3a/light_viewable.vtp in 137.062us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+127.0.0.1 - - [22/Oct/2025 17:09:20] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+id d6b2172dd4544829b4fdb3f5e10bcc3a
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.generic.register params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setPointsActiveColoring d6b2172dd4544829b4fdb3f5e10bcc3a color
+setMeshEdgesActiveColoring d6b2172dd4544829b4fdb3f5e10bcc3a color
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+beforeEach edges id d6b2172dd4544829b4fdb3f5e10bcc3a
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshEdgesActiveColoring d6b2172dd4544829b4fdb3f5e10bcc3a color
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.visibility params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshVisibility d6b2172dd4544829b4fdb3f5e10bcc3a true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.points.visibility params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.points.color params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setPointsVisibility d6b2172dd4544829b4fdb3f5e10bcc3a false
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.points.size params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setPointsColor d6b2172dd4544829b4fdb3f5e10bcc3a {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.visibility params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setPointsSize d6b2172dd4544829b4fdb3f5e10bcc3a 10
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.color params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshEdgesVisibility d6b2172dd4544829b4fdb3f5e10bcc3a true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.color params={'id': 'd6b2172dd4544829b4fdb3f5e10bcc3a', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshEdgesColor d6b2172dd4544829b4fdb3f5e10bcc3a {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshEdgesColor d6b2172dd4544829b4fdb3f5e10bcc3a {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "c80e1252cd1114ab2b30247ad6ecf37b7"}}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+available_port [33m37183[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stderr | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Connection close
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Host: localhost, Port: 37183, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+ * Serving Flask app 'opengeodeweb_back.app'
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:37183
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+geodeStore.base_url http://localhost:37183
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[2025-10-22 17:09:22.616] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/146d0899fdfe440fac9bc9f2611e9b37/test.og_edc2d in 876.936us
+[2025-10-22 17:09:22.617] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[2025-10-22 17:09:22.618] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/146d0899fdfe440fac9bc9f2611e9b37/native.og_edc2d in 1.255974ms
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[2025-10-22 17:09:22.619] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/146d0899fdfe440fac9bc9f2611e9b37/viewable.vtp in 326.733us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[2025-10-22 17:09:22.619] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/146d0899fdfe440fac9bc9f2611e9b37/light_viewable.vtp in 121.804us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+127.0.0.1 - - [22/Oct/2025 17:09:22] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+id 146d0899fdfe440fac9bc9f2611e9b37
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.generic.register params={'id': '146d0899fdfe440fac9bc9f2611e9b37'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': '146d0899fdfe440fac9bc9f2611e9b37'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setPointsActiveColoring 146d0899fdfe440fac9bc9f2611e9b37 color
+setMeshEdgesActiveColoring 146d0899fdfe440fac9bc9f2611e9b37 color
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+beforeEach edges id 146d0899fdfe440fac9bc9f2611e9b37
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.visibility params={'id': '146d0899fdfe440fac9bc9f2611e9b37', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setMeshVisibility 146d0899fdfe440fac9bc9f2611e9b37 true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.points.visibility params={'id': '146d0899fdfe440fac9bc9f2611e9b37', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.points.color params={'id': '146d0899fdfe440fac9bc9f2611e9b37', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setPointsVisibility 146d0899fdfe440fac9bc9f2611e9b37 false
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.points.size params={'id': '146d0899fdfe440fac9bc9f2611e9b37', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setPointsColor 146d0899fdfe440fac9bc9f2611e9b37 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.edges.visibility params={'id': '146d0899fdfe440fac9bc9f2611e9b37', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setPointsSize 146d0899fdfe440fac9bc9f2611e9b37 10
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setMeshEdgesVisibility 146d0899fdfe440fac9bc9f2611e9b37 true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.edges.color params={'id': '146d0899fdfe440fac9bc9f2611e9b37', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.edges.color params={'id': '146d0899fdfe440fac9bc9f2611e9b37', 'color': {'r': 255, 'g': 0, 'b': 0}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setMeshEdgesColor 146d0899fdfe440fac9bc9f2611e9b37 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setMeshEdgesColor 146d0899fdfe440fac9bc9f2611e9b37 {"r":255,"g":0,"b":0}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "ca8add2d6813f46e39a7d3e9403f3790c"}}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+Child Process exited with code 0
+
+ ✓ |integration| tests/integration/stores/data_style/mesh/edges.nuxt.test.js (3 tests) 6720ms
+   ✓ Mesh edges > Edges visibility > Visibility true  2780ms
+   ✓ Mesh edges > Edges active coloring > test coloring  2066ms
+   ✓ Mesh edges > Edges color > test red  1870ms
+stderr | Object.<anonymous> (/home/julien/Code/OpenGeodeWeb-Front/stores/viewer.js:103:19)
+Connection close
+
+stderr | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+WebSocket error: Error: connect ECONNREFUSED 127.0.0.1:1234
+[90m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)[39m {
+  errno: [33m-111[39m,
+  code: [32m'ECONNREFUSED'[39m,
+  syscall: [32m'connect'[39m,
+  address: [32m'127.0.0.1'[39m,
+  port: [33m1234[39m
+}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Back not killed
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+available_port [33m44317[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Host: localhost, Port: 44317, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+ * Serving Flask app 'opengeodeweb_back.app'
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:44317
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+geodeStore.base_url http://localhost:44317
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[2025-10-22 17:09:42.663] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/400b80d76b7d429789a427072718d7e4/test.og_edc2d in 894.519us
+[2025-10-22 17:09:42.663] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[2025-10-22 17:09:42.665] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/400b80d76b7d429789a427072718d7e4/native.og_edc2d in 984.09us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[2025-10-22 17:09:42.665] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/400b80d76b7d429789a427072718d7e4/viewable.vtp in 259.422us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[2025-10-22 17:09:42.665] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/400b80d76b7d429789a427072718d7e4/light_viewable.vtp in 76.867us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+127.0.0.1 - - [22/Oct/2025 17:09:42] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+id 400b80d76b7d429789a427072718d7e4
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.generic.register params={'id': '400b80d76b7d429789a427072718d7e4'}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': '400b80d76b7d429789a427072718d7e4'}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsActiveColoring 400b80d76b7d429789a427072718d7e4 color
+setMeshEdgesActiveColoring 400b80d76b7d429789a427072718d7e4 color
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+beforeEach points id 400b80d76b7d429789a427072718d7e4
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsActiveColoring 400b80d76b7d429789a427072718d7e4 color
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.visibility params={'id': '400b80d76b7d429789a427072718d7e4', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setMeshVisibility 400b80d76b7d429789a427072718d7e4 true
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.points.visibility params={'id': '400b80d76b7d429789a427072718d7e4', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.points.color params={'id': '400b80d76b7d429789a427072718d7e4', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsVisibility 400b80d76b7d429789a427072718d7e4 false
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.points.size params={'id': '400b80d76b7d429789a427072718d7e4', 'size': 10}
+opengeodeweb_viewer.mesh.edges.visibility params={'id': '400b80d76b7d429789a427072718d7e4', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsColor 400b80d76b7d429789a427072718d7e4 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.color params={'id': '400b80d76b7d429789a427072718d7e4', 'color': {'r': 20, 'g': 20, 'b': 20}}
+opengeodeweb_viewer.mesh.points.color params={'id': '400b80d76b7d429789a427072718d7e4', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsSize 400b80d76b7d429789a427072718d7e4 10
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setMeshEdgesVisibility 400b80d76b7d429789a427072718d7e4 true
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setMeshEdgesColor 400b80d76b7d429789a427072718d7e4 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsColor 400b80d76b7d429789a427072718d7e4 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "c080288c916af4bbf8e1354145e019589"}}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+available_port [33m41495[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stderr | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Connection close
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Host: localhost, Port: 41495, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+ * Serving Flask app 'opengeodeweb_back.app'
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:41495
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+geodeStore.base_url http://localhost:41495
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[2025-10-22 17:09:44.653] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/924775c501ee4a1cb31b2c0f61193107/test.og_edc2d in 1.455052ms
+[2025-10-22 17:09:44.653] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[2025-10-22 17:09:44.655] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/924775c501ee4a1cb31b2c0f61193107/native.og_edc2d in 996.492us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[2025-10-22 17:09:44.655] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/924775c501ee4a1cb31b2c0f61193107/viewable.vtp in 299.567us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[2025-10-22 17:09:44.656] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/924775c501ee4a1cb31b2c0f61193107/light_viewable.vtp in 124.208us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+127.0.0.1 - - [22/Oct/2025 17:09:44] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+id 924775c501ee4a1cb31b2c0f61193107
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.generic.register params={'id': '924775c501ee4a1cb31b2c0f61193107'}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': '924775c501ee4a1cb31b2c0f61193107'}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsActiveColoring 924775c501ee4a1cb31b2c0f61193107 color
+setMeshEdgesActiveColoring 924775c501ee4a1cb31b2c0f61193107 color
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+beforeEach points id 924775c501ee4a1cb31b2c0f61193107
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.visibility params={'id': '924775c501ee4a1cb31b2c0f61193107', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.points.visibility params={'id': '924775c501ee4a1cb31b2c0f61193107', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setMeshVisibility 924775c501ee4a1cb31b2c0f61193107 true
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.points.color params={'id': '924775c501ee4a1cb31b2c0f61193107', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsVisibility 924775c501ee4a1cb31b2c0f61193107 false
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.points.size params={'id': '924775c501ee4a1cb31b2c0f61193107', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsColor 924775c501ee4a1cb31b2c0f61193107 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.edges.visibility params={'id': '924775c501ee4a1cb31b2c0f61193107', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsSize 924775c501ee4a1cb31b2c0f61193107 10
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.edges.color params={'id': '924775c501ee4a1cb31b2c0f61193107', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setMeshEdgesVisibility 924775c501ee4a1cb31b2c0f61193107 true
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.points.color params={'id': '924775c501ee4a1cb31b2c0f61193107', 'color': {'r': 255, 'g': 0, 'b': 0}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setMeshEdgesColor 924775c501ee4a1cb31b2c0f61193107 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsColor 924775c501ee4a1cb31b2c0f61193107 {"r":255,"g":0,"b":0}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "c61ff90c4b51b4d0783d71ff473dba28e"}}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+Child Process exited with code 0
+
+ ❯ |integration| tests/integration/stores/data_style/mesh/points.nuxt.test.js (3 tests | 1 failed) 28745ms
+   × Mesh points > Points visibility > Visibility true 25029ms
+     → Hook timed out in 25000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+     → undefined
+   ✓ Mesh points > Points active coloring > test coloring  1749ms
+   ✓ Mesh points > Points color > test red  1963ms
+stderr | Object.<anonymous> (/home/julien/Code/OpenGeodeWeb-Front/stores/viewer.js:103:19)
+Connection close
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Error: Hook timed out in 25000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+ ❯ tests/integration/stores/data_style/mesh/points.nuxt.test.js:22:11
+     20| const object_type = "mesh"
+     21| 
+     22| beforeEach(async () => {
+       |           ^
+     23|   id = await setupIntegrationTests(file_name, geode_object, object_typ…
+     24|   console.log("beforeEach points id", id)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |integration| tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Unknown Error: undefined
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 5 passed (6)
+   Start at  17:09:06
+   Duration  38.25s (transform 3.27s, setup 7.96s, collect 423ms, tests 35.47s, environment 766ms, prepare 8.70s)
+
+ FAIL  Tests failed. Watching for file changes...
+       press h to show help, press q to quit
+c[3J RERUN  utils/local.js 
+        Filename pattern: integration
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+available_port [33m46819[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+available_port [33m39349[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Host: localhost, Port: 46819, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+ * Serving Flask app 'opengeodeweb_back.app'
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:46819
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Host: localhost, Port: 39349, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+ * Serving Flask app 'opengeodeweb_back.app'
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:39349
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+geodeStore.base_url http://localhost:46819
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[2025-10-22 17:11:41.187] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/31e2b7542cd2470c969ddfd801ef3f65/test.og_edc2d in 1.17355ms
+[2025-10-22 17:11:41.187] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[2025-10-22 17:11:41.189] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/31e2b7542cd2470c969ddfd801ef3f65/native.og_edc2d in 1.527311ms
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[2025-10-22 17:11:41.190] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/31e2b7542cd2470c969ddfd801ef3f65/viewable.vtp in 479.117us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[2025-10-22 17:11:41.191] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/31e2b7542cd2470c969ddfd801ef3f65/light_viewable.vtp in 186.585us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+127.0.0.1 - - [22/Oct/2025 17:11:41] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Traceback (most recent call last):
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/bin/opengeodeweb-viewer", line 8, in <module>
+    sys.exit(run_server())
+             ^^^^^^^^^^^^
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/opengeodeweb_viewer/vtkw_server.py", line 148, in run_server
+    server.start_webserver(options=args, protocol=Server)
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/wslink/server.py", line 301, in start_webserver
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+    return exec_modes[exec_mode]()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/wslink/server.py", line 284, in main_exec
+    loop.run_until_complete(create_coroutine())
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/wslink/backends/aiohttp/__init__.py", line 111, in start
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+    await self._site.start()
+  File "/home/julien/Code/OpenGeodeWeb-Front/tests/integration/microservices/viewer/venv/lib/python3.12/site-packages/aiohttp/web_runner.py", line 121, in start
+    self._server = await loop.create_server(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1572, in create_server
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+    raise OSError(err.errno, msg) from None
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+OSError: [Errno 98] error while attempting to bind on address ('127.0.0.1', 1234): address already in use
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+id 31e2b7542cd2470c969ddfd801ef3f65
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.generic.register params={'id': '31e2b7542cd2470c969ddfd801ef3f65'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': '31e2b7542cd2470c969ddfd801ef3f65'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setPointsActiveColoring 31e2b7542cd2470c969ddfd801ef3f65 color
+setMeshEdgesActiveColoring 31e2b7542cd2470c969ddfd801ef3f65 color
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+beforeEach edges id 31e2b7542cd2470c969ddfd801ef3f65
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.visibility params={'id': '31e2b7542cd2470c969ddfd801ef3f65', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setMeshVisibility 31e2b7542cd2470c969ddfd801ef3f65 true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.points.visibility params={'id': '31e2b7542cd2470c969ddfd801ef3f65', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.points.color params={'id': '31e2b7542cd2470c969ddfd801ef3f65', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setPointsVisibility 31e2b7542cd2470c969ddfd801ef3f65 false
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Child Process exited with code 1
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.points.size params={'id': '31e2b7542cd2470c969ddfd801ef3f65', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setPointsColor 31e2b7542cd2470c969ddfd801ef3f65 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.edges.visibility params={'id': '31e2b7542cd2470c969ddfd801ef3f65', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setPointsSize 31e2b7542cd2470c969ddfd801ef3f65 10
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.edges.color params={'id': '31e2b7542cd2470c969ddfd801ef3f65', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setMeshEdgesVisibility 31e2b7542cd2470c969ddfd801ef3f65 true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+opengeodeweb_viewer.mesh.edges.visibility params={'id': '31e2b7542cd2470c969ddfd801ef3f65', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setMeshEdgesColor 31e2b7542cd2470c969ddfd801ef3f65 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setMeshEdgesVisibility 31e2b7542cd2470c969ddfd801ef3f65 true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "c8fbd59fed01f4b69a42205d0d834ba86"}}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+available_port [33m38687[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stderr | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Connection close
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Host: localhost, Port: 38687, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+ * Serving Flask app 'opengeodeweb_back.app'
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:38687
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+geodeStore.base_url http://localhost:38687
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[2025-10-22 17:11:43.549] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/b7b96a68fd0543a395b4663d8518b61a/test.og_edc2d in 1.615921ms
+[2025-10-22 17:11:43.549] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[2025-10-22 17:11:43.551] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/b7b96a68fd0543a395b4663d8518b61a/native.og_edc2d in 1.072617ms
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[2025-10-22 17:11:43.552] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/b7b96a68fd0543a395b4663d8518b61a/viewable.vtp in 354.021us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+[2025-10-22 17:11:43.552] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/b7b96a68fd0543a395b4663d8518b61a/light_viewable.vtp in 135.712us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+127.0.0.1 - - [22/Oct/2025 17:11:43] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+id b7b96a68fd0543a395b4663d8518b61a
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.generic.register params={'id': 'b7b96a68fd0543a395b4663d8518b61a'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': 'b7b96a68fd0543a395b4663d8518b61a'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setPointsActiveColoring b7b96a68fd0543a395b4663d8518b61a color
+setMeshEdgesActiveColoring b7b96a68fd0543a395b4663d8518b61a color
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+beforeEach edges id b7b96a68fd0543a395b4663d8518b61a
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshEdgesActiveColoring b7b96a68fd0543a395b4663d8518b61a color
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.visibility params={'id': 'b7b96a68fd0543a395b4663d8518b61a', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshVisibility b7b96a68fd0543a395b4663d8518b61a true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.points.visibility params={'id': 'b7b96a68fd0543a395b4663d8518b61a', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.points.color params={'id': 'b7b96a68fd0543a395b4663d8518b61a', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setPointsVisibility b7b96a68fd0543a395b4663d8518b61a false
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.points.size params={'id': 'b7b96a68fd0543a395b4663d8518b61a', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setPointsColor b7b96a68fd0543a395b4663d8518b61a {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.visibility params={'id': 'b7b96a68fd0543a395b4663d8518b61a', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setPointsSize b7b96a68fd0543a395b4663d8518b61a 10
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.color params={'id': 'b7b96a68fd0543a395b4663d8518b61a', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshEdgesVisibility b7b96a68fd0543a395b4663d8518b61a true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.color params={'id': 'b7b96a68fd0543a395b4663d8518b61a', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshEdgesColor b7b96a68fd0543a395b4663d8518b61a {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+setMeshEdgesColor b7b96a68fd0543a395b4663d8518b61a {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "c4b328711e4c845779ffc24c9bc7984e0"}}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges active coloring > test coloring
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+available_port [33m42891[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stderr | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Connection close
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Host: localhost, Port: 42891, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+ * Serving Flask app 'opengeodeweb_back.app'
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:42891
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+geodeStore.base_url http://localhost:42891
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[2025-10-22 17:11:46.267] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/b17e3005fd294fc392481a00c6fba86d/test.og_edc2d in 1.414253ms
+[2025-10-22 17:11:46.267] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[2025-10-22 17:11:46.268] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/b17e3005fd294fc392481a00c6fba86d/native.og_edc2d in 1.071753ms
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[2025-10-22 17:11:46.269] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/b17e3005fd294fc392481a00c6fba86d/viewable.vtp in 357.872us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+[2025-10-22 17:11:46.269] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/b17e3005fd294fc392481a00c6fba86d/light_viewable.vtp in 141.942us
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+127.0.0.1 - - [22/Oct/2025 17:11:46] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+id b17e3005fd294fc392481a00c6fba86d
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.generic.register params={'id': 'b17e3005fd294fc392481a00c6fba86d'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': 'b17e3005fd294fc392481a00c6fba86d'}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setPointsActiveColoring b17e3005fd294fc392481a00c6fba86d color
+setMeshEdgesActiveColoring b17e3005fd294fc392481a00c6fba86d color
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+beforeEach edges id b17e3005fd294fc392481a00c6fba86d
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.visibility params={'id': 'b17e3005fd294fc392481a00c6fba86d', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setMeshVisibility b17e3005fd294fc392481a00c6fba86d true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.points.visibility params={'id': 'b17e3005fd294fc392481a00c6fba86d', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.points.color params={'id': 'b17e3005fd294fc392481a00c6fba86d', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setPointsVisibility b17e3005fd294fc392481a00c6fba86d false
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.points.size params={'id': 'b17e3005fd294fc392481a00c6fba86d', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setPointsColor b17e3005fd294fc392481a00c6fba86d {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.edges.visibility params={'id': 'b17e3005fd294fc392481a00c6fba86d', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setPointsSize b17e3005fd294fc392481a00c6fba86d 10
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.edges.color params={'id': 'b17e3005fd294fc392481a00c6fba86d', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setMeshEdgesVisibility b17e3005fd294fc392481a00c6fba86d true
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+opengeodeweb_viewer.mesh.edges.color params={'id': 'b17e3005fd294fc392481a00c6fba86d', 'color': {'r': 255, 'g': 0, 'b': 0}}
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setMeshEdgesColor b17e3005fd294fc392481a00c6fba86d {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+setMeshEdgesColor b17e3005fd294fc392481a00c6fba86d {"r":255,"g":0,"b":0}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "cdc657140b6d34223b37669cf5b2a3f04"}}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges color > test red
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+Child Process exited with code 0
+
+ ✓ |integration| tests/integration/stores/data_style/mesh/edges.nuxt.test.js (3 tests) 8252ms
+   ✓ Mesh edges > Edges visibility > Visibility true  3269ms
+   ✓ Mesh edges > Edges active coloring > test coloring  2256ms
+   ✓ Mesh edges > Edges color > test red  2720ms
+stderr | Object.<anonymous> (/home/julien/Code/OpenGeodeWeb-Front/stores/viewer.js:103:19)
+Connection close
+
+stderr | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+WebSocket error: Error: connect ECONNREFUSED 127.0.0.1:1234
+[90m    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)[39m {
+  errno: [33m-111[39m,
+  code: [32m'ECONNREFUSED'[39m,
+  syscall: [32m'connect'[39m,
+  address: [32m'127.0.0.1'[39m,
+  port: [33m1234[39m
+}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Back not killed
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+available_port [33m44835[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Host: localhost, Port: 44835, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+ * Serving Flask app 'opengeodeweb_back.app'
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:44835
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+geodeStore.base_url http://localhost:44835
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[2025-10-22 17:12:05.688] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/ad99a490e48942b296a85a3d24c58537/test.og_edc2d in 1.344818ms
+[2025-10-22 17:12:05.688] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[2025-10-22 17:12:05.690] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/ad99a490e48942b296a85a3d24c58537/native.og_edc2d in 1.313726ms
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[2025-10-22 17:12:05.691] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/ad99a490e48942b296a85a3d24c58537/viewable.vtp in 306.19us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+[2025-10-22 17:12:05.691] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/ad99a490e48942b296a85a3d24c58537/light_viewable.vtp in 119.916us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+127.0.0.1 - - [22/Oct/2025 17:12:05] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+id ad99a490e48942b296a85a3d24c58537
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.generic.register params={'id': 'ad99a490e48942b296a85a3d24c58537'}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': 'ad99a490e48942b296a85a3d24c58537'}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsActiveColoring ad99a490e48942b296a85a3d24c58537 color
+setMeshEdgesActiveColoring ad99a490e48942b296a85a3d24c58537 color
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+beforeEach points id ad99a490e48942b296a85a3d24c58537
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsActiveColoring ad99a490e48942b296a85a3d24c58537 color
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.visibility params={'id': 'ad99a490e48942b296a85a3d24c58537', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setMeshVisibility ad99a490e48942b296a85a3d24c58537 true
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.points.visibility params={'id': 'ad99a490e48942b296a85a3d24c58537', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsVisibility ad99a490e48942b296a85a3d24c58537 false
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.points.color params={'id': 'ad99a490e48942b296a85a3d24c58537', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.points.size params={'id': 'ad99a490e48942b296a85a3d24c58537', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.visibility params={'id': 'ad99a490e48942b296a85a3d24c58537', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsColor ad99a490e48942b296a85a3d24c58537 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsSize ad99a490e48942b296a85a3d24c58537 10
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.edges.color params={'id': 'ad99a490e48942b296a85a3d24c58537', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setMeshEdgesVisibility ad99a490e48942b296a85a3d24c58537 true
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+opengeodeweb_viewer.mesh.points.color params={'id': 'ad99a490e48942b296a85a3d24c58537', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setMeshEdgesColor ad99a490e48942b296a85a3d24c58537 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+setPointsColor ad99a490e48942b296a85a3d24c58537 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "c0506887f09ed474fbeeb53f0ce3c52ff"}}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points active coloring > test coloring
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+available_port [33m1234[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+available_port [33m33571[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stderr | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Connection close
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Host: localhost, Port: 33571, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+ * Serving Flask app 'opengeodeweb_back.app'
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:33571
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Database connected (tables not created) for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Viewer connected to database at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+args=Namespace(debug=False, nosignalhandlers=False, host='localhost', port=1234, timeout=0, content='', authKey='wslink-secret', ws='ws', nows=False, fsEndpoints='', reverse_url=None, ssl='', data_folder_path='/home/julien/Code/OpenGeodeWeb-Front/tests/integration/data')
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+wslink: Starting factory
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+geodeStore.base_url http://localhost:33571
+viewerStore.base_url ws://localhost:1234/ws
+VIEWER LOCK GRANTED ! { name: [32m'viewer.ws_connect'[39m }
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+viewerStore.status CONNECTED
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.viewer.reset_visualization params={}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+save_viewable_file from microservice
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[2025-10-22 17:12:07.953] [console] [info] EdgedCurve2D loaded from /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/6ea0571451a44018ba7dd31c43af0525/test.og_edc2d in 1.068593ms
+[2025-10-22 17:12:07.953] [console] [info] EdgedCurve2D has: 7 vertices, 6 edges
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[2025-10-22 17:12:07.955] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/6ea0571451a44018ba7dd31c43af0525/native.og_edc2d in 1.139187ms
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[2025-10-22 17:12:07.955] [console] [info] EdgedCurve2D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/6ea0571451a44018ba7dd31c43af0525/viewable.vtp in 351.041us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+[2025-10-22 17:12:07.956] [console] [info] EdgedCurve3D saved in /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/6ea0571451a44018ba7dd31c43af0525/light_viewable.vtp in 121.549us
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+127.0.0.1 - - [22/Oct/2025 17:12:07] "POST /opengeodeweb_back/save_viewable_file HTTP/1.1" 200 -
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+id 6ea0571451a44018ba7dd31c43af0525
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.generic.register params={'id': '6ea0571451a44018ba7dd31c43af0525'}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+{'rpc': 'register', 'type': 'object', 'properties': {'id': {'type': 'string', 'minLength': 1}}, 'required': ['id'], 'additionalProperties': False}
+opengeodeweb_viewer.mesh.register params={'id': '6ea0571451a44018ba7dd31c43af0525'}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+max_id=3
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsActiveColoring 6ea0571451a44018ba7dd31c43af0525 color
+setMeshEdgesActiveColoring 6ea0571451a44018ba7dd31c43af0525 color
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+beforeEach points id 6ea0571451a44018ba7dd31c43af0525
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.visibility params={'id': '6ea0571451a44018ba7dd31c43af0525', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.points.visibility params={'id': '6ea0571451a44018ba7dd31c43af0525', 'visibility': False}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setMeshVisibility 6ea0571451a44018ba7dd31c43af0525 true
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.points.color params={'id': '6ea0571451a44018ba7dd31c43af0525', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsVisibility 6ea0571451a44018ba7dd31c43af0525 false
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.points.size params={'id': '6ea0571451a44018ba7dd31c43af0525', 'size': 10}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsColor 6ea0571451a44018ba7dd31c43af0525 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.edges.visibility params={'id': '6ea0571451a44018ba7dd31c43af0525', 'visibility': True}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsSize 6ea0571451a44018ba7dd31c43af0525 10
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.edges.color params={'id': '6ea0571451a44018ba7dd31c43af0525', 'color': {'r': 20, 'g': 20, 'b': 20}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setMeshEdgesVisibility 6ea0571451a44018ba7dd31c43af0525 true
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+opengeodeweb_viewer.mesh.points.color params={'id': '6ea0571451a44018ba7dd31c43af0525', 'color': {'r': 255, 'g': 0, 'b': 0}}
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setMeshEdgesColor 6ea0571451a44018ba7dd31c43af0525 {"r":20,"g":20,"b":20}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+setPointsColor 6ea0571451a44018ba7dd31c43af0525 {"r":255,"g":0,"b":0}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Connected to WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Manual server kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Received from server: {"wslink": "1.0", "id": "system:hello", "result": {"clientID": "cf59532b5f5874f66914eed5a445e487e"}}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Manual viewer kill, shutting down...
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Back closed
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Child Process exited with code 0
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points color > test red
+Disconnected from WebSocket server
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+Child Process exited with code 0
+
+ ❯ |integration| tests/integration/stores/data_style/mesh/points.nuxt.test.js (3 tests | 1 failed) 29699ms
+   × Mesh points > Points visibility > Visibility true 25026ms
+     → Hook timed out in 25000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+     → undefined
+   ✓ Mesh points > Points active coloring > test coloring  2523ms
+   ✓ Mesh points > Points color > test red  2145ms
+stderr | Object.<anonymous> (/home/julien/Code/OpenGeodeWeb-Front/stores/viewer.js:103:19)
+Connection close
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Error: Hook timed out in 25000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+ ❯ tests/integration/stores/data_style/mesh/points.nuxt.test.js:22:11
+     20| const object_type = "mesh"
+     21| 
+     22| beforeEach(async () => {
+       |           ^
+     23|   id = await setupIntegrationTests(file_name, geode_object, object_typ…
+     24|   console.log("beforeEach points id", id)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |integration| tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Unknown Error: undefined
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 5 passed (6)
+   Start at  17:11:35
+   Duration  42.21s
+
+ FAIL  Tests failed. Watching for file changes...
+       press h to show help, press q to quit
+c[3J RERUN  tests/integration/setup.js 
+        Filename pattern: integration
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js
+foldersBeforeTests Set(0) {}
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+available_port [33m42619[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+available_port [33m46507[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+available_port [33m33249[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+setupIntegrationTests test.og_edc2d EdgedCurve2D mesh
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+available_port [33m37423[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+available_port [33m42033[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+available_port [33m33281[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+available_port [33m45155[39m
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+upload_folder_path /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/uploads
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+available_port [33m44293[39m
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Host: localhost, Port: 33249, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Host: localhost, Port: 33281, Debug: False, Data folder path: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data, Timeout: 0, Origins: http://localhost:*
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+ * Serving Flask app 'opengeodeweb_back.app'
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:33249
+
+
+stdout | tests/integration/stores/data_style/mesh/points.nuxt.test.js > Mesh points > Points visibility > Visibility true
+[33mPress CTRL+C to quit[0m
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database engine created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+Database tables created for /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+Database initialized at: /home/julien/Code/OpenGeodeWeb-Front/tests/integration/data/project.db
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+ * Serving Flask app 'opengeodeweb_back.app'
+ * Debug mode: off
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:33281
+
+
+stdout | tests/integration/stores/data_style/mesh/edges.nuxt.test.js > Mesh edges > Edges visibility > Visibility true
+[33mPress CTRL+C to quit[0m
+
+
+Cancelling test run. Press CTRL+c again to exit forcefully.
+

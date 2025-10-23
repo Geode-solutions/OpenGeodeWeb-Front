@@ -1,16 +1,15 @@
-// Global imports
+// Node.js imports
 
 // Third party imports
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { beforeEach, describe, expect, test, vi } from "vitest"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_f/utils/status"
-import * as composables from "@ogw_f/composables/viewer_call"
-import { useDataStyleStore } from "@ogw_f/stores/data_style"
-import { useViewerStore } from "@ogw_f/stores/viewer"
-import { setupTests } from "../setup.test.js"
-import { kill_viewer } from "@ogw_f/utils/local"
+import Status from "~/utils/status"
+import * as composables from "~/composables/viewer_call"
+import { useDataStyleStore } from "~/stores/data_style"
+import { useViewerStore } from "~/stores/viewer"
+import { setupIntegrationTests } from "./integration/setup.js"
 
 // Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
@@ -20,14 +19,11 @@ const geode_object = "PolygonalSurface3D"
 const object_type = "mesh"
 
 beforeEach(async () => {
-  await setupTests(id, file_name, geode_object, object_type)
+  await setupIntegrationTests(id, file_name, geode_object, object_type)
+  console.log("beforeEach polygons id", id)
 })
 
 describe("Mesh polygons", () => {
-  afterEach(async () => {
-    const viewerStore = useViewerStore()
-    await kill_viewer(viewerStore.default_local_port)
-  })
   describe("Polygons visibility", () => {
     test("Visibility true", async () => {
       const dataStyleStore = useDataStyleStore()

@@ -5,7 +5,7 @@
     "test": "npm run test:unit",
     "tests": "vitest --config ./tests/vitest.config.js",
     "test:unit": "npm run tests --project unit",
-    "test:integration": "npm run tests --project integration",
+    "test:integration": "npm run tests --project integration --fileParallelism=false",
     "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
     "build": ""
   },
@@ -38,7 +38,7 @@
   "overrides": {
     "vue": "latest"
   },
-  "description": "OpenSource Vue/Vuetify framework for web applications",
+  "description": "OpenSource Vue/Nuxt/Pinia/Vuetify framework for web applications",
   "type": "module",
   "version": "0.0.0",
   "main": "./nuxt.config.js",

@@ -9,7 +9,7 @@ import Status from "@ogw_f/utils/status"
 import * as composables from "@ogw_f/composables/viewer_call"
 import { useDataStyleStore } from "@ogw_f/stores/data_style"
 import { useViewerStore } from "@ogw_f/stores/viewer"
-import { setupTests } from "../setup.test.js"
+import { setupTests } from "../integration/stores/data_style/setup.test.js"
 
 // Local constants
 const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
