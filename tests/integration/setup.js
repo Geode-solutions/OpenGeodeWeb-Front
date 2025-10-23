@@ -28,7 +28,6 @@ import {
 import { getCurrentFolders, cleanupCreatedFolders } from "./utils.js"
 
 async function setupIntegrationTests(file_name, geode_object, object_type) {
-  console.log("setupIntegrationTests", file_name, geode_object, object_type)
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -54,9 +53,6 @@ async function setupIntegrationTests(file_name, geode_object, object_type) {
   )
   const b_port = await get_available_port()
   const v_port = await get_available_port()
-
-  console.log("b_port", b_port)
-  console.log("v_port", v_port)
   const [back_port, viewer_port] = await Promise.all([
     run_back(back_path, {
       port: b_port,
@@ -72,11 +68,7 @@ async function setupIntegrationTests(file_name, geode_object, object_type) {
   console.log("viewer_port", viewer_port)
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
-  console.log("geodeStore.base_url", geodeStore.base_url)
-  console.log("viewerStore.base_url", viewerStore.base_url)
-
   await viewerStore.ws_connect()
-  console.log("viewerStore.status", viewerStore.status)
 
   const response = await api_fetch({
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
@@ -85,12 +77,9 @@ async function setupIntegrationTests(file_name, geode_object, object_type) {
       filename: file_name,
     },
   })
-  console.log("response.error", response.error)
 
   const id = response.data._value.id
-  console.log("id", id)
   await dataBaseStore.registerObject(id)
-
   await dataStyleStore.addDataStyle(id, geode_object, object_type)
   expect(viewerStore.status).toBe(Status.CONNECTED)
   return { id, back_port, viewer_port }
