@@ -25,8 +25,7 @@ beforeEach(async () => {
     geode_object,
     object_type,
   ))
-  console.log("beforeEach polyhedra id", id)
-}, 25000)
+}, 20000)
 
 afterEach(async () => {
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])

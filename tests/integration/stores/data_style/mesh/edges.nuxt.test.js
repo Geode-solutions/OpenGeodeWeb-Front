@@ -24,22 +24,9 @@ beforeEach(async () => {
     geode_object,
     object_type,
   ))
-  console.log(
-    "beforeEach edges id",
-    id,
-    "back_port",
-    back_port,
-    "viewer_port",
-    viewer_port,
-  )
-}, 25000)
+}, 20000)
 
 afterEach(async () => {
-  const viewerStore = useViewerStore()
-  const geodeStore = useGeodeStore()
-
-  console.log("afterEach back_port", back_port)
-  console.log("afterEach viewer_port", viewer_port)
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
 
