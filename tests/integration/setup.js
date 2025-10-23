@@ -21,7 +21,6 @@ import Status from "~/utils/status"
 import {
   executable_name,
   executable_path,
-  get_available_port,
   run_back,
   run_viewer,
 } from "~/utils/local"
@@ -51,16 +50,12 @@ async function setupIntegrationTests(file_name, geode_object, object_type) {
     executable_path(path.join(microservices_path, "viewer")),
     executable_name("opengeodeweb-viewer"),
   )
-  const b_port = await get_available_port()
-  const v_port = await get_available_port()
   const [back_port, viewer_port] = await Promise.all([
     run_back(back_path, {
-      port: b_port,
       project_folder_path: project_folder_path,
       upload_folder_path: upload_folder_path,
     }),
     run_viewer(viewer_path, {
-      port: v_port,
       project_folder_path: project_folder_path,
     }),
   ])

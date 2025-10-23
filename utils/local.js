@@ -110,15 +110,15 @@ async function run_script(
 
 async function run_back(
   command,
-  args = { port, project_folder_path, upload_folder_path: null },
+  args = { project_folder_path, upload_folder_path: null },
 ) {
-  console.log("run_back", command, args)
   return new Promise(async (resolve, reject) => {
     if (args.upload_folder_path === null) {
       args.upload_folder_path = path.join(args.project_folder_path, "uploads")
     }
+    const port = await get_available_port()
     const back_args = [
-      "--port " + args.port,
+      "--port " + port,
       "--data_folder_path " + args.project_folder_path,
       "--upload_folder_path " + args.upload_folder_path,
       "--allowed_origin http://localhost:*",
@@ -126,20 +126,21 @@ async function run_back(
     ]
     console.log("run_back", command, back_args)
     await run_script(command, back_args, "Serving Flask app")
-    resolve(args.port)
+    resolve(port)
   })
 }
 
-async function run_viewer(command, args = { port, project_folder_path }) {
+async function run_viewer(command, args = { project_folder_path }) {
   return new Promise(async (resolve, reject) => {
+    const port = await get_available_port()
     const viewer_args = [
-      "--port " + args.port,
+      "--port " + port,
       "--data_folder_path " + args.project_folder_path,
       "--timeout " + 0,
     ]
     console.log("run_viewer", command, viewer_args)
     await run_script(command, viewer_args, "Starting factory")
-    resolve(args.port)
+    resolve(port)
   })
 }
 
@@ -222,8 +223,8 @@ function kill_viewer(viewer_port) {
 async function run_browser(
   script_name,
   microservices_options = {
-    back: { command, args: { port: 5000, data_folder_path } },
-    viewer: { command, args: { port: 1234, data_folder_path } },
+    back: { command, args: { data_folder_path } },
+    viewer: { command, args: { data_folder_path } },
   },
 ) {
   console.log("microservices_options", microservices_options)
