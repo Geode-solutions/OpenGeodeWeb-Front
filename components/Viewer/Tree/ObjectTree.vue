@@ -9,7 +9,7 @@
     >
       <div class="scrollable-wrapper">
         <v-sheet
-          style="max-height: calc(90vh)"
+          style="max-height: calc(85vh)"
           class="transparent-treeview scrollbar-hover"
         >
           <v-row v-if="treeviewStore.items.length > 0">
