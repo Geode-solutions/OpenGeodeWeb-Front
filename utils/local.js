@@ -112,15 +112,15 @@ async function run_back(
   command,
   args = {
     project_folder_path,
+    upload_folder_path: path.join(args.project_folder_path, "uploads"),
   },
 ) {
   return new Promise(async (resolve, reject) => {
-    const upload_folder_path = path.join(args.project_folder_path, "uploads")
     const port = await get_available_port()
     const back_args = [
       "--port " + port,
       "--data_folder_path " + args.project_folder_path,
-      "--upload_folder_path " + upload_folder_path,
+      "--upload_folder_path " + args.upload_folder_path,
       "--allowed_origin http://localhost:*",
       "--timeout " + 0,
     ]
