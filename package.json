@@ -38,7 +38,7 @@
   "overrides": {
     "vue": "latest"
   },
-  "description": "OpenSource Vue/Vuetify framework for web applications",
+  "description": "OpenSource Vue/Nuxt/Pinia/Vuetify framework for web applications",
   "type": "module",
   "version": "0.0.0",
   "main": "./nuxt.config.js",

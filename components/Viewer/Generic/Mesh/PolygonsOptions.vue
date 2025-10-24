@@ -32,34 +32,34 @@
   const id = toRef(() => props.itemProps.id)
 
   const visibility = computed({
-    get: () => dataStyleStore.polygonsVisibility(id.value),
-    set: (newValue) => dataStyleStore.setPolygonsVisibility(id.value, newValue),
+    get: () => dataStyleStore.meshPolygonsVisibility(id.value),
+    set: (newValue) =>
+      dataStyleStore.setMeshPolygonsVisibility(id.value, newValue),
   })
   const coloring_style_key = computed({
-    get: () => dataStyleStore.polygonsActiveColoring(id.value),
+    get: () => dataStyleStore.meshPolygonsActiveColoring(id.value),
     set: (newValue) =>
-      dataStyleStore.setPolygonsActiveColoring(id.value, newValue),
+      dataStyleStore.setMeshPolygonsActiveColoring(id.value, newValue),
   })
   const color = computed({
-    get: () => dataStyleStore.polygonsColor(id.value),
-    set: (newValue) => dataStyleStore.setPolygonsColor(id.value, newValue),
+    get: () => dataStyleStore.meshPolygonsColor(id.value),
+    set: (newValue) => dataStyleStore.setMeshPolygonsColor(id.value, newValue),
   })
   const textures = computed({
-    get: () => dataStyleStore.polygonsTextures(id.value),
-    set: (newValue) => dataStyleStore.setPolygonsTextures(id.value, newValue),
+    get: () => dataStyleStore.meshPolygonsTextures(id.value),
+    set: (newValue) =>
+      dataStyleStore.setMeshPolygonsTextures(id.value, newValue),
   })
   const vertex_attribute = computed({
-    get: () => dataStyleStore.polygonsVertexAttribute(id.value),
+    get: () => dataStyleStore.meshPolygonsVertexAttribute(id.value),
     set: (newValue) => {
-      console.log("setPolygonsVertexAttribute", id.value, newValue)
-      dataStyleStore.setPolygonsVertexAttribute(id.value, newValue)
+      dataStyleStore.setMeshPolygonsVertexAttribute(id.value, newValue)
     },
   })
   const polygon_attribute = computed({
-    get: () => dataStyleStore.polygonsPolygonAttribute(id.value),
+    get: () => dataStyleStore.meshPolygonsPolygonAttribute(id.value),
     set: (newValue) => {
-      console.log("setPolygonsPolygonAttribute", id.value, newValue)
-      dataStyleStore.setPolygonsPolygonAttribute(id.value, newValue)
+      dataStyleStore.setMeshPolygonsPolygonAttribute(id.value, newValue)
     },
   })
 </script>

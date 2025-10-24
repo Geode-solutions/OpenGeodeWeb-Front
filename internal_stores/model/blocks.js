@@ -56,5 +56,3 @@ export function useBlocksStyle() {
     applyBlocksStyle,
   }
 }
-
-export default useBlocksStyle

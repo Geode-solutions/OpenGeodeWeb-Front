@@ -32,18 +32,18 @@
   const id = toRef(() => props.itemProps.id)
 
   const visibility = computed({
-    get: () => dataStyleStore.polyhedraVisibility(id.value),
+    get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
     set: (newValue) =>
-      dataStyleStore.setPolyhedraVisibility(id.value, newValue),
+      dataStyleStore.setMeshPolyhedraVisibility(id.value, newValue),
   })
   const coloring_style_key = computed({
-    get: () => dataStyleStore.polyhedraActiveColoring(id.value),
+    get: () => dataStyleStore.meshPolyhedraActiveColoring(id.value),
     set: (newValue) =>
-      dataStyleStore.setPolyhedraActiveColoring(id.value, newValue),
+      dataStyleStore.setMeshPolyhedraActiveColoring(id.value, newValue),
   })
   const color = computed({
-    get: () => dataStyleStore.polyhedraColor(id.value),
-    set: (newValue) => dataStyleStore.setPolyhedraColor(id.value, newValue),
+    get: () => dataStyleStore.meshPolyhedraColor(id.value),
+    set: (newValue) => dataStyleStore.setMeshPolyhedraColor(id.value, newValue),
   })
   const vertex_attribute = computed({
     get: () => dataStyleStore.polyhedraVertexAttribute(id.value),
