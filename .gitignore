@@ -28,4 +28,4 @@ venv
 __snapshots__
 coverage
 *.db
-# package-lock.json
+package-lock.json
