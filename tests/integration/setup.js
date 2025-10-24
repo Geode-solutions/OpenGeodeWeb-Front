@@ -53,7 +53,6 @@ async function setupIntegrationTests(file_name, geode_object, object_type) {
   const [back_port, viewer_port] = await Promise.all([
     run_back(back_path, {
       project_folder_path: project_folder_path,
-      upload_folder_path: upload_folder_path,
     }),
     run_viewer(viewer_path, {
       project_folder_path: project_folder_path,
