@@ -115,7 +115,7 @@ async function run_back(
   },
 ) {
   return new Promise(async (resolve, reject) => {
-    const upload_folder_path = path.join(project_folder_path, "uploads")
+    const upload_folder_path = path.join(args.project_folder_path, "uploads")
     const port = await get_available_port()
     const back_args = [
       "--port " + port,
