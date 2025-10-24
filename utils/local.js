@@ -254,23 +254,16 @@ async function run_browser(
   process.env.BROWSER = true
   process.on("SIGINT", async () => {
     console.log("Shutting down microservices")
-    await Promise.all([
-      kill_back(process.env.GEODE_PORT),
-      kill_viewer(process.env.VIEWER_PORT),
-    ])
+    await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
     console.log("Quitting App...")
     process.exit(0)
   })
 
-  const nuxt_port = await get_available_port()
-  console.log("nuxt_port", nuxt_port)
-
-  process.env.NUXT_PORT = nuxt_port
   const nuxt_process = child_process.spawn("npm", ["run", script_name], {
     shell: true,
   })
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     nuxt_process.stdout.on("data", function (data) {
       const output = data.toString()
       const portMatch = output.match(
@@ -278,7 +271,9 @@ async function run_browser(
       )
       console.log("Nuxt: ", output)
       if (portMatch) {
-        resolve(portMatch[1])
+        const nuxt_port = portMatch[1]
+        process.env.NUXT_PORT = nuxt_port
+        resolve({ geode_port: back_port, viewer_port, nuxt_port })
         return
       }
     })
