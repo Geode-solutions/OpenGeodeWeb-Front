@@ -110,12 +110,12 @@ async function run_script(
 
 async function run_back(
   command,
-  args = { project_folder_path, upload_folder_path: null },
+  args = {
+    project_folder_path,
+    upload_folder_path: path.join(project_folder_path, "uploads"),
+  },
 ) {
   return new Promise(async (resolve, reject) => {
-    if (args.upload_folder_path === null) {
-      args.upload_folder_path = path.join(args.project_folder_path, "uploads")
-    }
     const port = await get_available_port()
     const back_args = [
       "--port " + port,
@@ -223,8 +223,8 @@ function kill_viewer(viewer_port) {
 async function run_browser(
   script_name,
   microservices_options = {
-    back: { command, args: { data_folder_path } },
-    viewer: { command, args: { data_folder_path } },
+    back: { command, args: { project_folder_path } },
+    viewer: { command, args: { project_folder_path } },
   },
 ) {
   console.log("microservices_options", microservices_options)
