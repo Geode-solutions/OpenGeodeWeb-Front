@@ -184,7 +184,7 @@ function kill_back(back_port) {
 }
 
 function kill_viewer(viewer_port) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
     socket.on("open", () => {
       console.log("Connected to WebSocket server")
@@ -200,17 +200,15 @@ function kill_viewer(viewer_port) {
       const message = data.toString()
       console.log("Received from server:", message)
       if (message.includes("hello")) {
-        try {
-          socket.send(
-            JSON.stringify({
-              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
-              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
-            }),
-          )
-        } catch (error) {
-          console.error("WebSocket error:", error)
-          resolve()
-        }
+        socket.send(
+          JSON.stringify({
+            id: viewer_schemas.opengeodeweb_viewer.kill.$id,
+            method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+          }),
+        )
+      } else if (message.includes("Viewer killed")) {
+        console.log("Received last message from WebSocket server")
+        resolve()
       }
     })
     socket.on("close", () => {
