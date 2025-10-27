@@ -197,8 +197,12 @@ function kill_viewer(viewer_port) {
       )
     })
     socket.on("message", (data) => {
-      const message = data.toString()
-      console.log("Received from server:", message)
+      let message
+      setTimeout(() => {
+        message = data.toString()
+        console.log("Received from server:", message)
+      }, 2000)
+
       if (message.includes("hello")) {
         socket.send(
           JSON.stringify({
