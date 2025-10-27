@@ -20,7 +20,7 @@ const geode_object = "PolygonalSurface3D"
 const object_type = "mesh"
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port } = await setupIntegrationTests(
+  ; ({ id, back_port, viewer_port } = await setupIntegrationTests(
     file_name,
     geode_object,
     object_type,
@@ -29,7 +29,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-})
+}, 15000)
 
 describe("Mesh polygons", () => {
   describe("Polygons visibility", () => {
