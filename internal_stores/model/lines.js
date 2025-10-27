@@ -77,5 +77,3 @@ export function useLinesStyle() {
     applyLinesStyle,
   }
 }
-
-export default useLinesStyle

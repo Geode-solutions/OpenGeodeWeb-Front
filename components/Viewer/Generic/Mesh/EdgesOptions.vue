@@ -1,5 +1,5 @@
 <template>
-  <ContextMenuItem
+  <ViewerContextMenuItem
     :itemProps="props.itemProps"
     tooltip="Edges options"
     :btn_image="props.btn_image"
@@ -14,7 +14,7 @@
         />
       </template>
     </template>
-  </ContextMenuItem>
+  </ViewerContextMenuItem>
 </template>
 
 <script setup>
@@ -28,21 +28,22 @@
   const dataStyleStore = useDataStyleStore()
 
   const visibility = computed({
-    get: () => dataStyleStore.edgesVisibility(id.value),
-    set: (newValue) => dataStyleStore.setEdgesVisibility(id.value, newValue),
+    get: () => dataStyleStore.meshEdgesVisibility(id.value),
+    set: (newValue) =>
+      dataStyleStore.setMeshEdgesVisibility(id.value, newValue),
   })
   const size = computed({
     get: () => dataStyleStore.edgesSize(id.value),
     set: (newValue) => dataStyleStore.setEdgesSize(id.value, newValue),
   })
   const coloring_style_key = computed({
-    get: () => dataStyleStore.edgesActiveColoring(id.value),
+    get: () => dataStyleStore.meshEdgesActiveColoring(id.value),
     set: (newValue) => {
-      dataStyleStore.setEdgesActiveColoring(id.value, newValue)
+      dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
     },
   })
   const color = computed({
-    get: () => dataStyleStore.edgesColor(id.value),
-    set: (newValue) => dataStyleStore.setEdgesColor(id.value, newValue),
+    get: () => dataStyleStore.meshEdgesColor(id.value),
+    set: (newValue) => dataStyleStore.setMeshEdgesColor(id.value, newValue),
   })
 </script>

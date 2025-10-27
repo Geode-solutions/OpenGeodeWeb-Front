@@ -5,10 +5,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   const treeview_store = useTreeviewStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  /** State **/
   const db = reactive({})
 
-  /** Getters **/
   function itemMetaDatas(id) {
     return db[id]
   }
@@ -41,13 +39,13 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     return null
   }
 
-  /** Actions **/
-  async function registerObject(id, file_name, viewer_object) {
+  async function registerObject(id) {
     return viewer_call({
       schema: viewer_schemas.opengeodeweb_viewer.generic.register,
-      params: { id, file_name, viewer_object },
+      params: { id },
     })
   }
+
   async function addItem(
     id,
     value = {
@@ -76,14 +74,11 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function fetchMeshComponents(id) {
-    const { native_filename, geode_object } = itemMetaDatas(id)
     await api_fetch(
       {
         schema: back_schemas.opengeodeweb_back.models.mesh_components,
         params: {
           id,
-          filename: native_filename,
-          geode_object,
         },
       },
       {
