@@ -55,7 +55,7 @@ export function useMeshPolyhedraStyle() {
         response_function: () => {
           coloring.color = color
           console.log(
-            `${setMeshPolyhedraColor.name} ${id} ${meshPolyhedraColor(id)}`,
+            `${setMeshPolyhedraColor.name} ${id} ${JSON.stringify(meshPolyhedraColor(id))}`,
           )
         },
       },
