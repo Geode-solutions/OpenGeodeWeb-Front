@@ -198,7 +198,7 @@ function kill_viewer(viewer_port) {
     })
     socket.on("message", (data) => {
       let message
-      setTimeout(() => {
+      await setTimeout(() => {
         message = data.toString()
         console.log("Received from server:", message)
       }, 2000)
