@@ -196,7 +196,7 @@ function kill_viewer(viewer_port) {
         }),
       )
     })
-    socket.on("message", (data) => {
+    socket.on("message", async (data) => {
       let message
       await setTimeout(() => {
         message = data.toString()
