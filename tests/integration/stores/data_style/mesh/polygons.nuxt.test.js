@@ -20,7 +20,7 @@ const geode_object = "PolygonalSurface3D"
 const object_type = "mesh"
 
 beforeEach(async () => {
-  ; ({ id, back_port, viewer_port } = await setupIntegrationTests(
+  ;({ id, back_port, viewer_port } = await setupIntegrationTests(
     file_name,
     geode_object,
     object_type,
