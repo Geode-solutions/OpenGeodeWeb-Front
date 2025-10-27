@@ -29,7 +29,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-}, 15000)
+})
 
 describe("Mesh points", () => {
   describe("Points visibility", () => {
