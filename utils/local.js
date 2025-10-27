@@ -50,13 +50,11 @@ function create_path(path) {
   return path
 }
 
-async function get_available_port(port) {
-  const available_port = await getPort({
-    port,
+function get_available_port() {
+  return getPort({
     host: "localhost",
+    random: true,
   })
-  console.log("available_port", available_port)
-  return available_port
 }
 
 async function run_script(
@@ -69,6 +67,7 @@ async function run_script(
     setTimeout(() => {
       reject("Timed out after " + timeout_seconds + " seconds")
     }, timeout_seconds * 1000)
+
     const child = child_process.spawn(command, args, {
       encoding: "utf8",
       shell: true,
@@ -109,32 +108,43 @@ async function run_script(
   })
 }
 
-async function run_back(command, args = { port, data_folder_path }) {
+async function run_back(
+  command,
+  args = {
+    project_folder_path,
+    upload_folder_path: undefined,
+  },
+) {
   return new Promise(async (resolve, reject) => {
-    const back_port = await get_available_port(args.port)
-    const upload_folder_path = path.join(args.data_folder_path, "uploads")
+    let upload_folder_path = args.upload_folder_path
+    if (!args.upload_folder_path) {
+      upload_folder_path = args.project_folder_path
+    }
+    const port = await get_available_port()
     const back_args = [
-      "--port " + back_port,
-      "--data_folder_path " + args.data_folder_path,
+      "--port " + port,
+      "--data_folder_path " + args.project_folder_path,
       "--upload_folder_path " + upload_folder_path,
       "--allowed_origin http://localhost:*",
       "--timeout " + 0,
     ]
+    console.log("run_back", command, back_args)
     await run_script(command, back_args, "Serving Flask app")
-    resolve(back_port)
+    resolve(port)
   })
 }
 
-async function run_viewer(command, args = { port, data_folder_path }) {
+async function run_viewer(command, args = { project_folder_path }) {
   return new Promise(async (resolve, reject) => {
-    const viewer_port = await get_available_port(args.port)
+    const port = await get_available_port()
     const viewer_args = [
-      "--port " + viewer_port,
-      "--data_folder_path " + args.data_folder_path,
+      "--port " + port,
+      "--data_folder_path " + args.project_folder_path,
       "--timeout " + 0,
     ]
+    console.log("run_viewer", command, viewer_args)
     await run_script(command, viewer_args, "Starting factory")
-    resolve(viewer_port)
+    resolve(port)
   })
 }
 
@@ -153,8 +163,6 @@ function delete_folder_recursive(data_folder_path) {
 
 function kill_back(back_port) {
   return new Promise((resolve, reject) => {
-    console.log("back_schemas", back_schemas)
-
     fetch(
       "http://localhost:" +
         back_port +
@@ -176,7 +184,7 @@ function kill_back(back_port) {
 }
 
 function kill_viewer(viewer_port) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
     socket.on("open", () => {
       console.log("Connected to WebSocket server")
@@ -191,19 +199,15 @@ function kill_viewer(viewer_port) {
     socket.on("message", (data) => {
       const message = data.toString()
       console.log("Received from server:", message)
+
       if (message.includes("hello")) {
-        try {
-          console.log("viewer_schemas", viewer_schemas)
-          socket.send(
-            JSON.stringify({
-              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
-              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
-            }),
-          )
-        } catch (error) {
-          console.error("WebSocket error:", error)
-          resolve()
-        }
+        socket.send(
+          JSON.stringify({
+            id: viewer_schemas.opengeodeweb_viewer.kill.$id,
+            method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+          }),
+        )
+        resolve()
       }
     })
     socket.on("close", () => {
@@ -220,8 +224,8 @@ function kill_viewer(viewer_port) {
 async function run_browser(
   script_name,
   microservices_options = {
-    back: { command, args: { port: 5000, data_folder_path } },
-    viewer: { command, args: { port: 1234, data_folder_path } },
+    back: { command, args: { project_folder_path } },
+    viewer: { command, args: { project_folder_path } },
   },
 ) {
   console.log("microservices_options", microservices_options)
@@ -247,23 +251,16 @@ async function run_browser(
   process.env.BROWSER = true
   process.on("SIGINT", async () => {
     console.log("Shutting down microservices")
-    await Promise.all([
-      kill_back(process.env.GEODE_PORT),
-      kill_viewer(process.env.VIEWER_PORT),
-    ])
+    await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
     console.log("Quitting App...")
     process.exit(0)
   })
 
-  const nuxt_port = await get_available_port()
-  console.log("nuxt_port", nuxt_port)
-
-  process.env.NUXT_PORT = nuxt_port
   const nuxt_process = child_process.spawn("npm", ["run", script_name], {
     shell: true,
   })
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     nuxt_process.stdout.on("data", function (data) {
       const output = data.toString()
       const portMatch = output.match(
@@ -271,7 +268,9 @@ async function run_browser(
       )
       console.log("Nuxt: ", output)
       if (portMatch) {
-        resolve(portMatch[1])
+        const nuxt_port = portMatch[1]
+        process.env.NUXT_PORT = nuxt_port
+        resolve({ geode_port: back_port, viewer_port, nuxt_port })
         return
       }
     })
