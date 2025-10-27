@@ -38,7 +38,7 @@ export const useAppStore = defineStore("app", () => {
     return snapshot
   }
 
-  function load(snapshot) {
+  async function load(snapshot) {
     if (!snapshot) {
       console.warn("[AppStore] load called with invalid snapshot")
       return
@@ -48,9 +48,8 @@ export const useAppStore = defineStore("app", () => {
     const notFoundStores = []
 
     for (const store of stores) {
-      if (!store.load) {
+      if (!store.load) 
         continue
-      }
 
       const storeId = store.$id
 
@@ -60,7 +59,7 @@ export const useAppStore = defineStore("app", () => {
       }
 
       try {
-        store.load(snapshot[storeId])
+        await store.load(snapshot[storeId])
         loadedCount++
       } catch (error) {
         console.error(`[AppStore] Error loading store "${storeId}":`, error)

@@ -184,6 +184,25 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender()
   }
 
+  function clear() {
+    const renderer = genericRenderWindow.value.getRenderer()
+    const actors = renderer.getActors()
+    actors.forEach((actor) => renderer.removeActor(actor))
+    genericRenderWindow.value.getRenderWindow().render()
+    Object.keys(db).forEach((id) => delete db[id])
+  }
+
+  function save() {
+    return { zScale: zScale.value }
+  }
+
+  async function load(snapshot) {
+    const z_scale = snapshot?.zScale
+    if (z_scale != null) {
+      await setZScaling(z_scale)
+    }
+  }
+
   return {
     db,
     genericRenderWindow,
@@ -195,5 +214,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     resize,
     setContainer,
     zScale,
+    clear,
+    save,
+    load,
   }
 })

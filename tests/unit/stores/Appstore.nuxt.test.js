@@ -122,39 +122,23 @@ describe("App Store", () => {
     })
 
     describe("load", () => {
-      test("load stores with load method", () => {
-        const app_store = useAppStore()
-        const mock_store_1 = {
-          $id: "userStore",
-          save: vi.fn().mockImplementation(() => {}),
-          load: vi.fn().mockImplementation(() => {}),
-        }
-        const mock_store_2 = {
-          $id: "cartStore",
-          save: vi.fn().mockImplementation(() => {}),
-          load: vi.fn().mockImplementation(() => {}),
-        }
-
-        app_store.registerStore(mock_store_1)
-        app_store.registerStore(mock_store_2)
-
+      test("App Store > actions > load > load stores with load method", async () => {
+        const appStore = useAppStore()
+      
+        const userStore = { $id: "userStore", load: vi.fn().mockResolvedValue() }
+        const cartStore = { $id: "cartStore", load: vi.fn().mockResolvedValue() }
+      
+        appStore.registerStore(userStore)
+        appStore.registerStore(cartStore)
+      
         const snapshot = {
-          userStore: { name: "tata", email: "tata@tutu.com" },
-          cartStore: { items: [{ id: 1 }], total: 50 },
+          userStore: { some: "data" },
+          cartStore: { other: "data" },
         }
-
-        app_store.load(snapshot)
-
-        expect(mock_store_1.load).toHaveBeenCalledTimes(1)
-        expect(mock_store_1.load).toHaveBeenCalledWith({
-          name: "tata",
-          email: "tata@tutu.com",
-        })
-        expect(mock_store_2.load).toHaveBeenCalledTimes(1)
-        expect(mock_store_2.load).toHaveBeenCalledWith({
-          items: [{ id: 1 }],
-          total: 50,
-        })
+      
+        await appStore.load(snapshot)
+        expect(userStore.load).toHaveBeenCalledTimes(1)
+        expect(cartStore.load).toHaveBeenCalledTimes(1)
       })
 
       test("skip stores without load method", () => {

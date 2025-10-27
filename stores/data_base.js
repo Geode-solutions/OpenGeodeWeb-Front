@@ -1,5 +1,6 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { viewer_call } from "@/composables/viewer_call.js"
 
 export const useDataBaseStore = defineStore("dataBase", () => {
   const treeview_store = useTreeviewStore()
@@ -136,6 +137,21 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     return flat_indexes.filter((index) => index !== null)
   }
 
+  function save() {
+    return { db: JSON.parse(JSON.stringify(db)) }
+  }
+
+  async function load(snapshot) {
+    const entries = snapshot?.db || {}
+    const hybrid_store = useHybridViewerStore()
+    await hybrid_store.initHybridViewer()
+    hybrid_store.clear()
+    for (const [id, item] of Object.entries(entries)) {
+      await registerObject(id)
+      await addItem(id, item)
+    }
+  }
+
   return {
     db,
     itemMetaDatas,
@@ -150,5 +166,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
+    save,
+    load,
   }
 })
