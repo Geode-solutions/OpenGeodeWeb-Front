@@ -59,5 +59,3 @@ export function useCornersStyle() {
     applyCornersStyle,
   }
 }
-
-export default useCornersStyle
