@@ -135,7 +135,7 @@ describe("App Store", () => {
           userStore: { some: "data" },
           geodeStore: { other: "data" },
         }
-      
+
         await appStore.load(snapshot)
         expect(userStore.load).toHaveBeenCalledTimes(1)
         expect(geodeStore.load).toHaveBeenCalledTimes(1)

@@ -48,8 +48,7 @@ export const useAppStore = defineStore("app", () => {
     const notFoundStores = []
 
     for (const store of stores) {
-      if (!store.load) 
-        continue
+      if (!store.load) continue
 
       const storeId = store.$id
 
