@@ -124,13 +124,19 @@ describe("App Store", () => {
     describe("load", () => {
       test("App Store > actions > load > load stores with load method", async () => {
         const appStore = useAppStore()
-      
-        const userStore = { $id: "userStore", load: vi.fn().mockResolvedValue() }
-        const geodeStore = { $id: "geodeStore", load: vi.fn().mockResolvedValue() }
-      
+
+        const userStore = {
+          $id: "userStore",
+          load: vi.fn().mockResolvedValue(),
+        }
+        const geodeStore = {
+          $id: "geodeStore",
+          load: vi.fn().mockResolvedValue(),
+        }
+
         appStore.registerStore(userStore)
         appStore.registerStore(geodeStore)
-      
+
         const snapshot = {
           userStore: { some: "data" },
           geodeStore: { other: "data" },
