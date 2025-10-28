@@ -23,7 +23,6 @@ vi.mock("@/stores/hybrid_viewer.js", () => ({
   }),
 }))
 
-
 beforeEach(() => setActivePinia(createPinia()))
 
 describe("Project load", () => {

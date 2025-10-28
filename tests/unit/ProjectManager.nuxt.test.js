@@ -60,7 +60,11 @@ describe("ProjectManager plugin", () => {
       const snapshot = JSON.parse(raw)
       await mockInfraStore.create_connection()
       viewer_call({})
-      console.log("[TEST] viewer_call:", viewer_call.mock?.calls, viewer_call.mock?.calls?.length || 0)
+      console.log(
+        "[TEST] viewer_call:",
+        viewer_call.mock?.calls,
+        viewer_call.mock?.calls?.length || 0,
+      )
       await mockAppStore.load(snapshot)
     }
 

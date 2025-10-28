@@ -124,18 +124,24 @@ describe("App Store", () => {
     describe("load", () => {
       test("App Store > actions > load > load stores with load method", async () => {
         const appStore = useAppStore()
-      
-        const userStore = { $id: "userStore", load: vi.fn().mockResolvedValue() }
-        const cartStore = { $id: "cartStore", load: vi.fn().mockResolvedValue() }
-      
+
+        const userStore = {
+          $id: "userStore",
+          load: vi.fn().mockResolvedValue(),
+        }
+        const cartStore = {
+          $id: "cartStore",
+          load: vi.fn().mockResolvedValue(),
+        }
+
         appStore.registerStore(userStore)
         appStore.registerStore(cartStore)
-      
+
         const snapshot = {
           userStore: { some: "data" },
           cartStore: { other: "data" },
         }
-      
+
         await appStore.load(snapshot)
         expect(userStore.load).toHaveBeenCalledTimes(1)
         expect(cartStore.load).toHaveBeenCalledTimes(1)

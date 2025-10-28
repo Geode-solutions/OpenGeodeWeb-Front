@@ -7,7 +7,9 @@ export default defineNuxtPlugin(() => {
 
   async function exportProject() {
     const snapshot = appStore.save()
-    const blob = new Blob([JSON.stringify(snapshot)], { type: "application/json" })
+    const blob = new Blob([JSON.stringify(snapshot)], {
+      type: "application/json",
+    })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -25,7 +27,7 @@ export default defineNuxtPlugin(() => {
 
   return {
     provide: {
-      project: { export: exportProject, importFile: importProjectFile }
-    }
+      project: { export: exportProject, importFile: importProjectFile },
+    },
   }
 })
