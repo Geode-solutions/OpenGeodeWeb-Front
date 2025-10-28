@@ -2,132 +2,119 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 
 export function useMeshPointsStyle() {
-  /** State **/
   const dataStyleStore = useDataStyleStore()
 
-  /** Getters **/
-  function pointsVisibility(id) {
-    return dataStyleStore.styles[id].points.visibility
-  }
-  function pointsActiveColoring(id) {
-    return dataStyleStore.styles[id].points.coloring.active
-  }
-  function pointsColor(id) {
-    return dataStyleStore.styles[id].points.coloring.color
-  }
-  function pointsVertexAttribute(id) {
-    return dataStyleStore.styles[id].points.coloring.vertex
-  }
-  function pointsSize(id) {
-    return dataStyleStore.styles[id].points.size
+  function meshPointsStyle(id) {
+    return dataStyleStore.getStyle(id).points
   }
 
-  /** Actions **/
-  function setPointsVisibility(id, visibility) {
+  function meshPointsVisibility(id) {
+    return meshPointsStyle(id).visibility
+  }
+  function setMeshPointsVisibility(id, visibility) {
+    const points_style = meshPointsStyle(id)
     return viewer_call(
-      {
-        schema: mesh_points_schemas.visibility,
-        params: { id, visibility },
-      },
+      { schema: mesh_points_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
-          dataStyleStore.styles[id].points.visibility = visibility
+          points_style.visibility = visibility
           console.log(
-            "setPointsVisibility",
-            dataStyleStore.styles[id].points.visibility,
+            `${setMeshPointsVisibility.name} ${id} ${meshPointsVisibility(id)}`,
           )
         },
       },
     )
   }
 
-  function setPointsColor(id, color) {
+  function meshPointsActiveColoring(id) {
+    return meshPointsStyle(id).coloring.active
+  }
+  function setMeshPointsActiveColoring(id, type) {
+    const coloring = meshPointsStyle(id).coloring
+    coloring.active = type
+    console.log(
+      `${setMeshPointsActiveColoring.name} ${id} ${meshPointsActiveColoring(id)}`,
+    )
+    if (type == "color") {
+      return dataStyleStore.setMeshPointsColor(id, coloring.color)
+    } else if (type == "vertex" && coloring.vertex !== null) {
+      return dataStyleStore.setMeshPointsVertexAttribute(id, coloring.vertex)
+    } else throw new Error("Unknown points coloring type: " + type)
+  }
+
+  function meshPointsColor(id) {
+    return meshPointsStyle(id).coloring.color
+  }
+  function setMeshPointsColor(id, color) {
+    const coloring_style = meshPointsStyle(id).coloring
     return viewer_call(
-      {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.points.color,
-        params: { id, color },
-      },
+      { schema: mesh_points_schemas.color, params: { id, color } },
       {
         response_function: () => {
-          dataStyleStore.styles[id].points.coloring.color = color
+          coloring_style.color = color
           console.log(
-            "setPointsColor",
-            dataStyleStore.styles[id].points.coloring.color,
+            `${setMeshPointsColor.name} ${id} ${JSON.stringify(meshPointsColor(id))}`,
           )
         },
       },
     )
   }
-  function setPointsVertexAttribute(id, vertex_attribute) {
+  function meshPointsVertexAttribute(id) {
+    return meshPointsStyle(id).coloring.vertex
+  }
+  function setMeshPointsVertexAttribute(id, vertex_attribute) {
+    const coloring_style = meshPointsStyle(id).coloring
     return viewer_call(
       {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.points.vertex_attribute,
+        schema: mesh_points_schemas.vertex_attribute,
         params: { id, ...vertex_attribute },
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].points.coloring.vertex = vertex_attribute
+          coloring_style.vertex = vertex_attribute
           console.log(
-            "setPointsVertexAttribute",
-            dataStyleStore.styles[id].points.coloring.vertex,
+            `${setMeshPointsVertexAttribute.name} ${id} ${meshPointsVertexAttribute(id)}`,
           )
         },
       },
     )
   }
-  function setPointsSize(id, size) {
+
+  function meshPointsSize(id) {
+    return meshPointsStyle(id).size
+  }
+  function setMeshPointsSize(id, size) {
+    const points_style = meshPointsStyle(id)
     return viewer_call(
-      {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.points.size,
-        params: { id, size },
-      },
+      { schema: mesh_points_schemas.size, params: { id, size } },
       {
         response_function: () => {
-          dataStyleStore.styles[id].points.size = size
-          console.log("setPointsSize", dataStyleStore.styles[id].points.size)
+          points_style.size = size
+          console.log(`${setMeshPointsSize.name} ${id} ${meshPointsSize(id)}`)
         },
       },
     )
   }
 
-  function setPointsActiveColoring(id, type) {
-    if (type == "color")
-      dataStyleStore.setPointsColor(
-        id,
-        dataStyleStore.styles[id].points.coloring.color,
-      )
-    else if (type == "vertex") {
-      const vertex = dataStyleStore.styles[id].points.coloring.vertex
-      if (vertex !== null) dataStyleStore.setPointsVertexAttribute(id, vertex)
-    } else throw new Error("Unknown edges coloring type: " + type)
-    dataStyleStore.styles[id].points.coloring.active = type
-    console.log(
-      "setPointsActiveColoring",
-      dataStyleStore.styles[id].points.coloring.active,
-    )
-  }
-
-  function applyPointsStyle(id, style) {
+  function applyMeshPointsStyle(id, style) {
     return Promise.all([
-      setPointsVisibility(id, style.visibility),
-      setPointsActiveColoring(id, style.coloring.active),
-      setPointsSize(id, style.size),
+      setMeshPointsVisibility(id, style.visibility),
+      setMeshPointsActiveColoring(id, style.coloring.active),
+      setMeshPointsSize(id, style.size),
     ])
   }
 
   return {
-    pointsVisibility,
-    pointsActiveColoring,
-    pointsColor,
-    pointsVertexAttribute,
-    pointsSize,
-    setPointsVisibility,
-    setPointsActiveColoring,
-    setPointsColor,
-    setPointsVertexAttribute,
-    setPointsSize,
-    applyPointsStyle,
+    meshPointsVisibility,
+    meshPointsActiveColoring,
+    meshPointsColor,
+    meshPointsVertexAttribute,
+    meshPointsSize,
+    setMeshPointsVisibility,
+    setMeshPointsActiveColoring,
+    setMeshPointsColor,
+    setMeshPointsVertexAttribute,
+    setMeshPointsSize,
+    applyMeshPointsStyle,
   }
 }
-
-export default useMeshPointsStyle

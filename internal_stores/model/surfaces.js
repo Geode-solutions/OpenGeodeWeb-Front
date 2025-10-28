@@ -56,5 +56,3 @@ export function useSurfacesStyle() {
     applySurfacesStyle,
   }
 }
-
-export default useSurfacesStyle

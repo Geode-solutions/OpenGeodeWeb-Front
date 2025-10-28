@@ -5,10 +5,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   const treeview_store = useTreeviewStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  /** State **/
   const db = reactive({})
 
-  /** Getters **/
   function itemMetaDatas(id) {
     return db[id]
   }
@@ -41,13 +39,13 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     return null
   }
 
-  /** Actions **/
-  async function registerObject(id, viewer_object) {
+  async function registerObject(id) {
     return viewer_call({
       schema: viewer_schemas.opengeodeweb_viewer.generic.register,
-      params: { id, viewer_object },
+      params: { id },
     })
   }
+
   async function addItem(
     id,
     value = {
