@@ -49,25 +49,26 @@
   const id = toRef(() => props.itemProps.id)
 
   const visibility = computed({
-    get: () => dataStyleStore.pointsVisibility(id.value),
-    set: (newValue) => dataStyleStore.setPointsVisibility(id.value, newValue),
+    get: () => dataStyleStore.meshPointsVisibility(id.value),
+    set: (newValue) =>
+      dataStyleStore.setMeshPointsVisibility(id.value, newValue),
   })
   const size = computed({
-    get: () => dataStyleStore.pointsSize(id.value),
-    set: (newValue) => dataStyleStore.setPointsSize(id.value, newValue),
+    get: () => dataStyleStore.meshPointsSize(id.value),
+    set: (newValue) => dataStyleStore.setMeshPointsSize(id.value, newValue),
   })
   const coloring_style_key = computed({
-    get: () => dataStyleStore.pointsActiveColoring(id.value),
+    get: () => dataStyleStore.meshPointsActiveColoring(id.value),
     set: (newValue) =>
-      dataStyleStore.setPointsActiveColoring(id.value, newValue),
+      dataStyleStore.setMeshPointsActiveColoring(id.value, newValue),
   })
   const color = computed({
-    get: () => dataStyleStore.pointsColor(id.value),
-    set: (newValue) => dataStyleStore.setPointsColor(id.value, newValue),
+    get: () => dataStyleStore.meshPointsColor(id.value),
+    set: (newValue) => dataStyleStore.setMeshPointsColor(id.value, newValue),
   })
   const vertex_attribute = computed({
-    get: () => dataStyleStore.pointsVertexAttribute(id.value),
+    get: () => dataStyleStore.meshPointsVertexAttribute(id.value),
     set: (newValue) =>
-      dataStyleStore.setPointsVertexAttribute(id.value, newValue),
+      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue),
   })
 </script>
