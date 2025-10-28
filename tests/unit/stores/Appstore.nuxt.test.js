@@ -46,7 +46,7 @@ describe("App Store", () => {
           load: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
-          $id: "cartStore",
+          $id: "geodeStore",
           save: vi.fn().mockImplementation(() => {}),
           load: vi.fn().mockImplementation(() => {}),
         }
@@ -56,7 +56,7 @@ describe("App Store", () => {
 
         expect(app_store.stores.length).toBe(2)
         expect(app_store.stores[0].$id).toBe("userStore")
-        expect(app_store.stores[1].$id).toBe("cartStore")
+        expect(app_store.stores[1].$id).toBe("geodeStore")
       })
     })
 
@@ -72,7 +72,7 @@ describe("App Store", () => {
           load: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
-          $id: "cartStore",
+          $id: "geodeStore",
           save: vi.fn().mockImplementation(() => ({ items: [], total: 0 })),
           load: vi.fn().mockImplementation(() => {}),
         }
@@ -86,7 +86,7 @@ describe("App Store", () => {
         expect(mock_store_2.save).toHaveBeenCalledTimes(1)
         expect(snapshot).toEqual({
           userStore: { name: "toto", email: "toto@titi.com" },
-          cartStore: { items: [], total: 0 },
+          geodeStore: { items: [], total: 0 },
         })
       })
 
@@ -126,19 +126,19 @@ describe("App Store", () => {
         const appStore = useAppStore()
       
         const userStore = { $id: "userStore", load: vi.fn().mockResolvedValue() }
-        const cartStore = { $id: "cartStore", load: vi.fn().mockResolvedValue() }
+        const geodeStore = { $id: "geodeStore", load: vi.fn().mockResolvedValue() }
       
         appStore.registerStore(userStore)
-        appStore.registerStore(cartStore)
+        appStore.registerStore(geodeStore)
       
         const snapshot = {
           userStore: { some: "data" },
-          cartStore: { other: "data" },
+          geodeStore: { other: "data" },
         }
       
         await appStore.load(snapshot)
         expect(userStore.load).toHaveBeenCalledTimes(1)
-        expect(cartStore.load).toHaveBeenCalledTimes(1)
+        expect(geodeStore.load).toHaveBeenCalledTimes(1)
       })
 
       test("skip stores without load method", () => {
