@@ -1,5 +1,3 @@
-// Node.js imports
-
 // Third party imports
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
@@ -9,14 +7,14 @@ import Status from "~/utils/status"
 import * as composables from "~/composables/viewer_call"
 import { useDataStyleStore } from "~/stores/data_style"
 import { useViewerStore } from "~/stores/viewer"
-import { kill_back, kill_viewer } from "~/utils/local"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
-const mesh_polyhedra_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra
+const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks
+const file_name = "test.og_brep"
+const geode_object = "BRep"
+
 let id, back_port, viewer_port
-const file_name = "test.og_rgd3d"
-const geode_object = "RegularGrid3D"
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port } = await setupIntegrationTests(
@@ -29,58 +27,59 @@ afterEach(async () => {
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
 
-describe("Mesh polyhedra", () => {
-  describe("Polyhedra visibility", () => {
-    test("Visibility true", async () => {
+describe("Model blocks", () => {
+  describe("Blocks visibility", () => {
+    test("Visibility false", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const visibility = true
+      const dataBaseStore = useDataBaseStore()
+      const block_ids = dataBaseStore.getBlocksUuids(id)
+      const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+      const visibility = false
       const spy = vi.spyOn(composables, "viewer_call")
-      await dataStyleStore.setMeshPolyhedraVisibility(id, visibility)
+      await dataStyleStore.setModelBlocksVisibility(id, block_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         {
-          schema: mesh_polyhedra_schemas.visibility,
-          params: { id, visibility },
+          schema: model_blocks_schemas.visibility,
+          params: { id, block_ids: block_flat_indexes, visibility },
         },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolyhedraVisibility(id)).toBe(visibility)
+      for (const block_id of block_ids) {
+        expect(dataStyleStore.modelBlockVisibility(id, block_id)).toBe(
+          visibility,
+        )
+      }
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
-  describe("Polyhedra active coloring", () => {
-    test("test coloring", async () => {
+
+  describe("Blocks color", () => {
+    test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshPolyhedraActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshPolyhedraActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
-    })
-  })
-  describe("Polyhedra color", () => {
-    test("test red", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
+      const dataBaseStore = useDataBaseStore()
+      const block_ids = dataBaseStore.getBlocksUuids(id)
+      const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(composables, "viewer_call")
-      await dataStyleStore.setMeshPolyhedraColor(id, color)
+      await dataStyleStore.setModelBlocksColor(id, block_ids, color)
       expect(spy).toHaveBeenCalledWith(
         {
-          schema: mesh_polyhedra_schemas.color,
-          params: { id, color },
+          schema: model_blocks_schemas.color,
+          params: { id, block_ids: block_flat_indexes, color },
         },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolyhedraColor(id)).toStrictEqual(color)
+      for (const block_id of block_ids) {
+        expect(dataStyleStore.modelBlockColor(id, block_id)).toStrictEqual(
+          color,
+        )
+      }
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })

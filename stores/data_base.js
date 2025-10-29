@@ -1,5 +1,10 @@
+// Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local constants
+const back_model_schemas = back_schemas.opengeodeweb_back.models
+const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 
 export const useDataBaseStore = defineStore("dataBase", () => {
   const treeview_store = useTreeviewStore()
@@ -41,7 +46,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   async function registerObject(id) {
     return viewer_call({
-      schema: viewer_schemas.opengeodeweb_viewer.generic.register,
+      schema: viewer_generic_schemas.register,
       params: { id },
     })
   }
@@ -57,11 +62,11 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       vtk_js: { binary_light_viewable },
     },
   ) {
+    console.log("addItem", id, value)
     db[id] = value
 
     if (value.object_type === "model") {
-      await fetchMeshComponents(id)
-      await fetchUuidToFlatIndexDict(id)
+      await Promise.all([fetchMeshComponents(id), fetchUuidToFlatIndexDict(id)])
     }
     treeview_store.addItem(
       value.geode_object,
@@ -74,34 +79,32 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function fetchMeshComponents(id) {
-    await api_fetch(
+    console.log("fetchMeshComponents", id)
+    return api_fetch(
       {
-        schema: back_schemas.opengeodeweb_back.models.mesh_components,
+        schema: back_model_schemas.mesh_components,
         params: {
           id,
         },
       },
       {
         response_function: async (response) => {
-          if (response._data?.uuid_dict) {
-            db[id].mesh_components = response._data.uuid_dict
-          }
+          db[id].mesh_components = response._data.uuid_dict
         },
       },
     )
   }
 
   async function fetchUuidToFlatIndexDict(id) {
-    await api_fetch(
+    console.log("fetchUuidToFlatIndexDict", id)
+    return api_fetch(
       {
-        schema: back_schemas.opengeodeweb_back.models.vtm_component_indices,
+        schema: back_model_schemas.vtm_component_indices,
         params: { id },
       },
       {
         response_function: async (response) => {
-          if (response._data?.uuid_to_flat_index) {
-            db[id]["uuid_to_flat_index"] = response._data.uuid_to_flat_index
-          }
+          db[id]["uuid_to_flat_index"] = response._data.uuid_to_flat_index
         },
       },
     )

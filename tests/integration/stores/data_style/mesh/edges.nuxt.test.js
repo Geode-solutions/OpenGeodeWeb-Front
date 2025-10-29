@@ -9,6 +9,7 @@ import Status from "~/utils/status"
 import * as composables from "~/composables/viewer_call"
 import { useDataStyleStore } from "~/stores/data_style"
 import { useViewerStore } from "~/stores/viewer"
+import { kill_back, kill_viewer } from "~/utils/local"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -16,13 +17,11 @@ const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 let id, back_port, viewer_port
 const file_name = "test.og_edc2d"
 const geode_object = "EdgedCurve2D"
-const object_type = "mesh"
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port } = await setupIntegrationTests(
     file_name,
     geode_object,
-    object_type,
   ))
 }, 20000)
 

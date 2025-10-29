@@ -15,6 +15,7 @@ const corners_defaultVisibility = true
 const lines_defaultVisibility = true
 const surfaces_defaultVisibility = true
 const blocks_defaultVisibility = true
+const blocks_defaultColor = { r: 20, g: 20, b: 20 }
 const lines_defaultColor = { r: 20, g: 20, b: 20 }
 
 // Mesh functions
@@ -127,8 +128,11 @@ const modelLinesDefaultStyle = (
 const modelSurfacesDefaultStyle = (visibility = surfaces_defaultVisibility) => {
   return { visibility }
 }
-const modelBlocksDefaultStyle = (visibility = blocks_defaultVisibility) => {
-  return { visibility }
+const modelBlocksDefaultStyle = (
+  visibility = blocks_defaultVisibility,
+  color = blocks_defaultColor,
+) => {
+  return { visibility, color }
 }
 const modelPointsDefaultStyle = (
   visibility = points_defaultVisibility,

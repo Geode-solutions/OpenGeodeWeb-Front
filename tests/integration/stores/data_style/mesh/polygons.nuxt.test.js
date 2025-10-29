@@ -17,13 +17,11 @@ const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 let id, back_port, viewer_port
 const file_name = "test.og_psf3d"
 const geode_object = "PolygonalSurface3D"
-const object_type = "mesh"
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port } = await setupIntegrationTests(
     file_name,
     geode_object,
-    object_type,
   ))
 }, 20000)
 

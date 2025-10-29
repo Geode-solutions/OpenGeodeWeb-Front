@@ -1,4 +1,7 @@
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 
 export function useMeshPolygonsStyle() {
@@ -125,7 +128,9 @@ export function useMeshPolygonsStyle() {
       return setMeshPolygonsVertexAttribute(id, coloring.vertex)
     } else if (type === "polygon" && coloring.polygon !== null) {
       return setMeshPolygonsPolygonAttribute(id, coloring.polygon)
-    } else throw new Error("Unknown polygons coloring type: " + type)
+    } else {
+      throw new Error("Unknown mesh polygons coloring type: " + type)
+    }
   }
 
   function applyMeshPolygonsStyle(id, style) {

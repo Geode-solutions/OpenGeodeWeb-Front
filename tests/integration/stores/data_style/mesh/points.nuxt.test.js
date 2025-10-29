@@ -17,13 +17,11 @@ const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 let id, back_port, viewer_port
 const file_name = "test.og_edc2d"
 const geode_object = "EdgedCurve2D"
-const object_type = "mesh"
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port } = await setupIntegrationTests(
     file_name,
     geode_object,
-    object_type,
   ))
 }, 20000)
 

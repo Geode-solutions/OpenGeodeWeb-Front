@@ -1,4 +1,7 @@
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local constants
 const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
 
 export function useModelPointsStyle() {
@@ -21,6 +24,10 @@ export function useModelPointsStyle() {
         response_function: () => {
           dataStyleStore.styles[id].points.visibility = visibility
           console.log("setModelPointsVisibility", visibility)
+
+          console.log(
+            `${setModelBlocksVisibility.name} ${id} ${block_ids} ${modelBlockVisibility(id, block_ids[0])}`,
+          )
         },
       },
     )

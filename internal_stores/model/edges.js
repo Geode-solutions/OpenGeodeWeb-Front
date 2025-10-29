@@ -1,4 +1,7 @@
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local constants
 const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges
 
 export function useModelEdgesStyle() {
@@ -17,7 +20,9 @@ export function useModelEdgesStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].edges.visibility = visibility
-          console.log("setModelEdgesVisibility", visibility)
+          console.log(
+            `${setModelEdgesVisibility.name} ${id} ${modelEdgesVisibility(id)}`,
+          )
         },
       },
     )

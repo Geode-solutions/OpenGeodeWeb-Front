@@ -7,6 +7,9 @@ import { useMeshEdgesStyle } from "./edges.js"
 import { useMeshPolygonsStyle } from "./polygons.js"
 import { useMeshPolyhedraStyle } from "./polyhedra.js"
 
+// Local constants
+const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh
+
 export default function useMeshStyle() {
   const dataStyleStore = useDataStyleStore()
   const pointsStyleStore = useMeshPointsStyle()
@@ -21,7 +24,7 @@ export default function useMeshStyle() {
   function setMeshVisibility(id, visibility) {
     return viewer_call(
       {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.visibility,
+        schema: mesh_schemas.visibility,
         params: { id, visibility },
       },
       {
@@ -38,20 +41,22 @@ export default function useMeshStyle() {
     const style = dataStyleStore.getStyle(id)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
-      if (key == "visibility") {
+      if (key === "visibility") {
         promise_array.push(setMeshVisibility(id, value))
-      } else if (key == "points") {
+      } else if (key === "points") {
         promise_array.push(pointsStyleStore.applyMeshPointsStyle(id, value))
-      } else if (key == "edges") {
+      } else if (key === "edges") {
         promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id, value))
-      } else if (key == "polygons") {
+      } else if (key === "polygons") {
         promise_array.push(
           meshPolygonsStyleStore.applyMeshPolygonsStyle(id, value),
         )
-      } else if (key == "polyhedra") {
+      } else if (key === "polyhedra") {
         promise_array.push(
           meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id, value),
         )
+      } else {
+        throw new Error("Unknown key")
       }
     }
     return promise_array

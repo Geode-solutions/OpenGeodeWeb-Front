@@ -1,5 +1,11 @@
+// Node.js imports
+
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local imports
+
+// Local constants
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 
 export function useMeshEdgesStyle() {
@@ -42,7 +48,9 @@ export function useMeshEdgesStyle() {
       //   return setEdgesVertexAttribute(id, coloring.vertex)
       // } else if (type == "edges" && coloring.edges !== null) {
       //   return setEdgesEdgeAttribute(id, coloring.edges)
-    } else throw new Error("Unknown edges coloring type: " + type)
+    } else {
+      throw new Error("Unknown mesh edges coloring type: " + type)
+    }
   }
 
   function meshEdgesColor(id) {

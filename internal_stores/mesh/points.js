@@ -1,4 +1,7 @@
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local constants
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 
 export function useMeshPointsStyle() {
@@ -39,7 +42,9 @@ export function useMeshPointsStyle() {
       return dataStyleStore.setMeshPointsColor(id, coloring.color)
     } else if (type == "vertex" && coloring.vertex !== null) {
       return dataStyleStore.setMeshPointsVertexAttribute(id, coloring.vertex)
-    } else throw new Error("Unknown points coloring type: " + type)
+    } else {
+      throw new Error("Unknown mesh points coloring type: " + type)
+    }
   }
 
   function meshPointsColor(id) {

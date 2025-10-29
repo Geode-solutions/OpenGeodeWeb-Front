@@ -1,5 +1,7 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local constants
 const mesh_polyhedra_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra
 
 export function useMeshPolyhedraStyle() {
@@ -41,7 +43,9 @@ export function useMeshPolyhedraStyle() {
       //   return setPolyhedraVertexAttribute(id, coloring.vertex)
       // } else if (type === "polyhedron" && coloring.polyhedron !== null) {
       //   return setPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
-    } else throw new Error("Unknown mesh polyhedra coloring type: " + type)
+    } else {
+      throw new Error("Unknown mesh polyhedra coloring type: " + type)
+    }
   }
 
   function meshPolyhedraColor(id) {

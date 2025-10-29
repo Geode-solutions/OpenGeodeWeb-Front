@@ -1,22 +1,22 @@
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-const surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 
-export function useSurfacesStyle() {
-  /** State **/
+// Local constants
+const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
+
+export function useModelSurfacesStyle() {
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
 
-  /** Getters **/
-  function surfaceVisibility(id, surface_id) {
+  function modelSurfaceVisibility(id, surface_id) {
     return dataStyleStore.styles[id].surfaces[surface_id].visibility
   }
 
-  /** Actions **/
-  function setSurfaceVisibility(id, surface_ids, visibility) {
+  function setModelSurfacesVisibility(id, surface_ids, visibility) {
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
     return viewer_call(
       {
-        schema: surfaces_schemas.visibility,
+        schema: model_surfaces_schemas.visibility,
         params: { id, block_ids: surface_flat_indexes, visibility },
       },
       {
@@ -27,15 +27,15 @@ export function useSurfacesStyle() {
             dataStyleStore.styles[id].surfaces[surface_id].visibility =
               visibility
           }
-          console.log("setSurfaceVisibility", surface_ids, visibility)
+          console.log("setModelSurfacesVisibility", surface_ids, visibility)
         },
       },
     )
   }
 
-  function setSurfacesDefaultStyle(id) {
+  function setModelSurfacesDefaultStyle(id) {
     const surface_ids = dataBaseStore.getSurfacesUuids(id)
-    setSurfaceVisibility(
+    setModelSurfacesVisibility(
       id,
       surface_ids,
       dataStyleStore.styles[id].surfaces.visibility,
@@ -45,14 +45,14 @@ export function useSurfacesStyle() {
   function applySurfacesStyle(id) {
     const surfaces = dataStyleStore.styles[id].surfaces
     for (const [surface_id, style] of Object.entries(surfaces)) {
-      setSurfaceVisibility(id, [surface_id], style.visibility)
+      setModelSurfacesVisibility(id, [surface_id], style.visibility)
     }
   }
 
   return {
-    surfaceVisibility,
-    setSurfacesDefaultStyle,
-    setSurfaceVisibility,
+    modelSurfaceVisibility,
+    setModelSurfacesDefaultStyle,
+    setModelSurfacesVisibility,
     applySurfacesStyle,
   }
 }
