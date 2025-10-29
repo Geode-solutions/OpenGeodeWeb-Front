@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
 import { setActivePinia, createPinia } from "pinia"
-import { useAppStore } from "@/stores/app_store.js"
+import { useAppStore } from "@/stores/app.js"
 import { useDataBaseStore } from "@/stores/data_base.js"
 import { useTreeviewStore } from "@/stores/treeview.js"
 import { useDataStyleStore } from "@/stores/data_style.js"

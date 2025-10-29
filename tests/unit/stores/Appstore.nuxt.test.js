@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
-import { useAppStore } from "@/stores/app_store.js"
+import { useAppStore } from "@/stores/app.js"
 import { setActivePinia } from "pinia"
 
 beforeEach(async () => {

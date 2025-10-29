@@ -1,4 +1,4 @@
-import { useAppStore } from "@/stores/app_store.js"
+import { useAppStore } from "@/stores/app.js"
 import { useInfraStore } from "@ogw_f/stores/infra"
 import { viewer_call } from "@/composables/viewer_call.js"
 
