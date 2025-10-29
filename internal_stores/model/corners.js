@@ -9,7 +9,7 @@ export function useModelCornersStyle() {
   const dataBaseStore = useDataBaseStore()
 
   function modelCornersStyle(id) {
-    dataStyleStore.getStyle(id).corners
+    return dataStyleStore.getStyle(id).corners
   }
   function modelCornerStyle(id, corner_id) {
     if (!modelCornersStyle(id)[corner_id]) {
@@ -88,11 +88,14 @@ export function useModelCornersStyle() {
   }
 
   function applyModelCornersStyle(id) {
+    console.log("applyModelCornersStyle", id)
     const corners_style = modelCornersStyle(id)
-    console.log("applyModelCornersStyle corners_style", corners_style)
-    for (const [corner_id, style] of Object.entries(corners_style)) {
-      setModelCornersVisibility(id, [corner_id], style.visibility)
-    }
+    console.log("corners_style", corners_style)
+    const corner_ids = dataBaseStore.getCornersUuids(id)
+    return Promise.all([
+      setModelCornersVisibility(id, [corner_ids], corners_style.visibility),
+      setModelCornersColor(id, [corner_ids], corners_style.color),
+    ])
   }
 
   return {

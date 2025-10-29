@@ -89,12 +89,11 @@ export function useMeshPointsStyle() {
     return meshPointsStyle(id).size
   }
   function setMeshPointsSize(id, size) {
-    const points_style = meshPointsStyle(id)
     return viewer_call(
       { schema: mesh_points_schemas.size, params: { id, size } },
       {
         response_function: () => {
-          points_style.size = size
+          meshPointsStyle(id).size = size
           console.log(`${setMeshPointsSize.name} ${id} ${meshPointsSize(id)}`)
         },
       },

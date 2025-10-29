@@ -1,5 +1,3 @@
-// Node.js imports
-
 // Third party imports
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
@@ -14,9 +12,10 @@ import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
 const mesh_polyhedra_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra
-let id, back_port, viewer_port
 const file_name = "test.og_rgd3d"
 const geode_object = "RegularGrid3D"
+
+let id, back_port, viewer_port
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port } = await setupIntegrationTests(
@@ -65,7 +64,7 @@ describe("Mesh polyhedra", () => {
     })
   })
   describe("Polyhedra color", () => {
-    test("test red", async () => {
+    test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }

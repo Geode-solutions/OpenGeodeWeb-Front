@@ -76,7 +76,9 @@ async function setupIntegrationTests(file_name, geode_object) {
     },
   })
 
-  console.log("response", response)
+  console.log("response.data._value.id", response.data._value.id)
+  console.log("response.status._value", response.status._value)
+
   const id = response.data._value.id
   await dataBaseStore.registerObject(id)
 

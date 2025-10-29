@@ -62,7 +62,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       vtk_js: { binary_light_viewable },
     },
   ) {
-    console.log("addItem", id, value)
     db[id] = value
 
     if (value.object_type === "model") {

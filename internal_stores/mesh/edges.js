@@ -19,12 +19,11 @@ export function useMeshEdgesStyle() {
     return meshEdgesStyle(id).visibility
   }
   function setMeshEdgesVisibility(id, visibility) {
-    const mesh_edges_style = meshEdgesStyle(id)
     return viewer_call(
       { schema: mesh_edges_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
-          mesh_edges_style.visibility = visibility
+          meshEdgesStyle(id).visibility = visibility
           console.log(
             `${setMeshEdgesVisibility.name} ${id} ${meshEdgesVisibility(id)}`,
           )

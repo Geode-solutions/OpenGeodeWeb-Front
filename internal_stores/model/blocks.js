@@ -85,7 +85,6 @@ export function useModelBlocksStyle() {
     console.log("applyModelBlocksStyle", id)
     const blocks_style = dataStyleStore.getStyle(id).blocks
     console.log("blocks_style", blocks_style)
-
     const block_ids = dataBaseStore.getBlocksUuids(id)
     return Promise.all([
       setModelBlocksVisibility(id, [block_ids], blocks_style.visibility),

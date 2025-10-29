@@ -138,28 +138,28 @@ export default function useModelStyle() {
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
         promise_array.push(setModelVisibility(id, value))
-        // } else if (key === "edges") {
-        //   promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id, value))
-        // } else if (key === "points") {
-        //   promise_array.push(
-        //     modelPointsStyleStore.applyModelPointsStyle(id, value),
-        //   )
-        // } else if (key === "corners") {
-        //   promise_array.push(
-        //     modelCornersStyleStore.applyModelCornersStyle(id, value),
-        //   )
-        // } else if (key === "lines") {
-        //   promise_array.push(modelLinesStyleStore.applyModelLinesStyle(id, value))
-        // } else if (key === "surfaces") {
-        //   promise_array.push(
-        //     modelSurfacesStyleStore.applyModelSurfacesStyle(id, value),
-        //   )
+      } else if (key === "edges") {
+        promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id, value))
+      } else if (key === "points") {
+        promise_array.push(
+          modelPointsStyleStore.applyModelPointsStyle(id, value),
+        )
+      } else if (key === "corners") {
+        promise_array.push(
+          modelCornersStyleStore.applyModelCornersStyle(id, value),
+        )
+      } else if (key === "lines") {
+        promise_array.push(modelLinesStyleStore.applyModelLinesStyle(id, value))
+      } else if (key === "surfaces") {
+        promise_array.push(
+          modelSurfacesStyleStore.applyModelSurfacesStyle(id, value),
+        )
       } else if (key === "blocks") {
         promise_array.push(
           modelBlocksStyleStore.applyModelBlocksStyle(id, value),
         )
-        // } else {
-        //   throw new Error("Unknown key: " + key)
+      } else {
+        throw new Error("Unknown key: " + key)
       }
     }
     return promise_array

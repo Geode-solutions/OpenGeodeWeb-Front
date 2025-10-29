@@ -9,7 +9,7 @@ export function useModelLinesStyle() {
   const dataBaseStore = useDataBaseStore()
 
   function modelLinesStyle(id) {
-    dataStyleStore.getStyle(id).lines
+    return dataStyleStore.getStyle(id).lines
   }
   function modelLineStyle(id, line_id) {
     if (!modelLinesStyle(id)[line_id]) {
@@ -93,6 +93,8 @@ export function useModelLinesStyle() {
     modelLineColor,
     setModelLinesDefaultStyle,
     setModelLinesVisibility,
+    setModelLinesColor,
+    setModelLinesDefaultStyle,
     applyModelLinesStyle,
   }
 }

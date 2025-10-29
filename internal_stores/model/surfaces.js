@@ -8,10 +8,19 @@ export function useModelSurfacesStyle() {
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
 
-  function modelSurfaceVisibility(id, surface_id) {
-    return dataStyleStore.styles[id].surfaces[surface_id].visibility
+  function modelSurfaceStyle(id, surface_id) {
+    if (!dataStyleStore.getStyle(id).surfaces[surface_id]) {
+      dataStyleStore.getStyle(id).surfaces[surface_id] = {}
+    }
+    return dataStyleStore.getStyle(id).surfaces[surface_id]
   }
 
+  function modelSurfaceVisibility(id, surface_id) {
+    return modelSurfaceStyle(id, surface_id).visibility
+  }
+  function saveModelSurfaceVisibility(id, surface_id, visibility) {
+    modelSurfaceStyle(id, surface_id).visibility = visibility
+  }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
     return viewer_call(
@@ -22,12 +31,38 @@ export function useModelSurfacesStyle() {
       {
         response_function: () => {
           for (const surface_id of surface_ids) {
-            if (!dataStyleStore.styles[id].surfaces[surface_id])
-              dataStyleStore.styles[id].surfaces[surface_id] = {}
-            dataStyleStore.styles[id].surfaces[surface_id].visibility =
-              visibility
+            saveModelSurfaceVisibility(id, surface_id, visibility)
           }
-          console.log("setModelSurfacesVisibility", surface_ids, visibility)
+
+          console.log(
+            `${setModelSurfacesVisibility.name} ${id} ${surface_ids} ${modelSurfaceVisibility(id, surface_ids[0])}`,
+          )
+        },
+      },
+    )
+  }
+  function modelSurfaceColor(id, surface_id) {
+    return modelSurfaceStyle(id, surface_id).color
+  }
+  function saveModelSurfaceColor(id, surface_id, color) {
+    modelSurfaceStyle(id, surface_id).color = color
+  }
+
+  function setModelSurfacesColor(id, surface_ids, color) {
+    const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+    return viewer_call(
+      {
+        schema: model_surfaces_schemas.color,
+        params: { id, block_ids: surface_flat_indexes, color },
+      },
+      {
+        response_function: () => {
+          for (const surface_id of surface_ids) {
+            saveModelSurfaceColor(id, surface_id, color)
+          }
+          console.log(
+            `${setModelSurfacesColor.name} ${id} ${surface_ids} ${modelSurfaceColor(id, surface_ids[0])}`,
+          )
         },
       },
     )
@@ -42,17 +77,23 @@ export function useModelSurfacesStyle() {
     )
   }
 
-  function applySurfacesStyle(id) {
-    const surfaces = dataStyleStore.styles[id].surfaces
-    for (const [surface_id, style] of Object.entries(surfaces)) {
-      setModelSurfacesVisibility(id, [surface_id], style.visibility)
-    }
+  function applyModelSurfacesStyle(id) {
+    console.log("applyModelSurfacesStyle", id)
+    const surfaces_style = dataStyleStore.getStyle(id).surfaces
+    console.log("surfaces_style", surfaces_style)
+    const block_ids = dataBaseStore.getSurfacesUuids(id)
+    return Promise.all([
+      setModelSurfacesVisibility(id, [block_ids], surfaces_style.visibility),
+      setModelSurfacesColor(id, [block_ids], surfaces_style.color),
+    ])
   }
 
   return {
     modelSurfaceVisibility,
-    setModelSurfacesDefaultStyle,
+    modelSurfaceColor,
     setModelSurfacesVisibility,
-    applySurfacesStyle,
+    setModelSurfacesColor,
+    setModelSurfacesDefaultStyle,
+    applyModelSurfacesStyle,
   }
 }

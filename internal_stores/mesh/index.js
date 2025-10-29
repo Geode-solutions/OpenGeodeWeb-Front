@@ -19,7 +19,7 @@ export default function useMeshStyle() {
   const hybridViewerStore = useHybridViewerStore()
 
   function meshVisibility(id) {
-    return dataStyleStore.styles[id].visibility
+    return dataStyleStore.getStyle(id).visibility
   }
   function setMeshVisibility(id, visibility) {
     return viewer_call(
@@ -30,7 +30,7 @@ export default function useMeshStyle() {
       {
         response_function: () => {
           hybridViewerStore.setVisibility(id, visibility)
-          dataStyleStore.styles[id].visibility = visibility
+          dataStyleStore.getStyle(id).visibility = visibility
           console.log(`${setMeshVisibility.name} ${id} ${meshVisibility(id)}`)
         },
       },

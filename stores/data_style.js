@@ -17,7 +17,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       // promise_array.push(modelStyleStore.setModelMeshComponentsDefaultStyle(id))
       promise_array.push(modelStyleStore.applyModelDefaultStyle(id))
     } else {
-      throw new Error("Unknown object_type")
+      throw new Error("Unknown object_type: " + object_type)
     }
     return Promise.all(promise_array)
   }

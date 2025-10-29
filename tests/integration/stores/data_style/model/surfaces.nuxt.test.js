@@ -7,13 +7,12 @@ import Status from "~/utils/status"
 import * as composables from "~/composables/viewer_call"
 import { useDataStyleStore } from "~/stores/data_style"
 import { useViewerStore } from "~/stores/viewer"
-import { kill_back, kill_viewer } from "~/utils/local"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
-const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
-const file_name = "test.og_psf3d"
-const geode_object = "PolygonalSurface3D"
+const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
+const file_name = "test.og_brep"
+const geode_object = "BRep"
 
 let id, back_port, viewer_port
 
@@ -28,58 +27,63 @@ afterEach(async () => {
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
 
-describe("Mesh polygons", () => {
-  describe("Polygons visibility", () => {
+describe("Model surfaces", () => {
+  describe("Surfaces visibility", () => {
     test("Visibility true", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
+      const dataBaseStore = useDataBaseStore()
+      const surface_ids = dataBaseStore.getSurfacesUuids(id)
+      const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
       const visibility = true
       const spy = vi.spyOn(composables, "viewer_call")
-      await dataStyleStore.setMeshPolygonsVisibility(id, visibility)
+      await dataStyleStore.setModelSurfacesVisibility(
+        id,
+        surface_ids,
+        visibility,
+      )
       expect(spy).toHaveBeenCalledWith(
         {
-          schema: mesh_polygons_schemas.visibility,
-          params: { id, visibility },
+          schema: model_surfaces_schemas.visibility,
+          params: { id, block_ids: surface_flat_indexes, visibility },
         },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolygonsVisibility(id)).toBe(visibility)
+      for (const surface_id of surface_ids) {
+        expect(dataStyleStore.modelSurfaceVisibility(id, surface_id)).toBe(
+          visibility,
+        )
+      }
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
-  describe("Polygons active coloring", () => {
-    test("test coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshPolygonsActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
-    })
-  })
-  describe("Polygons color", () => {
+
+  describe("Surfaces color", () => {
     test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
+      const dataBaseStore = useDataBaseStore()
+      const surface_ids = dataBaseStore.getSurfacesUuids(id)
+      const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(composables, "viewer_call")
-      await dataStyleStore.setMeshPolygonsColor(id, color)
+      await dataStyleStore.setModelSurfacesColor(id, surface_ids, color)
       expect(spy).toHaveBeenCalledWith(
         {
-          schema: mesh_polygons_schemas.color,
-          params: { id, color },
+          schema: model_surfaces_schemas.color,
+          params: { id, block_ids: surface_flat_indexes, color },
         },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolygonsColor(id)).toStrictEqual(color)
+      for (const surface_id of surface_ids) {
+        expect(dataStyleStore.modelSurfaceColor(id, surface_id)).toStrictEqual(
+          color,
+        )
+      }
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })

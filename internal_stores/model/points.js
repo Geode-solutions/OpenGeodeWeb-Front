@@ -7,13 +7,12 @@ const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
 export function useModelPointsStyle() {
   const dataStyleStore = useDataStyleStore()
 
+  function modelPointsStyle(id) {
+    return dataStyleStore.getStyle(id).points
+  }
   function modelPointsVisibility(id) {
-    return dataStyleStore.styles[id].points.visibility
+    return modelPointsStyle(id).visibility
   }
-  function modelPointsSize(id) {
-    return dataStyleStore.styles[id].points.size
-  }
-
   function setModelPointsVisibility(id, visibility) {
     return viewer_call(
       {
@@ -22,17 +21,18 @@ export function useModelPointsStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].points.visibility = visibility
-          console.log("setModelPointsVisibility", visibility)
-
+          modelPointsStyle(id).visibility = visibility
           console.log(
-            `${setModelBlocksVisibility.name} ${id} ${block_ids} ${modelBlockVisibility(id, block_ids[0])}`,
+            `${setModelPointsVisibility.name} ${id} ${modelEdgesVisibility(id)}`,
           )
         },
       },
     )
   }
 
+  function modelPointsSize(id) {
+    return modelPointsStyle(id).size
+  }
   function setModelPointsSize(id, size) {
     return viewer_call(
       {
@@ -42,19 +42,18 @@ export function useModelPointsStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].points.size = size
-          console.log("setModelPointsSize", size)
+          console.log(`${setModelPointsSize.name} ${id} ${modelPointsSize(id)}`)
         },
       },
     )
   }
 
-  function applyModelPointsStyle(id, style) {
-    setModelPointsVisibility(id, style.visibility)
-    setModelPointsSize(id, style.size)
-  }
-
-  function setModelPointsDefaultStyle(id) {
-    setModelPointsVisibility(id, false)
+  function applyModelPointsStyle(id) {
+    const model_points_style = modelPointsStyle(id)
+    return Promise.all([
+      setModelPointsVisibility(id, model_points_style.visibility),
+      setModelPointsSize(id, model_points_style.size),
+    ])
   }
 
   return {
@@ -63,6 +62,5 @@ export function useModelPointsStyle() {
     setModelPointsVisibility,
     setModelPointsSize,
     applyModelPointsStyle,
-    setModelPointsDefaultStyle,
   }
 }
