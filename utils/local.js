@@ -118,7 +118,7 @@ async function run_back(
   return new Promise(async (resolve, reject) => {
     let upload_folder_path = args.upload_folder_path
     if (!args.upload_folder_path) {
-      upload_folder_path = args.project_folder_path
+      upload_folder_path = path.join(args.project_folder_path, "uploads")
     }
     const port = await get_available_port()
     const back_args = [
@@ -185,6 +185,7 @@ function kill_back(back_port) {
 
 function kill_viewer(viewer_port) {
   return new Promise((resolve) => {
+    const child = viewerChildren.get(viewer_port)
     const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
     socket.on("open", () => {
       console.log("Connected to WebSocket server")
