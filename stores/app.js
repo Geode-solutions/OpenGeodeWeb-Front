@@ -5,79 +5,71 @@ export const useAppStore = defineStore("app", () => {
     const isAlreadyRegistered = stores.some(
       (registeredStore) => registeredStore.$id === store.$id,
     )
-
     if (isAlreadyRegistered) {
       console.log(
         `[AppStore] Store "${store.$id}" already registered, skipping`,
       )
       return
     }
-
     console.log("[AppStore] Registering store", store.$id)
     stores.push(store)
   }
 
-  function save() {
+
+  function exportStore() {
     const snapshot = {}
-    let savedCount = 0
+    let exportCount = 0
 
     for (const store of stores) {
-      if (!store.save) {
+         if (!store.exportStore) {
         continue
       }
       const storeId = store.$id
       try {
-        snapshot[storeId] = store.save()
-        savedCount++
+        snapshot[storeId] = store.exportStore()
+        exportCount++
       } catch (error) {
-        console.error(`[AppStore] Error saving store "${storeId}":`, error)
+        console.error(`[AppStore] Error exporting store "${storeId}":`, error)
       }
     }
-
-    console.log(`[AppStore] Saved ${savedCount} stores`)
+    console.log(`[AppStore] Exported ${exportCount} stores`)
     return snapshot
   }
 
-  async function load(snapshot) {
+
+  async function importStore(snapshot) {
     if (!snapshot) {
-      console.warn("[AppStore] load called with invalid snapshot")
+      console.warn("[AppStore] import called with invalid snapshot")
       return
     }
-
-    let loadedCount = 0
+    let importedCount = 0
     const notFoundStores = []
-
     for (const store of stores) {
-      if (!store.load) continue
-
+      if (!store.importStore) continue
       const storeId = store.$id
-
       if (!snapshot[storeId]) {
         notFoundStores.push(storeId)
         continue
       }
-
       try {
-        await store.load(snapshot[storeId])
-        loadedCount++
+        await store.importStore(snapshot[storeId])
+        importedCount++
       } catch (error) {
-        console.error(`[AppStore] Error loading store "${storeId}":`, error)
+        console.error(`[AppStore] Error importing store "${storeId}":`, error)
       }
     }
-
     if (notFoundStores.length > 0) {
       console.warn(
         `[AppStore] Stores not found in snapshot: ${notFoundStores.join(", ")}`,
       )
     }
-
-    console.log(`[AppStore] Loaded ${loadedCount} stores`)
+    console.log(`[AppStore] Imported ${importedCount} stores`)
   }
 
   return {
     stores,
     registerStore,
-    save,
-    load,
+    exportStore,
+    importStore,
   }
 })

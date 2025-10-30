@@ -53,18 +53,18 @@ export const useTreeviewStore = defineStore("treeview", () => {
     panelWidth.value = width
   }
 
-  function save() {
+  function exportStore() {
     return {
       isAdditionnalTreeDisplayed: isAdditionnalTreeDisplayed.value,
       panelWidth: panelWidth.value,
       model_id: model_id.value,
       isTreeCollection: isTreeCollection.value,
       selectedTree: selectedTree.value,
-      selection: selection.value, // Keep for UX ?
+      selection: selection.value,
     }
   }
 
-  function load(snapshot) {
+  async function importStore(snapshot) {
     selection.value = snapshot?.selection || []
     isAdditionnalTreeDisplayed.value =
       snapshot?.isAdditionnalTreeDisplayed || false
@@ -87,7 +87,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayFileTree,
     toggleTreeView,
     setPanelWidth,
-    save,
-    load,
+    exportStore,
+    importStore,
   }
 })

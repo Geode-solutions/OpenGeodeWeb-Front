@@ -135,11 +135,11 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     return flat_indexes.filter((index) => index !== null)
   }
 
-  function save() {
+  function exportStore() {
     return { db: JSON.parse(JSON.stringify(db)) }
   }
 
-  async function load(snapshot) {
+  async function importStore(snapshot) {
     const entries = snapshot?.db || {}
     const hybrid_store = useHybridViewerStore()
     await hybrid_store.initHybridViewer()
@@ -164,7 +164,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
-    save,
-    load,
+    exportStore,
+    importStore,
   }
 })

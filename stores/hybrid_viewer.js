@@ -192,11 +192,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     Object.keys(db).forEach((id) => delete db[id])
   }
 
-  function save() {
+  function exportStore() {
     return { zScale: zScale.value }
   }
 
-  async function load(snapshot) {
+  async function importStore(snapshot) {
     const z_scale = snapshot?.zScale
     if (z_scale != null) {
       await setZScaling(z_scale)
@@ -215,7 +215,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setContainer,
     zScale,
     clear,
-    save,
-    load,
+    exportStore,
+    importStore,
   }
 })

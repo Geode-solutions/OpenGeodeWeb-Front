@@ -6,7 +6,7 @@ export default defineNuxtPlugin(() => {
   const appStore = useAppStore()
 
   async function exportProject() {
-    const snapshot = appStore.save()
+    const snapshot = appStore.exportStore()
     const blob = new Blob([JSON.stringify(snapshot)], {
       type: "application/json",
     })
@@ -22,7 +22,7 @@ export default defineNuxtPlugin(() => {
     const snapshot = JSON.parse(await file.text())
     await useInfraStore().create_connection()
     viewer_call({})
-    await appStore.load(snapshot)
+    await appStore.importStore(snapshot)
   }
 
   return {
