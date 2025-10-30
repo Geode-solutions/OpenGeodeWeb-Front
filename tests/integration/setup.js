@@ -26,7 +26,10 @@ import {
 } from "~/utils/local"
 import { getCurrentFolders, cleanupCreatedFolders } from "./utils.js"
 
-async function setupIntegrationTests(file_name, geode_object, object_type) {
+// Local constants
+const data_folder = path.join("tests", "integration", "data")
+
+async function setupIntegrationTests(file_name, geode_object) {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -61,6 +64,10 @@ async function setupIntegrationTests(file_name, geode_object, object_type) {
   ])
   console.log("back_port", back_port)
   console.log("viewer_port", viewer_port)
+
+  if (!back_port || !viewer_port) {
+    throw new Error("Failed to start microservices")
+  }
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
@@ -73,9 +80,28 @@ async function setupIntegrationTests(file_name, geode_object, object_type) {
     },
   })
 
+  console.log("response.data._value.id", response.data._value.id)
+  console.log("response.status._value", response.status._value)
+
   const id = response.data._value.id
   await dataBaseStore.registerObject(id)
-  await dataStyleStore.addDataStyle(id, geode_object, object_type)
+
+  await dataBaseStore.addItem(response.data._value.id, {
+    object_type: response.data._value.object_type,
+    geode_object: response.data._value.geode_object,
+    native_filename: response.data._value.native_file_name,
+    viewable_filename: response.data._value.viewable_file_name,
+    displayed_name: response.data._value.name,
+    vtk_js: {
+      binary_light_viewable: response.data._value.binary_light_viewable,
+    },
+  })
+
+  await dataStyleStore.addDataStyle(
+    id,
+    response.data._value.geode_object,
+    response.data._value.object_type,
+  )
   expect(viewerStore.status).toBe(Status.CONNECTED)
   return { id, back_port, viewer_port }
 }
@@ -93,19 +119,14 @@ vi.stubGlobal("navigator", {
 
 let foldersBeforeTests = new Set()
 
-const data_folder = path.join("tests", "integration", "data")
 beforeAll(() => {
   global.WebSocket = WebSocket
   foldersBeforeTests = getCurrentFolders(data_folder)
-  console.log("foldersBeforeTests", foldersBeforeTests)
 })
 
 afterAll(() => {
-  console.log("afterAll")
   delete global.WebSocket
-  setTimeout(() => {
-    cleanupCreatedFolders(data_folder, foldersBeforeTests)
-  }, 2000)
+  cleanupCreatedFolders(data_folder, foldersBeforeTests)
 })
 
 export { setupIntegrationTests }

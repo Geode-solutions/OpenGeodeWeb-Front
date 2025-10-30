@@ -1,5 +1,3 @@
-// Node.js imports
-
 // Third party imports
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
@@ -14,20 +12,21 @@ import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
-let id, back_port, viewer_port
 const file_name = "test.og_psf3d"
 const geode_object = "PolygonalSurface3D"
-const object_type = "mesh"
+
+let id, back_port, viewer_port
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port } = await setupIntegrationTests(
     file_name,
     geode_object,
-    object_type,
   ))
 }, 20000)
 
 afterEach(async () => {
+  console.log("afterEach mesh polygons kill", back_port, viewer_port)
+
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
 
@@ -36,8 +35,19 @@ describe("Mesh polygons", () => {
     test("Visibility true", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      await dataStyleStore.setMeshPolygonsVisibility(id, true)
-      expect(dataStyleStore.meshPolygonsVisibility(id)).toBe(true)
+      const visibility = true
+      const spy = vi.spyOn(composables, "viewer_call")
+      await dataStyleStore.setMeshPolygonsVisibility(id, visibility)
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: mesh_polygons_schemas.visibility,
+          params: { id, visibility },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPolygonsVisibility(id)).toBe(visibility)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
@@ -56,7 +66,7 @@ describe("Mesh polygons", () => {
     })
   })
   describe("Polygons color", () => {
-    test("test red", async () => {
+    test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }

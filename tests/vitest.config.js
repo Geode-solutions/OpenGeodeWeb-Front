@@ -20,8 +20,9 @@ export default defineConfig({
         test: {
           name: "integration",
           include: ["tests/integration/**/*.test.js"],
-          setupFiles: ["tests/integration/setup.js"],
           environment: "nuxt",
+          fileParallelism: false,
+          setupFiles: ["tests/integration/setup.js"],
           server: {
             deps: {
               inline: ["vuetify"],

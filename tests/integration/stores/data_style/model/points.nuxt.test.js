@@ -7,13 +7,12 @@ import Status from "~/utils/status"
 import * as composables from "~/composables/viewer_call"
 import { useDataStyleStore } from "~/stores/data_style"
 import { useViewerStore } from "~/stores/viewer"
-import { kill_back, kill_viewer } from "~/utils/local"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
-const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
-const file_name = "test.og_edc2d"
-const geode_object = "EdgedCurve2D"
+const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
+const file_name = "test.og_brep"
+const geode_object = "BRep"
 
 let id, back_port, viewer_port
 
@@ -25,62 +24,49 @@ beforeEach(async () => {
 }, 25000)
 
 afterEach(async () => {
-  console.log("afterEach mesh edges kill", back_port, viewer_port)
+  console.log("afterEach model points kill", back_port, viewer_port)
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
 
-describe("Mesh edges", () => {
-  describe("Edges visibility", () => {
+describe("Model points", () => {
+  describe("Points visibility", () => {
     test("Visibility true", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
       const spy = vi.spyOn(composables, "viewer_call")
-      await dataStyleStore.setMeshEdgesVisibility(id, visibility)
+      await dataStyleStore.setModelPointsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
         {
-          schema: mesh_edges_schemas.visibility,
+          schema: model_points_schemas.visibility,
           params: { id, visibility },
         },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshEdgesVisibility(id)).toBe(visibility)
+      expect(dataStyleStore.modelPointsVisibility(id)).toBe(visibility)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
-  describe("Edges active coloring", () => {
-    test("test coloring", async () => {
+
+  describe("Points size", () => {
+    test("Size 20", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshEdgesActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
-    })
-  })
-  describe("Edges color", () => {
-    test("Color red", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const color = { r: 255, g: 0, b: 0 }
+      const size = 20
       const spy = vi.spyOn(composables, "viewer_call")
-      await dataStyleStore.setMeshEdgesColor(id, color)
+      await dataStyleStore.setModelPointsSize(id, size)
       expect(spy).toHaveBeenCalledWith(
         {
-          schema: mesh_edges_schemas.color,
-          params: { id, color },
+          schema: model_points_schemas.size,
+          params: { id, size },
         },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshEdgesColor(id)).toStrictEqual(color)
+      expect(dataStyleStore.modelPointsSize(id)).toBe(size)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
