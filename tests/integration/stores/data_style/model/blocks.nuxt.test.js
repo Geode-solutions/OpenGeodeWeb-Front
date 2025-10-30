@@ -48,7 +48,11 @@ describe("Model blocks", () => {
           response_function: expect.any(Function),
         },
       )
+      console.log("test", { id }, { block_ids })
       for (const block_id of block_ids) {
+        console.log("test", { block_id })
+        console.log("test", dataStyleStore.modelBlockVisibility(id, block_id))
+
         expect(dataStyleStore.modelBlockVisibility(id, block_id)).toBe(
           visibility,
         )
