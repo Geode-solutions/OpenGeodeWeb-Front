@@ -25,8 +25,8 @@ vi.mock("@/stores/hybrid_viewer.js", () => ({
 
 beforeEach(() => setActivePinia(createPinia()))
 
-describe("Project load", () => {
-  test("appStore.load restores stores", async () => {
+describe("Project import", () => {
+  test("app.importStore restores stores", async () => {
     const stores = {
       app: useAppStore(),
       dataBase: useDataBaseStore(),
@@ -65,24 +65,24 @@ describe("Project load", () => {
       hybridViewer: { zScale: 1.5 },
     }
 
-    console.log("[TEST ProjectLoad] Snapshot keys:", Object.keys(snapshot))
+    console.log("[TEST ProjectImport] Snapshot keys:", Object.keys(snapshot))
     console.log(
-      "[TEST ProjectLoad] treeview snapshot:",
+      "[TEST ProjectImport] treeview snapshot:",
       JSON.stringify(snapshot.treeview, null, 2),
     )
     console.log(
-      "[TEST ProjectLoad] dataStyle snapshot:",
+      "[TEST ProjectImport] dataStyle snapshot:",
       JSON.stringify(snapshot.dataStyle, null, 2),
     )
 
-    await stores.app.load(snapshot)
+    await stores.app.importStore(snapshot)
 
     console.log(
-      "[TEST ProjectLoad] Treeview items after load:",
+      "[TEST ProjectImport] Treeview items after import:",
       JSON.stringify(stores.treeview.items, null, 2),
     )
     console.log(
-      "[TEST ProjectLoad] Styles after load:",
+      "[TEST ProjectImport] Styles after import:",
       JSON.stringify(stores.dataStyle.styles, null, 2),
     )
 

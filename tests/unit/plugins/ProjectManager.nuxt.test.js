@@ -4,8 +4,8 @@ import { viewer_call } from "@/composables/viewer_call.js"
 
 // Mocks
 const mockAppStore = {
-  save: vi.fn(() => ({ projectName: "mockedProject" })),
-  load: vi.fn(),
+  exportStore: vi.fn(() => ({ projectName: "mockedProject" })),
+  importStore: vi.fn(),
 }
 const mockInfraStore = { create_connection: vi.fn() }
 
@@ -37,7 +37,7 @@ describe("ProjectManager plugin", () => {
     })
 
     projectManagerPlugin.provide.project.export = async () => {
-      const snapshot = mockAppStore.save()
+      const snapshot = mockAppStore.exportStore()
       const json = JSON.stringify(snapshot, null, 2)
       const blob = new Blob([json], { type: "application/json" })
       const url = URL.createObjectURL(blob)
@@ -48,9 +48,8 @@ describe("ProjectManager plugin", () => {
       URL.revokeObjectURL(url)
       console.log("[TEST] URL's project :", { a })
     }
-
     await projectManagerPlugin.provide.project.export()
-    expect(mockAppStore.save).toHaveBeenCalled()
+    expect(mockAppStore.exportStore).toHaveBeenCalled()
     expect(mockElement.click).toHaveBeenCalled()
   })
 
@@ -65,14 +64,12 @@ describe("ProjectManager plugin", () => {
         viewer_call.mock?.calls,
         viewer_call.mock?.calls?.length || 0,
       )
-      await mockAppStore.load(snapshot)
+      await mockAppStore.importStore(snapshot)
     }
-
     const file = { text: () => Promise.resolve('{"dataBase":{"db":{}}}') }
     await projectManagerPlugin.provide.project.importFile(file)
-
     expect(mockInfraStore.create_connection).toHaveBeenCalled()
     expect(viewer_call).toHaveBeenCalled()
-    expect(mockAppStore.load).toHaveBeenCalled()
+    expect(mockAppStore.importStore).toHaveBeenCalled()
   })
 })
