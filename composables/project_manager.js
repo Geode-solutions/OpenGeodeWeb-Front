@@ -28,8 +28,7 @@ export function useProjectManager() {
         throw new Error(`Export failed: ${response.statusText}`)
       }
       const blob = await response.blob()
-      const filename =
-        response.headers.get("new-file-name")
+      const filename = response.headers.get("new-file-name")
       const urlObject = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = urlObject
