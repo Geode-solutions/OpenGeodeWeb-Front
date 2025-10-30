@@ -22,11 +22,13 @@ export function useModelCornersStyle() {
     return modelCornerStyle(id, corner_id).visibility
   }
 
-  function saveModelCornersVisibility(id, corner_id, visibility) {
-    modelCornersStyle(id, corner_id).visibility = visibility
+  function saveModelCornerVisibility(id, corner_id, visibility) {
+    modelCornerStyle(id, corner_id).visibility = visibility
   }
   function setModelCornersVisibility(id, corner_ids, visibility) {
+    console.log("setModelCornersVisibility", id, corner_ids, visibility)
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+    console.log("corner_flat_indexes", corner_flat_indexes)
     return viewer_call(
       {
         schema: model_corners_schemas.visibility,
@@ -35,10 +37,13 @@ export function useModelCornersStyle() {
       {
         response_function: () => {
           for (const corner_id of corner_ids) {
-            saveModelCornersVisibility(id, corner_id, visibility)
+            saveModelCornerVisibility(id, corner_id, visibility)
           }
           console.log(
-            `${setModelCornersVisibility.name} ${id} ${corner_ids} ${modelCornerVisibility(id, corner_ids[0])}`,
+            setModelCornersVisibility.name,
+            { id },
+            { corner_ids },
+            modelCornerVisibility(id, corner_ids[0]),
           )
         },
       },
@@ -66,24 +71,13 @@ export function useModelCornersStyle() {
             saveModelCornerColor(id, corner_id, color)
           }
           console.log(
-            `${setModelCornersColor.name} ${id} ${corner_ids} ${modelCornerColor(id, corner_ids[0])}`,
+            setModelCornersColor.name,
+            { id },
+            { corner_ids },
+            JSON.stringify(modelCornerColor(id, corner_ids[0])),
           )
         },
       },
-    )
-  }
-
-  function setModelCornersDefaultStyle(id) {
-    const corner_ids = dataBaseStore.getCornersUuids(id)
-    console.log(
-      "dataStyleStore.styles[id].corners.visibility",
-      corner_ids,
-      dataStyleStore.styles[id].corners.visibility,
-    )
-    return setModelCornersVisibility(
-      id,
-      corner_ids,
-      dataStyleStore.styles[id].corners.visibility,
     )
   }
 
@@ -93,8 +87,8 @@ export function useModelCornersStyle() {
     console.log("corners_style", corners_style)
     const corner_ids = dataBaseStore.getCornersUuids(id)
     return Promise.all([
-      setModelCornersVisibility(id, [corner_ids], corners_style.visibility),
-      setModelCornersColor(id, [corner_ids], corners_style.color),
+      setModelCornersVisibility(id, corner_ids, corners_style.visibility),
+      setModelCornersColor(id, corner_ids, corners_style.color),
     ])
   }
 
@@ -103,7 +97,6 @@ export function useModelCornersStyle() {
     modelCornerColor,
     setModelCornersVisibility,
     setModelCornersColor,
-    setModelCornersDefaultStyle,
     applyModelCornersStyle,
   }
 }

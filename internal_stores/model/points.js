@@ -23,7 +23,9 @@ export function useModelPointsStyle() {
         response_function: () => {
           modelPointsStyle(id).visibility = visibility
           console.log(
-            `${setModelPointsVisibility.name} ${id} ${modelEdgesVisibility(id)}`,
+            setModelPointsVisibility.name,
+            { id },
+            modelPointsVisibility(id),
           )
         },
       },
@@ -42,7 +44,7 @@ export function useModelPointsStyle() {
       {
         response_function: () => {
           dataStyleStore.styles[id].points.size = size
-          console.log(`${setModelPointsSize.name} ${id} ${modelPointsSize(id)}`)
+          console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
         },
       },
     )

@@ -33,9 +33,11 @@ export function useModelSurfacesStyle() {
           for (const surface_id of surface_ids) {
             saveModelSurfaceVisibility(id, surface_id, visibility)
           }
-
           console.log(
-            `${setModelSurfacesVisibility.name} ${id} ${surface_ids} ${modelSurfaceVisibility(id, surface_ids[0])}`,
+            setModelSurfacesVisibility.name,
+            { id },
+            { surface_ids },
+            modelSurfaceVisibility(id, surface_ids[0]),
           )
         },
       },
@@ -61,7 +63,10 @@ export function useModelSurfacesStyle() {
             saveModelSurfaceColor(id, surface_id, color)
           }
           console.log(
-            `${setModelSurfacesColor.name} ${id} ${surface_ids} ${modelSurfaceColor(id, surface_ids[0])}`,
+            setModelSurfacesColor.name,
+            { id },
+            { surface_ids },
+            JSON.stringify(modelSurfaceColor(id, surface_ids[0])),
           )
         },
       },
@@ -81,10 +86,10 @@ export function useModelSurfacesStyle() {
     console.log("applyModelSurfacesStyle", id)
     const surfaces_style = dataStyleStore.getStyle(id).surfaces
     console.log("surfaces_style", surfaces_style)
-    const block_ids = dataBaseStore.getSurfacesUuids(id)
+    const surface_ids = dataBaseStore.getSurfacesUuids(id)
     return Promise.all([
-      setModelSurfacesVisibility(id, [block_ids], surfaces_style.visibility),
-      setModelSurfacesColor(id, [block_ids], surfaces_style.color),
+      setModelSurfacesVisibility(id, surface_ids, surfaces_style.visibility),
+      setModelSurfacesColor(id, surface_ids, surfaces_style.color),
     ])
   }
 

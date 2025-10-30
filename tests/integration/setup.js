@@ -64,6 +64,10 @@ async function setupIntegrationTests(file_name, geode_object) {
   ])
   console.log("back_port", back_port)
   console.log("viewer_port", viewer_port)
+
+  if (!back_port || !viewer_port) {
+    throw new Error("Failed to start microservices")
+  }
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()

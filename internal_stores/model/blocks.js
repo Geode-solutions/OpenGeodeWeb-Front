@@ -8,11 +8,14 @@ export function useModelBlocksStyle() {
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
 
+  function modelBlocksStyle(id) {
+    return dataStyleStore.getStyle(id).blocks
+  }
   function modelBlockStyle(id, block_id) {
-    if (!dataStyleStore.getStyle(id).blocks[block_id]) {
-      dataStyleStore.getStyle(id).blocks[block_id] = {}
+    if (!modelBlocksStyle(id)[block_id]) {
+      modelBlocksStyle(id)[block_id] = {}
     }
-    return dataStyleStore.getStyle(id).blocks[block_id]
+    return modelBlocksStyle[block_id]
   }
 
   function modelBlockVisibility(id, block_id) {
@@ -35,7 +38,10 @@ export function useModelBlocksStyle() {
             saveModelBlockVisibility(id, block_id, visibility)
           }
           console.log(
-            `${setModelBlocksVisibility.name} ${id} ${block_ids} ${modelBlockVisibility(id, block_ids[0])}`,
+            setModelBlocksVisibility.name,
+            { id },
+            { block_ids },
+            modelBlockVisibility(id, block_ids[0]),
           )
         },
       },
@@ -62,7 +68,10 @@ export function useModelBlocksStyle() {
             saveModelBlockColor(id, block_id, color)
           }
           console.log(
-            `${setModelBlocksColor.name} ${id} ${block_ids} ${JSON.stringify(modelBlockColor(id, block_ids[0]))}`,
+            setModelBlocksColor.name,
+            { id },
+            { block_ids },
+            JSON.stringify(modelBlockColor(id, block_ids[0])),
           )
         },
       },
@@ -83,12 +92,12 @@ export function useModelBlocksStyle() {
 
   function applyModelBlocksStyle(id) {
     console.log("applyModelBlocksStyle", id)
-    const blocks_style = dataStyleStore.getStyle(id).blocks
+    const blocks_style = modelBlocksStyle(id)
     console.log("blocks_style", blocks_style)
     const block_ids = dataBaseStore.getBlocksUuids(id)
     return Promise.all([
-      setModelBlocksVisibility(id, [block_ids], blocks_style.visibility),
-      setModelBlocksColor(id, [block_ids], blocks_style.color),
+      setModelBlocksVisibility(id, block_ids, blocks_style.visibility),
+      setModelBlocksColor(id, block_ids, blocks_style.color),
     ])
   }
 

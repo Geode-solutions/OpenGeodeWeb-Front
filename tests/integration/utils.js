@@ -22,7 +22,6 @@ function cleanupCreatedFolders(dataFolderPath, foldersBeforeTests) {
     return
   }
   const currentFolders = getCurrentFolders(dataFolderPath)
-  console.log("getCurrentFolders currentFolders", currentFolders)
   for (const folder of currentFolders) {
     if (!foldersBeforeTests.has(folder)) {
       const folderPath = path.join(dataFolderPath, folder)

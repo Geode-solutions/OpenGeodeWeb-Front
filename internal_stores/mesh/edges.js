@@ -21,7 +21,9 @@ export function useMeshEdgesStyle() {
         response_function: () => {
           meshEdgesStyle(id).visibility = visibility
           console.log(
-            `${setMeshEdgesVisibility.name} ${id} ${meshEdgesVisibility(id)}`,
+            setMeshEdgesVisibility.name,
+            { id },
+            meshEdgesVisibility(id),
           )
         },
       },
@@ -35,7 +37,9 @@ export function useMeshEdgesStyle() {
     const coloring = meshEdgesStyle(id).coloring
     coloring.active = type
     console.log(
-      `${setMeshEdgesActiveColoring.name} ${id} ${meshEdgesActiveColoring(id)}`,
+      setMeshEdgesActiveColoring.name,
+      { id },
+      meshEdgesActiveColoring(id),
     )
     if (type === "color") {
       return setMeshEdgesColor(id, coloring.color)
@@ -59,7 +63,9 @@ export function useMeshEdgesStyle() {
         response_function: () => {
           coloring_style.color = color
           console.log(
-            `${setMeshEdgesColor.name} ${id} ${JSON.stringify(meshEdgesColor(id))}`,
+            setMeshEdgesColor.name,
+            { id },
+            JSON.stringify(meshEdgesColor(id)),
           )
         },
       },
@@ -76,7 +82,7 @@ export function useMeshEdgesStyle() {
       {
         response_function: () => {
           edges_style.width = width
-          console.log(`${setMeshEdgesWidth.name} ${id} ${meshEdgesWidth(id)}`)
+          console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
         },
       },
     )

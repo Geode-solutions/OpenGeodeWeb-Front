@@ -31,7 +31,7 @@ export default function useMeshStyle() {
         response_function: () => {
           hybridViewerStore.setVisibility(id, visibility)
           dataStyleStore.getStyle(id).visibility = visibility
-          console.log(`${setMeshVisibility.name} ${id} ${meshVisibility(id)}`)
+          console.log(setMeshVisibility.name, { id }, meshVisibility(id))
         },
       },
     )

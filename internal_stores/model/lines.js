@@ -38,7 +38,10 @@ export function useModelLinesStyle() {
             saveModelLineVisibility(id, line_id, visibility)
           }
           console.log(
-            `${setModelLinesVisibility.name} ${id} ${line_ids} ${modelLineVisibility(id, line_ids[0])}`,
+            setModelLinesVisibility.name,
+            { id },
+            { line_ids },
+            modelLineVisibility(id, line_ids[0]),
           )
         },
       },
@@ -64,37 +67,32 @@ export function useModelLinesStyle() {
             saveModelLineColor(id, line_id, color)
           }
           console.log(
-            `${setModelLinesVisibility.name} ${id} ${line_ids} ${modelLineColor(id, line_ids[0])}`,
+            setModelLinesColor.name,
+            { id },
+            { line_ids },
+            JSON.stringify(modelLineColor(id, line_ids[0])),
           )
         },
       },
     )
   }
 
-  function setModelLinesDefaultStyle(id) {
-    const line_ids = dataBaseStore.getLinesUuids(id)
-    setModelLinesVisibility(
-      id,
-      line_ids,
-      dataStyleStore.styles[id].lines.visibility,
-    )
-    setModelLinesColor(id, line_ids, dataStyleStore.styles[id].lines.color)
-  }
-
   function applyModelLinesStyle(id) {
-    const lines = dataStyleStore.styles[id].lines
-    for (const [line_id, style] of Object.entries(lines)) {
-      setModelLinesVisibility(id, [line_id], style.visibility)
-    }
+    console.log("applyModelLinesStyle", id)
+    const lines_style = modelLinesStyle(id)
+    console.log("lines_style", lines_style)
+    const line_ids = dataBaseStore.getLinesUuids(id)
+    return Promise.all([
+      setModelLinesVisibility(id, line_ids, lines_style.visibility),
+      setModelLinesColor(id, line_ids, lines_style.color),
+    ])
   }
 
   return {
     modelLineVisibility,
     modelLineColor,
-    setModelLinesDefaultStyle,
     setModelLinesVisibility,
     setModelLinesColor,
-    setModelLinesDefaultStyle,
     applyModelLinesStyle,
   }
 }

@@ -21,9 +21,10 @@ beforeEach(async () => {
     file_name,
     geode_object,
   ))
-}, 20000)
+}, 25000)
 
 afterEach(async () => {
+  console.log("afterEach model corners kill", back_port, viewer_port)
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
 

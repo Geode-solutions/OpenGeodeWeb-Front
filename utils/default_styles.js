@@ -12,11 +12,13 @@ const polygons_defaultColor = { r: 255, g: 255, b: 255 }
 const polyhedra_defaultColor = { r: 255, g: 255, b: 255 }
 
 const corners_defaultVisibility = true
+const corners_defaultColor = { r: 20, g: 20, b: 20 }
 const lines_defaultVisibility = true
+const lines_defaultColor = { r: 20, g: 20, b: 20 }
 const surfaces_defaultVisibility = true
+const surfaces_defaultColor = { r: 20, g: 20, b: 20 }
 const blocks_defaultVisibility = true
 const blocks_defaultColor = { r: 20, g: 20, b: 20 }
-const lines_defaultColor = { r: 20, g: 20, b: 20 }
 
 // Mesh functions
 const meshPointsDefaultStyle = (
@@ -116,8 +118,11 @@ const solid_defaultStyle = () => {
 }
 
 // Model functions
-const modelCornersDefaultStyle = (visibility = corners_defaultVisibility) => {
-  return { visibility }
+const modelCornersDefaultStyle = (
+  visibility = corners_defaultVisibility,
+  color = corners_defaultColor,
+) => {
+  return { visibility, color }
 }
 const modelLinesDefaultStyle = (
   visibility = lines_defaultVisibility,
@@ -125,8 +130,11 @@ const modelLinesDefaultStyle = (
 ) => {
   return { visibility, color }
 }
-const modelSurfacesDefaultStyle = (visibility = surfaces_defaultVisibility) => {
-  return { visibility }
+const modelSurfacesDefaultStyle = (
+  visibility = surfaces_defaultVisibility,
+  color = surfaces_defaultColor,
+) => {
+  return { visibility, color }
 }
 const modelBlocksDefaultStyle = (
   visibility = blocks_defaultVisibility,

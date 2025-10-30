@@ -25,6 +25,7 @@ beforeEach(async () => {
 }, 20000)
 
 afterEach(async () => {
+  console.log("afterEach mesh points kill", back_port, viewer_port)
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
 

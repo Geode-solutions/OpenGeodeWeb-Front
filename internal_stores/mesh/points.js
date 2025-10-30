@@ -22,7 +22,9 @@ export function useMeshPointsStyle() {
         response_function: () => {
           points_style.visibility = visibility
           console.log(
-            `${setMeshPointsVisibility.name} ${id} ${meshPointsVisibility(id)}`,
+            setMeshPointsVisibility.name,
+            { id },
+            meshPointsVisibility(id),
           )
         },
       },
@@ -36,7 +38,9 @@ export function useMeshPointsStyle() {
     const coloring = meshPointsStyle(id).coloring
     coloring.active = type
     console.log(
-      `${setMeshPointsActiveColoring.name} ${id} ${meshPointsActiveColoring(id)}`,
+      setMeshPointsActiveColoring.name,
+      { id },
+      meshPointsActiveColoring(id),
     )
     if (type == "color") {
       return dataStyleStore.setMeshPointsColor(id, coloring.color)
@@ -58,7 +62,9 @@ export function useMeshPointsStyle() {
         response_function: () => {
           coloring_style.color = color
           console.log(
-            `${setMeshPointsColor.name} ${id} ${JSON.stringify(meshPointsColor(id))}`,
+            setMeshPointsColor.name,
+            { id },
+            JSON.stringify(meshPointsColor(id)),
           )
         },
       },
@@ -78,7 +84,9 @@ export function useMeshPointsStyle() {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
           console.log(
-            `${setMeshPointsVertexAttribute.name} ${id} ${meshPointsVertexAttribute(id)}`,
+            setMeshPointsVertexAttribute.name,
+            { id },
+            meshPointsVertexAttribute(id),
           )
         },
       },
@@ -94,7 +102,7 @@ export function useMeshPointsStyle() {
       {
         response_function: () => {
           meshPointsStyle(id).size = size
-          console.log(`${setMeshPointsSize.name} ${id} ${meshPointsSize(id)}`)
+          console.log(setMeshPointsSize.name, { id }, meshPointsSize(id))
         },
       },
     )
