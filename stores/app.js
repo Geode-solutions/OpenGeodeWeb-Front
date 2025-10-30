@@ -15,13 +15,12 @@ export const useAppStore = defineStore("app", () => {
     stores.push(store)
   }
 
-
   function exportStore() {
     const snapshot = {}
     let exportCount = 0
 
     for (const store of stores) {
-         if (!store.exportStore) {
+      if (!store.exportStore) {
         continue
       }
       const storeId = store.$id
@@ -35,7 +34,6 @@ export const useAppStore = defineStore("app", () => {
     console.log(`[AppStore] Exported ${exportCount} stores`)
     return snapshot
   }
-
 
   async function importStore(snapshot) {
     if (!snapshot) {
