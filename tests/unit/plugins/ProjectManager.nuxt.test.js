@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
 import { setActivePinia, createPinia } from "pinia"
-import { viewer_call } from "@/composables/viewer_call.js"
+import { useProjectManager } from "@/composables/project_manager.js"
 
 // Mocks
 const mockAppStore = {
@@ -9,25 +9,49 @@ const mockAppStore = {
 }
 const mockInfraStore = { create_connection: vi.fn() }
 
-vi.mock("@/stores/app_store.js", () => ({ useAppStore: () => mockAppStore }))
+vi.mock("@/stores/app.js", () => ({ useAppStore: () => mockAppStore }))
 vi.mock("@ogw_f/stores/infra", () => ({ useInfraStore: () => mockInfraStore }))
 vi.mock("@/composables/viewer_call.js", () => ({
   default: vi.fn(),
   viewer_call: vi.fn(),
 }))
 
-const projectManagerPlugin = {
-  provide: {
-    project: {
-      export: vi.fn(),
-      importFile: vi.fn(),
+vi.mock("@/stores/geode.js", () => ({
+  useGeodeStore: () => ({
+    base_url: "http://localhost:5000",
+    start_request: vi.fn(),
+    stop_request: vi.fn(),
+    do_ping: vi.fn(),
+  }),
+}))
+
+vi.mock(
+  "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json",
+  () => ({
+    default: {
+      opengeodeweb_back: {
+        project: {
+          export_project: { route: "/project/export_project", methods: ["POST"] },
+        },
+      },
     },
-  },
-}
+  }),
+)
+vi.mock(
+  "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json",
+  () => ({
+    default: {
+      opengeodeweb_viewer: {
+        utils: { import_project: { rpc: "utils.import_project" } },
+        viewer: { reset_visualization: { rpc: "viewer.reset_visualization" } },
+      },
+    },
+  }),
+)
 
 beforeEach(() => setActivePinia(createPinia()))
 
-describe("ProjectManager plugin", () => {
+describe("ProjectManager composable", () => {
   test("exportProject triggers download", async () => {
     const mockElement = { href: "", download: "", click: vi.fn() }
     vi.stubGlobal("document", { createElement: () => mockElement })
@@ -35,41 +59,32 @@ describe("ProjectManager plugin", () => {
       createObjectURL: () => "blob:url",
       revokeObjectURL: vi.fn(),
     })
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        blob: async () =>
+          new Blob(["zipcontent"], { type: "application/zip" }),
+        headers: { get: () => "project_123.zip" },
+      })),
+    )
 
-    projectManagerPlugin.provide.project.export = async () => {
-      const snapshot = mockAppStore.exportStore()
-      const json = JSON.stringify(snapshot, null, 2)
-      const blob = new Blob([json], { type: "application/json" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `project_${Date.now()}.json`
-      a.click()
-      URL.revokeObjectURL(url)
-      console.log("[TEST] URL's project :", { a })
-    }
-    await projectManagerPlugin.provide.project.export()
+    const { exportProject } = useProjectManager()
+    await exportProject()
+
     expect(mockAppStore.exportStore).toHaveBeenCalled()
+    expect(fetch).toHaveBeenCalledTimes(1)
     expect(mockElement.click).toHaveBeenCalled()
   })
 
   test("importProjectFile loads snapshot", async () => {
-    projectManagerPlugin.provide.project.importFile = async (file) => {
-      const raw = await file.text()
-      const snapshot = JSON.parse(raw)
-      await mockInfraStore.create_connection()
-      viewer_call({})
-      console.log(
-        "[TEST] viewer_call:",
-        viewer_call.mock?.calls,
-        viewer_call.mock?.calls?.length || 0,
-      )
-      await mockAppStore.importStore(snapshot)
-    }
+    const { importProjectFile } = useProjectManager()
+
     const file = { text: () => Promise.resolve('{"dataBase":{"db":{}}}') }
-    await projectManagerPlugin.provide.project.importFile(file)
+    await importProjectFile(file)
+
     expect(mockInfraStore.create_connection).toHaveBeenCalled()
-    expect(viewer_call).toHaveBeenCalled()
+    expect((await import("@/composables/viewer_call.js")).viewer_call).toHaveBeenCalled()
     expect(mockAppStore.importStore).toHaveBeenCalled()
   })
 })
