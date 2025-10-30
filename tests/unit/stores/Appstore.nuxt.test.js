@@ -73,7 +73,9 @@ describe("App Store", () => {
         }
         const mock_store_2 = {
           $id: "geodeStore",
-          exportStore: vi.fn().mockImplementation(() => ({ items: [], total: 0 })),
+          exportStore: vi
+            .fn()
+            .mockImplementation(() => ({ items: [], total: 0 })),
           importStore: vi.fn().mockImplementation(() => {}),
         }
 
@@ -142,7 +144,7 @@ describe("App Store", () => {
         expect(userStore.importStore).toHaveBeenCalledTimes(1)
         expect(geodeStore.importStore).toHaveBeenCalledTimes(1)
       })
-    
+
       test("skip stores without importStore method", () => {
         const app_store = useAppStore()
         const mock_store_1 = {
@@ -164,10 +166,12 @@ describe("App Store", () => {
         expect(mock_store_1.importStore).toHaveBeenCalledTimes(1)
         expect(mock_store_2.importStore).toBeUndefined()
       })
-    
+
       test("warn when store not found in snapshot", () => {
         const app_store = useAppStore()
-        const console_warn_spy = vi.spyOn(console, "warn").mockImplementation(() => {})
+        const console_warn_spy = vi
+          .spyOn(console, "warn")
+          .mockImplementation(() => {})
         const mock_store = {
           $id: "testStore",
           importStore: vi.fn().mockImplementation(() => {}),
