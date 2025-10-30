@@ -111,23 +111,29 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   function getCornersUuids(id) {
     const { mesh_components } = itemMetaDatas(id)
+    console.log("getCornersUuids mesh_components", mesh_components)
     return Object.values(mesh_components["Corner"])
   }
 
   function getLinesUuids(id) {
     const { mesh_components } = itemMetaDatas(id)
+    console.log("getLinesUuids mesh_components", mesh_components)
     return Object.values(mesh_components["Line"])
   }
   function getSurfacesUuids(id) {
     const { mesh_components } = itemMetaDatas(id)
+    console.log("getSurfacesUuids mesh_components", mesh_components)
+
     return Object.values(mesh_components["Surface"])
   }
   function getBlocksUuids(id) {
     const { mesh_components } = itemMetaDatas(id)
+    console.log("getBlocksUuids mesh_components", mesh_components)
     return Object.values(mesh_components["Block"])
   }
 
   function getFlatIndexes(id, mesh_component_ids) {
+    console.log("getFlatIndexes", id, mesh_component_ids)
     const { uuid_to_flat_index } = itemMetaDatas(id)
 
     const flat_indexes = mesh_component_ids.map(

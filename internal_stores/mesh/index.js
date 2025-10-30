@@ -56,7 +56,7 @@ export default function useMeshStyle() {
           meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id, value),
         )
       } else {
-        throw new Error("Unknown key")
+        throw new Error("Unknown mesh key: " + key)
       }
     }
     return promise_array
