@@ -25,29 +25,23 @@ vi.mock("@/stores/geode.js", () => ({
   }),
 }))
 
-vi.mock(
-  "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json",
-  () => ({
-    default: {
-      opengeodeweb_back: {
-        project: {
-          export_project: { route: "/project/export_project", methods: ["POST"] },
-        },
+vi.mock("@geode/opengeodeweb-back/opengeodeweb_back_schemas.json", () => ({
+  default: {
+    opengeodeweb_back: {
+      project: {
+        export_project: { route: "/project/export_project", methods: ["POST"] },
       },
     },
-  }),
-)
-vi.mock(
-  "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json",
-  () => ({
-    default: {
-      opengeodeweb_viewer: {
-        utils: { import_project: { rpc: "utils.import_project" } },
-        viewer: { reset_visualization: { rpc: "viewer.reset_visualization" } },
-      },
+  },
+}))
+vi.mock("@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json", () => ({
+  default: {
+    opengeodeweb_viewer: {
+      utils: { import_project: { rpc: "utils.import_project" } },
+      viewer: { reset_visualization: { rpc: "viewer.reset_visualization" } },
     },
-  }),
-)
+  },
+}))
 
 beforeEach(() => setActivePinia(createPinia()))
 
@@ -63,8 +57,7 @@ describe("ProjectManager composable", () => {
       "fetch",
       vi.fn(async () => ({
         ok: true,
-        blob: async () =>
-          new Blob(["zipcontent"], { type: "application/zip" }),
+        blob: async () => new Blob(["zipcontent"], { type: "application/zip" }),
         headers: { get: () => "project_123.zip" },
       })),
     )
@@ -84,7 +77,9 @@ describe("ProjectManager composable", () => {
     await importProjectFile(file)
 
     expect(mockInfraStore.create_connection).toHaveBeenCalled()
-    expect((await import("@/composables/viewer_call.js")).viewer_call).toHaveBeenCalled()
+    expect(
+      (await import("@/composables/viewer_call.js")).viewer_call,
+    ).toHaveBeenCalled()
     expect(mockAppStore.importStore).toHaveBeenCalled()
   })
 })
