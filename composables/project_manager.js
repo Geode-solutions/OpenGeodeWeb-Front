@@ -10,27 +10,31 @@ export function useProjectManager() {
     try {
       await useInfraStore().create_connection()
       const snapshot = appStore.exportStores()
+      const schema = back_schemas.opengeodeweb_back.export_project
+      const defaultName = "project.zip"
 
-      const schema = back_schemas.opengeodeweb_back.project.export_project
-      const url = `${geode.base_url}${schema.$id}`
-      const method = schema.methods[0]
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ snapshot }),
-      })
-      if (!response.ok) {
-        throw new Error(`Export failed: ${response.statusText}`)
-      }
-      const blob = await response.blob()
-      const filename = response.headers.get("new-file-name")
-      const urlObject = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = urlObject
-      a.download = filename
-      a.click()
-      URL.revokeObjectURL(urlObject)
+      await api_fetch(
+        { schema, params: { snapshot, filename: defaultName } },
+        {
+          response_function: async (response) => {
+            const contentType =
+              response.headers?.get?.("content-type") || "application/zip"
+            const data = response._data
+            const blob =
+              data instanceof Blob
+                ? data
+                : new Blob([data], { type: contentType })
+            const downloadName =
+              response.headers?.get?.("new-file-name") || defaultName
+            const urlObject = URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = urlObject
+            a.download = downloadName
+            a.click()
+            URL.revokeObjectURL(urlObject)
+          },
+        },
+      )
     } finally {
       geode.stop_request()
     }
@@ -43,11 +47,11 @@ export function useProjectManager() {
       await useInfraStore().create_connection()
 
       await viewer_call({
-        schema: viewer_schemas.opengeodeweb_viewer.utils.import_project,
+        schema: viewer_schemas.opengeodeweb_viewer.import_project,
         params: {},
       })
       await viewer_call({
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
+        schema: viewer_schemas.opengeodeweb_viewer.reset_visualization,
         params: {},
       })
 
