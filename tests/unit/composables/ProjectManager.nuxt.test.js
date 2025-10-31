@@ -5,8 +5,8 @@ import { useProjectManager } from "@/composables/project_manager.js"
 
 // Mocks
 const mockAppStore = {
-  exportStore: vi.fn(() => ({ projectName: "mockedProject" })),
-  importStore: vi.fn(),
+  exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
+  importStores: vi.fn(),
 }
 const mockInfraStore = { create_connection: vi.fn() }
 
@@ -26,20 +26,12 @@ beforeEach(async () => {
   await geode_store.$reset()
   geode_store.base_url = ""
 })
-vi.mock("@/stores/geode.js", () => ({
-  useGeodeStore: () => ({
-    base_url: "http://localhost:5000",
-    start_request: vi.fn(),
-    stop_request: vi.fn(),
-    do_ping: vi.fn(),
-  }),
-}))
 
 vi.mock("@geode/opengeodeweb-back/opengeodeweb_back_schemas.json", () => ({
   default: {
     opengeodeweb_back: {
       project: {
-        export_project: { route: "/project/export_project", methods: ["POST"] },
+        export_project: { $id: "/project/export_project", methods: ["POST"] },
       },
     },
   },
@@ -71,7 +63,7 @@ describe("ProjectManager composable", () => {
     await exportProject()
 
     const app_store = useAppStore()
-    expect(app_store.exportStore).toHaveBeenCalled()
+    expect(app_store.exportStores).toHaveBeenCalled()
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(clickSpy).toHaveBeenCalled()
   })
@@ -88,6 +80,6 @@ describe("ProjectManager composable", () => {
 
     expect(infra_store.create_connection).toHaveBeenCalled()
     expect(viewer_call).toHaveBeenCalled()
-    expect(app_store.importStore).toHaveBeenCalled()
+    expect(app_store.importStores).toHaveBeenCalled()
   })
 })

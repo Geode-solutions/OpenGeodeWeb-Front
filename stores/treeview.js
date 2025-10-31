@@ -17,19 +17,18 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayed_name,
     id,
     object_type,
-    autoSelect = true,
   ) {
     dataStyleStore.addDataStyle(id, geodeObject, object_type)
     const child = { title: displayed_name, id, object_type }
     for (let i = 0; i < items.value.length; i++) {
       if (items.value[i].title === geodeObject) {
         items.value[i].children.push(child)
-        if (autoSelect) selection.value.push(child)
+        selection.value.push(child)
         return
       }
     }
     items.value.push({ title: geodeObject, children: [child] })
-    if (autoSelect) selection.value.push(child)
+    selection.value.push(child)
   }
 
   function displayAdditionalTree(id) {
@@ -53,7 +52,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     panelWidth.value = width
   }
 
-  function exportStore() {
+  function exportStores() {
     return {
       isAdditionnalTreeDisplayed: isAdditionnalTreeDisplayed.value,
       panelWidth: panelWidth.value,
@@ -64,7 +63,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  async function importStore(snapshot) {
+  async function importStores(snapshot) {
     selection.value = snapshot?.selection || []
     isAdditionnalTreeDisplayed.value =
       snapshot?.isAdditionnalTreeDisplayed || false
@@ -87,7 +86,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayFileTree,
     toggleTreeView,
     setPanelWidth,
-    exportStore,
-    importStore,
+    exportStores,
+    importStores,
   }
 })

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
-import { setActivePinia, createPinia } from "pinia"
+import { setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
 import { useAppStore } from "@/stores/app.js"
 import { useDataBaseStore } from "@/stores/data_base.js"
 import { useTreeviewStore } from "@/stores/treeview.js"
@@ -23,10 +24,17 @@ vi.mock("@/stores/hybrid_viewer.js", () => ({
   }),
 }))
 
-beforeEach(() => setActivePinia(createPinia()))
+beforeEach(() => {
+  setActivePinia(
+    createTestingPinia({
+      stubActions: false,
+      createSpy: vi.fn,
+    }),
+  )
+})
 
 describe("Project import", () => {
-  test("app.importStore restores stores", async () => {
+  test("app.importStores restores stores", async () => {
     const stores = {
       app: useAppStore(),
       dataBase: useDataBaseStore(),
@@ -75,7 +83,7 @@ describe("Project import", () => {
       JSON.stringify(snapshot.dataStyle, null, 2),
     )
 
-    await stores.app.importStore(snapshot)
+    await stores.app.importStores(snapshot)
 
     console.log(
       "[TEST ProjectImport] Treeview items after import:",

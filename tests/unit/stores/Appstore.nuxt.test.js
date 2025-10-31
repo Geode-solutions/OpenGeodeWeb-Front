@@ -16,8 +16,8 @@ describe("App Store", () => {
     test("initial state", () => {
       const app_store = useAppStore()
       expectTypeOf(app_store.stores).toBeArray()
-      expectTypeOf(app_store.exportStore).toBeFunction()
-      expectTypeOf(app_store.importStore).toBeFunction()
+      expectTypeOf(app_store.exportStores).toBeFunction()
+      expectTypeOf(app_store.importStores).toBeFunction()
       expectTypeOf(app_store.registerStore).toBeFunction()
     })
   })
@@ -61,31 +61,31 @@ describe("App Store", () => {
     })
 
     describe("Export", () => {
-      test("export stores with exportStore method", () => {
+      test("export stores with exportStores method", () => {
         const app_store = useAppStore()
         const mock_store_1 = {
           $id: "userStore",
-          exportStore: vi.fn().mockImplementation(() => ({
+          exportStores: vi.fn().mockImplementation(() => ({
             name: "toto",
             email: "toto@titi.com",
           })),
-          importStore: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
           $id: "geodeStore",
-          exportStore: vi
+          exportStores: vi
             .fn()
             .mockImplementation(() => ({ items: [], total: 0 })),
-          importStore: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
 
         app_store.registerStore(mock_store_1)
         app_store.registerStore(mock_store_2)
 
-        const snapshot = app_store.exportStore()
+        const snapshot = app_store.exportStores()
 
-        expect(mock_store_1.exportStore).toHaveBeenCalledTimes(1)
-        expect(mock_store_2.exportStore).toHaveBeenCalledTimes(1)
+        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(1)
+        expect(mock_store_2.exportStores).toHaveBeenCalledTimes(1)
         expect(snapshot).toEqual({
           userStore: { name: "toto", email: "toto@titi.com" },
           geodeStore: { items: [], total: 0 },
@@ -96,20 +96,20 @@ describe("App Store", () => {
         const app_store = useAppStore()
         const mock_store_1 = {
           $id: "withSave",
-          exportStore: vi.fn().mockImplementation(() => ({ data: "test" })),
-          importStore: vi.fn().mockImplementation(() => {}),
+          exportStores: vi.fn().mockImplementation(() => ({ data: "test" })),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
           $id: "withoutSave",
-          importStore: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
 
         app_store.registerStore(mock_store_1)
         app_store.registerStore(mock_store_2)
 
-        const snapshot = app_store.exportStore()
+        const snapshot = app_store.exportStores()
 
-        expect(mock_store_1.exportStore).toHaveBeenCalledTimes(1)
+        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(1)
         expect(snapshot).toEqual({
           withSave: { data: "test" },
         })
@@ -118,21 +118,21 @@ describe("App Store", () => {
 
       test("return empty snapshot when no stores registered", () => {
         const app_store = useAppStore()
-        const snapshot = app_store.exportStore()
+        const snapshot = app_store.exportStores()
         expect(snapshot).toEqual({})
       })
     })
 
     describe("load", () => {
-      test("App Store > actions > importStore > import stores with importStore method", async () => {
+      test("App Store > actions > importStores > import stores with importStores method", async () => {
         const appStore = useAppStore()
         const userStore = {
           $id: "userStore",
-          importStore: vi.fn().mockResolvedValue(),
+          importStores: vi.fn().mockResolvedValue(),
         }
         const geodeStore = {
           $id: "geodeStore",
-          importStore: vi.fn().mockResolvedValue(),
+          importStores: vi.fn().mockResolvedValue(),
         }
         appStore.registerStore(userStore)
         appStore.registerStore(geodeStore)
@@ -140,17 +140,17 @@ describe("App Store", () => {
           userStore: { some: "data" },
           geodeStore: { other: "data" },
         }
-        await appStore.importStore(snapshot)
-        expect(userStore.importStore).toHaveBeenCalledTimes(1)
-        expect(geodeStore.importStore).toHaveBeenCalledTimes(1)
+        await appStore.importStores(snapshot)
+        expect(userStore.importStores).toHaveBeenCalledTimes(1)
+        expect(geodeStore.importStores).toHaveBeenCalledTimes(1)
       })
 
-      test("skip stores without importStore method", () => {
+      test("skip stores without importStores method", () => {
         const app_store = useAppStore()
         const mock_store_1 = {
           $id: "withImport",
           save: vi.fn().mockImplementation(() => {}),
-          importStore: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
           $id: "withoutImport",
@@ -162,9 +162,9 @@ describe("App Store", () => {
           withImport: { data: "test" },
           withoutImport: { data: "ignored" },
         }
-        app_store.importStore(snapshot)
-        expect(mock_store_1.importStore).toHaveBeenCalledTimes(1)
-        expect(mock_store_2.importStore).toBeUndefined()
+        app_store.importStores(snapshot)
+        expect(mock_store_1.importStores).toHaveBeenCalledTimes(1)
+        expect(mock_store_2.importStores).toBeUndefined()
       })
 
       test("warn when store not found in snapshot", () => {
@@ -174,10 +174,10 @@ describe("App Store", () => {
           .mockImplementation(() => {})
         const mock_store = {
           $id: "testStore",
-          importStore: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
         app_store.registerStore(mock_store)
-        app_store.importStore({})
+        app_store.importStores({})
         expect(console_warn_spy).toHaveBeenCalledWith(
           expect.stringContaining("Stores not found in snapshot: testStore"),
         )

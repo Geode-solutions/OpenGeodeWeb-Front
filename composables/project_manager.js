@@ -1,7 +1,3 @@
-import { useAppStore } from "@/stores/app.js"
-import { useInfraStore } from "@ogw_f/stores/infra"
-import { viewer_call } from "@/composables/viewer_call.js"
-import { useGeodeStore } from "@/stores/geode.js"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
@@ -13,10 +9,10 @@ export function useProjectManager() {
     geode.start_request()
     try {
       await useInfraStore().create_connection()
-      const snapshot = appStore.exportStore()
+      const snapshot = appStore.exportStores()
 
       const schema = back_schemas.opengeodeweb_back.project.export_project
-      const url = `${geode.base_url}${schema.route}`
+      const url = `${geode.base_url}${schema.$id}`
       const method = schema.methods[0]
 
       const response = await fetch(url, {
@@ -55,7 +51,7 @@ export function useProjectManager() {
         params: {},
       })
 
-      await appStore.importStore(snapshot)
+      await appStore.importStores(snapshot)
     } finally {
       geode.stop_request()
     }

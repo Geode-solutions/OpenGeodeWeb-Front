@@ -15,17 +15,17 @@ export const useAppStore = defineStore("app", () => {
     stores.push(store)
   }
 
-  function exportStore() {
+  function exportStores() {
     const snapshot = {}
     let exportCount = 0
 
     for (const store of stores) {
-      if (!store.exportStore) {
+      if (!store.exportStores) {
         continue
       }
       const storeId = store.$id
       try {
-        snapshot[storeId] = store.exportStore()
+        snapshot[storeId] = store.exportStores()
         exportCount++
       } catch (error) {
         console.error(`[AppStore] Error exporting store "${storeId}":`, error)
@@ -35,7 +35,7 @@ export const useAppStore = defineStore("app", () => {
     return snapshot
   }
 
-  async function importStore(snapshot) {
+  async function importStores(snapshot) {
     if (!snapshot) {
       console.warn("[AppStore] import called with invalid snapshot")
       return
@@ -43,14 +43,14 @@ export const useAppStore = defineStore("app", () => {
     let importedCount = 0
     const notFoundStores = []
     for (const store of stores) {
-      if (!store.importStore) continue
+      if (!store.importStores) continue
       const storeId = store.$id
       if (!snapshot[storeId]) {
         notFoundStores.push(storeId)
         continue
       }
       try {
-        await store.importStore(snapshot[storeId])
+        await store.importStores(snapshot[storeId])
         importedCount++
       } catch (error) {
         console.error(`[AppStore] Error importing store "${storeId}":`, error)
@@ -67,7 +67,7 @@ export const useAppStore = defineStore("app", () => {
   return {
     stores,
     registerStore,
-    exportStore,
-    importStore,
+    exportStores,
+    importStores,
   }
 })
