@@ -134,6 +134,21 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     return flat_indexes.filter((index) => index !== null)
   }
 
+  function exportStores() {
+    return { db: JSON.parse(JSON.stringify(db)) }
+  }
+
+  async function importStores(snapshot) {
+    const entries = snapshot?.db || {}
+    const hybrid_store = useHybridViewerStore()
+    await hybrid_store.initHybridViewer()
+    hybrid_store.clear()
+    for (const [id, item] of Object.entries(entries)) {
+      await registerObject(id)
+      await addItem(id, item)
+    }
+  }
+
   return {
     db,
     itemMetaDatas,
@@ -148,5 +163,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
+    exportStores,
+    importStores,
   }
 })

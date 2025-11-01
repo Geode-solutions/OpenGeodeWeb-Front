@@ -46,12 +46,22 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     return modelStyleStore.modelMeshComponentVisibility(id, "Edge", null)
   }
 
+  function exportStores() {
+    return { styles: dataStyleState.styles }
+  }
+
+  async function importStores(snapshot) {
+    dataStyleState.styles = snapshot?.styles || {}
+  }
+
   return {
     ...dataStyleState,
     addDataStyle,
     setVisibility,
     setModelEdgesVisibility,
     modelEdgesVisibility,
+    exportStores,
+    importStores,
     ...meshStyleStore,
     ...modelStyleStore,
   }
