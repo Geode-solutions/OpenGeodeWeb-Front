@@ -53,15 +53,25 @@ export function useProjectManager() {
       await infra.create_connection()
 
       // ping backend sans useFetch
-      const pingId = back_schemas.opengeodeweb_back.ping?.$id || "opengeodeweb_back/ping"
-      const pingURL = new URL("/" + String(pingId), infra?.base_url || window.location.origin).toString()
+      const pingId =
+        back_schemas.opengeodeweb_back.ping?.$id || "opengeodeweb_back/ping"
+      const pingURL = new URL(
+        "/" + String(pingId),
+        infra?.base_url || window.location.origin,
+      ).toString()
       await $fetch(pingURL, { method: "POST", body: {} })
 
       const isJson = (file.name || "").toLowerCase().endsWith(".json")
       if (isJson) {
         const snapshot = JSON.parse(await file.text())
-        await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.import_project, params: {} })
-        await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization, params: {} })
+        await viewer_call({
+          schema: viewer_schemas.opengeodeweb_viewer.import_project,
+          params: {},
+        })
+        await viewer_call({
+          schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
+          params: {},
+        })
         await appStore.importStores(snapshot)
         return
       }
@@ -70,8 +80,13 @@ export function useProjectManager() {
       const form = new FormData()
       form.append("file", file, file.name || "project.zip")
 
-      const importId = back_schemas.opengeodeweb_back.import_project?.$id || "opengeodeweb_back/import_project"
-      const importURL = new URL("/" + String(importId), infra?.base_url || window.location.origin).toString()
+      const importId =
+        back_schemas.opengeodeweb_back.import_project?.$id ||
+        "opengeodeweb_back/import_project"
+      const importURL = new URL(
+        "/" + String(importId),
+        infra?.base_url || window.location.origin,
+      ).toString()
 
       let result
       try {
@@ -80,7 +95,11 @@ export function useProjectManager() {
         const status = error?.response?.status ?? error?.status
         const data = error?.response?._data ?? error?.data
         if (status === 423) {
-          await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization, params: {} })
+          await viewer_call({
+            schema:
+              viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
+            params: {},
+          })
           result = await $fetch(importURL, { method: "POST", body: form })
         } else {
           console.error("Backend import_project erreur:", data ?? error)
@@ -97,13 +116,19 @@ export function useProjectManager() {
       if (needsViewables) {
         const candidates = [
           { input_geode_object: "BRep", filename: "native/main.og_brep" },
-          { input_geode_object: "SurfaceMesh", filename: "native/main.og_mesh" },
+          {
+            input_geode_object: "SurfaceMesh",
+            filename: "native/main.og_mesh",
+          },
         ]
         for (const c of candidates) {
           try {
             await api_fetch({
               schema: back_schemas.opengeodeweb_back.save_viewable_file,
-              params: { input_geode_object: c.input_geode_object, filename: c.filename },
+              params: {
+                input_geode_object: c.input_geode_object,
+                filename: c.filename,
+              },
             })
             break
           } catch (_) {
@@ -113,8 +138,14 @@ export function useProjectManager() {
       }
 
       // Synchronisation Viewer
-      await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.import_project, params: {} })
-      await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization, params: {} })
+      await viewer_call({
+        schema: viewer_schemas.opengeodeweb_viewer.import_project,
+        params: {},
+      })
+      await viewer_call({
+        schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
+        params: {},
+      })
     } finally {
       geode.stop_request()
     }
