@@ -27,7 +27,6 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
-    console.log("setModelVisibility", id, visibility)
     return viewer_call(
       {
         schema: model_schemas.visibility,
@@ -36,7 +35,7 @@ export default function useModelStyle() {
       {
         response_function: () => {
           dataStyleStore.getStyle(id).visibility = visibility
-          // hybridViewerStore.setVisibility(id, visibility)
+          hybridViewerStore.setVisibility(id, visibility)
           console.log(setModelVisibility.name, { id }, modelVisibility(id))
         },
       },
@@ -84,7 +83,6 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).color
   }
   function setModelColor(id, color) {
-    console.log("setModelColor", id, color)
     return viewer_call(
       {
         schema: model_schemas.color,
@@ -136,7 +134,6 @@ export default function useModelStyle() {
 
   function applyModelDefaultStyle(id) {
     const style = dataStyleStore.getStyle(id)
-    console.log("applyModelDefaultStyle", id, style)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
@@ -157,7 +154,6 @@ export default function useModelStyle() {
         throw new Error("Unknown model key: " + key)
       }
     }
-    console.log("applyModelDefaultStyle", { promise_array })
     return Promise.all(promise_array)
   }
 

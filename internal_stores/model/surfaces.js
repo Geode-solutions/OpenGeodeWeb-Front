@@ -22,7 +22,6 @@ export function useModelSurfacesStyle() {
     modelSurfaceStyle(id, surface_id).visibility = visibility
   }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
-    console.log("setModelSurfacesVisibility", id, surface_ids, visibility)
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
     return viewer_call(
       {
@@ -52,7 +51,6 @@ export function useModelSurfacesStyle() {
   }
 
   function setModelSurfacesColor(id, surface_ids, color) {
-    console.log("setModelSurfacesColor", id, surface_ids, color)
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
     return viewer_call(
       {
@@ -76,9 +74,7 @@ export function useModelSurfacesStyle() {
   }
 
   function applyModelSurfacesStyle(id) {
-    console.log("applyModelSurfacesStyle", id)
     const surfaces_style = dataStyleStore.getStyle(id).surfaces
-    console.log("surfaces_style", surfaces_style)
     const surface_ids = dataBaseStore.getSurfacesUuids(id)
     return Promise.all([
       setModelSurfacesVisibility(id, surface_ids, surfaces_style.visibility),

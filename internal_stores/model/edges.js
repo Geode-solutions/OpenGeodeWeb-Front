@@ -15,7 +15,6 @@ export function useModelEdgesStyle() {
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    console.log("setModelEdgesVisibility", id, visibility)
     return viewer_call(
       {
         schema: model_edges_schemas.visibility,
@@ -35,9 +34,7 @@ export function useModelEdgesStyle() {
   }
 
   function applyModelEdgesStyle(id) {
-    console.log("applyModelEdgesStyle", id)
     const edges_style = modelEdgesStyle(id)
-    console.log("edges_style", edges_style)
     return Promise.all([setModelEdgesVisibility(id, edges_style.visibility)])
   }
 

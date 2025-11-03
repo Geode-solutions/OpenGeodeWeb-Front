@@ -26,9 +26,7 @@ export function useModelCornersStyle() {
     modelCornerStyle(id, corner_id).visibility = visibility
   }
   function setModelCornersVisibility(id, corner_ids, visibility) {
-    console.log("setModelCornersVisibility", id, corner_ids, visibility)
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
-    console.log("corner_flat_indexes", corner_flat_indexes)
     return viewer_call(
       {
         schema: model_corners_schemas.visibility,
@@ -59,7 +57,6 @@ export function useModelCornersStyle() {
   }
 
   function setModelCornersColor(id, corner_ids, color) {
-    console.log("setModelCornersColor", id, corner_ids, color)
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
     return viewer_call(
       {
@@ -83,9 +80,7 @@ export function useModelCornersStyle() {
   }
 
   function applyModelCornersStyle(id) {
-    console.log("applyModelCornersStyle", id)
     const corners_style = modelCornersStyle(id)
-    console.log("corners_style", corners_style)
     const corner_ids = dataBaseStore.getCornersUuids(id)
     return Promise.all([
       setModelCornersVisibility(id, corner_ids, corners_style.visibility),

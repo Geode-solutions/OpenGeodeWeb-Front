@@ -7,6 +7,7 @@ import Status from "~/utils/status"
 import * as composables from "~/composables/viewer_call"
 import { useDataStyleStore } from "~/stores/data_style"
 import { useViewerStore } from "~/stores/viewer"
+import { delete_folder_recursive, kill_back, kill_viewer } from "~/utils/local"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -14,18 +15,22 @@ const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let id, back_port, viewer_port
+let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port } = await setupIntegrationTests(
-    file_name,
-    geode_object,
-  ))
+  ;({ id, back_port, viewer_port, project_folder_path } =
+    await setupIntegrationTests(file_name, geode_object))
 }, 25000)
 
 afterEach(async () => {
-  console.log("afterEach model edges kill", back_port, viewer_port)
+  console.log(
+    "afterEach model edges kill",
+    back_port,
+    viewer_port,
+    project_folder_path,
+  )
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+  delete_folder_recursive(project_folder_path)
 })
 
 describe("Model edges", () => {

@@ -7,7 +7,7 @@ import Status from "~/utils/status"
 import * as composables from "~/composables/viewer_call"
 import { useDataStyleStore } from "~/stores/data_style"
 import { useViewerStore } from "~/stores/viewer"
-import { kill_back, kill_viewer } from "~/utils/local"
+import { delete_folder_recursive, kill_back, kill_viewer } from "~/utils/local"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -15,18 +15,22 @@ const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh
 const file_name = "test.og_rgd3d"
 const geode_object = "RegularGrid3D"
 
-let id, back_port, viewer_port
+let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port } = await setupIntegrationTests(
-    file_name,
-    geode_object,
-  ))
+  ;({ id, back_port, viewer_port, project_folder_path } =
+    await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
 afterEach(async () => {
-  console.log("afterEach mesh index kill", back_port, viewer_port)
+  console.log(
+    "afterEach mesh index kill",
+    back_port,
+    viewer_port,
+    project_folder_path,
+  )
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+  delete_folder_recursive(project_folder_path)
 })
 
 describe("Mesh", () => {
@@ -35,8 +39,8 @@ describe("Mesh", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      await dataStyleStore.setMeshVisibility(id, visibility)
       const spy = vi.spyOn(composables, "viewer_call")
+      await dataStyleStore.setMeshVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
         {
           schema: mesh_schemas.visibility,

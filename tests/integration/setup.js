@@ -47,7 +47,7 @@ async function setupIntegrationTests(file_name, geode_object) {
   infraStore.app_mode = appMode.BROWSER
 
   const microservices_path = path.join("tests", "integration", "microservices")
-  const project_folder_path = path.join(__dirname, "data", uuidv4())
+  const project_folder_path = path.join(data_folder, uuidv4())
   const upload_folder_path = path.join(__dirname, "data", "uploads")
   const back_path = path.join(
     executable_path(path.join(microservices_path, "back")),
@@ -132,7 +132,7 @@ async function setupIntegrationTests(file_name, geode_object) {
   expect(viewerStore.status).toBe(Status.CONNECTED)
   console.log("END OF SETUP")
 
-  return { id, back_port, viewer_port }
+  return { id, back_port, viewer_port, project_folder_path }
 }
 
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
@@ -146,16 +146,12 @@ vi.stubGlobal("navigator", {
   },
 })
 
-let foldersBeforeTests = new Set()
-
 beforeAll(() => {
   global.WebSocket = WebSocket
-  foldersBeforeTests = getCurrentFolders(data_folder)
 })
 
 afterAll(() => {
   delete global.WebSocket
-  cleanupCreatedFolders(data_folder, foldersBeforeTests)
 })
 
 export { setupIntegrationTests }

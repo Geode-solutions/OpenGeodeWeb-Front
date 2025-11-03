@@ -59,7 +59,6 @@ export default function useMeshStyle() {
         throw new Error("Unknown mesh key: " + key)
       }
     }
-    console.log(0, { promise_array })
     return Promise.all(promise_array)
   }
 

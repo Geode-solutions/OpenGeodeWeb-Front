@@ -14,18 +14,17 @@ const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let id, back_port, viewer_port
+let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port } = await setupIntegrationTests(
-    file_name,
-    geode_object,
-  ))
+  ;({ id, back_port, viewer_port, project_folder_path } =
+    await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
 afterEach(async () => {
   console.log("afterEach model lines kill", back_port, viewer_port)
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+  delete_folder_recursive(project_folder_path)
 })
 
 describe("Model lines", () => {

@@ -26,7 +26,6 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).visibility = visibility
   }
   function setModelLinesVisibility(id, line_ids, visibility) {
-    console.log("setModelLinesVisibility", id, line_ids, visibility)
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
     return viewer_call(
       {
@@ -56,7 +55,6 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).color = color
   }
   function setModelLinesColor(id, line_ids, color) {
-    console.log("setModelLinesColor", id, line_ids, color)
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
     return viewer_call(
       {
