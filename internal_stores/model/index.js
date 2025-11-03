@@ -27,6 +27,7 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
+    console.log("setModelVisibility", id, visibility)
     return viewer_call(
       {
         schema: model_schemas.visibility,
@@ -83,6 +84,7 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).color
   }
   function setModelColor(id, color) {
+    console.log("setModelColor", id, color)
     return viewer_call(
       {
         schema: model_schemas.color,
@@ -137,25 +139,26 @@ export default function useModelStyle() {
     console.log("applyModelDefaultStyle", id, style)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
-      if (key === "visibility") {
-        promise_array.push(setModelVisibility(id, value))
-      } else if (key === "edges") {
-        promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id))
-      } else if (key === "points") {
-        promise_array.push(modelPointsStyleStore.applyModelPointsStyle(id))
-      } else if (key === "corners") {
-        promise_array.push(modelCornersStyleStore.applyModelCornersStyle(id))
-      } else if (key === "lines") {
+      // if (key === "visibility") {
+      //   promise_array.push(setModelVisibility(id, value))
+      // if (key === "corners") {
+      //   promise_array.push(modelCornersStyleStore.applyModelCornersStyle(id))
+      if (key === "lines") {
         promise_array.push(modelLinesStyleStore.applyModelLinesStyle(id))
-      } else if (key === "surfaces") {
-        promise_array.push(modelSurfacesStyleStore.applyModelSurfacesStyle(id))
-      } else if (key === "blocks") {
-        promise_array.push(modelBlocksStyleStore.applyModelBlocksStyle(id))
-      } else {
-        throw new Error("Unknown key: " + key)
+        // if (key === "surfaces") {
+        //   promise_array.push(modelSurfacesStyleStore.applyModelSurfacesStyle(id))
+        // } else if (key === "blocks") {
+        //   promise_array.push(modelBlocksStyleStore.applyModelBlocksStyle(id))
+        // } else if (key === "points") {
+        //   promise_array.push(modelPointsStyleStore.applyModelPointsStyle(id))
+        // } else if (key === "edges") {
+        //   promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id))
+        // } else {
+        //   throw new Error("Unknown model key: " + key)
       }
     }
-    return promise_array
+    console.log("applyModelDefaultStyle", { promise_array })
+    return Promise.all(promise_array)
   }
 
   function setModelMeshComponentsDefaultStyle(id) {

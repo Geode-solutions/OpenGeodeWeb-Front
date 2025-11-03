@@ -8,7 +8,8 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import Status from "@ogw_f/utils/status.js"
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
-  const viewer_store = useViewerStore()
+  const viewerStore = useViewerStore()
+  const dataBaseStore = useDataBaseStore()
   const db = reactive({})
   const status = ref(Status.NOT_CREATED)
   const camera_options = reactive({})
@@ -32,8 +33,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     imageStyle.transition = "opacity 0.1s ease-in"
     imageStyle.zIndex = 1
 
-    await viewer_store.ws_connect()
-    viewStream = viewer_store.client.getImageStream().createViewStream("-1")
+    await viewerstore.ws_connect()
+    viewStream = viewerstore.client.getImageStream().createViewStream("-1")
     viewStream.onImageReady((e) => {
       if (is_moving.value) return
       const webGLRenderWindow =
@@ -46,7 +47,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     status.value = Status.CREATED
   }
 
-  async function addItem(id, value) {
+  async function addItem(id) {
+    const value = dataBaseStore.db[id]
     const reader = vtkXMLPolyDataReader.newInstance()
     const textEncoder = new TextEncoder()
     await reader.parseAsArrayBuffer(
@@ -166,7 +168,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   async function resize(width, height) {
     if (
-      viewer_store.status !== Status.CONNECTED ||
+      viewerstore.status !== Status.CONNECTED ||
       status.value !== Status.CREATED
     ) {
       return

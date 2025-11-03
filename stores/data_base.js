@@ -7,9 +7,6 @@ const back_model_schemas = back_schemas.opengeodeweb_back.models
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 
 export const useDataBaseStore = defineStore("dataBase", () => {
-  const treeview_store = useTreeviewStore()
-  const hybridViewerStore = useHybridViewerStore()
-
   const db = reactive({})
 
   function itemMetaDatas(id) {
@@ -63,18 +60,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     },
   ) {
     db[id] = value
-
-    if (value.object_type === "model") {
-      await Promise.all([fetchMeshComponents(id), fetchUuidToFlatIndexDict(id)])
-    }
-    treeview_store.addItem(
-      value.geode_object,
-      value.displayed_name,
-      id,
-      value.object_type,
-    )
-
-    hybridViewerStore.addItem(id, value.vtk_js)
   }
 
   async function fetchMeshComponents(id) {

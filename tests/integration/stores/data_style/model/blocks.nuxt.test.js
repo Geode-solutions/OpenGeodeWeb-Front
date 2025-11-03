@@ -21,10 +21,9 @@ beforeEach(async () => {
     file_name,
     geode_object,
   ))
-}, 25000)
+}, 20000)
 
 afterEach(async () => {
-  console.log("afterEach model blocks kill", back_port, viewer_port)
   await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
 })
 
@@ -48,11 +47,7 @@ describe("Model blocks", () => {
           response_function: expect.any(Function),
         },
       )
-      console.log("TUTU", { id }, { block_ids })
       for (const block_id of block_ids) {
-        console.log("TUTU", { block_id })
-        console.log("TUTU", dataStyleStore.modelBlockVisibility(id, block_id))
-
         expect(dataStyleStore.modelBlockVisibility(id, block_id)).toBe(
           visibility,
         )
@@ -61,31 +56,31 @@ describe("Model blocks", () => {
     })
   })
 
-  // describe("Blocks color", () => {
-  //   test("Color red", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const dataBaseStore = useDataBaseStore()
-  //     const block_ids = dataBaseStore.getBlocksUuids(id)
-  //     const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
-  //     const color = { r: 255, g: 0, b: 0 }
-  //     const spy = vi.spyOn(composables, "viewer_call")
-  //     await dataStyleStore.setModelBlocksColor(id, block_ids, color)
-  //     expect(spy).toHaveBeenCalledWith(
-  //       {
-  //         schema: model_blocks_schemas.color,
-  //         params: { id, block_ids: block_flat_indexes, color },
-  //       },
-  //       {
-  //         response_function: expect.any(Function),
-  //       },
-  //     )
-  //     for (const block_id of block_ids) {
-  //       expect(dataStyleStore.modelBlockColor(id, block_id)).toStrictEqual(
-  //         color,
-  //       )
-  //     }
-  //     expect(viewerStore.status).toBe(Status.CONNECTED)
-  //   })
-  // })
+  describe("Blocks color", () => {
+    test("Color red", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const dataBaseStore = useDataBaseStore()
+      const block_ids = dataBaseStore.getBlocksUuids(id)
+      const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+      const color = { r: 255, g: 0, b: 0 }
+      const spy = vi.spyOn(composables, "viewer_call")
+      await dataStyleStore.setModelBlocksColor(id, block_ids, color)
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_blocks_schemas.color,
+          params: { id, block_ids: block_flat_indexes, color },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      for (const block_id of block_ids) {
+        expect(dataStyleStore.modelBlockColor(id, block_id)).toStrictEqual(
+          color,
+        )
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 })

@@ -59,6 +59,7 @@ export function useModelCornersStyle() {
   }
 
   function setModelCornersColor(id, corner_ids, color) {
+    console.log("setModelCornersColor", id, corner_ids, color)
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
     return viewer_call(
       {

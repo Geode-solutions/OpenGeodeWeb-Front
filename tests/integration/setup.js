@@ -14,6 +14,8 @@ import { useDataStyleStore } from "~/stores/data_style"
 import { useDataBaseStore } from "~/stores/data_base"
 import { useGeodeStore } from "~/stores/geode"
 import { useViewerStore } from "~/stores/viewer"
+import { useTreeviewStore } from "~/stores/treeview"
+import { useHybridViewerStore } from "~/stores/hybrid_viewer"
 import { useInfraStore } from "~/stores/infra"
 import { api_fetch } from "~/composables/api_fetch"
 import { appMode } from "~/utils/app_mode"
@@ -38,7 +40,9 @@ async function setupIntegrationTests(file_name, geode_object) {
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
   const geodeStore = useGeodeStore()
+  const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()
+  const treeviewStore = useTreeviewStore()
   const infraStore = useInfraStore()
   infraStore.app_mode = appMode.BROWSER
 
@@ -65,14 +69,11 @@ async function setupIntegrationTests(file_name, geode_object) {
   console.log("back_port", back_port)
   console.log("viewer_port", viewer_port)
 
-  if (!back_port || !viewer_port) {
-    throw new Error("Failed to start microservices")
-  }
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   await viewerStore.ws_connect()
 
-  const response = await api_fetch({
+  const { data } = await api_fetch({
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
     params: {
       input_geode_object: geode_object,
@@ -80,29 +81,57 @@ async function setupIntegrationTests(file_name, geode_object) {
     },
   })
 
-  console.log("response.data._value.id", response.data._value.id)
-  console.log("response.status._value", response.status._value)
-
-  const id = response.data._value.id
+  console.log("data._value.id", data._value.id)
+  // console.log("response.status._value", response.status._value)
+  const id = data._value.id
   await dataBaseStore.registerObject(id)
 
-  await dataBaseStore.addItem(response.data._value.id, {
-    object_type: response.data._value.object_type,
-    geode_object: response.data._value.geode_object,
-    native_filename: response.data._value.native_file_name,
-    viewable_filename: response.data._value.viewable_file_name,
-    displayed_name: response.data._value.name,
+  console.log("after dataBaseStore.registerObject")
+  await dataBaseStore.addItem(data._value.id, {
+    object_type: data._value.object_type,
+    geode_object: data._value.geode_object,
+    native_filename: data._value.native_file_name,
+    viewable_filename: data._value.viewable_file_name,
+    displayed_name: data._value.name,
     vtk_js: {
-      binary_light_viewable: response.data._value.binary_light_viewable,
+      binary_light_viewable: data._value.binary_light_viewable,
     },
   })
-
+  console.log("after dataBaseStore.addItem")
   await dataStyleStore.addDataStyle(
     id,
-    response.data._value.geode_object,
-    response.data._value.object_type,
+    data._value.geode_object,
+    data._value.object_type,
   )
+  console.log("after dataStyleStore.addDataStyle")
+
+  if (data._value.object_type === "model") {
+    await Promise.all([
+      dataBaseStore.fetchMeshComponents(id),
+      dataBaseStore.fetchUuidToFlatIndexDict(id),
+    ])
+    console.log("after dataBaseStore.fetchMeshComponents")
+
+    console.log("after dataBaseStore.fetchUuidToFlatIndexDict")
+  }
+  const applyDefaultStyle = await dataStyleStore.applyDefaultStyle(id)
+
+  console.log("after dataStyleStore.applyDefaultStyle", { applyDefaultStyle })
+
+  // await treeviewStore.addItem(
+  //   data._value.geode_object,
+  //   data._value.name,
+  //   id,
+  //   data._value.object_type,
+  // )
+  // console.log(4, { applyDefaultStyle })
+
+  console.log("after treeviewStore.addItem")
+  // await hybridViewerStore.addItem(id)
+  // console.log("after hybridViewerStore.addItem")
   expect(viewerStore.status).toBe(Status.CONNECTED)
+  console.log("END OF SETUP")
+
   return { id, back_port, viewer_port }
 }
 

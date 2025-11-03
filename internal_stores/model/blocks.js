@@ -15,7 +15,7 @@ export function useModelBlocksStyle() {
     if (!modelBlocksStyle(id)[block_id]) {
       modelBlocksStyle(id)[block_id] = {}
     }
-    return modelBlocksStyle[block_id]
+    return modelBlocksStyle(id)[block_id]
   }
 
   function modelBlockVisibility(id, block_id) {
@@ -26,11 +26,11 @@ export function useModelBlocksStyle() {
     modelBlockStyle(id, block_id).visibility = visibility
   }
   function setModelBlocksVisibility(id, block_ids, visibility) {
-    const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+    const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
     return viewer_call(
       {
         schema: model_blocks_schemas.visibility,
-        params: { id, block_ids: block_flat_indexes, visibility },
+        params: { id, block_ids: blocks_flat_indexes, visibility },
       },
       {
         response_function: () => {
@@ -56,17 +56,18 @@ export function useModelBlocksStyle() {
   }
 
   function setModelBlocksColor(id, block_ids, color) {
-    const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+    const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
     return viewer_call(
       {
         schema: model_blocks_schemas.color,
-        params: { id, block_ids: block_flat_indexes, color },
+        params: { id, block_ids: blocks_flat_indexes, color },
       },
       {
         response_function: () => {
           for (const block_id of block_ids) {
             saveModelBlockColor(id, block_id, color)
           }
+
           console.log(
             setModelBlocksColor.name,
             { id },
@@ -78,26 +79,12 @@ export function useModelBlocksStyle() {
     )
   }
 
-  function setModelBlocksDefaultStyle(id) {
-    const blocks = dataBaseStore.getBlocksUuids(id)
-    return Promise.all([
-      setModelBlocksVisibility(
-        id,
-        blocks,
-        dataStyleStore.styles[id].blocks.visibility,
-      ),
-      setModelBlocksColor(id, blocks, dataStyleStore.styles[id].blocks.color),
-    ])
-  }
-
   function applyModelBlocksStyle(id) {
-    console.log("applyModelBlocksStyle", id)
     const blocks_style = modelBlocksStyle(id)
-    console.log("blocks_style", blocks_style)
-    const block_ids = dataBaseStore.getBlocksUuids(id)
+    const blocks_ids = dataBaseStore.getBlocksUuids(id)
     return Promise.all([
-      setModelBlocksVisibility(id, block_ids, blocks_style.visibility),
-      setModelBlocksColor(id, block_ids, blocks_style.color),
+      setModelBlocksVisibility(id, blocks_ids, blocks_style.visibility),
+      setModelBlocksColor(id, blocks_ids, blocks_style.color),
     ])
   }
 
@@ -106,7 +93,6 @@ export function useModelBlocksStyle() {
     modelBlockColor,
     setModelBlocksVisibility,
     setModelBlocksColor,
-    setModelBlocksDefaultStyle,
     applyModelBlocksStyle,
   }
 }

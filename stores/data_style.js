@@ -8,18 +8,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const modelStyleStore = useModelStyle()
   const dataBaseStore = useDataBaseStore()
 
-  function addDataStyle(id, geode_object, object_type) {
+  function addDataStyle(id, geode_object) {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)
-    const promise_array = []
-    if (object_type === "mesh") {
-      promise_array.push(meshStyleStore.applyMeshDefaultStyle(id))
-    } else if (object_type === "model") {
-      // promise_array.push(modelStyleStore.setModelMeshComponentsDefaultStyle(id))
-      promise_array.push(modelStyleStore.applyModelDefaultStyle(id))
-    } else {
-      throw new Error("Unknown object_type: " + object_type)
-    }
-    return Promise.all(promise_array)
   }
 
   function setVisibility(id, visibility) {
@@ -32,25 +22,23 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     throw new Error("Unknown object_type")
   }
 
-  function modelEdgesVisibility(id) {
-    return modelStyleStore.modelMeshComponentVisibility(id, "Edge", null)
-  }
-  function setModelEdgesVisibility(id, visibility) {
-    modelStyleStore.setModelMeshComponentVisibility(
-      id,
-      "Edge",
-      null,
-      visibility,
-    )
+  function applyDefaultStyle(id) {
+    const { object_type } = dataBaseStore.itemMetaDatas(id)
+    if (object_type === "mesh") {
+      return meshStyleStore.applyMeshDefaultStyle(id)
+    } else if (object_type === "model") {
+      return modelStyleStore.applyModelDefaultStyle(id)
+    } else {
+      throw new Error("Unknown object_type: " + object_type)
+    }
   }
 
   return {
     ...dataStyleState,
-    addDataStyle,
-    setVisibility,
-    setModelEdgesVisibility,
-    modelEdgesVisibility,
     ...meshStyleStore,
     ...modelStyleStore,
+    addDataStyle,
+    applyDefaultStyle,
+    setVisibility,
   }
 })

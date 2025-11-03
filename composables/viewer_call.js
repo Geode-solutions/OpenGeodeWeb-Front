@@ -27,7 +27,7 @@ export function viewer_call(
       .getSession()
       .call(schema.$id, [params])
       .then(
-        (value) => {
+        async (value) => {
           if (response_function) {
             response_function(value)
           }
