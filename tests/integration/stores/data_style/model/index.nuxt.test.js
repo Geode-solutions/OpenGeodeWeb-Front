@@ -35,8 +35,8 @@ describe("Model", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      await dataStyleStore.setModelVisibility(id, visibility)
       const spy = vi.spyOn(composables, "viewer_call")
+      await dataStyleStore.setModelVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
         {
           schema: model_schemas.visibility,

@@ -35,8 +35,8 @@ export default function useModelStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].visibility = visibility
-          hybridViewerStore.setVisibility(id, visibility)
+          dataStyleStore.getStyle(id).visibility = visibility
+          // hybridViewerStore.setVisibility(id, visibility)
           console.log(setModelVisibility.name, { id }, modelVisibility(id))
         },
       },
@@ -139,22 +139,22 @@ export default function useModelStyle() {
     console.log("applyModelDefaultStyle", id, style)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
-      // if (key === "visibility") {
-      //   promise_array.push(setModelVisibility(id, value))
-      // if (key === "corners") {
-      //   promise_array.push(modelCornersStyleStore.applyModelCornersStyle(id))
-      if (key === "lines") {
+      if (key === "visibility") {
+        promise_array.push(setModelVisibility(id, value))
+      } else if (key === "corners") {
+        promise_array.push(modelCornersStyleStore.applyModelCornersStyle(id))
+      } else if (key === "lines") {
         promise_array.push(modelLinesStyleStore.applyModelLinesStyle(id))
-        // if (key === "surfaces") {
-        //   promise_array.push(modelSurfacesStyleStore.applyModelSurfacesStyle(id))
-        // } else if (key === "blocks") {
-        //   promise_array.push(modelBlocksStyleStore.applyModelBlocksStyle(id))
-        // } else if (key === "points") {
-        //   promise_array.push(modelPointsStyleStore.applyModelPointsStyle(id))
-        // } else if (key === "edges") {
-        //   promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id))
-        // } else {
-        //   throw new Error("Unknown model key: " + key)
+      } else if (key === "surfaces") {
+        promise_array.push(modelSurfacesStyleStore.applyModelSurfacesStyle(id))
+      } else if (key === "blocks") {
+        promise_array.push(modelBlocksStyleStore.applyModelBlocksStyle(id))
+      } else if (key === "points") {
+        promise_array.push(modelPointsStyleStore.applyModelPointsStyle(id))
+      } else if (key === "edges") {
+        promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id))
+      } else {
+        throw new Error("Unknown model key: " + key)
       }
     }
     console.log("applyModelDefaultStyle", { promise_array })

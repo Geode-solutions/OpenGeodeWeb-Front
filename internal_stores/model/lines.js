@@ -48,13 +48,13 @@ export function useModelLinesStyle() {
       },
     )
   }
-  function modelLineColor(id) {
+
+  function modelLineColor(id, line_id) {
     return modelLineStyle(id, line_id).color
   }
   function saveModelLineColor(id, line_id, color) {
     modelLineStyle(id, line_id).color = color
   }
-
   function setModelLinesColor(id, line_ids, color) {
     console.log("setModelLinesColor", id, line_ids, color)
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
@@ -65,11 +65,9 @@ export function useModelLinesStyle() {
       },
       {
         response_function: () => {
-          console.log("response setModelLinesColor")
           for (const line_id of line_ids) {
             saveModelLineColor(id, line_id, color)
           }
-          console.log("end response setModelLinesColor")
           console.log(
             setModelLinesColor.name,
             { id },
@@ -82,16 +80,12 @@ export function useModelLinesStyle() {
   }
 
   function applyModelLinesStyle(id) {
-    console.log("applyModelLinesStyle", id)
     const lines_style = modelLinesStyle(id)
-    console.log("lines_style", lines_style)
-    const lines_ids = dataBaseStore.getLinesUuids(id)
-    const promise_array = [
-      setModelLinesVisibility(id, lines_ids, lines_style.visibility),
-      setModelLinesColor(id, lines_ids, lines_style.color),
-    ]
-    console.log("applyModelLinesStyle", { promise_array })
-    return Promise.all(promise_array)
+    const line_ids = dataBaseStore.getLinesUuids(id)
+    return Promise.all([
+      setModelLinesVisibility(id, line_ids, lines_style.visibility),
+      setModelLinesColor(id, line_ids, lines_style.color),
+    ])
   }
 
   return {

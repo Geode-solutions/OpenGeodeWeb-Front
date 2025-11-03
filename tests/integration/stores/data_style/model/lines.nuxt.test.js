@@ -56,29 +56,29 @@ describe("Model lines", () => {
     })
   })
 
-  // describe("Lines color", () => {
-  //   test("Color red", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const dataBaseStore = useDataBaseStore()
-  //     const line_ids = dataBaseStore.getLinesUuids(id)
-  //     const lines_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
-  //     const color = { r: 255, g: 0, b: 0 }
-  //     const spy = vi.spyOn(composables, "viewer_call")
-  //     await dataStyleStore.setModelLinesColor(id, line_ids, color)
-  //     expect(spy).toHaveBeenCalledWith(
-  //       {
-  //         schema: model_lines_schemas.color,
-  //         params: { id, block_ids: lines_flat_indexes, color },
-  //       },
-  //       {
-  //         response_function: expect.any(Function),
-  //       },
-  //     )
-  //     for (const line_id of line_ids) {
-  //       expect(dataStyleStore.modelLineColor(id, line_id)).toStrictEqual(color)
-  //     }
-  //     expect(viewerStore.status).toBe(Status.CONNECTED)
-  //   })
-  // })
+  describe("Lines color", () => {
+    test("Color red", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const dataBaseStore = useDataBaseStore()
+      const line_ids = dataBaseStore.getLinesUuids(id)
+      const lines_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
+      const color = { r: 255, g: 0, b: 0 }
+      const spy = vi.spyOn(composables, "viewer_call")
+      await dataStyleStore.setModelLinesColor(id, line_ids, color)
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_lines_schemas.color,
+          params: { id, block_ids: lines_flat_indexes, color },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      for (const line_id of line_ids) {
+        expect(dataStyleStore.modelLineColor(id, line_id)).toStrictEqual(color)
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 })

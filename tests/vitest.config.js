@@ -19,9 +19,7 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "integration",
-          include: [
-            "tests/integration/stores/data_style/model/lines.nuxt.test.js",
-          ],
+          include: ["tests/integration/stores/data_style/model/**/*.test.js"],
           environment: "nuxt",
           fileParallelism: false,
           setupFiles: ["tests/integration/setup.js"],
