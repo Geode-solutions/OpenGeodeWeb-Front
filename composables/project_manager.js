@@ -2,7 +2,6 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import fileDownload from "js-file-download"
 
-
 export function useProjectManager() {
   const geode = useGeodeStore()
   const appStore = useAppStore()
