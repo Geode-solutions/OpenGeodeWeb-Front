@@ -10,9 +10,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataBaseStore = useDataBaseStore()
 
   /** Actions **/
-  function addDataStyle(id, geode_object, object_type) {
-    dataStyleState.styles[id] = getDefaultStyle(geode_object)
-    const promise_array = []
+  // function applyDataStyle() {
     if (object_type === "mesh") {
       promise_array.push(meshStyleStore.applyMeshDefaultStyle(id))
     } else if (object_type === "model") {
@@ -21,15 +19,37 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     } else {
       throw new Error("Unknown object type")
     }
-    return Promise.all(promise_array)
+    await Promise.all(promise_array);
+    await rpc_call("opengeodeweb_viewer.viewer.render_now", {});
+    return true;
   }
 
-  function setVisibility(id, visibility) {
-    const object_type = dataBaseStore.itemMetaDatas(id).object_type
+  async function setVisibility(payloadOrId, visibility) {
+    const id =
+      typeof payloadOrId === "string"
+        ? payloadOrId
+        : payloadOrId?.id ?? payloadOrId?.data_id ?? payloadOrId?.model_id
+    if (!id) return Promise.resolve([])
+
+    const meta = dataBaseStore.itemMetaDatas(id)
+    const object_type = meta?.object_type
+    if (!object_type) return Promise.resolve([])
+
+    if (!dataStyleState.styles[id]) {
+      await addDataStyle(id, meta.geode_object, object_type)
+    }
+
+    const visible =
+      typeof visibility === "boolean"
+        ? visibility
+        : payloadOrId?.visible != null
+        ? !!payloadOrId.visible
+        : true
+
     if (object_type === "mesh") {
-      return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
-    } else if (object_type === "model") {
-      return Promise.all([modelStyleStore.setModelVisibility(id, visibility)])
+      return Promise.all([meshStyleStore.setMeshVisibility(id, visible)])
+    } else {
+      return Promise.all([modelStyleStore.setModelVisibility(id, visible)])
     }
   }
 
