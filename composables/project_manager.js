@@ -58,38 +58,13 @@ export function useProjectManager() {
         params: {},
       })
 
+      const dataBaseStore = useDataBaseStore()
+      const treeviewStore = useTreeviewStore()
+      treeviewStore.isImporting = true
+
       await appStore.importStores(result.snapshot)
 
-      const dataBaseStore = useDataBaseStore()
-      for (const [id, item] of Object.entries(dataBaseStore.items)) {
-        const registerSchema =
-          item.object_type === "model"
-            ? viewer_schemas.opengeodeweb_viewer.model.register
-            : viewer_schemas.opengeodeweb_viewer.mesh.register
-        await viewer_call({ schema: registerSchema, params: { id } })
-
-        if (item.vtk_js?.binary_light_viewable) {
-          await viewer_call({
-            schema: viewer_schemas.opengeodeweb_viewer.viewer.update_data,
-            params: {
-              id,
-              vtk_js: {
-                binary_light_viewable: item.vtk_js.binary_light_viewable,
-              },
-            },
-          })
-        }
-
-        if (item.viewable_filename) {
-          await viewer_call({
-            schema: viewer_schemas.opengeodeweb_viewer.viewer.update_data,
-            params: {
-              id,
-              vtk_js: { viewable_file_name: item.viewable_filename },
-            },
-          })
-        }
-      }
+      treeviewStore.isImporting = false
     } finally {
       geode.stop_request()
     }
