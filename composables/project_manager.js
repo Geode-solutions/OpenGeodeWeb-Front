@@ -58,7 +58,7 @@ export function useProjectManager() {
         params: {},
       })
 
-      const dataBaseStore = useDataBaseStore()
+      // const dataBaseStore = useDataBaseStore()
       const treeviewStore = useTreeviewStore()
       treeviewStore.isImporting = true
 
