@@ -77,7 +77,9 @@ vi.mock("@/composables/api_fetch.js", () => ({
   api_fetch: vi.fn(async (_req, options = {}) => {
     const response = {
       _data: new Blob(["zipcontent"], { type: "application/zip" }),
-      headers: { get: (k) => (k === "new-file-name" ? "project_123.zip" : null) },
+      headers: {
+        get: (k) => (k === "new-file-name" ? "project_123.zip" : null),
+      },
     }
     if (options.response_function) {
       await options.response_function(response)
@@ -85,7 +87,10 @@ vi.mock("@/composables/api_fetch.js", () => ({
     return response
   }),
 }))
-vi.stubGlobal("$fetch", vi.fn(async () => ({ snapshot: {} })))
+vi.stubGlobal(
+  "$fetch",
+  vi.fn(async () => ({ snapshot: {} })),
+)
 vi.stubGlobal("useDataBaseStore", () => ({ items: {} }))
 
 // Mock du store base de données pour éviter Object.entries(undefined)
@@ -108,7 +113,9 @@ describe("ProjectManager composable", () => {
   test("importProjectFile loads snapshot", async () => {
     const { importProjectFile } = useProjectManager()
 
-    const file = new Blob(['{"dataBase":{"db":{}}}'], { type: "application/json" })
+    const file = new Blob(['{"dataBase":{"db":{}}}'], {
+      type: "application/json",
+    })
     await importProjectFile(file)
 
     const infra_store = useInfraStore()
