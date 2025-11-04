@@ -31,15 +31,15 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const id =
       typeof payloadOrId === "string"
         ? payloadOrId
-        : payloadOrId?.id ?? payloadOrId?.data_id ?? payloadOrId?.model_id
+        : (payloadOrId?.id ?? payloadOrId?.data_id ?? payloadOrId?.model_id)
     if (!id) return Promise.resolve([])
 
     const visible =
       typeof visibility === "boolean"
         ? visibility
         : payloadOrId?.visible != null
-        ? !!payloadOrId.visible
-        : true
+          ? !!payloadOrId.visible
+          : true
 
     const meta = dataBaseStore.itemMetaDatas(id)
     const object_type = meta?.object_type
