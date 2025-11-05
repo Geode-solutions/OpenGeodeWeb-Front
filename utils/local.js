@@ -57,8 +57,17 @@ function get_available_port() {
   })
 }
 
+function commandExistsSync(executable_name) {
+  const envPath = process.env.PATH || ""
+  return envPath.split(path.delimiter).some((dir) => {
+    const filePath = path.join(dir, executable_name)
+    return fs.existsSync(filePath) && fs.statSync(filePath).isFile()
+  })
+}
+
 async function run_script(
-  command,
+  executable_name,
+  executable_path,
   args,
   expected_response,
   timeout_seconds = 30,
@@ -68,6 +77,10 @@ async function run_script(
       reject("Timed out after " + timeout_seconds + " seconds")
     }, timeout_seconds * 1000)
 
+    const command = commandExistsSync(executable_name)
+      ? executable_name
+      : path.join(executable_path, executable_name)
+    console.log("run_script", command, args)
     const child = child_process.spawn(command, args, {
       encoding: "utf8",
       shell: true,
@@ -109,7 +122,8 @@ async function run_script(
 }
 
 async function run_back(
-  command,
+  executable_name,
+  executable_path,
   args = {
     project_folder_path,
     upload_folder_path: undefined,
@@ -128,13 +142,22 @@ async function run_back(
       "--allowed_origin http://localhost:*",
       "--timeout " + 0,
     ]
-    console.log("run_back", command, back_args)
-    await run_script(command, back_args, "Serving Flask app")
+    console.log("run_back", executable_name, executable_path, back_args)
+    await run_script(
+      executable_name,
+      executable_path,
+      back_args,
+      "Serving Flask app",
+    )
     resolve(port)
   })
 }
 
-async function run_viewer(command, args = { project_folder_path }) {
+async function run_viewer(
+  executable_name,
+  executable_path,
+  args = { project_folder_path },
+) {
   return new Promise(async (resolve, reject) => {
     const port = await get_available_port()
     const viewer_args = [
@@ -142,8 +165,13 @@ async function run_viewer(command, args = { project_folder_path }) {
       "--data_folder_path " + args.project_folder_path,
       "--timeout " + 0,
     ]
-    console.log("run_viewer", command, viewer_args)
-    await run_script(command, viewer_args, "Starting factory")
+    console.log("run_viewer", executable_name, executable_path, viewer_args)
+    await run_script(
+      executable_name,
+      executable_path,
+      viewer_args,
+      "Starting factory",
+    )
     resolve(port)
   })
 }
@@ -224,19 +252,27 @@ function kill_viewer(viewer_port) {
 async function run_browser(
   script_name,
   microservices_options = {
-    back: { command, args: { project_folder_path } },
-    viewer: { command, args: { project_folder_path } },
+    back: { executable_name, executable_path, args: { project_folder_path } },
+    viewer: { executable_name, executable_path, args: { project_folder_path } },
   },
 ) {
   console.log("microservices_options", microservices_options)
-  const back_promise = run_back(microservices_options.back.command, {
-    ...microservices_options.back.args,
-  })
+  const back_promise = run_back(
+    microservices_options.back.executable_name,
+    microservices_options.back.executable_path,
+    {
+      ...microservices_options.back.args,
+    },
+  )
   console.log("back_promise", back_promise)
 
-  const viewer_promise = run_viewer(microservices_options.viewer.command, {
-    ...microservices_options.viewer.args,
-  })
+  const viewer_promise = run_viewer(
+    microservices_options.viewer.executable_name,
+    microservices_options.viewer.executable_path,
+    {
+      ...microservices_options.viewer.args,
+    },
+  )
   console.log("viewer_promise", viewer_promise)
 
   const [back_port, viewer_port] = await Promise.all([

@@ -40,20 +40,16 @@ async function setupIntegrationTests(file_name, geode_object) {
   const microservices_path = path.join("tests", "integration", "microservices")
   const project_folder_path = path.join(data_folder, uuidv4())
   const upload_folder_path = path.join(__dirname, "data", "uploads")
-  const back_path = path.join(
-    executable_path(path.join(microservices_path, "back")),
-    executable_name("opengeodeweb-back"),
-  )
-  const viewer_path = path.join(
-    executable_path(path.join(microservices_path, "viewer")),
-    executable_name("opengeodeweb-viewer"),
-  )
+  const back_path = executable_path(path.join(microservices_path, "back"))
+  const back_name = executable_name("opengeodeweb-back")
+  const viewer_path = executable_path(path.join(microservices_path, "viewer"))
+  const viewer_name = executable_name("opengeodeweb-viewer")
   const [back_port, viewer_port] = await Promise.all([
-    run_back(back_path, {
+    run_back(back_name, back_path, {
       project_folder_path: project_folder_path,
       upload_folder_path: upload_folder_path,
     }),
-    run_viewer(viewer_path, {
+    run_viewer(viewer_name, viewer_path, {
       project_folder_path: project_folder_path,
     }),
   ])
