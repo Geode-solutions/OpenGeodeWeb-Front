@@ -44,17 +44,13 @@ export default function useMeshStyle() {
       if (key === "visibility") {
         promise_array.push(setMeshVisibility(id, value))
       } else if (key === "points") {
-        promise_array.push(pointsStyleStore.applyMeshPointsStyle(id, value))
+        promise_array.push(pointsStyleStore.applyMeshPointsStyle(id))
       } else if (key === "edges") {
-        promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id, value))
+        promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id))
       } else if (key === "polygons") {
-        promise_array.push(
-          meshPolygonsStyleStore.applyMeshPolygonsStyle(id, value),
-        )
+        promise_array.push(meshPolygonsStyleStore.applyMeshPolygonsStyle(id))
       } else if (key === "polyhedra") {
-        promise_array.push(
-          meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id, value),
-        )
+        promise_array.push(meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id))
       } else {
         throw new Error("Unknown mesh key: " + key)
       }

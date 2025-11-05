@@ -78,11 +78,11 @@ export function useModelLinesStyle() {
   }
 
   function applyModelLinesStyle(id) {
-    const lines_style = modelLinesStyle(id)
+    const style = modelLinesStyle(id)
     const line_ids = dataBaseStore.getLinesUuids(id)
     return Promise.all([
-      setModelLinesVisibility(id, line_ids, lines_style.visibility),
-      setModelLinesColor(id, line_ids, lines_style.color),
+      setModelLinesVisibility(id, line_ids, style.visibility),
+      setModelLinesColor(id, line_ids, style.color),
     ])
   }
 

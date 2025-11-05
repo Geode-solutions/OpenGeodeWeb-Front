@@ -88,7 +88,8 @@ export function useMeshEdgesStyle() {
     )
   }
 
-  function applyMeshEdgesStyle(id, style) {
+  function applyMeshEdgesStyle(id) {
+    const style = meshEdgesStyle(id)
     return Promise.all([
       setMeshEdgesVisibility(id, style.visibility),
       setMeshEdgesActiveColoring(id, style.coloring.active),

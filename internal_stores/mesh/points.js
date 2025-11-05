@@ -108,7 +108,8 @@ export function useMeshPointsStyle() {
     )
   }
 
-  function applyMeshPointsStyle(id, style) {
+  function applyMeshPointsStyle(id) {
+    const style = meshPointsStyle(id)
     return Promise.all([
       setMeshPointsVisibility(id, style.visibility),
       setMeshPointsActiveColoring(id, style.coloring.active),

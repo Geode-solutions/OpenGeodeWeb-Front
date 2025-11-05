@@ -74,11 +74,11 @@ export function useModelSurfacesStyle() {
   }
 
   function applyModelSurfacesStyle(id) {
-    const surfaces_style = dataStyleStore.getStyle(id).surfaces
+    const style = dataStyleStore.getStyle(id).surfaces
     const surface_ids = dataBaseStore.getSurfacesUuids(id)
     return Promise.all([
-      setModelSurfacesVisibility(id, surface_ids, surfaces_style.visibility),
-      setModelSurfacesColor(id, surface_ids, surfaces_style.color),
+      setModelSurfacesVisibility(id, surface_ids, style.visibility),
+      setModelSurfacesColor(id, surface_ids, style.color),
     ])
   }
 

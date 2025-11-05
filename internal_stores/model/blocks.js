@@ -80,11 +80,11 @@ export function useModelBlocksStyle() {
   }
 
   function applyModelBlocksStyle(id) {
-    const blocks_style = modelBlocksStyle(id)
+    const style = modelBlocksStyle(id)
     const blocks_ids = dataBaseStore.getBlocksUuids(id)
     return Promise.all([
-      setModelBlocksVisibility(id, blocks_ids, blocks_style.visibility),
-      setModelBlocksColor(id, blocks_ids, blocks_style.color),
+      setModelBlocksVisibility(id, blocks_ids, style.visibility),
+      setModelBlocksColor(id, blocks_ids, style.color),
     ])
   }
 

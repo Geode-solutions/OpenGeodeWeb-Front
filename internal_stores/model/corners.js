@@ -80,11 +80,11 @@ export function useModelCornersStyle() {
   }
 
   function applyModelCornersStyle(id) {
-    const corners_style = modelCornersStyle(id)
+    const style = modelCornersStyle(id)
     const corner_ids = dataBaseStore.getCornersUuids(id)
     return Promise.all([
-      setModelCornersVisibility(id, corner_ids, corners_style.visibility),
-      setModelCornersColor(id, corner_ids, corners_style.color),
+      setModelCornersVisibility(id, corner_ids, style.visibility),
+      setModelCornersColor(id, corner_ids, style.color),
     ])
   }
 

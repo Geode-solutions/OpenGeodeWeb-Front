@@ -51,10 +51,10 @@ export function useModelPointsStyle() {
   }
 
   function applyModelPointsStyle(id) {
-    const model_points_style = modelPointsStyle(id)
+    const style = modelPointsStyle(id)
     return Promise.all([
-      setModelPointsVisibility(id, model_points_style.visibility),
-      setModelPointsSize(id, model_points_style.size),
+      setModelPointsVisibility(id, style.visibility),
+      setModelPointsSize(id, style.size),
     ])
   }
 
