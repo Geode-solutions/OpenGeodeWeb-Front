@@ -8,7 +8,6 @@ import WebSocket from "ws"
 import pkg from "electron"
 const { app, dialog } = pkg
 import { getPort } from "get-port-please"
-import { sync as commandExistsSync } from "command-exists"
 import isElectron from "is-electron"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" }
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
@@ -55,6 +54,14 @@ function get_available_port() {
   return getPort({
     host: "localhost",
     random: true,
+  })
+}
+
+function commandExistsSync(executable_name) {
+  const envPath = process.env.PATH || ""
+  return envPath.split(path.delimiter).some((dir) => {
+    const filePath = path.join(dir, executable_name)
+    return fs.existsSync(filePath) && fs.statSync(filePath).isFile()
   })
 }
 
