@@ -50,10 +50,19 @@ export function useProjectManager() {
         method: "POST",
         body: form,
       })
-      console.log("[ProjectManager] snapshot keys:", Object.keys(result?.snapshot || {}))
+      console.log(
+        "[ProjectManager] snapshot keys:",
+        Object.keys(result?.snapshot || {}),
+      )
 
-      await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.import_project, params: {} })
-      await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization, params: {} })
+      await viewer_call({
+        schema: viewer_schemas.opengeodeweb_viewer.import_project,
+        params: {},
+      })
+      await viewer_call({
+        schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
+        params: {},
+      })
 
       const treeviewStore = useTreeviewStore()
       treeviewStore.isImporting = true

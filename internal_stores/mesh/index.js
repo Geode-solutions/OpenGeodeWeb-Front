@@ -36,7 +36,12 @@ export default function useMeshStyle() {
 
   function applyMeshDefaultStyle(id) {
     const style = dataStyleStore.getStyle(id)
-    console.log("[MeshStyle] applyMeshDefaultStyle for id:", id, "style:", style)
+    console.log(
+      "[MeshStyle] applyMeshDefaultStyle for id:",
+      id,
+      "style:",
+      style,
+    )
     const promise_array = []
     for (const [key, value] of Object.entries(style || {})) {
       if (key === "visibility") {

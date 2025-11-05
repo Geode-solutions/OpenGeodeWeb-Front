@@ -96,11 +96,15 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     )
 
     // Conserver la référence réactive -> clear + merge
-    for (const id of Object.keys(dataStyleState.styles)) delete dataStyleState.styles[id]
+    for (const id of Object.keys(dataStyleState.styles))
+      delete dataStyleState.styles[id]
     for (const [id, style] of Object.entries(stylesSnapshot)) {
       dataStyleState.styles[id] = style
     }
-    console.log("[DataStyle] importStores merged ids:", Object.keys(dataStyleState.styles))
+    console.log(
+      "[DataStyle] importStores merged ids:",
+      Object.keys(dataStyleState.styles),
+    )
   }
 
   async function applyAllStylesFromState() {
@@ -113,10 +117,17 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       const objectType = meta?.object_type
       const style = dataStyleState.styles[id]
       if (!style || !objectType) {
-        console.warn("[DataStyle] applyAllStylesFromState skip:", { id, hasStyle: !!style, objectType })
+        console.warn("[DataStyle] applyAllStylesFromState skip:", {
+          id,
+          hasStyle: !!style,
+          objectType,
+        })
         continue
       }
-      console.log("[DataStyle] applyAllStylesFromState applying:", { id, objectType })
+      console.log("[DataStyle] applyAllStylesFromState applying:", {
+        id,
+        objectType,
+      })
       if (objectType === "mesh") {
         await meshStyleStore.applyMeshDefaultStyle(id)
       } else if (objectType === "model") {
