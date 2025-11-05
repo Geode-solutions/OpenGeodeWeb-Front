@@ -36,19 +36,20 @@ export default function useMeshStyle() {
 
   function applyMeshDefaultStyle(id) {
     const style = dataStyleStore.getStyle(id)
+    console.log("[MeshStyle] applyMeshDefaultStyle for id:", id, "style:", style)
     const promise_array = []
-    for (const [key, value] of Object.entries(style)) {
-      if (key == "visibility") {
+    for (const [key, value] of Object.entries(style || {})) {
+      if (key === "visibility") {
         promise_array.push(setMeshVisibility(id, value))
-      } else if (key == "points") {
+      } else if (key === "points") {
         promise_array.push(pointsStyleStore.applyMeshPointsStyle(id, value))
-      } else if (key == "edges") {
+      } else if (key === "edges") {
         promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id, value))
-      } else if (key == "polygons") {
+      } else if (key === "polygons") {
         promise_array.push(
           meshPolygonsStyleStore.applyMeshPolygonsStyle(id, value),
         )
-      } else if (key == "polyhedra") {
+      } else if (key === "polyhedra") {
         promise_array.push(
           meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id, value),
         )

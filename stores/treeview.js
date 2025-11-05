@@ -15,8 +15,18 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   /** Functions **/
   function addItem(geodeObject, displayed_name, id, object_type) {
+    console.log("[Treeview] addItem", {
+      id,
+      object_type,
+      geodeObject,
+      isImporting: isImporting.value,
+    })
+
     if (!isImporting.value) {
+      console.log("[Treeview] addItem -> apply default style")
       dataStyleStore.addDataStyle(id, geodeObject, object_type)
+    } else {
+      console.log("[Treeview] addItem -> skip default style (import)")
     }
 
     const child = { title: displayed_name, id, object_type }

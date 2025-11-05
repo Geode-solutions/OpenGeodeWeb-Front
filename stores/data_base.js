@@ -57,19 +57,21 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       vtk_js: { binary_light_viewable },
     },
   ) {
+    console.log("[DataBase] addItem start", { id, object_type: value.object_type, geode_object: value.geode_object })
     db[id] = value
 
     if (value.object_type === "model") {
       await fetchMeshComponents(id)
       await fetchUuidToFlatIndexDict(id)
     }
-    treeview_store.addItem(
-      value.geode_object,
-      value.displayed_name,
-      id,
-      value.object_type,
-    )
-    hybridViewerStore.addItem(id, value.vtk_js)
+
+    treeview_store.addItem(value.geode_object, value.displayed_name, id, value.object_type)
+    console.log("[DataBase] addItem -> treeview.addItem done", id)
+
+    console.log("[DataBase] addItem -> hybridViewer.addItem start", id)
+    // Ajout viewer (potentiellement asynchrone)
+    await hybridViewerStore.addItem(id, value.vtk_js)
+    console.log("[DataBase] addItem -> hybridViewer.addItem done", id)
   }
 
   async function fetchMeshComponents(id) {

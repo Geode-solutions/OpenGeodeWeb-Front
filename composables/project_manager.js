@@ -50,27 +50,24 @@ export function useProjectManager() {
         method: "POST",
         body: form,
       })
+      console.log("[ProjectManager] snapshot keys:", Object.keys(result?.snapshot || {}))
 
-      await viewer_call({
-        schema: viewer_schemas.opengeodeweb_viewer.import_project,
-        params: {},
-      })
-
-      await viewer_call({
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
-        params: {},
-      })
+      await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.import_project, params: {} })
+      await viewer_call({ schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization, params: {} })
 
       const treeviewStore = useTreeviewStore()
       treeviewStore.isImporting = true
+      console.log("[ProjectManager] isImporting = true")
 
       await appStore.importStores(result.snapshot)
+      console.log("[ProjectManager] stores imported")
 
       const dataStyleStore = useDataStyleStore()
       await dataStyleStore.applyAllStylesFromState()
+      console.log("[ProjectManager] styles applied")
 
       treeviewStore.isImporting = false
-      console.log("[ProjectManager] Import finished")
+      console.log("[ProjectManager] isImporting = false")
     } finally {
       geode.stop_request()
     }
