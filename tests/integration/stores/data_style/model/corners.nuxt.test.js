@@ -11,20 +11,20 @@ import { delete_folder_recursive, kill_back, kill_viewer } from "~/utils/local"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
-const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
-const file_name = "test.og_edc2d"
-const geode_object = "EdgedCurve2D"
+const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners
+const file_name = "test.og_brep"
+const geode_object = "BRep"
 
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 25000)
+}, 20000)
 
 afterEach(async () => {
   console.log(
-    "afterEach mesh edges kill",
+    "afterEach model corners kill",
     back_port,
     viewer_port,
     project_folder_path,
@@ -33,58 +33,59 @@ afterEach(async () => {
   delete_folder_recursive(project_folder_path)
 })
 
-describe("Mesh edges", () => {
-  describe("Edges visibility", () => {
-    test("Visibility true", async () => {
+describe("Model corners", () => {
+  describe("Corners visibility", () => {
+    test("Visibility false", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const visibility = true
+      const dataBaseStore = useDataBaseStore()
+      const corner_ids = dataBaseStore.getCornersUuids(id)
+      const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+      const visibility = false
       const spy = vi.spyOn(composables, "viewer_call")
-      await dataStyleStore.setMeshEdgesVisibility(id, visibility)
+      await dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         {
-          schema: mesh_edges_schemas.visibility,
-          params: { id, visibility },
+          schema: model_corners_schemas.visibility,
+          params: { id, block_ids: corner_flat_indexes, visibility },
         },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshEdgesVisibility(id)).toBe(visibility)
+      for (const corner_id of corner_ids) {
+        expect(dataStyleStore.modelCornerVisibility(id, corner_id)).toBe(
+          visibility,
+        )
+      }
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
-  describe("Edges active coloring", () => {
-    test("test coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshEdgesActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
-    })
-  })
-  describe("Edges color", () => {
+
+  describe("Corner color", () => {
     test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
+      const dataBaseStore = useDataBaseStore()
+      const corner_ids = dataBaseStore.getCornersUuids(id)
+      const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(composables, "viewer_call")
-      await dataStyleStore.setMeshEdgesColor(id, color)
+      await dataStyleStore.setModelCornersColor(id, corner_ids, color)
       expect(spy).toHaveBeenCalledWith(
         {
-          schema: mesh_edges_schemas.color,
-          params: { id, color },
+          schema: model_corners_schemas.color,
+          params: { id, block_ids: corner_flat_indexes, color },
         },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshEdgesColor(id)).toStrictEqual(color)
+      for (const corner_id of corner_ids) {
+        expect(dataStyleStore.modelCornerColor(id, corner_id)).toStrictEqual(
+          color,
+        )
+      }
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
