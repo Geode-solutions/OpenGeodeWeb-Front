@@ -132,7 +132,7 @@ export default function useModelStyle() {
     }
   }
 
-  function applyModelDefaultStyle(id) {
+  function applyModelStyle(id) {
     const style = dataStyleStore.getStyle(id)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
@@ -184,7 +184,7 @@ export default function useModelStyle() {
     setModelVisibility,
     setModelColor,
     setModelMeshComponentVisibility,
-    applyModelDefaultStyle,
+    applyModelStyle,
     setModelMeshComponentsDefaultStyle,
     ...useModelBlocksStyle(),
     ...useModelCornersStyle(),

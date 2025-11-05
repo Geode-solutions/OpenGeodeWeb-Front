@@ -7,18 +7,13 @@ import { WebSocket } from "ws"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { afterAll, beforeAll, expect, vi } from "vitest"
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "~/stores/data_style"
-import { useDataBaseStore } from "~/stores/data_base"
 import { useGeodeStore } from "~/stores/geode"
 import { useViewerStore } from "~/stores/viewer"
-import { useTreeviewStore } from "~/stores/treeview"
-import { useHybridViewerStore } from "~/stores/hybrid_viewer"
 import { useInfraStore } from "~/stores/infra"
-import { api_fetch } from "~/composables/api_fetch"
 import { appMode } from "~/utils/app_mode"
+import { importFile } from "~/utils/file_import_workflow"
 import Status from "~/utils/status"
 import {
   executable_name,
@@ -26,7 +21,6 @@ import {
   run_back,
   run_viewer,
 } from "~/utils/local"
-import { getCurrentFolders, cleanupCreatedFolders } from "./utils.js"
 
 // Local constants
 const data_folder = path.join("tests", "integration", "data")
@@ -37,13 +31,10 @@ async function setupIntegrationTests(file_name, geode_object) {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
   const geodeStore = useGeodeStore()
   const hybridViewerStore = useHybridViewerStore()
-  const viewerStore = useViewerStore()
-  const treeviewStore = useTreeviewStore()
   const infraStore = useInfraStore()
+  const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
 
   const microservices_path = path.join("tests", "integration", "microservices")
@@ -71,67 +62,15 @@ async function setupIntegrationTests(file_name, geode_object) {
 
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
+  console.log("after ports")
   await viewerStore.ws_connect()
+  // await hybridViewerStore.initHybridViewer()
+  console.log("after hybridViewerStore.initHybridViewer")
 
-  const { data } = await api_fetch({
-    schema: back_schemas.opengeodeweb_back.save_viewable_file,
-    params: {
-      input_geode_object: geode_object,
-      filename: file_name,
-    },
-  })
-
-  console.log("data._value.id", data._value.id)
-  // console.log("response.status._value", response.status._value)
-  const id = data._value.id
-  await dataBaseStore.registerObject(id)
-
-  console.log("after dataBaseStore.registerObject")
-  await dataBaseStore.addItem(data._value.id, {
-    object_type: data._value.object_type,
-    geode_object: data._value.geode_object,
-    native_filename: data._value.native_file_name,
-    viewable_filename: data._value.viewable_file_name,
-    displayed_name: data._value.name,
-    vtk_js: {
-      binary_light_viewable: data._value.binary_light_viewable,
-    },
-  })
-  console.log("after dataBaseStore.addItem")
-  await dataStyleStore.addDataStyle(
-    id,
-    data._value.geode_object,
-    data._value.object_type,
-  )
-  console.log("after dataStyleStore.addDataStyle")
-
-  if (data._value.object_type === "model") {
-    await Promise.all([
-      dataBaseStore.fetchMeshComponents(id),
-      dataBaseStore.fetchUuidToFlatIndexDict(id),
-    ])
-    console.log("after dataBaseStore.fetchMeshComponents")
-
-    console.log("after dataBaseStore.fetchUuidToFlatIndexDict")
-  }
-  const applyDefaultStyle = await dataStyleStore.applyDefaultStyle(id)
-
-  console.log("after dataStyleStore.applyDefaultStyle", { applyDefaultStyle })
-
-  // await treeviewStore.addItem(
-  //   data._value.geode_object,
-  //   data._value.name,
-  //   id,
-  //   data._value.object_type,
-  // )
-  // console.log(4, { applyDefaultStyle })
-
-  console.log("after treeviewStore.addItem")
-  // await hybridViewerStore.addItem(id)
-  // console.log("after hybridViewerStore.addItem")
+  // await viewerStore.ws_connect()
+  const id = await importFile(file_name, geode_object)
   expect(viewerStore.status).toBe(Status.CONNECTED)
-  console.log("END OF SETUP")
-
+  console.log("end of setupIntegrationTests")
   return { id, back_port, viewer_port, project_folder_path }
 }
 

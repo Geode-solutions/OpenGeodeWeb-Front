@@ -37,7 +37,7 @@ export default function useMeshStyle() {
     )
   }
 
-  function applyMeshDefaultStyle(id) {
+  function applyMeshStyle(id) {
     const style = dataStyleStore.getStyle(id)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
@@ -65,7 +65,7 @@ export default function useMeshStyle() {
   return {
     meshVisibility,
     setMeshVisibility,
-    applyMeshDefaultStyle,
+    applyMeshStyle,
     ...useMeshPointsStyle(),
     ...useMeshEdgesStyle(),
     ...useMeshPolygonsStyle(),

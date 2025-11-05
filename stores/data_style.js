@@ -13,6 +13,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   function setVisibility(id, visibility) {
+    console.log(
+      "dataBaseStore.itemMetaDatas(id)",
+      dataBaseStore.itemMetaDatas(id),
+    )
     const object_type = dataBaseStore.itemMetaDatas(id).object_type
     if (object_type === "mesh") {
       return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
@@ -25,9 +29,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   function applyDefaultStyle(id) {
     const { object_type } = dataBaseStore.itemMetaDatas(id)
     if (object_type === "mesh") {
-      return meshStyleStore.applyMeshDefaultStyle(id)
+      return meshStyleStore.applyMeshStyle(id)
     } else if (object_type === "model") {
-      return modelStyleStore.applyModelDefaultStyle(id)
+      return modelStyleStore.applyModelStyle(id)
     } else {
       throw new Error("Unknown object_type: " + object_type)
     }

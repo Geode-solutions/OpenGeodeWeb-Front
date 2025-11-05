@@ -33,8 +33,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     imageStyle.transition = "opacity 0.1s ease-in"
     imageStyle.zIndex = 1
 
-    await viewerstore.ws_connect()
-    viewStream = viewerstore.client.getImageStream().createViewStream("-1")
+    await viewerStore.ws_connect()
+    viewStream = viewerStore.client.getImageStream().createViewStream("-1")
     viewStream.onImageReady((e) => {
       if (is_moving.value) return
       const webGLRenderWindow =
@@ -48,11 +48,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function addItem(id) {
+    if (!genericRenderWindow.value) {
+      return
+    }
     const value = dataBaseStore.db[id]
+    console.log("hybridViewerStore.addItem", { value })
     const reader = vtkXMLPolyDataReader.newInstance()
     const textEncoder = new TextEncoder()
     await reader.parseAsArrayBuffer(
-      textEncoder.encode(value.binary_light_viewable),
+      textEncoder.encode(value.vtk_js.binary_light_viewable),
     )
     const polydata = reader.getOutputData(0)
     const mapper = vtkMapper.newInstance()
@@ -168,7 +172,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   async function resize(width, height) {
     if (
-      viewerstore.status !== Status.CONNECTED ||
+      viewerStore.status !== Status.CONNECTED ||
       status.value !== Status.CREATED
     ) {
       return

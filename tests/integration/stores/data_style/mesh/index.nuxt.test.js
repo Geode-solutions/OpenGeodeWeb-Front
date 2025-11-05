@@ -59,7 +59,7 @@ describe("Mesh", () => {
     test("test", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      await dataStyleStore.applyMeshDefaultStyle(id)
+      await dataStyleStore.applyMeshStyle(id)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
