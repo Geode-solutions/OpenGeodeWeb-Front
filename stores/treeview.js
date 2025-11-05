@@ -11,9 +11,14 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const isTreeCollection = ref(false)
   const selectedTree = ref(null)
 
+  const isImporting = ref(false)
+
   /** Functions **/
   function addItem(geodeObject, displayed_name, id, object_type) {
-    dataStyleStore.addDataStyle(id, geodeObject, object_type)
+    if (!isImporting.value) {
+      dataStyleStore.addDataStyle(id, geodeObject, object_type)
+    }
+
     const child = { title: displayed_name, id, object_type }
 
     for (let i = 0; i < items.value.length; i++) {
@@ -83,6 +88,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     panelWidth,
     model_id,
     selectedTree,
+    isImporting,
     addItem,
     displayAdditionalTree,
     displayFileTree,

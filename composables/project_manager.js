@@ -33,6 +33,8 @@ export function useProjectManager() {
   async function importProjectFile(file) {
     geode.start_request()
     try {
+      console.log("[ProjectManager] Import start with file:", file?.name)
+
       const infra = useInfraStore()
       await infra.create_connection()
 
@@ -53,18 +55,22 @@ export function useProjectManager() {
         schema: viewer_schemas.opengeodeweb_viewer.import_project,
         params: {},
       })
+
       await viewer_call({
         schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
         params: {},
       })
 
-      // const dataBaseStore = useDataBaseStore()
       const treeviewStore = useTreeviewStore()
       treeviewStore.isImporting = true
 
       await appStore.importStores(result.snapshot)
 
+      const dataStyleStore = useDataStyleStore()
+      await dataStyleStore.applyAllStylesFromState()
+
       treeviewStore.isImporting = false
+      console.log("[ProjectManager] Import finished")
     } finally {
       geode.stop_request()
     }

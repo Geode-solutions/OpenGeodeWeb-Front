@@ -20,9 +20,7 @@ export const useAppStore = defineStore("app", () => {
     let exportCount = 0
 
     for (const store of stores) {
-      if (!store.exportStores) {
-        continue
-      }
+      if (!store.exportStores) continue
       const storeId = store.$id
       try {
         snapshot[storeId] = store.exportStores()
@@ -31,7 +29,10 @@ export const useAppStore = defineStore("app", () => {
         console.error(`[AppStore] Error exporting store "${storeId}":`, error)
       }
     }
-    console.log(`[AppStore] Exported ${exportCount} stores`)
+    console.log(
+      `[AppStore] Exported ${exportCount} stores; snapshot keys:`,
+      Object.keys(snapshot),
+    )
     return snapshot
   }
 
@@ -40,6 +41,11 @@ export const useAppStore = defineStore("app", () => {
       console.warn("[AppStore] import called with invalid snapshot")
       return
     }
+    console.log(
+      "[AppStore] Import snapshot keys:",
+      Object.keys(snapshot || {}),
+    )
+
     let importedCount = 0
     const notFoundStores = []
     for (const store of stores) {

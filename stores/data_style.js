@@ -71,7 +71,37 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function importStores(snapshot) {
-    dataStyleState.styles = snapshot?.styles || {}
+    const stylesSnapshot = snapshot?.styles || {}
+    console.log("[DataStyle] importStores snapshot ids:", Object.keys(stylesSnapshot))
+
+    for (const id of Object.keys(dataStyleState.styles)) {
+      delete dataStyleState.styles[id]
+    }
+    for (const [id, style] of Object.entries(stylesSnapshot)) {
+      dataStyleState.styles[id] = style
+    }
+  }
+
+  async function applyAllStylesFromState() {
+    const ids = Object.keys(dataStyleState.styles || {})
+    console.log("[DataStyle] applyAllStylesFromState ids:", ids)
+    const applyTasks = []
+    for (const id of ids) {
+      const meta = dataBaseStore.itemMetaDatas(id)
+      const objectType = meta?.object_type
+      const style = dataStyleState.styles[id]
+      if (!style) {
+        console.warn("[DataStyle] No style for id:", id, "skip")
+        continue
+      }
+      if (objectType === "mesh") {
+        applyTasks.push(Promise.all(meshStyleStore.applyMeshDefaultStyle(id)))
+      } else if (objectType === "model") {
+        applyTasks.push(modelStyleStore.applyModelDefaultStyle(id))
+      }
+    }
+    await Promise.all(applyTasks)
+    console.log("[DataStyle] applyAllStylesFromState finished")
   }
 
   return {
@@ -82,6 +112,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     modelEdgesVisibility,
     exportStores,
     importStores,
+    applyAllStylesFromState,
     ...meshStyleStore,
     ...modelStyleStore,
   }

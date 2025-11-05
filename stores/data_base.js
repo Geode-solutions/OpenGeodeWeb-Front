@@ -69,7 +69,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       id,
       value.object_type,
     )
-
     hybridViewerStore.addItem(id, value.vtk_js)
   }
 
@@ -77,9 +76,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     await api_fetch(
       {
         schema: back_schemas.opengeodeweb_back.models.mesh_components,
-        params: {
-          id,
-        },
+        params: { id },
       },
       {
         response_function: async (response) => {
@@ -105,6 +102,18 @@ export const useDataBaseStore = defineStore("dataBase", () => {
         },
       },
     )
+  }
+
+  async function importStores(snapshot) {
+    const entries = snapshot?.db || {}
+    const hybrid_store = useHybridViewerStore()
+    await hybrid_store.initHybridViewer()
+    hybrid_store.clear()
+    console.log("[DataBase] importStores entries:", Object.keys(entries))
+    for (const [id, item] of Object.entries(entries)) {
+      await registerObject(id)
+      await addItem(id, item)
+    }
   }
 
   function getCornersUuids(id) {
