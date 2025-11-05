@@ -73,6 +73,7 @@ async function run_script(
     const command = commandExistsSync(executable_name)
       ? executable_name
       : path.join(executable_path, executable_name)
+    console.log("run_script", command, args)
     const child = child_process.spawn(command, args, {
       encoding: "utf8",
       shell: true,
