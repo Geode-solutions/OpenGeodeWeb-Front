@@ -41,10 +41,7 @@ export const useAppStore = defineStore("app", () => {
       console.warn("[AppStore] import called with invalid snapshot")
       return
     }
-    console.log(
-      "[AppStore] Import snapshot keys:",
-      Object.keys(snapshot || {}),
-    )
+    console.log("[AppStore] Import snapshot keys:", Object.keys(snapshot || {}))
 
     let importedCount = 0
     const notFoundStores = []

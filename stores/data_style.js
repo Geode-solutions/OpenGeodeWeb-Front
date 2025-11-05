@@ -72,7 +72,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function importStores(snapshot) {
     const stylesSnapshot = snapshot?.styles || {}
-    console.log("[DataStyle] importStores snapshot ids:", Object.keys(stylesSnapshot))
+    console.log(
+      "[DataStyle] importStores snapshot ids:",
+      Object.keys(stylesSnapshot),
+    )
 
     for (const id of Object.keys(dataStyleState.styles)) {
       delete dataStyleState.styles[id]
