@@ -118,7 +118,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         params,
       },
       {
-        response_fonction: () => {
+        response_function: () => {
           for (const key in params.camera_options) {
             camera_options[key] = params.camera_options[key]
           }

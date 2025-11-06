@@ -73,18 +73,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       await fetchMeshComponents(id)
       await fetchUuidToFlatIndexDict(id)
     }
-
-    treeviewStore.addItem(
-      value.geode_object,
-      value.displayed_name,
-      id,
-      value.object_type,
-    )
-    console.log("[DataBase] addItem -> treeview.addItem done", id)
-
-    console.log("[DataBase] addItem -> hybridViewer.addItem start", id)
-    await hybridViewerStore.addItem(id)
-    console.log("[DataBase] addItem -> hybridViewer.addItem done", id)
   }
 
   async function fetchMeshComponents(id) {
