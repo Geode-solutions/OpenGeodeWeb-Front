@@ -14,44 +14,37 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)
   }
 
-  // useDataStyleStore: setVisibility
-  function setVisibility(payloadOrId, visibility) {
-    const id =
-      typeof payloadOrId === "string"
-        ? payloadOrId
-        : (payloadOrId?.id ?? payloadOrId?.data_id ?? payloadOrId?.model_id)
-    if (!id) return Promise.resolve([])
-
-    const visible =
-      typeof visibility === "boolean"
-        ? visibility
-        : payloadOrId?.visible != null
-          ? !!payloadOrId.visible
-          : true
-
+  function setVisibility(id, visibility) {
     const meta = dataBaseStore.itemMetaDatas(id)
-    const object_type = meta?.object_type
-    if (!object_type) return Promise.resolve([])
-
+    if (!meta) {
+      console.warn("[DataStyle] setVisibility skipped: unknown id", id)
+      return Promise.resolve([])
+    }
+    const object_type = meta.object_type
     if (object_type === "mesh") {
       return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
     } else if (object_type === "model") {
       return Promise.all([modelStyleStore.setModelVisibility(id, visibility)])
     }
+    throw new Error("Unknown object_type")
+  }
+
+  function applyDefaultStyle(id) {
+    const { object_type } = dataBaseStore.itemMetaDatas(id)
+    if (object_type === "mesh") {
+      return meshStyleStore.applyMeshStyle(id)
+    } else if (object_type === "model") {
+      return modelStyleStore.applyModelStyle(id)
+    }
     return Promise.resolve([])
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    modelStyleStore.setModelMeshComponentVisibility(
-      id,
-      "Edge",
-      null,
-      visibility,
-    )
+    return modelStyleStore.setModelEdgesVisibility(id, visibility)
   }
 
   function modelEdgesVisibility(id) {
-    return modelStyleStore.modelMeshComponentVisibility(id, "Edge", null)
+    return modelStyleStore.modelEdgesVisibility(id)
   }
 
   function exportStores() {
@@ -84,6 +77,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   return {
     ...dataStyleState,
+    ...meshStyleStore,
+    ...modelStyleStore,
     addDataStyle,
     applyDefaultStyle,
     setVisibility,
@@ -91,10 +86,6 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     modelEdgesVisibility,
     exportStores,
     importStores,
-    ...meshStyleStore,
-    ...modelStyleStore,
-    addDataStyle,
-    applyDefaultStyle,
-    setVisibility,
+    applyAllStylesFromState,
   }
 })

@@ -199,98 +199,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function exportStores() {
-    const cam =
-      Object.keys(camera_options).length > 0
-        ? { ...camera_options }
-        : (() => {
-            if (!genericRenderWindow.value || status.value !== Status.CREATED) {
-              return undefined
-            }
-            const renderer = genericRenderWindow.value.getRenderer()
-            const camera = renderer.getActiveCamera()
-            return {
-              focal_point: camera.getFocalPoint(),
-              view_up: camera.getViewUp(),
-              position: camera.getPosition(),
-              view_angle: camera.getViewAngle(),
-              clipping_range: camera.getClippingRange(),
-              distance: camera.getDistance(),
-              // Ajouts pour style et zoom corrects
-              parallel_projection:
-                typeof camera.getParallelProjection === "function"
-                  ? camera.getParallelProjection()
-                  : undefined,
-              parallel_scale:
-                typeof camera.getParallelScale === "function"
-                  ? camera.getParallelScale()
-                  : undefined,
-              roll:
-                typeof camera.getRoll === "function"
-                  ? camera.getRoll()
-                  : undefined,
-            }
-          })()
-    return { zScale: zScale.value, camera_options: cam }
+    return { zScale: zScale.value }
   }
 
   async function importStores(snapshot) {
     const z_scale = snapshot?.zScale
     if (z_scale != null) {
       await setZScaling(z_scale)
-    }
-
-    const cam = snapshot?.camera_options
-    if (cam && genericRenderWindow.value && status.value === Status.CREATED) {
-      const renderer = genericRenderWindow.value.getRenderer()
-      const camera = renderer.getActiveCamera()
-
-      // Appliquer après que la scène soit prête (évite les reset ultérieurs)
-      await new Promise((resolve) => requestAnimationFrame(resolve))
-
-      // Mode de projection et zoom
-      if (
-        cam.parallel_projection !== undefined &&
-        typeof camera.setParallelProjection === "function"
-      ) {
-        camera.setParallelProjection(!!cam.parallel_projection)
-      }
-
-      // Pose / orientation
-      if (cam.focal_point) camera.setFocalPoint(...cam.focal_point)
-      if (cam.view_up) camera.setViewUp(...cam.view_up)
-      if (cam.position) camera.setPosition(...cam.position)
-
-      // Zoom selon le mode
-      if (
-        typeof camera.getParallelProjection === "function" &&
-        camera.getParallelProjection() &&
-        cam.parallel_scale !== undefined &&
-        typeof camera.setParallelScale === "function"
-      ) {
-        camera.setParallelScale(cam.parallel_scale)
-      } else if (cam.view_angle != null) {
-        camera.setViewAngle(cam.view_angle)
-      }
-
-      // Roll (si dispo)
-      if (cam.roll != null && typeof camera.setRoll === "function") {
-        camera.setRoll(cam.roll)
-      }
-
-      // Clipping et rendu
-      if (cam.clipping_range) camera.setClippingRange(...cam.clipping_range)
-      if (typeof camera.modified === "function") camera.modified()
-      renderer.resetCameraClippingRange()
-      genericRenderWindow.value.getRenderWindow().render()
-
-      // Sync côté viewer distant (si schéma présent)
-      const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.update_camera
-      if (schema) {
-        await viewer_call({
-          schema,
-          params: { camera_options: cam },
-        })
-      }
     }
   }
 
