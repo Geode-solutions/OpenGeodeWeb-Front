@@ -49,7 +49,10 @@ export function useProjectManager() {
       })
 
       const snapshot = result?.snapshot ?? {}
-      console.log("[ProjectManager] snapshot keys:", Object.keys(snapshot || {}))
+      console.log(
+        "[ProjectManager] snapshot keys:",
+        Object.keys(snapshot || {}),
+      )
 
       await viewer_call({
         schema: viewer_schemas.opengeodeweb_viewer.import_project,

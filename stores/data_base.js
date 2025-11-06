@@ -47,7 +47,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       params: { id },
     })
   }
-  
+
   const treeviewStore = useTreeviewStore()
   const hybridViewerStore = useHybridViewerStore()
 
@@ -139,7 +139,10 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   async function importStores(snapshot) {
     await hybridViewerStore.initHybridViewer()
     hybridViewerStore.clear()
-    console.log("[DataBase] importStores entries:", Object.keys(snapshot?.db || {}))
+    console.log(
+      "[DataBase] importStores entries:",
+      Object.keys(snapshot?.db || {}),
+    )
     for (const [id, item] of Object.entries(snapshot?.db || {})) {
       await registerObject(id)
       await addItem(id, item)
@@ -187,7 +190,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
-    exportStores,   // maintenant défini
+    exportStores, // maintenant défini
     importStores,
   }
 })
