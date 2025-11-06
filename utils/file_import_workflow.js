@@ -17,8 +17,8 @@ async function importWorkflow(files) {
 async function importFile(filename, geode_object) {
   const dataBaseStore = useDataBaseStore()
   const dataStyleStore = useDataStyleStore()
-  const treeviewStore = useTreeviewStore()
   const hybridViewerStore = useHybridViewerStore()
+  const treeviewStore = useTreeviewStore()
   const { data } = await api_fetch({
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
     params: {
@@ -45,26 +45,37 @@ async function importFile(filename, geode_object) {
 
   await dataBaseStore.registerObject(id)
   await dataBaseStore.addItem(id, {
-    object_type,
-    geode_object,
+    object_type: object_type,
+    geode_object: geode_object,
     native_filename: native_file_name,
     viewable_filename: viewable_file_name,
     displayed_name: name,
-    vtk_js: { binary_light_viewable },
+    vtk_js: {
+      binary_light_viewable,
+    },
   })
 
   await treeviewStore.addItem(geode_object, name, id, object_type)
-  await hybridViewerStore.addItem(id)
 
-  await dataStyleStore.addDataStyle(id, geode_object, object_type)
-  if (object_type === "model") {
+  console.log("after treeviewStore.addItem")
+
+  await hybridViewerStore.addItem(id)
+  console.log("after dataBaseStore.addItem")
+
+  await dataStyleStore.addDataStyle(
+    data._value.id,
+    data._value.geode_object,
+    data._value.object_type,
+  )
+  if (data._value.object_type === "model") {
     await Promise.all([
       dataBaseStore.fetchMeshComponents(id),
       dataBaseStore.fetchUuidToFlatIndexDict(id),
     ])
   }
   await dataStyleStore.applyDefaultStyle(id)
-  return id
+  console.log("after dataStyleStore.applyDefaultStyle")
+  return data._value.id
 }
 
 async function importWorkflowFromSnapshot(items) {
