@@ -248,8 +248,10 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       await new Promise((resolve) => requestAnimationFrame(resolve))
 
       // Mode de projection et zoom
-      if (cam.parallel_projection !== undefined &&
-          typeof camera.setParallelProjection === "function") {
+      if (
+        cam.parallel_projection !== undefined &&
+        typeof camera.setParallelProjection === "function"
+      ) {
         camera.setParallelProjection(!!cam.parallel_projection)
       }
 
@@ -259,10 +261,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       if (cam.position) camera.setPosition(...cam.position)
 
       // Zoom selon le mode
-      if (typeof camera.getParallelProjection === "function" &&
-          camera.getParallelProjection() &&
-          cam.parallel_scale !== undefined &&
-          typeof camera.setParallelScale === "function") {
+      if (
+        typeof camera.getParallelProjection === "function" &&
+        camera.getParallelProjection() &&
+        cam.parallel_scale !== undefined &&
+        typeof camera.setParallelScale === "function"
+      ) {
         camera.setParallelScale(cam.parallel_scale)
       } else if (cam.view_angle != null) {
         camera.setViewAngle(cam.view_angle)
@@ -280,8 +284,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       genericRenderWindow.value.getRenderWindow().render()
 
       // Sync côté viewer distant (si schéma présent)
-      const schema =
-        viewer_schemas?.opengeodeweb_viewer?.viewer?.update_camera
+      const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.update_camera
       if (schema) {
         await viewer_call({
           schema,
