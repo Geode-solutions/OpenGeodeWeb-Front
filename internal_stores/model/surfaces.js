@@ -83,7 +83,9 @@ export function useModelSurfacesStyle() {
 
     const promises = []
     if (typeof style?.visibility === "boolean") {
-      promises.push(setModelSurfacesVisibility(id, surface_ids, style.visibility))
+      promises.push(
+        setModelSurfacesVisibility(id, surface_ids, style.visibility),
+      )
     }
     if (style?.color) {
       promises.push(setModelSurfacesColor(id, surface_ids, style.color))
