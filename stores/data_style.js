@@ -15,11 +15,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   function setVisibility(id, visibility) {
-    console.log(
-      "dataBaseStore.itemMetaDatas(id)",
-      dataBaseStore.itemMetaDatas(id),
-    )
-    const object_type = dataBaseStore.itemMetaDatas(id).object_type
+    const meta = dataBaseStore.itemMetaDatas(id)
+    if (!meta) {
+      console.warn("[DataStyle] setVisibility skipped: unknown id", id)
+      return Promise.resolve([])
+    }
+    const object_type = meta.object_type
     if (object_type === "mesh") {
       return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
     } else if (object_type === "model") {
@@ -33,18 +34,13 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     if (object_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id)
     } else if (object_type === "model") {
-      return Promise.all([modelStyleStore.setModelVisibility(id, visible)])
+      return modelStyleStore.applyModelStyle(id)
     }
     return Promise.resolve([])
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    modelStyleStore.setModelMeshComponentVisibility(
-      id,
-      "Edge",
-      null,
-      visibility,
-    )
+    modelStyleStore.setModelMeshComponentVisibility(id, "Edge", null, visibility)
   }
 
   function modelEdgesVisibility(id) {
@@ -57,52 +53,25 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function importStores(snapshot) {
     const stylesSnapshot = snapshot?.styles || {}
-    console.log(
-      "[DataStyle] importStores snapshot ids:",
-      Object.keys(stylesSnapshot),
-    )
-
-    // Conserver la référence réactive -> clear + merge
-    for (const id of Object.keys(dataStyleState.styles))
-      delete dataStyleState.styles[id]
+    for (const id of Object.keys(dataStyleState.styles)) delete dataStyleState.styles[id]
     for (const [id, style] of Object.entries(stylesSnapshot)) {
       dataStyleState.styles[id] = style
     }
-    console.log(
-      "[DataStyle] importStores merged ids:",
-      Object.keys(dataStyleState.styles),
-    )
   }
 
   async function applyAllStylesFromState() {
     const ids = Object.keys(dataStyleState.styles || {})
-    console.log("[DataStyle] applyAllStylesFromState start ids:", ids)
-
-    // Séquentiel par id pour mieux tracer et éviter les courses
     for (const id of ids) {
       const meta = dataBaseStore.itemMetaDatas(id)
       const objectType = meta?.object_type
       const style = dataStyleState.styles[id]
-      if (!style || !objectType) {
-        console.warn("[DataStyle] applyAllStylesFromState skip:", {
-          id,
-          hasStyle: !!style,
-          objectType,
-        })
-        continue
-      }
-      console.log("[DataStyle] applyAllStylesFromState applying:", {
-        id,
-        objectType,
-      })
+      if (!style || !objectType) continue
       if (objectType === "mesh") {
-        await meshStyleStore.applyMeshDefaultStyle(id)
+        await meshStyleStore.applyMeshStyle(id)
       } else if (objectType === "model") {
-        await modelStyleStore.applyModelDefaultStyle(id)
+        await modelStyleStore.applyModelStyle(id)
       }
-      console.log("[DataStyle] applyAllStylesFromState applied:", id)
     }
-    console.log("[DataStyle] applyAllStylesFromState finished")
   }
 
   return {
@@ -112,5 +81,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     addDataStyle,
     applyDefaultStyle,
     setVisibility,
+    setModelEdgesVisibility,
+    modelEdgesVisibility,
+    exportStores,
+    importStores,
+    applyAllStylesFromState,
   }
 })

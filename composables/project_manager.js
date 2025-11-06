@@ -37,23 +37,19 @@ export function useProjectManager() {
 
       const infra = useInfraStore()
       await infra.create_connection()
+      const schemaImport = back_schemas.opengeodeweb_back.import_project || {}
 
       const form = new FormData()
-      form.append("file", file, file.name || "project.zip")
+      form.append("file", file, file?.name || "project.zip")
 
-      const importPath =
-        back_schemas.opengeodeweb_back.import_project?.$id ||
-        "opengeodeweb_back/import_project"
-
-      const result = await $fetch(importPath, {
+      const result = await $fetch(schemaImport.$id, {
         baseURL: geode.base_url,
         method: "POST",
         body: form,
       })
-      console.log(
-        "[ProjectManager] snapshot keys:",
-        Object.keys(result?.snapshot || {}),
-      )
+
+      const snapshot = result?.snapshot ?? {}
+      console.log("[ProjectManager] snapshot keys:", Object.keys(snapshot || {}))
 
       await viewer_call({
         schema: viewer_schemas.opengeodeweb_viewer.import_project,
@@ -68,13 +64,14 @@ export function useProjectManager() {
       treeviewStore.isImporting = true
       console.log("[ProjectManager] isImporting = true")
 
-      await appStore.importStores(result.snapshot)
+      await appStore.importStores(snapshot)
       console.log("[ProjectManager] stores imported")
 
       const dataStyleStore = useDataStyleStore()
       await dataStyleStore.applyAllStylesFromState()
       console.log("[ProjectManager] styles applied")
 
+      treeviewStore.finalizeImportSelection()
       treeviewStore.isImporting = false
       console.log("[ProjectManager] isImporting = false")
     } finally {

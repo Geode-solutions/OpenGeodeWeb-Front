@@ -47,6 +47,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       params: { id },
     })
   }
+  
+  const treeviewStore = useTreeviewStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   async function addItem(
     id,
@@ -71,7 +74,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       await fetchUuidToFlatIndexDict(id)
     }
 
-    treeview_store.addItem(
+    treeviewStore.addItem(
       value.geode_object,
       value.displayed_name,
       id,
@@ -80,8 +83,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     console.log("[DataBase] addItem -> treeview.addItem done", id)
 
     console.log("[DataBase] addItem -> hybridViewer.addItem start", id)
-    // Ajout viewer (potentiellement asynchrone)
-    await hybridViewerStore.addItem(id, value.vtk_js)
+    await hybridViewerStore.addItem(id)
     console.log("[DataBase] addItem -> hybridViewer.addItem done", id)
   }
 
@@ -116,13 +118,29 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     )
   }
 
+  function exportStores() {
+    const snapshotDb = {}
+    for (const [id, item] of Object.entries(db)) {
+      if (!item) continue
+      snapshotDb[id] = {
+        object_type: item.object_type,
+        geode_object: item.geode_object,
+        native_filename: item.native_filename,
+        viewable_filename: item.viewable_filename,
+        displayed_name: item.displayed_name,
+        vtk_js: {
+          binary_light_viewable: item?.vtk_js?.binary_light_viewable,
+        },
+      }
+    }
+    return { db: snapshotDb }
+  }
+
   async function importStores(snapshot) {
-    const entries = snapshot?.db || {}
-    const hybrid_store = useHybridViewerStore()
-    await hybrid_store.initHybridViewer()
-    hybrid_store.clear()
-    console.log("[DataBase] importStores entries:", Object.keys(entries))
-    for (const [id, item] of Object.entries(entries)) {
+    await hybridViewerStore.initHybridViewer()
+    hybridViewerStore.clear()
+    console.log("[DataBase] importStores entries:", Object.keys(snapshot?.db || {}))
+    for (const [id, item] of Object.entries(snapshot?.db || {})) {
       await registerObject(id)
       await addItem(id, item)
     }
@@ -169,7 +187,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
-    exportStores,
+    exportStores,   // maintenant défini
     importStores,
   }
 })
