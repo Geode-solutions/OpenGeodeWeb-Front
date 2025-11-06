@@ -1,4 +1,7 @@
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local constants
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 
 export function useMeshPointsStyle() {
@@ -19,7 +22,9 @@ export function useMeshPointsStyle() {
         response_function: () => {
           points_style.visibility = visibility
           console.log(
-            `${setMeshPointsVisibility.name} ${id} ${meshPointsVisibility(id)}`,
+            setMeshPointsVisibility.name,
+            { id },
+            meshPointsVisibility(id),
           )
         },
       },
@@ -33,13 +38,17 @@ export function useMeshPointsStyle() {
     const coloring = meshPointsStyle(id).coloring
     coloring.active = type
     console.log(
-      `${setMeshPointsActiveColoring.name} ${id} ${meshPointsActiveColoring(id)}`,
+      setMeshPointsActiveColoring.name,
+      { id },
+      meshPointsActiveColoring(id),
     )
     if (type == "color") {
       return dataStyleStore.setMeshPointsColor(id, coloring.color)
     } else if (type == "vertex" && coloring.vertex !== null) {
       return dataStyleStore.setMeshPointsVertexAttribute(id, coloring.vertex)
-    } else throw new Error("Unknown points coloring type: " + type)
+    } else {
+      throw new Error("Unknown mesh points coloring type: " + type)
+    }
   }
 
   function meshPointsColor(id) {
@@ -53,7 +62,9 @@ export function useMeshPointsStyle() {
         response_function: () => {
           coloring_style.color = color
           console.log(
-            `${setMeshPointsColor.name} ${id} ${JSON.stringify(meshPointsColor(id))}`,
+            setMeshPointsColor.name,
+            { id },
+            JSON.stringify(meshPointsColor(id)),
           )
         },
       },
@@ -73,7 +84,9 @@ export function useMeshPointsStyle() {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
           console.log(
-            `${setMeshPointsVertexAttribute.name} ${id} ${meshPointsVertexAttribute(id)}`,
+            setMeshPointsVertexAttribute.name,
+            { id },
+            meshPointsVertexAttribute(id),
           )
         },
       },
@@ -84,19 +97,19 @@ export function useMeshPointsStyle() {
     return meshPointsStyle(id).size
   }
   function setMeshPointsSize(id, size) {
-    const points_style = meshPointsStyle(id)
     return viewer_call(
       { schema: mesh_points_schemas.size, params: { id, size } },
       {
         response_function: () => {
-          points_style.size = size
-          console.log(`${setMeshPointsSize.name} ${id} ${meshPointsSize(id)}`)
+          meshPointsStyle(id).size = size
+          console.log(setMeshPointsSize.name, { id }, meshPointsSize(id))
         },
       },
     )
   }
 
-  function applyMeshPointsStyle(id, style) {
+  function applyMeshPointsStyle(id) {
+    const style = meshPointsStyle(id)
     return Promise.all([
       setMeshPointsVisibility(id, style.visibility),
       setMeshPointsActiveColoring(id, style.coloring.active),
