@@ -38,13 +38,13 @@
   "overrides": {
     "vue": "latest"
   },
-  "description": "OpenSource Vue/Vuetify framework for web applications",
+  "description": "OpenSource Vue/Nuxt/Pinia/Vuetify framework for web applications",
   "type": "module",
   "version": "0.0.0",
   "main": "./nuxt.config.js",
   "dependencies": {
-    "@geode/opengeodeweb-back": "latest",
-    "@geode/opengeodeweb-viewer": "latest",
+    "@geode/opengeodeweb-back": "0.0.0",
+    "@geode/opengeodeweb-viewer": "0.0.0",
     "@kitware/vtk.js": "33.3.0",
     "@mdi/font": "7.4.47",
     "@pinia/nuxt": "0.5.4",
@@ -59,10 +59,10 @@
     "pinia": "3.0.3",
     "sass": "1.87.0",
     "semver": "7.7.1",
-    "tree-kill": "1.2.2",
     "uuid": "11.1.0",
     "vue3-carousel": "0.3.4",
     "vuetify": "3.8.12",
+    "ws": "8.18.3",
     "wslink": "1.12.4"
   },
   "repository": {

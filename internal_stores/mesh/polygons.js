@@ -1,106 +1,85 @@
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+// Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 
 export function useMeshPolygonsStyle() {
-  /** State **/
   const dataStyleStore = useDataStyleStore()
 
-  /** Getters **/
-  function polygonsVisibility(id) {
-    return dataStyleStore.styles[id].polygons.visibility
-  }
-  function polygonsActiveColoring(id) {
-    return dataStyleStore.styles[id].polygons.coloring.active
-  }
-  function polygonsColor(id) {
-    return dataStyleStore.styles[id].polygons.coloring.color
-  }
-  function polygonsTextures(id) {
-    return dataStyleStore.styles[id].polygons.coloring.textures
-  }
-  function polygonsPolygonAttribute(id) {
-    return dataStyleStore.styles[id].polygons.coloring.polygon
-  }
-  function polygonsVertexAttribute(id) {
-    return dataStyleStore.styles[id].polygons.coloring.vertex
+  function meshPolygonsStyle(id) {
+    return dataStyleStore.getStyle(id).polygons
   }
 
-  /** Actions **/
-  function setPolygonsVisibility(id, visibility) {
+  function meshPolygonsVisibility(id) {
+    return meshPolygonsStyle(id).visibility
+  }
+  function setMeshPolygonsVisibility(id, visibility) {
+    const polygons_style = meshPolygonsStyle(id)
     return viewer_call(
-      {
-        schema: mesh_polygons_schemas.visibility,
-        params: { id, visibility },
-      },
+      { schema: mesh_polygons_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.visibility = visibility
+          polygons_style.visibility = visibility
           console.log(
-            "setPolygonsVisibility",
-            dataStyleStore.styles[id].polygons.visibility,
+            setMeshPolygonsVisibility.name,
+            { id },
+            meshPolygonsVisibility(id),
           )
         },
       },
     )
   }
-  function setPolygonsActiveColoring(id, type) {
-    console.log("setPolygonsActiveColoring", id, type)
-    if (type == "color") {
-      setPolygonsColor(id, dataStyleStore.styles[id].polygons.coloring.color)
-    } else if (type == "textures") {
-      const textures = dataStyleStore.styles[id].polygons.coloring.textures
-      if (textures !== null) setPolygonsTextures(id, textures)
-    } else if (type == "vertex") {
-      const vertex = dataStyleStore.styles[id].polygons.coloring.vertex
-      if (vertex !== null) {
-        console.log("vertex", vertex)
-        setPolygonsVertexAttribute(id, vertex)
-      }
-    } else if (type == "polygon") {
-      const polygon = dataStyleStore.styles[id].polygons.coloring.polygon
-      if (polygon !== null) setPolygonsPolygonAttribute(id, polygon)
-    } else throw new Error("Unknown polygons coloring type: " + type)
-    dataStyleStore.styles[id].polygons.coloring.active = type
-    console.log(
-      "setPolygonsActiveColoring",
-      dataStyleStore.styles[id].polygons.coloring.active,
-    )
+
+  function meshPolygonsColor(id) {
+    return meshPolygonsStyle(id).coloring.color
   }
-  function setPolygonsColor(id, color) {
+  function setMeshPolygonsColor(id, color) {
+    const coloring_style = meshPolygonsStyle(id).coloring
     return viewer_call(
-      {
-        schema: mesh_polygons_schemas.color,
-        params: { id, color },
-      },
+      { schema: mesh_polygons_schemas.color, params: { id, color } },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.coloring.color = color
+          coloring_style.color = color
           console.log(
-            "setPolygonsColor",
-            dataStyleStore.styles[id].polygons.coloring.color,
+            setMeshPolygonsColor.name,
+            { id },
+            JSON.stringify(meshPolygonsColor(id)),
           )
         },
       },
     )
   }
-  function setPolygonsTextures(id, textures) {
+
+  function meshPolygonsTextures(id) {
+    return meshPolygonsStyle(id).coloring.textures
+  }
+  function setMeshPolygonsTextures(id, textures) {
+    const coloring_style = meshPolygonsStyle(id).coloring
     return viewer_call(
       {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.apply_textures,
+        schema: mesh_polygons_schemas.apply_textures,
         params: { id, textures },
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.coloring.textures = textures
+          coloring_style.textures = textures
           console.log(
-            "setPolygonsTextures",
-            dataStyleStore.styles[id].polygons.coloring.textures,
+            setMeshPolygonsTextures.name,
+            { id },
+            meshPolygonsTextures(id),
           )
         },
       },
     )
   }
-  function setPolygonsVertexAttribute(id, vertex_attribute) {
+
+  function meshPolygonsVertexAttribute(id) {
+    return meshPolygonsStyle(id).coloring.vertex
+  }
+
+  function setMeshPolygonsVertexAttribute(id, vertex_attribute) {
+    const coloring_style = meshPolygonsStyle(id).coloring
     return viewer_call(
       {
         schema: mesh_polygons_schemas.vertex_attribute,
@@ -108,16 +87,22 @@ export function useMeshPolygonsStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.coloring.vertex = vertex_attribute
+          coloring_style.vertex = vertex_attribute
           console.log(
-            "setPolygonsVertexAttribute",
-            dataStyleStore.styles[id].polygons.coloring.vertex,
+            setMeshPolygonsVertexAttribute.name,
+            { id },
+            meshPolygonsVertexAttribute(id),
           )
         },
       },
     )
   }
-  function setPolygonsPolygonAttribute(id, polygon_attribute) {
+
+  function meshPolygonsPolygonAttribute(id) {
+    return meshPolygonsStyle(id).coloring.polygon
+  }
+  function setMeshPolygonsPolygonAttribute(id, polygon_attribute) {
+    const coloring_style = meshPolygonsStyle(id).coloring
     return viewer_call(
       {
         schema: mesh_polygons_schemas.polygon_attribute,
@@ -125,37 +110,62 @@ export function useMeshPolygonsStyle() {
       },
       {
         response_function: () => {
-          dataStyleStore.styles[id].polygons.coloring.polygon =
-            polygon_attribute
+          coloring_style.polygon = polygon_attribute
           console.log(
-            "setPolygonsPolygonAttribute",
-            dataStyleStore.styles[id].polygons.coloring.polygon,
+            setMeshPolygonsPolygonAttribute.name,
+            { id },
+            meshPolygonsPolygonAttribute(id),
           )
         },
       },
     )
   }
 
-  function applyPolygonsStyle(id, style) {
+  function meshPolygonsActiveColoring(id) {
+    return meshPolygonsStyle(id).coloring.active
+  }
+  function setMeshPolygonsActiveColoring(id, type) {
+    const coloring = meshPolygonsStyle(id).coloring
+    coloring.active = type
+    console.log(
+      setMeshPolygonsActiveColoring.name,
+      { id },
+      meshPolygonsActiveColoring(id),
+    )
+    if (type === "color") {
+      return setMeshPolygonsColor(id, coloring.color)
+    } else if (type === "textures" && coloring.textures !== null) {
+      return setMeshPolygonsTextures(id, coloring.textures)
+    } else if (type === "vertex" && coloring.vertex !== null) {
+      return setMeshPolygonsVertexAttribute(id, coloring.vertex)
+    } else if (type === "polygon" && coloring.polygon !== null) {
+      return setMeshPolygonsPolygonAttribute(id, coloring.polygon)
+    } else {
+      throw new Error("Unknown mesh polygons coloring type: " + type)
+    }
+  }
+
+  function applyMeshPolygonsStyle(id) {
+    const style = meshPolygonsStyle(id)
     return Promise.all([
-      setPolygonsVisibility(id, style.visibility),
-      setPolygonsActiveColoring(id, style.coloring.active),
+      setMeshPolygonsVisibility(id, style.visibility),
+      setMeshPolygonsActiveColoring(id, style.coloring.active),
     ])
   }
 
   return {
-    polygonsVisibility,
-    polygonsActiveColoring,
-    polygonsColor,
-    polygonsTextures,
-    polygonsPolygonAttribute,
-    polygonsVertexAttribute,
-    setPolygonsVisibility,
-    setPolygonsActiveColoring,
-    setPolygonsColor,
-    setPolygonsTextures,
-    setPolygonsVertexAttribute,
-    setPolygonsPolygonAttribute,
-    applyPolygonsStyle,
+    meshPolygonsVisibility,
+    meshPolygonsActiveColoring,
+    meshPolygonsColor,
+    meshPolygonsTextures,
+    meshPolygonsPolygonAttribute,
+    meshPolygonsVertexAttribute,
+    setMeshPolygonsVisibility,
+    setMeshPolygonsActiveColoring,
+    setMeshPolygonsColor,
+    setMeshPolygonsTextures,
+    setMeshPolygonsVertexAttribute,
+    setMeshPolygonsPolygonAttribute,
+    applyMeshPolygonsStyle,
   }
 }

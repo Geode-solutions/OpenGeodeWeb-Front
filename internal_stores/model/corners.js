@@ -1,63 +1,98 @@
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-const corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners
 
-export function useCornersStyle() {
-  /** State **/
+// Local constants
+const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners
+
+export function useModelCornersStyle() {
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
 
-  /** Getters **/
-  function cornerVisibility(id, corner_id) {
-    return dataStyleStore.styles[id].corners[corner_id].visibility
+  function modelCornersStyle(id) {
+    return dataStyleStore.getStyle(id).corners
+  }
+  function modelCornerStyle(id, corner_id) {
+    if (!modelCornersStyle(id)[corner_id]) {
+      modelCornersStyle(id)[corner_id] = {}
+    }
+    return modelCornersStyle(id)[corner_id]
   }
 
-  /** Actions **/
-  function setCornerVisibility(id, corner_ids, visibility) {
+  function modelCornerVisibility(id, corner_id) {
+    return modelCornerStyle(id, corner_id).visibility
+  }
+
+  function saveModelCornerVisibility(id, corner_id, visibility) {
+    modelCornerStyle(id, corner_id).visibility = visibility
+  }
+  function setModelCornersVisibility(id, corner_ids, visibility) {
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
     return viewer_call(
       {
-        schema: corners_schemas.visibility,
+        schema: model_corners_schemas.visibility,
         params: { id, block_ids: corner_flat_indexes, visibility },
       },
       {
         response_function: () => {
           for (const corner_id of corner_ids) {
-            if (!dataStyleStore.styles[id].corners[corner_id])
-              dataStyleStore.styles[id].corners[corner_id] = {}
-            dataStyleStore.styles[id].corners[corner_id].visibility = visibility
+            saveModelCornerVisibility(id, corner_id, visibility)
           }
-          console.log("setCornerVisibility", corner_ids, visibility)
+          console.log(
+            setModelCornersVisibility.name,
+            { id },
+            { corner_ids },
+            modelCornerVisibility(id, corner_ids[0]),
+          )
         },
       },
     )
   }
 
-  function setCornersDefaultStyle(id) {
-    const corner_ids = dataBaseStore.getCornersUuids(id)
-    console.log(
-      "dataStyleStore.styles[id].corners.visibility",
-      dataStyleStore.styles[id].corners.visibility,
-    )
-    setCornerVisibility(
-      id,
-      corner_ids,
-      dataStyleStore.styles[id].corners.visibility,
+  function modelCornerColor(id, corner_id) {
+    return modelCornerStyle(id, corner_id).color
+  }
+
+  function saveModelCornerColor(id, corner_id, color) {
+    modelCornerStyle(id, corner_id).color = color
+  }
+
+  function setModelCornersColor(id, corner_ids, color) {
+    const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+    return viewer_call(
+      {
+        schema: model_corners_schemas.color,
+        params: { id, block_ids: corner_flat_indexes, color },
+      },
+      {
+        response_function: () => {
+          for (const corner_id of corner_ids) {
+            saveModelCornerColor(id, corner_id, color)
+          }
+          console.log(
+            setModelCornersColor.name,
+            { id },
+            { corner_ids },
+            JSON.stringify(modelCornerColor(id, corner_ids[0])),
+          )
+        },
+      },
     )
   }
 
-  function applyCornersStyle(id) {
-    const corners = dataStyleStore.styles[id].corners
-    for (const [corner_id, style] of Object.entries(corners)) {
-      setCornerVisibility(id, [corner_id], style.visibility)
-    }
+  function applyModelCornersStyle(id) {
+    const style = modelCornersStyle(id)
+    const corner_ids = dataBaseStore.getCornersUuids(id)
+    return Promise.all([
+      setModelCornersVisibility(id, corner_ids, style.visibility),
+      setModelCornersColor(id, corner_ids, style.color),
+    ])
   }
 
   return {
-    cornerVisibility,
-    setCornersDefaultStyle,
-    setCornerVisibility,
-    applyCornersStyle,
+    modelCornerVisibility,
+    modelCornerColor,
+    setModelCornersVisibility,
+    setModelCornersColor,
+    applyModelCornersStyle,
   }
 }
-
-export default useCornersStyle

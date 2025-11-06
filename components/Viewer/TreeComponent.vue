@@ -40,22 +40,42 @@
           removed_blocks,
         ] = sortMeshComponents(removed)
         if (added_corners.length > 0)
-          dataStyleStore.setCornerVisibility(props.id, added_corners, true)
+          dataStyleStore.setModelCornersVisibility(
+            props.id,
+            added_corners,
+            true,
+          )
         if (added_lines.length > 0)
-          dataStyleStore.setLineVisibility(props.id, added_lines, true)
+          dataStyleStore.setModelLinesVisibility(props.id, added_lines, true)
         if (added_surfaces.length > 0)
-          dataStyleStore.setSurfaceVisibility(props.id, added_surfaces, true)
+          dataStyleStore.setModelSurfacesVisibility(
+            props.id,
+            added_surfaces,
+            true,
+          )
         if (added_blocks.length > 0)
-          dataStyleStore.setBlockVisibility(props.id, added_blocks, true)
+          dataStyleStore.setModelBlocksVisibility(props.id, added_blocks, true)
 
         if (removed_corners.length > 0)
-          dataStyleStore.setCornerVisibility(props.id, removed_corners, false)
+          dataStyleStore.setModelCornersVisibility(
+            props.id,
+            removed_corners,
+            false,
+          )
         if (removed_lines.length > 0)
-          dataStyleStore.setLineVisibility(props.id, removed_lines, false)
+          dataStyleStore.setModelLinesVisibility(props.id, removed_lines, false)
         if (removed_surfaces.length > 0)
-          dataStyleStore.setSurfaceVisibility(props.id, removed_surfaces, false)
+          dataStyleStore.setModelSurfacesVisibility(
+            props.id,
+            removed_surfaces,
+            false,
+          )
         if (removed_blocks.length > 0)
-          dataStyleStore.setBlockVisibility(props.id, removed_blocks, false)
+          dataStyleStore.setModelBlocksVisibility(
+            props.id,
+            removed_blocks,
+            false,
+          )
       }
     },
     { immediate: true, deep: true },

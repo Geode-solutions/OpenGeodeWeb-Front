@@ -90,4 +90,14 @@
   function decrement_step() {
     stepper_tree.current_step_index--
   }
+
+  const sortedChips = computed(() => {
+    const chips = steps.value[props.step_index]?.chips || []
+    return [...chips].sort((a, b) =>
+      a.localeCompare(b, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      }),
+    )
+  })
 </script>
