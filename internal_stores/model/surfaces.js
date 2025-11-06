@@ -8,11 +8,14 @@ export function useModelSurfacesStyle() {
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
 
+  function modelSurfacesStyle(id) {
+    return dataStyleStore.getStyle(id).surfaces
+  }
   function modelSurfaceStyle(id, surface_id) {
-    if (!dataStyleStore.getStyle(id).surfaces[surface_id]) {
-      dataStyleStore.getStyle(id).surfaces[surface_id] = {}
+    if (!modelSurfacesStyle(id)[surface_id]) {
+      modelSurfacesStyle(id)[surface_id] = {}
     }
-    return dataStyleStore.getStyle(id).surfaces[surface_id]
+    return modelSurfacesStyle(id)[surface_id]
   }
 
   function modelSurfaceVisibility(id, surface_id) {
@@ -74,7 +77,7 @@ export function useModelSurfacesStyle() {
   }
 
   function applyModelSurfacesStyle(id) {
-    const style = dataStyleStore.getStyle(id).surfaces
+    const style = modelSurfacesStyle(id)
     const surface_ids = dataBaseStore.getSurfacesUuids(id)
     return Promise.all([
       setModelSurfacesVisibility(id, surface_ids, style.visibility),
