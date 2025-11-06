@@ -7,14 +7,7 @@
     "style": "error",
     "restriction": "error"
   },
-  "plugins": [
-    "import",
-    "node",
-    "oxc",
-    "promise",
-    "unicorn",
-    "vitest"
-  ],
+  "plugins": ["import", "node", "oxc", "promise", "unicorn", "vitest"],
   "rules": {
     "unicorn/filename-case": [
       "error",
@@ -33,9 +26,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "**/components/*"
-      ],
+      "files": ["**/components/*"],
       "rules": {
         "unicorn/filename-case": [
           "error",
