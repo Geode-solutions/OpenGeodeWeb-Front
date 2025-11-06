@@ -1,7 +1,7 @@
 export const useTreeviewStore = defineStore("treeview", () => {
   const dataStyleStore = useDataStyleStore()
+  const dataBaseStore = useDataBaseStore()
 
-  /** State **/
   const items = ref([])
   const selection = ref([])
   const components_selection = ref([])
@@ -11,9 +11,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const isTreeCollection = ref(false)
   const selectedTree = ref(null)
 
-  /** Functions **/
+  // /** Functions **/
   function addItem(geodeObject, displayed_name, id, object_type) {
-    dataStyleStore.addDataStyle(id, geodeObject, object_type)
     const child = { title: displayed_name, id, object_type }
 
     for (let i = 0; i < items.value.length; i++) {

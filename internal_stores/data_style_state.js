@@ -3,7 +3,12 @@ import { reactive, computed } from "vue"
 export default function useDataStyleState() {
   const styles = reactive({})
 
-  const objectVisibility = computed(() => (id) => styles[id].visibility)
+  const objectVisibility = computed(() => (id) => {
+    if (styles[id]) {
+      return styles[id].visibility
+    }
+    return false
+  })
   const selectedObjects = computed(() => {
     const selection = []
     for (const [id, value] of Object.entries(styles)) {

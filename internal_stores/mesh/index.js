@@ -7,6 +7,9 @@ import { useMeshEdgesStyle } from "./edges.js"
 import { useMeshPolygonsStyle } from "./polygons.js"
 import { useMeshPolyhedraStyle } from "./polyhedra.js"
 
+// Local constants
+const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh
+
 export default function useMeshStyle() {
   const dataStyleStore = useDataStyleStore()
   const pointsStyleStore = useMeshPointsStyle()
@@ -16,51 +19,49 @@ export default function useMeshStyle() {
   const hybridViewerStore = useHybridViewerStore()
 
   function meshVisibility(id) {
-    return dataStyleStore.styles[id].visibility
+    return dataStyleStore.getStyle(id).visibility
   }
   function setMeshVisibility(id, visibility) {
     return viewer_call(
       {
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.visibility,
+        schema: mesh_schemas.visibility,
         params: { id, visibility },
       },
       {
         response_function: () => {
           hybridViewerStore.setVisibility(id, visibility)
-          dataStyleStore.styles[id].visibility = visibility
-          console.log(`${setMeshVisibility.name} ${id} ${meshVisibility(id)}`)
+          dataStyleStore.getStyle(id).visibility = visibility
+          console.log(setMeshVisibility.name, { id }, meshVisibility(id))
         },
       },
     )
   }
 
-  function applyMeshDefaultStyle(id) {
+  function applyMeshStyle(id) {
     const style = dataStyleStore.getStyle(id)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
-      if (key == "visibility") {
+      if (key === "visibility") {
         promise_array.push(setMeshVisibility(id, value))
-      } else if (key == "points") {
-        promise_array.push(pointsStyleStore.applyMeshPointsStyle(id, value))
-      } else if (key == "edges") {
-        promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id, value))
-      } else if (key == "polygons") {
-        promise_array.push(
-          meshPolygonsStyleStore.applyMeshPolygonsStyle(id, value),
-        )
-      } else if (key == "polyhedra") {
-        promise_array.push(
-          meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id, value),
-        )
+      } else if (key === "points") {
+        promise_array.push(pointsStyleStore.applyMeshPointsStyle(id))
+      } else if (key === "edges") {
+        promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id))
+      } else if (key === "polygons") {
+        promise_array.push(meshPolygonsStyleStore.applyMeshPolygonsStyle(id))
+      } else if (key === "polyhedra") {
+        promise_array.push(meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id))
+      } else {
+        throw new Error("Unknown mesh key: " + key)
       }
     }
-    return promise_array
+    return Promise.all(promise_array)
   }
 
   return {
     meshVisibility,
     setMeshVisibility,
-    applyMeshDefaultStyle,
+    applyMeshStyle,
     ...useMeshPointsStyle(),
     ...useMeshEdgesStyle(),
     ...useMeshPolygonsStyle(),

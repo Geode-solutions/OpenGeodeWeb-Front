@@ -7,16 +7,13 @@ import { WebSocket } from "ws"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { afterAll, beforeAll, expect, vi } from "vitest"
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "~/stores/data_style"
-import { useDataBaseStore } from "~/stores/data_base"
 import { useGeodeStore } from "~/stores/geode"
 import { useViewerStore } from "~/stores/viewer"
 import { useInfraStore } from "~/stores/infra"
-import { api_fetch } from "~/composables/api_fetch"
 import { appMode } from "~/utils/app_mode"
+import { importFile } from "~/utils/file_import_workflow"
 import Status from "~/utils/status"
 import {
   executable_name,
@@ -24,60 +21,53 @@ import {
   run_back,
   run_viewer,
 } from "~/utils/local"
-import { getCurrentFolders, cleanupCreatedFolders } from "./utils.js"
 
-async function setupIntegrationTests(file_name, geode_object, object_type) {
+// Local constants
+const data_folder = path.join("tests", "integration", "data")
+
+async function setupIntegrationTests(file_name, geode_object) {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
   const geodeStore = useGeodeStore()
-  const viewerStore = useViewerStore()
+  const hybridViewerStore = useHybridViewerStore()
   const infraStore = useInfraStore()
+  const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
 
   const microservices_path = path.join("tests", "integration", "microservices")
-  const project_folder_path = path.join(__dirname, "data", uuidv4())
+  const project_folder_path = path.join(data_folder, uuidv4())
   const upload_folder_path = path.join(__dirname, "data", "uploads")
-  const back_path = path.join(
-    executable_path(path.join(microservices_path, "back")),
-    executable_name("opengeodeweb-back"),
-  )
-  const viewer_path = path.join(
-    executable_path(path.join(microservices_path, "viewer")),
-    executable_name("opengeodeweb-viewer"),
-  )
+  const back_path = executable_path(path.join(microservices_path, "back"))
+  const back_name = executable_name("opengeodeweb-back")
+  const viewer_path = executable_path(path.join(microservices_path, "viewer"))
+  const viewer_name = executable_name("opengeodeweb-viewer")
   const [back_port, viewer_port] = await Promise.all([
-    run_back(back_path, {
+    run_back(back_name, back_path, {
       project_folder_path: project_folder_path,
       upload_folder_path: upload_folder_path,
     }),
-    run_viewer(viewer_path, {
+    run_viewer(viewer_name, viewer_path, {
       project_folder_path: project_folder_path,
     }),
   ])
   console.log("back_port", back_port)
   console.log("viewer_port", viewer_port)
+
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
+  console.log("after ports")
   await viewerStore.ws_connect()
+  // await hybridViewerStore.initHybridViewer()
+  console.log("after hybridViewerStore.initHybridViewer")
 
-  const response = await api_fetch({
-    schema: back_schemas.opengeodeweb_back.save_viewable_file,
-    params: {
-      input_geode_object: geode_object,
-      filename: file_name,
-    },
-  })
-
-  const id = response.data._value.id
-  await dataBaseStore.registerObject(id)
-  await dataStyleStore.addDataStyle(id, geode_object, object_type)
+  // await viewerStore.ws_connect()
+  const id = await importFile(file_name, geode_object)
   expect(viewerStore.status).toBe(Status.CONNECTED)
-  return { id, back_port, viewer_port }
+  console.log("end of setupIntegrationTests")
+  return { id, back_port, viewer_port, project_folder_path }
 }
 
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
@@ -91,21 +81,12 @@ vi.stubGlobal("navigator", {
   },
 })
 
-let foldersBeforeTests = new Set()
-
-const data_folder = path.join("tests", "integration", "data")
 beforeAll(() => {
   global.WebSocket = WebSocket
-  foldersBeforeTests = getCurrentFolders(data_folder)
-  console.log("foldersBeforeTests", foldersBeforeTests)
 })
 
 afterAll(() => {
-  console.log("afterAll")
   delete global.WebSocket
-  setTimeout(() => {
-    cleanupCreatedFolders(data_folder, foldersBeforeTests)
-  }, 2000)
 })
 
 export { setupIntegrationTests }
