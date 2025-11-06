@@ -75,6 +75,8 @@ export default function useModelStyle() {
       return modelSurfacesStyleStore.modelSurfaceVisibility(id, component_id)
     } else if (component_type === "Block") {
       return modelBlocksStyleStore.modelBlockVisibility(id, component_id)
+    } else if (component_type === "Edge") {
+      return modelEdgesStyleStore.modelEdgesVisibility(id)
     }
     throw new Error("Unknown model component_type: " + component_type)
   }
@@ -127,6 +129,8 @@ export default function useModelStyle() {
         [component_id],
         visibility,
       )
+    } else if (component_type === "Edge") {
+      return modelEdgesStyleStore.setModelEdgesVisibility(id, visibility)
     } else {
       throw new Error("Unknown model component_type: " + component_type)
     }
