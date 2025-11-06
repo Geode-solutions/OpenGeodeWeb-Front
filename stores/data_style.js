@@ -33,10 +33,76 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     if (object_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id)
     } else if (object_type === "model") {
-      return modelStyleStore.applyModelStyle(id)
-    } else {
-      throw new Error("Unknown object_type: " + object_type)
+      return Promise.all([modelStyleStore.setModelVisibility(id, visible)])
     }
+    return Promise.resolve([])
+  }
+
+  function setModelEdgesVisibility(id, visibility) {
+    modelStyleStore.setModelMeshComponentVisibility(
+      id,
+      "Edge",
+      null,
+      visibility,
+    )
+  }
+
+  function modelEdgesVisibility(id) {
+    return modelStyleStore.modelMeshComponentVisibility(id, "Edge", null)
+  }
+
+  function exportStores() {
+    return { styles: dataStyleState.styles }
+  }
+
+  async function importStores(snapshot) {
+    const stylesSnapshot = snapshot?.styles || {}
+    console.log(
+      "[DataStyle] importStores snapshot ids:",
+      Object.keys(stylesSnapshot),
+    )
+
+    // Conserver la référence réactive -> clear + merge
+    for (const id of Object.keys(dataStyleState.styles))
+      delete dataStyleState.styles[id]
+    for (const [id, style] of Object.entries(stylesSnapshot)) {
+      dataStyleState.styles[id] = style
+    }
+    console.log(
+      "[DataStyle] importStores merged ids:",
+      Object.keys(dataStyleState.styles),
+    )
+  }
+
+  async function applyAllStylesFromState() {
+    const ids = Object.keys(dataStyleState.styles || {})
+    console.log("[DataStyle] applyAllStylesFromState start ids:", ids)
+
+    // Séquentiel par id pour mieux tracer et éviter les courses
+    for (const id of ids) {
+      const meta = dataBaseStore.itemMetaDatas(id)
+      const objectType = meta?.object_type
+      const style = dataStyleState.styles[id]
+      if (!style || !objectType) {
+        console.warn("[DataStyle] applyAllStylesFromState skip:", {
+          id,
+          hasStyle: !!style,
+          objectType,
+        })
+        continue
+      }
+      console.log("[DataStyle] applyAllStylesFromState applying:", {
+        id,
+        objectType,
+      })
+      if (objectType === "mesh") {
+        await meshStyleStore.applyMeshDefaultStyle(id)
+      } else if (objectType === "model") {
+        await modelStyleStore.applyModelDefaultStyle(id)
+      }
+      console.log("[DataStyle] applyAllStylesFromState applied:", id)
+    }
+    console.log("[DataStyle] applyAllStylesFromState finished")
   }
 
   return {
