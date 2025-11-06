@@ -82,11 +82,11 @@ export function useModelBlocksStyle() {
   function applyModelBlocksStyle(id) {
     const style = dataStyleStore.getStyle(id).blocks
     const block_ids = dataBaseStore.getBlocksUuids(id)
-  
+
     if (!block_ids || block_ids.length === 0) {
       return Promise.resolve()
     }
-  
+
     const promises = []
     if (typeof style?.visibility === "boolean") {
       promises.push(setModelBlocksVisibility(id, block_ids, style.visibility))
