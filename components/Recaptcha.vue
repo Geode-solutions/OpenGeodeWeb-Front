@@ -53,13 +53,15 @@
   const launch = ref(false)
   const emailRules = [
     (value) => {
-      if (value) return true
-
+      if (value) {
+        return true
+      }
       return "E-mail is required."
     },
     (value) => {
-      if (/.+@.+\..+/.test(value)) return true
-
+      if (/.+@.+\..+/.test(value)) {
+        return true
+      }
       return "E-mail must be valid."
     },
   ]
@@ -74,14 +76,14 @@
       }
     }
   })
-  async function submit_recaptcha() {
+  function submit_recaptcha() {
     $fetch(
       `/.netlify/functions/recaptcha?name=${name.value}&email=${email.value}&launch=${launch.value}`,
       {
         onResponse({ response }) {
           if (response.ok) {
             infra_store.$patch({
-              is_captcha_validated: response.status == 200,
+              is_captcha_validated: response.status === 200,
             })
           }
         },
