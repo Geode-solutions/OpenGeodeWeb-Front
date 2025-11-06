@@ -34,9 +34,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     if (!object_type) return Promise.resolve([])
 
     if (object_type === "mesh") {
-      return Promise.all([meshStyleStore.setMeshVisibility(id, visible)])
+      return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
     } else if (object_type === "model") {
-      return Promise.all([modelStyleStore.setModelVisibility(id, visible)])
+      return Promise.all([modelStyleStore.setModelVisibility(id, visibility)])
     }
     return Promise.resolve([])
   }
@@ -59,12 +59,33 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function importStores(snapshot) {
-    dataStyleState.styles = snapshot?.styles || {}
+    const stylesSnapshot = snapshot?.styles || {}
+    for (const id of Object.keys(dataStyleState.styles))
+      delete dataStyleState.styles[id]
+    for (const [id, style] of Object.entries(stylesSnapshot)) {
+      dataStyleState.styles[id] = style
+    }
+  }
+
+  async function applyAllStylesFromState() {
+    const ids = Object.keys(dataStyleState.styles || {})
+    for (const id of ids) {
+      const meta = dataBaseStore.itemMetaDatas(id)
+      const objectType = meta?.object_type
+      const style = dataStyleState.styles[id]
+      if (!style || !objectType) continue
+      if (objectType === "mesh") {
+        await meshStyleStore.applyMeshStyle(id)
+      } else if (objectType === "model") {
+        await modelStyleStore.applyModelStyle(id)
+      }
+    }
   }
 
   return {
     ...dataStyleState,
     addDataStyle,
+    applyDefaultStyle,
     setVisibility,
     setModelEdgesVisibility,
     modelEdgesVisibility,

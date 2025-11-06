@@ -79,10 +79,21 @@ export function useModelSurfacesStyle() {
   function applyModelSurfacesStyle(id) {
     const style = modelSurfacesStyle(id)
     const surface_ids = dataBaseStore.getSurfacesUuids(id)
-    return Promise.all([
-      setModelSurfacesVisibility(id, surface_ids, style.visibility),
-      setModelSurfacesColor(id, surface_ids, style.color),
-    ])
+
+    if (!surface_ids || surface_ids.length === 0) {
+      return Promise.resolve()
+    }
+
+    const promises = []
+    if (typeof style?.visibility === "boolean") {
+      promises.push(
+        setModelSurfacesVisibility(id, surface_ids, style.visibility),
+      )
+    }
+    if (style?.color) {
+      promises.push(setModelSurfacesColor(id, surface_ids, style.color))
+    }
+    return Promise.all(promises)
   }
 
   return {

@@ -48,6 +48,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     })
   }
 
+  const treeviewStore = useTreeviewStore()
+  const hybridViewerStore = useHybridViewerStore()
+
   async function addItem(
     id,
     value = {
@@ -59,7 +62,17 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       vtk_js: { binary_light_viewable },
     },
   ) {
+    console.log("[DataBase] addItem start", {
+      id,
+      object_type: value.object_type,
+      geode_object: value.geode_object,
+    })
     db[id] = value
+
+    if (value.object_type === "model") {
+      await fetchMeshComponents(id)
+      await fetchUuidToFlatIndexDict(id)
+    }
   }
 
   async function fetchMeshComponents(id) {
@@ -93,6 +106,37 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     )
   }
 
+  function exportStores() {
+    const snapshotDb = {}
+    for (const [id, item] of Object.entries(db)) {
+      if (!item) continue
+      snapshotDb[id] = {
+        object_type: item.object_type,
+        geode_object: item.geode_object,
+        native_filename: item.native_filename,
+        viewable_filename: item.viewable_filename,
+        displayed_name: item.displayed_name,
+        vtk_js: {
+          binary_light_viewable: item?.vtk_js?.binary_light_viewable,
+        },
+      }
+    }
+    return { db: snapshotDb }
+  }
+
+  async function importStores(snapshot) {
+    await hybridViewerStore.initHybridViewer()
+    hybridViewerStore.clear()
+    console.log(
+      "[DataBase] importStores entries:",
+      Object.keys(snapshot?.db || {}),
+    )
+    for (const [id, item] of Object.entries(snapshot?.db || {})) {
+      await registerObject(id)
+      await addItem(id, item)
+    }
+  }
+
   function getCornersUuids(id) {
     const { mesh_components } = itemMetaDatas(id)
     return Object.values(mesh_components["Corner"])
@@ -118,21 +162,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       flat_indexes.push(uuid_to_flat_index[mesh_component_id])
     }
     return flat_indexes
-  }
-
-  function exportStores() {
-    return { db: JSON.parse(JSON.stringify(db)) }
-  }
-
-  async function importStores(snapshot) {
-    const entries = snapshot?.db || {}
-    const hybrid_store = useHybridViewerStore()
-    await hybrid_store.initHybridViewer()
-    hybrid_store.clear()
-    for (const [id, item] of Object.entries(entries)) {
-      await registerObject(id)
-      await addItem(id, item)
-    }
   }
 
   return {

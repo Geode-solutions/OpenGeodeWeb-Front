@@ -33,21 +33,18 @@ export function useProjectManager() {
   async function importProjectFile(file) {
     geode.start_request()
     try {
-      const infra = useInfraStore()
-      await infra.create_connection()
+      await useInfraStore().create_connection()
 
+      const schemaImport = back_schemas.opengeodeweb_back.import_project
       const form = new FormData()
-      form.append("file", file, file.name || "project.zip")
+      form.append("file", file, file?.name)
 
-      const importPath =
-        back_schemas.opengeodeweb_back.import_project?.$id ||
-        "opengeodeweb_back/import_project"
-
-      const result = await $fetch(importPath, {
+      const result = await $fetch(schemaImport.$id, {
         baseURL: geode.base_url,
         method: "POST",
         body: form,
       })
+      const snapshot = result?.snapshot ?? {}
 
       await viewer_call({
         schema: viewer_schemas.opengeodeweb_viewer.import_project,
@@ -58,12 +55,32 @@ export function useProjectManager() {
         params: {},
       })
 
-      // const dataBaseStore = useDataBaseStore()
       const treeviewStore = useTreeviewStore()
       treeviewStore.isImporting = true
+      await treeviewStore.importStores(snapshot?.treeview)
 
-      await appStore.importStores(result.snapshot)
+      const hybridViewerStore = useHybridViewerStore()
+      await hybridViewerStore.initHybridViewer()
+      hybridViewerStore.clear()
 
+      const snapshotDataBase = snapshot?.dataBase?.db || {}
+      const items = Object.entries(snapshotDataBase).map(([id, item]) => ({
+        id,
+        object_type: item.object_type,
+        geode_object: item.geode_object,
+        native_filename: item.native_filename,
+        viewable_filename: item.viewable_filename,
+        displayed_name: item.displayed_name,
+        vtk_js: { binary_light_viewable: item?.vtk_js?.binary_light_viewable },
+      }))
+
+      await importWorkflowFromSnapshot(items)
+
+      const dataStyleStore = useDataStyleStore()
+      await dataStyleStore.importStores(snapshot?.dataStyle)
+      await dataStyleStore.applyAllStylesFromState()
+
+      treeviewStore.finalizeImportSelection()
       treeviewStore.isImporting = false
     } finally {
       geode.stop_request()
