@@ -40,7 +40,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    modelStyleStore.setModelMeshComponentVisibility(id, "Edge", null, visibility)
+    modelStyleStore.setModelMeshComponentVisibility(
+      id,
+      "Edge",
+      null,
+      visibility,
+    )
   }
 
   function modelEdgesVisibility(id) {
@@ -53,7 +58,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function importStores(snapshot) {
     const stylesSnapshot = snapshot?.styles || {}
-    for (const id of Object.keys(dataStyleState.styles)) delete dataStyleState.styles[id]
+    for (const id of Object.keys(dataStyleState.styles))
+      delete dataStyleState.styles[id]
     for (const [id, style] of Object.entries(stylesSnapshot)) {
       dataStyleState.styles[id] = style
     }
