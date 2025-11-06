@@ -8,7 +8,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const isTreeCollection = ref(false)
   const selectedTree = ref(null)
   const isImporting = ref(false)
-  // Buffer pour reconstruire la sélection après que les items soient recréés
   const pendingSelectionIds = ref([])
 
   // /** Functions **/
@@ -24,7 +23,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
             sensitivity: "base",
           }),
         )
-        // Ne pas polluer la sélection pendant import; on la reconstruit ensuite
         if (!isImporting.value) {
           selection.value.push(child)
         }
@@ -65,13 +63,11 @@ export const useTreeviewStore = defineStore("treeview", () => {
       model_id: model_id.value,
       isTreeCollection: isTreeCollection.value,
       selectedTree: selectedTree.value,
-      // Exporter uniquement les IDs pour éviter les problèmes de référence
       selectionIds: selection.value.map((c) => c.id),
     }
   }
 
   async function importStores(snapshot) {
-    // Charger l’état UI
     isAdditionnalTreeDisplayed.value =
       snapshot?.isAdditionnalTreeDisplayed || false
     panelWidth.value = snapshot?.panelWidth || 300
@@ -79,14 +75,12 @@ export const useTreeviewStore = defineStore("treeview", () => {
     isTreeCollection.value = snapshot?.isTreeCollection || false
     selectedTree.value = snapshot?.selectedTree || null
 
-    // Bufferiser les IDs de sélection (compat v1: snapshot.selection -> ids)
     pendingSelectionIds.value =
       snapshot?.selectionIds ||
       (snapshot?.selection || []).map((c) => c.id) ||
       []
   }
 
-  // Appeler après import pour reconstruire la sélection à partir des items
   function finalizeImportSelection() {
     const ids = pendingSelectionIds.value || []
     const rebuilt = []

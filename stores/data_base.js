@@ -190,7 +190,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
-    exportStores, // maintenant défini
+    exportStores,
     importStores,
   }
 })

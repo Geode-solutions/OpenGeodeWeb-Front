@@ -33,26 +33,18 @@ export function useProjectManager() {
   async function importProjectFile(file) {
     geode.start_request()
     try {
-      console.log("[ProjectManager] Import start with file:", file?.name)
+      await useInfraStore().create_connection()
 
-      const infra = useInfraStore()
-      await infra.create_connection()
-      const schemaImport = back_schemas.opengeodeweb_back.import_project || {}
-
+      const schemaImport = back_schemas.opengeodeweb_back.import_project
       const form = new FormData()
-      form.append("file", file, file?.name || "project.zip")
+      form.append("file", file, file?.name)
 
       const result = await $fetch(schemaImport.$id, {
         baseURL: geode.base_url,
         method: "POST",
         body: form,
       })
-
       const snapshot = result?.snapshot ?? {}
-      console.log(
-        "[ProjectManager] snapshot keys:",
-        Object.keys(snapshot || {}),
-      )
 
       await viewer_call({
         schema: viewer_schemas.opengeodeweb_viewer.import_project,
@@ -65,18 +57,31 @@ export function useProjectManager() {
 
       const treeviewStore = useTreeviewStore()
       treeviewStore.isImporting = true
-      console.log("[ProjectManager] isImporting = true")
+      await treeviewStore.importStores(snapshot?.treeview)
 
-      await appStore.importStores(snapshot)
-      console.log("[ProjectManager] stores imported")
+      const hybridViewerStore = useHybridViewerStore()
+      await hybridViewerStore.initHybridViewer()
+      hybridViewerStore.clear()
+
+      const snapshotDataBase = snapshot?.dataBase?.db || {}
+      const items = Object.entries(snapshotDataBase).map(([id, item]) => ({
+        id,
+        object_type: item.object_type,
+        geode_object: item.geode_object,
+        native_filename: item.native_filename,
+        viewable_filename: item.viewable_filename,
+        displayed_name: item.displayed_name,
+        vtk_js: { binary_light_viewable: item?.vtk_js?.binary_light_viewable },
+      }))
+
+      await importWorkflowFromSnapshot(items)
 
       const dataStyleStore = useDataStyleStore()
+      await dataStyleStore.importStores(snapshot?.dataStyle)
       await dataStyleStore.applyAllStylesFromState()
-      console.log("[ProjectManager] styles applied")
 
       treeviewStore.finalizeImportSelection()
       treeviewStore.isImporting = false
-      console.log("[ProjectManager] isImporting = false")
     } finally {
       geode.stop_request()
     }

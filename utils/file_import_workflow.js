@@ -6,13 +6,13 @@ import { useHybridViewerStore } from "../stores/hybrid_viewer"
 
 async function importWorkflow(files) {
   console.log("importWorkflow", { files })
-  const promise_array = []
-  for (const file of files) {
-    const { filename, geode_object } = file
+  const results = []
+  for (const { filename, geode_object } of files) {
     console.log({ filename }, { geode_object })
-    promise_array.push(importFile(filename, geode_object))
+    const id = await importFile(filename, geode_object)
+    results.push(id)
   }
-  return Promise.all(promise_array)
+  return results
 }
 
 async function importFile(filename, geode_object) {
@@ -53,12 +53,9 @@ async function importFile(filename, geode_object) {
     },
   })
 
-  await treeviewStore.addItem(geode_object, name, id, object_type)
-
-  console.log("after treeviewStore.addItem")
-
-  await hybridViewerStore.addItem(id)
-  console.log("after dataBaseStore.addItem")
+  // await treeviewStore.addItem(geode_object, name, id, object_type)
+  // await hybridViewerStore.addItem(id)
+  // console.log("after dataBaseStore.addItem")
 
   await dataStyleStore.addDataStyle(
     data._value.id,
@@ -79,4 +76,33 @@ async function importFile(filename, geode_object) {
   return data._value.id
 }
 
-export { importFile, importWorkflow }
+async function importWorkflowFromSnapshot(items) {
+  const dataBaseStore = useDataBaseStore()
+  const ids = []
+  for (const item of items) {
+    const {
+      id,
+      object_type,
+      geode_object,
+      native_filename,
+      viewable_filename,
+      displayed_name,
+      vtk_js,
+    } = item
+
+    await dataBaseStore.registerObject(id)
+    await dataBaseStore.addItem(id, {
+      object_type,
+      geode_object,
+      native_filename,
+      viewable_filename,
+      displayed_name,
+      vtk_js,
+    })
+
+    ids.push(id)
+  }
+  return ids
+}
+
+export { importFile, importWorkflow, importWorkflowFromSnapshot }
