@@ -39,6 +39,7 @@
   const treeviewStore = useTreeviewStore()
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
+  const hybridViewerStore = useHybridViewerStore()
   const emit = defineEmits(["show-menu"])
 
   function isLeafNode(item) {
@@ -68,6 +69,7 @@
           }
         }
       })
+      hybridViewerStore.remoteRender()
     },
     { immediate: true },
   )

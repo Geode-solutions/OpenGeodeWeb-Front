@@ -40,6 +40,7 @@
 
 <script setup>
   const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
@@ -50,25 +51,37 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshPointsVisibility(id.value),
-    set: (newValue) =>
-      dataStyleStore.setMeshPointsVisibility(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshPointsVisibility(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const size = computed({
     get: () => dataStyleStore.meshPointsSize(id.value),
-    set: (newValue) => dataStyleStore.setMeshPointsSize(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshPointsSize(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshPointsActiveColoring(id.value),
-    set: (newValue) =>
-      dataStyleStore.setMeshPointsActiveColoring(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshPointsActiveColoring(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const color = computed({
     get: () => dataStyleStore.meshPointsColor(id.value),
-    set: (newValue) => dataStyleStore.setMeshPointsColor(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshPointsColor(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const vertex_attribute = computed({
     get: () => dataStyleStore.meshPointsVertexAttribute(id.value),
-    set: (newValue) =>
-      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
 </script>

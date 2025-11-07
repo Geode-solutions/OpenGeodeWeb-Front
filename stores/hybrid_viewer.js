@@ -100,6 +100,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function syncRemoteCamera() {
+    console.log("syncRemoteCamera")
     const renderer = genericRenderWindow.value.getRenderer()
     const camera = renderer.getActiveCamera()
     const params = {
@@ -119,6 +120,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       },
       {
         response_function: () => {
+          remoteRender()
           for (const key in params.camera_options) {
             camera_options[key] = params.camera_options[key]
           }
@@ -129,7 +131,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   function remoteRender() {
     viewer_call({
-      schema: viewer_schemas.opengeodeweb_viewer.viewer.render_now,
+      schema: viewer_schemas.opengeodeweb_viewer.viewer.render,
     })
   }
 
@@ -142,10 +144,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     imageStyle.transition = "opacity 0.1s ease-in"
     imageStyle.zIndex = 1
     resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight)
+    console.log("setContainer", container.value.$el)
 
     useMousePressed({
       target: container,
       onPressed: (event) => {
+        console.log("onPressed")
         if (event.button == 0) {
           is_moving.value = true
           event.stopPropagation()
@@ -153,7 +157,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         }
       },
       onReleased: () => {
+        if (!is_moving.value) {
+          return
+        }
         is_moving.value = false
+        console.log("onReleased")
         syncRemoteCamera()
       },
     })
@@ -252,6 +260,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setZScaling,
     syncRemoteCamera,
     initHybridViewer,
+    remoteRender,
     resize,
     setContainer,
     zScale,
