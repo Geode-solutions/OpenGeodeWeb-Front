@@ -1,6 +1,8 @@
+// Third party imports
 import { describe, expect, test } from "vitest"
 
-import check_recaptcha_params from "@ogw_f/utils/recaptcha.js"
+// Local imports
+import { check_recaptcha_params } from "~/utils/recaptcha.js"
 
 describe("recaptcha.js", () => {
   const name = ""
