@@ -116,6 +116,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight)
     console.log("setContainer", container.value.$el)
 
+
     useMousePressed({
       target: container,
       onPressed: (event) => {
@@ -135,6 +136,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         syncRemoteCamera()
       },
     })
+
 
     let wheelEventEndTimeout = null
     useEventListener(container, "wheel", () => {
@@ -197,41 +199,54 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (z_scale != null) {
       await setZScaling(z_scale)
     }
-  
+
     const cam = snapshot?.camera_options
     if (cam) {
       console.log("[hybrid_viewer] importStores snapshot camera", cam)
       const renderer = genericRenderWindow.value.getRenderer()
       const camera = renderer.getActiveCamera()
-  
+
       const fp = toNumArray(cam.focal_point, 3)
       const vu = toNumArray(cam.view_up, 3)
       const pos = toNumArray(cam.position, 3)
       const cr = toNumArray(cam.clipping_range, 2)
       const va = Number(cam.view_angle)
-  
-      const valid =
-        fp && vu && pos && cr && Number.isFinite(va)
-  
+
+      const valid = fp && vu && pos && cr && Number.isFinite(va)
+
       console.log("[hybrid_viewer] importStores normalized camera", {
-        focal_point: fp, view_up: vu, position: pos, view_angle: va, clipping_range: cr, valid
+        focal_point: fp,
+        view_up: vu,
+        position: pos,
+        view_angle: va,
+        clipping_range: cr,
+        valid,
       })
-  
+
       if (!valid) {
-        console.warn("[hybrid_viewer] importStores camera skipped: invalid snapshot camera", cam)
+        console.warn(
+          "[hybrid_viewer] importStores camera skipped: invalid snapshot camera",
+          cam,
+        )
         return
       }
-  
+
       camera.setFocalPoint(fp)
       camera.setViewUp(vu)
       camera.setPosition(pos)
       camera.setViewAngle(va)
       camera.setClippingRange(cr)
-  
+
       genericRenderWindow.value.getRenderWindow().render()
-  
+
       console.log("[hybrid_viewer] importStores -> viewer.update_camera", {
-        camera_options: { focal_point: fp, view_up: vu, position: pos, view_angle: va, clipping_range: cr },
+        camera_options: {
+          focal_point: fp,
+          view_up: vu,
+          position: pos,
+          view_angle: va,
+          clipping_range: cr,
+        },
       })
       await viewer_call({
         schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
@@ -245,7 +260,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           },
         },
       })
-  
+
       Object.assign(camera_options, {
         focal_point: fp,
         view_up: vu,

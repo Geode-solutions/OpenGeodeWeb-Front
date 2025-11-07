@@ -119,18 +119,27 @@ async function importWorkflowFromSnapshot(items) {
     console.log("[importWorkflowFromSnapshot] hybridViewer.addItem ok", item.id)
 
     await dataStyleStore.addDataStyle(item.id, item.geode_object)
-    console.log("[importWorkflowFromSnapshot] dataStyle.addDataStyle ok", item.id)
+    console.log(
+      "[importWorkflowFromSnapshot] dataStyle.addDataStyle ok",
+      item.id,
+    )
 
     if (item.object_type === "model") {
       await Promise.all([
         dataBaseStore.fetchMeshComponents(item.id),
         dataBaseStore.fetchUuidToFlatIndexDict(item.id),
       ])
-      console.log("[importWorkflowFromSnapshot] model components fetched", item.id)
+      console.log(
+        "[importWorkflowFromSnapshot] model components fetched",
+        item.id,
+      )
     }
 
     await dataStyleStore.applyDefaultStyle(item.id)
-    console.log("[importWorkflowFromSnapshot] dataStyle.applyDefaultStyle ok", item.id)
+    console.log(
+      "[importWorkflowFromSnapshot] dataStyle.applyDefaultStyle ok",
+      item.id,
+    )
 
     ids.push(item.id)
   }
