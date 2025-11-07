@@ -1,214 +1,70 @@
-import "@kitware/vtk.js/Rendering/Profiles/Geometry"
-import vtkGenericRenderWindow from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
-import vtkXMLPolyDataReader from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
-import vtkMapper from "@kitware/vtk.js/Rendering/Core/Mapper"
-import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
-
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import Status from "@ogw_f/utils/status.js"
 
-export const useHybridViewerStore = defineStore("hybridViewer", () => {
-  const viewerStore = useViewerStore()
-  const dataBaseStore = useDataBaseStore()
-  const db = reactive({})
-  const status = ref(Status.NOT_CREATED)
-  const camera_options = reactive({})
-  const genericRenderWindow = reactive({})
-  const is_moving = ref(false)
-  const zScale = ref(1.0)
-  let viewStream
-  let gridActor = null
+// Local imports
+import { useMeshPointsStyle } from "./points.js"
+import { useMeshEdgesStyle } from "./edges.js"
+import { useMeshPolygonsStyle } from "./polygons.js"
+import { useMeshPolyhedraStyle } from "./polyhedra.js"
 
-  async function initHybridViewer() {
-    if (status.value !== Status.NOT_CREATED) return
-    status.value = Status.CREATING
-    genericRenderWindow.value = vtkGenericRenderWindow.newInstance({
-      background: [180 / 255, 180 / 255, 180 / 255],
-      listenWindowResize: false,
-    })
+// Local constants
+const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh
 
-    const webGLRenderWindow =
-      genericRenderWindow.value.getApiSpecificRenderWindow()
-    const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style
-    imageStyle.transition = "opacity 0.1s ease-in"
-    imageStyle.zIndex = 1
+export default function useMeshStyle() {
+  const dataStyleStore = useDataStyleStore()
+  const pointsStyleStore = useMeshPointsStyle()
+  const edgesStyleStore = useMeshEdgesStyle()
+  const meshPolygonsStyleStore = useMeshPolygonsStyle()
+  const meshPolyhedraStyleStore = useMeshPolyhedraStyle()
+  const hybridViewerStore = useHybridViewerStore()
 
-    await viewerStore.ws_connect()
-    viewStream = viewerStore.client.getImageStream().createViewStream("-1")
-    viewStream.onImageReady((e) => {
-      if (is_moving.value) return
-      const webGLRenderWindow =
-        genericRenderWindow.value.getApiSpecificRenderWindow()
-      const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style
-      webGLRenderWindow.setBackgroundImage(e.image)
-      imageStyle.opacity = 1
-    })
-
-    status.value = Status.CREATED
+  function meshVisibility(id) {
+    return dataStyleStore.getStyle(id).visibility
   }
-
-  async function addItem(id) {
-    if (!genericRenderWindow.value) {
-      return
-    }
-    const value = dataBaseStore.db[id]
-    console.log("hybridViewerStore.addItem", { value })
-    const reader = vtkXMLPolyDataReader.newInstance()
-    const textEncoder = new TextEncoder()
-    await reader.parseAsArrayBuffer(
-      textEncoder.encode(value.vtk_js.binary_light_viewable),
-    )
-    const polydata = reader.getOutputData(0)
-    const mapper = vtkMapper.newInstance()
-    mapper.setInputData(polydata)
-    const actor = vtkActor.newInstance()
-    actor.getProperty().setColor(20 / 255, 20 / 255, 20 / 255)
-    actor.setMapper(mapper)
-    const renderer = genericRenderWindow.value.getRenderer()
-    const renderWindow = genericRenderWindow.value.getRenderWindow()
-    renderer.addActor(actor)
-    renderer.resetCamera()
-    renderWindow.render()
-    db[id] = { actor, polydata, mapper }
-  }
-
-  async function setVisibility(id, visibility) {
-    db[id].actor.setVisibility(visibility)
-    const renderWindow = genericRenderWindow.value.getRenderWindow()
-    renderWindow.render()
-  }
-  async function setZScaling(z_scale) {
-    zScale.value = z_scale
-    const renderer = genericRenderWindow.value.getRenderer()
-    const actors = renderer.getActors()
-    actors.forEach((actor) => {
-      if (actor !== gridActor) {
-        const scale = actor.getScale()
-        actor.setScale(scale[0], scale[1], z_scale)
-      }
-    })
-    renderer.resetCamera()
-    genericRenderWindow.value.getRenderWindow().render()
-    const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling
-    if (!schema) return
-    await viewer_call({
-      schema,
-      params: {
-        z_scale: z_scale,
-      },
-    })
-  }
-
-  function syncRemoteCamera() {
-    console.log("syncRemoteCamera")
-    const renderer = genericRenderWindow.value.getRenderer()
-    const camera = renderer.getActiveCamera()
-    const params = {
-      camera_options: {
-        focal_point: camera.getFocalPoint(),
-        view_up: camera.getViewUp(),
-        position: camera.getPosition(),
-        view_angle: camera.getViewAngle(),
-        clipping_range: camera.getClippingRange(),
-        distance: camera.getDistance(),
-      },
-    }
-    viewer_call(
+  function setMeshVisibility(id, visibility) {
+    return viewer_call(
       {
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-        params,
+        schema: mesh_schemas.visibility,
+        params: { id, visibility },
       },
       {
         response_function: () => {
-          remoteRender()
-          for (const key in params.camera_options) {
-            camera_options[key] = params.camera_options[key]
-          }
+          hybridViewerStore.setVisibility(id, visibility)
+          dataStyleStore.getStyle(id).visibility = visibility
+          console.log(setMeshVisibility.name, { id }, meshVisibility(id))
         },
       },
     )
   }
 
-  function remoteRender() {
-    viewer_call({
-      schema: viewer_schemas.opengeodeweb_viewer.viewer.render,
-    })
-  }
-
-  function setContainer(container) {
-    genericRenderWindow.value.setContainer(container.value.$el)
-    const webGLRenderWindow =
-      genericRenderWindow.value.getApiSpecificRenderWindow()
-    webGLRenderWindow.setUseBackgroundImage(true)
-    const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style
-    imageStyle.transition = "opacity 0.1s ease-in"
-    imageStyle.zIndex = 1
-    resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight)
-    console.log("setContainer", container.value.$el)
-
-    useMousePressed({
-      target: container,
-      onPressed: (event) => {
-        console.log("onPressed")
-        if (event.button == 0) {
-          is_moving.value = true
-          event.stopPropagation()
-          imageStyle.opacity = 0
-        }
-      },
-      onReleased: () => {
-        if (!is_moving.value) {
-          return
-        }
-        is_moving.value = false
-        console.log("onReleased")
-        syncRemoteCamera()
-      },
-    })
-
-    let wheelEventEndTimeout = null
-    useEventListener(container, "wheel", () => {
-      is_moving.value = true
-      imageStyle.opacity = 0
-      clearTimeout(wheelEventEndTimeout)
-      wheelEventEndTimeout = setTimeout(() => {
-        is_moving.value = false
-        syncRemoteCamera()
-      }, 600)
-    })
-  }
-
-  async function resize(width, height) {
-    if (
-      viewerStore.status !== Status.CONNECTED ||
-      status.value !== Status.CREATED
-    ) {
-      return
+  function applyMeshStyle(id) {
+    const style = dataStyleStore.getStyle(id)
+    const promise_array = []
+    for (const [key, value] of Object.entries(style)) {
+      if (key === "visibility") {
+        promise_array.push(setMeshVisibility(id, value))
+      } else if (key === "points") {
+        promise_array.push(pointsStyleStore.applyMeshPointsStyle(id))
+      } else if (key === "edges") {
+        promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id))
+      } else if (key === "polygons") {
+        promise_array.push(meshPolygonsStyleStore.applyMeshPolygonsStyle(id))
+      } else if (key === "polyhedra") {
+        promise_array.push(meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id))
+      } else {
+        throw new Error("Unknown mesh key: " + key)
+      }
     }
-    const webGLRenderWindow =
-      genericRenderWindow.value.getApiSpecificRenderWindow()
-    const canvas = webGLRenderWindow.getCanvas()
-    canvas.width = width
-    canvas.height = height
-    await nextTick()
-    webGLRenderWindow.setSize(width, height)
-    viewStream.setSize(width, height)
-    const renderWindow = genericRenderWindow.value.getRenderWindow()
-    renderWindow.render()
-    remoteRender()
+    return Promise.all(promise_array)
   }
 
   return {
-    db,
-    genericRenderWindow,
-    addItem,
-    setVisibility,
-    setZScaling,
-    syncRemoteCamera,
-    initHybridViewer,
-    remoteRender,
-    resize,
-    setContainer,
-    zScale,
+    meshVisibility,
+    setMeshVisibility,
+    applyMeshStyle,
+    ...useMeshPointsStyle(),
+    ...useMeshEdgesStyle(),
+    ...useMeshPolygonsStyle(),
+    ...useMeshPolyhedraStyle(),
   }
-})
+}
