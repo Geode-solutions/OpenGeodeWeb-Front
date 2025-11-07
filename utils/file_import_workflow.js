@@ -80,36 +80,63 @@ async function importFile(filename, geode_object) {
 }
 
 async function importWorkflowFromSnapshot(items) {
+  console.log("[importWorkflowFromSnapshot] start", { count: items?.length })
   const dataBaseStore = useDataBaseStore()
   const treeviewStore = useTreeviewStore()
+  const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
   const ids = []
   for (const item of items) {
-    const {
-      id,
-      object_type,
-      geode_object,
-      native_filename,
-      viewable_filename,
-      displayed_name,
-      vtk_js,
-    } = item
-
-    await dataBaseStore.registerObject(id)
-    await dataBaseStore.addItem(id, {
-      object_type,
-      geode_object,
-      native_filename,
-      viewable_filename,
-      displayed_name,
-      vtk_js,
+    console.log("[importWorkflowFromSnapshot] item", {
+      id: item.id,
+      object_type: item.object_type,
+      geode_object: item.geode_object,
+      displayed_name: item.displayed_name,
     })
 
-    await treeviewStore.addItem(geode_object, displayed_name, id, object_type)
-    await hybridViewerStore.addItem(id)
+    await dataBaseStore.registerObject(item.id)
+    console.log("[importWorkflowFromSnapshot] registerObject ok", item.id)
 
-    ids.push(id)
+    await dataBaseStore.addItem(item.id, {
+      object_type: item.object_type,
+      geode_object: item.geode_object,
+      native_filename: item.native_filename,
+      viewable_filename: item.viewable_filename,
+      displayed_name: item.displayed_name,
+      vtk_js: item.vtk_js,
+    })
+    console.log("[importWorkflowFromSnapshot] addItem ok", item.id)
+
+    await treeviewStore.addItem(
+      item.geode_object,
+      item.displayed_name,
+      item.id,
+      item.object_type,
+    )
+    console.log("[importWorkflowFromSnapshot] treeview.addItem ok", item.id)
+
+    await hybridViewerStore.addItem(item.id)
+    console.log("[importWorkflowFromSnapshot] hybridViewer.addItem ok", item.id)
+
+    await dataStyleStore.addDataStyle(item.id, item.geode_object)
+    console.log("[importWorkflowFromSnapshot] dataStyle.addDataStyle ok", item.id)
+
+    if (item.object_type === "model") {
+      await Promise.all([
+        dataBaseStore.fetchMeshComponents(item.id),
+        dataBaseStore.fetchUuidToFlatIndexDict(item.id),
+      ])
+      console.log("[importWorkflowFromSnapshot] model components fetched", item.id)
+    }
+
+    await dataStyleStore.applyDefaultStyle(item.id)
+    console.log("[importWorkflowFromSnapshot] dataStyle.applyDefaultStyle ok", item.id)
+
+    ids.push(item.id)
   }
+  hybridViewerStore.remoteRender()
+  console.log("[importWorkflowFromSnapshot] remoteRender called")
+  console.log("[importWorkflowFromSnapshot] done", { ids })
   return ids
 }
 
