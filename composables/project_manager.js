@@ -35,6 +35,25 @@ export function useProjectManager() {
     try {
       await useInfraStore().create_connection()
 
+      const viewerStore = useViewerStore()
+      await viewerStore.ws_connect()
+
+      await viewer_call({
+        schema: viewer_schemas.opengeodeweb_viewer.import_project,
+        params: {},
+      })
+      await viewer_call({
+        schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
+        params: {},
+      })
+
+      const dataBaseStore = useDataBaseStore()
+      const treeviewStore = useTreeviewStore()
+      const hybridViewerStore = useHybridViewerStore()
+      treeviewStore.clear()
+      dataBaseStore.clear()
+      hybridViewerStore.clear()
+
       const schemaImport = back_schemas.opengeodeweb_back.import_project
       const form = new FormData()
       form.append("file", file, file?.name)
@@ -46,22 +65,10 @@ export function useProjectManager() {
       })
       const snapshot = result?.snapshot ?? {}
 
-      await viewer_call({
-        schema: viewer_schemas.opengeodeweb_viewer.import_project,
-        params: {},
-      })
-      await viewer_call({
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
-        params: {},
-      })
-
-      const treeviewStore = useTreeviewStore()
       treeviewStore.isImporting = true
       await treeviewStore.importStores(snapshot?.treeview)
 
-      const hybridViewerStore = useHybridViewerStore()
       await hybridViewerStore.initHybridViewer()
-      hybridViewerStore.clear()
       await hybridViewerStore.importStores(snapshot?.hybridViewer)
 
       const snapshotDataBase = snapshot?.dataBase?.db || {}
@@ -77,7 +84,6 @@ export function useProjectManager() {
 
       await importWorkflowFromSnapshot(items)
 
-      // Appliquer la caméra importée après avoir créé les actors
       await hybridViewerStore.importStores(snapshot?.hybridViewer)
 
       const dataStyleStore = useDataStyleStore()

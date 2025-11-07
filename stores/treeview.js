@@ -84,13 +84,30 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function finalizeImportSelection() {
     const ids = pendingSelectionIds.value || []
     const rebuilt = []
-    for (const group of items.value) {
-      for (const child of group.children) {
-        if (ids.includes(child.id)) rebuilt.push(child)
+    if (ids.length === 0) {
+      for (const group of items.value) {
+        for (const child of group.children) {
+          rebuilt.push(child)
+        }
+      }
+    } else {
+      for (const group of items.value) {
+        for (const child of group.children) {
+          if (ids.includes(child.id)) rebuilt.push(child)
+        }
       }
     }
     selection.value = rebuilt
     pendingSelectionIds.value = []
+  }
+
+  function clear() {
+    items.value = []
+    selection.value = []
+    components_selection.value = []
+    pendingSelectionIds.value = []
+    model_id.value = ""
+    selectedTree.value = null
   }
 
   return {
@@ -110,5 +127,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
     exportStores,
     importStores,
     finalizeImportSelection,
+    clear,
   }
 })
