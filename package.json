@@ -7,7 +7,8 @@
     "test:unit": "npm run tests --project unit",
     "test:integration": "npm run tests --project integration",
     "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
-    "build": ""
+    "build": "",
+    "update_version": "node scripts/update_version.js"
   },
   "devDependencies": {
     "@nuxt/test-utils": "3.19.2",
