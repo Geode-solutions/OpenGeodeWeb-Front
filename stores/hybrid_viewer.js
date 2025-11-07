@@ -199,13 +199,48 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function exportStores() {
-    return { zScale: zScale.value }
+    const renderer = genericRenderWindow.value?.getRenderer?.()
+    const camera = renderer?.getActiveCamera?.()
+    const cameraSnapshot = camera
+      ? {
+          focal_point: Array.from(camera.getFocalPoint()),
+          view_up: Array.from(camera.getViewUp()),
+          position: Array.from(camera.getPosition()),
+          view_angle: camera.getViewAngle(),
+          clipping_range: Array.from(camera.getClippingRange()),
+          distance: camera.getDistance(),
+        }
+      : camera_options
+    return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
 
   async function importStores(snapshot) {
     const z_scale = snapshot?.zScale
     if (z_scale != null) {
       await setZScaling(z_scale)
+    }
+
+    const cam = snapshot?.camera_options
+    if (cam) {
+      const renderer = genericRenderWindow.value.getRenderer()
+      const camera = renderer.getActiveCamera()
+
+      if (cam.focal_point) camera.setFocalPoint(cam.focal_point)
+      if (cam.view_up) camera.setViewUp(cam.view_up)
+      if (cam.position) camera.setPosition(cam.position)
+      if (cam.view_angle != null) camera.setViewAngle(cam.view_angle)
+      if (cam.clipping_range) camera.setClippingRange(cam.clipping_range)
+
+      genericRenderWindow.value.getRenderWindow().render()
+
+      await viewer_call({
+        schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+        params: { camera_options: cam },
+      })
+
+      for (const key in cam) {
+        camera_options[key] = cam[key]
+      }
     }
   }
 

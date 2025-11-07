@@ -62,6 +62,7 @@ export function useProjectManager() {
       const hybridViewerStore = useHybridViewerStore()
       await hybridViewerStore.initHybridViewer()
       hybridViewerStore.clear()
+      await hybridViewerStore.importStores(snapshot?.hybridViewer)
 
       const snapshotDataBase = snapshot?.dataBase?.db || {}
       const items = Object.entries(snapshotDataBase).map(([id, item]) => ({
@@ -75,6 +76,9 @@ export function useProjectManager() {
       }))
 
       await importWorkflowFromSnapshot(items)
+
+      // Appliquer la caméra importée après avoir créé les actors
+      await hybridViewerStore.importStores(snapshot?.hybridViewer)
 
       const dataStyleStore = useDataStyleStore()
       await dataStyleStore.importStores(snapshot?.dataStyle)
