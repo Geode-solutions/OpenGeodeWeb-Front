@@ -19,6 +19,38 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   let viewStream
   let gridActor = null
 
+  // Helper: conversion stricte aux types/schema + logs des types
+  function sanitizeCameraOptions(opts) {
+    if (!opts) return null
+    const toNums = (arr, size) =>
+      Array.from(arr || [])
+        .slice(0, size)
+        .map((n) => Number(n))
+    return {
+      focal_point: toNums(opts.focal_point, 3),
+      view_up: toNums(opts.view_up, 3),
+      position: toNums(opts.position, 3),
+      view_angle: Number(opts.view_angle),
+      clipping_range: toNums(opts.clipping_range, 2),
+    }
+  }
+
+  function logCameraOptions(label, opts) {
+    const types = (arr) => Array.from(arr || []).map((v) => typeof v)
+    console.log(`[Camera] ${label}`, {
+      focal_point: opts?.focal_point,
+      focal_point_types: types(opts?.focal_point),
+      view_up: opts?.view_up,
+      view_up_types: types(opts?.view_up),
+      position: opts?.position,
+      position_types: types(opts?.position),
+      view_angle: opts?.view_angle,
+      view_angle_type: typeof opts?.view_angle,
+      clipping_range: opts?.clipping_range,
+      clipping_range_types: types(opts?.clipping_range),
+    })
+  }
+
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) return
     status.value = Status.CREATING
@@ -100,7 +132,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function syncRemoteCamera() {
-    console.log("syncRemoteCamera")
     const renderer = genericRenderWindow.value.getRenderer()
     const camera = renderer.getActiveCamera()
     const params = {
@@ -110,7 +141,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         position: camera.getPosition(),
         view_angle: camera.getViewAngle(),
         clipping_range: camera.getClippingRange(),
-        distance: camera.getDistance(),
       },
     }
     viewer_call(
@@ -222,6 +252,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
 
+  
   async function importStores(snapshot) {
     const z_scale = snapshot?.zScale
     if (z_scale != null) {
@@ -234,17 +265,25 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const renderer = genericRenderWindow.value.getRenderer()
     const camera = renderer.getActiveCamera()
 
-    // Applique directement les valeurs du snapshot (elles sont déjà numériques)
-    camera.setFocalPoint(cam.focal_point)
-    camera.setViewUp(cam.view_up)
-    camera.setPosition(cam.position)
+    // Appliquer les composantes (x, y, z), pas le tableau
+    camera.setFocalPoint(...cam.focal_point)
+    camera.setViewUp(...cam.view_up)
+    camera.setPosition(...cam.position)
     camera.setViewAngle(cam.view_angle)
-    camera.setClippingRange(cam.clipping_range)
+    camera.setClippingRange(...cam.clipping_range)
 
     genericRenderWindow.value.getRenderWindow().render()
 
-    // Envoie tel quel au viewer distant (inclut distance si présente)
-    const payload = { camera_options: cam }
+    // Envoyer uniquement les champs conformes au schéma (sans distance)
+    const payload = {
+      camera_options: {
+        focal_point: cam.focal_point,
+        view_up: cam.view_up,
+        position: cam.position,
+        view_angle: cam.view_angle,
+        clipping_range: cam.clipping_range,
+      },
+    }
     viewer_call(
       {
         schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
