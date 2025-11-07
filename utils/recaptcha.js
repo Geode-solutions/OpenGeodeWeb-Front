@@ -11,4 +11,4 @@ function check_recaptcha_params(name, email, launch) {
   return { status: 200 }
 }
 
-export default check_recaptcha_params
+export { check_recaptcha_params }

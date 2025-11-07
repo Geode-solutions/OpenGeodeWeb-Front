@@ -9,7 +9,7 @@ describe("recaptcha.js", () => {
   const internal_error = 500
   const success = 200
 
-  describe("Wrong params", () => {
+  describe("wrong params", () => {
     test("name", () => {
       const name = "test"
       const result = check_recaptcha_params(name, email, launch)
@@ -29,7 +29,7 @@ describe("recaptcha.js", () => {
     })
   })
 
-  describe("Right params", () => {
+  describe("right params", () => {
     test("name", () => {
       const result = check_recaptcha_params(name, email, launch)
       expect(result.status).toBe(success)
