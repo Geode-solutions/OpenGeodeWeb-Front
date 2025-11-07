@@ -99,6 +99,36 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     })
   }
 
+  function syncRemoteCamera() {
+    console.log("syncRemoteCamera")
+    const renderer = genericRenderWindow.value.getRenderer()
+    const camera = renderer.getActiveCamera()
+    const params = {
+      camera_options: {
+        focal_point: camera.getFocalPoint(),
+        view_up: camera.getViewUp(),
+        position: camera.getPosition(),
+        view_angle: camera.getViewAngle(),
+        clipping_range: camera.getClippingRange(),
+        distance: camera.getDistance(),
+      },
+    }
+    viewer_call(
+      {
+        schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+        params,
+      },
+      {
+        response_function: () => {
+          remoteRender()
+          for (const key in params.camera_options) {
+            camera_options[key] = params.camera_options[key]
+          }
+        },
+      },
+    )
+  }
+
   function remoteRender() {
     viewer_call({
       schema: viewer_schemas.opengeodeweb_viewer.viewer.render,
@@ -201,74 +231,34 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     }
 
     const cam = snapshot?.camera_options
-    if (cam) {
-      console.log("[hybrid_viewer] importStores snapshot camera", cam)
-      const renderer = genericRenderWindow.value.getRenderer()
-      const camera = renderer.getActiveCamera()
+    if (!cam) return
 
-      const fp = toNumArray(cam.focal_point, 3)
-      const vu = toNumArray(cam.view_up, 3)
-      const pos = toNumArray(cam.position, 3)
-      const cr = toNumArray(cam.clipping_range, 2)
-      const va = Number(cam.view_angle)
+    const renderer = genericRenderWindow.value.getRenderer()
+    const camera = renderer.getActiveCamera()
 
-      const valid = fp && vu && pos && cr && Number.isFinite(va)
+    // Applique directement les valeurs du snapshot (elles sont déjà numériques)
+    camera.setFocalPoint(cam.focal_point)
+    camera.setViewUp(cam.view_up)
+    camera.setPosition(cam.position)
+    camera.setViewAngle(cam.view_angle)
+    camera.setClippingRange(cam.clipping_range)
 
-      console.log("[hybrid_viewer] importStores normalized camera", {
-        focal_point: fp,
-        view_up: vu,
-        position: pos,
-        view_angle: va,
-        clipping_range: cr,
-        valid,
-      })
+    genericRenderWindow.value.getRenderWindow().render()
 
-      if (!valid) {
-        console.warn(
-          "[hybrid_viewer] importStores camera skipped: invalid snapshot camera",
-          cam,
-        )
-        return
-      }
-
-      camera.setFocalPoint(fp)
-      camera.setViewUp(vu)
-      camera.setPosition(pos)
-      camera.setViewAngle(va)
-      camera.setClippingRange(cr)
-
-      genericRenderWindow.value.getRenderWindow().render()
-
-      console.log("[hybrid_viewer] importStores -> viewer.update_camera", {
-        camera_options: {
-          focal_point: fp,
-          view_up: vu,
-          position: pos,
-          view_angle: va,
-          clipping_range: cr,
-        },
-      })
-      await viewer_call({
+    // Envoie tel quel au viewer distant (inclut distance si présente)
+    const payload = { camera_options: cam }
+    viewer_call(
+      {
         schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-        params: {
-          camera_options: {
-            focal_point: fp,
-            view_up: vu,
-            position: pos,
-            view_angle: va,
-            clipping_range: cr,
-          },
+        params: payload,
+      },
+      {
+        response_function: () => {
+          remoteRender()
+          Object.assign(camera_options, payload.camera_options)
         },
-      })
-
-      Object.assign(camera_options, {
-        focal_point: fp,
-        view_up: vu,
-        position: pos,
-        view_angle: va,
-        clipping_range: cr,
-      })
-    }
+      },
+    )
   }
 
   return {
