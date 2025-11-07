@@ -220,7 +220,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
 
-  
   async function importStores(snapshot) {
     const z_scale = snapshot?.zScale
     if (z_scale != null) {
