@@ -82,19 +82,10 @@ export function useModelCornersStyle() {
   function applyModelCornersStyle(id) {
     const style = modelCornersStyle(id)
     const corner_ids = dataBaseStore.getCornersUuids(id)
-
-    if (!corner_ids || corner_ids.length === 0) {
-      return Promise.resolve()
-    }
-
-    const promises = []
-    if (typeof style?.visibility === "boolean") {
-      promises.push(setModelCornersVisibility(id, corner_ids, style.visibility))
-    }
-    if (style?.color) {
-      promises.push(setModelCornersColor(id, corner_ids, style.color))
-    }
-    return Promise.all(promises)
+    return Promise.all([
+      setModelCornersVisibility(id, corner_ids, style.visibility),
+      setModelCornersColor(id, corner_ids, style.color),
+    ])
   }
 
   return {

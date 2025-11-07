@@ -127,8 +127,6 @@ export default function useModelStyle() {
         [component_id],
         visibility,
       )
-    } else if (component_type === "Edge") {
-      return modelEdgesStyleStore.setModelEdgesVisibility(id, visibility)
     } else {
       throw new Error("Unknown model component_type: " + component_type)
     }
@@ -182,8 +180,10 @@ export default function useModelStyle() {
   return {
     modelVisibility,
     visibleMeshComponents,
+    modelMeshComponentVisibility,
     setModelVisibility,
     setModelColor,
+    setModelMeshComponentVisibility,
     applyModelStyle,
     setModelMeshComponentsDefaultStyle,
     ...useModelBlocksStyle(),
