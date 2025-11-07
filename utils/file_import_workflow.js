@@ -76,6 +76,7 @@ async function importFile(filename, geode_object) {
   }
   await dataStyleStore.applyDefaultStyle(id)
   console.log("after dataStyleStore.applyDefaultStyle")
+  hybridViewerStore.remoteRender()
   return data._value.id
 }
 
