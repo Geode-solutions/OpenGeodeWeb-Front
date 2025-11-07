@@ -1,13 +1,15 @@
-<template align="center" justify="center" style="display: none">
-  <VRow>
-    <VCol>
+<template>
+  <VRow align="center" justify="center" style="display: none">
+    <VCol cols="4">
       <VForm v-model="valid">
         <VContainer>
           <VRow>
-            <VCol cols="12" md="4">
+            <VCol>
               <VTextField v-model="name" label="Name" required />
             </VCol>
-            <VCol cols="12" md="4">
+          </VRow>
+          <VRow>
+            <VCol>
               <VTextField
                 v-model="email"
                 :rules="emailRules"
@@ -15,7 +17,9 @@
                 required
               />
             </VCol>
-            <VCol cols="12" md="4">
+          </VRow>
+          <VRow>
+            <VCol>
               <VCheckbox label="Launch the app" v-model="launch" />
             </VCol>
           </VRow>
@@ -23,8 +27,8 @@
       </VForm>
     </VCol>
   </VRow>
-  <VRow>
-    <VCol>
+  <VRow align="center" justify="center">
+    <VCol cols="4" class="d-flex justify-center align-center">
       <VBtn
         :text="props.button_label"
         :color="props.button_color"
@@ -39,12 +43,12 @@
     button_label: {
       type: String,
       required: false,
-      default: "Click to launch the app",
+      default: "Launch the app",
     },
     button_color: {
       type: String,
       required: false,
-      default: "primary",
+      default: "white",
     },
   })
   const infra_store = useInfraStore()
