@@ -18,8 +18,9 @@ export function viewer_call(
   const client = viewer_store.client
 
   return new Promise((resolve, reject) => {
-    if (!client) {
-      reject()
+    if (!client?.getConnection) {
+      resolve()
+      return
     }
     viewer_store.start_request()
     client
@@ -37,7 +38,7 @@ export function viewer_call(
           if (request_error_function) {
             request_error_function(reason)
           }
-          reject()
+          reject(reason)
         },
       )
       .catch((error) => {
@@ -50,7 +51,7 @@ export function viewer_call(
         if (response_error_function) {
           response_error_function(error)
         }
-        reject()
+        reject(error)
       })
       .finally(() => {
         viewer_store.stop_request()
