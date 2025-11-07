@@ -116,7 +116,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight)
     console.log("setContainer", container.value.$el)
 
-
     useMousePressed({
       target: container,
       onPressed: (event) => {
@@ -136,7 +135,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         syncRemoteCamera()
       },
     })
-
 
     let wheelEventEndTimeout = null
     useEventListener(container, "wheel", () => {
