@@ -22,6 +22,7 @@
 
 <script setup>
   const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
@@ -33,26 +34,37 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
-    set: (newValue) =>
-      dataStyleStore.setMeshPolyhedraVisibility(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolyhedraVisibility(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshPolyhedraActiveColoring(id.value),
-    set: (newValue) =>
-      dataStyleStore.setMeshPolyhedraActiveColoring(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolyhedraActiveColoring(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const color = computed({
     get: () => dataStyleStore.meshPolyhedraColor(id.value),
-    set: (newValue) => dataStyleStore.setMeshPolyhedraColor(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolyhedraColor(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const vertex_attribute = computed({
     get: () => dataStyleStore.polyhedraVertexAttribute(id.value),
-    set: (newValue) =>
-      dataStyleStore.setPolyhedraVertexAttribute(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setPolyhedraVertexAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const polyhedron_attribute = computed({
     get: () => dataStyleStore.polyhedraPolyhedronAttribute(id.value),
-    set: (newValue) =>
-      dataStyleStore.setPolyhedraPolyhedronAttribute(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setPolyhedraPolyhedronAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
 </script>

@@ -16,6 +16,7 @@
 <script setup>
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   const props = defineProps({ id: { type: String, required: true } })
 
@@ -39,43 +40,51 @@
           removed_surfaces,
           removed_blocks,
         ] = sortMeshComponents(removed)
-        if (added_corners.length > 0)
+        if (added_corners.length > 0) {
           dataStyleStore.setModelCornersVisibility(
             props.id,
             added_corners,
             true,
           )
-        if (added_lines.length > 0)
+        }
+        if (added_lines.length > 0) {
           dataStyleStore.setModelLinesVisibility(props.id, added_lines, true)
-        if (added_surfaces.length > 0)
+        }
+        if (added_surfaces.length > 0) {
           dataStyleStore.setModelSurfacesVisibility(
             props.id,
             added_surfaces,
             true,
           )
-        if (added_blocks.length > 0)
+        }
+        if (added_blocks.length > 0) {
           dataStyleStore.setModelBlocksVisibility(props.id, added_blocks, true)
-
-        if (removed_corners.length > 0)
+        }
+        if (removed_corners.length > 0) {
           dataStyleStore.setModelCornersVisibility(
             props.id,
             removed_corners,
             false,
           )
-        if (removed_lines.length > 0)
+        }
+        if (removed_lines.length > 0) {
           dataStyleStore.setModelLinesVisibility(props.id, removed_lines, false)
-        if (removed_surfaces.length > 0)
+        }
+        if (removed_surfaces.length > 0) {
           dataStyleStore.setModelSurfacesVisibility(
             props.id,
             removed_surfaces,
             false,
           )
-        if (removed_blocks.length > 0)
+        }
+        if (removed_blocks.length > 0) {
           dataStyleStore.setModelBlocksVisibility(
             props.id,
             removed_blocks,
             false,
           )
+        }
+        hybridViewerStore.remoteRender()
       }
     },
     { immediate: true, deep: true },

@@ -33,6 +33,7 @@
   import SurfacePoints from "@ogw_f/assets/viewer_svgs/surface_points.svg"
 
   const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
@@ -43,11 +44,16 @@
 
   const visibility = computed({
     get: () => dataStyleStore.modelPointsVisibility(id.value),
-    set: (newValue) =>
-      dataStyleStore.setModelPointsVisibility(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setModelPointsVisibility(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const size = computed({
     get: () => dataStyleStore.modelPointsSize(id.value),
-    set: (newValue) => dataStyleStore.setModelPointsSize(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setModelPointsSize(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
 </script>
