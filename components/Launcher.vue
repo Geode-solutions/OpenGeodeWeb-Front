@@ -8,8 +8,7 @@
         align-self="center"
         style="z-index: 1000"
       >
-        <h4 class="pb-3">Please complete the recaptcha to launch the app</h4>
-        <Recaptcha :site_key="site_key" />
+        <Recaptcha :color="'secondary'" />
       </v-col>
       <v-col v-else-if="infra_store.status == Status.CREATING">
         <Loading />
