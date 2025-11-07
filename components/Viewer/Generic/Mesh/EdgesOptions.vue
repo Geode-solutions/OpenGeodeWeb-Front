@@ -26,24 +26,34 @@
   const id = toRef(() => props.itemProps.id)
 
   const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   const visibility = computed({
     get: () => dataStyleStore.meshEdgesVisibility(id.value),
-    set: (newValue) =>
-      dataStyleStore.setMeshEdgesVisibility(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshEdgesVisibility(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const size = computed({
     get: () => dataStyleStore.edgesSize(id.value),
-    set: (newValue) => dataStyleStore.setEdgesSize(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setEdgesSize(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshEdgesActiveColoring(id.value),
     set: (newValue) => {
       dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
+      hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshEdgesColor(id.value),
-    set: (newValue) => dataStyleStore.setMeshEdgesColor(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setMeshEdgesColor(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
 </script>

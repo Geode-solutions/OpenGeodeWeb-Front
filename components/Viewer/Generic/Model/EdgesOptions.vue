@@ -20,10 +20,13 @@
 
   const id = toRef(() => props.itemProps.id)
   const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   const visibility = computed({
     get: () => dataStyleStore.modelEdgesVisibility(id.value),
-    set: (newValue) =>
-      dataStyleStore.setModelEdgesVisibility(id.value, newValue),
+    set: (newValue) => {
+      dataStyleStore.setModelEdgesVisibility(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
 </script>
