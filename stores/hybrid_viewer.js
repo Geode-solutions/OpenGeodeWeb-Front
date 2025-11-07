@@ -21,7 +21,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) return
-    console.log("[hybrid_viewer] initHybridViewer: status", status.value)
     status.value = Status.CREATING
     genericRenderWindow.value = vtkGenericRenderWindow.newInstance({
       background: [180 / 255, 180 / 255, 180 / 255],
@@ -35,20 +34,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     imageStyle.zIndex = 1
 
     await viewerStore.ws_connect()
-    console.log("[hybrid_viewer] ws_connect done")
     viewStream = viewerStore.client.getImageStream().createViewStream("-1")
-    console.log("[hybrid_viewer] viewStream created (-1)")
     viewStream.onImageReady((e) => {
+      if (is_moving.value) return
       const webGLRenderWindow =
         genericRenderWindow.value.getApiSpecificRenderWindow()
       const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style
-      const canvas = webGLRenderWindow.getCanvas()
-      console.log("[hybrid_viewer] onImageReady", {
-        is_moving: is_moving.value,
-        canvas: { width: canvas.width, height: canvas.height },
-        image: typeof e?.image,
-      })
-      if (is_moving.value) return
       webGLRenderWindow.setBackgroundImage(e.image)
       imageStyle.opacity = 1
     })
@@ -68,7 +59,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       textEncoder.encode(value.vtk_js.binary_light_viewable),
     )
     const polydata = reader.getOutputData(0)
-    console.log("[hybrid_viewer] addItem polydata bounds", polydata?.getBounds?.())
     const mapper = vtkMapper.newInstance()
     mapper.setInputData(polydata)
     const actor = vtkActor.newInstance()
@@ -77,10 +67,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const renderer = genericRenderWindow.value.getRenderer()
     const renderWindow = genericRenderWindow.value.getRenderWindow()
     renderer.addActor(actor)
-    console.log("[hybrid_viewer] addItem actors count", renderer.getActors().length)
     renderer.resetCamera()
     renderWindow.render()
-    console.log("[hybrid_viewer] addItem render done")
     db[id] = { actor, polydata, mapper }
   }
 
@@ -111,147 +99,50 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     })
   }
 
-  // Convertit un "array-like" (y compris TypedArray) en tableau de nombres finis
-  function toNumArray(arrLike, expectedLen) {
-    try {
-      const a = Array.from(arrLike ?? [])
-      if (a.length !== expectedLen) return null
-      const n = a.map((x) => Number(x))
-      return n.every((x) => Number.isFinite(x)) ? n : null
-    } catch (_) {
-      return null
-    }
-  }
-
-  function syncRemoteCamera() {
-    console.log("[hybrid_viewer] syncRemoteCamera")
-    const renderer = genericRenderWindow.value.getRenderer()
-    renderer.resetCameraClippingRange()
-    const camera = renderer.getActiveCamera()
-  
-    const raw = {
-      focal_point: camera.getFocalPoint(),
-      view_up: camera.getViewUp(),
-      position: camera.getPosition(),
-      view_angle: camera.getViewAngle(),
-      clipping_range: camera.getClippingRange(),
-    }
-    console.log("[hybrid_viewer] camera raw", {
-      focal_point: raw.focal_point,
-      view_up: raw.view_up,
-      position: raw.position,
-      view_angle: raw.view_angle,
-      clipping_range: raw.clipping_range,
-      types: {
-        focal_point: Array.isArray(raw.focal_point) ? "array" : typeof raw.focal_point,
-        view_up: Array.isArray(raw.view_up) ? "array" : typeof raw.view_up,
-        position: Array.isArray(raw.position) ? "array" : typeof raw.position,
-        clipping_range: Array.isArray(raw.clipping_range) ? "array" : typeof raw.clipping_range,
-      },
-    })
-  
-    const fp = toNumArray(raw.focal_point, 3)
-    const vu = toNumArray(raw.view_up, 3)
-    const pos = toNumArray(raw.position, 3)
-    const cr = toNumArray(raw.clipping_range, 2)
-    const va = Number(raw.view_angle)
-  
-    const normalized = { focal_point: fp, view_up: vu, position: pos, view_angle: va, clipping_range: cr }
-    console.log("[hybrid_viewer] camera normalized", normalized)
-  
-    const valid = fp && vu && pos && cr && Number.isFinite(va)
-    if (!valid) {
-      console.warn("[hybrid_viewer] syncRemoteCamera skipped: invalid camera", normalized)
-      return
-    }
-  
-    const params = { camera_options: normalized }
-    console.log("[hybrid_viewer] viewer.update_camera request", params)
-  
-    viewer_call(
-      {
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-        params,
-      },
-      {
-        response_function: () => {
-          console.log("[hybrid_viewer] viewer.update_camera response: ok -> render")
-          remoteRender()
-          Object.assign(camera_options, params.camera_options)
-        },
-      },
-    )
-  }
-
   function remoteRender() {
-    console.log("[hybrid_viewer] viewer.render request")
     viewer_call({
       schema: viewer_schemas.opengeodeweb_viewer.viewer.render,
     })
   }
 
   function setContainer(container) {
-    console.log("[hybrid_viewer] setContainer attach", {
-      el: container.value?.$el,
-      size: {
-        w: container.value?.$el?.offsetWidth,
-        h: container.value?.$el?.offsetHeight,
-      },
-    })
     genericRenderWindow.value.setContainer(container.value.$el)
     const webGLRenderWindow =
       genericRenderWindow.value.getApiSpecificRenderWindow()
     webGLRenderWindow.setUseBackgroundImage(true)
     const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style
-    console.log("[hybrid_viewer] bgImage style before", {
-      transition: imageStyle.transition,
-      zIndex: imageStyle.zIndex,
-      opacity: imageStyle.opacity,
-    })
     imageStyle.transition = "opacity 0.1s ease-in"
     imageStyle.zIndex = 1
     resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight)
     console.log("setContainer", container.value.$el)
-  
+
     useMousePressed({
       target: container,
       onPressed: (event) => {
-        console.log("[hybrid_viewer] onPressed", {
-          button: event.button,
-          is_moving_before: is_moving.value,
-        })
+        console.log("onPressed")
         if (event.button == 0) {
           is_moving.value = true
           event.stopPropagation()
           imageStyle.opacity = 0
-          console.log("[hybrid_viewer] onPressed applied", {
-            is_moving_after: is_moving.value,
-            bg_opacity: imageStyle.opacity,
-          })
         }
       },
       onReleased: () => {
-        console.log("[hybrid_viewer] onReleased", {
-          was_moving: is_moving.value,
-        })
         if (!is_moving.value) {
           return
         }
         is_moving.value = false
-        console.log("[hybrid_viewer] onReleased -> syncRemoteCamera")
+        console.log("onReleased")
         syncRemoteCamera()
       },
     })
-  
+
     let wheelEventEndTimeout = null
     useEventListener(container, "wheel", () => {
       is_moving.value = true
       imageStyle.opacity = 0
-      console.log("[hybrid_viewer] wheel", { bg_opacity: imageStyle.opacity })
       clearTimeout(wheelEventEndTimeout)
       wheelEventEndTimeout = setTimeout(() => {
         is_moving.value = false
-        console.log("[hybrid_viewer] wheel end -> syncRemoteCamera")
         syncRemoteCamera()
       }, 600)
     })
@@ -264,12 +155,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     ) {
       return
     }
-    console.log("[hybrid_viewer] resize", {
-      width,
-      height,
-      viewer_status: viewerStore.status,
-      store_status: status.value,
-    })
     const webGLRenderWindow =
       genericRenderWindow.value.getApiSpecificRenderWindow()
     const canvas = webGLRenderWindow.getCanvas()
@@ -280,9 +165,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     viewStream.setSize(width, height)
     const renderWindow = genericRenderWindow.value.getRenderWindow()
     renderWindow.render()
-    console.log("[hybrid_viewer] resize applied", {
-      canvas: { width: canvas.width, height: canvas.height },
-    })
     remoteRender()
   }
 
