@@ -226,27 +226,27 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       await setZScaling(z_scale)
     }
 
-    const cam = snapshot?.camera_options
-    if (!cam) return
+    const camera_options = snapshot?.camera_options
+    if (!camera_options) return
 
     const renderer = genericRenderWindow.value.getRenderer()
     const camera = renderer.getActiveCamera()
 
-    camera.setFocalPoint(...cam.focal_point)
-    camera.setViewUp(...cam.view_up)
-    camera.setPosition(...cam.position)
-    camera.setViewAngle(cam.view_angle)
-    camera.setClippingRange(...cam.clipping_range)
+    camera.setFocalPoint(...camera_options.focal_point)
+    camera.setViewUp(...camera_options.view_up)
+    camera.setPosition(...camera_options.position)
+    camera.setViewAngle(camera_options.view_angle)
+    camera.setClippingRange(...camera_options.clipping_range)
 
     genericRenderWindow.value.getRenderWindow().render()
 
     const payload = {
       camera_options: {
-        focal_point: cam.focal_point,
-        view_up: cam.view_up,
-        position: cam.position,
-        view_angle: cam.view_angle,
-        clipping_range: cam.clipping_range,
+        focal_point: camera_options.focal_point,
+        view_up: camera_options.view_up,
+        position: camera_options.position,
+        view_angle: camera_options.view_angle,
+        clipping_range: camera_options.clipping_range,
       },
     }
     viewer_call(
