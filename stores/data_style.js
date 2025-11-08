@@ -1,8 +1,6 @@
 import useDataStyleState from "../internal_stores/data_style_state.js"
 import useMeshStyle from "../internal_stores/mesh/index.js"
 import useModelStyle from "../internal_stores/model/index.js"
-import { defineStore } from "pinia"
-import { useDataBaseStore } from "./data_base.js"
 
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState()
@@ -11,7 +9,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataBaseStore = useDataBaseStore()
 
   function addDataStyle(id, geode_object) {
-    dataStyleState.styles[id] = getDefaultStyle(geode_object)
+    const style = getDefaultStyle(geode_object)
+    dataStyleState.styles[id] = style
   }
 
   function setVisibility(id, visibility) {
