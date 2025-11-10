@@ -80,7 +80,7 @@
       }
     }
   })
-  function submit_recaptcha() {
+  async function submit_recaptcha() {
     const response = await $fetch(
       `/.netlify/functions/recaptcha`,
       {
@@ -102,7 +102,6 @@
         },
       },
     )
-
 
     console.log("response", response)
   }
