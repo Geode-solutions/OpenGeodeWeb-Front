@@ -1,14 +1,23 @@
 function check_recaptcha_params(name, email, launch) {
   if (name !== "") {
-    return { status: 500 }
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "INTERNAL_ERROR" }),
+    }
   }
   if (email !== "") {
-    return { status: 500 }
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "INTERNAL_ERROR" }),
+    }
   }
   if (launch !== false) {
-    return { status: 500 }
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "INTERNAL_ERROR" }),
+    }
   }
-  return { status: 200 }
+  return { statusCode: 200, body: JSON.stringify({ message: "OK" }) }
 }
 
 export { check_recaptcha_params }
