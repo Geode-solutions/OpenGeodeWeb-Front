@@ -93,6 +93,7 @@
       },
       {
         onResponse({ response }) {
+          console.log("onResponse", { response })
           if (response.ok) {
             infra_store.$patch({
               is_captcha_validated: response.status === 200,
