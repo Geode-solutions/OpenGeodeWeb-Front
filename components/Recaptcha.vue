@@ -81,7 +81,7 @@
     }
   })
   function submit_recaptcha() {
-    $fetch(
+    const response = await $fetch(
       `/.netlify/functions/recaptcha`,
       {
         method: "POST",
@@ -102,5 +102,8 @@
         },
       },
     )
+
+
+    console.log("response", response)
   }
 </script>
