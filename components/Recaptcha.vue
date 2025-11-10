@@ -82,7 +82,15 @@
   })
   function submit_recaptcha() {
     $fetch(
-      `/.netlify/functions/recaptcha?name=${name.value}&email=${email.value}&launch=${launch.value}`,
+      `/.netlify/functions/recaptcha`,
+      {
+        method: "POST",
+        body: {
+          name: name.value,
+          email: email.value,
+          launch: launch.value,
+        },
+      },
       {
         onResponse({ response }) {
           if (response.ok) {
