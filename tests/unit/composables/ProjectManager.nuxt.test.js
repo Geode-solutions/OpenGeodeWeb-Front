@@ -30,7 +30,11 @@ const snapshotMock = {
       abc123: {
         points: {
           visibility: true,
-          coloring: { active: "color", color: { r: 255, g: 255, b: 255 }, vertex: null },
+          coloring: {
+            active: "color",
+            color: { r: 255, g: 255, b: 255 },
+            vertex: null,
+          },
           size: 2,
         },
       },
@@ -48,10 +52,14 @@ const snapshotMock = {
   },
 }
 
-const geodeStoreMock = { start_request: vi.fn(), stop_request: vi.fn(), base_url: "", $reset: vi.fn() }
-const infraStoreMock = { create_connection: vi.fn(() => Promise.resolve()) }
-const viewerStoreMock = { ws_connect: vi.fn(() => Promise.resolve())
+const geodeStoreMock = {
+  start_request: vi.fn(),
+  stop_request: vi.fn(),
+  base_url: "",
+  $reset: vi.fn(),
 }
+const infraStoreMock = { create_connection: vi.fn(() => Promise.resolve()) }
+const viewerStoreMock = { ws_connect: vi.fn(() => Promise.resolve()) }
 const treeviewStoreMock = {
   clear: vi.fn(),
   importStores: vi.fn(() => Promise.resolve()),
@@ -73,7 +81,8 @@ const hybridViewerStoreMock = {
   clear: vi.fn(),
   initHybridViewer: vi.fn(() => Promise.resolve()),
   importStores: vi.fn(async (snapshot) => {
-    if (snapshot?.zScale != null) hybridViewerStoreMock.setZScaling(snapshot.zScale)
+    if (snapshot?.zScale != null)
+      hybridViewerStoreMock.setZScaling(snapshot.zScale)
     if (snapshot?.camera_options) {
       const { viewer_call } = await import("@/composables/viewer_call.js")
       viewer_call({
@@ -89,13 +98,20 @@ const hybridViewerStoreMock = {
 }
 
 // Mocks
-vi.stubGlobal("$fetch", vi.fn(async () => ({ snapshot: snapshotMock })))
-vi.mock("@/composables/viewer_call.js", () => ({ viewer_call: vi.fn(() => Promise.resolve()) }))
+vi.stubGlobal(
+  "$fetch",
+  vi.fn(async () => ({ snapshot: snapshotMock })),
+)
+vi.mock("@/composables/viewer_call.js", () => ({
+  viewer_call: vi.fn(() => Promise.resolve()),
+}))
 vi.mock("@/composables/api_fetch.js", () => ({
   api_fetch: vi.fn(async (_req, options = {}) => {
     const response = {
       _data: new Blob(["zipcontent"], { type: "application/zip" }),
-      headers: { get: (k) => (k === "new-file-name" ? "project_123.zip" : null) },
+      headers: {
+        get: (k) => (k === "new-file-name" ? "project_123.zip" : null),
+      },
     }
     if (options.response_function) await options.response_function(response)
     return response
@@ -104,16 +120,28 @@ vi.mock("@/composables/api_fetch.js", () => ({
 vi.mock("js-file-download", () => ({ default: vi.fn() }))
 vi.mock("@/stores/infra.js", () => ({ useInfraStore: () => infraStoreMock }))
 vi.mock("@/stores/viewer.js", () => ({ useViewerStore: () => viewerStoreMock }))
-vi.mock("@/stores/treeview.js", () => ({ useTreeviewStore: () => treeviewStoreMock }))
-vi.mock("@/stores/data_base.js", () => ({ useDataBaseStore: () => dataBaseStoreMock }))
-vi.mock("@/stores/data_style.js", () => ({ useDataStyleStore: () => dataStyleStoreMock }))
-vi.mock("@/stores/hybrid_viewer.js", () => ({ useHybridViewerStore: () => hybridViewerStoreMock }))
+vi.mock("@/stores/treeview.js", () => ({
+  useTreeviewStore: () => treeviewStoreMock,
+}))
+vi.mock("@/stores/data_base.js", () => ({
+  useDataBaseStore: () => dataBaseStoreMock,
+}))
+vi.mock("@/stores/data_style.js", () => ({
+  useDataStyleStore: () => dataStyleStoreMock,
+}))
+vi.mock("@/stores/hybrid_viewer.js", () => ({
+  useHybridViewerStore: () => hybridViewerStoreMock,
+}))
 vi.mock("@/stores/geode.js", () => ({ useGeodeStore: () => geodeStoreMock }))
 vi.mock("@/stores/app.js", () => ({
-  useAppStore: () => ({ exportStores: vi.fn(() => ({ projectName: "mockedProject" })) }),
+  useAppStore: () => ({
+    exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
+  }),
 }))
 
-vi.stubGlobal("useAppStore", () => ({ exportStores: vi.fn(() => ({ projectName: "mockedProject" })) }))
+vi.stubGlobal("useAppStore", () => ({
+  exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
+}))
 
 describe("ProjectManager composable (compact)", () => {
   beforeEach(async () => {
@@ -129,7 +157,9 @@ describe("ProjectManager composable (compact)", () => {
       dataStyleStoreMock,
       hybridViewerStoreMock,
     ]) {
-      Object.values(store).forEach((v) => typeof v === "function" && v.mockClear && v.mockClear())
+      Object.values(store).forEach(
+        (v) => typeof v === "function" && v.mockClear && v.mockClear(),
+      )
     }
     const { viewer_call } = await import("@/composables/viewer_call.js")
     viewer_call.mockClear()
@@ -147,7 +177,9 @@ describe("ProjectManager composable (compact)", () => {
 
   test("importProjectFile with snapshot", async () => {
     const { importProjectFile } = useProjectManager()
-    const file = new Blob(['{"dataBase":{"db":{}}}'], { type: "application/json" })
+    const file = new Blob(['{"dataBase":{"db":{}}}'], {
+      type: "application/json",
+    })
 
     await importProjectFile(file)
 
@@ -157,12 +189,18 @@ describe("ProjectManager composable (compact)", () => {
     expect(viewerStoreMock.ws_connect).toHaveBeenCalled()
     expect(viewer_call).toHaveBeenCalledTimes(4)
 
-    expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.treeview)
+    expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(
+      snapshotMock.treeview,
+    )
     expect(hybridViewerStoreMock.initHybridViewer).toHaveBeenCalled()
-    expect(hybridViewerStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.hybridViewer)
+    expect(hybridViewerStoreMock.importStores).toHaveBeenCalledWith(
+      snapshotMock.hybridViewer,
+    )
     expect(hybridViewerStoreMock.setZScaling).toHaveBeenCalledWith(1.5)
 
-    expect(dataStyleStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.dataStyle)
+    expect(dataStyleStoreMock.importStores).toHaveBeenCalledWith(
+      snapshotMock.dataStyle,
+    )
     expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalled()
 
     expect(dataBaseStoreMock.registerObject).toHaveBeenCalledWith("abc123")
@@ -174,9 +212,17 @@ describe("ProjectManager composable (compact)", () => {
         displayed_name: "My Data",
       }),
     )
-    expect(treeviewStoreMock.addItem).toHaveBeenCalledWith("PointSet2D", "My Data", "abc123", "mesh")
+    expect(treeviewStoreMock.addItem).toHaveBeenCalledWith(
+      "PointSet2D",
+      "My Data",
+      "abc123",
+      "mesh",
+    )
     expect(hybridViewerStoreMock.addItem).toHaveBeenCalledWith("abc123")
-    expect(dataStyleStoreMock.addDataStyle).toHaveBeenCalledWith("abc123", "PointSet2D")
+    expect(dataStyleStoreMock.addDataStyle).toHaveBeenCalledWith(
+      "abc123",
+      "PointSet2D",
+    )
     expect(dataStyleStoreMock.applyDefaultStyle).toHaveBeenCalledWith("abc123")
 
     expect(hybridViewerStoreMock.remoteRender).toHaveBeenCalled()
