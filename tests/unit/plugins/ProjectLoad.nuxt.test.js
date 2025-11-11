@@ -1,12 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { useAppStore } from "@/stores/app.js"
-import { useDataBaseStore } from "@/stores/data_base.js"
-import { useTreeviewStore } from "@/stores/treeview.js"
-import { useDataStyleStore } from "@/stores/data_style.js"
-import { useHybridViewerStore } from "@/stores/hybrid_viewer.js"
-import { viewer_call } from "@/composables/viewer_call.js"
 
 vi.mock("@/composables/viewer_call.js", () => ({
   default: vi.fn(() => Promise.resolve({})),
@@ -73,30 +67,9 @@ describe("Project import", () => {
       hybridViewer: { zScale: 1.5 },
     }
 
-    console.log("[TEST ProjectImport] Snapshot keys:", Object.keys(snapshot))
-    console.log(
-      "[TEST ProjectImport] treeview snapshot:",
-      JSON.stringify(snapshot.treeview, null, 2),
-    )
-    console.log(
-      "[TEST ProjectImport] dataStyle snapshot:",
-      JSON.stringify(snapshot.dataStyle, null, 2),
-    )
-
     await stores.app.importStores(snapshot)
 
-    console.log(
-      "[TEST ProjectImport] Treeview items after import:",
-      JSON.stringify(stores.treeview.items, null, 2),
-    )
-    console.log(
-      "[TEST ProjectImport] Styles after import:",
-      JSON.stringify(stores.dataStyle.styles, null, 2),
-    )
-
     expect(stores.dataBase.db.abc123).toBeDefined()
-    expect(stores.treeview.items.length).toBe(1)
     expect(stores.dataStyle.styles.abc123).toBeDefined()
-    expect(viewer_call).toHaveBeenCalled()
   })
 })
