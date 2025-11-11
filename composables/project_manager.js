@@ -64,8 +64,7 @@ export function useProjectManager() {
       })
       .then(function () {
         return viewer_call({
-          schema:
-            viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
+          schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
           params: {},
         })
       })
