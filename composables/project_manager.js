@@ -1,6 +1,7 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import fileDownload from "js-file-download"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { once } from "lodash"
 
 export function useProjectManager() {
   const geode = useGeodeStore()
@@ -19,21 +20,15 @@ export function useProjectManager() {
         return api_fetch(
           { schema, params: { snapshot, filename: defaultName } },
           {
-            response_function: function (response) {
+            response_function: once(function (response) {
               const data = response._data
-              let downloadName = defaultName
-              if (
-                response &&
-                response.headers &&
-                typeof response.headers.get === "function"
-              ) {
-                const name = response.headers.get("new-file-name")
-                if (name) {
-                  downloadName = name
-                }
-              }
-              fileDownload(data, downloadName)
-            },
+              const name =
+                (response.headers &&
+                  typeof response.headers.get === "function" &&
+                  response.headers.get("new-file-name")) ||
+                defaultName
+              fileDownload(data, name)
+            }),
           },
         )
       })

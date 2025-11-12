@@ -228,7 +228,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const z_scale = snapshot.zScale
 
     const applyCamera = () => {
-      const camera_options = snapshot.camera_options
+      const { camera_options } = snapshot
       if (!camera_options) {
         return
       }
