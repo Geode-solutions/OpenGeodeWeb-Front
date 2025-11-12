@@ -116,8 +116,8 @@ async function importItemFromSnapshot(
   }
 
   await dataStyleStore.applyDefaultStyle(item.id)
-    hybridViewerStore.remoteRender()
-    return item.id
+  hybridViewerStore.remoteRender()
+  return item.id
 }
 
 async function importWorkflowFromSnapshot(items) {
