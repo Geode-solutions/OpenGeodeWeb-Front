@@ -196,24 +196,28 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender()
   }
 
-  function clear() {
+  const clear = () => {
     const renderer = genericRenderWindow.value.getRenderer()
     const actors = renderer.getActors()
-    actors.forEach((actor) => renderer.removeActor(actor))
+    for (const actor of actors) {
+      renderer.removeActor(actor)
+    }
     genericRenderWindow.value.getRenderWindow().render()
-    Object.keys(db).forEach((id) => delete db[id])
+    for (const id of Object.keys(db)) {
+      delete db[id]
+    }
   }
 
-  function exportStores() {
-    const renderer = genericRenderWindow.value?.getRenderer?.()
-    const camera = renderer?.getActiveCamera?.()
+  const exportStores = () => {
+    const renderer = genericRenderWindow.value.getRenderer()
+    const camera = renderer.getActiveCamera()
     const cameraSnapshot = camera
       ? {
-          focal_point: Array.from(camera.getFocalPoint()),
-          view_up: Array.from(camera.getViewUp()),
-          position: Array.from(camera.getPosition()),
+          focal_point: [...camera.getFocalPoint()],
+          view_up: [...camera.getViewUp()],
+          position: [...camera.getPosition()],
           view_angle: camera.getViewAngle(),
-          clipping_range: Array.from(camera.getClippingRange()),
+          clipping_range: [...camera.getClippingRange()],
           distance: camera.getDistance(),
         }
       : camera_options
@@ -221,46 +225,53 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function importStores(snapshot) {
-    const z_scale = snapshot?.zScale
-    if (z_scale != null) {
-      await setZScaling(z_scale)
-    }
+    const z_scale = snapshot.zScale
 
-    const camera_options = snapshot?.camera_options
-    if (!camera_options) return
+    const applyCamera = () => {
+      const camera_options = snapshot?.camera_options
+      if (!camera_options) return
 
-    const renderer = genericRenderWindow.value.getRenderer()
-    const camera = renderer.getActiveCamera()
+      const renderer = genericRenderWindow.value.getRenderer()
+      const camera = renderer.getActiveCamera()
 
-    camera.setFocalPoint(...camera_options.focal_point)
-    camera.setViewUp(...camera_options.view_up)
-    camera.setPosition(...camera_options.position)
-    camera.setViewAngle(camera_options.view_angle)
-    camera.setClippingRange(...camera_options.clipping_range)
+      camera.setFocalPoint(...camera_options.focal_point)
+      camera.setViewUp(...camera_options.view_up)
+      camera.setPosition(...camera_options.position)
+      camera.setViewAngle(camera_options.view_angle)
+      camera.setClippingRange(...camera_options.clipping_range)
 
-    genericRenderWindow.value.getRenderWindow().render()
+      genericRenderWindow.value.getRenderWindow().render()
 
-    const payload = {
-      camera_options: {
-        focal_point: camera_options.focal_point,
-        view_up: camera_options.view_up,
-        position: camera_options.position,
-        view_angle: camera_options.view_angle,
-        clipping_range: camera_options.clipping_range,
-      },
-    }
-    viewer_call(
-      {
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-        params: payload,
-      },
-      {
-        response_function: () => {
-          remoteRender()
-          Object.assign(camera_options, payload.camera_options)
+      const payload = {
+        camera_options: {
+          focal_point: camera_options.focal_point,
+          view_up: camera_options.view_up,
+          position: camera_options.position,
+          view_angle: camera_options.view_angle,
+          clipping_range: camera_options.clipping_range,
         },
-      },
-    )
+      }
+      viewer_call(
+        {
+          schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+          params: payload,
+        },
+        {
+          response_function: () => {
+            remoteRender()
+            Object.assign(camera_options, payload.camera_options)
+          },
+        },
+      )
+    }
+
+    if (typeof z_scale === "number") {
+      return setZScaling(z_scale).then(() => {
+        applyCamera()
+      })
+    }
+    applyCamera()
+    return Promise.resolve()
   }
 
   return {
