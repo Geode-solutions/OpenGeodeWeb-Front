@@ -55,17 +55,17 @@ export const useGeodeStore = defineStore("geode", {
         method: back_schemas.opengeodeweb_back.ping.methods[0],
         body: {},
         onRequestError({ error }) {
-          feedback_store.server_error = true
+          feedback_store.$patch({ server_error: true })
           geode_store.status = Status.NOT_CONNECTED
         },
         onResponse({ response }) {
           if (response.ok) {
-            feedback_store.server_error = false
+            feedback_store.$patch({ server_error: false })
             geode_store.status = Status.CONNECTED
           }
         },
         onResponseError({ response }) {
-          feedback_store.server_error = true
+          feedback_store.$patch({ server_error: true })
           geode_store.status = Status.NOT_CONNECTED
         },
       })
