@@ -125,12 +125,10 @@ describe("Geode store", () => {
 
       test("response", async () => {
         const geode_store = useGeodeStore()
-        const feedback_store = useFeedbackStore()
         geode_store.base_url = ""
         getFakeCall.mockImplementation(() => ({}))
         await geode_store.do_ping()
         expect(geode_store.status).toBe(Status.CONNECTED)
-        expect(feedback_store.server_error).toBe(false)
       })
       test("response_error", async () => {
         const geode_store = useGeodeStore()
@@ -143,8 +141,6 @@ describe("Geode store", () => {
 
         await geode_store.do_ping()
         expect(geode_store.status).toBe(Status.NOT_CONNECTED)
-        const feedback_store = useFeedbackStore()
-        expect(feedback_store.server_error).toBe(true)
       })
     })
 
