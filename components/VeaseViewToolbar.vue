@@ -81,7 +81,6 @@
           {
             response_function: () => {
               grid_scale.value = !grid_scale.value
-              hybridViewerStore.remoteRender()
             },
           },
         )

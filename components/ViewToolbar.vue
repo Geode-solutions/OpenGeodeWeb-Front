@@ -22,7 +22,6 @@
 
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-  const hybridViewerStore = useHybridViewerStore()
 
   const take_screenshot = ref(false)
   const grid_scale = ref(false)
@@ -58,7 +57,6 @@
           {
             response_function: () => {
               grid_scale.value = !grid_scale.value
-              hybridViewerStore.remoteRender()
             },
           },
         )
