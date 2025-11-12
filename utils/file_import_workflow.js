@@ -63,7 +63,6 @@ async function importFile(filename, geode_object) {
   await dataStyleStore.addDataStyle(
     data._value.id,
     data._value.geode_object,
-    data._value.object_type,
   )
   console.log("after dataStyleStore.addDataStyle")
   if (data._value.object_type === "model") {
@@ -81,12 +80,12 @@ async function importFile(filename, geode_object) {
 }
 
 async function importItemFromSnapshot(
-  item,
-  dataBaseStore,
-  treeviewStore,
-  dataStyleStore,
-  hybridViewerStore,
+  item
 ) {
+  const dataBaseStore = useDataBaseStore()
+  const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
+  const treeviewStore = useTreeviewStore()
   await dataBaseStore.registerObject(item.id)
   await dataBaseStore.addItem(item.id, {
     object_type: item.object_type,

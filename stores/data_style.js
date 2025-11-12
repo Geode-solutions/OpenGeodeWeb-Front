@@ -15,12 +15,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     dataStyleState.styles[id] = style
   }
 
-  function setVisibility(id, visibility) {
-    const meta = dataBaseStore.itemMetaDatas(id)
-    if (!meta) {
-      return Promise.resolve([])
-    }
-    const { object_type } = meta
+ function setVisibility(id, visibility) {
+    console.log(
+      "dataBaseStore.itemMetaDatas(id)",
+      dataBaseStore.itemMetaDatas(id),
+    )
+    const object_type = dataBaseStore.itemMetaDatas(id).object_type
     if (object_type === "mesh") {
       return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
     } else if (object_type === "model") {
