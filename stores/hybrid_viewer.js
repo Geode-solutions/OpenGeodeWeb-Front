@@ -97,9 +97,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         z_scale: z_scale,
       },
     })
+    remoteRender()
   }
 
   function syncRemoteCamera() {
+    console.log("syncRemoteCamera")
     const renderer = genericRenderWindow.value.getRenderer()
     const camera = renderer.getActiveCamera()
     const params = {
@@ -109,6 +111,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         position: camera.getPosition(),
         view_angle: camera.getViewAngle(),
         clipping_range: camera.getClippingRange(),
+        distance: camera.getDistance(),
       },
     }
     viewer_call(

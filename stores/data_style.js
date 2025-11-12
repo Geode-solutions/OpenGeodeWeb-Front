@@ -8,6 +8,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const meshStyleStore = useMeshStyle()
   const modelStyleStore = useModelStyle()
   const dataBaseStore = useDataBaseStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   function addDataStyle(id, geode_object) {
     const style = getDefaultStyle(geode_object)
@@ -21,9 +22,13 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
     const { object_type } = meta
     if (object_type === "mesh") {
-      return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
+      return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)]).then(() => {
+        hybridViewerStore.remoteRender()
+      })
     } else if (object_type === "model") {
-      return Promise.all([modelStyleStore.setModelVisibility(id, visibility)])
+      return Promise.all([modelStyleStore.setModelVisibility(id, visibility)]).then(() => {
+        hybridViewerStore.remoteRender()
+      })
     }
     throw new Error("Unknown object_type")
   }
@@ -31,9 +36,13 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   function applyDefaultStyle(id) {
     const { object_type } = dataBaseStore.itemMetaDatas(id)
     if (object_type === "mesh") {
-      return meshStyleStore.applyMeshStyle(id)
+      return meshStyleStore.applyMeshStyle(id).then(() => {
+        hybridViewerStore.remoteRender()
+      })
     } else if (object_type === "model") {
-      return modelStyleStore.applyModelStyle(id)
+      return modelStyleStore.applyModelStyle(id).then(() => {
+        hybridViewerStore.remoteRender()
+      })
     }
     return Promise.resolve([])
   }
@@ -73,7 +82,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
         promises.push(modelStyleStore.applyModelStyle(id))
       }
     }
-    return Promise.all(promises)
+    return Promise.all(promises).then(() => {
+      hybridViewerStore.remoteRender()
+    })
   }
 
   return {
