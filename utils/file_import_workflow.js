@@ -4,7 +4,7 @@ import { useHybridViewerStore } from "../stores/hybrid_viewer"
 
 // Local imports
 
-async function importWorkflow(files) {
+function importWorkflow(files) {
   console.log("importWorkflow", { files })
   const promise_array = []
   for (const file of files) {
@@ -24,9 +24,11 @@ async function importFile(filename, geode_object) {
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
     params: {
       input_geode_object: geode_object,
-      filename: filename,
+      filename,
     },
   })
+
+  console.log("data.value", data.value)
 
   const {
     id,
@@ -35,12 +37,9 @@ async function importFile(filename, geode_object) {
     name,
     object_type,
     binary_light_viewable,
-  } = data._value
+  } = data.value
 
-  console.log("data._value", data._value)
-
-  console.log("data._value.id", data._value.id)
-  await dataBaseStore.registerObject(data._value.id)
+  await dataBaseStore.registerObject(id)
   console.log("after dataBaseStore.registerObject")
   await dataBaseStore.addItem(id, {
     object_type: object_type,
@@ -60,13 +59,9 @@ async function importFile(filename, geode_object) {
   await hybridViewerStore.addItem(id)
   console.log("after dataBaseStore.addItem")
 
-  await dataStyleStore.addDataStyle(
-    data._value.id,
-    data._value.geode_object,
-    data._value.object_type,
-  )
+  await dataStyleStore.addDataStyle(id, geode_object, object_type)
   console.log("after dataStyleStore.addDataStyle")
-  if (data._value.object_type === "model") {
+  if (object_type === "model") {
     await Promise.all([
       dataBaseStore.fetchMeshComponents(id),
       dataBaseStore.fetchUuidToFlatIndexDict(id),
@@ -77,7 +72,7 @@ async function importFile(filename, geode_object) {
   await dataStyleStore.applyDefaultStyle(id)
   console.log("after dataStyleStore.applyDefaultStyle")
   hybridViewerStore.remoteRender()
-  return data._value.id
+  return id
 }
 
 export { importFile, importWorkflow }
