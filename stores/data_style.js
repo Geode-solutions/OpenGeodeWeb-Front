@@ -17,10 +17,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   function setVisibility(id, visibility) {
     const meta = dataBaseStore.itemMetaDatas(id)
     if (!meta) {
-      console.warn("[DataStyle] setVisibility skipped: unknown id", id)
       return Promise.resolve([])
     }
-    const object_type = meta.object_type
+    const { object_type } = meta
     if (object_type === "mesh") {
       return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
     } else if (object_type === "model") {
@@ -39,40 +38,42 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     return Promise.resolve([])
   }
 
-  function setModelEdgesVisibility(id, visibility) {
+  const setModelEdgesVisibility = (id, visibility) => {
     return modelStyleStore.setModelEdgesVisibility(id, visibility)
   }
 
-  function modelEdgesVisibility(id) {
+  const modelEdgesVisibility = (id) => {
     return modelStyleStore.modelEdgesVisibility(id)
   }
 
-  function exportStores() {
+  const exportStores = () => {
     return { styles: dataStyleState.styles }
   }
 
-  async function importStores(snapshot) {
-    const stylesSnapshot = snapshot?.styles || {}
-    for (const id of Object.keys(dataStyleState.styles))
+  const importStores = (snapshot) => {
+    const stylesSnapshot = snapshot.styles || {}
+    for (const id of Object.keys(dataStyleState.styles)) {
       delete dataStyleState.styles[id]
+    }
     for (const [id, style] of Object.entries(stylesSnapshot)) {
       dataStyleState.styles[id] = style
     }
   }
 
-  async function applyAllStylesFromState() {
+  const applyAllStylesFromState = () => {
     const ids = Object.keys(dataStyleState.styles || {})
+    const promises = []
     for (const id of ids) {
       const meta = dataBaseStore.itemMetaDatas(id)
       const objectType = meta?.object_type
       const style = dataStyleState.styles[id]
-      if (!style || !objectType) continue
-      if (objectType === "mesh") {
-        await meshStyleStore.applyMeshStyle(id)
-      } else if (objectType === "model") {
-        await modelStyleStore.applyModelStyle(id)
+      if (style && objectType === "mesh") {
+        promises.push(meshStyleStore.applyMeshStyle(id))
+      } else if (style && objectType === "model") {
+        promises.push(modelStyleStore.applyModelStyle(id))
       }
     }
+    return Promise.all(promises)
   }
 
   return {

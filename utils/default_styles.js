@@ -16,9 +16,12 @@ const corners_defaultColor = { r: 20, g: 20, b: 20 }
 const lines_defaultVisibility = true
 const lines_defaultColor = { r: 20, g: 20, b: 20 }
 const surfaces_defaultVisibility = true
-const surfaces_defaultColor = { r: 255, g: 255, b: 255 }
+const redKey = "r"
+const greenKey = "g"
+const blueKey = "b"
+const surfaces_defaultColor = { [redKey]: 255, [greenKey]: 255, [blueKey]: 255 }
 const blocks_defaultVisibility = true
-const blocks_defaultColor = { r: 20, g: 20, b: 20 }
+const blocks_defaultColor = { [redKey]: 20, [greenKey]: 20, [blueKey]: 20 }
 
 // Mesh functions
 const meshPointsDefaultStyle = (

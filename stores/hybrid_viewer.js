@@ -224,12 +224,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
 
-  async function importStores(snapshot) {
+  const importStores = (snapshot) => {
     const z_scale = snapshot.zScale
 
     const applyCamera = () => {
-      const camera_options = snapshot?.camera_options
-      if (!camera_options) return
+      const camera_options = snapshot.camera_options
+      if (!camera_options) {
+        return
+      }
 
       const renderer = genericRenderWindow.value.getRenderer()
       const camera = renderer.getActiveCamera()
@@ -251,7 +253,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           clipping_range: camera_options.clipping_range,
         },
       }
-      viewer_call(
+      return viewer_call(
         {
           schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
           params: payload,
@@ -266,12 +268,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     }
 
     if (typeof z_scale === "number") {
-      return setZScaling(z_scale).then(() => {
-        applyCamera()
-      })
+      return setZScaling(z_scale).then(() => applyCamera())
     }
-    applyCamera()
-    return Promise.resolve()
+    return applyCamera()
   }
 
   return {
