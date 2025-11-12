@@ -22,11 +22,15 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
     const { object_type } = meta
     if (object_type === "mesh") {
-      return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)]).then(() => {
+      return Promise.all([
+        meshStyleStore.setMeshVisibility(id, visibility),
+      ]).then(() => {
         hybridViewerStore.remoteRender()
       })
     } else if (object_type === "model") {
-      return Promise.all([modelStyleStore.setModelVisibility(id, visibility)]).then(() => {
+      return Promise.all([
+        modelStyleStore.setModelVisibility(id, visibility),
+      ]).then(() => {
         hybridViewerStore.remoteRender()
       })
     }
