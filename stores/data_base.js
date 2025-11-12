@@ -48,8 +48,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     })
   }
 
-  const hybridViewerStore = useHybridViewerStore()
-
   async function addItem(
     id,
     value = {
@@ -62,11 +60,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     },
   ) {
     db[id] = value
-
-    if (value.object_type === "model") {
-      await fetchMeshComponents(id)
-      await fetchUuidToFlatIndexDict(id)
-    }
   }
 
   async function fetchMeshComponents(id) {

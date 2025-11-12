@@ -8,7 +8,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const meshStyleStore = useMeshStyle()
   const modelStyleStore = useModelStyle()
   const dataBaseStore = useDataBaseStore()
-  // const hybridViewerStore = useHybridViewerStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   function addDataStyle(id, geode_object) {
     const style = getDefaultStyle(geode_object)
@@ -35,8 +35,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       return meshStyleStore.applyMeshStyle(id)
     } else if (object_type === "model") {
       return modelStyleStore.applyModelStyle(id)
+    } else {
+      throw new Error("Unknown object_type: " + object_type)
     }
-    return Promise.resolve([])
   }
 
   const setModelEdgesVisibility = (id, visibility) => {
