@@ -4,7 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 export function useProjectManager() {
   const exportProject = function () {
-    console.log("[export triggered]");
+    console.log("[export triggered]")
     const appStore = useAppStore()
     const geode = useGeodeStore()
     const infraStore = useInfraStore()
@@ -26,11 +26,10 @@ export function useProjectManager() {
               const headerName =
                 (response.headers &&
                   typeof response.headers.get === "function" &&
-                  (
-                    response.headers.get("Content-Disposition")
-                      ?.match(/filename=\"(.+?)\"/)?.[1] ||
-                    response.headers.get("new-file-name")
-                  )) ||
+                  (response.headers
+                    .get("Content-Disposition")
+                    ?.match(/filename=\"(.+?)\"/)?.[1] ||
+                    response.headers.get("new-file-name"))) ||
                 defaultName
               if (!headerName.toLowerCase().endsWith(".vease")) {
                 throw new Error("Server returned non-.vease project archive")
