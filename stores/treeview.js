@@ -23,16 +23,12 @@ export const useTreeviewStore = defineStore("treeview", () => {
             sensitivity: "base",
           }),
         )
-        if (!isImporting.value) {
-          selection.value.push(child)
-        }
+        selection.value.push(child)
         return
       }
     }
     items.value.push({ title: geodeObject, children: [child] })
-    if (!isImporting.value) {
-      selection.value.push(child)
-    }
+    selection.value.push(child)
   }
 
   function displayAdditionalTree(id) {
