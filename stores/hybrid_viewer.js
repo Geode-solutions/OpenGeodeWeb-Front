@@ -199,18 +199,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender()
   }
 
-  const clear = () => {
-    const renderer = genericRenderWindow.value.getRenderer()
-    const actors = renderer.getActors()
-    for (const actor of actors) {
-      renderer.removeActor(actor)
-    }
-    genericRenderWindow.value.getRenderWindow().render()
-    for (const id of Object.keys(db)) {
-      delete db[id]
-    }
-  }
-
   const exportStores = () => {
     const renderer = genericRenderWindow.value.getRenderer()
     const camera = renderer.getActiveCamera()
@@ -274,6 +262,18 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return setZScaling(z_scale).then(() => applyCamera())
     }
     return applyCamera()
+  }
+
+   const clear = () => {
+    const renderer = genericRenderWindow.value.getRenderer()
+    const actors = renderer.getActors()
+    for (const actor of actors) {
+      renderer.removeActor(actor)
+    }
+    genericRenderWindow.value.getRenderWindow().render()
+    for (const id of Object.keys(db)) {
+      delete db[id]
+    }
   }
 
   return {
