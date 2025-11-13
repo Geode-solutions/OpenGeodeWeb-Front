@@ -50,6 +50,9 @@
     () => treeviewStore.selection,
     (current, previous) => {
       if (!previous) previous = []
+      if (current.value === previous) {
+        return
+      }
       const { added, removed } = compareSelections(current, previous)
 
       added.forEach((item) => {
@@ -71,7 +74,6 @@
       })
       hybridViewerStore.remoteRender()
     },
-    { immediate: true },
   )
 
   function isModel(item) {

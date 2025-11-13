@@ -4,7 +4,7 @@ import { useHybridViewerStore } from "../stores/hybrid_viewer"
 
 // Local imports
 
-async function importWorkflow(files) {
+function importWorkflow(files) {
   console.log("importWorkflow", { files })
   const promise_array = []
   for (const file of files) {
@@ -69,9 +69,11 @@ async function importFile(filename, geode_object) {
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
     params: {
       input_geode_object: geode_object,
-      filename: filename,
+      filename,
     },
   })
+
+  console.log("data.value", data.value)
 
   const item = buildImportItemFromPayloadApi(data._value, geode_object)
   return importItem(item)

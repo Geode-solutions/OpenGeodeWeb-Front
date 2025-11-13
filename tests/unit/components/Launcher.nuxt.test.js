@@ -9,7 +9,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import Launcher from "@ogw_f/components/Launcher.vue"
+import Launcher from "~/components/Launcher.vue"
 
 const vuetify = createVuetify({
   components,
@@ -38,15 +38,14 @@ describe("Launcher.vue", async () => {
     })
     setActivePinia(pinia)
     const infra_store = useInfraStore()
-    const spy_create_backend = vi.spyOn(infra_store, "create_backend")
     const wrapper = await mountSuspended(Launcher, {
       global: {
-        plugins: [vuetify],
+        plugins: [pinia, vuetify],
       },
     })
     expect(wrapper.exists()).toBe(true)
     await infra_store.$patch({ is_captcha_validated: true })
-    flushPromises()
-    expect(spy_create_backend).toHaveBeenCalled()
+    await flushPromises()
+    expect(infra_store.create_backend).toHaveBeenCalled()
   })
 })
