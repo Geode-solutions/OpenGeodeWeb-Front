@@ -5,4 +5,3 @@
 #    pip-compile --output-file=tests/integration/microservices/viewer/requirements.txt tests/integration/microservices/viewer/requirements.in
 #
 
-opengeodeweb-viewer==1.*,>=1.11.9
