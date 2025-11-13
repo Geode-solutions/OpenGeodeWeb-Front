@@ -30,8 +30,8 @@ export function useProjectManager() {
               const name = serverName.endsWith(".zip")
                 ? serverName.replace(/\.zip$/i, ".vease")
                 : serverName.endsWith(".vease")
-                ? serverName
-                : `${serverName}.vease`
+                  ? serverName
+                  : `${serverName}.vease`
               fileDownload(data, name)
             }),
           },
@@ -75,8 +75,7 @@ export function useProjectManager() {
 
         const schemaImport = back_schemas.opengeodeweb_back.import_project
         const form = new FormData()
-        const originalFileName =
-          file && file.name ? file.name : "project.vease"
+        const originalFileName = file && file.name ? file.name : "project.vease"
         const serverFileName = originalFileName.toLowerCase().endsWith(".vease")
           ? originalFileName.replace(/\.vease$/i, ".zip")
           : originalFileName

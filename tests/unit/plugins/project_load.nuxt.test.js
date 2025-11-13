@@ -40,11 +40,13 @@ describe("Project import", () => {
       .slice(1)
       .forEach((store) => stores.app.registerStore(store))
 
-    vi.spyOn(stores.dataBase, "importStores").mockImplementation(async (snapshot) => {
-      for (const [id, item] of Object.entries(snapshot?.db || {})) {
-        stores.dataBase.db[id] = item
-      }
-    })
+    vi.spyOn(stores.dataBase, "importStores").mockImplementation(
+      async (snapshot) => {
+        for (const [id, item] of Object.entries(snapshot?.db || {})) {
+          stores.dataBase.db[id] = item
+        }
+      },
+    )
 
     const snapshot = {
       dataBase: {
