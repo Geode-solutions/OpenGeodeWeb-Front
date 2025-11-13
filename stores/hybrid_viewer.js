@@ -264,7 +264,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return applyCamera()
   }
 
-   const clear = () => {
+  const clear = () => {
     const renderer = genericRenderWindow.value.getRenderer()
     const actors = renderer.getActors()
     for (const actor of actors) {
