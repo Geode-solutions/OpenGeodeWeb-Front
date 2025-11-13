@@ -1,14 +1,12 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import fileDownload from "js-file-download"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import { once } from "lodash"
 
 export function useProjectManager() {
-  const geode = useGeodeStore()
-  const appStore = useAppStore()
-
   const exportProject = function () {
-    geode.start_request()
+    console.log("[export triggered]");
+    const appStore = useAppStore()
+    const geode = useGeodeStore()
     const infraStore = useInfraStore()
     const snapshot = appStore.exportStores()
     const schema = back_schemas.opengeodeweb_back.export_project
@@ -17,23 +15,28 @@ export function useProjectManager() {
     return infraStore
       .create_connection()
       .then(function () {
+        let downloaded = false
         return api_fetch(
           { schema, params: { snapshot, filename: defaultName } },
           {
-            response_function: once(function (response) {
+            response_function: function (response) {
+              if (downloaded) return
+              downloaded = true
               const data = response._data
-              const serverName =
+              const headerName =
                 (response.headers &&
                   typeof response.headers.get === "function" &&
-                  response.headers.get("new-file-name")) ||
+                  (
+                    response.headers.get("Content-Disposition")
+                      ?.match(/filename=\"(.+?)\"/)?.[1] ||
+                    response.headers.get("new-file-name")
+                  )) ||
                 defaultName
-              const name = serverName.endsWith(".zip")
-                ? serverName.replace(/\.zip$/i, ".vease")
-                : serverName.endsWith(".vease")
-                  ? serverName
-                  : `${serverName}.vease`
-              fileDownload(data, name)
-            }),
+              if (!headerName.toLowerCase().endsWith(".vease")) {
+                throw new Error("Server returned non-.vease project archive")
+              }
+              fileDownload(data, headerName)
+            },
           },
         )
       })
@@ -43,8 +46,7 @@ export function useProjectManager() {
   }
 
   const importProjectFile = function (file) {
-    geode.start_request()
-
+    const geode = useGeodeStore()
     const viewerStore = useViewerStore()
     const dataBaseStore = useDataBaseStore()
     const treeviewStore = useTreeviewStore()
@@ -76,13 +78,10 @@ export function useProjectManager() {
         const schemaImport = back_schemas.opengeodeweb_back.import_project
         const form = new FormData()
         const originalFileName = file && file.name ? file.name : "project.vease"
-        const serverFileName = originalFileName.toLowerCase().endsWith(".vease")
-          ? originalFileName.replace(/\.vease$/i, ".zip")
-          : originalFileName
-        const zipNamedFile = new File([file], serverFileName, {
-          type: file.type || "application/zip",
-        })
-        form.append("file", zipNamedFile, serverFileName)
+        if (!originalFileName.toLowerCase().endsWith(".vease")) {
+          throw new Error("Uploaded file must be a .vease")
+        }
+        form.append("file", file, originalFileName)
 
         return $fetch(schemaImport.$id, {
           baseURL: geode.base_url,
