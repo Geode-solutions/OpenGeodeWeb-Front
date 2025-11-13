@@ -15,68 +15,19 @@ async function importWorkflow(files) {
   return Promise.all(promise_array)
 }
 
-async function importFile(filename, geode_object) {
-  const dataBaseStore = useDataBaseStore()
-  const dataStyleStore = useDataStyleStore()
-  const hybridViewerStore = useHybridViewerStore()
-  const treeviewStore = useTreeviewStore()
-  const { data } = await api_fetch({
-    schema: back_schemas.opengeodeweb_back.save_viewable_file,
-    params: {
-      input_geode_object: geode_object,
-      filename: filename,
-    },
-  })
-
-  const {
-    id,
-    native_file_name,
-    viewable_file_name,
-    name,
-    object_type,
-    binary_light_viewable,
-  } = data._value
-
-  console.log("data._value", data._value)
-
-  console.log("data._value.id", data._value.id)
-  await dataBaseStore.registerObject(data._value.id)
-  console.log("after dataBaseStore.registerObject")
-  await dataBaseStore.addItem(id, {
-    object_type: object_type,
-    geode_object: geode_object,
-    native_filename: native_file_name,
-    viewable_filename: viewable_file_name,
-    displayed_name: name,
-    vtk_js: {
-      binary_light_viewable,
-    },
-  })
-
-  await treeviewStore.addItem(geode_object, name, id, object_type)
-
-  console.log("after treeviewStore.addItem")
-
-  await hybridViewerStore.addItem(id)
-  console.log("after dataBaseStore.addItem")
-
-  await dataStyleStore.addDataStyle(data._value.id, data._value.geode_object)
-  console.log("after dataStyleStore.addDataStyle")
-  if (data._value.object_type === "model") {
-    await Promise.all([
-      dataBaseStore.fetchMeshComponents(id),
-      dataBaseStore.fetchUuidToFlatIndexDict(id),
-    ])
-    console.log("after dataBaseStore.fetchMeshComponents")
-    console.log("after dataBaseStore.fetchUuidToFlatIndexDict")
+function buildImportItemFromPayloadApi(value, geode_object) {
+  return {
+    id: value.id,
+    object_type: value.object_type,
+    geode_object,
+    native_filename: value.native_file_name,
+    viewable_filename: value.viewable_file_name,
+    displayed_name: value.name,
+    vtk_js: { binary_light_viewable: value.binary_light_viewable },
   }
-  await dataStyleStore.applyDefaultStyle(id)
-  console.log("after dataStyleStore.applyDefaultStyle")
-  hybridViewerStore.remoteRender()
-  return data._value.id
 }
 
-async function importItemFromSnapshot(item) {
+async function importItem(item) {
   const dataBaseStore = useDataBaseStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
@@ -99,7 +50,6 @@ async function importItemFromSnapshot(item) {
   )
 
   await hybridViewerStore.addItem(item.id)
-
   await dataStyleStore.addDataStyle(item.id, item.geode_object)
 
   if (item.object_type === "model") {
@@ -112,6 +62,23 @@ async function importItemFromSnapshot(item) {
   await dataStyleStore.applyDefaultStyle(item.id)
   hybridViewerStore.remoteRender()
   return item.id
+}
+
+async function importFile(filename, geode_object) {
+  const { data } = await api_fetch({
+    schema: back_schemas.opengeodeweb_back.save_viewable_file,
+    params: {
+      input_geode_object: geode_object,
+      filename: filename,
+    },
+  })
+
+  const item = buildImportItemFromPayloadApi(data._value, geode_object)
+  return importItem(item)
+}
+
+async function importItemFromSnapshot(item) {
+  return importItem(item)
 }
 
 async function importWorkflowFromSnapshot(items) {
