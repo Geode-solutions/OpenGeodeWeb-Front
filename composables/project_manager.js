@@ -12,7 +12,7 @@ export function useProjectManager() {
     const infraStore = useInfraStore()
     const snapshot = appStore.exportStores()
     const schema = back_schemas.opengeodeweb_back.export_project
-    const defaultName = "project.zip"
+    const defaultName = "project.vease"
 
     return infraStore
       .create_connection()
@@ -22,11 +22,16 @@ export function useProjectManager() {
           {
             response_function: once(function (response) {
               const data = response._data
-              const name =
+              const serverName =
                 (response.headers &&
                   typeof response.headers.get === "function" &&
                   response.headers.get("new-file-name")) ||
                 defaultName
+              const name = serverName.endsWith(".zip")
+                ? serverName.replace(/\.zip$/i, ".vease")
+                : serverName.endsWith(".vease")
+                ? serverName
+                : `${serverName}.vease`
               fileDownload(data, name)
             }),
           },
@@ -70,8 +75,15 @@ export function useProjectManager() {
 
         const schemaImport = back_schemas.opengeodeweb_back.import_project
         const form = new FormData()
-        const fileName = file && file.name ? file.name : "file"
-        form.append("file", file, fileName)
+        const originalFileName =
+          file && file.name ? file.name : "project.vease"
+        const serverFileName = originalFileName.toLowerCase().endsWith(".vease")
+          ? originalFileName.replace(/\.vease$/i, ".zip")
+          : originalFileName
+        const zipNamedFile = new File([file], serverFileName, {
+          type: file.type || "application/zip",
+        })
+        form.append("file", zipNamedFile, serverFileName)
 
         return $fetch(schemaImport.$id, {
           baseURL: geode.base_url,
