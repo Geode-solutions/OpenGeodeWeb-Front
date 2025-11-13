@@ -11,8 +11,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const hybridViewerStore = useHybridViewerStore()
 
   function addDataStyle(id, geode_object) {
-    const style = getDefaultStyle(geode_object)
-    dataStyleState.styles[id] = style
+    dataStyleState.styles[id] = getDefaultStyle(geode_object)
   }
 
   function setVisibility(id, visibility) {
@@ -38,14 +37,6 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     } else {
       throw new Error("Unknown object_type: " + object_type)
     }
-  }
-
-  const setModelEdgesVisibility = (id, visibility) => {
-    return modelStyleStore.setModelEdgesVisibility(id, visibility)
-  }
-
-  const modelEdgesVisibility = (id) => {
-    return modelStyleStore.modelEdgesVisibility(id)
   }
 
   const exportStores = () => {
@@ -85,8 +76,6 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     addDataStyle,
     applyDefaultStyle,
     setVisibility,
-    setModelEdgesVisibility,
-    modelEdgesVisibility,
     exportStores,
     importStores,
     applyAllStylesFromState,
