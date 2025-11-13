@@ -15,7 +15,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     dataStyleState.styles[id] = style
   }
 
- function setVisibility(id, visibility) {
+  function setVisibility(id, visibility) {
     console.log(
       "dataBaseStore.itemMetaDatas(id)",
       dataBaseStore.itemMetaDatas(id),

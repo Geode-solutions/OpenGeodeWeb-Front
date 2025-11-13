@@ -60,10 +60,7 @@ async function importFile(filename, geode_object) {
   await hybridViewerStore.addItem(id)
   console.log("after dataBaseStore.addItem")
 
-  await dataStyleStore.addDataStyle(
-    data._value.id,
-    data._value.geode_object,
-  )
+  await dataStyleStore.addDataStyle(data._value.id, data._value.geode_object)
   console.log("after dataStyleStore.addDataStyle")
   if (data._value.object_type === "model") {
     await Promise.all([
@@ -79,9 +76,7 @@ async function importFile(filename, geode_object) {
   return data._value.id
 }
 
-async function importItemFromSnapshot(
-  item
-) {
+async function importItemFromSnapshot(item) {
   const dataBaseStore = useDataBaseStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
