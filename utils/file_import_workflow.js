@@ -12,7 +12,10 @@ async function importWorkflow(files) {
     console.log({ filename }, { geode_object })
     promise_array.push(importFile(filename, geode_object))
   }
-  return Promise.all(promise_array)
+  const results = await Promise.all(promise_array)
+  const hybridViewerStore = useHybridViewerStore()
+  hybridViewerStore.remoteRender()
+  return results
 }
 
 function buildImportItemFromPayloadApi(value, geode_object) {
@@ -60,7 +63,6 @@ async function importItem(item) {
   }
 
   await dataStyleStore.applyDefaultStyle(item.id)
-  hybridViewerStore.remoteRender()
   return item.id
 }
 
