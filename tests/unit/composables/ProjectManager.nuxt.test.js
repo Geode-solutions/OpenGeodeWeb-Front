@@ -110,7 +110,7 @@ vi.mock("@/composables/api_fetch.js", () => ({
     const response = {
       _data: new Blob(["zipcontent"], { type: "application/zip" }),
       headers: {
-        get: (k) => (k === "new-file-name" ? "project_123.zip" : null),
+        get: (k) => (k === "new-file-name" ? "project_123.vease" : null),
       },
     }
     if (options.response_function) await options.response_function(response)
@@ -187,7 +187,7 @@ describe("ProjectManager composable (compact)", () => {
 
     expect(infraStoreMock.create_connection).toHaveBeenCalled()
     expect(viewerStoreMock.ws_connect).toHaveBeenCalled()
-    expect(viewer_call).toHaveBeenCalledTimes(4)
+    expect(viewer_call).toHaveBeenCalledTimes(3)
 
     expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(
       snapshotMock.treeview,
