@@ -80,18 +80,17 @@
       }
     }
   })
-  function submit_recaptcha() {
-    $fetch(
-      `/.netlify/functions/recaptcha?name=${name.value}&email=${email.value}&launch=${launch.value}`,
-      {
-        onResponse({ response }) {
-          if (response.ok) {
-            infra_store.$patch({
-              is_captcha_validated: response.status === 200,
-            })
-          }
-        },
+  async function submit_recaptcha() {
+    const response = await $fetch.raw(`/.netlify/functions/recaptcha`, {
+      method: "POST",
+      body: {
+        name: name.value,
+        email: email.value,
+        launch: launch.value,
       },
-    )
+    })
+    infra_store.$patch({
+      is_captcha_validated: response.status === 200,
+    })
   }
 </script>
