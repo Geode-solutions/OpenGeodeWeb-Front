@@ -88,7 +88,11 @@ export function useProjectManager() {
       treeviewStore.isImporting = true
 
       const client2 = viewerStore.client
-      if (client2 && client2.getConnection && client2.getConnection().getSession) {
+      if (
+        client2 &&
+        client2.getConnection &&
+        client2.getConnection().getSession
+      ) {
         await client2
           .getConnection()
           .getSession()
