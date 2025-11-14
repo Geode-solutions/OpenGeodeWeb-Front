@@ -48,9 +48,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     })
   }
 
-  const treeviewStore = useTreeviewStore()
-  const hybridViewerStore = useHybridViewerStore()
-
   async function addItem(
     id,
     value = {
@@ -62,17 +59,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       vtk_js: { binary_light_viewable },
     },
   ) {
-    console.log("[DataBase] addItem start", {
-      id,
-      object_type: value.object_type,
-      geode_object: value.geode_object,
-    })
     db[id] = value
-
-    if (value.object_type === "model") {
-      await fetchMeshComponents(id)
-      await fetchUuidToFlatIndexDict(id)
-    }
   }
 
   async function fetchMeshComponents(id) {

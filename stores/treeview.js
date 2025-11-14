@@ -23,16 +23,12 @@ export const useTreeviewStore = defineStore("treeview", () => {
             sensitivity: "base",
           }),
         )
-        if (!isImporting.value) {
-          selection.value.push(child)
-        }
+        selection.value.push(child)
         return
       }
     }
     items.value.push({ title: geodeObject, children: [child] })
-    if (!isImporting.value) {
-      selection.value.push(child)
-    }
+    selection.value.push(child)
   }
 
   function displayAdditionalTree(id) {
@@ -84,7 +80,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function finalizeImportSelection() {
     const ids = pendingSelectionIds.value || []
     const rebuilt = []
-    if (ids.length === 0) {
+    if (!ids.length) {
       for (const group of items.value) {
         for (const child of group.children) {
           rebuilt.push(child)
@@ -93,7 +89,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
     } else {
       for (const group of items.value) {
         for (const child of group.children) {
-          if (ids.includes(child.id)) rebuilt.push(child)
+          if (ids.includes(child.id)) {
+            rebuilt.push(child)
+          }
         }
       }
     }
@@ -101,13 +99,13 @@ export const useTreeviewStore = defineStore("treeview", () => {
     pendingSelectionIds.value = []
   }
 
-  function clear() {
+  const clear = () => {
     items.value = []
     selection.value = []
     components_selection.value = []
     pendingSelectionIds.value = []
     model_id.value = ""
-    selectedTree.value = null
+    selectedTree.value = undefined
   }
 
   return {
