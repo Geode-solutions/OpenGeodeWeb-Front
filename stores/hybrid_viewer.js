@@ -97,6 +97,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         z_scale: z_scale,
       },
     })
+    remoteRender()
   }
 
   function syncRemoteCamera() {
@@ -198,6 +199,83 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender()
   }
 
+  const exportStores = () => {
+    const renderer = genericRenderWindow.value.getRenderer()
+    const camera = renderer.getActiveCamera()
+    const cameraSnapshot = camera
+      ? {
+          focal_point: [...camera.getFocalPoint()],
+          view_up: [...camera.getViewUp()],
+          position: [...camera.getPosition()],
+          view_angle: camera.getViewAngle(),
+          clipping_range: [...camera.getClippingRange()],
+          distance: camera.getDistance(),
+        }
+      : camera_options
+    return { zScale: zScale.value, camera_options: cameraSnapshot }
+  }
+
+  const importStores = (snapshot) => {
+    const z_scale = snapshot.zScale
+
+    const applyCamera = () => {
+      const { camera_options } = snapshot
+      if (!camera_options) {
+        return
+      }
+
+      const renderer = genericRenderWindow.value.getRenderer()
+      const camera = renderer.getActiveCamera()
+
+      camera.setFocalPoint(...camera_options.focal_point)
+      camera.setViewUp(...camera_options.view_up)
+      camera.setPosition(...camera_options.position)
+      camera.setViewAngle(camera_options.view_angle)
+      camera.setClippingRange(...camera_options.clipping_range)
+
+      genericRenderWindow.value.getRenderWindow().render()
+
+      const payload = {
+        camera_options: {
+          focal_point: camera_options.focal_point,
+          view_up: camera_options.view_up,
+          position: camera_options.position,
+          view_angle: camera_options.view_angle,
+          clipping_range: camera_options.clipping_range,
+        },
+      }
+      return viewer_call(
+        {
+          schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+          params: payload,
+        },
+        {
+          response_function: () => {
+            remoteRender()
+            Object.assign(camera_options, payload.camera_options)
+          },
+        },
+      )
+    }
+
+    if (typeof z_scale === "number") {
+      return setZScaling(z_scale).then(() => applyCamera())
+    }
+    return applyCamera()
+  }
+
+  const clear = () => {
+    const renderer = genericRenderWindow.value.getRenderer()
+    const actors = renderer.getActors()
+    for (const actor of actors) {
+      renderer.removeActor(actor)
+    }
+    genericRenderWindow.value.getRenderWindow().render()
+    for (const id of Object.keys(db)) {
+      delete db[id]
+    }
+  }
+
   return {
     db,
     genericRenderWindow,
@@ -210,5 +288,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     resize,
     setContainer,
     zScale,
+    clear,
+    exportStores,
+    importStores,
   }
 })

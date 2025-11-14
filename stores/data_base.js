@@ -120,6 +120,43 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     return flat_indexes
   }
 
+  function exportStores() {
+    const snapshotDb = {}
+    for (const [id, item] of Object.entries(db)) {
+      if (!item) continue
+      snapshotDb[id] = {
+        object_type: item.object_type,
+        geode_object: item.geode_object,
+        native_filename: item.native_filename,
+        viewable_filename: item.viewable_filename,
+        displayed_name: item.displayed_name,
+        vtk_js: {
+          binary_light_viewable: item?.vtk_js?.binary_light_viewable,
+        },
+      }
+    }
+    return { db: snapshotDb }
+  }
+
+  async function importStores(snapshot) {
+    await hybridViewerStore.initHybridViewer()
+    hybridViewerStore.clear()
+    console.log(
+      "[DataBase] importStores entries:",
+      Object.keys(snapshot?.db || {}),
+    )
+    for (const [id, item] of Object.entries(snapshot?.db || {})) {
+      await registerObject(id)
+      await addItem(id, item)
+    }
+  }
+
+  function clear() {
+    for (const id of Object.keys(db)) {
+      delete db[id]
+    }
+  }
+
   return {
     db,
     itemMetaDatas,
@@ -134,5 +171,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
+    exportStores,
+    importStores,
+    clear,
   }
 })
