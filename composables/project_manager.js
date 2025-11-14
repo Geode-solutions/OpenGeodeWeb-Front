@@ -9,17 +9,17 @@ export function useProjectManager() {
     const geode = useGeodeStore()
     const infraStore = useInfraStore()
     const snapshot = appStore.exportStores()
+    try {
+      console.log("[export] snapshot keys", Object.keys(snapshot || {}))
+    } catch {}
     const schema = back_schemas.opengeodeweb_back.export_project
     const defaultName = "project.vease"
 
     await infraStore.create_connection()
-    let downloaded = false
     const result = await api_fetch(
       { schema, params: { snapshot, filename: defaultName } },
       {
         response_function: function (response) {
-          if (downloaded) return
-          downloaded = true
           const data = response._data
           const headerName =
             (response.headers &&

@@ -32,6 +32,15 @@ export function api_fetch(
   if (schema.max_retry) {
     request_options.max_retry = schema.max_retry
   }
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      console.log("[api_fetch]", schema?.$id, request_options)
+      if (schema?.$id === "opengeodeweb_back/export_project") {
+        console.log("[api_fetch] export_project", { params: body })
+        console.trace()
+      }
+    } catch {}
+  }
   return useFetch(schema.$id, {
     baseURL: geode_store.base_url,
     ...request_options,
