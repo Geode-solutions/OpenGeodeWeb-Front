@@ -12,7 +12,7 @@ export function useProjectManager() {
     const schema = back_schemas.opengeodeweb_back.export_project
     const defaultName = "project.vease"
 
-    try {
+
       await infraStore.create_connection()
       let downloaded = false
       const result = await api_fetch(
@@ -38,9 +38,7 @@ export function useProjectManager() {
         },
       )
       return result
-    } finally {
-      geode.stop_request()
-    }
+
   }
 
   const importProjectFile = async function (file) {
@@ -51,7 +49,7 @@ export function useProjectManager() {
     const hybridViewerStore = useHybridViewerStore()
     const infraStore = useInfraStore()
 
-    try {
+
       await infraStore.create_connection()
       await viewerStore.ws_connect()
 
@@ -137,9 +135,6 @@ export function useProjectManager() {
 
       treeviewStore.finalizeImportSelection()
       treeviewStore.isImporting = false
-    } finally {
-      geode.stop_request()
-    }
   }
 
   return { exportProject, importProjectFile }
