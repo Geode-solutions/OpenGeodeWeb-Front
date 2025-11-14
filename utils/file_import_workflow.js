@@ -4,7 +4,7 @@ import { useHybridViewerStore } from "../stores/hybrid_viewer"
 
 // Local imports
 
-function importWorkflow(files) {
+async function importWorkflow(files) {
   console.log("importWorkflow", { files })
   const promise_array = []
   for (const file of files) {
@@ -69,10 +69,62 @@ async function importFile(filename, geode_object) {
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
     params: {
       input_geode_object: geode_object,
-      filename,
+      filename: filename,
     },
   })
 
+<<<<<<< HEAD
+  const {
+    id,
+    native_file_name,
+    viewable_file_name,
+    name,
+    object_type,
+    binary_light_viewable,
+  } = data._value
+
+  console.log("[importFile] response", {
+    id,
+    geode_object,
+    input_file: data._value?.input_file,
+    name,
+  })
+
+  await dataBaseStore.registerObject(id)
+  await dataBaseStore.addItem(id, {
+    object_type: object_type,
+    geode_object: geode_object,
+    native_filename: native_file_name,
+    viewable_filename: viewable_file_name,
+    displayed_name: name,
+    vtk_js: {
+      binary_light_viewable,
+    },
+  })
+
+  await treeviewStore.addItem(geode_object, name, id, object_type)
+
+  console.log("after treeviewStore.addItem")
+
+  await hybridViewerStore.addItem(id)
+  console.log("after dataBaseStore.addItem")
+
+  await dataStyleStore.addDataStyle(
+    data._value.id,
+    data._value.geode_object,
+    data._value.object_type,
+  )
+  if (data._value.object_type === "model") {
+    await Promise.all([
+      dataBaseStore.fetchMeshComponents(id),
+      dataBaseStore.fetchUuidToFlatIndexDict(id),
+    ])
+  }
+  await dataStyleStore.applyDefaultStyle(id)
+  console.log("after dataStyleStore.applyDefaultStyle")
+  hybridViewerStore.remoteRender()
+  return data._value.id
+=======
   console.log("data.value", data.value)
 
   const item = buildImportItemFromPayloadApi(data._value, geode_object)
@@ -81,6 +133,7 @@ async function importFile(filename, geode_object) {
 
 async function importItemFromSnapshot(item) {
   return importItem(item)
+>>>>>>> f06c643755e1a38ffe8b4d61d736cda0e54210db
 }
 
 async function importWorkflowFromSnapshot(items) {
