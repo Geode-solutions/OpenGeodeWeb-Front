@@ -18,8 +18,9 @@ export function viewer_call(
   const client = viewer_store.client
 
   return new Promise((resolve, reject) => {
-    if (!client) {
-      reject()
+    if (!client.getConnection) {
+      resolve()
+      return
     }
     viewer_store.start_request()
     client
