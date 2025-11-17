@@ -20,14 +20,16 @@
   const container = useTemplateRef("viewer")
   const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()
-  const { windowWidth, windowHeight } = useWindowSize()
-  const { width, height } = useElementSize(container)
+
+  const { width: elementWidth, height: elementHeight } =
+    useElementSize(container)
+  const { width: windowWidth, height: windowHeight } = useWindowSize()
 
   const debouncedResize = debounce(() => {
-    hybridViewerStore.resize(width.value, height.value)
+    hybridViewerStore.resize(elementWidth.value, elementHeight.value)
   }, 100)
 
-  watch([windowWidth, windowHeight, width, height], () => {
+  watch([elementWidth, elementHeight, windowWidth, windowHeight], (value) => {
     debouncedResize()
   })
 

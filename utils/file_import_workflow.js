@@ -37,12 +37,7 @@ async function importItem(item) {
   const treeviewStore = useTreeviewStore()
   await dataBaseStore.registerObject(item.id)
   await dataBaseStore.addItem(item.id, {
-    object_type: item.object_type,
-    geode_object: item.geode_object,
-    native_filename: item.native_filename,
-    viewable_filename: item.viewable_filename,
-    displayed_name: item.displayed_name,
-    vtk_js: item.vtk_js,
+    ...item,
   })
 
   await treeviewStore.addItem(
@@ -81,10 +76,6 @@ async function importFile(filename, geode_object) {
   return importItem(item)
 }
 
-async function importItemFromSnapshot(item) {
-  return importItem(item)
-}
-
 async function importWorkflowFromSnapshot(items) {
   console.log("[importWorkflowFromSnapshot] start", { count: items?.length })
   const dataBaseStore = useDataBaseStore()
@@ -94,7 +85,7 @@ async function importWorkflowFromSnapshot(items) {
 
   const ids = []
   for (const item of items) {
-    const id = await importItemFromSnapshot(
+    const id = await importItem(
       item,
       dataBaseStore,
       treeviewStore,
@@ -108,4 +99,4 @@ async function importWorkflowFromSnapshot(items) {
   return ids
 }
 
-export { importFile, importWorkflow, importWorkflowFromSnapshot }
+export { importFile, importWorkflow, importWorkflowFromSnapshot, importItem }
