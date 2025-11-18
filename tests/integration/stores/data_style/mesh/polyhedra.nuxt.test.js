@@ -4,14 +4,12 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import Status from "@ogw_f/utils/status"
-import * as composables from "@ogw_f/composables/viewer_call"
-import { useDataStyleStore } from "@ogw_f/stores/data_style"
-import { useViewerStore } from "@ogw_f/stores/viewer"
 import {
   delete_folder_recursive,
   kill_back,
   kill_viewer,
 } from "@ogw_f/utils/local"
+import * as composables from "@ogw_f/composables/viewer_call"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
