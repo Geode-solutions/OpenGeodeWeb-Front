@@ -3,6 +3,7 @@ import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_f/utils/status.js"
+import { appMode } from "@ogw_f/utils/app_mode.js"
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -16,14 +17,14 @@ export const useViewerStore = defineStore("viewer", {
   }),
   getters: {
     protocol() {
-      if (useInfraStore().app_mode == appMode.appMode.CLOUD) {
+      if (useInfraStore().app_mode == appMode.CLOUD) {
         return "wss"
       } else {
         return "ws"
       }
     },
     port() {
-      if (useInfraStore().app_mode == appMode.appMode.CLOUD) {
+      if (useInfraStore().app_mode == appMode.CLOUD) {
         return "443"
       }
       const VIEWER_PORT = useRuntimeConfig().public.VIEWER_PORT
@@ -35,7 +36,7 @@ export const useViewerStore = defineStore("viewer", {
     base_url() {
       const infra_store = useInfraStore()
       let viewer_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
-      if (infra_store.app_mode == appMode.appMode.CLOUD) {
+      if (infra_store.app_mode == appMode.CLOUD) {
         if (infra_store.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }

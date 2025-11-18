@@ -1,3 +1,5 @@
+import validate_schema from "~/app/utils/validate_schema.js"
+
 export function viewer_call(
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},

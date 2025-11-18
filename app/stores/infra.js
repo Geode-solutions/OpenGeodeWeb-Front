@@ -1,5 +1,8 @@
 import { useStorage } from "@vueuse/core"
 import Status from "@ogw_f/utils/status.js"
+import { appMode, getAppMode } from "@ogw_f/utils/app_mode.js"
+
+console.log("appMode", appMode)
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
@@ -10,7 +13,7 @@ export const useInfraStore = defineStore("infra", {
   }),
   getters: {
     domain_name() {
-      if (this.app_mode == appMode.appMode.CLOUD) {
+      if (this.app_mode == appMode.CLOUD) {
         return useRuntimeConfig().public.API_URL
       }
       return "localhost"
@@ -56,7 +59,7 @@ export const useInfraStore = defineStore("infra", {
           ])
           geode_store.$patch({ default_local_port: back_port })
           viewer_store.$patch({ default_local_port: viewer_port })
-        } else if (this.app_mode == appMode.appMode.CLOUD) {
+        } else if (this.app_mode == appMode.CLOUD) {
           const { data, error } = await useFetch(this.lambda_url, {
             method: "POST",
           })

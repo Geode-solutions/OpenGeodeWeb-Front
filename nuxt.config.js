@@ -16,11 +16,11 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
   ],
   imports: {
-    dirs: ["stores"],
+    dirs: ["app/stores", "app/composables"],
   },
 
   alias: {
-    "@ogw_f": __dirname,
+    "@ogw_f": __dirname + "/app/",
   },
 
   // ** Global CSS
