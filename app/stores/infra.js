@@ -50,7 +50,7 @@ export const useInfraStore = defineStore("infra", {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return
         console.log("LOCK GRANTED !", lock)
-        if (this.app_mode == appMode.appMode.DESKTOP) {
+        if (this.app_mode == appMode.DESKTOP) {
           const viewer_store = useViewerStore()
           const geode_store = useGeodeStore()
           const [back_port, viewer_port] = await Promise.all([

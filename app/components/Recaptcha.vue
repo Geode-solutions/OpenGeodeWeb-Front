@@ -39,6 +39,8 @@
 </template>
 
 <script setup>
+  import { appMode } from "@ogw_f/utils/infra"
+
   const props = defineProps({
     button_label: {
       type: String,
@@ -74,7 +76,7 @@
     if (import.meta.client) {
       if (
         process.env.NODE_ENV !== "production" ||
-        infra_store.app_mode !== appMode.appMode.CLOUD
+        infra_store.app_mode !== appMode.CLOUD
       ) {
         infra_store.$patch({ is_captcha_validated: true })
       }
