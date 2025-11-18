@@ -2,8 +2,6 @@ import { useStorage } from "@vueuse/core"
 import Status from "@ogw_f/utils/status.js"
 import { appMode, getAppMode } from "@ogw_f/utils/app_mode.js"
 
-console.log("appMode", appMode)
-
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),

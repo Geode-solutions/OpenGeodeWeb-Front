@@ -2,11 +2,13 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import fileDownload from "js-file-download"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
+import { importWorkflowFromSnapshot } from "@ogw_f/utils/file_import_workflow"
+
 export function useProjectManager() {
   const exportProject = async function () {
     console.log("[export triggered]")
     const appStore = useAppStore()
-    const geode = useGeodeStore()
+    const geodeStore = useGeodeStore()
     const infraStore = useInfraStore()
     const snapshot = appStore.exportStores()
     const schema = back_schemas.opengeodeweb_back.export_project

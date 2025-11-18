@@ -23,6 +23,8 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
+  import Screenshot from "./Screenshot.vue"
+
   const take_screenshot = ref(false)
   const grid_scale = ref(false)
 

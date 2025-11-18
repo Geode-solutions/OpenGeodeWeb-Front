@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-  import { appMode } from "@ogw_f/utils/infra"
+  import { appMode } from "@ogw_f/utils/app_mode.js"
 
   const props = defineProps({
     button_label: {

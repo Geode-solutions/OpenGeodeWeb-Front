@@ -42,6 +42,8 @@
 </template>
 
 <script setup>
+  import InspectorResultPanel from "./ResultPanel.vue"
+
   const props = defineProps({
     inspection_result: { type: Array, required: true },
   })

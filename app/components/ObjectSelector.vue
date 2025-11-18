@@ -52,6 +52,8 @@
   import geode_objects from "@ogw_f/assets/geode_objects"
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
+  import FetchingData from "./FetchingData.vue"
+
   const schema = schemas.opengeodeweb_back.allowed_objects
 
   const emit = defineEmits(["update_values", "increment_step"])

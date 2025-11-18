@@ -10,13 +10,19 @@
         <v-col>
           <Stepper />
         </v-col>
-        <v-col> <PackagesVersions :schema="versions_schema" /> </v-col>
+        <v-col>
+          <PackagesVersions :schema="versions_schema" />
+        </v-col>
       </template>
     </v-row>
   </v-container>
 </template>
 
 <script setup>
+  import Launcher from "./Launcher.vue"
+  import PackagesVersions from "./PackagesVersions.vue"
+  import Stepper from "./Stepper.vue"
+
   const infra_store = useInfraStore()
 
   const props = defineProps({

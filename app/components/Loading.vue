@@ -37,6 +37,8 @@
   import derniere from "@ogw_f/assets/img/energy_sobriety/derniere.png"
   import salon from "@ogw_f/assets/img/energy_sobriety/salon.png"
 
+  import Carousel from "./Carousel.vue"
+
   const users_list = [
     {
       name: "YING YANG",

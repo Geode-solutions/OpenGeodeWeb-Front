@@ -10,6 +10,9 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
+  import FetchingData from "./FetchingData.vue"
+  import FileUploader from "./FileUploader.vue"
+
   const schema = schemas.opengeodeweb_back.allowed_files
   const emit = defineEmits([
     "update_values",

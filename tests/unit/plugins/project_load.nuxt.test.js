@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
 
-vi.mock("@/composables/viewer_call.js", () => ({
+vi.mock("@ogw_f/composables/viewer_call.js", () => ({
   default: vi.fn(() => Promise.resolve({})),
   viewer_call: vi.fn(() => Promise.resolve({})),
 }))

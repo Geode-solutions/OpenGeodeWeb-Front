@@ -19,9 +19,10 @@
 
 <script setup>
   import Status from "@ogw_f/utils/status.js"
+  import Loading from "./Loading.vue"
+  import Recaptcha from "./Recaptcha.vue"
 
   const infra_store = useInfraStore()
-  const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
 
   watch(
     () => infra_store.is_captcha_validated,
