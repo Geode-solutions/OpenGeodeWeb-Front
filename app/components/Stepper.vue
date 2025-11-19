@@ -14,6 +14,8 @@
 </template>
 
 <script setup>
+  import Step from "@ogw_f/components/Step.vue"
+
   const stepper_tree = inject("stepper_tree")
   const { steps, current_step_index } = toRefs(stepper_tree)
 </script>

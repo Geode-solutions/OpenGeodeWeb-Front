@@ -15,6 +15,7 @@
 </template>
 
 <script setup>
+  import VeaseViewToolbar from "@ogw_f/components/VeaseViewToolbar.vue"
   const emit = defineEmits(["click"])
 
   const container = useTemplateRef("viewer")

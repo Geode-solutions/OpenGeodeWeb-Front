@@ -42,6 +42,10 @@
 </template>
 
 <script setup>
+  import ViewerBreadCrumb from "@/app/components/Viewer/BreadCrumb.vue"
+  import ViewerTreeObject from "@/app/components/Viewer/TreeObject.vue"
+  import ViewerTreeComponent from "@/app/components/Viewer/TreeComponent.vue"
+
   const treeviewStore = useTreeviewStore()
   const menuStore = useMenuStore()
   const cardContainer = useTemplateRef("cardContainer")
