@@ -40,6 +40,7 @@
 </template>
 
 <script setup>
+  import ViewerContextMenuItem from "../ContextMenuItem.vue"
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 

@@ -6,6 +6,7 @@
 </template>
 
 <script setup>
+  import ViewerGenericMeshEdgesOptions from "../Generic/Mesh/EdgesOptions.vue"
   import SolidEdges from "@ogw_f/assets/viewer_svgs/solid_edges.svg"
 
   const props = defineProps({

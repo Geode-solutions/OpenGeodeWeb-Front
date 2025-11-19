@@ -1,7 +1,7 @@
 <template>
   <ClientOnly>
     <div style="position: relative; width: 100%; height: calc(100vh - 80px)">
-      <view-toolbar />
+      <ViewToolbar />
       <slot name="ui"></slot>
       <v-col
         ref="viewer"
@@ -25,6 +25,8 @@
   import { useElementSize, useWindowSize } from "@vueuse/core"
   import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
   import Status from "@ogw_f/utils/status.js"
+
+  import ViewToolbar from "./ViewToolbar.vue"
 
   const props = defineProps({
     viewId: { type: String, default: "-1" },

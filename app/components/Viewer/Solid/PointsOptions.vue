@@ -6,6 +6,7 @@
 </template>
 
 <script setup>
+  import ViewerGenericMeshPointsOptions from "./GenericMeshPointsOptions.vue"
   import SolidPoints from "@ogw_f/assets/viewer_svgs/solid_points.svg"
 
   const props = defineProps({

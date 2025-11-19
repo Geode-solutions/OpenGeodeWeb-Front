@@ -6,6 +6,7 @@
 </template>
 
 <script setup>
+  import ViewerGenericMeshPointsOptions from "./GenericMeshPointsOptions.vue"
   import TriangulatedSurfaceEdgesPoints from "@ogw_f/assets/viewer_svgs/surface_points.svg"
 
   const props = defineProps({
