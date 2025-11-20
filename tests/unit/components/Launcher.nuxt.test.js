@@ -9,7 +9,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import Launcher from "@ogw_f/components/Launcher.vue"
+import Launcher from "@ogw_front/components/Launcher.vue"
 
 const vuetify = createVuetify({
   components,

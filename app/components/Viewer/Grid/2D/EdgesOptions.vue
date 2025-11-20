@@ -6,7 +6,8 @@
 </template>
 
 <script setup>
-  import Grid2D_Edges from "@ogw_f/assets/viewer_svgs/grid_2d_edges.svg"
+  import ViewerGenericMeshEdgesOptions from "@ogw_front/components/Viewer/Generic/Mesh/EdgesOptions.vue"
+  import Grid2D_Edges from "@ogw_front/assets/viewer_svgs/grid_2d_edges.svg"
 
   const props = defineProps({
     itemProps: { type: Object, required: true },

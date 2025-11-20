@@ -3,13 +3,13 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_f/utils/status"
+import Status from "@ogw_front/utils/status"
 import {
   delete_folder_recursive,
   kill_back,
   kill_viewer,
-} from "@ogw_f/utils/local"
-import * as composables from "@ogw_f/composables/viewer_call"
+} from "@ogw_front/utils/local"
+import * as composables from "@ogw_front/composables/viewer_call"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants

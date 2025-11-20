@@ -11,7 +11,9 @@
 </template>
 
 <script setup>
-  import SurfaceEdges from "@ogw_f/assets/viewer_svgs/surface_edges.svg"
+  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem.vue"
+  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue"
+  import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg"
 
   const props = defineProps({
     itemProps: { type: Object, required: true },

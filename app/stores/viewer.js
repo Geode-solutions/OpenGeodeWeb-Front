@@ -2,8 +2,8 @@ import _ from "lodash"
 import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import Status from "@ogw_f/utils/status.js"
-import { appMode } from "@ogw_f/utils/app_mode.js"
+import Status from "@ogw_front/utils/status.js"
+import { appMode } from "@ogw_front/utils/app_mode.js"
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({

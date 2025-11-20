@@ -37,6 +37,7 @@
 
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+  import FileUploader from "@ogw_front/components/FileUploader.vue"
 
   const emit = defineEmits(["update_value"])
 

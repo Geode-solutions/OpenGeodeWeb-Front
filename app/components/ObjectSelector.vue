@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-  import geode_objects from "@ogw_f/assets/geode_objects"
+  import geode_objects from "@ogw_front/assets/geode_objects"
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
   import FetchingData from "./FetchingData.vue"

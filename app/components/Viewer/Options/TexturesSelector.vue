@@ -37,6 +37,7 @@
 </template>
 
 <script setup>
+  import ViewerOptionsTextureItem from "./TextureItem.vue"
   const textures = defineModel()
 
   const internal_textures = ref([])

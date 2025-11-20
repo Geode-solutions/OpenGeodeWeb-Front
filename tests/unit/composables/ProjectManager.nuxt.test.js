@@ -3,8 +3,8 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
 // Local imports
-import { useProjectManager } from "@ogw_f/composables/project_manager.js"
-import { appMode } from "@ogw_f/utils/app_mode.js"
+import { useProjectManager } from "@ogw_front/composables/project_manager.js"
+import { appMode } from "@ogw_front/utils/app_mode.js"
 
 // Snapshot
 const snapshotMock = {
@@ -94,7 +94,9 @@ const hybridViewerStoreMock = {
     if (snapshot?.zScale != null)
       hybridViewerStoreMock.setZScaling(snapshot.zScale)
     if (snapshot?.camera_options) {
-      const { viewer_call } = await import("@ogw_f/composables/viewer_call.js")
+      const { viewer_call } = await import(
+        "@ogw_front/composables/viewer_call.js"
+      )
       viewer_call({
         schema: { $id: "opengeodeweb_viewer/viewer.update_camera" },
         params: { camera_options: snapshot.camera_options },
@@ -112,11 +114,11 @@ vi.stubGlobal(
   "$fetch",
   vi.fn(async () => ({ snapshot: snapshotMock })),
 )
-vi.mock("@ogw_f/composables/viewer_call.js", () => ({
+vi.mock("@ogw_front/composables/viewer_call.js", () => ({
   viewer_call: vi.fn(() => Promise.resolve()),
 }))
 
-vi.mock("@ogw_f/composables/api_fetch.js", () => ({
+vi.mock("@ogw_front/composables/api_fetch.js", () => ({
   api_fetch: vi.fn(async (_req, options = {}) => {
     const response = {
       _data: new Blob(["zipcontent"], { type: "application/zip" }),
@@ -129,28 +131,28 @@ vi.mock("@ogw_f/composables/api_fetch.js", () => ({
   }),
 }))
 vi.mock("js-file-download", () => ({ default: vi.fn() }))
-vi.mock("@ogw_f/stores/infra.js", () => ({
+vi.mock("@ogw_front/stores/infra.js", () => ({
   useInfraStore: () => infraStoreMock,
 }))
-vi.mock("@ogw_f/stores/viewer.js", () => ({
+vi.mock("@ogw_front/stores/viewer.js", () => ({
   useViewerStore: () => viewerStoreMock,
 }))
-vi.mock("@ogw_f/stores/treeview.js", () => ({
+vi.mock("@ogw_front/stores/treeview.js", () => ({
   useTreeviewStore: () => treeviewStoreMock,
 }))
-vi.mock("@ogw_f/stores/data_base.js", () => ({
+vi.mock("@ogw_front/stores/data_base.js", () => ({
   useDataBaseStore: () => dataBaseStoreMock,
 }))
-vi.mock("@ogw_f/stores/data_style.js", () => ({
+vi.mock("@ogw_front/stores/data_style.js", () => ({
   useDataStyleStore: () => dataStyleStoreMock,
 }))
-vi.mock("@ogw_f/stores/hybrid_viewer.js", () => ({
+vi.mock("@ogw_front/stores/hybrid_viewer.js", () => ({
   useHybridViewerStore: () => hybridViewerStoreMock,
 }))
-vi.mock("@ogw_f/stores/geode.js", () => ({
+vi.mock("@ogw_front/stores/geode.js", () => ({
   useGeodeStore: () => geodeStoreMock,
 }))
-vi.mock("@ogw_f/stores/app.js", () => ({
+vi.mock("@ogw_front/stores/app.js", () => ({
   useAppStore: () => ({
     exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
   }),
@@ -189,7 +191,9 @@ describe("ProjectManager composable (compact)", () => {
         (v) => typeof v === "function" && v.mockClear && v.mockClear(),
       )
     }
-    const { viewer_call } = await import("@ogw_f/composables/viewer_call.js")
+    const { viewer_call } = await import(
+      "@ogw_front/composables/viewer_call.js"
+    )
     viewer_call.mockClear()
   })
 
@@ -211,7 +215,9 @@ describe("ProjectManager composable (compact)", () => {
 
     await importProjectFile(file)
 
-    const { viewer_call } = await import("@ogw_f/composables/viewer_call.js")
+    const { viewer_call } = await import(
+      "@ogw_front/composables/viewer_call.js"
+    )
 
     expect(infraStoreMock.create_connection).toHaveBeenCalled()
     expect(viewerStoreMock.ws_connect).toHaveBeenCalled()

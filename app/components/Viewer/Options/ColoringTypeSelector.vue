@@ -1,7 +1,6 @@
 <template>
   <v-row justify="center" align="center">
     <v-divider />
-
     <v-col>
       <v-row justify="center" align="center">
         <v-col cols="auto">
@@ -57,6 +56,13 @@
 </template>
 
 <script setup>
+  import ViewerOptionsColorPicker from "./ColorPicker.vue"
+  import ViewerOptionsTexturesSelector from "./TexturesSelector.vue"
+  import ViewerOptionsVertexAttributeSelector from "./VertexAttributeSelector.vue"
+  // import ViewerOptionsEdgeAttributeSelector from "./EdgeAttributeSelector.vue"
+  import ViewerOptionsPolygonAttributeSelector from "./PolygonAttributeSelector.vue"
+  import ViewerOptionsPolyhedronAttributeSelector from "./PolyhedronAttributeSelector.vue"
+
   const coloring_style_key = defineModel("coloring_style_key")
 
   const color = defineModel("color")

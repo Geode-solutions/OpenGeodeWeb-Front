@@ -9,18 +9,18 @@ import { createTestingPinia } from "@pinia/testing"
 import { afterAll, beforeAll, expect, vi } from "vitest"
 
 // Local imports
-import { useGeodeStore } from "@ogw_f/stores/geode"
-import { useViewerStore } from "@ogw_f/stores/viewer"
-import { useInfraStore } from "@ogw_f/stores/infra"
-import { appMode } from "@ogw_f/utils/app_mode"
-import { importFile } from "@ogw_f/utils/file_import_workflow"
-import Status from "@ogw_f/utils/status"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useInfraStore } from "@ogw_front/stores/infra"
+import { appMode } from "@ogw_front/utils/app_mode"
+import { importFile } from "@ogw_front/utils/file_import_workflow"
+import Status from "@ogw_front/utils/status"
 import {
   executable_name,
   executable_path,
   run_back,
   run_viewer,
-} from "@ogw_f/utils/local"
+} from "@ogw_front/utils/local"
 
 // Local constants
 const data_folder = path.join("tests", "integration", "data")

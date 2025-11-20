@@ -6,8 +6,8 @@
 </template>
 
 <script setup>
-  import ViewerGenericMeshPolygonsOptions from "./GenericMeshPolygonsOptions.vue"
-  import SolidFacets from "@ogw_f/assets/viewer_svgs/solid_facets.svg"
+  import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions.vue"
+  import SolidFacets from "@ogw_front/assets/viewer_svgs/solid_facets.svg"
 
   const props = defineProps({
     itemProps: { type: Object, required: true },

@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-  import Status from "@ogw_f/utils/status.js"
+  import Status from "@ogw_front/utils/status.js"
   import Loading from "./Loading.vue"
   import Recaptcha from "./Recaptcha.vue"
 

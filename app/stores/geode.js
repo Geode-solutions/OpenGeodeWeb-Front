@@ -1,6 +1,6 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import Status from "@ogw_f/utils/status.js"
-import { appMode } from "@ogw_f/utils/app_mode.js"
+import Status from "@ogw_front/utils/status.js"
+import { appMode } from "@ogw_front/utils/app_mode.js"
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({

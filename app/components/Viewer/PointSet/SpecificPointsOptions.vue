@@ -41,6 +41,8 @@
 
 <script setup>
   import ViewerContextMenuItem from "../ContextMenuItem.vue"
+  import ViewerOptionsVisibilitySwitch from "../Options/VisibilitySwitch.vue"
+  import ViewerOptionsColoringTypeSelector from "../Options/ColoringTypeSelector.vue"
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 

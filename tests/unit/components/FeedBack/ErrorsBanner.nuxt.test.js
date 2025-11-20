@@ -5,7 +5,7 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createTestingPinia } from "@pinia/testing"
 
-import FeedBackErrorBanner from "@ogw_f/components/FeedBack/ErrorBanner.vue"
+import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner.vue"
 import { setActivePinia } from "pinia"
 
 const vuetify = createVuetify({
@@ -14,7 +14,7 @@ const vuetify = createVuetify({
 })
 
 describe("FeedBackErrorBanner.vue", async () => {
-  ;(test(`Test reload`, async () => {
+  test(`Test reload`, async () => {
     const pinia = createTestingPinia({
       stubActions: false,
       createSpy: vi.fn,
@@ -55,5 +55,5 @@ describe("FeedBackErrorBanner.vue", async () => {
       const v_btn = wrapper.findAll(".v-btn")
       await v_btn[1].trigger("click")
       expect(feedback_store.server_error).toBe(false)
-    }))
+    })
 })

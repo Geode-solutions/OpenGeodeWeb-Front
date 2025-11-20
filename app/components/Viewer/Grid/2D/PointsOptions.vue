@@ -6,7 +6,8 @@
 </template>
 
 <script setup>
-  import Grid2D_Points from "@ogw_f/assets/viewer_svgs/grid_2d_points.svg"
+  import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions.vue"
+  import Grid2D_Points from "@ogw_front/assets/viewer_svgs/grid_2d_points.svg"
 
   const props = defineProps({
     itemProps: { type: Object, required: true },

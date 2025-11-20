@@ -18,6 +18,10 @@
 </template>
 
 <script setup>
+  import ViewerContextMenuItem from "../../ContextMenuItem.vue"
+  import ViewerOptionsVisibilitySwitch from "../../Options/VisibilitySwitch.vue"
+  import ViewerOptionsColoringTypeSelector from "../../Options/ColoringTypeSelector.vue"
+
   const props = defineProps({
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },

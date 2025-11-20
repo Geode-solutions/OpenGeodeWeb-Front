@@ -6,8 +6,8 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 // Local imports
-import Status from "@ogw_f/utils/status.js"
-import { appMode } from "@ogw_f/utils/app_mode"
+import Status from "@ogw_front/utils/status.js"
+import { appMode } from "@ogw_front/utils/app_mode"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
