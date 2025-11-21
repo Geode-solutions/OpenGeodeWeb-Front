@@ -6,7 +6,8 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 // Local imports
-import Status from "@ogw_f/utils/status.js"
+import Status from "@ogw_front/utils/status.js"
+import { appMode } from "@ogw_front/utils/app_mode"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
@@ -48,17 +49,17 @@ describe("Infra Store", () => {
     describe("domain_name", () => {
       test("test app_mode BROWSER", () => {
         const infra_store = useInfraStore()
-        infra_store.app_mode = appMode.appMode.BROWSER
+        infra_store.app_mode = appMode.BROWSER
         expect(infra_store.domain_name).toBe("localhost")
       })
       test("test app_mode DESKTOP", () => {
         const infra_store = useInfraStore()
-        infra_store.app_mode = appMode.appMode.DESKTOP
+        infra_store.app_mode = appMode.DESKTOP
         expect(infra_store.domain_name).toBe("localhost")
       })
       test("test app_mode CLOUD", () => {
         const infra_store = useInfraStore()
-        infra_store.app_mode = appMode.appMode.CLOUD
+        infra_store.app_mode = appMode.CLOUD
         expect(infra_store.domain_name).toBe("api.geode-solutions.com")
       })
     })
@@ -68,7 +69,7 @@ describe("Infra Store", () => {
         const infra_store = useInfraStore()
         useRuntimeConfig().public.SITE_BRANCH = "/test"
         useRuntimeConfig().public.PROJECT = "/project"
-        infra_store.app_mode = appMode.appMode.CLOUD
+        infra_store.app_mode = appMode.CLOUD
         expect(infra_store.lambda_url).toBe(
           "https://api.geode-solutions.com:443/test/project/createbackend",
         )

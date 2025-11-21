@@ -15,7 +15,7 @@ var geode_objects = "const geode_objects = {"
 for (const file of files) {
   const geode_object = file.replace(".svg", "")
   imports +=
-    `import ${geode_object} from "@ogw_f/assets/img/geode_objects/${file}"` +
+    `import ${geode_object} from "@ogw_front/assets/img/geode_objects/${file}"` +
     "\n"
   geode_objects += `${geode_object}:{\n tooltip: "${geode_object}",\n image: ${geode_object},\n},\n`
 }

@@ -5,7 +5,7 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createTestingPinia } from "@pinia/testing"
 
-import FeedBackErrorBanner from "@ogw_f/components/FeedBack/ErrorBanner.vue"
+import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner.vue"
 import { setActivePinia } from "pinia"
 
 const vuetify = createVuetify({

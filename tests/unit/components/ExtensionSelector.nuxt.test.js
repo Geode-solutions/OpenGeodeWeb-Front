@@ -7,7 +7,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import ExtensionSelector from "@ogw_f/components/ExtensionSelector.vue"
+import ExtensionSelector from "@ogw_front/components/ExtensionSelector.vue"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 

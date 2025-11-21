@@ -9,7 +9,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import FeedBackSnackers from "@ogw_f/components/FeedBack/Snackers.vue"
+import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers.vue"
 
 const vuetify = createVuetify({
   components,

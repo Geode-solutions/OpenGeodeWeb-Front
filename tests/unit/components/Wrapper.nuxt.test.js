@@ -5,8 +5,8 @@ import { describe, expect, test } from "vitest"
 // import * as components from "vuetify/components"
 // import * as directives from "vuetify/directives"
 
-// // import Wrapper from "@ogw_f/components/Wrapper.vue"
-// import ObjectSelector from "@ogw_f/components/ObjectSelector.vue"
+// // import Wrapper from "@ogw_front/components/Wrapper.vue"
+// import ObjectSelector from "@ogw_front/components/ObjectSelector.vue"
 
 // const vuetify = createVuetify({
 //   components,

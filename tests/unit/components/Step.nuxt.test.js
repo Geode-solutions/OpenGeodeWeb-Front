@@ -5,8 +5,8 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import Step from "@ogw_f/components/Step.vue"
-import ObjectSelector from "@ogw_f/components/ObjectSelector.vue"
+import Step from "@ogw_front/components/Step.vue"
+import ObjectSelector from "@ogw_front/components/ObjectSelector.vue"
 
 const vuetify = createVuetify({
   components,

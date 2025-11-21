@@ -5,7 +5,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import InspectorResultPanel from "@ogw_f/components/Inspector/ResultPanel.vue"
+import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel.vue"
 
 const vuetify = createVuetify({
   components,
