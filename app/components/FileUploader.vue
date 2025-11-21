@@ -49,7 +49,7 @@
   const label = props.multiple
     ? "Please select file(s) to import"
     : "Please select a file to import"
-  const internal_files = toRef(() => props.files)
+  const internal_files = ref(props.files)
   const loading = ref(false)
   const files_uploaded = ref(false)
 
@@ -95,6 +95,14 @@
     internal_files.value = []
     emit("files_uploaded", internal_files.value)
   }
+
+  watch(
+    () => props.files,
+    (newVal) => {
+      internal_files.value = newVal
+    },
+    { deep: true },
+  )
 
   watch(internal_files, (value) => {
     files_uploaded.value = false

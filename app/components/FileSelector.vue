@@ -27,18 +27,19 @@
     auto_upload: { type: Boolean, required: false, default: true },
   })
 
-  const { auto_upload, multiple, files, supported_feature } = props
+  const { auto_upload, multiple, supported_feature } = props
 
-  const internal_files = toRef(() => props.files)
+  const internal_files = ref(props.files)
   const accept = ref("")
   const loading = ref(false)
 
-  if (props.files.length) {
-    internal_files.value = props.files
-    if (props.auto_upload) {
-      upload_files()
-    }
-  }
+  watch(
+    () => props.files,
+    (newVal) => {
+      internal_files.value = newVal
+    },
+    { deep: true },
+  )
 
   const toggle_loading = useToggle(loading)
 
@@ -64,5 +65,5 @@
     )
     toggle_loading()
   }
-  get_allowed_files()
+  await get_allowed_files()
 </script>
