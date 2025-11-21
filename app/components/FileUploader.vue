@@ -49,7 +49,7 @@
   const label = props.multiple
     ? "Please select file(s) to import"
     : "Please select a file to import"
-  const internal_files = ref([])
+  const internal_files = toRef(() => props.files)
   const loading = ref(false)
   const files_uploaded = ref(false)
 

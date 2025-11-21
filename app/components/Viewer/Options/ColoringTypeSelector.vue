@@ -56,12 +56,12 @@
 </template>
 
 <script setup>
-  import ViewerOptionsColorPicker from "./ColorPicker.vue"
-  import ViewerOptionsTexturesSelector from "./TexturesSelector.vue"
-  import ViewerOptionsVertexAttributeSelector from "./VertexAttributeSelector.vue"
-  // import ViewerOptionsEdgeAttributeSelector from "./EdgeAttributeSelector.vue"
-  import ViewerOptionsPolygonAttributeSelector from "./PolygonAttributeSelector.vue"
-  import ViewerOptionsPolyhedronAttributeSelector from "./PolyhedronAttributeSelector.vue"
+  import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue"
+  import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue"
+  import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector.vue"
+  // import ViewerOptionsEdgeAttributeSelector from "@ogw_front/components/Viewer/Options/EdgeAttributeSelector.vue"
+  import ViewerOptionsPolygonAttributeSelector from "@ogw_front/components/Viewer/Options/PolygonAttributeSelector.vue"
+  import ViewerOptionsPolyhedronAttributeSelector from "@ogw_front/components/Viewer/Options/PolyhedronAttributeSelector.vue"
 
   const coloring_style_key = defineModel("coloring_style_key")
 

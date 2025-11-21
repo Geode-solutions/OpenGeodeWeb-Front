@@ -30,8 +30,8 @@
 </template>
 
 <script setup>
-  import ViewerContextMenuItem from "../../ContextMenuItem.vue"
-  import ViewerOptionsVisibilitySwitch from "../../Options/VisibilitySwitch.vue"
+  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem.vue"
+  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue"
   import SurfacePoints from "@ogw_front/assets/viewer_svgs/surface_points.svg"
 
   const dataStyleStore = useDataStyleStore()

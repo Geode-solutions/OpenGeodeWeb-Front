@@ -45,8 +45,8 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-  import FetchingData from "./FetchingData.vue"
-  import FileUploader from "./FileUploader.vue"
+  import FetchingData from "@ogw_front/components/FetchingData.vue"
+  import FileUploader from "@ogw_front/components/FileUploader.vue"
 
   const schema = schemas.opengeodeweb_back.missing_files
 

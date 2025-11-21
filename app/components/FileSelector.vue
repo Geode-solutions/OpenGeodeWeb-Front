@@ -2,7 +2,7 @@
   <FetchingData v-if="loading" />
   <FileUploader
     v-else
-    v-bind="{ multiple, accept, files, auto_upload }"
+    v-bind="{ multiple, accept, files: internal_files, auto_upload }"
     @files_uploaded="files_uploaded_event"
   />
 </template>
@@ -10,8 +10,8 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-  import FetchingData from "./FetchingData.vue"
-  import FileUploader from "./FileUploader.vue"
+  import FetchingData from "@ogw_front/components/FetchingData.vue"
+  import FileUploader from "@ogw_front/components/FileUploader.vue"
 
   const schema = schemas.opengeodeweb_back.allowed_files
   const emit = defineEmits([
@@ -27,9 +27,18 @@
     auto_upload: { type: Boolean, required: false, default: true },
   })
 
-  const { auto_upload, multiple, supported_feature } = props
+  const { auto_upload, multiple, files, supported_feature } = props
+
+  const internal_files = toRef(() => props.files)
   const accept = ref("")
   const loading = ref(false)
+
+  if (props.files.length) {
+    internal_files.value = props.files
+    if (props.auto_upload) {
+      upload_files()
+    }
+  }
 
   const toggle_loading = useToggle(loading)
 
@@ -55,5 +64,5 @@
     )
     toggle_loading()
   }
-  await get_allowed_files()
+  get_allowed_files()
 </script>

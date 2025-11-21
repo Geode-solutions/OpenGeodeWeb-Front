@@ -57,7 +57,7 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-  import FetchingData from "./FetchingData.vue"
+  import FetchingData from "@ogw_front/components/FetchingData.vue"
 
   const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
   const emit = defineEmits([

@@ -19,8 +19,8 @@
 
 <script setup>
   import Status from "@ogw_front/utils/status.js"
-  import Loading from "./Loading.vue"
-  import Recaptcha from "./Recaptcha.vue"
+  import Loading from "@ogw_front/components/Loading.vue"
+  import Recaptcha from "@ogw_front/components/Recaptcha.vue"
 
   const infra_store = useInfraStore()
 

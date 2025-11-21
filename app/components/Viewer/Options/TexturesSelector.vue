@@ -5,7 +5,6 @@
     align="center"
   >
     <br />
-
     <v-col cols="1" class="pa-0">
       <v-icon
         v-if="internal_textures.length > 1"
@@ -37,14 +36,15 @@
 </template>
 
 <script setup>
-  import ViewerOptionsTextureItem from "./TextureItem.vue"
-  const textures = defineModel()
+  import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue"
 
-  const internal_textures = ref([])
+  const textures = defineModel()
 
   const props = defineProps({
     id: { type: String, required: true },
   })
+
+  const internal_textures = ref([])
 
   onMounted(() => {
     if (textures.value != null) {

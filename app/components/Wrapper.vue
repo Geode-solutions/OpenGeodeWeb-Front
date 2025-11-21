@@ -19,9 +19,9 @@
 </template>
 
 <script setup>
-  import Launcher from "./Launcher.vue"
-  import PackagesVersions from "./PackagesVersions.vue"
-  import Stepper from "./Stepper.vue"
+  import Launcher from "@ogw_front/components/Launcher.vue"
+  import PackagesVersions from "@ogw_front/components/PackagesVersions.vue"
+  import Stepper from "@ogw_front/components/Stepper.vue"
 
   const infra_store = useInfraStore()
 

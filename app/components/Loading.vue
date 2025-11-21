@@ -37,7 +37,7 @@
   import derniere from "@ogw_front/assets/img/energy_sobriety/derniere.png"
   import salon from "@ogw_front/assets/img/energy_sobriety/salon.png"
 
-  import Carousel from "./Carousel.vue"
+  import Carousel from "@ogw_front/components/Carousel.vue"
 
   const users_list = [
     {
