@@ -26,8 +26,6 @@ beforeEach(async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const infra_store = useInfraStore()
-  infra_store.$reset?.()
 })
 
 describe("Infra Store", () => {
@@ -121,40 +119,38 @@ describe("Infra Store", () => {
     describe("is_busy", () => {
       test("test geode false & viewer false", () => {
         const infra_store = useInfraStore()
-        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
-        geode_store.$patch({ is_busy: false })
-        viewer_store.$patch({ is_busy: false })
+        geode_store.is_busy = false
+        viewer_store.is_busy = false
+        infra_store.init_microservices()
+
         expect(infra_store.microservices_busy).toBe(false)
       })
       test("test geode true & viewer false", () => {
         const infra_store = useInfraStore()
-        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
-        geode_store.$patch({ is_busy: true })
-        viewer_store.$patch({ is_busy: false })
+        geode_store.is_busy = true
+        viewer_store.is_busy = false
         infra_store.init_microservices()
         expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode false & viewer true", () => {
         const infra_store = useInfraStore()
-        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
-        geode_store.$patch({ is_busy: false })
-        viewer_store.$patch({ is_busy: true })
+        geode_store.is_busy = false
+        viewer_store.is_busy = true
         infra_store.init_microservices()
         expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode true & viewer true", () => {
         const infra_store = useInfraStore()
-        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
-        geode_store.$patch({ is_busy: true })
-        viewer_store.$patch({ is_busy: true })
+        geode_store.is_busy = true
+        viewer_store.is_busy = true
         infra_store.init_microservices()
         expect(infra_store.microservices_busy).toBe(true)
       })
