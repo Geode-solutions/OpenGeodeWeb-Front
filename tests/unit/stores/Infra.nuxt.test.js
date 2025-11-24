@@ -26,6 +26,8 @@ beforeEach(async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
+  const infra_store = useInfraStore()
+  infra_store.$reset?.()
 })
 
 describe("Infra Store", () => {
@@ -133,6 +135,7 @@ describe("Infra Store", () => {
         const viewer_store = useViewerStore()
         geode_store.$patch({ is_busy: true })
         viewer_store.$patch({ is_busy: false })
+        infra_store.init_microservices()
         expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode false & viewer true", () => {
@@ -142,6 +145,7 @@ describe("Infra Store", () => {
         const viewer_store = useViewerStore()
         geode_store.$patch({ is_busy: false })
         viewer_store.$patch({ is_busy: true })
+        infra_store.init_microservices()
         expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode true & viewer true", () => {
@@ -151,6 +155,7 @@ describe("Infra Store", () => {
         const viewer_store = useViewerStore()
         geode_store.$patch({ is_busy: true })
         viewer_store.$patch({ is_busy: true })
+        infra_store.init_microservices()
         expect(infra_store.microservices_busy).toBe(true)
       })
     })
