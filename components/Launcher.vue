@@ -21,7 +21,7 @@
   import Status from "@ogw_f/utils/status.js"
 
   const infra_store = useInfraStore()
-  const site_key = useRuntimeConfig().public.RECAPTCHA_SITE_KEY
+  infra_store.init_microservices()
 
   watch(
     () => infra_store.is_captcha_validated,

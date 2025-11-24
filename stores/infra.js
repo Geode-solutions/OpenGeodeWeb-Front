@@ -8,6 +8,7 @@ export const useInfraStore = defineStore("infra", {
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
     microservices: [],
+    _initialized: false,
   }),
   getters: {
     domain_name() {
@@ -17,7 +18,7 @@ export const useInfraStore = defineStore("infra", {
       return "localhost"
     },
     lambda_url() {
-      const geode_store = useGeodeStore()
+      const geode_store = this.get_microservice_store("geode")
       const public_runtime_config = useRuntimeConfig().public
       const url =
         geode_store.protocol +
@@ -31,16 +32,42 @@ export const useInfraStore = defineStore("infra", {
       return url
     },
     microservices_connected() {
-      return (
-        useGeodeStore().status == Status.CONNECTED &&
-        useViewerStore().status == Status.CONNECTED
+      return this.microservices.every(
+        (microservice) => microservice.store.status === Status.CONNECTED,
       )
     },
     microservices_busy() {
-      return useGeodeStore().is_busy || useViewerStore().is_busy
+      return this.microservices.some(
+        (microservice) => microservice.store.is_busy === true,
+      )
     },
   },
   actions: {
+    init_microservices() {
+      if (this._initialized) return
+      this._initialized = true
+
+      this.microservices = [
+        {
+          name: "geode",
+          store: useGeodeStore(),
+          connect: (store) => store.do_ping(),
+          electron_runner: "run_back",
+        },
+        {
+          name: "viewer",
+          store: useViewerStore(),
+          connect: (store) => store.ws_connect(),
+          electron_runner: "run_viewer",
+        },
+      ]
+    },
+    get_microservice_store(name) {
+      const microservice = this.microservices.find(
+        (microservice) => microservice.name === name,
+      )
+      return microservice.store
+    },
     async create_backend() {
       console.log("create_backend this.app_mode", this.app_mode)
       if (this.status === Status.CREATED) return
@@ -49,14 +76,13 @@ export const useInfraStore = defineStore("infra", {
         if (this.status === Status.CREATED) return
         console.log("LOCK GRANTED !", lock)
         if (this.app_mode == appMode.appMode.DESKTOP) {
-          const viewer_store = useViewerStore()
-          const geode_store = useGeodeStore()
-          const [back_port, viewer_port] = await Promise.all([
-            window.electronAPI.run_back(),
-            window.electronAPI.run_viewer(),
-          ])
-          geode_store.$patch({ default_local_port: back_port })
-          viewer_store.$patch({ default_local_port: viewer_port })
+          const port_promises = this.microservices.map((microservice) =>
+            window.electronAPI[microservice.electron_runner](),
+          )
+          const ports = await Promise.all(port_promises)
+          this.microservices.forEach((microservice, index) => {
+            microservice.store.$patch({ default_local_port: ports[index] })
+          })
         } else if (this.app_mode == appMode.appMode.CLOUD) {
           const { data, error } = await useFetch(this.lambda_url, {
             method: "POST",
@@ -76,9 +102,15 @@ export const useInfraStore = defineStore("infra", {
     },
     async create_connection() {
       console.log("create_connection")
-      await useViewerStore().ws_connect()
-      await useGeodeStore().do_ping()
+      await Promise.all(
+        this.microservices.map((microservice) =>
+          microservice.connect(microservice.store),
+        ),
+      )
       return
     },
+  },
+  share: {
+    omit: ["status", "microservices", "_initialized"],
   },
 })
