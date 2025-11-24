@@ -13,30 +13,13 @@ export function useProjectManager() {
     const defaultName = "project.vease"
 
     await infraStore.create_connection()
-    let downloaded = false
-    const result = await api_fetch(
-      { schema, params: { snapshot, filename: defaultName } },
-      {
-        response_function: function (response) {
-          if (downloaded) return
-          downloaded = true
-          const data = response._data
-          const headerName =
-            (response.headers &&
-              typeof response.headers.get === "function" &&
-              (response.headers
-                .get("Content-Disposition")
-                ?.match(/filename=\"(.+?)\"/)?.[1] ||
-                response.headers.get("new-file-name"))) ||
-            defaultName
-          if (!headerName.toLowerCase().endsWith(".vease")) {
-            throw new Error("Server returned non-.vease project archive")
-          }
-          fileDownload(data, headerName)
-        },
-      },
-    )
-    return result
+    const result = await $fetch(schema.$id, {
+      baseURL: geode.base_url,
+      method: schema.methods.filter((m) => m !== "OPTIONS")[0],
+      body: { snapshot, filename: defaultName },
+    })
+    fileDownload(result, defaultName)
+    return { result }
   }
 
   const importProjectFile = async function (file) {
