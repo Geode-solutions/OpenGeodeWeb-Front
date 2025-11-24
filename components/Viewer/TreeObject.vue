@@ -11,7 +11,6 @@
     <template #title="{ item }">
       <span
         class="treeview-item"
-        @click.stop
         @click.right.stop="
           isLeafNode(item)
             ? emit('show-menu', { event: $event, itemId: item.id })
