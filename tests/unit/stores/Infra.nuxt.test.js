@@ -66,9 +66,12 @@ describe("Infra Store", () => {
     describe("lambda_url", () => {
       test("test is cloud true", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         useRuntimeConfig().public.SITE_BRANCH = "/test"
         useRuntimeConfig().public.PROJECT = "/project"
         infra_store.app_mode = appMode.appMode.CLOUD
+        const geode_store = useGeodeStore()
+        geode_store.$patch({ protocol: "https", port: 443 })
         expect(infra_store.lambda_url).toBe(
           "https://api.geode-solutions.com:443/test/project/createbackend",
         )
@@ -77,6 +80,7 @@ describe("Infra Store", () => {
     describe("status", () => {
       test("test geode false & viewer false", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
         geode_store.$patch({ status: Status.NOT_CONNECTED })
@@ -85,6 +89,7 @@ describe("Infra Store", () => {
       })
       test("test geode true & viewer false", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
         geode_store.$patch({ status: Status.CONNECTED })
@@ -93,6 +98,7 @@ describe("Infra Store", () => {
       })
       test("test geode false & viewer true", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
         geode_store.$patch({ status: Status.NOT_CONNECTED })
@@ -101,6 +107,7 @@ describe("Infra Store", () => {
       })
       test("test geode true & viewer true", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
         geode_store.$patch({ status: Status.CONNECTED })
@@ -112,34 +119,38 @@ describe("Infra Store", () => {
     describe("is_busy", () => {
       test("test geode false & viewer false", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
-        geode_store.$patch({ request_counter: 0 })
-        viewer_store.$patch({ request_counter: 0 })
+        geode_store.$patch({ is_busy: false })
+        viewer_store.$patch({ is_busy: false })
         expect(infra_store.microservices_busy).toBe(false)
       })
       test("test geode true & viewer false", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
-        geode_store.$patch({ request_counter: 1 })
-        viewer_store.$patch({ request_counter: 0 })
+        geode_store.$patch({ is_busy: true })
+        viewer_store.$patch({ is_busy: false })
         expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode false & viewer true", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
-        geode_store.$patch({ request_counter: 0 })
-        viewer_store.$patch({ request_counter: 1 })
+        geode_store.$patch({ is_busy: false })
+        viewer_store.$patch({ is_busy: true })
         expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode true & viewer true", () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
-        geode_store.$patch({ request_counter: 1 })
-        viewer_store.$patch({ request_counter: 1 })
+        geode_store.$patch({ is_busy: true })
+        viewer_store.$patch({ is_busy: true })
         expect(infra_store.microservices_busy).toBe(true)
       })
     })
@@ -149,6 +160,7 @@ describe("Infra Store", () => {
     describe("create_backend", () => {
       test("test without end-point", async () => {
         const infra_store = useInfraStore()
+        infra_store.init_microservices()
         const geode_store = useGeodeStore()
         const viewer_store = useViewerStore()
         await infra_store.create_backend()

@@ -31,13 +31,20 @@ describe("run_function_when_microservices_connected", () => {
     expect(spy).toHaveBeenCalled()
   })
 
-  test("microservices not connected", async () => {
+  test("microservices not connected - does not call function", async () => {
+    const infra_store = useInfraStore()
+    infra_store.init_microservices()
     const geode_store = useGeodeStore()
     const viewer_store = useViewerStore()
     const spy = vi.spyOn(dumb_obj, "dumb_method")
+
+    geode_store.$patch({ status: Status.NOT_CONNECTED })
+    viewer_store.$patch({ status: Status.NOT_CONNECTED })
+
     run_function_when_microservices_connected(dumb_obj.dumb_method)
-    await geode_store.$patch({ status: Status.NOT_CONNECTED })
-    await viewer_store.$patch({ status: Status.NOT_CONNECTED })
+
+    await new Promise((resolve) => setTimeout(resolve, 200))
+
     expect(spy).not.toHaveBeenCalled()
   })
 })
