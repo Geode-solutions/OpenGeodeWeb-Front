@@ -16,7 +16,7 @@ export function useProjectManager() {
 
     await infraStore.create_connection()
     const result = await $fetch(schema.$id, {
-      baseURL: geode.base_url,
+      baseURL: geodeStore.base_url,
       method: schema.methods.filter((m) => m !== "OPTIONS")[0],
       body: { snapshot, filename: defaultName },
     })
@@ -25,7 +25,7 @@ export function useProjectManager() {
   }
 
   const importProjectFile = async function (file) {
-    const geode = useGeodeStore()
+    const geodeStore = useGeodeStore()
     const viewerStore = useViewerStore()
     const dataBaseStore = useDataBaseStore()
     const treeviewStore = useTreeviewStore()
@@ -61,7 +61,7 @@ export function useProjectManager() {
     form.append("file", file, originalFileName)
 
     const result = await $fetch(schemaImport.$id, {
-      baseURL: geode.base_url,
+      baseURL: geodeStore.base_url,
       method: "POST",
       body: form,
     })
