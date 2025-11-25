@@ -117,7 +117,6 @@ describe("Infra Store", () => {
         const viewer_store = useViewerStore()
         geode_store.is_busy = false
         viewer_store.is_busy = false
-
         expect(infra_store.microservices_busy).toBe(false)
       })
       test("test geode true & viewer false", () => {
