@@ -44,7 +44,11 @@ export const useInfraStore = defineStore("infra", {
   },
   actions: {
     register_microservice(config) {
-      if (!this.microservices.find((microservice) => microservice.name === config.name)) {
+      if (
+        !this.microservices.find(
+          (microservice) => microservice.name === config.name,
+        )
+      ) {
         this.microservices.push({
           name: config.name,
           store: config.useStore(),
