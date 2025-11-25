@@ -31,7 +31,6 @@ async function setupIntegrationTests(file_name, geode_object) {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  // infraStore.init_microservices()
   const geodeStore = useGeodeStore()
   const hybridViewerStore = useHybridViewerStore()
   const infraStore = useInfraStore()
