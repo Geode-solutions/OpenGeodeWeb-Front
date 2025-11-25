@@ -28,7 +28,7 @@ beforeEach(async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  
+
   registerMicroservice({
     name: "geode",
     useStore: useGeodeStore,
