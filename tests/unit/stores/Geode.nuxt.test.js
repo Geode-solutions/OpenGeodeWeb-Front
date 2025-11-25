@@ -3,7 +3,8 @@ import { createTestingPinia } from "@pinia/testing"
 import { describe, test, expect, expectTypeOf, beforeEach, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import Status from "@ogw_f/utils/status"
+import Status from "@ogw_front/utils/status"
+import { appMode } from "@ogw_front/utils/app_mode"
 
 beforeEach(async () => {
   const pinia = createTestingPinia({
@@ -28,19 +29,19 @@ describe("Geode store", () => {
       test("test app_mode CLOUD", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.CLOUD
+        infra_store.app_mode = appMode.CLOUD
         expect(geode_store.protocol).toBe("https")
       })
       test("test app_mode BROWSER", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.BROWSER
+        infra_store.app_mode = appMode.BROWSER
         expect(geode_store.protocol).toBe("http")
       })
       test("test app_mode DESKTOP", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.DESKTOP
+        infra_store.app_mode = appMode.DESKTOP
         expect(geode_store.protocol).toBe("http")
       })
     })
@@ -49,26 +50,26 @@ describe("Geode store", () => {
       test("test app_mode CLOUD", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.CLOUD
+        infra_store.app_mode = appMode.CLOUD
         expect(geode_store.port).toBe("443")
       })
       test("test app_mode BROWSER", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.BROWSER
+        infra_store.app_mode = appMode.BROWSER
         expect(geode_store.port).toBe(geode_store.default_local_port)
       })
       test("test app_mode DESKTOP", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.DESKTOP
+        infra_store.app_mode = appMode.DESKTOP
         expect(geode_store.port).toBe(geode_store.default_local_port)
       })
 
       test("test override default_local_port", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.DESKTOP
+        infra_store.app_mode = appMode.DESKTOP
         geode_store.default_local_port = "12"
         expect(geode_store.port).toBe("12")
       })
@@ -78,14 +79,14 @@ describe("Geode store", () => {
       test("test app_mode BROWSER", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.BROWSER
+        infra_store.app_mode = appMode.BROWSER
         infra_store.domain_name = "localhost"
         expect(geode_store.base_url).toBe("http://localhost:5000")
       })
       test("test app_mode CLOUD", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.CLOUD
+        infra_store.app_mode = appMode.CLOUD
         infra_store.ID = "123456"
         infra_store.domain_name = "example.com"
         expect(geode_store.base_url).toBe(
@@ -95,7 +96,7 @@ describe("Geode store", () => {
       test("test app_mode CLOUD, ID empty", () => {
         const infra_store = useInfraStore()
         const geode_store = useGeodeStore()
-        infra_store.app_mode = appMode.appMode.CLOUD
+        infra_store.app_mode = appMode.CLOUD
         infra_store.ID = ""
         infra_store.domain_name = "example.com"
         expect(() => geode_store.base_url).toThrowError(

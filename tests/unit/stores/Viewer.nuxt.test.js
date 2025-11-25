@@ -18,11 +18,11 @@ import {
 import { WebSocket } from "ws"
 
 // Local imports
-import { useViewerStore } from "@ogw_f/stores/viewer"
-import { useInfraStore } from "@ogw_f/stores/infra"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useInfraStore } from "@ogw_front/stores/infra"
 
-import { appMode } from "@ogw_f/utils/app_mode"
-import Status from "@ogw_f/utils/status"
+import { appMode } from "@ogw_front/utils/app_mode"
+import Status from "@ogw_front/utils/status"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
