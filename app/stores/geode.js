@@ -1,7 +1,6 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
-import { registerMicroservice } from "@ogw_front/stores/infra.js"
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -82,11 +81,4 @@ export const useGeodeStore = defineStore("geode", {
   share: {
     omit: ["status"],
   },
-})
-
-registerMicroservice({
-  name: "geode",
-  useStore: useGeodeStore,
-  connect: (store) => store.do_ping(),
-  electron_runner: "run_back",
 })
