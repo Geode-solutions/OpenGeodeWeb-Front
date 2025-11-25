@@ -9,7 +9,7 @@ beforeEach(async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  
+
   const infra_store = useInfraStore()
   infra_store.register_microservice({
     name: "geode",

@@ -31,7 +31,7 @@ async function setupIntegrationTests(file_name, geode_object) {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  
+
   const infraStore = useInfraStore()
   infraStore.register_microservice({
     name: "geode",
@@ -45,7 +45,7 @@ async function setupIntegrationTests(file_name, geode_object) {
     connect: (store) => store.ws_connect(),
     electron_runner: "run_viewer",
   })
-  
+
   const geodeStore = useGeodeStore()
   const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()
