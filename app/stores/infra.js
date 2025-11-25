@@ -57,7 +57,7 @@ export const useInfraStore = defineStore("infra", {
         })
       }
     },
-    get_microservice_store(name) {
+    microservice_store(name) {
       const microservice = this.microservices.find(
         (microservice) => microservice.name === name,
       )
