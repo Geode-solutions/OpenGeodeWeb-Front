@@ -118,6 +118,6 @@ export const useInfraStore = defineStore("infra", {
     },
   },
   share: {
-    omit: ["status", "microservices", "_initialized"],
+    omit: ["status", "microservices"],
   },
 })
