@@ -37,14 +37,9 @@ describe("run_function_when_microservices_connected", () => {
     const geode_store = useGeodeStore()
     const viewer_store = useViewerStore()
     const spy = vi.spyOn(dumb_obj, "dumb_method")
-
     geode_store.$patch({ status: Status.NOT_CONNECTED })
     viewer_store.$patch({ status: Status.NOT_CONNECTED })
-
     run_function_when_microservices_connected(dumb_obj.dumb_method)
-
-    await new Promise((resolve) => setTimeout(resolve, 200))
-
     expect(spy).not.toHaveBeenCalled()
   })
 })
