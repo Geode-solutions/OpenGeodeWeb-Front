@@ -2,6 +2,11 @@ import { useStorage } from "@vueuse/core"
 import Status from "@ogw_front/utils/status.js"
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode.js"
 
+const microserviceRegistry = []
+export function registerMicroservice(config) {
+  microserviceRegistry.push(config)
+}
+
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
@@ -9,7 +14,6 @@ export const useInfraStore = defineStore("infra", {
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
     microservices: [],
-    _initialized: false,
   }),
   getters: {
     domain_name() {
@@ -33,11 +37,17 @@ export const useInfraStore = defineStore("infra", {
       return url
     },
     microservices_connected() {
+      if (this.microservices.length === 0) {
+        this.init_microservices()
+      }
       return this.microservices.every(
         (microservice) => microservice.store.status === Status.CONNECTED,
       )
     },
     microservices_busy() {
+      if (this.microservices.length === 0) {
+        this.init_microservices()
+      }
       return this.microservices.some(
         (microservice) => microservice.store.is_busy === true,
       )
@@ -45,25 +55,18 @@ export const useInfraStore = defineStore("infra", {
   },
   actions: {
     init_microservices() {
-      if (this._initialized) return
-      this._initialized = true
-
-      this.microservices = [
-        {
-          name: "geode",
-          store: useGeodeStore(),
-          connect: (store) => store.do_ping(),
-          electron_runner: "run_back",
-        },
-        {
-          name: "viewer",
-          store: useViewerStore(),
-          connect: (store) => store.ws_connect(),
-          electron_runner: "run_viewer",
-        },
-      ]
+      if (this.microservices.length > 0) return
+      this.microservices = microserviceRegistry.map((config) => ({
+        name: config.name,
+        store: config.useStore(),
+        connect: config.connect,
+        electron_runner: config.electron_runner,
+      }))
     },
     get_microservice_store(name) {
+      if (this.microservices.length === 0) {
+        this.init_microservices()
+      }
       const microservice = this.microservices.find(
         (microservice) => microservice.name === name,
       )
@@ -72,12 +75,14 @@ export const useInfraStore = defineStore("infra", {
     async create_backend() {
       console.log("create_backend this.app_mode", this.app_mode)
       if (this.status === Status.CREATED) return
+      if (this.microservices.length === 0) {
+        this.init_microservices()
+      }
       return navigator.locks.request("infra.create_backend", async (lock) => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return
         console.log("LOCK GRANTED !", lock)
-<<<<<<< HEAD:stores/infra.js
-        if (this.app_mode == appMode.appMode.DESKTOP) {
+        if (this.app_mode == appMode.DESKTOP) {
           const port_promises = this.microservices.map((microservice) =>
             window.electronAPI[microservice.electron_runner](),
           )
@@ -85,19 +90,7 @@ export const useInfraStore = defineStore("infra", {
           this.microservices.forEach((microservice, index) => {
             microservice.store.$patch({ default_local_port: ports[index] })
           })
-        } else if (this.app_mode == appMode.appMode.CLOUD) {
-=======
-        if (this.app_mode == appMode.DESKTOP) {
-          const viewer_store = useViewerStore()
-          const geode_store = useGeodeStore()
-          const [back_port, viewer_port] = await Promise.all([
-            window.electronAPI.run_back(),
-            window.electronAPI.run_viewer(),
-          ])
-          geode_store.$patch({ default_local_port: back_port })
-          viewer_store.$patch({ default_local_port: viewer_port })
         } else if (this.app_mode == appMode.CLOUD) {
->>>>>>> e086021df0e72623662424dcc8920ca782c0dc9c:app/stores/infra.js
           const { data, error } = await useFetch(this.lambda_url, {
             method: "POST",
           })

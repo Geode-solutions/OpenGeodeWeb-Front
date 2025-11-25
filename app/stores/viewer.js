@@ -4,6 +4,7 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
+import { registerMicroservice } from "@ogw_front/stores/infra.js"
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -142,4 +143,11 @@ export const useViewerStore = defineStore("viewer", {
   share: {
     omit: ["status", "client"],
   },
+})
+
+registerMicroservice({
+  name: "viewer",
+  useStore: useViewerStore,
+  connect: (store) => store.ws_connect(),
+  electron_runner: "run_viewer",
 })
