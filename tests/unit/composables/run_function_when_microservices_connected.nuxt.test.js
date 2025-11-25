@@ -31,7 +31,7 @@ describe("run_function_when_microservices_connected", () => {
     expect(spy).toHaveBeenCalled()
   })
 
-  test("microservices not connected - does not call function", async () => {
+  test("microservices not connected", async () => {
     const infra_store = useInfraStore()
     infra_store.init_microservices()
     const geode_store = useGeodeStore()
