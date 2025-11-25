@@ -32,7 +32,7 @@ async function setupIntegrationTests(file_name, geode_object) {
   })
   setActivePinia(pinia)
   const infraStore = useInfraStore()
-  infraStore.init_microservices()
+  // infraStore.init_microservices()
   const geodeStore = useGeodeStore()
   const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()

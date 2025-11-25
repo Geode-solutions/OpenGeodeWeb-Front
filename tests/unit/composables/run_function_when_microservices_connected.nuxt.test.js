@@ -32,8 +32,8 @@ describe("run_function_when_microservices_connected", () => {
   })
 
   test("microservices not connected", async () => {
-    const infra_store = useInfraStore()
-    infra_store.init_microservices()
+    // const infra_store = useInfraStore()
+    // infra_store.init_microservices()
     const geode_store = useGeodeStore()
     const viewer_store = useViewerStore()
     const spy = vi.spyOn(dumb_obj, "dumb_method")
