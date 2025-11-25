@@ -23,7 +23,6 @@
   import Recaptcha from "@ogw_front/components/Recaptcha.vue"
 
   const infra_store = useInfraStore()
-  infra_store.init_microservices()
 
   watch(
     () => infra_store.is_captcha_validated,
