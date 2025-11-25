@@ -11,7 +11,7 @@ import { afterAll, beforeAll, expect, vi } from "vitest"
 // Local imports
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useInfraStore, registerMicroservice } from "@ogw_front/stores/infra"
+import { useInfraStore } from "@ogw_front/stores/infra"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
 import Status from "@ogw_front/utils/status"
@@ -32,13 +32,14 @@ async function setupIntegrationTests(file_name, geode_object) {
   })
   setActivePinia(pinia)
   
-  registerMicroservice({
+  const infraStore = useInfraStore()
+  infraStore.register_microservice({
     name: "geode",
     useStore: useGeodeStore,
     connect: (store) => store.do_ping(),
     electron_runner: "run_back",
   })
-  registerMicroservice({
+  infraStore.register_microservice({
     name: "viewer",
     useStore: useViewerStore,
     connect: (store) => store.ws_connect(),
@@ -47,7 +48,6 @@ async function setupIntegrationTests(file_name, geode_object) {
   
   const geodeStore = useGeodeStore()
   const hybridViewerStore = useHybridViewerStore()
-  const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
 

@@ -2,11 +2,6 @@ import { useStorage } from "@vueuse/core"
 import Status from "@ogw_front/utils/status.js"
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode.js"
 
-const microserviceRegistry = []
-export function registerMicroservice(config) {
-  microserviceRegistry.push(config)
-}
-
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
@@ -37,36 +32,28 @@ export const useInfraStore = defineStore("infra", {
       return url
     },
     microservices_connected() {
-      if (this.microservices.length === 0) {
-        this.init_microservices()
-      }
       return this.microservices.every(
         (microservice) => microservice.store.status === Status.CONNECTED,
       )
     },
     microservices_busy() {
-      if (this.microservices.length === 0) {
-        this.init_microservices()
-      }
       return this.microservices.some(
         (microservice) => microservice.store.is_busy === true,
       )
     },
   },
   actions: {
-    init_microservices() {
-      if (this.microservices.length > 0) return
-      this.microservices = microserviceRegistry.map((config) => ({
-        name: config.name,
-        store: config.useStore(),
-        connect: config.connect,
-        electron_runner: config.electron_runner,
-      }))
+    register_microservice(config) {
+      if (!this.microservices.find((microservice) => microservice.name === config.name)) {
+        this.microservices.push({
+          name: config.name,
+          store: config.useStore(),
+          connect: config.connect,
+          electron_runner: config.electron_runner,
+        })
+      }
     },
     get_microservice_store(name) {
-      if (this.microservices.length === 0) {
-        this.init_microservices()
-      }
       const microservice = this.microservices.find(
         (microservice) => microservice.name === name,
       )
@@ -75,9 +62,6 @@ export const useInfraStore = defineStore("infra", {
     async create_backend() {
       console.log("create_backend this.app_mode", this.app_mode)
       if (this.status === Status.CREATED) return
-      if (this.microservices.length === 0) {
-        this.init_microservices()
-      }
       return navigator.locks.request("infra.create_backend", async (lock) => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return

@@ -8,7 +8,6 @@ import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 // Local imports
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode"
-import { registerMicroservice } from "@ogw_front/stores/infra.js"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
@@ -29,13 +28,14 @@ beforeEach(async () => {
   })
   setActivePinia(pinia)
   
-  registerMicroservice({
+  const infra_store = useInfraStore()
+  infra_store.register_microservice({
     name: "geode",
     useStore: useGeodeStore,
     connect: (store) => store.do_ping(),
     electron_runner: "run_back",
   })
-  registerMicroservice({
+  infra_store.register_microservice({
     name: "viewer",
     useStore: useViewerStore,
     connect: (store) => store.ws_connect(),
