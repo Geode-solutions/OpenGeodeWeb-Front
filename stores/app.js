@@ -94,12 +94,12 @@ export const useAppStore = defineStore("app", () => {
         const response = await fetch(path)
         let code = await response.text()
 
-        // Replace Vue imports - handle all patterns including multiline
+        // Replace Vue imports - handle all patterns including multiline and minified
         code = code.replace(
-          /import\s+(?:{([^}]+)}|\*\s+as\s+(\w+)|(\w+))\s+from\s+["']vue["'];?/gs,
+          /import\s*(?:{([^}]+)}|\*\s*as\s+(\w+)|(\w+))\s*from\s*["']vue["'];?/gs,
           (match, namedImports, namespaceImport, defaultImport) => {
             if (namedImports) {
-              // Named imports: import { ref, computed } from 'vue'
+              // Named imports: import { ref, computed } from 'vue' or import{ref}from"vue"
               // Convert 'as' to ':' for object destructuring
               const converted = namedImports.replace(/\s+as\s+/g, ': ')
               return `const {${converted}} = window.__VUE_RUNTIME__;`
@@ -116,7 +116,7 @@ export const useAppStore = defineStore("app", () => {
         
         // Replace Pinia imports
         code = code.replace(
-          /import\s+(?:{([^}]+)}|\*\s+as\s+(\w+)|(\w+))\s+from\s+["']pinia["'];?/gs,
+          /import\s*(?:{([^}]+)}|\*\s*as\s+(\w+)|(\w+))\s*from\s*["']pinia["'];?/gs,
           (match, namedImports, namespaceImport, defaultImport) => {
             if (namedImports) {
               const converted = namedImports.replace(/\s+as\s+/g, ': ')
@@ -129,16 +129,32 @@ export const useAppStore = defineStore("app", () => {
             return match
           }
         )
-
-        // Replace @geode/* imports - just comment them out for now
+        
+        // Replace back schemas import FIRST (before other @geode imports)
+        let schemasReplaced = false
         code = code.replace(
-          /import\s+[^;]+from\s+["']@geode\/[^"']+["'];?/gs,
-          (match) => `/* ${match} */ // External dependency - resolved at runtime\n`
+          /import\s+(\w+)\s*from\s*["']@geode\/opengeodeweb-back\/opengeodeweb_back_schemas\.json["'];?/g,
+          (match, defaultImport) => {
+            console.log('[AppStore] ✓ Replacing back schemas:', match)
+            schemasReplaced = true
+            return `const ${defaultImport} = window.__GEODE_BACK_SCHEMAS__;`
+          }
+        )
+        
+        if (!schemasReplaced) {
+          console.warn('[AppStore] ⚠️ Back schemas import NOT found!')
+          console.log('[AppStore] First 300 chars after Vue/Pinia replacement:', code.substring(0, 300))
+        }
+
+        // Replace other @geode/* imports - comment them out
+        code = code.replace(
+          /import\s+[^;]+from\s*["']@geode\/[^"']+["'];?/g,
+          (match) => `/* ${match} */ // External dependency\n`
         )
 
         // Replace @ogw_* imports
         code = code.replace(
-          /import\s+[^;]+from\s+["']@ogw_[^"']+["'];?/gs,
+          /import\s+[^;]+from\s*["']@ogw_[^"']+["'];?/gs,
           (match) => `/* ${match} */ // External dependency - resolved at runtime\n`
         )
 
