@@ -164,8 +164,8 @@ export const useAppStore = defineStore("app", () => {
           ext => ext.metadata?.name === extensionName
         )
         if (alreadyLoaded) {
-          console.warn(`[AppStore] Extension "${extensionName}" is already loaded`)
-          throw new Error(`Extension "${extensionName}" is already loaded. Please unload it first.`)
+          console.warn(`[AppStore]"${extensionName}" is already loaded`)
+          throw new Error(`"${extensionName}" is already loaded.`)
         }
       }
 
