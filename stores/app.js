@@ -77,10 +77,10 @@ export const useAppStore = defineStore("app", () => {
 
   async function loadExtension(path) {
     try {
-      // Check if already loaded
+      // Check if already loaded by path
       if (loadedExtensions.value.has(path)) {
-        console.warn(`[AppStore] Extension already loaded: ${path}`)
-        return loadedExtensions.value.get(path)
+        console.warn(`[AppStore] Extension already loaded from this path: ${path}`)
+        throw new Error('This extension file is already loaded')
       }
 
       if (!extensionAPI.value) {
@@ -155,6 +155,18 @@ export const useAppStore = defineStore("app", () => {
       // Clean up temporary blob URL
       if (finalURL !== path && finalURL.startsWith('blob:')) {
         URL.revokeObjectURL(finalURL)
+      }
+
+      // Check for duplicate extension by name
+      const extensionName = extensionModule.metadata?.name
+      if (extensionName) {
+        const alreadyLoaded = Array.from(loadedExtensions.value.values()).find(
+          ext => ext.metadata?.name === extensionName
+        )
+        if (alreadyLoaded) {
+          console.warn(`[AppStore] Extension "${extensionName}" is already loaded`)
+          throw new Error(`Extension "${extensionName}" is already loaded. Please unload it first.`)
+        }
       }
 
       // Check if extension has an install function
