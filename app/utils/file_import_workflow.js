@@ -8,9 +8,9 @@ async function importWorkflow(files) {
   console.log("importWorkflow", { files })
   const promise_array = []
   for (const file of files) {
-    const { filename, geode_object } = file
-    console.log({ filename }, { geode_object })
-    promise_array.push(importFile(filename, geode_object))
+    const { filename, geode_object_type } = file
+    console.log({ filename }, { geode_object_type })
+    promise_array.push(importFile(filename, geode_object_type))
   }
   const results = await Promise.all(promise_array)
   const hybridViewerStore = useHybridViewerStore()
@@ -18,11 +18,12 @@ async function importWorkflow(files) {
   return results
 }
 
-function buildImportItemFromPayloadApi(value, geode_object) {
+function buildImportItemFromPayloadApi(value, geode_object_type) {
+  console.log("buildImportItemFromPayloadApi", { value, geode_object_type })
   return {
     id: value.id,
-    object_type: value.object_type,
-    geode_object,
+    viewer_type: value.viewer_type,
+    geode_object_type,
     native_filename: value.native_file_name,
     viewable_filename: value.viewable_file_name,
     displayed_name: value.name,
@@ -41,16 +42,16 @@ async function importItem(item) {
   })
 
   await treeviewStore.addItem(
-    item.geode_object,
+    item.geode_object_type,
     item.displayed_name,
     item.id,
-    item.object_type,
+    item.viewer_type,
   )
 
   await hybridViewerStore.addItem(item.id)
-  await dataStyleStore.addDataStyle(item.id, item.geode_object)
+  await dataStyleStore.addDataStyle(item.id, item.geode_object_type)
 
-  if (item.object_type === "model") {
+  if (item.viewer_type === "model") {
     await Promise.all([
       dataBaseStore.fetchMeshComponents(item.id),
       dataBaseStore.fetchUuidToFlatIndexDict(item.id),
@@ -61,18 +62,18 @@ async function importItem(item) {
   return item.id
 }
 
-async function importFile(filename, geode_object) {
+async function importFile(filename, geode_object_type) {
   const { data } = await api_fetch({
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
     params: {
-      input_geode_object: geode_object,
+      geode_object_type: geode_object_type,
       filename: filename,
     },
   })
 
   console.log("data.value", data.value)
 
-  const item = buildImportItemFromPayloadApi(data._value, geode_object)
+  const item = buildImportItemFromPayloadApi(data._value, geode_object_type)
   return importItem(item)
 }
 

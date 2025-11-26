@@ -18,11 +18,11 @@ global.ResizeObserver = require("resize-observer-polyfill")
 
 describe("Stepper.vue", async () => {
   test(`Mount`, async () => {
-    const input_geode_object = ref("BRep")
+    const geode_object_type = ref("BRep")
     const files = ref([])
     const stepper_tree = reactive({
       current_step_index: ref(0),
-      input_geode_object,
+      geode_object_type,
       steps: [
         {
           step_title: "Confirm the data type",
@@ -36,10 +36,10 @@ describe("Stepper.vue", async () => {
             },
           },
           chips: computed(() => {
-            if (input_geode_object.value === "") {
+            if (geode_object_type.value === "") {
               return []
             } else {
-              return [input_geode_object.value]
+              return [geode_object_type.value]
             }
           }),
         },

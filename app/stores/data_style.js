@@ -19,23 +19,23 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       "dataBaseStore.itemMetaDatas(id)",
       dataBaseStore.itemMetaDatas(id),
     )
-    const object_type = dataBaseStore.itemMetaDatas(id).object_type
-    if (object_type === "mesh") {
+    const { viewer_type } = dataBaseStore.itemMetaDatas(id)
+    if (viewer_type === "mesh") {
       return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
-    } else if (object_type === "model") {
+    } else if (viewer_type === "model") {
       return Promise.all([modelStyleStore.setModelVisibility(id, visibility)])
     }
-    throw new Error("Unknown object_type")
+    throw new Error("Unknown viewer_type")
   }
 
   function applyDefaultStyle(id) {
-    const { object_type } = dataBaseStore.itemMetaDatas(id)
-    if (object_type === "mesh") {
+    const { viewer_type } = dataBaseStore.itemMetaDatas(id)
+    if (viewer_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id)
-    } else if (object_type === "model") {
+    } else if (viewer_type === "model") {
       return modelStyleStore.applyModelStyle(id)
     } else {
-      throw new Error("Unknown object_type: " + object_type)
+      throw new Error("Unknown viewer_type: " + viewer_type)
     }
   }
 

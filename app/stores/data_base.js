@@ -125,8 +125,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     for (const [id, item] of Object.entries(db)) {
       if (!item) continue
       snapshotDb[id] = {
-        object_type: item.object_type,
-        geode_object: item.geode_object,
+        object_type: item.viewer_type,
+        geode_object_type: item.geode_object,
         native_filename: item.native_filename,
         viewable_filename: item.viewable_filename,
         displayed_name: item.displayed_name,
