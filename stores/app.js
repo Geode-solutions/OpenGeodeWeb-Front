@@ -159,14 +159,15 @@ export const useAppStore = defineStore("app", () => {
 
       // Check if extension has an install function
       if (typeof extensionModule.install === 'function') {
-        // Call install with the Extension API
-        await extensionModule.install(extensionAPI.value)
+        // Call install with the Extension API and the extension path
+        await extensionModule.install(extensionAPI.value, path)
         
         // Store the loaded extension
         const extensionData = {
           module: extensionModule,
           path,
           loadedAt: new Date().toISOString(),
+          metadata: extensionModule.metadata || {},
         }
         loadedExtensions.value.set(path, extensionData)
 
@@ -188,6 +189,24 @@ export const useAppStore = defineStore("app", () => {
 
   function unloadExtension(path) {
     if (loadedExtensions.value.has(path)) {
+      const extensionData = loadedExtensions.value.get(path)
+      
+      // Call uninstall function if it exists
+      if (extensionData.module && typeof extensionData.module.uninstall === 'function') {
+        try {
+          extensionData.module.uninstall(extensionAPI.value, path)
+          console.log(`[AppStore] Extension uninstall called: ${path}`)
+        } catch (error) {
+          console.error(`[AppStore] Error calling uninstall for ${path}:`, error)
+        }
+      }
+      
+      // Clean up all tools registered by this extension
+      if (extensionAPI.value) {
+        extensionAPI.value.unregisterToolsByExtension(path)
+      }
+      
+      // Remove from loaded extensions
       loadedExtensions.value.delete(path)
       console.log(`[AppStore] Extension unloaded: ${path}`)
       return true
