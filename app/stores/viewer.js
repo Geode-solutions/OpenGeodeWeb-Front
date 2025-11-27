@@ -143,3 +143,56 @@ export const useViewerStore = defineStore("viewer", {
     omit: ["status", "client"],
   },
 })
+
+// Standardized methods for microservice registration
+export function viewer_request(store, schema, params = {}, callbacks = {}) {
+  const { request_error_function, response_function, response_error_function } = callbacks
+  const feedback_store = useFeedbackStore()
+
+  const client = store.client
+
+  return new Promise((resolve, reject) => {
+    if (!client.getConnection) {
+      resolve()
+      return
+    }
+    store.start_request()
+    client
+      .getConnection()
+      .getSession()
+      .call(schema.$id, [params])
+      .then(
+        (value) => {
+          if (response_function) {
+            response_function(value)
+          }
+          resolve()
+        },
+        (reason) => {
+          if (request_error_function) {
+            request_error_function(reason)
+          }
+          reject()
+        },
+      )
+      .catch((error) => {
+        feedback_store.add_error(
+          error.code,
+          schema.$id,
+          error.message,
+          error.message,
+        )
+        if (response_error_function) {
+          response_error_function(error)
+        }
+        reject()
+      })
+      .finally(() => {
+        store.stop_request()
+      })
+  })
+}
+
+export function viewer_connect(store) {
+  return store.ws_connect()
+}

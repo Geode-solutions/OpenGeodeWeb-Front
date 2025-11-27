@@ -75,6 +75,7 @@ export const useAppStore = defineStore("app", () => {
   }
 
   async function loadExtension(path) {
+    console.log(`[EXTENSION] Loading extension from: ${path}`)
     try {
       if (loadedExtensions.value.has(path)) {
         console.warn(`[AppStore] Extension already loaded from this path: ${path}`)
@@ -144,6 +145,7 @@ export const useAppStore = defineStore("app", () => {
       }
 
       const extensionName = extensionModule.metadata?.name
+      console.log(`[EXTENSION] Extension metadata:`, extensionModule.metadata)
       if (extensionName) {
         const alreadyLoaded = Array.from(loadedExtensions.value.values()).find(
           ext => ext.metadata?.name === extensionName
@@ -155,6 +157,7 @@ export const useAppStore = defineStore("app", () => {
       }
 
       if (typeof extensionModule.install === 'function') {
+        console.log(`[EXTENSION] Calling install function for extension: ${extensionName || path}`)
         await extensionModule.install(extensionAPI.value, path)
         
         const extensionData = {

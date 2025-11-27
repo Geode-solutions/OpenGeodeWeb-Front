@@ -82,3 +82,65 @@ export const useGeodeStore = defineStore("geode", {
     omit: ["status"],
   },
 })
+
+// Standardized methods for microservice registration
+export function geode_request(store, schema, params, callbacks = {}) {
+  const { request_error_function, response_function, response_error_function } = callbacks
+  const feedback_store = useFeedbackStore()
+  const body = params || {}
+
+  store.start_request()
+
+  const method = schema.methods.filter((m) => m !== "OPTIONS")[0]
+  const request_options = {
+    method: method,
+  }
+  if (body && Object.keys(body).length > 0) {
+    request_options.body = body
+  }
+
+  if (schema.max_retry) {
+    request_options.max_retry = schema.max_retry
+  }
+
+  return useFetch(schema.$id, {
+    baseURL: store.base_url,
+    ...request_options,
+    async onRequestError({ error }) {
+      await store.stop_request()
+      await feedback_store.add_error(
+        error.code,
+        schema.$id,
+        error.message,
+        error.stack,
+      )
+      if (request_error_function) {
+        await request_error_function(error)
+      }
+    },
+    async onResponse({ response }) {
+      if (response.ok) {
+        await store.stop_request()
+        if (response_function) {
+          await response_function(response)
+        }
+      }
+    },
+    async onResponseError({ response }) {
+      await store.stop_request()
+      await feedback_store.add_error(
+        response.status,
+        schema.$id,
+        response._data.name,
+        response._data.description,
+      )
+      if (response_error_function) {
+        await response_error_function(response)
+      }
+    },
+  })
+}
+
+export function geode_connect(store) {
+  return store.do_ping()
+}
