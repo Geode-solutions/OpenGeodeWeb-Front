@@ -294,6 +294,7 @@ async function run_browser(
 
   const nuxt_process = child_process.spawn("npm", ["run", script_name], {
     shell: true,
+    FORCE_COLOR: true,
   })
 
   return new Promise((resolve) => {
