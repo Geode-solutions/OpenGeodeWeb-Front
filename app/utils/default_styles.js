@@ -2,12 +2,14 @@
 
 const points_defaultVisibility = true
 const edges_defaultVisibility = true
+const cells_defaultVisibility = true
 const polygons_defaultVisibility = true
 const polyhedra_defaultVisibility = true
 const points_defaultSize = 10
 const points_defaultColor = { r: 20, g: 20, b: 20 }
 const edges_defaultSize = 5
 const edges_defaultColor = { r: 20, g: 20, b: 20 }
+const cells_defaultColor = { r: 255, g: 255, b: 255 }
 const polygons_defaultColor = { r: 255, g: 255, b: 255 }
 const polyhedra_defaultColor = { r: 255, g: 255, b: 255 }
 
@@ -52,6 +54,22 @@ const meshEdgesDefaultStyle = (
   }
 }
 
+const meshCellsDefaultStyle = (
+  visibility = cells_defaultVisibility,
+  color = cells_defaultColor,
+) => {
+  return {
+    visibility,
+    coloring: {
+      active: "color",
+      cell: null,
+      color,
+      textures: null,
+      vertex: null,
+    },
+  }
+}
+
 const meshPolygonsDefaultStyle = (
   visibility = polygons_defaultVisibility,
   color = polygons_defaultColor,
@@ -93,16 +111,24 @@ const pointSet_defaultStyle = () => {
 const edgedCurve_defaultStyle = () => {
   return {
     visibility: true,
-    points: meshPointsDefaultStyle(false),
+    points: meshPointsDefaultStyle(),
     edges: meshEdgesDefaultStyle(),
   }
 }
 
-const surface_defaultStyle = (visibility = true) => {
+const grid_defaultStyle = () => {
   return {
-    visibility,
-    points: meshPointsDefaultStyle(false),
-    edges: meshEdgesDefaultStyle(false),
+    visibility: true,
+    points: meshPointsDefaultStyle(),
+    edges: meshEdgesDefaultStyle(),
+    cells: meshCellsDefaultStyle(),
+  }
+}
+const surface_defaultStyle = () => {
+  return {
+    visibility: true,
+    points: meshPointsDefaultStyle(),
+    edges: meshEdgesDefaultStyle(),
     polygons: meshPolygonsDefaultStyle(),
   }
 }
@@ -231,8 +257,8 @@ const default_styles = () => {
     HybridSolid3D: solid_defaultStyle(),
     ImplicitCrossSection: implicitCrossSection_defaultStyle(),
     ImplicitStructuralModel: implicitStructuralModel_defaultStyle(),
-    LightRegularGrid2D: surface_defaultStyle(),
-    LightRegularGrid3D: solid_defaultStyle(),
+    LightRegularGrid2D: grid_defaultStyle(),
+    LightRegularGrid3D: grid_defaultStyle(),
     PointSet2D: pointSet_defaultStyle(),
     PointSet3D: pointSet_defaultStyle(),
     PolygonalSurface2D: surface_defaultStyle(),
@@ -240,8 +266,8 @@ const default_styles = () => {
     PolyhedralSolid3D: solid_defaultStyle(),
     RasterImage2D: {},
     RasterImage3D: {},
-    RegularGrid2D: surface_defaultStyle(),
-    RegularGrid3D: solid_defaultStyle(),
+    RegularGrid2D: grid_defaultStyle(),
+    RegularGrid3D: grid_defaultStyle(),
     Section: section_defaultStyle(),
     StructuralModel: structuralModel_defaultStyle(),
     TetrahedralSolid3D: solid_defaultStyle(),

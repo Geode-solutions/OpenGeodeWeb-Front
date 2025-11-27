@@ -134,11 +134,20 @@ export function useMeshPolygonsStyle() {
     )
     if (type === "color") {
       return setMeshPolygonsColor(id, coloring.color)
-    } else if (type === "textures" && coloring.textures !== null) {
+    } else if (type === "textures") {
+      if (coloring.textures === null) {
+        return
+      }
       return setMeshPolygonsTextures(id, coloring.textures)
-    } else if (type === "vertex" && coloring.vertex !== null) {
+    } else if (type === "vertex") {
+      if (coloring.vertex === null) {
+        return
+      }
       return setMeshPolygonsVertexAttribute(id, coloring.vertex)
-    } else if (type === "polygon" && coloring.polygon !== null) {
+    } else if (type === "polygon") {
+      if (coloring.polygon === null) {
+        return
+      }
       return setMeshPolygonsPolygonAttribute(id, coloring.polygon)
     } else {
       throw new Error("Unknown mesh polygons coloring type: " + type)
