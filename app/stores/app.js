@@ -67,7 +67,6 @@ export const useAppStore = defineStore("app", () => {
     console.log(`[AppStore] Imported ${importedCount} stores`)
   }
 
-  // Extension loading system
   const loadedExtensions = ref(new Map())
   const extensionAPI = ref(null)
 
@@ -77,7 +76,6 @@ export const useAppStore = defineStore("app", () => {
 
   async function loadExtension(path) {
     try {
-      // Check if already loaded by path
       if (loadedExtensions.value.has(path)) {
         console.warn(`[AppStore] Extension already loaded from this path: ${path}`)
         throw new Error('This extension file is already loaded')
@@ -89,32 +87,25 @@ export const useAppStore = defineStore("app", () => {
 
       let finalURL = path
 
-      // For blob URLs, we need to rewrite imports to use available modules
       if (path.startsWith('blob:')) {
         const response = await fetch(path)
         let code = await response.text()
 
-        // Replace Vue imports - handle all patterns including multiline
         code = code.replace(
           /import\s+(?:{([^}]+)}|\*\s+as\s+(\w+)|(\w+))\s+from\s+["']vue["'];?/gs,
           (match, namedImports, namespaceImport, defaultImport) => {
             if (namedImports) {
-              // Named imports: import { ref, computed } from 'vue'
-              // Convert 'as' to ':' for object destructuring
               const converted = namedImports.replace(/\s+as\s+/g, ': ')
               return `const {${converted}} = window.__VUE_RUNTIME__;`
             } else if (namespaceImport) {
-              // Namespace import: import * as Vue from 'vue'
               return `const ${namespaceImport} = window.__VUE_RUNTIME__;`
             } else if (defaultImport) {
-              // Default import: import Vue from 'vue'
               return `const ${defaultImport} = window.__VUE_RUNTIME__;`
             }
             return match
           }
         )
         
-        // Replace Pinia imports
         code = code.replace(
           /import\s+(?:{([^}]+)}|\*\s+as\s+(\w+)|(\w+))\s+from\s+["']pinia["'];?/gs,
           (match, namedImports, namespaceImport, defaultImport) => {
@@ -130,13 +121,11 @@ export const useAppStore = defineStore("app", () => {
           }
         )
 
-        // Replace @geode/* imports - just comment them out for now
         code = code.replace(
           /import\s+[^;]+from\s+["']@geode\/[^"']+["'];?/gs,
           (match) => `/* ${match} */ // External dependency - resolved at runtime\n`
         )
 
-        // Replace @ogw_* imports
         code = code.replace(
           /import\s+[^;]+from\s+["']@ogw_[^"']+["'];?/gs,
           (match) => `/* ${match} */ // External dependency - resolved at runtime\n`
@@ -144,20 +133,16 @@ export const useAppStore = defineStore("app", () => {
 
         console.log('[AppStore] Rewritten extension code preview:', code.substring(0, 800))
 
-        // Create new blob with rewritten code
         const newBlob = new Blob([code], { type: 'application/javascript' })
         finalURL = URL.createObjectURL(newBlob)
       }
 
-      // Dynamic import of the extension module
-      const extensionModule = await import(/* @vite-ignore */ finalURL)
+      const extensionModule = await import(finalURL)
 
-      // Clean up temporary blob URL
       if (finalURL !== path && finalURL.startsWith('blob:')) {
         URL.revokeObjectURL(finalURL)
       }
 
-      // Check for duplicate extension by name
       const extensionName = extensionModule.metadata?.name
       if (extensionName) {
         const alreadyLoaded = Array.from(loadedExtensions.value.values()).find(
@@ -169,17 +154,15 @@ export const useAppStore = defineStore("app", () => {
         }
       }
 
-      // Check if extension has an install function
       if (typeof extensionModule.install === 'function') {
-        // Call install with the Extension API and the extension path
         await extensionModule.install(extensionAPI.value, path)
         
-        // Store the loaded extension
         const extensionData = {
           module: extensionModule,
           path,
           loadedAt: new Date().toISOString(),
           metadata: extensionModule.metadata || {},
+          enabled: true,
         }
         loadedExtensions.value.set(path, extensionData)
 
@@ -203,7 +186,6 @@ export const useAppStore = defineStore("app", () => {
     if (loadedExtensions.value.has(path)) {
       const extensionData = loadedExtensions.value.get(path)
       
-      // Call uninstall function if it exists
       if (extensionData.module && typeof extensionData.module.uninstall === 'function') {
         try {
           extensionData.module.uninstall(extensionAPI.value, path)
@@ -213,15 +195,40 @@ export const useAppStore = defineStore("app", () => {
         }
       }
       
-      // Clean up all tools registered by this extension
       if (extensionAPI.value) {
         extensionAPI.value.unregisterToolsByExtension(path)
       }
       
-      // Remove from loaded extensions
       loadedExtensions.value.delete(path)
       console.log(`[AppStore] Extension unloaded: ${path}`)
       return true
+    }
+    return false
+  }
+
+  function toggleExtension(path) {
+    if (loadedExtensions.value.has(path)) {
+      const extensionData = loadedExtensions.value.get(path)
+      extensionData.enabled = !extensionData.enabled
+      console.log(`[AppStore] Extension ${extensionData.enabled ? 'enabled' : 'disabled'}: ${path}`)
+      return extensionData.enabled
+    }
+    return false
+  }
+
+  function setExtensionEnabled(path, enabled) {
+    if (loadedExtensions.value.has(path)) {
+      const extensionData = loadedExtensions.value.get(path)
+      extensionData.enabled = enabled
+      console.log(`[AppStore] Extension ${enabled ? 'enabled' : 'disabled'}: ${path}`)
+      return true
+    }
+    return false
+  }
+
+  function getExtensionEnabled(path) {
+    if (loadedExtensions.value.has(path)) {
+      return loadedExtensions.value.get(path).enabled
     }
     return false
   }
@@ -236,5 +243,8 @@ export const useAppStore = defineStore("app", () => {
     loadExtension,
     getLoadedExtensions,
     unloadExtension,
+    toggleExtension,
+    setExtensionEnabled,
+    getExtensionEnabled,
   }
 })
