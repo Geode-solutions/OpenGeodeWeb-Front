@@ -1,3 +1,5 @@
+import { transformExtensionCode } from '../utils/extensionCodeTransformer.js'
+
 export const useAppStore = defineStore("app", () => {
   const stores = []
 
@@ -89,51 +91,10 @@ export const useAppStore = defineStore("app", () => {
 
       if (path.startsWith('blob:')) {
         const response = await fetch(path)
-        let code = await response.text()
+        const code = await response.text()
+        const transformedCode = transformExtensionCode(code)
 
-        code = code.replace(
-          /import\s+(?:{([^}]+)}|\*\s+as\s+(\w+)|(\w+))\s+from\s+["']vue["'];?/gs,
-          (match, namedImports, namespaceImport, defaultImport) => {
-            if (namedImports) {
-              const converted = namedImports.replace(/\s+as\s+/g, ': ')
-              return `const {${converted}} = window.__VUE_RUNTIME__;`
-            } else if (namespaceImport) {
-              return `const ${namespaceImport} = window.__VUE_RUNTIME__;`
-            } else if (defaultImport) {
-              return `const ${defaultImport} = window.__VUE_RUNTIME__;`
-            }
-            return match
-          }
-        )
-        
-        code = code.replace(
-          /import\s+(?:{([^}]+)}|\*\s+as\s+(\w+)|(\w+))\s+from\s+["']pinia["'];?/gs,
-          (match, namedImports, namespaceImport, defaultImport) => {
-            if (namedImports) {
-              const converted = namedImports.replace(/\s+as\s+/g, ': ')
-              return `const {${converted}} = window.__PINIA__;`
-            } else if (namespaceImport) {
-              return `const ${namespaceImport} = window.__PINIA__;`
-            } else if (defaultImport) {
-              return `const ${defaultImport} = window.__PINIA__;`
-            }
-            return match
-          }
-        )
-
-        code = code.replace(
-          /import\s+[^;]+from\s+["']@geode\/[^"']+["'];?/gs,
-          (match) => `/* ${match} */ // External dependency - resolved at runtime\n`
-        )
-
-        code = code.replace(
-          /import\s+[^;]+from\s+["']@ogw_[^"']+["'];?/gs,
-          (match) => `/* ${match} */ // External dependency - resolved at runtime\n`
-        )
-
-        console.log('[AppStore] Rewritten extension code preview:', code.substring(0, 800))
-
-        const newBlob = new Blob([code], { type: 'application/javascript' })
+        const newBlob = new Blob([transformedCode], { type: 'application/javascript' })
         finalURL = URL.createObjectURL(newBlob)
       }
 
