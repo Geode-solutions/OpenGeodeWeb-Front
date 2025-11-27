@@ -58,11 +58,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const promises = []
     for (const id of ids) {
       const meta = dataBaseStore.itemMetaDatas(id)
-      const objectType = meta?.object_type
+      const viewerType = meta?.viewer_type
       const style = dataStyleState.styles[id]
-      if (style && objectType === "mesh") {
+      if (style && viewerType === "mesh") {
         promises.push(meshStyleStore.applyMeshStyle(id))
-      } else if (style && objectType === "model") {
+      } else if (style && viewerType === "model") {
         promises.push(modelStyleStore.applyModelStyle(id))
       }
     }

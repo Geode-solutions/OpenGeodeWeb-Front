@@ -23,7 +23,7 @@ function buildImportItemFromPayloadApi(value, geode_object_type) {
   return {
     id: value.id,
     viewer_type: value.viewer_type,
-    geode_object_type,
+    geode_object_type: geode_object_type,
     native_filename: value.native_file_name,
     viewable_filename: value.viewable_file_name,
     displayed_name: value.name,
@@ -66,14 +66,15 @@ async function importFile(filename, geode_object_type) {
   const { data } = await api_fetch({
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
     params: {
-      geode_object_type: geode_object_type,
-      filename: filename,
+      geode_object_type,
+      filename,
     },
   })
 
   console.log("data.value", data.value)
+  console.log("data.value", data._value)
 
-  const item = buildImportItemFromPayloadApi(data._value, geode_object_type)
+  const item = buildImportItemFromPayloadApi(data.value, geode_object_type)
   return importItem(item)
 }
 

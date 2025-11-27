@@ -98,11 +98,7 @@ export function useProjectManager() {
           : undefined
       return {
         id: id,
-        object_type: item.viewer_type,
-        geode_object_type: item.geode_object,
-        native_filename: item.native_filename,
-        viewable_filename: item.viewable_filename,
-        displayed_name: item.displayed_name,
+        ...item,
         vtk_js: { binary_light_viewable: binaryLightViewable },
       }
     })

@@ -52,7 +52,7 @@ describe("Project import", () => {
       dataBase: {
         db: {
           abc123: {
-            object_type: "mesh",
+            viewer_type: "mesh",
             geode_object_type: "PointSet2D",
             native_filename: "native.ext",
             viewable_filename: "viewable.ext",
