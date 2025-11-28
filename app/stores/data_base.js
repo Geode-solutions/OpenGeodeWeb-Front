@@ -125,11 +125,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     for (const [id, item] of Object.entries(db)) {
       if (!item) continue
       snapshotDb[id] = {
-        viewer_type: item.viewer_type,
-        geode_object_type: item.geode_object_type,
-        native_filename: item.native_filename,
-        viewable_filename: item.viewable_filename,
-        displayed_name: item.displayed_name,
+        ...item,
         vtk_js: {
           binary_light_viewable: item?.vtk_js?.binary_light_viewable,
         },

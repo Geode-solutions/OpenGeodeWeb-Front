@@ -119,16 +119,16 @@ const edgedCurve_defaultStyle = () => {
 const grid_defaultStyle = () => {
   return {
     visibility: true,
-    points: meshPointsDefaultStyle(),
-    edges: meshEdgesDefaultStyle(),
+    points: meshPointsDefaultStyle(false),
+    edges: meshEdgesDefaultStyle(false),
     cells: meshCellsDefaultStyle(),
   }
 }
 const surface_defaultStyle = () => {
   return {
     visibility: true,
-    points: meshPointsDefaultStyle(),
-    edges: meshEdgesDefaultStyle(),
+    points: meshPointsDefaultStyle(false),
+    edges: meshEdgesDefaultStyle(false),
     polygons: meshPolygonsDefaultStyle(),
   }
 }
