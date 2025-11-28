@@ -79,9 +79,9 @@
   const include_background = ref(true)
 
   async function takeScreenshot() {
-    const viewer_store = useViewerStore();
+    const viewer_store = useViewerStore()
     await viewer_call(
-      viewer_store, 
+      viewer_store,
       {
         schema: viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot,
         params: {
