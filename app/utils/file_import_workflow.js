@@ -62,7 +62,8 @@ async function importItem(item) {
 }
 
 async function importFile(filename, geode_object) {
-  const { data } = await api_fetch({
+  const geode_store = useGeodeStore()
+  const { data } = await api_fetch(geode_store, {
     schema: back_schemas.opengeodeweb_back.save_viewable_file,
     params: {
       input_geode_object: geode_object,

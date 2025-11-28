@@ -1,6 +1,7 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
+import { api_fetch } from "@ogw_front/composables/api_fetch.js"
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -82,3 +83,36 @@ export const useGeodeStore = defineStore("geode", {
     omit: ["status"],
   },
 })
+
+// Exported functions for microservice registration
+
+export async function geode_launch() {
+  console.log("[GEODE] Launching geode microservice...")
+  const port = await window.electronAPI.run_back()
+  console.log("[GEODE] Geode launched on port:", port)
+  return port
+}
+
+export async function geode_connect(store) {
+  console.log("[GEODE] Connecting to geode microservice...")
+  await store.do_ping()
+  console.log("[GEODE] Geode connected successfully")
+}
+
+export function geode_request(store, schema, params, callbacks = {}) {
+  console.log("[GEODE] Request:", schema.$id)
+
+  return api_fetch(
+    store,
+    { schema, params },
+    {
+      ...callbacks,
+      response_function: async (response) => {
+        console.log("[GEODE] Request completed:", schema.$id)
+        if (callbacks.response_function) {
+          await callbacks.response_function(response)
+        }
+      },
+    },
+  )
+}

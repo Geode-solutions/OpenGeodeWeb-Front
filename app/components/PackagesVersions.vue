@@ -33,6 +33,7 @@
 
     const promise = new Promise((resolve, reject) => {
       api_fetch(
+        geode_store,
         { schema: props.schema },
         {
           request_error_function: () => {

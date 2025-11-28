@@ -1,11 +1,11 @@
 import validate_schema from "~/app/utils/validate_schema.js"
 
 export function viewer_call(
+  store,
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
   const feedback_store = useFeedbackStore()
-  const viewer_store = useViewerStore()
 
   const { valid, error } = validate_schema(schema, params)
 
@@ -14,17 +14,17 @@ export function viewer_call(
       console.log("Bad request", error, schema, params)
     }
     feedback_store.add_error(400, schema.$id, "Bad request", error)
-    throw new Error(schema.$id.concat(": "))
+    throw new Error(schema.$id.concat(": ", error))
   }
 
-  const client = viewer_store.client
+  const client = store.client
 
   return new Promise((resolve, reject) => {
     if (!client.getConnection) {
       resolve()
       return
     }
-    viewer_store.start_request()
+    store.start_request()
     client
       .getConnection()
       .getSession()
@@ -56,7 +56,7 @@ export function viewer_call(
         reject()
       })
       .finally(() => {
-        viewer_store.stop_request()
+        store.stop_request()
       })
   })
 }

@@ -16,7 +16,9 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraVisibility(id, visibility) {
     const polyhedra_style = meshPolyhedraStyle(id)
+    const viewer_store = useViewerStore()
     return viewer_call(
+      viewer_store,
       { schema: mesh_polyhedra_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
@@ -57,7 +59,9 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraColor(id, color) {
     const coloring = meshPolyhedraStyle(id).coloring
+    const viewer_store = useViewerStore()
     return viewer_call(
+      viewer_store,
       { schema: mesh_polyhedra_schemas.color, params: { id, color } },
       {
         response_function: () => {
@@ -77,7 +81,8 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraVertexAttribute(id, vertex_attribute) {
   //   const coloring_style = meshPolyhedraStyle(id).coloring
-  //   return viewer_call(
+  //   const viewer_store = useViewerStore()
+  //   return viewer_call(viewer_store,
   //     {
   //       schema: mesh_polyhedra_schemas.vertex_attribute,
   //       params: { id, ...vertex_attribute },
@@ -98,7 +103,8 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraPolygonAttribute(id, polygon_attribute) {
   //   const coloring_style = meshPolyhedraStyle(id).coloring
-  //   return viewer_call(
+  //   const viewer_store = useViewerStore()
+  //   return viewer_call(viewer_store,
   //     {
   //       schema: mesh_polyhedra_schemas.polygon_attribute,
   //       params: { id, ...polygon_attribute },
@@ -119,7 +125,8 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
   //   const coloring = meshPolyhedraStyle(id).coloring
-  //   return viewer_call(
+  //   const viewer_store = useViewerStore()
+  //   return viewer_call(viewer_store,
   //     {
   //       schema: mesh_polyhedra_schemas.polyhedron_attribute,
   //       params: { id, ...polyhedron_attribute },

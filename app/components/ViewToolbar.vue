@@ -33,7 +33,7 @@
       tooltip: "Reset camera",
       icon: "mdi-cube-scan",
       action: () => {
-        viewer_call({
+        const viewer_store = useViewerStore(); viewer_call(viewer_store, {
           schema: schemas.opengeodeweb_viewer.viewer.reset_camera,
         })
       },

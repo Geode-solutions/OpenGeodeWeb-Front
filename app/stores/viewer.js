@@ -4,6 +4,7 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
+import { viewer_call } from "@ogw_front/composables/viewer_call.js"
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -118,7 +119,7 @@ export const useViewerStore = defineStore("viewer", {
               clientToConnect.endBusy()
 
               // Now that the client is ready let's setup the server for us
-              viewer_call({
+              viewer_call(viewer_store, {
                 schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
               })
               viewer_store.status = Status.CONNECTED
@@ -143,3 +144,36 @@ export const useViewerStore = defineStore("viewer", {
     omit: ["status", "client"],
   },
 })
+
+// Exported functions for microservice registration
+
+export async function viewer_launch() {
+  console.log("[VIEWER] Launching viewer microservice...")
+  const port = await window.electronAPI.run_viewer()
+  console.log("[VIEWER] Viewer launched on port:", port)
+  return port
+}
+
+export async function viewer_connect(store) {
+  console.log("[VIEWER] Connecting to viewer microservice...")
+  await store.ws_connect()
+  console.log("[VIEWER] Viewer connected successfully")
+}
+
+export function viewer_request(store, schema, params = {}, callbacks = {}) {
+  console.log("[VIEWER] Request:", schema.$id)
+
+  return viewer_call(
+    store,
+    { schema, params },
+    {
+      ...callbacks,
+      response_function: async (response) => {
+        console.log("[VIEWER] Request completed:", schema.$id)
+        if (callbacks.response_function) {
+          await callbacks.response_function(response)
+        }
+      },
+    },
+  )
+}

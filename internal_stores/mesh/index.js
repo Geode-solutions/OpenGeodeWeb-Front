@@ -22,7 +22,9 @@ export default function useMeshStyle() {
     return dataStyleStore.getStyle(id).visibility
   }
   function setMeshVisibility(id, visibility) {
+    const viewer_store = useViewerStore()
     return viewer_call(
+      viewer_store,
       {
         schema: mesh_schemas.visibility,
         params: { id, visibility },

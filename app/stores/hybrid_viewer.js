@@ -91,7 +91,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     genericRenderWindow.value.getRenderWindow().render()
     const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling
     if (!schema) return
-    await viewer_call({
+    const viewer_store = useViewerStore()
+    await viewer_call(viewer_store, {
       schema,
       params: {
         z_scale: z_scale,
@@ -114,7 +115,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         distance: camera.getDistance(),
       },
     }
+    const viewer_store = useViewerStore()
     viewer_call(
+      viewer_store,
       {
         schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
         params,
@@ -131,7 +134,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function remoteRender() {
-    viewer_call({
+    const viewer_store = useViewerStore()
+    viewer_call(viewer_store, {
       schema: viewer_schemas.opengeodeweb_viewer.viewer.render,
     })
   }
@@ -244,7 +248,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           clipping_range: camera_options.clipping_range,
         },
       }
+      const viewer_store = useViewerStore()
       return viewer_call(
+        viewer_store,
         {
           schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
           params: payload,

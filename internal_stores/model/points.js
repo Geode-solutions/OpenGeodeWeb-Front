@@ -14,7 +14,9 @@ export function useModelPointsStyle() {
     return modelPointsStyle(id).visibility
   }
   function setModelPointsVisibility(id, visibility) {
+    const viewer_store = useViewerStore()
     return viewer_call(
+      viewer_store,
       {
         schema: model_points_schemas.visibility,
         params: { id, visibility },
@@ -36,7 +38,9 @@ export function useModelPointsStyle() {
     return modelPointsStyle(id).size
   }
   function setModelPointsSize(id, size) {
+    const viewer_store = useViewerStore()
     return viewer_call(
+      viewer_store,
       {
         schema: model_points_schemas.size,
         params: { id, size },

@@ -108,9 +108,10 @@
   async function get_allowed_objects() {
     toggle_loading()
     allowed_objects.value = {}
+    const geode_store = useGeodeStore()
     const promise_array = filenames.map((filename) => {
       const params = { filename, supported_feature }
-      return api_fetch({ schema, params })
+      return api_fetch(geode_store, { schema, params })
     })
     const responses = await Promise.all(promise_array)
     const allowed_objects_list = responses.map(

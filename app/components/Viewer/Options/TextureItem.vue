@@ -54,6 +54,7 @@
   texture_id.value = props.texture_id
 
   const texture_coordinates = ref([])
+  const geode_store = useGeodeStore()
 
   onMounted(() => {
     getTextureCoordinates()
@@ -61,6 +62,7 @@
 
   function getTextureCoordinates() {
     api_fetch(
+      geode_store,
       {
         schema: back_schemas.opengeodeweb_back.texture_coordinates,
         params: {
@@ -78,6 +80,7 @@
   async function files_uploaded_event(value) {
     if (value.length) {
       await api_fetch(
+        geode_store,
         {
           schema: back_schemas.opengeodeweb_back.save_viewable_file,
           params: {
