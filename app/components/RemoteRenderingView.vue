@@ -42,10 +42,14 @@
     if (viewer_store.picking_mode.value === true) {
       const { offsetX, offsetY } = event
       viewer_store.set_picked_point(offsetX, offsetY)
-      const viewer_store = useViewerStore(); viewer_call(viewer_store, {
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
-        params: { x: offsetX, y: offsetY },
-      })
+      const viewer_store = useViewerStore(); 
+      viewer_call(
+        viewer_store, 
+        {
+          schema: viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
+          params: { x: offsetX, y: offsetY },
+        }
+      )
     }
   }
 

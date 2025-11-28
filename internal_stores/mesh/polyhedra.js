@@ -81,8 +81,7 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraVertexAttribute(id, vertex_attribute) {
   //   const coloring_style = meshPolyhedraStyle(id).coloring
-  //   const viewer_store = useViewerStore()
-  //   return viewer_call(viewer_store,
+  //   return viewer_call(
   //     {
   //       schema: mesh_polyhedra_schemas.vertex_attribute,
   //       params: { id, ...vertex_attribute },
@@ -103,8 +102,7 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraPolygonAttribute(id, polygon_attribute) {
   //   const coloring_style = meshPolyhedraStyle(id).coloring
-  //   const viewer_store = useViewerStore()
-  //   return viewer_call(viewer_store,
+  //   return viewer_call(
   //     {
   //       schema: mesh_polyhedra_schemas.polygon_attribute,
   //       params: { id, ...polygon_attribute },
@@ -125,8 +123,7 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
   //   const coloring = meshPolyhedraStyle(id).coloring
-  //   const viewer_store = useViewerStore()
-  //   return viewer_call(viewer_store,
+  //   return viewer_call(
   //     {
   //       schema: mesh_polyhedra_schemas.polyhedron_attribute,
   //       params: { id, ...polyhedron_attribute },
