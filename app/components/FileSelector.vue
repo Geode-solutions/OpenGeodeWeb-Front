@@ -53,9 +53,9 @@
   async function get_allowed_files() {
     toggle_loading()
     const params = { supported_feature }
-    const geode_store = useGeodeStore()
+    const geodeStore = useGeodeStore()
     await api_fetch(
-      geode_store,
+      geodeStore,
       { schema, params },
       {
         response_function: (response) => {

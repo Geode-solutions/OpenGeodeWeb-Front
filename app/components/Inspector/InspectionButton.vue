@@ -33,10 +33,10 @@
   async function get_inspection_results(input_geode_object, filename) {
     toggle_loading()
     const params = { input_geode_object, filename }
-    const geode_store = useGeodeStore()
+    const geodeStore = useGeodeStore()
 
     await api_fetch(
-      geode_store,
+      geodeStore,
       { schema, params },
       {
         response_function: (response) => {

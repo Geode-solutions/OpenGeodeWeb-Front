@@ -65,10 +65,10 @@
 
   async function get_crs_table() {
     const params = { input_geode_object }
-    const geode_store = useGeodeStore()
+    const geodeStore = useGeodeStore()
     toggle_loading()
     await api_fetch(
-      geode_store,
+      geodeStore,
       { schema, params },
       {
         response_function: (response) => {

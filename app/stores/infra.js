@@ -27,45 +27,6 @@ export const useInfraStore = defineStore("infra", {
     },
   },
   actions: {
-    async init_microservices() {
-      if (this.microservices.length > 0) return
-
-      console.log("[INFRA] Initializing microservices...")
-
-      // Import and register microservices
-      const { useGeodeStore, geode_request, geode_connect, geode_launch } =
-        await import("@ogw_front/stores/geode.js")
-      const { useViewerStore, viewer_request, viewer_connect, viewer_launch } =
-        await import("@ogw_front/stores/viewer.js")
-
-      const geode_store = useGeodeStore()
-      this.register_microservice(geode_store, {
-        request: geode_request,
-        connect: geode_connect,
-        launch: geode_launch,
-      })
-
-      const viewer_store = useViewerStore()
-      this.register_microservice(viewer_store, {
-        request: viewer_request,
-        connect: viewer_connect,
-        launch: viewer_launch,
-      })
-
-      if (this.app_mode === appMode.CLOUD) {
-        const { useLambdaStore } = await import("@ogw_front/stores/lambda.js")
-        const lambda_store = useLambdaStore()
-        this.register_microservice(lambda_store, {
-          request: () => {
-            throw new Error("Lambda does not handle requests")
-          },
-          connect: (store) => store.connect(),
-          launch: () => lambda_store.launch(),
-        })
-      }
-
-      console.log("[INFRA] Microservices initialized")
-    },
     register_microservice(store, { request, connect, launch }) {
       const store_name = store.$id
       console.log("[INFRA] Registering microservice:", store_name)
@@ -80,9 +41,6 @@ export const useInfraStore = defineStore("infra", {
       }
     },
     async create_backend() {
-      // Initialize microservices first
-      await this.init_microservices()
-
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode)
       console.log(
         "[INFRA] Registered microservices:",
@@ -112,12 +70,10 @@ export const useInfraStore = defineStore("infra", {
           })
         } else if (this.app_mode == appMode.CLOUD) {
           console.log("[INFRA] CLOUD mode - Launching lambda...")
-          const lambda_microservice = this.microservices.find(
-            (microservice) => microservice.store.$id === "lambda",
-          )
-          if (lambda_microservice) {
-            await lambda_microservice.launch()
-          }
+          const lambdaStore = useLambdaStore()
+          const id = await lambdaStore.launch()
+          this.ID = id
+          console.log("[INFRA] Lambda ID stored:", id)
         }
 
         this.status = Status.CREATED

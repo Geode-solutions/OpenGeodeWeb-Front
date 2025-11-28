@@ -64,9 +64,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function fetchMeshComponents(id) {
-    const geode_store = useGeodeStore()
+    const geodeStore = useGeodeStore()
     return api_fetch(
-      geode_store,
+      geodeStore,
       {
         schema: back_model_schemas.mesh_components,
         params: {
@@ -83,9 +83,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   async function fetchUuidToFlatIndexDict(id) {
     console.log("fetchUuidToFlatIndexDict", id)
-    const geode_store = useGeodeStore()
+    const geodeStore = useGeodeStore()
     return api_fetch(
-      geode_store,
+      geodeStore,
       {
         schema: back_model_schemas.vtm_component_indices,
         params: { id },

@@ -25,7 +25,7 @@
     schema: { type: Object, required: true },
   })
 
-  const geode_store = useGeodeStore()
+  const geodeStore = useGeodeStore()
   const packages_versions = ref([])
 
   async function get_packages_versions() {
@@ -33,7 +33,7 @@
 
     const promise = new Promise((resolve, reject) => {
       api_fetch(
-        geode_store,
+        geodeStore,
         { schema: props.schema },
         {
           request_error_function: () => {
@@ -54,7 +54,7 @@
   }
 
   watch(
-    () => geode_store.status,
+    () => geodeStore.status,
     (value) => {
       if (value == Status.CONNECTED) get_packages_versions()
     },

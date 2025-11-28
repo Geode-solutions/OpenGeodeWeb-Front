@@ -18,7 +18,7 @@
   const polygon_attribute_name = ref("")
   const polygon_attribute_names = ref([])
   const polygon_attribute = reactive({ name: polygon_attribute_name.value })
-  const geode_store = useGeodeStore()
+  const geodeStore = useGeodeStore()
 
   onMounted(() => {
     if (model.value != null) {
@@ -37,7 +37,7 @@
 
   function getVertexAttributes() {
     api_fetch(
-      geode_store,
+      geodeStore,
       {
         schema: back_schemas.opengeodeweb_back.polygon_attribute_names,
         params: {

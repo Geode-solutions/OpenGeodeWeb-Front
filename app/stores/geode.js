@@ -1,7 +1,7 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
-import { api_fetch } from "@ogw_front/composables/api_fetch.js"
+import { api_fetch } from "@ogw_internal/utils/api_fetch.js"
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -50,7 +50,7 @@ export const useGeodeStore = defineStore("geode", {
       }, 10 * 1000)
     },
     do_ping() {
-      const geode_store = this
+      const geodeStore = this
       const feedback_store = useFeedbackStore()
       return useFetch(back_schemas.opengeodeweb_back.ping.$id, {
         baseURL: this.base_url,
@@ -58,17 +58,17 @@ export const useGeodeStore = defineStore("geode", {
         body: {},
         onRequestError({ error }) {
           feedback_store.$patch({ server_error: true })
-          geode_store.status = Status.NOT_CONNECTED
+          geodeStore.status = Status.NOT_CONNECTED
         },
         onResponse({ response }) {
           if (response.ok) {
             feedback_store.$patch({ server_error: false })
-            geode_store.status = Status.CONNECTED
+            geodeStore.status = Status.CONNECTED
           }
         },
         onResponseError({ response }) {
           feedback_store.$patch({ server_error: true })
-          geode_store.status = Status.NOT_CONNECTED
+          geodeStore.status = Status.NOT_CONNECTED
         },
       })
     },
@@ -78,41 +78,36 @@ export const useGeodeStore = defineStore("geode", {
     stop_request() {
       this.request_counter--
     },
+    async launch() {
+      console.log("[GEODE] Launching geode microservice...")
+      const port = await window.electronAPI.run_back()
+      console.log("[GEODE] Geode launched on port:", port)
+      return port
+    },
+    async connect() {
+      console.log("[GEODE] Connecting to geode microservice...")
+      await this.do_ping()
+      console.log("[GEODE] Geode connected successfully")
+    },
+    request(schema, params, callbacks = {}) {
+      console.log("[GEODE] Request:", schema.$id)
+
+      return api_fetch(
+        this,
+        { schema, params },
+        {
+          ...callbacks,
+          response_function: async (response) => {
+            console.log("[GEODE] Request completed:", schema.$id)
+            if (callbacks.response_function) {
+              await callbacks.response_function(response)
+            }
+          },
+        },
+      )
+    },
   },
   share: {
     omit: ["status"],
   },
 })
-
-// Exported functions for microservice registration
-
-export async function geode_launch() {
-  console.log("[GEODE] Launching geode microservice...")
-  const port = await window.electronAPI.run_back()
-  console.log("[GEODE] Geode launched on port:", port)
-  return port
-}
-
-export async function geode_connect(store) {
-  console.log("[GEODE] Connecting to geode microservice...")
-  await store.do_ping()
-  console.log("[GEODE] Geode connected successfully")
-}
-
-export function geode_request(store, schema, params, callbacks = {}) {
-  console.log("[GEODE] Request:", schema.$id)
-
-  return api_fetch(
-    store,
-    { schema, params },
-    {
-      ...callbacks,
-      response_function: async (response) => {
-        console.log("[GEODE] Request completed:", schema.$id)
-        if (callbacks.response_function) {
-          await callbacks.response_function(response)
-        }
-      },
-    },
-  )
-}

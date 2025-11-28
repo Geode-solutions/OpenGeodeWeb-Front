@@ -6,6 +6,7 @@ import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status.js"
+import { viewer_call } from "@ogw_internal/utils/viewer_call.js"
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore()
@@ -220,6 +221,10 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   const importStores = (snapshot) => {
+    if (!snapshot) {
+      console.warn("importStores called with undefined snapshot")
+      return
+    }
     const z_scale = snapshot.zScale
 
     const applyCamera = () => {

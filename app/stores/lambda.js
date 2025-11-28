@@ -12,12 +12,12 @@ export const useLambdaStore = defineStore("lambda", {
       return "443"
     },
     base_url() {
-      const infra_store = useInfraStore()
       const public_runtime_config = useRuntimeConfig().public
+      const domain_name = public_runtime_config.API_URL
       const url =
         this.protocol +
         "://" +
-        infra_store.domain_name +
+        domain_name +
         ":" +
         this.port +
         public_runtime_config.SITE_BRANCH +
@@ -32,7 +32,6 @@ export const useLambdaStore = defineStore("lambda", {
   actions: {
     async launch() {
       console.log("[LAMBDA] Launching lambda backend...")
-      const infra_store = useInfraStore()
       const feedback_store = useFeedbackStore()
 
       const { data, error } = await useFetch(this.base_url, {
@@ -46,12 +45,12 @@ export const useLambdaStore = defineStore("lambda", {
         throw new Error("Failed to launch lambda backend")
       }
 
-      infra_store.ID = data.value.ID
-      localStorage.setItem("ID", data.value.ID)
       this.status = Status.CONNECTED
+      const id = data.value.ID
+      localStorage.setItem("ID", id)
 
-      console.log("[LAMBDA] Lambda launched, ID:", data.value.ID)
-      return data.value
+      console.log("[LAMBDA] Lambda launched, ID:", id)
+      return id
     },
     async connect() {
       console.log("[LAMBDA] Lambda connected")

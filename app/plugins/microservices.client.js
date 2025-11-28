@@ -1,53 +1,42 @@
+import { useGeodeStore } from "@ogw_front/stores/geode.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
 import { useInfraStore } from "@ogw_front/stores/infra.js"
-import { useLambdaStore } from "@ogw_front/stores/lambda.js"
-import {
-  useGeodeStore,
-  geode_request,
-  geode_connect,
-  geode_launch,
-} from "@ogw_front/stores/geode.js"
-import {
-  useViewerStore,
-  viewer_request,
-  viewer_connect,
-  viewer_launch,
-} from "@ogw_front/stores/viewer.js"
-import { appMode } from "@ogw_front/utils/app_mode.js"
+import { useDataBaseStore } from "@ogw_front/stores/data_base.js"
+import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer.js"
+import { useTreeviewStore } from "@ogw_front/stores/treeview.js"
 
 export default defineNuxtPlugin(() => {
   console.log("[PLUGIN] Initializing microservices plugin...")
-  const infra_store = useInfraStore()
 
-  // Register geode microservice
+  const infraStore = useInfraStore()
+
+  // Initialize and register geode microservice
   console.log("[PLUGIN] Registering geode microservice")
-  const geode_store = useGeodeStore()
-  infra_store.register_microservice(geode_store, {
-    request: geode_request,
-    connect: geode_connect,
-    launch: geode_launch,
+  const geodeStore = useGeodeStore()
+  infraStore.register_microservice(geodeStore, {
+    request: (schema, params, callbacks) =>
+      geodeStore.request(schema, params, callbacks),
+    connect: () => geodeStore.connect(),
+    launch: () => geodeStore.launch(),
   })
 
-  // Register viewer microservice
+  // Initialize and register viewer microservice
   console.log("[PLUGIN] Registering viewer microservice")
-  const viewer_store = useViewerStore()
-  infra_store.register_microservice(viewer_store, {
-    request: viewer_request,
-    connect: viewer_connect,
-    launch: viewer_launch,
+  const viewerStore = useViewerStore()
+  infraStore.register_microservice(viewerStore, {
+    request: (schema, params, callbacks) =>
+      viewerStore.request(schema, params, callbacks),
+    connect: () => viewerStore.connect(),
+    launch: () => viewerStore.launch(),
   })
 
-  // Register lambda for CLOUD mode
-  if (infra_store.app_mode === appMode.CLOUD) {
-    console.log("[PLUGIN] Registering lambda microservice (CLOUD mode)")
-    const lambda_store = useLambdaStore()
-    infra_store.register_microservice(lambda_store, {
-      request: () => {
-        throw new Error("Lambda does not handle requests")
-      },
-      connect: (store) => store.connect(),
-      launch: () => lambda_store.launch(),
-    })
-  }
+  // Initialize stores that have export/import methods to ensure they're registered
+  console.log("[PLUGIN] Initializing stores for export/import registration...")
+  useDataBaseStore()
+  useDataStyleStore()
+  useHybridViewerStore()
+  useTreeviewStore()
 
-  console.log("[PLUGIN] All microservices registered")
+  console.log("[PLUGIN] All microservices registered and stores initialized")
 })

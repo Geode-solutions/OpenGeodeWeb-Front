@@ -82,9 +82,9 @@ export function useProjectManager() {
         .call("opengeodeweb_viewer.import_project", [{}])
     }
 
-    await treeviewStore.importStores(snapshot.treeview)
+    await treeviewStore.importStores(snapshot.treeview || {})
     await hybridViewerStore.initHybridViewer()
-    await hybridViewerStore.importStores(snapshot.hybridViewer)
+    await hybridViewerStore.importStores(snapshot.hybridViewer || {})
 
     const snapshotDataBase =
       snapshot && snapshot.dataBase && snapshot.dataBase.db
@@ -109,11 +109,11 @@ export function useProjectManager() {
     })
 
     await importWorkflowFromSnapshot(items)
-    await hybridViewerStore.importStores(snapshot.hybridViewer)
+    await hybridViewerStore.importStores(snapshot.hybridViewer || {})
 
     {
       const dataStyleStore = useDataStyleStore()
-      await dataStyleStore.importStores(snapshot.dataStyle)
+      await dataStyleStore.importStores(snapshot.dataStyle || {})
     }
     {
       const dataStyleStore = useDataStyleStore()

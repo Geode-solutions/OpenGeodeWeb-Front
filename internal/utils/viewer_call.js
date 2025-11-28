@@ -1,7 +1,7 @@
 import validate_schema from "~/app/utils/validate_schema.js"
 
 export function viewer_call(
-  store,
+  microservice,
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
@@ -17,14 +17,14 @@ export function viewer_call(
     throw new Error(schema.$id.concat(": ", error))
   }
 
-  const client = store.client
+  const client = microservice.client
 
   return new Promise((resolve, reject) => {
     if (!client.getConnection) {
       resolve()
       return
     }
-    store.start_request()
+    microservice.start_request()
     client
       .getConnection()
       .getSession()
@@ -56,7 +56,7 @@ export function viewer_call(
         reject()
       })
       .finally(() => {
-        store.stop_request()
+        microservice.stop_request()
       })
   })
 }

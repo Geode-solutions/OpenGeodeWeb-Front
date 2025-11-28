@@ -2,7 +2,7 @@ import _ from "lodash"
 import validate_schema from "@/app/utils/validate_schema.js"
 
 export function api_fetch(
-  store,
+  microservice,
   { schema, params },
   { request_error_function, response_function, response_error_function } = {},
 ) {
@@ -20,7 +20,7 @@ export function api_fetch(
     throw new Error(schema.$id.concat(": ", error))
   }
 
-  store.start_request()
+  microservice.start_request()
 
   const method = schema.methods.filter((m) => m !== "OPTIONS")[0]
   const request_options = {
@@ -34,10 +34,10 @@ export function api_fetch(
     request_options.max_retry = schema.max_retry
   }
   return useFetch(schema.$id, {
-    baseURL: store.base_url,
+    baseURL: microservice.base_url,
     ...request_options,
     async onRequestError({ error }) {
-      await store.stop_request()
+      await microservice.stop_request()
       await feedback_store.add_error(
         error.code,
         schema.$id,
@@ -50,14 +50,14 @@ export function api_fetch(
     },
     async onResponse({ response }) {
       if (response.ok) {
-        await store.stop_request()
+        await microservice.stop_request()
         if (response_function) {
           await response_function(response)
         }
       }
     },
     async onResponseError({ response }) {
-      await store.stop_request()
+      await microservice.stop_request()
       await feedback_store.add_error(
         response.status,
         schema.$id,
