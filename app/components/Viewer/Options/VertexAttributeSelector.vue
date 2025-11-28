@@ -31,6 +31,7 @@
   })
 
   const dataBaseStore = useDataBaseStore()
+  const geodeStore = useGeodeStore()
 
   const vertex_attribute_names = ref([])
 
@@ -40,6 +41,7 @@
 
   function getVertexAttributes() {
     api_fetch(
+      geodeStore,
       {
         schema: back_schemas.opengeodeweb_back.vertex_attribute_names,
         params: {

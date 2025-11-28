@@ -33,6 +33,7 @@
   })
 
   const polyhedron_attribute_names = ref([])
+  const geodeStore = useGeodeStore()
 
   onMounted(() => {
     getVertexAttributes()
@@ -40,6 +41,7 @@
 
   function getVertexAttributes() {
     api_fetch(
+      geodeStore,
       {
         schema: back_schemas.opengeodeweb_back.polyhedron_attribute_names,
         params: {

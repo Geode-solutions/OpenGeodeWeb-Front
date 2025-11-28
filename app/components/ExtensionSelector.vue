@@ -80,10 +80,12 @@
     toggle_loading()
     geode_objects_and_output_extensions.value = {}
     var promise_array = []
+    const geodeStore = useGeodeStore()
     for (const filename of filenames) {
       const params = { input_geode_object, filename }
       const promise = new Promise((resolve, reject) => {
         api_fetch(
+          geodeStore,
           { schema, params },
           {
             request_error_function: () => {

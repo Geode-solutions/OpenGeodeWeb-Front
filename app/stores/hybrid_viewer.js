@@ -6,6 +6,7 @@ import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status.js"
+import { viewer_call } from "@ogw_internal/utils/viewer_call.js"
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore()
@@ -91,7 +92,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     genericRenderWindow.value.getRenderWindow().render()
     const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling
     if (!schema) return
-    await viewer_call({
+    const viewerStore = useViewerStore()
+    await viewer_call(viewerStore, {
       schema,
       params: {
         z_scale: z_scale,
@@ -114,7 +116,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         distance: camera.getDistance(),
       },
     }
+    const viewerStore = useViewerStore()
     viewer_call(
+      viewerStore,
       {
         schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
         params,
@@ -131,7 +135,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function remoteRender() {
-    viewer_call({
+    const viewerStore = useViewerStore()
+    viewer_call(viewerStore, {
       schema: viewer_schemas.opengeodeweb_viewer.viewer.render,
     })
   }
@@ -216,6 +221,10 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   const importStores = (snapshot) => {
+    if (!snapshot) {
+      console.warn("importStores called with undefined snapshot")
+      return
+    }
     const z_scale = snapshot.zScale
 
     const applyCamera = () => {
@@ -244,7 +253,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           clipping_range: camera_options.clipping_range,
         },
       }
+      const viewerStore = useViewerStore()
       return viewer_call(
+        viewerStore,
         {
           schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
           params: payload,

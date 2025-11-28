@@ -42,7 +42,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function registerObject(id) {
-    return viewer_call({
+    const viewerStore = useViewerStore()
+    return viewer_call(viewerStore, {
       schema: viewer_generic_schemas.register,
       params: { id },
     })
@@ -63,7 +64,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function fetchMeshComponents(id) {
+    const geodeStore = useGeodeStore()
     return api_fetch(
+      geodeStore,
       {
         schema: back_model_schemas.mesh_components,
         params: {
@@ -80,7 +83,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   async function fetchUuidToFlatIndexDict(id) {
     console.log("fetchUuidToFlatIndexDict", id)
+    const geodeStore = useGeodeStore()
     return api_fetch(
+      geodeStore,
       {
         schema: back_model_schemas.vtm_component_indices,
         params: { id },

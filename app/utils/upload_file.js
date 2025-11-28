@@ -3,7 +3,7 @@ export async function upload_file(
   { request_error_function, response_function, response_error_function } = {},
 ) {
   const feedback_store = useFeedbackStore()
-  const geode_store = useGeodeStore()
+  const geodeStore = useGeodeStore()
   if (!(file instanceof File)) {
     throw new Error("file must be a instance of File")
   }
@@ -16,12 +16,12 @@ export async function upload_file(
     body: body,
   }
 
-  geode_store.start_request()
+  geodeStore.start_request()
   return $fetch(route, {
-    baseURL: geode_store.base_url,
+    baseURL: geodeStore.base_url,
     ...request_options,
     onRequestError({ error }) {
-      geode_store.stop_request()
+      geodeStore.stop_request()
       feedback_store.add_error(error.code, route, error.message, error.stack)
       if (request_error_function) {
         request_error_function(error)
@@ -29,14 +29,14 @@ export async function upload_file(
     },
     onResponse({ response }) {
       if (response.ok) {
-        geode_store.stop_request()
+        geodeStore.stop_request()
         if (response_function) {
           response_function(response)
         }
       }
     },
     onResponseError({ response }) {
-      geode_store.stop_request()
+      geodeStore.stop_request()
       feedback_store.add_error(
         response.status,
         route,

@@ -8,6 +8,7 @@ export const useInfraStore = defineStore("infra", {
     ID: useStorage("ID", ""),
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
+    microservices: [],
   }),
   getters: {
     domain_name() {
@@ -16,69 +17,89 @@ export const useInfraStore = defineStore("infra", {
       }
       return "localhost"
     },
-    lambda_url() {
-      const geode_store = useGeodeStore()
-      const public_runtime_config = useRuntimeConfig().public
-      const url =
-        geode_store.protocol +
-        "://" +
-        this.domain_name +
-        ":" +
-        geode_store.port +
-        public_runtime_config.SITE_BRANCH +
-        public_runtime_config.PROJECT +
-        "/createbackend"
-      return url
-    },
     microservices_connected() {
-      return (
-        useGeodeStore().status == Status.CONNECTED &&
-        useViewerStore().status == Status.CONNECTED
+      return this.microservices.every(
+        (m) => m.store.status === Status.CONNECTED,
       )
     },
     microservices_busy() {
-      return useGeodeStore().is_busy || useViewerStore().is_busy
+      return this.microservices.some((m) => m.store.is_busy === true)
     },
   },
   actions: {
+    register_microservice(store, { request, connect, launch }) {
+      const store_name = store.$id
+      console.log("[INFRA] Registering microservice:", store_name)
+
+      if (
+        !this.microservices.find(
+          (microservice) => microservice.store.$id === store_name,
+        )
+      ) {
+        this.microservices.push({ store, request, connect, launch })
+        console.log("[INFRA] Microservice registered:", store_name)
+      }
+    },
     async create_backend() {
-      console.log("create_backend this.app_mode", this.app_mode)
+      console.log("[INFRA] Starting create_backend - Mode:", this.app_mode)
+      console.log(
+        "[INFRA] Registered microservices:",
+        this.microservices.map((microservice) => microservice.store.$id),
+      )
+
       if (this.status === Status.CREATED) return
+
       return navigator.locks.request("infra.create_backend", async (lock) => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) return
-        console.log("LOCK GRANTED !", lock)
+        console.log("[INFRA] Lock granted for create_backend")
+
         if (this.app_mode == appMode.DESKTOP) {
-          const viewer_store = useViewerStore()
-          const geode_store = useGeodeStore()
-          const [back_port, viewer_port] = await Promise.all([
-            window.electronAPI.run_back(),
-            window.electronAPI.run_viewer(),
-          ])
-          geode_store.$patch({ default_local_port: back_port })
-          viewer_store.$patch({ default_local_port: viewer_port })
-        } else if (this.app_mode == appMode.CLOUD) {
-          const { data, error } = await useFetch(this.lambda_url, {
-            method: "POST",
+          console.log("[INFRA] DESKTOP mode - Launching microservices...")
+          const microservices_with_launch = this.microservices.filter(
+            (microservice) => microservice.launch,
+          )
+
+          const port_promises = microservices_with_launch.map((microservice) =>
+            microservice.launch(),
+          )
+          const ports = await Promise.all(port_promises)
+
+          microservices_with_launch.forEach((microservice, index) => {
+            microservice.store.$patch({ default_local_port: ports[index] })
           })
-          if (error.value || !data.value) {
-            this.status = Status.NOT_CREATED
-            const feedback_store = useFeedbackStore()
-            feedback_store.server_error = true
-            return
-          }
-          this.ID = data.value.ID
-          localStorage.setItem("ID", data.value.ID)
+        } else if (this.app_mode == appMode.CLOUD) {
+          console.log("[INFRA] CLOUD mode - Launching lambda...")
+          const lambdaStore = useLambdaStore()
+          const id = await lambdaStore.launch()
+          this.ID = id
+          console.log("[INFRA] Lambda ID stored:", id)
         }
+
         this.status = Status.CREATED
+        console.log("[INFRA] Backend created successfully")
         return this.create_connection()
       })
     },
     async create_connection() {
-      console.log("create_connection")
-      await useViewerStore().ws_connect()
-      await useGeodeStore().do_ping()
+      console.log("[INFRA] Starting create_connection")
+      console.log(
+        "[INFRA] Connecting microservices:",
+        this.microservices.map((microservice) => microservice.store.$id),
+      )
+
+      const connection_promises = this.microservices.map((microservice) => {
+        return microservice.connect(microservice.store).then(() => {
+          console.log("[INFRA] Microservice connected:", microservice.store.$id)
+        })
+      })
+
+      await Promise.all(connection_promises)
+      console.log("[INFRA] All microservices connected")
       return
     },
+  },
+  share: {
+    omit: ["microservices"],
   },
 })

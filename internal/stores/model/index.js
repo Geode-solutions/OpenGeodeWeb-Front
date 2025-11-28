@@ -27,7 +27,9 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
+    const viewerStore = useViewerStore()
     return viewer_call(
+      viewerStore,
       {
         schema: model_schemas.visibility,
         params: { id, visibility },
@@ -83,7 +85,9 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).color
   }
   function setModelColor(id, color) {
+    const viewerStore = useViewerStore()
     return viewer_call(
+      viewerStore,
       {
         schema: model_schemas.color,
         params: { id, color },

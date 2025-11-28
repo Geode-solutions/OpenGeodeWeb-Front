@@ -82,11 +82,13 @@
     mandatory_files.value = []
     additional_files.value = []
     var promise_array = []
+    const geodeStore = useGeodeStore()
 
     for (const filename of filenames) {
       const params = { input_geode_object, filename }
       const promise = new Promise((resolve, reject) => {
         api_fetch(
+          geodeStore,
           { schema, params },
           {
             request_error_function: () => {
