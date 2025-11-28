@@ -92,14 +92,9 @@ export function useProjectManager() {
     const items = Object.entries(snapshotDataBase).map(function (pair) {
       const id = pair[0]
       const item = pair[1]
-      const binaryLightViewable =
-        item && item.vtk_js && item.vtk_js.binary_light_viewable
-          ? item.vtk_js.binary_light_viewable
-          : undefined
       return {
         id: id,
         ...item,
-        vtk_js: { binary_light_viewable: binaryLightViewable },
       }
     })
 

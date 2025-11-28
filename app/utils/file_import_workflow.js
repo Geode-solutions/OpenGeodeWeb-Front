@@ -21,13 +21,7 @@ async function importWorkflow(files) {
 function buildImportItemFromPayloadApi(value, geode_object_type) {
   console.log("buildImportItemFromPayloadApi", { value, geode_object_type })
   return {
-    id: value.id,
-    viewer_type: value.viewer_type,
-    geode_object_type: geode_object_type,
-    native_filename: value.native_file_name,
-    viewable_filename: value.viewable_file_name,
-    displayed_name: value.name,
-    vtk_js: { binary_light_viewable: value.binary_light_viewable },
+    ...value,
   }
 }
 
@@ -43,7 +37,7 @@ async function importItem(item) {
 
   await treeviewStore.addItem(
     item.geode_object_type,
-    item.displayed_name,
+    item.name,
     item.id,
     item.viewer_type,
   )

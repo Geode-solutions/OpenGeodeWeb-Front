@@ -55,8 +55,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       geode_object_type,
       native_filename,
       viewable_filename,
-      displayed_name,
-      vtk_js: { binary_light_viewable },
+      name,
+      binary_light_viewable,
     },
   ) {
     db[id] = value
@@ -126,9 +126,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       if (!item) continue
       snapshotDb[id] = {
         ...item,
-        vtk_js: {
-          binary_light_viewable: item?.vtk_js?.binary_light_viewable,
-        },
       }
     }
     return { db: snapshotDb }
