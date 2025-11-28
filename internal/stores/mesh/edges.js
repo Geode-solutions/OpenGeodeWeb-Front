@@ -15,9 +15,9 @@ export function useMeshEdgesStyle() {
     return meshEdgesStyle(id).visibility
   }
   function setMeshEdgesVisibility(id, visibility) {
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_edges_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
@@ -59,9 +59,9 @@ export function useMeshEdgesStyle() {
   }
   function setMeshEdgesColor(id, color) {
     const coloring_style = meshEdgesStyle(id).coloring
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_edges_schemas.color, params: { id, color } },
       {
         response_function: () => {
@@ -81,9 +81,9 @@ export function useMeshEdgesStyle() {
   }
   function setMeshEdgesWidth(id, width) {
     const edges_style = meshEdgesStyle(id)
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_edges_schemas.width, params: { id, width } },
       {
         response_function: () => {

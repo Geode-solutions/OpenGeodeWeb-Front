@@ -16,9 +16,9 @@ export function useMeshPointsStyle() {
   }
   function setMeshPointsVisibility(id, visibility) {
     const points_style = meshPointsStyle(id)
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_points_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
@@ -58,9 +58,9 @@ export function useMeshPointsStyle() {
   }
   function setMeshPointsColor(id, color) {
     const coloring_style = meshPointsStyle(id).coloring
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_points_schemas.color, params: { id, color } },
       {
         response_function: () => {
@@ -79,9 +79,9 @@ export function useMeshPointsStyle() {
   }
   function setMeshPointsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPointsStyle(id).coloring
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       {
         schema: mesh_points_schemas.vertex_attribute,
         params: { id, ...vertex_attribute },
@@ -103,9 +103,9 @@ export function useMeshPointsStyle() {
     return meshPointsStyle(id).size
   }
   function setMeshPointsSize(id, size) {
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_points_schemas.size, params: { id, size } },
       {
         response_function: () => {

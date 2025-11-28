@@ -42,8 +42,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function registerObject(id) {
-    const viewer_store = useViewerStore()
-    return viewer_call(viewer_store, {
+    const viewerStore = useViewerStore()
+    return viewer_call(viewerStore, {
       schema: viewer_generic_schemas.register,
       params: { id },
     })

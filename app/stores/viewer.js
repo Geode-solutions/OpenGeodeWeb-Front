@@ -115,14 +115,14 @@ export const useViewerStore = defineStore("viewer", {
             .connect(config)
             .then((validClient) => {
               connectImageStream(validClient.getConnection().getSession())
-              viewer_store.client = validClient
+              viewerStore.client = validClient
               clientToConnect.endBusy()
 
               // Now that the client is ready let's setup the server for us
-              viewer_call(viewer_store, {
+              viewer_call(viewerStore, {
                 schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
               })
-              viewer_store.status = Status.CONNECTED
+              viewerStore.status = Status.CONNECTED
               resolve()
             })
             .catch((error) => {

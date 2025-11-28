@@ -16,9 +16,9 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsVisibility(id, visibility) {
     const polygons_style = meshPolygonsStyle(id)
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_polygons_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
@@ -38,9 +38,9 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsColor(id, color) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_polygons_schemas.color, params: { id, color } },
       {
         response_function: () => {
@@ -60,9 +60,9 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsTextures(id, textures) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       {
         schema: mesh_polygons_schemas.apply_textures,
         params: { id, textures },
@@ -86,9 +86,9 @@ export function useMeshPolygonsStyle() {
 
   function setMeshPolygonsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       {
         schema: mesh_polygons_schemas.vertex_attribute,
         params: { id, ...vertex_attribute },
@@ -111,9 +111,9 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsPolygonAttribute(id, polygon_attribute) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       {
         schema: mesh_polygons_schemas.polygon_attribute,
         params: { id, ...polygon_attribute },

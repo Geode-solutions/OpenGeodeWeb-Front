@@ -16,9 +16,9 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraVisibility(id, visibility) {
     const polyhedra_style = meshPolyhedraStyle(id)
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_polyhedra_schemas.visibility, params: { id, visibility } },
       {
         response_function: () => {
@@ -59,9 +59,9 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraColor(id, color) {
     const coloring = meshPolyhedraStyle(id).coloring
-    const viewer_store = useViewerStore()
+    const viewerStore = useViewerStore()
     return viewer_call(
-      viewer_store,
+      viewerStore,
       { schema: mesh_polyhedra_schemas.color, params: { id, color } },
       {
         response_function: () => {
