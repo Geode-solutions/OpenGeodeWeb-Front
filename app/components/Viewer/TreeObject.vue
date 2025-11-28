@@ -63,7 +63,7 @@
         dataStyleStore.setVisibility(item.id, false)
 
         const objectMeta = dataBaseStore.itemMetaDatas(item.id)
-        if (objectMeta.object_type === "mesh") {
+        if (objectMeta.viewer_type === "mesh") {
           if (dataBaseStore.db[item.id]?.mesh_components_selection) {
             dataBaseStore.db[item.id].mesh_components_selection = []
           }
@@ -77,7 +77,7 @@
   )
 
   function isModel(item) {
-    return item.object_type === "model"
+    return item.viewer_type === "model"
   }
 
   onMounted(() => {

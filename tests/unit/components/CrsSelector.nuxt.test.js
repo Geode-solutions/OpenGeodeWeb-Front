@@ -46,7 +46,7 @@ describe("CrsSelector.vue", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { input_geode_object: "BRep", key_to_update },
+      props: { geode_object_type: "BRep", key_to_update },
     })
     const td = await wrapper.find("td")
     await wrapper.vm.$nextTick()

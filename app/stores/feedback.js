@@ -4,7 +4,7 @@ export const useFeedbackStore = defineStore("feedback", {
   state: () => ({
     feedbacks: [],
     server_error: false,
-    feedbacks_timeout_miliseconds: 5000,
+    feedbacks_timeout_miliseconds: 10 * 1000,
   }),
   actions: {
     async add_error(code, route, name, description) {

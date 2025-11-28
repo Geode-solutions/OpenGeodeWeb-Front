@@ -81,7 +81,7 @@
         {
           schema: back_schemas.opengeodeweb_back.save_viewable_file,
           params: {
-            input_geode_object: "RasterImage2D",
+            geode_object_type: "RasterImage2D",
             filename: value[0].name,
           },
         },

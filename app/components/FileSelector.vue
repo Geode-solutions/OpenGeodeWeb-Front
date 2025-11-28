@@ -52,9 +52,8 @@
 
   async function get_allowed_files() {
     toggle_loading()
-    const params = { supported_feature }
     await api_fetch(
-      { schema, params },
+      { schema },
       {
         response_function: (response) => {
           accept.value = response._data.extensions

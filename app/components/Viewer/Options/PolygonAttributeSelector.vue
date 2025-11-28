@@ -31,10 +31,10 @@
   })
 
   onMounted(() => {
-    getVertexAttributes()
+    getPolygonAttributes()
   })
 
-  function getVertexAttributes() {
+  function getPolygonAttributes() {
     api_fetch(
       {
         schema: back_schemas.opengeodeweb_back.polygon_attribute_names,

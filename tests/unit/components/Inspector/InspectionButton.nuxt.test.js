@@ -50,14 +50,14 @@ describe("Inspector/InspectionButton.vue", async () => {
         inspection_result,
       }),
     })
-    const input_geode_object = "BRep"
+    const geode_object_type = "BRep"
     const filename = "test.txt"
 
     const wrapper = await mountSuspended(InspectorInspectionButton, {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { input_geode_object, filename },
+      props: { geode_object_type, filename },
     })
 
     expect(wrapper.exists()).toBe(true)

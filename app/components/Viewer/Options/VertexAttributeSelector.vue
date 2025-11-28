@@ -12,7 +12,12 @@
 
   const model = defineModel()
 
+  const props = defineProps({
+    id: { type: String, required: true },
+  })
+
   const vertex_attribute_name = ref("")
+  const vertex_attribute_names = ref([])
 
   onMounted(() => {
     if (model.value != null) {
@@ -25,14 +30,6 @@
     vertex_attribute.name = value
     model.value = vertex_attribute
   })
-
-  const props = defineProps({
-    id: { type: String, required: true },
-  })
-
-  const dataBaseStore = useDataBaseStore()
-
-  const vertex_attribute_names = ref([])
 
   onMounted(() => {
     getVertexAttributes()

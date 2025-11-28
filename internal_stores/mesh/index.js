@@ -4,6 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { useMeshPointsStyle } from "./points.js"
 import { useMeshEdgesStyle } from "./edges.js"
+import { useMeshCellsStyle } from "./cells.js"
 import { useMeshPolygonsStyle } from "./polygons.js"
 import { useMeshPolyhedraStyle } from "./polyhedra.js"
 
@@ -12,8 +13,9 @@ const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh
 
 export default function useMeshStyle() {
   const dataStyleStore = useDataStyleStore()
-  const pointsStyleStore = useMeshPointsStyle()
-  const edgesStyleStore = useMeshEdgesStyle()
+  const meshPointsStyleStore = useMeshPointsStyle()
+  const meshEdgesStyleStore = useMeshEdgesStyle()
+  const meshCellsStyleStore = useMeshCellsStyle()
   const meshPolygonsStyleStore = useMeshPolygonsStyle()
   const meshPolyhedraStyleStore = useMeshPolyhedraStyle()
   const hybridViewerStore = useHybridViewerStore()
@@ -44,9 +46,11 @@ export default function useMeshStyle() {
       if (key === "visibility") {
         promise_array.push(setMeshVisibility(id, value))
       } else if (key === "points") {
-        promise_array.push(pointsStyleStore.applyMeshPointsStyle(id))
+        promise_array.push(meshPointsStyleStore.applyMeshPointsStyle(id))
       } else if (key === "edges") {
-        promise_array.push(edgesStyleStore.applyMeshEdgesStyle(id))
+        promise_array.push(meshEdgesStyleStore.applyMeshEdgesStyle(id))
+      } else if (key === "cells") {
+        promise_array.push(meshCellsStyleStore.applyMeshCellsStyle(id))
       } else if (key === "polygons") {
         promise_array.push(meshPolygonsStyleStore.applyMeshPolygonsStyle(id))
       } else if (key === "polyhedra") {
@@ -64,6 +68,7 @@ export default function useMeshStyle() {
     applyMeshStyle,
     ...useMeshPointsStyle(),
     ...useMeshEdgesStyle(),
+    ...useMeshCellsStyle(),
     ...useMeshPolygonsStyle(),
     ...useMeshPolyhedraStyle(),
   }
