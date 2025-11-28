@@ -43,8 +43,8 @@ export function useProjectManager() {
         .call("opengeodeweb_viewer.release_database", [{}])
     }
 
-    const viewerStore = useViewerStore()
-    await viewer_call(viewerStore, {
+    const viewer_store = useViewerStore()
+    await viewer_call(viewer_store, {
       schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
       params: {},
     })
