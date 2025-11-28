@@ -9,7 +9,6 @@ export const useInfraStore = defineStore("infra", {
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
     microservices: [],
-    _initialized: false,
   }),
   getters: {
     domain_name() {
@@ -29,8 +28,7 @@ export const useInfraStore = defineStore("infra", {
   },
   actions: {
     async init_microservices() {
-      if (this._initialized) return
-      this._initialized = true
+      if (this.microservices.length > 0) return
 
       console.log("[INFRA] Initializing microservices...")
 
@@ -88,7 +86,7 @@ export const useInfraStore = defineStore("infra", {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode)
       console.log(
         "[INFRA] Registered microservices:",
-        this.microservices.map((m) => m.store.$id),
+        this.microservices.map((microservice) => microservice.store.$id),
       )
 
       if (this.status === Status.CREATED) return
@@ -146,6 +144,6 @@ export const useInfraStore = defineStore("infra", {
     },
   },
   share: {
-    omit: ["microservices", "_initialized"],
+    omit: ["microservices"],
   },
 })
