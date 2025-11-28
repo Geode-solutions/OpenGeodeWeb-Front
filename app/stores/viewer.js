@@ -106,9 +106,10 @@ export const useViewerStore = defineStore("viewer", {
         })
 
         // Connect
-        const { connectImageStream } =
-          await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
-        const viewer_store = this
+        const { connectImageStream } = await import(
+          "@kitware/vtk.js/Rendering/Misc/RemoteView"
+        )
+        const viewerStore = this
         return new Promise((resolve, reject) => {
           clientToConnect
             .connect(config)
@@ -126,7 +127,7 @@ export const useViewerStore = defineStore("viewer", {
             })
             .catch((error) => {
               console.error("error", error)
-              viewer_store.status = Status.NOT_CONNECTED
+              viewerStore.status = Status.NOT_CONNECTED
               reject(error)
             })
         })
