@@ -13,8 +13,8 @@ const snapshotMock = {
       abc123: {
         viewer_type: "mesh",
         geode_object_type: "PointSet2D",
-        native_filename: "native.ext",
-        viewable_filename: "viewable.ext",
+        native_file: "native.ext",
+        viewable_file: "viewable.ext",
         name: "My Data",
         binary_light_viewable: "VGxpZ2h0RGF0YQ==",
       },

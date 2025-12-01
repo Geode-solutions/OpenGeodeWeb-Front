@@ -11,8 +11,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const pendingSelectionIds = ref([])
 
   // /** Functions **/
-  function addItem(geode_object_type, displayed_name, id, viewer_type) {
-    const child = { title: displayed_name, id, viewer_type }
+  function addItem(geode_object_type, name, id, viewer_type) {
+    const child = { title: name, id, viewer_type }
 
     for (let i = 0; i < items.value.length; i++) {
       if (items.value[i].title === geode_object_type) {

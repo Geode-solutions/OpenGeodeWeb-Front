@@ -53,8 +53,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     value = {
       viewer_type,
       geode_object_type,
-      native_filename,
-      viewable_filename,
+      native_file,
+      viewable_file,
       name,
       binary_light_viewable,
     },

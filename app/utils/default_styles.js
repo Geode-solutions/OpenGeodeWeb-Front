@@ -116,12 +116,22 @@ const edgedCurve_defaultStyle = () => {
   }
 }
 
-const grid_defaultStyle = () => {
+const grid2d_defaultStyle = () => {
   return {
     visibility: true,
     points: meshPointsDefaultStyle(false),
     edges: meshEdgesDefaultStyle(false),
     cells: meshCellsDefaultStyle(),
+  }
+}
+
+const grid3d_defaultStyle = () => {
+  return {
+    visibility: true,
+    points: meshPointsDefaultStyle(false),
+    edges: meshEdgesDefaultStyle(false),
+    cells: meshCellsDefaultStyle(),
+    polyhedra: meshPolyhedraDefaultStyle(),
   }
 }
 const surface_defaultStyle = () => {
@@ -257,8 +267,8 @@ const default_styles = () => {
     HybridSolid3D: solid_defaultStyle(),
     ImplicitCrossSection: implicitCrossSection_defaultStyle(),
     ImplicitStructuralModel: implicitStructuralModel_defaultStyle(),
-    LightRegularGrid2D: grid_defaultStyle(),
-    LightRegularGrid3D: grid_defaultStyle(),
+    LightRegularGrid2D: grid2d_defaultStyle(),
+    LightRegularGrid3D: grid3d_defaultStyle(),
     PointSet2D: pointSet_defaultStyle(),
     PointSet3D: pointSet_defaultStyle(),
     PolygonalSurface2D: surface_defaultStyle(),
@@ -266,8 +276,8 @@ const default_styles = () => {
     PolyhedralSolid3D: solid_defaultStyle(),
     RasterImage2D: {},
     RasterImage3D: {},
-    RegularGrid2D: grid_defaultStyle(),
-    RegularGrid3D: grid_defaultStyle(),
+    RegularGrid2D: grid2d_defaultStyle(),
+    RegularGrid3D: grid3d_defaultStyle(),
     Section: section_defaultStyle(),
     StructuralModel: structuralModel_defaultStyle(),
     TetrahedralSolid3D: solid_defaultStyle(),
