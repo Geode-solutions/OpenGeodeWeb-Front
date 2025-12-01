@@ -4,7 +4,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import Status from "@ogw_front/utils/status"
-import * as composables from "@ogw_front/composables/viewer_call"
 import * as composables from "../../../../../internal/utils/viewer_call.js"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import {
