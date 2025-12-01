@@ -6,7 +6,7 @@ export function api_fetch(
   { schema, params },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  const feedback_store = useFeedbackStore()
+  const feedbackStore = useFeedbackStore()
 
   const body = params || {}
 
@@ -16,13 +16,13 @@ export function api_fetch(
     if (process.env.NODE_ENV !== "production") {
       console.log("Bad request", error, schema, params)
     }
-    feedback_store.add_error(400, schema.$id, "Bad request", error)
+    feedbackStore.add_error(400, schema.$id, "Bad request", error)
     throw new Error(schema.$id.concat(": ", error))
   }
 
   microservice.start_request()
 
-  const method = schema.methods.filter((m) => m !== "OPTIONS")[0]
+  const method = schema.methods.filter((method) => method !== "OPTIONS")[0]
   const request_options = {
     method: method,
   }
@@ -38,7 +38,7 @@ export function api_fetch(
     ...request_options,
     async onRequestError({ error }) {
       await microservice.stop_request()
-      await feedback_store.add_error(
+      await feedbackStore.add_error(
         error.code,
         schema.$id,
         error.message,
@@ -58,7 +58,7 @@ export function api_fetch(
     },
     async onResponseError({ response }) {
       await microservice.stop_request()
-      await feedback_store.add_error(
+      await feedbackStore.add_error(
         response.status,
         schema.$id,
         response._data.name,

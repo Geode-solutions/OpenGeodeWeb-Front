@@ -67,9 +67,9 @@
     const params = { input_geode_object }
     const geodeStore = useGeodeStore()
     toggle_loading()
-    await api_fetch(
-      geodeStore,
-      { schema, params },
+    await geodeStore.request(
+      schema,
+      params,
       {
         response_function: (response) => {
           crs_list.value = response._data.crs_list

@@ -54,9 +54,9 @@
     toggle_loading()
     const params = { supported_feature }
     const geodeStore = useGeodeStore()
-    await api_fetch(
-      geodeStore,
-      { schema, params },
+    await geodeStore.request(
+      schema,
+      params,
       {
         response_function: (response) => {
           accept.value = response._data.extensions

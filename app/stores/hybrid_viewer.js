@@ -6,7 +6,7 @@ import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status.js"
-import { viewer_call } from "@ogw_internal/utils/viewer_call.js"
+import { viewer_call } from "../../internal/utils/viewer_call.js"
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore()
@@ -93,11 +93,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling
     if (!schema) return
     const viewerStore = useViewerStore()
-    await viewer_call(viewerStore, {
-      schema,
-      params: {
-        z_scale: z_scale,
-      },
+    await viewerStore.request(schema, {
+      z_scale: z_scale,
     })
     remoteRender()
   }
@@ -117,12 +114,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       },
     }
     const viewerStore = useViewerStore()
-    viewer_call(
-      viewerStore,
-      {
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-        params,
-      },
+    viewerStore.request(
+      viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+      params,
       {
         response_function: () => {
           remoteRender()
@@ -136,9 +130,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   function remoteRender() {
     const viewerStore = useViewerStore()
-    viewer_call(viewerStore, {
-      schema: viewer_schemas.opengeodeweb_viewer.viewer.render,
-    })
+    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render)
   }
 
   function setContainer(container) {
@@ -254,12 +246,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         },
       }
       const viewerStore = useViewerStore()
-      return viewer_call(
-        viewerStore,
-        {
-          schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-          params: payload,
-        },
+      return viewerStore.request(
+        viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+        payload,
         {
           response_function: () => {
             remoteRender()

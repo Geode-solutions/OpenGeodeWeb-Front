@@ -111,7 +111,7 @@
     const geodeStore = useGeodeStore()
     const promise_array = filenames.map((filename) => {
       const params = { filename, supported_feature }
-      return api_fetch(geodeStore, { schema, params })
+      return geodeStore.request(schema, params)
     })
     const responses = await Promise.all(promise_array)
     const allowed_objects_list = responses.map(

@@ -35,9 +35,9 @@
     const params = { input_geode_object, filename }
     const geodeStore = useGeodeStore()
 
-    await api_fetch(
-      geodeStore,
-      { schema, params },
+    await geodeStore.request(
+      schema,
+      params,
       {
         response_function: (response) => {
           emit("update_values", {

@@ -81,30 +81,22 @@
     has_missing_files.value = false
     mandatory_files.value = []
     additional_files.value = []
-    var promise_array = []
     const geodeStore = useGeodeStore()
 
-    for (const filename of filenames) {
+    const promise_array = filenames.map((filename) => {
       const params = { input_geode_object, filename }
-      const promise = new Promise((resolve, reject) => {
-        api_fetch(
-          geodeStore,
-          { schema, params },
+      return new Promise((resolve, reject) => {
+        geodeStore.request(
+          schema,
+          params,
           {
-            request_error_function: () => {
-              reject()
-            },
-            response_function: (response) => {
-              resolve(response._data)
-            },
-            response_error_function: () => {
-              reject()
-            },
+            request_error_function: () => reject(),
+            response_function: (response) => resolve(response._data),
+            response_error_function: () => reject(),
           },
         )
       })
-      promise_array.push(promise)
-    }
+    })
     const values = await Promise.all(promise_array)
     for (const value of values) {
       has_missing_files.value = value.has_missing_files

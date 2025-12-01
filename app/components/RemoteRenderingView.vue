@@ -14,7 +14,7 @@
         "
         class="pa-0"
         @click="get_x_y"
-        @keydown.esc="viewer_store.toggle_picking_mode(false)"
+        @keydown.esc="viewerStore.toggle_picking_mode(false)"
       />
     </div>
   </ClientOnly>
@@ -32,21 +32,20 @@
     viewId: { type: String, default: "-1" },
   })
 
-  const viewer_store = useViewerStore()
+  const viewerStore = useViewerStore()
   const viewer = useTemplateRef("viewer")
   const { width, height } = useElementSize(viewer)
 
   const { width: windowWidth, height: windowHeight } = useWindowSize()
 
   function get_x_y(event) {
-    if (viewer_store.picking_mode.value === true) {
+    if (viewerStore.picking_mode.value === true) {
       const { offsetX, offsetY } = event
-      viewer_store.set_picked_point(offsetX, offsetY)
-      const viewerStore = useViewerStore()
-      viewer_call(viewerStore, {
-        schema: viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
-        params: { x: offsetX, y: offsetY },
-      })
+      viewerStore.set_picked_point(offsetX, offsetY)
+      viewerStore.request(
+        viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
+        { x: offsetX, y: offsetY },
+      )
     }
   }
 
@@ -71,7 +70,7 @@
   })
 
   watch(
-    () => viewer_store.picking_mode,
+    () => viewerStore.picking_mode,
     (value) => {
       const cursor = value ? "crosshair" : "pointer"
       view.getCanvasView().setCursor(cursor)
@@ -83,7 +82,7 @@
   })
 
   watch(
-    () => viewer_store.client,
+    () => viewerStore.client,
     () => {
       connect()
     },
@@ -100,10 +99,10 @@
   )
 
   function connect() {
-    if (viewer_store.status !== Status.CONNECTED) {
+    if (viewerStore.status !== Status.CONNECTED) {
       return
     }
-    const session = viewer_store.client.getConnection().getSession()
+    const session = viewerStore.client.getConnection().getSession()
     view.setSession(session)
     view.setViewId(props.viewId)
     connected.value = true

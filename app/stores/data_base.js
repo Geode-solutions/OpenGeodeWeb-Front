@@ -43,10 +43,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   async function registerObject(id) {
     const viewerStore = useViewerStore()
-    return viewer_call(viewerStore, {
-      schema: viewer_generic_schemas.register,
-      params: { id },
-    })
+    return viewerStore.request(viewer_generic_schemas.register, { id })
   }
 
   async function addItem(
@@ -65,14 +62,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   async function fetchMeshComponents(id) {
     const geodeStore = useGeodeStore()
-    return api_fetch(
-      geodeStore,
-      {
-        schema: back_model_schemas.mesh_components,
-        params: {
-          id,
-        },
-      },
+    return geodeStore.request(
+      back_model_schemas.mesh_components,
+      { id },
       {
         response_function: async (response) => {
           db[id].mesh_components = response._data.uuid_dict
@@ -84,12 +76,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   async function fetchUuidToFlatIndexDict(id) {
     console.log("fetchUuidToFlatIndexDict", id)
     const geodeStore = useGeodeStore()
-    return api_fetch(
-      geodeStore,
-      {
-        schema: back_model_schemas.vtm_component_indices,
-        params: { id },
-      },
+    return geodeStore.request(
+      back_model_schemas.vtm_component_indices,
+      { id },
       {
         response_function: async (response) => {
           db[id]["uuid_to_flat_index"] = response._data.uuid_to_flat_index

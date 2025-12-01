@@ -1,11 +1,9 @@
-import { useStorage } from "@vueuse/core"
 import Status from "@ogw_front/utils/status.js"
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode.js"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
-    ID: useStorage("ID", ""),
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
     microservices: [],
@@ -71,9 +69,8 @@ export const useInfraStore = defineStore("infra", {
         } else if (this.app_mode == appMode.CLOUD) {
           console.log("[INFRA] CLOUD mode - Launching lambda...")
           const lambdaStore = useLambdaStore()
-          const id = await lambdaStore.launch()
-          this.ID = id
-          console.log("[INFRA] Lambda ID stored:", id)
+          await lambdaStore.launch()
+          console.log("[INFRA] Lambda launched successfully")
         }
 
         this.status = Status.CREATED

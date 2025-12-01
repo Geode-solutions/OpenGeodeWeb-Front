@@ -36,14 +36,9 @@
   })
 
   function getVertexAttributes() {
-    api_fetch(
-      geodeStore,
-      {
-        schema: back_schemas.opengeodeweb_back.polygon_attribute_names,
-        params: {
-          id: props.id,
-        },
-      },
+    geodeStore.request(
+      back_schemas.opengeodeweb_back.polygon_attribute_names,
+      { id: props.id },
       {
         response_function: (response) => {
           polygon_attribute_names.value = response._data.polygon_attribute_names

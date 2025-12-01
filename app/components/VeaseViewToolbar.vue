@@ -75,14 +75,9 @@
       icon: "mdi-ruler-square",
       action: () => {
         const viewerStore = useViewerStore()
-        viewer_call(
-          viewerStore,
-          {
-            schema: schemas.opengeodeweb_viewer.viewer.grid_scale,
-            params: {
-              visibility: !grid_scale.value,
-            },
-          },
+        viewerStore.request(
+          schemas.opengeodeweb_viewer.viewer.grid_scale,
+          { visibility: !grid_scale.value },
           {
             response_function: () => {
               grid_scale.value = !grid_scale.value

@@ -61,14 +61,9 @@
   })
 
   function getTextureCoordinates() {
-    api_fetch(
-      geodeStore,
-      {
-        schema: back_schemas.opengeodeweb_back.texture_coordinates,
-        params: {
-          id: props.id,
-        },
-      },
+    geodeStore.request(
+      back_schemas.opengeodeweb_back.texture_coordinates,
+      { id: props.id },
       {
         response_function: (response) => {
           texture_coordinates.value = response._data.texture_coordinates
@@ -79,14 +74,11 @@
 
   async function files_uploaded_event(value) {
     if (value.length) {
-      await api_fetch(
-        geodeStore,
+      await geodeStore.request(
+        back_schemas.opengeodeweb_back.save_viewable_file,
         {
-          schema: back_schemas.opengeodeweb_back.save_viewable_file,
-          params: {
-            input_geode_object: "RasterImage2D",
-            filename: value[0].name,
-          },
+          input_geode_object: "RasterImage2D",
+          filename: value[0].name,
         },
         {
           response_function: async (response) => {
