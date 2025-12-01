@@ -97,7 +97,7 @@ const hybridViewerStoreMock = {
       const { viewer_call } =
         await import("@ogw_front/composables/viewer_call.js")
       viewer_call({
-        schema: { $id: "opengeodeweb_viewer/viewer.update_camera" },
+        schema: { $id: "opengeodeweb_viewer.viewer.update_camera" },
         params: { camera_options: snapshot.camera_options },
       })
       hybridViewerStoreMock.remoteRender()
