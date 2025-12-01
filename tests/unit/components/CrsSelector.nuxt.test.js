@@ -24,8 +24,8 @@ describe("CrsSelector.vue", () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`Default behavior`, async () => {
     const crs_list = [

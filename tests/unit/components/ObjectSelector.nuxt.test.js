@@ -25,8 +25,8 @@ describe("ObjectSelector.vue", async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`test loadable with one class`, async () => {
     var response = {

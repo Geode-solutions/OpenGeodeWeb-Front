@@ -82,6 +82,10 @@
     const geodeStore = useGeodeStore()
     const promise_array = filenames.map((filename) => {
       return new Promise((resolve, reject) => {
+        const params = {
+          input_geode_object,
+          filename,
+        }
         geodeStore.request(schema, params, {
           request_error_function: () => reject(),
           response_function: (response) => {

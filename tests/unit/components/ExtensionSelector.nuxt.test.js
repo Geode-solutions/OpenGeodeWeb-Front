@@ -24,8 +24,23 @@ describe("ExtensionSelector.vue", async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
+  
+  // Mock the request method to simulate API call
+  geodeStore.request = vi.fn((schema, params, callbacks) => {
+    const response = {
+      _data: {
+        geode_objects_and_output_extensions: {
+          BRep: { msh: { is_saveable: true } },
+        },
+      },
+    }
+    if (callbacks?.response_function) {
+      callbacks.response_function(response)
+    }
+    return Promise.resolve(response)
+  })
 
   test(`Select geode_object & extension`, async () => {
     const output_geode_object = "BRep"

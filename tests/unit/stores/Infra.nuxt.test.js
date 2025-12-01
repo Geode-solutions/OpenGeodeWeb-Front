@@ -64,103 +64,229 @@ describe("Infra Store", () => {
       })
     })
 
-    describe("lambda_url", () => {
-      test("test is cloud true", () => {
+    describe("microservices_connected", () => {
+      test("test no microservices registered", () => {
         const infra_store = useInfraStore()
-        useRuntimeConfig().public.SITE_BRANCH = "/test"
-        useRuntimeConfig().public.PROJECT = "/project"
-        infra_store.app_mode = appMode.CLOUD
-        expect(infra_store.lambda_url).toBe(
-          "https://api.geode-solutions.com:443/test/project/createbackend",
-        )
+        expect(infra_store.microservices_connected).toBe(true)
       })
-    })
-    describe("status", () => {
       test("test geode false & viewer false", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
-        geode_store.$patch({ status: Status.NOT_CONNECTED })
-        viewer_store.$patch({ status: Status.NOT_CONNECTED })
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        geodeStore.$patch({ status: Status.NOT_CONNECTED })
+        viewerStore.$patch({ status: Status.NOT_CONNECTED })
         expect(infra_store.microservices_connected).toBe(false)
       })
       test("test geode true & viewer false", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
-        geode_store.$patch({ status: Status.CONNECTED })
-        viewer_store.$patch({ status: Status.NOT_CONNECTED })
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        geodeStore.$patch({ status: Status.CONNECTED })
+        viewerStore.$patch({ status: Status.NOT_CONNECTED })
         expect(infra_store.microservices_connected).toBe(false)
       })
       test("test geode false & viewer true", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
-        geode_store.$patch({ status: Status.NOT_CONNECTED })
-        viewer_store.$patch({ status: Status.CONNECTED })
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        geodeStore.$patch({ status: Status.NOT_CONNECTED })
+        viewerStore.$patch({ status: Status.CONNECTED })
         expect(infra_store.microservices_connected).toBe(false)
       })
       test("test geode true & viewer true", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
-        geode_store.$patch({ status: Status.CONNECTED })
-        viewer_store.$patch({ status: Status.CONNECTED })
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        geodeStore.$patch({ status: Status.CONNECTED })
+        viewerStore.$patch({ status: Status.CONNECTED })
         expect(infra_store.microservices_connected).toBe(true)
       })
     })
 
-    describe("is_busy", () => {
+    describe("microservices_busy", () => {
+      test("test no microservices registered", () => {
+        const infra_store = useInfraStore()
+        expect(infra_store.microservices_busy).toBe(false)
+      })
       test("test geode false & viewer false", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
-        geode_store.$patch({ request_counter: 0 })
-        viewer_store.$patch({ request_counter: 0 })
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        geodeStore.$patch({ request_counter: 0 })
+        viewerStore.$patch({ request_counter: 0 })
         expect(infra_store.microservices_busy).toBe(false)
       })
       test("test geode true & viewer false", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
-        geode_store.$patch({ request_counter: 1 })
-        viewer_store.$patch({ request_counter: 0 })
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        geodeStore.$patch({ request_counter: 1 })
+        viewerStore.$patch({ request_counter: 0 })
         expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode false & viewer true", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
-        geode_store.$patch({ request_counter: 0 })
-        viewer_store.$patch({ request_counter: 1 })
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        geodeStore.$patch({ request_counter: 0 })
+        viewerStore.$patch({ request_counter: 1 })
         expect(infra_store.microservices_busy).toBe(true)
       })
       test("test geode true & viewer true", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
-        geode_store.$patch({ request_counter: 1 })
-        viewer_store.$patch({ request_counter: 1 })
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        geodeStore.$patch({ request_counter: 1 })
+        viewerStore.$patch({ request_counter: 1 })
         expect(infra_store.microservices_busy).toBe(true)
       })
     })
   })
 
   describe("actions", () => {
-    describe("create_backend", () => {
-      test("test without end-point", async () => {
+    describe("register_microservice", () => {
+      test("register geode microservice", () => {
         const infra_store = useInfraStore()
-        const geode_store = useGeodeStore()
-        const viewer_store = useViewerStore()
+        const geodeStore = useGeodeStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        expect(infra_store.microservices.length).toBe(1)
+        expect(infra_store.microservices[0].store.$id).toBe("geode")
+      })
+
+      test("register multiple microservices", () => {
+        const infra_store = useInfraStore()
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        
+        infra_store.register_microservice(geodeStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        infra_store.register_microservice(viewerStore, {
+          request: vi.fn(),
+          connect: vi.fn(),
+          launch: vi.fn(),
+        })
+        
+        expect(infra_store.microservices.length).toBe(2)
+      })
+    })
+
+    describe("create_backend", () => {
+      test("test without microservices", async () => {
+        const infra_store = useInfraStore()
+        infra_store.app_mode = appMode.BROWSER
         await infra_store.create_backend()
-        expect(infra_store.status).toBe(Status.NOT_CREATED)
-        expect(geode_store.status).toBe(Status.NOT_CONNECTED)
-        expect(viewer_store.status).toBe(Status.NOT_CONNECTED)
+        expect(infra_store.status).toBe(Status.CREATED)
       })
       // test("test with end-point", async () => {
       //   const infra_store = useInfraStore()
-      //   const geode_store = useGeodeStore()
-      //   const viewer_store = useViewerStore()
+      //   const geodeStore = useGeodeStore()
+      //   const viewerStore = useViewerStore()
       //   const feedback_store = useFeedbackStore()
 
       //   registerEndpoint(infra_store.lambda_url, {
@@ -169,8 +295,8 @@ describe("Infra Store", () => {
       //   })
       //   await infra_store.create_backend()
       //   expect(infra_store.status).toBe(Status.CREATED)
-      //   expect(geode_store.status).toBe(Status.NOT_CONNECTED)
-      //   expect(viewer_store.status).toBe(Status.NOT_CONNECTED)
+      //   expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
+      //   expect(viewerStore.status).toBe(Status.NOT_CONNECTED)
       //   expect(feedback_store.server_error).toBe(true)
       // })
     })

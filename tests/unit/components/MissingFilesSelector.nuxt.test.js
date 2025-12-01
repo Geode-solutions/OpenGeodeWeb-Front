@@ -27,8 +27,8 @@ describe("MissingFilesSelector.vue", async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`Select file`, async () => {
     registerEndpoint(missing_files_schema.$id, {
