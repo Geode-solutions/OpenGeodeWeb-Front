@@ -25,7 +25,7 @@ export const useInfraStore = defineStore("infra", {
     },
   },
   actions: {
-    register_microservice(store, { request, connect, launch }) {
+    register_microservice(store, methods) {
       const store_name = store.$id
       console.log("[INFRA] Registering microservice:", store_name)
 
@@ -34,6 +34,12 @@ export const useInfraStore = defineStore("infra", {
           (microservice) => microservice.store.$id === store_name,
         )
       ) {
+        const { request, connect, launch } = methods || {
+          request: store.request?.bind(store),
+          connect: store.connect?.bind(store),
+          launch: store.launch?.bind(store),
+        }
+        
         this.microservices.push({ store, request, connect, launch })
         console.log("[INFRA] Microservice registered:", store_name)
       }

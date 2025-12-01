@@ -14,22 +14,12 @@ export default defineNuxtPlugin(() => {
   // Initialize and register geode microservice
   console.log("[PLUGIN] Registering geode microservice")
   const geodeStore = useGeodeStore()
-  infraStore.register_microservice(geodeStore, {
-    request: (schema, params, callbacks) =>
-      geodeStore.request(schema, params, callbacks),
-    connect: () => geodeStore.connect(),
-    launch: () => geodeStore.launch(),
-  })
+  infraStore.register_microservice(geodeStore)
 
   // Initialize and register viewer microservice
   console.log("[PLUGIN] Registering viewer microservice")
   const viewerStore = useViewerStore()
-  infraStore.register_microservice(viewerStore, {
-    request: (schema, params, callbacks) =>
-      viewerStore.request(schema, params, callbacks),
-    connect: () => viewerStore.connect(),
-    launch: () => viewerStore.launch(),
-  })
+  infraStore.register_microservice(viewerStore)
 
   // Initialize stores that have export/import methods to ensure they're registered
   console.log("[PLUGIN] Initializing stores for export/import registration...")
