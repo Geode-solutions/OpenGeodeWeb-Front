@@ -35,18 +35,14 @@
     const params = { input_geode_object, filename }
     const geodeStore = useGeodeStore()
 
-    await geodeStore.request(
-      schema,
-      params,
-      {
-        response_function: (response) => {
-          emit("update_values", {
-            inspection_result: [response._data.inspection_result],
-          })
-          emit("increment_step")
-        },
+    await geodeStore.request(schema, params, {
+      response_function: (response) => {
+        emit("update_values", {
+          inspection_result: [response._data.inspection_result],
+        })
+        emit("increment_step")
       },
-    )
+    })
     toggle_loading()
   }
 </script>

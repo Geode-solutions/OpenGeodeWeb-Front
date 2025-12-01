@@ -54,17 +54,13 @@
     toggle_loading()
     const params = { supported_feature }
     const geodeStore = useGeodeStore()
-    await geodeStore.request(
-      schema,
-      params,
-      {
-        response_function: (response) => {
-          accept.value = response._data.extensions
-            .map((extension) => "." + extension)
-            .join(",")
-        },
+    await geodeStore.request(schema, params, {
+      response_function: (response) => {
+        accept.value = response._data.extensions
+          .map((extension) => "." + extension)
+          .join(",")
       },
-    )
+    })
     toggle_loading()
   }
   await get_allowed_files()

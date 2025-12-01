@@ -86,15 +86,11 @@
     const promise_array = filenames.map((filename) => {
       const params = { input_geode_object, filename }
       return new Promise((resolve, reject) => {
-        geodeStore.request(
-          schema,
-          params,
-          {
-            request_error_function: () => reject(),
-            response_function: (response) => resolve(response._data),
-            response_error_function: () => reject(),
-          },
-        )
+        geodeStore.request(schema, params, {
+          request_error_function: () => reject(),
+          response_function: (response) => resolve(response._data),
+          response_error_function: () => reject(),
+        })
       })
     })
     const values = await Promise.all(promise_array)
