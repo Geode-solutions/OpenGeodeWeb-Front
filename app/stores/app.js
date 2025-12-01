@@ -118,9 +118,7 @@ export const useAppStore = defineStore("app", () => {
       }
 
       if (typeof extensionModule.install === 'function') {
-        extensionAPI.value.setCurrentExtensionId(extensionId)
-        await extensionModule.install(extensionAPI.value)
-        extensionAPI.value.clearCurrentExtensionId()
+        await extensionModule.install(extensionAPI.value, extensionId)
         
         const extensionData = {
           module: extensionModule,
