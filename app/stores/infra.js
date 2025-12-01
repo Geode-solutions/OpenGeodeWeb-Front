@@ -39,7 +39,7 @@ export const useInfraStore = defineStore("infra", {
           connect: store.connect?.bind(store),
           launch: store.launch?.bind(store),
         }
-        
+
         this.microservices.push({ store, request, connect, launch })
         console.log("[INFRA] Microservice registered:", store_name)
       }
