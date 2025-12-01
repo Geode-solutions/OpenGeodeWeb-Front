@@ -89,9 +89,7 @@ describe("Geode store", () => {
         infra_store.app_mode = appMode.CLOUD
         infra_store.ID = "123456"
         infra_store.domain_name = "example.com"
-        expect(geodeStore.base_url).toBe(
-          "https://example.com:443/123456/geode",
-        )
+        expect(geodeStore.base_url).toBe("https://example.com:443/123456/geode")
       })
       test("test app_mode CLOUD, ID empty", () => {
         const infra_store = useInfraStore()

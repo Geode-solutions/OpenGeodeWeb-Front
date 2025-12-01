@@ -19,7 +19,7 @@ describe("run_function_when_microservices_connected", () => {
     const infraStore = useInfraStore()
     const geodeStore = useGeodeStore()
     const viewerStore = useViewerStore()
-    
+
     // Register microservices in infra store
     infraStore.register_microservice(geodeStore, {
       request: vi.fn(),
@@ -31,11 +31,11 @@ describe("run_function_when_microservices_connected", () => {
       connect: vi.fn(),
       launch: vi.fn(),
     })
-    
+
     await geodeStore.$patch({ status: Status.NOT_CONNECTED })
     await viewerStore.$patch({ status: Status.NOT_CONNECTED })
   })
-  
+
   test("microservices connected", async () => {
     const geodeStore = useGeodeStore()
     const viewerStore = useViewerStore()

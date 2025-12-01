@@ -26,7 +26,7 @@ describe("ExtensionSelector.vue", async () => {
   setActivePinia(pinia)
   const geodeStore = useGeodeStore()
   geodeStore.base_url = ""
-  
+
   // Mock the request method to simulate API call
   geodeStore.request = vi.fn((schema, params, callbacks) => {
     const response = {
