@@ -64,26 +64,26 @@ describe("Lambda Store", () => {
   describe("actions", () => {
     describe("launch", () => {
       const postFakeCall = vi.fn()
-      
+
       test("successful launch", async () => {
         const lambdaStore = useLambdaStore()
         const feedbackStore = useFeedbackStore()
-        
+
         useRuntimeConfig().public.API_URL = "api.example.com"
         useRuntimeConfig().public.SITE_BRANCH = "/test"
         useRuntimeConfig().public.PROJECT = "/project"
-        
+
         registerEndpoint(lambdaStore.base_url, {
           method: "POST",
           handler: postFakeCall,
         })
-        
+
         postFakeCall.mockImplementation(() => ({
           ID: "test-id-123456",
         }))
-        
+
         const id = await lambdaStore.launch()
-        
+
         expect(lambdaStore.status).toBe(Status.CONNECTED)
         expect(id).toBe("test-id-123456")
         expect(feedbackStore.server_error).toBe(false)
@@ -92,27 +92,27 @@ describe("Lambda Store", () => {
       test("failed launch - error response", async () => {
         const lambdaStore = useLambdaStore()
         const feedbackStore = useFeedbackStore()
-        
+
         useRuntimeConfig().public.API_URL = "api.example.com"
         useRuntimeConfig().public.SITE_BRANCH = "/test"
         useRuntimeConfig().public.PROJECT = "/project"
-        
+
         registerEndpoint(lambdaStore.base_url, {
           method: "POST",
           handler: postFakeCall,
         })
-        
+
         postFakeCall.mockImplementation(() => {
           throw createError({
             status: 500,
             statusMessage: "Internal Server Error",
           })
         })
-        
+
         await expect(lambdaStore.launch()).rejects.toThrow(
           "Failed to launch lambda backend",
         )
-        
+
         expect(lambdaStore.status).toBe(Status.NOT_CONNECTED)
         expect(feedbackStore.server_error).toBe(true)
       })
@@ -121,9 +121,9 @@ describe("Lambda Store", () => {
     describe("connect", () => {
       test("successful connect", async () => {
         const lambdaStore = useLambdaStore()
-        
+
         await lambdaStore.connect()
-        
+
         expect(lambdaStore.status).toBe(Status.CONNECTED)
       })
     })
