@@ -44,6 +44,7 @@ describe("Mesh points", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshPointsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: mesh_points_schemas.visibility,
           params: { id, visibility },
@@ -79,6 +80,7 @@ describe("Mesh points", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshPointsColor(id, color)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: mesh_points_schemas.color,
           params: { id, color },
@@ -100,6 +102,7 @@ describe("Mesh points", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshPointsSize(id, size)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: mesh_points_schemas.size,
           params: { id, size },

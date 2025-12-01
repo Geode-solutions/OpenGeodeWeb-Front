@@ -44,6 +44,7 @@ describe("Mesh polyhedra", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshPolyhedraVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: mesh_polyhedra_schemas.visibility,
           params: { id, visibility },
@@ -78,6 +79,7 @@ describe("Mesh polyhedra", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshPolyhedraColor(id, color)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: mesh_polyhedra_schemas.color,
           params: { id, color },

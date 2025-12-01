@@ -44,6 +44,7 @@ describe("Model", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: model_schemas.visibility,
           params: { id, visibility },

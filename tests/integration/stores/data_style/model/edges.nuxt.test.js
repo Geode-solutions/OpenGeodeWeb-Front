@@ -44,6 +44,7 @@ describe("Model edges", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelEdgesVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: model_edges_schemas.visibility,
           params: { id, visibility },

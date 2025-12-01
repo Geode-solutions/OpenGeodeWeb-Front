@@ -44,6 +44,7 @@ describe("Mesh", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: mesh_schemas.visibility,
           params: { id, visibility },

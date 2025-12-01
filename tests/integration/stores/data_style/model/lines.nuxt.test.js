@@ -43,6 +43,7 @@ describe("Model lines", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelLinesVisibility(id, line_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: model_lines_schemas.visibility,
           params: { id, block_ids: lines_flat_indexes, visibility },
@@ -69,6 +70,7 @@ describe("Model lines", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelLinesColor(id, line_ids, color)
       expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({ client: expect.anything() }),
         {
           schema: model_lines_schemas.color,
           params: { id, block_ids: lines_flat_indexes, color },
