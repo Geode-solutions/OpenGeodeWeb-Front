@@ -67,10 +67,140 @@ export const useAppStore = defineStore("app", () => {
     console.log(`[AppStore] Imported ${importedCount} stores`)
   }
 
+  const loadedExtensions = ref(new Map())
+  const extensionAPI = ref(null)
+
+  function setExtensionAPI(api) {
+    extensionAPI.value = api
+  }
+
+  function getExtension(path) {
+    return loadedExtensions.value.get(path)
+  }
+
+  async function loadExtension(path, codeTransformer = null) {
+    try {
+      if (loadedExtensions.value.has(path)) {
+        console.warn(`[AppStore] Extension already loaded from this path: ${path}`)
+        throw new Error('This extension file is already loaded')
+      }
+
+      if (!extensionAPI.value) {
+        throw new Error("Extension API not initialized")
+      }
+
+      let finalURL = path
+
+      if (codeTransformer && path.startsWith('blob:')) {
+        const response = await fetch(path)
+        const code = await response.text()
+        const transformedCode = codeTransformer(code)
+
+        const newBlob = new Blob([transformedCode], { type: 'application/javascript' })
+        finalURL = URL.createObjectURL(newBlob)
+      }
+
+      const extensionModule = await import(finalURL)
+
+      if (finalURL !== path && finalURL.startsWith('blob:')) {
+        URL.revokeObjectURL(finalURL)
+      }
+
+      const extensionName = extensionModule.metadata?.name
+      if (extensionName) {
+        const alreadyLoaded = Array.from(loadedExtensions.value.values()).find(
+          ext => ext.metadata?.name === extensionName
+        )
+        if (alreadyLoaded) {
+          console.warn(`[AppStore] Extension "${extensionName}" is already loaded`)
+          throw new Error(`Extension "${extensionName}" is already loaded.`)
+        }
+      }
+
+      if (typeof extensionModule.install === 'function') {
+        await extensionModule.install(extensionAPI.value, path)
+        
+        const extensionData = {
+          module: extensionModule,
+          path,
+          loadedAt: new Date().toISOString(),
+          metadata: extensionModule.metadata || {},
+          enabled: true,
+        }
+        loadedExtensions.value.set(path, extensionData)
+
+        console.log(`[AppStore] Extension loaded successfully: ${path}`)
+
+        return extensionModule
+      } else {
+        throw new Error('Extension must export an install function')
+      }
+    } catch (error) {
+      console.error(`[AppStore] Failed to load extension from ${path}:`, error)
+      throw error
+    }
+  }
+
+  function getLoadedExtensions() {
+    return Array.from(loadedExtensions.value.values())
+  }
+
+  function unloadExtension(path) {
+    const extensionData = getExtension(path)
+    if (!extensionData) return false
+    
+    if (extensionData.module && typeof extensionData.module.uninstall === 'function') {
+      try {
+        extensionData.module.uninstall(extensionAPI.value, path)
+        console.log(`[AppStore] Extension uninstall called: ${path}`)
+      } catch (error) {
+        console.error(`[AppStore] Error calling uninstall for ${path}:`, error)
+      }
+    }
+    
+    if (extensionAPI.value && typeof extensionAPI.value.unregisterToolsByExtension === 'function') {
+      extensionAPI.value.unregisterToolsByExtension(path)
+    }
+    
+    loadedExtensions.value.delete(path)
+    console.log(`[AppStore] Extension unloaded: ${path}`)
+    return true
+  }
+
+  function toggleExtension(path) {
+    const extensionData = getExtension(path)
+    if (!extensionData) return false
+    
+    extensionData.enabled = !extensionData.enabled
+    console.log(`[AppStore] Extension ${extensionData.enabled ? 'enabled' : 'disabled'}: ${path}`)
+    return extensionData.enabled
+  }
+
+  function setExtensionEnabled(path, enabled) {
+    const extensionData = getExtension(path)
+    if (!extensionData) return false
+    
+    extensionData.enabled = enabled
+    console.log(`[AppStore] Extension ${enabled ? 'enabled' : 'disabled'}: ${path}`)
+    return true
+  }
+
+  function getExtensionEnabled(path) {
+    return getExtension(path)?.enabled ?? false
+  }
+
   return {
     stores,
     registerStore,
     exportStores,
     importStores,
+    loadedExtensions,
+    setExtensionAPI,
+    loadExtension,
+    getLoadedExtensions,
+    unloadExtension,
+    toggleExtension,
+    setExtensionEnabled,
+    getExtensionEnabled,
   }
 })
