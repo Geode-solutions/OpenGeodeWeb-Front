@@ -69,32 +69,28 @@ export const useAppStore = defineStore("app", () => {
 
   const loadedExtensions = ref(new Map())
   const extensionAPI = ref(null)
+  const codeTransformer = ref(null)
 
   function setExtensionAPI(api) {
     extensionAPI.value = api
   }
 
-  function getExtension(path) {
-    return loadedExtensions.value.get(path)
+  function setCodeTransformer(transformer) {
+    codeTransformer.value = transformer
   }
 
-  async function loadExtension(path, codeTransformer = null) {
+  function getExtension(id) {
+    return loadedExtensions.value.get(id)
+  }
+
+  async function loadExtension(path) {
     try {
-      if (loadedExtensions.value.has(path)) {
-        console.warn(`[AppStore] Extension already loaded from this path: ${path}`)
-        throw new Error('This extension file is already loaded')
-      }
-
-      if (!extensionAPI.value) {
-        throw new Error("Extension API not initialized")
-      }
-
       let finalURL = path
 
-      if (codeTransformer && path.startsWith('blob:')) {
+      if (codeTransformer.value && path.startsWith('blob:')) {
         const response = await fetch(path)
         const code = await response.text()
-        const transformedCode = codeTransformer(code)
+        const transformedCode = codeTransformer.value(code)
 
         const newBlob = new Blob([transformedCode], { type: 'application/javascript' })
         finalURL = URL.createObjectURL(newBlob)
@@ -106,30 +102,37 @@ export const useAppStore = defineStore("app", () => {
         URL.revokeObjectURL(finalURL)
       }
 
-      const extensionName = extensionModule.metadata?.name
-      if (extensionName) {
-        const alreadyLoaded = Array.from(loadedExtensions.value.values()).find(
-          ext => ext.metadata?.name === extensionName
-        )
-        if (alreadyLoaded) {
-          console.warn(`[AppStore] Extension "${extensionName}" is already loaded`)
-          throw new Error(`Extension "${extensionName}" is already loaded.`)
-        }
+      if (!extensionModule.metadata?.id) {
+        throw new Error('Extension must have metadata.id')
+      }
+
+      const extensionId = extensionModule.metadata.id
+
+      if (loadedExtensions.value.has(extensionId)) {
+        console.warn(`[AppStore] Extension "${extensionId}" is already loaded`)
+        throw new Error(`Extension "${extensionId}" is already loaded.`)
+      }
+
+      if (!extensionAPI.value) {
+        throw new Error("Extension API not initialized")
       }
 
       if (typeof extensionModule.install === 'function') {
-        await extensionModule.install(extensionAPI.value, path)
+        extensionAPI.value.setCurrentExtensionId(extensionId)
+        await extensionModule.install(extensionAPI.value)
+        extensionAPI.value.clearCurrentExtensionId()
         
         const extensionData = {
           module: extensionModule,
+          id: extensionId,
           path,
           loadedAt: new Date().toISOString(),
-          metadata: extensionModule.metadata || {},
+          metadata: extensionModule.metadata,
           enabled: true,
         }
-        loadedExtensions.value.set(path, extensionData)
+        loadedExtensions.value.set(extensionId, extensionData)
 
-        console.log(`[AppStore] Extension loaded successfully: ${path}`)
+        console.log(`[AppStore] Extension loaded successfully: ${extensionId}`)
 
         return extensionModule
       } else {
@@ -145,48 +148,48 @@ export const useAppStore = defineStore("app", () => {
     return Array.from(loadedExtensions.value.values())
   }
 
-  function unloadExtension(path) {
-    const extensionData = getExtension(path)
+  function unloadExtension(id) {
+    const extensionData = getExtension(id)
     if (!extensionData) return false
     
     if (extensionData.module && typeof extensionData.module.uninstall === 'function') {
       try {
-        extensionData.module.uninstall(extensionAPI.value, path)
-        console.log(`[AppStore] Extension uninstall called: ${path}`)
+        extensionData.module.uninstall(extensionAPI.value)
+        console.log(`[AppStore] Extension uninstall called: ${id}`)
       } catch (error) {
-        console.error(`[AppStore] Error calling uninstall for ${path}:`, error)
+        console.error(`[AppStore] Error calling uninstall for ${id}:`, error)
       }
     }
     
     if (extensionAPI.value && typeof extensionAPI.value.unregisterToolsByExtension === 'function') {
-      extensionAPI.value.unregisterToolsByExtension(path)
+      extensionAPI.value.unregisterToolsByExtension(id)
     }
     
-    loadedExtensions.value.delete(path)
-    console.log(`[AppStore] Extension unloaded: ${path}`)
+    loadedExtensions.value.delete(id)
+    console.log(`[AppStore] Extension unloaded: ${id}`)
     return true
   }
 
-  function toggleExtension(path) {
-    const extensionData = getExtension(path)
+  function toggleExtension(id) {
+    const extensionData = getExtension(id)
     if (!extensionData) return false
     
     extensionData.enabled = !extensionData.enabled
-    console.log(`[AppStore] Extension ${extensionData.enabled ? 'enabled' : 'disabled'}: ${path}`)
+    console.log(`[AppStore] Extension ${extensionData.enabled ? 'enabled' : 'disabled'}: ${id}`)
     return extensionData.enabled
   }
 
-  function setExtensionEnabled(path, enabled) {
-    const extensionData = getExtension(path)
+  function setExtensionEnabled(id, enabled) {
+    const extensionData = getExtension(id)
     if (!extensionData) return false
     
     extensionData.enabled = enabled
-    console.log(`[AppStore] Extension ${enabled ? 'enabled' : 'disabled'}: ${path}`)
+    console.log(`[AppStore] Extension ${enabled ? 'enabled' : 'disabled'}: ${id}`)
     return true
   }
 
-  function getExtensionEnabled(path) {
-    return getExtension(path)?.enabled ?? false
+  function getExtensionEnabled(id) {
+    return getExtension(id)?.enabled ?? false
   }
 
   return {
@@ -196,6 +199,7 @@ export const useAppStore = defineStore("app", () => {
     importStores,
     loadedExtensions,
     setExtensionAPI,
+    setCodeTransformer,
     loadExtension,
     getLoadedExtensions,
     unloadExtension,
