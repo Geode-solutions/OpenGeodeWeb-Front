@@ -57,18 +57,16 @@ async function importItem(item) {
 }
 
 async function importFile(filename, geode_object_type) {
-  const { data } = await api_fetch({
-    schema: back_schemas.opengeodeweb_back.save_viewable_file,
-    params: {
+  const geodeStore = useGeodeStore()
+  const response = await geodeStore.request(
+    back_schemas.opengeodeweb_back.save_viewable_file,
+    {
       geode_object_type,
       filename,
     },
-  })
+  )
 
-  console.log("data.value", data.value)
-  console.log("data.value", data._value)
-
-  const item = buildImportItemFromPayloadApi(data.value, geode_object_type)
+  const item = buildImportItemFromPayloadApi(response._data, geode_object_type)
   return importItem(item)
 }
 

@@ -45,6 +45,7 @@
   const crs_list = ref([])
   const selected_crs = ref([])
   const toggle_loading = useToggle(data_table_loading)
+  const geodeStore = useGeodeStore()
 
   watch(selected_crs, (new_value) => {
     const crs = get_selected_crs(new_value[0])

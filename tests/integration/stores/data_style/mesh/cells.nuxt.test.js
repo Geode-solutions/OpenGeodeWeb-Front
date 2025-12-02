@@ -9,7 +9,7 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "@ogw_front/composables/viewer_call"
+import * as composables from "../../../../internal/utils/viewer_call"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants

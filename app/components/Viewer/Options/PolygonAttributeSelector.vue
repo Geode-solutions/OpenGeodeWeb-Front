@@ -36,12 +36,10 @@
   })
 
   function getPolygonAttributes() {
-    api_fetch(
+    geodeStore.request(
+      back_schemas.opengeodeweb_back.polygon_attribute_names,
       {
-        schema: back_schemas.opengeodeweb_back.polygon_attribute_names,
-        params: {
-          id: props.id,
-        },
+        id: props.id,
       },
       {
         response_function: (response) => {

@@ -35,12 +35,15 @@ describe("CrsSelector.vue", () => {
         name: "Anguilla 1957 / British West Indies Grid",
       },
     ]
-    registerEndpoint(crs_selector_schema.$id, {
-      method: crs_selector_schema.methods.filter((m) => m !== "OPTIONS")[0],
-      handler: () => ({
-        crs_list,
-      }),
+
+    // Mock geodeStore.request instead of registerEndpoint
+    geodeStore.request = vi.fn((schema, params, callbacks) => {
+      if (callbacks?.response_function) {
+        callbacks.response_function({ _data: { crs_list } })
+      }
+      return Promise.resolve({ _data: { crs_list } })
     })
+
     const key_to_update = "key"
     const wrapper = await mountSuspended(CrsSelector, {
       global: {

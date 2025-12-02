@@ -18,6 +18,7 @@
   const cell_attribute_name = ref("")
   const cell_attribute_names = ref([])
   const cell_attribute = reactive({ name: cell_attribute_name.value })
+  const geodeStore = useGeodeStore()
 
   onMounted(() => {
     if (model.value != null) {
@@ -35,12 +36,10 @@
   })
 
   function getCellAttributes() {
-    api_fetch(
+    geodeStore.request(
+      back_schemas.opengeodeweb_back.cell_attribute_names,
       {
-        schema: back_schemas.opengeodeweb_back.cell_attribute_names,
-        params: {
-          id: props.id,
-        },
+        id: props.id,
       },
       {
         response_function: (response) => {

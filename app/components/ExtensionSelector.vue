@@ -83,7 +83,7 @@
     const promise_array = filenames.map((filename) => {
       return new Promise((resolve, reject) => {
         const params = {
-          input_geode_object,
+          geode_object_type,
           filename,
         }
         geodeStore.request(schema, params, {

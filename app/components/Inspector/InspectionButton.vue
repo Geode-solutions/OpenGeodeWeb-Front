@@ -32,7 +32,7 @@
 
   async function get_inspection_results(geode_object_type, filename) {
     toggle_loading()
-    const params = { input_geode_object, filename }
+    const params = { geode_object_type, filename }
     const geodeStore = useGeodeStore()
 
     await geodeStore.request(schema, params, {

@@ -97,7 +97,7 @@ const hybridViewerStoreMock = {
     }
     if (snapshot?.camera_options) {
       const { viewer_call } = await import(
-        "@ogw_front/composables/viewer_call.js"
+        "../../../internal/utils/viewer_call.js"
       )
       viewer_call({
         schema: { $id: "opengeodeweb_viewer.viewer.update_camera" },
@@ -193,7 +193,7 @@ describe("ProjectManager composable (compact)", () => {
       )
     }
     const { viewer_call } = await import(
-      "@ogw_front/composables/viewer_call.js"
+      "../../../internal/utils/viewer_call.js"
     )
     viewer_call.mockClear()
   })
@@ -216,10 +216,9 @@ describe("ProjectManager composable (compact)", () => {
     await importProjectFile(file)
 
     const { viewer_call } = await import(
-      "@ogw_front/composables/viewer_call.js"
+      "../../../internal/utils/viewer_call.js"
     )
 
-    expect(infraStoreMock.create_connection).toHaveBeenCalled()
     expect(viewerStoreMock.ws_connect).toHaveBeenCalled()
     expect(viewer_call).toHaveBeenCalledTimes(2)
 

@@ -2,9 +2,8 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
 
-vi.mock("@ogw_front/composables/viewer_call.js", () => ({
-  default: vi.fn(() => Promise.resolve({})),
-  viewer_call: vi.fn(() => Promise.resolve({})),
+vi.mock("../../../internal/utils/viewer_call.js", () => ({
+  viewer_call: vi.fn(() => Promise.resolve()),
 }))
 vi.mock("@/stores/hybrid_viewer.js", () => ({
   useHybridViewerStore: () => ({
