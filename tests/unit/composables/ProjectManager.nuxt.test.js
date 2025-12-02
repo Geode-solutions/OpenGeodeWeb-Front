@@ -65,7 +65,6 @@ const geodeStoreMock = {
 const infraStoreMock = {
   app_mode: appMode.BROWSER,
   ID: "1234",
-  create_connection: vi.fn(() => Promise.resolve()),
 }
 const viewerStoreMock = {
   ws_connect: vi.fn(() => Promise.resolve()),
@@ -93,8 +92,9 @@ const hybridViewerStoreMock = {
   clear: vi.fn(),
   initHybridViewer: vi.fn(() => Promise.resolve()),
   importStores: vi.fn(async (snapshot) => {
-    if (snapshot?.zScale != null)
+    if (snapshot?.zScale != null) {
       hybridViewerStoreMock.setZScaling(snapshot.zScale)
+    }
     if (snapshot?.camera_options) {
       viewer_call({
         schema: { $id: "opengeodeweb_viewer.viewer.update_camera" },
@@ -179,7 +179,6 @@ describe("ProjectManager composable (compact)", () => {
 
     // reset spies
     for (const store of [
-      infraStoreMock,
       viewerStoreMock,
       treeviewStoreMock,
       dataBaseStoreMock,
@@ -199,7 +198,6 @@ describe("ProjectManager composable (compact)", () => {
 
     await exportProject()
 
-    expect(infraStoreMock.create_connection).toHaveBeenCalled()
     expect(fileDownload).toHaveBeenCalled()
   })
 
@@ -211,7 +209,6 @@ describe("ProjectManager composable (compact)", () => {
 
     await importProjectFile(file)
 
-    expect(infraStoreMock.create_connection).toHaveBeenCalled()
     expect(viewerStoreMock.ws_connect).toHaveBeenCalled()
     expect(viewer_call).toHaveBeenCalledTimes(2)
 
