@@ -50,7 +50,7 @@ describe("ObjectSelector.vue", async () => {
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
-      input_geode_object: geode_object_1,
+      geode_object_type: geode_object_1,
     })
   })
 
@@ -83,7 +83,7 @@ describe("ObjectSelector.vue", async () => {
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
-      input_geode_object: geode_object_1,
+      geode_object_type: geode_object_1,
     })
   })
 
@@ -112,7 +112,7 @@ describe("ObjectSelector.vue", async () => {
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
-      input_geode_object: geode_object_1,
+      geode_object_type: geode_object_1,
     })
   })
 })

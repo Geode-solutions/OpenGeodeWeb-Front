@@ -11,11 +11,11 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const pendingSelectionIds = ref([])
 
   // /** Functions **/
-  function addItem(geodeObject, displayed_name, id, object_type) {
-    const child = { title: displayed_name, id, object_type }
+  function addItem(geode_object_type, name, id, viewer_type) {
+    const child = { title: name, id, viewer_type }
 
     for (let i = 0; i < items.value.length; i++) {
-      if (items.value[i].title === geodeObject) {
+      if (items.value[i].title === geode_object_type) {
         items.value[i].children.push(child)
         items.value[i].children.sort((a, b) =>
           a.title.localeCompare(b.title, undefined, {
@@ -27,7 +27,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         return
       }
     }
-    items.value.push({ title: geodeObject, children: [child] })
+    items.value.push({ title: geode_object_type, children: [child] })
     selection.value.push(child)
   }
 

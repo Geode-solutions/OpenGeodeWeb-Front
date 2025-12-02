@@ -37,6 +37,12 @@
           <!-- <template v-if="coloring_style_key === edge_dict['value']">
             <ViewerOptionsEdgeAttributeSelector v-model="edge_attribute" :id="id" />
           </template> -->
+          <template v-if="coloring_style_key === cell_dict['value']">
+            <ViewerOptionsCellAttributeSelector
+              v-model="cell_attribute"
+              :id="id"
+            />
+          </template>
           <template v-if="coloring_style_key === polygon_dict['value']">
             <ViewerOptionsPolygonAttributeSelector
               v-model="polygon_attribute"
@@ -61,6 +67,7 @@
   import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector.vue"
   // import ViewerOptionsEdgeAttributeSelector from "@ogw_front/components/Viewer/Options/EdgeAttributeSelector.vue"
   import ViewerOptionsPolygonAttributeSelector from "@ogw_front/components/Viewer/Options/PolygonAttributeSelector.vue"
+  import ViewerOptionsCellAttributeSelector from "@ogw_front/components/Viewer/Options/CellAttributeSelector.vue"
   import ViewerOptionsPolyhedronAttributeSelector from "@ogw_front/components/Viewer/Options/PolyhedronAttributeSelector.vue"
 
   const coloring_style_key = defineModel("coloring_style_key")
@@ -69,6 +76,7 @@
   const textures = defineModel("textures")
   const vertex_attribute = defineModel("vertex_attribute")
   // const edge_attribute = defineModel("edge_attribute");
+  const cell_attribute = defineModel("cell_attribute")
   const polygon_attribute = defineModel("polygon_attribute")
   const polyhedron_attribute = defineModel("polyhedron_attribute")
 
@@ -83,6 +91,10 @@
   const has_vertex = computed(() =>
     vertex_attribute.value !== undefined ? true : false,
   )
+  // const has_edge = computed(() => (edge_attribute.value !== undefined ? true : false));
+  const has_cells = computed(() =>
+    cell_attribute.value !== undefined ? true : false,
+  )
   const has_polygons = computed(() =>
     polygon_attribute.value !== undefined ? true : false,
   )
@@ -93,7 +105,8 @@
   const color_dict = { name: "Color", value: "color" }
   const textures_dict = { name: "Textures", value: "textures" }
   const vertex_dict = { name: "Vertex attribute", value: "vertex" }
-  // const edge_dict = { name: "Edge attribute", value: "edge" };
+  // const edge_dict = { name: "Edge attribute", value: "edge" }
+  const cell_dict = { name: "Cell attribute", value: "cell" }
   const polygon_dict = { name: "Polygon attribute", value: "polygon" }
   const polyhedron_dict = {
     name: "Polyhedron attribute",
@@ -105,6 +118,7 @@
     if (has_textures.value) array.push(textures_dict)
     if (has_vertex.value) array.push(vertex_dict)
     // if (has_edges.value) array.push(edge_dict);
+    if (has_cells.value) array.push(cell_dict)
     if (has_polygons.value) array.push(polygon_dict)
     if (has_polyhedra.value) array.push(polyhedron_dict)
 

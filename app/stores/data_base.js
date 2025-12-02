@@ -51,12 +51,12 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   async function addItem(
     id,
     value = {
-      object_type,
-      geode_object,
-      native_filename,
-      viewable_filename,
-      displayed_name,
-      vtk_js: { binary_light_viewable },
+      viewer_type,
+      geode_object_type,
+      native_file,
+      viewable_file,
+      name,
+      binary_light_viewable,
     },
   ) {
     db[id] = value
@@ -125,14 +125,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     for (const [id, item] of Object.entries(db)) {
       if (!item) continue
       snapshotDb[id] = {
-        object_type: item.object_type,
-        geode_object: item.geode_object,
-        native_filename: item.native_filename,
-        viewable_filename: item.viewable_filename,
-        displayed_name: item.displayed_name,
-        vtk_js: {
-          binary_light_viewable: item?.vtk_js?.binary_light_viewable,
-        },
+        ...item,
       }
     }
     return { db: snapshotDb }

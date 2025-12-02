@@ -56,20 +56,7 @@ describe("Mesh edges", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
-  describe("Edges active coloring", () => {
-    test("test coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshEdgesActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
-    })
-  })
+
   describe("Edges color", () => {
     test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
@@ -88,6 +75,21 @@ describe("Mesh edges", () => {
       )
       expect(dataStyleStore.meshEdgesColor(id)).toStrictEqual(color)
       expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
+
+  describe("Edges active coloring", () => {
+    test("test coloring", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const coloringTypes = ["color"]
+      for (let i = 0; i < coloringTypes.length; i++) {
+        dataStyleStore.setMeshEdgesActiveColoring(id, coloringTypes[i])
+        expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
+          coloringTypes[i],
+        )
+        expect(viewerStore.status).toBe(Status.CONNECTED)
+      }
     })
   })
 })

@@ -11,12 +11,12 @@ const snapshotMock = {
   dataBase: {
     db: {
       abc123: {
-        object_type: "mesh",
-        geode_object: "PointSet2D",
-        native_filename: "native.ext",
-        viewable_filename: "viewable.ext",
-        displayed_name: "My Data",
-        vtk_js: { binary_light_viewable: "VGxpZ2h0RGF0YQ==" },
+        viewer_type: "mesh",
+        geode_object_type: "PointSet2D",
+        native_file: "native.ext",
+        viewable_file: "viewable.ext",
+        name: "My Data",
+        binary_light_viewable: "VGxpZ2h0RGF0YQ==",
       },
     },
   },
@@ -94,9 +94,8 @@ const hybridViewerStoreMock = {
     if (snapshot?.zScale != null)
       hybridViewerStoreMock.setZScaling(snapshot.zScale)
     if (snapshot?.camera_options) {
-      const { viewer_call } = await import(
-        "@ogw_front/composables/viewer_call.js"
-      )
+      const { viewer_call } =
+        await import("@ogw_front/composables/viewer_call.js")
       viewer_call({
         schema: { $id: "opengeodeweb_viewer/viewer.update_camera" },
         params: { camera_options: snapshot.camera_options },
@@ -191,9 +190,8 @@ describe("ProjectManager composable (compact)", () => {
         (v) => typeof v === "function" && v.mockClear && v.mockClear(),
       )
     }
-    const { viewer_call } = await import(
-      "@ogw_front/composables/viewer_call.js"
-    )
+    const { viewer_call } =
+      await import("@ogw_front/composables/viewer_call.js")
     viewer_call.mockClear()
   })
 
@@ -215,9 +213,8 @@ describe("ProjectManager composable (compact)", () => {
 
     await importProjectFile(file)
 
-    const { viewer_call } = await import(
-      "@ogw_front/composables/viewer_call.js"
-    )
+    const { viewer_call } =
+      await import("@ogw_front/composables/viewer_call.js")
 
     expect(infraStoreMock.create_connection).toHaveBeenCalled()
     expect(viewerStoreMock.ws_connect).toHaveBeenCalled()
@@ -241,9 +238,9 @@ describe("ProjectManager composable (compact)", () => {
     expect(dataBaseStoreMock.addItem).toHaveBeenCalledWith(
       "abc123",
       expect.objectContaining({
-        object_type: "mesh",
-        geode_object: "PointSet2D",
-        displayed_name: "My Data",
+        viewer_type: "mesh",
+        geode_object_type: "PointSet2D",
+        name: "My Data",
       }),
     )
     expect(treeviewStoreMock.addItem).toHaveBeenCalledWith(

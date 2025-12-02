@@ -57,20 +57,6 @@ describe("Mesh points", () => {
     })
   })
 
-  describe("Points active coloring", () => {
-    test("test coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshPointsActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
-    })
-  })
   describe("Points color", () => {
     test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
@@ -89,6 +75,21 @@ describe("Mesh points", () => {
       )
       expect(dataStyleStore.meshPointsColor(id)).toStrictEqual(color)
       expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
+
+  describe("Points active coloring", () => {
+    test("test coloring", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const coloringTypes = ["color"]
+      for (let i = 0; i < coloringTypes.length; i++) {
+        dataStyleStore.setMeshPointsActiveColoring(id, coloringTypes[i])
+        expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(
+          coloringTypes[i],
+        )
+        expect(viewerStore.status).toBe(Status.CONNECTED)
+      }
     })
   })
 
