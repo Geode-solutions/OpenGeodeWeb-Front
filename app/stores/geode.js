@@ -78,16 +78,13 @@ export const useGeodeStore = defineStore("geode", {
     stop_request() {
       this.request_counter--
     },
-    async launch() {
+    launch() {
       console.log("[GEODE] Launching geode microservice...")
-      const port = await window.electronAPI.run_back()
-      console.log("[GEODE] Geode launched on port:", port)
-      return port
+      return window.electronAPI.run_back()
     },
-    async connect() {
+    connect() {
       console.log("[GEODE] Connecting to geode microservice...")
-      await this.do_ping()
-      console.log("[GEODE] Geode connected successfully")
+      return this.do_ping()
     },
     request(schema, params, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id)
