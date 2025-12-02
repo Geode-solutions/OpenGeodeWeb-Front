@@ -9,12 +9,10 @@ export function useProjectManager() {
     console.log("[export triggered]")
     const appStore = useAppStore()
     const geodeStore = useGeodeStore()
-    const infraStore = useInfraStore()
     const snapshot = appStore.exportStores()
     const schema = back_schemas.opengeodeweb_back.export_project
     const defaultName = "project.vease"
 
-    await infraStore.create_connection()
     const result = await $fetch(schema.$id, {
       baseURL: geodeStore.base_url,
       method: schema.methods.filter((m) => m !== "OPTIONS")[0],
@@ -30,9 +28,7 @@ export function useProjectManager() {
     const dataBaseStore = useDataBaseStore()
     const treeviewStore = useTreeviewStore()
     const hybridViewerStore = useHybridViewerStore()
-    const infraStore = useInfraStore()
 
-    await infraStore.create_connection()
     await viewerStore.ws_connect()
 
     const client = viewerStore.client

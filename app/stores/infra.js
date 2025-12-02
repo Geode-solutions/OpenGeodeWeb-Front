@@ -81,25 +81,19 @@ export const useInfraStore = defineStore("infra", {
 
         this.status = Status.CREATED
         console.log("[INFRA] Backend created successfully")
-        return this.create_connection()
-      })
-    },
-    async create_connection() {
-      console.log("[INFRA] Starting create_connection")
-      console.log(
-        "[INFRA] Connecting microservices:",
-        this.microservices.map((microservice) => microservice.store.$id),
-      )
-
-      const connection_promises = this.microservices.map((microservice) => {
-        return microservice.connect(microservice.store).then(() => {
-          console.log("[INFRA] Microservice connected:", microservice.store.$id)
+        console.log("[INFRA] Connecting microservices...")
+        const connection_promises = this.microservices.map((microservice) => {
+          return microservice.connect(microservice.store).then(() => {
+            console.log(
+              "[INFRA] Microservice connected:",
+              microservice.store.$id,
+            )
+          })
         })
-      })
 
-      await Promise.all(connection_promises)
-      console.log("[INFRA] All microservices connected")
-      return
+        await Promise.all(connection_promises)
+        console.log("[INFRA] All microservices connected")
+      })
     },
   },
   share: {
