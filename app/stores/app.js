@@ -87,23 +87,25 @@ export const useAppStore = defineStore("app", () => {
     try {
       let finalURL = path
 
-      if (codeTransformer.value && path.startsWith('blob:')) {
+      if (codeTransformer.value && path.startsWith("blob:")) {
         const response = await fetch(path)
         const code = await response.text()
         const transformedCode = codeTransformer.value(code)
 
-        const newBlob = new Blob([transformedCode], { type: 'application/javascript' })
+        const newBlob = new Blob([transformedCode], {
+          type: "application/javascript",
+        })
         finalURL = URL.createObjectURL(newBlob)
       }
 
       const extensionModule = await import(finalURL)
 
-      if (finalURL !== path && finalURL.startsWith('blob:')) {
+      if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL)
       }
 
       if (!extensionModule.metadata?.id) {
-        throw new Error('Extension must have metadata.id')
+        throw new Error("Extension must have metadata.id")
       }
 
       const extensionId = extensionModule.metadata.id
@@ -117,9 +119,9 @@ export const useAppStore = defineStore("app", () => {
         throw new Error("Extension API not initialized")
       }
 
-      if (typeof extensionModule.install === 'function') {
+      if (typeof extensionModule.install === "function") {
         await extensionModule.install(extensionAPI.value)
-        
+
         const extensionData = {
           module: extensionModule,
           id: extensionId,
@@ -134,7 +136,7 @@ export const useAppStore = defineStore("app", () => {
 
         return extensionModule
       } else {
-        throw new Error('Extension must export an install function')
+        throw new Error("Extension must export an install function")
       }
     } catch (error) {
       console.error(`[AppStore] Failed to load extension from ${path}:`, error)
@@ -149,8 +151,11 @@ export const useAppStore = defineStore("app", () => {
   function unloadExtension(id) {
     const extensionData = getExtension(id)
     if (!extensionData) return false
-    
-    if (extensionData.module && typeof extensionData.module.uninstall === 'function') {
+
+    if (
+      extensionData.module &&
+      typeof extensionData.module.uninstall === "function"
+    ) {
       try {
         extensionData.module.uninstall(extensionAPI.value)
         console.log(`[AppStore] Extension uninstall called: ${id}`)
@@ -158,11 +163,14 @@ export const useAppStore = defineStore("app", () => {
         console.error(`[AppStore] Error calling uninstall for ${id}:`, error)
       }
     }
-    
-    if (extensionAPI.value && typeof extensionAPI.value.unregisterToolsByExtension === 'function') {
+
+    if (
+      extensionAPI.value &&
+      typeof extensionAPI.value.unregisterToolsByExtension === "function"
+    ) {
       extensionAPI.value.unregisterToolsByExtension(id)
     }
-    
+
     loadedExtensions.value.delete(id)
     console.log(`[AppStore] Extension unloaded: ${id}`)
     return true
@@ -171,18 +179,22 @@ export const useAppStore = defineStore("app", () => {
   function toggleExtension(id) {
     const extensionData = getExtension(id)
     if (!extensionData) return false
-    
+
     extensionData.enabled = !extensionData.enabled
-    console.log(`[AppStore] Extension ${extensionData.enabled ? 'enabled' : 'disabled'}: ${id}`)
+    console.log(
+      `[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${id}`,
+    )
     return extensionData.enabled
   }
 
   function setExtensionEnabled(id, enabled) {
     const extensionData = getExtension(id)
     if (!extensionData) return false
-    
+
     extensionData.enabled = enabled
-    console.log(`[AppStore] Extension ${enabled ? 'enabled' : 'disabled'}: ${id}`)
+    console.log(
+      `[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${id}`,
+    )
     return true
   }
 
