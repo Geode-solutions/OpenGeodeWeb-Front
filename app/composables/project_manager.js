@@ -92,18 +92,9 @@ export function useProjectManager() {
     const items = Object.entries(snapshotDataBase).map(function (pair) {
       const id = pair[0]
       const item = pair[1]
-      const binaryLightViewable =
-        item && item.vtk_js && item.vtk_js.binary_light_viewable
-          ? item.vtk_js.binary_light_viewable
-          : undefined
       return {
         id: id,
-        object_type: item.object_type,
-        geode_object: item.geode_object,
-        native_filename: item.native_filename,
-        viewable_filename: item.viewable_filename,
-        displayed_name: item.displayed_name,
-        vtk_js: { binary_light_viewable: binaryLightViewable },
+        ...item,
       }
     })
 

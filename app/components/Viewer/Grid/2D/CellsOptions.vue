@@ -1,5 +1,5 @@
 <template>
-  <ViewerGenericMeshPolygonsOptions
+  <ViewerGenericMeshCellsOptions
     :itemProps="props.itemProps"
     :btn_image="Grid2D_Cells"
     tooltip="Cells options"
@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-  import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions.vue"
+  import ViewerGenericMeshCellsOptions from "@ogw_front/components/Viewer/Generic/Mesh/CellsOptions.vue"
   import Grid2D_Cells from "@ogw_front/assets/viewer_svgs/grid_2d_cells.svg"
 
   const props = defineProps({

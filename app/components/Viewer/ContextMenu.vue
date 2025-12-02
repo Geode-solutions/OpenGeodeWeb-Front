@@ -104,8 +104,8 @@
 
   const menu_items = computed(() =>
     menuStore.getMenuItems(
-      meta_data.value.object_type,
-      meta_data.value.geode_object,
+      meta_data.value.viewer_type,
+      meta_data.value.geode_object_type,
     ),
   )
 
