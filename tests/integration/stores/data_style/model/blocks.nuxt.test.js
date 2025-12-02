@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "../../../../../internal/utils/viewer_call.js"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -44,14 +43,11 @@ describe("Model blocks", () => {
       const block_ids = dataBaseStore.getBlocksUuids(id)
       const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
       const visibility = false
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelBlocksVisibility(id, block_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: model_blocks_schemas.visibility,
-          params: { id, block_ids: block_flat_indexes, visibility },
-        },
+        model_blocks_schemas.visibility,
+        { id, block_ids: block_flat_indexes, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -73,14 +69,11 @@ describe("Model blocks", () => {
   //     const block_ids = dataBaseStore.getBlocksUuids(id)
   //     const block_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
   //     const color = { r: 255, g: 0, b: 0 }
-  //     const spy = vi.spyOn(composables, "viewer_call")
+  //     const spy = vi.spyOn(viewerStore, "request")
   //     await dataStyleStore.setModelBlocksColor(id, block_ids, color)
   //     expect(spy).toHaveBeenCalledWith(
-  //       expect.anything(), // microservice,
-  //       {
-  //         schema: model_blocks_schemas.color,
-  //         params: { id, block_ids: block_flat_indexes, color },
-  //       },
+  //       model_blocks_schemas.color,
+  //       { id, block_ids: block_flat_indexes, color },
   //       {
   //         response_function: expect.any(Function),
   //       },

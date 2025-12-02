@@ -4,7 +4,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import Status from "@ogw_front/utils/status"
-import * as composables from "../../../../../internal/utils/viewer_call.js"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import {
   delete_folder_recursive,
@@ -37,14 +36,11 @@ describe("Model points", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelPointsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: model_points_schemas.visibility,
-          params: { id, visibility },
-        },
+        model_points_schemas.visibility,
+        { id, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -59,14 +55,11 @@ describe("Model points", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const size = 20
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelPointsSize(id, size)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: model_points_schemas.size,
-          params: { id, size },
-        },
+        model_points_schemas.size,
+        { id, size },
         {
           response_function: expect.any(Function),
         },

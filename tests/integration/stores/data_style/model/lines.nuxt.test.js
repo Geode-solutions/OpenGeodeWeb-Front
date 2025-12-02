@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "../../../../../internal/utils/viewer_call.js"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -40,14 +39,11 @@ describe("Model lines", () => {
       const line_ids = dataBaseStore.getLinesUuids(id)
       const lines_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
       const visibility = false
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelLinesVisibility(id, line_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: model_lines_schemas.visibility,
-          params: { id, block_ids: lines_flat_indexes, visibility },
-        },
+        model_lines_schemas.visibility,
+        { id, block_ids: lines_flat_indexes, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -67,14 +63,11 @@ describe("Model lines", () => {
       const line_ids = dataBaseStore.getLinesUuids(id)
       const lines_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
       const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelLinesColor(id, line_ids, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: model_lines_schemas.color,
-          params: { id, block_ids: lines_flat_indexes, color },
-        },
+        model_lines_schemas.color,
+        { id, block_ids: lines_flat_indexes, color },
         {
           response_function: expect.any(Function),
         },

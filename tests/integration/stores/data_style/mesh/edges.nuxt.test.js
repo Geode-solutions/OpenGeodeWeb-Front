@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "../../../../../internal/utils/viewer_call.js"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -41,14 +40,11 @@ describe("Mesh edges", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshEdgesVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: mesh_edges_schemas.visibility,
-          params: { id, visibility },
-        },
+        mesh_edges_schemas.visibility,
+        { id, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -63,14 +59,11 @@ describe("Mesh edges", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshEdgesColor(id, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: mesh_edges_schemas.color,
-          params: { id, color },
-        },
+        mesh_edges_schemas.color,
+        { id, color },
         {
           response_function: expect.any(Function),
         },

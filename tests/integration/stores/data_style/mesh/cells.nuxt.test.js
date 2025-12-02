@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "../../../../internal/utils/viewer_call"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -42,14 +41,11 @@ describe("Mesh cells", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshCellsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: mesh_cells_schemas.visibility,
-          params: { id, visibility },
-        },
+        mesh_cells_schemas.visibility,
+        { id, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -64,14 +60,11 @@ describe("Mesh cells", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshCellsColor(id, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: mesh_cells_schemas.color,
-          params: { id, color },
-        },
+        mesh_cells_schemas.color,
+        { id, color },
         {
           response_function: expect.any(Function),
         },
@@ -86,13 +79,11 @@ describe("Mesh cells", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const vertex_attribute = { name: "points" }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshCellsVertexAttribute(id, vertex_attribute)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: mesh_cells_schemas.vertex_attribute,
-          params: { id, ...vertex_attribute },
-        },
+        mesh_cells_schemas.vertex_attribute,
+        { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
@@ -109,13 +100,11 @@ describe("Mesh cells", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const cell_attribute = { name: "RGB_data" }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshCellsCellAttribute(id, cell_attribute)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: mesh_cells_schemas.cell_attribute,
-          params: { id, ...cell_attribute },
-        },
+        mesh_cells_schemas.cell_attribute,
+        { id, ...cell_attribute },
         {
           response_function: expect.any(Function),
         },

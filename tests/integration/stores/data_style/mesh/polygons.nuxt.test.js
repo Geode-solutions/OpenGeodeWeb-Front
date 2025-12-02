@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "../../../../../internal/utils/viewer_call.js"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -42,14 +41,11 @@ describe("Mesh polygons", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPolygonsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: mesh_polygons_schemas.visibility,
-          params: { id, visibility },
-        },
+        mesh_polygons_schemas.visibility,
+        { id, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -64,14 +60,11 @@ describe("Mesh polygons", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPolygonsColor(id, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: mesh_polygons_schemas.color,
-          params: { id, color },
-        },
+        mesh_polygons_schemas.color,
+        { id, color },
         {
           response_function: expect.any(Function),
         },
@@ -86,14 +79,11 @@ describe("Mesh polygons", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const vertex_attribute = { name: "points" }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPolygonsVertexAttribute(id, vertex_attribute)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice,
-        {
-          schema: mesh_polygons_schemas.vertex_attribute,
-          params: { id, ...vertex_attribute },
-        },
+        mesh_polygons_schemas.vertex_attribute,
+        { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
@@ -110,16 +100,14 @@ describe("Mesh polygons", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const polygon_attribute = { name: "test_attribute" }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPolygonsPolygonAttribute(
         id,
         polygon_attribute,
       )
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: mesh_polygons_schemas.polygon_attribute,
-          params: { id, ...polygon_attribute },
-        },
+        mesh_polygons_schemas.polygon_attribute,
+        { id, ...polygon_attribute },
         {
           response_function: expect.any(Function),
         },

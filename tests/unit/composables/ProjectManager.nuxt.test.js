@@ -5,7 +5,6 @@ import { createTestingPinia } from "@pinia/testing"
 // Local imports
 import { useProjectManager } from "@ogw_front/composables/project_manager.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
-import { viewer_call } from "../../../internal/utils/viewer_call.js"
 
 // Snapshot
 const snapshotMock = {
@@ -96,8 +95,9 @@ const hybridViewerStoreMock = {
       hybridViewerStoreMock.setZScaling(snapshot.zScale)
     }
     if (snapshot?.camera_options) {
-      const { viewer_call } =
-        await import("../../../internal/utils/viewer_call.js")
+      const { viewer_call } = await import(
+        "../../../internal/utils/viewer_call.js"
+      )
       viewer_call({
         schema: { $id: "opengeodeweb_viewer.viewer.update_camera" },
         params: { camera_options: snapshot.camera_options },
@@ -191,8 +191,9 @@ describe("ProjectManager composable (compact)", () => {
         (v) => typeof v === "function" && v.mockClear && v.mockClear(),
       )
     }
-    const { viewer_call } =
-      await import("../../../internal/utils/viewer_call.js")
+    const { viewer_call } = await import(
+      "../../../internal/utils/viewer_call.js"
+    )
     viewer_call.mockClear()
   })
 
@@ -213,8 +214,9 @@ describe("ProjectManager composable (compact)", () => {
 
     await importProjectFile(file)
 
-    const { viewer_call } =
-      await import("../../../internal/utils/viewer_call.js")
+    const { viewer_call } = await import(
+      "../../../internal/utils/viewer_call.js"
+    )
 
     expect(viewerStoreMock.ws_connect).toHaveBeenCalled()
     expect(viewer_call).toHaveBeenCalledTimes(2)

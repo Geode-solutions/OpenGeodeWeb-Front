@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "../../../../../internal/utils/viewer_call.js"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -41,14 +40,11 @@ describe("Mesh polyhedra", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPolyhedraVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice
-        {
-          schema: mesh_polyhedra_schemas.visibility,
-          params: { id, visibility },
-        },
+        mesh_polyhedra_schemas.visibility,
+        { id, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -76,14 +72,11 @@ describe("Mesh polyhedra", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPolyhedraColor(id, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.anything(), // microservice
-        {
-          schema: mesh_polyhedra_schemas.color,
-          params: { id, color },
-        },
+        mesh_polyhedra_schemas.color,
+        { id, color },
         {
           response_function: expect.any(Function),
         },
