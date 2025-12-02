@@ -47,7 +47,7 @@ describe("Model corners", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: model_corners_schemas.visibility,
           params: { id, block_ids: corner_flat_indexes, visibility },
@@ -76,7 +76,7 @@ describe("Model corners", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelCornersColor(id, corner_ids, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: model_corners_schemas.color,
           params: { id, block_ids: corner_flat_indexes, color },

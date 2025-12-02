@@ -40,7 +40,7 @@ describe("Model points", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelPointsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: model_points_schemas.visibility,
           params: { id, visibility },
@@ -62,7 +62,7 @@ describe("Model points", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelPointsSize(id, size)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: model_points_schemas.size,
           params: { id, size },

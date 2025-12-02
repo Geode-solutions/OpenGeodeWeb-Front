@@ -45,6 +45,7 @@ describe("Mesh cells", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshCellsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
+        expect.anything(), // microservice,
         {
           schema: mesh_cells_schemas.visibility,
           params: { id, visibility },
@@ -66,6 +67,7 @@ describe("Mesh cells", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshCellsColor(id, color)
       expect(spy).toHaveBeenCalledWith(
+        expect.anything(), // microservice,
         {
           schema: mesh_cells_schemas.color,
           params: { id, color },

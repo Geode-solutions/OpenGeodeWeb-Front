@@ -45,7 +45,7 @@ describe("Mesh polygons", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshPolygonsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: mesh_polygons_schemas.visibility,
           params: { id, visibility },
@@ -67,7 +67,7 @@ describe("Mesh polygons", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshPolygonsColor(id, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: mesh_polygons_schemas.color,
           params: { id, color },
@@ -89,6 +89,7 @@ describe("Mesh polygons", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshPolygonsVertexAttribute(id, vertex_attribute)
       expect(spy).toHaveBeenCalledWith(
+        expect.anything(), // microservice,
         {
           schema: mesh_polygons_schemas.vertex_attribute,
           params: { id, ...vertex_attribute },

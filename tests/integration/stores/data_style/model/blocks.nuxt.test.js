@@ -47,7 +47,7 @@ describe("Model blocks", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelBlocksVisibility(id, block_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: model_blocks_schemas.visibility,
           params: { id, block_ids: block_flat_indexes, visibility },
@@ -76,7 +76,7 @@ describe("Model blocks", () => {
   //     const spy = vi.spyOn(composables, "viewer_call")
   //     await dataStyleStore.setModelBlocksColor(id, block_ids, color)
   //     expect(spy).toHaveBeenCalledWith(
-  //       expect.objectContaining({ client: expect.anything() }),
+  //       expect.anything(), // microservice,
   //       {
   //         schema: model_blocks_schemas.color,
   //         params: { id, block_ids: block_flat_indexes, color },

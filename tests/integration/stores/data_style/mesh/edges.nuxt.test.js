@@ -44,7 +44,7 @@ describe("Mesh edges", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshEdgesVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: mesh_edges_schemas.visibility,
           params: { id, visibility },
@@ -66,7 +66,7 @@ describe("Mesh edges", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setMeshEdgesColor(id, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: mesh_edges_schemas.color,
           params: { id, color },

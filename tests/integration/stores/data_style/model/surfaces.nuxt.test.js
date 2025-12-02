@@ -51,7 +51,7 @@ describe("Model surfaces", () => {
         visibility,
       )
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: model_surfaces_schemas.visibility,
           params: { id, block_ids: surface_flat_indexes, visibility },
@@ -80,7 +80,7 @@ describe("Model surfaces", () => {
       const spy = vi.spyOn(composables, "viewer_call")
       await dataStyleStore.setModelSurfacesColor(id, surface_ids, color)
       expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({ client: expect.anything() }),
+        expect.anything(), // microservice,
         {
           schema: model_surfaces_schemas.color,
           params: { id, block_ids: surface_flat_indexes, color },
