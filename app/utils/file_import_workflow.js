@@ -63,7 +63,7 @@ async function importFile(filename, geode_object_type) {
       geode_object_type,
       filename,
     },
-  )
+  })
 
   console.log("data.value", data.value)
   console.log("data.value", data._value)
