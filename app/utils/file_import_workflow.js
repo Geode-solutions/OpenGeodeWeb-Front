@@ -66,7 +66,10 @@ async function importFile(filename, geode_object_type) {
     },
   )
 
-  const item = buildImportItemFromPayloadApi(response._data, geode_object_type)
+  const item = buildImportItemFromPayloadApi(
+    response.data.value,
+    geode_object_type,
+  )
   return importItem(item)
 }
 

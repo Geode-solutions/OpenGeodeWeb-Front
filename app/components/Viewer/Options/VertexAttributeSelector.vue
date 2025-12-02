@@ -31,15 +31,6 @@
     model.value = vertex_attribute
   })
 
-  const props = defineProps({
-    id: { type: String, required: true },
-  })
-
-  const dataBaseStore = useDataBaseStore()
-  const geodeStore = useGeodeStore()
-
-  const vertex_attribute_names = ref([])
-
   onMounted(() => {
     getVertexAttributes()
   })
