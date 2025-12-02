@@ -28,12 +28,9 @@ export function useModelBlocksStyle() {
   function setModelBlocksVisibility(id, block_ids, visibility) {
     const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      {
-        schema: model_blocks_schemas.visibility,
-        params: { id, block_ids: blocks_flat_indexes, visibility },
-      },
+    return viewerStore.request(
+      model_blocks_schemas.visibility,
+      { id, block_ids: blocks_flat_indexes, visibility },
       {
         response_function: () => {
           for (const block_id of block_ids) {
@@ -60,12 +57,9 @@ export function useModelBlocksStyle() {
   function setModelBlocksColor(id, block_ids, color) {
     const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      {
-        schema: model_blocks_schemas.color,
-        params: { id, block_ids: blocks_flat_indexes, color },
-      },
+    return viewerStore.request(
+      model_blocks_schemas.color,
+      { id, block_ids: blocks_flat_indexes, color },
       {
         response_function: () => {
           for (const block_id of block_ids) {

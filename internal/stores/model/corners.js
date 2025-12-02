@@ -28,12 +28,9 @@ export function useModelCornersStyle() {
   function setModelCornersVisibility(id, corner_ids, visibility) {
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      {
-        schema: model_corners_schemas.visibility,
-        params: { id, block_ids: corner_flat_indexes, visibility },
-      },
+    return viewerStore.request(
+      model_corners_schemas.visibility,
+      { id, block_ids: corner_flat_indexes, visibility },
       {
         response_function: () => {
           for (const corner_id of corner_ids) {
@@ -61,12 +58,9 @@ export function useModelCornersStyle() {
   function setModelCornersColor(id, corner_ids, color) {
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      {
-        schema: model_corners_schemas.color,
-        params: { id, block_ids: corner_flat_indexes, color },
-      },
+    return viewerStore.request(
+      model_corners_schemas.color,
+      { id, block_ids: corner_flat_indexes, color },
       {
         response_function: () => {
           for (const corner_id of corner_ids) {

@@ -17,9 +17,9 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsVisibility(id, visibility) {
     const polygons_style = meshPolygonsStyle(id)
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      { schema: mesh_polygons_schemas.visibility, params: { id, visibility } },
+    return viewerStore.request(
+      mesh_polygons_schemas.visibility,
+      { id, visibility },
       {
         response_function: () => {
           polygons_style.visibility = visibility
@@ -39,9 +39,9 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsColor(id, color) {
     const coloring_style = meshPolygonsStyle(id).coloring
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      { schema: mesh_polygons_schemas.color, params: { id, color } },
+    return viewerStore.request(
+      mesh_polygons_schemas.color,
+      { id, color },
       {
         response_function: () => {
           coloring_style.color = color
@@ -61,12 +61,9 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsTextures(id, textures) {
     const coloring_style = meshPolygonsStyle(id).coloring
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      {
-        schema: mesh_polygons_schemas.apply_textures,
-        params: { id, textures },
-      },
+    return viewerStore.request(
+      mesh_polygons_schemas.apply_textures,
+      { id, textures },
       {
         response_function: () => {
           coloring_style.textures = textures
@@ -87,12 +84,9 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPolygonsStyle(id).coloring
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      {
-        schema: mesh_polygons_schemas.vertex_attribute,
-        params: { id, ...vertex_attribute },
-      },
+    return viewerStore.request(
+      mesh_polygons_schemas.vertex_attribute,
+      { id, ...vertex_attribute },
       {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
@@ -112,12 +106,9 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsPolygonAttribute(id, polygon_attribute) {
     const coloring_style = meshPolygonsStyle(id).coloring
     const viewerStore = useViewerStore()
-    return viewer_call(
-      viewerStore,
-      {
-        schema: mesh_polygons_schemas.polygon_attribute,
-        params: { id, ...polygon_attribute },
-      },
+    return viewerStore.request(
+      mesh_polygons_schemas.polygon_attribute,
+      { id, ...polygon_attribute },
       {
         response_function: () => {
           coloring_style.polygon = polygon_attribute

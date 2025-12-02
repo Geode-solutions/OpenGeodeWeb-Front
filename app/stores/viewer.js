@@ -106,8 +106,9 @@ export const useViewerStore = defineStore("viewer", {
         })
 
         // Connect
-        const { connectImageStream } =
-          await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+        const { connectImageStream } = await import(
+          "@kitware/vtk.js/Rendering/Misc/RemoteView"
+        )
         const viewerStore = this
         return new Promise((resolve, reject) => {
           clientToConnect
@@ -116,8 +117,6 @@ export const useViewerStore = defineStore("viewer", {
               connectImageStream(validClient.getConnection().getSession())
               viewerStore.client = validClient
               clientToConnect.endBusy()
-
-              // Now that the client is ready let's setup the server for us
               viewer_call(viewerStore, {
                 schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
               })
