@@ -58,11 +58,11 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    input_geode_object: { type: String, required: true },
+    geode_object_type: { type: String, required: true },
     filenames: { type: Array, required: true },
   })
 
-  const { multiple, input_geode_object, filenames } = props
+  const { multiple, geode_object_type, filenames } = props
 
   const accept = ref("")
   const loading = ref(false)

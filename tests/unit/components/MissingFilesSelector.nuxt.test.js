@@ -45,7 +45,7 @@ describe("MissingFilesSelector.vue", async () => {
       },
       props: {
         multiple: false,
-        input_geode_object: "BRep",
+        geode_object_type: "BRep",
         filenames: ["fake_file.txt"],
       },
     })

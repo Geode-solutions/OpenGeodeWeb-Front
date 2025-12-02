@@ -142,9 +142,9 @@
     toggle_loading()
   }
 
-  function set_geode_object(input_geode_object) {
-    if (input_geode_object) {
-      emit("update_values", { input_geode_object })
+  function set_geode_object(geode_object_type) {
+    if (geode_object_type) {
+      emit("update_values", { geode_object_type })
       emit("increment_step")
     }
   }
@@ -156,6 +156,7 @@
     filter: opacity(0.7);
     cursor: pointer;
   }
+
   .disabled div {
     cursor: not-allowed;
   }

@@ -77,8 +77,11 @@
       await geodeStore.request(
         back_schemas.opengeodeweb_back.save_viewable_file,
         {
-          input_geode_object: "RasterImage2D",
-          filename: value[0].name,
+          schema: back_schemas.opengeodeweb_back.save_viewable_file,
+          params: {
+            geode_object_type: "RasterImage2D",
+            filename: value[0].name,
+          },
         },
         {
           response_function: async (response) => {

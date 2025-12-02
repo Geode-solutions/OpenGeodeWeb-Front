@@ -57,7 +57,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const reader = vtkXMLPolyDataReader.newInstance()
     const textEncoder = new TextEncoder()
     await reader.parseAsArrayBuffer(
-      textEncoder.encode(value.vtk_js.binary_light_viewable),
+      textEncoder.encode(value.binary_light_viewable),
     )
     const polydata = reader.getOutputData(0)
     const mapper = vtkMapper.newInstance()

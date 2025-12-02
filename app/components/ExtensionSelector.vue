@@ -67,10 +67,10 @@
   ])
 
   const props = defineProps({
-    input_geode_object: { type: String, required: true },
+    geode_object_type: { type: String, required: true },
     filenames: { type: Array, required: true },
   })
-  const { input_geode_object, filenames } = props
+  const { geode_object_type, filenames } = props
   const geode_objects_and_output_extensions = ref({})
   const loading = ref(false)
 

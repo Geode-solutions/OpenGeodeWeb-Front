@@ -64,7 +64,7 @@ const Grid2D_menu = [
 const Grid3D_menu = [
   Grid3DPointsOptions,
   Grid3DEdgesOptions,
-  Grid3DFacetsOptions,
+  // Grid3DFacetsOptions,
   Grid3DCellsOptions,
 ]
 

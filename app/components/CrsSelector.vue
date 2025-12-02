@@ -34,11 +34,11 @@
   ])
 
   const props = defineProps({
-    input_geode_object: { type: String, required: true },
+    geode_object_type: { type: String, required: true },
     key_to_update: { type: String, required: true },
   })
 
-  const { input_geode_object, key_to_update } = props
+  const { geode_object_type, key_to_update } = props
 
   const search = ref("")
   const data_table_loading = ref(false)
@@ -64,8 +64,7 @@
   }
 
   async function get_crs_table() {
-    const params = { input_geode_object }
-    const geodeStore = useGeodeStore()
+    const params = { geode_object_type }
     toggle_loading()
     await geodeStore.request(schema, params, {
       response_function: (response) => {

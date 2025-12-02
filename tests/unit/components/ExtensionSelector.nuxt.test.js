@@ -58,7 +58,7 @@ describe("ExtensionSelector.vue", async () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { input_geode_object: "BRep", filenames: ["test.toto"] },
+      props: { geode_object_type: "BRep", filenames: ["test.toto"] },
     })
     await nextTick()
     expect(wrapper.exists()).toBe(true)

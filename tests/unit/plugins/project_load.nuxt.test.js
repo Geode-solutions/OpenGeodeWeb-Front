@@ -52,12 +52,12 @@ describe("Project import", () => {
       dataBase: {
         db: {
           abc123: {
-            object_type: "mesh",
-            geode_object: "PointSet2D",
-            native_filename: "native.ext",
-            viewable_filename: "viewable.ext",
-            displayed_name: "My Data",
-            vtk_js: { binary_light_viewable: "VGxpZ2h0RGF0YQ==" },
+            viewer_type: "mesh",
+            geode_object_type: "PointSet2D",
+            native_file: "native.ext",
+            viewable_file: "viewable.ext",
+            name: "My Data",
+            binary_light_viewable: "VGxpZ2h0RGF0YQ==",
           },
         },
       },
