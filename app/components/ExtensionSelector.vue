@@ -79,27 +79,22 @@
   async function get_output_file_extensions() {
     toggle_loading()
     geode_objects_and_output_extensions.value = {}
-    var promise_array = []
-    for (const filename of filenames) {
-      const params = { geode_object_type, filename }
-      const promise = new Promise((resolve, reject) => {
-        api_fetch(
-          { schema, params },
-          {
-            request_error_function: () => {
-              reject()
-            },
-            response_function: (response) => {
-              resolve(response._data.geode_objects_and_output_extensions)
-            },
-            response_error_function: () => {
-              reject()
-            },
+    const geodeStore = useGeodeStore()
+    const promise_array = filenames.map((filename) => {
+      return new Promise((resolve, reject) => {
+        const params = {
+          geode_object_type,
+          filename,
+        }
+        geodeStore.request(schema, params, {
+          request_error_function: () => reject(),
+          response_function: (response) => {
+            resolve(response._data.geode_objects_and_output_extensions)
           },
-        )
+          response_error_function: () => reject(),
+        })
       })
-      promise_array.push(promise)
-    }
+    })
     const values = await Promise.all(promise_array)
     const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
     const common_keys = all_keys.filter(

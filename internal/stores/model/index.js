@@ -27,11 +27,10 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
-    return viewer_call(
-      {
-        schema: model_schemas.visibility,
-        params: { id, visibility },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      model_schemas.visibility,
+      { id, visibility },
       {
         response_function: () => {
           dataStyleStore.getStyle(id).visibility = visibility
@@ -83,11 +82,10 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).color
   }
   function setModelColor(id, color) {
-    return viewer_call(
-      {
-        schema: model_schemas.color,
-        params: { id, color },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      model_schemas.color,
+      { id, color },
       {
         response_function: () => {
           dataStyleStore.styles[id].color = color

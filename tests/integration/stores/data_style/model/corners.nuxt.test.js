@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "@ogw_front/composables/viewer_call"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -44,13 +43,11 @@ describe("Model corners", () => {
       const corner_ids = dataBaseStore.getCornersUuids(id)
       const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
       const visibility = false
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_corners_schemas.visibility,
-          params: { id, block_ids: corner_flat_indexes, visibility },
-        },
+        model_corners_schemas.visibility,
+        { id, block_ids: corner_flat_indexes, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -72,13 +69,11 @@ describe("Model corners", () => {
       const corner_ids = dataBaseStore.getCornersUuids(id)
       const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
       const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelCornersColor(id, corner_ids, color)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_corners_schemas.color,
-          params: { id, block_ids: corner_flat_indexes, color },
-        },
+        model_corners_schemas.color,
+        { id, block_ids: corner_flat_indexes, color },
         {
           response_function: expect.any(Function),
         },

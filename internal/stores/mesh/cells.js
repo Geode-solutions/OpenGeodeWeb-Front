@@ -3,7 +3,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local constants
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells
-
 export function useMeshCellsStyle() {
   const dataStyleStore = useDataStyleStore()
 
@@ -16,8 +15,10 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsVisibility(id, visibility) {
     const cells_style = meshCellsStyle(id)
-    return viewer_call(
-      { schema: mesh_cells_schemas.visibility, params: { id, visibility } },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      mesh_cells_schemas.visibility,
+      { id, visibility },
       {
         response_function: () => {
           cells_style.visibility = visibility
@@ -36,8 +37,10 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsColor(id, color) {
     const coloring_style = meshCellsStyle(id).coloring
-    return viewer_call(
-      { schema: mesh_cells_schemas.color, params: { id, color } },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      mesh_cells_schemas.color,
+      { id, color },
       {
         response_function: () => {
           coloring_style.color = color
@@ -56,11 +59,10 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsTextures(id, textures) {
     const coloring_style = meshCellsStyle(id).coloring
-    return viewer_call(
-      {
-        schema: mesh_cells_schemas.apply_textures,
-        params: { id, textures },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      mesh_cells_schemas.apply_textures,
+      { id, textures },
       {
         response_function: () => {
           coloring_style.textures = textures
@@ -76,11 +78,10 @@ export function useMeshCellsStyle() {
 
   function setMeshCellsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshCellsStyle(id).coloring
-    return viewer_call(
-      {
-        schema: mesh_cells_schemas.vertex_attribute,
-        params: { id, ...vertex_attribute },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      mesh_cells_schemas.vertex_attribute,
+      { id, ...vertex_attribute },
       {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
@@ -99,11 +100,10 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsCellAttribute(id, cell_attribute) {
     const coloring_style = meshCellsStyle(id).coloring
-    return viewer_call(
-      {
-        schema: mesh_cells_schemas.cell_attribute,
-        params: { id, ...cell_attribute },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      mesh_cells_schemas.cell_attribute,
+      { id, ...cell_attribute },
       {
         response_function: () => {
           coloring_style.cell = cell_attribute

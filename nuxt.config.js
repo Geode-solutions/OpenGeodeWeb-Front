@@ -16,7 +16,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
   ],
   imports: {
-    dirs: ["app/stores", "app/composables"],
+    dirs: ["app/stores", "app/composables", "app/utils", "internal/utils"],
   },
 
   alias: {

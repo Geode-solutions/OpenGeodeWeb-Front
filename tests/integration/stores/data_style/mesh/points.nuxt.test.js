@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "@ogw_front/composables/viewer_call"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -41,13 +40,11 @@ describe("Mesh points", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPointsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: mesh_points_schemas.visibility,
-          params: { id, visibility },
-        },
+        mesh_points_schemas.visibility,
+        { id, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -62,13 +59,11 @@ describe("Mesh points", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPointsColor(id, color)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: mesh_points_schemas.color,
-          params: { id, color },
-        },
+        mesh_points_schemas.color,
+        { id, color },
         {
           response_function: expect.any(Function),
         },
@@ -98,13 +93,11 @@ describe("Mesh points", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const size = 20
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPointsSize(id, size)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: mesh_points_schemas.size,
-          params: { id, size },
-        },
+        mesh_points_schemas.size,
+        { id, size },
         {
           response_function: expect.any(Function),
         },

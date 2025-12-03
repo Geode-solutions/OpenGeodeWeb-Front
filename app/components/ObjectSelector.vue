@@ -108,13 +108,13 @@
   async function get_allowed_objects() {
     toggle_loading()
     allowed_objects.value = {}
+    const geodeStore = useGeodeStore()
     const promise_array = filenames.map((filename) => {
-      const params = { filename }
-      return api_fetch({ schema, params })
+      return geodeStore.request(schema, { filename })
     })
     const responses = await Promise.all(promise_array)
     const allowed_objects_list = responses.map(
-      (response) => response.data.value.allowed_objects,
+      (r) => r.data.value.allowed_objects,
     )
     const all_keys = [...new Set(allowed_objects_list.flatMap(Object.keys))]
     const common_keys = all_keys.filter((key) =>

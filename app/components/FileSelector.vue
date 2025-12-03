@@ -55,16 +55,11 @@
 
   async function get_allowed_files() {
     toggle_loading()
-    await api_fetch(
-      { schema },
-      {
-        response_function: (response) => {
-          accept.value = response._data.extensions
-            .map((extension) => "." + extension)
-            .join(",")
-        },
-      },
-    )
+    const geodeStore = useGeodeStore()
+    const response = await geodeStore.request(schema, {})
+    accept.value = response.data.value.extensions
+      .map((extension) => "." + extension)
+      .join(",")
     toggle_loading()
   }
   await get_allowed_files()

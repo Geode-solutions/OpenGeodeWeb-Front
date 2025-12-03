@@ -25,35 +25,23 @@
     schema: { type: Object, required: true },
   })
 
-  const geode_store = useGeodeStore()
+  const geodeStore = useGeodeStore()
   const packages_versions = ref([])
 
   async function get_packages_versions() {
-    const array_promise = []
-
-    const promise = new Promise((resolve, reject) => {
-      api_fetch(
-        { schema: props.schema },
-        {
-          request_error_function: () => {
-            reject()
-          },
-          response_function: (response) => {
-            packages_versions.value = response._data.versions
-            resolve()
-          },
-          response_error_function: () => {
-            reject()
-          },
+    await geodeStore.request(
+      props.schema,
+      {},
+      {
+        response_function: (response) => {
+          packages_versions.value = response._data.versions
         },
-      )
-    })
-    array_promise.push(promise)
-    await Promise.all(array_promise)
+      },
+    )
   }
 
   watch(
-    () => geode_store.status,
+    () => geodeStore.status,
     (value) => {
       if (value == Status.CONNECTED) get_packages_versions()
     },

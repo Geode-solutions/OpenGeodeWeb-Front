@@ -15,11 +15,10 @@ export function useModelEdgesStyle() {
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    return viewer_call(
-      {
-        schema: model_edges_schemas.visibility,
-        params: { id, visibility },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      model_edges_schemas.visibility,
+      { id, visibility },
       {
         response_function: () => {
           modelEdgesStyle(id).visibility = visibility
