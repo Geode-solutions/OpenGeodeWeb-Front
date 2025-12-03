@@ -51,9 +51,10 @@
       :key="step_index"
       :is="steps[step_index].component.component_name"
       v-bind="steps[step_index].component.component_options"
-      @update_values="update_values_event"
       @increment_step="increment_step"
       @decrement_step="decrement_step"
+      @update_values="update_values_event"
+      @reset_values="$emit('reset_values')"
     />
   </v-stepper-content>
 </template>
