@@ -252,7 +252,7 @@ describe("Infra Store", () => {
         })
 
         expect(infra_store.microservices.length).toBe(1)
-        expect(infra_store.microservices[0].store.$id).toBe("geode")
+        expect(infra_store.microservices[0].$id).toBe("geode")
       })
 
       test("register multiple microservices", () => {

@@ -17,30 +17,20 @@ export const useInfraStore = defineStore("infra", {
     },
     microservices_connected() {
       return this.microservices.every(
-        (m) => m.store.status === Status.CONNECTED,
+        (store) => store.status === Status.CONNECTED,
       )
     },
     microservices_busy() {
-      return this.microservices.some((m) => m.store.is_busy === true)
+      return this.microservices.some((store) => store.is_busy === true)
     },
   },
   actions: {
-    register_microservice(store, methods) {
+    register_microservice(store) {
       const store_name = store.$id
       console.log("[INFRA] Registering microservice:", store_name)
 
-      if (
-        !this.microservices.find(
-          (microservice) => microservice.store.$id === store_name,
-        )
-      ) {
-        const { request, connect, launch } = methods || {
-          request: store.request?.bind(store),
-          connect: store.connect?.bind(store),
-          launch: store.launch?.bind(store),
-        }
-
-        this.microservices.push({ store, request, connect, launch })
+      if (!this.microservices.find((store) => store.$id === store_name)) {
+        this.microservices.push(store)
         console.log("[INFRA] Microservice registered:", store_name)
       }
     },
@@ -48,7 +38,7 @@ export const useInfraStore = defineStore("infra", {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode)
       console.log(
         "[INFRA] Registered microservices:",
-        this.microservices.map((microservice) => microservice.store.$id),
+        this.microservices.map((store) => store.$id),
       )
 
       if (this.status === Status.CREATED) return
@@ -61,16 +51,16 @@ export const useInfraStore = defineStore("infra", {
         if (this.app_mode == appMode.DESKTOP) {
           console.log("[INFRA] DESKTOP mode - Launching microservices...")
           const microservices_with_launch = this.microservices.filter(
-            (microservice) => microservice.launch,
+            (store) => store.launch,
           )
 
-          const port_promises = microservices_with_launch.map((microservice) =>
-            microservice.launch(),
+          const port_promises = microservices_with_launch.map((store) =>
+            store.launch(),
           )
           const ports = await Promise.all(port_promises)
 
-          microservices_with_launch.forEach((microservice, index) => {
-            microservice.store.$patch({ default_local_port: ports[index] })
+          microservices_with_launch.forEach((store, index) => {
+            store.$patch({ default_local_port: ports[index] })
           })
         } else if (this.app_mode == appMode.CLOUD) {
           console.log("[INFRA] CLOUD mode - Launching lambda...")
@@ -81,19 +71,25 @@ export const useInfraStore = defineStore("infra", {
 
         this.status = Status.CREATED
         console.log("[INFRA] Backend created successfully")
-        console.log("[INFRA] Connecting microservices...")
-        const connection_promises = this.microservices.map((microservice) => {
-          return microservice.connect(microservice.store).then(() => {
-            console.log(
-              "[INFRA] Microservice connected:",
-              microservice.store.$id,
-            )
-          })
-        })
-
-        await Promise.all(connection_promises)
-        console.log("[INFRA] All microservices connected")
+        return this.create_connection()
       })
+    },
+    async create_connection() {
+      console.log("[INFRA] Starting create_connection")
+      console.log(
+        "[INFRA] Connecting microservices:",
+        this.microservices.map((store) => store.$id),
+      )
+
+      const connection_promises = this.microservices.map((store) => {
+        return store.connect().then(() => {
+          console.log("[INFRA] Microservice connected:", store.$id)
+        })
+      })
+
+      await Promise.all(connection_promises)
+      console.log("[INFRA] All microservices connected")
+      return
     },
   },
   share: {

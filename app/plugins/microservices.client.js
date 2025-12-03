@@ -21,12 +21,5 @@ export default defineNuxtPlugin(() => {
   const viewerStore = useViewerStore()
   infraStore.register_microservice(viewerStore)
 
-  // Initialize stores that have export/import methods to ensure they're registered
-  console.log("[PLUGIN] Initializing stores for export/import registration...")
-  useDataBaseStore()
-  useDataStyleStore()
-  useHybridViewerStore()
-  useTreeviewStore()
-
   console.log("[PLUGIN] All microservices registered and stores initialized")
 })
