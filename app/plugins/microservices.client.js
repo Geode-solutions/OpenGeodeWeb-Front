@@ -1,10 +1,6 @@
 import { useGeodeStore } from "@ogw_front/stores/geode.js"
 import { useViewerStore } from "@ogw_front/stores/viewer.js"
 import { useInfraStore } from "@ogw_front/stores/infra.js"
-import { useDataBaseStore } from "@ogw_front/stores/data_base.js"
-import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer.js"
-import { useTreeviewStore } from "@ogw_front/stores/treeview.js"
 
 export default defineNuxtPlugin(() => {
   console.log("[PLUGIN] Initializing microservices plugin...")
