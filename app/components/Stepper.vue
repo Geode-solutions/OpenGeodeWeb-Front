@@ -7,7 +7,12 @@
   >
     <v-stepper-items>
       <v-col cols="12">
-        <Step v-for="(step, index) in steps" :key="step" :step_index="index" />
+        <Step
+          v-for="(step, index) in steps"
+          :key="step"
+          :step_index="index"
+          @reset_values="emit('reset_values')"
+        />
       </v-col>
     </v-stepper-items>
   </v-stepper-vertical>
@@ -16,6 +21,7 @@
 <script setup>
   import Step from "@ogw_front/components/Step.vue"
 
+  const emit = defineEmits(["reset_values"])
   const stepper_tree = inject("stepper_tree")
   const { steps, current_step_index } = toRefs(stepper_tree)
 </script>

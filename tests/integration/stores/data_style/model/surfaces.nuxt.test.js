@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "@ogw_front/composables/viewer_call"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -44,17 +43,15 @@ describe("Model surfaces", () => {
       const surface_ids = dataBaseStore.getSurfacesUuids(id)
       const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelSurfacesVisibility(
         id,
         surface_ids,
         visibility,
       )
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_surfaces_schemas.visibility,
-          params: { id, block_ids: surface_flat_indexes, visibility },
-        },
+        model_surfaces_schemas.visibility,
+        { id, block_ids: surface_flat_indexes, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -76,13 +73,11 @@ describe("Model surfaces", () => {
       const surface_ids = dataBaseStore.getSurfacesUuids(id)
       const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
       const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelSurfacesColor(id, surface_ids, color)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_surfaces_schemas.color,
-          params: { id, block_ids: surface_flat_indexes, color },
-        },
+        model_surfaces_schemas.color,
+        { id, block_ids: surface_flat_indexes, color },
         {
           response_function: expect.any(Function),
         },

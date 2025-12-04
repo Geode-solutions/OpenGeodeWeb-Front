@@ -45,6 +45,7 @@
   const crs_list = ref([])
   const selected_crs = ref([])
   const toggle_loading = useToggle(data_table_loading)
+  const geodeStore = useGeodeStore()
 
   watch(selected_crs, (new_value) => {
     const crs = get_selected_crs(new_value[0])
@@ -66,14 +67,11 @@
   async function get_crs_table() {
     const params = { geode_object_type }
     toggle_loading()
-    await api_fetch(
-      { schema, params },
-      {
-        response_function: (response) => {
-          crs_list.value = response._data.crs_list
-        },
+    await geodeStore.request(schema, params, {
+      response_function: (response) => {
+        crs_list.value = response._data.crs_list
       },
-    )
+    })
     toggle_loading()
   }
 

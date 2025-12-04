@@ -4,6 +4,7 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
+import { viewer_call } from "../../internal/utils/viewer_call.js"
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -107,25 +108,23 @@ export const useViewerStore = defineStore("viewer", {
         // Connect
         const { connectImageStream } =
           await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
-        const viewer_store = this
+        const viewerStore = this
         return new Promise((resolve, reject) => {
           clientToConnect
             .connect(config)
             .then((validClient) => {
               connectImageStream(validClient.getConnection().getSession())
-              viewer_store.client = validClient
+              viewerStore.client = validClient
               clientToConnect.endBusy()
-
-              // Now that the client is ready let's setup the server for us
-              viewer_call({
+              viewer_call(viewerStore, {
                 schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
               })
-              viewer_store.status = Status.CONNECTED
+              viewerStore.status = Status.CONNECTED
               resolve()
             })
             .catch((error) => {
               console.error("error", error)
-              viewer_store.status = Status.NOT_CONNECTED
+              viewerStore.status = Status.NOT_CONNECTED
               reject(error)
             })
         })
@@ -136,6 +135,34 @@ export const useViewerStore = defineStore("viewer", {
     },
     stop_request() {
       this.request_counter--
+    },
+    async launch() {
+      console.log("[VIEWER] Launching viewer microservice...")
+      const port = await window.electronAPI.run_viewer()
+      console.log("[VIEWER] Viewer launched on port:", port)
+      return port
+    },
+    async connect() {
+      console.log("[VIEWER] Connecting to viewer microservice...")
+      await this.ws_connect()
+      console.log("[VIEWER] Viewer connected successfully")
+    },
+    request(schema, params = {}, callbacks = {}) {
+      console.log("[VIEWER] Request:", schema.$id)
+
+      return viewer_call(
+        this,
+        { schema, params },
+        {
+          ...callbacks,
+          response_function: async (response) => {
+            console.log("[VIEWER] Request completed:", schema.$id)
+            if (callbacks.response_function) {
+              await callbacks.response_function(response)
+            }
+          },
+        },
+      )
     },
   },
   share: {

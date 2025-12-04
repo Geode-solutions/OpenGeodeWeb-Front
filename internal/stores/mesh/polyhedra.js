@@ -16,8 +16,10 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraVisibility(id, visibility) {
     const polyhedra_style = meshPolyhedraStyle(id)
-    return viewer_call(
-      { schema: mesh_polyhedra_schemas.visibility, params: { id, visibility } },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      mesh_polyhedra_schemas.visibility,
+      { id, visibility },
       {
         response_function: () => {
           polyhedra_style.visibility = visibility
@@ -57,8 +59,10 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraColor(id, color) {
     const coloring = meshPolyhedraStyle(id).coloring
-    return viewer_call(
-      { schema: mesh_polyhedra_schemas.color, params: { id, color } },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      mesh_polyhedra_schemas.color,
+      { id, color },
       {
         response_function: () => {
           coloring.color = color
@@ -77,11 +81,9 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraVertexAttribute(id, vertex_attribute) {
   //   const coloring_style = meshPolyhedraStyle(id).coloring
-  //   return viewer_call(
-  //     {
-  //       schema: mesh_polyhedra_schemas.vertex_attribute,
-  //       params: { id, ...vertex_attribute },
-  //     },
+  //   return viewerStore.request(
+  //     mesh_polyhedra_schemas.vertex_attribute,
+  //     { id, ...vertex_attribute },
   //     {
   //       response_function: () => {
   //         coloring_style.vertex = vertex_attribute
@@ -98,11 +100,9 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraPolygonAttribute(id, polygon_attribute) {
   //   const coloring_style = meshPolyhedraStyle(id).coloring
-  //   return viewer_call(
-  //     {
-  //       schema: mesh_polyhedra_schemas.polygon_attribute,
-  //       params: { id, ...polygon_attribute },
-  //     },
+  //   return viewerStore.request(
+  //     mesh_polyhedra_schemas.polygon_attribute,
+  //     { id, ...polygon_attribute },
   //     {
   //       response_function: () => {
   //         coloring_style.polygon = polygon_attribute
@@ -119,11 +119,9 @@ export function useMeshPolyhedraStyle() {
   // }
   // function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
   //   const coloring = meshPolyhedraStyle(id).coloring
-  //   return viewer_call(
-  //     {
-  //       schema: mesh_polyhedra_schemas.polyhedron_attribute,
-  //       params: { id, ...polyhedron_attribute },
-  //     },
+  //   return viewerStore.request(
+  //     mesh_polyhedra_schemas.polyhedron_attribute,
+  //     { id, ...polyhedron_attribute },
   //     {
   //       response_function: () => {
   //         coloring.polyhedron = polyhedron_attribute

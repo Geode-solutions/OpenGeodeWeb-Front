@@ -28,8 +28,8 @@ describe("FileSelector.vue", async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`Select file`, async () => {
     registerEndpoint(allowed_files_schema.$id, {

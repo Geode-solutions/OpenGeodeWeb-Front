@@ -2,11 +2,11 @@ import _ from "lodash"
 import validate_schema from "@/utils/validate_schema.js"
 
 export function api_fetch(
+  microservice,
   { schema, params },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  const feedback_store = useFeedbackStore()
-  const geode_store = useGeodeStore()
+  const feedbackStore = useFeedbackStore()
 
   const body = params || {}
 
@@ -16,13 +16,13 @@ export function api_fetch(
     if (process.env.NODE_ENV !== "production") {
       console.log("Bad request", error, schema, params)
     }
-    feedback_store.add_error(400, schema.$id, "Bad request", error)
+    feedbackStore.add_error(400, schema.$id, "Bad request", error)
     throw new Error(schema.$id.concat(": ", error))
   }
 
-  geode_store.start_request()
+  microservice.start_request()
 
-  const method = schema.methods.filter((m) => m !== "OPTIONS")[0]
+  const method = schema.methods.filter((method) => method !== "OPTIONS")[0]
   const request_options = {
     method: method,
   }
@@ -34,11 +34,11 @@ export function api_fetch(
     request_options.max_retry = schema.max_retry
   }
   return useFetch(schema.$id, {
-    baseURL: geode_store.base_url,
+    baseURL: microservice.base_url,
     ...request_options,
     async onRequestError({ error }) {
-      await geode_store.stop_request()
-      await feedback_store.add_error(
+      await microservice.stop_request()
+      await feedbackStore.add_error(
         error.code,
         schema.$id,
         error.message,
@@ -50,15 +50,15 @@ export function api_fetch(
     },
     async onResponse({ response }) {
       if (response.ok) {
-        await geode_store.stop_request()
+        await microservice.stop_request()
         if (response_function) {
           await response_function(response)
         }
       }
     },
     async onResponseError({ response }) {
-      await geode_store.stop_request()
-      await feedback_store.add_error(
+      await microservice.stop_request()
+      await feedbackStore.add_error(
         response.status,
         schema.$id,
         response._data.name,

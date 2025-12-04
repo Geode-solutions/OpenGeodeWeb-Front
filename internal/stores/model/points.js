@@ -14,11 +14,10 @@ export function useModelPointsStyle() {
     return modelPointsStyle(id).visibility
   }
   function setModelPointsVisibility(id, visibility) {
-    return viewer_call(
-      {
-        schema: model_points_schemas.visibility,
-        params: { id, visibility },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      model_points_schemas.visibility,
+      { id, visibility },
       {
         response_function: () => {
           modelPointsStyle(id).visibility = visibility
@@ -36,11 +35,10 @@ export function useModelPointsStyle() {
     return modelPointsStyle(id).size
   }
   function setModelPointsSize(id, size) {
-    return viewer_call(
-      {
-        schema: model_points_schemas.size,
-        params: { id, size },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      model_points_schemas.size,
+      { id, size },
       {
         response_function: () => {
           dataStyleStore.styles[id].points.size = size

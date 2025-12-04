@@ -26,11 +26,10 @@ export function useModelSurfacesStyle() {
   }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
-    return viewer_call(
-      {
-        schema: model_surfaces_schemas.visibility,
-        params: { id, block_ids: surface_flat_indexes, visibility },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      model_surfaces_schemas.visibility,
+      { id, block_ids: surface_flat_indexes, visibility },
       {
         response_function: () => {
           for (const surface_id of surface_ids) {
@@ -55,11 +54,10 @@ export function useModelSurfacesStyle() {
 
   function setModelSurfacesColor(id, surface_ids, color) {
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
-    return viewer_call(
-      {
-        schema: model_surfaces_schemas.color,
-        params: { id, block_ids: surface_flat_indexes, color },
-      },
+    const viewerStore = useViewerStore()
+    return viewerStore.request(
+      model_surfaces_schemas.color,
+      { id, block_ids: surface_flat_indexes, color },
       {
         response_function: () => {
           for (const surface_id of surface_ids) {

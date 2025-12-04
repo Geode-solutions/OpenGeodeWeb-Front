@@ -22,14 +22,14 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    supported_feature: { type: String, required: false, default: null },
     files: { type: Array, required: false, default: [] },
     auto_upload: { type: Boolean, required: false, default: true },
   })
 
-  const { auto_upload, multiple, supported_feature } = props
+  const { multiple } = props
 
   const internal_files = ref(props.files)
+  const auto_upload = ref(props.auto_upload)
   const accept = ref("")
   const loading = ref(false)
 
@@ -40,6 +40,9 @@
     },
     { deep: true },
   )
+  watch(props.auto_upload, (newVal) => {
+    auto_upload.value = newVal
+  })
 
   const toggle_loading = useToggle(loading)
 
@@ -52,16 +55,11 @@
 
   async function get_allowed_files() {
     toggle_loading()
-    await api_fetch(
-      { schema },
-      {
-        response_function: (response) => {
-          accept.value = response._data.extensions
-            .map((extension) => "." + extension)
-            .join(",")
-        },
-      },
-    )
+    const geodeStore = useGeodeStore()
+    const response = await geodeStore.request(schema, {})
+    accept.value = response.data.value.extensions
+      .map((extension) => "." + extension)
+      .join(",")
     toggle_loading()
   }
   await get_allowed_files()
