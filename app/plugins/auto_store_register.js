@@ -1,3 +1,5 @@
+import { useAppStore } from "../stores/app"
+
 const autoStoreRegister = ({ store }) => {
   if (store.$id === "app") {
     return

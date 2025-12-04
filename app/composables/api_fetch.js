@@ -1,5 +1,5 @@
 import _ from "lodash"
-import validate_schema from "@/app/utils/validate_schema.js"
+import validate_schema from "@/utils/validate_schema.js"
 
 export function api_fetch(
   { schema, params },

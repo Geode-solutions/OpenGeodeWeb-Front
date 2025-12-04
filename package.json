@@ -54,7 +54,7 @@
     "get-port-please": "3.2.0",
     "is-electron": "2.2.2",
     "js-file-download": "0.4.12",
-    "nuxt": "3.20.1",
+    "nuxt": "4.2.1",
     "pinia": "3.0.4",
     "sass": "1.87.0",
     "semver": "7.7.1",

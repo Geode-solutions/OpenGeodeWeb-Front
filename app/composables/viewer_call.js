@@ -1,4 +1,4 @@
-import validate_schema from "~/app/utils/validate_schema.js"
+import validate_schema from "@/utils/validate_schema"
 
 export function viewer_call(
   { schema, params = {} },
