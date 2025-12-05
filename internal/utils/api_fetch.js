@@ -1,5 +1,5 @@
 import _ from "lodash"
-import validate_schema from "@/utils/validate_schema.js"
+import validate_schema from "@ogw_front/utils/validate_schema"
 
 export function api_fetch(
   microservice,

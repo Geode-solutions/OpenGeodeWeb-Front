@@ -1,11 +1,16 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
+// Local imports
+import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
+
 // Local constants
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 
 export function useMeshPointsStyle() {
   const dataStyleStore = useDataStyleStore()
+  const viewerStore = useViewerStore()
 
   function meshPointsStyle(id) {
     return dataStyleStore.getStyle(id).points
@@ -16,7 +21,6 @@ export function useMeshPointsStyle() {
   }
   function setMeshPointsVisibility(id, visibility) {
     const points_style = meshPointsStyle(id)
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_points_schemas.visibility,
       { id, visibility },
@@ -58,7 +62,6 @@ export function useMeshPointsStyle() {
   }
   function setMeshPointsColor(id, color) {
     const coloring_style = meshPointsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_points_schemas.color,
       { id, color },
@@ -79,7 +82,6 @@ export function useMeshPointsStyle() {
   }
   function setMeshPointsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPointsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_points_schemas.vertex_attribute,
       { id, ...vertex_attribute },
@@ -100,7 +102,6 @@ export function useMeshPointsStyle() {
     return meshPointsStyle(id).size
   }
   function setMeshPointsSize(id, size) {
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_points_schemas.size,
       { id, size },

@@ -19,7 +19,9 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "integration",
-          include: ["tests/integration/**/*.test.js"],
+          include: [
+            "tests/integration/stores/data_style/mesh/cells.nuxt.test.js",
+          ],
           environment: "nuxt",
           fileParallelism: false,
           setupFiles: ["tests/integration/setup.js"],

@@ -1,5 +1,6 @@
 import Status from "@ogw_front/utils/status.js"
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode.js"
+import { useInfraStore } from "@ogw_front/stores/infra"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({

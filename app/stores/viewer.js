@@ -5,6 +5,7 @@ import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
 import { viewer_call } from "../../internal/utils/viewer_call.js"
+import { useInfraStore } from "@ogw_front/stores/infra"
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -35,13 +36,13 @@ export const useViewerStore = defineStore("viewer", {
       return this.default_local_port
     },
     base_url() {
-      const infra_store = useInfraStore()
-      let viewer_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
-      if (infra_store.app_mode == appMode.CLOUD) {
-        if (infra_store.ID == "") {
+      const infraStore = useInfraStore()
+      let viewer_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
+      if (infraStore.app_mode == appMode.CLOUD) {
+        if (infraStore.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }
-        viewer_url += `/${infra_store.ID}/viewer`
+        viewer_url += `/${infraStore.ID}/viewer`
       }
       viewer_url += "/ws"
       return viewer_url
@@ -106,8 +107,9 @@ export const useViewerStore = defineStore("viewer", {
         })
 
         // Connect
-        const { connectImageStream } =
-          await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+        const { connectImageStream } = await import(
+          "@kitware/vtk.js/Rendering/Misc/RemoteView"
+        )
         const viewerStore = this
         return new Promise((resolve, reject) => {
           clientToConnect

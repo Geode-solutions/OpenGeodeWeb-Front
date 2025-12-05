@@ -2,6 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer.js"
+import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
 import { useMeshPointsStyle } from "./points.js"
 import { useMeshEdgesStyle } from "./edges.js"
 import { useMeshCellsStyle } from "./cells.js"
@@ -13,6 +16,7 @@ const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh
 
 export default function useMeshStyle() {
   const dataStyleStore = useDataStyleStore()
+  const viewerStore = useViewerStore()
   const meshPointsStyleStore = useMeshPointsStyle()
   const meshEdgesStyleStore = useMeshEdgesStyle()
   const meshCellsStyleStore = useMeshCellsStyle()
@@ -24,7 +28,6 @@ export default function useMeshStyle() {
     return dataStyleStore.getStyle(id).visibility
   }
   function setMeshVisibility(id, visibility) {
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_schemas.visibility,
       { id, visibility },

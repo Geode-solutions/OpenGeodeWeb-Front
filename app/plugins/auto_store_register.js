@@ -11,7 +11,13 @@ const autoStoreRegister = ({ store }) => {
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.$pinia.use(autoStoreRegister)
+  const { $pinia } = nuxtApp
+  if (!$pinia) {
+    console.warn("Pinia instance not available.")
+    return
+  }
+
+  $pinia.use(autoStoreRegister)
   console.log(
     "[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front",
   )

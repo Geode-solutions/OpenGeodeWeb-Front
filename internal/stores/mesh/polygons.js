@@ -1,11 +1,16 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
+// Local imports
+import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
+
 // Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 
 export function useMeshPolygonsStyle() {
   const dataStyleStore = useDataStyleStore()
+  const viewerStore = useViewerStore()
 
   function meshPolygonsStyle(id) {
     return dataStyleStore.getStyle(id).polygons
@@ -16,7 +21,6 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsVisibility(id, visibility) {
     const polygons_style = meshPolygonsStyle(id)
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_polygons_schemas.visibility,
       { id, visibility },
@@ -38,7 +42,6 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsColor(id, color) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_polygons_schemas.color,
       { id, color },
@@ -60,7 +63,6 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsTextures(id, textures) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_polygons_schemas.apply_textures,
       { id, textures },
@@ -83,7 +85,6 @@ export function useMeshPolygonsStyle() {
 
   function setMeshPolygonsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_polygons_schemas.vertex_attribute,
       { id, ...vertex_attribute },
@@ -105,7 +106,6 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsPolygonAttribute(id, polygon_attribute) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_polygons_schemas.polygon_attribute,
       { id, ...polygon_attribute },

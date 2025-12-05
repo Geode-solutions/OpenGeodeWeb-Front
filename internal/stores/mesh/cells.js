@@ -1,10 +1,14 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
+import { useDataStyleStore } from "../data.js"
+import { useViewerStore } from "../viewer.js"
+
 // Local constants
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells
 export function useMeshCellsStyle() {
   const dataStyleStore = useDataStyleStore()
+  const viewerStore = useViewerStore()
 
   function meshCellsStyle(id) {
     return dataStyleStore.getStyle(id).cells
@@ -15,7 +19,6 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsVisibility(id, visibility) {
     const cells_style = meshCellsStyle(id)
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_cells_schemas.visibility,
       { id, visibility },
@@ -37,7 +40,6 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsColor(id, color) {
     const coloring_style = meshCellsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_cells_schemas.color,
       { id, color },
@@ -59,7 +61,6 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsTextures(id, textures) {
     const coloring_style = meshCellsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_cells_schemas.apply_textures,
       { id, textures },
@@ -78,7 +79,6 @@ export function useMeshCellsStyle() {
 
   function setMeshCellsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshCellsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_cells_schemas.vertex_attribute,
       { id, ...vertex_attribute },
@@ -100,7 +100,6 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsCellAttribute(id, cell_attribute) {
     const coloring_style = meshCellsStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_cells_schemas.cell_attribute,
       { id, ...cell_attribute },

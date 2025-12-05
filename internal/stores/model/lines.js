@@ -1,12 +1,18 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
+// Local imports
+import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
+import { useDataBaseStore } from "@ogw_front/stores/data_base.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
+
 // Local constants
 const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
 
 export function useModelLinesStyle() {
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
+  const viewerStore = useViewerStore()
 
   function modelLinesStyle(id) {
     return dataStyleStore.getStyle(id).lines
@@ -27,7 +33,6 @@ export function useModelLinesStyle() {
   }
   function setModelLinesVisibility(id, line_ids, visibility) {
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       model_lines_schemas.visibility,
       { id, block_ids: line_flat_indexes, visibility },
@@ -55,7 +60,6 @@ export function useModelLinesStyle() {
   }
   function setModelLinesColor(id, line_ids, color) {
     const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       model_lines_schemas.color,
       { id, block_ids: line_flat_indexes, color },

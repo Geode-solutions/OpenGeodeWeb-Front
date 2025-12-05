@@ -2,6 +2,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
 import { api_fetch } from "../../internal/utils/api_fetch.js"
+import { useInfraStore } from "@ogw_front/stores/infra"
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -27,13 +28,13 @@ export const useGeodeStore = defineStore("geode", {
       return this.default_local_port
     },
     base_url() {
-      const infra_store = useInfraStore()
-      let geode_url = `${this.protocol}://${infra_store.domain_name}:${this.port}`
-      if (infra_store.app_mode == appMode.CLOUD) {
-        if (infra_store.ID == "") {
+      const infraStore = useInfraStore()
+      let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
+      if (infraStore.app_mode == appMode.CLOUD) {
+        if (infraStore.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
         }
-        geode_url += `/${infra_store.ID}/geode`
+        geode_url += `/${infraStore.ID}/geode`
       }
       return geode_url
     },

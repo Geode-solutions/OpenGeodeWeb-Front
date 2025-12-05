@@ -4,6 +4,10 @@ import Status from "@ogw_front/utils/status.js"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
+import { useInfraStore } from "@ogw_front/stores/infra"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+
 beforeEach(async () => {
   const pinia = createTestingPinia({
     stubActions: false,

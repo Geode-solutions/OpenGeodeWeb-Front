@@ -1,11 +1,16 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
+// Local imports
+import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
+
 // Local constants
 const mesh_polyhedra_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra
 
 export function useMeshPolyhedraStyle() {
   const dataStyleStore = useDataStyleStore()
+  const viewerStore = useViewerStore()
 
   function meshPolyhedraStyle(id) {
     return dataStyleStore.getStyle(id).polyhedra
@@ -16,7 +21,6 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraVisibility(id, visibility) {
     const polyhedra_style = meshPolyhedraStyle(id)
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_polyhedra_schemas.visibility,
       { id, visibility },
@@ -59,7 +63,6 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraColor(id, color) {
     const coloring = meshPolyhedraStyle(id).coloring
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       mesh_polyhedra_schemas.color,
       { id, color },

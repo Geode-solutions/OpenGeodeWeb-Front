@@ -2,6 +2,10 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer.js"
+import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
+import { useDataBaseStore } from "@ogw_front/stores/data_base.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
 import { useModelSurfacesStyle } from "./surfaces.js"
 import { useModelCornersStyle } from "./corners.js"
 import { useModelBlocksStyle } from "./blocks.js"
@@ -22,12 +26,12 @@ export default function useModelStyle() {
   const modelPointsStyleStore = useModelPointsStyle()
   const modelSurfacesStyleStore = useModelSurfacesStyle()
   const hybridViewerStore = useHybridViewerStore()
+  const viewerStore = useViewerStore()
 
   function modelVisibility(id) {
     return dataStyleStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       model_schemas.visibility,
       { id, visibility },
@@ -82,7 +86,6 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).color
   }
   function setModelColor(id, color) {
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       model_schemas.color,
       { id, color },
