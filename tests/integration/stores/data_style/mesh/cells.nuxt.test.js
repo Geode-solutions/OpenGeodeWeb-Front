@@ -11,7 +11,7 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import { setupIntegrationTests } from "tests/integration/setup.js"
+import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells

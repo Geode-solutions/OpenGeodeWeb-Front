@@ -1,8 +1,8 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-import { useDataStyleStore } from "../data.js"
-import { useViewerStore } from "../viewer.js"
+import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
 
 // Local constants
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells

@@ -1,12 +1,16 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
 // Local constants
 const back_model_schemas = back_schemas.opengeodeweb_back.models
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 
 export const useDataBaseStore = defineStore("dataBase", () => {
+  const viewerStore = useViewerStore()
+
   const db = reactive({})
 
   function itemMetaDatas(id) {
@@ -42,7 +46,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function registerObject(id) {
-    const viewerStore = useViewerStore()
     return viewerStore.request(viewer_generic_schemas.register, { id })
   }
 

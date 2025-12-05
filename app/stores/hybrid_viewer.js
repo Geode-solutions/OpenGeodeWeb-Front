@@ -6,7 +6,8 @@ import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status.js"
-import { viewer_call } from "../../internal/utils/viewer_call.js"
+import { useViewerStore } from "@ogw_front/stores/viewer.js"
+import { useDataBaseStore } from "@ogw_front/stores/data_base.js"
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore()
