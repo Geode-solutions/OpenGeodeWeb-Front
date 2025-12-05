@@ -23,8 +23,8 @@ describe("Inspector/InspectionButton.vue", async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`Test with issues`, async () => {
     var inspection_result = {
@@ -44,12 +44,17 @@ describe("Inspector/InspectionButton.vue", async () => {
       ],
     }
 
-    registerEndpoint(schema.$id, {
-      method: schema.methods[0],
-      handler: () => ({
-        inspection_result,
-      }),
+    geodeStore.request = vi.fn((schema, params, callbacks) => {
+      if (callbacks?.response_function) {
+        callbacks.response_function({
+          _data: { inspection_result },
+        })
+      }
+      return Promise.resolve({
+        _data: { inspection_result },
+      })
     })
+
     const geode_object_type = "BRep"
     const filename = "test.txt"
 

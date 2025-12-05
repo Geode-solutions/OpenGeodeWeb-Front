@@ -54,19 +54,16 @@
   texture_id.value = props.texture_id
 
   const texture_coordinates = ref([])
+  const geodeStore = useGeodeStore()
 
   onMounted(() => {
     getTextureCoordinates()
   })
 
   function getTextureCoordinates() {
-    api_fetch(
-      {
-        schema: back_schemas.opengeodeweb_back.texture_coordinates,
-        params: {
-          id: props.id,
-        },
-      },
+    geodeStore.request(
+      back_schemas.opengeodeweb_back.texture_coordinates,
+      { id: props.id },
       {
         response_function: (response) => {
           texture_coordinates.value = response._data.texture_coordinates
@@ -77,7 +74,8 @@
 
   async function files_uploaded_event(value) {
     if (value.length) {
-      await api_fetch(
+      await geodeStore.request(
+        back_schemas.opengeodeweb_back.save_viewable_file,
         {
           schema: back_schemas.opengeodeweb_back.save_viewable_file,
           params: {

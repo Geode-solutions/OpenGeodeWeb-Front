@@ -9,7 +9,6 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import * as composables from "@ogw_front/composables/viewer_call"
 import { setupIntegrationTests } from "../../../setup.js"
 
 // Local constants
@@ -41,13 +40,11 @@ describe("Model", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_schemas.visibility,
-          params: { id, visibility },
-        },
+        model_schemas.visibility,
+        { id, visibility },
         {
           response_function: expect.any(Function),
         },

@@ -55,16 +55,16 @@ beforeEach(() => {
 describe("Viewer Store", () => {
   describe("state", () => {
     test("initial state", () => {
-      const viewer_store = useViewerStore()
-      expectTypeOf(viewer_store.default_local_port).toBeString()
-      expectTypeOf(viewer_store.client).toEqualTypeOf({})
-      expectTypeOf(viewer_store.picking_mode).toBeBoolean()
-      expectTypeOf(viewer_store.picked_point).toEqualTypeOf({
+      const viewerStore = useViewerStore()
+      expectTypeOf(viewerStore.default_local_port).toBeString()
+      expectTypeOf(viewerStore.client).toEqualTypeOf({})
+      expectTypeOf(viewerStore.picking_mode).toBeBoolean()
+      expectTypeOf(viewerStore.picked_point).toEqualTypeOf({
         x: null,
         y: null,
       })
-      expectTypeOf(viewer_store.picked_point).toBeNumber()
-      expectTypeOf(viewer_store.status).toBeString()
+      expectTypeOf(viewerStore.picked_point).toBeNumber()
+      expectTypeOf(viewerStore.status).toBeString()
     })
   })
 
@@ -72,50 +72,50 @@ describe("Viewer Store", () => {
     describe("protocol", () => {
       test("test app_mode CLOUD", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.CLOUD
-        expect(viewer_store.protocol).toBe("wss")
+        expect(viewerStore.protocol).toBe("wss")
       })
       test("test app_mode BROWSER", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.BROWSER
-        expect(viewer_store.protocol).toBe("ws")
+        expect(viewerStore.protocol).toBe("ws")
       })
       test("test app_mode DESKTOP", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.DESKTOP
-        expect(viewer_store.protocol).toBe("ws")
+        expect(viewerStore.protocol).toBe("ws")
       })
     })
 
     describe("port", () => {
       test("test app_mode CLOUD", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.CLOUD
-        expect(viewer_store.port).toBe("443")
+        expect(viewerStore.port).toBe("443")
       })
       test("test app_mode BROWSER", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.BROWSER
-        expect(viewer_store.port).toBe(viewer_store.default_local_port)
+        expect(viewerStore.port).toBe(viewerStore.default_local_port)
       })
       test("test app_mode DESKTOP", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.DESKTOP
-        expect(viewer_store.port).toBe(viewer_store.default_local_port)
+        expect(viewerStore.port).toBe(viewerStore.default_local_port)
       })
 
       test("test override default_local_port", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.DESKTOP
-        viewer_store.default_local_port = "8080"
-        expect(viewer_store.port).toBe("8080")
+        viewerStore.default_local_port = "8080"
+        expect(viewerStore.port).toBe("8080")
       })
     })
     describe("base_url", () => {
@@ -123,48 +123,48 @@ describe("Viewer Store", () => {
         const infra_store = useInfraStore()
         infra_store.app_mode = appMode.DESKTOP
         infra_store.domain_name = "localhost"
-        // expect(viewer_store.base_url).toBe("ws://localhost:1234/ws")
+        // expect(viewerStore.base_url).toBe("ws://localhost:1234/ws")
       })
 
       test("test app_mode CLOUD", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.CLOUD
         infra_store.ID = "123456"
         infra_store.domain_name = "example.com"
-        expect(viewer_store.base_url).toBe(
+        expect(viewerStore.base_url).toBe(
           "wss://example.com:443/123456/viewer/ws",
         )
       })
 
       test("test app_mode CLOUD, ID empty", () => {
         const infra_store = useInfraStore()
-        const viewer_store = useViewerStore()
+        const viewerStore = useViewerStore()
         infra_store.app_mode = appMode.CLOUD
         infra_store.ID = ""
         infra_store.domain_name = "example.com"
-        expect(() => viewer_store.base_url).toThrowError(
+        expect(() => viewerStore.base_url).toThrowError(
           "ID must not be empty in cloud mode",
         )
       })
     })
     describe("is_busy", () => {
       test("test is_busy", () => {
-        const viewer_store = useViewerStore()
-        viewer_store.request_counter = 1
-        expect(viewer_store.is_busy).toBe(true)
+        const viewerStore = useViewerStore()
+        viewerStore.request_counter = 1
+        expect(viewerStore.is_busy).toBe(true)
       })
       test("test not is_busy", () => {
-        const viewer_store = useViewerStore()
-        viewer_store.request_counter = 0
-        expect(viewer_store.is_busy).toBe(false)
+        const viewerStore = useViewerStore()
+        viewerStore.request_counter = 0
+        expect(viewerStore.is_busy).toBe(false)
       })
     })
   })
   describe("actions", () => {
     // test("ws_connect", async () => {
     //   const infra_store = useInfraStore()
-    //   const viewer_store = useViewerStore()
+    //   const viewerStore = useViewerStore()
     //   infra_store.app_mode = appMode.BROWSER
     //   const viewer_path = path.join(
     //     executable_path(
@@ -176,29 +176,31 @@ describe("Viewer Store", () => {
     //     port: 1234,
     //     data_folder_path: "./data",
     //   })
-    //   viewer_store.default_local_port = viewer_port
-    //   await viewer_store.ws_connect()
-    //   expect(viewer_store.status).toBe(Status.CONNECTED)
+    //   viewerStore.default_local_port = viewer_port
+    //   await viewerStore.ws_connect()
+    //   expect(viewerStore.status).toBe(Status.CONNECTED)
     // }, 10000)
     describe("toggle_picking_mode", () => {
       test("test true", async () => {
-        const viewer_store = useViewerStore()
-        await viewer_store.toggle_picking_mode(true)
-        expect(viewer_store.picking_mode).toBe(true)
+        const viewerStore = useViewerStore()
+        await viewerStore.toggle_picking_mode(true)
+        expect(viewerStore.picking_mode).toBe(true)
       })
     })
+
     describe("start_request", () => {
       test("test increment", async () => {
-        const viewer_store = useViewerStore()
-        await viewer_store.start_request()
-        expect(viewer_store.request_counter).toBe(1)
+        const viewerStore = useViewerStore()
+        await viewerStore.start_request()
+        expect(viewerStore.request_counter).toBe(1)
       })
     })
+
     describe("stop_request", () => {
       test("test decrement", async () => {
-        const viewer_store = useViewerStore()
-        await viewer_store.stop_request()
-        expect(viewer_store.request_counter).toBe(-1)
+        const viewerStore = useViewerStore()
+        await viewerStore.stop_request()
+        expect(viewerStore.request_counter).toBe(-1)
       })
     })
   })

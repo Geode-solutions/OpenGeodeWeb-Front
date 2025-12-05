@@ -33,9 +33,8 @@
       tooltip: "Reset camera",
       icon: "mdi-cube-scan",
       action: () => {
-        viewer_call({
-          schema: schemas.opengeodeweb_viewer.viewer.reset_camera,
-        })
+        const viewerStore = useViewerStore()
+        viewerStore.request(schemas.opengeodeweb_viewer.viewer.reset_camera)
       },
     },
     {
@@ -49,13 +48,10 @@
       tooltip: "Toggle grid scale",
       icon: "mdi-ruler-square",
       action: () => {
-        viewer_call(
-          {
-            schema: schemas.opengeodeweb_viewer.viewer.grid_scale,
-            params: {
-              visibility: !grid_scale.value,
-            },
-          },
+        const viewerStore = useViewerStore()
+        viewerStore.request(
+          schemas.opengeodeweb_viewer.viewer.grid_scale,
+          { visibility: !grid_scale.value },
           {
             response_function: () => {
               grid_scale.value = !grid_scale.value

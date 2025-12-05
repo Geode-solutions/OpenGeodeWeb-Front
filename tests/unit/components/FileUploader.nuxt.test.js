@@ -25,8 +25,8 @@ describe("FileUploader.vue", async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   registerEndpoint(upload_file_schema.$id, {
     method: upload_file_schema.methods[0],

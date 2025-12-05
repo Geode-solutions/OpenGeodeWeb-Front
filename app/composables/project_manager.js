@@ -9,12 +9,10 @@ export function useProjectManager() {
     console.log("[export triggered]")
     const appStore = useAppStore()
     const geodeStore = useGeodeStore()
-    const infraStore = useInfraStore()
     const snapshot = appStore.exportStores()
     const schema = back_schemas.opengeodeweb_back.export_project
     const defaultName = "project.vease"
 
-    await infraStore.create_connection()
     const result = await $fetch(schema.$id, {
       baseURL: geodeStore.base_url,
       method: schema.methods.filter((m) => m !== "OPTIONS")[0],
@@ -30,9 +28,7 @@ export function useProjectManager() {
     const dataBaseStore = useDataBaseStore()
     const treeviewStore = useTreeviewStore()
     const hybridViewerStore = useHybridViewerStore()
-    const infraStore = useInfraStore()
 
-    await infraStore.create_connection()
     await viewerStore.ws_connect()
 
     const client = viewerStore.client
@@ -43,10 +39,10 @@ export function useProjectManager() {
         .call("opengeodeweb_viewer.release_database", [{}])
     }
 
-    await viewer_call({
-      schema: viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
-      params: {},
-    })
+    await viewerStore.request(
+      viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
+      {},
+    )
 
     treeviewStore.clear()
     dataBaseStore.clear()
@@ -81,9 +77,9 @@ export function useProjectManager() {
         .call("opengeodeweb_viewer.import_project", [{}])
     }
 
-    await treeviewStore.importStores(snapshot.treeview)
+    await treeviewStore.importStores(snapshot.treeview || {})
     await hybridViewerStore.initHybridViewer()
-    await hybridViewerStore.importStores(snapshot.hybridViewer)
+    await hybridViewerStore.importStores(snapshot.hybridViewer || {})
 
     const snapshotDataBase =
       snapshot && snapshot.dataBase && snapshot.dataBase.db
@@ -99,11 +95,11 @@ export function useProjectManager() {
     })
 
     await importWorkflowFromSnapshot(items)
-    await hybridViewerStore.importStores(snapshot.hybridViewer)
+    await hybridViewerStore.importStores(snapshot.hybridViewer || {})
 
     {
       const dataStyleStore = useDataStyleStore()
-      await dataStyleStore.importStores(snapshot.dataStyle)
+      await dataStyleStore.importStores(snapshot.dataStyle || {})
     }
     {
       const dataStyleStore = useDataStyleStore()

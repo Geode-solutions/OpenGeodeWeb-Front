@@ -27,18 +27,29 @@ describe("MissingFilesSelector.vue", async () => {
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`Select file`, async () => {
-    registerEndpoint(missing_files_schema.$id, {
-      method: missing_files_schema.methods[0],
-      handler: () => ({
-        has_missing_files: true,
-        mandatory_files: ["fake_file.txt"],
-        additional_files: ["fake_file_2.txt"],
-      }),
+    geodeStore.request = vi.fn((schema, params, callbacks) => {
+      if (callbacks?.response_function) {
+        callbacks.response_function({
+          _data: {
+            has_missing_files: true,
+            mandatory_files: ["fake_file.txt"],
+            additional_files: ["fake_file_2.txt"],
+          },
+        })
+      }
+      return Promise.resolve({
+        _data: {
+          has_missing_files: true,
+          mandatory_files: ["fake_file.txt"],
+          additional_files: ["fake_file_2.txt"],
+        },
+      })
     })
+
     const wrapper = await mountSuspended(MissingFilesSelector, {
       global: {
         plugins: [vuetify, pinia],

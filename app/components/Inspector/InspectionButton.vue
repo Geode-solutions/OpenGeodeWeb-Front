@@ -33,18 +33,16 @@
   async function get_inspection_results(geode_object_type, filename) {
     toggle_loading()
     const params = { geode_object_type, filename }
+    const geodeStore = useGeodeStore()
 
-    await api_fetch(
-      { schema, params },
-      {
-        response_function: (response) => {
-          emit("update_values", {
-            inspection_result: [response._data.inspection_result],
-          })
-          emit("increment_step")
-        },
+    await geodeStore.request(schema, params, {
+      response_function: (response) => {
+        emit("update_values", {
+          inspection_result: [response._data.inspection_result],
+        })
+        emit("increment_step")
       },
-    )
+    })
     toggle_loading()
   }
 </script>
