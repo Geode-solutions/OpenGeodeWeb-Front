@@ -9,6 +9,8 @@ import { createTestingPinia } from "@pinia/testing"
 
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector.vue"
 
+import { useGeodeStore } from "@ogw_front/stores/geode"
+
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions

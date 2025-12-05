@@ -20,6 +20,7 @@
 
 <script setup>
   import Status from "@ogw_front/utils/status.js"
+  import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const props = defineProps({
     schema: { type: Object, required: true },

@@ -12,6 +12,7 @@
 
   import FetchingData from "@ogw_front/components/FetchingData.vue"
   import FileUploader from "@ogw_front/components/FileUploader.vue"
+  import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const schema = schemas.opengeodeweb_back.allowed_files
   const emit = defineEmits([

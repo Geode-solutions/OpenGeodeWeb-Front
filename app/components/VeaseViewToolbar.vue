@@ -32,7 +32,11 @@
   import Screenshot from "@ogw_front/components/Screenshot.vue"
   import ZScaling from "@ogw_front/components/ZScaling.vue"
 
+  import { useViewerStore } from "@ogw_front/stores/viewer"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+
   const hybridViewerStore = useHybridViewerStore()
+  const viewerStore = useViewerStore()
   const take_screenshot = ref(false)
   const showZScaling = ref(false)
   const grid_scale = ref(false)
@@ -74,7 +78,6 @@
       tooltip: "Toggle grid scale",
       icon: "mdi-ruler-square",
       action: () => {
-        const viewerStore = useViewerStore()
         viewerStore.request(
           schemas.opengeodeweb_viewer.viewer.grid_scale,
           { visibility: !grid_scale.value },

@@ -25,8 +25,8 @@
   import { useElementSize, useWindowSize } from "@vueuse/core"
   import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
   import Status from "@ogw_front/utils/status.js"
-
   import ViewToolbar from "@ogw_front/components/ViewToolbar.vue"
+  import { useViewerStore } from "@ogw_front/stores/viewer"
 
   const props = defineProps({
     viewId: { type: String, default: "-1" },

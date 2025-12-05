@@ -54,6 +54,8 @@
 
   import FetchingData from "@ogw_front/components/FetchingData.vue"
 
+  import { useGeodeStore } from "@ogw_front/stores/geode"
+
   const schema = schemas.opengeodeweb_back.allowed_objects
 
   const emit = defineEmits(["update_values", "increment_step"])
@@ -62,6 +64,8 @@
     filenames: { type: Array, required: true },
     supported_feature: { type: String, required: false, default: null },
   })
+
+  const geodeStore = useGeodeStore()
   const { filenames, supported_feature } = props
 
   const loading = ref(false)
@@ -108,7 +112,7 @@
   async function get_allowed_objects() {
     toggle_loading()
     allowed_objects.value = {}
-    const geodeStore = useGeodeStore()
+
     const promise_array = filenames.map((filename) => {
       return geodeStore.request(schema, { filename })
     })
