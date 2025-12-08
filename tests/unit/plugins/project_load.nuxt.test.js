@@ -6,7 +6,7 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview"
 import { useAppStore } from "@ogw_front/stores/app"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import { useDataBaseStore } from "@ogw_front/stores/database"
+import { useDataBaseStore } from "@ogw_front/stores/data_base"
 
 vi.mock("../../../internal/utils/viewer_call.js", () => ({
   viewer_call: vi.fn(() => Promise.resolve()),
