@@ -83,7 +83,7 @@ export const useAppStore = defineStore("app", () => {
     return loadedExtensions.value.get(id)
   }
 
-  async function loadExtension(path) {
+  async function loadExtension(path, backendPath = null) {
     try {
       let finalURL = path
 
@@ -126,6 +126,7 @@ export const useAppStore = defineStore("app", () => {
           module: extensionModule,
           id: extensionId,
           path,
+          backendPath,
           loadedAt: new Date().toISOString(),
           metadata: extensionModule.metadata,
           enabled: true,
