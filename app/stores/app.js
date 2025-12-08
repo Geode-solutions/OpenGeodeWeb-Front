@@ -79,6 +79,40 @@ export const useAppStore = defineStore("app", () => {
     codeTransformer.value = transformer
   }
 
+  async function launchExtensionMicroservice(extensionId, backendPath) {
+    console.log(
+      `[AppStore] Launching microservice for extension: ${extensionId}`,
+    )
+    console.log(`[AppStore] Backend path: ${backendPath}`)
+
+    if (!backendPath) {
+      throw new Error(`No backend path provided for extension: ${extensionId}`)
+    }
+
+    // Use the Electron IPC to launch the microservice
+    if (window.electronAPI && window.electronAPI.launchMicroservice) {
+      try {
+        const result = await window.electronAPI.launchMicroservice({
+          name: extensionId,
+          executablePath: backendPath,
+        })
+        console.log(
+          `[AppStore] Microservice launched for ${extensionId}:`,
+          result,
+        )
+        return result
+      } catch (error) {
+        console.error(
+          `[AppStore] Failed to launch microservice for ${extensionId}:`,
+          error,
+        )
+        throw error
+      }
+    } else {
+      throw new Error("Electron API not available for launching microservices")
+    }
+  }
+
   function getExtension(id) {
     return loadedExtensions.value.get(id)
   }
@@ -120,7 +154,7 @@ export const useAppStore = defineStore("app", () => {
       }
 
       if (typeof extensionModule.install === "function") {
-        await extensionModule.install(extensionAPI.value)
+        await extensionModule.install(extensionAPI.value, backendPath)
 
         const extensionData = {
           module: extensionModule,
@@ -209,13 +243,16 @@ export const useAppStore = defineStore("app", () => {
     exportStores,
     importStores,
     loadedExtensions,
+    extensionAPI,
     setExtensionAPI,
     setCodeTransformer,
     loadExtension,
     getLoadedExtensions,
+    getExtension,
     unloadExtension,
     toggleExtension,
     setExtensionEnabled,
     getExtensionEnabled,
+    launchExtensionMicroservice,
   }
 })
