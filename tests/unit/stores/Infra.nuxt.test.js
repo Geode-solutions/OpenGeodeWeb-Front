@@ -283,22 +283,26 @@ describe("Infra Store", () => {
         await infra_store.create_backend()
         expect(infra_store.status).toBe(Status.CREATED)
       })
-      // test("test with end-point", async () => {
-      //   const infra_store = useInfraStore()
-      //   const geodeStore = useGeodeStore()
-      //   const viewerStore = useViewerStore()
-      //   const feedback_store = useFeedbackStore()
+      test("test with end-point", async () => {
+        const infra_store = useInfraStore()
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        const feedback_store = useFeedbackStore()
+        const lambdaStore = useLambdaStore()
 
-      //   registerEndpoint(infra_store.lambda_url, {
-      //     method: "POST",
-      //     handler: () => ({ ID: "123456" }),
-      //   })
-      //   await infra_store.create_backend()
-      //   expect(infra_store.status).toBe(Status.CREATED)
-      //   expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
-      //   expect(viewerStore.status).toBe(Status.NOT_CONNECTED)
-      //   expect(feedback_store.server_error).toBe(true)
-      // })
+        infra_store.app_mode = appMode.CLOUD
+        const ID = "123456"
+        registerEndpoint(lambdaStore.base_url, {
+          method: "POST",
+          handler: () => ({ ID }),
+        })
+        await infra_store.create_backend()
+        expect(infra_store.status).toBe(Status.CREATED)
+        expect(infra_store.ID).toBe(ID)
+
+        expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
+        expect(viewerStore.status).toBe(Status.NOT_CONNECTED)
+      })
     })
   })
 })
