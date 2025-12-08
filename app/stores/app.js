@@ -89,28 +89,12 @@ export const useAppStore = defineStore("app", () => {
       throw new Error(`No backend path provided for extension: ${extensionId}`)
     }
 
-    // Use the Electron IPC to launch the microservice
-    if (window.electronAPI && window.electronAPI.launchMicroservice) {
-      try {
-        const result = await window.electronAPI.launchMicroservice({
-          name: extensionId,
-          executablePath: backendPath,
-        })
-        console.log(
-          `[AppStore] Microservice launched for ${extensionId}:`,
-          result,
-        )
-        return result
-      } catch (error) {
-        console.error(
-          `[AppStore] Failed to launch microservice for ${extensionId}:`,
-          error,
-        )
-        throw error
-      }
-    } else {
-      throw new Error("Electron API not available for launching microservices")
-    }
+    // Use infra store to launch the extension microservice
+    const infraStore = useInfraStore()
+    return await infraStore.launch_extension_microservice(
+      extensionId,
+      backendPath,
+    )
   }
 
   function getExtension(id) {
