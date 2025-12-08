@@ -33,7 +33,10 @@ async function importItem(item) {
   try {
     await dataBaseStore.registerObject(item.id)
   } catch (error) {
-    console.warn(`[Import] Failed to register object ${item.id} in backend viewer:`, error)
+    console.warn(
+      `[Import] Failed to register object ${item.id} in backend viewer:`,
+      error,
+    )
   }
   await dataBaseStore.addItem(item.id, {
     ...item,
