@@ -22,15 +22,18 @@
   import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue"
   import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue"
 
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+
+  const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
+
   const props = defineProps({
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },
   })
 
   const id = toRef(() => props.itemProps.id)
-
-  const dataStyleStore = useDataStyleStore()
-  const hybridViewerStore = useHybridViewerStore()
 
   const visibility = computed({
     get: () => dataStyleStore.meshEdgesVisibility(id.value),

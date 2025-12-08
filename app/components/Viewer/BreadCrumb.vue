@@ -37,6 +37,7 @@
 </template>
 
 <script setup>
+  import { useTreeviewStore } from "@ogw_front/stores/treeview"
   const treeviewStore = useTreeviewStore()
 
   const selectedTree = computed(() => treeviewStore.selectedTree)

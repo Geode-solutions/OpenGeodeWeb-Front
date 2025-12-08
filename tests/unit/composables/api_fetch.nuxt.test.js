@@ -3,6 +3,9 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
+
 describe("geodeStore.request()", () => {
   const pinia = createTestingPinia({
     stubActions: false,
@@ -10,7 +13,7 @@ describe("geodeStore.request()", () => {
   })
   setActivePinia(pinia)
   const geodeStore = useGeodeStore()
-  const feedback_store = useFeedbackStore()
+  const feedbackStore = useFeedbackStore()
   geodeStore.base_url = ""
 
   const schema = {
@@ -27,7 +30,7 @@ describe("geodeStore.request()", () => {
   }
 
   beforeEach(async () => {
-    await feedback_store.$reset()
+    await feedbackStore.$reset()
     await geodeStore.$reset()
     geodeStore.base_url = ""
   })

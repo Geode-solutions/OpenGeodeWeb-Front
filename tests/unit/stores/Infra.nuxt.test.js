@@ -9,6 +9,8 @@ import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { useInfraStore } from "@ogw_front/stores/infra"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
@@ -288,7 +290,7 @@ describe("Infra Store", () => {
       //   const infraStore = useInfraStore()
       //   const geodeStore = useGeodeStore()
       //   const viewerStore = useViewerStore()
-      //   const feedback_store = useFeedbackStore()
+      //   const feedbackStore = useFeedbackStore()
 
       //   registerEndpoint(infraStore.lambda_url, {
       //     method: "POST",
@@ -298,7 +300,7 @@ describe("Infra Store", () => {
       //   expect(infraStore.status).toBe(Status.CREATED)
       //   expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
       //   expect(viewerStore.status).toBe(Status.NOT_CONNECTED)
-      //   expect(feedback_store.server_error).toBe(true)
+      //   expect(feedbackStore.server_error).toBe(true)
       // })
     })
   })

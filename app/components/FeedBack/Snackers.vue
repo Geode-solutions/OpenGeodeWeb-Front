@@ -1,6 +1,6 @@
 <template>
   <v-snackbar
-    v-for="(feedback, index) in feedback_store.feedbacks"
+    v-for="(feedback, index) in feedbackStore.feedbacks"
     :key="feedback"
     v-model="show"
     :style="{ 'margin-bottom': calc_margin(index) }"
@@ -51,7 +51,7 @@
           variant="flat"
           size="20"
           :color="feedback.type"
-          @click="feedback_store.delete_feedback(feedback.id)"
+          @click="feedbackStore.delete_feedback(feedback.id)"
         >
           <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
@@ -61,7 +61,9 @@
 </template>
 
 <script setup>
-  const feedback_store = useFeedbackStore()
+  import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
+
+  const feedbackStore = useFeedbackStore()
   const show = true
 
   function calc_margin(index) {

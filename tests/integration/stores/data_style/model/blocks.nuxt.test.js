@@ -6,7 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import Status from "@ogw_front/utils/status"
 import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
 import { useViewerStore } from "@ogw_front/stores/viewer.js"
-import { useDataBaseStore } from "@ogw_front/stores/database.js"
+import { useDataBaseStore } from "@ogw_front/stores/data_base.js"
 import {
   delete_folder_recursive,
   kill_back,

@@ -45,6 +45,8 @@
   import ViewerBreadCrumb from "@/components/Viewer/BreadCrumb.vue"
   import ViewerTreeObject from "@/components/Viewer/TreeObject.vue"
   import ViewerTreeComponent from "@/components/Viewer/TreeComponent.vue"
+  import { useTreeviewStore } from "@ogw_front/stores/treeview"
+  import { useMenuStore } from "@ogw_front/stores/menu"
 
   const treeviewStore = useTreeviewStore()
   const menuStore = useMenuStore()

@@ -6,6 +6,9 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useLambdaStore } from "@ogw_front/stores/lambda"
+
 // Local imports
 import Status from "@ogw_front/utils/status.js"
 
@@ -121,9 +124,7 @@ describe("Lambda Store", () => {
     describe("connect", () => {
       test("successful connect", async () => {
         const lambdaStore = useLambdaStore()
-
         await lambdaStore.connect()
-
         expect(lambdaStore.status).toBe(Status.CONNECTED)
       })
     })

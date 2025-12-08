@@ -6,7 +6,7 @@ export function viewer_call(
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  const feedback_store = useFeedbackStore()
+  const feedbackStore = useFeedbackStore()
 
   const { valid, error } = validate_schema(schema, params)
 
@@ -14,7 +14,7 @@ export function viewer_call(
     if (process.env.NODE_ENV !== "production") {
       console.log("Bad request", error, schema, params)
     }
-    feedback_store.add_error(400, schema.$id, "Bad request", error)
+    feedbackStore.add_error(400, schema.$id, "Bad request", error)
     throw new Error(schema.$id.concat(": ", error))
   }
 
@@ -45,7 +45,7 @@ export function viewer_call(
         },
       )
       .catch((error) => {
-        feedback_store.add_error(
+        feedbackStore.add_error(
           error.code,
           schema.$id,
           error.message,

@@ -1,8 +1,11 @@
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
+
 export async function upload_file(
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  const feedback_store = useFeedbackStore()
+  const feedbackStore = useFeedbackStore()
   const geodeStore = useGeodeStore()
   if (!(file instanceof File)) {
     throw new Error("file must be a instance of File")
@@ -22,7 +25,7 @@ export async function upload_file(
     ...request_options,
     onRequestError({ error }) {
       geodeStore.stop_request()
-      feedback_store.add_error(error.code, route, error.message, error.stack)
+      feedbackStore.add_error(error.code, route, error.message, error.stack)
       if (request_error_function) {
         request_error_function(error)
       }
@@ -37,7 +40,7 @@ export async function upload_file(
     },
     onResponseError({ response }) {
       geodeStore.stop_request()
-      feedback_store.add_error(
+      feedbackStore.add_error(
         response.status,
         route,
         response._data.name,

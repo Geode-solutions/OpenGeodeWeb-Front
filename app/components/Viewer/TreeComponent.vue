@@ -14,6 +14,10 @@
 </template>
 
 <script setup>
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import { useDataBaseStore } from "@ogw_front/stores/data_base"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
   const hybridViewerStore = useHybridViewerStore()

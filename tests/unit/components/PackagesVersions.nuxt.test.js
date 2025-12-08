@@ -9,6 +9,7 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
 import PackagesVersions from "@ogw_front/components/PackagesVersions.vue"
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
 const vuetify = createVuetify({
   components,

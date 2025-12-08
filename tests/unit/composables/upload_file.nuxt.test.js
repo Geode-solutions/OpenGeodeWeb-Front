@@ -4,6 +4,9 @@ import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import upload_file from "@ogw_front/utils/upload_file"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
+
+import { useGeodeStore } from "@ogw_front/stores/geode"
 const schema = schemas.opengeodeweb_back.upload_file
 
 beforeEach(async () => {
@@ -29,7 +32,7 @@ describe("upload_file.js", () => {
   })
 
   test("onResponse", async () => {
-    const feedback_store = useFeedbackStore()
+    const feedbackStore = useFeedbackStore()
     registerEndpoint(schema.$id, {
       method: "PUT",
       handler: () => ({ test: "ok" }),
@@ -44,7 +47,7 @@ describe("upload_file.js", () => {
         },
       },
     )
-    expect(feedback_store.feedbacks.length).toBe(0)
+    expect(feedbackStore.feedbacks.length).toBe(0)
     expect(response_value).toBe("ok")
   })
 })

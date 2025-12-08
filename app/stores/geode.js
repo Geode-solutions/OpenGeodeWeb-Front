@@ -3,6 +3,7 @@ import Status from "@ogw_front/utils/status.js"
 import { appMode } from "@ogw_front/utils/app_mode.js"
 import { api_fetch } from "../../internal/utils/api_fetch.js"
 import { useInfraStore } from "@ogw_front/stores/infra"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -52,23 +53,23 @@ export const useGeodeStore = defineStore("geode", {
     },
     do_ping() {
       const geodeStore = this
-      const feedback_store = useFeedbackStore()
+      const feedbackStore = useFeedbackStore()
       return useFetch(back_schemas.opengeodeweb_back.ping.$id, {
         baseURL: this.base_url,
         method: back_schemas.opengeodeweb_back.ping.methods[0],
         body: {},
         onRequestError({ error }) {
-          feedback_store.$patch({ server_error: true })
+          feedbackStore.$patch({ server_error: true })
           geodeStore.status = Status.NOT_CONNECTED
         },
         onResponse({ response }) {
           if (response.ok) {
-            feedback_store.$patch({ server_error: false })
+            feedbackStore.$patch({ server_error: false })
             geodeStore.status = Status.CONNECTED
           }
         },
         onResponseError({ response }) {
-          feedback_store.$patch({ server_error: true })
+          feedbackStore.$patch({ server_error: true })
           geodeStore.status = Status.NOT_CONNECTED
         },
       })
