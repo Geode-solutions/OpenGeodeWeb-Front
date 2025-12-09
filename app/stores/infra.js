@@ -91,37 +91,6 @@ export const useInfraStore = defineStore("infra", {
       console.log("[INFRA] All microservices connected")
       return
     },
-    async launch_extension_microservice(extensionId, backendPath) {
-      console.log(`[INFRA] Launching extension microservice: ${extensionId}`)
-
-      if (this.app_mode === appMode.DESKTOP) {
-        // In DESKTOP mode, use Electron API
-        if (window.electronAPI && window.electronAPI.run_extension) {
-          return await window.electronAPI.run_extension(
-            extensionId,
-            backendPath,
-          )
-        }
-        throw new Error("Electron API not available")
-      } else if (this.app_mode === appMode.BROWSER) {
-        // In BROWSER mode, use Nuxt server API
-        const response = await $fetch("/api/extension-launch", {
-          method: "POST",
-          body: {
-            extensionId,
-            executablePath: backendPath,
-          },
-        })
-        console.log(`[INFRA] Extension microservice launched: ${extensionId}`)
-        return response.port
-      } else {
-        // CLOUD mode - extensions not supported yet
-        console.warn(
-          `[INFRA] Extension microservices not supported in ${this.app_mode} mode`,
-        )
-        return null
-      }
-    },
   },
   share: {
     omit: ["microservices"],

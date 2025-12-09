@@ -79,24 +79,6 @@ export const useAppStore = defineStore("app", () => {
     codeTransformer.value = transformer
   }
 
-  async function launchExtensionMicroservice(extensionId, backendPath) {
-    console.log(
-      `[AppStore] Launching microservice for extension: ${extensionId}`,
-    )
-    console.log(`[AppStore] Backend path: ${backendPath}`)
-
-    if (!backendPath) {
-      throw new Error(`No backend path provided for extension: ${extensionId}`)
-    }
-
-    // Use infra store to launch the extension microservice
-    const infraStore = useInfraStore()
-    return await infraStore.launch_extension_microservice(
-      extensionId,
-      backendPath,
-    )
-  }
-
   function getExtension(id) {
     return loadedExtensions.value.get(id)
   }
@@ -237,6 +219,5 @@ export const useAppStore = defineStore("app", () => {
     toggleExtension,
     setExtensionEnabled,
     getExtensionEnabled,
-    launchExtensionMicroservice,
   }
 })

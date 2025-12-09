@@ -30,6 +30,7 @@ async function importItem(item) {
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
   const treeviewStore = useTreeviewStore()
+  console.log("importItem", { item })
   try {
     await dataBaseStore.registerObject(item.id)
   } catch (error) {
