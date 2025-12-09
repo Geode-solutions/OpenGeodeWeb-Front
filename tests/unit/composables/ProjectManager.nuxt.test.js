@@ -95,9 +95,8 @@ const hybridViewerStoreMock = {
       hybridViewerStoreMock.setZScaling(snapshot.zScale)
     }
     if (snapshot?.camera_options) {
-      const { viewer_call } = await import(
-        "../../../internal/utils/viewer_call"
-      )
+      const { viewer_call } =
+        await import("../../../internal/utils/viewer_call")
       viewer_call({
         schema: { $id: "opengeodeweb_viewer.viewer.update_camera" },
         params: { camera_options: snapshot.camera_options },
