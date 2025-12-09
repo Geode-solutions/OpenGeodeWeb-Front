@@ -2,14 +2,14 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer.js"
-import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
-import { useViewerStore } from "@ogw_front/stores/viewer.js"
-import { useMeshPointsStyle } from "./points.js"
-import { useMeshEdgesStyle } from "./edges.js"
-import { useMeshCellsStyle } from "./cells.js"
-import { useMeshPolygonsStyle } from "./polygons.js"
-import { useMeshPolyhedraStyle } from "./polyhedra.js"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useMeshPointsStyle } from "./points"
+import { useMeshEdgesStyle } from "./edges"
+import { useMeshCellsStyle } from "./cells"
+import { useMeshPolygonsStyle } from "./polygons"
+import { useMeshPolyhedraStyle } from "./polyhedra"
 
 // Local constants
 const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh

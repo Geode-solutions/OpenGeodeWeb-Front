@@ -10,7 +10,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 
 // Local imports
-import Status from "@ogw_front/utils/status.js"
+import Status from "@ogw_front/utils/status"
 
 beforeEach(async () => {
   const pinia = createTestingPinia({

@@ -2,16 +2,16 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer.js"
-import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
-import { useDataBaseStore } from "@ogw_front/stores/data_base.js"
-import { useViewerStore } from "@ogw_front/stores/viewer.js"
-import { useModelSurfacesStyle } from "./surfaces.js"
-import { useModelCornersStyle } from "./corners.js"
-import { useModelBlocksStyle } from "./blocks.js"
-import { useModelLinesStyle } from "./lines.js"
-import { useModelEdgesStyle } from "./edges.js"
-import { useModelPointsStyle } from "./points.js"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useModelSurfacesStyle } from "./surfaces"
+import { useModelCornersStyle } from "./corners"
+import { useModelBlocksStyle } from "./blocks"
+import { useModelLinesStyle } from "./lines"
+import { useModelEdgesStyle } from "./edges"
+import { useModelPointsStyle } from "./points"
 
 // Local constants
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model

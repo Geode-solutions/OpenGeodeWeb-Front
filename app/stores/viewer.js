@@ -2,9 +2,9 @@ import _ from "lodash"
 import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import Status from "@ogw_front/utils/status.js"
-import { appMode } from "@ogw_front/utils/app_mode.js"
-import { viewer_call } from "../../internal/utils/viewer_call.js"
+import Status from "@ogw_front/utils/status"
+import { appMode } from "@ogw_front/utils/app_mode"
+import { viewer_call } from "../../internal/utils/viewer_call"
 import { useInfraStore } from "@ogw_front/stores/infra"
 
 export const useViewerStore = defineStore("viewer", {
@@ -107,8 +107,9 @@ export const useViewerStore = defineStore("viewer", {
         })
 
         // Connect
-        const { connectImageStream } =
-          await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+        const { connectImageStream } = await import(
+          "@kitware/vtk.js/Rendering/Misc/RemoteView"
+        )
         const viewerStore = this
         return new Promise((resolve, reject) => {
           clientToConnect

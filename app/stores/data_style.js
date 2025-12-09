@@ -1,16 +1,14 @@
-import { getDefaultStyle } from "../utils/default_styles.js"
+import { getDefaultStyle } from "../utils/default_styles"
 import { useDataBaseStore } from "@ogw_front/stores/data_base"
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import useDataStyleState from "../internal/stores/data_style_state.js"
-import useMeshStyle from "../internal/stores/mesh/index.js"
-import useModelStyle from "../internal/stores/model/index.js"
+import useDataStyleState from "../../internal/stores/data_style_state"
+import useMeshStyle from "../../internal/stores/mesh/index"
+import useModelStyle from "../../internal/stores/model/index"
 
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState()
   const meshStyleStore = useMeshStyle()
   const modelStyleStore = useModelStyle()
   const dataBaseStore = useDataBaseStore()
-  const hybridViewerStore = useHybridViewerStore()
 
   function addDataStyle(id, geode_object) {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)

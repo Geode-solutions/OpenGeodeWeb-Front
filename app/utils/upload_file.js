@@ -1,5 +1,5 @@
 import { useGeodeStore } from "@ogw_front/stores/geode"
-import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 export async function upload_file(
   { route, file },

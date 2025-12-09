@@ -1,4 +1,4 @@
-import Status from "@ogw_front/utils/status.js"
+import Status from "@ogw_front/utils/status"
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 

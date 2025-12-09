@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataBaseStore } from "@ogw_front/stores/data_base.js"
-import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
-import { useViewerStore } from "@ogw_front/stores/viewer.js"
+import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces

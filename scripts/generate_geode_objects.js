@@ -2,7 +2,7 @@ import * as path from "path"
 import * as fs from "fs"
 import * as process from "process"
 
-const output_file = path.join(process.cwd(), "assets/geode_objects.js")
+const output_file = path.join(process.cwd(), "assets/geode_objects")
 
 if (fs.existsSync(output_file)) {
   fs.unlinkSync(output_file)

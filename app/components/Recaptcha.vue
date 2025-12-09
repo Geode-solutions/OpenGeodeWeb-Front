@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-  import { appMode } from "@ogw_front/utils/app_mode.js"
+  import { appMode } from "@ogw_front/utils/app_mode"
   import { useInfraStore } from "@ogw_front/stores/infra"
 
   const props = defineProps({

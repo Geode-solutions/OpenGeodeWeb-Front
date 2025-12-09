@@ -1,7 +1,7 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import Status from "@ogw_front/utils/status.js"
-import { appMode } from "@ogw_front/utils/app_mode.js"
-import { api_fetch } from "../../internal/utils/api_fetch.js"
+import Status from "@ogw_front/utils/status"
+import { appMode } from "@ogw_front/utils/app_mode"
+import { api_fetch } from "../../internal/utils/api_fetch"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 

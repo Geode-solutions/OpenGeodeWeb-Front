@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "@ogw_front/stores/data_style.js"
-import { useViewerStore } from "@ogw_front/stores/viewer.js"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges

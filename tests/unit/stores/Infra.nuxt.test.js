@@ -6,7 +6,7 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 // Local imports
-import Status from "@ogw_front/utils/status.js"
+import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useGeodeStore } from "@ogw_front/stores/geode"
@@ -288,20 +288,20 @@ describe("Infra Store", () => {
         expect(infraStore.status).toBe(Status.CREATED)
       })
       test("test with end-point", async () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const geodeStore = useGeodeStore()
         const viewerStore = useViewerStore()
         const lambdaStore = useLambdaStore()
 
-        infra_store.app_mode = appMode.CLOUD
+        infraStore.app_mode = appMode.CLOUD
         const ID = "123456"
         registerEndpoint(lambdaStore.base_url, {
           method: "POST",
           handler: () => ({ ID }),
         })
-        await infra_store.create_backend()
-        expect(infra_store.status).toBe(Status.CREATED)
-        expect(infra_store.ID).toBe(ID)
+        await infraStore.create_backend()
+        expect(infraStore.status).toBe(Status.CREATED)
+        expect(infraStore.ID).toBe(ID)
 
         expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
         expect(viewerStore.status).toBe(Status.NOT_CONNECTED)

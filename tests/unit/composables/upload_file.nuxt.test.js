@@ -4,7 +4,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import upload_file from "@ogw_front/utils/upload_file"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 import { useGeodeStore } from "@ogw_front/stores/geode"
 const schema = schemas.opengeodeweb_back.upload_file
@@ -17,7 +17,7 @@ beforeEach(async () => {
   setActivePinia(pinia)
 })
 
-describe("upload_file.js", () => {
+describe("upload_file", () => {
   beforeEach(() => {
     const geodeStore = useGeodeStore()
     geodeStore.base_url = ""

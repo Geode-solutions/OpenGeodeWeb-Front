@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-  import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
+  import { useFeedbackStore } from "@ogw_front/stores/feedback"
   const feedbackStore = useFeedbackStore()
 
   function reload() {

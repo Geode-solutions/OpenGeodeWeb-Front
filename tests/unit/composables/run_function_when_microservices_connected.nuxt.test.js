@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
-import Status from "@ogw_front/utils/status.js"
+import Status from "@ogw_front/utils/status"
 
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"

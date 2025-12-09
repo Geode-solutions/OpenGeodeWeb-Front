@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-  import Status from "@ogw_front/utils/status.js"
+  import Status from "@ogw_front/utils/status"
   import Loading from "@ogw_front/components/Loading.vue"
   import Recaptcha from "@ogw_front/components/Recaptcha.vue"
   import { useInfraStore } from "@ogw_front/stores/infra"

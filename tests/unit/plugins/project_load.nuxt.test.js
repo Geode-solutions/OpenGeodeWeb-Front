@@ -8,10 +8,10 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useDataBaseStore } from "@ogw_front/stores/data_base"
 
-vi.mock("../../../internal/utils/viewer_call.js", () => ({
+vi.mock("../../../internal/utils/viewer_call", () => ({
   viewer_call: vi.fn(() => Promise.resolve()),
 }))
-vi.mock("@/stores/hybrid_viewer.js", () => ({
+vi.mock("@/stores/hybrid_viewer", () => ({
   useHybridViewerStore: () => ({
     $id: "hybridViewer",
     initHybridViewer: vi.fn(),
