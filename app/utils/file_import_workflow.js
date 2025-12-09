@@ -30,7 +30,15 @@ async function importItem(item) {
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
   const treeviewStore = useTreeviewStore()
-  await dataBaseStore.registerObject(item.id)
+  console.log("importItem", { item })
+  try {
+    await dataBaseStore.registerObject(item.id)
+  } catch (error) {
+    console.warn(
+      `[Import] Failed to register object ${item.id} in backend viewer:`,
+      error,
+    )
+  }
   await dataBaseStore.addItem(item.id, {
     ...item,
   })
