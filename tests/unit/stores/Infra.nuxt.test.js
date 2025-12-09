@@ -286,22 +286,25 @@ describe("Infra Store", () => {
         await infraStore.create_backend()
         expect(infraStore.status).toBe(Status.CREATED)
       })
-      // test("test with end-point", async () => {
-      //   const infraStore = useInfraStore()
-      //   const geodeStore = useGeodeStore()
-      //   const viewerStore = useViewerStore()
-      //   const feedbackStore = useFeedbackStore()
+      test("test with end-point", async () => {
+        const infra_store = useInfraStore()
+        const geodeStore = useGeodeStore()
+        const viewerStore = useViewerStore()
+        const lambdaStore = useLambdaStore()
 
-      //   registerEndpoint(infraStore.lambda_url, {
-      //     method: "POST",
-      //     handler: () => ({ ID: "123456" }),
-      //   })
-      //   await infraStore.create_backend()
-      //   expect(infraStore.status).toBe(Status.CREATED)
-      //   expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
-      //   expect(viewerStore.status).toBe(Status.NOT_CONNECTED)
-      //   expect(feedbackStore.server_error).toBe(true)
-      // })
+        infra_store.app_mode = appMode.CLOUD
+        const ID = "123456"
+        registerEndpoint(lambdaStore.base_url, {
+          method: "POST",
+          handler: () => ({ ID }),
+        })
+        await infra_store.create_backend()
+        expect(infra_store.status).toBe(Status.CREATED)
+        expect(infra_store.ID).toBe(ID)
+
+        expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
+        expect(viewerStore.status).toBe(Status.NOT_CONNECTED)
+      })
     })
   })
 })
