@@ -11,6 +11,7 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useLambdaStore } from "@ogw_front/stores/lambda"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
