@@ -15,7 +15,7 @@ const vuetify = createVuetify({
 })
 
 describe("FeedBackErrorBanner.vue", async () => {
-  test(`Test reload`, async () => {
+  ;(test(`Test reload`, async () => {
     const pinia = createTestingPinia({
       stubActions: false,
       createSpy: vi.fn,
@@ -56,5 +56,5 @@ describe("FeedBackErrorBanner.vue", async () => {
       const v_btn = wrapper.findAll(".v-btn")
       await v_btn[1].trigger("click")
       expect(feedbackStore.server_error).toBe(false)
-    })
+    }))
 })
