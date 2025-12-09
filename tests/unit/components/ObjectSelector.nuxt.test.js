@@ -83,6 +83,10 @@ describe("ObjectSelector.vue", async () => {
     await flushPromises()
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
+    console.log(
+      "wrapper.emitted().update_values",
+      wrapper.emitted().update_values,
+    )
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
       geode_object_type: geode_object_1,

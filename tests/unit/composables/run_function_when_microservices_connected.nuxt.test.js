@@ -54,10 +54,15 @@ describe("run_function_when_microservices_connected", () => {
   test("microservices not connected", async () => {
     const geodeStore = useGeodeStore()
     const viewerStore = useViewerStore()
+    const infraStore = useInfraStore()
     const spy = vi.spyOn(dumb_obj, "dumb_method")
     run_function_when_microservices_connected(dumb_obj.dumb_method)
     await geodeStore.$patch({ status: Status.NOT_CONNECTED })
     await viewerStore.$patch({ status: Status.NOT_CONNECTED })
+    console.log("geodeStore", geodeStore.status)
+    console.log("viewerStore", viewerStore.status)
+
+    console.log("microservices_connected", infraStore.microservices_connected)
     expect(spy).not.toHaveBeenCalled()
   })
 })

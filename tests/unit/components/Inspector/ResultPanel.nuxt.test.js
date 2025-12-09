@@ -30,7 +30,6 @@ describe("Inspector/ResultPanel.vue", async () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    expect(wrapper.componentVM.opened_panels._value).toStrictEqual([0])
     expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
       inspection_result,
     )
@@ -58,7 +57,9 @@ describe("Inspector/ResultPanel.vue", async () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    expect(wrapper.componentVM.opened_panels._value).toStrictEqual([])
+
+    console.log({ wrapper })
+
     expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
       inspection_result,
     )

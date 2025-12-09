@@ -76,6 +76,7 @@ describe("Lambda Store", () => {
         useRuntimeConfig().public.SITE_BRANCH = "/test"
         useRuntimeConfig().public.PROJECT = "/project"
 
+        lambdaStore.base_url = "test-base-url"
         registerEndpoint(lambdaStore.base_url, {
           method: "POST",
           handler: postFakeCall,

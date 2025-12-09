@@ -49,24 +49,23 @@
 </template>
 
 <script setup>
-  import geode_objects from "@ogw_front/assets/geode_objects"
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
+  import geode_objects from "@ogw_front/assets/geode_objects"
   import FetchingData from "@ogw_front/components/FetchingData.vue"
-
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const schema = schemas.opengeodeweb_back.allowed_objects
 
   const emit = defineEmits(["update_values", "increment_step"])
-
+  console.log("ObjectSelector")
   const props = defineProps({
     filenames: { type: Array, required: true },
     supported_feature: { type: String, required: false, default: null },
   })
 
   const geodeStore = useGeodeStore()
-  const { filenames, supported_feature } = props
+  const { filenames } = props
 
   const loading = ref(false)
   const allowed_objects = ref({})
@@ -146,6 +145,7 @@
   }
 
   function set_geode_object(geode_object_type) {
+    console.log("set_geode_object", { geode_object_type })
     if (geode_object_type) {
       emit("update_values", { geode_object_type })
       emit("increment_step")

@@ -16,6 +16,7 @@ export const useInfraStore = defineStore("infra", {
       return "localhost"
     },
     microservices_connected() {
+      console.log("microservices", this.microservices)
       return this.microservices.every(
         (store) => store.status === Status.CONNECTED,
       )
