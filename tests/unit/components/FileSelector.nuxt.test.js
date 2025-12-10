@@ -11,8 +11,8 @@ import { createTestingPinia } from "@pinia/testing"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-import FileSelector from "@ogw_front/components/FileSelector.vue"
-import FileUploader from "@ogw_front/components/FileUploader.vue"
+import FileSelector from "@ogw_front/components/FileSelector"
+import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
 const allowed_files_schema = schemas.opengeodeweb_back.allowed_files
@@ -23,7 +23,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-describe("FileSelector.vue", async () => {
+describe("FileSelector", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -43,7 +43,7 @@ describe("FileSelector.vue", async () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { multiple: false, supported_feature: "test", auto_upload: false },
+      props: { multiple: false, auto_upload: false },
     })
 
     const file_uploader = wrapper.findComponent(FileUploader)
@@ -92,7 +92,6 @@ describe("FileSelector.vue", async () => {
         },
         props: {
           multiple: false,
-          supported_feature: "test",
           files: files,
           auto_upload: true,
         },
@@ -115,7 +114,6 @@ describe("FileSelector.vue", async () => {
         },
         props: {
           multiple: false,
-          supported_feature: "test",
           files: files,
           auto_upload: false,
         },

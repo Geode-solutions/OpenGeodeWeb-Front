@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-  import VeaseViewToolbar from "@ogw_front/components/VeaseViewToolbar.vue"
+  import VeaseViewToolbar from "@ogw_front/components/VeaseViewToolbar"
 
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import { useViewerStore } from "@ogw_front/stores/viewer"

@@ -9,7 +9,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers.vue"
+import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 const vuetify = createVuetify({
@@ -17,7 +17,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-describe("FeedBackSnackers.vue", async () => {
+describe("FeedBackSnackers", async () => {
   test(`Test delete error`, async () => {
     const pinia = createTestingPinia({
       initialState: {

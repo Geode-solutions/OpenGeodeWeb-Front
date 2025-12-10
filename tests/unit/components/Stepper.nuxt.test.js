@@ -5,8 +5,8 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import Stepper from "@ogw_front/components/Stepper.vue"
-import ObjectSelector from "@ogw_front/components/ObjectSelector.vue"
+import Stepper from "@ogw_front/components/Stepper"
+import ObjectSelector from "@ogw_front/components/ObjectSelector"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 const vuetify = createVuetify({
@@ -16,7 +16,7 @@ const vuetify = createVuetify({
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-describe("Stepper.vue", async () => {
+describe("Stepper", async () => {
   test(`Mount`, async () => {
     const geode_object_type = ref("BRep")
     const files = ref([])

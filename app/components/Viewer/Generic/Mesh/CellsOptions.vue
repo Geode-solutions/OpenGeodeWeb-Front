@@ -21,9 +21,9 @@
 </template>
 
 <script setup>
-  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem.vue"
-  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue"
-  import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue"
+  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
+  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
+  import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"

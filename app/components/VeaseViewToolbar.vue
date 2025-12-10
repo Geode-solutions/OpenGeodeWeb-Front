@@ -29,8 +29,8 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-  import Screenshot from "@ogw_front/components/Screenshot.vue"
-  import ZScaling from "@ogw_front/components/ZScaling.vue"
+  import Screenshot from "@ogw_front/components/Screenshot"
+  import ZScaling from "@ogw_front/components/ZScaling"
 
   import { useViewerStore } from "@ogw_front/stores/viewer"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"

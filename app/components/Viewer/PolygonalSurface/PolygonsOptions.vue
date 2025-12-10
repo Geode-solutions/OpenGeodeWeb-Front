@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-  import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions.vue"
+  import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions"
   import PolygonalSurfacePolygons from "@ogw_front/assets/viewer_svgs/surface_triangles.svg"
 
   const props = defineProps({

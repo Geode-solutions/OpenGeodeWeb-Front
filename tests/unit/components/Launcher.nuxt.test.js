@@ -9,7 +9,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import Launcher from "@ogw_front/components/Launcher.vue"
+import Launcher from "@ogw_front/components/Launcher"
 
 import { useInfraStore } from "@ogw_front/stores/infra"
 
@@ -32,7 +32,7 @@ vi.stubGlobal("navigator", {
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-describe("Launcher.vue", async () => {
+describe("Launcher", async () => {
   test(`Mount`, async () => {
     const pinia = createTestingPinia({
       stubActions: false,

@@ -61,7 +61,6 @@
   console.log("ObjectSelector")
   const props = defineProps({
     filenames: { type: Array, required: true },
-    supported_feature: { type: String, required: false, default: null },
   })
 
   const geodeStore = useGeodeStore()

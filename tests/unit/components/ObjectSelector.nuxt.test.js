@@ -8,7 +8,7 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import ObjectSelector from "@ogw_front/components/ObjectSelector.vue"
+import ObjectSelector from "@ogw_front/components/ObjectSelector"
 
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
@@ -21,7 +21,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-describe("ObjectSelector.vue", async () => {
+describe("ObjectSelector", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -44,7 +44,7 @@ describe("ObjectSelector.vue", async () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { filenames: ["test.toto"], supported_feature: "test" },
+      props: { filenames: ["test.toto"] },
     })
     const v_card = wrapper.findComponent(components.VCard)
     const v_img = v_card.findComponent(components.VImg)
@@ -54,6 +54,7 @@ describe("ObjectSelector.vue", async () => {
     expect(wrapper.emitted().update_values[0][0]).toEqual({
       geode_object_type: geode_object_1,
     })
+    wrapper.unmount()
   })
 
   test(`test loabable with multiple classes`, async () => {
@@ -72,15 +73,13 @@ describe("ObjectSelector.vue", async () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { filenames: ["test.toto"], supported_feature: "test" },
+      props: { filenames: ["test.toto"] },
     })
     const v_card = wrapper.findComponent(components.VCard)
     const v_img = v_card.findComponent(components.VImg)
     expect(v_img.vm.src).toContain(`${geode_object_1}.svg`)
     await flushPromises()
-    await flushPromises()
     await v_card.trigger("click")
-    await flushPromises()
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
     console.log(
@@ -91,6 +90,7 @@ describe("ObjectSelector.vue", async () => {
     expect(wrapper.emitted().update_values[0][0]).toEqual({
       geode_object_type: geode_object_1,
     })
+    wrapper.unmount()
   })
 
   test(`test object_priority when is_loadable scores equal`, async () => {
@@ -113,12 +113,15 @@ describe("ObjectSelector.vue", async () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { filenames: ["test.toto"], supported_feature: "test" },
+      props: { filenames: ["test.toto"] },
     })
+
+    await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
       geode_object_type: geode_object_1,
     })
+    wrapper.unmount()
   })
 })

@@ -23,7 +23,7 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-  import Screenshot from "@ogw_front/components/Screenshot.vue"
+  import Screenshot from "@ogw_front/components/Screenshot"
   import { useViewerStore } from "@ogw_front/stores/viewer"
 
   const viewerStore = useViewerStore()

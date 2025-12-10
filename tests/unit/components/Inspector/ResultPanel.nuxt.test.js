@@ -5,14 +5,14 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel.vue"
+import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-describe("Inspector/ResultPanel.vue", async () => {
+describe("Inspector/ResultPanel", async () => {
   test(`Test with issues`, async () => {
     const inspection_result = [
       {

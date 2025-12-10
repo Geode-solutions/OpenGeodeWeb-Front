@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-  import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions.vue"
+  import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions"
   import Grid3D_Points from "@ogw_front/assets/viewer_svgs/grid_3d_points.svg"
 
   const props = defineProps({

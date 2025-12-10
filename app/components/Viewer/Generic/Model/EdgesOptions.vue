@@ -11,8 +11,8 @@
 </template>
 
 <script setup>
-  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem.vue"
-  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue"
+  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
+  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
   import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"

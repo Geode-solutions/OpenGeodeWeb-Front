@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-  import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions.vue"
+  import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions"
   import Grid3D_Facets from "@ogw_front/assets/viewer_svgs/grid_3d_facets.svg"
 
   const props = defineProps({

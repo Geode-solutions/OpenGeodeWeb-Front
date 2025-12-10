@@ -10,7 +10,7 @@ import { createTestingPinia } from "@pinia/testing"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-import FileUploader from "@ogw_front/components/FileUploader.vue"
+import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
@@ -20,7 +20,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-describe("FileUploader.vue", async () => {
+describe("FileUploader", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
