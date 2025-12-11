@@ -2,10 +2,16 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
 
-vi.mock("../../../internal/utils/viewer_call.js", () => ({
+import { useTreeviewStore } from "@ogw_front/stores/treeview"
+import { useAppStore } from "@ogw_front/stores/app"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+import { useDataBaseStore } from "@ogw_front/stores/data_base"
+
+vi.mock("../../../internal/utils/viewer_call", () => ({
   viewer_call: vi.fn(() => Promise.resolve()),
 }))
-vi.mock("@/stores/hybrid_viewer.js", () => ({
+vi.mock("@/stores/hybrid_viewer", () => ({
   useHybridViewerStore: () => ({
     $id: "hybridViewer",
     initHybridViewer: vi.fn(),

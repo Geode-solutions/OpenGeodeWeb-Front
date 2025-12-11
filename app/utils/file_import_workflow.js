@@ -1,8 +1,12 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import { useHybridViewerStore } from "../stores/hybrid_viewer"
 
 // Local imports
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
 async function importWorkflow(files) {
   console.log("importWorkflow", { files })

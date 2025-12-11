@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-  import ViewerGenericMeshCellsOptions from "@ogw_front/components/Viewer/Generic/Mesh/CellsOptions.vue"
+  import ViewerGenericMeshCellsOptions from "@ogw_front/components/Viewer/Generic/Mesh/CellsOptions"
   import Grid2D_Cells from "@ogw_front/assets/viewer_svgs/grid_2d_cells.svg"
 
   const props = defineProps({

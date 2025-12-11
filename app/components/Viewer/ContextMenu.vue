@@ -30,6 +30,8 @@
 </template>
 
 <script setup>
+  import { useMenuStore } from "@ogw_front/stores/menu"
+  import { useDataBaseStore } from "@ogw_front/stores/data_base"
   const menuStore = useMenuStore()
   const dataBaseStore = useDataBaseStore()
 

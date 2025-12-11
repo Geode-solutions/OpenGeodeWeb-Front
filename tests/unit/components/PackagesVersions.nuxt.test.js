@@ -8,14 +8,15 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import PackagesVersions from "@ogw_front/components/PackagesVersions.vue"
+import PackagesVersions from "@ogw_front/components/PackagesVersions"
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-describe("PackagesVersions.vue", async () => {
+describe("PackagesVersions", async () => {
   test(`Mount`, async () => {
     const pinia = createTestingPinia({
       createSpy: vi.fn,

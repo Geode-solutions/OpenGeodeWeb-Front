@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-  import Step from "@ogw_front/components/Step.vue"
+  import Step from "@ogw_front/components/Step"
 
   const emit = defineEmits(["reset_values"])
   const stepper_tree = inject("stepper_tree")

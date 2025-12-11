@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-  import ViewerPointSetSpecificPointsOptions from "@ogw_front/components/Viewer/PointSet/SpecificPointsOptions.vue"
+  import ViewerPointSetSpecificPointsOptions from "@ogw_front/components/Viewer/PointSet/SpecificPointsOptions"
   import PointSetPoints from "@ogw_front/assets/viewer_svgs/point_set_points.svg"
 
   const props = defineProps({

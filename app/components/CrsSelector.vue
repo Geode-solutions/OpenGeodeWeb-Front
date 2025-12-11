@@ -26,6 +26,7 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   const schema = schemas.opengeodeweb_back.geographic_coordinate_systems
+  import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const emit = defineEmits([
     "update_values",

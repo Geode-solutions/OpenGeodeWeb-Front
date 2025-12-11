@@ -34,7 +34,7 @@
 
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-  import { upload_file } from "@ogw_front/utils/upload_file.js"
+  import { upload_file } from "@ogw_front/utils/upload_file"
   const schema = schemas.opengeodeweb_back.upload_file
 
   const emit = defineEmits(["files_uploaded", "decrement_step"])

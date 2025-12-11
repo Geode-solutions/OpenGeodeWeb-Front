@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-  import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel.vue"
+  import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
 
   const props = defineProps({
     inspection_result: { type: Array, required: true },

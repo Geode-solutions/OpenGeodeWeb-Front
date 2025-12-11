@@ -9,6 +9,7 @@
 
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+  import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const props = defineProps({
     id: { type: String, required: true },

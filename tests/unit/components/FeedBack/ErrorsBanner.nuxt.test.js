@@ -4,16 +4,17 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createTestingPinia } from "@pinia/testing"
-
-import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner.vue"
 import { setActivePinia } from "pinia"
+
+import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-describe("FeedBackErrorBanner.vue", async () => {
+describe("FeedBackErrorBanner", async () => {
   ;(test(`Test reload`, async () => {
     const pinia = createTestingPinia({
       stubActions: false,
@@ -26,9 +27,9 @@ describe("FeedBackErrorBanner.vue", async () => {
       },
     })
     const reload_spy = vi.spyOn(wrapper.vm, "reload")
-    const feedback_store = useFeedbackStore()
-    await feedback_store.$patch({ server_error: true })
-    expect(feedback_store.server_error).toBe(true)
+    const feedbackStore = useFeedbackStore()
+    await feedbackStore.$patch({ server_error: true })
+    expect(feedbackStore.server_error).toBe(true)
     const v_btn = wrapper.findAll(".v-btn")
     await v_btn[0].trigger("click")
     expect(reload_spy).toHaveBeenCalledTimes(1)
@@ -51,9 +52,9 @@ describe("FeedBackErrorBanner.vue", async () => {
         },
       })
 
-      const feedback_store = useFeedbackStore()
+      const feedbackStore = useFeedbackStore()
       const v_btn = wrapper.findAll(".v-btn")
       await v_btn[1].trigger("click")
-      expect(feedback_store.server_error).toBe(false)
+      expect(feedbackStore.server_error).toBe(false)
     }))
 })

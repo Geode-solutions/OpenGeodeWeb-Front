@@ -1,5 +1,6 @@
-import Status from "@ogw_front/utils/status.js"
-import { appMode, getAppMode } from "@ogw_front/utils/app_mode.js"
+import Status from "@ogw_front/utils/status"
+import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
+import { useLambdaStore } from "@ogw_front/stores/lambda"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
@@ -17,6 +18,7 @@ export const useInfraStore = defineStore("infra", {
       return "localhost"
     },
     microservices_connected() {
+      console.log("microservices", this.microservices)
       return this.microservices.every(
         (store) => store.status === Status.CONNECTED,
       )
