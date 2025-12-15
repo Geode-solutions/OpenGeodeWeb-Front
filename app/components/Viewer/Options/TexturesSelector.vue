@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-  import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue"
+  import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem"
 
   const textures = defineModel()
 

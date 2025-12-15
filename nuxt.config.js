@@ -16,7 +16,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
   ],
   imports: {
-    dirs: ["app/stores", "app/composables", "app/utils", "internal/utils"],
+    scan: false,
   },
 
   alias: {
@@ -36,8 +36,6 @@ export default defineNuxtConfig({
       isCustomElement: (tag) => ["md-linedivider"].includes(tag),
     },
   },
-
-  testUtils: {},
 
   vite: {
     optimizeDeps: {

@@ -4,6 +4,14 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/file_import_workflow"
 
+import { useAppStore } from "@ogw_front/stores/app"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+import { useTreeviewStore } from "@ogw_front/stores/treeview"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+
 export function useProjectManager() {
   const exportProject = async function () {
     console.log("[export triggered]")
@@ -24,6 +32,7 @@ export function useProjectManager() {
 
   const importProjectFile = async function (file) {
     const geodeStore = useGeodeStore()
+    const dataStyleStore = useDataStyleStore()
     const viewerStore = useViewerStore()
     const dataBaseStore = useDataBaseStore()
     const treeviewStore = useTreeviewStore()
@@ -96,13 +105,10 @@ export function useProjectManager() {
 
     await importWorkflowFromSnapshot(items)
     await hybridViewerStore.importStores(snapshot.hybridViewer || {})
-
     {
-      const dataStyleStore = useDataStyleStore()
       await dataStyleStore.importStores(snapshot.dataStyle || {})
     }
     {
-      const dataStyleStore = useDataStyleStore()
       await dataStyleStore.applyAllStylesFromState()
     }
 

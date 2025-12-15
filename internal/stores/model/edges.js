@@ -1,11 +1,16 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
+// Local imports
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+
 // Local constants
 const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges
 
 export function useModelEdgesStyle() {
   const dataStyleStore = useDataStyleStore()
+  const viewerStore = useViewerStore()
 
   function modelEdgesStyle(id) {
     return dataStyleStore.styles[id].edges
@@ -15,7 +20,6 @@ export function useModelEdgesStyle() {
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       model_edges_schemas.visibility,
       { id, visibility },

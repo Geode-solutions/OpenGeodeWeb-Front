@@ -23,8 +23,10 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-  import Screenshot from "@ogw_front/components/Screenshot.vue"
+  import Screenshot from "@ogw_front/components/Screenshot"
+  import { useViewerStore } from "@ogw_front/stores/viewer"
 
+  const viewerStore = useViewerStore()
   const take_screenshot = ref(false)
   const grid_scale = ref(false)
 
@@ -33,7 +35,6 @@
       tooltip: "Reset camera",
       icon: "mdi-cube-scan",
       action: () => {
-        const viewerStore = useViewerStore()
         viewerStore.request(schemas.opengeodeweb_viewer.viewer.reset_camera)
       },
     },

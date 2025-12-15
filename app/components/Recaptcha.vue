@@ -39,7 +39,8 @@
 </template>
 
 <script setup>
-  import { appMode } from "@ogw_front/utils/app_mode.js"
+  import { appMode } from "@ogw_front/utils/app_mode"
+  import { useInfraStore } from "@ogw_front/stores/infra"
 
   const props = defineProps({
     button_label: {
@@ -53,7 +54,7 @@
       default: "white",
     },
   })
-  const infra_store = useInfraStore()
+  const infraStore = useInfraStore()
   const name = ref("")
   const email = ref("")
   const launch = ref(false)
@@ -76,9 +77,9 @@
     if (import.meta.client) {
       if (
         process.env.NODE_ENV !== "production" ||
-        infra_store.app_mode !== appMode.CLOUD
+        infraStore.app_mode !== appMode.CLOUD
       ) {
-        infra_store.$patch({ is_captcha_validated: true })
+        infraStore.$patch({ is_captcha_validated: true })
       }
     }
   })
@@ -91,7 +92,7 @@
         launch: launch.value,
       },
     })
-    infra_store.$patch({
+    infraStore.$patch({
       is_captcha_validated: response.status === 200,
     })
   }

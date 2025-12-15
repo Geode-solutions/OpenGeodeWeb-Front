@@ -1,4 +1,5 @@
-import Status from "@ogw_front/utils/status.js"
+import Status from "@ogw_front/utils/status"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 export const useLambdaStore = defineStore("lambda", {
   state: () => ({
@@ -41,7 +42,7 @@ export const useLambdaStore = defineStore("lambda", {
       if (error.value || !data.value) {
         this.status = Status.NOT_CONNECTED
         feedbackStore.server_error = true
-        console.error("[LAMBDA] Failed to launch lambda backend")
+        console.error("[LAMBDA] Failed to launch lambda backend", error.value)
         throw new Error("Failed to launch lambda backend")
       }
 

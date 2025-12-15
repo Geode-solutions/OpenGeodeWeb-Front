@@ -1,9 +1,11 @@
-import Status from "@ogw_front/utils/status.js"
-import { appMode, getAppMode } from "@ogw_front/utils/app_mode.js"
+import Status from "@ogw_front/utils/status"
+import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
+import { useLambdaStore } from "@ogw_front/stores/lambda"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
+    ID: "",
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
     microservices: [],
@@ -16,6 +18,7 @@ export const useInfraStore = defineStore("infra", {
       return "localhost"
     },
     microservices_connected() {
+      console.log("microservices", this.microservices)
       return this.microservices.every(
         (store) => store.status === Status.CONNECTED,
       )
@@ -65,7 +68,7 @@ export const useInfraStore = defineStore("infra", {
         } else if (this.app_mode == appMode.CLOUD) {
           console.log("[INFRA] CLOUD mode - Launching lambda...")
           const lambdaStore = useLambdaStore()
-          await lambdaStore.launch()
+          this.ID = await lambdaStore.launch()
           console.log("[INFRA] Lambda launched successfully")
         }
 

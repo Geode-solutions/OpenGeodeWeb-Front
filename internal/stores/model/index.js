@@ -2,12 +2,16 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelSurfacesStyle } from "./surfaces.js"
-import { useModelCornersStyle } from "./corners.js"
-import { useModelBlocksStyle } from "./blocks.js"
-import { useModelLinesStyle } from "./lines.js"
-import { useModelEdgesStyle } from "./edges.js"
-import { useModelPointsStyle } from "./points.js"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useModelSurfacesStyle } from "./surfaces"
+import { useModelCornersStyle } from "./corners"
+import { useModelBlocksStyle } from "./blocks"
+import { useModelLinesStyle } from "./lines"
+import { useModelEdgesStyle } from "./edges"
+import { useModelPointsStyle } from "./points"
 
 // Local constants
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model
@@ -22,12 +26,12 @@ export default function useModelStyle() {
   const modelPointsStyleStore = useModelPointsStyle()
   const modelSurfacesStyleStore = useModelSurfacesStyle()
   const hybridViewerStore = useHybridViewerStore()
+  const viewerStore = useViewerStore()
 
   function modelVisibility(id) {
     return dataStyleStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       model_schemas.visibility,
       { id, visibility },
@@ -82,7 +86,6 @@ export default function useModelStyle() {
     return dataStyleStore.getStyle(id).color
   }
   function setModelColor(id, color) {
-    const viewerStore = useViewerStore()
     return viewerStore.request(
       model_schemas.color,
       { id, color },

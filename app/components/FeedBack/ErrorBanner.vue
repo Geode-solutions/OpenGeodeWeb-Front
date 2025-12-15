@@ -1,6 +1,6 @@
 <template>
   <v-banner
-    v-if="feedback_store.server_error"
+    v-if="feedbackStore.server_error"
     elevation="2"
     style="background-color: grey; z-index: 9999"
     position="fixed"
@@ -33,7 +33,7 @@
           size="20"
           color="grey"
           class=".align-center"
-          @click="feedback_store.delete_server_error()"
+          @click="feedbackStore.delete_server_error()"
         >
           <v-icon icon="mdi-close" size="20" color="white" />
         </v-btn>
@@ -43,7 +43,8 @@
 </template>
 
 <script setup>
-  const feedback_store = useFeedbackStore()
+  import { useFeedbackStore } from "@ogw_front/stores/feedback"
+  const feedbackStore = useFeedbackStore()
 
   function reload() {
     window.location.reload()

@@ -24,9 +24,9 @@
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize, useWindowSize } from "@vueuse/core"
   import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-  import Status from "@ogw_front/utils/status.js"
-
-  import ViewToolbar from "@ogw_front/components/ViewToolbar.vue"
+  import Status from "@ogw_front/utils/status"
+  import ViewToolbar from "@ogw_front/components/ViewToolbar"
+  import { useViewerStore } from "@ogw_front/stores/viewer"
 
   const props = defineProps({
     viewId: { type: String, default: "-1" },

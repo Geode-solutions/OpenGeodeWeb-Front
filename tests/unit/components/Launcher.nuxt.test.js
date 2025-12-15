@@ -9,7 +9,9 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import Launcher from "@ogw_front/components/Launcher.vue"
+import Launcher from "@ogw_front/components/Launcher"
+
+import { useInfraStore } from "@ogw_front/stores/infra"
 
 const vuetify = createVuetify({
   components,
@@ -30,22 +32,22 @@ vi.stubGlobal("navigator", {
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-describe("Launcher.vue", async () => {
+describe("Launcher", async () => {
   test(`Mount`, async () => {
     const pinia = createTestingPinia({
       stubActions: false,
       createSpy: vi.fn,
     })
     setActivePinia(pinia)
-    const infra_store = useInfraStore()
+    const infraStore = useInfraStore()
     const wrapper = await mountSuspended(Launcher, {
       global: {
         plugins: [pinia, vuetify],
       },
     })
     expect(wrapper.exists()).toBe(true)
-    await infra_store.$patch({ is_captcha_validated: true })
+    await infraStore.$patch({ is_captcha_validated: true })
     await flushPromises()
-    expect(infra_store.create_backend).toHaveBeenCalled()
+    expect(infraStore.create_backend).toHaveBeenCalled()
   })
 })

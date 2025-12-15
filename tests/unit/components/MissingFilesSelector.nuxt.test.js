@@ -8,10 +8,11 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector.vue"
-import FileUploader from "@ogw_front/components/FileUploader.vue"
-
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+
+import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector"
+import FileUploader from "@ogw_front/components/FileUploader"
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
 const missing_files_schema = schemas.opengeodeweb_back.missing_files
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
@@ -21,7 +22,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-describe("MissingFilesSelector.vue", async () => {
+describe("MissingFilesSelector", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,

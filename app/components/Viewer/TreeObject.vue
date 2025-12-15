@@ -36,10 +36,16 @@
 </template>
 
 <script setup>
+  import { useTreeviewStore } from "@ogw_front/stores/treeview"
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import { useDataBaseStore } from "@ogw_front/stores/data_base"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+
   const treeviewStore = useTreeviewStore()
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
   const hybridViewerStore = useHybridViewerStore()
+
   const emit = defineEmits(["show-menu"])
 
   function isLeafNode(item) {

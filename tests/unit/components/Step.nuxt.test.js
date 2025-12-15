@@ -5,8 +5,8 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import Step from "@ogw_front/components/Step.vue"
-import ObjectSelector from "@ogw_front/components/ObjectSelector.vue"
+import Step from "@ogw_front/components/Step"
+import ObjectSelector from "@ogw_front/components/ObjectSelector"
 
 const vuetify = createVuetify({
   components,
@@ -15,7 +15,7 @@ const vuetify = createVuetify({
 
 global.ResizeObserver = require("resize-observer-polyfill")
 
-describe("Step.vue", async () => {
+describe("Step", async () => {
   test(`BRep`, async () => {
     const geode_object_type = ref("BRep")
     const files = ref([])

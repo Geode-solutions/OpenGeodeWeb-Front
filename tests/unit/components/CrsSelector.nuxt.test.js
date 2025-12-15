@@ -7,8 +7,10 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 
-import CrsSelector from "@ogw_front/components/CrsSelector.vue"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+
+import CrsSelector from "@ogw_front/components/CrsSelector"
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
 const crs_selector_schema =
   schemas.opengeodeweb_back.geographic_coordinate_systems
@@ -18,7 +20,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-describe("CrsSelector.vue", () => {
+describe("CrsSelector", () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,

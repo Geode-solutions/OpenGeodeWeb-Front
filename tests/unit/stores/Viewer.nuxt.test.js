@@ -71,78 +71,78 @@ describe("Viewer Store", () => {
   describe("getters", () => {
     describe("protocol", () => {
       test("test app_mode CLOUD", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.CLOUD
+        infraStore.app_mode = appMode.CLOUD
         expect(viewerStore.protocol).toBe("wss")
       })
       test("test app_mode BROWSER", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.BROWSER
+        infraStore.app_mode = appMode.BROWSER
         expect(viewerStore.protocol).toBe("ws")
       })
       test("test app_mode DESKTOP", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.DESKTOP
+        infraStore.app_mode = appMode.DESKTOP
         expect(viewerStore.protocol).toBe("ws")
       })
     })
 
     describe("port", () => {
       test("test app_mode CLOUD", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.CLOUD
+        infraStore.app_mode = appMode.CLOUD
         expect(viewerStore.port).toBe("443")
       })
       test("test app_mode BROWSER", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.BROWSER
+        infraStore.app_mode = appMode.BROWSER
         expect(viewerStore.port).toBe(viewerStore.default_local_port)
       })
       test("test app_mode DESKTOP", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.DESKTOP
+        infraStore.app_mode = appMode.DESKTOP
         expect(viewerStore.port).toBe(viewerStore.default_local_port)
       })
 
       test("test override default_local_port", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.DESKTOP
+        infraStore.app_mode = appMode.DESKTOP
         viewerStore.default_local_port = "8080"
         expect(viewerStore.port).toBe("8080")
       })
     })
     describe("base_url", () => {
       test("test app_mode DESKTOP", () => {
-        const infra_store = useInfraStore()
-        infra_store.app_mode = appMode.DESKTOP
-        infra_store.domain_name = "localhost"
+        const infraStore = useInfraStore()
+        infraStore.app_mode = appMode.DESKTOP
+        infraStore.domain_name = "localhost"
         // expect(viewerStore.base_url).toBe("ws://localhost:1234/ws")
       })
 
       test("test app_mode CLOUD", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.CLOUD
-        infra_store.ID = "123456"
-        infra_store.domain_name = "example.com"
+        infraStore.app_mode = appMode.CLOUD
+        infraStore.ID = "123456"
+        infraStore.domain_name = "example.com"
         expect(viewerStore.base_url).toBe(
           "wss://example.com:443/123456/viewer/ws",
         )
       })
 
       test("test app_mode CLOUD, ID empty", () => {
-        const infra_store = useInfraStore()
+        const infraStore = useInfraStore()
         const viewerStore = useViewerStore()
-        infra_store.app_mode = appMode.CLOUD
-        infra_store.ID = ""
-        infra_store.domain_name = "example.com"
+        infraStore.app_mode = appMode.CLOUD
+        infraStore.ID = ""
+        infraStore.domain_name = "example.com"
         expect(() => viewerStore.base_url).toThrowError(
           "ID must not be empty in cloud mode",
         )
@@ -163,9 +163,9 @@ describe("Viewer Store", () => {
   })
   describe("actions", () => {
     // test("ws_connect", async () => {
-    //   const infra_store = useInfraStore()
+    //   const infraStore = useInfraStore()
     //   const viewerStore = useViewerStore()
-    //   infra_store.app_mode = appMode.BROWSER
+    //   infraStore.app_mode = appMode.BROWSER
     //   const viewer_path = path.join(
     //     executable_path(
     //       path.join("tests", "integration", "microservices", "viewer"),

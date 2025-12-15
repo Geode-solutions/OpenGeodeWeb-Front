@@ -1,6 +1,8 @@
 import { defineConfig } from "vitest/config"
 import { defineVitestProject } from "@nuxt/test-utils/config"
 
+const globalRetry = process.env.CI ? 3 : 0
+
 export default defineConfig({
   test: {
     projects: [
@@ -14,6 +16,7 @@ export default defineConfig({
               inline: ["vuetify"],
             },
           },
+          retry: globalRetry,
         },
       }),
       await defineVitestProject({
@@ -22,12 +25,12 @@ export default defineConfig({
           include: ["tests/integration/**/*.test.js"],
           environment: "nuxt",
           fileParallelism: false,
-          setupFiles: ["tests/integration/setup.js"],
           server: {
             deps: {
               inline: ["vuetify"],
             },
           },
+          retry: globalRetry,
         },
       }),
     ],

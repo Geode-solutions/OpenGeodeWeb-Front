@@ -7,7 +7,9 @@ import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import ExtensionSelector from "@ogw_front/components/ExtensionSelector.vue"
+import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
+
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
@@ -18,7 +20,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-describe("ExtensionSelector.vue", async () => {
+describe("ExtensionSelector", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,

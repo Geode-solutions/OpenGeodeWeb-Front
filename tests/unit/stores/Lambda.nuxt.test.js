@@ -6,8 +6,11 @@ import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useLambdaStore } from "@ogw_front/stores/lambda"
+
 // Local imports
-import Status from "@ogw_front/utils/status.js"
+import Status from "@ogw_front/utils/status"
 
 beforeEach(async () => {
   const pinia = createTestingPinia({
@@ -73,6 +76,7 @@ describe("Lambda Store", () => {
         useRuntimeConfig().public.SITE_BRANCH = "/test"
         useRuntimeConfig().public.PROJECT = "/project"
 
+        lambdaStore.base_url = "test-base-url"
         registerEndpoint(lambdaStore.base_url, {
           method: "POST",
           handler: postFakeCall,
@@ -121,9 +125,7 @@ describe("Lambda Store", () => {
     describe("connect", () => {
       test("successful connect", async () => {
         const lambdaStore = useLambdaStore()
-
         await lambdaStore.connect()
-
         expect(lambdaStore.status).toBe(Status.CONNECTED)
       })
     })
