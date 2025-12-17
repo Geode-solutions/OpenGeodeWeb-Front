@@ -84,7 +84,7 @@
     }
   })
   async function submit_recaptcha() {
-    const response = await $fetch.raw(`/.netlify/functions/recaptcha`, {
+    const response = await $fetch.raw(`/.netlify/functions/recaptcha.js`, {
       method: "POST",
       body: {
         name: name.value,
