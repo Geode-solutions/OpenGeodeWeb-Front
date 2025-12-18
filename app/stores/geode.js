@@ -46,9 +46,7 @@ export const useGeodeStore = defineStore("geode", {
   actions: {
     ping_task() {
       setInterval(() => {
-        if (this.status == Status.CONNECTED) {
-          this.do_ping()
-        }
+        this.do_ping()
       }, 10 * 1000)
     },
     do_ping() {
@@ -86,7 +84,7 @@ export const useGeodeStore = defineStore("geode", {
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")
-      return this.do_ping()
+      return this.ping_task()
     },
     request(schema, params, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id)
