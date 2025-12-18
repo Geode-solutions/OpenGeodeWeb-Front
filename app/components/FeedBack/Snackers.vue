@@ -64,7 +64,7 @@
   import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
   const feedbackStore = useFeedbackStore()
-  const show = true
+  const show = ref(true)
 
   function calc_margin(index) {
     return index * 60 + 8 + "px"

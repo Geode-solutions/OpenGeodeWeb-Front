@@ -18,6 +18,8 @@
   import { useDataBaseStore } from "@ogw_front/stores/data_base"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 
+  import { compareSelections } from "@ogw_front/utils/treeview"
+
   const dataStyleStore = useDataStyleStore()
   const dataBaseStore = useDataBaseStore()
   const hybridViewerStore = useHybridViewerStore()
