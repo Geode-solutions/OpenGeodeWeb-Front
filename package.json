@@ -34,6 +34,7 @@
     "vite": "6.3.5",
     "vite-plugin-vuetify": "2.1.1",
     "vitest": "4.0.16",
+    "vitest-browser-vue": "2.0.1",
     "vitest-environment-nuxt": "1.0.1"
   },
   "overrides": {
@@ -61,7 +62,6 @@
     "sass": "1.87.0",
     "semver": "7.7.1",
     "uuid": "11.1.0",
-    "vitest-browser-vue": "^2.0.1",
     "vue3-carousel": "0.3.4",
     "vuetify": "3.10.11",
     "ws": "8.18.3",
