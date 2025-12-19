@@ -1,17 +1,9 @@
 import { describe, expect, test } from "vitest"
 // import { mountSuspended } from "@nuxt/test-utils/runtime"
 
-// import { createVuetify } from "vuetify"
-// import * as components from "vuetify/components"
-// import * as directives from "vuetify/directives"
-
 // // import Wrapper from "@ogw_front/components/Wrapper"
 // import ObjectSelector from "@ogw_front/components/ObjectSelector"
-
-// const vuetify = createVuetify({
-//   components,
-//   directives,
-// })
+// import { vuetify } from "../../utils"
 
 // global.ResizeObserver = require("resize-observer-polyfill")
 
