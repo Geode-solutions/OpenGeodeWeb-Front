@@ -1,21 +1,14 @@
 import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
 
 import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
+import { vuetify } from "../../../utils"
 
 describe("FeedBackErrorBanner", async () => {
-  ;(test(`Test reload`, async () => {
+  test(`Test reload`, async () => {
     const pinia = createTestingPinia({
       stubActions: false,
       createSpy: vi.fn,
@@ -56,5 +49,5 @@ describe("FeedBackErrorBanner", async () => {
       const v_btn = wrapper.findAll(".v-btn")
       await v_btn[1].trigger("click")
       expect(feedbackStore.server_error).toBe(false)
-    }))
+    })
 })
