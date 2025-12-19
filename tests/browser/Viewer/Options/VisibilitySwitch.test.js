@@ -1,10 +1,8 @@
 import { expect, test } from "vitest"
 import { render } from "vitest-browser-vue"
 
-import VisibilitySwitch from "@/components/Viewer/Options/VisibilitySwitch.vue"
+import VisibilitySwitch from "@/components/Viewer/Options/VisibilitySwitch"
 import { vuetify } from "../../../utils"
-
-console.log("VisibilitySwitch", VisibilitySwitch)
 
 test("Graphic test for VisibilitySwitch", async () => {
   const component = await render(VisibilitySwitch, {
@@ -12,6 +10,5 @@ test("Graphic test for VisibilitySwitch", async () => {
       plugins: [vuetify],
     },
   })
-  console.log("component", component)
-  await expect(component).toMatchScreenshot()
+  await expect(component.container).toMatchScreenshot("VisibilitySwitch")
 })
