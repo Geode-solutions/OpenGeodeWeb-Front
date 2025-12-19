@@ -2,20 +2,13 @@
 vi.stubGlobal("visualViewport", new EventTarget())
 import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
-import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
 import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
+import { vuetify } from "../../../utils"
 
 describe("FeedBackSnackers", async () => {
   test(`Test delete error`, async () => {

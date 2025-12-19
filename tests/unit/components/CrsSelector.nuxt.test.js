@@ -1,24 +1,16 @@
-import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 import { describe, expect, test, vi } from "vitest"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-
 import CrsSelector from "@ogw_front/components/CrsSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
+import { vuetify } from "../../utils"
+
 const crs_selector_schema =
   schemas.opengeodeweb_back.geographic_coordinate_systems
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
 
 describe("CrsSelector", () => {
   const pinia = createTestingPinia({

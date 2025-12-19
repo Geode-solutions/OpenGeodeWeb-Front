@@ -1,24 +1,15 @@
 import { describe, expect, test, vi } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-
-import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
-
-import { useGeodeStore } from "@ogw_front/stores/geode"
+import * as components from "vuetify/components"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { vuetify } from "../../utils"
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
 
 describe("ExtensionSelector", async () => {
   const pinia = createTestingPinia({

@@ -1,20 +1,11 @@
 import { describe, expect, test, vi } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
-
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
 import PackagesVersions from "@ogw_front/components/PackagesVersions"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
+import { vuetify } from "../../utils"
 
 describe("PackagesVersions", async () => {
   test(`Mount`, async () => {

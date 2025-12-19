@@ -1,16 +1,8 @@
 import { describe, expect, test } from "vitest"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-
 import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
+import { vuetify } from "../../../utils"
 
 describe("Inspector/ResultPanel", async () => {
   test(`Test with issues`, async () => {

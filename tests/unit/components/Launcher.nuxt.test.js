@@ -1,22 +1,13 @@
 import { describe, expect, test, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
-
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
 import Launcher from "@ogw_front/components/Launcher"
 
 import { useInfraStore } from "@ogw_front/stores/infra"
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
+import { vuetify } from "../../utils"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
