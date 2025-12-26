@@ -3,7 +3,7 @@
     <v-btn
       :loading="loading"
       color="primary"
-      @click="get_inspection_results(props.input_geode_object, props.filename)"
+      @click="get_inspection_results(props.geode_object_type, props.filename)"
     >
       Inspect
       <template #loader>
@@ -24,15 +24,15 @@
     "decrement_step",
   ])
   const props = defineProps({
-    input_geode_object: { type: String, required: true },
+    geode_object_type: { type: String, required: true },
     filename: { type: String, required: true },
   })
   const loading = ref(false)
   const toggle_loading = useToggle(loading)
 
-  async function get_inspection_results(input_geode_object, filename) {
+  async function get_inspection_results(geode_object_type, filename) {
     toggle_loading()
-    const params = { input_geode_object, filename }
+    const params = { geode_object_type, filename }
 
     await api_fetch(
       { schema, params },

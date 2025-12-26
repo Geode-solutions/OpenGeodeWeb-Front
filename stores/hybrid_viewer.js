@@ -73,9 +73,20 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function setVisibility(id, visibility) {
-    db[id].actor.setVisibility(visibility)
-    const renderWindow = genericRenderWindow.value.getRenderWindow()
-    renderWindow.render()
+    if (db[id]) {
+      db[id].actor.setVisibility(visibility)
+      const renderWindow = genericRenderWindow.value.getRenderWindow()
+      renderWindow.render()
+    }
+  }
+
+  async function removeItem(id) {
+    if (db[id] && genericRenderWindow.value) {
+      const renderer = genericRenderWindow.value.getRenderer()
+      renderer.removeActor(db[id].actor)
+      delete db[id]
+      genericRenderWindow.value.getRenderWindow().render()
+    }
   }
   async function setZScaling(z_scale) {
     zScale.value = z_scale
@@ -137,6 +148,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setContainer(container) {
+    if (!container.value) return
     genericRenderWindow.value.setContainer(container.value.$el)
     const webGLRenderWindow =
       genericRenderWindow.value.getApiSpecificRenderWindow()
@@ -204,13 +216,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const cameraSnapshot = camera
       ? {
-          focal_point: [...camera.getFocalPoint()],
-          view_up: [...camera.getViewUp()],
-          position: [...camera.getPosition()],
-          view_angle: camera.getViewAngle(),
-          clipping_range: [...camera.getClippingRange()],
-          distance: camera.getDistance(),
-        }
+        focal_point: [...camera.getFocalPoint()],
+        view_up: [...camera.getViewUp()],
+        position: [...camera.getPosition()],
+        view_angle: camera.getViewAngle(),
+        clipping_range: [...camera.getClippingRange()],
+        distance: camera.getDistance(),
+      }
       : camera_options
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
@@ -265,6 +277,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   const clear = () => {
+    if (!genericRenderWindow.value) return
     const renderer = genericRenderWindow.value.getRenderer()
     const actors = renderer.getActors()
     for (const actor of actors) {
@@ -280,6 +293,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     db,
     genericRenderWindow,
     addItem,
+    removeItem,
     setVisibility,
     setZScaling,
     syncRemoteCamera,

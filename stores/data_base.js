@@ -1,20 +1,45 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { db } from "@ogw_front/composables/db.js"
 
 // Local constants
 const back_model_schemas = back_schemas.opengeodeweb_back.models
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 
 export const useDataBaseStore = defineStore("dataBase", () => {
-  const db = reactive({})
+  // In-memory cache for backward compatibility with existing code
+  const db_cache = reactive({})
 
-  function itemMetaDatas(id) {
-    return db[id]
+  /**
+   * Get item metadata by ID
+   * Uses in-memory cache for performance, falls back to Dexie
+   */
+  async function itemMetaDatas(id) {
+    // Check cache first
+    if (db_cache[id]) {
+      return db_cache[id]
+    }
+    // Query from Dexie
+    const item = await db.importedData.get(id)
+    if (item) {
+      db_cache[id] = item
+    }
+    return item
+  }
+
+  /**
+   * Get item metadata synchronously from cache only
+   * For backward compatibility with synchronous code
+   */
+  function itemMetaDatasSync(id) {
+    return db_cache[id]
   }
 
   function formatedMeshComponents(id) {
-    const { mesh_components } = itemMetaDatas(id)
+    const item = itemMetaDatasSync(id)
+    if (!item || !item.mesh_components) return []
+    const { mesh_components } = item
     const formated_mesh_components = ref([])
 
     for (const [category, uuids] of Object.entries(mesh_components)) {
@@ -32,7 +57,9 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   function meshComponentType(id, uuid) {
-    const { mesh_components } = itemMetaDatas(id)
+    const item = itemMetaDatasSync(id)
+    if (!item || !item.mesh_components) return null
+    const { mesh_components } = item
 
     if (mesh_components["Corner"]?.includes(uuid)) return "corner"
     else if (mesh_components["Line"]?.includes(uuid)) return "line"
@@ -48,18 +75,54 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     })
   }
 
+  async function deregisterObject(id) {
+    return viewer_call({
+      schema: viewer_generic_schemas.deregister,
+      params: { id },
+    })
+  }
+
   async function addItem(
     id,
     value = {
       object_type,
-      geode_object,
+      geode_object_type,
       native_filename,
       viewable_filename,
-      displayed_name,
+      name,
       vtk_js: { binary_light_viewable },
     },
   ) {
-    db[id] = value
+    const itemData = {
+      id,
+      visible: true,
+      created_at: new Date().toISOString(),
+      ...value,
+    }
+
+    await db.importedData.put(itemData)
+
+    db_cache[id] = itemData
+  }
+
+  async function getAllItems() {
+    const items = await db.importedData.toArray()
+    items.forEach((item) => {
+      db_cache[item.id] = item
+    })
+    return items
+  }
+
+  async function deleteItem(id) {
+    await db.importedData.delete(id)
+    delete db_cache[id]
+  }
+
+  async function updateItem(id, changes) {
+    await db.importedData.update(id, changes)
+    if (db_cache[id]) {
+      Object.assign(db_cache[id], changes)
+    }
   }
 
   async function fetchMeshComponents(id) {
@@ -72,7 +135,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       },
       {
         response_function: async (response) => {
-          db[id].mesh_components = response._data.uuid_dict
+          const mesh_components = response._data.uuid_dict
+          await updateItem(id, { mesh_components })
         },
       },
     )
@@ -87,83 +151,99 @@ export const useDataBaseStore = defineStore("dataBase", () => {
       },
       {
         response_function: async (response) => {
-          db[id]["uuid_to_flat_index"] = response._data.uuid_to_flat_index
+          const uuid_to_flat_index = response._data.uuid_to_flat_index
+          await updateItem(id, { uuid_to_flat_index })
         },
       },
     )
   }
 
   function getCornersUuids(id) {
-    const { mesh_components } = itemMetaDatas(id)
-    return Object.values(mesh_components["Corner"])
+    const item = itemMetaDatasSync(id)
+    if (!item || !item.mesh_components) return []
+    const { mesh_components } = item
+    return Object.values(mesh_components["Corner"] || {})
   }
 
   function getLinesUuids(id) {
-    const { mesh_components } = itemMetaDatas(id)
-    return Object.values(mesh_components["Line"])
+    const item = itemMetaDatasSync(id)
+    if (!item || !item.mesh_components) return []
+    const { mesh_components } = item
+    return Object.values(mesh_components["Line"] || {})
   }
   function getSurfacesUuids(id) {
-    const { mesh_components } = itemMetaDatas(id)
-    return Object.values(mesh_components["Surface"])
+    const item = itemMetaDatasSync(id)
+    if (!item || !item.mesh_components) return []
+    const { mesh_components } = item
+    return Object.values(mesh_components["Surface"] || {})
   }
   function getBlocksUuids(id) {
-    const { mesh_components } = itemMetaDatas(id)
-    return Object.values(mesh_components["Block"])
+    const item = itemMetaDatasSync(id)
+    if (!item || !item.mesh_components) return []
+    const { mesh_components } = item
+    return Object.values(mesh_components["Block"] || {})
   }
 
   function getFlatIndexes(id, mesh_component_ids) {
-    const { uuid_to_flat_index } = itemMetaDatas(id)
+    const item = itemMetaDatasSync(id)
+    if (!item || !item.uuid_to_flat_index) return []
+    const { uuid_to_flat_index } = item
     const flat_indexes = []
     for (const mesh_component_id of mesh_component_ids) {
-      flat_indexes.push(uuid_to_flat_index[mesh_component_id])
+      if (uuid_to_flat_index[mesh_component_id] !== undefined) {
+        flat_indexes.push(uuid_to_flat_index[mesh_component_id])
+      }
     }
     return flat_indexes
   }
 
-  function exportStores() {
+  async function exportStores() {
+    const items = await db.importedData.toArray()
     const snapshotDb = {}
-    for (const [id, item] of Object.entries(db)) {
-      if (!item) continue
-      snapshotDb[id] = {
-        object_type: item.object_type,
-        geode_object: item.geode_object,
-        native_filename: item.native_filename,
-        viewable_filename: item.viewable_filename,
-        displayed_name: item.displayed_name,
-        vtk_js: {
-          binary_light_viewable: item?.vtk_js?.binary_light_viewable,
-        },
+    for (const item of items) {
+      if (!item || !item.id) continue
+      snapshotDb[item.id] = {
+        ...item,
       }
     }
     return { db: snapshotDb }
   }
 
   async function importStores(snapshot) {
+    const hybridViewerStore = useHybridViewerStore()
     await hybridViewerStore.initHybridViewer()
     hybridViewerStore.clear()
     console.log(
       "[DataBase] importStores entries:",
       Object.keys(snapshot?.db || {}),
     )
+
+    await db.importedData.clear()
+    Object.keys(db_cache).forEach((key) => delete db_cache[key])
+
     for (const [id, item] of Object.entries(snapshot?.db || {})) {
       await registerObject(id)
       await addItem(id, item)
     }
   }
 
-  function clear() {
-    for (const id of Object.keys(db)) {
-      delete db[id]
-    }
+  async function clear() {
+    await db.importedData.clear()
+    Object.keys(db_cache).forEach((key) => delete db_cache[key])
   }
 
   return {
-    db,
+    db: db_cache,
     itemMetaDatas,
+    itemMetaDatasSync,
     meshComponentType,
     formatedMeshComponents,
     registerObject,
+    deregisterObject,
     addItem,
+    getAllItems,
+    deleteItem,
+    updateItem,
     fetchUuidToFlatIndexDict,
     fetchMeshComponents,
     getCornersUuids,

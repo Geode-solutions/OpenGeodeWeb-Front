@@ -55,11 +55,11 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    input_geode_object: { type: String, required: true },
+    geode_object_type: { type: String, required: true },
     filenames: { type: Array, required: true },
   })
 
-  const { multiple, input_geode_object, filenames } = props
+  const { multiple, geode_object_type, filenames } = toRefs(props)
 
   const accept = ref("")
   const loading = ref(false)
@@ -80,8 +80,8 @@
     additional_files.value = []
     var promise_array = []
 
-    for (const filename of filenames) {
-      const params = { input_geode_object, filename }
+    for (const filename of filenames.value) {
+      const params = { geode_object_type: geode_object_type.value, filename }
       const promise = new Promise((resolve, reject) => {
         api_fetch(
           { schema, params },

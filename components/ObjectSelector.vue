@@ -107,7 +107,7 @@
     toggle_loading()
     allowed_objects.value = {}
     const promise_array = filenames.map((filename) => {
-      const params = { filename, supported_feature }
+      const params = { filename }
       return api_fetch({ schema, params })
     })
     const responses = await Promise.all(promise_array)
@@ -139,9 +139,9 @@
     toggle_loading()
   }
 
-  function set_geode_object(input_geode_object) {
-    if (input_geode_object) {
-      emit("update_values", { input_geode_object })
+  function set_geode_object(geode_object_type) {
+    if (geode_object_type) {
+      emit("update_values", { geode_object_type })
       emit("increment_step")
     }
   }

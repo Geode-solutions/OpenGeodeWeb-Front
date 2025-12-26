@@ -77,9 +77,8 @@ async function run_script(
       reject("Timed out after " + timeout_seconds + " seconds")
     }, timeout_seconds * 1000)
 
-    const command = commandExistsSync(executable_name)
-      ? executable_name
-      : path.join(executable_path, executable_name)
+    const full_path = path.join(executable_path, executable_name)
+    const command = fs.existsSync(full_path) ? full_path : executable_name
     console.log("run_script", command, args)
     const child = child_process.spawn(command, args, {
       encoding: "utf8",
@@ -193,9 +192,9 @@ function kill_back(back_port) {
   return new Promise((resolve, reject) => {
     fetch(
       "http://localhost:" +
-        back_port +
-        "/" +
-        back_schemas.opengeodeweb_back.kill.$id,
+      back_port +
+      "/" +
+      back_schemas.opengeodeweb_back.kill.$id,
       {
         method: back_schemas.opengeodeweb_back.kill.methods[0],
       },

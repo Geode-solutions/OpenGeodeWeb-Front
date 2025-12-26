@@ -46,36 +46,6 @@
     return !item.children || item.children.length === 0
   }
 
-  watch(
-    () => treeviewStore.selection,
-    (current, previous) => {
-      if (!previous) previous = []
-      if (current.value === previous) {
-        return
-      }
-      const { added, removed } = compareSelections(current, previous)
-
-      added.forEach((item) => {
-        dataStyleStore.setVisibility(item.id, true)
-      })
-
-      removed.forEach((item) => {
-        dataStyleStore.setVisibility(item.id, false)
-
-        const objectMeta = dataBaseStore.itemMetaDatas(item.id)
-        if (objectMeta.object_type === "mesh") {
-          if (dataBaseStore.db[item.id]?.mesh_components_selection) {
-            dataBaseStore.db[item.id].mesh_components_selection = []
-          }
-          if (dataStyleStore.visibleMeshComponentIds?.[item.id]) {
-            dataStyleStore.updateVisibleMeshComponents(item.id, [])
-          }
-        }
-      })
-      hybridViewerStore.remoteRender()
-    },
-  )
-
   function isModel(item) {
     return item.object_type === "model"
   }

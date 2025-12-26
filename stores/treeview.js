@@ -99,6 +99,47 @@ export const useTreeviewStore = defineStore("treeview", () => {
     pendingSelectionIds.value = []
   }
 
+  function updateItemName(id, newName) {
+    for (const group of items.value) {
+      const child = group.children.find((c) => c.id === id)
+      if (child) {
+        child.title = newName
+        return
+      }
+    }
+  }
+
+  function removeItem(id) {
+    for (const group of items.value) {
+      const index = group.children.findIndex((c) => c.id === id)
+      if (index !== -1) {
+        group.children.splice(index, 1)
+        if (group.children.length === 0) {
+          const groupIndex = items.value.indexOf(group)
+          items.value.splice(groupIndex, 1)
+        }
+        break
+      }
+    }
+    selection.value = selection.value.filter((c) => c.id !== id)
+  }
+
+  function setItemVisibility(id, visible) {
+    if (visible) {
+      if (!selection.value.find((c) => c.id === id)) {
+        for (const group of items.value) {
+          const child = group.children.find((c) => c.id === id)
+          if (child) {
+            selection.value.push(child)
+            return
+          }
+        }
+      }
+    } else {
+      selection.value = selection.value.filter((c) => c.id !== id)
+    }
+  }
+
   const clear = () => {
     items.value = []
     selection.value = []
@@ -122,6 +163,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayFileTree,
     toggleTreeView,
     setPanelWidth,
+    updateItemName,
+    removeItem,
+    setItemVisibility,
     exportStores,
     importStores,
     finalizeImportSelection,

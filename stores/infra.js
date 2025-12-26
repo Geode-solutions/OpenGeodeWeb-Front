@@ -7,6 +7,7 @@ export const useInfraStore = defineStore("infra", {
     ID: useStorage("ID", ""),
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
+    microservices: [],
   }),
   getters: {
     domain_name() {
@@ -78,6 +79,9 @@ export const useInfraStore = defineStore("infra", {
       await useViewerStore().ws_connect()
       await useGeodeStore().do_ping()
       return
+    },
+    register_microservice(store) {
+      this.microservices.push(store)
     },
   },
 })

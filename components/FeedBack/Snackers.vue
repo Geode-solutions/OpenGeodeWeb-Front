@@ -1,8 +1,8 @@
 <template>
   <v-snackbar
     v-for="(feedback, index) in feedback_store.feedbacks"
-    :key="feedback"
-    v-model="show"
+    :key="feedback.id"
+    :model-value="true"
     :style="{ 'margin-bottom': calc_margin(index) }"
     :color="feedback.type"
     location="bottom right"
@@ -10,6 +10,7 @@
     max-width="200px"
     height="20px"
     timeout="10000"
+    @update:model-value="(value) => !value && feedback_store.delete_feedback(feedback.id)"
   >
     <v-row dense class="flex-nowrap">
       <v-col cols="auto">
@@ -62,7 +63,6 @@
 
 <script setup>
   const feedback_store = useFeedbackStore()
-  const show = true
 
   function calc_margin(index) {
     return index * 60 + 8 + "px"
