@@ -116,7 +116,10 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   async function deleteFolder(id) {
     await db.folders.delete(id)
-    await db.importedData.where("folder_id").equals(id).modify({ folder_id: null })
+    await db.importedData
+      .where("folder_id")
+      .equals(id)
+      .modify({ folder_id: null })
     Object.values(db_cache).forEach((item) => {
       if (item.folder_id === id) item.folder_id = null
     })
@@ -167,7 +170,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     for (const id of itemIds) {
       const item = await db.importedData.get(id)
       if (item) {
-        const newTags = (item.tags || []).filter(t => !tags.includes(t))
+        const newTags = (item.tags || []).filter((t) => !tags.includes(t))
         await updateItem(id, { tags: newTags })
       }
     }
@@ -268,7 +271,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     const snapshotDb = {}
 
     const filteredItems = params.itemIds
-      ? items.filter(item => params.itemIds.includes(item.id))
+      ? items.filter((item) => params.itemIds.includes(item.id))
       : items
 
     for (const item of filteredItems) {
@@ -279,7 +282,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     }
 
     const filteredFolders = params.itemIds
-      ? folders.filter(f => filteredItems.some(i => i.folder_id === f.id))
+      ? folders.filter((f) => filteredItems.some((i) => i.folder_id === f.id))
       : folders
 
     return { db: snapshotDb, folders: filteredFolders }
