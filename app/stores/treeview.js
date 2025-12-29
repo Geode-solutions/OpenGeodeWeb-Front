@@ -28,6 +28,12 @@ export const useTreeviewStore = defineStore("treeview", () => {
       }
     }
     items.value.push({ title: geode_object_type, children: [child] })
+    items.value.sort((a, b) =>
+      a.title.localeCompare(b.title, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      }),
+    )
     selection.value.push(child)
   }
 
