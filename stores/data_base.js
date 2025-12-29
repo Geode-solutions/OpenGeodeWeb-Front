@@ -1,9 +1,7 @@
-// Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { db } from "@ogw_front/composables/db.js"
 
-// Local constants
 const back_model_schemas = back_schemas.opengeodeweb_back.models
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 
@@ -71,17 +69,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     })
   }
 
-  async function addItem(
-    id,
-    value = {
-      object_type,
-      geode_object_type,
-      native_filename,
-      viewable_filename,
-      name,
-      vtk_js: { binary_light_viewable },
-    },
-  ) {
+  async function addItem(id, value) {
     const itemData = {
       id,
       visible: true,
@@ -132,7 +120,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function fetchUuidToFlatIndexDict(id) {
-    console.log("fetchUuidToFlatIndexDict", id)
     return api_fetch(
       {
         schema: back_model_schemas.vtm_component_indices,
@@ -202,10 +189,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     const hybridViewerStore = useHybridViewerStore()
     await hybridViewerStore.initHybridViewer()
     hybridViewerStore.clear()
-    console.log(
-      "[DataBase] importStores entries:",
-      Object.keys(snapshot?.db || {}),
-    )
 
     await db.importedData.clear()
     Object.keys(db_cache).forEach((key) => delete db_cache[key])

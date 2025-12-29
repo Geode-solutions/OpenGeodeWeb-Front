@@ -10,7 +10,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const isImporting = ref(false)
   const pendingSelectionIds = ref([])
 
-  // /** Functions **/
   function addItem(geodeObject, displayed_name, id, object_type) {
     const child = { title: displayed_name, id, object_type }
 
@@ -42,10 +41,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   function toggleTreeView() {
     isTreeCollection.value = !isTreeCollection.value
-    console.log(
-      "Switched to",
-      isTreeCollection.value ? "TreeCollection" : "TreeComponent",
-    )
   }
 
   function setPanelWidth(width) {

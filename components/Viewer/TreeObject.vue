@@ -74,12 +74,6 @@
     { deep: true },
   )
 
-  onMounted(() => {
-    const savedSelection = treeviewStore.selection
-    if (savedSelection && savedSelection.length > 0) {
-      treeviewStore.selection = savedSelection
-    }
-  })
 </script>
 
 <style scoped>
