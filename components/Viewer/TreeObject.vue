@@ -50,6 +50,30 @@
     return item.object_type === "model"
   }
 
+  watch(
+    () => treeviewStore.selection,
+    (current, previous) => {
+      const added = current.filter(
+        (item) => !previous.find((p) => p.id === item.id),
+      )
+      const removed = previous.filter(
+        (item) => !current.find((c) => c.id === item.id),
+      )
+
+      added.forEach((item) => {
+        dataStyleStore.setVisibility(item.id, true)
+      })
+      removed.forEach((item) => {
+        dataStyleStore.setVisibility(item.id, false)
+      })
+
+      if (added.length > 0 || removed.length > 0) {
+        hybridViewerStore.remoteRender()
+      }
+    },
+    { deep: true },
+  )
+
   onMounted(() => {
     const savedSelection = treeviewStore.selection
     if (savedSelection && savedSelection.length > 0) {
