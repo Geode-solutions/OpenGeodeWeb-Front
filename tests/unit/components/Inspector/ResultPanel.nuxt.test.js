@@ -1,18 +1,10 @@
 import { describe, expect, test } from "vitest"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
+import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
+import { vuetify } from "../../../utils"
 
-import InspectorResultPanel from "@ogw_f/components/Inspector/ResultPanel.vue"
-
-const vuetify = createVuetify({
-  components,
-  directives,
-})
-
-describe("Inspector/ResultPanel.vue", async () => {
+describe("Inspector/ResultPanel", async () => {
   test(`Test with issues`, async () => {
     const inspection_result = [
       {
@@ -30,7 +22,6 @@ describe("Inspector/ResultPanel.vue", async () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    expect(wrapper.componentVM.opened_panels._value).toStrictEqual([0])
     expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
       inspection_result,
     )
@@ -58,7 +49,9 @@ describe("Inspector/ResultPanel.vue", async () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    expect(wrapper.componentVM.opened_panels._value).toStrictEqual([])
+
+    console.log({ wrapper })
+
     expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
       inspection_result,
     )

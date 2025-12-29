@@ -3,12 +3,15 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "~/utils/status"
-import * as composables from "~/composables/viewer_call"
-import { useDataStyleStore } from "~/stores/data_style"
-import { useViewerStore } from "~/stores/viewer"
-import { delete_folder_recursive, kill_back, kill_viewer } from "~/utils/local"
-import { setupIntegrationTests } from "../../../setup.js"
+import Status from "@ogw_front/utils/status"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import {
+  delete_folder_recursive,
+  kill_back,
+  kill_viewer,
+} from "@ogw_front/utils/local"
+import { setupIntegrationTests } from "../../../setup"
 
 // Local constants
 const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
@@ -34,13 +37,11 @@ describe("Model points", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelPointsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_points_schemas.visibility,
-          params: { id, visibility },
-        },
+        model_points_schemas.visibility,
+        { id, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -55,13 +56,11 @@ describe("Model points", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const size = 20
-      const spy = vi.spyOn(composables, "viewer_call")
+      const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelPointsSize(id, size)
       expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_points_schemas.size,
-          params: { id, size },
-        },
+        model_points_schemas.size,
+        { id, size },
         {
           response_function: expect.any(Function),
         },

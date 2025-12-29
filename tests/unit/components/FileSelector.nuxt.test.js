@@ -1,35 +1,29 @@
 import { describe, expect, test, vi } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
-
-import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import FileSelector from "@ogw_f/components/FileSelector.vue"
-import FileUploader from "@ogw_f/components/FileUploader.vue"
-
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+
+import FileSelector from "@ogw_front/components/FileSelector"
+import FileUploader from "@ogw_front/components/FileUploader"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { vuetify } from "../../utils"
 
 const allowed_files_schema = schemas.opengeodeweb_back.allowed_files
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
-const vuetify = createVuetify({
-  components,
-  directives,
-})
-
-describe("FileSelector.vue", async () => {
+describe("FileSelector", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`Select file`, async () => {
     registerEndpoint(allowed_files_schema.$id, {
@@ -42,7 +36,7 @@ describe("FileSelector.vue", async () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { multiple: false, supported_feature: "test", auto_upload: false },
+      props: { multiple: false, auto_upload: false },
     })
 
     const file_uploader = wrapper.findComponent(FileUploader)
@@ -91,7 +85,6 @@ describe("FileSelector.vue", async () => {
         },
         props: {
           multiple: false,
-          supported_feature: "test",
           files: files,
           auto_upload: true,
         },
@@ -114,7 +107,6 @@ describe("FileSelector.vue", async () => {
         },
         props: {
           multiple: false,
-          supported_feature: "test",
           files: files,
           auto_upload: false,
         },

@@ -1,31 +1,39 @@
 import { describe, expect, test, vi } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-
-import ExtensionSelector from "@ogw_f/components/ExtensionSelector.vue"
+import * as components from "vuetify/components"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { vuetify } from "../../utils"
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
 
-const vuetify = createVuetify({
-  components,
-  directives,
-})
-
-describe("ExtensionSelector.vue", async () => {
+describe("ExtensionSelector", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
+
+  // Mock the request method to simulate API call
+  geodeStore.request = vi.fn((schema, params, callbacks) => {
+    const response = {
+      _data: {
+        geode_objects_and_output_extensions: {
+          BRep: { msh: { is_saveable: true } },
+        },
+      },
+    }
+    if (callbacks?.response_function) {
+      callbacks.response_function(response)
+    }
+    return Promise.resolve(response)
+  })
 
   test(`Select geode_object & extension`, async () => {
     const output_geode_object = "BRep"
@@ -43,7 +51,7 @@ describe("ExtensionSelector.vue", async () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { input_geode_object: "BRep", filenames: ["test.toto"] },
+      props: { geode_object_type: "BRep", filenames: ["test.toto"] },
     })
     await nextTick()
     expect(wrapper.exists()).toBe(true)

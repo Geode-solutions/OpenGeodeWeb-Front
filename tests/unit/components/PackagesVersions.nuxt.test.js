@@ -1,28 +1,20 @@
 import { describe, expect, test, vi } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
-
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import PackagesVersions from "@ogw_f/components/PackagesVersions.vue"
+import PackagesVersions from "@ogw_front/components/PackagesVersions"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { vuetify } from "../../utils"
 
-const vuetify = createVuetify({
-  components,
-  directives,
-})
-
-describe("PackagesVersions.vue", async () => {
+describe("PackagesVersions", async () => {
   test(`Mount`, async () => {
     const pinia = createTestingPinia({
       createSpy: vi.fn,
     })
     setActivePinia(pinia)
-    const geode_store = useGeodeStore()
-    geode_store.base_url = ""
+    const geodeStore = useGeodeStore()
+    geodeStore.base_url = ""
 
     const schema = {
       $id: "/versions",

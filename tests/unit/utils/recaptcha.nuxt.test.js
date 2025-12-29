@@ -2,9 +2,9 @@
 import { describe, expect, test } from "vitest"
 
 // Local imports
-import { check_recaptcha_params } from "~/utils/recaptcha.js"
+import { check_recaptcha_params } from "@ogw_front/utils/recaptcha"
 
-describe("recaptcha.js", () => {
+describe("recaptcha", () => {
   const name = ""
   const email = ""
   const launch = false

@@ -1,32 +1,27 @@
 import { describe, expect, test, vi } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
-
-import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import FileUploader from "@ogw_f/components/FileUploader.vue"
-
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+
+import FileUploader from "@ogw_front/components/FileUploader"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+
+import { vuetify } from "../../utils"
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
-const vuetify = createVuetify({
-  components,
-  directives,
-})
-
-describe("FileUploader.vue", async () => {
+describe("FileUploader", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   registerEndpoint(upload_file_schema.$id, {
     method: upload_file_schema.methods[0],

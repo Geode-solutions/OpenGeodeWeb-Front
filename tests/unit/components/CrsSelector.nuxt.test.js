@@ -1,31 +1,25 @@
-import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 import { describe, expect, test, vi } from "vitest"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 
-import CrsSelector from "@ogw_f/components/CrsSelector.vue"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import CrsSelector from "@ogw_front/components/CrsSelector"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+
+import { vuetify } from "../../utils"
 
 const crs_selector_schema =
   schemas.opengeodeweb_back.geographic_coordinate_systems
 
-const vuetify = createVuetify({
-  components,
-  directives,
-})
-
-describe("CrsSelector.vue", () => {
+describe("CrsSelector", () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`Default behavior`, async () => {
     const crs_list = [
@@ -35,18 +29,21 @@ describe("CrsSelector.vue", () => {
         name: "Anguilla 1957 / British West Indies Grid",
       },
     ]
-    registerEndpoint(crs_selector_schema.$id, {
-      method: crs_selector_schema.methods.filter((m) => m !== "OPTIONS")[0],
-      handler: () => ({
-        crs_list,
-      }),
+
+    // Mock geodeStore.request instead of registerEndpoint
+    geodeStore.request = vi.fn((schema, params, callbacks) => {
+      if (callbacks?.response_function) {
+        callbacks.response_function({ _data: { crs_list } })
+      }
+      return Promise.resolve({ _data: { crs_list } })
     })
+
     const key_to_update = "key"
     const wrapper = await mountSuspended(CrsSelector, {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { input_geode_object: "BRep", key_to_update },
+      props: { geode_object_type: "BRep", key_to_update },
     })
     const td = await wrapper.find("td")
     await wrapper.vm.$nextTick()

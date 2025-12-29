@@ -16,11 +16,11 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
   ],
   imports: {
-    dirs: ["stores"],
+    scan: false,
   },
 
   alias: {
-    "@ogw_f": __dirname,
+    "@ogw_front": __dirname + "/app/",
   },
 
   // ** Global CSS
@@ -36,8 +36,6 @@ export default defineNuxtConfig({
       isCustomElement: (tag) => ["md-linedivider"].includes(tag),
     },
   },
-
-  testUtils: {},
 
   vite: {
     optimizeDeps: {

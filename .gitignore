@@ -29,3 +29,4 @@ __snapshots__
 coverage
 *.db
 package-lock.json
+VTK.txt

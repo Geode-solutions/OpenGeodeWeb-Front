@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest"
 
-import validate_schema from "~/utils/validate_schema.js"
+import validate_schema from "@ogw_front/utils/validate_schema"
 
-describe("validate_schema.js", () => {
+describe("validate_schema", () => {
   const schema = {
     $id: "/test",
     type: "object",

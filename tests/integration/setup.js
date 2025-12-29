@@ -9,18 +9,18 @@ import { createTestingPinia } from "@pinia/testing"
 import { afterAll, beforeAll, expect, vi } from "vitest"
 
 // Local imports
-import { useGeodeStore } from "~/stores/geode"
-import { useViewerStore } from "~/stores/viewer"
-import { useInfraStore } from "~/stores/infra"
-import { appMode } from "~/utils/app_mode"
-import { importFile } from "~/utils/file_import_workflow"
-import Status from "~/utils/status"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useInfraStore } from "@ogw_front/stores/infra"
+import { appMode } from "@ogw_front/utils/app_mode"
+import { importFile } from "@ogw_front/utils/file_import_workflow"
+import Status from "@ogw_front/utils/status"
 import {
   executable_name,
   executable_path,
   run_back,
   run_viewer,
-} from "~/utils/local"
+} from "@ogw_front/utils/local"
 
 // Local constants
 const data_folder = path.join("tests", "integration", "data")
@@ -32,7 +32,7 @@ async function setupIntegrationTests(file_name, geode_object) {
   })
   setActivePinia(pinia)
   const geodeStore = useGeodeStore()
-  const hybridViewerStore = useHybridViewerStore()
+  // const hybridViewerStore = useHybridViewerStore()
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER

@@ -1,0 +1,16 @@
+<template>
+  <ViewerGenericMeshCellsOptions
+    :itemProps="props.itemProps"
+    :btn_image="Grid3DCells"
+    tooltip="Cells options"
+  />
+</template>
+
+<script setup>
+  import ViewerGenericMeshCellsOptions from "@ogw_front/components/Viewer/Generic/Mesh/CellsOptions"
+  import Grid3DCells from "@ogw_front/assets/viewer_svgs/grid_3d_cells.svg"
+
+  const props = defineProps({
+    itemProps: { type: Object, required: true },
+  })
+</script>

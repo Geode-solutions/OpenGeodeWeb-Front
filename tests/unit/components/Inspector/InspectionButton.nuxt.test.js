@@ -1,30 +1,25 @@
 import { describe, expect, test, vi } from "vitest"
-import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
-
-import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
-import InspectorInspectionButton from "@ogw_f/components/Inspector/InspectionButton.vue"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import InspectorInspectionButton from "@ogw_front/components/Inspector/InspectionButton"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { vuetify } from "../../../utils"
+
 const schema = schemas.opengeodeweb_back.inspect_file
 
-const vuetify = createVuetify({
-  components,
-  directives,
-})
-
-describe("Inspector/InspectionButton.vue", async () => {
+describe("Inspector/InspectionButton", async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-  const geode_store = useGeodeStore()
-  geode_store.base_url = ""
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 
   test(`Test with issues`, async () => {
     var inspection_result = {
@@ -44,20 +39,25 @@ describe("Inspector/InspectionButton.vue", async () => {
       ],
     }
 
-    registerEndpoint(schema.$id, {
-      method: schema.methods[0],
-      handler: () => ({
-        inspection_result,
-      }),
+    geodeStore.request = vi.fn((schema, params, callbacks) => {
+      if (callbacks?.response_function) {
+        callbacks.response_function({
+          _data: { inspection_result },
+        })
+      }
+      return Promise.resolve({
+        _data: { inspection_result },
+      })
     })
-    const input_geode_object = "BRep"
+
+    const geode_object_type = "BRep"
     const filename = "test.txt"
 
     const wrapper = await mountSuspended(InspectorInspectionButton, {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { input_geode_object, filename },
+      props: { geode_object_type, filename },
     })
 
     expect(wrapper.exists()).toBe(true)
