@@ -1,3 +1,6 @@
+import { getActivePinia } from "pinia"
+import { useAppStore } from "../stores/app.js"
+
 const autoStoreRegister = ({ store }) => {
   if (store.$id === "app") {
     return
@@ -9,8 +12,15 @@ const autoStoreRegister = ({ store }) => {
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.$pinia.use(autoStoreRegister)
-  console.log(
-    "[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front",
-  )
+  const pinia = nuxtApp.$pinia || getActivePinia()
+  if (pinia) {
+    pinia.use(autoStoreRegister)
+    console.log(
+      "[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front",
+    )
+  } else {
+    console.warn(
+      "[AUTOREGISTER PLUGIN] Pinia instance not found, skipping registration",
+    )
+  }
 })

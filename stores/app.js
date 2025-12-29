@@ -15,7 +15,7 @@ export const useAppStore = defineStore("app", () => {
     stores.push(store)
   }
 
-  function exportStores() {
+  function exportStores(params = {}) {
     const snapshot = {}
     let exportCount = 0
 
@@ -23,7 +23,7 @@ export const useAppStore = defineStore("app", () => {
       if (!store.exportStores) continue
       const storeId = store.$id
       try {
-        snapshot[storeId] = store.exportStores()
+        snapshot[storeId] = store.exportStores(params)
         exportCount++
       } catch (error) {
         console.error(`[AppStore] Error exporting store "${storeId}":`, error)

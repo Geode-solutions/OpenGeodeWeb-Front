@@ -52,14 +52,18 @@ export const useTreeviewStore = defineStore("treeview", () => {
     panelWidth.value = width
   }
 
-  function exportStores() {
+  function exportStores(params = {}) {
+    let selectionIds = selection.value.map((c) => c.id)
+    if (params.itemIds) {
+      selectionIds = selectionIds.filter(id => params.itemIds.includes(id))
+    }
     return {
       isAdditionnalTreeDisplayed: isAdditionnalTreeDisplayed.value,
       panelWidth: panelWidth.value,
       model_id: model_id.value,
       isTreeCollection: isTreeCollection.value,
       selectedTree: selectedTree.value,
-      selectionIds: selection.value.map((c) => c.id),
+      selectionIds,
     }
   }
 

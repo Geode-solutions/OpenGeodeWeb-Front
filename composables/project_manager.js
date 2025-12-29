@@ -3,12 +3,12 @@ import fileDownload from "js-file-download"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 export function useProjectManager() {
-  const exportProject = async function () {
-    console.log("[export triggered]")
+  const exportProject = async function (params = {}) {
+    console.log("[export triggered]", params)
     const appStore = useAppStore()
     const geode = useGeodeStore()
     const infraStore = useInfraStore()
-    const snapshot = appStore.exportStores()
+    const snapshot = appStore.exportStores(params)
     const schema = back_schemas.opengeodeweb_back.export_project
     const defaultName = "project.vease"
 
