@@ -8,19 +8,12 @@ const back_model_schemas = back_schemas.opengeodeweb_back.models
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 
 export const useDataBaseStore = defineStore("dataBase", () => {
-  // In-memory cache for backward compatibility with existing code
   const db_cache = reactive({})
 
-  /**
-   * Get item metadata by ID
-   * Uses in-memory cache for performance, falls back to Dexie
-   */
   async function itemMetaDatas(id) {
-    // Check cache first
     if (db_cache[id]) {
       return db_cache[id]
     }
-    // Query from Dexie
     const item = await db.importedData.get(id)
     if (item) {
       db_cache[id] = item
@@ -28,10 +21,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     return item
   }
 
-  /**
-   * Get item metadata synchronously from cache only
-   * For backward compatibility with synchronous code
-   */
   function itemMetaDatasSync(id) {
     return db_cache[id]
   }
