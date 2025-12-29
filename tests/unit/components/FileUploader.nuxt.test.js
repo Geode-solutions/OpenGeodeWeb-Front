@@ -1,10 +1,7 @@
 import { describe, expect, test, vi } from "vitest"
 import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
-
-import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
 
@@ -13,12 +10,9 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
-const upload_file_schema = schemas.opengeodeweb_back.upload_file
+import { vuetify } from "../../utils"
 
-const vuetify = createVuetify({
-  components,
-  directives,
-})
+const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
 describe("FileUploader", async () => {
   const pinia = createTestingPinia({
