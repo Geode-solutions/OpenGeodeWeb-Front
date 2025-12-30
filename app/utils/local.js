@@ -5,8 +5,6 @@ import child_process from "child_process"
 import WebSocket from "ws"
 
 // Third party imports
-import pkg from "electron"
-const { app, dialog } = pkg
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
 import pTimeout from "p-timeout"
@@ -24,12 +22,13 @@ function venv_script_path(root_path, microservice_path) {
   return script_path
 }
 
-function executable_path(microservice_path) {
+async function executable_path(microservice_path) {
   if (isElectron()) {
-    if (app.isPackaged) {
+    const electron = await import("electron")
+    if (electron.app.isPackaged) {
       return process.resourcesPath
     } else {
-      return venv_script_path(app.getAppPath(), microservice_path)
+      return venv_script_path(electron.app.getAppPath(), microservice_path)
     }
   } else {
     return venv_script_path(process.cwd(), microservice_path)
@@ -89,8 +88,9 @@ async function run_script(
 
     // You can also use a variable to save the output for when the script closes later
     child.stderr.setEncoding("utf8")
-    child.on("error", (error) => {
-      dialog.showMessageBox({
+    child.on("error", async (error) => {
+      const electron = await import("electron")
+      electron.dialog.showMessageBox({
         title: "Title",
         type: "warning",
         message: "Error occured.\r\n" + error,
