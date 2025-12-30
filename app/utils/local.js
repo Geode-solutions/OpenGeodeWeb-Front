@@ -5,10 +5,9 @@ import child_process from "child_process"
 import WebSocket from "ws"
 
 // Third party imports
-import pkg from "electron"
-const { app, dialog } = pkg
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
+import pTimeout from "p-timeout"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" }
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
@@ -23,12 +22,13 @@ function venv_script_path(root_path, microservice_path) {
   return script_path
 }
 
-function executable_path(microservice_path) {
+async function executable_path(microservice_path) {
   if (isElectron()) {
-    if (app.isPackaged) {
+    const electron = await import("electron")
+    if (electron.app.isPackaged) {
       return process.resourcesPath
     } else {
-      return venv_script_path(app.getAppPath(), microservice_path)
+      return venv_script_path(electron.app.getAppPath(), microservice_path)
     }
   } else {
     return venv_script_path(process.cwd(), microservice_path)
@@ -88,8 +88,9 @@ async function run_script(
 
     // You can also use a variable to save the output for when the script closes later
     child.stderr.setEncoding("utf8")
-    child.on("error", (error) => {
-      dialog.showMessageBox({
+    child.on("error", async (error) => {
+      const electron = await import("electron")
+      electron.dialog.showMessageBox({
         title: "Title",
         type: "warning",
         message: "Error occured.\r\n" + error,
@@ -185,71 +186,87 @@ function delete_folder_recursive(data_folder_path) {
     return
   }
   try {
-    fs.rmSync(data_folder_path, { recursive: true, force: true })
-    console.log(`Deleted folder: ${data_folder_path}`)
+    for (const i = 0; i <= 5; i++) {
+      console.log(`Deleting folder: ${data_folder_path}`)
+      fs.rmSync(data_folder_path, { recursive: true, force: true })
+      console.log(`Deleted folder: ${data_folder_path}`)
+      return
+    }
   } catch (err) {
     console.error(`Error deleting folder ${data_folder_path}:`, err)
   }
 }
 
 function kill_back(back_port) {
-  return new Promise((resolve, reject) => {
-    fetch(
-      "http://localhost:" +
-      back_port +
-      "/" +
-      back_schemas.opengeodeweb_back.kill.$id,
-      {
-        method: back_schemas.opengeodeweb_back.kill.methods[0],
-      },
-    )
-      .then(() => {
-        console.log("Back not killed")
-        reject()
-      })
-      .catch(() => {
-        console.log("Back closed")
-        resolve()
-      })
-  })
+  return pTimeout(
+    new Promise((resolve, reject) => {
+      fetch(
+        "http://localhost:" +
+        back_port +
+        "/" +
+        back_schemas.opengeodeweb_back.kill.$id,
+        {
+          method: back_schemas.opengeodeweb_back.kill.methods[0],
+        },
+      )
+        .then(() => {
+          console.log("Failed to kill back")
+          reject()
+        })
+        .catch(() => {
+          console.log("Back closed")
+          resolve()
+        })
+    }),
+    {
+      milliseconds: 500,
+      message: "Failed to kill back",
+    },
+  )
 }
 
 function kill_viewer(viewer_port) {
-  return new Promise((resolve) => {
-    const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
-    socket.on("open", () => {
-      console.log("Connected to WebSocket server")
-      socket.send(
-        JSON.stringify({
-          id: "system:hello",
-          method: "wslink.hello",
-          args: [{ secret: "wslink-secret" }],
-        }),
-      )
-    })
-    socket.on("message", (data) => {
-      const message = data.toString()
-      console.log("Received from server:", message)
-
-      if (message.includes("hello")) {
+  return pTimeout(
+    new Promise((resolve) => {
+      const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
+      socket.on("open", () => {
+        console.log("Connected to WebSocket server")
         socket.send(
           JSON.stringify({
-            id: viewer_schemas.opengeodeweb_viewer.kill.$id,
-            method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+            id: "system:hello",
+            method: "wslink.hello",
+            args: [{ secret: "wslink-secret" }],
           }),
         )
+      })
+      socket.on("message", (data) => {
+        const message = data.toString()
+        console.log("Received from server:", message)
+
+        if (message.includes("hello")) {
+          socket.send(
+            JSON.stringify({
+              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
+              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+            }),
+          )
+          resolve()
+        }
+      })
+      socket.on("close", () => {
+        console.log("Disconnected from WebSocket server")
         resolve()
-      }
-    })
-    socket.on("close", () => {
-      console.log("Disconnected from WebSocket server")
-      resolve()
-    })
-    socket.on("error", (error) => {
-      console.error("WebSocket error:", error)
-      resolve()
-    })
-  })
+      })
+      socket.on("error", (error) => {
+        console.error("WebSocket error:", error)
+        resolve()
+      })
+    }),
+    {
+      milliseconds: 500,
+      message: "Failed to kill viewer",
+    },
+  )
 }
 
 async function run_browser(
