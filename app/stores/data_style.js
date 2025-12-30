@@ -39,16 +39,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
   }
 
-  const exportStores = (params = {}) => {
-    if (params.itemIds) {
-      const filteredStyles = {}
-      for (const id of params.itemIds) {
-        if (dataStyleState.styles[id]) {
-          filteredStyles[id] = dataStyleState.styles[id]
-        }
-      }
-      return { styles: filteredStyles }
-    }
+  const exportStores = () => {
     return { styles: dataStyleState.styles }
   }
 

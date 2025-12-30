@@ -77,16 +77,16 @@ async function run_script(
       reject("Timed out after " + timeout_seconds + " seconds")
     }, timeout_seconds * 1000)
 
-    const local_command = path.join(executable_path, executable_name)
-    const command = fs.existsSync(local_command)
-      ? local_command
-      : executable_name
+    const command = commandExistsSync(executable_name)
+      ? executable_name
+      : path.join(executable_path, executable_name)
     console.log("run_script", command, args)
     const child = child_process.spawn(command, args, {
       encoding: "utf8",
       shell: true,
     })
 
+    // You can also use a variable to save the output for when the script closes later
     child.stderr.setEncoding("utf8")
     child.on("error", (error) => {
       dialog.showMessageBox({
@@ -97,6 +97,7 @@ async function run_script(
     })
     child.stdout.setEncoding("utf8")
     child.stdout.on("data", (data) => {
+      //Here is the output
       data = data.toString()
       if (data.includes(expected_response)) {
         resolve(child)
@@ -109,6 +110,7 @@ async function run_script(
     })
 
     child.on("close", (_code) => {
+      //Here you can get the exit code of the script
       console.log("Child Process exited with code " + _code)
     })
     child.on("kill", () => {
@@ -194,9 +196,9 @@ function kill_back(back_port) {
   return new Promise((resolve, reject) => {
     fetch(
       "http://localhost:" +
-        back_port +
-        "/" +
-        back_schemas.opengeodeweb_back.kill.$id,
+      back_port +
+      "/" +
+      back_schemas.opengeodeweb_back.kill.$id,
       {
         method: back_schemas.opengeodeweb_back.kill.methods[0],
       },

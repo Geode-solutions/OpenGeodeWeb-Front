@@ -1,13 +1,13 @@
 import Dexie from "dexie"
 
-export class ImportedDataDB extends Dexie {
+export class DataDB extends Dexie {
   constructor() {
-    super("ImportedDataDB")
+    super("DataDB")
 
     this.version(1).stores({
-      importedData: "id, name, viewer_type, geode_object_type, visible, created_at",
+      data: "id, name, viewer_type, geode_object_type, visible, created_at",
     })
   }
 }
 
-export const db = new ImportedDataDB()
+export const db = new DataDB()

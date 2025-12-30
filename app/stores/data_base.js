@@ -18,7 +18,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     if (db_cache[id]) {
       return db_cache[id]
     }
-    const item = await db.importedData.get(id)
+    const item = await db.data.get(id)
     if (item) {
       db_cache[id] = item
     }
@@ -72,20 +72,20 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   async function addItem(id, value) {
     const itemData = {
       id,
-      name: value.name || value.displayed_name || id,
-      geode_object_type: value.geode_object_type || value.geode_object || "Unknown",
+      name: value.name || id,
+      geode_object_type: value.geode_object_type || "Unknown",
       visible: true,
       created_at: new Date().toISOString(),
       ...value,
     }
 
     const serializedData = JSON.parse(JSON.stringify(itemData))
-    await db.importedData.put(serializedData)
+    await db.data.put(serializedData)
     db_cache[id] = serializedData
   }
 
   async function getAllItems() {
-    const items = await db.importedData.toArray()
+    const items = await db.data.toArray()
     items.forEach((item) => {
       db_cache[item.id] = item
     })
@@ -93,12 +93,12 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function deleteItem(id) {
-    await db.importedData.delete(id)
+    await db.data.delete(id)
     delete db_cache[id]
   }
 
   async function updateItem(id, changes) {
-    await db.importedData.update(id, changes)
+    await db.data.update(id, changes)
     if (db_cache[id]) {
       Object.assign(db_cache[id], changes)
     }
@@ -172,7 +172,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function exportStores() {
-    const items = await db.importedData.toArray()
+    const items = await db.data.toArray()
     const snapshotDb = {}
 
     for (const item of items) {
@@ -187,8 +187,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     await hybridViewerStore.initHybridViewer()
     hybridViewerStore.clear()
 
-    await db.importedData.clear()
-    Object.keys(db_cache).forEach((key) => delete db_cache[key])
+    await clear()
 
     for (const [id, item] of Object.entries(snapshot?.db || {})) {
       await registerObject(id)
@@ -197,7 +196,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function clear() {
-    await db.importedData.clear()
+    await db.data.clear()
     Object.keys(db_cache).forEach((key) => delete db_cache[key])
   }
 
