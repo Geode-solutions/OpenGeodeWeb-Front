@@ -1,13 +1,17 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import { db } from "@ogw_f/composables/db.js"
+import { db } from "@ogw_front/composables/db.js"
 
 // Local constants
 const back_model_schemas = back_schemas.opengeodeweb_back.models
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 
+import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+
 export const useDataBaseStore = defineStore("dataBase", () => {
+  const viewerStore = useViewerStore()
   const db_cache = reactive({})
 
   async function itemMetaDatas(id) {
@@ -58,29 +62,26 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function registerObject(id) {
-    return viewer_call({
-      schema: viewer_generic_schemas.register,
-      params: { id },
-    })
+    return viewerStore.request(viewer_generic_schemas.register, { id })
   }
 
   async function deregisterObject(id) {
-    return viewer_call({
-      schema: viewer_generic_schemas.deregister,
-      params: { id },
-    })
+    return viewerStore.request(viewer_generic_schemas.deregister, { id })
   }
 
   async function addItem(id, value) {
     const itemData = {
       id,
+      displayed_name: value.name || value.displayed_name || id,
+      geode_object: value.geode_object_type || value.geode_object || "Unknown",
       visible: true,
       created_at: new Date().toISOString(),
       ...value,
     }
 
-    await db.importedData.put(itemData)
-    db_cache[id] = itemData
+    const serializedData = JSON.parse(JSON.stringify(itemData))
+    await db.importedData.put(serializedData)
+    db_cache[id] = serializedData
   }
 
   async function getAllItems() {
@@ -103,100 +104,11 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     }
   }
 
-  // Folder management
-  async function createFolder(name, parent_id = null) {
-    const folder = {
-      name,
-      parent_id,
-      created_at: new Date().toISOString(),
-    }
-    const id = await db.folders.add(folder)
-    return { ...folder, id }
-  }
-
-  async function deleteFolder(id) {
-    await db.folders.delete(id)
-    await db.importedData
-      .where("folder_id")
-      .equals(id)
-      .modify({ folder_id: null })
-    Object.values(db_cache).forEach((item) => {
-      if (item.folder_id === id) item.folder_id = null
-    })
-  }
-
-  async function getAllFolders() {
-    return await db.folders.toArray()
-  }
-
-  async function updateFolder(id, changes) {
-    await db.folders.update(id, changes)
-  }
-
-  // Tag management
-  async function addTag(itemId, tag) {
-    const item = await itemMetaDatas(itemId)
-    const tags = item.tags || []
-    if (!tags.includes(tag)) {
-      tags.push(tag)
-      await updateItem(itemId, { tags })
-    }
-  }
-
-  async function removeTag(itemId, tag) {
-    const item = await itemMetaDatas(itemId)
-    const tags = (item.tags || []).filter((t) => t !== tag)
-    await updateItem(itemId, { tags })
-  }
-
-  async function togglePin(itemId) {
-    const item = await db.importedData.get(itemId)
-    if (item) {
-      await updateItem(itemId, { pinned: !item.pinned })
-    }
-  }
-
-  async function batchAddTags(itemIds, tags) {
-    for (const id of itemIds) {
-      const item = await db.importedData.get(id)
-      if (item) {
-        const newTags = [...new Set([...(item.tags || []), ...tags])]
-        await updateItem(id, { tags: newTags })
-      }
-    }
-  }
-
-  async function batchRemoveTags(itemIds, tags) {
-    for (const id of itemIds) {
-      const item = await db.importedData.get(id)
-      if (item) {
-        const newTags = (item.tags || []).filter((t) => !tags.includes(t))
-        await updateItem(id, { tags: newTags })
-      }
-    }
-  }
-
-  async function batchMoveToFolder(itemIds, folderId) {
-    for (const id of itemIds) {
-      await updateItem(id, { folder_id: folderId })
-    }
-  }
-
-  async function batchUpdateColor(itemIds, color) {
-    const dataStyleStore = useDataStyleStore()
-    for (const id of itemIds) {
-      await dataStyleStore.updateStyle(id, { color })
-    }
-  }
-
   async function fetchMeshComponents(id) {
-    return api_fetch(
-      {
-        schema: back_model_schemas.mesh_components,
-        params: {
-          id,
-        },
-      },
+    const geodeStore = useGeodeStore()
+    return geodeStore.request(
+      back_model_schemas.mesh_components,
+      { id },
       {
         response_function: async (response) => {
           const mesh_components = response._data.uuid_dict
@@ -207,11 +119,10 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function fetchUuidToFlatIndexDict(id) {
-    return api_fetch(
-      {
-        schema: back_model_schemas.vtm_component_indices,
-        params: { id },
-      },
+    const geodeStore = useGeodeStore()
+    return geodeStore.request(
+      back_model_schemas.vtm_component_indices,
+      { id },
       {
         response_function: async (response) => {
           const uuid_to_flat_index = response._data.uuid_to_flat_index
@@ -260,32 +171,15 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     return flat_indexes
   }
 
-  async function exportSelectedItems(itemIds) {
-    const { exportProject } = useProjectManager()
-    await exportProject({ itemIds })
-  }
-
-  async function exportStores(params = {}) {
+  async function exportStores() {
     const items = await db.importedData.toArray()
-    const folders = await db.folders.toArray()
     const snapshotDb = {}
 
-    const filteredItems = params.itemIds
-      ? items.filter((item) => params.itemIds.includes(item.id))
-      : items
-
-    for (const item of filteredItems) {
-      if (!item || !item.id) continue
-      snapshotDb[item.id] = {
-        ...item,
-      }
+    for (const item of items) {
+      snapshotDb[item.id] = { ...item }
     }
 
-    const filteredFolders = params.itemIds
-      ? folders.filter((f) => filteredItems.some((i) => i.folder_id === f.id))
-      : folders
-
-    return { db: snapshotDb, folders: filteredFolders }
+    return { db: snapshotDb }
   }
 
   async function importStores(snapshot) {
@@ -294,14 +188,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     hybridViewerStore.clear()
 
     await db.importedData.clear()
-    await db.folders.clear()
     Object.keys(db_cache).forEach((key) => delete db_cache[key])
-
-    if (snapshot?.folders) {
-      for (const folder of snapshot.folders) {
-        await db.folders.put(folder)
-      }
-    }
 
     for (const [id, item] of Object.entries(snapshot?.db || {})) {
       await registerObject(id)
@@ -326,18 +213,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     getAllItems,
     deleteItem,
     updateItem,
-    createFolder,
-    deleteFolder,
-    getAllFolders,
-    updateFolder,
-    addTag,
-    removeTag,
-    togglePin,
-    batchAddTags,
-    batchRemoveTags,
-    batchMoveToFolder,
-    batchUpdateColor,
-    exportSelectedItems,
     fetchUuidToFlatIndexDict,
     fetchMeshComponents,
     getCornersUuids,

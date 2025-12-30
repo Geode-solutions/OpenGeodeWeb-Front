@@ -1,4 +1,4 @@
-import { useAppStore } from "../stores/app"
+import { useAppStore } from "@ogw_front/stores/app"
 
 const autoStoreRegister = ({ store }) => {
   if (store.$id === "app") {

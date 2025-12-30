@@ -20,6 +20,12 @@ export class ImportedDataDB extends Dexie {
         "id, name, viewer_type, geode_object_type, visible, created_at, folder_id, *tags, pinned",
       folders: "++id, name, parent_id, created_at",
     })
+
+    this.version(4).stores({
+      importedData:
+        "id, name, viewer_type, geode_object_type, visible, created_at",
+      folders: null,
+    })
   }
 }
 
