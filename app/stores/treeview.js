@@ -121,7 +121,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
           items.value.splice(i, 1)
         }
 
-        const selectionIndex = selection.value.findIndex((item) => item.id === id)
+        const selectionIndex = selection.value.findIndex(
+          (item) => item.id === id,
+        )
         if (selectionIndex !== -1) {
           selection.value.splice(selectionIndex, 1)
         }
