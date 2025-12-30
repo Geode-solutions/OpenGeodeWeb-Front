@@ -34,6 +34,7 @@
     "uuid": "11.1.0",
     "vue3-carousel": "0.3.4",
     "vuetify": "3.10.11",
+    "vuetify-nuxt-module": "0.18.7",
     "ws": "8.18.3",
     "wslink": "1.12.4"
   },
@@ -60,6 +61,9 @@
     "vite-plugin-vuetify": "2.1.1",
     "vitest": "4.0.15",
     "vitest-environment-nuxt": "1.0.1"
+  },
+  "peerDependencies": {
+    "electron": "36.4.0"
   },
   "overrides": {
     "vue": "latest"
