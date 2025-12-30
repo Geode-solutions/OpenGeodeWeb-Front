@@ -14,7 +14,6 @@
     "@pinia/testing": "1.0.3",
     "@vitejs/plugin-vue": "5.2.4",
     "@vue/test-utils": "2.4.6",
-    "electron": "36.4.0",
     "eslint": "9.26.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-nuxt": "4.0.0",
@@ -32,6 +31,9 @@
     "vite-plugin-vuetify": "2.1.1",
     "vitest": "4.0.15",
     "vitest-environment-nuxt": "1.0.1"
+  },
+  "peerDependencies": {
+    "electron": "36.4.0"
   },
   "overrides": {
     "vue": "latest"
