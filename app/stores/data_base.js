@@ -73,7 +73,8 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     const itemData = {
       id,
       name: value.name || value.displayed_name || id,
-      geode_object_type: value.geode_object_type || value.geode_object || "Unknown",
+      geode_object_type:
+        value.geode_object_type || value.geode_object || "Unknown",
       visible: true,
       created_at: new Date().toISOString(),
       ...value,
