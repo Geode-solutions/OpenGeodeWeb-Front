@@ -202,9 +202,9 @@ function kill_back(back_port) {
     new Promise((resolve, reject) => {
       fetch(
         "http://localhost:" +
-        back_port +
-        "/" +
-        back_schemas.opengeodeweb_back.kill.$id,
+          back_port +
+          "/" +
+          back_schemas.opengeodeweb_back.kill.$id,
         {
           method: back_schemas.opengeodeweb_back.kill.methods[0],
         },
