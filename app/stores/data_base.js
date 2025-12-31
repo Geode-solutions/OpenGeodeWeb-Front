@@ -1,7 +1,7 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import { db } from "@ogw_front/composables/db.js"
+import { db } from "../../internal/database/db.js"
 import { liveQuery } from "dexie"
 
 // Local constants
