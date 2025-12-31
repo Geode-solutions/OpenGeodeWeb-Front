@@ -1,5 +1,9 @@
 {
   "name": "@geode/opengeodeweb-front",
+  "description": "OpenSource Vue/Nuxt/Pinia/Vuetify framework for web applications",
+  "type": "module",
+  "version": "0.0.0",
+  "main": "./nuxt.config.js",
   "scripts": {
     "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
     "test": "npm run test:unit",
@@ -8,6 +12,31 @@
     "test:integration": "npm run tests --project integration",
     "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
     "build": ""
+  },
+  "dependencies": {
+    "@geode/opengeodeweb-back": "0.0.0",
+    "@geode/opengeodeweb-viewer": "0.0.0",
+    "@kitware/vtk.js": "33.3.0",
+    "@mdi/font": "7.4.47",
+    "@pinia/nuxt": "0.11.3",
+    "@types/node": "22.15.3",
+    "@vueuse/components": "13.1.0",
+    "@vueuse/nuxt": "13.1.0",
+    "ajv": "8.17.1",
+    "get-port-please": "3.2.0",
+    "is-electron": "2.2.2",
+    "js-file-download": "0.4.12",
+    "nuxt": "4.2.2",
+    "p-timeout": "7.0.1",
+    "pinia": "3.0.4",
+    "sass": "1.87.0",
+    "semver": "7.7.1",
+    "uuid": "11.1.0",
+    "vue3-carousel": "0.3.4",
+    "vuetify": "3.10.11",
+    "vuetify-nuxt-module": "0.18.7",
+    "ws": "8.18.3",
+    "wslink": "1.12.4"
   },
   "devDependencies": {
     "@nuxt/test-utils": "3.21.0",
@@ -33,35 +62,11 @@
     "vitest": "4.0.15",
     "vitest-environment-nuxt": "1.0.1"
   },
+  "peerDependencies": {
+    "electron": "36.4.0"
+  },
   "overrides": {
     "vue": "latest"
-  },
-  "description": "OpenSource Vue/Nuxt/Pinia/Vuetify framework for web applications",
-  "type": "module",
-  "version": "0.0.0",
-  "main": "./nuxt.config.js",
-  "dependencies": {
-    "@geode/opengeodeweb-back": "0.0.0",
-    "@geode/opengeodeweb-viewer": "0.0.0",
-    "@kitware/vtk.js": "33.3.0",
-    "@mdi/font": "7.4.47",
-    "@pinia/nuxt": "0.11.3",
-    "@types/node": "22.15.3",
-    "@vueuse/components": "13.1.0",
-    "@vueuse/nuxt": "13.1.0",
-    "ajv": "8.17.1",
-    "get-port-please": "3.2.0",
-    "is-electron": "2.2.2",
-    "js-file-download": "0.4.12",
-    "nuxt": "4.2.2",
-    "pinia": "3.0.4",
-    "sass": "1.87.0",
-    "semver": "7.7.1",
-    "uuid": "11.1.0",
-    "vue3-carousel": "0.3.4",
-    "vuetify": "3.10.11",
-    "ws": "8.18.3",
-    "wslink": "1.12.4"
   },
   "repository": {
     "type": "git",
