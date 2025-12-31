@@ -2,6 +2,7 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { db } from "@ogw_front/composables/db.js"
+import { liveQuery } from "dexie"
 
 // Local constants
 const back_model_schemas = back_schemas.opengeodeweb_back.models
@@ -12,31 +13,40 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 
 export const useDataBaseStore = defineStore("dataBase", () => {
   const viewerStore = useViewerStore()
-  const db_cache = reactive({})
+
+  const syncCache = reactive({})
+
+  liveQuery(() => db.data.toArray()).subscribe((items) => {
+    Object.keys(syncCache).forEach((key) => delete syncCache[key])
+    items.forEach((item) => {
+      syncCache[item.id] = item
+    })
+  })
+
+  function getAllItemsLive() {
+    return liveQuery(() => db.data.toArray())
+  }
+
+  function getItemLive(id) {
+    return liveQuery(() => db.data.get(id))
+  }
 
   async function itemMetaDatas(id) {
-    if (db_cache[id]) {
-      return db_cache[id]
-    }
-    const item = await db.data.get(id)
-    if (item) {
-      db_cache[id] = item
-    }
-    return item
+    return await db.data.get(id)
   }
 
   function itemMetaDatasSync(id) {
-    return db_cache[id]
+    return syncCache[id]
   }
 
   function formatedMeshComponents(id) {
     const item = itemMetaDatasSync(id)
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
-    const formated_mesh_components = ref([])
+    const formated_mesh_components = []
 
     for (const [category, uuids] of Object.entries(mesh_components)) {
-      formated_mesh_components.value.push({
+      formated_mesh_components.push({
         id: category,
         title: category,
         children: uuids.map((uuid) => ({
@@ -46,7 +56,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
         })),
       })
     }
-    return formated_mesh_components.value
+    return formated_mesh_components
   }
 
   function meshComponentType(id, uuid) {
@@ -73,7 +83,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     const itemData = {
       id,
       name: value.name || id,
-      geode_object_type: value.geode_object_type || "Unknown",
+      geode_object_type: value.geode_object_type,
       visible: true,
       created_at: new Date().toISOString(),
       ...value,
@@ -81,26 +91,22 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
     const serializedData = JSON.parse(JSON.stringify(itemData))
     await db.data.put(serializedData)
-    db_cache[id] = serializedData
+    syncCache[id] = serializedData
   }
 
   async function getAllItems() {
-    const items = await db.data.toArray()
-    items.forEach((item) => {
-      db_cache[item.id] = item
-    })
-    return items
+    return await db.data.toArray()
   }
 
   async function deleteItem(id) {
     await db.data.delete(id)
-    delete db_cache[id]
+    delete syncCache[id]
   }
 
   async function updateItem(id, changes) {
     await db.data.update(id, changes)
-    if (db_cache[id]) {
-      Object.assign(db_cache[id], changes)
+    if (syncCache[id]) {
+      Object.assign(syncCache[id], changes)
     }
   }
 
@@ -197,11 +203,11 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   async function clear() {
     await db.data.clear()
-    Object.keys(db_cache).forEach((key) => delete db_cache[key])
   }
 
   return {
-    db: db_cache,
+    getAllItemsLive,
+    getItemLive,
     itemMetaDatas,
     itemMetaDatasSync,
     meshComponentType,

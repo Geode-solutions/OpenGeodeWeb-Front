@@ -56,7 +56,7 @@
 
   watch(
     () => treeviewStore.selection,
-    (current, previous) => {
+    async (current, previous) => {
       if (!previous) previous = []
       if (current.value === previous) {
         return
@@ -67,19 +67,16 @@
         dataStyleStore.setVisibility(item.id, true)
       })
 
-      removed.forEach((item) => {
-        dataStyleStore.setVisibility(item.id, false)
+      for (const item of removed) {
+        await dataStyleStore.setVisibility(item.id, false)
 
-        const objectMeta = dataBaseStore.itemMetaDatas(item.id)
-        if (objectMeta.viewer_type === "mesh") {
-          if (dataBaseStore.db[item.id]?.mesh_components_selection) {
-            dataBaseStore.db[item.id].mesh_components_selection = []
-          }
+        const objectMeta = await dataBaseStore.itemMetaDatas(item.id)
+        if (objectMeta?.viewer_type === "mesh") {
           if (dataStyleStore.visibleMeshComponentIds?.[item.id]) {
             dataStyleStore.updateVisibleMeshComponents(item.id, [])
           }
         }
-      })
+      }
       hybridViewerStore.remoteRender()
     },
   )

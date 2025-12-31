@@ -53,7 +53,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return
     }
-    const value = dataBaseStore.db[id]
+    const value = await dataBaseStore.itemMetaDatas(id)
     console.log("hybridViewerStore.addItem", { value })
     const reader = vtkXMLPolyDataReader.newInstance()
     const textEncoder = new TextEncoder()
@@ -72,6 +72,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     renderer.resetCamera()
     renderWindow.render()
     db[id] = { actor, polydata, mapper }
+  }
+
+  async function removeItem(id) {
+    if (!db[id]) return
+    const renderer = genericRenderWindow.value.getRenderer()
+    renderer.removeActor(db[id].actor)
+    genericRenderWindow.value.getRenderWindow().render()
+    delete db[id]
   }
 
   async function setVisibility(id, visibility) {
@@ -202,13 +210,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const cameraSnapshot = camera
       ? {
-          focal_point: [...camera.getFocalPoint()],
-          view_up: [...camera.getViewUp()],
-          position: [...camera.getPosition()],
-          view_angle: camera.getViewAngle(),
-          clipping_range: [...camera.getClippingRange()],
-          distance: camera.getDistance(),
-        }
+        focal_point: [...camera.getFocalPoint()],
+        view_up: [...camera.getViewUp()],
+        position: [...camera.getPosition()],
+        view_angle: camera.getViewAngle(),
+        clipping_range: [...camera.getClippingRange()],
+        distance: camera.getDistance(),
+      }
       : camera_options
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
@@ -281,6 +289,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     db,
     genericRenderWindow,
     addItem,
+    removeItem,
     setVisibility,
     setZScaling,
     syncRemoteCamera,
