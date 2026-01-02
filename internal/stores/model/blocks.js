@@ -33,6 +33,9 @@ export function useModelBlocksStyle() {
   }
   function setModelBlocksVisibility(id, block_ids, visibility) {
     const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+    if (blocks_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_blocks_schemas.visibility,
       { id, block_ids: blocks_flat_indexes, visibility },
@@ -61,6 +64,9 @@ export function useModelBlocksStyle() {
 
   function setModelBlocksColor(id, block_ids, color) {
     const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+    if (blocks_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_blocks_schemas.color,
       { id, block_ids: blocks_flat_indexes, color },

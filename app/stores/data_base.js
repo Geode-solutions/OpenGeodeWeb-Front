@@ -3,6 +3,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { db } from "../../internal/database/db.js"
 import { liveQuery } from "dexie"
+import { useObservable } from "@vueuse/rxjs"
 
 // Local constants
 const back_model_schemas = back_schemas.opengeodeweb_back.models
@@ -14,14 +15,7 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 export const useDataBaseStore = defineStore("dataBase", () => {
   const viewerStore = useViewerStore()
 
-  const syncCache = reactive({})
-
-  liveQuery(() => db.data.toArray()).subscribe((items) => {
-    Object.keys(syncCache).forEach((key) => delete syncCache[key])
-    items.forEach((item) => {
-      syncCache[item.id] = item
-    })
-  })
+  const syncCache = useObservable(liveQuery(() => db.data.toArray()), { initialValue: [] })
 
   function getAllItemsLive() {
     return liveQuery(() => db.data.toArray())
@@ -36,7 +30,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   function itemMetaDatasSync(id) {
-    return syncCache[id]
+    return syncCache.value?.find(item => item.id === id)
   }
 
   function formatedMeshComponents(id) {
@@ -91,7 +85,6 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
     const serializedData = JSON.parse(JSON.stringify(itemData))
     await db.data.put(serializedData)
-    syncCache[id] = serializedData
   }
 
   async function getAllItems() {
@@ -100,14 +93,10 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
   async function deleteItem(id) {
     await db.data.delete(id)
-    delete syncCache[id]
   }
 
   async function updateItem(id, changes) {
     await db.data.update(id, changes)
-    if (syncCache[id]) {
-      Object.assign(syncCache[id], changes)
-    }
   }
 
   async function fetchMeshComponents(id) {

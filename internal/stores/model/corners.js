@@ -33,6 +33,9 @@ export function useModelCornersStyle() {
   }
   function setModelCornersVisibility(id, corner_ids, visibility) {
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+    if (corner_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_corners_schemas.visibility,
       { id, block_ids: corner_flat_indexes, visibility },
@@ -62,6 +65,9 @@ export function useModelCornersStyle() {
 
   function setModelCornersColor(id, corner_ids, color) {
     const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+    if (corner_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_corners_schemas.color,
       { id, block_ids: corner_flat_indexes, color },

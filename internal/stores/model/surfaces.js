@@ -32,6 +32,9 @@ export function useModelSurfacesStyle() {
   }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+    if (surface_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_surfaces_schemas.visibility,
       { id, block_ids: surface_flat_indexes, visibility },
@@ -59,6 +62,9 @@ export function useModelSurfacesStyle() {
 
   function setModelSurfacesColor(id, surface_ids, color) {
     const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+    if (surface_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_surfaces_schemas.color,
       { id, block_ids: surface_flat_indexes, color },
