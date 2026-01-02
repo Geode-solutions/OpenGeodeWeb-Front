@@ -15,7 +15,10 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 export const useDataBaseStore = defineStore("dataBase", () => {
   const viewerStore = useViewerStore()
 
-  const syncCache = useObservable(liveQuery(() => db.data.toArray()), { initialValue: [] })
+  const syncCache = useObservable(
+    liveQuery(() => db.data.toArray()),
+    { initialValue: [] },
+  )
 
   function getAllItemsLive() {
     return liveQuery(() => db.data.toArray())
@@ -30,7 +33,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   function itemMetaDatasSync(id) {
-    return syncCache.value?.find(item => item.id === id)
+    return syncCache.value?.find((item) => item.id === id)
   }
 
   function formatedMeshComponents(id) {
