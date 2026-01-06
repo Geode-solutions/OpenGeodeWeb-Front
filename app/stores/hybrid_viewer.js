@@ -7,12 +7,13 @@ import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
+import { database } from "../../internal/database/database.js"
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore()
-  const dataBaseStore = useDataBaseStore()
-  const db = reactive({})
+  const dataStore = useDataStore()
+  const hybridDb = reactive({})
   const status = ref(Status.NOT_CREATED)
   const camera_options = reactive({})
   const genericRenderWindow = reactive({})
@@ -53,7 +54,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return
     }
-    const value = await dataBaseStore.itemMetaDatas(id)
+    const value = await database.data.get(id)
     console.log("hybridViewerStore.addItem", { value })
     const reader = vtkXMLPolyDataReader.newInstance()
     const textEncoder = new TextEncoder()
@@ -71,19 +72,19 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     renderer.addActor(actor)
     renderer.resetCamera()
     renderWindow.render()
-    db[id] = { actor, polydata, mapper }
+    hybridDb[id] = { actor, polydata, mapper }
   }
 
   async function removeItem(id) {
-    if (!db[id]) return
+    if (!hybridDb[id]) return
     const renderer = genericRenderWindow.value.getRenderer()
-    renderer.removeActor(db[id].actor)
+    renderer.removeActor(hybridDb[id].actor)
     genericRenderWindow.value.getRenderWindow().render()
-    delete db[id]
+    delete hybridDb[id]
   }
 
   async function setVisibility(id, visibility) {
-    db[id].actor.setVisibility(visibility)
+    hybridDb[id].actor.setVisibility(visibility)
     const renderWindow = genericRenderWindow.value.getRenderWindow()
     renderWindow.render()
   }
@@ -210,13 +211,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const cameraSnapshot = camera
       ? {
-          focal_point: [...camera.getFocalPoint()],
-          view_up: [...camera.getViewUp()],
-          position: [...camera.getPosition()],
-          view_angle: camera.getViewAngle(),
-          clipping_range: [...camera.getClippingRange()],
-          distance: camera.getDistance(),
-        }
+        focal_point: [...camera.getFocalPoint()],
+        view_up: [...camera.getViewUp()],
+        position: [...camera.getPosition()],
+        view_angle: camera.getViewAngle(),
+        clipping_range: [...camera.getClippingRange()],
+        distance: camera.getDistance(),
+      }
       : camera_options
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
@@ -280,13 +281,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       renderer.removeActor(actor)
     }
     genericRenderWindow.value.getRenderWindow().render()
-    for (const id of Object.keys(db)) {
-      delete db[id]
+    for (const id of Object.keys(hybridDb)) {
+      delete hybridDb[id]
     }
   }
 
   return {
-    db,
+    hybridDb,
     genericRenderWindow,
     addItem,
     removeItem,

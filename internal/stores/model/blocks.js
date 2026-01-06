@@ -3,7 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -11,7 +11,7 @@ const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks
 
 export function useModelBlocksStyle() {
   const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelBlocksStyle(id) {
@@ -32,7 +32,7 @@ export function useModelBlocksStyle() {
     modelBlockStyle(id, block_id).visibility = visibility
   }
   function setModelBlocksVisibility(id, block_ids, visibility) {
-    const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+    const blocks_flat_indexes = dataStore.getFlatIndexes(id, block_ids)
     if (blocks_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -63,7 +63,7 @@ export function useModelBlocksStyle() {
   }
 
   function setModelBlocksColor(id, block_ids, color) {
-    const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+    const blocks_flat_indexes = dataStore.getFlatIndexes(id, block_ids)
     if (blocks_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -89,7 +89,7 @@ export function useModelBlocksStyle() {
 
   function applyModelBlocksStyle(id) {
     const style = modelBlocksStyle(id)
-    const blocks_ids = dataBaseStore.getBlocksUuids(id)
+    const blocks_ids = dataStore.getBlocksUuids(id)
     return Promise.all([
       setModelBlocksVisibility(id, blocks_ids, style.visibility),
       setModelBlocksColor(id, blocks_ids, style.color),

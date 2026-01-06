@@ -5,7 +5,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
 async function importWorkflow(files) {
@@ -30,12 +30,12 @@ function buildImportItemFromPayloadApi(value, geode_object_type) {
 }
 
 async function importItem(item) {
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
   const treeviewStore = useTreeviewStore()
-  await dataBaseStore.registerObject(item.id)
-  await dataBaseStore.addItem(item.id, {
+  await dataStore.registerObject(item.id)
+  await dataStore.addItem(item.id, {
     ...item,
   })
 
@@ -51,12 +51,12 @@ async function importItem(item) {
 
   if (item.viewer_type === "model") {
     await Promise.all([
-      dataBaseStore.fetchMeshComponents(item.id),
-      dataBaseStore.fetchUuidToFlatIndexDict(item.id),
+      dataStore.fetchMeshComponents(item.id),
+      dataStore.fetchUuidToFlatIndexDict(item.id),
     ])
   }
 
-  await dataStyleStore.applyDefaultStyle(item.id)
+  await dataStyleStore.applyDefaultStyle(item.id, item)
   return item.id
 }
 
@@ -79,7 +79,7 @@ async function importFile(filename, geode_object_type) {
 
 async function importWorkflowFromSnapshot(items) {
   console.log("[importWorkflowFromSnapshot] start", { count: items?.length })
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const treeviewStore = useTreeviewStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
@@ -88,7 +88,7 @@ async function importWorkflowFromSnapshot(items) {
   for (const item of items) {
     const id = await importItem(
       item,
-      dataBaseStore,
+      dataStore,
       treeviewStore,
       dataStyleStore,
       hybridViewerStore,

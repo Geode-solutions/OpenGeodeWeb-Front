@@ -6,7 +6,7 @@ import { importWorkflowFromSnapshot } from "@ogw_front/utils/file_import_workflo
 
 import { useAppStore } from "@ogw_front/stores/app"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
@@ -34,7 +34,7 @@ export function useProjectManager() {
     const geodeStore = useGeodeStore()
     const dataStyleStore = useDataStyleStore()
     const viewerStore = useViewerStore()
-    const dataBaseStore = useDataBaseStore()
+    const dataStore = useDataStore()
     const treeviewStore = useTreeviewStore()
     const hybridViewerStore = useHybridViewerStore()
 
@@ -54,7 +54,7 @@ export function useProjectManager() {
     )
 
     treeviewStore.clear()
-    dataBaseStore.clear()
+    dataStore.clear()
     hybridViewerStore.clear()
 
     const schemaImport = back_schemas.opengeodeweb_back.import_project

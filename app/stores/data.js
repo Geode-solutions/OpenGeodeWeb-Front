@@ -1,7 +1,7 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import { db } from "../../internal/database/db.js"
+import { database } from "../../internal/database/database.js"
 import { liveQuery } from "dexie"
 import { useObservable } from "@vueuse/rxjs"
 
@@ -12,32 +12,25 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
-export const useDataBaseStore = defineStore("dataBase", () => {
+export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  const syncCache = useObservable(
-    liveQuery(() => db.data.toArray()),
-    { initialValue: [] },
-  )
-
-  function getAllItemsLive() {
-    return liveQuery(() => db.data.toArray())
+  function getAllItems() {
+    return useObservable(
+      liveQuery(() => database.data.toArray()),
+      { initialValue: [] },
+    )
   }
 
-  function getItemLive(id) {
-    return liveQuery(() => db.data.get(id))
-  }
-
-  async function itemMetaDatas(id) {
-    return await db.data.get(id)
-  }
-
-  function itemMetaDatasSync(id) {
-    return syncCache.value?.find((item) => item.id === id)
+  function getItem(id) {
+    return useObservable(
+      liveQuery(() => database.data.get(id)),
+      { initialValue: null },
+    )
   }
 
   function formatedMeshComponents(id) {
-    const item = itemMetaDatasSync(id)
+    const item = getItem(id).value
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     const formated_mesh_components = []
@@ -57,7 +50,7 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   function meshComponentType(id, uuid) {
-    const item = itemMetaDatasSync(id)
+    const item = getItem(id).value
     if (!item || !item.mesh_components) return null
     const { mesh_components } = item
 
@@ -87,19 +80,15 @@ export const useDataBaseStore = defineStore("dataBase", () => {
     }
 
     const serializedData = JSON.parse(JSON.stringify(itemData))
-    await db.data.put(serializedData)
-  }
-
-  async function getAllItems() {
-    return await db.data.toArray()
+    await database.data.put(serializedData)
   }
 
   async function deleteItem(id) {
-    await db.data.delete(id)
+    await database.data.delete(id)
   }
 
   async function updateItem(id, changes) {
-    await db.data.update(id, changes)
+    await database.data.update(id, changes)
   }
 
   async function fetchMeshComponents(id) {
@@ -131,33 +120,33 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   function getCornersUuids(id) {
-    const item = itemMetaDatasSync(id)
+    const item = getItem(id).value
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Corner"] || {})
   }
 
   function getLinesUuids(id) {
-    const item = itemMetaDatasSync(id)
+    const item = getItem(id).value
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Line"] || {})
   }
   function getSurfacesUuids(id) {
-    const item = itemMetaDatasSync(id)
+    const item = getItem(id).value
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Surface"] || {})
   }
   function getBlocksUuids(id) {
-    const item = itemMetaDatasSync(id)
+    const item = getItem(id).value
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Block"] || {})
   }
 
   function getFlatIndexes(id, mesh_component_ids) {
-    const item = itemMetaDatasSync(id)
+    const item = getItem(id).value
     if (!item || !item.uuid_to_flat_index) return []
     const { uuid_to_flat_index } = item
     const flat_indexes = []
@@ -170,14 +159,14 @@ export const useDataBaseStore = defineStore("dataBase", () => {
   }
 
   async function exportStores() {
-    const items = await db.data.toArray()
-    const snapshotDb = {}
+    const items = await database.data.toArray()
+    const snapshotdatabase = {}
 
     for (const item of items) {
-      snapshotDb[item.id] = { ...item }
+      snapshotdatabase[item.id] = { ...item }
     }
 
-    return { db: snapshotDb }
+    return { database: snapshotdatabase }
   }
 
   async function importStores(snapshot) {
@@ -187,27 +176,24 @@ export const useDataBaseStore = defineStore("dataBase", () => {
 
     await clear()
 
-    for (const [id, item] of Object.entries(snapshot?.db || {})) {
+    for (const [id, item] of Object.entries(snapshot?.database || {})) {
       await registerObject(id)
       await addItem(id, item)
     }
   }
 
   async function clear() {
-    await db.data.clear()
+    await database.data.clear()
   }
 
   return {
-    getAllItemsLive,
-    getItemLive,
-    itemMetaDatas,
-    itemMetaDatasSync,
+    getAllItems,
+    getItem,
     meshComponentType,
     formatedMeshComponents,
     registerObject,
     deregisterObject,
     addItem,
-    getAllItems,
     deleteItem,
     updateItem,
     fetchUuidToFlatIndexDict,

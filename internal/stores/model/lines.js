@@ -3,7 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -11,7 +11,7 @@ const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
 
 export function useModelLinesStyle() {
   const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelLinesStyle(id) {
@@ -32,7 +32,7 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).visibility = visibility
   }
   function setModelLinesVisibility(id, line_ids, visibility) {
-    const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
+    const line_flat_indexes = dataStore.getFlatIndexes(id, line_ids)
     if (line_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -62,7 +62,7 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).color = color
   }
   function setModelLinesColor(id, line_ids, color) {
-    const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
+    const line_flat_indexes = dataStore.getFlatIndexes(id, line_ids)
     if (line_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -87,7 +87,7 @@ export function useModelLinesStyle() {
 
   function applyModelLinesStyle(id) {
     const style = modelLinesStyle(id)
-    const line_ids = dataBaseStore.getLinesUuids(id)
+    const line_ids = dataStore.getLinesUuids(id)
     return Promise.all([
       setModelLinesVisibility(id, line_ids, style.visibility),
       setModelLinesColor(id, line_ids, style.color),

@@ -37,10 +37,10 @@
 </template>
 
 <script setup>
-  import { useDataBaseStore } from "@ogw_front/stores/data_base"
+  import { useDataStore } from "@ogw_front/stores/data"
   import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const treeviewStore = useTreeviewStore()
 
   const selectedTree = computed(() => treeviewStore.selectedTree)
@@ -51,7 +51,12 @@
 
   const model_id = computed(() => treeviewStore.model_id)
 
-  const metaDatas = computed(() => dataBaseStore.itemMetaDatas(model_id.value))
+  const metaDatas = computed(() => {
+    const id = model_id.value
+    if (!id) return {}
+    const item = dataStore.getItem(id)
+    return item.value || {}
+  })
 </script>
 
 <style scoped>

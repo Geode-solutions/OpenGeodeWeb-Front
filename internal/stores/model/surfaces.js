@@ -2,7 +2,7 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
@@ -11,7 +11,7 @@ const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 
 export function useModelSurfacesStyle() {
   const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelSurfacesStyle(id) {
@@ -31,7 +31,7 @@ export function useModelSurfacesStyle() {
     modelSurfaceStyle(id, surface_id).visibility = visibility
   }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
-    const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+    const surface_flat_indexes = dataStore.getFlatIndexes(id, surface_ids)
     if (surface_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -61,7 +61,7 @@ export function useModelSurfacesStyle() {
   }
 
   function setModelSurfacesColor(id, surface_ids, color) {
-    const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+    const surface_flat_indexes = dataStore.getFlatIndexes(id, surface_ids)
     if (surface_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -86,7 +86,7 @@ export function useModelSurfacesStyle() {
 
   function applyModelSurfacesStyle(id) {
     const style = modelSurfacesStyle(id)
-    const surface_ids = dataBaseStore.getSurfacesUuids(id)
+    const surface_ids = dataStore.getSurfacesUuids(id)
     return Promise.all([
       setModelSurfacesVisibility(id, surface_ids, style.visibility),
       setModelSurfacesColor(id, surface_ids, style.color),

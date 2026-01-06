@@ -3,7 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -11,7 +11,7 @@ const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners
 
 export function useModelCornersStyle() {
   const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelCornersStyle(id) {
@@ -32,7 +32,7 @@ export function useModelCornersStyle() {
     modelCornerStyle(id, corner_id).visibility = visibility
   }
   function setModelCornersVisibility(id, corner_ids, visibility) {
-    const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+    const corner_flat_indexes = dataStore.getFlatIndexes(id, corner_ids)
     if (corner_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -64,7 +64,7 @@ export function useModelCornersStyle() {
   }
 
   function setModelCornersColor(id, corner_ids, color) {
-    const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+    const corner_flat_indexes = dataStore.getFlatIndexes(id, corner_ids)
     if (corner_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -89,7 +89,7 @@ export function useModelCornersStyle() {
 
   function applyModelCornersStyle(id) {
     const style = modelCornersStyle(id)
-    const corner_ids = dataBaseStore.getCornersUuids(id)
+    const corner_ids = dataStore.getCornersUuids(id)
     return Promise.all([
       setModelCornersVisibility(id, corner_ids, style.visibility),
       setModelCornersColor(id, corner_ids, style.color),

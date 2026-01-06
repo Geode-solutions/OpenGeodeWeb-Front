@@ -4,7 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useModelSurfacesStyle } from "./surfaces"
 import { useModelCornersStyle } from "./corners"
@@ -17,7 +17,7 @@ import { useModelPointsStyle } from "./points"
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model
 
 export default function useModelStyle() {
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const dataStyleStore = useDataStyleStore()
   const modelCornersStyleStore = useModelCornersStyle()
   const modelBlocksStyleStore = useModelBlocksStyle()
@@ -159,7 +159,8 @@ export default function useModelStyle() {
   }
 
   function setModelMeshComponentsDefaultStyle(id) {
-    const { mesh_components } = dataBaseStore.itemMetaDatas(id)
+    const item = dataStore.getItem(id)
+    const { mesh_components } = item.value
     const promise_array = []
     if ("Corner" in mesh_components) {
       promise_array.push(modelCornersStyleStore.setModelCornersDefaultStyle(id))

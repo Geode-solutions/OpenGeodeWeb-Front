@@ -6,7 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import Status from "@ogw_front/utils/status"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import {
   delete_folder_recursive,
   kill_back,
@@ -22,7 +22,7 @@ const geode_object = "BRep"
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -38,9 +38,9 @@ describe("Model lines", () => {
       console.log("FROM TEST MODEL LINES")
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const dataBaseStore = useDataBaseStore()
-      const line_ids = dataBaseStore.getLinesUuids(id)
-      const lines_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
+      const dataStore = useDataStore()
+      const line_ids = dataStore.getLinesUuids(id)
+      const lines_flat_indexes = dataStore.getFlatIndexes(id, line_ids)
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelLinesVisibility(id, line_ids, visibility)
@@ -62,9 +62,9 @@ describe("Model lines", () => {
     test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const dataBaseStore = useDataBaseStore()
-      const line_ids = dataBaseStore.getLinesUuids(id)
-      const lines_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
+      const dataStore = useDataStore()
+      const line_ids = dataStore.getLinesUuids(id)
+      const lines_flat_indexes = dataStore.getFlatIndexes(id, line_ids)
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelLinesColor(id, line_ids, color)

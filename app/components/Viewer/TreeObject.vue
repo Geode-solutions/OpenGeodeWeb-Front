@@ -38,14 +38,15 @@
 <script setup>
   import { useTreeviewStore } from "@ogw_front/stores/treeview"
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useDataBaseStore } from "@ogw_front/stores/data_base"
+  import { useDataStore } from "@ogw_front/stores/data"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+  import { database } from "../../../internal/database/database.js"
 
   import { compareSelections } from "@ogw_front/utils/treeview"
 
   const treeviewStore = useTreeviewStore()
   const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const hybridViewerStore = useHybridViewerStore()
 
   const emit = defineEmits(["show-menu"])
@@ -70,7 +71,7 @@
       for (const item of removed) {
         await dataStyleStore.setVisibility(item.id, false)
 
-        const objectMeta = await dataBaseStore.itemMetaDatas(item.id)
+        const objectMeta = await database.data.get(item.id)
         if (objectMeta?.viewer_type === "mesh") {
           if (dataStyleStore.visibleMeshComponentIds?.[item.id]) {
             dataStyleStore.updateVisibleMeshComponents(item.id, [])
