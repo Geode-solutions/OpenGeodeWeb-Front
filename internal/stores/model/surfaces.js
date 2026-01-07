@@ -31,7 +31,10 @@ export function useModelSurfacesStyle() {
     modelSurfaceStyle(id, surface_id).visibility = visibility
   }
   async function setModelSurfacesVisibility(id, surface_ids, visibility) {
-    const surface_flat_indexes = await dataStore.getFlatIndexesAsync(id, surface_ids)
+    const surface_flat_indexes = await dataStore.getFlatIndexesAsync(
+      id,
+      surface_ids,
+    )
     if (surface_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -61,7 +64,10 @@ export function useModelSurfacesStyle() {
   }
 
   async function setModelSurfacesColor(id, surface_ids, color) {
-    const surface_flat_indexes = await dataStore.getFlatIndexesAsync(id, surface_ids)
+    const surface_flat_indexes = await dataStore.getFlatIndexesAsync(
+      id,
+      surface_ids,
+    )
     if (surface_flat_indexes.length === 0) {
       return Promise.resolve()
     }

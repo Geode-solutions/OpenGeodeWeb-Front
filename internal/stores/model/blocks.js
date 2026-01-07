@@ -32,7 +32,10 @@ export function useModelBlocksStyle() {
     modelBlockStyle(id, block_id).visibility = visibility
   }
   async function setModelBlocksVisibility(id, block_ids, visibility) {
-    const blocks_flat_indexes = await dataStore.getFlatIndexesAsync(id, block_ids)
+    const blocks_flat_indexes = await dataStore.getFlatIndexesAsync(
+      id,
+      block_ids,
+    )
     if (blocks_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -63,7 +66,10 @@ export function useModelBlocksStyle() {
   }
 
   async function setModelBlocksColor(id, block_ids, color) {
-    const blocks_flat_indexes = await dataStore.getFlatIndexesAsync(id, block_ids)
+    const blocks_flat_indexes = await dataStore.getFlatIndexesAsync(
+      id,
+      block_ids,
+    )
     if (blocks_flat_indexes.length === 0) {
       return Promise.resolve()
     }

@@ -32,7 +32,10 @@ export function useModelCornersStyle() {
     modelCornerStyle(id, corner_id).visibility = visibility
   }
   async function setModelCornersVisibility(id, corner_ids, visibility) {
-    const corner_flat_indexes = await dataStore.getFlatIndexesAsync(id, corner_ids)
+    const corner_flat_indexes = await dataStore.getFlatIndexesAsync(
+      id,
+      corner_ids,
+    )
     if (corner_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -64,7 +67,10 @@ export function useModelCornersStyle() {
   }
 
   async function setModelCornersColor(id, corner_ids, color) {
-    const corner_flat_indexes = await dataStore.getFlatIndexesAsync(id, corner_ids)
+    const corner_flat_indexes = await dataStore.getFlatIndexesAsync(
+      id,
+      corner_ids,
+    )
     if (corner_flat_indexes.length === 0) {
       return Promise.resolve()
     }
