@@ -19,14 +19,21 @@ export const useAppStore = defineStore("app", () => {
     const snapshot = {}
     let exportCount = 0
 
-    console.log(`[AppStore] Exporting stores, total registered: ${stores.length}`)
+    console.log(
+      `[AppStore] Exporting stores, total registered: ${stores.length}`,
+    )
     for (const store of stores) {
-      console.log(`[AppStore] Checking store: ${store.$id}, has exportStores: ${!!store.exportStores}`)
+      console.log(
+        `[AppStore] Checking store: ${store.$id}, has exportStores: ${!!store.exportStores}`,
+      )
       if (!store.exportStores) continue
       const storeId = store.$id
       try {
         snapshot[storeId] = await store.exportStores(params)
-        console.log(`[AppStore] Exported store "${storeId}":`, snapshot[storeId])
+        console.log(
+          `[AppStore] Exported store "${storeId}":`,
+          snapshot[storeId],
+        )
         exportCount++
       } catch (error) {
         console.error(`[AppStore] Error exporting store "${storeId}":`, error)

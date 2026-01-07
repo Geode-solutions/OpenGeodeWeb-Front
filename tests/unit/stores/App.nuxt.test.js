@@ -30,7 +30,7 @@ describe("App Store", () => {
         const mock_store = {
           $id: "testStore",
           save: vi.fn().mockImplementation(() => ({ data: "test" })),
-          load: vi.fn().mockImplementation(() => { }),
+          load: vi.fn().mockImplementation(() => {}),
         }
 
         appStore.registerStore(mock_store)
@@ -43,13 +43,13 @@ describe("App Store", () => {
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "userStore",
-          save: vi.fn().mockImplementation(() => { }),
-          load: vi.fn().mockImplementation(() => { }),
+          save: vi.fn().mockImplementation(() => {}),
+          load: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
           $id: "geodeStore",
-          save: vi.fn().mockImplementation(() => { }),
-          load: vi.fn().mockImplementation(() => { }),
+          save: vi.fn().mockImplementation(() => {}),
+          load: vi.fn().mockImplementation(() => {}),
         }
 
         appStore.registerStore(mock_store_1)
@@ -70,14 +70,14 @@ describe("App Store", () => {
             name: "toto",
             email: "toto@titi.com",
           })),
-          importStores: vi.fn().mockImplementation(() => { }),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
           $id: "geodeStore",
           exportStores: vi
             .fn()
             .mockImplementation(() => ({ items: [], total: 0 })),
-          importStores: vi.fn().mockImplementation(() => { }),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
 
         appStore.registerStore(mock_store_1)
@@ -98,11 +98,11 @@ describe("App Store", () => {
         const mock_store_1 = {
           $id: "withSave",
           exportStores: vi.fn().mockImplementation(() => ({ data: "test" })),
-          importStores: vi.fn().mockImplementation(() => { }),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
           $id: "withoutSave",
-          importStores: vi.fn().mockImplementation(() => { }),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
 
         appStore.registerStore(mock_store_1)
@@ -150,12 +150,12 @@ describe("App Store", () => {
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "withImport",
-          save: vi.fn().mockImplementation(() => { }),
-          importStores: vi.fn().mockImplementation(() => { }),
+          save: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
         const mock_store_2 = {
           $id: "withoutImport",
-          save: vi.fn().mockImplementation(() => { }),
+          save: vi.fn().mockImplementation(() => {}),
         }
         appStore.registerStore(mock_store_1)
         appStore.registerStore(mock_store_2)
@@ -172,10 +172,10 @@ describe("App Store", () => {
         const appStore = useAppStore()
         const console_warn_spy = vi
           .spyOn(console, "warn")
-          .mockImplementation(() => { })
+          .mockImplementation(() => {})
         const mock_store = {
           $id: "testStore",
-          importStores: vi.fn().mockImplementation(() => { }),
+          importStores: vi.fn().mockImplementation(() => {}),
         }
         appStore.registerStore(mock_store)
         appStore.importStores({})
