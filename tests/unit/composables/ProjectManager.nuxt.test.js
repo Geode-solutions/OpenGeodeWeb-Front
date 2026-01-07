@@ -8,9 +8,10 @@ import { appMode } from "@ogw_front/utils/app_mode"
 
 // Snapshot
 const snapshotMock = {
-  dataBase: {
-    db: {
-      abc123: {
+  data: {
+    items: [
+      {
+        id: "abc123",
         viewer_type: "mesh",
         geode_object_type: "PointSet2D",
         native_file: "native.ext",
@@ -18,7 +19,7 @@ const snapshotMock = {
         name: "My Data",
         binary_light_viewable: "VGxpZ2h0RGF0YQ==",
       },
-    },
+    ],
   },
   treeview: {
     isAdditionnalTreeDisplayed: false,

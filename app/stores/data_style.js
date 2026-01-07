@@ -1,8 +1,8 @@
-import { getDefaultStyle } from "../utils/default_styles"
+import { getDefaultStyle } from "@ogw_front/utils/default_styles"
 import { useDataStore } from "@ogw_front/stores/data"
-import useDataStyleState from "../../internal/stores/data_style_state"
-import useMeshStyle from "../../internal/stores/mesh/index"
-import useModelStyle from "../../internal/stores/model/index"
+import useDataStyleState from "@/internal/stores/data_style_state"
+import useMeshStyle from "@/internal/stores/mesh/index"
+import useModelStyle from "@/internal/stores/model/index"
 
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState()
@@ -14,16 +14,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)
   }
 
-  function setVisibility(id, visibility, itemData = null) {
-    let viewer_type
-    if (itemData) {
-      viewer_type = itemData.viewer_type
-    } else {
-      const item = dataStore.getItem(id)
-      if (!item.value) {
-        throw new Error("Item not found or not loaded: " + id)
-      }
-      viewer_type = item.value.viewer_type
+  async function setVisibility(id, visibility) {
+    const item = await dataStore.getItemAsync(id)
+    const viewer_type = item?.viewer_type
+    if (!viewer_type) {
+      throw new Error("Item not found or not loaded: " + id)
     }
 
     if (viewer_type === "mesh") {
@@ -34,16 +29,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     throw new Error("Unknown viewer_type")
   }
 
-  function applyDefaultStyle(id, itemData = null) {
-    let viewer_type
-    if (itemData) {
-      viewer_type = itemData.viewer_type
-    } else {
-      const item = dataStore.getItem(id)
-      if (!item.value) {
-        throw new Error("Item not found or not loaded: " + id)
-      }
-      viewer_type = item.value.viewer_type
+  async function applyDefaultStyle(id) {
+    const item = await dataStore.getItemAsync(id)
+    const viewer_type = item?.viewer_type
+    if (!viewer_type) {
+      throw new Error("Item not found or not loaded: " + id)
     }
 
     if (viewer_type === "mesh") {

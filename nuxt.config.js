@@ -21,6 +21,7 @@ export default defineNuxtConfig({
 
   alias: {
     "@ogw_front": __dirname + "/app/",
+    "@": __dirname,
   },
 
   // ** Global CSS

@@ -1,7 +1,7 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import { database } from "../../internal/database/database.js"
+import { database } from "@/internal/database/database.js"
 import { liveQuery } from "dexie"
 import { useObservable } from "@vueuse/rxjs"
 
@@ -23,10 +23,25 @@ export const useDataStore = defineStore("data", () => {
   }
 
   function getItem(id) {
+    if (!id) {
+      return useObservable(
+        liveQuery(() => null),
+        { initialValue: {} },
+      )
+    }
     return useObservable(
       liveQuery(() => database.data.get(id)),
-      { initialValue: null },
+      { initialValue: {} },
     )
+  }
+
+  async function getItemAsync(id) {
+    if (!id) return null
+    return await database.data.get(id)
+  }
+
+  async function getAllItemsAsync() {
+    return await database.data.toArray()
   }
 
   function formatedMeshComponents(id) {
@@ -71,12 +86,12 @@ export const useDataStore = defineStore("data", () => {
 
   async function addItem(id, value) {
     const itemData = {
+      ...value,
       id,
       name: value.name || id,
       geode_object_type: value.geode_object_type,
-      visible: true,
-      created_at: new Date().toISOString(),
-      ...value,
+      visible: value.visible !== undefined ? value.visible : true,
+      created_at: value.created_at || new Date().toISOString(),
     }
 
     const serializedData = JSON.parse(JSON.stringify(itemData))
@@ -159,27 +174,12 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function exportStores() {
-    const items = await database.data.toArray()
-    const snapshotdatabase = {}
-
-    for (const item of items) {
-      snapshotdatabase[item.id] = { ...item }
-    }
-
-    return { database: snapshotdatabase }
+    const items = await getAllItemsAsync()
+    return { items }
   }
 
   async function importStores(snapshot) {
-    const hybridViewerStore = useHybridViewerStore()
-    await hybridViewerStore.initHybridViewer()
-    hybridViewerStore.clear()
-
     await clear()
-
-    for (const [id, item] of Object.entries(snapshot?.database || {})) {
-      await registerObject(id)
-      await addItem(id, item)
-    }
   }
 
   async function clear() {
@@ -188,7 +188,9 @@ export const useDataStore = defineStore("data", () => {
 
   return {
     getAllItems,
+    getAllItemsAsync,
     getItem,
+    getItemAsync,
     meshComponentType,
     formatedMeshComponents,
     registerObject,

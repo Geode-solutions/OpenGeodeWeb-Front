@@ -56,7 +56,7 @@ async function importItem(item) {
     ])
   }
 
-  await dataStyleStore.applyDefaultStyle(item.id, item)
+  await dataStyleStore.applyDefaultStyle(item.id)
   return item.id
 }
 

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
+import { database } from "@/internal/database/database.js"
 
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 import { useAppStore } from "@ogw_front/stores/app"
@@ -47,16 +48,17 @@ describe("Project import", () => {
 
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(
       async (snapshot) => {
-        for (const [id, item] of Object.entries(snapshot?.db || {})) {
-          stores.dataBase.db[id] = item
+        for (const item of snapshot?.items || []) {
+          await database.data.put(item)
         }
       },
     )
 
     const snapshot = {
-      dataBase: {
-        db: {
-          abc123: {
+      data: {
+        items: [
+          {
+            id: "abc123",
             viewer_type: "mesh",
             geode_object_type: "PointSet2D",
             native_file: "native.ext",
@@ -64,7 +66,7 @@ describe("Project import", () => {
             name: "My Data",
             binary_light_viewable: "VGxpZ2h0RGF0YQ==",
           },
-        },
+        ],
       },
       treeview: {
         items: [{ title: "PointSet2D", children: [] }],
@@ -82,7 +84,9 @@ describe("Project import", () => {
 
     await stores.app.importStores(snapshot)
 
-    expect(stores.dataBase.db.abc123).toBeDefined()
+    const item = await database.data.get("abc123")
+    expect(item).toBeDefined()
+    expect(item.id).toBe("abc123")
     expect(stores.dataStyle.styles.abc123).toBeDefined()
   })
 })

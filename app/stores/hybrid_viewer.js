@@ -8,7 +8,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import Status from "@ogw_front/utils/status"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useDataStore } from "@ogw_front/stores/data"
-import { database } from "../../internal/database/database.js"
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore()
@@ -54,7 +53,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return
     }
-    const value = await database.data.get(id)
+    const value = await dataStore.getItemAsync(id)
     console.log("hybridViewerStore.addItem", { value })
     const reader = vtkXMLPolyDataReader.newInstance()
     const textEncoder = new TextEncoder()

@@ -17,7 +17,7 @@ export function useProjectManager() {
     console.log("[export triggered]")
     const appStore = useAppStore()
     const geodeStore = useGeodeStore()
-    const snapshot = appStore.exportStores()
+    const snapshot = await appStore.exportStores()
     const schema = back_schemas.opengeodeweb_back.export_project
     const defaultName = "project.vease"
 
@@ -90,18 +90,7 @@ export function useProjectManager() {
     await hybridViewerStore.initHybridViewer()
     await hybridViewerStore.importStores(snapshot.hybridViewer || {})
 
-    const snapshotDataBase =
-      snapshot && snapshot.dataBase && snapshot.dataBase.db
-        ? snapshot.dataBase.db
-        : {}
-    const items = Object.entries(snapshotDataBase).map(function (pair) {
-      const id = pair[0]
-      const item = pair[1]
-      return {
-        id: id,
-        ...item,
-      }
-    })
+    const items = snapshot?.data?.items || []
 
     await importWorkflowFromSnapshot(items)
     await hybridViewerStore.importStores(snapshot.hybridViewer || {})
