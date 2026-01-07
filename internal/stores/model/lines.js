@@ -31,8 +31,8 @@ export function useModelLinesStyle() {
   function saveModelLineVisibility(id, line_id, visibility) {
     modelLineStyle(id, line_id).visibility = visibility
   }
-  function setModelLinesVisibility(id, line_ids, visibility) {
-    const line_flat_indexes = dataStore.getFlatIndexes(id, line_ids)
+  async function setModelLinesVisibility(id, line_ids, visibility) {
+    const line_flat_indexes = await dataStore.getFlatIndexesAsync(id, line_ids)
     if (line_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -61,8 +61,8 @@ export function useModelLinesStyle() {
   function saveModelLineColor(id, line_id, color) {
     modelLineStyle(id, line_id).color = color
   }
-  function setModelLinesColor(id, line_ids, color) {
-    const line_flat_indexes = dataStore.getFlatIndexes(id, line_ids)
+  async function setModelLinesColor(id, line_ids, color) {
+    const line_flat_indexes = await dataStore.getFlatIndexesAsync(id, line_ids)
     if (line_flat_indexes.length === 0) {
       return Promise.resolve()
     }
@@ -85,9 +85,9 @@ export function useModelLinesStyle() {
     )
   }
 
-  function applyModelLinesStyle(id) {
+  async function applyModelLinesStyle(id) {
     const style = modelLinesStyle(id)
-    const line_ids = dataStore.getLinesUuids(id)
+    const line_ids = await dataStore.getLinesUuidsAsync(id)
     return Promise.all([
       setModelLinesVisibility(id, line_ids, style.visibility),
       setModelLinesColor(id, line_ids, style.color),

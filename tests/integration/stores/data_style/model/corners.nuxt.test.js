@@ -22,7 +22,7 @@ const geode_object = "BRep"
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -43,10 +43,14 @@ describe("Model corners", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const corner_ids = dataStore.getCornersUuids(id)
-      const corner_flat_indexes = dataStore.getFlatIndexes(id, corner_ids)
+      const corner_ids = await dataStore.getCornersUuidsAsync(id)
+      const corner_flat_indexes = await dataStore.getFlatIndexesAsync(
+        id,
+        corner_ids,
+      )
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear()
       await dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.visibility,
@@ -69,10 +73,14 @@ describe("Model corners", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const corner_ids = dataStore.getCornersUuids(id)
-      const corner_flat_indexes = dataStore.getFlatIndexes(id, corner_ids)
+      const corner_ids = await dataStore.getCornersUuidsAsync(id)
+      const corner_flat_indexes = await dataStore.getFlatIndexesAsync(
+        id,
+        corner_ids,
+      )
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear()
       await dataStyleStore.setModelCornersColor(id, corner_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.color,

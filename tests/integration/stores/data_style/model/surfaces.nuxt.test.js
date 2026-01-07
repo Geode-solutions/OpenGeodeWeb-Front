@@ -22,7 +22,7 @@ const geode_object = "BRep"
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -43,10 +43,14 @@ describe("Model surfaces", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const surface_ids = dataStore.getSurfacesUuids(id)
-      const surface_flat_indexes = dataStore.getFlatIndexes(id, surface_ids)
+      const surface_ids = await dataStore.getSurfacesUuidsAsync(id)
+      const surface_flat_indexes = await dataStore.getFlatIndexesAsync(
+        id,
+        surface_ids,
+      )
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear() // Clear calls from setup (applyDefaultStyle)
       await dataStyleStore.setModelSurfacesVisibility(
         id,
         surface_ids,
@@ -73,10 +77,14 @@ describe("Model surfaces", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const surface_ids = dataStore.getSurfacesUuids(id)
-      const surface_flat_indexes = dataStore.getFlatIndexes(id, surface_ids)
+      const surface_ids = await dataStore.getSurfacesUuidsAsync(id)
+      const surface_flat_indexes = await dataStore.getFlatIndexesAsync(
+        id,
+        surface_ids,
+      )
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear() // Clear calls from setup (applyDefaultStyle)
       await dataStyleStore.setModelSurfacesColor(id, surface_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.color,

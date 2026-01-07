@@ -22,7 +22,7 @@ const geode_object = "BRep"
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -39,10 +39,14 @@ describe("Model lines", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const line_ids = dataStore.getLinesUuids(id)
-      const lines_flat_indexes = dataStore.getFlatIndexes(id, line_ids)
+      const line_ids = await dataStore.getLinesUuidsAsync(id)
+      const lines_flat_indexes = await dataStore.getFlatIndexesAsync(
+        id,
+        line_ids,
+      )
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear()
       await dataStyleStore.setModelLinesVisibility(id, line_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.visibility,
@@ -63,10 +67,14 @@ describe("Model lines", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const line_ids = dataStore.getLinesUuids(id)
-      const lines_flat_indexes = dataStore.getFlatIndexes(id, line_ids)
+      const line_ids = await dataStore.getLinesUuidsAsync(id)
+      const lines_flat_indexes = await dataStore.getFlatIndexesAsync(
+        id,
+        line_ids,
+      )
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear()
       await dataStyleStore.setModelLinesColor(id, line_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.color,

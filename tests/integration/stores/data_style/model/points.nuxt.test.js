@@ -21,7 +21,7 @@ const geode_object = "BRep"
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -38,6 +38,7 @@ describe("Model points", () => {
       const viewerStore = useViewerStore()
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear()
       await dataStyleStore.setModelPointsVisibility(id, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_points_schemas.visibility,
@@ -57,6 +58,7 @@ describe("Model points", () => {
       const viewerStore = useViewerStore()
       const size = 20
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear()
       await dataStyleStore.setModelPointsSize(id, size)
       expect(spy).toHaveBeenCalledWith(
         model_points_schemas.size,
