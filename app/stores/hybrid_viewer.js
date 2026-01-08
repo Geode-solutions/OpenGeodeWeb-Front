@@ -210,13 +210,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const cameraSnapshot = camera
       ? {
-        focal_point: [...camera.getFocalPoint()],
-        view_up: [...camera.getViewUp()],
-        position: [...camera.getPosition()],
-        view_angle: camera.getViewAngle(),
-        clipping_range: [...camera.getClippingRange()],
-        distance: camera.getDistance(),
-      }
+          focal_point: [...camera.getFocalPoint()],
+          view_up: [...camera.getViewUp()],
+          position: [...camera.getPosition()],
+          view_angle: camera.getViewAngle(),
+          clipping_range: [...camera.getClippingRange()],
+          distance: camera.getDistance(),
+        }
       : camera_options
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }

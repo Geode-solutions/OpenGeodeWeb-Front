@@ -44,10 +44,7 @@ describe("Model corners", () => {
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
       const corner_ids = await dataStore.getCornersUuids(id)
-      const corner_flat_indexes = await dataStore.getFlatIndexes(
-        id,
-        corner_ids,
-      )
+      const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
@@ -74,10 +71,7 @@ describe("Model corners", () => {
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
       const corner_ids = await dataStore.getCornersUuids(id)
-      const corner_flat_indexes = await dataStore.getFlatIndexes(
-        id,
-        corner_ids,
-      )
+      const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
