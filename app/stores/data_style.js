@@ -76,7 +76,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   return {
-    ...dataStyleState,
+    styles: dataStyleState.styles,
+    getStyle: dataStyleState.getStyle,
+    objectVisibility: dataStyleState.objectVisibility,
+    selectedObjects: dataStyleState.selectedObjects,
     ...meshStyleStore,
     ...modelStyleStore,
     addDataStyle,
