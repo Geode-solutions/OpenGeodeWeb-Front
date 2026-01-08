@@ -1,8 +1,8 @@
 import { getDefaultStyle } from "@ogw_front/utils/default_styles"
 import { useDataStore } from "@ogw_front/stores/data"
-import { useDataStyleStateStore } from "@/internal/stores/data_style_state"
-import useMeshStyle from "@/internal/stores/mesh/index"
-import useModelStyle from "@/internal/stores/model/index"
+import { useDataStyleStateStore } from "../../internal/stores/data_style_state"
+import useMeshStyle from "../../internal/stores/mesh/index"
+import useModelStyle from "../../internal/stores/model/index"
 
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleStateStore()
