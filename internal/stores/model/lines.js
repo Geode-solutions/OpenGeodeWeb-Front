@@ -2,20 +2,20 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStateStore } from "@/internal/stores/data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
 
 export function useModelLinesStyle() {
-  const dataStyleStore = useDataStyleStore()
+  const dataStyleStateStore = useDataStyleStateStore()
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelLinesStyle(id) {
-    return dataStyleStore.getStyle(id).lines
+    return dataStyleStateStore.getStyle(id).lines
   }
   function modelLineStyle(id, line_id) {
     if (!modelLinesStyle(id)[line_id]) {

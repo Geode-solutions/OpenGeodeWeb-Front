@@ -128,29 +128,29 @@ export const useDataStore = defineStore("data", () => {
     )
   }
 
-  function getCornersUuids(id) {
-    const item = getItem(id).value
+  async function getCornersUuids(id) {
+    const item = await getItem(id).fetch()
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Corner"] || {})
   }
 
-  function getLinesUuids(id) {
-    const item = getItem(id).value
+  async function getLinesUuids(id) {
+    const item = await getItem(id).fetch()
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Line"] || {})
   }
 
-  function getSurfacesUuids(id) {
-    const item = getItem(id).value
+  async function getSurfacesUuids(id) {
+    const item = await getItem(id).fetch()
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Surface"] || {})
   }
 
-  function getBlocksUuids(id) {
-    const item = getItem(id).value
+  async function getBlocksUuids(id) {
+    const item = await getItem(id).fetch()
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Block"] || {})

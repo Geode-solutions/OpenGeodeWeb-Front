@@ -3,7 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataStyleStateStore } from "@/internal/stores/data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useMeshPointsStyle } from "./points"
 import { useMeshEdgesStyle } from "./edges"
@@ -15,17 +15,17 @@ import { useMeshPolyhedraStyle } from "./polyhedra"
 const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh
 
 export default function useMeshStyle() {
-  const dataStyleStore = useDataStyleStore()
-  const viewerStore = useViewerStore()
-  const meshPointsStyleStore = useMeshPointsStyle()
-  const meshEdgesStyleStore = useMeshEdgesStyle()
+  const dataStyleStateStore = useDataStyleStateStore()
   const meshCellsStyleStore = useMeshCellsStyle()
+  const meshEdgesStyleStore = useMeshEdgesStyle()
+  const meshPointsStyleStore = useMeshPointsStyle()
   const meshPolygonsStyleStore = useMeshPolygonsStyle()
   const meshPolyhedraStyleStore = useMeshPolyhedraStyle()
+  const viewerStore = useViewerStore()
   const hybridViewerStore = useHybridViewerStore()
 
   function meshVisibility(id) {
-    return dataStyleStore.getStyle(id).visibility
+    return dataStyleStateStore.getStyle(id).visibility
   }
   function setMeshVisibility(id, visibility) {
     return viewerStore.request(
@@ -34,7 +34,7 @@ export default function useMeshStyle() {
       {
         response_function: () => {
           hybridViewerStore.setVisibility(id, visibility)
-          dataStyleStore.getStyle(id).visibility = visibility
+          dataStyleStateStore.getStyle(id).visibility = visibility
           console.log(setMeshVisibility.name, { id }, meshVisibility(id))
         },
       },
@@ -42,7 +42,7 @@ export default function useMeshStyle() {
   }
 
   function applyMeshStyle(id) {
-    const style = dataStyleStore.getStyle(id)
+    const style = dataStyleStateStore.getStyle(id)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {

@@ -2,18 +2,18 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataStyleStateStore } from "@/internal/stores/data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 
 export function useMeshPointsStyle() {
-  const dataStyleStore = useDataStyleStore()
+  const dataStyleStateStore = useDataStyleStateStore()
   const viewerStore = useViewerStore()
 
   function meshPointsStyle(id) {
-    return dataStyleStore.getStyle(id).points
+    return dataStyleStateStore.getStyle(id).points
   }
 
   function meshPointsVisibility(id) {
@@ -49,9 +49,9 @@ export function useMeshPointsStyle() {
       meshPointsActiveColoring(id),
     )
     if (type == "color") {
-      return dataStyleStore.setMeshPointsColor(id, coloring.color)
+      return setMeshPointsColor(id, coloring.color)
     } else if (type == "vertex" && coloring.vertex !== null) {
-      return dataStyleStore.setMeshPointsVertexAttribute(id, coloring.vertex)
+      return setMeshPointsVertexAttribute(id, coloring.vertex)
     } else {
       throw new Error("Unknown mesh points coloring type: " + type)
     }

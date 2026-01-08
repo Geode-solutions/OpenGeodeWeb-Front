@@ -2,18 +2,18 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataStyleStateStore } from "@/internal/stores/data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 
 export function useMeshEdgesStyle() {
-  const dataStyleStore = useDataStyleStore()
+  const dataStyleStateStore = useDataStyleStateStore()
   const viewerStore = useViewerStore()
 
   function meshEdgesStyle(id) {
-    return dataStyleStore.getStyle(id).edges
+    return dataStyleStateStore.getStyle(id).edges
   }
 
   function meshEdgesVisibility(id) {

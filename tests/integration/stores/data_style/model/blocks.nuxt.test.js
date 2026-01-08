@@ -22,7 +22,7 @@ const geode_object = "BRep"
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -73,7 +73,7 @@ describe("Model blocks", () => {
   //     const dataStyleStore = useDataStyleStore()
   //     const viewerStore = useViewerStore()
   //     const dataStore = useDataStore()
-  //     const block_ids = dataStore.getBlocksUuids(id)
+  //     const block_ids = await dataStore.getBlocksUuids(id)
   //     const block_flat_indexes = dataStore.getFlatIndexes(id, block_ids)
   //     const color = { r: 255, g: 0, b: 0 }
   //     const spy = vi.spyOn(viewerStore, "request")

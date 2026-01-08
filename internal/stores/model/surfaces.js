@@ -3,19 +3,19 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStore } from "@ogw_front/stores/data"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataStyleStateStore } from "@/internal/stores/data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 
 export function useModelSurfacesStyle() {
-  const dataStyleStore = useDataStyleStore()
+  const dataStyleStateStore = useDataStyleStateStore()
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelSurfacesStyle(id) {
-    return dataStyleStore.getStyle(id).surfaces
+    return dataStyleStateStore.getStyle(id).surfaces
   }
   function modelSurfaceStyle(id, surface_id) {
     if (!modelSurfacesStyle(id)[surface_id]) {
