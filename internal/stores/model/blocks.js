@@ -2,20 +2,20 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks
 
 export function useModelBlocksStyle() {
-  const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelBlocksStyle(id) {
-    return dataStyleStore.getStyle(id).blocks
+    return dataStyleStateStore.getStyle(id).blocks
   }
   function modelBlockStyle(id, block_id) {
     if (!modelBlocksStyle(id)[block_id]) {
@@ -31,8 +31,11 @@ export function useModelBlocksStyle() {
   function saveModelBlockVisibility(id, block_id, visibility) {
     modelBlockStyle(id, block_id).visibility = visibility
   }
-  function setModelBlocksVisibility(id, block_ids, visibility) {
-    const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+  async function setModelBlocksVisibility(id, block_ids, visibility) {
+    const blocks_flat_indexes = await dataStore.getFlatIndexes(id, block_ids)
+    if (blocks_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_blocks_schemas.visibility,
       { id, block_ids: blocks_flat_indexes, visibility },
@@ -59,8 +62,11 @@ export function useModelBlocksStyle() {
     modelBlockStyle(id, block_id).color = color
   }
 
-  function setModelBlocksColor(id, block_ids, color) {
-    const blocks_flat_indexes = dataBaseStore.getFlatIndexes(id, block_ids)
+  async function setModelBlocksColor(id, block_ids, color) {
+    const blocks_flat_indexes = await dataStore.getFlatIndexes(id, block_ids)
+    if (blocks_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_blocks_schemas.color,
       { id, block_ids: blocks_flat_indexes, color },
@@ -81,9 +87,9 @@ export function useModelBlocksStyle() {
     )
   }
 
-  function applyModelBlocksStyle(id) {
+  async function applyModelBlocksStyle(id) {
     const style = modelBlocksStyle(id)
-    const blocks_ids = dataBaseStore.getBlocksUuids(id)
+    const blocks_ids = await dataStore.getBlocksUuids(id)
     return Promise.all([
       setModelBlocksVisibility(id, blocks_ids, style.visibility),
       setModelBlocksColor(id, blocks_ids, style.color),

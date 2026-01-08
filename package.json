@@ -22,13 +22,16 @@
     "@types/node": "22.15.3",
     "@vueuse/components": "13.1.0",
     "@vueuse/nuxt": "13.1.0",
+    "@vueuse/rxjs": "^14.1.0",
     "ajv": "8.17.1",
+    "dexie": "3.2.4",
     "get-port-please": "3.2.0",
     "is-electron": "2.2.2",
     "js-file-download": "0.4.12",
     "nuxt": "4.2.2",
     "p-timeout": "7.0.1",
     "pinia": "3.0.4",
+    "rxjs": "^7.8.2",
     "sass": "1.87.0",
     "semver": "7.7.1",
     "uuid": "11.1.0",
@@ -60,7 +63,8 @@
     "vite": "6.3.5",
     "vite-plugin-vuetify": "2.1.1",
     "vitest": "4.0.15",
-    "vitest-environment-nuxt": "1.0.1"
+    "vitest-environment-nuxt": "1.0.1",
+    "vitest-indexeddb": "^0.0.1"
   },
   "peerDependencies": {
     "electron": "36.4.0"

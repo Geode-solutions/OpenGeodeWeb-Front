@@ -3,8 +3,8 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStyleStateStore } from "../data_style_state"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useModelSurfacesStyle } from "./surfaces"
 import { useModelCornersStyle } from "./corners"
@@ -17,8 +17,8 @@ import { useModelPointsStyle } from "./points"
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model
 
 export default function useModelStyle() {
-  const dataBaseStore = useDataBaseStore()
-  const dataStyleStore = useDataStyleStore()
+  const dataStore = useDataStore()
+  const dataStyleStateStore = useDataStyleStateStore()
   const modelCornersStyleStore = useModelCornersStyle()
   const modelBlocksStyleStore = useModelBlocksStyle()
   const modelEdgesStyleStore = useModelEdgesStyle()
@@ -29,7 +29,7 @@ export default function useModelStyle() {
   const viewerStore = useViewerStore()
 
   function modelVisibility(id) {
-    return dataStyleStore.getStyle(id).visibility
+    return dataStyleStateStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
     return viewerStore.request(
@@ -37,7 +37,7 @@ export default function useModelStyle() {
       { id, visibility },
       {
         response_function: () => {
-          dataStyleStore.getStyle(id).visibility = visibility
+          dataStyleStateStore.getStyle(id).visibility = visibility
           hybridViewerStore.setVisibility(id, visibility)
           console.log(setModelVisibility.name, { id }, modelVisibility(id))
         },
@@ -47,7 +47,7 @@ export default function useModelStyle() {
 
   function visibleMeshComponents(id) {
     const visible_mesh_components = ref([])
-    const styles = dataStyleStore.styles[id]
+    const styles = dataStyleStateStore.styles[id]
     if (!styles) return visible_mesh_components
 
     Object.entries(styles.corners || {}).forEach(([corner_id, style]) => {
@@ -83,7 +83,7 @@ export default function useModelStyle() {
   }
 
   function modelColor(id) {
-    return dataStyleStore.getStyle(id).color
+    return dataStyleStateStore.getStyle(id).color
   }
   function setModelColor(id, color) {
     return viewerStore.request(
@@ -91,7 +91,7 @@ export default function useModelStyle() {
       { id, color },
       {
         response_function: () => {
-          dataStyleStore.styles[id].color = color
+          dataStyleStateStore.styles[id].color = color
           console.log(setModelColor.name, { id }, modelColor(id))
         },
       },
@@ -134,7 +134,7 @@ export default function useModelStyle() {
   }
 
   function applyModelStyle(id) {
-    const style = dataStyleStore.getStyle(id)
+    const style = dataStyleStateStore.getStyle(id)
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
@@ -159,7 +159,8 @@ export default function useModelStyle() {
   }
 
   function setModelMeshComponentsDefaultStyle(id) {
-    const { mesh_components } = dataBaseStore.itemMetaDatas(id)
+    const item = dataStore.getItem(id)
+    const { mesh_components } = item.value
     const promise_array = []
     if ("Corner" in mesh_components) {
       promise_array.push(modelCornersStyleStore.setModelCornersDefaultStyle(id))

@@ -42,9 +42,9 @@
 </template>
 
 <script setup>
-  import ViewerBreadCrumb from "@/components/Viewer/BreadCrumb"
-  import ViewerTreeObject from "@/components/Viewer/TreeObject"
-  import ViewerTreeComponent from "@/components/Viewer/TreeComponent"
+  import ViewerBreadCrumb from "@ogw_front/components/Viewer/BreadCrumb"
+  import ViewerTreeObject from "@ogw_front/components/Viewer/TreeObject"
+  import ViewerTreeComponent from "@ogw_front/components/Viewer/TreeComponent"
   import { useTreeviewStore } from "@ogw_front/stores/treeview"
   import { useMenuStore } from "@ogw_front/stores/menu"
 

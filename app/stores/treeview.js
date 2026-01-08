@@ -59,13 +59,14 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function exportStores() {
+    const selectionIds = selection.value.map((c) => c.id)
     return {
       isAdditionnalTreeDisplayed: isAdditionnalTreeDisplayed.value,
       panelWidth: panelWidth.value,
       model_id: model_id.value,
       isTreeCollection: isTreeCollection.value,
       selectedTree: selectedTree.value,
-      selectionIds: selection.value.map((c) => c.id),
+      selectionIds,
     }
   }
 
@@ -105,6 +106,30 @@ export const useTreeviewStore = defineStore("treeview", () => {
     pendingSelectionIds.value = []
   }
 
+  function removeItem(id) {
+    for (let i = 0; i < items.value.length; i++) {
+      const group = items.value[i]
+      const childIndex = group.children.findIndex((child) => child.id === id)
+
+      if (childIndex !== -1) {
+        group.children.splice(childIndex, 1)
+
+        if (group.children.length === 0) {
+          items.value.splice(i, 1)
+        }
+
+        const selectionIndex = selection.value.findIndex(
+          (item) => item.id === id,
+        )
+        if (selectionIndex !== -1) {
+          selection.value.splice(selectionIndex, 1)
+        }
+
+        return
+      }
+    }
+  }
+
   const clear = () => {
     items.value = []
     selection.value = []
@@ -124,6 +149,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     selectedTree,
     isImporting,
     addItem,
+    removeItem,
     displayAdditionalTree,
     displayFileTree,
     toggleTreeView,

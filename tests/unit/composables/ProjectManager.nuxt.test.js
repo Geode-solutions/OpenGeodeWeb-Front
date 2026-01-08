@@ -8,9 +8,10 @@ import { appMode } from "@ogw_front/utils/app_mode"
 
 // Snapshot
 const snapshotMock = {
-  dataBase: {
-    db: {
-      abc123: {
+  data: {
+    items: [
+      {
+        id: "abc123",
         viewer_type: "mesh",
         geode_object_type: "PointSet2D",
         native_file: "native.ext",
@@ -18,7 +19,7 @@ const snapshotMock = {
         name: "My Data",
         binary_light_viewable: "VGxpZ2h0RGF0YQ==",
       },
-    },
+    ],
   },
   treeview: {
     isAdditionnalTreeDisplayed: false,
@@ -76,7 +77,7 @@ const treeviewStoreMock = {
   finalizeImportSelection: vi.fn(),
   addItem: vi.fn(() => Promise.resolve()),
 }
-const dataBaseStoreMock = {
+const dataStoreMock = {
   clear: vi.fn(),
   registerObject: vi.fn(() => Promise.resolve()),
   addItem: vi.fn(() => Promise.resolve()),
@@ -140,8 +141,8 @@ vi.mock("@ogw_front/stores/viewer", () => ({
 vi.mock("@ogw_front/stores/treeview", () => ({
   useTreeviewStore: () => treeviewStoreMock,
 }))
-vi.mock("@ogw_front/stores/data_base", () => ({
-  useDataBaseStore: () => dataBaseStoreMock,
+vi.mock("@ogw_front/stores/data", () => ({
+  useDataStore: () => dataStoreMock,
 }))
 vi.mock("@ogw_front/stores/data_style", () => ({
   useDataStyleStore: () => dataStyleStoreMock,
@@ -182,7 +183,7 @@ describe("ProjectManager composable (compact)", () => {
     for (const store of [
       viewerStoreMock,
       treeviewStoreMock,
-      dataBaseStoreMock,
+      dataStoreMock,
       dataStyleStoreMock,
       hybridViewerStoreMock,
     ]) {
@@ -230,8 +231,8 @@ describe("ProjectManager composable (compact)", () => {
     )
     expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalled()
 
-    expect(dataBaseStoreMock.registerObject).toHaveBeenCalledWith("abc123")
-    expect(dataBaseStoreMock.addItem).toHaveBeenCalledWith(
+    expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123")
+    expect(dataStoreMock.addItem).toHaveBeenCalledWith(
       "abc123",
       expect.objectContaining({
         viewer_type: "mesh",

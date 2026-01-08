@@ -31,9 +31,9 @@
 
 <script setup>
   import { useMenuStore } from "@ogw_front/stores/menu"
-  import { useDataBaseStore } from "@ogw_front/stores/data_base"
+  import { useDataStore } from "@ogw_front/stores/data"
   const menuStore = useMenuStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
 
   const props = defineProps({
     id: { type: String, required: true },
@@ -45,7 +45,7 @@
 
   const meta_data = computed(() => {
     const itemId = props.id || menuStore.current_id
-    return itemId ? dataBaseStore.itemMetaDatas(itemId) : {}
+    return dataStore.getItem(itemId).value
   })
 
   const radius = 80

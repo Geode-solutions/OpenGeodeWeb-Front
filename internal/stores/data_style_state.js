@@ -1,6 +1,6 @@
 import { reactive, computed } from "vue"
 
-export default function useDataStyleState() {
+export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   const styles = reactive({})
 
   const objectVisibility = computed(() => (id) => {
@@ -24,4 +24,4 @@ export default function useDataStyleState() {
   }
 
   return { getStyle, styles, objectVisibility, selectedObjects }
-}
+})

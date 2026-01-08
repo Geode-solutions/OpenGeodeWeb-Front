@@ -2,18 +2,18 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
 
 export function useModelPointsStyle() {
-  const dataStyleStore = useDataStyleStore()
+  const dataStyleStateStore = useDataStyleStateStore()
   const viewerStore = useViewerStore()
 
   function modelPointsStyle(id) {
-    return dataStyleStore.getStyle(id).points
+    return dataStyleStateStore.getStyle(id).points
   }
   function modelPointsVisibility(id) {
     return modelPointsStyle(id).visibility
@@ -44,7 +44,7 @@ export function useModelPointsStyle() {
       { id, size },
       {
         response_function: () => {
-          dataStyleStore.styles[id].points.size = size
+          modelPointsStyle(id).size = size
           console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
         },
       },
