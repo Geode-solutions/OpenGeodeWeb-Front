@@ -40,10 +40,7 @@ describe("Model lines", () => {
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
       const line_ids = await dataStore.getLinesUuids(id)
-      const lines_flat_indexes = await dataStore.getFlatIndexes(
-        id,
-        line_ids,
-      )
+      const lines_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
@@ -68,10 +65,7 @@ describe("Model lines", () => {
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
       const line_ids = await dataStore.getLinesUuids(id)
-      const lines_flat_indexes = await dataStore.getFlatIndexes(
-        id,
-        line_ids,
-      )
+      const lines_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()

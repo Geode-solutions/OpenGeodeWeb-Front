@@ -44,10 +44,7 @@ describe("Model blocks", () => {
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
       const block_ids = await dataStore.getBlocksUuids(id)
-      const block_flat_indexes = await dataStore.getFlatIndexes(
-        id,
-        block_ids,
-      )
+      const block_flat_indexes = await dataStore.getFlatIndexes(id, block_ids)
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
