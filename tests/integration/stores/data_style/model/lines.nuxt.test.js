@@ -39,8 +39,8 @@ describe("Model lines", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const line_ids = await dataStore.getLinesUuidsAsync(id)
-      const lines_flat_indexes = await dataStore.getFlatIndexesAsync(
+      const line_ids = await dataStore.getLinesUuids(id)
+      const lines_flat_indexes = await dataStore.getFlatIndexes(
         id,
         line_ids,
       )
@@ -67,8 +67,8 @@ describe("Model lines", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const line_ids = await dataStore.getLinesUuidsAsync(id)
-      const lines_flat_indexes = await dataStore.getFlatIndexesAsync(
+      const line_ids = await dataStore.getLinesUuids(id)
+      const lines_flat_indexes = await dataStore.getFlatIndexes(
         id,
         line_ids,
       )

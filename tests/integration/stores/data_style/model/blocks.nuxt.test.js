@@ -43,8 +43,8 @@ describe("Model blocks", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const block_ids = await dataStore.getBlocksUuidsAsync(id)
-      const block_flat_indexes = await dataStore.getFlatIndexesAsync(
+      const block_ids = await dataStore.getBlocksUuids(id)
+      const block_flat_indexes = await dataStore.getFlatIndexes(
         id,
         block_ids,
       )

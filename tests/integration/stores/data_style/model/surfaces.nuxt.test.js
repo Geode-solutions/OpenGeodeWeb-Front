@@ -43,8 +43,8 @@ describe("Model surfaces", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const surface_ids = await dataStore.getSurfacesUuidsAsync(id)
-      const surface_flat_indexes = await dataStore.getFlatIndexesAsync(
+      const surface_ids = await dataStore.getSurfacesUuids(id)
+      const surface_flat_indexes = await dataStore.getFlatIndexes(
         id,
         surface_ids,
       )
@@ -77,8 +77,8 @@ describe("Model surfaces", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const surface_ids = await dataStore.getSurfacesUuidsAsync(id)
-      const surface_flat_indexes = await dataStore.getFlatIndexesAsync(
+      const surface_ids = await dataStore.getSurfacesUuids(id)
+      const surface_flat_indexes = await dataStore.getFlatIndexes(
         id,
         surface_ids,
       )

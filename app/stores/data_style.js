@@ -15,7 +15,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function setVisibility(id, visibility) {
-    const item = await dataStore.getItemAsync(id)
+    const item = await dataStore.getItem(id).fetch()
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
       throw new Error("Item not found or not loaded: " + id)
@@ -30,7 +30,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function applyDefaultStyle(id) {
-    const item = await dataStore.getItemAsync(id)
+    const item = await dataStore.getItem(id).fetch()
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
       throw new Error("Item not found or not loaded: " + id)

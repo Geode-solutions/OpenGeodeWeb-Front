@@ -15,30 +15,27 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  function getAllItems() {
-    return useObservable(
-      liveQuery(() => database.data.toArray()),
-      { initialValue: [] },
-    )
-  }
-
   function getItem(id) {
     if (!id) {
-      return ref({})
+      const emptyRef = ref({})
+      emptyRef.fetch = async () => null
+      return emptyRef
     }
-    return useObservable(
+    const observable = useObservable(
       liveQuery(() => database.data.get(id)),
       { initialValue: {} },
     )
+    observable.fetch = async () => await database.data.get(id)
+    return observable
   }
 
-  async function getItemAsync(id) {
-    if (!id) return null
-    return await database.data.get(id)
-  }
-
-  async function getAllItemsAsync() {
-    return await database.data.toArray()
+  function getAllItems() {
+    const observable = useObservable(
+      liveQuery(() => database.data.toArray()),
+      { initialValue: [] },
+    )
+    observable.fetch = async () => await database.data.toArray()
+    return observable
   }
 
   function formatedMeshComponents(id) {
@@ -131,45 +128,6 @@ export const useDataStore = defineStore("data", () => {
     )
   }
 
-  async function getCornersUuidsAsync(id) {
-    const item = await getItemAsync(id)
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
-    return Object.values(mesh_components["Corner"] || {})
-  }
-
-  async function getLinesUuidsAsync(id) {
-    const item = await getItemAsync(id)
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
-    return Object.values(mesh_components["Line"] || {})
-  }
-  async function getSurfacesUuidsAsync(id) {
-    const item = await getItemAsync(id)
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
-    return Object.values(mesh_components["Surface"] || {})
-  }
-  async function getBlocksUuidsAsync(id) {
-    const item = await getItemAsync(id)
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
-    return Object.values(mesh_components["Block"] || {})
-  }
-
-  async function getFlatIndexesAsync(id, mesh_component_ids) {
-    const item = await getItemAsync(id)
-    if (!item || !item.uuid_to_flat_index) return []
-    const { uuid_to_flat_index } = item
-    const flat_indexes = []
-    for (const mesh_component_id of mesh_component_ids) {
-      if (uuid_to_flat_index[mesh_component_id] !== undefined) {
-        flat_indexes.push(uuid_to_flat_index[mesh_component_id])
-      }
-    }
-    return flat_indexes
-  }
-
   function getCornersUuids(id) {
     const item = getItem(id).value
     if (!item || !item.mesh_components) return []
@@ -183,12 +141,14 @@ export const useDataStore = defineStore("data", () => {
     const { mesh_components } = item
     return Object.values(mesh_components["Line"] || {})
   }
+
   function getSurfacesUuids(id) {
     const item = getItem(id).value
     if (!item || !item.mesh_components) return []
     const { mesh_components } = item
     return Object.values(mesh_components["Surface"] || {})
   }
+
   function getBlocksUuids(id) {
     const item = getItem(id).value
     if (!item || !item.mesh_components) return []
@@ -196,8 +156,8 @@ export const useDataStore = defineStore("data", () => {
     return Object.values(mesh_components["Block"] || {})
   }
 
-  function getFlatIndexes(id, mesh_component_ids) {
-    const item = getItem(id).value
+  async function getFlatIndexes(id, mesh_component_ids) {
+    const item = await getItem(id).fetch()
     if (!item || !item.uuid_to_flat_index) return []
     const { uuid_to_flat_index } = item
     const flat_indexes = []
@@ -210,7 +170,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function exportStores() {
-    const items = await getAllItemsAsync()
+    const items = await getAllItems().fetch()
     return { items }
   }
 
@@ -224,9 +184,7 @@ export const useDataStore = defineStore("data", () => {
 
   return {
     getAllItems,
-    getAllItemsAsync,
     getItem,
-    getItemAsync,
     meshComponentType,
     formatedMeshComponents,
     registerObject,
@@ -241,11 +199,6 @@ export const useDataStore = defineStore("data", () => {
     getSurfacesUuids,
     getBlocksUuids,
     getFlatIndexes,
-    getCornersUuidsAsync,
-    getLinesUuidsAsync,
-    getSurfacesUuidsAsync,
-    getBlocksUuidsAsync,
-    getFlatIndexesAsync,
     exportStores,
     importStores,
     clear,

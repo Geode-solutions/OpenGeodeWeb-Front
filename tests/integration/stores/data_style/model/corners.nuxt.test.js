@@ -43,8 +43,8 @@ describe("Model corners", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const corner_ids = await dataStore.getCornersUuidsAsync(id)
-      const corner_flat_indexes = await dataStore.getFlatIndexesAsync(
+      const corner_ids = await dataStore.getCornersUuids(id)
+      const corner_flat_indexes = await dataStore.getFlatIndexes(
         id,
         corner_ids,
       )
@@ -73,8 +73,8 @@ describe("Model corners", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const corner_ids = await dataStore.getCornersUuidsAsync(id)
-      const corner_flat_indexes = await dataStore.getFlatIndexesAsync(
+      const corner_ids = await dataStore.getCornersUuids(id)
+      const corner_flat_indexes = await dataStore.getFlatIndexes(
         id,
         corner_ids,
       )
