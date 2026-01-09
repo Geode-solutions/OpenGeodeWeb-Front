@@ -74,16 +74,12 @@ function toggleOptions() {
   background-color: white !important;
   border: 1px solid rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
-  color: rgba(0, 0, 0, 0.6) !important;
-  opacity: 1 !important;
 }
 
 .menu-btn:hover {
   background-color: #e3f2fd !important;
-  /* blue-lighten-5 */
   transform: scale(1.1);
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  color: var(--v-primary-base) !important;
 }
 
 .menu-btn.v-btn--active {
@@ -128,7 +124,6 @@ function toggleOptions() {
   padding: 20px;
 }
 
-/* Ensure text inside card is visible */
 .options-card :v-deep(*) {
   color: white !important;
 }
@@ -144,7 +139,6 @@ function toggleOptions() {
   cursor: pointer;
 }
 
-/* Improve visibility of switches and sliders */
 .menu-options ::v-deep(.v-selection-control__wrapper) {
   color: rgba(255, 255, 255, 0.9) !important;
 }
