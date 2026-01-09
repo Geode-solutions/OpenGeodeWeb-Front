@@ -1,17 +1,17 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells
 export function useMeshCellsStyle() {
-  const dataStyleStore = useDataStyleStore()
+  const dataStyleStateStore = useDataStyleStateStore()
   const viewerStore = useViewerStore()
 
   function meshCellsStyle(id) {
-    return dataStyleStore.getStyle(id).cells
+    return dataStyleStateStore.getStyle(id).cells
   }
 
   function meshCellsVisibility(id) {

@@ -5,7 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import Status from "@ogw_front/utils/status"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import {
   delete_folder_recursive,
@@ -42,11 +42,15 @@ describe("Model surfaces", () => {
     test("Visibility true", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const dataBaseStore = useDataBaseStore()
-      const surface_ids = dataBaseStore.getSurfacesUuids(id)
-      const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+      const dataStore = useDataStore()
+      const surface_ids = await dataStore.getSurfacesUuids(id)
+      const surface_flat_indexes = await dataStore.getFlatIndexes(
+        id,
+        surface_ids,
+      )
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear() // Clear calls from setup (applyDefaultStyle)
       await dataStyleStore.setModelSurfacesVisibility(
         id,
         surface_ids,
@@ -72,11 +76,15 @@ describe("Model surfaces", () => {
     test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const dataBaseStore = useDataBaseStore()
-      const surface_ids = dataBaseStore.getSurfacesUuids(id)
-      const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+      const dataStore = useDataStore()
+      const surface_ids = await dataStore.getSurfacesUuids(id)
+      const surface_flat_indexes = await dataStore.getFlatIndexes(
+        id,
+        surface_ids,
+      )
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear() // Clear calls from setup (applyDefaultStyle)
       await dataStyleStore.setModelSurfacesColor(id, surface_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.color,

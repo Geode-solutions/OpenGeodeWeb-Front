@@ -1,25 +1,26 @@
-import { getDefaultStyle } from "../utils/default_styles"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
-import useDataStyleState from "../../internal/stores/data_style_state"
+import { getDefaultStyle } from "@ogw_front/utils/default_styles"
+import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStateStore } from "../../internal/stores/data_style_state"
 import useMeshStyle from "../../internal/stores/mesh/index"
 import useModelStyle from "../../internal/stores/model/index"
 
 export const useDataStyleStore = defineStore("dataStyle", () => {
-  const dataStyleState = useDataStyleState()
+  const dataStyleState = useDataStyleStateStore()
   const meshStyleStore = useMeshStyle()
   const modelStyleStore = useModelStyle()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
 
   function addDataStyle(id, geode_object) {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)
   }
 
-  function setVisibility(id, visibility) {
-    console.log(
-      "dataBaseStore.itemMetaDatas(id)",
-      dataBaseStore.itemMetaDatas(id),
-    )
-    const { viewer_type } = dataBaseStore.itemMetaDatas(id)
+  async function setVisibility(id, visibility) {
+    const item = await dataStore.getItem(id).fetch()
+    const viewer_type = item?.viewer_type
+    if (!viewer_type) {
+      throw new Error("Item not found or not loaded: " + id)
+    }
+
     if (viewer_type === "mesh") {
       return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
     } else if (viewer_type === "model") {
@@ -28,8 +29,13 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     throw new Error("Unknown viewer_type")
   }
 
-  function applyDefaultStyle(id) {
-    const { viewer_type } = dataBaseStore.itemMetaDatas(id)
+  async function applyDefaultStyle(id) {
+    const item = await dataStore.getItem(id).fetch()
+    const viewer_type = item?.viewer_type
+    if (!viewer_type) {
+      throw new Error("Item not found or not loaded: " + id)
+    }
+
     if (viewer_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id)
     } else if (viewer_type === "model") {
@@ -57,7 +63,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const ids = Object.keys(dataStyleState.styles || {})
     const promises = []
     for (const id of ids) {
-      const meta = dataBaseStore.itemMetaDatas(id)
+      const meta = dataStore.getItem(id).value
       const viewerType = meta?.viewer_type
       const style = dataStyleState.styles[id]
       if (style && viewerType === "mesh") {
@@ -70,7 +76,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   return {
-    ...dataStyleState,
+    styles: dataStyleState.styles,
+    getStyle: dataStyleState.getStyle,
+    objectVisibility: dataStyleState.objectVisibility,
+    selectedObjects: dataStyleState.selectedObjects,
     ...meshStyleStore,
     ...modelStyleStore,
     addDataStyle,

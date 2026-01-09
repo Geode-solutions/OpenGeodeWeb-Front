@@ -2,20 +2,20 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
 
 export function useModelLinesStyle() {
-  const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelLinesStyle(id) {
-    return dataStyleStore.getStyle(id).lines
+    return dataStyleStateStore.getStyle(id).lines
   }
   function modelLineStyle(id, line_id) {
     if (!modelLinesStyle(id)[line_id]) {
@@ -31,8 +31,11 @@ export function useModelLinesStyle() {
   function saveModelLineVisibility(id, line_id, visibility) {
     modelLineStyle(id, line_id).visibility = visibility
   }
-  function setModelLinesVisibility(id, line_ids, visibility) {
-    const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
+  async function setModelLinesVisibility(id, line_ids, visibility) {
+    const line_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
+    if (line_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_lines_schemas.visibility,
       { id, block_ids: line_flat_indexes, visibility },
@@ -58,8 +61,11 @@ export function useModelLinesStyle() {
   function saveModelLineColor(id, line_id, color) {
     modelLineStyle(id, line_id).color = color
   }
-  function setModelLinesColor(id, line_ids, color) {
-    const line_flat_indexes = dataBaseStore.getFlatIndexes(id, line_ids)
+  async function setModelLinesColor(id, line_ids, color) {
+    const line_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
+    if (line_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_lines_schemas.color,
       { id, block_ids: line_flat_indexes, color },
@@ -79,9 +85,9 @@ export function useModelLinesStyle() {
     )
   }
 
-  function applyModelLinesStyle(id) {
+  async function applyModelLinesStyle(id) {
     const style = modelLinesStyle(id)
-    const line_ids = dataBaseStore.getLinesUuids(id)
+    const line_ids = await dataStore.getLinesUuids(id)
     return Promise.all([
       setModelLinesVisibility(id, line_ids, style.visibility),
       setModelLinesColor(id, line_ids, style.color),

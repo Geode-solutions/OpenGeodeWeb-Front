@@ -15,18 +15,18 @@
 
 <script setup>
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useDataBaseStore } from "@ogw_front/stores/data_base"
+  import { useDataStore } from "@ogw_front/stores/data"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 
   import { compareSelections } from "@ogw_front/utils/treeview"
 
   const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
   const hybridViewerStore = useHybridViewerStore()
 
   const props = defineProps({ id: { type: String, required: true } })
 
-  const items = dataBaseStore.formatedMeshComponents(props.id)
+  const items = dataStore.formatedMeshComponents(props.id)
   const mesh_components_selection = ref(
     dataStyleStore.visibleMeshComponents(props.id),
   )
@@ -102,7 +102,7 @@
       surface_ids = [],
       block_ids = []
     for (const item of items) {
-      const item_type = dataBaseStore.meshComponentType(props.id, item)
+      const item_type = dataStore.meshComponentType(props.id, item)
       if (item_type === "corner") corner_ids.push(item)
       else if (item_type === "line") line_ids.push(item)
       else if (item_type === "surface") surface_ids.push(item)

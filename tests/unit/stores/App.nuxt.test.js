@@ -62,7 +62,7 @@ describe("App Store", () => {
     })
 
     describe("Export", () => {
-      test("export stores with exportStores method", () => {
+      test("export stores with exportStores method", async () => {
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "userStore",
@@ -83,7 +83,7 @@ describe("App Store", () => {
         appStore.registerStore(mock_store_1)
         appStore.registerStore(mock_store_2)
 
-        const snapshot = appStore.exportStores()
+        const snapshot = await appStore.exportStores()
 
         expect(mock_store_1.exportStores).toHaveBeenCalledTimes(1)
         expect(mock_store_2.exportStores).toHaveBeenCalledTimes(1)
@@ -93,7 +93,7 @@ describe("App Store", () => {
         })
       })
 
-      test("skip stores without exportSave method", () => {
+      test("skip stores without exportSave method", async () => {
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "withSave",
@@ -108,7 +108,7 @@ describe("App Store", () => {
         appStore.registerStore(mock_store_1)
         appStore.registerStore(mock_store_2)
 
-        const snapshot = appStore.exportStores()
+        const snapshot = await appStore.exportStores()
 
         expect(mock_store_1.exportStores).toHaveBeenCalledTimes(1)
         expect(snapshot).toEqual({
@@ -117,9 +117,9 @@ describe("App Store", () => {
         expect(snapshot.withoutSave).toBeUndefined()
       })
 
-      test("return empty snapshot when no stores registered", () => {
+      test("return empty snapshot when no stores registered", async () => {
         const appStore = useAppStore()
-        const snapshot = appStore.exportStores()
+        const snapshot = await appStore.exportStores()
         expect(snapshot).toEqual({})
       })
     })

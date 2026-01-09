@@ -2,20 +2,20 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners
 
 export function useModelCornersStyle() {
-  const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
+  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
 
   function modelCornersStyle(id) {
-    return dataStyleStore.getStyle(id).corners
+    return dataStyleStateStore.getStyle(id).corners
   }
   function modelCornerStyle(id, corner_id) {
     if (!modelCornersStyle(id)[corner_id]) {
@@ -31,8 +31,11 @@ export function useModelCornersStyle() {
   function saveModelCornerVisibility(id, corner_id, visibility) {
     modelCornerStyle(id, corner_id).visibility = visibility
   }
-  function setModelCornersVisibility(id, corner_ids, visibility) {
-    const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+  async function setModelCornersVisibility(id, corner_ids, visibility) {
+    const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
+    if (corner_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_corners_schemas.visibility,
       { id, block_ids: corner_flat_indexes, visibility },
@@ -60,8 +63,11 @@ export function useModelCornersStyle() {
     modelCornerStyle(id, corner_id).color = color
   }
 
-  function setModelCornersColor(id, corner_ids, color) {
-    const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+  async function setModelCornersColor(id, corner_ids, color) {
+    const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
+    if (corner_flat_indexes.length === 0) {
+      return Promise.resolve()
+    }
     return viewerStore.request(
       model_corners_schemas.color,
       { id, block_ids: corner_flat_indexes, color },
@@ -81,9 +87,9 @@ export function useModelCornersStyle() {
     )
   }
 
-  function applyModelCornersStyle(id) {
+  async function applyModelCornersStyle(id) {
     const style = modelCornersStyle(id)
-    const corner_ids = dataBaseStore.getCornersUuids(id)
+    const corner_ids = await dataStore.getCornersUuids(id)
     return Promise.all([
       setModelCornersVisibility(id, corner_ids, style.visibility),
       setModelCornersColor(id, corner_ids, style.color),

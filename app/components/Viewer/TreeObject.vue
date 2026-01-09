@@ -38,14 +38,12 @@
 <script setup>
   import { useTreeviewStore } from "@ogw_front/stores/treeview"
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useDataBaseStore } from "@ogw_front/stores/data_base"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 
   import { compareSelections } from "@ogw_front/utils/treeview"
 
   const treeviewStore = useTreeviewStore()
   const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
   const hybridViewerStore = useHybridViewerStore()
 
   const emit = defineEmits(["show-menu"])
@@ -56,7 +54,7 @@
 
   watch(
     () => treeviewStore.selection,
-    (current, previous) => {
+    async (current, previous) => {
       if (!previous) previous = []
       if (current.value === previous) {
         return
@@ -67,19 +65,9 @@
         dataStyleStore.setVisibility(item.id, true)
       })
 
-      removed.forEach((item) => {
-        dataStyleStore.setVisibility(item.id, false)
-
-        const objectMeta = dataBaseStore.itemMetaDatas(item.id)
-        if (objectMeta.viewer_type === "mesh") {
-          if (dataBaseStore.db[item.id]?.mesh_components_selection) {
-            dataBaseStore.db[item.id].mesh_components_selection = []
-          }
-          if (dataStyleStore.visibleMeshComponentIds?.[item.id]) {
-            dataStyleStore.updateVisibleMeshComponents(item.id, [])
-          }
-        }
-      })
+      for (const item of removed) {
+        await dataStyleStore.setVisibility(item.id, false)
+      }
       hybridViewerStore.remoteRender()
     },
   )

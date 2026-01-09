@@ -6,7 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import Status from "@ogw_front/utils/status"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useDataStore } from "@ogw_front/stores/data"
 import {
   delete_folder_recursive,
   kill_back,
@@ -42,11 +42,12 @@ describe("Model corners", () => {
     test("Visibility false", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const dataBaseStore = useDataBaseStore()
-      const corner_ids = dataBaseStore.getCornersUuids(id)
-      const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+      const dataStore = useDataStore()
+      const corner_ids = await dataStore.getCornersUuids(id)
+      const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear()
       await dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.visibility,
@@ -68,11 +69,12 @@ describe("Model corners", () => {
     test("Color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const dataBaseStore = useDataBaseStore()
-      const corner_ids = dataBaseStore.getCornersUuids(id)
-      const corner_flat_indexes = dataBaseStore.getFlatIndexes(id, corner_ids)
+      const dataStore = useDataStore()
+      const corner_ids = await dataStore.getCornersUuids(id)
+      const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
+      spy.mockClear()
       await dataStyleStore.setModelCornersColor(id, corner_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.color,
