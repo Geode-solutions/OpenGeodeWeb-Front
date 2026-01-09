@@ -7,11 +7,33 @@
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
       <template v-if="visibility">
-        <ViewerOptionsColoringTypeSelector
-          :id="id"
-          v-model:coloring_style_key="coloring_style_key"
-          v-model:color="color"
-        />
+        <v-row class="pa-0" align="center">
+          <v-divider />
+          <v-col cols="auto" justify="center">
+            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Width'" />
+          </v-col>
+          <v-col justify="center">
+            <v-slider
+              v-model="size"
+              hide-details
+              min="0"
+              max="20"
+              step="2"
+              thumb-color="black"
+              ticks
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <ViewerOptionsColoringTypeSelector
+              :id="id"
+              v-model:coloring_style_key="coloring_style_key"
+              v-model:color="color"
+              v-model:vertex_attribute="vertex_attribute"
+            />
+          </v-col>
+        </v-row>
       </template>
     </template>
   </ViewerContextMenuItem>
@@ -43,9 +65,9 @@
     },
   })
   const size = computed({
-    get: () => dataStyleStore.edgesSize(id.value),
+    get: () => dataStyleStore.meshEdgesWidth(id.value),
     set: (newValue) => {
-      dataStyleStore.setEdgesSize(id.value, newValue)
+      dataStyleStore.setMeshEdgesWidth(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
@@ -60,6 +82,13 @@
     get: () => dataStyleStore.meshEdgesColor(id.value),
     set: (newValue) => {
       dataStyleStore.setMeshEdgesColor(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute = computed({
+    get: () => dataStyleStore.meshEdgesVertexAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshEdgesVertexAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
