@@ -52,14 +52,10 @@ export const useGeodeStore = defineStore("geode", {
     do_ping() {
       const geodeStore = this
       const feedbackStore = useFeedbackStore()
-      return useFetch(back_schemas.opengeodeweb_back.ping.$id, {
+      return $fetch(back_schemas.opengeodeweb_back.ping.$id, {
         baseURL: this.base_url,
         method: back_schemas.opengeodeweb_back.ping.methods[0],
         body: {},
-        onRequestError({ error }) {
-          feedbackStore.$patch({ server_error: true })
-          geodeStore.status = Status.NOT_CONNECTED
-        },
         onResponse({ response }) {
           if (response.ok) {
             feedbackStore.$patch({ server_error: false })
@@ -70,6 +66,9 @@ export const useGeodeStore = defineStore("geode", {
           feedbackStore.$patch({ server_error: true })
           geodeStore.status = Status.NOT_CONNECTED
         },
+      }).catch((error) => {
+        feedbackStore.$patch({ server_error: true })
+        geodeStore.status = Status.NOT_CONNECTED
       })
     },
     start_request() {
