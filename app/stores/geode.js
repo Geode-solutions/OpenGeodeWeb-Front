@@ -52,7 +52,6 @@ export const useGeodeStore = defineStore("geode", {
       }, 10 * 1000)
     },
     ping() {
-      console.log("ping")
       const geodeStore = this
       const feedbackStore = useFeedbackStore()
 

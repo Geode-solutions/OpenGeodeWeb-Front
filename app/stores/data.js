@@ -38,20 +38,22 @@ export const useDataStore = defineStore("data", () => {
     return observable
   }
 
-  function formatedMeshComponents(id) {
-    const item = getItem(id).value
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
+  async function formatedMeshComponents(id) {
+    const items = await database.model_components.where({ id }).toArray()    const distinctTypes = [...new Set(items.map((item) => item.type))]
     const formated_mesh_components = []
+    for (const type of distinctTypes) {
+      const meshComponents = await database.model_components
+        .where({ id, type })
+        .toArray()
+      console.log(formatedMeshComponents.name, { meshComponents })
 
-    for (const [category, GeodeIds] of Object.entries(mesh_components)) {
       formated_mesh_components.push({
-        id: category,
-        title: category,
-        children: GeodeIds.map((uuid) => ({
-          id: uuid,
-          title: uuid,
-          category,
+        id: type,
+        title: type,
+        children: meshComponents.map((meshComponent) => ({
+          id: meshComponent.geode_id,
+          title: meshComponent.name,
+          category: meshComponent.type,
         })),
       })
     }
@@ -59,7 +61,9 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function meshComponentType(id, geode_id) {
-    return database.model_components.get({ id, geode_id })
+    return (
+      await database.model_components.where({ id, geode_id }).toArray()
+    ).map((component) => component.type)[0]
   }
 
   async function registerObject(id) {
