@@ -32,13 +32,13 @@ export function useModelCornersStyle() {
     modelCornerStyle(id, corner_id).visibility = visibility
   }
   async function setModelCornersVisibility(id, corner_ids, visibility) {
-    const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
-    if (corner_flat_indexes.length === 0) {
-      return Promise.resolve()
-    }
+    const corner_viewer_indexes = await dataStore.getViewerIndexes(
+      id,
+      corner_ids,
+    )
     return viewerStore.request(
       model_corners_schemas.visibility,
-      { id, block_ids: corner_flat_indexes, visibility },
+      { id, block_ids: corner_viewer_indexes, visibility },
       {
         response_function: () => {
           for (const corner_id of corner_ids) {
@@ -64,13 +64,17 @@ export function useModelCornersStyle() {
   }
 
   async function setModelCornersColor(id, corner_ids, color) {
-    const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
-    if (corner_flat_indexes.length === 0) {
+    const corner_viewer_indexes = await dataStore.getViewerIndexes(
+      id,
+      corner_ids,
+    )
+    console.log(setModelCornersColor.name, { corner_viewer_indexes })
+    if (corner_viewer_indexes.length === 0) {
       return Promise.resolve()
     }
     return viewerStore.request(
       model_corners_schemas.color,
-      { id, block_ids: corner_flat_indexes, color },
+      { id, block_ids: corner_viewer_indexes, color },
       {
         response_function: () => {
           for (const corner_id of corner_ids) {

@@ -143,7 +143,8 @@ async function run_back(
       "--allowed_origin http://localhost:*",
       "--timeout " + 0,
     ]
-    if (process.env.NODE_ENV === "development") {
+    console.log("process.env.NODE_ENV", process.env.NODE_ENV)
+    if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
       back_args.push("--debug")
     }
     console.log("run_back", executable_name, executable_path, back_args)
@@ -169,6 +170,9 @@ async function run_viewer(
       "--data_folder_path " + args.project_folder_path,
       "--timeout " + 0,
     ]
+    if (process.env.NODE_ENV === "development") {
+      viewer_args.push("--debug")
+    }
     console.log("run_viewer", executable_name, executable_path, viewer_args)
     await run_script(
       executable_name,

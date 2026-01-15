@@ -96,8 +96,18 @@ export const useDataStore = defineStore("data", () => {
     await database.data.delete(id)
   }
 
+  async function deleteMeshComponents(id) {
+    await database.mesh_components.delete(id)
+  }
+
   async function updateItem(id, changes) {
+    console.log(updateItem.name, { id, changes })
     await database.data.update(id, changes)
+  }
+
+  async function updateMeshComponents(id, changes) {
+    console.log(updateMeshComponents.name, { id, changes })
+    await database.mesh_components.update(id, changes)
   }
 
   async function fetchMeshComponents(id) {
@@ -107,26 +117,29 @@ export const useDataStore = defineStore("data", () => {
       { id },
       {
         response_function: async (response) => {
-          const mesh_components = response._data.uuid_dict
+          console.log(fetchMeshComponents.name, { response })
+          const mesh_components = response.uuid_dict
           await updateItem(id, { mesh_components })
         },
       },
     )
   }
 
-  async function fetchUuidToFlatIndexDict(id) {
-    const geodeStore = useGeodeStore()
-    return geodeStore.request(
-      back_model_schemas.vtm_component_indices,
-      { id },
-      {
-        response_function: async (response) => {
-          const uuid_to_flat_index = response._data.uuid_to_flat_index
-          await updateItem(id, { uuid_to_flat_index })
-        },
-      },
-    )
-  }
+  // async function fetchUuidToFlatIndexDict(id) {
+  //   console.log(fetchUuidToFlatIndexDict.name, { id })
+  //   const geodeStore = useGeodeStore()
+  //   return geodeStore.request(
+  //     back_model_schemas.vtm_component_indices,
+  //     { id },
+  //     {
+  //       response_function: async (response) => {
+  //         console.log(fetchUuidToFlatIndexDict.name, { response })
+  //         const uuid_to_flat_index = response._data.uuid_to_flat_index
+  //         await updateMeshComponents(id, { uuid_to_flat_index })
+  //       },
+  //     },
+  //   )
+  // }
 
   async function getCornersUuids(id) {
     const item = await getItem(id).fetch()
@@ -156,17 +169,19 @@ export const useDataStore = defineStore("data", () => {
     return Object.values(mesh_components["Block"] || {})
   }
 
-  async function getFlatIndexes(id, mesh_component_ids) {
+  async function getViewerIndexes(id, mesh_component_ids) {
     const item = await getItem(id).fetch()
+    console.log(getViewerIndexes.name, { item })
+    // await fetchUuidToFlatIndexDict(id)
     if (!item || !item.uuid_to_flat_index) return []
     const { uuid_to_flat_index } = item
-    const flat_indexes = []
+    const viewer_indexes = []
     for (const mesh_component_id of mesh_component_ids) {
       if (uuid_to_flat_index[mesh_component_id] !== undefined) {
-        flat_indexes.push(uuid_to_flat_index[mesh_component_id])
+        viewer_indexes.push(uuid_to_flat_index[mesh_component_id])
       }
     }
-    return flat_indexes
+    return viewer_indexes
   }
 
   async function exportStores() {
@@ -191,14 +206,16 @@ export const useDataStore = defineStore("data", () => {
     deregisterObject,
     addItem,
     deleteItem,
+    deleteMeshComponents,
     updateItem,
-    fetchUuidToFlatIndexDict,
+    updateMeshComponents,
+    // fetchUuidToFlatIndexDict,
     fetchMeshComponents,
     getCornersUuids,
     getLinesUuids,
     getSurfacesUuids,
     getBlocksUuids,
-    getFlatIndexes,
+    getViewerIndexes,
     exportStores,
     importStores,
     clear,

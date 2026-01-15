@@ -44,14 +44,17 @@ describe("Model blocks", () => {
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
       const block_ids = await dataStore.getBlocksUuids(id)
-      const block_flat_indexes = await dataStore.getFlatIndexes(id, block_ids)
+      const block_viewer_indexes = await dataStore.getViewerIndexes(
+        id,
+        block_ids,
+      )
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
       await dataStyleStore.setModelBlocksVisibility(id, block_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.visibility,
-        { id, block_ids: block_flat_indexes, visibility },
+        { id, block_ids: block_viewer_indexes, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -71,13 +74,13 @@ describe("Model blocks", () => {
   //     const viewerStore = useViewerStore()
   //     const dataStore = useDataStore()
   //     const block_ids = await dataStore.getBlocksUuids(id)
-  //     const block_flat_indexes = dataStore.getFlatIndexes(id, block_ids)
+  //     const block_viewer_indexes = dataStore.getViewerIndexes(id, block_ids)
   //     const color = { r: 255, g: 0, b: 0 }
   //     const spy = vi.spyOn(viewerStore, "request")
   //     await dataStyleStore.setModelBlocksColor(id, block_ids, color)
   //     expect(spy).toHaveBeenCalledWith(
   //       model_blocks_schemas.color,
-  //       { id, block_ids: block_flat_indexes, color },
+  //       { id, block_ids: block_viewer_indexes, color },
   //       {
   //         response_function: expect.any(Function),
   //       },

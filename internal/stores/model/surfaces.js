@@ -31,13 +31,16 @@ export function useModelSurfacesStyle() {
     modelSurfaceStyle(id, surface_id).visibility = visibility
   }
   async function setModelSurfacesVisibility(id, surface_ids, visibility) {
-    const surface_flat_indexes = await dataStore.getFlatIndexes(id, surface_ids)
-    if (surface_flat_indexes.length === 0) {
+    const surface_viewer_indexes = await dataStore.getViewerIndexes(
+      id,
+      surface_ids,
+    )
+    if (surface_viewer_indexes.length === 0) {
       return Promise.resolve()
     }
     return viewerStore.request(
       model_surfaces_schemas.visibility,
-      { id, block_ids: surface_flat_indexes, visibility },
+      { id, block_ids: surface_viewer_indexes, visibility },
       {
         response_function: () => {
           for (const surface_id of surface_ids) {
@@ -61,13 +64,16 @@ export function useModelSurfacesStyle() {
   }
 
   async function setModelSurfacesColor(id, surface_ids, color) {
-    const surface_flat_indexes = await dataStore.getFlatIndexes(id, surface_ids)
-    if (surface_flat_indexes.length === 0) {
+    const surface_viewer_indexes = await dataStore.getViewerIndexes(
+      id,
+      surface_ids,
+    )
+    if (surface_viewer_indexes.length === 0) {
       return Promise.resolve()
     }
     return viewerStore.request(
       model_surfaces_schemas.color,
-      { id, block_ids: surface_flat_indexes, color },
+      { id, block_ids: surface_viewer_indexes, color },
       {
         response_function: () => {
           for (const surface_id of surface_ids) {

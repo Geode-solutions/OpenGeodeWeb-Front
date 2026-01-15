@@ -32,13 +32,13 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).visibility = visibility
   }
   async function setModelLinesVisibility(id, line_ids, visibility) {
-    const line_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
-    if (line_flat_indexes.length === 0) {
+    const line_viewer_indexes = await dataStore.getViewerIndexes(id, line_ids)
+    if (line_viewer_indexes.length === 0) {
       return Promise.resolve()
     }
     return viewerStore.request(
       model_lines_schemas.visibility,
-      { id, block_ids: line_flat_indexes, visibility },
+      { id, block_ids: line_viewer_indexes, visibility },
       {
         response_function: () => {
           for (const line_id of line_ids) {
@@ -62,13 +62,13 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).color = color
   }
   async function setModelLinesColor(id, line_ids, color) {
-    const line_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
-    if (line_flat_indexes.length === 0) {
+    const line_viewer_indexes = await dataStore.getViewerIndexes(id, line_ids)
+    if (line_viewer_indexes.length === 0) {
       return Promise.resolve()
     }
     return viewerStore.request(
       model_lines_schemas.color,
-      { id, block_ids: line_flat_indexes, color },
+      { id, block_ids: line_viewer_indexes, color },
       {
         response_function: () => {
           for (const line_id of line_ids) {

@@ -34,7 +34,7 @@ export function api_fetch(
   if (schema.max_retry) {
     request_options.max_retry = schema.max_retry
   }
-  return useFetch(schema.$id, {
+  return $fetch(schema.$id, {
     baseURL: microservice.base_url,
     ...request_options,
     async onRequestError({ error }) {
@@ -62,8 +62,8 @@ export function api_fetch(
       await feedbackStore.add_error(
         response.status,
         schema.$id,
-        response._data.name,
-        response._data.description,
+        response.name,
+        response.description,
       )
       if (response_error_function) {
         await response_error_function(response)

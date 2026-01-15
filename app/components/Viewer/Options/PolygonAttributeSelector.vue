@@ -44,7 +44,7 @@
       },
       {
         response_function: (response) => {
-          polygon_attribute_names.value = response._data.polygon_attribute_names
+          polygon_attribute_names.value = response.polygon_attribute_names
         },
       },
     )

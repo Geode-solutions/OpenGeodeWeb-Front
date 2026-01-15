@@ -35,11 +35,11 @@ export const useLambdaStore = defineStore("lambda", {
       console.log("[LAMBDA] Launching lambda backend...")
       const feedbackStore = useFeedbackStore()
 
-      const { data, error } = await useFetch(this.base_url, {
+      const { data, error } = await $fetch(this.base_url, {
         method: "POST",
       })
 
-      if (error.value || !data.value) {
+      if (error.value) {
         this.status = Status.NOT_CONNECTED
         feedbackStore.server_error = true
         console.error("[LAMBDA] Failed to launch lambda backend", error.value)
@@ -47,7 +47,7 @@ export const useLambdaStore = defineStore("lambda", {
       }
 
       this.status = Status.CONNECTED
-      const id = data.value.ID
+      const id = data.ID
 
       console.log("[LAMBDA] Lambda launched, ID:", id)
       return id

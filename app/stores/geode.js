@@ -44,33 +44,36 @@ export const useGeodeStore = defineStore("geode", {
     },
   },
   actions: {
-    ping_task() {
+    set_ping() {
+      console.log("set_ping")
+      this.ping()
       setInterval(() => {
-        this.do_ping()
+        this.ping()
       }, 10 * 1000)
     },
-    do_ping() {
+    ping() {
+      console.log("ping")
       const geodeStore = this
       const feedbackStore = useFeedbackStore()
-      return useFetch(back_schemas.opengeodeweb_back.ping.$id, {
-        baseURL: this.base_url,
-        method: back_schemas.opengeodeweb_back.ping.methods[0],
-        body: {},
-        onRequestError({ error }) {
-          feedbackStore.$patch({ server_error: true })
-          geodeStore.status = Status.NOT_CONNECTED
-        },
-        onResponse({ response }) {
-          if (response.ok) {
+
+      return api_fetch(
+        this,
+        { schema: back_schemas.opengeodeweb_back.ping },
+        {
+          request_error_function: async () => {
+            feedbackStore.$patch({ server_error: true })
+            geodeStore.status = Status.NOT_CONNECTED
+          },
+          response_function: async () => {
             feedbackStore.$patch({ server_error: false })
             geodeStore.status = Status.CONNECTED
-          }
+          },
+          response_error_function: async () => {
+            feedbackStore.$patch({ server_error: true })
+            geodeStore.status = Status.NOT_CONNECTED
+          },
         },
-        onResponseError({ response }) {
-          feedbackStore.$patch({ server_error: true })
-          geodeStore.status = Status.NOT_CONNECTED
-        },
-      })
+      )
     },
     start_request() {
       this.request_counter++
@@ -84,7 +87,8 @@ export const useGeodeStore = defineStore("geode", {
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")
-      return this.ping_task()
+      this.set_ping()
+      return Promise.resolve()
     },
     request(schema, params, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id)

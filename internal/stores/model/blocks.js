@@ -32,13 +32,16 @@ export function useModelBlocksStyle() {
     modelBlockStyle(id, block_id).visibility = visibility
   }
   async function setModelBlocksVisibility(id, block_ids, visibility) {
-    const blocks_flat_indexes = await dataStore.getFlatIndexes(id, block_ids)
-    if (blocks_flat_indexes.length === 0) {
+    const blocks_viewer_indexes = await dataStore.getViewerIndexes(
+      id,
+      block_ids,
+    )
+    if (blocks_viewer_indexes.length === 0) {
       return Promise.resolve()
     }
     return viewerStore.request(
       model_blocks_schemas.visibility,
-      { id, block_ids: blocks_flat_indexes, visibility },
+      { id, block_ids: blocks_viewer_indexes, visibility },
       {
         response_function: () => {
           for (const block_id of block_ids) {
@@ -63,13 +66,16 @@ export function useModelBlocksStyle() {
   }
 
   async function setModelBlocksColor(id, block_ids, color) {
-    const blocks_flat_indexes = await dataStore.getFlatIndexes(id, block_ids)
-    if (blocks_flat_indexes.length === 0) {
+    const blocks_viewer_indexes = await dataStore.getViewerIndexes(
+      id,
+      block_ids,
+    )
+    if (blocks_viewer_indexes.length === 0) {
       return Promise.resolve()
     }
     return viewerStore.request(
       model_blocks_schemas.color,
-      { id, block_ids: blocks_flat_indexes, color },
+      { id, block_ids: blocks_viewer_indexes, color },
       {
         response_function: () => {
           for (const block_id of block_ids) {

@@ -44,7 +44,7 @@
       },
       {
         response_function: (response) => {
-          cell_attribute_names.value = response._data.cell_attribute_names
+          cell_attribute_names.value = response.cell_attribute_names
         },
       },
     )

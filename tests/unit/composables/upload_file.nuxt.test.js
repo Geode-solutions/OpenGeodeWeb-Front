@@ -43,7 +43,7 @@ describe("upload_file", () => {
       { route: schema.$id, file },
       {
         response_function: (response) => {
-          response_value = response._data.test
+          response_value = response.test
         },
       },
     )

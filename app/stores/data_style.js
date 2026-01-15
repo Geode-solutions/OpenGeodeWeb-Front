@@ -31,7 +31,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyDefaultStyle(id) {
     const item = await dataStore.getItem(id).fetch()
+    console.log("applyDefaultStyle", { item })
     const viewer_type = item?.viewer_type
+    console.log("applyDefaultStyle", { viewer_type })
     if (!viewer_type) {
       throw new Error("Item not found or not loaded: " + id)
     }
