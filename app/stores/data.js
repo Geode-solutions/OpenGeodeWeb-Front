@@ -44,11 +44,11 @@ export const useDataStore = defineStore("data", () => {
     const { mesh_components } = item
     const formated_mesh_components = []
 
-    for (const [category, uuids] of Object.entries(mesh_components)) {
+    for (const [category, GeodeIds] of Object.entries(mesh_components)) {
       formated_mesh_components.push({
         id: category,
         title: category,
-        children: uuids.map((uuid) => ({
+        children: GeodeIds.map((uuid) => ({
           id: uuid,
           title: uuid,
           category,
@@ -58,16 +58,8 @@ export const useDataStore = defineStore("data", () => {
     return formated_mesh_components
   }
 
-  function meshComponentType(id, uuid) {
-    const item = getItem(id).value
-    if (!item || !item.mesh_components) return null
-    const { mesh_components } = item
-
-    if (mesh_components["Corner"]?.includes(uuid)) return "corner"
-    else if (mesh_components["Line"]?.includes(uuid)) return "line"
-    else if (mesh_components["Surface"]?.includes(uuid)) return "surface"
-    else if (mesh_components["Block"]?.includes(uuid)) return "block"
-    return null
+  async function meshComponentType(id, geode_id) {
+    return database.model_components.get({ id, geode_id })
   }
 
   async function registerObject(id) {
@@ -91,23 +83,17 @@ export const useDataStore = defineStore("data", () => {
     const serializedData = JSON.parse(JSON.stringify(itemData))
     await database.data.put(serializedData)
   }
-
   async function deleteItem(id) {
     await database.data.delete(id)
   }
-
-  async function deleteMeshComponents(id) {
-    await database.mesh_components.delete(id)
-  }
-
   async function updateItem(id, changes) {
     console.log(updateItem.name, { id, changes })
     await database.data.update(id, changes)
   }
 
-  async function updateMeshComponents(id, changes) {
-    console.log(updateMeshComponents.name, { id, changes })
-    await database.mesh_components.update(id, changes)
+  async function addModelComponent(value) {
+    const serializedData = JSON.parse(JSON.stringify(value))
+    await database.model_components.put(serializedData)
   }
 
   async function fetchMeshComponents(id) {
@@ -117,71 +103,52 @@ export const useDataStore = defineStore("data", () => {
       { id },
       {
         response_function: async (response) => {
-          console.log(fetchMeshComponents.name, { response })
-          const mesh_components = response.uuid_dict
-          await updateItem(id, { mesh_components })
+          const { mesh_components } = response._data
+          for (const mesh_component of mesh_components) {
+            await addModelComponent(mesh_component)
+          }
         },
       },
     )
   }
 
-  // async function fetchUuidToFlatIndexDict(id) {
-  //   console.log(fetchUuidToFlatIndexDict.name, { id })
-  //   const geodeStore = useGeodeStore()
-  //   return geodeStore.request(
-  //     back_model_schemas.vtm_component_indices,
-  //     { id },
-  //     {
-  //       response_function: async (response) => {
-  //         console.log(fetchUuidToFlatIndexDict.name, { response })
-  //         const uuid_to_flat_index = response._data.uuid_to_flat_index
-  //         await updateMeshComponents(id, { uuid_to_flat_index })
-  //       },
-  //     },
-  //   )
-  // }
-
-  async function getCornersUuids(id) {
-    const item = await getItem(id).fetch()
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
-    return Object.values(mesh_components["Corner"] || {})
+  async function getMeshComponentGeodeIds(id, meshComponentType) {
+    console.log(getMeshComponentGeodeIds.name, { id, meshComponentType })
+    return (
+      await database.model_components
+        .where({ id, type: meshComponentType })
+        .toArray()
+    ).map((component) => component.geode_id)
   }
 
-  async function getLinesUuids(id) {
-    const item = await getItem(id).fetch()
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
-    return Object.values(mesh_components["Line"] || {})
+  async function getCornersGeodeIds(id) {
+    console.log(getCornersGeodeIds.name, { id })
+    return getMeshComponentGeodeIds(id, "Corner")
   }
 
-  async function getSurfacesUuids(id) {
-    const item = await getItem(id).fetch()
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
-    return Object.values(mesh_components["Surface"] || {})
+  async function getLinesGeodeIds(id) {
+    console.log(getLinesGeodeIds.name, { id })
+    return getMeshComponentGeodeIds(id, "Line")
   }
 
-  async function getBlocksUuids(id) {
-    const item = await getItem(id).fetch()
-    if (!item || !item.mesh_components) return []
-    const { mesh_components } = item
-    return Object.values(mesh_components["Block"] || {})
+  async function getSurfacesGeodeIds(id) {
+    console.log(getSurfacesGeodeIds.name, { id })
+    return getMeshComponentGeodeIds(id, "Surface")
   }
 
-  async function getViewerIndexes(id, mesh_component_ids) {
-    const item = await getItem(id).fetch()
-    console.log(getViewerIndexes.name, { item })
-    // await fetchUuidToFlatIndexDict(id)
-    if (!item || !item.uuid_to_flat_index) return []
-    const { uuid_to_flat_index } = item
-    const viewer_indexes = []
-    for (const mesh_component_id of mesh_component_ids) {
-      if (uuid_to_flat_index[mesh_component_id] !== undefined) {
-        viewer_indexes.push(uuid_to_flat_index[mesh_component_id])
-      }
-    }
-    return viewer_indexes
+  async function getBlocksGeodeIds(id) {
+    console.log(getBlocksGeodeIds.name, { id })
+    return getMeshComponentGeodeIds(id, "Block")
+  }
+
+  async function getMeshComponentsViewerIds(id, meshComponentGeodeIds) {
+    return (
+      await database.model_components
+        .where("id")
+        .equals(id)
+        .and((component) => meshComponentGeodeIds.includes(component.geode_id))
+        .toArray()
+    ).map((component) => component.viewer_id)
   }
 
   async function exportStores() {
@@ -206,16 +173,14 @@ export const useDataStore = defineStore("data", () => {
     deregisterObject,
     addItem,
     deleteItem,
-    deleteMeshComponents,
     updateItem,
-    updateMeshComponents,
-    // fetchUuidToFlatIndexDict,
+    addModelComponent,
     fetchMeshComponents,
-    getCornersUuids,
-    getLinesUuids,
-    getSurfacesUuids,
-    getBlocksUuids,
-    getViewerIndexes,
+    getCornersGeodeIds,
+    getLinesGeodeIds,
+    getSurfacesGeodeIds,
+    getBlocksGeodeIds,
+    getMeshComponentsViewerIds,
     exportStores,
     importStores,
     clear,

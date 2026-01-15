@@ -32,13 +32,13 @@ export function useModelCornersStyle() {
     modelCornerStyle(id, corner_id).visibility = visibility
   }
   async function setModelCornersVisibility(id, corner_ids, visibility) {
-    const corner_viewer_indexes = await dataStore.getViewerIndexes(
+    const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       corner_ids,
     )
     return viewerStore.request(
       model_corners_schemas.visibility,
-      { id, block_ids: corner_viewer_indexes, visibility },
+      { id, block_ids: corner_viewer_ids, visibility },
       {
         response_function: () => {
           for (const corner_id of corner_ids) {
@@ -64,17 +64,13 @@ export function useModelCornersStyle() {
   }
 
   async function setModelCornersColor(id, corner_ids, color) {
-    const corner_viewer_indexes = await dataStore.getViewerIndexes(
+    const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       corner_ids,
     )
-    console.log(setModelCornersColor.name, { corner_viewer_indexes })
-    if (corner_viewer_indexes.length === 0) {
-      return Promise.resolve()
-    }
     return viewerStore.request(
       model_corners_schemas.color,
-      { id, block_ids: corner_viewer_indexes, color },
+      { id, block_ids: corner_viewer_ids, color },
       {
         response_function: () => {
           for (const corner_id of corner_ids) {
@@ -93,7 +89,8 @@ export function useModelCornersStyle() {
 
   async function applyModelCornersStyle(id) {
     const style = modelCornersStyle(id)
-    const corner_ids = await dataStore.getCornersUuids(id)
+    const corner_ids = await dataStore.getCornersGeodeIds(id)
+    console.log(applyModelCornersStyle.name, { id }, { corner_ids })
     return Promise.all([
       setModelCornersVisibility(id, corner_ids, style.visibility),
       setModelCornersColor(id, corner_ids, style.color),

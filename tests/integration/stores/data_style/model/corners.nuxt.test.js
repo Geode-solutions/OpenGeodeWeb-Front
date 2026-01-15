@@ -43,8 +43,8 @@ describe("Model corners", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const corner_ids = await dataStore.getCornersUuids(id)
-      const corner_viewer_indexes = await dataStore.getViewerIndexes(
+      const corner_ids = await dataStore.getCornersGeodeIds(id)
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
         id,
         corner_ids,
       )
@@ -54,7 +54,7 @@ describe("Model corners", () => {
       await dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.visibility,
-        { id, block_ids: corner_viewer_indexes, visibility },
+        { id, block_ids: corner_viewer_ids, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -73,8 +73,8 @@ describe("Model corners", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const corner_ids = await dataStore.getCornersUuids(id)
-      const corner_viewer_indexes = await dataStore.getViewerIndexes(
+      const corner_ids = await dataStore.getCornersGeodeIds(id)
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
         id,
         corner_ids,
       )
@@ -84,7 +84,7 @@ describe("Model corners", () => {
       await dataStyleStore.setModelCornersColor(id, corner_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.color,
-        { id, block_ids: corner_viewer_indexes, color },
+        { id, block_ids: corner_viewer_ids, color },
         {
           response_function: expect.any(Function),
         },

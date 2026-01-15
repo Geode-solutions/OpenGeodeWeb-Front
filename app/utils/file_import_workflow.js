@@ -50,10 +50,7 @@ async function importItem(item) {
   await dataStyleStore.addDataStyle(item.id, item.geode_object_type)
 
   if (item.viewer_type === "model") {
-    await Promise.all([
-      dataStore.fetchMeshComponents(item.id),
-      // dataStore.fetchUuidToFlatIndexDict(item.id),
-    ])
+    await dataStore.fetchMeshComponents(item.id)
   }
 
   await dataStyleStore.applyDefaultStyle(item.id)

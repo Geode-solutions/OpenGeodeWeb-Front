@@ -31,16 +31,13 @@ export function useModelSurfacesStyle() {
     modelSurfaceStyle(id, surface_id).visibility = visibility
   }
   async function setModelSurfacesVisibility(id, surface_ids, visibility) {
-    const surface_viewer_indexes = await dataStore.getViewerIndexes(
+    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       surface_ids,
     )
-    if (surface_viewer_indexes.length === 0) {
-      return Promise.resolve()
-    }
     return viewerStore.request(
       model_surfaces_schemas.visibility,
-      { id, block_ids: surface_viewer_indexes, visibility },
+      { id, block_ids: surface_viewer_ids, visibility },
       {
         response_function: () => {
           for (const surface_id of surface_ids) {
@@ -64,16 +61,13 @@ export function useModelSurfacesStyle() {
   }
 
   async function setModelSurfacesColor(id, surface_ids, color) {
-    const surface_viewer_indexes = await dataStore.getViewerIndexes(
+    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       surface_ids,
     )
-    if (surface_viewer_indexes.length === 0) {
-      return Promise.resolve()
-    }
     return viewerStore.request(
       model_surfaces_schemas.color,
-      { id, block_ids: surface_viewer_indexes, color },
+      { id, block_ids: surface_viewer_ids, color },
       {
         response_function: () => {
           for (const surface_id of surface_ids) {
@@ -92,7 +86,7 @@ export function useModelSurfacesStyle() {
 
   async function applyModelSurfacesStyle(id) {
     const style = modelSurfacesStyle(id)
-    const surface_ids = await dataStore.getSurfacesUuids(id)
+    const surface_ids = await dataStore.getSurfacesGeodeIds(id)
     return Promise.all([
       setModelSurfacesVisibility(id, surface_ids, style.visibility),
       setModelSurfacesColor(id, surface_ids, style.color),

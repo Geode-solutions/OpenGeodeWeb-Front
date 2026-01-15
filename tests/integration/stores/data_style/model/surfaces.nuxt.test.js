@@ -43,8 +43,8 @@ describe("Model surfaces", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const surface_ids = await dataStore.getSurfacesUuids(id)
-      const surface_viewer_indexes = await dataStore.getViewerIndexes(
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id)
+      const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
         id,
         surface_ids,
       )
@@ -58,7 +58,7 @@ describe("Model surfaces", () => {
       )
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.visibility,
-        { id, block_ids: surface_viewer_indexes, visibility },
+        { id, block_ids: surface_viewer_ids, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -77,8 +77,8 @@ describe("Model surfaces", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const surface_ids = await dataStore.getSurfacesUuids(id)
-      const surface_viewer_indexes = await dataStore.getViewerIndexes(
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id)
+      const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
         id,
         surface_ids,
       )
@@ -88,7 +88,7 @@ describe("Model surfaces", () => {
       await dataStyleStore.setModelSurfacesColor(id, surface_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.color,
-        { id, block_ids: surface_viewer_indexes, color },
+        { id, block_ids: surface_viewer_ids, color },
         {
           response_function: expect.any(Function),
         },

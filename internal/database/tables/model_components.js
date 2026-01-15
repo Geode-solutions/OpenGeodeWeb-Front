@@ -1,4 +1,4 @@
 export const modelComponentsTable = {
   name: "model_components",
-  schema: "[id+geode_uuid], viewer_id, type, created_at",
+  schema: "[id+geode_id], viewer_id, type, name, created_at",
 }

@@ -39,8 +39,8 @@ describe("Model lines", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const line_ids = await dataStore.getLinesUuids(id)
-      const lines_viewer_indexes = await dataStore.getViewerIndexes(
+      const line_ids = await dataStore.getLinesGeodeIds(id)
+      const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(
         id,
         line_ids,
       )
@@ -50,7 +50,7 @@ describe("Model lines", () => {
       await dataStyleStore.setModelLinesVisibility(id, line_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.visibility,
-        { id, block_ids: lines_viewer_indexes, visibility },
+        { id, block_ids: lines_viewer_ids, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -67,8 +67,8 @@ describe("Model lines", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const line_ids = await dataStore.getLinesUuids(id)
-      const lines_viewer_indexes = await dataStore.getViewerIndexes(
+      const line_ids = await dataStore.getLinesGeodeIds(id)
+      const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(
         id,
         line_ids,
       )
@@ -78,7 +78,7 @@ describe("Model lines", () => {
       await dataStyleStore.setModelLinesColor(id, line_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.color,
-        { id, block_ids: lines_viewer_indexes, color },
+        { id, block_ids: lines_viewer_ids, color },
         {
           response_function: expect.any(Function),
         },

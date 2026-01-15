@@ -32,16 +32,13 @@ export function useModelBlocksStyle() {
     modelBlockStyle(id, block_id).visibility = visibility
   }
   async function setModelBlocksVisibility(id, block_ids, visibility) {
-    const blocks_viewer_indexes = await dataStore.getViewerIndexes(
+    const blocks_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       block_ids,
     )
-    if (blocks_viewer_indexes.length === 0) {
-      return Promise.resolve()
-    }
     return viewerStore.request(
       model_blocks_schemas.visibility,
-      { id, block_ids: blocks_viewer_indexes, visibility },
+      { id, block_ids: blocks_viewer_ids, visibility },
       {
         response_function: () => {
           for (const block_id of block_ids) {
@@ -66,16 +63,13 @@ export function useModelBlocksStyle() {
   }
 
   async function setModelBlocksColor(id, block_ids, color) {
-    const blocks_viewer_indexes = await dataStore.getViewerIndexes(
+    const blocks_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       block_ids,
     )
-    if (blocks_viewer_indexes.length === 0) {
-      return Promise.resolve()
-    }
     return viewerStore.request(
       model_blocks_schemas.color,
-      { id, block_ids: blocks_viewer_indexes, color },
+      { id, block_ids: blocks_viewer_ids, color },
       {
         response_function: () => {
           for (const block_id of block_ids) {
@@ -95,7 +89,7 @@ export function useModelBlocksStyle() {
 
   async function applyModelBlocksStyle(id) {
     const style = modelBlocksStyle(id)
-    const blocks_ids = await dataStore.getBlocksUuids(id)
+    const blocks_ids = await dataStore.getBlocksGeodeIds(id)
     return Promise.all([
       setModelBlocksVisibility(id, blocks_ids, style.visibility),
       setModelBlocksColor(id, blocks_ids, style.color),
