@@ -39,13 +39,13 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function formatedMeshComponents(id) {
-    const items = await database.model_components.where({ id }).toArray()    const distinctTypes = [...new Set(items.map((item) => item.type))]
+    const items = await database.model_components.where({ id }).toArray()
+    const distinctTypes = [...new Set(items.map((item) => item.type))]
     const formated_mesh_components = []
     for (const type of distinctTypes) {
       const meshComponents = await database.model_components
         .where({ id, type })
         .toArray()
-      console.log(formatedMeshComponents.name, { meshComponents })
 
       formated_mesh_components.push({
         id: type,
@@ -57,6 +57,7 @@ export const useDataStore = defineStore("data", () => {
         })),
       })
     }
+
     return formated_mesh_components
   }
 
@@ -91,7 +92,6 @@ export const useDataStore = defineStore("data", () => {
     await database.data.delete(id)
   }
   async function updateItem(id, changes) {
-    console.log(updateItem.name, { id, changes })
     await database.data.update(id, changes)
   }
 
@@ -117,7 +117,6 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function getMeshComponentGeodeIds(id, meshComponentType) {
-    console.log(getMeshComponentGeodeIds.name, { id, meshComponentType })
     return (
       await database.model_components
         .where({ id, type: meshComponentType })
@@ -126,22 +125,18 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function getCornersGeodeIds(id) {
-    console.log(getCornersGeodeIds.name, { id })
     return getMeshComponentGeodeIds(id, "Corner")
   }
 
   async function getLinesGeodeIds(id) {
-    console.log(getLinesGeodeIds.name, { id })
     return getMeshComponentGeodeIds(id, "Line")
   }
 
   async function getSurfacesGeodeIds(id) {
-    console.log(getSurfacesGeodeIds.name, { id })
     return getMeshComponentGeodeIds(id, "Surface")
   }
 
   async function getBlocksGeodeIds(id) {
-    console.log(getBlocksGeodeIds.name, { id })
     return getMeshComponentGeodeIds(id, "Block")
   }
 

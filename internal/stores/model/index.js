@@ -103,18 +103,10 @@ export default function useModelStyle() {
     component_geode_ids,
     visibility,
   ) {
-    console.log(setModelMeshComponentVisibility.name, {
-      id,
-      component_geode_ids,
-      visibility,
-    })
     const component_type = await dataStore.meshComponentType(
       id,
       component_geode_ids[0],
     )
-    console.log(setModelMeshComponentVisibility.name, {
-      component_type,
-    })
     if (component_type === "Corner") {
       return modelCornersStyleStore.setModelCornersVisibility(
         id,
@@ -145,9 +137,7 @@ export default function useModelStyle() {
   }
 
   function applyModelStyle(id) {
-    console.log(applyModelStyle.name, { id })
     const style = dataStyleStateStore.getStyle(id)
-    console.log(applyModelStyle.name, { style })
     const promise_array = []
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
@@ -168,7 +158,6 @@ export default function useModelStyle() {
         throw new Error("Unknown model key: " + key)
       }
     }
-    console.log(applyModelStyle.name, { promise_array })
     return Promise.all(promise_array)
   }
 
