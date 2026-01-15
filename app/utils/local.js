@@ -169,9 +169,6 @@ async function run_viewer(
       "--data_folder_path " + args.project_folder_path,
       "--timeout " + 0,
     ]
-    if (process.env.NODE_ENV === "development") {
-      viewer_args.push("--debug")
-    }
     console.log("run_viewer", executable_name, executable_path, viewer_args)
     await run_script(
       executable_name,
