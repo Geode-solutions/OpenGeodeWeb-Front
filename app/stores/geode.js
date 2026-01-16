@@ -54,10 +54,9 @@ export const useGeodeStore = defineStore("geode", {
     ping() {
       const geodeStore = this
       const feedbackStore = useFeedbackStore()
-
-      return api_fetch(
-        this,
-        { schema: back_schemas.opengeodeweb_back.ping },
+      return this.request(
+        back_schemas.opengeodeweb_back.ping,
+        {},
         {
           request_error_function: async () => {
             feedbackStore.$patch({ server_error: true })

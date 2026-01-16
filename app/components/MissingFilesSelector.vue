@@ -89,7 +89,7 @@
       return new Promise((resolve, reject) => {
         geodeStore.request(schema, params, {
           request_error_function: () => reject(),
-          response_function: (response) => resolve(response._data),
+          response_function: (response) => resolve(response),
           response_error_function: () => reject(),
         })
       })

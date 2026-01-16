@@ -90,14 +90,22 @@ export const useDataStore = defineStore("data", () => {
   }
   async function deleteItem(id) {
     await database.data.delete(id)
+    await deleteModelComponents(id)
   }
   async function updateItem(id, changes) {
     await database.data.update(id, changes)
   }
 
-  async function addModelComponent(value) {
-    const serializedData = JSON.parse(JSON.stringify(value))
-    await database.model_components.put(serializedData)
+  async function addModelComponents(values) {
+    values.map((value) => {
+      value.created_at = new Date().toISOString()
+    })
+    const serializedData = JSON.parse(JSON.stringify(values))
+    await database.model_components.bulkAdd(serializedData)
+  }
+
+  async function deleteModelComponents(id) {
+    await database.model_components.where({ id }).delete()
   }
 
   async function fetchMeshComponents(id) {
@@ -107,10 +115,8 @@ export const useDataStore = defineStore("data", () => {
       { id },
       {
         response_function: async (response) => {
-          const { mesh_components } = response._data
-          for (const mesh_component of mesh_components) {
-            await addModelComponent(mesh_component)
-          }
+          const { mesh_components } = response
+          await addModelComponents(mesh_components)
         },
       },
     )
@@ -173,7 +179,6 @@ export const useDataStore = defineStore("data", () => {
     addItem,
     deleteItem,
     updateItem,
-    addModelComponent,
     fetchMeshComponents,
     getCornersGeodeIds,
     getLinesGeodeIds,
