@@ -139,8 +139,7 @@ describe("Geode store", () => {
             status: 500,
           })
         })
-
-        await geodeStore.ping()
+        await expect(geodeStore.ping()).rejects.toThrow()
         expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
       })
     })
