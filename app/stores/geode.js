@@ -45,7 +45,6 @@ export const useGeodeStore = defineStore("geode", {
   },
   actions: {
     set_ping() {
-      console.log("set_ping")
       this.ping()
       setInterval(() => {
         this.ping()
