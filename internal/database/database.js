@@ -1,5 +1,6 @@
 import Dexie from "dexie"
-import { dataTable } from "./tables/data_table.js"
+import { dataTable } from "./tables/data_table"
+import { modelComponentsTable } from "./tables/model_components"
 
 export class Database extends Dexie {
   constructor() {
@@ -7,6 +8,7 @@ export class Database extends Dexie {
 
     this.version(1).stores({
       [dataTable.name]: dataTable.schema,
+      [modelComponentsTable.name]: modelComponentsTable.schema,
     })
   }
 
@@ -15,7 +17,7 @@ export class Database extends Dexie {
     await tempDb.open()
 
     if (tempDb.tables.some((t) => t.name === tableName)) {
-      console.warn(`Table "${tableName}" existe déjà`)
+      console.warn(`Table "${tableName}" already exists`)
       tempDb.close()
       return tempDb
     }
@@ -39,6 +41,7 @@ export class Database extends Dexie {
           if (v === 1) {
             this.version(1).stores({
               [dataTable.name]: dataTable.schema,
+              [modelComponentsTable.name]: modelComponentsTable.schema,
             })
           } else {
             this.version(v).stores(currentStores)

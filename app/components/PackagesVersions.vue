@@ -35,7 +35,7 @@
       {},
       {
         response_function: (response) => {
-          packages_versions.value = response._data.versions
+          packages_versions.value = response.versions
         },
       },
     )

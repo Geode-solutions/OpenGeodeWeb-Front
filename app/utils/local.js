@@ -143,7 +143,7 @@ async function run_back(
       "--allowed_origin http://localhost:*",
       "--timeout " + 0,
     ]
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
       back_args.push("--debug")
     }
     console.log("run_back", executable_name, executable_path, back_args)

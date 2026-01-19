@@ -67,7 +67,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          texture_coordinates.value = response._data.texture_coordinates
+          texture_coordinates.value = response.texture_coordinates
         },
       },
     )
@@ -86,7 +86,7 @@
         },
         {
           response_function: async (response) => {
-            texture_id.value = response._data.id
+            texture_id.value = response.id
           },
         },
       )
