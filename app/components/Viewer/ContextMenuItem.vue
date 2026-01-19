@@ -46,9 +46,9 @@
 </template>
 
 <script setup>
-  import { useTheme } from 'vuetify'
+  import { useTheme } from "vuetify"
   import { useMenuStore } from "@ogw_front/stores/menu"
-  import { useElementSize } from '@vueuse/core'
+  import { useElementSize } from "@vueuse/core"
 
   const menuStore = useMenuStore()
   const theme = useTheme()
@@ -64,13 +64,15 @@
   const optionsRef = ref(null)
   const { height: optionsHeight } = useElementSize(optionsRef)
 
-  const maxCardHeight = computed(() => Math.min(500, menuStore.containerHeight - 40))
+  const maxCardHeight = computed(() =>
+    Math.min(500, menuStore.containerHeight - 40),
+  )
 
   const optionsStyle = computed(() => {
     if (!is_active.value || !optionsHeight.value) return {}
     const angle = (props.index / props.itemProps.totalItems) * 2 * Math.PI
     const radius = 80
-    const absoluteButtonY = menuStore.menuY + (Math.sin(angle) * radius)
+    const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius
     const h = optionsHeight.value
     const margin = 20
     let dy = 0
@@ -89,9 +91,14 @@
     const margin = 60
     const radius = 80
     if (loc === "right") {
-      return (menuStore.menuX + radius + margin + cardWidth > menuStore.containerWidth) ? "options-left" : "options-right"
+      return menuStore.menuX + radius + margin + cardWidth >
+        menuStore.containerWidth
+        ? "options-left"
+        : "options-right"
     }
-    return (menuStore.menuX - radius - margin - cardWidth < 0) ? "options-right" : "options-left"
+    return menuStore.menuX - radius - margin - cardWidth < 0
+      ? "options-right"
+      : "options-left"
   })
 
   const toggleOptions = () => menuStore.toggleItemOptions(props.index)
@@ -105,19 +112,21 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.3s ease;
   }
 
-  .menu-btn { 
-    transition: all 0.2s ease; 
+  .menu-btn {
+    transition: all 0.2s ease;
     border-color: rgba(0, 0, 0, 0.1) !important;
   }
 
-  .menu-btn:hover { 
-    transform: scale(1.1); 
+  .menu-btn:hover {
+    transform: scale(1.1);
     background-color: #e3f2fd !important;
   }
-  
+
   .menu-btn.v-btn--active {
     background-color: v-bind(primaryColor) !important;
     color: white !important;
@@ -134,8 +143,12 @@
     z-index: 1001;
   }
 
-  .options-right { left: 60px; }
-  .options-left { right: 60px; }
+  .options-right {
+    left: 60px;
+  }
+  .options-left {
+    right: 60px;
+  }
 
   .options-card {
     background-color: rgba(30, 30, 30, 0.85) !important;
@@ -144,8 +157,11 @@
     border-color: rgba(255, 255, 255, 0.15) !important;
   }
 
-  ::v-deep(.v-list-item:hover) { background-color: rgba(255, 255, 255, 0.1); }
-  ::v-deep(.v-slider-track__fill), ::v-deep(.v-selection-control--dirty .v-switch__track) {
+  ::v-deep(.v-list-item:hover) {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  ::v-deep(.v-slider-track__fill),
+  ::v-deep(.v-selection-control--dirty .v-switch__track) {
     background-color: v-bind(primaryColor) !important;
   }
 </style>

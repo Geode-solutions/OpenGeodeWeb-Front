@@ -76,11 +76,9 @@
     document.addEventListener("mouseup", stopResize)
   }
 
-  onMounted(() => {
-  })
+  onMounted(() => {})
 
-  onUnmounted(() => {
-  })
+  onUnmounted(() => {})
 </script>
 
 <style scoped>

@@ -62,17 +62,26 @@
   const menuX = ref(props.x)
   const menuY = ref(props.y)
 
-  watch(() => [props.x, props.y], ([newX, newY]) => {
-    const { x, y } = clampPosition(newX, newY)
-    menuX.value = x
-    menuY.value = y
-    menuStore.setMenuPosition(x, y)
-  }, { immediate: true })
+  watch(
+    () => [props.x, props.y],
+    ([newX, newY]) => {
+      const { x, y } = clampPosition(newX, newY)
+      menuX.value = x
+      menuY.value = y
+      menuStore.setMenuPosition(x, y)
+    },
+    { immediate: true },
+  )
 
-  useEventListener(window, "mousemove", (e) => {
-    if (!isDragging.value) return
-    handleDrag(e)
-  }, { passive: true })
+  useEventListener(
+    window,
+    "mousemove",
+    (e) => {
+      if (!isDragging.value) return
+      handleDrag(e)
+    },
+    { passive: true },
+  )
 
   useEventListener(window, "mouseup", (e) => {
     if (!isDragging.value) return
@@ -80,9 +89,13 @@
   })
 
   const menu_items = ref([])
-  watch(() => [meta_data.value.viewer_type, meta_data.value.geode_object_type], ([v, g]) => {
-    menu_items.value = menuStore.getMenuItems(v, g)
-  }, { immediate: true })
+  watch(
+    () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
+    ([v, g]) => {
+      menu_items.value = menuStore.getMenuItems(v, g)
+    },
+    { immediate: true },
+  )
 
   const menuItemCount = computed(() => menu_items.value.length)
 
@@ -102,7 +115,10 @@
   }
 
   function handleDrag(e) {
-    const { x, y } = clampPosition(e.clientX - dragStartX.value, e.clientY - dragStartY.value)
+    const { x, y } = clampPosition(
+      e.clientX - dragStartX.value,
+      e.clientY - dragStartY.value,
+    )
     menuX.value = x
     menuY.value = y
     menuStore.setMenuPosition(x, y)
@@ -116,7 +132,7 @@
 
   function getMenuStyle() {
     return {
-      position: 'fixed',
+      position: "fixed",
       left: `${menuStore.containerLeft + menuX.value - radius}px`,
       top: `${menuStore.containerTop + menuY.value - radius}px`,
       zIndex: 1000,
