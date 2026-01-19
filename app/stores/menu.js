@@ -129,6 +129,9 @@ export const useMenuStore = defineStore("menu", () => {
   const menuY = ref(0)
   const containerWidth = ref(window.innerWidth)
   const containerHeight = ref(window.innerHeight)
+  const containerTop = ref(0)
+  const containerLeft = ref(0)
+  const active_item_index = ref(null)
 
   function getMenuItems(objectType, geodeObject) {
     if (!objectType || !geodeObject || !menus.value[objectType]) {
@@ -140,9 +143,10 @@ export const useMenuStore = defineStore("menu", () => {
   function closeMenu() {
     display_menu.value = false
     current_id.value = null
+    active_item_index.value = null
   }
 
-  async function openMenu(id, x, y, width, height, meta_data) {
+  async function openMenu(id, x, y, width, height, top, left, meta_data) {
     await closeMenu()
 
     if (meta_data) {
@@ -162,8 +166,10 @@ export const useMenuStore = defineStore("menu", () => {
       menuY.value = y
     }
 
-    if (containerWidth) containerWidth.value = width
-    if (containerHeight) containerHeight.value = height
+    containerWidth.value = width
+    containerHeight.value = height
+    containerTop.value = top
+    containerLeft.value = left
 
     display_menu.value = true
   }
@@ -172,18 +178,6 @@ export const useMenuStore = defineStore("menu", () => {
     menuX.value = x
     menuY.value = y
   }
-
-  function showItemsWithDelay() {
-    const DELAY = 50
-    const items = getMenuItems()
-    items.forEach((item, index) => {
-      setTimeout(() => {
-        item.visible = true
-      }, index * DELAY)
-    })
-  }
-
-  const active_item_index = ref(null)
 
   function toggleItemOptions(index) {
     if (active_item_index.value === index) {
@@ -200,12 +194,13 @@ export const useMenuStore = defineStore("menu", () => {
     menuY,
     containerWidth,
     containerHeight,
+    containerTop,
+    containerLeft,
     active_item_index,
     getMenuItems,
     closeMenu,
     openMenu,
     setMenuPosition,
-    showItemsWithDelay,
     toggleItemOptions,
   }
 })
