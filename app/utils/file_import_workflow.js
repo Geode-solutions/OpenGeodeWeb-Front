@@ -50,10 +50,7 @@ async function importItem(item) {
   await dataStyleStore.addDataStyle(item.id, item.geode_object_type)
 
   if (item.viewer_type === "model") {
-    await Promise.all([
-      dataStore.fetchMeshComponents(item.id),
-      dataStore.fetchUuidToFlatIndexDict(item.id),
-    ])
+    await dataStore.fetchMeshComponents(item.id)
   }
 
   await dataStyleStore.applyDefaultStyle(item.id)
@@ -70,10 +67,7 @@ async function importFile(filename, geode_object_type) {
     },
   )
 
-  const item = buildImportItemFromPayloadApi(
-    response.data.value,
-    geode_object_type,
-  )
+  const item = buildImportItemFromPayloadApi(response, geode_object_type)
   return importItem(item)
 }
 

@@ -90,7 +90,7 @@
         geodeStore.request(schema, params, {
           request_error_function: () => reject(),
           response_function: (response) => {
-            resolve(response._data.geode_objects_and_output_extensions)
+            resolve(response.geode_objects_and_output_extensions)
           },
           response_error_function: () => reject(),
         })

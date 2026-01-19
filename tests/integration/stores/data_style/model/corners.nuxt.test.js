@@ -43,15 +43,18 @@ describe("Model corners", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const corner_ids = await dataStore.getCornersUuids(id)
-      const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
+      const corner_ids = await dataStore.getCornersGeodeIds(id)
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+        id,
+        corner_ids,
+      )
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
       await dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.visibility,
-        { id, block_ids: corner_flat_indexes, visibility },
+        { id, block_ids: corner_viewer_ids, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -70,15 +73,18 @@ describe("Model corners", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const corner_ids = await dataStore.getCornersUuids(id)
-      const corner_flat_indexes = await dataStore.getFlatIndexes(id, corner_ids)
+      const corner_ids = await dataStore.getCornersGeodeIds(id)
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+        id,
+        corner_ids,
+      )
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
       await dataStyleStore.setModelCornersColor(id, corner_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.color,
-        { id, block_ids: corner_flat_indexes, color },
+        { id, block_ids: corner_viewer_ids, color },
         {
           response_function: expect.any(Function),
         },

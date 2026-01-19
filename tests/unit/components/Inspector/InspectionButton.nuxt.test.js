@@ -42,11 +42,11 @@ describe("Inspector/InspectionButton", async () => {
     geodeStore.request = vi.fn((schema, params, callbacks) => {
       if (callbacks?.response_function) {
         callbacks.response_function({
-          _data: { inspection_result },
+          inspection_result,
         })
       }
       return Promise.resolve({
-        _data: { inspection_result },
+        inspection_result,
       })
     })
 

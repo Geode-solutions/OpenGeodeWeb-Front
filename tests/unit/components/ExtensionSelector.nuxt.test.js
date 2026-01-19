@@ -23,10 +23,8 @@ describe("ExtensionSelector", async () => {
   // Mock the request method to simulate API call
   geodeStore.request = vi.fn((schema, params, callbacks) => {
     const response = {
-      _data: {
-        geode_objects_and_output_extensions: {
-          BRep: { msh: { is_saveable: true } },
-        },
+      geode_objects_and_output_extensions: {
+        BRep: { msh: { is_saveable: true } },
       },
     }
     if (callbacks?.response_function) {

@@ -98,34 +98,37 @@ export default function useModelStyle() {
     )
   }
 
-  function setModelMeshComponentVisibility(
+  async function setModelMeshComponentVisibility(
     id,
-    component_type,
-    component_id,
+    component_geode_ids,
     visibility,
   ) {
+    const component_type = await dataStore.meshComponentType(
+      id,
+      component_geode_ids[0],
+    )
     if (component_type === "Corner") {
       return modelCornersStyleStore.setModelCornersVisibility(
         id,
-        [component_id],
+        component_geode_ids,
         visibility,
       )
     } else if (component_type === "Line") {
       return modelLinesStyleStore.setModelLinesVisibility(
         id,
-        [component_id],
+        component_geode_ids,
         visibility,
       )
     } else if (component_type === "Surface") {
       return modelSurfacesStyleStore.setModelSurfacesVisibility(
         id,
-        [component_id],
+        component_geode_ids,
         visibility,
       )
     } else if (component_type === "Block") {
       return modelBlocksStyleStore.setModelBlocksVisibility(
         id,
-        [component_id],
+        component_geode_ids,
         visibility,
       )
     } else {

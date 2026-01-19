@@ -39,7 +39,7 @@
     await geodeStore.request(schema, params, {
       response_function: (response) => {
         emit("update_values", {
-          inspection_result: [response._data.inspection_result],
+          inspection_result: [response.inspection_result],
         })
         emit("increment_step")
       },
