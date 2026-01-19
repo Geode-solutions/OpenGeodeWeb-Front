@@ -144,6 +144,8 @@ export const useAppStore = defineStore("app", () => {
         loadedExtensions.value.set(extensionId, extensionData)
 
         console.log(`[AppStore] Extension loaded successfully: ${extensionId}`)
+        const config = await import("config")
+        config.extensions.push({ id: extensionId, path })
 
         return extensionModule
       } else {

@@ -5,7 +5,6 @@ import child_process from "child_process"
 import WebSocket from "ws"
 
 // Third party imports
-import config from "config"
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
 import pTimeout from "p-timeout"
