@@ -122,7 +122,7 @@ const menusData = {
 }
 
 export const useMenuStore = defineStore("menu", () => {
-  const menus = ref(menusData)
+  const menus = shallowRef(menusData)
   const display_menu = ref(false)
   const current_id = ref(null)
   const menuX = ref(0)

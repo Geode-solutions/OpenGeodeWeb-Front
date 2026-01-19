@@ -88,7 +88,7 @@
     stopDrag(e)
   })
 
-  const menu_items = ref([])
+  const menu_items = shallowRef([])
   watch(
     () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
     ([v, g]) => {
