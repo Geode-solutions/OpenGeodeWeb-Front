@@ -43,8 +43,8 @@ export async function upload_file(
       feedbackStore.add_error(
         response.status,
         route,
-        response._data.name,
-        response._data.description,
+        response.name,
+        response.description,
       )
       if (response_error_function) {
         response_error_function(response)

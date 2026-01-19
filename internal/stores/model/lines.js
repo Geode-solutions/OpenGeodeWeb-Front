@@ -32,13 +32,13 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).visibility = visibility
   }
   async function setModelLinesVisibility(id, line_ids, visibility) {
-    const line_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
-    if (line_flat_indexes.length === 0) {
-      return Promise.resolve()
-    }
+    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+      id,
+      line_ids,
+    )
     return viewerStore.request(
       model_lines_schemas.visibility,
-      { id, block_ids: line_flat_indexes, visibility },
+      { id, block_ids: line_viewer_ids, visibility },
       {
         response_function: () => {
           for (const line_id of line_ids) {
@@ -62,13 +62,13 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).color = color
   }
   async function setModelLinesColor(id, line_ids, color) {
-    const line_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
-    if (line_flat_indexes.length === 0) {
-      return Promise.resolve()
-    }
+    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+      id,
+      line_ids,
+    )
     return viewerStore.request(
       model_lines_schemas.color,
-      { id, block_ids: line_flat_indexes, color },
+      { id, block_ids: line_viewer_ids, color },
       {
         response_function: () => {
           for (const line_id of line_ids) {
@@ -87,7 +87,7 @@ export function useModelLinesStyle() {
 
   async function applyModelLinesStyle(id) {
     const style = modelLinesStyle(id)
-    const line_ids = await dataStore.getLinesUuids(id)
+    const line_ids = await dataStore.getLinesGeodeIds(id)
     return Promise.all([
       setModelLinesVisibility(id, line_ids, style.visibility),
       setModelLinesColor(id, line_ids, style.color),

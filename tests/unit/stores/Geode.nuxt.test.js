@@ -120,7 +120,7 @@ describe("Geode store", () => {
   })
 
   describe("actions", () => {
-    describe("do_ping", () => {
+    describe("ping", () => {
       const getFakeCall = vi.fn()
       registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, getFakeCall)
 
@@ -128,7 +128,7 @@ describe("Geode store", () => {
         const geodeStore = useGeodeStore()
         geodeStore.base_url = ""
         getFakeCall.mockImplementation(() => ({}))
-        await geodeStore.do_ping()
+        await geodeStore.ping()
         expect(geodeStore.status).toBe(Status.CONNECTED)
       })
       test("response_error", async () => {
@@ -139,8 +139,7 @@ describe("Geode store", () => {
             status: 500,
           })
         })
-
-        await geodeStore.do_ping()
+        await expect(geodeStore.ping()).rejects.toThrow()
         expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
       })
     })

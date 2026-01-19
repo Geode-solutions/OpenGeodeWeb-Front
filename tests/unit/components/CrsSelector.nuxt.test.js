@@ -33,9 +33,9 @@ describe("CrsSelector", () => {
     // Mock geodeStore.request instead of registerEndpoint
     geodeStore.request = vi.fn((schema, params, callbacks) => {
       if (callbacks?.response_function) {
-        callbacks.response_function({ _data: { crs_list } })
+        callbacks.response_function({ crs_list })
       }
-      return Promise.resolve({ _data: { crs_list } })
+      return Promise.resolve({ crs_list })
     })
 
     const key_to_update = "key"
