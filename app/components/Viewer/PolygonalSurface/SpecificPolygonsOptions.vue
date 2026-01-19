@@ -14,7 +14,7 @@
           v-model:color="color"
           v-model:textures="textures"
           v-model:vertex_attribute="vertex_attribute"
-          v-model:cell_attribute="cell_attribute"
+          v-model:polygon_attribute="polygon_attribute"
         />
       </template>
     </template>
@@ -36,50 +36,50 @@
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },
     index: { type: Number, required: true },
-    tooltip: { type: String, required: false, default: "Cells options" },
+    tooltip: { type: String, required: false, default: "Polygons options" },
   })
 
   const id = toRef(() => props.itemProps.id)
 
   const visibility = computed({
-    get: () => dataStyleStore.meshCellsVisibility(id.value),
+    get: () => dataStyleStore.meshPolygonsVisibility(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshCellsVisibility(id.value, newValue)
+      dataStyleStore.setMeshPolygonsVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
-    get: () => dataStyleStore.meshCellsActiveColoring(id.value),
+    get: () => dataStyleStore.meshPolygonsActiveColoring(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshCellsActiveColoring(id.value, newValue)
+      dataStyleStore.setMeshPolygonsActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
-    get: () => dataStyleStore.meshCellsColor(id.value),
+    get: () => dataStyleStore.meshPolygonsColor(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshCellsColor(id.value, newValue)
+      dataStyleStore.setMeshPolygonsColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const textures = computed({
-    get: () => dataStyleStore.meshCellsTextures(id.value),
+    get: () => dataStyleStore.meshPolygonsTextures(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshCellsTextures(id.value, newValue)
+      dataStyleStore.setMeshPolygonsTextures(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute = computed({
-    get: () => dataStyleStore.meshCellsVertexAttribute(id.value),
+    get: () => dataStyleStore.meshPolygonsVertexAttribute(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshCellsVertexAttribute(id.value, newValue)
+      dataStyleStore.setMeshPolygonsVertexAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
-  const cell_attribute = computed({
-    get: () => dataStyleStore.meshCellsCellAttribute(id.value),
+  const polygon_attribute = computed({
+    get: () => dataStyleStore.meshPolygonsPolygonAttribute(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshCellsCellAttribute(id.value, newValue)
+      dataStyleStore.setMeshPolygonsPolygonAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

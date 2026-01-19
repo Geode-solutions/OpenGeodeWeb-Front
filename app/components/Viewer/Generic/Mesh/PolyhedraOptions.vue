@@ -3,17 +3,15 @@
     :itemProps="props.itemProps"
     :tooltip="props.tooltip"
     :btn_image="props.btn_image"
+    :index="props.index"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
-
       <template v-if="visibility">
         <ViewerOptionsColoringTypeSelector
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
-          v-model:vertex_attribute="vertex_attribute"
-          v-model:polyhedron_attribute="polyhedron_attribute"
         />
       </template>
     </template>
@@ -35,6 +33,7 @@
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },
     tooltip: { type: String, required: false, default: "Polyhedra options" },
+    index: { type: Number, required: true },
   })
 
   const id = toRef(() => props.itemProps.id)
@@ -57,20 +56,6 @@
     get: () => dataStyleStore.meshPolyhedraColor(id.value),
     set: (newValue) => {
       dataStyleStore.setMeshPolyhedraColor(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.polyhedraVertexAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setPolyhedraVertexAttribute(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const polyhedron_attribute = computed({
-    get: () => dataStyleStore.polyhedraPolyhedronAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setPolyhedraPolyhedronAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

@@ -1,16 +1,18 @@
 <template>
-  <ViewerGenericMeshPolygonsOptions
+  <ViewerSpecificPolygonsOptions
     :itemProps="props.itemProps"
-    :btn_image="TriangulatedSurfaceEdgesTriangles"
+    :btn_image="TriangulatedSurfaceTriangles"
+    :index="props.index"
     tooltip="Triangles options"
   />
 </template>
 
 <script setup>
-  import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions"
-  import TriangulatedSurfaceEdgesTriangles from "@ogw_front/assets/viewer_svgs/surface_triangles.svg"
+  import ViewerSpecificPolygonsOptions from "@ogw_front/components/Viewer/PolygonalSurface/SpecificPolygonsOptions"
+  import TriangulatedSurfaceTriangles from "@ogw_front/assets/viewer_svgs/surface_triangles.svg"
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
+    index: { type: Number, required: true },
   })
 </script>

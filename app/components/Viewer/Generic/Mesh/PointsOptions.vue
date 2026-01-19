@@ -3,6 +3,7 @@
     :itemProps="props.itemProps"
     tooltip="Points options"
     :btn_image="props.btn_image"
+    :index="props.index"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
@@ -52,6 +53,7 @@
   const props = defineProps({
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },
+    index: { type: Number, required: true },
   })
 
   const id = toRef(() => props.itemProps.id)
@@ -81,13 +83,6 @@
     get: () => dataStyleStore.meshPointsColor(id.value),
     set: (newValue) => {
       dataStyleStore.setMeshPointsColor(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshPointsVertexAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

@@ -2,6 +2,7 @@
   <ViewerGenericMeshPolygonsOptions
     :itemProps="props.itemProps"
     :btn_image="SolidFacets"
+    :index="props.index"
   />
 </template>
 
@@ -11,5 +12,6 @@
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
+    index: { type: Number, required: true },
   })
 </script>

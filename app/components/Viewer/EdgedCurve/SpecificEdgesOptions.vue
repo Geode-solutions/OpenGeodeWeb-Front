@@ -1,7 +1,7 @@
 <template>
   <ViewerContextMenuItem
     :itemProps="props.itemProps"
-    tooltip="Points options"
+    tooltip="Edges options"
     :btn_image="props.btn_image"
     :index="props.index"
   >
@@ -11,7 +11,7 @@
         <v-row class="pa-0" align="center">
           <v-divider />
           <v-col cols="auto" justify="center">
-            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Size'" />
+            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Width'" />
           </v-col>
           <v-col justify="center">
             <v-slider
@@ -32,6 +32,7 @@
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
               v-model:vertex_attribute="vertex_attribute"
+              v-model:edge_attribute="edge_attribute"
             />
           </v-col>
         </v-row>
@@ -60,37 +61,44 @@
   const id = toRef(() => props.itemProps.id)
 
   const visibility = computed({
-    get: () => dataStyleStore.meshPointsVisibility(id.value),
+    get: () => dataStyleStore.meshEdgesVisibility(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshPointsVisibility(id.value, newValue)
+      dataStyleStore.setMeshEdgesVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const size = computed({
-    get: () => dataStyleStore.meshPointsSize(id.value),
+    get: () => dataStyleStore.meshEdgesWidth(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshPointsSize(id.value, newValue)
+      dataStyleStore.setMeshEdgesWidth(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
-    get: () => dataStyleStore.meshPointsActiveColoring(id.value),
+    get: () => dataStyleStore.meshEdgesActiveColoring(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshPointsActiveColoring(id.value, newValue)
+      dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
-    get: () => dataStyleStore.meshPointsColor(id.value),
+    get: () => dataStyleStore.meshEdgesColor(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshPointsColor(id.value, newValue)
+      dataStyleStore.setMeshEdgesColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute = computed({
-    get: () => dataStyleStore.meshPointsVertexAttribute(id.value),
+    get: () => dataStyleStore.meshEdgesVertexAttribute(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue)
+      dataStyleStore.setMeshEdgesVertexAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const edge_attribute = computed({
+    get: () => dataStyleStore.meshEdgesEdgeAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshEdgesEdgeAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

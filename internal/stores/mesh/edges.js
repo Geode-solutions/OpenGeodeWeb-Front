@@ -49,10 +49,11 @@ export function useMeshEdgesStyle() {
     )
     if (type === "color") {
       return setMeshEdgesColor(id, coloring.color)
-      // } else if (type == "vertex" && coloring.vertex !== null) {
-      //   return setEdgesVertexAttribute(id, coloring.vertex)
-      // } else if (type == "edges" && coloring.edges !== null) {
-      //   return setEdgesEdgeAttribute(id, coloring.edges)
+    } else if (type === "vertex") {
+      if (coloring.vertex === null) {
+        return
+      }
+      return setMeshEdgesVertexAttribute(id, coloring.vertex)
     } else {
       throw new Error("Unknown mesh edges coloring type: " + type)
     }
@@ -89,8 +90,29 @@ export function useMeshEdgesStyle() {
       { id, width },
       {
         response_function: () => {
-          edges_style.width = width
+          edges_style.size = width
           console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
+        },
+      },
+    )
+  }
+
+  function meshEdgesVertexAttribute(id) {
+    return meshEdgesStyle(id).coloring.vertex
+  }
+  function setMeshEdgesVertexAttribute(id, vertex_attribute) {
+    const coloring_style = meshEdgesStyle(id).coloring
+    return viewerStore.request(
+      mesh_edges_schemas.vertex_attribute,
+      { id, ...vertex_attribute },
+      {
+        response_function: () => {
+          coloring_style.vertex = vertex_attribute
+          console.log(
+            setMeshEdgesVertexAttribute.name,
+            { id },
+            meshEdgesVertexAttribute(id),
+          )
         },
       },
     )
@@ -101,7 +123,7 @@ export function useMeshEdgesStyle() {
     return Promise.all([
       setMeshEdgesVisibility(id, style.visibility),
       setMeshEdgesActiveColoring(id, style.coloring.active),
-      // setMeshEdgesWidth(id, style.width);
+      setMeshEdgesWidth(id, style.size),
     ])
   }
 
@@ -111,9 +133,11 @@ export function useMeshEdgesStyle() {
     meshEdgesColor,
     meshEdgesVisibility,
     meshEdgesWidth,
+    meshEdgesVertexAttribute,
     setMeshEdgesActiveColoring,
     setMeshEdgesColor,
     setMeshEdgesVisibility,
     setMeshEdgesWidth,
+    setMeshEdgesVertexAttribute,
   }
 }

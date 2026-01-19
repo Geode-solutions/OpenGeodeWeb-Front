@@ -1,15 +1,17 @@
 <template>
-  <ViewerGenericMeshPolyhedraOptions
+  <ViewerSpecificPolyhedraOptions
     :itemProps="props.itemProps"
-    :btn_image="SolidPolyhedra"
+    :btn_image="SolidPolyhedras"
+    :index="props.index"
   />
 </template>
 
 <script setup>
-  import ViewerGenericMeshPolyhedraOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolyhedraOptions"
-  import SolidPolyhedra from "@ogw_front/assets/viewer_svgs/solid_polyhedra.svg"
+  import ViewerSpecificPolyhedraOptions from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraOptions"
+  import SolidPolyhedras from "@ogw_front/assets/viewer_svgs/solid_polyhedras.svg"
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
+    index: { type: Number, required: true },
   })
 </script>

@@ -2,6 +2,7 @@
   <ViewerPointSetSpecificPointsOptions
     :itemProps="props.itemProps"
     :btn_image="PointSetPoints"
+    :index="props.index"
   />
 </template>
 
@@ -11,5 +12,6 @@
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
+    index: { type: Number, required: true },
   })
 </script>

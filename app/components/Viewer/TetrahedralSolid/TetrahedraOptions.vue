@@ -3,6 +3,8 @@
     :itemProps="props.itemProps"
     :btn_image="TetrahedralSolidTetrahedra"
     tooltip="Tetrahedra options"
+    :index="props.index"
+
   />
 </template>
 
@@ -12,5 +14,6 @@
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
+    index: { type: Number, required: true },
   })
 </script>

@@ -3,6 +3,7 @@
     :itemProps="itemProps"
     tooltip="Edges options"
     :btn_image="SurfaceEdges"
+    :index="props.index"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
