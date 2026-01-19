@@ -122,8 +122,8 @@
     }
   })
 
-  const menu_items = shallowRef([])
-
+  const menu_items = ref([])
+  
   watch(
     () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
     ([viewerType, geodeType]) => {

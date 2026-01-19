@@ -54,7 +54,7 @@
 
   const optionsClass = computed(() => {
     const loc = props.itemProps.tooltip_location
-    const isRightish = loc === "right" || loc === "top"
+    const isRightish = loc === "right" 
     const cardWidth = 320
     const margin = 60
     const radius = 80
