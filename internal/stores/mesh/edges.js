@@ -54,6 +54,11 @@ export function useMeshEdgesStyle() {
         return
       }
       return setMeshEdgesVertexAttribute(id, coloring.vertex)
+    } else if (type === "edge") {
+      if (coloring.edge === null) {
+        return
+      }
+      return setMeshEdgesEdgeAttribute(id, coloring.edge)
     } else {
       throw new Error("Unknown mesh edges coloring type: " + type)
     }
@@ -118,6 +123,27 @@ export function useMeshEdgesStyle() {
     )
   }
 
+  function meshEdgesEdgeAttribute(id) {
+    return meshEdgesStyle(id).coloring.edge
+  }
+  function setMeshEdgesEdgeAttribute(id, edge_attribute) {
+    const coloring_style = meshEdgesStyle(id).coloring
+    return viewerStore.request(
+      mesh_edges_schemas.edge_attribute,
+      { id, ...edge_attribute },
+      {
+        response_function: () => {
+          coloring_style.edge = edge_attribute
+          console.log(
+            setMeshEdgesEdgeAttribute.name,
+            { id },
+            meshEdgesEdgeAttribute(id),
+          )
+        },
+      },
+    )
+  }
+
   function applyMeshEdgesStyle(id) {
     const style = meshEdgesStyle(id)
     return Promise.all([
@@ -134,10 +160,12 @@ export function useMeshEdgesStyle() {
     meshEdgesVisibility,
     meshEdgesWidth,
     meshEdgesVertexAttribute,
+    meshEdgesEdgeAttribute,
     setMeshEdgesActiveColoring,
     setMeshEdgesColor,
     setMeshEdgesVisibility,
     setMeshEdgesWidth,
     setMeshEdgesVertexAttribute,
+    setMeshEdgesEdgeAttribute,
   }
 }

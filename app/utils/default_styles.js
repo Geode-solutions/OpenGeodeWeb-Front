@@ -49,6 +49,7 @@ const meshEdgesDefaultStyle = (
     coloring: {
       active: "color",
       color,
+      edge: null,
       vertex: null,
     },
     size,
