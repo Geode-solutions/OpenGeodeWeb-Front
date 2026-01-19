@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-item">
+  <template class="menu-item">
     <v-tooltip
       :location="props.itemProps.tooltip_location"
       :origin="props.itemProps.tooltip_origin"
@@ -36,7 +36,7 @@
         </v-card-text>
       </v-card>
     </div>
-  </div>
+  </template>
 </template>
 
 <script setup>
