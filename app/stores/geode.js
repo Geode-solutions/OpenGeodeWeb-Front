@@ -66,9 +66,10 @@ export const useGeodeStore = defineStore("geode", {
           feedbackStore.$patch({ server_error: true })
           geodeStore.status = Status.NOT_CONNECTED
         },
-      }).catch((error) => {
-        feedbackStore.$patch({ server_error: true })
-        geodeStore.status = Status.NOT_CONNECTED
+        onRequestError({ error }) {
+          feedbackStore.$patch({ server_error: true })
+          geodeStore.status = Status.NOT_CONNECTED
+        },
       })
     },
     start_request() {

@@ -48,20 +48,11 @@
     containerHeight: { type: Number, required: true },
   })
 
-  const meta_data = ref({})
-
-  watch(
-    () => props.id || menuStore.current_id,
-    (itemId) => {
-      if (itemId) {
-        const item = dataStore.getItem(itemId)
-        watch(() => item.value, (newItem) => { meta_data.value = newItem || {} }, { immediate: true })
-      } else {
-        meta_data.value = {}
-      }
-    },
-    { immediate: true },
-  )
+  const meta_data = computed(() => {
+    const itemId = props.id || menuStore.current_id
+    if (!itemId) return {}
+    return dataStore.getItem(itemId).value || {}
+  })
 
   const radius = 80
   const show_menu = ref(true)
