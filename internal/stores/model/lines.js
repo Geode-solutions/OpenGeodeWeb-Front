@@ -39,7 +39,7 @@ export function useModelLinesStyle() {
     if (!line_viewer_ids || line_viewer_ids.length === 0) {
       console.warn(
         "[setModelLinesVisibility] No viewer IDs found, skipping visibility request",
-        { id, line_ids }
+        { id, line_ids },
       )
       return
     }
@@ -76,7 +76,7 @@ export function useModelLinesStyle() {
     if (!line_viewer_ids || line_viewer_ids.length === 0) {
       console.warn(
         "[setModelLinesColor] No viewer IDs found, skipping color request",
-        { id, line_ids }
+        { id, line_ids },
       )
       return
     }

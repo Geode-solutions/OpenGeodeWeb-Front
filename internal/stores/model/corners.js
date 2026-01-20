@@ -39,7 +39,7 @@ export function useModelCornersStyle() {
     if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
       console.warn(
         "[setModelCornersVisibility] No viewer IDs found, skipping visibility request",
-        { id, corner_ids }
+        { id, corner_ids },
       )
       return
     }
@@ -78,7 +78,7 @@ export function useModelCornersStyle() {
     if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
       console.warn(
         "[setModelCornersColor] No viewer IDs found, skipping color request",
-        { id, corner_ids }
+        { id, corner_ids },
       )
       return
     }

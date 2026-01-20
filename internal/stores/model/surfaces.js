@@ -38,7 +38,7 @@ export function useModelSurfacesStyle() {
     if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
       console.warn(
         "[setModelSurfacesVisibility] No viewer IDs found, skipping visibility request",
-        { id, surface_ids }
+        { id, surface_ids },
       )
       return
     }
@@ -75,7 +75,7 @@ export function useModelSurfacesStyle() {
     if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
       console.warn(
         "[setModelSurfacesColor] No viewer IDs found, skipping color request",
-        { id, surface_ids }
+        { id, surface_ids },
       )
       return
     }

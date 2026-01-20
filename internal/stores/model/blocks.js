@@ -39,7 +39,7 @@ export function useModelBlocksStyle() {
     if (!blocks_viewer_ids || blocks_viewer_ids.length === 0) {
       console.warn(
         "[setModelBlocksVisibility] No viewer IDs found, skipping visibility request",
-        { id, block_ids }
+        { id, block_ids },
       )
       return
     }
@@ -77,7 +77,7 @@ export function useModelBlocksStyle() {
     if (!blocks_viewer_ids || blocks_viewer_ids.length === 0) {
       console.warn(
         "[setModelBlocksColor] No viewer IDs found, skipping color request",
-        { id, block_ids }
+        { id, block_ids },
       )
       return
     }
