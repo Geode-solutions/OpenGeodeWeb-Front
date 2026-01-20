@@ -39,15 +39,18 @@ describe("Model lines", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const line_ids = await dataStore.getLinesUuids(id)
-      const lines_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
+      const line_ids = await dataStore.getLinesGeodeIds(id)
+      const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+        id,
+        line_ids,
+      )
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
       await dataStyleStore.setModelLinesVisibility(id, line_ids, visibility)
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.visibility,
-        { id, block_ids: lines_flat_indexes, visibility },
+        { id, block_ids: lines_viewer_ids, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -64,15 +67,18 @@ describe("Model lines", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
-      const line_ids = await dataStore.getLinesUuids(id)
-      const lines_flat_indexes = await dataStore.getFlatIndexes(id, line_ids)
+      const line_ids = await dataStore.getLinesGeodeIds(id)
+      const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+        id,
+        line_ids,
+      )
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
       await dataStyleStore.setModelLinesColor(id, line_ids, color)
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.color,
-        { id, block_ids: lines_flat_indexes, color },
+        { id, block_ids: lines_viewer_ids, color },
         {
           response_function: expect.any(Function),
         },

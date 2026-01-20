@@ -70,7 +70,7 @@
     toggle_loading()
     await geodeStore.request(schema, params, {
       response_function: (response) => {
-        crs_list.value = response._data.crs_list
+        crs_list.value = response.crs_list
       },
     })
     toggle_loading()

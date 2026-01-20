@@ -29,19 +29,15 @@ describe("MissingFilesSelector", async () => {
     geodeStore.request = vi.fn((schema, params, callbacks) => {
       if (callbacks?.response_function) {
         callbacks.response_function({
-          _data: {
-            has_missing_files: true,
-            mandatory_files: ["fake_file.txt"],
-            additional_files: ["fake_file_2.txt"],
-          },
-        })
-      }
-      return Promise.resolve({
-        _data: {
           has_missing_files: true,
           mandatory_files: ["fake_file.txt"],
           additional_files: ["fake_file_2.txt"],
-        },
+        })
+      }
+      return Promise.resolve({
+        has_missing_files: true,
+        mandatory_files: ["fake_file.txt"],
+        additional_files: ["fake_file_2.txt"],
       })
     })
 

@@ -44,7 +44,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          vertex_attribute_names.value = response._data.vertex_attribute_names
+          vertex_attribute_names.value = response.vertex_attribute_names
         },
       },
     )

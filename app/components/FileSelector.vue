@@ -58,7 +58,7 @@
     toggle_loading()
     const geodeStore = useGeodeStore()
     const response = await geodeStore.request(schema, {})
-    accept.value = response.data.value.extensions
+    accept.value = response.extensions
       .map((extension) => "." + extension)
       .join(",")
     toggle_loading()

@@ -46,8 +46,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          polyhedron_attribute_names.value =
-            response._data.polyhedron_attribute_names
+          polyhedron_attribute_names.value = response.polyhedron_attribute_names
         },
       },
     )
