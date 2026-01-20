@@ -196,7 +196,7 @@ export const useMenuStore = defineStore("menu", () => {
       if (display_menu.value || active_item_index.value !== null) {
         closeMenu()
       }
-    }
+    },
   )
 
   return {
