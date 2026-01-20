@@ -210,5 +210,3 @@ describe("Mesh EdgedCurve3D", () => {
     })
   })
 })
-
-

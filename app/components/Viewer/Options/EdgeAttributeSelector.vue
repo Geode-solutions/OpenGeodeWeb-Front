@@ -1,7 +1,11 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="auto">
-      <v-icon size="30" icon="mdi-ray-end-arrow" v-tooltip:left="'Edge Attribute'" />
+      <v-icon
+        size="30"
+        icon="mdi-ray-end-arrow"
+        v-tooltip:left="'Edge Attribute'"
+      />
     </v-col>
     <v-col>
       <v-select
