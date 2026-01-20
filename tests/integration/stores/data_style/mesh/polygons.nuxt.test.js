@@ -77,7 +77,7 @@ describe("Mesh polygons", () => {
     })
   })
 
-    describe("Polygons active coloring", () => {
+  describe("Polygons active coloring", () => {
     test("test coloring", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
