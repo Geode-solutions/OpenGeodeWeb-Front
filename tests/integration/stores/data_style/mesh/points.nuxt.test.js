@@ -107,5 +107,24 @@ describe("Mesh points", () => {
       expect(dataStyleStore.meshPointsSize(id)).toBe(size)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
+
+    test("Points vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const vertex_attribute = { name: "points" }
+      const spy = vi.spyOn(viewerStore, "request")
+      await dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute)
+      expect(spy).toHaveBeenCalledWith(
+        mesh_points_schemas.vertex_attribute,
+        { id, ...vertex_attribute },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPointsVertexAttribute(id)).toStrictEqual(
+        vertex_attribute,
+      )
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
   })
 })

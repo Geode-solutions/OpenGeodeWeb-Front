@@ -49,7 +49,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          edge_attribute_names.value = response._data.edge_attribute_names
+          edge_attribute_names.value = response.edge_attribute_names
         },
       },
     )
