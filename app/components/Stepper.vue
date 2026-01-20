@@ -1,13 +1,15 @@
 <template>
   <v-stepper-vertical
-    v-model="current_step_index"
+    :model-value="current_step_index + 1"
+    @update:model-value="current_step_index = $event - 1"
     class="pa-0 ma-0 custom-stepper"
     flat
     rounded="xl"
+    non-linear
   >
     <Step
       v-for="(step, index) in steps"
-      :key="step"
+      :key="index"
       :step_index="index"
       @reset_values="emit('reset_values')"
     />
@@ -24,21 +26,21 @@
 
 <style scoped>
   .custom-stepper {
-    background: transparent !important;
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
   }
 
   :deep(.v-stepper-vertical-item) {
     padding: 0 !important;
-    margin-bottom: 16px !important;
-    border-radius: 24px !important;
-    overflow: hidden;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.05) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   :deep(.v-stepper-vertical-item--active) {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
-    border-color: rgba(var(--v-theme-primary), 0.2) !important;
+    background: rgba(var(--v-theme-primary), 0.02);
+  }
+
+  :deep(.v-stepper-vertical-item__loader) {
+    display: none;
   }
 </style>
