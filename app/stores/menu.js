@@ -122,13 +122,16 @@ const menusData = {
 }
 
 export const useMenuStore = defineStore("menu", () => {
-  const menus = ref(menusData)
+  const menus = shallowRef(menusData)
   const display_menu = ref(false)
   const current_id = ref(null)
   const menuX = ref(0)
   const menuY = ref(0)
   const containerWidth = ref(window.innerWidth)
   const containerHeight = ref(window.innerHeight)
+  const containerTop = ref(0)
+  const containerLeft = ref(0)
+  const active_item_index = ref(null)
 
   function getMenuItems(objectType, geodeObject) {
     if (!objectType || !geodeObject || !menus.value[objectType]) {
@@ -138,12 +141,26 @@ export const useMenuStore = defineStore("menu", () => {
   }
 
   function closeMenu() {
-    display_menu.value = false
+    active_item_index.value = null
     current_id.value = null
+    menuX.value = 0
+    menuY.value = 0
+    display_menu.value = false
   }
 
-  async function openMenu(id, x, y, width, height) {
+  async function openMenu(id, x, y, width, height, top, left, meta_data) {
     await closeMenu()
+
+    if (meta_data) {
+      const items = getMenuItems(
+        meta_data.viewer_type,
+        meta_data.geode_object_type,
+      )
+      if (items.length === 0) {
+        return
+      }
+    }
+
     current_id.value = id
 
     if (x !== undefined && y !== undefined) {
@@ -151,21 +168,36 @@ export const useMenuStore = defineStore("menu", () => {
       menuY.value = y
     }
 
-    if (containerWidth) containerWidth.value = width
-    if (containerHeight) containerHeight.value = height
+    containerWidth.value = width
+    containerHeight.value = height
+    containerTop.value = top
+    containerLeft.value = left
 
     display_menu.value = true
   }
 
-  function showItemsWithDelay() {
-    const DELAY = 50
-    const items = getMenuItems()
-    items.forEach((item, index) => {
-      setTimeout(() => {
-        item.visible = true
-      }, index * DELAY)
-    })
+  function setMenuPosition(x, y) {
+    menuX.value = x
+    menuY.value = y
   }
+
+  function toggleItemOptions(index) {
+    if (active_item_index.value === index) {
+      active_item_index.value = null
+    } else {
+      active_item_index.value = index
+    }
+  }
+
+  const router = useRouter()
+  watch(
+    () => router.currentRoute.value.path,
+    () => {
+      if (display_menu.value || active_item_index.value !== null) {
+        closeMenu()
+      }
+    },
+  )
 
   return {
     display_menu,
@@ -174,9 +206,13 @@ export const useMenuStore = defineStore("menu", () => {
     menuY,
     containerWidth,
     containerHeight,
+    containerTop,
+    containerLeft,
+    active_item_index,
     getMenuItems,
     closeMenu,
     openMenu,
-    showItemsWithDelay,
+    setMenuPosition,
+    toggleItemOptions,
   }
 })

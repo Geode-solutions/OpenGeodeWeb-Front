@@ -15,17 +15,22 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
+  const itemCache = new Map()
   function getItem(id) {
     if (!id) {
       const emptyRef = ref({})
       emptyRef.fetch = async () => null
       return emptyRef
     }
+    if (itemCache.has(id)) {
+      return itemCache.get(id)
+    }
     const observable = useObservable(
       liveQuery(() => database.data.get(id)),
       { initialValue: {} },
     )
     observable.fetch = async () => await database.data.get(id)
+    itemCache.set(id, observable)
     return observable
   }
 
@@ -97,6 +102,10 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function addModelComponents(values) {
+    if (!values || values.length === 0) {
+      console.warn("[addModelComponents] No mesh components to add")
+      return
+    }
     values.map((value) => {
       value.created_at = new Date().toISOString()
     })
