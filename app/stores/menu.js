@@ -189,6 +189,16 @@ export const useMenuStore = defineStore("menu", () => {
     }
   }
 
+  const router = useRouter()
+  watch(
+    () => router.currentRoute.value.path,
+    () => {
+      if (display_menu.value || active_item_index.value !== null) {
+        closeMenu()
+      }
+    }
+  )
+
   return {
     display_menu,
     current_id,
