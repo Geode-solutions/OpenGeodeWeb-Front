@@ -11,7 +11,10 @@
         position: 'relative',
         overflow: 'hidden',
         transition: 'all 0.3s ease',
-        background: isHovering || isDragging ? 'rgba(var(--v-theme-primary), 0.05)' : 'rgba(0, 0, 0, 0.02)',
+        background:
+          isHovering || isDragging
+            ? 'rgba(var(--v-theme-primary), 0.05)'
+            : 'rgba(0, 0, 0, 0.02)',
         border: `2px dashed ${isHovering || isDragging ? 'rgb(var(--v-theme-primary))' : '#e0e0e0'}`,
         transform: isHovering || isDragging ? 'translateY(-2px)' : 'none',
         pointerEvents: loading ? 'none' : 'auto',
@@ -45,20 +48,16 @@
 
         <div
           class="text-h6 font-weight-bold mb-1"
-          :class="isHovering || isDragging ? 'text-primary' : 'text-grey-darken-2'"
+          :class="
+            isHovering || isDragging ? 'text-primary' : 'text-grey-darken-2'
+          "
           style="transition: color 0.3s ease"
         >
-          {{
-            loading
-              ? loadingText
-              : isDragging
-                ? dropText
-                : idleText
-          }}
+          {{ loading ? loadingText : isDragging ? dropText : idleText }}
         </div>
 
         <div v-if="showExtensions" class="text-body-2 text-grey-darken-1">
-          {{ accept ? `(${accept} files)` : 'All files allowed' }}
+          {{ accept ? `(${accept} files)` : "All files allowed" }}
         </div>
       </v-card-text>
 
