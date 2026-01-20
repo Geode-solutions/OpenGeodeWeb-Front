@@ -44,33 +44,36 @@ export const useGeodeStore = defineStore("geode", {
     },
   },
   actions: {
-    set_ping() {
-      this.ping()
+    ping_task() {
       setInterval(() => {
-        this.ping()
+        this.do_ping()
       }, 10 * 1000)
     },
-    ping() {
+    do_ping() {
       const geodeStore = this
       const feedbackStore = useFeedbackStore()
-      return this.request(
-        back_schemas.opengeodeweb_back.ping,
-        {},
-        {
-          request_error_function: () => {
-            feedbackStore.$patch({ server_error: true })
-            geodeStore.status = Status.NOT_CONNECTED
-          },
-          response_function: () => {
+      return $fetch(back_schemas.opengeodeweb_back.ping.$id, {
+        baseURL: this.base_url,
+        method: back_schemas.opengeodeweb_back.ping.methods[0],
+        body: {},
+        onResponse({ response }) {
+          if (response.ok) {
             feedbackStore.$patch({ server_error: false })
             geodeStore.status = Status.CONNECTED
-          },
-          response_error_function: () => {
-            feedbackStore.$patch({ server_error: true })
-            geodeStore.status = Status.NOT_CONNECTED
-          },
+          }
         },
-      )
+        onResponseError({ response }) {
+          feedbackStore.$patch({ server_error: true })
+          geodeStore.status = Status.NOT_CONNECTED
+        },
+        onRequestError({ error }) {
+          feedbackStore.$patch({ server_error: true })
+          geodeStore.status = Status.NOT_CONNECTED
+        },
+      })
+    },
+    ping() {
+      return this.do_ping()
     },
     start_request() {
       this.request_counter++
@@ -84,8 +87,7 @@ export const useGeodeStore = defineStore("geode", {
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")
-      this.set_ping()
-      return Promise.resolve()
+      return this.ping_task()
     },
     request(schema, params, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id)

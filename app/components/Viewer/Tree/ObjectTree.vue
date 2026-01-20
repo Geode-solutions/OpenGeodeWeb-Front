@@ -2,6 +2,7 @@
   <v-container
     class="treeview-container"
     :style="{ width: `${treeviewStore.panelWidth}px` }"
+    @contextmenu.prevent
   >
     <v-row
       class="resizable-panel"
@@ -14,11 +15,7 @@
         >
           <v-row v-if="treeviewStore.items.length > 0">
             <v-col>
-              <ViewerBreadCrumb
-                :selectedTree="selectedTree"
-                :treeOptions="treeOptions"
-                @update:selectedTree="selectedTree = $event"
-              />
+              <ViewerBreadCrumb />
             </v-col>
           </v-row>
           <v-row>
@@ -46,27 +43,12 @@
   import ViewerTreeObject from "@ogw_front/components/Viewer/TreeObject"
   import ViewerTreeComponent from "@ogw_front/components/Viewer/TreeComponent"
   import { useTreeviewStore } from "@ogw_front/stores/treeview"
-  import { useMenuStore } from "@ogw_front/stores/menu"
 
   const treeviewStore = useTreeviewStore()
-  const menuStore = useMenuStore()
-  const cardContainer = useTemplateRef("cardContainer")
-  const containerWidth = ref(window.innerWidth)
-  const containerHeight = ref(window.innerHeight)
-  const menuX = ref(0)
-  const menuY = ref(0)
-  const id = ref(null)
-
-  const handleResize = () => {
-    containerWidth.value = window.innerWidth
-    containerHeight.value = window.innerHeight
-  }
+  const emit = defineEmits(["show-menu"])
 
   function handleTreeMenu({ event, itemId }) {
-    menuX.value = event.clientX
-    menuY.value = event.clientY
-    id.value = itemId
-    menuStore.openMenu(itemId, event.clientX, event.clientY)
+    emit("show-menu", { event, itemId })
   }
 
   function onResizeStart(event) {
@@ -90,15 +72,9 @@
     document.addEventListener("mouseup", stopResize)
   }
 
-  onMounted(() => {
-    containerWidth.value = window.innerWidth
-    containerHeight.value = window.innerHeight
-    window.addEventListener("resize", handleResize)
-  })
+  onMounted(() => {})
 
-  onUnmounted(() => {
-    window.removeEventListener("resize", handleResize)
-  })
+  onUnmounted(() => {})
 </script>
 
 <style scoped>
@@ -113,17 +89,20 @@
     display: flex;
     box-sizing: border-box;
   }
+
   .resizable-panel {
     display: flex;
     height: 100%;
     position: relative;
     box-sizing: border-box;
   }
+
   .scrollable-wrapper {
     overflow-y: auto;
     padding-right: 6px;
     flex: 1;
   }
+
   .resizer {
     position: absolute;
     top: 0;
@@ -134,25 +113,32 @@
     background-color: transparent;
     z-index: 15;
   }
+
   .resizer:hover {
     background-color: #999;
   }
+
   .resizer:active {
     background-color: #666;
   }
+
   .transparent-treeview {
     background-color: transparent;
     margin: 4px 0;
   }
+
   .scrollbar-hover {
     overflow-x: hidden;
   }
+
   .scrollbar-hover::-webkit-scrollbar {
     width: 5px;
   }
+
   .scrollbar-hover::-webkit-scrollbar-thumb {
     background-color: transparent;
   }
+
   .scrollbar-hover:hover::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
