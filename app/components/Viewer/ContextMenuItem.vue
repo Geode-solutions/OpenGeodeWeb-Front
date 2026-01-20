@@ -1,5 +1,5 @@
 <template>
-  <template class="menu-item">
+  <v-sheet class="menu-item-container transition-swing" color="transparent">
     <v-tooltip
       :location="props.itemProps.tooltip_location"
       :origin="props.itemProps.tooltip_origin"
@@ -10,39 +10,49 @@
           :active="is_active"
           @click.stop="toggleOptions"
           v-bind="tooltipProps"
-          class="menu-btn bg-blue-lighten-5"
+          class="menu-btn bg-white border"
+          elevation="2"
         >
           <v-img :src="btn_image" height="28" width="28" />
         </v-btn>
       </template>
       <span>{{ props.tooltip }}</span>
     </v-tooltip>
-    <div
+
+    <v-sheet
       v-if="is_active"
-      class="menu-options pa-0"
+      ref="optionsRef"
+      class="menu-options d-flex align-center pa-0"
       :class="optionsClass"
+      :style="optionsStyle"
+      color="transparent"
       @click.stop
     >
       <v-card
         @click.stop
         :title="props.tooltip"
-        class="options-card"
+        class="options-card rounded-xl border-thin elevation-24"
         width="320"
-        max-height="500"
+        :max-height="maxCardHeight"
         :ripple="false"
+        theme="dark"
       >
-        <v-card-text class="options-content">
+        <v-card-text class="pa-5">
           <slot name="options" />
         </v-card-text>
       </v-card>
-    </div>
-  </template>
+    </v-sheet>
+  </v-sheet>
 </template>
 
 <script setup>
+  import { useTheme } from "vuetify"
   import { useMenuStore } from "@ogw_front/stores/menu"
-  const menuStore = useMenuStore()
+  import { useElementSize } from "@vueuse/core"
 
+  const menuStore = useMenuStore()
+  const theme = useTheme()
+  const primaryColor = computed(() => theme.current.value.colors.primary)
   const props = defineProps({
     index: { type: Number, required: true },
     itemProps: { type: Object, required: true },
@@ -51,37 +61,51 @@
   })
 
   const is_active = computed(() => menuStore.active_item_index === props.index)
+  const optionsRef = ref(null)
+  const { height: optionsHeight } = useElementSize(optionsRef)
+
+  const maxCardHeight = computed(() =>
+    Math.min(500, menuStore.containerHeight - 40),
+  )
+
+  const optionsStyle = computed(() => {
+    if (!is_active.value || !optionsHeight.value) return {}
+    const angle = (props.index / props.itemProps.totalItems) * 2 * Math.PI
+    const radius = 80
+    const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius
+    const h = optionsHeight.value
+    const margin = 20
+    let dy = 0
+
+    if (absoluteButtonY - h / 2 < margin) {
+      dy = margin - (absoluteButtonY - h / 2)
+    } else if (absoluteButtonY + h / 2 > menuStore.containerHeight - margin) {
+      dy = menuStore.containerHeight - margin - (absoluteButtonY + h / 2)
+    }
+    return { top: `calc(50% + ${dy}px)` }
+  })
 
   const optionsClass = computed(() => {
     const loc = props.itemProps.tooltip_location
-    const isRightish = loc === "right" 
     const cardWidth = 320
     const margin = 60
     const radius = 80
-
-    if (isRightish) {
-      if (
-        menuStore.menuX + radius + margin + cardWidth >
+    if (loc === "right") {
+      return menuStore.menuX + radius + margin + cardWidth >
         menuStore.containerWidth
-      ) {
-        return "options-left"
-      }
-      return "options-right"
-    } else {
-      if (menuStore.menuX - radius - margin - cardWidth < 0) {
-        return "options-right"
-      }
-      return "options-left"
+        ? "options-left"
+        : "options-right"
     }
+    return menuStore.menuX - radius - margin - cardWidth < 0
+      ? "options-right"
+      : "options-left"
   })
 
-  function toggleOptions() {
-    menuStore.toggleItemOptions(props.index)
-  }
+  const toggleOptions = () => menuStore.toggleItemOptions(props.index)
 </script>
 
 <style scoped>
-  .menu-item {
+  .menu-item-container {
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -94,103 +118,50 @@
   }
 
   .menu-btn {
-    background-color: white !important;
-    border: 1px solid rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
+    border-color: rgba(0, 0, 0, 0.1) !important;
   }
 
   .menu-btn:hover {
-    background-color: #e3f2fd !important;
     transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    background-color: #e3f2fd !important;
   }
 
   .menu-btn.v-btn--active {
-    background-color: rgb(var(--v-theme-primary)) !important;
-    border-color: rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    background-color: v-bind(primaryColor) !important;
     color: white !important;
   }
 
   .menu-btn.v-btn--active ::v-deep(.v-img__img) {
-    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg)
-      brightness(100%) contrast(100%);
+    filter: invert(100%);
   }
 
   .menu-options {
     position: absolute;
     top: 50%;
+    transform: translateY(-50%);
     z-index: 1001;
   }
 
   .options-right {
     left: 60px;
-    transform: translateY(-50%);
   }
-
   .options-left {
     right: 60px;
-    transform: translateY(-50%);
   }
 
   .options-card {
     background-color: rgba(30, 30, 30, 0.85) !important;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7);
-    border-radius: 20px !important;
-    overflow: hidden;
-    color: white !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
   }
 
-  .options-content {
-    padding: 20px;
-  }
-
-  .options-card :v-deep(*) {
-    color: white !important;
-  }
-
-  .menu-options ::v-deep(.v-list-item) {
-    padding: 12px 20px;
-    white-space: nowrap;
-    transition: background-color 0.2s ease;
-  }
-
-  .menu-options ::v-deep(.v-list-item:hover) {
+  ::v-deep(.v-list-item:hover) {
     background-color: rgba(255, 255, 255, 0.1);
-    cursor: pointer;
   }
-
-  .menu-options ::v-deep(.v-selection-control__wrapper) {
-    color: rgba(255, 255, 255, 0.9) !important;
-  }
-
-  .menu-options ::v-deep(.v-switch__track) {
-    background-color: rgba(255, 255, 255, 0.3) !important;
-    opacity: 1 !important;
-  }
-
-  .menu-options ::v-deep(.v-selection-control--dirty .v-switch__track) {
-    background-color: rgb(var(--v-theme-primary)) !important;
-    opacity: 1 !important;
-  }
-
-  .menu-options ::v-deep(.v-slider-track__fill) {
-    background-color: rgb(var(--v-theme-primary)) !important;
-  }
-
-  .menu-options ::v-deep(.v-slider-track__background) {
-    background-color: rgba(255, 255, 255, 0.3) !important;
-    opacity: 1 !important;
-  }
-
-  .menu-options ::v-deep(.v-slider-thumb__surface) {
-    background-color: white !important;
-  }
-
-  .menu-options ::v-deep(.v-slider-thumb__label) {
-    background-color: rgb(var(--v-theme-primary)) !important;
+  ::v-deep(.v-slider-track__fill),
+  ::v-deep(.v-selection-control--dirty .v-switch__track) {
+    background-color: v-bind(primaryColor) !important;
   }
 </style>

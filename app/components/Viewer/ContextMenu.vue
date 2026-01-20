@@ -1,10 +1,11 @@
 <template>
   <v-menu
     v-model="show_menu"
-    content-class="circular-menu"
+    content-class="circular-menu-container"
     :style="getMenuStyle()"
     :close-on-content-click="false"
     :close-delay="100"
+    :overlay="false"
   >
     <div class="circular-menu-drag-handle" @mousedown.stop="startDrag">
       <div
@@ -20,6 +21,7 @@
             id: props.id,
             tooltip_location: getTooltipLocation(index),
             tooltip_origin: getTooltipOrigin(index),
+            totalItems: menuItemCount,
           }"
           class="menu-item-wrapper"
           :style="getItemStyle(index)"
@@ -33,6 +35,8 @@
 <script setup>
   import { useMenuStore } from "@ogw_front/stores/menu"
   import { useDataStore } from "@ogw_front/stores/data"
+  import { useEventListener } from "@vueuse/core"
+
   const menuStore = useMenuStore()
   const dataStore = useDataStore()
 
@@ -44,34 +48,30 @@
     containerHeight: { type: Number, required: true },
   })
 
-  const meta_data = ref({})
-
-  watch(
-    () => props.id || menuStore.current_id,
-    (itemId) => {
-      if (itemId) {
-        const item = dataStore.getItem(itemId)
-        watch(
-          () => item.value,
-          (newItem) => {
-            meta_data.value = newItem || {}
-          },
-          { immediate: true },
-        )
-      } else {
-        meta_data.value = {}
-      }
-    },
-    { immediate: true },
-  )
+  const meta_data = computed(() => {
+    const itemId = props.id || menuStore.current_id
+    if (!itemId) return {}
+    return dataStore.getItem(itemId).value || {}
+  })
 
   const radius = 80
   const show_menu = ref(true)
   const isDragging = ref(false)
   const dragStartX = ref(0)
   const dragStartY = ref(0)
-  const menuX = ref(props.x || menuStore.menuX)
-  const menuY = ref(props.y || menuStore.menuY)
+  const menuX = ref(props.x)
+  const menuY = ref(props.y)
+
+  watch(
+    () => [props.x, props.y],
+    ([newX, newY]) => {
+      const { x, y } = clampPosition(newX, newY)
+      menuX.value = x
+      menuY.value = y
+      menuStore.setMenuPosition(x, y)
+    },
+    { immediate: true },
+  )
 
   useEventListener(
     window,
@@ -88,46 +88,11 @@
     stopDrag(e)
   })
 
-  useEventListener(
-    window,
-    "touchstart",
-    (e) => {
-      startDrag(e.touches[0])
-      e.preventDefault()
-    },
-    { passive: false },
-  )
-
-  useEventListener(
-    window,
-    "touchmove",
-    (e) => {
-      if (!isDragging.value) return
-      handleDrag(e.touches[0])
-      e.preventDefault()
-    },
-    { passive: false },
-  )
-
-  useEventListener(window, "touchend", (e) => {
-    if (!isDragging.value) return
-    stopDrag(e.changedTouches[0])
-  })
-
-  watch(show_menu, (newVal) => {
-    if (!newVal && isDragging.value) {
-      setTimeout(() => {
-        show_menu.value = true
-      }, 10)
-    }
-  })
-
-  const menu_items = ref([])
-  
+  const menu_items = shallowRef([])
   watch(
     () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
-    ([viewerType, geodeType]) => {
-      menu_items.value = menuStore.getMenuItems(viewerType, geodeType)
+    ([v, g]) => {
+      menu_items.value = menuStore.getMenuItems(v, g)
     },
     { immediate: true },
   )
@@ -141,19 +106,22 @@
     e.preventDefault()
   }
 
-  function handleDrag(e) {
-    if (!isDragging.value) return
-    menuX.value = e.clientX - dragStartX.value
-    menuY.value = e.clientY - dragStartY.value
+  function clampPosition(x, y) {
+    const margin = radius + 40
+    return {
+      x: Math.min(Math.max(x, margin), props.containerWidth - margin),
+      y: Math.min(Math.max(y, margin), props.containerHeight - margin),
+    }
+  }
 
-    menuX.value = Math.min(
-      Math.max(menuX.value, radius),
-      props.containerWidth - radius,
+  function handleDrag(e) {
+    const { x, y } = clampPosition(
+      e.clientX - dragStartX.value,
+      e.clientY - dragStartY.value,
     )
-    menuY.value = Math.min(
-      Math.max(menuY.value, radius),
-      props.containerHeight - radius,
-    )
+    menuX.value = x
+    menuY.value = y
+    menuStore.setMenuPosition(x, y)
   }
 
   function stopDrag(e) {
@@ -164,8 +132,10 @@
 
   function getMenuStyle() {
     return {
-      left: `${menuX.value - radius}px`,
-      top: `${menuY.value - radius}px`,
+      position: "fixed",
+      left: `${menuStore.containerLeft + menuX.value - radius}px`,
+      top: `${menuStore.containerTop + menuY.value - radius}px`,
+      zIndex: 1000,
     }
   }
 
@@ -197,17 +167,12 @@
 </script>
 
 <style scoped>
-  .circular-menu {
-    position: absolute;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-    user-select: none;
-    cursor: grab;
-    z-index: 1000;
+  :deep(.circular-menu-container) {
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    contain: none !important;
   }
 
   .circular-menu-drag-handle {
@@ -226,6 +191,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background-color: transparent;
+    border: none;
   }
 
   .menu-item-wrapper {

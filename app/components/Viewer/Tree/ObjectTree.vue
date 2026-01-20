@@ -15,11 +15,7 @@
         >
           <v-row v-if="treeviewStore.items.length > 0">
             <v-col>
-              <ViewerBreadCrumb
-                :selectedTree="selectedTree"
-                :treeOptions="treeOptions"
-                @update:selectedTree="selectedTree = $event"
-              />
+              <ViewerBreadCrumb />
             </v-col>
           </v-row>
           <v-row>
@@ -47,27 +43,12 @@
   import ViewerTreeObject from "@ogw_front/components/Viewer/TreeObject"
   import ViewerTreeComponent from "@ogw_front/components/Viewer/TreeComponent"
   import { useTreeviewStore } from "@ogw_front/stores/treeview"
-  import { useMenuStore } from "@ogw_front/stores/menu"
 
   const treeviewStore = useTreeviewStore()
-  const menuStore = useMenuStore()
-  const cardContainer = useTemplateRef("cardContainer")
-  const containerWidth = ref(window.innerWidth)
-  const containerHeight = ref(window.innerHeight)
-  const menuX = ref(0)
-  const menuY = ref(0)
-  const id = ref(null)
-
-  const handleResize = () => {
-    containerWidth.value = window.innerWidth
-    containerHeight.value = window.innerHeight
-  }
+  const emit = defineEmits(["show-menu"])
 
   function handleTreeMenu({ event, itemId }) {
-    menuX.value = event.clientX
-    menuY.value = event.clientY
-    id.value = itemId
-    menuStore.openMenu(itemId, event.clientX, event.clientY)
+    emit("show-menu", { event, itemId })
   }
 
   function onResizeStart(event) {
@@ -91,15 +72,9 @@
     document.addEventListener("mouseup", stopResize)
   }
 
-  onMounted(() => {
-    containerWidth.value = window.innerWidth
-    containerHeight.value = window.innerHeight
-    window.addEventListener("resize", handleResize)
-  })
+  onMounted(() => {})
 
-  onUnmounted(() => {
-    window.removeEventListener("resize", handleResize)
-  })
+  onUnmounted(() => {})
 </script>
 
 <style scoped>

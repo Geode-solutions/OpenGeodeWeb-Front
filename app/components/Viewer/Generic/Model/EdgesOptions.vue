@@ -24,7 +24,6 @@
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
-    btn_image: { type: String, required: true },
   })
 
   const id = toRef(() => props.itemProps.id)
