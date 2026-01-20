@@ -15,6 +15,7 @@ import { setupIntegrationTests } from "../../../setup"
 
 // Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
+const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 const file_name = "test.og_psf3d"
 const geode_object = "PolygonalSurface3D"
 
@@ -23,7 +24,7 @@ let id, back_port, viewer_port, project_folder_path
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 20000)
+}, 25000)
 
 afterEach(async () => {
   console.log(
@@ -76,6 +77,21 @@ describe("Mesh polygons", () => {
     })
   })
 
+    describe("Polygons active coloring", () => {
+    test("test coloring", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const coloringTypes = ["color", "vertex", "polygon"]
+      for (let i = 0; i < coloringTypes.length; i++) {
+        dataStyleStore.setMeshPolygonsActiveColoring(id, coloringTypes[i])
+        expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(
+          coloringTypes[i],
+        )
+        expect(viewerStore.status).toBe(Status.CONNECTED)
+      }
+    })
+  })
+
   describe("Polygons vertex attribute", () => {
     test("Coloring vertex attribute", async () => {
       const dataStyleStore = useDataStyleStore()
@@ -121,18 +137,69 @@ describe("Mesh polygons", () => {
     })
   })
 
-  describe("Polygons active coloring", () => {
-    test("test coloring", async () => {
+  describe("Points", () => {
+    test("Points visibility", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const coloringTypes = ["color", "vertex", "polygon"]
+      const visibility = true
+      const spy = vi.spyOn(viewerStore, "request")
+      await dataStyleStore.setMeshPointsVisibility(id, visibility)
+      expect(spy).toHaveBeenCalledWith(
+        mesh_points_schemas.visibility,
+        { id, visibility },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPointsVisibility(id)).toBe(visibility)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+
+    test("Points color red", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const color = { r: 255, g: 0, b: 0 }
+      const spy = vi.spyOn(viewerStore, "request")
+      await dataStyleStore.setMeshPointsColor(id, color)
+      expect(spy).toHaveBeenCalledWith(
+        mesh_points_schemas.color,
+        { id, color },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPointsColor(id)).toStrictEqual(color)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+
+    test("Points active coloring", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const coloringTypes = ["color", "vertex"]
       for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshPolygonsActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(
+        dataStyleStore.setMeshPointsActiveColoring(id, coloringTypes[i])
+        expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(
           coloringTypes[i],
         )
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
+    })
+
+    test("Points size", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const size = 20
+      const spy = vi.spyOn(viewerStore, "request")
+      await dataStyleStore.setMeshPointsSize(id, size)
+      expect(spy).toHaveBeenCalledWith(
+        mesh_points_schemas.size,
+        { id, size },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPointsSize(id)).toBe(size)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
 })

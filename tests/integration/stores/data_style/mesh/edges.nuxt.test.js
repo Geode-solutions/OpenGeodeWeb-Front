@@ -191,6 +191,23 @@ describe("Mesh EdgedCurve3D", () => {
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
+
+    test("Points size", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const size = 20
+      const spy = vi.spyOn(viewerStore, "request")
+      await dataStyleStore.setMeshPointsSize(id, size)
+      expect(spy).toHaveBeenCalledWith(
+        mesh_points_schemas.size,
+        { id, size },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPointsSize(id)).toBe(size)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
   })
 })
 
