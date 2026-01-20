@@ -1,31 +1,48 @@
 <template>
-  <v-row>
-    <v-col class="pa-0">
-      <v-file-input
-        v-model="internal_files"
-        :multiple="props.multiple"
-        :label="label"
-        :accept="props.accept"
-        :rules="[(value) => !!value || 'The file is mandatory']"
+  <DragAndDrop
+    :multiple="props.multiple"
+    :accept="props.accept"
+    :loading="loading"
+    :show-extensions="false"
+    @files-selected="processSelectedFiles"
+  />
+
+  <div v-if="internal_files.length" class="mt-6">
+    <div class="text-subtitle-2 font-weight-bold mb-3 d-flex align-center">
+      <v-icon icon="mdi-file-check" class="mr-2" color="primary" />
+      Selected Files
+      <v-chip size="x-small" class="ml-2" color="primary" variant="flat">
+        {{ internal_files.length }}
+      </v-chip>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <v-chip
+        v-for="(file, index) in internal_files"
+        :key="index"
+        closable
+        size="small"
         color="primary"
-        :hide-input="props.mini"
-        :hide-details="props.mini"
-        chips
-        counter
-        show-size
-        @click:clear="clear()"
-      />
-    </v-col>
-  </v-row>
-  <v-row v-if="!props.auto_upload">
+        variant="tonal"
+        class="font-weight-medium"
+        @click:close="removeFile(index)"
+      >
+        <v-icon start size="16">mdi-file-outline</v-icon>
+        {{ file.name }}
+      </v-chip>
+    </div>
+  </div>
+
+  <v-row v-if="!props.auto_upload && internal_files.length" class="mt-6">
     <v-col cols="auto">
       <v-btn
         color="primary"
-        :disabled="!internal_files.length && !files_uploaded"
         :loading="loading"
-        class="pa-2"
+        class="text-none px-8"
+        rounded="lg"
+        elevation="2"
         @click="upload_files"
       >
+        <v-icon start>mdi-upload</v-icon>
         Upload file(s)
       </v-btn>
     </v-col>
@@ -35,6 +52,8 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { upload_file } from "@ogw_front/utils/upload_file"
+  import DragAndDrop from "@ogw_front/components/DragAndDrop"
+
   const schema = schemas.opengeodeweb_back.upload_file
 
   const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"])
@@ -47,14 +66,27 @@
     mini: { type: Boolean, required: false, default: false },
   })
 
-  const label = props.multiple
-    ? "Please select file(s) to import"
-    : "Please select a file to import"
   const internal_files = ref(props.files)
   const loading = ref(false)
   const files_uploaded = ref(false)
 
   const toggle_loading = useToggle(loading)
+
+  function processSelectedFiles(files) {
+    if (props.multiple) {
+      internal_files.value = [...internal_files.value, ...files]
+    } else {
+      internal_files.value = [files[0]]
+    }
+  }
+
+  function removeFile(index) {
+    internal_files.value.splice(index, 1)
+    if (internal_files.value.length === 0) {
+      files_uploaded.value = false
+      emit("files_uploaded", [])
+    }
+  }
 
   async function upload_files() {
     toggle_loading()
@@ -92,11 +124,6 @@
     }
   }
 
-  function clear() {
-    internal_files.value = []
-    emit("files_uploaded", internal_files.value)
-  }
-
   watch(
     () => props.files,
     (newVal) => {
@@ -107,17 +134,31 @@
 
   watch(internal_files, (value) => {
     files_uploaded.value = false
-    if (props.auto_upload) {
-      if (props.multiple == false) {
-        internal_files.value = [value]
-      }
+    if (props.auto_upload && value.length > 0) {
       upload_files()
     }
   })
 </script>
 
 <style scoped>
-  .div.v-input__details {
-    display: none;
+  .rotating {
+    animation: rotate 1s linear infinite;
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .gap-2 {
+    gap: 8px;
+  }
+
+  .text-primary {
+    color: rgb(var(--v-theme-primary)) !important;
   }
 </style>

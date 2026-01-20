@@ -4,7 +4,6 @@
     @update:model-value="current_step_index = $event - 1"
     class="pa-0 ma-0 custom-stepper"
     flat
-    rounded="xl"
     non-linear
   >
     <Step
@@ -27,8 +26,8 @@
 <style scoped>
   .custom-stepper {
     background: white !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 24px !important;
+    overflow: hidden;
   }
 
   :deep(.v-stepper-vertical-item) {
@@ -36,7 +35,15 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  :deep(.v-stepper-vertical-item--active) {
+    background: rgba(var(--v-theme-primary), 0.02);
+  }
+
   :deep(.v-stepper-vertical-item__loader) {
     display: none;
+  }
+
+  .gap-4 {
+    gap: 16px;
   }
 </style>

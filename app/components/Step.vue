@@ -107,8 +107,32 @@
 
   :deep(.v-stepper-vertical-item__header) {
     align-items: center !important;
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+  }
+
+  :deep(.v-stepper-vertical-item__avatar) {
+    background: transparent !important;
+    color: #6b7280 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    border: 2px solid #e5e7eb !important;
+  }
+
+  :deep(.v-stepper-vertical-item--active .v-stepper-vertical-item__avatar) {
+    background: rgba(var(--v-theme-primary), 0.1) !important;
+    color: rgb(var(--v-theme-primary)) !important;
+    border-color: rgb(var(--v-theme-primary)) !important;
+  }
+
+  :deep(.v-stepper-vertical-item--complete .v-stepper-vertical-item__avatar) {
+    background: rgb(var(--v-theme-primary)) !important;
+    color: white !important;
+    border-color: rgb(var(--v-theme-primary)) !important;
+  }
+
+  :deep(.v-stepper-vertical-item__step-line) {
+    border-left: 1px solid #e5e7eb !important;
   }
 
   .step-title-wrapper {
@@ -116,6 +140,11 @@
     flex-direction: column;
     justify-content: center;
     min-height: 24px;
+    padding-left: 8px;
+  }
+
+  .text-primary {
+    color: rgb(var(--v-theme-primary)) !important;
   }
 
   @keyframes slideIn {
