@@ -72,6 +72,9 @@ export const useGeodeStore = defineStore("geode", {
         },
       })
     },
+    ping() {
+      return this.do_ping()
+    },
     start_request() {
       this.request_counter++
     },
