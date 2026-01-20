@@ -44,12 +44,13 @@ export const useGeodeStore = defineStore("geode", {
     },
   },
   actions: {
-    ping_task() {
+    set_ping() {
+      this.ping()
       setInterval(() => {
-        this.do_ping()
+        this.ping()
       }, 10 * 1000)
     },
-    do_ping() {
+    ping() {
       const geodeStore = this
       const feedbackStore = useFeedbackStore()
       return this.request(
@@ -63,6 +64,10 @@ export const useGeodeStore = defineStore("geode", {
           response_function: () => {
             feedbackStore.$patch({ server_error: false })
             geodeStore.status = Status.CONNECTED
+          },
+          response_error_function: () => {
+            feedbackStore.$patch({ server_error: true })
+            geodeStore.status = Status.NOT_CONNECTED
           },
         },
       )
@@ -79,7 +84,8 @@ export const useGeodeStore = defineStore("geode", {
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")
-      return this.ping_task()
+      this.set_ping()
+      return Promise.resolve()
     },
     request(schema, params, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id)
