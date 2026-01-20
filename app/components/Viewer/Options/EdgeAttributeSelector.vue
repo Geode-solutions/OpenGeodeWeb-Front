@@ -5,7 +5,7 @@
     </v-col>
     <v-col>
       <v-select
-        v-model="edge_attribute"
+        v-model="edge_attribute_name"
         :items="edge_attribute_names"
         label="Select an edge attribute"
         density="compact"
@@ -16,21 +16,43 @@
 </template>
 
 <script setup>
+  import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const geodeStore = useGeodeStore()
 
-  const edge_attribute = defineModel()
+  const model = defineModel()
 
   const props = defineProps({
     id: { type: String, required: true },
   })
 
+  const edge_attribute_name = ref("")
   const edge_attribute_names = ref([])
 
-  async function get_edge_attribute_names() {
-    const response = await geodeStore.get_edge_attribute_names(props.id)
-    edge_attribute_names.value = response
+  onMounted(() => {
+    if (model.value != null) {
+      edge_attribute_name.value = model.value.name
+    }
+  })
+
+  const edge_attribute = reactive({ name: edge_attribute_name.value })
+
+  watch(edge_attribute_name, (value) => {
+    edge_attribute.name = value
+    model.value = edge_attribute
+  })
+
+  function get_edge_attribute_names() {
+    geodeStore.request(
+      back_schemas.opengeodeweb_back.edge_attribute_names,
+      { id: props.id },
+      {
+        response_function: (response) => {
+          edge_attribute_names.value = response._data.edge_attribute_names
+        },
+      },
+    )
   }
 
   onMounted(() => {
