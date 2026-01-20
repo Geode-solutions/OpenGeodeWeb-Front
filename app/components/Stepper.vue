@@ -36,10 +36,6 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  :deep(.v-stepper-vertical-item--active) {
-    background: rgba(var(--v-theme-primary), 0.02);
-  }
-
   :deep(.v-stepper-vertical-item__loader) {
     display: none;
   }

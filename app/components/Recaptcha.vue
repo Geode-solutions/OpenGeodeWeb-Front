@@ -31,7 +31,7 @@
     <VCol cols="4" class="d-flex justify-center align-center">
       <VBtn
         :text="props.button_label"
-        :color="props.button_color"
+        :color="props.color || props.button_color"
         @click="submit_recaptcha"
       />
     </VCol>
@@ -53,11 +53,16 @@
       required: false,
       default: "white",
     },
+    color: {
+      type: String,
+      required: false,
+    },
   })
   const infraStore = useInfraStore()
   const name = ref("")
   const email = ref("")
   const launch = ref(false)
+  const valid = ref(false)
   const emailRules = [
     (value) => {
       if (value) {

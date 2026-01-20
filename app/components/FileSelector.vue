@@ -41,7 +41,8 @@
     },
     { deep: true },
   )
-  watch(props.auto_upload, (newVal) => {
+  const auto_upload_prop = toRef(props, "auto_upload")
+  watch(auto_upload_prop, (newVal) => {
     auto_upload.value = newVal
   })
 

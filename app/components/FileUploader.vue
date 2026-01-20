@@ -108,7 +108,7 @@
   watch(internal_files, (value) => {
     files_uploaded.value = false
     if (props.auto_upload) {
-      if (props.multiple.value == false) {
+      if (props.multiple == false) {
         internal_files.value = [value]
       }
       upload_files()

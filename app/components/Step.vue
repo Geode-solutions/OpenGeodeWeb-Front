@@ -2,6 +2,7 @@
   <v-stepper-vertical-item
     :value="step_index + 1"
     :editable="step_index < current_step_index"
+    color="primary"
     hide-actions
     class="custom-step-item"
   >
