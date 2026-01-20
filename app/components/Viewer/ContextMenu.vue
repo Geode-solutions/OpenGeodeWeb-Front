@@ -97,7 +97,6 @@
     { immediate: true },
   )
 
-
   const menuItemCount = computed(() => menu_items.value.length)
 
   function startDrag(e) {
