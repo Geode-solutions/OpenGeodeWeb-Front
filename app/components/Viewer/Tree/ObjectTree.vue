@@ -15,11 +15,7 @@
         >
           <v-row v-if="treeviewStore.items.length > 0">
             <v-col>
-              <ViewerBreadCrumb
-                :selectedTree="selectedTree"
-                :treeOptions="treeOptions"
-                @update:selectedTree="selectedTree = $event"
-              />
+              <ViewerBreadCrumb />
             </v-col>
           </v-row>
           <v-row>

@@ -97,6 +97,15 @@
     { immediate: true },
   )
 
+  // Close menu on route change
+  const route = useRoute()
+  watch(
+    () => route.path,
+    () => {
+      menuStore.closeMenu()
+    },
+  )
+
   const menuItemCount = computed(() => menu_items.value.length)
 
   function startDrag(e) {

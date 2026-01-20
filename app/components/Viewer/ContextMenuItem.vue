@@ -102,6 +102,17 @@
   })
 
   const toggleOptions = () => menuStore.toggleItemOptions(props.index)
+
+  // Close options card on route change
+  const route = useRoute()
+  watch(
+    () => route.path,
+    () => {
+      if (is_active.value) {
+        menuStore.toggleItemOptions(props.index)
+      }
+    },
+  )
 </script>
 
 <style scoped>

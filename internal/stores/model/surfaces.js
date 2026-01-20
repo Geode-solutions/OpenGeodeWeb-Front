@@ -35,6 +35,13 @@ export function useModelSurfacesStyle() {
       id,
       surface_ids,
     )
+    if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
+      console.warn(
+        "[setModelSurfacesVisibility] No viewer IDs found, skipping visibility request",
+        { id, surface_ids }
+      )
+      return
+    }
     return viewerStore.request(
       model_surfaces_schemas.visibility,
       { id, block_ids: surface_viewer_ids, visibility },
@@ -65,6 +72,13 @@ export function useModelSurfacesStyle() {
       id,
       surface_ids,
     )
+    if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
+      console.warn(
+        "[setModelSurfacesColor] No viewer IDs found, skipping color request",
+        { id, surface_ids }
+      )
+      return
+    }
     return viewerStore.request(
       model_surfaces_schemas.color,
       { id, block_ids: surface_viewer_ids, color },

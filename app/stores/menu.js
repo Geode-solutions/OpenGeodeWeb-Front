@@ -141,9 +141,11 @@ export const useMenuStore = defineStore("menu", () => {
   }
 
   function closeMenu() {
-    display_menu.value = false
-    current_id.value = null
     active_item_index.value = null
+    current_id.value = null
+    menuX.value = 0
+    menuY.value = 0
+    display_menu.value = false
   }
 
   async function openMenu(id, x, y, width, height, top, left, meta_data) {

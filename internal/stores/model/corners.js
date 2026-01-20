@@ -36,6 +36,13 @@ export function useModelCornersStyle() {
       id,
       corner_ids,
     )
+    if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
+      console.warn(
+        "[setModelCornersVisibility] No viewer IDs found, skipping visibility request",
+        { id, corner_ids }
+      )
+      return
+    }
     return viewerStore.request(
       model_corners_schemas.visibility,
       { id, block_ids: corner_viewer_ids, visibility },
@@ -68,6 +75,13 @@ export function useModelCornersStyle() {
       id,
       corner_ids,
     )
+    if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
+      console.warn(
+        "[setModelCornersColor] No viewer IDs found, skipping color request",
+        { id, corner_ids }
+      )
+      return
+    }
     return viewerStore.request(
       model_corners_schemas.color,
       { id, block_ids: corner_viewer_ids, color },

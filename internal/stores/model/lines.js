@@ -36,6 +36,13 @@ export function useModelLinesStyle() {
       id,
       line_ids,
     )
+    if (!line_viewer_ids || line_viewer_ids.length === 0) {
+      console.warn(
+        "[setModelLinesVisibility] No viewer IDs found, skipping visibility request",
+        { id, line_ids }
+      )
+      return
+    }
     return viewerStore.request(
       model_lines_schemas.visibility,
       { id, block_ids: line_viewer_ids, visibility },
@@ -66,6 +73,13 @@ export function useModelLinesStyle() {
       id,
       line_ids,
     )
+    if (!line_viewer_ids || line_viewer_ids.length === 0) {
+      console.warn(
+        "[setModelLinesColor] No viewer IDs found, skipping color request",
+        { id, line_ids }
+      )
+      return
+    }
     return viewerStore.request(
       model_lines_schemas.color,
       { id, block_ids: line_viewer_ids, color },
