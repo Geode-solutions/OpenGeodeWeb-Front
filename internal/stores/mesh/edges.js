@@ -86,7 +86,7 @@ export function useMeshEdgesStyle() {
   }
 
   function meshEdgesWidth(id) {
-    return meshEdgesStyle(id).size
+    return meshEdgesStyle(id).width
   }
   function setMeshEdgesWidth(id, width) {
     const edges_style = meshEdgesStyle(id)
@@ -95,7 +95,7 @@ export function useMeshEdgesStyle() {
       { id, width },
       {
         response_function: () => {
-          edges_style.size = width
+          edges_style.width = width
           console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
         },
       },
@@ -149,7 +149,7 @@ export function useMeshEdgesStyle() {
     return Promise.all([
       setMeshEdgesVisibility(id, style.visibility),
       setMeshEdgesActiveColoring(id, style.coloring.active),
-      setMeshEdgesWidth(id, style.size),
+      setMeshEdgesWidth(id, style.width),
     ])
   }
 

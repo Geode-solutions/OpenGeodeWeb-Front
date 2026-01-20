@@ -7,7 +7,7 @@ const polygons_defaultVisibility = true
 const polyhedra_defaultVisibility = true
 const points_defaultSize = 10
 const points_defaultColor = { r: 20, g: 20, b: 20 }
-const edges_defaultSize = 5
+const edges_defaultWidth = 2
 const edges_defaultColor = { r: 20, g: 20, b: 20 }
 const cells_defaultColor = { r: 255, g: 255, b: 255 }
 const polygons_defaultColor = { r: 255, g: 255, b: 255 }
@@ -41,7 +41,7 @@ const meshPointsDefaultStyle = (
 
 const meshEdgesDefaultStyle = (
   visibility = edges_defaultVisibility,
-  size = edges_defaultSize,
+  width = edges_defaultWidth,
   color = edges_defaultColor,
 ) => {
   return {
@@ -52,7 +52,7 @@ const meshEdgesDefaultStyle = (
       edge: null,
       vertex: null,
     },
-    size,
+    width,
   }
 }
 
@@ -198,7 +198,7 @@ const brep_defaultStyle = () => {
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
-    edges: modelEdgesDefaultStyle(false, edges_defaultSize),
+    edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
   }
 }
 
@@ -209,7 +209,7 @@ const crossSection_defaultStyle = () => {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
-    edges: modelEdgesDefaultStyle(false, edges_defaultSize),
+    edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
   }
 }
 
@@ -221,7 +221,7 @@ const structuralModel_defaultStyle = () => {
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
-    edges: modelEdgesDefaultStyle(false, edges_defaultSize),
+    edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
   }
 }
 
@@ -232,7 +232,7 @@ const section_defaultStyle = () => {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
-    edges: modelEdgesDefaultStyle(false, edges_defaultSize),
+    edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
   }
 }
 
@@ -243,7 +243,7 @@ const implicitCrossSection_defaultStyle = () => {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
-    edges: modelEdgesDefaultStyle(false, edges_defaultSize),
+    edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
   }
 }
 
@@ -255,7 +255,7 @@ const implicitStructuralModel_defaultStyle = () => {
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
-    edges: modelEdgesDefaultStyle(false, edges_defaultSize),
+    edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
   }
 }
 
