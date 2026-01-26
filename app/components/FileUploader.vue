@@ -10,9 +10,7 @@
   <v-card-text v-if="internal_files.length" class="mt-4">
     <v-sheet class="d-flex align-center mb-3" color="transparent">
       <v-icon icon="mdi-file-check" class="mr-2" color="primary" />
-      <span class="text-subtitle-2 font-weight-bold">
-        Selected Files
-      </span>
+      <span class="text-subtitle-2 font-weight-bold"> Selected Files </span>
       <v-chip size="x-small" class="ml-2" color="primary" variant="flat">
         {{ internal_files.length }}
       </v-chip>
@@ -35,23 +33,23 @@
     </v-sheet>
   </v-card-text>
 
-<v-card-actions
-  v-if="!props.auto_upload && internal_files.length"
->
-  <v-btn
-    color="primary"
-    variant="elevated"
-    size="large"
-    rounded="lg"
-    :loading="loading"
-    class="text-none px-3 font-weight-bold"
-    @click="upload_files"
-  >
-    <v-icon start size="20">mdi-cloud-upload-outline</v-icon>
-    Upload {{ internal_files.length }} file<span v-if="internal_files.length > 1">s</span>
-  </v-btn>
-</v-card-actions>
-
+  <v-card-actions v-if="!props.auto_upload && internal_files.length">
+    <v-btn
+      color="primary"
+      variant="elevated"
+      size="large"
+      rounded="lg"
+      :loading="loading"
+      class="text-none px-3 font-weight-bold"
+      @click="upload_files"
+    >
+      <v-icon start size="20">mdi-cloud-upload-outline</v-icon>
+      Upload {{ internal_files.length }} file<span
+        v-if="internal_files.length > 1"
+        >s</span
+      >
+    </v-btn>
+  </v-card-actions>
 </template>
 
 <script setup>
