@@ -16,9 +16,7 @@
             ? 'rgba(var(--v-theme-primary), 0.05)'
             : 'rgba(0, 0, 0, 0.02)',
         border: `2px dashed ${
-          isHovering || isDragging
-            ? 'rgb(var(--v-theme-primary))'
-            : '#e0e0e0'
+          isHovering || isDragging ? 'rgb(var(--v-theme-primary))' : '#e0e0e0'
         }`,
         transform: isHovering || isDragging ? 'translateY(-2px)' : 'none',
         pointerEvents: loading ? 'none' : 'auto',
@@ -51,20 +49,15 @@
         <v-card-title
           class="text-h6 font-weight-bold justify-center pa-0 mb-1"
           :class="
-            isHovering || isDragging
-              ? 'text-primary'
-              : 'text-grey-darken-2'
+            isHovering || isDragging ? 'text-primary' : 'text-grey-darken-2'
           "
           style="transition: color 0.3s ease"
         >
           {{ loading ? loadingText : isDragging ? dropText : idleText }}
         </v-card-title>
 
-        <v-card-subtitle
-          v-if="showExtensions"
-          class="text-body-2 pa-0"
-        >
-          {{ accept ? `(${accept} files)` : 'All files allowed' }}
+        <v-card-subtitle v-if="showExtensions" class="text-body-2 pa-0">
+          {{ accept ? `(${accept} files)` : "All files allowed" }}
         </v-card-subtitle>
       </v-card-text>
 
@@ -79,7 +72,6 @@
     </v-card>
   </v-hover>
 </template>
-
 
 <script setup>
   const props = defineProps({
