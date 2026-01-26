@@ -15,7 +15,6 @@ import { setupIntegrationTests } from "../../../setup"
 
 // Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
-const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 const file_name = "test.og_psf3d"
 const geode_object = "PolygonalSurface3D"
 
@@ -24,7 +23,7 @@ let id, back_port, viewer_port, project_folder_path
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 25000)
+}, 20000)
 
 afterEach(async () => {
   console.log(

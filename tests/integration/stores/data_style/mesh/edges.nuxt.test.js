@@ -15,7 +15,6 @@ import { setupIntegrationTests } from "../../../setup"
 
 // Local constants
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
-const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 const file_name = "test.og_edc3d"
 const geode_object = "EdgedCurve3D"
 

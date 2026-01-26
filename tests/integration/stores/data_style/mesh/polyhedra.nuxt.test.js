@@ -17,7 +17,6 @@ import { setupIntegrationTests } from "../../../setup"
 const mesh_polyhedra_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
-const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 const file_name = "test.vtu"
 const geode_object = "HybridSolid3D"
 
@@ -26,7 +25,7 @@ let id, back_port, viewer_port, project_folder_path
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 30000)
+}, 20000)
 
 afterEach(async () => {
   console.log(
@@ -127,70 +126,6 @@ describe("Mesh polyhedra", () => {
         polyhedron_attribute,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
-
-  describe("Polygons", () => {
-    test("Polygons color red", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPolygonsColor(id, color)
-      expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.color,
-        { id, color },
-        {
-          response_function: expect.any(Function),
-        },
-      )
-      expect(dataStyleStore.meshPolygonsColor(id)).toStrictEqual(color)
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-
-    test("Polygons active coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const coloringTypes = ["color", "vertex", "polygon"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshPolygonsActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
-    })
-  })
-
-  describe("Edges", () => {
-    test("Edges color red", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshEdgesColor(id, color)
-      expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.color,
-        { id, color },
-        {
-          response_function: expect.any(Function),
-        },
-      )
-      expect(dataStyleStore.meshEdgesColor(id)).toStrictEqual(color)
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-
-    test("Edges active coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const coloringTypes = ["color", "vertex", "edge"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshEdgesActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
     })
   })
 })
