@@ -52,7 +52,6 @@
   const props = defineProps({
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },
-    index: { type: Number, required: true },
   })
 
   const id = toRef(() => props.itemProps.id)

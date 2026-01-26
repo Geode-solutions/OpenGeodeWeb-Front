@@ -34,7 +34,6 @@
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },
     tooltip: { type: String, required: false, default: "Polyhedra options" },
-    index: { type: Number, required: true },
   })
 
   const id = toRef(() => props.itemProps.id)

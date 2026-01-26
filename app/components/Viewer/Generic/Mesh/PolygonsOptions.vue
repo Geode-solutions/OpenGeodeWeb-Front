@@ -32,7 +32,7 @@
   const props = defineProps({
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },
-    index: { type: Number, required: true },
+
     tooltip: { type: String, required: false, default: "Polygons options" },
   })
 
