@@ -11,6 +11,5 @@
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
-
   })
 </script>
