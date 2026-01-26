@@ -3,7 +3,6 @@
     :itemProps="props.itemProps"
     tooltip="Points options"
     :btn_image="SurfacePoints"
-    :index="props.index"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />

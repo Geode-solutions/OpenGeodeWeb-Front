@@ -2,7 +2,6 @@
   <ViewerPointSetSpecificPointsOptions
     :itemProps="props.itemProps"
     :btn_image="PointSetPoints"
-    :index="props.index"
   />
 </template>
 

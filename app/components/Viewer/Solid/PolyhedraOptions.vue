@@ -2,7 +2,6 @@
   <ViewerSpecificPolyhedraOptions
     :itemProps="props.itemProps"
     :btn_image="SolidPolyhedra"
-    :index="props.index"
   />
 </template>
 

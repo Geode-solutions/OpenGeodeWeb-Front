@@ -2,7 +2,6 @@
   <ViewerSpecificEdgesOptions
     :itemProps="props.itemProps"
     :btn_image="EdgedCurveEdges"
-    :index="props.index"
   />
 </template>
 

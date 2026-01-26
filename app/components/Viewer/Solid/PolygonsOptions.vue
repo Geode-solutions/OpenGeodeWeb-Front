@@ -2,7 +2,6 @@
   <ViewerGenericMeshPolygonsOptions
     :itemProps="props.itemProps"
     :btn_image="SolidFacets"
-    :index="props.index"
   />
 </template>
 

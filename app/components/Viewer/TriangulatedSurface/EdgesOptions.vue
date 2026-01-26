@@ -2,7 +2,6 @@
   <ViewerGenericMeshEdgesOptions
     :itemProps="props.itemProps"
     :btn_image="SurfaceEdges"
-    :index="props.index"
   />
 </template>
 

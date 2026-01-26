@@ -2,7 +2,6 @@
   <ViewerGenericMeshPointsOptions
     :itemProps="props.itemProps"
     :btn_image="TriangulatedSurfaceEdgesPoints"
-    :index="props.index"
   />
 </template>
 

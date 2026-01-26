@@ -2,7 +2,6 @@
   <ViewerSpecificPolygonsOptions
     :itemProps="props.itemProps"
     :btn_image="PolygonalSurfacePolygons"
-    :index="props.index"
   />
 </template>
 

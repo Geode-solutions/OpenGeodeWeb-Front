@@ -2,7 +2,6 @@
   <ViewerGenericMeshPointsOptions
     :itemProps="props.itemProps"
     :btn_image="SolidPoints"
-    :index="props.index"
   />
 </template>
 

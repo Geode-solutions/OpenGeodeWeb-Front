@@ -2,7 +2,6 @@
   <ViewerGenericMeshPointsOptions
     :itemProps="props.itemProps"
     :btn_image="PolygonalSurfacePoints"
-    :index="props.index"
   />
 </template>
 

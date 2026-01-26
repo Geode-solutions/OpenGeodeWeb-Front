@@ -3,7 +3,6 @@
     :itemProps="props.itemProps"
     :tooltip="props.tooltip"
     :btn_image="props.btn_image"
-    :index="props.index"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />

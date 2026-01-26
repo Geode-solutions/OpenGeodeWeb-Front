@@ -3,7 +3,6 @@
     :itemProps="props.itemProps"
     :btn_image="TetrahedralSolidTetrahedra"
     tooltip="Tetrahedra options"
-    :index="props.index"
   />
 </template>
 

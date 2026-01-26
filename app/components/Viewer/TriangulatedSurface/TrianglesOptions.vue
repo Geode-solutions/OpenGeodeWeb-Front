@@ -2,7 +2,6 @@
   <ViewerSpecificPolygonsOptions
     :itemProps="props.itemProps"
     :btn_image="TriangulatedSurfaceTriangles"
-    :index="props.index"
     tooltip="Triangles options"
   />
 </template>
