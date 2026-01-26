@@ -7,15 +7,18 @@
     @files-selected="processSelectedFiles"
   />
 
-  <div v-if="internal_files.length" class="mt-6">
-    <div class="text-subtitle-2 font-weight-bold mb-3 d-flex align-center">
+  <v-card-text v-if="internal_files.length" class="mt-4">
+    <v-sheet class="d-flex align-center mb-3" color="transparent">
       <v-icon icon="mdi-file-check" class="mr-2" color="primary" />
-      Selected Files
+      <span class="text-subtitle-2 font-weight-bold">
+        Selected Files
+      </span>
       <v-chip size="x-small" class="ml-2" color="primary" variant="flat">
         {{ internal_files.length }}
       </v-chip>
-    </div>
-    <div class="d-flex flex-wrap gap-2">
+    </v-sheet>
+
+    <v-sheet class="d-flex flex-wrap gap-2" color="transparent">
       <v-chip
         v-for="(file, index) in internal_files"
         :key="index"
@@ -29,24 +32,26 @@
         <v-icon start size="16">mdi-file-outline</v-icon>
         {{ file.name }}
       </v-chip>
-    </div>
-  </div>
+    </v-sheet>
+  </v-card-text>
 
-  <v-row v-if="!props.auto_upload && internal_files.length" class="mt-6">
-    <v-col cols="auto">
-      <v-btn
-        color="primary"
-        :loading="loading"
-        class="text-none px-8"
-        rounded="lg"
-        elevation="2"
-        @click="upload_files"
-      >
-        <v-icon start>mdi-upload</v-icon>
-        Upload file(s)
-      </v-btn>
-    </v-col>
-  </v-row>
+<v-card-actions
+  v-if="!props.auto_upload && internal_files.length"
+>
+  <v-btn
+    color="primary"
+    variant="elevated"
+    size="large"
+    rounded="lg"
+    :loading="loading"
+    class="text-none px-3 font-weight-bold"
+    @click="upload_files"
+  >
+    <v-icon start size="20">mdi-cloud-upload-outline</v-icon>
+    Upload {{ internal_files.length }} file<span v-if="internal_files.length > 1">s</span>
+  </v-btn>
+</v-card-actions>
+
 </template>
 
 <script setup>
@@ -139,26 +144,3 @@
     }
   })
 </script>
-
-<style scoped>
-  .rotating {
-    animation: rotate 1s linear infinite;
-  }
-
-  @keyframes rotate {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .gap-2 {
-    gap: 8px;
-  }
-
-  .text-primary {
-    color: rgb(var(--v-theme-primary)) !important;
-  }
-</style>
