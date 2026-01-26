@@ -2,7 +2,7 @@
   <ViewerContextMenuItem
     :itemProps="props.itemProps"
     :tooltip="props.tooltip"
-    :btn_image="props.btn_image"
+    :btn_image="SolidPolyhedra"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
@@ -23,6 +23,7 @@
   import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
   import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
   import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
+  import SolidPolyhedra from "@ogw_front/assets/viewer_svgs/solid_polyhedra.svg"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
@@ -32,7 +33,6 @@
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
-    btn_image: { type: String, required: true },
     tooltip: { type: String, required: false, default: "Polyhedra options" },
   })
 
