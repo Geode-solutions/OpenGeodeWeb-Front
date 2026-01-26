@@ -30,6 +30,7 @@
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
+              v-model:vertex_attribute="vertex_attribute"
             />
           </v-col>
         </v-row>
@@ -81,13 +82,6 @@
     get: () => dataStyleStore.meshPointsColor(id.value),
     set: (newValue) => {
       dataStyleStore.setMeshPointsColor(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshPointsVertexAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

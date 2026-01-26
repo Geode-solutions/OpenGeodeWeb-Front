@@ -76,6 +76,21 @@ describe("Mesh polygons", () => {
     })
   })
 
+  describe("Polygons active coloring", () => {
+    test("test coloring", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const coloringTypes = ["color", "vertex", "polygon"]
+      for (let i = 0; i < coloringTypes.length; i++) {
+        dataStyleStore.setMeshPolygonsActiveColoring(id, coloringTypes[i])
+        expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(
+          coloringTypes[i],
+        )
+        expect(viewerStore.status).toBe(Status.CONNECTED)
+      }
+    })
+  })
+
   describe("Polygons vertex attribute", () => {
     test("Coloring vertex attribute", async () => {
       const dataStyleStore = useDataStyleStore()
@@ -118,21 +133,6 @@ describe("Mesh polygons", () => {
         polygon_attribute,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
-
-  describe("Polygons active coloring", () => {
-    test("test coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const coloringTypes = ["color", "vertex", "polygon"]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshPolygonsActiveColoring(id, coloringTypes[i])
-        expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(
-          coloringTypes[i],
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
-      }
     })
   })
 })

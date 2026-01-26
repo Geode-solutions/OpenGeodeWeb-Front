@@ -15,8 +15,8 @@ import { setupIntegrationTests } from "../../../setup"
 
 // Local constants
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
-const file_name = "test.og_edc2d"
-const geode_object = "EdgedCurve2D"
+const file_name = "test.og_edc3d"
+const geode_object = "EdgedCurve3D"
 
 let id, back_port, viewer_port, project_folder_path
 
@@ -36,9 +36,9 @@ afterEach(async () => {
   delete_folder_recursive(project_folder_path)
 })
 
-describe("Mesh edges", () => {
-  describe("Edges visibility", () => {
-    test("Visibility true", async () => {
+describe("Mesh EdgedCurve3D", () => {
+  describe("Edges", () => {
+    test("Edges visibility", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const visibility = true
@@ -54,10 +54,8 @@ describe("Mesh edges", () => {
       expect(dataStyleStore.meshEdgesVisibility(id)).toBe(visibility)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
-  })
 
-  describe("Edges color", () => {
-    test("Color red", async () => {
+    test("Edges color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
@@ -73,13 +71,11 @@ describe("Mesh edges", () => {
       expect(dataStyleStore.meshEdgesColor(id)).toStrictEqual(color)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
-  })
 
-  describe("Edges active coloring", () => {
-    test("test coloring", async () => {
+    test("Edges active coloring", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
+      const coloringTypes = ["color", "vertex", "edge"]
       for (let i = 0; i < coloringTypes.length; i++) {
         dataStyleStore.setMeshEdgesActiveColoring(id, coloringTypes[i])
         expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
@@ -87,6 +83,44 @@ describe("Mesh edges", () => {
         )
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
+    })
+
+    test("Edges vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const vertex_attribute = { name: "vertex_attribute" }
+      const spy = vi.spyOn(viewerStore, "request")
+      await dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute)
+      expect(spy).toHaveBeenCalledWith(
+        mesh_edges_schemas.vertex_attribute,
+        { id, ...vertex_attribute },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshEdgesVertexAttribute(id)).toStrictEqual(
+        vertex_attribute,
+      )
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+
+    test("Edges edge attribute", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const edge_attribute = { name: "edge_attribute" }
+      const spy = vi.spyOn(viewerStore, "request")
+      await dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute)
+      expect(spy).toHaveBeenCalledWith(
+        mesh_edges_schemas.edge_attribute,
+        { id, ...edge_attribute },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshEdgesEdgeAttribute(id)).toStrictEqual(
+        edge_attribute,
+      )
+      expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
 })
