@@ -107,9 +107,10 @@ export function useMeshEdgesStyle() {
   }
   function setMeshEdgesVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshEdgesStyle(id).coloring
+    const { name } = vertex_attribute
     return viewerStore.request(
       mesh_edges_schemas.vertex_attribute,
-      { id, ...vertex_attribute },
+      { id, name },
       {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
@@ -128,9 +129,10 @@ export function useMeshEdgesStyle() {
   }
   function setMeshEdgesEdgeAttribute(id, edge_attribute) {
     const coloring_style = meshEdgesStyle(id).coloring
+    const { name } = edge_attribute
     return viewerStore.request(
       mesh_edges_schemas.edge_attribute,
-      { id, ...edge_attribute },
+      { id, name },
       {
         response_function: () => {
           coloring_style.edge = edge_attribute
@@ -139,6 +141,18 @@ export function useMeshEdgesStyle() {
             { id },
             meshEdgesEdgeAttribute(id),
           )
+        },
+      },
+    )
+  }
+
+  function setMeshEdgesVertexScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_edges_schemas.vertex_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(setMeshEdgesVertexScalarRange.name, { id, minimum, maximum })
         },
       },
     )
@@ -167,5 +181,6 @@ export function useMeshEdgesStyle() {
     setMeshEdgesWidth,
     setMeshEdgesVertexAttribute,
     setMeshEdgesEdgeAttribute,
+    setMeshEdgesVertexScalarRange,
   }
 }

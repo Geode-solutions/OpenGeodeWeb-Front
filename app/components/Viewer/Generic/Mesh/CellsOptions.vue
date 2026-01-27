@@ -14,6 +14,7 @@
           v-model:textures="textures"
           v-model:vertex_attribute="vertex_attribute"
           v-model:cell_attribute="cell_attribute"
+          mesh-type="cells"
         />
       </template>
     </template>

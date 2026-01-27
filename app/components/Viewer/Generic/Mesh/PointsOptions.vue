@@ -31,6 +31,7 @@
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
               v-model:vertex_attribute="vertex_attribute"
+              mesh-type="points"
             />
           </v-col>
         </v-row>

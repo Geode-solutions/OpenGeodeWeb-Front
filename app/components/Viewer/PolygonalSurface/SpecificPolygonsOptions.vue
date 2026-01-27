@@ -14,6 +14,7 @@
           v-model:textures="textures"
           v-model:vertex_attribute="vertex_attribute"
           v-model:polygon_attribute="polygon_attribute"
+          mesh-type="polygons"
         />
       </template>
     </template>

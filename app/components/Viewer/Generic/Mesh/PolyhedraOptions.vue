@@ -11,6 +11,9 @@
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
+          v-model:vertex_attribute="vertex_attribute"
+          v-model:polyhedron_attribute="polyhedron_attribute"
+          mesh-type="polyhedra"
         />
       </template>
     </template>

@@ -32,6 +32,7 @@
               v-model:color="color"
               v-model:vertex_attribute="vertex_attribute"
               v-model:edge_attribute="edge_attribute"
+              mesh-type="edges"
             />
           </v-col>
         </v-row>

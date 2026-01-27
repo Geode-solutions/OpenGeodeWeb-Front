@@ -79,9 +79,10 @@ export function useMeshCellsStyle() {
 
   function setMeshCellsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshCellsStyle(id).coloring
+    const { name } = vertex_attribute
     return viewerStore.request(
       mesh_cells_schemas.vertex_attribute,
-      { id, ...vertex_attribute },
+      { id, name },
       {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
@@ -100,9 +101,10 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsCellAttribute(id, cell_attribute) {
     const coloring_style = meshCellsStyle(id).coloring
+    const { name } = cell_attribute
     return viewerStore.request(
       mesh_cells_schemas.cell_attribute,
-      { id, ...cell_attribute },
+      { id, name },
       {
         response_function: () => {
           coloring_style.cell = cell_attribute
@@ -111,6 +113,54 @@ export function useMeshCellsStyle() {
             { id },
             meshCellsCellAttribute(id),
           )
+        },
+      },
+    )
+  }
+
+  function setMeshCellsCellScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_cells_schemas.cell_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(setMeshCellsCellScalarRange.name, { id, minimum, maximum })
+        },
+      },
+    )
+  }
+
+  function setMeshCellsVertexScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_cells_schemas.vertex_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(setMeshCellsVertexScalarRange.name, { id, minimum, maximum })
+        },
+      },
+    )
+  }
+
+  function setMeshCellsCellScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_cells_schemas.cell_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(setMeshCellsCellScalarRange.name, { id, minimum, maximum })
+        },
+      },
+    )
+  }
+
+  function setMeshCellsVertexScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_cells_schemas.vertex_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(setMeshCellsVertexScalarRange.name, { id, minimum, maximum })
         },
       },
     )
@@ -170,6 +220,8 @@ export function useMeshCellsStyle() {
     setMeshCellsTextures,
     setMeshCellsVertexAttribute,
     setMeshCellsCellAttribute,
+    setMeshCellsCellScalarRange,
+    setMeshCellsVertexScalarRange,
     applyMeshCellsStyle,
   }
 }

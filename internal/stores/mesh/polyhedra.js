@@ -90,9 +90,10 @@ export function useMeshPolyhedraStyle() {
   }
   function setPolyhedraVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPolyhedraStyle(id).coloring
+    const { name } = vertex_attribute
     return viewerStore.request(
       mesh_polyhedra_schemas.vertex_attribute,
-      { id, ...vertex_attribute },
+      { id, name },
       {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
@@ -111,9 +112,10 @@ export function useMeshPolyhedraStyle() {
   }
   function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
     const coloring = meshPolyhedraStyle(id).coloring
+    const { name } = polyhedron_attribute
     return viewerStore.request(
       mesh_polyhedra_schemas.polyhedron_attribute,
-      { id, ...polyhedron_attribute },
+      { id, name },
       {
         response_function: () => {
           coloring.polyhedron = polyhedron_attribute
@@ -121,6 +123,36 @@ export function useMeshPolyhedraStyle() {
             setPolyhedraPolyhedronAttribute.name,
             { id },
             polyhedraPolyhedronAttribute(id),
+          )
+        },
+      },
+    )
+  }
+
+  function setPolyhedraPolyhedronScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_polyhedra_schemas.polyhedron_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(
+            setPolyhedraPolyhedronScalarRange.name,
+            { id, minimum, maximum },
+          )
+        },
+      },
+    )
+  }
+
+  function setPolyhedraVertexScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_polyhedra_schemas.vertex_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(
+            setPolyhedraVertexScalarRange.name,
+            { id, minimum, maximum },
           )
         },
       },
@@ -146,6 +178,8 @@ export function useMeshPolyhedraStyle() {
     setMeshPolyhedraColor,
     setPolyhedraPolyhedronAttribute,
     setPolyhedraVertexAttribute,
+    setPolyhedraPolyhedronScalarRange,
+    setPolyhedraVertexScalarRange,
     setMeshPolyhedraVisibility,
   }
 }

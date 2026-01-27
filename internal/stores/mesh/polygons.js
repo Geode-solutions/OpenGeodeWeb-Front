@@ -85,9 +85,10 @@ export function useMeshPolygonsStyle() {
 
   function setMeshPolygonsVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPolygonsStyle(id).coloring
+    const { name } = vertex_attribute
     return viewerStore.request(
       mesh_polygons_schemas.vertex_attribute,
-      { id, ...vertex_attribute },
+      { id, name },
       {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
@@ -106,9 +107,10 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsPolygonAttribute(id, polygon_attribute) {
     const coloring_style = meshPolygonsStyle(id).coloring
+    const { name } = polygon_attribute
     return viewerStore.request(
       mesh_polygons_schemas.polygon_attribute,
-      { id, ...polygon_attribute },
+      { id, name },
       {
         response_function: () => {
           coloring_style.polygon = polygon_attribute
@@ -116,6 +118,66 @@ export function useMeshPolygonsStyle() {
             setMeshPolygonsPolygonAttribute.name,
             { id },
             meshPolygonsPolygonAttribute(id),
+          )
+        },
+      },
+    )
+  }
+
+  function setMeshPolygonsPolygonScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_polygons_schemas.polygon_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(
+            setMeshPolygonsPolygonScalarRange.name,
+            { id, minimum, maximum },
+          )
+        },
+      },
+    )
+  }
+
+  function setMeshPolygonsVertexScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_polygons_schemas.vertex_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(
+            setMeshPolygonsVertexScalarRange.name,
+            { id, minimum, maximum },
+          )
+        },
+      },
+    )
+  }
+
+  function setMeshPolygonsPolygonScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_polygons_schemas.polygon_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(
+            setMeshPolygonsPolygonScalarRange.name,
+            { id, minimum, maximum },
+          )
+        },
+      },
+    )
+  }
+
+  function setMeshPolygonsVertexScalarRange(id, minimum, maximum) {
+    return viewerStore.request(
+      mesh_polygons_schemas.vertex_scalar_range,
+      { id, minimum, maximum },
+      {
+        response_function: () => {
+          console.log(
+            setMeshPolygonsVertexScalarRange.name,
+            { id, minimum, maximum },
           )
         },
       },
@@ -176,6 +238,8 @@ export function useMeshPolygonsStyle() {
     setMeshPolygonsTextures,
     setMeshPolygonsVertexAttribute,
     setMeshPolygonsPolygonAttribute,
+    setMeshPolygonsPolygonScalarRange,
+    setMeshPolygonsVertexScalarRange,
     applyMeshPolygonsStyle,
   }
 }
