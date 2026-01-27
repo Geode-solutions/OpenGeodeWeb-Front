@@ -28,3 +28,17 @@ const props = defineProps({
     </template>
   </OptionCard>
 </template>
+
+<style scoped>
+.z-scaling-menu {
+  position: absolute;
+  z-index: 2;
+  top: 90px;
+  right: 55px;
+  border-radius: 12px !important;
+}
+
+.custom-number-input :deep(.v-input__control) {
+  min-height: 48px;
+}
+</style>
