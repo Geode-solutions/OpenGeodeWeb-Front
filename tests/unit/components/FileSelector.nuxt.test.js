@@ -46,11 +46,13 @@ describe("FileSelector", async () => {
       handler: () => ({}),
     })
 
-    const v_file_input = file_uploader.findComponent(components.VFileInput)
-    await v_file_input.trigger("click")
+    const v_file_input = file_uploader.find('input[type="file"]')
     const files = [new File(["fake_file"], "fake_file.txt")]
     const auto_upload = false
-    await v_file_input.setValue(files)
+    Object.defineProperty(v_file_input.element, "files", {
+      value: files,
+      writable: true,
+    })
     await v_file_input.trigger("change")
     const v_btn = wrapper.findComponent(components.VBtn)
     await v_btn.trigger("click")

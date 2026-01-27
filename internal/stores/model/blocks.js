@@ -32,6 +32,9 @@ export function useModelBlocksStyle() {
     modelBlockStyle(id, block_id).visibility = visibility
   }
   async function setModelBlocksVisibility(id, block_ids, visibility) {
+    if (!block_ids || block_ids.length === 0) {
+      return
+    }
     const blocks_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       block_ids,
@@ -70,6 +73,9 @@ export function useModelBlocksStyle() {
   }
 
   async function setModelBlocksColor(id, block_ids, color) {
+    if (!block_ids || block_ids.length === 0) {
+      return
+    }
     const blocks_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       block_ids,

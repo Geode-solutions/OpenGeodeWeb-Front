@@ -8,7 +8,7 @@
         align-self="center"
         style="z-index: 1000"
       >
-        <Recaptcha :color="'secondary'" />
+        <Recaptcha :button_color="'secondary'" />
       </v-col>
       <v-col v-else-if="infraStore.status == Status.CREATING">
         <Loading />

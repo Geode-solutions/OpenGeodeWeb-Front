@@ -1,20 +1,30 @@
 <template>
+  <v-card-item class="flex-shrink-0 pa-0">
+    <v-card-title
+      class="text-h4 text-primary px-8 pt-6 pb-4 font-weight-bold d-flex align-center"
+    >
+      <v-icon icon="mdi-file-upload-outline" class="mr-3" />
+      Import Data
+    </v-card-title>
+
+    <v-card-subtitle class="px-8 pb-4 text-medium">
+      Choose a file to import.
+    </v-card-subtitle>
+  </v-card-item>
+
   <v-stepper-vertical
-    v-model="current_step_index"
-    class="pa-4 ma-0"
-    elevation="1"
-    rounded
+    :model-value="current_step_index + 1"
+    @update:model-value="current_step_index = $event - 1"
+    flat
+    non-linear
+    class="pa-0 ma-0 bg-white rounded-xl overflow-hidden"
   >
-    <v-stepper-items>
-      <v-col cols="12">
-        <Step
-          v-for="(step, index) in steps"
-          :key="step"
-          :step_index="index"
-          @reset_values="emit('reset_values')"
-        />
-      </v-col>
-    </v-stepper-items>
+    <Step
+      v-for="(step, index) in steps"
+      :key="index"
+      :step_index="index"
+      @reset_values="emit('reset_values')"
+    />
   </v-stepper-vertical>
 </template>
 
