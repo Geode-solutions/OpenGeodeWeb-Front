@@ -1,37 +1,3 @@
-<template>
-  <v-row>
-    <v-col class="pa-0">
-      <v-file-input
-        v-model="internal_files"
-        :multiple="props.multiple"
-        :label="label"
-        :accept="props.accept"
-        :rules="[(value) => !!value || 'The file is mandatory']"
-        color="primary"
-        :hide-input="props.mini"
-        :hide-details="props.mini"
-        chips
-        counter
-        show-size
-        @click:clear="clear()"
-      />
-    </v-col>
-  </v-row>
-  <v-row v-if="!props.auto_upload">
-    <v-col cols="auto">
-      <v-btn
-        color="primary"
-        :disabled="!internal_files.length && !files_uploaded"
-        :loading="loading"
-        class="pa-2"
-        @click="upload_files"
-      >
-        Upload file(s)
-      </v-btn>
-    </v-col>
-  </v-row>
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { upload_file } from "@ogw_front/utils/upload_file"
@@ -115,6 +81,40 @@
     }
   })
 </script>
+
+<template>
+  <v-row>
+    <v-col class="pa-0">
+      <v-file-input
+        v-model="internal_files"
+        :multiple="props.multiple"
+        :label="label"
+        :accept="props.accept"
+        :rules="[(value) => !!value || 'The file is mandatory']"
+        color="primary"
+        :hide-input="props.mini"
+        :hide-details="props.mini"
+        chips
+        counter
+        show-size
+        @click:clear="clear()"
+      />
+    </v-col>
+  </v-row>
+  <v-row v-if="!props.auto_upload">
+    <v-col cols="auto">
+      <v-btn
+        color="primary"
+        :disabled="!internal_files.length && !files_uploaded"
+        :loading="loading"
+        class="pa-2"
+        @click="upload_files"
+      >
+        Upload file(s)
+      </v-btn>
+    </v-col>
+  </v-row>
+</template>
 
 <style scoped>
   .div.v-input__details {

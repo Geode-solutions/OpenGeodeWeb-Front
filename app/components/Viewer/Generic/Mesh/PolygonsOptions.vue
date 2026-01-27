@@ -1,23 +1,3 @@
-<template>
-  <ViewerContextMenuItem
-    :itemProps="props.itemProps"
-    :tooltip="props.tooltip"
-    :btn_image="props.btn_image"
-  >
-    <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
-      <template v-if="visibility">
-        <ViewerOptionsColoringTypeSelector
-          :id="id"
-          v-model:coloring_style_key="coloring_style_key"
-          v-model:color="color"
-          v-model:textures="textures"
-        />
-      </template>
-    </template>
-  </ViewerContextMenuItem>
-</template>
-
 <script setup>
   import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
   import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
@@ -67,3 +47,23 @@
     },
   })
 </script>
+
+<template>
+  <ViewerContextMenuItem
+    :itemProps="props.itemProps"
+    :tooltip="props.tooltip"
+    :btn_image="props.btn_image"
+  >
+    <template #options>
+      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <template v-if="visibility">
+        <ViewerOptionsColoringTypeSelector
+          :id="id"
+          v-model:coloring_style_key="coloring_style_key"
+          v-model:color="color"
+          v-model:textures="textures"
+        />
+      </template>
+    </template>
+  </ViewerContextMenuItem>
+</template>

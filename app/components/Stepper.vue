@@ -1,3 +1,11 @@
+<script setup>
+  import Step from "@ogw_front/components/Step"
+
+  const emit = defineEmits(["reset_values"])
+  const stepper_tree = inject("stepper_tree")
+  const { steps, current_step_index } = toRefs(stepper_tree)
+</script>
+
 <template>
   <v-stepper-vertical
     v-model="current_step_index"
@@ -17,11 +25,3 @@
     </v-stepper-items>
   </v-stepper-vertical>
 </template>
-
-<script setup>
-  import Step from "@ogw_front/components/Step"
-
-  const emit = defineEmits(["reset_values"])
-  const stepper_tree = inject("stepper_tree")
-  const { steps, current_step_index } = toRefs(stepper_tree)
-</script>

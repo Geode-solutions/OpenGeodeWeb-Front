@@ -1,3 +1,10 @@
+<script setup>
+  const zScale = defineModel({ type: Number, default: 1 })
+  const props = defineProps({
+    width: { type: Number, default: 400 },
+  })
+</script>
+
 <template>
   <v-sheet
     :width="width + 'px'"
@@ -63,13 +70,6 @@
     </v-card>
   </v-sheet>
 </template>
-
-<script setup>
-  const zScale = defineModel({ type: Number, default: 1 })
-  const props = defineProps({
-    width: { type: Number, default: 400 },
-  })
-</script>
 
 <style scoped>
   .z-scaling-menu {

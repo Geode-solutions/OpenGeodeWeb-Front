@@ -1,12 +1,3 @@
-<template>
-  <v-select
-    v-model="vertex_attribute_name"
-    :items="vertex_attribute_names"
-    label="Select an attribute"
-    density="compact"
-  />
-</template>
-
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
@@ -50,3 +41,12 @@
     )
   }
 </script>
+
+<template>
+  <v-select
+    v-model="vertex_attribute_name"
+    :items="vertex_attribute_names"
+    label="Select an attribute"
+    density="compact"
+  />
+</template>

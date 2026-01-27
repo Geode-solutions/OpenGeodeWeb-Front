@@ -1,24 +1,3 @@
-<template>
-  <v-row justify="center" align="center">
-    <v-col cols="auto">
-      <v-icon
-        size="30"
-        icon="mdi-ray-end-arrow"
-        v-tooltip:left="'Edge Attribute'"
-      />
-    </v-col>
-    <v-col>
-      <v-select
-        v-model="edge_attribute_name"
-        :items="edge_attribute_names"
-        label="Select an edge attribute"
-        density="compact"
-        hide-details
-      />
-    </v-col>
-  </v-row>
-</template>
-
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
@@ -70,3 +49,24 @@
     },
   )
 </script>
+
+<template>
+  <v-row justify="center" align="center">
+    <v-col cols="auto">
+      <v-icon
+        size="30"
+        icon="mdi-ray-end-arrow"
+        v-tooltip:left="'Edge Attribute'"
+      />
+    </v-col>
+    <v-col>
+      <v-select
+        v-model="edge_attribute_name"
+        :items="edge_attribute_names"
+        label="Select an edge attribute"
+        density="compact"
+        hide-details
+      />
+    </v-col>
+  </v-row>
+</template>

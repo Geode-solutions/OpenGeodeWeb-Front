@@ -1,19 +1,3 @@
-<template>
-  <ClientOnly>
-    <div class="fill-height" style="position: relative">
-      <VeaseViewToolbar />
-      <slot name="ui"></slot>
-      <v-col
-        class="pa-0"
-        ref="viewer"
-        style="height: 100%; overflow: hidden; position: relative; z-index: 0"
-        @click="get_x_y"
-        @keydown.esc="viewerStore.toggle_picking_mode(false)"
-      />
-    </div>
-  </ClientOnly>
-</template>
-
 <script setup>
   import VeaseViewToolbar from "@ogw_front/components/VeaseViewToolbar"
 
@@ -63,6 +47,22 @@
     emit("click", event)
   }
 </script>
+
+<template>
+  <ClientOnly>
+    <div class="fill-height" style="position: relative">
+      <VeaseViewToolbar />
+      <slot name="ui"></slot>
+      <v-col
+        class="pa-0"
+        ref="viewer"
+        style="height: 100%; overflow: hidden; position: relative; z-index: 0"
+        @click="get_x_y"
+        @keydown.esc="viewerStore.toggle_picking_mode(false)"
+      />
+    </div>
+  </ClientOnly>
+</template>
 
 <style>
   img {

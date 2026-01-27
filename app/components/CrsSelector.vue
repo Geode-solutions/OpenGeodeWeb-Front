@@ -1,28 +1,3 @@
-<template>
-  <v-text-field
-    v-model="search"
-    append-icon="mdi-magnify"
-    label="Search"
-    single-line
-    hide-details
-  ></v-text-field>
-  <v-data-table
-    v-model="selected_crs"
-    :v-model:items-per-page="10"
-    :headers="headers"
-    :items="crs_list"
-    item-value="code"
-    class="elevation-1"
-    density="compact"
-    fixed-header
-    select-strategy="single"
-    show-select
-    :search="search"
-    :loading="data_table_loading"
-    loading-text="Loading... Please wait"
-  ></v-data-table>
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   const schema = schemas.opengeodeweb_back.geographic_coordinate_systems
@@ -89,3 +64,28 @@
 
   await get_crs_table()
 </script>
+
+<template>
+  <v-text-field
+    v-model="search"
+    append-icon="mdi-magnify"
+    label="Search"
+    single-line
+    hide-details
+  ></v-text-field>
+  <v-data-table
+    v-model="selected_crs"
+    :v-model:items-per-page="10"
+    :headers="headers"
+    :items="crs_list"
+    item-value="code"
+    class="elevation-1"
+    density="compact"
+    fixed-header
+    select-strategy="single"
+    show-select
+    :search="search"
+    :loading="data_table_loading"
+    loading-text="Loading... Please wait"
+  ></v-data-table>
+</template>

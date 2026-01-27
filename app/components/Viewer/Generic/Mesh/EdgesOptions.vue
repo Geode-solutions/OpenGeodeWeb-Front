@@ -1,43 +1,3 @@
-<template>
-  <ViewerContextMenuItem
-    :itemProps="props.itemProps"
-    tooltip="Edges options"
-    :btn_image="props.btn_image"
-  >
-    <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
-      <template v-if="visibility">
-        <v-row class="pa-0" align="center">
-          <v-divider />
-          <v-col cols="auto" justify="center">
-            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Width'" />
-          </v-col>
-          <v-col justify="center">
-            <v-slider
-              v-model="size"
-              hide-details
-              min="0"
-              max="20"
-              step="2"
-              thumb-color="black"
-              ticks
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <ViewerOptionsColoringTypeSelector
-              :id="id"
-              v-model:coloring_style_key="coloring_style_key"
-              v-model:color="color"
-            />
-          </v-col>
-        </v-row>
-      </template>
-    </template>
-  </ViewerContextMenuItem>
-</template>
-
 <script setup>
   import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
   import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
@@ -92,3 +52,43 @@
     },
   })
 </script>
+
+<template>
+  <ViewerContextMenuItem
+    :itemProps="props.itemProps"
+    tooltip="Edges options"
+    :btn_image="props.btn_image"
+  >
+    <template #options>
+      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <template v-if="visibility">
+        <v-row class="pa-0" align="center">
+          <v-divider />
+          <v-col cols="auto" justify="center">
+            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Width'" />
+          </v-col>
+          <v-col justify="center">
+            <v-slider
+              v-model="size"
+              hide-details
+              min="0"
+              max="20"
+              step="2"
+              thumb-color="black"
+              ticks
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <ViewerOptionsColoringTypeSelector
+              :id="id"
+              v-model:coloring_style_key="coloring_style_key"
+              v-model:color="color"
+            />
+          </v-col>
+        </v-row>
+      </template>
+    </template>
+  </ViewerContextMenuItem>
+</template>

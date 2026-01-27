@@ -1,10 +1,3 @@
-<template>
-  <ViewerGenericMeshPolygonsOptions
-    :itemProps="props.itemProps"
-    :btn_image="HybridSolidPolygons"
-  />
-</template>
-
 <script setup>
   import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions"
   import HybridSolidPolygons from "@ogw_front/assets/viewer_svgs/solid_facets.svg"
@@ -13,3 +6,10 @@
     itemProps: { type: Object, required: true },
   })
 </script>
+
+<template>
+  <ViewerGenericMeshPolygonsOptions
+    :itemProps="props.itemProps"
+    :btn_image="HybridSolidPolygons"
+  />
+</template>

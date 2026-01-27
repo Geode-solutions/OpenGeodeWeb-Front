@@ -1,3 +1,51 @@
+<script setup>
+  import fileDownload from "js-file-download"
+  import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+  import { useViewerStore } from "@ogw_front/stores/viewer"
+
+  const emit = defineEmits(["close"])
+
+  const props = defineProps({
+    show_dialog: { type: Boolean, required: true },
+    width: { type: Number, required: false, default: 400 },
+  })
+
+  const output_extensions =
+    viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties
+      .output_extension.enum
+  const filename = ref("")
+  const output_extension = ref("png")
+  const include_background = ref(true)
+
+  async function takeScreenshot() {
+    const viewerStore = useViewerStore()
+    await viewerStore.request(
+      viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot,
+      {
+        filename: filename.value,
+        output_extension: output_extension.value,
+        include_background: include_background.value,
+      },
+      {
+        response_function: async (response) => {
+          fileDownload(
+            response.blob,
+            filename.value + "." + output_extension.value,
+          )
+        },
+      },
+    )
+    emit("close")
+  }
+
+  watch(output_extension, (value) => {
+    if (value !== "png") {
+      include_background.value = true
+    }
+  })
+</script>
+
 <template>
   <v-sheet
     v-if="props.show_dialog"
@@ -59,54 +107,6 @@
     </v-card>
   </v-sheet>
 </template>
-
-<script setup>
-  import fileDownload from "js-file-download"
-  import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-
-  import { useViewerStore } from "@ogw_front/stores/viewer"
-
-  const emit = defineEmits(["close"])
-
-  const props = defineProps({
-    show_dialog: { type: Boolean, required: true },
-    width: { type: Number, required: false, default: 400 },
-  })
-
-  const output_extensions =
-    viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties
-      .output_extension.enum
-  const filename = ref("")
-  const output_extension = ref("png")
-  const include_background = ref(true)
-
-  async function takeScreenshot() {
-    const viewerStore = useViewerStore()
-    await viewerStore.request(
-      viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot,
-      {
-        filename: filename.value,
-        output_extension: output_extension.value,
-        include_background: include_background.value,
-      },
-      {
-        response_function: async (response) => {
-          fileDownload(
-            response.blob,
-            filename.value + "." + output_extension.value,
-          )
-        },
-      },
-    )
-    emit("close")
-  }
-
-  watch(output_extension, (value) => {
-    if (value !== "png") {
-      include_background.value = true
-    }
-  })
-</script>
 
 <style scoped>
   .screenshot_menu {

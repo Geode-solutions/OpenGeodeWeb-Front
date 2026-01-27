@@ -1,37 +1,3 @@
-<template>
-  <v-menu
-    v-model="show_menu"
-    content-class="circular-menu-container"
-    :style="getMenuStyle()"
-    :close-on-content-click="false"
-    :close-delay="100"
-    :overlay="false"
-  >
-    <div class="circular-menu-drag-handle" @mousedown.stop="startDrag">
-      <div
-        class="circular-menu-items"
-        :style="{ width: `${radius * 2}px`, height: `${radius * 2}px` }"
-      >
-        <component
-          v-for="(item, index) in menu_items"
-          :is="item"
-          :key="index"
-          :index="index"
-          :itemProps="{
-            id: props.id,
-            tooltip_location: getTooltipLocation(index),
-            tooltip_origin: getTooltipOrigin(index),
-            totalItems: menuItemCount,
-          }"
-          class="menu-item-wrapper"
-          :style="getItemStyle(index)"
-          @mousedown.stop
-        />
-      </div>
-    </div>
-  </v-menu>
-</template>
-
 <script setup>
   import { useMenuStore } from "@ogw_front/stores/menu"
   import { useDataStore } from "@ogw_front/stores/data"
@@ -165,6 +131,40 @@
     }
   }
 </script>
+
+<template>
+  <v-menu
+    v-model="show_menu"
+    content-class="circular-menu-container"
+    :style="getMenuStyle()"
+    :close-on-content-click="false"
+    :close-delay="100"
+    :overlay="false"
+  >
+    <div class="circular-menu-drag-handle" @mousedown.stop="startDrag">
+      <div
+        class="circular-menu-items"
+        :style="{ width: `${radius * 2}px`, height: `${radius * 2}px` }"
+      >
+        <component
+          v-for="(item, index) in menu_items"
+          :is="item"
+          :key="index"
+          :index="index"
+          :itemProps="{
+            id: props.id,
+            tooltip_location: getTooltipLocation(index),
+            tooltip_origin: getTooltipOrigin(index),
+            totalItems: menuItemCount,
+          }"
+          class="menu-item-wrapper"
+          :style="getItemStyle(index)"
+          @mousedown.stop
+        />
+      </div>
+    </div>
+  </v-menu>
+</template>
 
 <style scoped>
   :deep(.circular-menu-container) {
