@@ -103,7 +103,7 @@ export const useDataStore = defineStore("data", () => {
 
   async function addModelComponents(values) {
     if (!values || values.length === 0) {
-      console.warn("[addModelComponents] No mesh components to add")
+      console.debug("[addModelComponents] No mesh components to add")
       return
     }
     values.map((value) => {
