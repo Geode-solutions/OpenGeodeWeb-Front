@@ -43,10 +43,11 @@ describe("FileUploader", async () => {
         props: { multiple: false, accept: "*.txt" },
       })
 
-      const v_file_input = wrapper.findComponent(components.VFileInput)
-      await v_file_input.trigger("click")
-
-      await v_file_input.setValue(files)
+      const v_file_input = wrapper.find('input[type="file"]')
+      Object.defineProperty(v_file_input.element, "files", {
+        value: files,
+        writable: true,
+      })
       await v_file_input.trigger("change")
       const v_btn = wrapper.findComponent(components.VBtn)
 

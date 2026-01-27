@@ -1,25 +1,3 @@
-<template>
-  <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row
-      v-for="camera_option in camera_options"
-      :key="camera_option.icon"
-      dense
-    >
-      <v-col>
-        <v-btn
-          density="comfortable"
-          icon
-          @click.stop="camera_option.action"
-          v-tooltip:left="camera_option.tooltip"
-        >
-          <v-icon :icon="camera_option.icon" size="32" />
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
-  <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
@@ -63,6 +41,28 @@
     },
   ]
 </script>
+
+<template>
+  <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
+    <v-row
+      v-for="camera_option in camera_options"
+      :key="camera_option.icon"
+      dense
+    >
+      <v-col>
+        <v-btn
+          density="comfortable"
+          icon
+          @click.stop="camera_option.action"
+          v-tooltip:left="camera_option.tooltip"
+        >
+          <v-icon :icon="camera_option.icon" size="32" />
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
+  <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
+</template>
 
 <style module>
   .floatToolbar {

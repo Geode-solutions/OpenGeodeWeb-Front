@@ -1,15 +1,3 @@
-<template>
-  <v-color-picker
-    ref="el"
-    v-model="color"
-    flat
-    canvas-height="100"
-    hide-inputs
-    width="100%"
-    mode="rgb"
-  />
-</template>
-
 <script setup>
   const el = useTemplateRef("el")
   const model = defineModel()
@@ -23,3 +11,15 @@
     }
   })
 </script>
+
+<template>
+  <v-color-picker
+    ref="el"
+    v-model="color"
+    flat
+    canvas-height="100"
+    hide-inputs
+    width="100%"
+    mode="rgb"
+  />
+</template>

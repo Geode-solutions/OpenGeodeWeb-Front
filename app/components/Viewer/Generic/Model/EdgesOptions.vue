@@ -1,15 +1,3 @@
-<template>
-  <ViewerContextMenuItem
-    :itemProps="itemProps"
-    tooltip="Edges options"
-    :btn_image="SurfaceEdges"
-  >
-    <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
-    </template>
-  </ViewerContextMenuItem>
-</template>
-
 <script setup>
   import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
   import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
@@ -35,3 +23,15 @@
     },
   })
 </script>
+
+<template>
+  <ViewerContextMenuItem
+    :itemProps="itemProps"
+    tooltip="Edges options"
+    :btn_image="SurfaceEdges"
+  >
+    <template #options>
+      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+    </template>
+  </ViewerContextMenuItem>
+</template>

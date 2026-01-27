@@ -1,25 +1,3 @@
-<template>
-  <ClientOnly>
-    <div style="position: relative; width: 100%; height: calc(100vh - 80px)">
-      <ViewToolbar />
-      <slot name="ui"></slot>
-      <v-col
-        ref="viewer"
-        style="
-          overflow: hidden;
-          position: relative;
-          z-index: 0;
-          height: 100%;
-          width: 100%;
-        "
-        class="pa-0"
-        @click="get_x_y"
-        @keydown.esc="viewerStore.toggle_picking_mode(false)"
-      />
-    </div>
-  </ClientOnly>
-</template>
-
 <script setup>
   import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize, useWindowSize } from "@vueuse/core"
@@ -119,6 +97,28 @@
     }
   })
 </script>
+
+<template>
+  <ClientOnly>
+    <div style="position: relative; width: 100%; height: calc(100vh - 80px)">
+      <ViewToolbar />
+      <slot name="ui"></slot>
+      <v-col
+        ref="viewer"
+        style="
+          overflow: hidden;
+          position: relative;
+          z-index: 0;
+          height: 100%;
+          width: 100%;
+        "
+        class="pa-0"
+        @click="get_x_y"
+        @keydown.esc="viewerStore.toggle_picking_mode(false)"
+      />
+    </div>
+  </ClientOnly>
+</template>
 
 <style scoped>
   .list {

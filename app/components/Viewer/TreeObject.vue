@@ -1,40 +1,3 @@
-<template>
-  <v-treeview
-    v-model:selected="treeviewStore.selection"
-    :items="treeviewStore.items"
-    return-object
-    class="transparent-treeview"
-    item-value="id"
-    select-strategy="classic"
-    selectable
-  >
-    <template #title="{ item }">
-      <span
-        class="treeview-item"
-        @contextmenu.prevent.stop="
-          isLeafNode(item)
-            ? emit('show-menu', { event: $event, itemId: item.id })
-            : null
-        "
-      >
-        {{ item.title }}
-      </span>
-    </template>
-
-    <template #append="{ item }">
-      <v-btn
-        v-if="isModel(item)"
-        icon="mdi-magnify-expand"
-        size="medium"
-        class="ml-8"
-        variant="text"
-        v-tooltip="'Model\'s mesh components'"
-        @click.stop="treeviewStore.displayAdditionalTree(item.id)"
-      />
-    </template>
-  </v-treeview>
-</template>
-
 <script setup>
   import { useTreeviewStore } from "@ogw_front/stores/treeview"
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
@@ -83,6 +46,43 @@
     }
   })
 </script>
+
+<template>
+  <v-treeview
+    v-model:selected="treeviewStore.selection"
+    :items="treeviewStore.items"
+    return-object
+    class="transparent-treeview"
+    item-value="id"
+    select-strategy="classic"
+    selectable
+  >
+    <template #title="{ item }">
+      <span
+        class="treeview-item"
+        @contextmenu.prevent.stop="
+          isLeafNode(item)
+            ? emit('show-menu', { event: $event, itemId: item.id })
+            : null
+        "
+      >
+        {{ item.title }}
+      </span>
+    </template>
+
+    <template #append="{ item }">
+      <v-btn
+        v-if="isModel(item)"
+        icon="mdi-magnify-expand"
+        size="medium"
+        class="ml-8"
+        variant="text"
+        v-tooltip="'Model\'s mesh components'"
+        @click.stop="treeviewStore.displayAdditionalTree(item.id)"
+      />
+    </template>
+  </v-treeview>
+</template>
 
 <style scoped>
   .transparent-treeview {
