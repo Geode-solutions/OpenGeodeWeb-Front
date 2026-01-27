@@ -13,9 +13,11 @@
   const stepper_tree = inject("stepper_tree")
   const { current_step_index, steps } = toRefs(stepper_tree)
 
-  function set_current_step(step_index) {
-    stepper_tree.current_step_index = step_index
-  }
+  watch(current_step_index, (newVal, oldVal) => {
+    if (newVal < oldVal) {
+      stepper_tree.navigating_back = true
+    }
+  })
 
   function update_values_event(keys_values_object) {
     for (const [key, value] of Object.entries(keys_values_object)) {
@@ -101,49 +103,3 @@
     </v-card-text>
   </v-stepper-vertical-item>
 </template>
-
-<script setup>
-  function truncate(text, maxLength) {
-    if (text.length > maxLength) {
-      return text.slice(0, maxLength) + "..."
-    }
-    return text
-  }
-
-  const props = defineProps({
-    step_index: { type: Number, required: true },
-  })
-
-  const stepper_tree = inject("stepper_tree")
-  const { current_step_index, steps } = toRefs(stepper_tree)
-
-  watch(current_step_index, (newVal, oldVal) => {
-    if (newVal < oldVal) {
-      stepper_tree.navigating_back = true
-    }
-  })
-
-  function update_values_event(keys_values_object) {
-    for (const [key, value] of Object.entries(keys_values_object)) {
-      stepper_tree[key] = value
-    }
-  }
-
-  function increment_step() {
-    stepper_tree.current_step_index++
-  }
-
-  function decrement_step() {
-    stepper_tree.current_step_index--
-  }
-
-  const sortedChips = computed(() => {
-    const chips = steps.value[props.step_index]?.chips || []
-    return [...chips].sort((a, b) =>
-      a.localeCompare(b, undefined, {
-        numeric: true,
-        sensitivity: "base",
-      }),
-    )
-  })
-</script>
