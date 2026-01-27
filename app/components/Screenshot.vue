@@ -1,31 +1,3 @@
-<template>
-  <OptionCard v-if="props.show_dialog" title="Take a screenshot" :width="props.width" class="screenshot_menu">
-    <v-container>
-      <v-row>
-        <v-col cols="8" class="py-0">
-          <v-text-field v-model="filename" label="File name"></v-text-field>
-        </v-col>
-        <v-col cols="4" class="py-0">
-          <v-select v-model="output_extension" :items="output_extensions" label="Extension" required />
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col cols="12" class="py-0">
-          <v-switch v-model="include_background" :disabled="output_extension !== 'png'" label="Include background"
-            inset></v-switch>
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <template #actions>
-      <v-btn variant="text" color="white" @click="emit('close')">Close</v-btn>
-      <v-btn variant="outlined" :disabled="!filename || !output_extension" color="white"
-        @click="takeScreenshot()">Screenshot</v-btn>
-    </template>
-  </OptionCard>
-</template>
-
 <script setup>
 import fileDownload from "js-file-download"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
@@ -73,12 +45,31 @@ watch(output_extension, (value) => {
   }
 })
 </script>
+<template>
+  <OptionCard v-if="props.show_dialog" title="Take a screenshot" :width="props.width" class="position-absolute"
+    style="z-index: 2; top: 90px; right: 55px">
+    <v-container>
+      <v-row>
+        <v-col cols="8" class="py-0">
+          <v-text-field v-model="filename" label="File name"></v-text-field>
+        </v-col>
+        <v-col cols="4" class="py-0">
+          <v-select v-model="output_extension" :items="output_extensions" label="Extension" required />
+        </v-col>
+      </v-row>
 
-<style scoped>
-.screenshot_menu {
-  position: absolute;
-  z-index: 2;
-  top: 90px;
-  right: 55px;
-}
-</style>
+      <v-row>
+        <v-col cols="12" class="py-0">
+          <v-switch v-model="include_background" :disabled="output_extension !== 'png'" label="Include background"
+            inset></v-switch>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <template #actions>
+      <v-btn variant="text" color="white" @click="emit('close')">Close</v-btn>
+      <v-btn variant="outlined" :disabled="!filename || !output_extension" color="white"
+        @click="takeScreenshot()">Screenshot</v-btn>
+    </template>
+  </OptionCard>
+</template>

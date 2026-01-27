@@ -1,15 +1,3 @@
-<template>
-    <v-card @click.stop :title="title" class="option-card rounded-xl border-thin elevation-24" :width="width"
-        :max-height="maxHeight" :ripple="false" theme="dark">
-        <v-card-text class="pa-5">
-            <slot />
-        </v-card-text>
-        <v-card-actions v-if="$slots.actions" class="justify-center pb-4">
-            <slot name="actions" />
-        </v-card-actions>
-    </v-card>
-</template>
-
 <script setup>
 import { useTheme } from "vuetify"
 
@@ -22,6 +10,17 @@ defineProps({
     maxHeight: { type: [Number, String], default: 500 },
 })
 </script>
+<template>
+    <v-card @click.stop :title="title" class="option-card rounded-xl border-thin elevation-24" :width="width"
+        :max-height="maxHeight" :ripple="false" theme="dark">
+        <v-card-text class="pa-5">
+            <slot />
+        </v-card-text>
+        <v-card-actions v-if="$slots.actions" class="justify-center pb-4">
+            <slot name="actions" />
+        </v-card-actions>
+    </v-card>
+</template>
 
 <style scoped>
 .option-card {
