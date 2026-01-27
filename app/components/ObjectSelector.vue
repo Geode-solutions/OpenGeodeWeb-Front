@@ -49,10 +49,9 @@
 </template>
 
 <script setup>
-  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-
-  import geode_objects from "@ogw_front/assets/geode_objects"
   import FetchingData from "@ogw_front/components/FetchingData.vue"
+  import { geode_objects } from "@ogw_front/assets/geode_objects"
+  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const schema = schemas.opengeodeweb_back.allowed_objects
