@@ -1,3 +1,33 @@
+<script setup>
+  import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem"
+
+  const textures = defineModel()
+
+  const props = defineProps({
+    id: { type: String, required: true },
+  })
+
+  const internal_textures = ref([])
+
+  onMounted(() => {
+    if (textures.value != null) {
+      internal_textures.value = textures.value
+    } else {
+      internal_textures.value = [{ id: "", texture_name: "" }]
+    }
+  })
+
+  function update_value_event($event, index) {
+    internal_textures.value[index][$event.key] = $event.value
+    const filtered = internal_textures.value.filter((texture) => {
+      return texture.texture_name !== "" && texture.id !== ""
+    })
+    if (filtered.length !== 0) {
+      textures.value = filtered
+    }
+  }
+</script>
+
 <template>
   <v-row
     v-for="(texture, index) in internal_textures"
@@ -34,33 +64,3 @@
     </v-col>
   </v-row>
 </template>
-
-<script setup>
-  import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem"
-
-  const textures = defineModel()
-
-  const props = defineProps({
-    id: { type: String, required: true },
-  })
-
-  const internal_textures = ref([])
-
-  onMounted(() => {
-    if (textures.value != null) {
-      internal_textures.value = textures.value
-    } else {
-      internal_textures.value = [{ id: "", texture_name: "" }]
-    }
-  })
-
-  function update_value_event($event, index) {
-    internal_textures.value[index][$event.key] = $event.value
-    const filtered = internal_textures.value.filter((texture) => {
-      return texture.texture_name !== "" && texture.id !== ""
-    })
-    if (filtered.length !== 0) {
-      textures.value = filtered
-    }
-  }
-</script>

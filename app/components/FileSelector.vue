@@ -1,12 +1,3 @@
-<template>
-  <FetchingData v-if="loading" />
-  <FileUploader
-    v-else
-    v-bind="{ multiple, accept, files: internal_files, auto_upload }"
-    @files_uploaded="files_uploaded_event"
-  />
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
@@ -62,3 +53,12 @@
 
   await get_allowed_files()
 </script>
+
+<template>
+  <FetchingData v-if="loading" />
+  <FileUploader
+    v-else
+    v-bind="{ multiple, accept, files: internal_files, auto_upload }"
+    @files_uploaded="files_uploaded_event"
+  />
+</template>

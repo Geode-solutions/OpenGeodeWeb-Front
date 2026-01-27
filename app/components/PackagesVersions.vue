@@ -1,23 +1,3 @@
-<template>
-  <v-container>
-    This tool uses our Open-Source codes
-    <v-tooltip location="end">
-      <span
-        v-for="package_version in packages_versions"
-        :key="package_version.package"
-      >
-        {{ package_version.package }} v{{ package_version.version }}
-        <br />
-      </span>
-      <template #activator="{ props }">
-        <v-icon v-bind="props" color="primary" class="justify-right">
-          mdi-information-outline
-        </v-icon>
-      </template>
-    </v-tooltip>
-  </v-container>
-</template>
-
 <script setup>
   import Status from "@ogw_front/utils/status"
   import { useGeodeStore } from "@ogw_front/stores/geode"
@@ -50,3 +30,23 @@
 
   await get_packages_versions()
 </script>
+
+<template>
+  <v-container>
+    This tool uses our Open-Source codes
+    <v-tooltip location="end">
+      <span
+        v-for="package_version in packages_versions"
+        :key="package_version.package"
+      >
+        {{ package_version.package }} v{{ package_version.version }}
+        <br />
+      </span>
+      <template #activator="{ props }">
+        <v-icon v-bind="props" color="primary" class="justify-right">
+          mdi-information-outline
+        </v-icon>
+      </template>
+    </v-tooltip>
+  </v-container>
+</template>
