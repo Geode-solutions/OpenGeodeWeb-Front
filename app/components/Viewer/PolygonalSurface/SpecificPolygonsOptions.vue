@@ -2,7 +2,7 @@
   <ViewerContextMenuItem
     :itemProps="props.itemProps"
     :tooltip="props.tooltip"
-    :btn_image="props.btn_image"
+    :btn_image="PolygonalSurfacePolygons"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
@@ -12,6 +12,8 @@
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
+          v-model:vertex_attribute="vertex_attribute"
+          v-model:polygon_attribute="polygon_attribute"
         />
       </template>
     </template>
@@ -22,6 +24,7 @@
   import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
   import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
   import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
+  import PolygonalSurfacePolygons from "@ogw_front/assets/viewer_svgs/surface_triangles.svg"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
@@ -31,8 +34,6 @@
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
-    btn_image: { type: String, required: true },
-
     tooltip: { type: String, required: false, default: "Polygons options" },
   })
 
@@ -63,6 +64,20 @@
     get: () => dataStyleStore.meshPolygonsTextures(id.value),
     set: (newValue) => {
       dataStyleStore.setMeshPolygonsTextures(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute = computed({
+    get: () => dataStyleStore.meshPolygonsVertexAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolygonsVertexAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const polygon_attribute = computed({
+    get: () => dataStyleStore.meshPolygonsPolygonAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolygonsPolygonAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
