@@ -64,10 +64,74 @@ export default function useMeshStyle() {
     return Promise.all(promise_array)
   }
 
+  function setVertexScalarRange(id, meshType, minimum, maximum) {
+    switch (meshType) {
+      case "points":
+        return meshPointsStyleStore.setMeshPointsVertexScalarRange(id, minimum, maximum)
+      case "edges":
+        return meshEdgesStyleStore.setMeshEdgesVertexScalarRange(id, minimum, maximum)
+      case "cells":
+        return meshCellsStyleStore.setMeshCellsVertexScalarRange(id, minimum, maximum)
+      case "polygons":
+        return meshPolygonsStyleStore.setMeshPolygonsVertexScalarRange(id, minimum, maximum)
+      case "polyhedra":
+        return meshPolyhedraStyleStore.setPolyhedraVertexScalarRange(id, minimum, maximum)
+      default:
+        throw new Error("Unknown meshType for vertex scalar range: " + meshType)
+    }
+  }
+
+  function setVertexColorMap(id, meshType, points) {
+    switch (meshType) {
+      case "points":
+        return meshPointsStyleStore.setMeshPointsVertexColorMap(id, points)
+      case "edges":
+        return meshEdgesStyleStore.setMeshEdgesVertexColorMap(id, points)
+      case "cells":
+        return meshCellsStyleStore.setMeshCellsVertexColorMap(id, points)
+      case "polygons":
+        return meshPolygonsStyleStore.setMeshPolygonsVertexColorMap(id, points)
+      case "polyhedra":
+        return meshPolyhedraStyleStore.setPolyhedraVertexColorMap(id, points)
+      default:
+        throw new Error("Unknown meshType for vertex color map: " + meshType)
+    }
+  }
+
+  function setElementScalarRange(id, elementType, minimum, maximum) {
+    switch (elementType) {
+      case "cell":
+        return meshCellsStyleStore.setMeshCellsCellScalarRange(id, minimum, maximum)
+      case "polygon":
+        return meshPolygonsStyleStore.setMeshPolygonsPolygonScalarRange(id, minimum, maximum)
+      case "polyhedron":
+        return meshPolyhedraStyleStore.setPolyhedraPolyhedronScalarRange(id, minimum, maximum)
+      default:
+        throw new Error("Unknown elementType for scalar range: " + elementType)
+    }
+  }
+
+  function setElementColorMap(id, elementType, points) {
+    switch (elementType) {
+      case "cell":
+        return meshCellsStyleStore.setMeshCellsCellColorMap(id, points)
+      case "polygon":
+        return meshPolygonsStyleStore.setMeshPolygonsPolygonColorMap(id, points)
+      case "polyhedron":
+        return meshPolyhedraStyleStore.setPolyhedraPolyhedraColorMap(id, points)
+      default:
+        throw new Error("Unknown elementType for color map: " + elementType)
+    }
+  }
+
   return {
     meshVisibility,
     setMeshVisibility,
     applyMeshStyle,
+    setVertexScalarRange,
+    setVertexColorMap,
+    setElementScalarRange,
+    setElementColorMap,
     ...useMeshPointsStyle(),
     ...useMeshEdgesStyle(),
     ...useMeshCellsStyle(),
