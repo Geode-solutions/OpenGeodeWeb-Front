@@ -22,8 +22,12 @@
       v-if="edge_attribute_name"
       v-model:min="edge_attribute.min"
       v-model:max="edge_attribute.max"
+      v-model:colorMap="edge_attribute.colorMap"
+      :auto-min="selectedAttributeRange[0]"
+      :auto-max="selectedAttributeRange[1]"
       @update:min="onScalarRangeChange"
       @update:max="onScalarRangeChange"
+      @update:colorMap="onColorMapChange"
     />
   </div>
 </template>
@@ -34,6 +38,7 @@
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
+  import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
@@ -47,11 +52,20 @@
 
   const edge_attribute_name = ref("")
   const edge_attribute_names = ref([])
+  const edge_attribute_metadata = ref({})
+
+  const selectedAttributeRange = computed(() => {
+    if (edge_attribute_name.value && edge_attribute_metadata.value[edge_attribute_name.value]) {
+      return edge_attribute_metadata.value[edge_attribute_name.value]
+    }
+    return [0, 1]
+  })
 
   const edge_attribute = reactive({
     name: edge_attribute_name.value,
     min: undefined,
     max: undefined,
+    colorMap: "Cool to Warm",
   })
 
   onMounted(() => {
@@ -59,6 +73,9 @@
       edge_attribute_name.value = model.value.name
       edge_attribute.min = model.value.min
       edge_attribute.max = model.value.max
+      if (model.value.colorMap) {
+        edge_attribute.colorMap = model.value.colorMap
+      }
     }
   })
 
@@ -68,12 +85,11 @@
   })
 
   watch(
-    () => [edge_attribute.min, edge_attribute.max],
+    () => [edge_attribute.min, edge_attribute.max, edge_attribute.colorMap],
     () => {
       model.value = { ...edge_attribute }
     },
   )
-
   function onScalarRangeChange() {
     if (edge_attribute.min !== undefined && edge_attribute.max !== undefined) {
       dataStyleStore.setMeshEdgesVertexScalarRange(
@@ -85,6 +101,22 @@
     }
   }
 
+  function onColorMapChange() {
+    if (
+      edge_attribute.min !== undefined &&
+      edge_attribute.max !== undefined &&
+      edge_attribute.colorMap
+    ) {
+      const points = getRGBPointsFromPreset(
+        edge_attribute.colorMap,
+        edge_attribute.min,
+        edge_attribute.max,
+      )
+      dataStyleStore.setMeshEdgesVertexColorMap(props.id, points)
+      hybridViewerStore.remoteRender()
+    }
+  }
+
   function get_edge_attribute_names() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.edge_attribute_names,
@@ -92,6 +124,7 @@
       {
         response_function: (response) => {
           edge_attribute_names.value = response.edge_attribute_names
+          edge_attribute_metadata.value = response.edge_attribute_metadata || {}
         },
       },
     )

@@ -10,8 +10,12 @@
       v-if="cell_attribute_name"
       v-model:min="cell_attribute.min"
       v-model:max="cell_attribute.max"
+      v-model:colorMap="cell_attribute.colorMap"
+      :auto-min="selectedAttributeRange[0]"
+      :auto-max="selectedAttributeRange[1]"
       @update:min="onScalarRangeChange"
       @update:max="onScalarRangeChange"
+      @update:colorMap="onColorMapChange"
     />
   </div>
 </template>
@@ -22,6 +26,7 @@
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
+  import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 
   const props = defineProps({
     id: { type: String, required: true },
@@ -30,10 +35,20 @@
   const model = defineModel()
   const cell_attribute_name = ref("")
   const cell_attribute_names = ref([])
+  const cell_attribute_metadata = ref({})
+
+  const selectedAttributeRange = computed(() => {
+    if (cell_attribute_name.value && cell_attribute_metadata.value[cell_attribute_name.value]) {
+      return cell_attribute_metadata.value[cell_attribute_name.value]
+    }
+    return [0, 1]
+  })
+
   const cell_attribute = reactive({
     name: cell_attribute_name.value,
     min: undefined,
     max: undefined,
+    colorMap: "Cool to Warm",
   })
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
@@ -44,6 +59,9 @@
       cell_attribute_name.value = model.value.name
       cell_attribute.min = model.value.min
       cell_attribute.max = model.value.max
+      if (model.value.colorMap) {
+        cell_attribute.colorMap = model.value.colorMap
+      }
     }
   })
 
@@ -53,7 +71,7 @@
   })
 
   watch(
-    () => [cell_attribute.min, cell_attribute.max],
+    () => [cell_attribute.min, cell_attribute.max, cell_attribute.colorMap],
     () => {
       model.value = { ...cell_attribute }
     },
@@ -66,6 +84,22 @@
         cell_attribute.min,
         cell_attribute.max,
       )
+      hybridViewerStore.remoteRender()
+    }
+  }
+
+  function onColorMapChange() {
+    if (
+      cell_attribute.min !== undefined &&
+      cell_attribute.max !== undefined &&
+      cell_attribute.colorMap
+    ) {
+      const points = getRGBPointsFromPreset(
+        cell_attribute.colorMap,
+        cell_attribute.min,
+        cell_attribute.max,
+      )
+      dataStyleStore.setMeshCellsCellColorMap(props.id, points)
       hybridViewerStore.remoteRender()
     }
   }
@@ -83,6 +117,7 @@
       {
         response_function: (response) => {
           cell_attribute_names.value = response.cell_attribute_names
+          cell_attribute_metadata.value = response.cell_attribute_metadata || {}
         },
       },
     )

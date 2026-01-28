@@ -133,6 +133,18 @@ export function useMeshPointsStyle() {
     )
   }
 
+  function setMeshPointsVertexColorMap(id, points) {
+    return viewerStore.request(
+      mesh_points_schemas.vertex_color_map,
+      { id, points },
+      {
+        response_function: () => {
+          console.log(setMeshPointsVertexColorMap.name, { id, points })
+        },
+      },
+    )
+  }
+
   function applyMeshPointsStyle(id) {
     const style = meshPointsStyle(id)
     return Promise.all([
@@ -154,6 +166,7 @@ export function useMeshPointsStyle() {
     setMeshPointsVertexAttribute,
     setMeshPointsSize,
     setMeshPointsVertexScalarRange,
+    setMeshPointsVertexColorMap,
     applyMeshPointsStyle,
   }
 }

@@ -154,35 +154,30 @@ export function useMeshPolygonsStyle() {
     )
   }
 
-  function setMeshPolygonsPolygonScalarRange(id, minimum, maximum) {
+  function setMeshPolygonsVertexColorMap(id, points) {
     return viewerStore.request(
-      mesh_polygons_schemas.polygon_scalar_range,
-      { id, minimum, maximum },
+      mesh_polygons_schemas.vertex_color_map,
+      { id, points },
       {
         response_function: () => {
-          console.log(
-            setMeshPolygonsPolygonScalarRange.name,
-            { id, minimum, maximum },
-          )
+          console.log(setMeshPolygonsVertexColorMap.name, { id, points })
         },
       },
     )
   }
 
-  function setMeshPolygonsVertexScalarRange(id, minimum, maximum) {
+  function setMeshPolygonsPolygonColorMap(id, points) {
     return viewerStore.request(
-      mesh_polygons_schemas.vertex_scalar_range,
-      { id, minimum, maximum },
+      mesh_polygons_schemas.polygon_color_map,
+      { id, points },
       {
         response_function: () => {
-          console.log(
-            setMeshPolygonsVertexScalarRange.name,
-            { id, minimum, maximum },
-          )
+          console.log(setMeshPolygonsPolygonColorMap.name, { id, points })
         },
       },
     )
   }
+
 
   function meshPolygonsActiveColoring(id) {
     return meshPolygonsStyle(id).coloring.active
@@ -240,6 +235,8 @@ export function useMeshPolygonsStyle() {
     setMeshPolygonsPolygonAttribute,
     setMeshPolygonsPolygonScalarRange,
     setMeshPolygonsVertexScalarRange,
+    setMeshPolygonsVertexColorMap,
+    setMeshPolygonsPolygonColorMap,
     applyMeshPolygonsStyle,
   }
 }

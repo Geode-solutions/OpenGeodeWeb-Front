@@ -2,8 +2,8 @@
   import ColorMapPicker from "./ColorMapPicker.vue"
 
   const props = defineProps({
-    autoMin: { type: Number, default: -50 },
-    autoMax: { type: Number, default: 50 },
+    autoMin: { type: Number, default: 0 },
+    autoMax: { type: Number, default: 1 },
   })
 
   const min = defineModel("min", { type: Number })
@@ -28,6 +28,15 @@
     if (min.value === undefined) min.value = props.autoMin
     if (max.value === undefined) max.value = props.autoMax
   })
+
+  // Reset min/max when autoMin/autoMax change (attribute selection changed)
+  watch(
+    () => [props.autoMin, props.autoMax],
+    ([newAutoMin, newAutoMax]) => {
+      min.value = newAutoMin
+      max.value = newAutoMax
+    },
+  )
 
   function reset() {
     min.value = props.autoMin

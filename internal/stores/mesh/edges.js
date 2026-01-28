@@ -158,6 +158,18 @@ export function useMeshEdgesStyle() {
     )
   }
 
+  function setMeshEdgesVertexColorMap(id, points) {
+    return viewerStore.request(
+      mesh_edges_schemas.vertex_color_map,
+      { id, points },
+      {
+        response_function: () => {
+          console.log(setMeshEdgesVertexColorMap.name, { id, points })
+        },
+      },
+    )
+  }
+
   function applyMeshEdgesStyle(id) {
     const style = meshEdgesStyle(id)
     return Promise.all([
@@ -182,5 +194,6 @@ export function useMeshEdgesStyle() {
     setMeshEdgesVertexAttribute,
     setMeshEdgesEdgeAttribute,
     setMeshEdgesVertexScalarRange,
+    setMeshEdgesVertexColorMap,
   }
 }

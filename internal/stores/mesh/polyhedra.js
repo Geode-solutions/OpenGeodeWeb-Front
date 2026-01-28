@@ -159,6 +159,48 @@ export function useMeshPolyhedraStyle() {
     )
   }
 
+  function setPolyhedraVertexColorMap(id, points) {
+    return viewerStore.request(
+      mesh_polyhedra_schemas.vertex_color_map,
+      { id, points },
+      {
+        response_function: () => {
+          console.log(setPolyhedraVertexColorMap.name, { id, points })
+        },
+      },
+    )
+  }
+
+  function setPolyhedraPolyhedraColorMap(id, points) {
+    return viewerStore.request(
+      mesh_polyhedra_schemas.polyhedra_color_map,
+      { id, points },
+      {
+        response_function: () => {
+          console.log(setPolyhedraPolyhedraColorMap.name, { id, points })
+        },
+      },
+    )
+  }
+
+  function setMeshPolyhedraVisibility(id, visibility) {
+    const polyhedra_style = meshPolyhedraStyle(id)
+    return viewerStore.request(
+      mesh_polyhedra_schemas.visibility,
+      { id, visibility },
+      {
+        response_function: () => {
+          polyhedra_style.visibility = visibility
+          console.log(
+            setMeshPolyhedraVisibility.name,
+            { id },
+            meshPolyhedraVisibility(id),
+          )
+        },
+      },
+    )
+  }
+
   function applyMeshPolyhedraStyle(id) {
     const style = meshPolyhedraStyle(id)
     return Promise.all([
@@ -180,6 +222,8 @@ export function useMeshPolyhedraStyle() {
     setPolyhedraVertexAttribute,
     setPolyhedraPolyhedronScalarRange,
     setPolyhedraVertexScalarRange,
+    setPolyhedraVertexColorMap,
+    setPolyhedraPolyhedraColorMap,
     setMeshPolyhedraVisibility,
   }
 }

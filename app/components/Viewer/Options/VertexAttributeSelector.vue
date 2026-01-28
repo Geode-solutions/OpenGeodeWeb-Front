@@ -10,8 +10,12 @@
       v-if="vertex_attribute_name"
       v-model:min="vertex_attribute.min"
       v-model:max="vertex_attribute.max"
+      v-model:colorMap="vertex_attribute.colorMap"
+      :auto-min="selectedAttributeRange[0]"
+      :auto-max="selectedAttributeRange[1]"
       @update:min="onScalarRangeChange"
       @update:max="onScalarRangeChange"
+      @update:colorMap="onColorMapChange"
     />
   </div>
 </template>
@@ -22,6 +26,7 @@
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
+  import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
@@ -36,11 +41,20 @@
 
   const vertex_attribute_name = ref("")
   const vertex_attribute_names = ref([])
+  const vertex_attribute_metadata = ref({})
+
+  const selectedAttributeRange = computed(() => {
+    if (vertex_attribute_name.value && vertex_attribute_metadata.value[vertex_attribute_name.value]) {
+      return vertex_attribute_metadata.value[vertex_attribute_name.value]
+    }
+    return [0, 1]
+  })
 
   const vertex_attribute = reactive({
     name: vertex_attribute_name.value,
     min: undefined,
     max: undefined,
+    colorMap: "Cool to Warm",
   })
 
   onMounted(() => {
@@ -48,6 +62,9 @@
       vertex_attribute_name.value = model.value.name
       vertex_attribute.min = model.value.min
       vertex_attribute.max = model.value.max
+      if (model.value.colorMap) {
+        vertex_attribute.colorMap = model.value.colorMap
+      }
     }
   })
 
@@ -57,7 +74,7 @@
   })
 
   watch(
-    () => [vertex_attribute.min, vertex_attribute.max],
+    () => [vertex_attribute.min, vertex_attribute.max, vertex_attribute.colorMap],
     () => {
       model.value = { ...vertex_attribute }
     },
@@ -103,6 +120,32 @@
     }
   }
 
+  function onColorMapChange() {
+    if (
+      vertex_attribute.min !== undefined &&
+      vertex_attribute.max !== undefined &&
+      vertex_attribute.colorMap
+    ) {
+      const points = getRGBPointsFromPreset(
+        vertex_attribute.colorMap,
+        vertex_attribute.min,
+        vertex_attribute.max,
+      )
+      if (props.meshType === "polygons") {
+        dataStyleStore.setMeshPolygonsVertexColorMap(props.id, points)
+      } else if (props.meshType === "cells") {
+        dataStyleStore.setMeshCellsVertexColorMap(props.id, points)
+      } else if (props.meshType === "edges") {
+        dataStyleStore.setMeshEdgesVertexColorMap(props.id, points)
+      } else if (props.meshType === "points") {
+        dataStyleStore.setMeshPointsVertexColorMap(props.id, points)
+      } else if (props.meshType === "polyhedra") {
+        dataStyleStore.setPolyhedraVertexColorMap(props.id, points)
+      }
+      hybridViewerStore.remoteRender()
+    }
+  }
+
   onMounted(() => {
     getVertexAttributes()
   })
@@ -114,6 +157,7 @@
       {
         response_function: (response) => {
           vertex_attribute_names.value = response.vertex_attribute_names
+          vertex_attribute_metadata.value = response.vertex_attribute_metadata || {}
         },
       },
     )

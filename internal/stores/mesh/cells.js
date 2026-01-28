@@ -142,25 +142,25 @@ export function useMeshCellsStyle() {
     )
   }
 
-  function setMeshCellsCellScalarRange(id, minimum, maximum) {
+  function setMeshCellsVertexColorMap(id, points) {
     return viewerStore.request(
-      mesh_cells_schemas.cell_scalar_range,
-      { id, minimum, maximum },
+      mesh_cells_schemas.vertex_color_map,
+      { id, points },
       {
         response_function: () => {
-          console.log(setMeshCellsCellScalarRange.name, { id, minimum, maximum })
+          console.log(setMeshCellsVertexColorMap.name, { id, points })
         },
       },
     )
   }
 
-  function setMeshCellsVertexScalarRange(id, minimum, maximum) {
+  function setMeshCellsCellColorMap(id, points) {
     return viewerStore.request(
-      mesh_cells_schemas.vertex_scalar_range,
-      { id, minimum, maximum },
+      mesh_cells_schemas.cell_color_map,
+      { id, points },
       {
         response_function: () => {
-          console.log(setMeshCellsVertexScalarRange.name, { id, minimum, maximum })
+          console.log(setMeshCellsCellColorMap.name, { id, points })
         },
       },
     )
@@ -222,6 +222,8 @@ export function useMeshCellsStyle() {
     setMeshCellsCellAttribute,
     setMeshCellsCellScalarRange,
     setMeshCellsVertexScalarRange,
+    setMeshCellsVertexColorMap,
+    setMeshCellsCellColorMap,
     applyMeshCellsStyle,
   }
 }
