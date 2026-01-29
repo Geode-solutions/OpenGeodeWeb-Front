@@ -1,3 +1,107 @@
+<script setup>
+  import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
+  import vtkColorTransferFunction from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction"
+
+  const props = defineProps({
+    presets: { type: Array, required: true },
+  })
+
+  const emit = defineEmits(["select"])
+
+  const filterText = ref("")
+  const canvasRefs = ref({})
+
+  const setCanvasRef = (name, el) => {
+    if (el) {
+      canvasRefs.value[name] = el
+    }
+  }
+
+  const filteredPresets = computed(() => {
+    if (!filterText.value) {
+      return props.presets
+    }
+
+    const term = filterText.value.toLowerCase()
+    const filtered = []
+
+    for (const item of props.presets) {
+      if (item.Children) {
+        const filteredChildren = item.Children.filter((child) =>
+          child.Name.toLowerCase().includes(term),
+        )
+        if (filteredChildren.length > 0) {
+          filtered.push({ ...item, Children: filteredChildren })
+        }
+      } else if (item.Name.toLowerCase().includes(term)) {
+        filtered.push(item)
+      }
+    }
+
+    return filtered
+  })
+
+  function drawPresetCanvas(presetName, canvas) {
+    if (!canvas) return
+
+    const preset = vtkColorMaps.getPresetByName(presetName)
+    if (!preset || !preset.RGBPoints) return
+
+    const ctx = canvas.getContext("2d")
+    const width = canvas.width
+    const height = canvas.height
+
+    const lut = vtkColorTransferFunction.newInstance()
+    const rgbPoints = preset.RGBPoints
+
+    for (let i = 0; i < rgbPoints.length; i += 4) {
+      lut.addRGBPoint(
+        rgbPoints[i],
+        rgbPoints[i + 1],
+        rgbPoints[i + 2],
+        rgbPoints[i + 3],
+      )
+    }
+
+    const range = [rgbPoints[0], rgbPoints[rgbPoints.length - 4]]
+    const table = lut.getUint8Table(range[0], range[1], width, true)
+
+    const imageData = ctx.createImageData(width, height)
+    for (let x = 0; x < width; x++) {
+      const r = table[x * 4]
+      const g = table[x * 4 + 1]
+      const b = table[x * 4 + 2]
+      const a = table[x * 4 + 3]
+
+      for (let y = 0; y < height; y++) {
+        const idx = (y * width + x) * 4
+        imageData.data[idx] = r
+        imageData.data[idx + 1] = g
+        imageData.data[idx + 2] = b
+        imageData.data[idx + 3] = a
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0)
+  }
+
+  function drawAllCanvases() {
+    nextTick(() => {
+      Object.entries(canvasRefs.value).forEach(([name, canvas]) => {
+        drawPresetCanvas(name, canvas)
+      })
+    })
+  }
+
+  onMounted(() => {
+    drawAllCanvases()
+  })
+
+  // Redraw when filter changes
+  watch(filteredPresets, () => {
+    drawAllCanvases()
+  })
+</script>
 <template>
   <div class="color-map-list">
     <v-text-field
@@ -52,107 +156,6 @@
     </v-list>
   </div>
 </template>
-
-<script setup>
-  import { ref, computed, onMounted, nextTick, watch } from "vue"
-  import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
-  import vtkColorTransferFunction from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction"
-
-  const props = defineProps({
-    presets: { type: Array, required: true },
-  })
-
-  const emit = defineEmits(["select"])
-
-  const filterText = ref("")
-  const canvasRefs = ref({})
-
-  const setCanvasRef = (name, el) => {
-    if (el) {
-      canvasRefs.value[name] = el
-    }
-  }
-
-  const filteredPresets = computed(() => {
-    if (!filterText.value) {
-      return props.presets
-    }
-
-    const term = filterText.value.toLowerCase()
-    const filtered = []
-
-    for (const item of props.presets) {
-      if (item.Children) {
-        const filteredChildren = item.Children.filter((child) =>
-          child.Name.toLowerCase().includes(term)
-        )
-        if (filteredChildren.length > 0) {
-          filtered.push({ ...item, Children: filteredChildren })
-        }
-      } else if (item.Name.toLowerCase().includes(term)) {
-        filtered.push(item)
-      }
-    }
-
-    return filtered
-  })
-
-  function drawPresetCanvas(presetName, canvas) {
-    if (!canvas) return
-
-    const preset = vtkColorMaps.getPresetByName(presetName)
-    if (!preset || !preset.RGBPoints) return
-
-    const ctx = canvas.getContext("2d")
-    const width = canvas.width
-    const height = canvas.height
-
-    const lut = vtkColorTransferFunction.newInstance()
-    const rgbPoints = preset.RGBPoints
-
-    for (let i = 0; i < rgbPoints.length; i += 4) {
-      lut.addRGBPoint(rgbPoints[i], rgbPoints[i + 1], rgbPoints[i + 2], rgbPoints[i + 3])
-    }
-
-    const range = [rgbPoints[0], rgbPoints[rgbPoints.length - 4]]
-    const table = lut.getUint8Table(range[0], range[1], width, true)
-
-    const imageData = ctx.createImageData(width, height)
-    for (let x = 0; x < width; x++) {
-      const r = table[x * 4]
-      const g = table[x * 4 + 1]
-      const b = table[x * 4 + 2]
-      const a = table[x * 4 + 3]
-
-      for (let y = 0; y < height; y++) {
-        const idx = (y * width + x) * 4
-        imageData.data[idx] = r
-        imageData.data[idx + 1] = g
-        imageData.data[idx + 2] = b
-        imageData.data[idx + 3] = a
-      }
-    }
-
-    ctx.putImageData(imageData, 0, 0)
-  }
-
-  function drawAllCanvases() {
-    nextTick(() => {
-      Object.entries(canvasRefs.value).forEach(([name, canvas]) => {
-        drawPresetCanvas(name, canvas)
-      })
-    })
-  }
-
-  onMounted(() => {
-    drawAllCanvases()
-  })
-
-  // Redraw when filter changes
-  watch(filteredPresets, () => {
-    drawAllCanvases()
-  })
-</script>
 
 <style scoped>
   .color-map-list {
