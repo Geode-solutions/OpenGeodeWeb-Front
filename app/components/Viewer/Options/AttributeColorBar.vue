@@ -8,7 +8,10 @@
 
   const min = defineModel("min", { type: Number })
   const max = defineModel("max", { type: Number })
-  const colorMap = defineModel("colorMap", { type: String, default: "Cool to Warm" })
+  const colorMap = defineModel("colorMap", {
+    type: String,
+    default: "Cool to Warm",
+  })
 
   const minValue = computed({
     get: () => min.value ?? props.autoMin,
@@ -28,15 +31,6 @@
     if (min.value === undefined) min.value = props.autoMin
     if (max.value === undefined) max.value = props.autoMax
   })
-
-  // Reset min/max when autoMin/autoMax change (attribute selection changed)
-  watch(
-    () => [props.autoMin, props.autoMax],
-    ([newAutoMin, newAutoMax]) => {
-      min.value = newAutoMin
-      max.value = newAutoMax
-    },
-  )
 
   function reset() {
     min.value = props.autoMin

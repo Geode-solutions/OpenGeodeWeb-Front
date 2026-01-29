@@ -46,7 +46,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   const exportStores = () => {
-    return { styles: dataStyleState.styles }
+    return {
+      styles: dataStyleState.styles,
+      attributeSettings: dataStyleState.attributeSettings,
+    }
   }
 
   const importStores = (snapshot) => {
@@ -57,7 +60,16 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     for (const [id, style] of Object.entries(stylesSnapshot)) {
       dataStyleState.styles[id] = style
     }
+
+    const attributeSettingsSnapshot = snapshot.attributeSettings || {}
+    for (const key of Object.keys(dataStyleState.attributeSettings)) {
+      delete dataStyleState.attributeSettings[key]
+    }
+    for (const [key, settings] of Object.entries(attributeSettingsSnapshot)) {
+      dataStyleState.attributeSettings[key] = settings
+    }
   }
+
 
   const applyAllStylesFromState = () => {
     const ids = Object.keys(dataStyleState.styles || {})
@@ -80,6 +92,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     getStyle: dataStyleState.getStyle,
     objectVisibility: dataStyleState.objectVisibility,
     selectedObjects: dataStyleState.selectedObjects,
+    getAttributeSettings: dataStyleState.getAttributeSettings,
+    setAttributeSettings: dataStyleState.setAttributeSettings,
     ...meshStyleStore,
     ...modelStyleStore,
     addDataStyle,
