@@ -1,24 +1,3 @@
-<template>
-  <v-treeview
-    v-model:selected="mesh_components_selection"
-    :items="items"
-    class="transparent-treeview"
-    item-value="id"
-    select-strategy="classic"
-    selectable
-  >
-    <template #title="{ item }">
-      <span
-        class="treeview-item"
-        @contextmenu.prevent.stop="
-          emit('show-menu', { event: $event, itemId: item })
-        "
-        >{{ item.title }}</span
-      >
-    </template>
-  </v-treeview>
-</template>
-
 <script setup>
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useDataStore } from "@ogw_front/stores/data"
@@ -119,6 +98,27 @@
     return [corner_ids, line_ids, surface_ids, block_ids]
   }
 </script>
+
+<template>
+  <v-treeview
+    v-model:selected="mesh_components_selection"
+    :items="items"
+    class="transparent-treeview"
+    item-value="id"
+    select-strategy="classic"
+    selectable
+  >
+    <template #title="{ item }">
+      <span
+        class="treeview-item"
+        @contextmenu.prevent.stop="
+          emit('show-menu', { event: $event, itemId: item })
+        "
+        >{{ item.title }}</span
+      >
+    </template>
+  </v-treeview>
+</template>
 
 <style scoped>
   .treeview-item {
