@@ -31,7 +31,12 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     const key = `${meshId}:${attributeType}:${attributeName}`
     return attributeSettings[key] || null
   }
-  function setAttributeSettings(meshId, attributeType, attributeName, settings) {
+  function setAttributeSettings(
+    meshId,
+    attributeType,
+    attributeName,
+    settings,
+  ) {
     const key = `${meshId}:${attributeType}:${attributeName}`
     attributeSettings[key] = {
       min: settings.min,

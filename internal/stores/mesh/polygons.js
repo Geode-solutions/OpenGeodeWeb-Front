@@ -130,10 +130,11 @@ export function useMeshPolygonsStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          console.log(
-            setMeshPolygonsPolygonScalarRange.name,
-            { id, minimum, maximum },
-          )
+          console.log(setMeshPolygonsPolygonScalarRange.name, {
+            id,
+            minimum,
+            maximum,
+          })
         },
       },
     )
@@ -145,10 +146,11 @@ export function useMeshPolygonsStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          console.log(
-            setMeshPolygonsVertexScalarRange.name,
-            { id, minimum, maximum },
-          )
+          console.log(setMeshPolygonsVertexScalarRange.name, {
+            id,
+            minimum,
+            maximum,
+          })
         },
       },
     )
@@ -177,7 +179,6 @@ export function useMeshPolygonsStyle() {
       },
     )
   }
-
 
   function meshPolygonsActiveColoring(id) {
     return meshPolygonsStyle(id).coloring.active

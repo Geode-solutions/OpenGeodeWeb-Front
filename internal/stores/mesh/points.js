@@ -124,10 +124,11 @@ export function useMeshPointsStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          console.log(
-            setMeshPointsVertexScalarRange.name,
-            { id, minimum, maximum },
-          )
+          console.log(setMeshPointsVertexScalarRange.name, {
+            id,
+            minimum,
+            maximum,
+          })
         },
       },
     )

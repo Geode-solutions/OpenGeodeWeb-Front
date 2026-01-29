@@ -124,7 +124,11 @@ export function useMeshCellsStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshCellsCellScalarRange.name, { id, minimum, maximum })
+          console.log(setMeshCellsCellScalarRange.name, {
+            id,
+            minimum,
+            maximum,
+          })
         },
       },
     )
@@ -136,7 +140,11 @@ export function useMeshCellsStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshCellsVertexScalarRange.name, { id, minimum, maximum })
+          console.log(setMeshCellsVertexScalarRange.name, {
+            id,
+            minimum,
+            maximum,
+          })
         },
       },
     )

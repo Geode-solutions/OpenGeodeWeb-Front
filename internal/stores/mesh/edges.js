@@ -152,7 +152,11 @@ export function useMeshEdgesStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshEdgesVertexScalarRange.name, { id, minimum, maximum })
+          console.log(setMeshEdgesVertexScalarRange.name, {
+            id,
+            minimum,
+            maximum,
+          })
         },
       },
     )

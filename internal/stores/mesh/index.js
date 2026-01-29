@@ -67,15 +67,35 @@ export default function useMeshStyle() {
   function setVertexScalarRange(id, meshType, minimum, maximum) {
     switch (meshType) {
       case "points":
-        return meshPointsStyleStore.setMeshPointsVertexScalarRange(id, minimum, maximum)
+        return meshPointsStyleStore.setMeshPointsVertexScalarRange(
+          id,
+          minimum,
+          maximum,
+        )
       case "edges":
-        return meshEdgesStyleStore.setMeshEdgesVertexScalarRange(id, minimum, maximum)
+        return meshEdgesStyleStore.setMeshEdgesVertexScalarRange(
+          id,
+          minimum,
+          maximum,
+        )
       case "cells":
-        return meshCellsStyleStore.setMeshCellsVertexScalarRange(id, minimum, maximum)
+        return meshCellsStyleStore.setMeshCellsVertexScalarRange(
+          id,
+          minimum,
+          maximum,
+        )
       case "polygons":
-        return meshPolygonsStyleStore.setMeshPolygonsVertexScalarRange(id, minimum, maximum)
+        return meshPolygonsStyleStore.setMeshPolygonsVertexScalarRange(
+          id,
+          minimum,
+          maximum,
+        )
       case "polyhedra":
-        return meshPolyhedraStyleStore.setPolyhedraVertexScalarRange(id, minimum, maximum)
+        return meshPolyhedraStyleStore.setPolyhedraVertexScalarRange(
+          id,
+          minimum,
+          maximum,
+        )
       default:
         throw new Error("Unknown meshType for vertex scalar range: " + meshType)
     }
@@ -101,11 +121,23 @@ export default function useMeshStyle() {
   function setElementScalarRange(id, elementType, minimum, maximum) {
     switch (elementType) {
       case "cell":
-        return meshCellsStyleStore.setMeshCellsCellScalarRange(id, minimum, maximum)
+        return meshCellsStyleStore.setMeshCellsCellScalarRange(
+          id,
+          minimum,
+          maximum,
+        )
       case "polygon":
-        return meshPolygonsStyleStore.setMeshPolygonsPolygonScalarRange(id, minimum, maximum)
+        return meshPolygonsStyleStore.setMeshPolygonsPolygonScalarRange(
+          id,
+          minimum,
+          maximum,
+        )
       case "polyhedron":
-        return meshPolyhedraStyleStore.setPolyhedraPolyhedronScalarRange(id, minimum, maximum)
+        return meshPolyhedraStyleStore.setPolyhedraPolyhedronScalarRange(
+          id,
+          minimum,
+          maximum,
+        )
       default:
         throw new Error("Unknown elementType for scalar range: " + elementType)
     }

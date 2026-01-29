@@ -70,7 +70,6 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
   }
 
-
   const applyAllStylesFromState = () => {
     const ids = Object.keys(dataStyleState.styles || {})
     const promises = []

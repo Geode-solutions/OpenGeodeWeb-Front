@@ -135,10 +135,11 @@ export function useMeshPolyhedraStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          console.log(
-            setPolyhedraPolyhedronScalarRange.name,
-            { id, minimum, maximum },
-          )
+          console.log(setPolyhedraPolyhedronScalarRange.name, {
+            id,
+            minimum,
+            maximum,
+          })
         },
       },
     )
@@ -150,10 +151,11 @@ export function useMeshPolyhedraStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          console.log(
-            setPolyhedraVertexScalarRange.name,
-            { id, minimum, maximum },
-          )
+          console.log(setPolyhedraVertexScalarRange.name, {
+            id,
+            minimum,
+            maximum,
+          })
         },
       },
     )
