@@ -1,3 +1,21 @@
+<script setup>
+  import Status from "@ogw_front/utils/status"
+  import Loading from "@ogw_front/components/Loading"
+  import Recaptcha from "@ogw_front/components/Recaptcha"
+  import { useInfraStore } from "@ogw_front/stores/infra"
+
+  const infraStore = useInfraStore()
+
+  watch(
+    () => infraStore.is_captcha_validated,
+    (value, oldValue) => {
+      if (value && !oldValue && import.meta.client) {
+        infraStore.create_backend()
+      }
+    },
+  )
+</script>
+
 <template>
   <v-container class="justify">
     <v-row align-content="center" align="center">
@@ -16,21 +34,3 @@
     </v-row>
   </v-container>
 </template>
-
-<script setup>
-  import Status from "@ogw_front/utils/status"
-  import Loading from "@ogw_front/components/Loading"
-  import Recaptcha from "@ogw_front/components/Recaptcha"
-  import { useInfraStore } from "@ogw_front/stores/infra"
-
-  const infraStore = useInfraStore()
-
-  watch(
-    () => infraStore.is_captcha_validated,
-    (value, oldValue) => {
-      if (value && !oldValue && import.meta.client) {
-        infraStore.create_backend()
-      }
-    },
-  )
-</script>

@@ -1,47 +1,3 @@
-<template>
-  <FetchingData v-if="loading" />
-  <v-container v-else-if="has_missing_files">
-    <v-row v-if="mandatory_files.length" align="center">
-      <v-col cols="auto" class="pa-0">
-        <v-icon color="warning" icon="mdi-file-document-alert-outline" />
-      </v-col>
-      <p class="pa-1">Mandatory files:</p>
-      <v-col v-for="mandatory_file in mandatory_files" cols="auto" class="pa-0">
-        <v-chip>{{ mandatory_file }}</v-chip>
-      </v-col>
-    </v-row>
-    <v-row v-if="additional_files.length" align="center">
-      <v-col cols="auto" class="pa-0">
-        <v-icon color="accent" icon="mdi-file-document-plus-outline" />
-      </v-col>
-      <p class="pa-1">Additional files:</p>
-      <v-col
-        v-for="additional_file in additional_files"
-        cols="auto"
-        class="pa-0"
-      >
-        <v-chip>{{ additional_file }}</v-chip>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <FileUploader
-          v-bind="{ multiple, accept }"
-          @files_uploaded="files_uploaded_event"
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col
-        v-if="!mandatory_files.length && additional_files.length"
-        cols="auto"
-      >
-        <v-btn @click="emit('increment_step')" color="warning">Skip step</v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
@@ -121,3 +77,47 @@
 
   await missing_files()
 </script>
+
+<template>
+  <FetchingData v-if="loading" />
+  <v-container v-else-if="has_missing_files">
+    <v-row v-if="mandatory_files.length" align="center">
+      <v-col cols="auto" class="pa-0">
+        <v-icon color="warning" icon="mdi-file-document-alert-outline" />
+      </v-col>
+      <p class="pa-1">Mandatory files:</p>
+      <v-col v-for="mandatory_file in mandatory_files" cols="auto" class="pa-0">
+        <v-chip>{{ mandatory_file }}</v-chip>
+      </v-col>
+    </v-row>
+    <v-row v-if="additional_files.length" align="center">
+      <v-col cols="auto" class="pa-0">
+        <v-icon color="accent" icon="mdi-file-document-plus-outline" />
+      </v-col>
+      <p class="pa-1">Additional files:</p>
+      <v-col
+        v-for="additional_file in additional_files"
+        cols="auto"
+        class="pa-0"
+      >
+        <v-chip>{{ additional_file }}</v-chip>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <FileUploader
+          v-bind="{ multiple, accept }"
+          @files_uploaded="files_uploaded_event"
+        />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col
+        v-if="!mandatory_files.length && additional_files.length"
+        cols="auto"
+      >
+        <v-btn @click="emit('increment_step')" color="warning">Skip step</v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>

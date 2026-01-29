@@ -1,3 +1,34 @@
+<script setup>
+  const props = defineProps({
+    multiple: { type: Boolean, default: false },
+    accept: { type: String, default: "" },
+    loading: { type: Boolean, default: false },
+    showExtensions: { type: Boolean, default: true },
+    idleText: { type: String, default: "Click or Drag & Drop files" },
+    dropText: { type: String, default: "Drop to upload" },
+    loadingText: { type: String, default: "Uploading..." },
+  })
+
+  const emit = defineEmits(["files-selected"])
+
+  const isDragging = ref(false)
+  const fileInput = ref(null)
+
+  const triggerFileDialog = () => fileInput.value?.click()
+
+  function handleDrop(e) {
+    isDragging.value = false
+    const files = Array.from(e.dataTransfer.files)
+    emit("files-selected", files)
+  }
+
+  function handleFileSelect(e) {
+    const files = Array.from(e.target.files)
+    emit("files-selected", files)
+    e.target.value = ""
+  }
+</script>
+
 <template>
   <v-hover v-slot="{ isHovering, props: hoverProps }">
     <v-card
@@ -72,37 +103,6 @@
     </v-card>
   </v-hover>
 </template>
-
-<script setup>
-  const props = defineProps({
-    multiple: { type: Boolean, default: false },
-    accept: { type: String, default: "" },
-    loading: { type: Boolean, default: false },
-    showExtensions: { type: Boolean, default: true },
-    idleText: { type: String, default: "Click or Drag & Drop files" },
-    dropText: { type: String, default: "Drop to upload" },
-    loadingText: { type: String, default: "Uploading..." },
-  })
-
-  const emit = defineEmits(["files-selected"])
-
-  const isDragging = ref(false)
-  const fileInput = ref(null)
-
-  const triggerFileDialog = () => fileInput.value?.click()
-
-  function handleDrop(e) {
-    isDragging.value = false
-    const files = Array.from(e.dataTransfer.files)
-    emit("files-selected", files)
-  }
-
-  function handleFileSelect(e) {
-    const files = Array.from(e.target.files)
-    emit("files-selected", files)
-    e.target.value = ""
-  }
-</script>
 
 <style scoped>
   .rotating {

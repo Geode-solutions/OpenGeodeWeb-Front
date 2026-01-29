@@ -1,3 +1,18 @@
+<script setup>
+  import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
+
+  const props = defineProps({
+    inspection_result: { type: Array, required: true },
+  })
+  const opened_panels = ref([])
+
+  onMounted(async () => {
+    opened_panels.value = props.inspection_result
+      .map((result, i) => (result.nb_issues > 0 ? i : -1))
+      .filter((index) => index !== -1)
+  })
+</script>
+
 <template>
   <v-container class="pa-2">
     <v-expansion-panels v-model="opened_panels" multiple elevation="5">
@@ -40,18 +55,3 @@
     </v-expansion-panels>
   </v-container>
 </template>
-
-<script setup>
-  import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
-
-  const props = defineProps({
-    inspection_result: { type: Array, required: true },
-  })
-  const opened_panels = ref([])
-
-  onMounted(async () => {
-    opened_panels.value = props.inspection_result
-      .map((result, i) => (result.nb_issues > 0 ? i : -1))
-      .filter((index) => index !== -1)
-  })
-</script>
