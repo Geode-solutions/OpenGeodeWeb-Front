@@ -40,97 +40,97 @@ afterEach(async () => {
 })
 
 describe("Mesh polygons", () => {
-  // describe("Polygons visibility", () => {
-  //   test("Visibility true", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const visibility = true
-  //     const spy = vi.spyOn(viewerStore, "request")
-  //     const result = dataStyleStore.setMeshPolygonsVisibility(id, visibility)
-  //     expect(result).toBeInstanceOf(Promise)
-  //     await result
-  //     expect(spy).toHaveBeenCalledWith(
-  //       mesh_polygons_schemas.visibility,
-  //       { id, visibility },
-  //       {
-  //         response_function: expect.any(Function),
-  //       },
-  //     )
-  //     expect(dataStyleStore.meshPolygonsVisibility(id)).toBe(visibility)
-  //     expect(viewerStore.status).toBe(Status.CONNECTED)
-  //   })
-  // })
+  describe("Polygons visibility", () => {
+    test("Visibility true", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const visibility = true
+      const spy = vi.spyOn(viewerStore, "request")
+      const result = dataStyleStore.setMeshPolygonsVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(spy).toHaveBeenCalledWith(
+        mesh_polygons_schemas.visibility,
+        { id, visibility },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPolygonsVisibility(id)).toBe(visibility)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 
-  // describe("Polygons color", () => {
-  //   test("Color red", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const color = { r: 255, g: 0, b: 0 }
-  //     const spy = vi.spyOn(viewerStore, "request")
-  //     const result = dataStyleStore.setMeshPolygonsColor(id, color)
-  //     expect(result).toBeInstanceOf(Promise)
-  //     await result
-  //     expect(spy).toHaveBeenCalledWith(
-  //       mesh_polygons_schemas.color,
-  //       { id, color },
-  //       {
-  //         response_function: expect.any(Function),
-  //       },
-  //     )
-  //     expect(dataStyleStore.meshPolygonsColor(id)).toStrictEqual(color)
-  //     expect(viewerStore.status).toBe(Status.CONNECTED)
-  //   })
-  // })
+  describe("Polygons color", () => {
+    test("Color red", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const color = { r: 255, g: 0, b: 0 }
+      const spy = vi.spyOn(viewerStore, "request")
+      const result = dataStyleStore.setMeshPolygonsColor(id, color)
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(spy).toHaveBeenCalledWith(
+        mesh_polygons_schemas.color,
+        { id, color },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPolygonsColor(id)).toStrictEqual(color)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 
-  // describe("Polygons vertex attribute", () => {
-  //   test("Coloring vertex attribute", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const spy = vi.spyOn(viewerStore, "request")
-  //     const result = dataStyleStore.setMeshPolygonsVertexAttribute(
-  //       id,
-  //       vertex_attribute,
-  //     )
-  //     expect(result).toBeInstanceOf(Promise)
-  //     await result
-  //     expect(spy).toHaveBeenCalledWith(
-  //       mesh_polygons_schemas.vertex_attribute,
-  //       { id, ...vertex_attribute },
-  //       {
-  //         response_function: expect.any(Function),
-  //       },
-  //     )
-  //     expect(dataStyleStore.meshPolygonsVertexAttribute(id)).toStrictEqual(
-  //       vertex_attribute,
-  //     )
-  //     expect(viewerStore.status).toBe(Status.CONNECTED)
-  //   })
-  // })
+  describe("Polygons vertex attribute", () => {
+    test("Coloring vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const spy = vi.spyOn(viewerStore, "request")
+      const result = dataStyleStore.setMeshPolygonsVertexAttribute(
+        id,
+        vertex_attribute,
+      )
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(spy).toHaveBeenCalledWith(
+        mesh_polygons_schemas.vertex_attribute,
+        { id, ...vertex_attribute },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPolygonsVertexAttribute(id)).toStrictEqual(
+        vertex_attribute,
+      )
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 
-  // describe("Polygons polygon attribute", () => {
-  //   test("Coloring polygon attribute", async () => {
-  //     const dataStyleStore = useDataStyleStore()
-  //     const viewerStore = useViewerStore()
-  //     const spy = vi.spyOn(viewerStore, "request")
-  //     const result = dataStyleStore.setMeshPolygonsPolygonAttribute(
-  //       id,
-  //       polygon_attribute,
-  //     )
-  //     expect(result).toBeInstanceOf(Promise)
-  //     await result
-  //     expect(spy).toHaveBeenCalledWith(
-  //       mesh_polygons_schemas.polygon_attribute,
-  //       { id, ...polygon_attribute },
-  //       {
-  //         response_function: expect.any(Function),
-  //       },
-  //     )
-  //     expect(dataStyleStore.meshPolygonsPolygonAttribute(id)).toStrictEqual(
-  //       polygon_attribute,
-  //     )
-  //     expect(viewerStore.status).toBe(Status.CONNECTED)
-  //   })
-  // })
+  describe("Polygons polygon attribute", () => {
+    test("Coloring polygon attribute", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const spy = vi.spyOn(viewerStore, "request")
+      const result = dataStyleStore.setMeshPolygonsPolygonAttribute(
+        id,
+        polygon_attribute,
+      )
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(spy).toHaveBeenCalledWith(
+        mesh_polygons_schemas.polygon_attribute,
+        { id, ...polygon_attribute },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPolygonsPolygonAttribute(id)).toStrictEqual(
+        polygon_attribute,
+      )
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 
   describe("Polygons active coloring", () => {
     test("test coloring", async () => {
@@ -141,10 +141,7 @@ describe("Mesh polygons", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshPolygonsPolygonAttribute(
-              id,
-              vertex_attribute,
-            ),
+            dataStyleStore.setMeshPolygonsVertexAttribute(id, vertex_attribute),
         },
         {
           name: "polygon",
@@ -157,7 +154,6 @@ describe("Mesh polygons", () => {
       ]
 
       for (let i = 0; i < coloringTypes.length; i++) {
-        console.log("coloringTypes[i]", coloringTypes[i])
         if (coloringTypes[i].function) {
           expect(() =>
             dataStyleStore.setMeshPolygonsActiveColoring(

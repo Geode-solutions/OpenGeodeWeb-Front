@@ -15,10 +15,10 @@ import { setupIntegrationTests } from "../../../setup"
 
 // Local constants
 const mesh_polyhedra_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra
-const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
-const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 const file_name = "test.vtu"
 const geode_object = "HybridSolid3D"
+const vertex_attribute = { name: "toto_on_vertices" }
+const polyhedron_attribute = { name: "toto_on_polyhedra" }
 
 let id, back_port, viewer_port, project_folder_path
 
@@ -81,55 +81,87 @@ describe("Mesh polyhedra", () => {
     test("Polyhedra active coloring", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const coloringTypes = ["color", "vertex", "polyhedron"]
+      const coloringTypes = [
+        { name: "color" },
+        {
+          name: "vertex",
+          function: () =>
+            dataStyleStore.setMeshPolyhedraVertexAttribute(
+              id,
+              vertex_attribute,
+            ),
+        },
+        {
+          name: "polyhedron",
+          function: () =>
+            dataStyleStore.setMeshPolyhedraPolyhedronAttribute(
+              id,
+              polyhedron_attribute,
+            ),
+        },
+      ]
       for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshPolyhedraActiveColoring(id, coloringTypes[i])
+        if (coloringTypes[i].function) {
+          expect(() =>
+            dataStyleStore.setMeshPolyhedraActiveColoring(
+              id,
+              coloringTypes[i].name,
+            ),
+          ).toThrowError()
+          await coloringTypes[i].function()
+        }
+        const result = dataStyleStore.setMeshPolyhedraActiveColoring(
+          id,
+          coloringTypes[i].name,
+        )
+        expect(result).toBeInstanceOf(Promise)
+        await result
         expect(dataStyleStore.meshPolyhedraActiveColoring(id)).toBe(
-          coloringTypes[i],
+          coloringTypes[i].name,
         )
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
     })
+  })
 
-    test("Polyhedra vertex attribute", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const vertex_attribute = { name: "toto_on_vertices" }
-      const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setPolyhedraVertexAttribute(id, vertex_attribute)
-      expect(spy).toHaveBeenCalledWith(
-        mesh_polyhedra_schemas.vertex_attribute,
-        { id, ...vertex_attribute },
-        {
-          response_function: expect.any(Function),
-        },
-      )
-      expect(dataStyleStore.polyhedraVertexAttribute(id)).toStrictEqual(
-        vertex_attribute,
-      )
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
+  test("Polyhedra vertex attribute", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
 
-    test("Polyhedra polyhedron attribute", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const polyhedron_attribute = { name: "toto_on_polyhedra" }
-      const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setPolyhedraPolyhedronAttribute(
-        id,
-        polyhedron_attribute,
-      )
-      expect(spy).toHaveBeenCalledWith(
-        mesh_polyhedra_schemas.polyhedron_attribute,
-        { id, ...polyhedron_attribute },
-        {
-          response_function: expect.any(Function),
-        },
-      )
-      expect(dataStyleStore.polyhedraPolyhedronAttribute(id)).toStrictEqual(
-        polyhedron_attribute,
-      )
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
+    const spy = vi.spyOn(viewerStore, "request")
+    await dataStyleStore.setMeshPolyhedraVertexAttribute(id, vertex_attribute)
+    expect(spy).toHaveBeenCalledWith(
+      mesh_polyhedra_schemas.vertex_attribute,
+      { id, ...vertex_attribute },
+      {
+        response_function: expect.any(Function),
+      },
+    )
+    expect(dataStyleStore.meshPolyhedraVertexAttribute(id)).toStrictEqual(
+      vertex_attribute,
+    )
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
+
+  test("Polyhedra polyhedron attribute", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+
+    const spy = vi.spyOn(viewerStore, "request")
+    await dataStyleStore.setMeshPolyhedraPolyhedronAttribute(
+      id,
+      polyhedron_attribute,
+    )
+    expect(spy).toHaveBeenCalledWith(
+      mesh_polyhedra_schemas.polyhedron_attribute,
+      { id, ...polyhedron_attribute },
+      {
+        response_function: expect.any(Function),
+      },
+    )
+    expect(dataStyleStore.meshPolyhedraPolyhedronAttribute(id)).toStrictEqual(
+      polyhedron_attribute,
+    )
+    expect(viewerStore.status).toBe(Status.CONNECTED)
   })
 })

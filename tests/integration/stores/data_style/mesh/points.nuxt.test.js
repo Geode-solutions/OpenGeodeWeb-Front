@@ -17,6 +17,7 @@ import { setupIntegrationTests } from "../../../setup"
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 const file_name = "test.og_edc2d"
 const geode_object = "EdgedCurve2D"
+const vertex_attribute = { name: "points" }
 
 let id, back_port, viewer_port, project_folder_path
 
@@ -83,16 +84,32 @@ describe("Mesh points", () => {
     test("test coloring", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
+      const coloringTypes = [
+        { name: "color" },
+        {
+          name: "vertex",
+          function: () =>
+            dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute),
+        },
+      ]
       for (let i = 0; i < coloringTypes.length; i++) {
+        if (coloringTypes[i].function) {
+          expect(() =>
+            dataStyleStore.setMeshPointsActiveColoring(
+              id,
+              coloringTypes[i].name,
+            ),
+          ).toThrowError()
+          await coloringTypes[i].function()
+        }
         const result = dataStyleStore.setMeshPointsActiveColoring(
           id,
-          coloringTypes[i],
+          coloringTypes[i].name,
         )
         expect(result).toBeInstanceOf(Promise)
         await result
         expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(
-          coloringTypes[i],
+          coloringTypes[i].name,
         )
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
@@ -122,7 +139,7 @@ describe("Mesh points", () => {
     test("Points vertex attribute", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const vertex_attribute = { name: "points" }
+
       const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute)
       expect(spy).toHaveBeenCalledWith(

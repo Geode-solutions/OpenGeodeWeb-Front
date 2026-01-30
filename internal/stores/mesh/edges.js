@@ -49,16 +49,16 @@ export function useMeshEdgesStyle() {
     )
     if (type === "color") {
       return setMeshEdgesColor(id, coloring.color)
-      // } else if (type === "vertex") {
-      //   if (coloring.vertex === null) {
-      //     return
-      //   }
-      //   return setMeshEdgesVertexAttribute(id, coloring.vertex)
-      // } else if (type === "edge") {
-      //   if (coloring.edge === null) {
-      //     return
-      //   }
-      //   return setMeshEdgesEdgeAttribute(id, coloring.edge)
+    } else if (type === "vertex") {
+      if (coloring.vertex === null) {
+        throw new Error("Vertex attribute not set")
+      }
+      return setMeshEdgesVertexAttribute(id, coloring.vertex)
+    } else if (type === "edge") {
+      if (coloring.edge === null) {
+        throw new Error("Edge attribute not set")
+      }
+      return setMeshEdgesEdgeAttribute(id, coloring.edge)
     } else {
       throw new Error("Unknown mesh edges coloring type: " + type)
     }
