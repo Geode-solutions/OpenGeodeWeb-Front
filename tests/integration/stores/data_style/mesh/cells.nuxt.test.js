@@ -47,7 +47,6 @@ describe("Mesh cells", () => {
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
       const result = dataStyleStore.setMeshCellsVisibility(id, visibility)
-      console.log("result", { result })
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(

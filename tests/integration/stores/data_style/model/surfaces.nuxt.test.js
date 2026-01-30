@@ -94,7 +94,6 @@ describe("Model surfaces", () => {
       )
       expect(result).toBeInstanceOf(Promise)
       await result
-      await result
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.color,
         { id, block_ids: surface_viewer_ids, color },
