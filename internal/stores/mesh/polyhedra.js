@@ -51,14 +51,14 @@ export function useMeshPolyhedraStyle() {
       return setMeshPolyhedraColor(id, coloring.color)
     } else if (type === "vertex") {
       if (coloring.vertex === null) {
-        return
+        throw new Error("Vertex attribute not set")
       }
-      return setPolyhedraVertexAttribute(id, coloring.vertex)
+      return setMeshPolyhedraVertexAttribute(id, coloring.vertex)
     } else if (type === "polyhedron") {
       if (coloring.polyhedron === null) {
-        return
+        throw new Error("Polyhedron attribute not set")
       }
-      return setPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
+      return setMeshPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
     } else {
       throw new Error("Unknown mesh polyhedra coloring type: " + type)
     }
@@ -85,10 +85,10 @@ export function useMeshPolyhedraStyle() {
     )
   }
 
-  function polyhedraVertexAttribute(id) {
+  function meshPolyhedraVertexAttribute(id) {
     return meshPolyhedraStyle(id).coloring.vertex
   }
-  function setPolyhedraVertexAttribute(id, vertex_attribute) {
+  function setMeshPolyhedraVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.vertex_attribute,
@@ -97,19 +97,19 @@ export function useMeshPolyhedraStyle() {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
           console.log(
-            setPolyhedraVertexAttribute.name,
+            setMeshPolyhedraVertexAttribute.name,
             { id },
-            polyhedraVertexAttribute(id),
+            meshPolyhedraVertexAttribute(id),
           )
         },
       },
     )
   }
 
-  function polyhedraPolyhedronAttribute(id) {
+  function meshPolyhedraPolyhedronAttribute(id) {
     return meshPolyhedraStyle(id).coloring.polyhedron
   }
-  function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
+  function setMeshPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
     const coloring = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.polyhedron_attribute,
@@ -118,9 +118,9 @@ export function useMeshPolyhedraStyle() {
         response_function: () => {
           coloring.polyhedron = polyhedron_attribute
           console.log(
-            setPolyhedraPolyhedronAttribute.name,
+            setMeshPolyhedraPolyhedronAttribute.name,
             { id },
-            polyhedraPolyhedronAttribute(id),
+            meshPolyhedraPolyhedronAttribute(id),
           )
         },
       },
@@ -139,13 +139,13 @@ export function useMeshPolyhedraStyle() {
     applyMeshPolyhedraStyle,
     meshPolyhedraActiveColoring,
     meshPolyhedraColor,
-    polyhedraVertexAttribute,
+    meshPolyhedraVertexAttribute,
     meshPolyhedraVisibility,
-    polyhedraPolyhedronAttribute,
+    meshPolyhedraPolyhedronAttribute,
     setMeshPolyhedraActiveColoring,
     setMeshPolyhedraColor,
-    setPolyhedraPolyhedronAttribute,
-    setPolyhedraVertexAttribute,
+    setMeshPolyhedraPolyhedronAttribute,
+    setMeshPolyhedraVertexAttribute,
     setMeshPolyhedraVisibility,
   }
 }

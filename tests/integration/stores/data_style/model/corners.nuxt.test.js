@@ -51,7 +51,13 @@ describe("Model corners", () => {
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
-      await dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility)
+      const result = dataStyleStore.setModelCornersVisibility(
+        id,
+        corner_ids,
+        visibility,
+      )
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.visibility,
         { id, block_ids: corner_viewer_ids, visibility },
@@ -81,7 +87,9 @@ describe("Model corners", () => {
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
-      await dataStyleStore.setModelCornersColor(id, corner_ids, color)
+      const result = dataStyleStore.setModelCornersColor(id, corner_ids, color)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.color,
         { id, block_ids: corner_viewer_ids, color },

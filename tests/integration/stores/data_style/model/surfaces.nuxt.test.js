@@ -51,11 +51,13 @@ describe("Model surfaces", () => {
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear() // Clear calls from setup (applyDefaultStyle)
-      await dataStyleStore.setModelSurfacesVisibility(
+      const result = dataStyleStore.setModelSurfacesVisibility(
         id,
         surface_ids,
         visibility,
       )
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.visibility,
         { id, block_ids: surface_viewer_ids, visibility },
@@ -85,7 +87,13 @@ describe("Model surfaces", () => {
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear() // Clear calls from setup (applyDefaultStyle)
-      await dataStyleStore.setModelSurfacesColor(id, surface_ids, color)
+      const result = dataStyleStore.setModelSurfacesColor(
+        id,
+        surface_ids,
+        color,
+      )
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.color,
         { id, block_ids: surface_viewer_ids, color },

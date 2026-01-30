@@ -51,12 +51,12 @@ export function useMeshEdgesStyle() {
       return setMeshEdgesColor(id, coloring.color)
     } else if (type === "vertex") {
       if (coloring.vertex === null) {
-        return
+        throw new Error("Vertex attribute not set")
       }
       return setMeshEdgesVertexAttribute(id, coloring.vertex)
     } else if (type === "edge") {
       if (coloring.edge === null) {
-        return
+        throw new Error("Edge attribute not set")
       }
       return setMeshEdgesEdgeAttribute(id, coloring.edge)
     } else {

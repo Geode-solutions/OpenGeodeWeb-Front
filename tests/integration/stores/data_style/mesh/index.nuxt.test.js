@@ -43,7 +43,9 @@ describe("Mesh", () => {
       const viewerStore = useViewerStore()
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshVisibility(id, visibility)
+      const result = dataStyleStore.setMeshVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         mesh_schemas.visibility,
         { id, visibility },
@@ -60,7 +62,9 @@ describe("Mesh", () => {
     test("test", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      await dataStyleStore.applyMeshStyle(id)
+      const result = dataStyleStore.applyMeshStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
