@@ -45,7 +45,9 @@ describe("Mesh polyhedra", () => {
       const viewerStore = useViewerStore()
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPolyhedraVisibility(id, visibility)
+      const result = dataStyleStore.setMeshPolyhedraVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         mesh_polyhedra_schemas.visibility,
         { id, visibility },
@@ -62,7 +64,9 @@ describe("Mesh polyhedra", () => {
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPolyhedraColor(id, color)
+      const result = dataStyleStore.setMeshPolyhedraColor(id, color)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         mesh_polyhedra_schemas.color,
         { id, color },

@@ -1,4 +1,4 @@
-// Third party imports
+s // Third party imports
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
@@ -43,7 +43,9 @@ describe("Mesh EdgedCurve3D", () => {
       const viewerStore = useViewerStore()
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshEdgesVisibility(id, visibility)
+      const result = dataStyleStore.setMeshEdgesVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         mesh_edges_schemas.visibility,
         { id, visibility },
@@ -60,7 +62,9 @@ describe("Mesh EdgedCurve3D", () => {
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshEdgesColor(id, color)
+      const result = dataStyleStore.setMeshEdgesColor(id, color)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         mesh_edges_schemas.color,
         { id, color },
