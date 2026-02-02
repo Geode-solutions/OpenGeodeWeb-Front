@@ -179,23 +179,21 @@
 </script>
 
 <template>
-  <div>
-    <v-select
-      v-model="polygon_attribute_name"
-      :items="polygon_attribute_names"
-      label="Select an attribute"
-      density="compact"
-    />
-    <ViewerOptionsAttributeColorBar
-      v-if="polygon_attribute_name"
-      v-model:min="polygon_attribute.min"
-      v-model:max="polygon_attribute.max"
-      v-model:colorMap="polygon_attribute.colorMap"
-      :auto-min="selectedAttributeRange[0]"
-      :auto-max="selectedAttributeRange[1]"
-      @update:min="onScalarRangeChange"
-      @update:max="onScalarRangeChange"
-      @update:colorMap="onColorMapChange"
-    />
-  </div>
+  <v-select
+    v-model="polygon_attribute_name"
+    :items="polygon_attribute_names"
+    label="Select an attribute"
+    density="compact"
+  />
+  <ViewerOptionsAttributeColorBar
+    v-if="polygon_attribute_name"
+    v-model:min="polygon_attribute.min"
+    v-model:max="polygon_attribute.max"
+    v-model:colorMap="polygon_attribute.colorMap"
+    :auto-min="selectedAttributeRange[0]"
+    :auto-max="selectedAttributeRange[1]"
+    @update:min="onScalarRangeChange"
+    @update:max="onScalarRangeChange"
+    @update:colorMap="onColorMapChange"
+  />
 </template>

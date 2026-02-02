@@ -177,25 +177,23 @@
 </script>
 
 <template>
-  <div>
-    <v-row justify="center" align="center">
-      <v-col cols="auto">
-        <v-icon
-          size="30"
-          icon="mdi-ray-end-arrow"
-          v-tooltip:left="'Edge Attribute'"
-        />
-      </v-col>
-      <v-col>
-        <v-select
-          v-model="edge_attribute_name"
-          :items="edge_attribute_names"
-          label="Select an edge attribute"
-          density="compact"
-          hide-details
-        />
-      </v-col>
-    </v-row>
+  <v-row justify="center" align="center">
+    <v-col cols="auto">
+      <v-icon
+        size="30"
+        icon="mdi-ray-end-arrow"
+        v-tooltip:left="'Edge Attribute'"
+      />
+    </v-col>
+    <v-col>
+      <v-select
+        v-model="edge_attribute_name"
+        :items="edge_attribute_names"
+        label="Select an edge attribute"
+        density="compact"
+        hide-details
+      />
+    </v-col>
     <ViewerOptionsAttributeColorBar
       v-if="edge_attribute_name"
       v-model:min="edge_attribute.min"
@@ -207,5 +205,5 @@
       @update:max="onScalarRangeChange"
       @update:colorMap="onColorMapChange"
     />
-  </div>
+  </v-row>
 </template>
