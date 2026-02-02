@@ -247,15 +247,15 @@ export function useMeshPolygonsStyle() {
       }
       return setMeshPolygonsTextures(id, coloring.textures)
     } else if (type === "vertex") {
-      if (coloring.vertex === null) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex) {
+        return setMeshPolygonsVertexAttribute(id, coloring.vertex)
       }
-      return setMeshPolygonsVertexAttribute(id, coloring.vertex)
+      return Promise.resolve()
     } else if (type === "polygon") {
-      if (coloring.polygon === null) {
-        throw new Error("Polygon attribute not set")
+      if (coloring.polygon) {
+        return setMeshPolygonsPolygonAttribute(id, coloring.polygon)
       }
-      return setMeshPolygonsPolygonAttribute(id, coloring.polygon)
+      return Promise.resolve()
     } else {
       throw new Error("Unknown mesh polygons coloring type: " + type)
     }
