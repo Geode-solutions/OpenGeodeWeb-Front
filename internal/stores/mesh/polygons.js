@@ -281,9 +281,7 @@ export function useMeshPolygonsStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setMeshPolygonsPolygonScalarRange(id, min, max))
         if (colorMap) {
-          promises.push(
-            setMeshPolygonsPolygonColorMap(id, colorMap, min, max),
-          )
+          promises.push(setMeshPolygonsPolygonColorMap(id, colorMap, min, max))
         }
       }
     }
