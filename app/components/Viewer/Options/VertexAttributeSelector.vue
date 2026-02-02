@@ -18,14 +18,13 @@
 
   const vertex_attribute_name = ref("")
   const vertex_attribute_names = ref([])
-  const vertex_attribute_metadata = ref({})
 
   const selectedAttributeRange = computed(() => {
-    if (
-      vertex_attribute_name.value &&
-      vertex_attribute_metadata.value[vertex_attribute_name.value]
-    ) {
-      return vertex_attribute_metadata.value[vertex_attribute_name.value]
+    const attribute = vertex_attribute_names.value.find(
+      (attr) => attr.attribute_name === vertex_attribute_name.value,
+    )
+    if (attribute) {
+      return [attribute.min_value, attribute.max_value]
     }
     return [0, 1]
   })
@@ -77,9 +76,11 @@
       vertex_attribute.max = cached.max
       vertex_attribute.colorMap = cached.colorMap
     } else {
-      const range = vertex_attribute_metadata.value[attributeName]
-      vertex_attribute.min = range ? range[0] : 0
-      vertex_attribute.max = range ? range[1] : 1
+      const attribute = vertex_attribute_names.value.find(
+        (attr) => attr.attribute_name === attributeName,
+      )
+      vertex_attribute.min = attribute ? attribute.min_value : 0
+      vertex_attribute.max = attribute ? attribute.max_value : 1
       vertex_attribute.colorMap = "Cool to Warm"
     }
     nextTick(() => {
@@ -153,17 +154,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          const names = []
-          const metadata = {}
-          for (const attribute of response.attributes) {
-            names.push(attribute.attribute_name)
-            metadata[attribute.attribute_name] = [
-              attribute.min_value,
-              attribute.max_value,
-            ]
-          }
-          vertex_attribute_names.value = names
-          vertex_attribute_metadata.value = metadata
+          vertex_attribute_names.value = response.attributes || []
         },
       },
     )
@@ -175,6 +166,8 @@
     <v-select
       v-model="vertex_attribute_name"
       :items="vertex_attribute_names"
+      item-title="attribute_name"
+      item-value="attribute_name"
       label="Select an attribute"
       density="compact"
     />

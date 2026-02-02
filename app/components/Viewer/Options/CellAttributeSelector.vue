@@ -12,18 +12,17 @@
   const model = defineModel()
   const cell_attribute_name = ref("")
   const cell_attribute_names = ref([])
-  const cell_attribute_metadata = ref({})
 
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
   const selectedAttributeRange = computed(() => {
-    if (
-      cell_attribute_name.value &&
-      cell_attribute_metadata.value[cell_attribute_name.value]
-    ) {
-      return cell_attribute_metadata.value[cell_attribute_name.value]
+    const attribute = cell_attribute_names.value.find(
+      (attr) => attr.attribute_name === cell_attribute_name.value,
+    )
+    if (attribute) {
+      return [attribute.min_value, attribute.max_value]
     }
     return [0, 1]
   })
@@ -72,9 +71,11 @@
       cell_attribute.max = cached.max
       cell_attribute.colorMap = cached.colorMap
     } else {
-      const range = cell_attribute_metadata.value[attributeName]
-      cell_attribute.min = range ? range[0] : 0
-      cell_attribute.max = range ? range[1] : 1
+      const attribute = cell_attribute_names.value.find(
+        (attr) => attr.attribute_name === attributeName,
+      )
+      cell_attribute.min = attribute ? attribute.min_value : 0
+      cell_attribute.max = attribute ? attribute.max_value : 1
       cell_attribute.colorMap = "Cool to Warm"
     }
     // Apply the loaded settings to the viewer
@@ -140,17 +141,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          const names = []
-          const metadata = {}
-          for (const attribute of response.attributes) {
-            names.push(attribute.attribute_name)
-            metadata[attribute.attribute_name] = [
-              attribute.min_value,
-              attribute.max_value,
-            ]
-          }
-          cell_attribute_names.value = names
-          cell_attribute_metadata.value = metadata
+          cell_attribute_names.value = response.attributes || []
         },
       },
     )
@@ -162,6 +153,8 @@
     <v-select
       v-model="cell_attribute_name"
       :items="cell_attribute_names"
+      item-title="attribute_name"
+      item-value="attribute_name"
       label="Select an attribute"
       density="compact"
     />

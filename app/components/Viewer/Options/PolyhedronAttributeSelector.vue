@@ -16,16 +16,13 @@
 
   const polyhedron_attribute_name = ref("")
   const polyhedron_attribute_names = ref([])
-  const polyhedron_attribute_metadata = ref({})
 
   const selectedAttributeRange = computed(() => {
-    if (
-      polyhedron_attribute_name.value &&
-      polyhedron_attribute_metadata.value[polyhedron_attribute_name.value]
-    ) {
-      return polyhedron_attribute_metadata.value[
-        polyhedron_attribute_name.value
-      ]
+    const attribute = polyhedron_attribute_names.value.find(
+      (attr) => attr.attribute_name === polyhedron_attribute_name.value,
+    )
+    if (attribute) {
+      return [attribute.min_value, attribute.max_value]
     }
     return [0, 1]
   })
@@ -74,9 +71,11 @@
       polyhedron_attribute.max = cached.max
       polyhedron_attribute.colorMap = cached.colorMap
     } else {
-      const range = polyhedron_attribute_metadata.value[attributeName]
-      polyhedron_attribute.min = range ? range[0] : 0
-      polyhedron_attribute.max = range ? range[1] : 1
+      const attribute = polyhedron_attribute_names.value.find(
+        (attr) => attr.attribute_name === attributeName,
+      )
+      polyhedron_attribute.min = attribute ? attribute.min_value : 0
+      polyhedron_attribute.max = attribute ? attribute.max_value : 1
       polyhedron_attribute.colorMap = "Cool to Warm"
     }
     // Apply the loaded settings to the viewer
@@ -149,17 +148,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          const names = []
-          const metadata = {}
-          for (const attribute of response.attributes) {
-            names.push(attribute.attribute_name)
-            metadata[attribute.attribute_name] = [
-              attribute.min_value,
-              attribute.max_value,
-            ]
-          }
-          polyhedron_attribute_names.value = names
-          polyhedron_attribute_metadata.value = metadata
+          polyhedron_attribute_names.value = response.attributes || []
         },
       },
     )
@@ -171,6 +160,8 @@
     <v-select
       v-model="polyhedron_attribute_name"
       :items="polyhedron_attribute_names"
+      item-title="attribute_name"
+      item-value="attribute_name"
       label="Select an attribute"
       density="compact"
     />

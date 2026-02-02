@@ -12,18 +12,17 @@
   const model = defineModel()
   const polygon_attribute_name = ref("")
   const polygon_attribute_names = ref([])
-  const polygon_attribute_metadata = ref({})
 
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
   const selectedAttributeRange = computed(() => {
-    if (
-      polygon_attribute_name.value &&
-      polygon_attribute_metadata.value[polygon_attribute_name.value]
-    ) {
-      return polygon_attribute_metadata.value[polygon_attribute_name.value]
+    const attribute = polygon_attribute_names.value.find(
+      (attr) => attr.attribute_name === polygon_attribute_name.value,
+    )
+    if (attribute) {
+      return [attribute.min_value, attribute.max_value]
     }
     return [0, 1]
   })
@@ -75,9 +74,11 @@
       polygon_attribute.max = cached.max
       polygon_attribute.colorMap = cached.colorMap
     } else {
-      const range = polygon_attribute_metadata.value[attributeName]
-      polygon_attribute.min = range ? range[0] : 0
-      polygon_attribute.max = range ? range[1] : 1
+      const attribute = polygon_attribute_names.value.find(
+        (attr) => attr.attribute_name === attributeName,
+      )
+      polygon_attribute.min = attribute ? attribute.min_value : 0
+      polygon_attribute.max = attribute ? attribute.max_value : 1
       polygon_attribute.colorMap = "Cool to Warm"
     }
     nextTick(() => {
@@ -149,17 +150,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          const names = []
-          const metadata = {}
-          for (const attribute of response.attributes) {
-            names.push(attribute.attribute_name)
-            metadata[attribute.attribute_name] = [
-              attribute.min_value,
-              attribute.max_value,
-            ]
-          }
-          polygon_attribute_names.value = names
-          polygon_attribute_metadata.value = metadata
+          polygon_attribute_names.value = response.attributes || []
         },
       },
     )
@@ -170,6 +161,8 @@
   <v-select
     v-model="polygon_attribute_name"
     :items="polygon_attribute_names"
+    item-title="attribute_name"
+    item-value="attribute_name"
     label="Select an attribute"
     density="compact"
   />

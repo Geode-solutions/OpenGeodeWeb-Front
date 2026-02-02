@@ -17,14 +17,13 @@
 
   const edge_attribute_name = ref("")
   const edge_attribute_names = ref([])
-  const edge_attribute_metadata = ref({})
 
   const selectedAttributeRange = computed(() => {
-    if (
-      edge_attribute_name.value &&
-      edge_attribute_metadata.value[edge_attribute_name.value]
-    ) {
-      return edge_attribute_metadata.value[edge_attribute_name.value]
+    const attribute = edge_attribute_names.value.find(
+      (attr) => attr.attribute_name === edge_attribute_name.value,
+    )
+    if (attribute) {
+      return [attribute.min_value, attribute.max_value]
     }
     return [0, 1]
   })
@@ -73,9 +72,11 @@
       edge_attribute.max = cached.max
       edge_attribute.colorMap = cached.colorMap
     } else {
-      const range = edge_attribute_metadata.value[attributeName]
-      edge_attribute.min = range ? range[0] : 0
-      edge_attribute.max = range ? range[1] : 1
+      const attribute = edge_attribute_names.value.find(
+        (attr) => attr.attribute_name === attributeName,
+      )
+      edge_attribute.min = attribute ? attribute.min_value : 0
+      edge_attribute.max = attribute ? attribute.max_value : 1
       edge_attribute.colorMap = "Cool to Warm"
     }
     nextTick(() => {
@@ -136,17 +137,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          const names = []
-          const metadata = {}
-          for (const attribute of response.attributes) {
-            names.push(attribute.attribute_name)
-            metadata[attribute.attribute_name] = [
-              attribute.min_value,
-              attribute.max_value,
-            ]
-          }
-          edge_attribute_names.value = names
-          edge_attribute_metadata.value = metadata
+          edge_attribute_names.value = response.attributes || []
         },
       },
     )
@@ -177,6 +168,8 @@
       <v-select
         v-model="edge_attribute_name"
         :items="edge_attribute_names"
+        item-title="attribute_name"
+        item-value="attribute_name"
         label="Select an edge attribute"
         density="compact"
         hide-details
