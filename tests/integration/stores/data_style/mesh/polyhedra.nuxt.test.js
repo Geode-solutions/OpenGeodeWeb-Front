@@ -164,4 +164,13 @@ describe("Mesh polyhedra", () => {
     )
     expect(viewerStore.status).toBe(Status.CONNECTED)
   })
+
+  test("Polyhedra apply default style", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const result = dataStyleStore.applyMeshPolyhedraStyle(id)
+    expect(result).toBeInstanceOf(Promise)
+    await result
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
 })

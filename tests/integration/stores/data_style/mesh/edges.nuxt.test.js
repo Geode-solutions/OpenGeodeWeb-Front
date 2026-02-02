@@ -39,120 +39,123 @@ afterEach(async () => {
 })
 
 describe("Mesh edges", () => {
-  describe("Edges", () => {
-    test("Edges visibility", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const visibility = true
-      const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshEdgesVisibility(id, visibility)
-      expect(result).toBeInstanceOf(Promise)
-      await result
-      expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.visibility,
-        { id, visibility },
-        {
-          response_function: expect.any(Function),
-        },
-      )
-      expect(dataStyleStore.meshEdgesVisibility(id)).toBe(visibility)
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
+  test("Edges visibility", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const visibility = true
+    const spy = vi.spyOn(viewerStore, "request")
+    const result = dataStyleStore.setMeshEdgesVisibility(id, visibility)
+    expect(result).toBeInstanceOf(Promise)
+    await result
+    expect(spy).toHaveBeenCalledWith(
+      mesh_edges_schemas.visibility,
+      { id, visibility },
+      {
+        response_function: expect.any(Function),
+      },
+    )
+    expect(dataStyleStore.meshEdgesVisibility(id)).toBe(visibility)
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
 
-    test("Edges color red", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshEdgesColor(id, color)
-      expect(result).toBeInstanceOf(Promise)
-      await result
-      expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.color,
-        { id, color },
-        {
-          response_function: expect.any(Function),
-        },
-      )
-      expect(dataStyleStore.meshEdgesColor(id)).toStrictEqual(color)
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
+  test("Edges color red", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const color = { r: 255, g: 0, b: 0 }
+    const spy = vi.spyOn(viewerStore, "request")
+    const result = dataStyleStore.setMeshEdgesColor(id, color)
+    expect(result).toBeInstanceOf(Promise)
+    await result
+    expect(spy).toHaveBeenCalledWith(
+      mesh_edges_schemas.color,
+      { id, color },
+      {
+        response_function: expect.any(Function),
+      },
+    )
+    expect(dataStyleStore.meshEdgesColor(id)).toStrictEqual(color)
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
 
-    test("Edges vertex attribute", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
+  test("Edges vertex attribute", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
 
-      const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute)
-      expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.vertex_attribute,
-        { id, ...vertex_attribute },
-        {
-          response_function: expect.any(Function),
-        },
-      )
-      expect(dataStyleStore.meshEdgesVertexAttribute(id)).toStrictEqual(
-        vertex_attribute,
-      )
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
+    const spy = vi.spyOn(viewerStore, "request")
+    await dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute)
+    expect(spy).toHaveBeenCalledWith(
+      mesh_edges_schemas.vertex_attribute,
+      { id, ...vertex_attribute },
+      {
+        response_function: expect.any(Function),
+      },
+    )
+    expect(dataStyleStore.meshEdgesVertexAttribute(id)).toStrictEqual(
+      vertex_attribute,
+    )
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
 
-    test("Edges edge attribute", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
+  test("Edges edge attribute", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
 
-      const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute)
-      expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.edge_attribute,
-        { id, ...edge_attribute },
-        {
-          response_function: expect.any(Function),
-        },
-      )
-      expect(dataStyleStore.meshEdgesEdgeAttribute(id)).toStrictEqual(
-        edge_attribute,
-      )
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
+    const spy = vi.spyOn(viewerStore, "request")
+    await dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute)
+    expect(spy).toHaveBeenCalledWith(
+      mesh_edges_schemas.edge_attribute,
+      { id, ...edge_attribute },
+      {
+        response_function: expect.any(Function),
+      },
+    )
+    expect(dataStyleStore.meshEdgesEdgeAttribute(id)).toStrictEqual(
+      edge_attribute,
+    )
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
 
-    test("Edges active coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const coloringTypes = [
-        { name: "color" },
-        {
-          name: "vertex",
-          function: () =>
-            dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute),
-        },
-        {
-          name: "edge",
-          function: () =>
-            dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute),
-        },
-      ]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        if (coloringTypes[i].function) {
-          expect(() =>
-            dataStyleStore.setMeshEdgesActiveColoring(
-              id,
-              coloringTypes[i].name,
-            ),
-          ).toThrowError()
-          await coloringTypes[i].function()
-        }
-        const result = dataStyleStore.setMeshEdgesActiveColoring(
-          id,
-          coloringTypes[i].name,
-        )
-        expect(result).toBeInstanceOf(Promise)
-        await result
-        expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
-          coloringTypes[i].name,
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
+  test("Edges active coloring", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const coloringTypes = [
+      { name: "color" },
+      {
+        name: "vertex",
+        function: () =>
+          dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute),
+      },
+      {
+        name: "edge",
+        function: () =>
+          dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute),
+      },
+    ]
+    for (let i = 0; i < coloringTypes.length; i++) {
+      if (coloringTypes[i].function) {
+        expect(() =>
+          dataStyleStore.setMeshEdgesActiveColoring(id, coloringTypes[i].name),
+        ).toThrowError()
+        await coloringTypes[i].function()
       }
-    })
+      const result = dataStyleStore.setMeshEdgesActiveColoring(
+        id,
+        coloringTypes[i].name,
+      )
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
+        coloringTypes[i].name,
+      )
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    }
+  })
+  test("Edges apply style", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const result = dataStyleStore.applyMeshEdgesStyle(id)
+    expect(result).toBeInstanceOf(Promise)
+    await result
+    expect(viewerStore.status).toBe(Status.CONNECTED)
   })
 })

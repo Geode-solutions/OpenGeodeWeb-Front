@@ -155,4 +155,13 @@ describe("Mesh points", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
+
+  test("Points apply default style", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const result = dataStyleStore.applyMeshPointsStyle(id)
+    expect(result).toBeInstanceOf(Promise)
+    await result
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
 })
