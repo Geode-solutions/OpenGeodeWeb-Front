@@ -114,6 +114,12 @@
   }
 
   onMounted(() => {
+    nextTick(() => {
+      drawLutCanvas()
+    })
+  })
+
+  watch(lutCanvas, () => {
     drawLutCanvas()
   })
 
@@ -150,25 +156,28 @@
     flex-direction: column;
     gap: 4px;
     padding: 8px;
-    border: 1px solid #ccc;
     border-radius: 4px;
-    background: white;
+    background-color: rgba(30, 30, 30, 0.85) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    transition: background-color 0.2s;
   }
 
   .color-map-picker:hover {
-    background: #f5f5f5;
+    background-color: rgba(255, 255, 255, 0.1) !important;
   }
 
   .preset-name {
     font-size: 12px;
     font-weight: 500;
-    color: #333;
+    color: #e0e0e0;
   }
 
   .lut-canvas {
     width: 100%;
     height: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 2px;
   }
 </style>

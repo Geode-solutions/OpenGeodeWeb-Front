@@ -123,7 +123,7 @@
         polyhedron_attribute.min,
         polyhedron_attribute.max,
       )
-      hybridViewerStore.remoteRender()
+      onColorMapChange()
     }
   }
 
@@ -135,8 +135,17 @@
     ) {
       const preset = getRGBPointsFromPreset(polyhedron_attribute.colorMap)
       if (preset && preset.RGBPoints) {
-        const points = convertRGBPointsToSchemaFormat(preset.RGBPoints)
-        dataStyleStore.setPolyhedraPolyhedraColorMap(props.id, points)
+        const points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          polyhedron_attribute.min,
+          polyhedron_attribute.max,
+        )
+        dataStyleStore.setPolyhedraPolyhedraColorMap(
+          props.id,
+          points,
+          polyhedron_attribute.min,
+          polyhedron_attribute.max,
+        )
         hybridViewerStore.remoteRender()
       }
     }
@@ -152,9 +161,17 @@
       { id: props.id },
       {
         response_function: (response) => {
-          polyhedron_attribute_names.value = response.polyhedron_attribute_names
-          polyhedron_attribute_metadata.value =
-            response.polyhedron_attribute_metadata || {}
+          const names = []
+          const metadata = {}
+          for (const attribute of response.attributes) {
+            names.push(attribute.attribute_name)
+            metadata[attribute.attribute_name] = [
+              attribute.min_value,
+              attribute.max_value,
+            ]
+          }
+          polyhedron_attribute_names.value = names
+          polyhedron_attribute_metadata.value = metadata
         },
       },
     )

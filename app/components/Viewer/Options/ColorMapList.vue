@@ -14,6 +14,7 @@
   const setCanvasRef = (name, el) => {
     if (el) {
       canvasRefs.value[name] = el
+      drawPresetCanvas(name, el)
     }
   }
 
@@ -106,51 +107,63 @@
   <div class="color-map-list">
     <v-text-field
       v-model="filterText"
-      placeholder="Filter color maps..."
+      placeholder="Search presets..."
       density="compact"
-      clearable
       hide-details
       prepend-inner-icon="mdi-magnify"
-      class="mb-2"
+      variant="outlined"
+      class="mb-3 search-input"
     />
-    <v-list density="compact" max-height="400" class="overflow-y-auto">
+    <v-list
+      density="compact"
+      max-height="350"
+      class="overflow-y-auto preset-list"
+    >
       <template v-for="(item, index) in filteredPresets" :key="index">
+        <!-- Group -->
         <v-list-group v-if="item.Children" :value="item.Name">
           <template #activator="{ props }">
-            <v-list-item v-bind="props" :title="item.Name" />
+            <v-list-item
+              v-bind="props"
+              :title="item.Name"
+              class="group-header"
+            />
           </template>
+
           <v-list-item
             v-for="(child, childIndex) in item.Children"
             :key="childIndex"
             @click="$emit('select', child)"
-            class="preset-item"
+            class="preset-item pl-4"
           >
-            <v-list-item-title>{{ child.Name }}</v-list-item-title>
-            <template #append>
+            <div class="d-flex flex-column w-100 py-1">
+              <span class="preset-item-name mb-1">{{ child.Name }}</span>
               <canvas
                 :ref="(el) => setCanvasRef(child.Name, el)"
-                width="100"
+                width="200"
                 height="20"
                 class="preset-canvas"
               />
-            </template>
+            </div>
           </v-list-item>
         </v-list-group>
+
+        <!-- Single Item -->
         <v-list-item
           v-else
           :key="index"
           @click="$emit('select', item)"
           class="preset-item"
         >
-          <v-list-item-title>{{ item.Name }}</v-list-item-title>
-          <template #append>
+          <div class="d-flex flex-column w-100 py-1">
+            <span class="preset-item-name mb-1">{{ item.Name }}</span>
             <canvas
               :ref="(el) => setCanvasRef(item.Name, el)"
-              width="100"
+              width="200"
               height="20"
               class="preset-canvas"
             />
-          </template>
+          </div>
         </v-list-item>
       </template>
     </v-list>
@@ -159,20 +172,56 @@
 
 <style scoped>
   .color-map-list {
-    width: 350px;
-    padding: 8px;
+    width: 320px;
+    padding: 12px;
+    background-color: rgba(30, 30, 30, 0.85) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px;
+  }
+
+  .search-input :deep(.v-field__input) {
+    font-size: 14px;
+    color: white !important;
+  }
+
+  .search-input :deep(.v-field__outline__start),
+  .search-input :deep(.v-field__outline__end),
+  .search-input :deep(.v-field__outline__notch::before),
+  .search-input :deep(.v-field__outline__notch::after) {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .preset-list {
+    background: transparent !important;
+  }
+
+  .group-header {
+    font-weight: 600;
+    color: #e0e0e0 !important;
   }
 
   .preset-item {
     cursor: pointer;
+    border-radius: 6px;
+    margin-bottom: 2px;
+    transition: background-color 0.2s;
   }
 
   .preset-item:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .preset-item-name {
+    font-size: 12px;
+    color: #bdbdbd;
   }
 
   .preset-canvas {
-    border: 1px solid #ccc;
-    border-radius: 2px;
+    width: 100%;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 </style>

@@ -46,6 +46,20 @@
       hybridViewerStore.remoteRender()
     },
   })
+  const vertex_attribute = computed({
+    get: () => dataStyleStore.meshPolygonsVertexAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolygonsVertexAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const polygon_attribute = computed({
+    get: () => dataStyleStore.meshPolygonsPolygonAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolygonsPolygonAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
 </script>
 <template>
   <ViewerContextMenuItem

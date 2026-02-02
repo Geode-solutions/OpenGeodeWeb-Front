@@ -4,18 +4,27 @@ export function getRGBPointsFromPreset(presetName) {
   return vtkColorMaps.getPresetByName(presetName)
 }
 
-export function convertRGBPointsToSchemaFormat(flatRGBPoints) {
+export function convertRGBPointsToSchemaFormat(flatRGBPoints, min, max) {
   if (!flatRGBPoints || !Array.isArray(flatRGBPoints)) {
     return []
   }
+
+  const minVal = min !== undefined && min !== null ? Number(min) : 0
+  const maxVal = max !== undefined && max !== null ? Number(max) : 1
+  const range = maxVal - minVal
+
   const points = []
   for (let i = 0; i < flatRGBPoints.length; i += 4) {
-    points.push([
-      flatRGBPoints[i],
-      flatRGBPoints[i + 1] * 255,
-      flatRGBPoints[i + 2] * 255,
-      flatRGBPoints[i + 3] * 255,
-    ])
+    let x = flatRGBPoints[i]
+    if (min !== undefined && max !== undefined) {
+      x = minVal + x * range
+    }
+    points.push(
+      x,
+      flatRGBPoints[i + 1],
+      flatRGBPoints[i + 2],
+      flatRGBPoints[i + 3],
+    )
   }
   return points
 }

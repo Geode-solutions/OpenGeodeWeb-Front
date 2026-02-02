@@ -130,11 +130,14 @@ export function useMeshPolyhedraStyle() {
   }
 
   function setPolyhedraPolyhedronScalarRange(id, minimum, maximum) {
+    const polyhedra_style = meshPolyhedraStyle(id)
     return viewerStore.request(
       mesh_polyhedra_schemas.polyhedron_scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
+          polyhedra_style.coloring.polyhedron.min = minimum
+          polyhedra_style.coloring.polyhedron.max = maximum
           console.log(setPolyhedraPolyhedronScalarRange.name, {
             id,
             minimum,
@@ -146,11 +149,14 @@ export function useMeshPolyhedraStyle() {
   }
 
   function setPolyhedraVertexScalarRange(id, minimum, maximum) {
+    const polyhedra_style = meshPolyhedraStyle(id)
     return viewerStore.request(
       mesh_polyhedra_schemas.vertex_scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
+          polyhedra_style.coloring.vertex.min = minimum
+          polyhedra_style.coloring.vertex.max = maximum
           console.log(setPolyhedraVertexScalarRange.name, {
             id,
             minimum,
@@ -161,25 +167,39 @@ export function useMeshPolyhedraStyle() {
     )
   }
 
-  function setPolyhedraVertexColorMap(id, points) {
+  function setPolyhedraVertexColorMap(id, points, minimum, maximum) {
+    const polyhedra_style = meshPolyhedraStyle(id)
     return viewerStore.request(
       mesh_polyhedra_schemas.vertex_color_map,
-      { id, points },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
-          console.log(setPolyhedraVertexColorMap.name, { id, points })
+          polyhedra_style.coloring.vertex.colorMap = points
+          console.log(setPolyhedraVertexColorMap.name, {
+            id,
+            points,
+            minimum,
+            maximum,
+          })
         },
       },
     )
   }
 
-  function setPolyhedraPolyhedraColorMap(id, points) {
+  function setPolyhedraPolyhedraColorMap(id, points, minimum, maximum) {
+    const polyhedra_style = meshPolyhedraStyle(id)
     return viewerStore.request(
       mesh_polyhedra_schemas.polyhedra_color_map,
-      { id, points },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
-          console.log(setPolyhedraPolyhedraColorMap.name, { id, points })
+          polyhedra_style.coloring.polyhedron.colorMap = points
+          console.log(setPolyhedraPolyhedraColorMap.name, {
+            id,
+            points,
+            minimum,
+            maximum,
+          })
         },
       },
     )

@@ -44,6 +44,13 @@
       hybridViewerStore.remoteRender()
     },
   })
+  const vertex_attribute = computed({
+    get: () => dataStyleStore.meshPointsVertexAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
 </script>
 <template>
   <ViewerContextMenuItem

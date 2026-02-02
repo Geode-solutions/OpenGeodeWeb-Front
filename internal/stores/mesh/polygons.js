@@ -125,11 +125,14 @@ export function useMeshPolygonsStyle() {
   }
 
   function setMeshPolygonsPolygonScalarRange(id, minimum, maximum) {
+    const polygons_style = meshPolygonsStyle(id)
     return viewerStore.request(
       mesh_polygons_schemas.polygon_scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
+          polygons_style.coloring.polygon.min = minimum
+          polygons_style.coloring.polygon.max = maximum
           console.log(setMeshPolygonsPolygonScalarRange.name, {
             id,
             minimum,
@@ -141,11 +144,14 @@ export function useMeshPolygonsStyle() {
   }
 
   function setMeshPolygonsVertexScalarRange(id, minimum, maximum) {
+    const polygons_style = meshPolygonsStyle(id)
     return viewerStore.request(
       mesh_polygons_schemas.vertex_scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
+          polygons_style.coloring.vertex.min = minimum
+          polygons_style.coloring.vertex.max = maximum
           console.log(setMeshPolygonsVertexScalarRange.name, {
             id,
             minimum,
@@ -156,25 +162,39 @@ export function useMeshPolygonsStyle() {
     )
   }
 
-  function setMeshPolygonsVertexColorMap(id, points) {
+  function setMeshPolygonsVertexColorMap(id, points, minimum, maximum) {
+    const polygons_style = meshPolygonsStyle(id)
     return viewerStore.request(
       mesh_polygons_schemas.vertex_color_map,
-      { id, points },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshPolygonsVertexColorMap.name, { id, points })
+          polygons_style.coloring.vertex.colorMap = points
+          console.log(setMeshPolygonsVertexColorMap.name, {
+            id,
+            points,
+            minimum,
+            maximum,
+          })
         },
       },
     )
   }
 
-  function setMeshPolygonsPolygonColorMap(id, points) {
+  function setMeshPolygonsPolygonColorMap(id, points, minimum, maximum) {
+    const polygons_style = meshPolygonsStyle(id)
     return viewerStore.request(
       mesh_polygons_schemas.polygon_color_map,
-      { id, points },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshPolygonsPolygonColorMap.name, { id, points })
+          polygons_style.coloring.polygon.colorMap = points
+          console.log(setMeshPolygonsPolygonColorMap.name, {
+            id,
+            points,
+            minimum,
+            maximum,
+          })
         },
       },
     )

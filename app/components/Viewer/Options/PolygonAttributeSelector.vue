@@ -46,9 +46,7 @@
     }
   })
 
-  // When attribute name changes, save current settings and load new ones
   watch(polygon_attribute_name, (newName, oldName) => {
-    // Save current settings for the old attribute
     if (
       oldName &&
       polygon_attribute.min !== undefined &&
@@ -61,10 +59,8 @@
       })
     }
 
-    // Update the name
     polygon_attribute.name = newName
 
-    // Load settings for the new attribute
     if (newName) {
       loadSettingsForAttribute(newName)
     }
@@ -83,13 +79,11 @@
       polygon_attribute.max = cached.max
       polygon_attribute.colorMap = cached.colorMap
     } else {
-      // Use auto range from metadata
       const range = polygon_attribute_metadata.value[attributeName]
       polygon_attribute.min = range ? range[0] : 0
       polygon_attribute.max = range ? range[1] : 1
       polygon_attribute.colorMap = "Cool to Warm"
     }
-    // Apply the loaded settings to the viewer
     nextTick(() => {
       onScalarRangeChange()
       onColorMapChange()
@@ -104,7 +98,6 @@
     ],
     () => {
       model.value = { ...polygon_attribute }
-      // Save settings when they change
       if (polygon_attribute.name) {
         dataStyleStore.setAttributeSettings(
           props.id,
@@ -130,7 +123,7 @@
         polygon_attribute.min,
         polygon_attribute.max,
       )
-      hybridViewerStore.remoteRender()
+      onColorMapChange()
     }
   }
 
@@ -142,8 +135,17 @@
     ) {
       const preset = getRGBPointsFromPreset(polygon_attribute.colorMap)
       if (preset && preset.RGBPoints) {
-        const points = convertRGBPointsToSchemaFormat(preset.RGBPoints)
-        dataStyleStore.setMeshPolygonsPolygonColorMap(props.id, points)
+        const points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          polygon_attribute.min,
+          polygon_attribute.max,
+        )
+        dataStyleStore.setMeshPolygonsPolygonColorMap(
+          props.id,
+          points,
+          polygon_attribute.min,
+          polygon_attribute.max,
+        )
         hybridViewerStore.remoteRender()
       }
     }
@@ -159,9 +161,17 @@
       { id: props.id },
       {
         response_function: (response) => {
-          polygon_attribute_names.value = response.polygon_attribute_names
-          polygon_attribute_metadata.value =
-            response.polygon_attribute_metadata || {}
+          const names = []
+          const metadata = {}
+          for (const attribute of response.attributes) {
+            names.push(attribute.attribute_name)
+            metadata[attribute.attribute_name] = [
+              attribute.min_value,
+              attribute.max_value,
+            ]
+          }
+          polygon_attribute_names.value = names
+          polygon_attribute_metadata.value = metadata
         },
       },
     )

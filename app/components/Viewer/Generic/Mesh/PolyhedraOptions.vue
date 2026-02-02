@@ -38,6 +38,20 @@
       hybridViewerStore.remoteRender()
     },
   })
+  const vertex_attribute = computed({
+    get: () => dataStyleStore.polyhedraVertexAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setPolyhedraVertexAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const polyhedron_attribute = computed({
+    get: () => dataStyleStore.polyhedraPolyhedronAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setPolyhedraPolyhedronAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
 </script>
 <template>
   <ViewerContextMenuItem

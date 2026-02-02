@@ -82,7 +82,6 @@
       edge_attribute.max = range ? range[1] : 1
       edge_attribute.colorMap = "Cool to Warm"
     }
-    // Apply the loaded settings to the viewer
     nextTick(() => {
       onScalarRangeChange()
       onColorMapChange()
@@ -115,7 +114,7 @@
         edge_attribute.min,
         edge_attribute.max,
       )
-      hybridViewerStore.remoteRender()
+      onColorMapChange()
     }
   }
 
@@ -127,8 +126,17 @@
     ) {
       const preset = getRGBPointsFromPreset(edge_attribute.colorMap)
       if (preset && preset.RGBPoints) {
-        const points = convertRGBPointsToSchemaFormat(preset.RGBPoints)
-        dataStyleStore.setMeshEdgesVertexColorMap(props.id, points)
+        const points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          edge_attribute.min,
+          edge_attribute.max,
+        )
+        dataStyleStore.setMeshEdgesVertexColorMap(
+          props.id,
+          points,
+          edge_attribute.min,
+          edge_attribute.max,
+        )
         hybridViewerStore.remoteRender()
       }
     }
@@ -140,8 +148,17 @@
       { id: props.id },
       {
         response_function: (response) => {
-          edge_attribute_names.value = response.edge_attribute_names
-          edge_attribute_metadata.value = response.edge_attribute_metadata || {}
+          const names = []
+          const metadata = {}
+          for (const attribute of response.attributes) {
+            names.push(attribute.attribute_name)
+            metadata[attribute.attribute_name] = [
+              attribute.min_value,
+              attribute.max_value,
+            ]
+          }
+          edge_attribute_names.value = names
+          edge_attribute_metadata.value = metadata
         },
       },
     )

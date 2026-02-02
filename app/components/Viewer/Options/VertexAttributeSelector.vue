@@ -48,9 +48,7 @@
     }
   })
 
-  // When attribute name changes, save current settings and load new ones
   watch(vertex_attribute_name, (newName, oldName) => {
-    // Save current settings for the old attribute
     if (
       oldName &&
       vertex_attribute.min !== undefined &&
@@ -63,10 +61,8 @@
       })
     }
 
-    // Update the name
     vertex_attribute.name = newName
 
-    // Load settings for the new attribute
     if (newName) {
       loadSettingsForAttribute(newName)
     }
@@ -85,13 +81,11 @@
       vertex_attribute.max = cached.max
       vertex_attribute.colorMap = cached.colorMap
     } else {
-      // Use auto range from metadata
       const range = vertex_attribute_metadata.value[attributeName]
       vertex_attribute.min = range ? range[0] : 0
       vertex_attribute.max = range ? range[1] : 1
       vertex_attribute.colorMap = "Cool to Warm"
     }
-    // Apply the loaded settings to the viewer
     nextTick(() => {
       onScalarRangeChange()
       onColorMapChange()
@@ -106,7 +100,6 @@
     ],
     () => {
       model.value = { ...vertex_attribute }
-      // Save settings when they change
       if (vertex_attribute.name) {
         dataStyleStore.setAttributeSettings(
           props.id,
@@ -133,7 +126,7 @@
         vertex_attribute.min,
         vertex_attribute.max,
       )
-      hybridViewerStore.remoteRender()
+      onColorMapChange()
     }
   }
 
@@ -145,8 +138,18 @@
     ) {
       const preset = getRGBPointsFromPreset(vertex_attribute.colorMap)
       if (preset && preset.RGBPoints) {
-        const points = convertRGBPointsToSchemaFormat(preset.RGBPoints)
-        dataStyleStore.setVertexColorMap(props.id, props.meshType, points)
+        const points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          vertex_attribute.min,
+          vertex_attribute.max,
+        )
+        dataStyleStore.setVertexColorMap(
+          props.id,
+          props.meshType,
+          points,
+          vertex_attribute.min,
+          vertex_attribute.max,
+        )
         hybridViewerStore.remoteRender()
       }
     }
@@ -162,9 +165,17 @@
       { id: props.id },
       {
         response_function: (response) => {
-          vertex_attribute_names.value = response.vertex_attribute_names
-          vertex_attribute_metadata.value =
-            response.vertex_attribute_metadata || {}
+          const names = []
+          const metadata = {}
+          for (const attribute of response.attributes) {
+            names.push(attribute.attribute_name)
+            metadata[attribute.attribute_name] = [
+              attribute.min_value,
+              attribute.max_value,
+            ]
+          }
+          vertex_attribute_names.value = names
+          vertex_attribute_metadata.value = metadata
         },
       },
     )

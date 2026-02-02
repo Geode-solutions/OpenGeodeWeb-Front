@@ -119,11 +119,14 @@ export function useMeshPointsStyle() {
   }
 
   function setMeshPointsVertexScalarRange(id, minimum, maximum) {
+    const points_style = meshPointsStyle(id)
     return viewerStore.request(
       mesh_points_schemas.vertex_scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
+          points_style.coloring.vertex.min = minimum
+          points_style.coloring.vertex.max = maximum
           console.log(setMeshPointsVertexScalarRange.name, {
             id,
             minimum,
@@ -134,13 +137,20 @@ export function useMeshPointsStyle() {
     )
   }
 
-  function setMeshPointsVertexColorMap(id, points) {
+  function setMeshPointsVertexColorMap(id, points, minimum, maximum) {
+    const points_style = meshPointsStyle(id)
     return viewerStore.request(
       mesh_points_schemas.vertex_color_map,
-      { id, points },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshPointsVertexColorMap.name, { id, points })
+          points_style.coloring.vertex.colorMap = points
+          console.log(setMeshPointsVertexColorMap.name, {
+            id,
+            points,
+            minimum,
+            maximum,
+          })
         },
       },
     )

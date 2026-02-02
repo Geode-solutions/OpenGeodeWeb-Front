@@ -147,11 +147,14 @@ export function useMeshEdgesStyle() {
   }
 
   function setMeshEdgesVertexScalarRange(id, minimum, maximum) {
+    const edges_style = meshEdgesStyle(id)
     return viewerStore.request(
       mesh_edges_schemas.vertex_scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
+          edges_style.coloring.vertex.min = minimum
+          edges_style.coloring.vertex.max = maximum
           console.log(setMeshEdgesVertexScalarRange.name, {
             id,
             minimum,
@@ -162,13 +165,20 @@ export function useMeshEdgesStyle() {
     )
   }
 
-  function setMeshEdgesVertexColorMap(id, points) {
+  function setMeshEdgesVertexColorMap(id, points, minimum, maximum) {
+    const edges_style = meshEdgesStyle(id)
     return viewerStore.request(
       mesh_edges_schemas.vertex_color_map,
-      { id, points },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshEdgesVertexColorMap.name, { id, points })
+          edges_style.coloring.vertex.colorMap = points
+          console.log(setMeshEdgesVertexColorMap.name, {
+            id,
+            points,
+            minimum,
+            maximum,
+          })
         },
       },
     )

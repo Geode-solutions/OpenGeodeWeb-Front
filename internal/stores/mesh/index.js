@@ -101,18 +101,43 @@ export default function useMeshStyle() {
     }
   }
 
-  function setVertexColorMap(id, meshType, points) {
+  function setVertexColorMap(id, meshType, points, minimum, maximum) {
     switch (meshType) {
       case "points":
-        return meshPointsStyleStore.setMeshPointsVertexColorMap(id, points)
+        return meshPointsStyleStore.setMeshPointsVertexColorMap(
+          id,
+          points,
+          minimum,
+          maximum,
+        )
       case "edges":
-        return meshEdgesStyleStore.setMeshEdgesVertexColorMap(id, points)
+        return meshEdgesStyleStore.setMeshEdgesVertexColorMap(
+          id,
+          points,
+          minimum,
+          maximum,
+        )
       case "cells":
-        return meshCellsStyleStore.setMeshCellsVertexColorMap(id, points)
+        return meshCellsStyleStore.setMeshCellsVertexColorMap(
+          id,
+          points,
+          minimum,
+          maximum,
+        )
       case "polygons":
-        return meshPolygonsStyleStore.setMeshPolygonsVertexColorMap(id, points)
+        return meshPolygonsStyleStore.setMeshPolygonsVertexColorMap(
+          id,
+          points,
+          minimum,
+          maximum,
+        )
       case "polyhedra":
-        return meshPolyhedraStyleStore.setPolyhedraVertexColorMap(id, points)
+        return meshPolyhedraStyleStore.setPolyhedraVertexColorMap(
+          id,
+          points,
+          minimum,
+          maximum,
+        )
       default:
         throw new Error("Unknown meshType for vertex color map: " + meshType)
     }
@@ -143,14 +168,29 @@ export default function useMeshStyle() {
     }
   }
 
-  function setElementColorMap(id, elementType, points) {
+  function setElementColorMap(id, elementType, points, minimum, maximum) {
     switch (elementType) {
       case "cell":
-        return meshCellsStyleStore.setMeshCellsCellColorMap(id, points)
+        return meshCellsStyleStore.setMeshCellsCellColorMap(
+          id,
+          points,
+          minimum,
+          maximum,
+        )
       case "polygon":
-        return meshPolygonsStyleStore.setMeshPolygonsPolygonColorMap(id, points)
+        return meshPolygonsStyleStore.setMeshPolygonsPolygonColorMap(
+          id,
+          points,
+          minimum,
+          maximum,
+        )
       case "polyhedron":
-        return meshPolyhedraStyleStore.setPolyhedraPolyhedraColorMap(id, points)
+        return meshPolyhedraStyleStore.setPolyhedraPolyhedraColorMap(
+          id,
+          points,
+          minimum,
+          maximum,
+        )
       default:
         throw new Error("Unknown elementType for color map: " + elementType)
     }

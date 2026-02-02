@@ -114,7 +114,7 @@
         cell_attribute.min,
         cell_attribute.max,
       )
-      hybridViewerStore.remoteRender()
+      onColorMapChange()
     }
   }
 
@@ -126,8 +126,17 @@
     ) {
       const preset = getRGBPointsFromPreset(cell_attribute.colorMap)
       if (preset && preset.RGBPoints) {
-        const points = convertRGBPointsToSchemaFormat(preset.RGBPoints)
-        dataStyleStore.setMeshCellsCellColorMap(props.id, points)
+        const points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          cell_attribute.min,
+          cell_attribute.max,
+        )
+        dataStyleStore.setMeshCellsCellColorMap(
+          props.id,
+          points,
+          cell_attribute.min,
+          cell_attribute.max,
+        )
         hybridViewerStore.remoteRender()
       }
     }
@@ -143,8 +152,17 @@
       { id: props.id },
       {
         response_function: (response) => {
-          cell_attribute_names.value = response.cell_attribute_names
-          cell_attribute_metadata.value = response.cell_attribute_metadata || {}
+          const names = []
+          const metadata = {}
+          for (const attribute of response.attributes) {
+            names.push(attribute.attribute_name)
+            metadata[attribute.attribute_name] = [
+              attribute.min_value,
+              attribute.max_value,
+            ]
+          }
+          cell_attribute_names.value = names
+          cell_attribute_metadata.value = metadata
         },
       },
     )

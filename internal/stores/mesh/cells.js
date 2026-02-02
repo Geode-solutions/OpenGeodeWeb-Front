@@ -119,11 +119,14 @@ export function useMeshCellsStyle() {
   }
 
   function setMeshCellsCellScalarRange(id, minimum, maximum) {
+    const cells_style = meshCellsStyle(id)
     return viewerStore.request(
       mesh_cells_schemas.cell_scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
+          cells_style.coloring.cell.min = minimum
+          cells_style.coloring.cell.max = maximum
           console.log(setMeshCellsCellScalarRange.name, {
             id,
             minimum,
@@ -135,11 +138,14 @@ export function useMeshCellsStyle() {
   }
 
   function setMeshCellsVertexScalarRange(id, minimum, maximum) {
+    const cells_style = meshCellsStyle(id)
     return viewerStore.request(
       mesh_cells_schemas.vertex_scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
+          cells_style.coloring.vertex.min = minimum
+          cells_style.coloring.vertex.max = maximum
           console.log(setMeshCellsVertexScalarRange.name, {
             id,
             minimum,
@@ -150,25 +156,39 @@ export function useMeshCellsStyle() {
     )
   }
 
-  function setMeshCellsVertexColorMap(id, points) {
+  function setMeshCellsVertexColorMap(id, points, minimum, maximum) {
+    const cells_style = meshCellsStyle(id)
     return viewerStore.request(
       mesh_cells_schemas.vertex_color_map,
-      { id, points },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshCellsVertexColorMap.name, { id, points })
+          cells_style.coloring.vertex.colorMap = points
+          console.log(setMeshCellsVertexColorMap.name, {
+            id,
+            points,
+            minimum,
+            maximum,
+          })
         },
       },
     )
   }
 
-  function setMeshCellsCellColorMap(id, points) {
+  function setMeshCellsCellColorMap(id, points, minimum, maximum) {
+    const cells_style = meshCellsStyle(id)
     return viewerStore.request(
       mesh_cells_schemas.cell_color_map,
-      { id, points },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
-          console.log(setMeshCellsCellColorMap.name, { id, points })
+          cells_style.coloring.cell.colorMap = points
+          console.log(setMeshCellsCellColorMap.name, {
+            id,
+            points,
+            minimum,
+            maximum,
+          })
         },
       },
     )
