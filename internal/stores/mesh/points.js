@@ -17,41 +17,6 @@ export function useMeshPointsStyle() {
   function meshPointsStyle(id) {
     return dataStyleStateStore.getStyle(id).points
   }
-  // ... (rest of the file until applyMeshPointsStyle)
-
-  function applyMeshPointsStyle(id) {
-    const style = meshPointsStyle(id)
-    const promises = [
-      setMeshPointsVisibility(id, style.visibility),
-      setMeshPointsActiveColoring(id, style.coloring.active),
-      setMeshPointsSize(id, style.size),
-    ]
-
-    if (style.coloring.active === "vertex" && style.coloring.vertex) {
-      const { min, max, colorMap } = style.coloring.vertex
-      if (min !== undefined && max !== undefined) {
-        promises.push(setMeshPointsVertexScalarRange(id, min, max))
-        if (colorMap) {
-          let points = colorMap
-          if (typeof colorMap === "string") {
-            const preset = vtkColorMaps.getPresetByName(colorMap)
-            if (preset && preset.RGBPoints) {
-              points = convertRGBPointsToSchemaFormat(
-                preset.RGBPoints,
-                min,
-                max,
-              )
-            }
-          }
-          if (Array.isArray(points)) {
-            promises.push(setMeshPointsVertexColorMap(id, points, min, max))
-          }
-        }
-      }
-    }
-
-    return Promise.all(promises)
-  }
 
   function meshPointsVisibility(id) {
     return meshPointsStyle(id).visibility
@@ -176,6 +141,19 @@ export function useMeshPointsStyle() {
 
   function setMeshPointsVertexColorMap(id, points, minimum, maximum) {
     const points_style = meshPointsStyle(id)
+    if (typeof points === "string") {
+      const preset = vtkColorMaps.getPresetByName(points)
+      if (preset && preset.RGBPoints) {
+        points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          minimum,
+          maximum,
+        )
+      } else {
+        console.error("Invalid colormap preset:", points)
+        return Promise.reject("Invalid colormap preset")
+      }
+    }
     return viewerStore.request(
       mesh_points_schemas.vertex_color_map,
       { id, points, minimum, maximum },

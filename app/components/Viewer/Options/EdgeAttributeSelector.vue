@@ -4,10 +4,6 @@
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
-  import {
-    getRGBPointsFromPreset,
-    convertRGBPointsToSchemaFormat,
-  } from "@ogw_front/utils/colormap"
 
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
@@ -124,21 +120,13 @@
       edge_attribute.max !== undefined &&
       edge_attribute.colorMap
     ) {
-      const preset = getRGBPointsFromPreset(edge_attribute.colorMap)
-      if (preset && preset.RGBPoints) {
-        const points = convertRGBPointsToSchemaFormat(
-          preset.RGBPoints,
-          edge_attribute.min,
-          edge_attribute.max,
-        )
-        dataStyleStore.setMeshEdgesVertexColorMap(
-          props.id,
-          points,
-          edge_attribute.min,
-          edge_attribute.max,
-        )
-        hybridViewerStore.remoteRender()
-      }
+      dataStyleStore.setMeshEdgesVertexColorMap(
+        props.id,
+        edge_attribute.colorMap,
+        edge_attribute.min,
+        edge_attribute.max,
+      )
+      hybridViewerStore.remoteRender()
     }
   }
 

@@ -4,10 +4,6 @@
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
-  import {
-    getRGBPointsFromPreset,
-    convertRGBPointsToSchemaFormat,
-  } from "@ogw_front/utils/colormap"
 
   const props = defineProps({
     id: { type: String, required: true },
@@ -133,21 +129,13 @@
       polygon_attribute.max !== undefined &&
       polygon_attribute.colorMap
     ) {
-      const preset = getRGBPointsFromPreset(polygon_attribute.colorMap)
-      if (preset && preset.RGBPoints) {
-        const points = convertRGBPointsToSchemaFormat(
-          preset.RGBPoints,
-          polygon_attribute.min,
-          polygon_attribute.max,
-        )
-        dataStyleStore.setMeshPolygonsPolygonColorMap(
-          props.id,
-          points,
-          polygon_attribute.min,
-          polygon_attribute.max,
-        )
-        hybridViewerStore.remoteRender()
-      }
+      dataStyleStore.setMeshPolygonsPolygonColorMap(
+        props.id,
+        polygon_attribute.colorMap,
+        polygon_attribute.min,
+        polygon_attribute.max,
+      )
+      hybridViewerStore.remoteRender()
     }
   }
 

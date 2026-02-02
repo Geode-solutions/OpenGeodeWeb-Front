@@ -4,10 +4,6 @@
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
-  import {
-    getRGBPointsFromPreset,
-    convertRGBPointsToSchemaFormat,
-  } from "@ogw_front/utils/colormap"
 
   const props = defineProps({
     id: { type: String, required: true },
@@ -133,21 +129,13 @@
       polyhedron_attribute.max !== undefined &&
       polyhedron_attribute.colorMap
     ) {
-      const preset = getRGBPointsFromPreset(polyhedron_attribute.colorMap)
-      if (preset && preset.RGBPoints) {
-        const points = convertRGBPointsToSchemaFormat(
-          preset.RGBPoints,
-          polyhedron_attribute.min,
-          polyhedron_attribute.max,
-        )
-        dataStyleStore.setPolyhedraPolyhedraColorMap(
-          props.id,
-          points,
-          polyhedron_attribute.min,
-          polyhedron_attribute.max,
-        )
-        hybridViewerStore.remoteRender()
-      }
+      dataStyleStore.setPolyhedraPolyhedraColorMap(
+        props.id,
+        polyhedron_attribute.colorMap,
+        polyhedron_attribute.min,
+        polyhedron_attribute.max,
+      )
+      hybridViewerStore.remoteRender()
     }
   }
 

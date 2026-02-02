@@ -162,6 +162,19 @@ export function useMeshCellsStyle() {
 
   function setMeshCellsVertexColorMap(id, points, minimum, maximum) {
     const cells_style = meshCellsStyle(id)
+    if (typeof points === "string") {
+      const preset = vtkColorMaps.getPresetByName(points)
+      if (preset && preset.RGBPoints) {
+        points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          minimum,
+          maximum,
+        )
+      } else {
+        console.error("Invalid colormap preset:", points)
+        return Promise.reject("Invalid colormap preset")
+      }
+    }
     return viewerStore.request(
       mesh_cells_schemas.vertex_color_map,
       { id, points, minimum, maximum },
@@ -181,6 +194,19 @@ export function useMeshCellsStyle() {
 
   function setMeshCellsCellColorMap(id, points, minimum, maximum) {
     const cells_style = meshCellsStyle(id)
+    if (typeof points === "string") {
+      const preset = vtkColorMaps.getPresetByName(points)
+      if (preset && preset.RGBPoints) {
+        points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          minimum,
+          maximum,
+        )
+      } else {
+        console.error("Invalid colormap preset:", points)
+        return Promise.reject("Invalid colormap preset")
+      }
+    }
     return viewerStore.request(
       mesh_cells_schemas.cell_color_map,
       { id, points, minimum, maximum },
@@ -243,20 +269,7 @@ export function useMeshCellsStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setMeshCellsVertexScalarRange(id, min, max))
         if (colorMap) {
-          let points = colorMap
-          if (typeof colorMap === "string") {
-            const preset = vtkColorMaps.getPresetByName(colorMap)
-            if (preset && preset.RGBPoints) {
-              points = convertRGBPointsToSchemaFormat(
-                preset.RGBPoints,
-                min,
-                max,
-              )
-            }
-          }
-          if (Array.isArray(points)) {
-            promises.push(setMeshCellsVertexColorMap(id, points, min, max))
-          }
+          promises.push(setMeshCellsVertexColorMap(id, colorMap, min, max))
         }
       }
     } else if (style.coloring.active === "cell" && style.coloring.cell) {
@@ -264,20 +277,7 @@ export function useMeshCellsStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setMeshCellsCellScalarRange(id, min, max))
         if (colorMap) {
-          let points = colorMap
-          if (typeof colorMap === "string") {
-            const preset = vtkColorMaps.getPresetByName(colorMap)
-            if (preset && preset.RGBPoints) {
-              points = convertRGBPointsToSchemaFormat(
-                preset.RGBPoints,
-                min,
-                max,
-              )
-            }
-          }
-          if (Array.isArray(points)) {
-            promises.push(setMeshCellsCellColorMap(id, points, min, max))
-          }
+          promises.push(setMeshCellsCellColorMap(id, colorMap, min, max))
         }
       }
     }

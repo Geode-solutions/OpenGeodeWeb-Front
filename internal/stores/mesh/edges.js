@@ -169,6 +169,19 @@ export function useMeshEdgesStyle() {
 
   function setMeshEdgesVertexColorMap(id, points, minimum, maximum) {
     const edges_style = meshEdgesStyle(id)
+    if (typeof points === "string") {
+      const preset = vtkColorMaps.getPresetByName(points)
+      if (preset && preset.RGBPoints) {
+        points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          minimum,
+          maximum,
+        )
+      } else {
+        console.error("Invalid colormap preset:", points)
+        return Promise.reject("Invalid colormap preset")
+      }
+    }
     return viewerStore.request(
       mesh_edges_schemas.vertex_color_map,
       { id, points, minimum, maximum },
@@ -199,20 +212,7 @@ export function useMeshEdgesStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setMeshEdgesVertexScalarRange(id, min, max))
         if (colorMap) {
-          let points = colorMap
-          if (typeof colorMap === "string") {
-            const preset = vtkColorMaps.getPresetByName(colorMap)
-            if (preset && preset.RGBPoints) {
-              points = convertRGBPointsToSchemaFormat(
-                preset.RGBPoints,
-                min,
-                max,
-              )
-            }
-          }
-          if (Array.isArray(points)) {
-            promises.push(setMeshEdgesVertexColorMap(id, points, min, max))
-          }
+          promises.push(setMeshEdgesVertexColorMap(id, colorMap, min, max))
         }
       }
     }

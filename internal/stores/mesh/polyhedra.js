@@ -171,6 +171,19 @@ export function useMeshPolyhedraStyle() {
 
   function setPolyhedraVertexColorMap(id, points, minimum, maximum) {
     const polyhedra_style = meshPolyhedraStyle(id)
+    if (typeof points === "string") {
+      const preset = vtkColorMaps.getPresetByName(points)
+      if (preset && preset.RGBPoints) {
+        points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          minimum,
+          maximum,
+        )
+      } else {
+        console.error("Invalid colormap preset:", points)
+        return Promise.reject("Invalid colormap preset")
+      }
+    }
     return viewerStore.request(
       mesh_polyhedra_schemas.vertex_color_map,
       { id, points, minimum, maximum },
@@ -190,6 +203,19 @@ export function useMeshPolyhedraStyle() {
 
   function setPolyhedraPolyhedraColorMap(id, points, minimum, maximum) {
     const polyhedra_style = meshPolyhedraStyle(id)
+    if (typeof points === "string") {
+      const preset = vtkColorMaps.getPresetByName(points)
+      if (preset && preset.RGBPoints) {
+        points = convertRGBPointsToSchemaFormat(
+          preset.RGBPoints,
+          minimum,
+          maximum,
+        )
+      } else {
+        console.error("Invalid colormap preset:", points)
+        return Promise.reject("Invalid colormap preset")
+      }
+    }
     return viewerStore.request(
       mesh_polyhedra_schemas.polyhedra_color_map,
       { id, points, minimum, maximum },
@@ -219,20 +245,7 @@ export function useMeshPolyhedraStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setPolyhedraVertexScalarRange(id, min, max))
         if (colorMap) {
-          let points = colorMap
-          if (typeof colorMap === "string") {
-            const preset = vtkColorMaps.getPresetByName(colorMap)
-            if (preset && preset.RGBPoints) {
-              points = convertRGBPointsToSchemaFormat(
-                preset.RGBPoints,
-                min,
-                max,
-              )
-            }
-          }
-          if (Array.isArray(points)) {
-            promises.push(setPolyhedraVertexColorMap(id, points, min, max))
-          }
+          promises.push(setPolyhedraVertexColorMap(id, colorMap, min, max))
         }
       }
     } else if (
@@ -243,20 +256,7 @@ export function useMeshPolyhedraStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setPolyhedraPolyhedronScalarRange(id, min, max))
         if (colorMap) {
-          let points = colorMap
-          if (typeof colorMap === "string") {
-            const preset = vtkColorMaps.getPresetByName(colorMap)
-            if (preset && preset.RGBPoints) {
-              points = convertRGBPointsToSchemaFormat(
-                preset.RGBPoints,
-                min,
-                max,
-              )
-            }
-          }
-          if (Array.isArray(points)) {
-            promises.push(setPolyhedraPolyhedraColorMap(id, points, min, max))
-          }
+          promises.push(setPolyhedraPolyhedraColorMap(id, colorMap, min, max))
         }
       }
     }
