@@ -31,7 +31,6 @@
       "Black-Body Radiation",
       "erdc_rainbow_bright",
     ]
-
     const matplotlibNames = [
       "Viridis (matplotlib)",
       "Plasma (matplotlib)",
@@ -42,11 +41,9 @@
     const paraviewPresets = paraviewNames
       .map((name) => vtkColorMaps.getPresetByName(name))
       .filter(Boolean)
-
     const matplotlibPresets = matplotlibNames
       .map((name) => vtkColorMaps.getPresetByName(name))
       .filter(Boolean)
-
     const otherPresets = allPresets.filter(
       (preset) =>
         !paraviewNames.includes(preset.Name) &&
@@ -63,14 +60,12 @@
 
   function drawLutCanvas() {
     if (!lutCanvas.value) return
-
     const preset = vtkColorMaps.getPresetByName(selectedPresetName.value)
     if (!preset || !preset.RGBPoints) return
 
     const canvas = lutCanvas.value
     const ctx = canvas.getContext("2d")
-    const width = canvas.width
-    const height = canvas.height
+    const { width, height } = canvas
 
     const lut = vtkColorTransferFunction.newInstance()
     const rgbPoints = preset.RGBPoints
@@ -84,17 +79,19 @@
       )
     }
 
-    const presetMin = rgbPoints[0]
-    const presetMax = rgbPoints[rgbPoints.length - 4]
-    const table = lut.getUint8Table(presetMin, presetMax, width, true)
-
+    const table = lut.getUint8Table(
+      rgbPoints[0],
+      rgbPoints[rgbPoints.length - 4],
+      width,
+      true,
+    )
     const imageData = ctx.createImageData(width, height)
-    for (let x = 0; x < width; x++) {
-      const r = table[x * 4]
-      const g = table[x * 4 + 1]
-      const b = table[x * 4 + 2]
-      const a = table[x * 4 + 3]
 
+    for (let x = 0; x < width; x++) {
+      const r = table[x * 4],
+        g = table[x * 4 + 1],
+        b = table[x * 4 + 2],
+        a = table[x * 4 + 3]
       for (let y = 0; y < height; y++) {
         const idx = (y * width + x) * 4
         imageData.data[idx] = r
@@ -103,7 +100,6 @@
         imageData.data[idx + 3] = a
       }
     }
-
     ctx.putImageData(imageData, 0, 0)
   }
 
@@ -113,71 +109,60 @@
     menuOpen.value = false
   }
 
-  onMounted(() => {
-    nextTick(() => {
-      drawLutCanvas()
-    })
-  })
-
-  watch(lutCanvas, () => {
-    drawLutCanvas()
-  })
-
-  watch([selectedPresetName, () => props.min, () => props.max], () => {
-    drawLutCanvas()
-  })
-
+  onMounted(() => nextTick(drawLutCanvas))
+  watch(
+    [lutCanvas, selectedPresetName, () => props.min, () => props.max],
+    drawLutCanvas,
+  )
   watch(
     () => props.modelValue,
-    (newValue) => {
-      if (newValue !== selectedPresetName.value) {
-        selectedPresetName.value = newValue
-      }
+    (nv) => {
+      if (nv !== selectedPresetName.value) selectedPresetName.value = nv
     },
   )
 </script>
 
 <template>
-  <v-menu v-model="menuOpen" :close-on-content-click="false" offset-y>
-    <template #activator="{ props }">
-      <div v-bind="props" class="color-map-picker">
-        <span class="preset-name">{{ selectedPresetName }}</span>
-        <canvas ref="lutCanvas" width="200" height="20" class="lut-canvas" />
-      </div>
+  <v-menu v-model="menuOpen" :close-on-content-click="false" location="bottom">
+    <template #activator="{ props: menuProps }">
+      <v-card
+        v-bind="menuProps"
+        theme="dark"
+        variant="outlined"
+        rounded="sm"
+        class="pa-2 blur-picker d-flex flex-column"
+        style="gap: 4px; cursor: pointer"
+      >
+        <span class="text-caption text-white font-weight-medium">
+          {{ selectedPresetName }}
+        </span>
+        <canvas
+          ref="lutCanvas"
+          width="200"
+          height="18"
+          class="w-100 rounded-xs border-thin"
+        />
+      </v-card>
     </template>
+
     <ColorMapList :presets="presets" @select="onSelectPreset" />
   </v-menu>
 </template>
 
 <style scoped>
-  .color-map-picker {
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 8px;
-    border-radius: 4px;
-    background-color: rgba(30, 30, 30, 0.85) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  .blur-picker {
+    background-color: rgba(40, 40, 40, 0.7) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-color: rgba(255, 255, 255, 0.2) !important;
     transition: background-color 0.2s;
   }
 
-  .color-map-picker:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+  .blur-picker {
+    background-color: rgba(60, 60, 60, 0.9) !important;
   }
 
-  .preset-name {
-    font-size: 12px;
-    font-weight: 500;
-    color: #e0e0e0;
-  }
-
-  .lut-canvas {
-    width: 100%;
-    height: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
+  .border-thin {
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
   }
 </style>
