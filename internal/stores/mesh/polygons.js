@@ -243,17 +243,17 @@ export function useMeshPolygonsStyle() {
       return setMeshPolygonsColor(id, coloring.color)
     } else if (type === "textures") {
       if (coloring.textures === null) {
-        return
+        throw new Error("Textures not set")
       }
       return setMeshPolygonsTextures(id, coloring.textures)
     } else if (type === "vertex") {
       if (coloring.vertex === null) {
-        return
+        throw new Error("Vertex attribute not set")
       }
       return setMeshPolygonsVertexAttribute(id, coloring.vertex)
     } else if (type === "polygon") {
       if (coloring.polygon === null) {
-        return
+        throw new Error("Polygon attribute not set")
       }
       return setMeshPolygonsPolygonAttribute(id, coloring.polygon)
     } else {

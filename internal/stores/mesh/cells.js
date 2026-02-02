@@ -239,17 +239,17 @@ export function useMeshCellsStyle() {
       return setMeshCellsColor(id, coloring.color)
     } else if (type === "textures") {
       if (coloring.textures === null) {
-        return
+        throw new Error("Textures not set")
       }
       return setMeshCellsTextures(id, coloring.textures)
     } else if (type === "vertex") {
       if (coloring.vertex === null) {
-        return
+        throw new Error("Vertex attribute not set")
       }
       return setMeshCellsVertexAttribute(id, coloring.vertex)
     } else if (type === "cell") {
       if (coloring.cell === null) {
-        return
+        throw new Error("Cell attribute not set")
       }
       return setMeshCellsCellAttribute(id, coloring.cell)
     } else {
