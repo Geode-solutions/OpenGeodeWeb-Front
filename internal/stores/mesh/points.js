@@ -1,9 +1,11 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
 
 // Local imports
 import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { convertRGBPointsToSchemaFormat } from "@ogw_front/utils/colormap"
 
 // Local constants
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
@@ -14,6 +16,41 @@ export function useMeshPointsStyle() {
 
   function meshPointsStyle(id) {
     return dataStyleStateStore.getStyle(id).points
+  }
+  // ... (rest of the file until applyMeshPointsStyle)
+
+  function applyMeshPointsStyle(id) {
+    const style = meshPointsStyle(id)
+    const promises = [
+      setMeshPointsVisibility(id, style.visibility),
+      setMeshPointsActiveColoring(id, style.coloring.active),
+      setMeshPointsSize(id, style.size),
+    ]
+
+    if (style.coloring.active === "vertex" && style.coloring.vertex) {
+      const { min, max, colorMap } = style.coloring.vertex
+      if (min !== undefined && max !== undefined) {
+        promises.push(setMeshPointsVertexScalarRange(id, min, max))
+        if (colorMap) {
+          let points = colorMap
+          if (typeof colorMap === "string") {
+            const preset = vtkColorMaps.getPresetByName(colorMap)
+            if (preset && preset.RGBPoints) {
+              points = convertRGBPointsToSchemaFormat(
+                preset.RGBPoints,
+                min,
+                max,
+              )
+            }
+          }
+          if (Array.isArray(points)) {
+            promises.push(setMeshPointsVertexColorMap(id, points, min, max))
+          }
+        }
+      }
+    }
+
+    return Promise.all(promises)
   }
 
   function meshPointsVisibility(id) {
@@ -158,11 +195,23 @@ export function useMeshPointsStyle() {
 
   function applyMeshPointsStyle(id) {
     const style = meshPointsStyle(id)
-    return Promise.all([
+    const promises = [
       setMeshPointsVisibility(id, style.visibility),
       setMeshPointsActiveColoring(id, style.coloring.active),
       setMeshPointsSize(id, style.size),
-    ])
+    ]
+
+    if (style.coloring.active === "vertex" && style.coloring.vertex) {
+      const { min, max, colorMap } = style.coloring.vertex
+      if (min !== undefined && max !== undefined) {
+        promises.push(setMeshPointsVertexScalarRange(id, min, max))
+        if (colorMap) {
+          promises.push(setMeshPointsVertexColorMap(id, colorMap, min, max))
+        }
+      }
+    }
+
+    return Promise.all(promises)
   }
 
   return {

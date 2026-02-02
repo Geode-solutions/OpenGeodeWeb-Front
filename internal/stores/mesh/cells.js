@@ -1,11 +1,15 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
 
+// Local imports
 import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { convertRGBPointsToSchemaFormat } from "@ogw_front/utils/colormap"
 
 // Local constants
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells
+
 export function useMeshCellsStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
   const viewerStore = useViewerStore()
@@ -229,10 +233,56 @@ export function useMeshCellsStyle() {
 
   function applyMeshCellsStyle(id) {
     const style = meshCellsStyle(id)
-    return Promise.all([
+    const promises = [
       setMeshCellsVisibility(id, style.visibility),
       setMeshCellsActiveColoring(id, style.coloring.active),
-    ])
+    ]
+
+    if (style.coloring.active === "vertex" && style.coloring.vertex) {
+      const { min, max, colorMap } = style.coloring.vertex
+      if (min !== undefined && max !== undefined) {
+        promises.push(setMeshCellsVertexScalarRange(id, min, max))
+        if (colorMap) {
+          let points = colorMap
+          if (typeof colorMap === "string") {
+            const preset = vtkColorMaps.getPresetByName(colorMap)
+            if (preset && preset.RGBPoints) {
+              points = convertRGBPointsToSchemaFormat(
+                preset.RGBPoints,
+                min,
+                max,
+              )
+            }
+          }
+          if (Array.isArray(points)) {
+            promises.push(setMeshCellsVertexColorMap(id, points, min, max))
+          }
+        }
+      }
+    } else if (style.coloring.active === "cell" && style.coloring.cell) {
+      const { min, max, colorMap } = style.coloring.cell
+      if (min !== undefined && max !== undefined) {
+        promises.push(setMeshCellsCellScalarRange(id, min, max))
+        if (colorMap) {
+          let points = colorMap
+          if (typeof colorMap === "string") {
+            const preset = vtkColorMaps.getPresetByName(colorMap)
+            if (preset && preset.RGBPoints) {
+              points = convertRGBPointsToSchemaFormat(
+                preset.RGBPoints,
+                min,
+                max,
+              )
+            }
+          }
+          if (Array.isArray(points)) {
+            promises.push(setMeshCellsCellColorMap(id, points, min, max))
+          }
+        }
+      }
+    }
+
+    return Promise.all(promises)
   }
 
   return {
