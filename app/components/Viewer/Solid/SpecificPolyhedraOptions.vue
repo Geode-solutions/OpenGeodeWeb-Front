@@ -39,16 +39,16 @@
     },
   })
   const vertex_attribute = computed({
-    get: () => dataStyleStore.polyhedraVertexAttribute(id.value),
+    get: () => dataStyleStore.meshPolyhedraVertexAttribute(id.value),
     set: (newValue) => {
-      dataStyleStore.setPolyhedraVertexAttribute(id.value, newValue)
+      dataStyleStore.setMeshPolyhedraVertexAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const polyhedron_attribute = computed({
-    get: () => dataStyleStore.polyhedraPolyhedronAttribute(id.value),
+    get: () => dataStyleStore.meshPolyhedraPolyhedronAttribute(id.value),
     set: (newValue) => {
-      dataStyleStore.setPolyhedraPolyhedronAttribute(id.value, newValue)
+      dataStyleStore.setMeshPolyhedraPolyhedronAttribute(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

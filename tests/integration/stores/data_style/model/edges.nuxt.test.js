@@ -44,7 +44,9 @@ describe("Model edges", () => {
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
-      await dataStyleStore.setModelEdgesVisibility(id, visibility)
+      const result = dataStyleStore.setModelEdgesVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_edges_schemas.visibility,
         { id, visibility },
