@@ -1,11 +1,10 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
 
 // Local imports
 import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { convertRGBPointsToSchemaFormat } from "@ogw_front/utils/colormap"
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 
 // Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
@@ -167,17 +166,7 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsVertexColorMap(id, points, minimum, maximum) {
     const polygons_style = meshPolygonsStyle(id)
     if (typeof points === "string") {
-      const preset = vtkColorMaps.getPresetByName(points)
-      if (preset && preset.RGBPoints) {
-        points = convertRGBPointsToSchemaFormat(
-          preset.RGBPoints,
-          minimum,
-          maximum,
-        )
-      } else {
-        console.error("Invalid colormap preset:", points)
-        return Promise.reject("Invalid colormap preset")
-      }
+      points = getRGBPointsFromPreset(points)
     }
     return viewerStore.request(
       mesh_polygons_schemas.vertex_color_map,
@@ -199,17 +188,7 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsPolygonColorMap(id, points, minimum, maximum) {
     const polygons_style = meshPolygonsStyle(id)
     if (typeof points === "string") {
-      const preset = vtkColorMaps.getPresetByName(points)
-      if (preset && preset.RGBPoints) {
-        points = convertRGBPointsToSchemaFormat(
-          preset.RGBPoints,
-          minimum,
-          maximum,
-        )
-      } else {
-        console.error("Invalid colormap preset:", points)
-        return Promise.reject("Invalid colormap preset")
-      }
+      points = getRGBPointsFromPreset(points)
     }
     return viewerStore.request(
       mesh_polygons_schemas.polygon_color_map,

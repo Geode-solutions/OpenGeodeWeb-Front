@@ -19,7 +19,6 @@
 
   const props = defineProps({
     id: { type: String, required: true },
-    meshType: { type: String, default: "polygons" },
   })
 
   const has_color = computed(() => (color.value !== undefined ? true : false))

@@ -141,7 +141,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          cell_attribute_names.value = response.attributes || []
+          cell_attribute_names.value = response.attributes
         },
       },
     )
@@ -149,25 +149,23 @@
 </script>
 
 <template>
-  <div>
-    <v-select
-      v-model="cell_attribute_name"
-      :items="cell_attribute_names"
-      item-title="attribute_name"
-      item-value="attribute_name"
-      label="Select an attribute"
-      density="compact"
-    />
-    <ViewerOptionsAttributeColorBar
-      v-if="cell_attribute_name"
-      v-model:min="cell_attribute.min"
-      v-model:max="cell_attribute.max"
-      v-model:colorMap="cell_attribute.colorMap"
-      :auto-min="selectedAttributeRange[0]"
-      :auto-max="selectedAttributeRange[1]"
-      @update:min="onScalarRangeChange"
-      @update:max="onScalarRangeChange"
-      @update:colorMap="onColorMapChange"
-    />
-  </div>
+  <v-select
+    v-model="cell_attribute_name"
+    :items="cell_attribute_names"
+    item-title="attribute_name"
+    item-value="attribute_name"
+    label="Select an attribute"
+    density="compact"
+  />
+  <ViewerOptionsAttributeColorBar
+    v-if="cell_attribute_name"
+    v-model:min="cell_attribute.min"
+    v-model:max="cell_attribute.max"
+    v-model:colorMap="cell_attribute.colorMap"
+    :auto-min="selectedAttributeRange[0]"
+    :auto-max="selectedAttributeRange[1]"
+    @update:min="onScalarRangeChange"
+    @update:max="onScalarRangeChange"
+    @update:colorMap="onColorMapChange"
+  />
 </template>

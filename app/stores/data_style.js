@@ -48,7 +48,6 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const exportStores = () => {
     return {
       styles: dataStyleState.styles,
-      attributeSettings: dataStyleState.attributeSettings,
     }
   }
 
@@ -62,11 +61,16 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
 
     const attributeSettingsSnapshot = snapshot.attributeSettings || {}
-    for (const key of Object.keys(dataStyleState.attributeSettings)) {
-      delete dataStyleState.attributeSettings[key]
-    }
     for (const [key, settings] of Object.entries(attributeSettingsSnapshot)) {
-      dataStyleState.attributeSettings[key] = settings
+      const [meshId, attributeType, attributeName] = key.split(":")
+      if (dataStyleState.styles[meshId]) {
+        if (!dataStyleState.styles[meshId].attributes) {
+          dataStyleState.styles[meshId].attributes = {}
+        }
+        dataStyleState.styles[meshId].attributes[
+          `${attributeType}:${attributeName}`
+        ] = settings
+      }
     }
   }
 

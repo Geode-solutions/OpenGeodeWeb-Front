@@ -57,6 +57,8 @@ export default function useMeshStyle() {
         promise_array.push(meshPolygonsStyleStore.applyMeshPolygonsStyle(id))
       } else if (key === "polyhedra") {
         promise_array.push(meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id))
+      } else if (key === "attributes") {
+        // Do nothing
       } else {
         throw new Error("Unknown mesh key: " + key)
       }

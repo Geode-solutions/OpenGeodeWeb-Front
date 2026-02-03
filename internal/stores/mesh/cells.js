@@ -1,11 +1,10 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
 
 // Local imports
 import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { convertRGBPointsToSchemaFormat } from "@ogw_front/utils/colormap"
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 
 // Local constants
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells
@@ -163,17 +162,7 @@ export function useMeshCellsStyle() {
   function setMeshCellsVertexColorMap(id, points, minimum, maximum) {
     const cells_style = meshCellsStyle(id)
     if (typeof points === "string") {
-      const preset = vtkColorMaps.getPresetByName(points)
-      if (preset && preset.RGBPoints) {
-        points = convertRGBPointsToSchemaFormat(
-          preset.RGBPoints,
-          minimum,
-          maximum,
-        )
-      } else {
-        console.error("Invalid colormap preset:", points)
-        return Promise.reject("Invalid colormap preset")
-      }
+      points = getRGBPointsFromPreset(points)
     }
     return viewerStore.request(
       mesh_cells_schemas.vertex_color_map,
@@ -195,17 +184,7 @@ export function useMeshCellsStyle() {
   function setMeshCellsCellColorMap(id, points, minimum, maximum) {
     const cells_style = meshCellsStyle(id)
     if (typeof points === "string") {
-      const preset = vtkColorMaps.getPresetByName(points)
-      if (preset && preset.RGBPoints) {
-        points = convertRGBPointsToSchemaFormat(
-          preset.RGBPoints,
-          minimum,
-          maximum,
-        )
-      } else {
-        console.error("Invalid colormap preset:", points)
-        return Promise.reject("Invalid colormap preset")
-      }
+      points = getRGBPointsFromPreset(points)
     }
     return viewerStore.request(
       mesh_cells_schemas.cell_color_map,

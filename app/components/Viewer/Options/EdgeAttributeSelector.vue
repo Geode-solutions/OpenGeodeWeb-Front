@@ -137,7 +137,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          edge_attribute_names.value = response.attributes || []
+          edge_attribute_names.value = response.attributes
         },
       },
     )

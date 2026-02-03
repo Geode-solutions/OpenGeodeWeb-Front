@@ -150,7 +150,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          polygon_attribute_names.value = response.attributes || []
+          polygon_attribute_names.value = response.attributes
         },
       },
     )

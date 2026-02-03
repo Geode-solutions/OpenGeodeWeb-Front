@@ -154,7 +154,7 @@
       { id: props.id },
       {
         response_function: (response) => {
-          vertex_attribute_names.value = response.attributes || []
+          vertex_attribute_names.value = response.attributes
         },
       },
     )
@@ -162,25 +162,23 @@
 </script>
 
 <template>
-  <div>
-    <v-select
-      v-model="vertex_attribute_name"
-      :items="vertex_attribute_names"
-      item-title="attribute_name"
-      item-value="attribute_name"
-      label="Select an attribute"
-      density="compact"
-    />
-    <ViewerOptionsAttributeColorBar
-      v-if="vertex_attribute_name"
-      v-model:min="vertex_attribute.min"
-      v-model:max="vertex_attribute.max"
-      v-model:colorMap="vertex_attribute.colorMap"
-      :auto-min="selectedAttributeRange[0]"
-      :auto-max="selectedAttributeRange[1]"
-      @update:min="onScalarRangeChange"
-      @update:max="onScalarRangeChange"
-      @update:colorMap="onColorMapChange"
-    />
-  </div>
+  <v-select
+    v-model="vertex_attribute_name"
+    :items="vertex_attribute_names"
+    item-title="attribute_name"
+    item-value="attribute_name"
+    label="Select an attribute"
+    density="compact"
+  />
+  <ViewerOptionsAttributeColorBar
+    v-if="vertex_attribute_name"
+    v-model:min="vertex_attribute.min"
+    v-model:max="vertex_attribute.max"
+    v-model:colorMap="vertex_attribute.colorMap"
+    :auto-min="selectedAttributeRange[0]"
+    :auto-max="selectedAttributeRange[1]"
+    @update:min="onScalarRangeChange"
+    @update:max="onScalarRangeChange"
+    @update:colorMap="onColorMapChange"
+  />
 </template>
