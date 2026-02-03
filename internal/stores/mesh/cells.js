@@ -243,15 +243,15 @@ export function useMeshCellsStyle() {
       }
       return setMeshCellsTextures(id, coloring.textures)
     } else if (type === "vertex") {
-      if (coloring.vertex === null) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex) {
+        return setMeshCellsVertexAttribute(id, coloring.vertex)
       }
-      return setMeshCellsVertexAttribute(id, coloring.vertex)
+      return Promise.resolve()
     } else if (type === "cell") {
-      if (coloring.cell === null) {
-        throw new Error("Cell attribute not set")
+      if (coloring.cell) {
+        return setMeshCellsCellAttribute(id, coloring.cell)
       }
-      return setMeshCellsCellAttribute(id, coloring.cell)
+      return Promise.resolve()
     } else {
       throw new Error("Unknown mesh cells coloring type: " + type)
     }

@@ -23,7 +23,7 @@ const edge_attribute = { name: "edge_attribute" }
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 25000)
 
@@ -134,12 +134,6 @@ describe("Mesh edges", () => {
       ]
       for (let i = 0; i < coloringTypes.length; i++) {
         if (coloringTypes[i].function) {
-          expect(() =>
-            dataStyleStore.setMeshEdgesActiveColoring(
-              id,
-              coloringTypes[i].name,
-            ),
-          ).toThrowError()
           await coloringTypes[i].function()
         }
         const result = dataStyleStore.setMeshEdgesActiveColoring(

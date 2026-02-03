@@ -52,15 +52,15 @@ export function useMeshPolyhedraStyle() {
     if (type === "color") {
       return setMeshPolyhedraColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex === null) {
-        return
+      if (coloring.vertex) {
+        return setMeshPolyhedraVertexAttribute(id, coloring.vertex)
       }
-      return setPolyhedraVertexAttribute(id, coloring.vertex)
+      return Promise.resolve()
     } else if (type === "polyhedron") {
-      if (coloring.polyhedron === null) {
-        return
+      if (coloring.polyhedron) {
+        return setMeshPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
       }
-      return setPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
+      return Promise.resolve()
     } else {
       throw new Error("Unknown mesh polyhedra coloring type: " + type)
     }
@@ -87,10 +87,10 @@ export function useMeshPolyhedraStyle() {
     )
   }
 
-  function polyhedraVertexAttribute(id) {
+  function meshPolyhedraVertexAttribute(id) {
     return meshPolyhedraStyle(id).coloring.vertex
   }
-  function setPolyhedraVertexAttribute(id, vertex_attribute) {
+  function setMeshPolyhedraVertexAttribute(id, vertex_attribute) {
     const coloring_style = meshPolyhedraStyle(id).coloring
     const { name } = vertex_attribute
     return viewerStore.request(
@@ -100,19 +100,19 @@ export function useMeshPolyhedraStyle() {
         response_function: () => {
           coloring_style.vertex = vertex_attribute
           console.log(
-            setPolyhedraVertexAttribute.name,
+            setMeshPolyhedraVertexAttribute.name,
             { id },
-            polyhedraVertexAttribute(id),
+            meshPolyhedraVertexAttribute(id),
           )
         },
       },
     )
   }
 
-  function polyhedraPolyhedronAttribute(id) {
+  function meshPolyhedraPolyhedronAttribute(id) {
     return meshPolyhedraStyle(id).coloring.polyhedron
   }
-  function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
+  function setMeshPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
     const coloring = meshPolyhedraStyle(id).coloring
     const { name } = polyhedron_attribute
     return viewerStore.request(
@@ -122,16 +122,16 @@ export function useMeshPolyhedraStyle() {
         response_function: () => {
           coloring.polyhedron = polyhedron_attribute
           console.log(
-            setPolyhedraPolyhedronAttribute.name,
+            setMeshPolyhedraPolyhedronAttribute.name,
             { id },
-            polyhedraPolyhedronAttribute(id),
+            meshPolyhedraPolyhedronAttribute(id),
           )
         },
       },
     )
   }
 
-  function setPolyhedraPolyhedronScalarRange(id, minimum, maximum) {
+  function setMeshPolyhedraPolyhedronScalarRange(id, minimum, maximum) {
     const polyhedra_style = meshPolyhedraStyle(id)
     return viewerStore.request(
       mesh_polyhedra_schemas.polyhedron_scalar_range,
@@ -140,7 +140,7 @@ export function useMeshPolyhedraStyle() {
         response_function: () => {
           polyhedra_style.coloring.polyhedron.min = minimum
           polyhedra_style.coloring.polyhedron.max = maximum
-          console.log(setPolyhedraPolyhedronScalarRange.name, {
+          console.log(setMeshPolyhedraPolyhedronScalarRange.name, {
             id,
             minimum,
             maximum,
@@ -150,7 +150,7 @@ export function useMeshPolyhedraStyle() {
     )
   }
 
-  function setPolyhedraVertexScalarRange(id, minimum, maximum) {
+  function setMeshPolyhedraVertexScalarRange(id, minimum, maximum) {
     const polyhedra_style = meshPolyhedraStyle(id)
     return viewerStore.request(
       mesh_polyhedra_schemas.vertex_scalar_range,
@@ -159,7 +159,7 @@ export function useMeshPolyhedraStyle() {
         response_function: () => {
           polyhedra_style.coloring.vertex.min = minimum
           polyhedra_style.coloring.vertex.max = maximum
-          console.log(setPolyhedraVertexScalarRange.name, {
+          console.log(setMeshPolyhedraVertexScalarRange.name, {
             id,
             minimum,
             maximum,
@@ -169,7 +169,7 @@ export function useMeshPolyhedraStyle() {
     )
   }
 
-  function setPolyhedraVertexColorMap(id, points, minimum, maximum) {
+  function setMeshPolyhedraVertexColorMap(id, points, minimum, maximum) {
     const polyhedra_style = meshPolyhedraStyle(id)
     if (typeof points === "string") {
       const preset = vtkColorMaps.getPresetByName(points)
@@ -190,7 +190,7 @@ export function useMeshPolyhedraStyle() {
       {
         response_function: () => {
           polyhedra_style.coloring.vertex.colorMap = points
-          console.log(setPolyhedraVertexColorMap.name, {
+          console.log(setMeshPolyhedraVertexColorMap.name, {
             id,
             points,
             minimum,
@@ -201,7 +201,7 @@ export function useMeshPolyhedraStyle() {
     )
   }
 
-  function setPolyhedraPolyhedraColorMap(id, points, minimum, maximum) {
+  function setMeshPolyhedraPolyhedronColorMap(id, points, minimum, maximum) {
     const polyhedra_style = meshPolyhedraStyle(id)
     if (typeof points === "string") {
       const preset = vtkColorMaps.getPresetByName(points)
@@ -222,7 +222,7 @@ export function useMeshPolyhedraStyle() {
       {
         response_function: () => {
           polyhedra_style.coloring.polyhedron.colorMap = points
-          console.log(setPolyhedraPolyhedraColorMap.name, {
+          console.log(setMeshPolyhedraPolyhedronColorMap.name, {
             id,
             points,
             minimum,
@@ -243,9 +243,9 @@ export function useMeshPolyhedraStyle() {
     if (style.coloring.active === "vertex" && style.coloring.vertex) {
       const { min, max, colorMap } = style.coloring.vertex
       if (min !== undefined && max !== undefined) {
-        promises.push(setPolyhedraVertexScalarRange(id, min, max))
+        promises.push(setMeshPolyhedraVertexScalarRange(id, min, max))
         if (colorMap) {
-          promises.push(setPolyhedraVertexColorMap(id, colorMap, min, max))
+          promises.push(setMeshPolyhedraVertexColorMap(id, colorMap, min, max))
         }
       }
     } else if (
@@ -254,9 +254,9 @@ export function useMeshPolyhedraStyle() {
     ) {
       const { min, max, colorMap } = style.coloring.polyhedron
       if (min !== undefined && max !== undefined) {
-        promises.push(setPolyhedraPolyhedronScalarRange(id, min, max))
+        promises.push(setMeshPolyhedraPolyhedronScalarRange(id, min, max))
         if (colorMap) {
-          promises.push(setPolyhedraPolyhedraColorMap(id, colorMap, min, max))
+          promises.push(setMeshPolyhedraPolyhedronColorMap(id, colorMap, min, max))
         }
       }
     }
@@ -268,17 +268,17 @@ export function useMeshPolyhedraStyle() {
     applyMeshPolyhedraStyle,
     meshPolyhedraActiveColoring,
     meshPolyhedraColor,
-    polyhedraVertexAttribute,
+    meshPolyhedraVertexAttribute,
     meshPolyhedraVisibility,
-    polyhedraPolyhedronAttribute,
+    meshPolyhedraPolyhedronAttribute,
     setMeshPolyhedraActiveColoring,
     setMeshPolyhedraColor,
-    setPolyhedraPolyhedronAttribute,
-    setPolyhedraVertexAttribute,
-    setPolyhedraPolyhedronScalarRange,
-    setPolyhedraVertexScalarRange,
-    setPolyhedraVertexColorMap,
-    setPolyhedraPolyhedraColorMap,
+    setMeshPolyhedraPolyhedronAttribute,
+    setMeshPolyhedraVertexAttribute,
+    setMeshPolyhedraPolyhedronScalarRange,
+    setMeshPolyhedraVertexScalarRange,
+    setMeshPolyhedraVertexColorMap,
+    setMeshPolyhedraPolyhedronColorMap,
     setMeshPolyhedraVisibility,
   }
 }

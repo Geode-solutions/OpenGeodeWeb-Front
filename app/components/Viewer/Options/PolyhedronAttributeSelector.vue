@@ -113,7 +113,7 @@
       polyhedron_attribute.min !== undefined &&
       polyhedron_attribute.max !== undefined
     ) {
-      dataStyleStore.setPolyhedraPolyhedronScalarRange(
+      dataStyleStore.setMeshPolyhedraPolyhedronScalarRange(
         props.id,
         polyhedron_attribute.min,
         polyhedron_attribute.max,
@@ -128,7 +128,7 @@
       polyhedron_attribute.max !== undefined &&
       polyhedron_attribute.colorMap
     ) {
-      dataStyleStore.setPolyhedraPolyhedraColorMap(
+      dataStyleStore.setMeshPolyhedraPolyhedronColorMap(
         props.id,
         polyhedron_attribute.colorMap,
         polyhedron_attribute.min,

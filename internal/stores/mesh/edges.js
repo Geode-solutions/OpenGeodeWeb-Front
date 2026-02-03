@@ -52,15 +52,15 @@ export function useMeshEdgesStyle() {
     if (type === "color") {
       return setMeshEdgesColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex === null) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex) {
+        return setMeshEdgesVertexAttribute(id, coloring.vertex)
       }
-      return setMeshEdgesVertexAttribute(id, coloring.vertex)
+      return Promise.resolve()
     } else if (type === "edge") {
-      if (coloring.edge === null) {
-        throw new Error("Edge attribute not set")
+      if (coloring.edge) {
+        return setMeshEdgesEdgeAttribute(id, coloring.edge)
       }
-      return setMeshEdgesEdgeAttribute(id, coloring.edge)
+      return Promise.resolve()
     } else {
       throw new Error("Unknown mesh edges coloring type: " + type)
     }

@@ -53,10 +53,10 @@ export function useMeshPointsStyle() {
     if (type === "color") {
       return setMeshPointsColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex === null) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex) {
+        return setMeshPointsVertexAttribute(id, coloring.vertex)
       }
-      return setMeshPointsVertexAttribute(id, coloring.vertex)
+      return Promise.resolve()
     } else {
       throw new Error("Unknown mesh points coloring type: " + type)
     }

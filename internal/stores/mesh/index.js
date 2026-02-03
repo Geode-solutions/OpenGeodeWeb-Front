@@ -91,7 +91,7 @@ export default function useMeshStyle() {
           maximum,
         )
       case "polyhedra":
-        return meshPolyhedraStyleStore.setPolyhedraVertexScalarRange(
+        return meshPolyhedraStyleStore.setMeshPolyhedraVertexScalarRange(
           id,
           minimum,
           maximum,
@@ -132,7 +132,7 @@ export default function useMeshStyle() {
           maximum,
         )
       case "polyhedra":
-        return meshPolyhedraStyleStore.setPolyhedraVertexColorMap(
+        return meshPolyhedraStyleStore.setMeshPolyhedraVertexColorMap(
           id,
           points,
           minimum,
@@ -158,7 +158,7 @@ export default function useMeshStyle() {
           maximum,
         )
       case "polyhedron":
-        return meshPolyhedraStyleStore.setPolyhedraPolyhedronScalarRange(
+        return meshPolyhedraStyleStore.setMeshPolyhedraPolyhedronScalarRange(
           id,
           minimum,
           maximum,
@@ -185,7 +185,7 @@ export default function useMeshStyle() {
           maximum,
         )
       case "polyhedron":
-        return meshPolyhedraStyleStore.setPolyhedraPolyhedraColorMap(
+        return meshPolyhedraStyleStore.setMeshPolyhedraPolyhedronColorMap(
           id,
           points,
           minimum,
