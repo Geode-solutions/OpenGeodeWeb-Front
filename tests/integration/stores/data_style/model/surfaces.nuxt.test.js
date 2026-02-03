@@ -109,4 +109,14 @@ describe("Model surfaces", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
+  describe("Surfaces style", () => {
+    test("Surfaces apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelSurfacesStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 })

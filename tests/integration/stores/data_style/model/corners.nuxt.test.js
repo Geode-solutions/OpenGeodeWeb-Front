@@ -105,4 +105,15 @@ describe("Model corners", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
+
+  describe("Corner style", () => {
+    test("Corners apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelCornersStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 })
