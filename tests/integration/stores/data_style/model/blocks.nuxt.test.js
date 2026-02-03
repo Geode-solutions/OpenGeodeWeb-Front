@@ -80,7 +80,7 @@ describe("Model blocks", () => {
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
       const block_ids = await dataStore.getBlocksGeodeIds(id)
-      const block_viewer_ids = dataStore.getMeshComponentsViewerIds(
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(
         id,
         block_ids,
       )
