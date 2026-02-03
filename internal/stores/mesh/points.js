@@ -52,7 +52,7 @@ export function useMeshPointsStyle() {
       return setMeshPointsColor(id, coloring.color)
     } else if (type === "vertex") {
       if (coloring.vertex === null) {
-        return
+        throw new Error("Vertex attribute not set")
       }
       return setMeshPointsVertexAttribute(id, coloring.vertex)
     } else {

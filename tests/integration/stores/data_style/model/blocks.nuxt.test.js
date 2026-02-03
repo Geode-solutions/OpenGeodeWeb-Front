@@ -51,7 +51,13 @@ describe("Model blocks", () => {
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
-      await dataStyleStore.setModelBlocksVisibility(id, block_ids, visibility)
+      const result = dataStyleStore.setModelBlocksVisibility(
+        id,
+        block_ids,
+        visibility,
+      )
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.visibility,
         { id, block_ids: block_viewer_ids, visibility },
