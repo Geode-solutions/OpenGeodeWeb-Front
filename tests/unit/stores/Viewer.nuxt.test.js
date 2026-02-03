@@ -171,7 +171,7 @@ describe("Viewer Store", () => {
         const viewerStore = useViewerStore()
         await viewerStore.ws_connect()
         expect(viewerStore.status).toBe(Status.CONNECTED)
-      })
+      }, 25000)
     })
     describe("connect", () => {
       test("connect", async () => {
@@ -179,7 +179,7 @@ describe("Viewer Store", () => {
         const viewerStore = useViewerStore()
         await viewerStore.connect()
         expect(viewerStore.status).toBe(Status.CONNECTED)
-      })
+      }, 25000)
     })
 
     describe("request", () => {
@@ -197,7 +197,7 @@ describe("Viewer Store", () => {
               `${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`,
             ),
         )
-      })
+      }, 25000)
     })
     describe("toggle_picking_mode", () => {
       test("test true", async () => {

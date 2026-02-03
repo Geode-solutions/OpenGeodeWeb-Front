@@ -27,7 +27,6 @@ const data_folder = path.join("tests", "integration", "data")
 
 async function runMicroservices() {
   const geodeStore = useGeodeStore()
-  // const hybridViewerStore = useHybridViewerStore()
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
