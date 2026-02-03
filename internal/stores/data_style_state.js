@@ -5,7 +5,6 @@ const DEFAULT_COLOR_MAP = "Cool to Warm"
 export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   const styles = reactive({})
 
-
   const objectVisibility = computed(() => (id) => {
     if (styles[id]) {
       return styles[id].visibility
