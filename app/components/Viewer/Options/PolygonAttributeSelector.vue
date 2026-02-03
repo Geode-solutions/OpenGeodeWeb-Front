@@ -29,8 +29,8 @@
 
   const polygon_attribute = reactive({
     name: "",
-    min: undefined,
-    max: undefined,
+    minimum: undefined,
+    maximum: undefined,
     colorMap: "Cool to Warm",
   })
 
@@ -44,12 +44,12 @@
   watch(polygon_attribute_name, (newName, oldName) => {
     if (
       oldName &&
-      polygon_attribute.min !== undefined &&
-      polygon_attribute.max !== undefined
+      polygon_attribute.minimum !== undefined &&
+      polygon_attribute.maximum !== undefined
     ) {
       dataStyleStore.setAttributeSettings(props.id, "polygon", oldName, {
-        min: polygon_attribute.min,
-        max: polygon_attribute.max,
+        minimum: polygon_attribute.minimum,
+        maximum: polygon_attribute.maximum,
         colorMap: polygon_attribute.colorMap,
       })
     }
@@ -70,15 +70,15 @@
       attributeName,
     )
     if (cached) {
-      polygon_attribute.min = cached.min
-      polygon_attribute.max = cached.max
+      polygon_attribute.minimum = cached.minimum
+      polygon_attribute.maximum = cached.maximum
       polygon_attribute.colorMap = cached.colorMap
     } else {
       const attribute = polygon_attribute_names.value.find(
         (attr) => attr.attribute_name === attributeName,
       )
-      polygon_attribute.min = attribute ? attribute.min_value : 0
-      polygon_attribute.max = attribute ? attribute.max_value : 1
+      polygon_attribute.minimum = attribute ? attribute.min_value : 0
+      polygon_attribute.maximum = attribute ? attribute.max_value : 1
       polygon_attribute.colorMap = "Cool to Warm"
     }
     nextTick(() => {
@@ -89,8 +89,8 @@
 
   watch(
     () => [
-      polygon_attribute.min,
-      polygon_attribute.max,
+      polygon_attribute.minimum,
+      polygon_attribute.maximum,
       polygon_attribute.colorMap,
     ],
     () => {
@@ -101,8 +101,8 @@
           "polygon",
           polygon_attribute.name,
           {
-            min: polygon_attribute.min,
-            max: polygon_attribute.max,
+            minimum: polygon_attribute.minimum,
+            maximum: polygon_attribute.maximum,
             colorMap: polygon_attribute.colorMap,
           },
         )
@@ -112,13 +112,13 @@
 
   function onScalarRangeChange() {
     if (
-      polygon_attribute.min !== undefined &&
-      polygon_attribute.max !== undefined
+      polygon_attribute.minimum !== undefined &&
+      polygon_attribute.maximum !== undefined
     ) {
-      dataStyleStore.setMeshPolygonsPolygonScalarRange(
+      dataStyleStore.setMeshPolygonsPolygonAttributeRange(
         props.id,
-        polygon_attribute.min,
-        polygon_attribute.max,
+        polygon_attribute.minimum,
+        polygon_attribute.maximum,
       )
       onColorMapChange()
     }
@@ -126,15 +126,15 @@
 
   function onColorMapChange() {
     if (
-      polygon_attribute.min !== undefined &&
-      polygon_attribute.max !== undefined &&
+      polygon_attribute.minimum !== undefined &&
+      polygon_attribute.maximum !== undefined &&
       polygon_attribute.colorMap
     ) {
-      dataStyleStore.setMeshPolygonsPolygonColorMap(
+      dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(
         props.id,
         polygon_attribute.colorMap,
-        polygon_attribute.min,
-        polygon_attribute.max,
+        polygon_attribute.minimum,
+        polygon_attribute.maximum,
       )
       hybridViewerStore.remoteRender()
     }
@@ -168,13 +168,13 @@
   />
   <ViewerOptionsAttributeColorBar
     v-if="polygon_attribute_name"
-    v-model:min="polygon_attribute.min"
-    v-model:max="polygon_attribute.max"
+    v-model:minimum="polygon_attribute.minimum"
+    v-model:maximum="polygon_attribute.maximum"
     v-model:colorMap="polygon_attribute.colorMap"
     :auto-min="selectedAttributeRange[0]"
     :auto-max="selectedAttributeRange[1]"
-    @update:min="onScalarRangeChange"
-    @update:max="onScalarRangeChange"
+    @update:minimum="onScalarRangeChange"
+    @update:maximum="onScalarRangeChange"
     @update:colorMap="onColorMapChange"
   />
 </template>

@@ -40,8 +40,8 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
       styles[meshId].attributes = {}
     }
     styles[meshId].attributes[key] = {
-      min: settings.min,
-      max: settings.max,
+      minimum: settings.minimum,
+      maximum: settings.maximum,
       colorMap: settings.colorMap || DEFAULT_COLOR_MAP,
     }
   }

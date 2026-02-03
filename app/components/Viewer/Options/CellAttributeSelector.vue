@@ -29,8 +29,8 @@
 
   const cell_attribute = reactive({
     name: "",
-    min: undefined,
-    max: undefined,
+    minimum: undefined,
+    maximum: undefined,
     colorMap: "Cool to Warm",
   })
 
@@ -44,12 +44,12 @@
   watch(cell_attribute_name, (newName, oldName) => {
     if (
       oldName &&
-      cell_attribute.min !== undefined &&
-      cell_attribute.max !== undefined
+      cell_attribute.minimum !== undefined &&
+      cell_attribute.maximum !== undefined
     ) {
       dataStyleStore.setAttributeSettings(props.id, "cell", oldName, {
-        min: cell_attribute.min,
-        max: cell_attribute.max,
+        minimum: cell_attribute.minimum,
+        maximum: cell_attribute.maximum,
         colorMap: cell_attribute.colorMap,
       })
     }
@@ -67,15 +67,15 @@
       attributeName,
     )
     if (cached) {
-      cell_attribute.min = cached.min
-      cell_attribute.max = cached.max
+      cell_attribute.minimum = cached.minimum
+      cell_attribute.maximum = cached.maximum
       cell_attribute.colorMap = cached.colorMap
     } else {
       const attribute = cell_attribute_names.value.find(
         (attr) => attr.attribute_name === attributeName,
       )
-      cell_attribute.min = attribute ? attribute.min_value : 0
-      cell_attribute.max = attribute ? attribute.max_value : 1
+      cell_attribute.minimum = attribute ? attribute.min_value : 0
+      cell_attribute.maximum = attribute ? attribute.max_value : 1
       cell_attribute.colorMap = "Cool to Warm"
     }
     // Apply the loaded settings to the viewer
@@ -86,7 +86,11 @@
   }
 
   watch(
-    () => [cell_attribute.min, cell_attribute.max, cell_attribute.colorMap],
+    () => [
+      cell_attribute.minimum,
+      cell_attribute.maximum,
+      cell_attribute.colorMap,
+    ],
     () => {
       model.value = { ...cell_attribute }
       if (cell_attribute.name) {
@@ -95,8 +99,8 @@
           "cell",
           cell_attribute.name,
           {
-            min: cell_attribute.min,
-            max: cell_attribute.max,
+            minimum: cell_attribute.minimum,
+            maximum: cell_attribute.maximum,
             colorMap: cell_attribute.colorMap,
           },
         )
@@ -105,11 +109,14 @@
   )
 
   function onScalarRangeChange() {
-    if (cell_attribute.min !== undefined && cell_attribute.max !== undefined) {
-      dataStyleStore.setMeshCellsCellScalarRange(
+    if (
+      cell_attribute.minimum !== undefined &&
+      cell_attribute.maximum !== undefined
+    ) {
+      dataStyleStore.setMeshCellsCellAttributeRange(
         props.id,
-        cell_attribute.min,
-        cell_attribute.max,
+        cell_attribute.minimum,
+        cell_attribute.maximum,
       )
       onColorMapChange()
     }
@@ -117,15 +124,15 @@
 
   function onColorMapChange() {
     if (
-      cell_attribute.min !== undefined &&
-      cell_attribute.max !== undefined &&
+      cell_attribute.minimum !== undefined &&
+      cell_attribute.maximum !== undefined &&
       cell_attribute.colorMap
     ) {
-      dataStyleStore.setMeshCellsCellColorMap(
+      dataStyleStore.setMeshCellsCellAttributeColorMap(
         props.id,
         cell_attribute.colorMap,
-        cell_attribute.min,
-        cell_attribute.max,
+        cell_attribute.minimum,
+        cell_attribute.maximum,
       )
       hybridViewerStore.remoteRender()
     }
@@ -159,13 +166,13 @@
   />
   <ViewerOptionsAttributeColorBar
     v-if="cell_attribute_name"
-    v-model:min="cell_attribute.min"
-    v-model:max="cell_attribute.max"
+    v-model:minimum="cell_attribute.minimum"
+    v-model:maximum="cell_attribute.maximum"
     v-model:colorMap="cell_attribute.colorMap"
     :auto-min="selectedAttributeRange[0]"
     :auto-max="selectedAttributeRange[1]"
-    @update:min="onScalarRangeChange"
-    @update:max="onScalarRangeChange"
+    @update:minimum="onScalarRangeChange"
+    @update:maximum="onScalarRangeChange"
     @update:colorMap="onColorMapChange"
   />
 </template>

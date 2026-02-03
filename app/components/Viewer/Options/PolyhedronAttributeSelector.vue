@@ -29,8 +29,8 @@
 
   const polyhedron_attribute = reactive({
     name: "",
-    min: undefined,
-    max: undefined,
+    minimum: undefined,
+    maximum: undefined,
     colorMap: "Cool to Warm",
   })
 
@@ -44,12 +44,12 @@
   watch(polyhedron_attribute_name, (newName, oldName) => {
     if (
       oldName &&
-      polyhedron_attribute.min !== undefined &&
-      polyhedron_attribute.max !== undefined
+      polyhedron_attribute.minimum !== undefined &&
+      polyhedron_attribute.maximum !== undefined
     ) {
       dataStyleStore.setAttributeSettings(props.id, "polyhedron", oldName, {
-        min: polyhedron_attribute.min,
-        max: polyhedron_attribute.max,
+        minimum: polyhedron_attribute.minimum,
+        maximum: polyhedron_attribute.maximum,
         colorMap: polyhedron_attribute.colorMap,
       })
     }
@@ -67,15 +67,15 @@
       attributeName,
     )
     if (cached) {
-      polyhedron_attribute.min = cached.min
-      polyhedron_attribute.max = cached.max
+      polyhedron_attribute.minimum = cached.minimum
+      polyhedron_attribute.maximum = cached.maximum
       polyhedron_attribute.colorMap = cached.colorMap
     } else {
       const attribute = polyhedron_attribute_names.value.find(
         (attr) => attr.attribute_name === attributeName,
       )
-      polyhedron_attribute.min = attribute ? attribute.min_value : 0
-      polyhedron_attribute.max = attribute ? attribute.max_value : 1
+      polyhedron_attribute.minimum = attribute ? attribute.min_value : 0
+      polyhedron_attribute.maximum = attribute ? attribute.max_value : 1
       polyhedron_attribute.colorMap = "Cool to Warm"
     }
     // Apply the loaded settings to the viewer
@@ -87,8 +87,8 @@
 
   watch(
     () => [
-      polyhedron_attribute.min,
-      polyhedron_attribute.max,
+      polyhedron_attribute.minimum,
+      polyhedron_attribute.maximum,
       polyhedron_attribute.colorMap,
     ],
     () => {
@@ -99,8 +99,8 @@
           "polyhedron",
           polyhedron_attribute.name,
           {
-            min: polyhedron_attribute.min,
-            max: polyhedron_attribute.max,
+            minimum: polyhedron_attribute.minimum,
+            maximum: polyhedron_attribute.maximum,
             colorMap: polyhedron_attribute.colorMap,
           },
         )
@@ -110,13 +110,13 @@
 
   function onScalarRangeChange() {
     if (
-      polyhedron_attribute.min !== undefined &&
-      polyhedron_attribute.max !== undefined
+      polyhedron_attribute.minimum !== undefined &&
+      polyhedron_attribute.maximum !== undefined
     ) {
-      dataStyleStore.setMeshPolyhedraPolyhedronScalarRange(
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(
         props.id,
-        polyhedron_attribute.min,
-        polyhedron_attribute.max,
+        polyhedron_attribute.minimum,
+        polyhedron_attribute.maximum,
       )
       onColorMapChange()
     }
@@ -124,15 +124,15 @@
 
   function onColorMapChange() {
     if (
-      polyhedron_attribute.min !== undefined &&
-      polyhedron_attribute.max !== undefined &&
+      polyhedron_attribute.minimum !== undefined &&
+      polyhedron_attribute.maximum !== undefined &&
       polyhedron_attribute.colorMap
     ) {
-      dataStyleStore.setMeshPolyhedraPolyhedronColorMap(
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(
         props.id,
         polyhedron_attribute.colorMap,
-        polyhedron_attribute.min,
-        polyhedron_attribute.max,
+        polyhedron_attribute.minimum,
+        polyhedron_attribute.maximum,
       )
       hybridViewerStore.remoteRender()
     }
@@ -166,13 +166,13 @@
   />
   <ViewerOptionsAttributeColorBar
     v-if="polyhedron_attribute_name"
-    v-model:min="polyhedron_attribute.min"
-    v-model:max="polyhedron_attribute.max"
+    v-model:minimum="polyhedron_attribute.minimum"
+    v-model:maximum="polyhedron_attribute.maximum"
     v-model:colorMap="polyhedron_attribute.colorMap"
     :auto-min="selectedAttributeRange[0]"
     :auto-max="selectedAttributeRange[1]"
-    @update:min="onScalarRangeChange"
-    @update:max="onScalarRangeChange"
+    @update:minimum="onScalarRangeChange"
+    @update:maximum="onScalarRangeChange"
     @update:colorMap="onColorMapChange"
   />
 </template>

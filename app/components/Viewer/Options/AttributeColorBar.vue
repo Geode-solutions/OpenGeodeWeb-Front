@@ -6,35 +6,35 @@
     autoMax: { type: Number, default: 1 },
   })
 
-  const min = defineModel("min", { type: Number })
-  const max = defineModel("max", { type: Number })
+  const minimum = defineModel("minimum", { type: Number })
+  const maximum = defineModel("maximum", { type: Number })
   const colorMap = defineModel("colorMap", {
     type: String,
     default: "Cool to Warm",
   })
 
   const minValue = computed({
-    get: () => min.value ?? props.autoMin,
+    get: () => minimum.value ?? props.autoMin,
     set: (val) => {
-      min.value = val
+      minimum.value = val
     },
   })
 
   const maxValue = computed({
-    get: () => max.value ?? props.autoMax,
+    get: () => maximum.value ?? props.autoMax,
     set: (val) => {
-      max.value = val
+      maximum.value = val
     },
   })
 
   onMounted(() => {
-    if (min.value === undefined) min.value = props.autoMin
-    if (max.value === undefined) max.value = props.autoMax
+    if (minimum.value === undefined) minimum.value = props.autoMin
+    if (maximum.value === undefined) maximum.value = props.autoMax
   })
 
   function reset() {
-    min.value = props.autoMin
-    max.value = props.autoMax
+    minimum.value = props.autoMin
+    maximum.value = props.autoMax
   }
 </script>
 

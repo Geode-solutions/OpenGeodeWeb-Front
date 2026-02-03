@@ -90,18 +90,70 @@ export function useMeshPolyhedraStyle() {
     return meshPolyhedraStyle(id).coloring.vertex
   }
   function setMeshPolyhedraVertexAttribute(id, vertex_attribute) {
+    return setMeshPolyhedraVertexAttributeName(id, vertex_attribute.name)
+  }
+  function meshPolyhedraVertexAttributeName(id) {
+    const vertex = meshPolyhedraStyle(id).coloring.vertex
+    return vertex ? vertex.name : ""
+  }
+  function setMeshPolyhedraVertexAttributeName(id, name) {
     const coloring_style = meshPolyhedraStyle(id).coloring
-    const { name } = vertex_attribute
     return viewerStore.request(
       mesh_polyhedra_schemas.vertex_attribute,
       { id, name },
       {
         response_function: () => {
-          coloring_style.vertex = vertex_attribute
+          if (!coloring_style.vertex) {
+            coloring_style.vertex = {}
+          }
+          coloring_style.vertex.name = name
+          console.log(setMeshPolyhedraVertexAttributeName.name, { id }, name)
+        },
+      },
+    )
+  }
+  function meshPolyhedraVertexAttributeRange(id) {
+    const vertex = meshPolyhedraStyle(id).coloring.vertex
+    return vertex ? [vertex.minimum, vertex.maximum] : [0, 1]
+  }
+  function setMeshPolyhedraVertexAttributeRange(id, min, max) {
+    const coloring_style = meshPolyhedraStyle(id).coloring
+    return viewerStore.request(
+      mesh_polyhedra_schemas.vertex_scalar_range,
+      { id, minimum: min, maximum: max },
+      {
+        response_function: () => {
+          if (!coloring_style.vertex) {
+            coloring_style.vertex = {}
+          }
+          coloring_style.vertex.minimum = min
+          coloring_style.vertex.maximum = max
+          console.log(setMeshPolyhedraVertexAttributeRange.name, { id, min, max })
+        },
+      },
+    )
+  }
+  function meshPolyhedraVertexAttributeColorMap(id) {
+    const vertex = meshPolyhedraStyle(id).coloring.vertex
+    return vertex ? vertex.colorMap : null
+  }
+  function setMeshPolyhedraVertexAttributeColorMap(id, points, minimum, maximum) {
+    const coloring_style = meshPolyhedraStyle(id).coloring
+    if (typeof points === "string") {
+      points = getRGBPointsFromPreset(points)
+    }
+    return viewerStore.request(
+      mesh_polyhedra_schemas.vertex_color_map,
+      { id, points, minimum, maximum },
+      {
+        response_function: () => {
+          if (!coloring_style.vertex) {
+            coloring_style.vertex = {}
+          }
+          coloring_style.vertex.colorMap = points
           console.log(
-            setMeshPolyhedraVertexAttribute.name,
-            { id },
-            meshPolyhedraVertexAttribute(id),
+            setMeshPolyhedraVertexAttributeColorMap.name,
+            { id, points },
           )
         },
       },
@@ -112,86 +164,64 @@ export function useMeshPolyhedraStyle() {
     return meshPolyhedraStyle(id).coloring.polyhedron
   }
   function setMeshPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
-    const coloring = meshPolyhedraStyle(id).coloring
-    const { name } = polyhedron_attribute
+    return setMeshPolyhedraPolyhedronAttributeName(id, polyhedron_attribute.name)
+  }
+  function meshPolyhedraPolyhedronAttributeName(id) {
+    const polyhedron = meshPolyhedraStyle(id).coloring.polyhedron
+    return polyhedron ? polyhedron.name : ""
+  }
+  function setMeshPolyhedraPolyhedronAttributeName(id, name) {
+    const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.polyhedron_attribute,
       { id, name },
       {
         response_function: () => {
-          coloring.polyhedron = polyhedron_attribute
-          console.log(
-            setMeshPolyhedraPolyhedronAttribute.name,
-            { id },
-            meshPolyhedraPolyhedronAttribute(id),
-          )
+          if (!coloring_style.polyhedron) {
+            coloring_style.polyhedron = {}
+          }
+          coloring_style.polyhedron.name = name
+          console.log(setMeshPolyhedraPolyhedronAttributeName.name, { id }, name)
         },
       },
     )
   }
-
-  function setMeshPolyhedraPolyhedronScalarRange(id, minimum, maximum) {
-    const polyhedra_style = meshPolyhedraStyle(id)
+  function meshPolyhedraPolyhedronAttributeRange(id) {
+    const polyhedron = meshPolyhedraStyle(id).coloring.polyhedron
+    return polyhedron ? [polyhedron.minimum, polyhedron.maximum] : [0, 1]
+  }
+  function setMeshPolyhedraPolyhedronScalarRange(id, min, max) {
+    const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.polyhedron_scalar_range,
-      { id, minimum, maximum },
+      { id, minimum: min, maximum: max },
       {
         response_function: () => {
-          polyhedra_style.coloring.polyhedron.min = minimum
-          polyhedra_style.coloring.polyhedron.max = maximum
+          if (!coloring_style.polyhedron) {
+            coloring_style.polyhedron = {}
+          }
+          coloring_style.polyhedron.minimum = min
+          coloring_style.polyhedron.maximum = max
           console.log(setMeshPolyhedraPolyhedronScalarRange.name, {
             id,
-            minimum,
-            maximum,
+            min,
+            max,
           })
         },
       },
     )
   }
-
-  function setMeshPolyhedraVertexScalarRange(id, minimum, maximum) {
-    const polyhedra_style = meshPolyhedraStyle(id)
-    return viewerStore.request(
-      mesh_polyhedra_schemas.vertex_scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          polyhedra_style.coloring.vertex.min = minimum
-          polyhedra_style.coloring.vertex.max = maximum
-          console.log(setMeshPolyhedraVertexScalarRange.name, {
-            id,
-            minimum,
-            maximum,
-          })
-        },
-      },
-    )
+  function meshPolyhedraPolyhedronAttributeColorMap(id) {
+    const polyhedron = meshPolyhedraStyle(id).coloring.polyhedron
+    return polyhedron ? polyhedron.colorMap : null
   }
-
-  function setMeshPolyhedraVertexColorMap(id, points, minimum, maximum) {
-    const polyhedra_style = meshPolyhedraStyle(id)
-    if (typeof points === "string") {
-      points = getRGBPointsFromPreset(points)
-    }
-    return viewerStore.request(
-      mesh_polyhedra_schemas.vertex_color_map,
-      { id, points, minimum, maximum },
-      {
-        response_function: () => {
-          polyhedra_style.coloring.vertex.colorMap = points
-          console.log(setMeshPolyhedraVertexColorMap.name, {
-            id,
-            points,
-            minimum,
-            maximum,
-          })
-        },
-      },
-    )
-  }
-
-  function setMeshPolyhedraPolyhedronColorMap(id, points, minimum, maximum) {
-    const polyhedra_style = meshPolyhedraStyle(id)
+  function setMeshPolyhedraPolyhedronColorMap(
+    id,
+    points,
+    minimum,
+    maximum,
+  ) {
+    const coloring_style = meshPolyhedraStyle(id).coloring
     if (typeof points === "string") {
       points = getRGBPointsFromPreset(points)
     }
@@ -200,12 +230,13 @@ export function useMeshPolyhedraStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          polyhedra_style.coloring.polyhedron.colorMap = points
+          if (!coloring_style.polyhedron) {
+            coloring_style.polyhedron = {}
+          }
+          coloring_style.polyhedron.colorMap = points
           console.log(setMeshPolyhedraPolyhedronColorMap.name, {
             id,
             points,
-            minimum,
-            maximum,
           })
         },
       },
@@ -220,23 +251,31 @@ export function useMeshPolyhedraStyle() {
     ]
 
     if (style.coloring.active === "vertex" && style.coloring.vertex) {
-      const { min, max, colorMap } = style.coloring.vertex
-      if (min !== undefined && max !== undefined) {
-        promises.push(setMeshPolyhedraVertexScalarRange(id, min, max))
+      const { name, minimum, maximum, colorMap } = style.coloring.vertex
+      if (name) {
+        promises.push(setMeshPolyhedraVertexAttributeName(id, name))
+      }
+      if (minimum !== undefined && maximum !== undefined) {
+        promises.push(setMeshPolyhedraVertexAttributeRange(id, minimum, maximum))
         if (colorMap) {
-          promises.push(setMeshPolyhedraVertexColorMap(id, colorMap, min, max))
+          promises.push(
+            setMeshPolyhedraVertexAttributeColorMap(id, colorMap, minimum, maximum),
+          )
         }
       }
     } else if (
       style.coloring.active === "polyhedron" &&
       style.coloring.polyhedron
     ) {
-      const { min, max, colorMap } = style.coloring.polyhedron
-      if (min !== undefined && max !== undefined) {
-        promises.push(setMeshPolyhedraPolyhedronScalarRange(id, min, max))
+      const { name, minimum, maximum, colorMap } = style.coloring.polyhedron
+      if (name) {
+        promises.push(setMeshPolyhedraPolyhedronAttributeName(id, name))
+      }
+      if (minimum !== undefined && maximum !== undefined) {
+        promises.push(setMeshPolyhedraPolyhedronScalarRange(id, minimum, maximum))
         if (colorMap) {
           promises.push(
-            setMeshPolyhedraPolyhedronColorMap(id, colorMap, min, max),
+            setMeshPolyhedraPolyhedronColorMap(id, colorMap, minimum, maximum),
           )
         }
       }
@@ -246,20 +285,28 @@ export function useMeshPolyhedraStyle() {
   }
 
   return {
-    applyMeshPolyhedraStyle,
+    meshPolyhedraVisibility,
     meshPolyhedraActiveColoring,
     meshPolyhedraColor,
     meshPolyhedraVertexAttribute,
-    meshPolyhedraVisibility,
+    meshPolyhedraVertexAttributeName,
+    meshPolyhedraVertexAttributeRange,
+    meshPolyhedraVertexAttributeColorMap,
     meshPolyhedraPolyhedronAttribute,
+    meshPolyhedraPolyhedronAttributeName,
+    meshPolyhedraPolyhedronAttributeRange,
+    meshPolyhedraPolyhedronAttributeColorMap,
+    setMeshPolyhedraVisibility,
     setMeshPolyhedraActiveColoring,
     setMeshPolyhedraColor,
-    setMeshPolyhedraPolyhedronAttribute,
     setMeshPolyhedraVertexAttribute,
-    setMeshPolyhedraPolyhedronScalarRange,
-    setMeshPolyhedraVertexScalarRange,
-    setMeshPolyhedraVertexColorMap,
-    setMeshPolyhedraPolyhedronColorMap,
-    setMeshPolyhedraVisibility,
+    setMeshPolyhedraVertexAttributeName,
+    setMeshPolyhedraVertexAttributeRange,
+    setMeshPolyhedraVertexAttributeColorMap,
+    setMeshPolyhedraPolyhedronAttribute,
+    setMeshPolyhedraPolyhedronAttributeName,
+    setMeshPolyhedraPolyhedronAttributeRange,
+    setMeshPolyhedraPolyhedronAttributeColorMap,
+    applyMeshPolyhedraStyle,
   }
 }
