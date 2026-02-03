@@ -256,7 +256,9 @@ export function useMeshPolyhedraStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setMeshPolyhedraPolyhedronScalarRange(id, min, max))
         if (colorMap) {
-          promises.push(setMeshPolyhedraPolyhedronColorMap(id, colorMap, min, max))
+          promises.push(
+            setMeshPolyhedraPolyhedronColorMap(id, colorMap, min, max),
+          )
         }
       }
     }
