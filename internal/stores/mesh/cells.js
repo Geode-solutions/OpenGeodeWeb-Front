@@ -266,7 +266,9 @@ export function useMeshCellsStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setMeshCellsVertexAttributeRange(id, min, max))
         if (colorMap) {
-          promises.push(setMeshCellsVertexAttributeColorMap(id, colorMap, min, max))
+          promises.push(
+            setMeshCellsVertexAttributeColorMap(id, colorMap, min, max),
+          )
         }
       }
     } else if (style.coloring.active === "cell" && style.coloring.cell) {
@@ -277,7 +279,9 @@ export function useMeshCellsStyle() {
       if (min !== undefined && max !== undefined) {
         promises.push(setMeshCellsCellAttributeRange(id, min, max))
         if (colorMap) {
-          promises.push(setMeshCellsCellAttributeColorMap(id, colorMap, min, max))
+          promises.push(
+            setMeshCellsCellAttributeColorMap(id, colorMap, min, max),
+          )
         }
       }
     }

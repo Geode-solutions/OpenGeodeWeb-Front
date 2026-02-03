@@ -185,7 +185,12 @@ export function useMeshPointsStyle() {
         promises.push(setMeshPointsVertexAttributeRange(id, minimum, maximum))
         if (colorMap) {
           promises.push(
-            setMeshPointsVertexAttributeColorMap(id, colorMap, minimum, maximum),
+            setMeshPointsVertexAttributeColorMap(
+              id,
+              colorMap,
+              minimum,
+              maximum,
+            ),
           )
         }
       }

@@ -122,7 +122,11 @@ export function useMeshPolygonsStyle() {
           }
           coloring_style.vertex.minimum = min
           coloring_style.vertex.maximum = max
-          console.log(setMeshPolygonsVertexAttributeRange.name, { id, min, max })
+          console.log(setMeshPolygonsVertexAttributeRange.name, {
+            id,
+            min,
+            max,
+          })
         },
       },
     )
@@ -131,7 +135,12 @@ export function useMeshPolygonsStyle() {
     const vertex = meshPolygonsStyle(id).coloring.vertex
     return vertex ? vertex.colorMap : null
   }
-  function setMeshPolygonsVertexAttributeColorMap(id, points, minimum, maximum) {
+  function setMeshPolygonsVertexAttributeColorMap(
+    id,
+    points,
+    minimum,
+    maximum,
+  ) {
     const coloring_style = meshPolygonsStyle(id).coloring
     if (typeof points === "string") {
       points = getRGBPointsFromPreset(points)
@@ -145,7 +154,10 @@ export function useMeshPolygonsStyle() {
             coloring_style.vertex = {}
           }
           coloring_style.vertex.colorMap = points
-          console.log(setMeshPolygonsVertexAttributeColorMap.name, { id, points })
+          console.log(setMeshPolygonsVertexAttributeColorMap.name, {
+            id,
+            points,
+          })
         },
       },
     )
@@ -293,7 +305,10 @@ export function useMeshPolygonsStyle() {
           )
         }
       }
-    } else if (style.coloring.active === "textures" && style.coloring.textures) {
+    } else if (
+      style.coloring.active === "textures" &&
+      style.coloring.textures
+    ) {
       promises.push(setMeshPolygonsTextures(id, style.coloring.textures))
     }
 
