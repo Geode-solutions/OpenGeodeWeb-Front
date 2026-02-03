@@ -5,6 +5,7 @@ export function viewer_call(
   microservice,
   { schema, params = {} },
   { request_error_function, response_function, response_error_function } = {},
+  timeout,
 ) {
   const feedbackStore = useFeedbackStore()
 
@@ -26,6 +27,9 @@ export function viewer_call(
       return
     }
     microservice.start_request()
+    setTimeout(() => {
+      reject(`${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`)
+    }, timeout)
     client
       .getConnection()
       .getSession()
