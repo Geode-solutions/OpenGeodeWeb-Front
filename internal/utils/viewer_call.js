@@ -27,9 +27,14 @@ export function viewer_call(
       return
     }
     microservice.start_request()
-    setTimeout(() => {
-      reject(`${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`)
-    }, timeout)
+
+    if (timeout !== undefined) {
+      setTimeout(() => {
+        reject(
+          `${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`,
+        )
+      }, timeout)
+    }
     client
       .getConnection()
       .getSession()

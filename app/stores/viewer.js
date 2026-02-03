@@ -120,9 +120,15 @@ export const useViewerStore = defineStore("viewer", {
               connectImageStream(validClient.getConnection().getSession())
               viewerStore.client = validClient
               clientToConnect.endBusy()
-              viewer_call(viewerStore, {
-                schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
-              })
+              viewer_call(
+                viewerStore,
+                {
+                  schema:
+                    schemas.opengeodeweb_viewer.viewer.reset_visualization,
+                },
+                {},
+                undefined,
+              )
               viewerStore.status = Status.CONNECTED
               resolve()
             })
