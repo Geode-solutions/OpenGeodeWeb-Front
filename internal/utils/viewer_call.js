@@ -4,8 +4,12 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback"
 export function viewer_call(
   microservice,
   { schema, params = {} },
-  { request_error_function, response_function, response_error_function } = {},
-  timeout,
+  {
+    request_error_function,
+    response_function,
+    response_error_function,
+    timeout,
+  } = {},
 ) {
   const feedbackStore = useFeedbackStore()
 
@@ -21,20 +25,13 @@ export function viewer_call(
 
   const client = microservice.client
 
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     if (!client.getConnection) {
       resolve()
       return
     }
     microservice.start_request()
 
-    if (timeout !== undefined) {
-      setTimeout(() => {
-        reject(
-          `${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`,
-        )
-      }, timeout)
-    }
     client
       .getConnection()
       .getSession()
@@ -69,6 +66,14 @@ export function viewer_call(
         microservice.stop_request()
       })
   })
+  if (timeout !== undefined && timeout > 0) {
+    const timeoutPromise = setTimeout(() => {
+      reject(`${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`)
+    }, timeout)
+    return Promise.race([promise, timeoutPromise])
+  } else {
+    return promise
+  }
 }
 
 export default viewer_call
