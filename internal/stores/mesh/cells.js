@@ -257,24 +257,50 @@ export function useMeshCellsStyle() {
       if (coloring.vertex.name === undefined) {
         throw new Error("Vertex attribute not set")
       }
-      return setMeshCellsVertexAttributeName(id, coloring.vertex.name).then(() => {
-        if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
-          return setMeshCellsVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
-            if (coloring.vertex.colorMap) {
-              return setMeshCellsVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
-            }
-          })
-        }
-      })
+      return setMeshCellsVertexAttributeName(id, coloring.vertex.name).then(
+        () => {
+          if (
+            coloring.vertex.minimum !== undefined &&
+            coloring.vertex.maximum !== undefined
+          ) {
+            return setMeshCellsVertexAttributeRange(
+              id,
+              coloring.vertex.minimum,
+              coloring.vertex.maximum,
+            ).then(() => {
+              if (coloring.vertex.colorMap) {
+                return setMeshCellsVertexAttributeColorMap(
+                  id,
+                  coloring.vertex.colorMap,
+                  coloring.vertex.minimum,
+                  coloring.vertex.maximum,
+                )
+              }
+            })
+          }
+        },
+      )
     } else if (type === "cell") {
       if (coloring.cell.name === undefined) {
         throw new Error("Cell attribute not set")
       }
       return setMeshCellsCellAttributeName(id, coloring.cell.name).then(() => {
-        if (coloring.cell.minimum !== undefined && coloring.cell.maximum !== undefined) {
-          return setMeshCellsCellAttributeRange(id, coloring.cell.minimum, coloring.cell.maximum).then(() => {
+        if (
+          coloring.cell.minimum !== undefined &&
+          coloring.cell.maximum !== undefined
+        ) {
+          return setMeshCellsCellAttributeRange(
+            id,
+            coloring.cell.minimum,
+            coloring.cell.maximum,
+          ).then(() => {
             if (coloring.cell.colorMap) {
-              return setMeshCellsCellAttributeColorMap(id, coloring.cell.colorMap, coloring.cell.minimum, coloring.cell.maximum)
+              return setMeshCellsCellAttributeColorMap(
+                id,
+                coloring.cell.colorMap,
+                coloring.cell.minimum,
+                coloring.cell.maximum,
+              )
             }
           })
         }

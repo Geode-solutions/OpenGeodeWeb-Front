@@ -55,15 +55,29 @@ export function useMeshPointsStyle() {
       if (coloring.vertex.name === undefined) {
         throw new Error("Vertex attribute not set")
       }
-      return setMeshPointsVertexAttributeName(id, coloring.vertex.name).then(() => {
-        if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
-          return setMeshPointsVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
-            if (coloring.vertex.colorMap) {
-              return setMeshPointsVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
-            }
-          })
-        }
-      })
+      return setMeshPointsVertexAttributeName(id, coloring.vertex.name).then(
+        () => {
+          if (
+            coloring.vertex.minimum !== undefined &&
+            coloring.vertex.maximum !== undefined
+          ) {
+            return setMeshPointsVertexAttributeRange(
+              id,
+              coloring.vertex.minimum,
+              coloring.vertex.maximum,
+            ).then(() => {
+              if (coloring.vertex.colorMap) {
+                return setMeshPointsVertexAttributeColorMap(
+                  id,
+                  coloring.vertex.colorMap,
+                  coloring.vertex.minimum,
+                  coloring.vertex.maximum,
+                )
+              }
+            })
+          }
+        },
+      )
     } else {
       throw new Error("Unknown mesh points coloring type: " + type)
     }

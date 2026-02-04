@@ -54,24 +54,53 @@ export function useMeshPolyhedraStyle() {
       if (coloring.vertex.name === undefined) {
         throw new Error("Vertex attribute not set")
       }
-      return setMeshPolyhedraVertexAttributeName(id, coloring.vertex.name).then(() => {
-        if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
-          return setMeshPolyhedraVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
-            if (coloring.vertex.colorMap) {
-              return setMeshPolyhedraVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
-            }
-          })
-        }
-      })
+      return setMeshPolyhedraVertexAttributeName(id, coloring.vertex.name).then(
+        () => {
+          if (
+            coloring.vertex.minimum !== undefined &&
+            coloring.vertex.maximum !== undefined
+          ) {
+            return setMeshPolyhedraVertexAttributeRange(
+              id,
+              coloring.vertex.minimum,
+              coloring.vertex.maximum,
+            ).then(() => {
+              if (coloring.vertex.colorMap) {
+                return setMeshPolyhedraVertexAttributeColorMap(
+                  id,
+                  coloring.vertex.colorMap,
+                  coloring.vertex.minimum,
+                  coloring.vertex.maximum,
+                )
+              }
+            })
+          }
+        },
+      )
     } else if (type === "polyhedron") {
       if (coloring.polyhedron.name === undefined) {
         throw new Error("Polyhedron attribute not set")
       }
-      return setMeshPolyhedraPolyhedronAttributeName(id, coloring.polyhedron.name).then(() => {
-        if (coloring.polyhedron.minimum !== undefined && coloring.polyhedron.maximum !== undefined) {
-          return setMeshPolyhedraPolyhedronAttributeRange(id, coloring.polyhedron.minimum, coloring.polyhedron.maximum).then(() => {
+      return setMeshPolyhedraPolyhedronAttributeName(
+        id,
+        coloring.polyhedron.name,
+      ).then(() => {
+        if (
+          coloring.polyhedron.minimum !== undefined &&
+          coloring.polyhedron.maximum !== undefined
+        ) {
+          return setMeshPolyhedraPolyhedronAttributeRange(
+            id,
+            coloring.polyhedron.minimum,
+            coloring.polyhedron.maximum,
+          ).then(() => {
             if (coloring.polyhedron.colorMap) {
-              return setMeshPolyhedraPolyhedronAttributeColorMap(id, coloring.polyhedron.colorMap, coloring.polyhedron.minimum, coloring.polyhedron.maximum)
+              return setMeshPolyhedraPolyhedronAttributeColorMap(
+                id,
+                coloring.polyhedron.colorMap,
+                coloring.polyhedron.minimum,
+                coloring.polyhedron.maximum,
+              )
             }
           })
         }

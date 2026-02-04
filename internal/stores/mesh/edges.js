@@ -54,24 +54,50 @@ export function useMeshEdgesStyle() {
       if (coloring.vertex.name === undefined) {
         throw new Error("Vertex attribute not set")
       }
-      return setMeshEdgesVertexAttributeName(id, coloring.vertex.name).then(() => {
-        if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
-          return setMeshEdgesVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
-            if (coloring.vertex.colorMap) {
-              return setMeshEdgesVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
-            }
-          })
-        }
-      })
+      return setMeshEdgesVertexAttributeName(id, coloring.vertex.name).then(
+        () => {
+          if (
+            coloring.vertex.minimum !== undefined &&
+            coloring.vertex.maximum !== undefined
+          ) {
+            return setMeshEdgesVertexAttributeRange(
+              id,
+              coloring.vertex.minimum,
+              coloring.vertex.maximum,
+            ).then(() => {
+              if (coloring.vertex.colorMap) {
+                return setMeshEdgesVertexAttributeColorMap(
+                  id,
+                  coloring.vertex.colorMap,
+                  coloring.vertex.minimum,
+                  coloring.vertex.maximum,
+                )
+              }
+            })
+          }
+        },
+      )
     } else if (type === "edge") {
       if (coloring.edge.name === undefined) {
         throw new Error("Edge attribute not set")
       }
       return setMeshEdgesEdgeAttributeName(id, coloring.edge.name).then(() => {
-        if (coloring.edge.minimum !== undefined && coloring.edge.maximum !== undefined) {
-          return setMeshEdgesEdgeAttributeRange(id, coloring.edge.minimum, coloring.edge.maximum).then(() => {
+        if (
+          coloring.edge.minimum !== undefined &&
+          coloring.edge.maximum !== undefined
+        ) {
+          return setMeshEdgesEdgeAttributeRange(
+            id,
+            coloring.edge.minimum,
+            coloring.edge.maximum,
+          ).then(() => {
             if (coloring.edge.colorMap) {
-              return setMeshEdgesEdgeAttributeColorMap(id, coloring.edge.colorMap, coloring.edge.minimum, coloring.edge.maximum)
+              return setMeshEdgesEdgeAttributeColorMap(
+                id,
+                coloring.edge.colorMap,
+                coloring.edge.minimum,
+                coloring.edge.maximum,
+              )
             }
           })
         }

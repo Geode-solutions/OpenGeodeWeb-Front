@@ -270,24 +270,53 @@ export function useMeshPolygonsStyle() {
       if (coloring.vertex.name === undefined) {
         throw new Error("Vertex attribute not set")
       }
-      return setMeshPolygonsVertexAttributeName(id, coloring.vertex.name).then(() => {
-        if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
-          return setMeshPolygonsVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
-            if (coloring.vertex.colorMap) {
-              return setMeshPolygonsVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
-            }
-          })
-        }
-      })
+      return setMeshPolygonsVertexAttributeName(id, coloring.vertex.name).then(
+        () => {
+          if (
+            coloring.vertex.minimum !== undefined &&
+            coloring.vertex.maximum !== undefined
+          ) {
+            return setMeshPolygonsVertexAttributeRange(
+              id,
+              coloring.vertex.minimum,
+              coloring.vertex.maximum,
+            ).then(() => {
+              if (coloring.vertex.colorMap) {
+                return setMeshPolygonsVertexAttributeColorMap(
+                  id,
+                  coloring.vertex.colorMap,
+                  coloring.vertex.minimum,
+                  coloring.vertex.maximum,
+                )
+              }
+            })
+          }
+        },
+      )
     } else if (type === "polygon") {
       if (coloring.polygon.name === undefined) {
         throw new Error("Polygon attribute not set")
       }
-      return setMeshPolygonsPolygonAttributeName(id, coloring.polygon.name).then(() => {
-        if (coloring.polygon.minimum !== undefined && coloring.polygon.maximum !== undefined) {
-          return setMeshPolygonsPolygonAttributeRange(id, coloring.polygon.minimum, coloring.polygon.maximum).then(() => {
+      return setMeshPolygonsPolygonAttributeName(
+        id,
+        coloring.polygon.name,
+      ).then(() => {
+        if (
+          coloring.polygon.minimum !== undefined &&
+          coloring.polygon.maximum !== undefined
+        ) {
+          return setMeshPolygonsPolygonAttributeRange(
+            id,
+            coloring.polygon.minimum,
+            coloring.polygon.maximum,
+          ).then(() => {
             if (coloring.polygon.colorMap) {
-              return setMeshPolygonsPolygonAttributeColorMap(id, coloring.polygon.colorMap, coloring.polygon.minimum, coloring.polygon.maximum)
+              return setMeshPolygonsPolygonAttributeColorMap(
+                id,
+                coloring.polygon.colorMap,
+                coloring.polygon.minimum,
+                coloring.polygon.maximum,
+              )
             }
           })
         }
