@@ -89,7 +89,7 @@ export function useMeshCellsStyle() {
   function setMeshCellsVertexAttributeName(id, name) {
     const coloring_style = meshCellsStyle(id).coloring
     return viewerStore.request(
-      mesh_cells_schemas.vertex_attribute,
+      mesh_cells_schemas.attribute.vertex.name,
       { id, name },
       {
         response_function: () => {
@@ -109,7 +109,7 @@ export function useMeshCellsStyle() {
   function setMeshCellsVertexAttributeRange(id, min, max) {
     const coloring_style = meshCellsStyle(id).coloring
     return viewerStore.request(
-      mesh_cells_schemas.vertex_scalar_range,
+      mesh_cells_schemas.attribute.vertex.scalar_range,
       { id, minimum: min, maximum: max },
       {
         response_function: () => {
@@ -133,7 +133,7 @@ export function useMeshCellsStyle() {
       points = getRGBPointsFromPreset(points)
     }
     return viewerStore.request(
-      mesh_cells_schemas.vertex_color_map,
+      mesh_cells_schemas.attribute.vertex.color_map,
       { id, points, minimum, maximum },
       {
         response_function: () => {
@@ -160,7 +160,7 @@ export function useMeshCellsStyle() {
   function setMeshCellsCellAttributeName(id, name) {
     const coloring_style = meshCellsStyle(id).coloring
     return viewerStore.request(
-      mesh_cells_schemas.cell_attribute,
+      mesh_cells_schemas.attribute.cell.name,
       { id, name },
       {
         response_function: () => {
@@ -177,10 +177,10 @@ export function useMeshCellsStyle() {
     const cell = meshCellsStyle(id).coloring.cell
     return cell ? [cell.minimum, cell.maximum] : [0, 1]
   }
-  function setMeshCellsCellScalarRange(id, min, max) {
+  function setMeshCellsCellAttributeRange(id, min, max) {
     const coloring_style = meshCellsStyle(id).coloring
     return viewerStore.request(
-      mesh_cells_schemas.cell_scalar_range,
+      mesh_cells_schemas.attribute.cell.scalar_range,
       { id, minimum: min, maximum: max },
       {
         response_function: () => {
@@ -189,7 +189,7 @@ export function useMeshCellsStyle() {
           }
           coloring_style.cell.minimum = min
           coloring_style.cell.maximum = max
-          console.log(setMeshCellsCellScalarRange.name, { id, min, max })
+          console.log(setMeshCellsCellAttributeRange.name, { id, min, max })
         },
       },
     )
@@ -198,13 +198,13 @@ export function useMeshCellsStyle() {
     const cell = meshCellsStyle(id).coloring.cell
     return cell ? cell.colorMap : null
   }
-  function setMeshCellsCellColorMap(id, points, minimum, maximum) {
+  function setMeshCellsCellAttributeColorMap(id, points, minimum, maximum) {
     const coloring_style = meshCellsStyle(id).coloring
     if (typeof points === "string") {
       points = getRGBPointsFromPreset(points)
     }
     return viewerStore.request(
-      mesh_cells_schemas.cell_color_map,
+      mesh_cells_schemas.attribute.cell.color_map,
       { id, points, minimum, maximum },
       {
         response_function: () => {
@@ -212,7 +212,7 @@ export function useMeshCellsStyle() {
             coloring_style.cell = {}
           }
           coloring_style.cell.colorMap = points
-          console.log(setMeshCellsCellColorMap.name, { id, points })
+          console.log(setMeshCellsCellAttributeColorMap.name, { id, points })
         },
       },
     )
@@ -290,30 +290,30 @@ export function useMeshCellsStyle() {
   }
 
   return {
-    meshCellsVisibility,
-    meshCellsActiveColoring,
-    meshCellsColor,
-    meshCellsTextures,
-    meshCellsVertexAttribute,
-    meshCellsVertexAttributeName,
-    meshCellsVertexAttributeRange,
-    meshCellsVertexAttributeColorMap,
-    meshCellsCellAttribute,
-    meshCellsCellAttributeName,
-    meshCellsCellAttributeRange,
-    meshCellsCellAttributeColorMap,
-    setMeshCellsVisibility,
-    setMeshCellsActiveColoring,
-    setMeshCellsColor,
-    setMeshCellsTextures,
-    setMeshCellsVertexAttribute,
-    setMeshCellsVertexAttributeName,
-    setMeshCellsVertexAttributeRange,
-    setMeshCellsVertexAttributeColorMap,
-    setMeshCellsCellAttribute,
-    setMeshCellsCellAttributeName,
-    setMeshCellsCellAttributeRange,
-    setMeshCellsCellAttributeColorMap,
-    applyMeshCellsStyle,
+    meshCellsVisibility: meshCellsVisibility,
+    meshCellsActiveColoring: meshCellsActiveColoring,
+    meshCellsColor: meshCellsColor,
+    meshCellsTextures: meshCellsTextures,
+    meshCellsVertexAttribute: meshCellsVertexAttribute,
+    meshCellsVertexAttributeName: meshCellsVertexAttributeName,
+    meshCellsVertexAttributeRange: meshCellsVertexAttributeRange,
+    meshCellsVertexAttributeColorMap: meshCellsVertexAttributeColorMap,
+    meshCellsCellAttribute: meshCellsCellAttribute,
+    meshCellsCellAttributeName: meshCellsCellAttributeName,
+    meshCellsCellAttributeRange: meshCellsCellAttributeRange,
+    meshCellsCellAttributeColorMap: meshCellsCellAttributeColorMap,
+    setMeshCellsVisibility: setMeshCellsVisibility,
+    setMeshCellsActiveColoring: setMeshCellsActiveColoring,
+    setMeshCellsColor: setMeshCellsColor,
+    setMeshCellsTextures: setMeshCellsTextures,
+    setMeshCellsVertexAttribute: setMeshCellsVertexAttribute,
+    setMeshCellsVertexAttributeName: setMeshCellsVertexAttributeName,
+    setMeshCellsVertexAttributeRange: setMeshCellsVertexAttributeRange,
+    setMeshCellsVertexAttributeColorMap: setMeshCellsVertexAttributeColorMap,
+    setMeshCellsCellAttribute: setMeshCellsCellAttribute,
+    setMeshCellsCellAttributeName: setMeshCellsCellAttributeName,
+    setMeshCellsCellAttributeRange: setMeshCellsCellAttributeRange,
+    setMeshCellsCellAttributeColorMap: setMeshCellsCellAttributeColorMap,
+    applyMeshCellsStyle: applyMeshCellsStyle,
   }
 }
