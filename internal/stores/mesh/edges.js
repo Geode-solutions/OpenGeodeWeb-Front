@@ -51,8 +51,8 @@ export function useMeshEdgesStyle() {
     if (type === "color") {
       return setMeshEdgesColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex.name === undefined) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshEdgesVertexAttributeName(id, coloring.vertex.name).then(
         () => {
@@ -78,8 +78,8 @@ export function useMeshEdgesStyle() {
         },
       )
     } else if (type === "edge") {
-      if (coloring.edge.name === undefined) {
-        throw new Error("Edge attribute not set")
+      if (coloring.edge?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshEdgesEdgeAttributeName(id, coloring.edge.name).then(() => {
         if (
@@ -103,7 +103,7 @@ export function useMeshEdgesStyle() {
         }
       })
     } else {
-      throw new Error("Unknown mesh edges coloring type: " + type)
+      return Promise.resolve()
     }
   }
 
@@ -155,7 +155,7 @@ export function useMeshEdgesStyle() {
     const vertex = meshEdgesStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshEdgesVertexAttributeName(id, name) {
+  function setMeshEdgesVertexAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshEdgesStyle(id).coloring
     return viewerStore.request(
       mesh_edges_schemas.attribute.vertex.name,
@@ -165,7 +165,45 @@ export function useMeshEdgesStyle() {
           if (!coloring_style.vertex) {
             coloring_style.vertex = {}
           }
+          const previousName = coloring_style.vertex.name
+          if (previousName) {
+            if (!coloring_style.vertex.attributes) {
+              coloring_style.vertex.attributes = {}
+            }
+            coloring_style.vertex.attributes[previousName] = {
+              minimum: coloring_style.vertex.minimum,
+              maximum: coloring_style.vertex.maximum,
+              colorMap: coloring_style.vertex.colorMap,
+            }
+          }
+
           coloring_style.vertex.name = name
+
+          if (
+            coloring_style.vertex.attributes &&
+            coloring_style.vertex.attributes[name]
+          ) {
+            const saved = coloring_style.vertex.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshEdgesVertexAttributeRange(id, saved.minimum, saved.maximum)
+              if (saved.colorMap) {
+                setMeshEdgesVertexAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshEdgesVertexAttributeRange(id, defaultMin, defaultMax)
+            setMeshEdgesVertexAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(setMeshEdgesVertexAttributeName.name, { id }, name)
         },
       },
@@ -235,7 +273,7 @@ export function useMeshEdgesStyle() {
     const edge = meshEdgesStyle(id).coloring.edge
     return edge ? edge.name : ""
   }
-  function setMeshEdgesEdgeAttributeName(id, name) {
+  function setMeshEdgesEdgeAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshEdgesStyle(id).coloring
     return viewerStore.request(
       mesh_edges_schemas.attribute.edge.name,
@@ -245,7 +283,45 @@ export function useMeshEdgesStyle() {
           if (!coloring_style.edge) {
             coloring_style.edge = {}
           }
+          const previousName = coloring_style.edge.name
+          if (previousName) {
+            if (!coloring_style.edge.attributes) {
+              coloring_style.edge.attributes = {}
+            }
+            coloring_style.edge.attributes[previousName] = {
+              minimum: coloring_style.edge.minimum,
+              maximum: coloring_style.edge.maximum,
+              colorMap: coloring_style.edge.colorMap,
+            }
+          }
+
           coloring_style.edge.name = name
+
+          if (
+            coloring_style.edge.attributes &&
+            coloring_style.edge.attributes[name]
+          ) {
+            const saved = coloring_style.edge.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshEdgesEdgeAttributeRange(id, saved.minimum, saved.maximum)
+              if (saved.colorMap) {
+                setMeshEdgesEdgeAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshEdgesEdgeAttributeRange(id, defaultMin, defaultMax)
+            setMeshEdgesEdgeAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(setMeshEdgesEdgeAttributeName.name, { id }, name)
         },
       },

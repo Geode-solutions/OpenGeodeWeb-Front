@@ -51,8 +51,8 @@ export function useMeshPolyhedraStyle() {
     if (type === "color") {
       return setMeshPolyhedraColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex.name === undefined) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshPolyhedraVertexAttributeName(id, coloring.vertex.name).then(
         () => {
@@ -78,8 +78,8 @@ export function useMeshPolyhedraStyle() {
         },
       )
     } else if (type === "polyhedron") {
-      if (coloring.polyhedron.name === undefined) {
-        throw new Error("Polyhedron attribute not set")
+      if (coloring.polyhedron?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshPolyhedraPolyhedronAttributeName(
         id,
@@ -106,7 +106,7 @@ export function useMeshPolyhedraStyle() {
         }
       })
     } else {
-      throw new Error("Unknown mesh polyhedra coloring type: " + type)
+      return Promise.resolve()
     }
   }
 
@@ -141,7 +141,7 @@ export function useMeshPolyhedraStyle() {
     const vertex = meshPolyhedraStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshPolyhedraVertexAttributeName(id, name) {
+  function setMeshPolyhedraVertexAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.attribute.vertex.name,
@@ -151,7 +151,49 @@ export function useMeshPolyhedraStyle() {
           if (!coloring_style.vertex) {
             coloring_style.vertex = {}
           }
+          const previousName = coloring_style.vertex.name
+          if (previousName) {
+            if (!coloring_style.vertex.attributes) {
+              coloring_style.vertex.attributes = {}
+            }
+            coloring_style.vertex.attributes[previousName] = {
+              minimum: coloring_style.vertex.minimum,
+              maximum: coloring_style.vertex.maximum,
+              colorMap: coloring_style.vertex.colorMap,
+            }
+          }
+
           coloring_style.vertex.name = name
+
+          if (
+            coloring_style.vertex.attributes &&
+            coloring_style.vertex.attributes[name]
+          ) {
+            const saved = coloring_style.vertex.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshPolyhedraVertexAttributeRange(
+                id,
+                saved.minimum,
+                saved.maximum,
+              )
+              if (saved.colorMap) {
+                setMeshPolyhedraVertexAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshPolyhedraVertexAttributeRange(id, defaultMin, defaultMax)
+            setMeshPolyhedraVertexAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(setMeshPolyhedraVertexAttributeName.name, { id }, name)
         },
       },
@@ -228,7 +270,7 @@ export function useMeshPolyhedraStyle() {
     const polyhedron = meshPolyhedraStyle(id).coloring.polyhedron
     return polyhedron ? polyhedron.name : ""
   }
-  function setMeshPolyhedraPolyhedronAttributeName(id, name) {
+  function setMeshPolyhedraPolyhedronAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.attribute.polyhedron.name,
@@ -238,7 +280,49 @@ export function useMeshPolyhedraStyle() {
           if (!coloring_style.polyhedron) {
             coloring_style.polyhedron = {}
           }
+          const previousName = coloring_style.polyhedron.name
+          if (previousName) {
+            if (!coloring_style.polyhedron.attributes) {
+              coloring_style.polyhedron.attributes = {}
+            }
+            coloring_style.polyhedron.attributes[previousName] = {
+              minimum: coloring_style.polyhedron.minimum,
+              maximum: coloring_style.polyhedron.maximum,
+              colorMap: coloring_style.polyhedron.colorMap,
+            }
+          }
+
           coloring_style.polyhedron.name = name
+
+          if (
+            coloring_style.polyhedron.attributes &&
+            coloring_style.polyhedron.attributes[name]
+          ) {
+            const saved = coloring_style.polyhedron.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshPolyhedraPolyhedronAttributeRange(
+                id,
+                saved.minimum,
+                saved.maximum,
+              )
+              if (saved.colorMap) {
+                setMeshPolyhedraPolyhedronAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshPolyhedraPolyhedronAttributeRange(id, defaultMin, defaultMax)
+            setMeshPolyhedraPolyhedronAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(
             setMeshPolyhedraPolyhedronAttributeName.name,
             { id },

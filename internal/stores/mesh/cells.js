@@ -86,7 +86,7 @@ export function useMeshCellsStyle() {
     const vertex = meshCellsStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshCellsVertexAttributeName(id, name) {
+  function setMeshCellsVertexAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshCellsStyle(id).coloring
     return viewerStore.request(
       mesh_cells_schemas.attribute.vertex.name,
@@ -96,7 +96,45 @@ export function useMeshCellsStyle() {
           if (!coloring_style.vertex) {
             coloring_style.vertex = {}
           }
+          const previousName = coloring_style.vertex.name
+          if (previousName) {
+            if (!coloring_style.vertex.attributes) {
+              coloring_style.vertex.attributes = {}
+            }
+            coloring_style.vertex.attributes[previousName] = {
+              minimum: coloring_style.vertex.minimum,
+              maximum: coloring_style.vertex.maximum,
+              colorMap: coloring_style.vertex.colorMap,
+            }
+          }
+
           coloring_style.vertex.name = name
+
+          if (
+            coloring_style.vertex.attributes &&
+            coloring_style.vertex.attributes[name]
+          ) {
+            const saved = coloring_style.vertex.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshCellsVertexAttributeRange(id, saved.minimum, saved.maximum)
+              if (saved.colorMap) {
+                setMeshCellsVertexAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshCellsVertexAttributeRange(id, defaultMin, defaultMax)
+            setMeshCellsVertexAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(setMeshCellsVertexAttributeName.name, { id }, name)
         },
       },
@@ -165,7 +203,7 @@ export function useMeshCellsStyle() {
   function meshCellsCellAttributeName(id) {
     return meshCellsStyle(id).coloring.cell?.name ?? ""
   }
-  function setMeshCellsCellAttributeName(id, name) {
+  function setMeshCellsCellAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshCellsStyle(id).coloring
     return viewerStore.request(
       mesh_cells_schemas.attribute.cell.name,
@@ -175,7 +213,45 @@ export function useMeshCellsStyle() {
           if (!coloring_style.cell) {
             coloring_style.cell = {}
           }
+          const previousName = coloring_style.cell.name
+          if (previousName) {
+            if (!coloring_style.cell.attributes) {
+              coloring_style.cell.attributes = {}
+            }
+            coloring_style.cell.attributes[previousName] = {
+              minimum: coloring_style.cell.minimum,
+              maximum: coloring_style.cell.maximum,
+              colorMap: coloring_style.cell.colorMap,
+            }
+          }
+
           coloring_style.cell.name = name
+
+          if (
+            coloring_style.cell.attributes &&
+            coloring_style.cell.attributes[name]
+          ) {
+            const saved = coloring_style.cell.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshCellsCellAttributeRange(id, saved.minimum, saved.maximum)
+              if (saved.colorMap) {
+                setMeshCellsCellAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshCellsCellAttributeRange(id, defaultMin, defaultMax)
+            setMeshCellsCellAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(setMeshCellsCellAttributeName.name, { id }, name)
         },
       },
@@ -250,12 +326,12 @@ export function useMeshCellsStyle() {
       return setMeshCellsColor(id, coloring.color)
     } else if (type === "textures") {
       if (coloring.textures === null) {
-        throw new Error("Textures not set")
+        return Promise.resolve()
       }
       return setMeshCellsTextures(id, coloring.textures)
     } else if (type === "vertex") {
-      if (coloring.vertex.name === undefined) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshCellsVertexAttributeName(id, coloring.vertex.name).then(
         () => {
@@ -281,8 +357,8 @@ export function useMeshCellsStyle() {
         },
       )
     } else if (type === "cell") {
-      if (coloring.cell.name === undefined) {
-        throw new Error("Cell attribute not set")
+      if (coloring.cell?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshCellsCellAttributeName(id, coloring.cell.name).then(() => {
         if (
@@ -306,7 +382,7 @@ export function useMeshCellsStyle() {
         }
       })
     } else {
-      throw new Error("Unknown mesh cells coloring type: " + type)
+      return Promise.resolve()
     }
   }
 

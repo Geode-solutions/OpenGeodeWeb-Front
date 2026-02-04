@@ -90,7 +90,7 @@ export function useMeshPolygonsStyle() {
     const vertex = meshPolygonsStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshPolygonsVertexAttributeName(id, name) {
+  function setMeshPolygonsVertexAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshPolygonsStyle(id).coloring
     return viewerStore.request(
       mesh_polygons_schemas.attribute.vertex.name,
@@ -100,7 +100,49 @@ export function useMeshPolygonsStyle() {
           if (!coloring_style.vertex) {
             coloring_style.vertex = {}
           }
+          const previousName = coloring_style.vertex.name
+          if (previousName) {
+            if (!coloring_style.vertex.attributes) {
+              coloring_style.vertex.attributes = {}
+            }
+            coloring_style.vertex.attributes[previousName] = {
+              minimum: coloring_style.vertex.minimum,
+              maximum: coloring_style.vertex.maximum,
+              colorMap: coloring_style.vertex.colorMap,
+            }
+          }
+
           coloring_style.vertex.name = name
+
+          if (
+            coloring_style.vertex.attributes &&
+            coloring_style.vertex.attributes[name]
+          ) {
+            const saved = coloring_style.vertex.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshPolygonsVertexAttributeRange(
+                id,
+                saved.minimum,
+                saved.maximum,
+              )
+              if (saved.colorMap) {
+                setMeshPolygonsVertexAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshPolygonsVertexAttributeRange(id, defaultMin, defaultMax)
+            setMeshPolygonsVertexAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(setMeshPolygonsVertexAttributeName.name, { id }, name)
         },
       },
@@ -174,7 +216,7 @@ export function useMeshPolygonsStyle() {
     const polygon = meshPolygonsStyle(id).coloring.polygon
     return polygon ? polygon.name : ""
   }
-  function setMeshPolygonsPolygonAttributeName(id, name) {
+  function setMeshPolygonsPolygonAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshPolygonsStyle(id).coloring
     return viewerStore.request(
       mesh_polygons_schemas.attribute.polygon.name,
@@ -184,7 +226,49 @@ export function useMeshPolygonsStyle() {
           if (!coloring_style.polygon) {
             coloring_style.polygon = {}
           }
+          const previousName = coloring_style.polygon.name
+          if (previousName) {
+            if (!coloring_style.polygon.attributes) {
+              coloring_style.polygon.attributes = {}
+            }
+            coloring_style.polygon.attributes[previousName] = {
+              minimum: coloring_style.polygon.minimum,
+              maximum: coloring_style.polygon.maximum,
+              colorMap: coloring_style.polygon.colorMap,
+            }
+          }
+
           coloring_style.polygon.name = name
+
+          if (
+            coloring_style.polygon.attributes &&
+            coloring_style.polygon.attributes[name]
+          ) {
+            const saved = coloring_style.polygon.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshPolygonsPolygonAttributeRange(
+                id,
+                saved.minimum,
+                saved.maximum,
+              )
+              if (saved.colorMap) {
+                setMeshPolygonsPolygonAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshPolygonsPolygonAttributeRange(id, defaultMin, defaultMax)
+            setMeshPolygonsPolygonAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(setMeshPolygonsPolygonAttributeName.name, { id }, name)
         },
       },
@@ -263,12 +347,12 @@ export function useMeshPolygonsStyle() {
       return setMeshPolygonsColor(id, coloring.color)
     } else if (type === "textures") {
       if (coloring.textures === null) {
-        throw new Error("Textures not set")
+        return Promise.resolve()
       }
       return setMeshPolygonsTextures(id, coloring.textures)
     } else if (type === "vertex") {
-      if (coloring.vertex.name === undefined) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshPolygonsVertexAttributeName(id, coloring.vertex.name).then(
         () => {
@@ -294,8 +378,8 @@ export function useMeshPolygonsStyle() {
         },
       )
     } else if (type === "polygon") {
-      if (coloring.polygon.name === undefined) {
-        throw new Error("Polygon attribute not set")
+      if (coloring.polygon?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshPolygonsPolygonAttributeName(
         id,
@@ -322,7 +406,7 @@ export function useMeshPolygonsStyle() {
         }
       })
     } else {
-      throw new Error("Unknown mesh polygons coloring type: " + type)
+      return Promise.resolve()
     }
   }
 

@@ -52,8 +52,8 @@ export function useMeshPointsStyle() {
     if (type === "color") {
       return setMeshPointsColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex.name === undefined) {
-        throw new Error("Vertex attribute not set")
+      if (coloring.vertex?.name === undefined) {
+        return Promise.resolve()
       }
       return setMeshPointsVertexAttributeName(id, coloring.vertex.name).then(
         () => {
@@ -79,7 +79,7 @@ export function useMeshPointsStyle() {
         },
       )
     } else {
-      throw new Error("Unknown mesh points coloring type: " + type)
+      return Promise.resolve()
     }
   }
 
@@ -113,7 +113,7 @@ export function useMeshPointsStyle() {
     const vertex = meshPointsStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshPointsVertexAttributeName(id, name) {
+  function setMeshPointsVertexAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshPointsStyle(id).coloring
     return viewerStore.request(
       mesh_points_schemas.attribute.vertex.name,
@@ -123,7 +123,49 @@ export function useMeshPointsStyle() {
           if (!coloring_style.vertex) {
             coloring_style.vertex = {}
           }
+          const previousName = coloring_style.vertex.name
+          if (previousName) {
+            if (!coloring_style.vertex.attributes) {
+              coloring_style.vertex.attributes = {}
+            }
+            coloring_style.vertex.attributes[previousName] = {
+              minimum: coloring_style.vertex.minimum,
+              maximum: coloring_style.vertex.maximum,
+              colorMap: coloring_style.vertex.colorMap,
+            }
+          }
+
           coloring_style.vertex.name = name
+
+          if (
+            coloring_style.vertex.attributes &&
+            coloring_style.vertex.attributes[name]
+          ) {
+            const saved = coloring_style.vertex.attributes[name]
+            if (saved.minimum !== undefined && saved.maximum !== undefined) {
+              setMeshPointsVertexAttributeRange(
+                id,
+                saved.minimum,
+                saved.maximum,
+              )
+              if (saved.colorMap) {
+                setMeshPointsVertexAttributeColorMap(
+                  id,
+                  saved.colorMap,
+                  saved.minimum,
+                  saved.maximum,
+                )
+              }
+            }
+          } else if (defaultMin !== undefined && defaultMax !== undefined) {
+            setMeshPointsVertexAttributeRange(id, defaultMin, defaultMax)
+            setMeshPointsVertexAttributeColorMap(
+              id,
+              "Cool to Warm",
+              defaultMin,
+              defaultMax,
+            )
+          }
           console.log(setMeshPointsVertexAttributeName.name, { id }, name)
         },
       },

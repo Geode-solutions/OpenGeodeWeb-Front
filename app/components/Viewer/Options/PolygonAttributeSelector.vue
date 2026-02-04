@@ -23,12 +23,26 @@
     get: () => storePolygonAttribute.value?.name || "",
     set: (newName) => {
       if (newName) {
-        dataStyleStore.setMeshPolygonsPolygonAttributeName(props.id, newName)
         const attribute = polygon_attribute_names.value.find(
           (attr) => attr.attribute_name === newName,
         )
         if (attribute) {
-          onScalarRangeChange(attribute.min_value, attribute.max_value)
+          dataStyleStore
+            .setMeshPolygonsPolygonAttributeName(
+              props.id,
+              newName,
+              attribute.min_value,
+              attribute.max_value,
+            )
+            .then(() => {
+              hybridViewerStore.remoteRender()
+            })
+        } else {
+          dataStyleStore
+            .setMeshPolygonsPolygonAttributeName(props.id, newName)
+            .then(() => {
+              hybridViewerStore.remoteRender()
+            })
         }
       }
     },

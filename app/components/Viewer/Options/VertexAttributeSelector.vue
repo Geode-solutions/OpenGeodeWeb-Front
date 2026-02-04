@@ -28,12 +28,22 @@
     set: (newName) => {
       if (newName) {
         const methodName = `setMesh${capitalize(props.meshType)}VertexAttributeName`
-        dataStyleStore[methodName](props.id, newName)
         const attribute = vertex_attribute_names.value.find(
           (attr) => attr.attribute_name === newName,
         )
         if (attribute) {
-          onScalarRangeChange(attribute.min_value, attribute.max_value)
+          dataStyleStore[methodName](
+            props.id,
+            newName,
+            attribute.min_value,
+            attribute.max_value,
+          ).then(() => {
+            hybridViewerStore.remoteRender()
+          })
+        } else {
+          dataStyleStore[methodName](props.id, newName).then(() => {
+            hybridViewerStore.remoteRender()
+          })
         }
       }
     },

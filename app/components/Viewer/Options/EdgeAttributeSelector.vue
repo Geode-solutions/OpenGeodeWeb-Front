@@ -23,12 +23,26 @@
     get: () => storeEdgeAttribute.value?.name || "",
     set: (newName) => {
       if (newName) {
-        dataStyleStore.setMeshEdgesEdgeAttributeName(props.id, newName)
         const attribute = edge_attribute_names.value.find(
           (attr) => attr.attribute_name === newName,
         )
         if (attribute) {
-          onScalarRangeChange(attribute.min_value, attribute.max_value)
+          dataStyleStore
+            .setMeshEdgesEdgeAttributeName(
+              props.id,
+              newName,
+              attribute.min_value,
+              attribute.max_value,
+            )
+            .then(() => {
+              hybridViewerStore.remoteRender()
+            })
+        } else {
+          dataStyleStore
+            .setMeshEdgesEdgeAttributeName(props.id, newName)
+            .then(() => {
+              hybridViewerStore.remoteRender()
+            })
         }
       }
     },

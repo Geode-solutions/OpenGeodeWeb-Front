@@ -23,12 +23,26 @@
     get: () => storeCellAttribute.value?.name || "",
     set: (newName) => {
       if (newName) {
-        dataStyleStore.setMeshCellsCellAttributeName(props.id, newName)
         const attribute = cell_attribute_names.value.find(
           (attr) => attr.attribute_name === newName,
         )
         if (attribute) {
-          onScalarRangeChange(attribute.min_value, attribute.max_value)
+          dataStyleStore
+            .setMeshCellsCellAttributeName(
+              props.id,
+              newName,
+              attribute.min_value,
+              attribute.max_value,
+            )
+            .then(() => {
+              hybridViewerStore.remoteRender()
+            })
+        } else {
+          dataStyleStore
+            .setMeshCellsCellAttributeName(props.id, newName)
+            .then(() => {
+              hybridViewerStore.remoteRender()
+            })
         }
       }
     },

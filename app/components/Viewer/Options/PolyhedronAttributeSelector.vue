@@ -23,15 +23,26 @@
     get: () => storePolyhedronAttribute.value?.name || "",
     set: (newName) => {
       if (newName) {
-        dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
-          props.id,
-          newName,
-        )
         const attribute = polyhedron_attribute_names.value.find(
           (attr) => attr.attribute_name === newName,
         )
         if (attribute) {
-          onScalarRangeChange(attribute.min_value, attribute.max_value)
+          dataStyleStore
+            .setMeshPolyhedraPolyhedronAttributeName(
+              props.id,
+              newName,
+              attribute.min_value,
+              attribute.max_value,
+            )
+            .then(() => {
+              hybridViewerStore.remoteRender()
+            })
+        } else {
+          dataStyleStore
+            .setMeshPolyhedraPolyhedronAttributeName(props.id, newName)
+            .then(() => {
+              hybridViewerStore.remoteRender()
+            })
         }
       }
     },
