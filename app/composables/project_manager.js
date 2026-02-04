@@ -5,15 +5,15 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/file_import_workflow"
 
 import { useAppStore } from "@ogw_front/stores/app"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 export function useProjectManager() {
-  const exportProject = async function () {
+  async function exportProject() {
     console.log("[export triggered]")
     const appStore = useAppStore()
     const geodeStore = useGeodeStore()
@@ -23,14 +23,14 @@ export function useProjectManager() {
 
     const result = await $fetch(schema.$id, {
       baseURL: geodeStore.base_url,
-      method: schema.methods.filter((m) => m !== "OPTIONS")[0],
+      method: schema.methods.find((method) => method !== "OPTIONS"),
       body: { snapshot, filename: defaultName },
     })
     fileDownload(result, defaultName)
     return { result }
   }
 
-  const importProjectFile = async function (file) {
+  async function importProjectFile(file) {
     const geodeStore = useGeodeStore()
     const dataStyleStore = useDataStyleStore()
     const viewerStore = useViewerStore()
@@ -40,7 +40,7 @@ export function useProjectManager() {
 
     await viewerStore.ws_connect()
 
-    const client = viewerStore.client
+    const { client } = viewerStore
     if (client && client.getConnection && client.getConnection().getSession) {
       await client
         .getConnection()
@@ -74,7 +74,7 @@ export function useProjectManager() {
 
     treeviewStore.isImporting = true
 
-    const client2 = viewerStore.client
+    const { client: client2 } = viewerStore
     if (
       client2 &&
       client2.getConnection &&
