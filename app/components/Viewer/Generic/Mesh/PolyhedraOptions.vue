@@ -52,7 +52,6 @@
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
-          :vertex_attribute="{}"
           :polyhedron_attribute="{}"
           mesh-type="polyhedra"
         />
