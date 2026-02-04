@@ -56,15 +56,29 @@ export function useMeshPointsStyle() {
         throw new Error("Vertex attribute not set")
       }
       if (coloring.vertex.name) {
-        return setMeshPointsVertexAttributeName(id, coloring.vertex.name).then(() => {
-          if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
-            return setMeshPointsVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
-              if (coloring.vertex.colorMap) {
-                return setMeshPointsVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
-              }
-            })
-          }
-        })
+        return setMeshPointsVertexAttributeName(id, coloring.vertex.name).then(
+          () => {
+            if (
+              coloring.vertex.minimum !== undefined &&
+              coloring.vertex.maximum !== undefined
+            ) {
+              return setMeshPointsVertexAttributeRange(
+                id,
+                coloring.vertex.minimum,
+                coloring.vertex.maximum,
+              ).then(() => {
+                if (coloring.vertex.colorMap) {
+                  return setMeshPointsVertexAttributeColorMap(
+                    id,
+                    coloring.vertex.colorMap,
+                    coloring.vertex.minimum,
+                    coloring.vertex.maximum,
+                  )
+                }
+              })
+            }
+          },
+        )
       }
       return Promise.resolve()
     } else {
@@ -143,7 +157,12 @@ export function useMeshPointsStyle() {
     const vertex = meshPointsStyle(id).coloring.vertex
     return vertex ? vertex.colorMap : null
   }
-  function setMeshPointsVertexAttributeColorMap(id, colorMapName, minimum, maximum) {
+  function setMeshPointsVertexAttributeColorMap(
+    id,
+    colorMapName,
+    minimum,
+    maximum,
+  ) {
     const coloring_style = meshPointsStyle(id).coloring
     let points = colorMapName
     if (typeof colorMapName === "string") {
@@ -158,7 +177,10 @@ export function useMeshPointsStyle() {
             coloring_style.vertex = {}
           }
           coloring_style.vertex.colorMap = colorMapName
-          console.log(setMeshPointsVertexAttributeColorMap.name, { id, colorMapName })
+          console.log(setMeshPointsVertexAttributeColorMap.name, {
+            id,
+            colorMapName,
+          })
         },
       },
     )
