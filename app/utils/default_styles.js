@@ -32,7 +32,7 @@ const meshPointsDefaultStyle = (
     coloring: {
       active: "color",
       color,
-      vertex: null,
+      vertex: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
     },
     size,
   }
@@ -48,8 +48,8 @@ const meshEdgesDefaultStyle = (
     coloring: {
       active: "color",
       color,
-      edge: null,
-      vertex: null,
+      edge: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
+      vertex: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
     },
     width,
   }
@@ -63,10 +63,10 @@ const meshCellsDefaultStyle = (
     visibility,
     coloring: {
       active: "color",
-      cell: null,
+      cell: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
       color,
       textures: null,
-      vertex: null,
+      vertex: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
     },
   }
 }
@@ -81,8 +81,8 @@ const meshPolygonsDefaultStyle = (
       active: "color",
       color,
       textures: null,
-      polygon: null,
-      vertex: null,
+      polygon: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
+      vertex: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
     },
   }
 }
@@ -96,8 +96,8 @@ const meshPolyhedraDefaultStyle = (
     coloring: {
       active: "color",
       color,
-      polyhedron: null,
-      vertex: null,
+      polyhedron: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
+      vertex: { name: undefined, minimum: 0, maximum: 1, colorMap: "Cool to Warm" },
     },
   }
 }

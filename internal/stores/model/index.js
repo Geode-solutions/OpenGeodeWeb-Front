@@ -154,8 +154,6 @@ export default function useModelStyle() {
         promise_array.push(modelPointsStyleStore.applyModelPointsStyle(id))
       } else if (key === "edges") {
         promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id))
-      } else if (key === "attributes") {
-        // Do nothing
       } else {
         throw new Error("Unknown model key: " + key)
       }

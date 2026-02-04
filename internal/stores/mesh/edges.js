@@ -51,37 +51,31 @@ export function useMeshEdgesStyle() {
     if (type === "color") {
       return setMeshEdgesColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex === null) {
+      if (coloring.vertex.name === undefined) {
         throw new Error("Vertex attribute not set")
       }
-      if (coloring.vertex.name) {
-        return setMeshEdgesVertexAttributeName(id, coloring.vertex.name).then(() => {
-          if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
-            return setMeshEdgesVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
-              if (coloring.vertex.colorMap) {
-                return setMeshEdgesVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
-              }
-            })
-          }
-        })
-      }
-      return Promise.resolve()
+      return setMeshEdgesVertexAttributeName(id, coloring.vertex.name).then(() => {
+        if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
+          return setMeshEdgesVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
+            if (coloring.vertex.colorMap) {
+              return setMeshEdgesVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
+            }
+          })
+        }
+      })
     } else if (type === "edge") {
-      if (coloring.edge === null) {
+      if (coloring.edge.name === undefined) {
         throw new Error("Edge attribute not set")
       }
-      if (coloring.edge.name) {
-        return setMeshEdgesEdgeAttributeName(id, coloring.edge.name).then(() => {
-          if (coloring.edge.minimum !== undefined && coloring.edge.maximum !== undefined) {
-            return setMeshEdgesEdgeAttributeRange(id, coloring.edge.minimum, coloring.edge.maximum).then(() => {
-              if (coloring.edge.colorMap) {
-                return setMeshEdgesEdgeAttributeColorMap(id, coloring.edge.colorMap, coloring.edge.minimum, coloring.edge.maximum)
-              }
-            })
-          }
-        })
-      }
-      return Promise.resolve()
+      return setMeshEdgesEdgeAttributeName(id, coloring.edge.name).then(() => {
+        if (coloring.edge.minimum !== undefined && coloring.edge.maximum !== undefined) {
+          return setMeshEdgesEdgeAttributeRange(id, coloring.edge.minimum, coloring.edge.maximum).then(() => {
+            if (coloring.edge.colorMap) {
+              return setMeshEdgesEdgeAttributeColorMap(id, coloring.edge.colorMap, coloring.edge.minimum, coloring.edge.maximum)
+            }
+          })
+        }
+      })
     } else {
       throw new Error("Unknown mesh edges coloring type: " + type)
     }

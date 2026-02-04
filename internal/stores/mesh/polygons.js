@@ -267,37 +267,31 @@ export function useMeshPolygonsStyle() {
       }
       return setMeshPolygonsTextures(id, coloring.textures)
     } else if (type === "vertex") {
-      if (coloring.vertex === null) {
+      if (coloring.vertex.name === undefined) {
         throw new Error("Vertex attribute not set")
       }
-      if (coloring.vertex.name) {
-        return setMeshPolygonsVertexAttributeName(id, coloring.vertex.name).then(() => {
-          if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
-            return setMeshPolygonsVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
-              if (coloring.vertex.colorMap) {
-                return setMeshPolygonsVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
-              }
-            })
-          }
-        })
-      }
-      return Promise.resolve()
+      return setMeshPolygonsVertexAttributeName(id, coloring.vertex.name).then(() => {
+        if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
+          return setMeshPolygonsVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
+            if (coloring.vertex.colorMap) {
+              return setMeshPolygonsVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
+            }
+          })
+        }
+      })
     } else if (type === "polygon") {
-      if (coloring.polygon === null) {
+      if (coloring.polygon.name === undefined) {
         throw new Error("Polygon attribute not set")
       }
-      if (coloring.polygon.name) {
-        return setMeshPolygonsPolygonAttributeName(id, coloring.polygon.name).then(() => {
-          if (coloring.polygon.minimum !== undefined && coloring.polygon.maximum !== undefined) {
-            return setMeshPolygonsPolygonAttributeRange(id, coloring.polygon.minimum, coloring.polygon.maximum).then(() => {
-              if (coloring.polygon.colorMap) {
-                return setMeshPolygonsPolygonAttributeColorMap(id, coloring.polygon.colorMap, coloring.polygon.minimum, coloring.polygon.maximum)
-              }
-            })
-          }
-        })
-      }
-      return Promise.resolve()
+      return setMeshPolygonsPolygonAttributeName(id, coloring.polygon.name).then(() => {
+        if (coloring.polygon.minimum !== undefined && coloring.polygon.maximum !== undefined) {
+          return setMeshPolygonsPolygonAttributeRange(id, coloring.polygon.minimum, coloring.polygon.maximum).then(() => {
+            if (coloring.polygon.colorMap) {
+              return setMeshPolygonsPolygonAttributeColorMap(id, coloring.polygon.colorMap, coloring.polygon.minimum, coloring.polygon.maximum)
+            }
+          })
+        }
+      })
     } else {
       throw new Error("Unknown mesh polygons coloring type: " + type)
     }
