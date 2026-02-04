@@ -141,7 +141,12 @@ export function useMeshPolyhedraStyle() {
     const vertex = meshPolyhedraStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshPolyhedraVertexAttributeName(id, name, defaultMin, defaultMax) {
+  function setMeshPolyhedraVertexAttributeName(
+    id,
+    name,
+    defaultMin,
+    defaultMax,
+  ) {
     const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.attribute.vertex.name,
@@ -270,7 +275,12 @@ export function useMeshPolyhedraStyle() {
     const polyhedron = meshPolyhedraStyle(id).coloring.polyhedron
     return polyhedron ? polyhedron.name : ""
   }
-  function setMeshPolyhedraPolyhedronAttributeName(id, name, defaultMin, defaultMax) {
+  function setMeshPolyhedraPolyhedronAttributeName(
+    id,
+    name,
+    defaultMin,
+    defaultMax,
+  ) {
     const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.attribute.polyhedron.name,
