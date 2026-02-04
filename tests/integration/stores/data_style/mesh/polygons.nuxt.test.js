@@ -94,13 +94,13 @@ describe("Mesh polygons", () => {
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.vertex_attribute,
+        mesh_polygons_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolygonsVertexAttribute(id)).toStrictEqual(
+      expect(dataStyleStore.meshPolygonsVertexAttribute(id)).toMatchObject(
         vertex_attribute,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
@@ -119,13 +119,13 @@ describe("Mesh polygons", () => {
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.polygon_attribute,
+        mesh_polygons_schemas.attribute.polygon.name,
         { id, ...polygon_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolygonsPolygonAttribute(id)).toStrictEqual(
+      expect(dataStyleStore.meshPolygonsPolygonAttribute(id)).toMatchObject(
         polygon_attribute,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)

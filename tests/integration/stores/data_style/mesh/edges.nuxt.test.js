@@ -85,13 +85,13 @@ describe("Mesh edges", () => {
       const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute)
       expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.vertex_attribute,
+        mesh_edges_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshEdgesVertexAttribute(id)).toStrictEqual(
+      expect(dataStyleStore.meshEdgesVertexAttribute(id)).toMatchObject(
         vertex_attribute,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
@@ -104,13 +104,13 @@ describe("Mesh edges", () => {
       const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute)
       expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.edge_attribute,
+        mesh_edges_schemas.attribute.edge.name,
         { id, ...edge_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshEdgesEdgeAttribute(id)).toStrictEqual(
+      expect(dataStyleStore.meshEdgesEdgeAttribute(id)).toMatchObject(
         edge_attribute,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)

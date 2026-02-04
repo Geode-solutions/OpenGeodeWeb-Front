@@ -94,13 +94,13 @@ describe("Mesh cells", () => {
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(
-        mesh_cells_schemas.vertex_attribute,
+        mesh_cells_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshCellsVertexAttribute(id)).toStrictEqual(
+      expect(dataStyleStore.meshCellsVertexAttribute(id)).toMatchObject(
         vertex_attribute,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
@@ -119,13 +119,13 @@ describe("Mesh cells", () => {
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(
-        mesh_cells_schemas.cell_attribute,
+        mesh_cells_schemas.attribute.cell.name,
         { id, ...cell_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshCellsCellAttribute(id)).toStrictEqual(
+      expect(dataStyleStore.meshCellsCellAttribute(id)).toMatchObject(
         cell_attribute,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)

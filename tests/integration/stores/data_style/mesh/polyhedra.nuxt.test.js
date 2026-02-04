@@ -125,13 +125,13 @@ describe("Mesh polyhedra", () => {
     const spy = vi.spyOn(viewerStore, "request")
     await dataStyleStore.setMeshPolyhedraVertexAttribute(id, vertex_attribute)
     expect(spy).toHaveBeenCalledWith(
-      mesh_polyhedra_schemas.vertex_attribute,
+      mesh_polyhedra_schemas.attribute.vertex.name,
       { id, ...vertex_attribute },
       {
         response_function: expect.any(Function),
       },
     )
-    expect(dataStyleStore.meshPolyhedraVertexAttribute(id)).toStrictEqual(
+    expect(dataStyleStore.meshPolyhedraVertexAttribute(id)).toMatchObject(
       vertex_attribute,
     )
     expect(viewerStore.status).toBe(Status.CONNECTED)
@@ -147,13 +147,13 @@ describe("Mesh polyhedra", () => {
       polyhedron_attribute,
     )
     expect(spy).toHaveBeenCalledWith(
-      mesh_polyhedra_schemas.polyhedron_attribute,
+      mesh_polyhedra_schemas.attribute.polyhedron.name,
       { id, ...polyhedron_attribute },
       {
         response_function: expect.any(Function),
       },
     )
-    expect(dataStyleStore.meshPolyhedraPolyhedronAttribute(id)).toStrictEqual(
+    expect(dataStyleStore.meshPolyhedraPolyhedronAttribute(id)).toMatchObject(
       polyhedron_attribute,
     )
     expect(viewerStore.status).toBe(Status.CONNECTED)

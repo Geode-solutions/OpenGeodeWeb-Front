@@ -21,7 +21,7 @@ const geode_object = "RegularGrid3D"
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -59,7 +59,7 @@ describe("Mesh", () => {
   })
 
   describe("Apply mesh default style", () => {
-    test("test", async () => {
+    test("Apply mesh default style", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const result = dataStyleStore.applyMeshStyle(id)
