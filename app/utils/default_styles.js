@@ -1,5 +1,4 @@
 // Global variables
-
 const points_defaultVisibility = true
 const edges_defaultVisibility = true
 const cells_defaultVisibility = true

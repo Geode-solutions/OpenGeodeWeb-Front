@@ -176,4 +176,13 @@ describe("Mesh polygons", () => {
       }
     })
   })
+
+  test("Polygons apply default style", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const result = dataStyleStore.applyMeshPolygonsStyle(id)
+    expect(result).toBeInstanceOf(Promise)
+    await result
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
 })

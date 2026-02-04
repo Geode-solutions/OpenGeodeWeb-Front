@@ -7,6 +7,8 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import { viewer_call } from "../../internal/utils/viewer_call"
 import { useInfraStore } from "@ogw_front/stores/infra"
 
+const request_timeout = 10 * 1000
+
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
     default_local_port: "1234",
@@ -117,9 +119,14 @@ export const useViewerStore = defineStore("viewer", {
               connectImageStream(validClient.getConnection().getSession())
               viewerStore.client = validClient
               clientToConnect.endBusy()
-              viewer_call(viewerStore, {
-                schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
-              })
+              viewer_call(
+                viewerStore,
+                {
+                  schema:
+                    schemas.opengeodeweb_viewer.viewer.reset_visualization,
+                },
+                { timeout: undefined },
+              )
               viewerStore.status = Status.CONNECTED
               resolve()
             })
@@ -148,7 +155,7 @@ export const useViewerStore = defineStore("viewer", {
       await this.ws_connect()
       console.log("[VIEWER] Viewer connected successfully")
     },
-    request(schema, params = {}, callbacks = {}) {
+    request(schema, params = {}, callbacks = {}, timeout = request_timeout) {
       console.log("[VIEWER] Request:", schema.$id)
 
       return viewer_call(
@@ -163,6 +170,7 @@ export const useViewerStore = defineStore("viewer", {
             }
           },
         },
+        timeout,
       )
     },
   },

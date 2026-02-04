@@ -154,5 +154,13 @@ describe("Mesh edges", () => {
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
     })
+    test("Edges apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyMeshEdgesStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
   })
 })

@@ -23,11 +23,9 @@
         return
       }
       const { added, removed } = compareSelections(current, previous)
-
-      added.forEach((item) => {
-        dataStyleStore.setVisibility(item.id, true)
-      })
-
+      for (const item of added) {
+        await dataStyleStore.setVisibility(item.id, true)
+      }
       for (const item of removed) {
         await dataStyleStore.setVisibility(item.id, false)
       }

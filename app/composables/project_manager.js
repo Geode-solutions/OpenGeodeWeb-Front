@@ -51,6 +51,7 @@ export function useProjectManager() {
     await viewerStore.request(
       viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
       {},
+      undefined,
     )
 
     treeviewStore.clear()
