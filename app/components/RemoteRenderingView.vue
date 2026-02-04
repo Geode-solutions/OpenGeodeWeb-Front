@@ -4,7 +4,7 @@
   import ViewToolbar from "@ogw_front/components/ViewToolbar"
   import { useViewerStore } from "@ogw_front/stores/viewer"
   import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-  import vtkRemoteView from "@kitware/vtk.js/Sources/Rendering/Misc/RemoteView"
+  import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
 
   const { viewId } = defineProps({
     viewId: { type: String, default: "-1" },
@@ -28,6 +28,7 @@
   }
 
   const connected = ref(false)
+  // oxlint-disable-next-line import/no-named-as-default-member
   const view = vtkRemoteView.newInstance({
     rpcWheelEvent: "viewport.mouse.zoom.wheel",
   })

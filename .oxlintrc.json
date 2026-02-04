@@ -40,6 +40,8 @@
     "unicorn/consistent-existence-index-check": "off",  // Opérateur < > remplacés par !== -1 for index check
     "unicorn/require-post-message-target-origin": "off", // lorsqu'on envoie un message avec postMessage, on doit spécifier l'origin
     "unicorn/prefer-structured-clone": "off", // Pas compatible avec plugin Pinia ?
+    "no-continue": "off",
+    "max-params": ["warn", { "max": 4 }],
     "eslint/no-magic-numbers": [
       "error",
       {

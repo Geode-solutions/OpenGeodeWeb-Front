@@ -1,11 +1,13 @@
+// oxlint-disable-next-line id-length
 import _ from "lodash"
-import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
+// oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
-import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
-import { viewer_call } from "../../internal/utils/viewer_call"
+import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { useInfraStore } from "@ogw_front/stores/infra"
+import { viewer_call } from "../../internal/utils/viewer_call"
+import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -19,18 +21,18 @@ export const useViewerStore = defineStore("viewer", {
   }),
   getters: {
     protocol() {
-      if (useInfraStore().app_mode == appMode.CLOUD) {
+      if (useInfraStore().app_mode === appMode.CLOUD) {
         return "wss"
       } else {
         return "ws"
       }
     },
     port() {
-      if (useInfraStore().app_mode == appMode.CLOUD) {
+      if (useInfraStore().app_mode === appMode.CLOUD) {
         return "443"
       }
-      const VIEWER_PORT = useRuntimeConfig().public.VIEWER_PORT
-      if (VIEWER_PORT != null && VIEWER_PORT !== "") {
+      const { VIEWER_PORT } = useRuntimeConfig().public
+      if (VIEWER_PORT !== null && VIEWER_PORT !== "") {
         return VIEWER_PORT
       }
       return this.default_local_port
@@ -38,8 +40,8 @@ export const useViewerStore = defineStore("viewer", {
     base_url() {
       const infraStore = useInfraStore()
       let viewer_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
-      if (infraStore.app_mode == appMode.CLOUD) {
-        if (infraStore.ID == "") {
+      if (infraStore.app_mode === appMode.CLOUD) {
+        if (infraStore.ID === "") {
           throw new Error("ID must not be empty in cloud mode")
         }
         viewer_url += `/${infraStore.ID}/viewer`
@@ -81,6 +83,7 @@ export const useViewerStore = defineStore("viewer", {
         }
         let clientToConnect = client
         if (_.isEmpty(clientToConnect)) {
+          // oxlint-disable-next-line import/no-named-as-default-member
           clientToConnect = vtkWSLinkClient.newInstance()
         }
 
@@ -107,35 +110,30 @@ export const useViewerStore = defineStore("viewer", {
         })
 
         // Connect
-        const { connectImageStream } =
-          await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
-        const viewerStore = this
-        return new Promise((resolve, reject) => {
-          clientToConnect
-            .connect(config)
-            .then((validClient) => {
-              connectImageStream(validClient.getConnection().getSession())
-              viewerStore.client = validClient
-              clientToConnect.endBusy()
-              viewer_call(viewerStore, {
-                schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
-              })
-              viewerStore.status = Status.CONNECTED
-              resolve()
-            })
-            .catch((error) => {
-              console.error("error", error)
-              viewerStore.status = Status.NOT_CONNECTED
-              reject(error)
-            })
-        })
+        const { connectImageStream } = await import(
+          "@kitware/vtk.js/Rendering/Misc/RemoteView"
+        )
+        try {
+          const validClient = await clientToConnect.connect(config)
+          connectImageStream(validClient.getConnection().getSession())
+          this.client = validClient
+          clientToConnect.endBusy()
+          viewer_call(this, {
+            schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
+          })
+          this.status = Status.CONNECTED
+        } catch (error) {
+          console.error("error", error)
+          this.status = Status.NOT_CONNECTED
+          throw error
+        }
       })
     },
     start_request() {
-      this.request_counter++
+      this.request_counter += 1
     },
     stop_request() {
-      this.request_counter--
+      this.request_counter -= 1
     },
     async launch() {
       console.log("[VIEWER] Launching viewer microservice...")

@@ -1,9 +1,12 @@
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import Status from "@ogw_front/utils/status"
-import { appMode } from "@ogw_front/utils/app_mode"
 import { api_fetch } from "../../internal/utils/api_fetch"
-import { useInfraStore } from "@ogw_front/stores/infra"
+import { appMode } from "@ogw_front/utils/app_mode"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useInfraStore } from "@ogw_front/stores/infra"
+
+const MILLISECONDS_IN_SECOND = 1000
+const DEFAULT_PING_INTERVAL_SECONDS = 10
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -13,17 +16,17 @@ export const useGeodeStore = defineStore("geode", {
   }),
   getters: {
     protocol() {
-      if (useInfraStore().app_mode == appMode.CLOUD) {
+      if (useInfraStore().app_mode === appMode.CLOUD) {
         return "https"
       }
       return "http"
     },
     port() {
-      if (useInfraStore().app_mode == appMode.CLOUD) {
+      if (useInfraStore().app_mode === appMode.CLOUD) {
         return "443"
       }
-      const GEODE_PORT = useRuntimeConfig().public.GEODE_PORT
-      if (GEODE_PORT != null && GEODE_PORT !== "") {
+      const { GEODE_PORT } = useRuntimeConfig().public
+      if (GEODE_PORT !== null && GEODE_PORT !== "") {
         return GEODE_PORT
       }
       return this.default_local_port
@@ -31,8 +34,8 @@ export const useGeodeStore = defineStore("geode", {
     base_url() {
       const infraStore = useInfraStore()
       let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
-      if (infraStore.app_mode == appMode.CLOUD) {
-        if (infraStore.ID == "") {
+      if (infraStore.app_mode === appMode.CLOUD) {
+        if (infraStore.ID === "") {
           throw new Error("ID must not be empty in cloud mode")
         }
         geode_url += `/${infraStore.ID}/geode`
@@ -48,7 +51,7 @@ export const useGeodeStore = defineStore("geode", {
       this.ping()
       setInterval(() => {
         this.ping()
-      }, 10 * 1000)
+      }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND)
     },
     ping() {
       const geodeStore = this
@@ -73,10 +76,10 @@ export const useGeodeStore = defineStore("geode", {
       )
     },
     start_request() {
-      this.request_counter++
+      this.request_counter += 1
     },
     stop_request() {
-      this.request_counter--
+      this.request_counter -= 1
     },
     launch() {
       console.log("[GEODE] Launching geode microservice...")
