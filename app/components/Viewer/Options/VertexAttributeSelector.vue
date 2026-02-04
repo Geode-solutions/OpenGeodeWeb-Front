@@ -9,15 +9,35 @@
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const model = defineModel()
-
   const props = defineProps({
     id: { type: String, required: true },
     meshType: { type: String, default: "polygons" },
   })
 
-  const vertex_attribute_name = ref("")
+  const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1)
+
   const vertex_attribute_names = ref([])
+
+  const storeVertexAttribute = computed(() => {
+    const methodName = `mesh${capitalize(props.meshType)}VertexAttribute`
+    return dataStyleStore[methodName]?.(props.id) || {}
+  })
+
+  const vertex_attribute_name = computed({
+    get: () => storeVertexAttribute.value?.name || "",
+    set: (newName) => {
+      if (newName) {
+        const methodName = `setMesh${capitalize(props.meshType)}VertexAttributeName`
+        dataStyleStore[methodName](props.id, newName)
+        const attribute = vertex_attribute_names.value.find(
+          (attr) => attr.attribute_name === newName,
+        )
+        if (attribute) {
+          onScalarRangeChange(attribute.min_value, attribute.max_value)
+        }
+      }
+    },
+  })
 
   const selectedAttributeRange = computed(() => {
     const attribute = vertex_attribute_names.value.find(
@@ -29,121 +49,37 @@
     return [0, 1]
   })
 
-  const vertex_attribute = reactive({
-    name: "",
-    minimum: undefined,
-    maximum: undefined,
-    colorMap: "Cool to Warm",
+  const minimum = computed({
+    get: () => storeVertexAttribute.value?.minimum,
+    set: (value) =>
+      onScalarRangeChange(value, storeVertexAttribute.value?.maximum),
   })
 
-  onMounted(() => {
-    if (model.value != null && model.value.name) {
-      vertex_attribute_name.value = model.value.name
-      loadSettingsForAttribute(model.value.name)
-    }
+  const maximum = computed({
+    get: () => storeVertexAttribute.value?.maximum,
+    set: (value) =>
+      onScalarRangeChange(storeVertexAttribute.value?.minimum, value),
   })
 
-  watch(vertex_attribute_name, (newName, oldName) => {
-    if (
-      oldName &&
-      vertex_attribute.minimum !== undefined &&
-      vertex_attribute.maximum !== undefined
-    ) {
-      dataStyleStore.setAttributeSettings(props.id, "vertex", oldName, {
-        minimum: vertex_attribute.minimum,
-        maximum: vertex_attribute.maximum,
-        colorMap: vertex_attribute.colorMap,
-      })
-    }
-
-    vertex_attribute.name = newName
-
-    if (newName) {
-      loadSettingsForAttribute(newName)
-    }
-
-    model.value = { ...vertex_attribute }
+  const colorMap = computed({
+    get: () => storeVertexAttribute.value?.colorMap || "Cool to Warm",
+    set: (value) => onColorMapChange(value),
   })
 
-  function loadSettingsForAttribute(attributeName) {
-    const cached = dataStyleStore.getAttributeSettings(
-      props.id,
-      "vertex",
-      attributeName,
-    )
-    if (cached) {
-      vertex_attribute.minimum = cached.minimum
-      vertex_attribute.maximum = cached.maximum
-      vertex_attribute.colorMap = cached.colorMap
-    } else {
-      const attribute = vertex_attribute_names.value.find(
-        (attr) => attr.attribute_name === attributeName,
-      )
-      vertex_attribute.minimum = attribute ? attribute.min_value : 0
-      vertex_attribute.maximum = attribute ? attribute.max_value : 1
-      vertex_attribute.colorMap = "Cool to Warm"
-    }
-    nextTick(() => {
-      onScalarRangeChange()
-      onColorMapChange()
-    })
-  }
-
-  watch(
-    () => [
-      vertex_attribute.minimum,
-      vertex_attribute.maximum,
-      vertex_attribute.colorMap,
-    ],
-    () => {
-      model.value = { ...vertex_attribute }
-      if (vertex_attribute.name) {
-        dataStyleStore.setAttributeSettings(
-          props.id,
-          "vertex",
-          vertex_attribute.name,
-          {
-            minimum: vertex_attribute.minimum,
-            maximum: vertex_attribute.maximum,
-            colorMap: vertex_attribute.colorMap,
-          },
-        )
-      }
-    },
-  )
-
-  function onScalarRangeChange() {
-    if (
-      vertex_attribute.minimum !== undefined &&
-      vertex_attribute.maximum !== undefined
-    ) {
-      const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1)
+  function onScalarRangeChange(min, max) {
+    if (min !== undefined && max !== undefined) {
       const methodName = `setMesh${capitalize(props.meshType)}VertexAttributeRange`
-      dataStyleStore[methodName](
-        props.id,
-        vertex_attribute.minimum,
-        vertex_attribute.maximum,
-      )
-      onColorMapChange()
+      dataStyleStore[methodName](props.id, min, max)
+      onColorMapChange(colorMap.value, min, max)
     }
   }
 
-  function onColorMapChange() {
-    if (
-      vertex_attribute.minimum !== undefined &&
-      vertex_attribute.maximum !== undefined &&
-      vertex_attribute.colorMap
-    ) {
-      const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1)
-      const methodName = `setMesh${capitalize(
-        props.meshType,
-      )}VertexAttributeColorMap`
-      dataStyleStore[methodName](
-        props.id,
-        vertex_attribute.colorMap,
-        vertex_attribute.minimum,
-        vertex_attribute.maximum,
-      )
+  function onColorMapChange(newColorMap, min, max) {
+    min = min ?? minimum.value
+    max = max ?? maximum.value
+    if (min !== undefined && max !== undefined && newColorMap) {
+      const methodName = `setMesh${capitalize(props.meshType)}VertexAttributeColorMap`
+      dataStyleStore[methodName](props.id, newColorMap, min, max)
       hybridViewerStore.remoteRender()
     }
   }
@@ -176,13 +112,10 @@
   />
   <ViewerOptionsAttributeColorBar
     v-if="vertex_attribute_name"
-    v-model:minimum="vertex_attribute.minimum"
-    v-model:maximum="vertex_attribute.maximum"
-    v-model:colorMap="vertex_attribute.colorMap"
+    v-model:minimum="minimum"
+    v-model:maximum="maximum"
+    v-model:colorMap="colorMap"
     :auto-min="selectedAttributeRange[0]"
     :auto-max="selectedAttributeRange[1]"
-    @update:minimum="onScalarRangeChange"
-    @update:maximum="onScalarRangeChange"
-    @update:colorMap="onColorMapChange"
   />
 </template>

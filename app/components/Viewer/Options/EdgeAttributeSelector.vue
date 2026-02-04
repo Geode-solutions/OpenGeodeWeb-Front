@@ -9,14 +9,30 @@
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const model = defineModel()
-
   const props = defineProps({
     id: { type: String, required: true },
   })
 
-  const edge_attribute_name = ref("")
   const edge_attribute_names = ref([])
+
+  const storeEdgeAttribute = computed(() => {
+    return dataStyleStore.meshEdgesEdgeAttribute?.(props.id) || {}
+  })
+
+  const edge_attribute_name = computed({
+    get: () => storeEdgeAttribute.value?.name || "",
+    set: (newName) => {
+      if (newName) {
+        dataStyleStore.setMeshEdgesEdgeAttributeName(props.id, newName)
+        const attribute = edge_attribute_names.value.find(
+          (attr) => attr.attribute_name === newName,
+        )
+        if (attribute) {
+          onScalarRangeChange(attribute.min_value, attribute.max_value)
+        }
+      }
+    },
+  })
 
   const selectedAttributeRange = computed(() => {
     const attribute = edge_attribute_names.value.find(
@@ -28,111 +44,39 @@
     return [0, 1]
   })
 
-  const edge_attribute = reactive({
-    name: "",
-    minimum: undefined,
-    maximum: undefined,
-    colorMap: "Cool to Warm",
+  const minimum = computed({
+    get: () => storeEdgeAttribute.value?.minimum,
+    set: (value) =>
+      onScalarRangeChange(value, storeEdgeAttribute.value?.maximum),
   })
 
-  onMounted(() => {
-    if (model.value != null && model.value.name) {
-      edge_attribute_name.value = model.value.name
-      loadSettingsForAttribute(model.value.name)
-    }
+  const maximum = computed({
+    get: () => storeEdgeAttribute.value?.maximum,
+    set: (value) =>
+      onScalarRangeChange(storeEdgeAttribute.value?.minimum, value),
   })
 
-  watch(edge_attribute_name, (newName, oldName) => {
-    if (
-      oldName &&
-      edge_attribute.minimum !== undefined &&
-      edge_attribute.maximum !== undefined
-    ) {
-      dataStyleStore.setAttributeSettings(props.id, "edge", oldName, {
-        minimum: edge_attribute.minimum,
-        maximum: edge_attribute.maximum,
-        colorMap: edge_attribute.colorMap,
-      })
-    }
-    edge_attribute.name = newName
-    if (newName) {
-      loadSettingsForAttribute(newName)
-    }
-    model.value = { ...edge_attribute }
+  const colorMap = computed({
+    get: () => storeEdgeAttribute.value?.colorMap || "Cool to Warm",
+    set: (value) => onColorMapChange(value),
   })
 
-  function loadSettingsForAttribute(attributeName) {
-    const cached = dataStyleStore.getAttributeSettings(
-      props.id,
-      "edge",
-      attributeName,
-    )
-    if (cached) {
-      edge_attribute.minimum = cached.minimum
-      edge_attribute.maximum = cached.maximum
-      edge_attribute.colorMap = cached.colorMap
-    } else {
-      const attribute = edge_attribute_names.value.find(
-        (attr) => attr.attribute_name === attributeName,
-      )
-      edge_attribute.minimum = attribute ? attribute.min_value : 0
-      edge_attribute.maximum = attribute ? attribute.max_value : 1
-      edge_attribute.colorMap = "Cool to Warm"
-    }
-    nextTick(() => {
-      onScalarRangeChange()
-      onColorMapChange()
-    })
-  }
-
-  watch(
-    () => [
-      edge_attribute.minimum,
-      edge_attribute.maximum,
-      edge_attribute.colorMap,
-    ],
-    () => {
-      model.value = { ...edge_attribute }
-      if (edge_attribute.name) {
-        dataStyleStore.setAttributeSettings(
-          props.id,
-          "edge",
-          edge_attribute.name,
-          {
-            minimum: edge_attribute.minimum,
-            maximum: edge_attribute.maximum,
-            colorMap: edge_attribute.colorMap,
-          },
-        )
-      }
-    },
-  )
-
-  function onScalarRangeChange() {
-    if (
-      edge_attribute.minimum !== undefined &&
-      edge_attribute.maximum !== undefined
-    ) {
-      dataStyleStore.setMeshEdgesEdgeAttributeRange(
-        props.id,
-        edge_attribute.minimum,
-        edge_attribute.maximum,
-      )
-      onColorMapChange()
+  function onScalarRangeChange(min, max) {
+    if (min !== undefined && max !== undefined) {
+      dataStyleStore.setMeshEdgesEdgeAttributeRange(props.id, min, max)
+      onColorMapChange(colorMap.value, min, max)
     }
   }
 
-  function onColorMapChange() {
-    if (
-      edge_attribute.minimum !== undefined &&
-      edge_attribute.maximum !== undefined &&
-      edge_attribute.colorMap
-    ) {
+  function onColorMapChange(newColorMap, min, max) {
+    min = min ?? minimum.value
+    max = max ?? maximum.value
+    if (min !== undefined && max !== undefined && newColorMap) {
       dataStyleStore.setMeshEdgesEdgeAttributeColorMap(
         props.id,
-        edge_attribute.colorMap,
-        edge_attribute.minimum,
-        edge_attribute.maximum,
+        newColorMap,
+        min,
+        max,
       )
       hybridViewerStore.remoteRender()
     }
@@ -184,14 +128,11 @@
     </v-col>
     <ViewerOptionsAttributeColorBar
       v-if="edge_attribute_name"
-      v-model:minimum="edge_attribute.minimum"
-      v-model:maximum="edge_attribute.maximum"
-      v-model:colorMap="edge_attribute.colorMap"
+      v-model:minimum="minimum"
+      v-model:maximum="maximum"
+      v-model:colorMap="colorMap"
       :auto-min="selectedAttributeRange[0]"
       :auto-max="selectedAttributeRange[1]"
-      @update:minimum="onScalarRangeChange"
-      @update:maximum="onScalarRangeChange"
-      @update:colorMap="onColorMapChange"
     />
   </v-row>
 </template>

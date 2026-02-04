@@ -9,13 +9,30 @@
     id: { type: String, required: true },
   })
 
-  const model = defineModel()
-  const polygon_attribute_name = ref("")
-  const polygon_attribute_names = ref([])
-
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
+
+  const polygon_attribute_names = ref([])
+
+  const storePolygonAttribute = computed(() => {
+    return dataStyleStore.meshPolygonsPolygonAttribute?.(props.id) || {}
+  })
+
+  const polygon_attribute_name = computed({
+    get: () => storePolygonAttribute.value?.name || "",
+    set: (newName) => {
+      if (newName) {
+        dataStyleStore.setMeshPolygonsPolygonAttributeName(props.id, newName)
+        const attribute = polygon_attribute_names.value.find(
+          (attr) => attr.attribute_name === newName,
+        )
+        if (attribute) {
+          onScalarRangeChange(attribute.min_value, attribute.max_value)
+        }
+      }
+    },
+  })
 
   const selectedAttributeRange = computed(() => {
     const attribute = polygon_attribute_names.value.find(
@@ -27,114 +44,39 @@
     return [0, 1]
   })
 
-  const polygon_attribute = reactive({
-    name: "",
-    minimum: undefined,
-    maximum: undefined,
-    colorMap: "Cool to Warm",
+  const minimum = computed({
+    get: () => storePolygonAttribute.value?.minimum,
+    set: (value) =>
+      onScalarRangeChange(value, storePolygonAttribute.value?.maximum),
   })
 
-  onMounted(() => {
-    if (model.value != null && model.value.name) {
-      polygon_attribute_name.value = model.value.name
-      loadSettingsForAttribute(model.value.name)
-    }
+  const maximum = computed({
+    get: () => storePolygonAttribute.value?.maximum,
+    set: (value) =>
+      onScalarRangeChange(storePolygonAttribute.value?.minimum, value),
   })
 
-  watch(polygon_attribute_name, (newName, oldName) => {
-    if (
-      oldName &&
-      polygon_attribute.minimum !== undefined &&
-      polygon_attribute.maximum !== undefined
-    ) {
-      dataStyleStore.setAttributeSettings(props.id, "polygon", oldName, {
-        minimum: polygon_attribute.minimum,
-        maximum: polygon_attribute.maximum,
-        colorMap: polygon_attribute.colorMap,
-      })
-    }
-
-    polygon_attribute.name = newName
-
-    if (newName) {
-      loadSettingsForAttribute(newName)
-    }
-
-    model.value = { ...polygon_attribute }
+  const colorMap = computed({
+    get: () => storePolygonAttribute.value?.colorMap || "Cool to Warm",
+    set: (value) => onColorMapChange(value),
   })
 
-  function loadSettingsForAttribute(attributeName) {
-    const cached = dataStyleStore.getAttributeSettings(
-      props.id,
-      "polygon",
-      attributeName,
-    )
-    if (cached) {
-      polygon_attribute.minimum = cached.minimum
-      polygon_attribute.maximum = cached.maximum
-      polygon_attribute.colorMap = cached.colorMap
-    } else {
-      const attribute = polygon_attribute_names.value.find(
-        (attr) => attr.attribute_name === attributeName,
-      )
-      polygon_attribute.minimum = attribute ? attribute.min_value : 0
-      polygon_attribute.maximum = attribute ? attribute.max_value : 1
-      polygon_attribute.colorMap = "Cool to Warm"
-    }
-    nextTick(() => {
-      onScalarRangeChange()
-      onColorMapChange()
-    })
-  }
-
-  watch(
-    () => [
-      polygon_attribute.minimum,
-      polygon_attribute.maximum,
-      polygon_attribute.colorMap,
-    ],
-    () => {
-      model.value = { ...polygon_attribute }
-      if (polygon_attribute.name) {
-        dataStyleStore.setAttributeSettings(
-          props.id,
-          "polygon",
-          polygon_attribute.name,
-          {
-            minimum: polygon_attribute.minimum,
-            maximum: polygon_attribute.maximum,
-            colorMap: polygon_attribute.colorMap,
-          },
-        )
-      }
-    },
-  )
-
-  function onScalarRangeChange() {
-    if (
-      polygon_attribute.minimum !== undefined &&
-      polygon_attribute.maximum !== undefined
-    ) {
-      dataStyleStore.setMeshPolygonsPolygonAttributeRange(
-        props.id,
-        polygon_attribute.minimum,
-        polygon_attribute.maximum,
-      )
-      onColorMapChange()
+  function onScalarRangeChange(min, max) {
+    if (min !== undefined && max !== undefined) {
+      dataStyleStore.setMeshPolygonsPolygonAttributeRange(props.id, min, max)
+      onColorMapChange(colorMap.value, min, max)
     }
   }
 
-  function onColorMapChange() {
-    if (
-      polygon_attribute.minimum !== undefined &&
-      polygon_attribute.maximum !== undefined &&
-      polygon_attribute.colorMap
-    ) {
+  function onColorMapChange(newColorMap, min, max) {
+    min = min ?? minimum.value
+    max = max ?? maximum.value
+    if (min !== undefined && max !== undefined && newColorMap) {
       dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(
         props.id,
-        polygon_attribute.colorMap,
-        polygon_attribute.minimum,
-        polygon_attribute.maximum,
+        newColorMap,
+        min,
+        max,
       )
       hybridViewerStore.remoteRender()
     }
@@ -168,13 +110,10 @@
   />
   <ViewerOptionsAttributeColorBar
     v-if="polygon_attribute_name"
-    v-model:minimum="polygon_attribute.minimum"
-    v-model:maximum="polygon_attribute.maximum"
-    v-model:colorMap="polygon_attribute.colorMap"
+    v-model:minimum="minimum"
+    v-model:maximum="maximum"
+    v-model:colorMap="colorMap"
     :auto-min="selectedAttributeRange[0]"
     :auto-max="selectedAttributeRange[1]"
-    @update:minimum="onScalarRangeChange"
-    @update:maximum="onScalarRangeChange"
-    @update:colorMap="onColorMapChange"
   />
 </template>

@@ -51,13 +51,35 @@ export function useMeshEdgesStyle() {
     if (type === "color") {
       return setMeshEdgesColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex && coloring.vertex.name) {
-        return setMeshEdgesVertexAttributeName(id, coloring.vertex.name)
+      if (coloring.vertex === null) {
+        throw new Error("Vertex attribute not set")
+      }
+      if (coloring.vertex.name) {
+        return setMeshEdgesVertexAttributeName(id, coloring.vertex.name).then(() => {
+          if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
+            return setMeshEdgesVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
+              if (coloring.vertex.colorMap) {
+                return setMeshEdgesVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
+              }
+            })
+          }
+        })
       }
       return Promise.resolve()
     } else if (type === "edge") {
-      if (coloring.edge && coloring.edge.name) {
-        return setMeshEdgesEdgeAttributeName(id, coloring.edge.name)
+      if (coloring.edge === null) {
+        throw new Error("Edge attribute not set")
+      }
+      if (coloring.edge.name) {
+        return setMeshEdgesEdgeAttributeName(id, coloring.edge.name).then(() => {
+          if (coloring.edge.minimum !== undefined && coloring.edge.maximum !== undefined) {
+            return setMeshEdgesEdgeAttributeRange(id, coloring.edge.minimum, coloring.edge.maximum).then(() => {
+              if (coloring.edge.colorMap) {
+                return setMeshEdgesEdgeAttributeColorMap(id, coloring.edge.colorMap, coloring.edge.minimum, coloring.edge.maximum)
+              }
+            })
+          }
+        })
       }
       return Promise.resolve()
     } else {
@@ -154,10 +176,11 @@ export function useMeshEdgesStyle() {
     const vertex = meshEdgesStyle(id).coloring.vertex
     return vertex ? vertex.colorMap : null
   }
-  function setMeshEdgesVertexAttributeColorMap(id, points, minimum, maximum) {
+  function setMeshEdgesVertexAttributeColorMap(id, colorMapName, minimum, maximum) {
     const coloring_style = meshEdgesStyle(id).coloring
-    if (typeof points === "string") {
-      points = getRGBPointsFromPreset(points)
+    let points = colorMapName
+    if (typeof colorMapName === "string") {
+      points = getRGBPointsFromPreset(colorMapName)
     }
     return viewerStore.request(
       mesh_edges_schemas.attribute.vertex.color_map,
@@ -167,8 +190,8 @@ export function useMeshEdgesStyle() {
           if (!coloring_style.vertex) {
             coloring_style.vertex = {}
           }
-          coloring_style.vertex.colorMap = points
-          console.log(setMeshEdgesVertexAttributeColorMap.name, { id, points })
+          coloring_style.vertex.colorMap = colorMapName
+          console.log(setMeshEdgesVertexAttributeColorMap.name, { id, colorMapName })
         },
       },
     )
@@ -234,17 +257,18 @@ export function useMeshEdgesStyle() {
     const edge = meshEdgesStyle(id).coloring.edge
     return edge ? edge.colorMap : null
   }
-  function setMeshEdgesEdgeAttributeColorMap(id, points, minimum, maximum) {
+  function setMeshEdgesEdgeAttributeColorMap(id, colorMapName, minimum, maximum) {
     const coloring_style = meshEdgesStyle(id).coloring
-    if (typeof points === "string") {
-      points = getRGBPointsFromPreset(points)
+    let points = colorMapName
+    if (typeof colorMapName === "string") {
+      points = getRGBPointsFromPreset(colorMapName)
     }
     if (!mesh_edges_schemas.edge_color_map) {
       console.warn("setMeshEdgesEdgeAttributeColorMap: RPC not available")
       if (!coloring_style.edge) {
         coloring_style.edge = {}
       }
-      coloring_style.edge.colorMap = points
+      coloring_style.edge.colorMap = colorMapName
       return Promise.resolve()
     }
     return viewerStore.request(
@@ -255,8 +279,8 @@ export function useMeshEdgesStyle() {
           if (!coloring_style.edge) {
             coloring_style.edge = {}
           }
-          coloring_style.edge.colorMap = points
-          console.log(setMeshEdgesEdgeAttributeColorMap.name, { id, points })
+          coloring_style.edge.colorMap = colorMapName
+          console.log(setMeshEdgesEdgeAttributeColorMap.name, { id, colorMapName })
         },
       },
     )
@@ -264,41 +288,11 @@ export function useMeshEdgesStyle() {
 
   function applyMeshEdgesStyle(id) {
     const style = meshEdgesStyle(id)
-    const promises = [
+    return Promise.all([
       setMeshEdgesVisibility(id, style.visibility),
       setMeshEdgesActiveColoring(id, style.coloring.active),
       setMeshEdgesWidth(id, style.width),
-    ]
-
-    if (style.coloring.active === "vertex" && style.coloring.vertex) {
-      const { name, minimum, maximum, colorMap } = style.coloring.vertex
-      if (name) {
-        promises.push(setMeshEdgesVertexAttributeName(id, name))
-      }
-      if (minimum !== undefined && maximum !== undefined) {
-        promises.push(setMeshEdgesVertexAttributeRange(id, minimum, maximum))
-        if (colorMap) {
-          promises.push(
-            setMeshEdgesVertexAttributeColorMap(id, colorMap, minimum, maximum),
-          )
-        }
-      }
-    } else if (style.coloring.active === "edge" && style.coloring.edge) {
-      const { name, minimum, maximum, colorMap } = style.coloring.edge
-      if (name) {
-        promises.push(setMeshEdgesEdgeAttributeName(id, name))
-      }
-      if (minimum !== undefined && maximum !== undefined) {
-        promises.push(setMeshEdgesEdgeAttributeRange(id, minimum, maximum))
-        if (colorMap) {
-          promises.push(
-            setMeshEdgesEdgeAttributeColorMap(id, colorMap, minimum, maximum),
-          )
-        }
-      }
-    }
-
-    return Promise.all(promises)
+    ])
   }
 
   return {

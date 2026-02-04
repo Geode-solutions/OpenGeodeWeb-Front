@@ -59,35 +59,6 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     for (const [id, style] of Object.entries(stylesSnapshot)) {
       dataStyleState.styles[id] = style
     }
-
-    const attributeSettingsSnapshot = snapshot.attributeSettings || {}
-    for (const [key, settings] of Object.entries(attributeSettingsSnapshot)) {
-      const [meshId, attributeType, attributeName] = key.split(":")
-      if (dataStyleState.styles[meshId]) {
-        if (!dataStyleState.styles[meshId].attributes) {
-          dataStyleState.styles[meshId].attributes = {}
-        }
-        // Migration: min/max to minimum/maximum
-        const migratedSettings = { ...settings }
-        if (
-          migratedSettings.min !== undefined &&
-          migratedSettings.minimum === undefined
-        ) {
-          migratedSettings.minimum = migratedSettings.min
-          delete migratedSettings.min
-        }
-        if (
-          migratedSettings.max !== undefined &&
-          migratedSettings.maximum === undefined
-        ) {
-          migratedSettings.maximum = migratedSettings.max
-          delete migratedSettings.max
-        }
-        dataStyleState.styles[meshId].attributes[
-          `${attributeType}:${attributeName}`
-        ] = migratedSettings
-      }
-    }
   }
 
   const applyAllStylesFromState = () => {
@@ -111,8 +82,6 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     getStyle: dataStyleState.getStyle,
     objectVisibility: dataStyleState.objectVisibility,
     selectedObjects: dataStyleState.selectedObjects,
-    getAttributeSettings: dataStyleState.getAttributeSettings,
-    setAttributeSettings: dataStyleState.setAttributeSettings,
     ...meshStyleStore,
     ...modelStyleStore,
     addDataStyle,

@@ -9,13 +9,30 @@
     id: { type: String, required: true },
   })
 
-  const model = defineModel()
-  const cell_attribute_name = ref("")
-  const cell_attribute_names = ref([])
-
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
+
+  const cell_attribute_names = ref([])
+
+  const storeCellAttribute = computed(() => {
+    return dataStyleStore.meshCellsCellAttribute?.(props.id) || {}
+  })
+
+  const cell_attribute_name = computed({
+    get: () => storeCellAttribute.value?.name || "",
+    set: (newName) => {
+      if (newName) {
+        dataStyleStore.setMeshCellsCellAttributeName(props.id, newName)
+        const attribute = cell_attribute_names.value.find(
+          (attr) => attr.attribute_name === newName,
+        )
+        if (attribute) {
+          onScalarRangeChange(attribute.min_value, attribute.max_value)
+        }
+      }
+    },
+  })
 
   const selectedAttributeRange = computed(() => {
     const attribute = cell_attribute_names.value.find(
@@ -27,112 +44,39 @@
     return [0, 1]
   })
 
-  const cell_attribute = reactive({
-    name: "",
-    minimum: undefined,
-    maximum: undefined,
-    colorMap: "Cool to Warm",
+  const minimum = computed({
+    get: () => storeCellAttribute.value?.minimum,
+    set: (value) =>
+      onScalarRangeChange(value, storeCellAttribute.value?.maximum),
   })
 
-  onMounted(() => {
-    if (model.value != null && model.value.name) {
-      cell_attribute_name.value = model.value.name
-      loadSettingsForAttribute(model.value.name)
-    }
+  const maximum = computed({
+    get: () => storeCellAttribute.value?.maximum,
+    set: (value) =>
+      onScalarRangeChange(storeCellAttribute.value?.minimum, value),
   })
 
-  watch(cell_attribute_name, (newName, oldName) => {
-    if (
-      oldName &&
-      cell_attribute.minimum !== undefined &&
-      cell_attribute.maximum !== undefined
-    ) {
-      dataStyleStore.setAttributeSettings(props.id, "cell", oldName, {
-        minimum: cell_attribute.minimum,
-        maximum: cell_attribute.maximum,
-        colorMap: cell_attribute.colorMap,
-      })
-    }
-    cell_attribute.name = newName
-    if (newName) {
-      loadSettingsForAttribute(newName)
-    }
-    model.value = { ...cell_attribute }
+  const colorMap = computed({
+    get: () => storeCellAttribute.value?.colorMap || "Cool to Warm",
+    set: (value) => onColorMapChange(value),
   })
 
-  function loadSettingsForAttribute(attributeName) {
-    const cached = dataStyleStore.getAttributeSettings(
-      props.id,
-      "cell",
-      attributeName,
-    )
-    if (cached) {
-      cell_attribute.minimum = cached.minimum
-      cell_attribute.maximum = cached.maximum
-      cell_attribute.colorMap = cached.colorMap
-    } else {
-      const attribute = cell_attribute_names.value.find(
-        (attr) => attr.attribute_name === attributeName,
-      )
-      cell_attribute.minimum = attribute ? attribute.min_value : 0
-      cell_attribute.maximum = attribute ? attribute.max_value : 1
-      cell_attribute.colorMap = "Cool to Warm"
-    }
-    // Apply the loaded settings to the viewer
-    nextTick(() => {
-      onScalarRangeChange()
-      onColorMapChange()
-    })
-  }
-
-  watch(
-    () => [
-      cell_attribute.minimum,
-      cell_attribute.maximum,
-      cell_attribute.colorMap,
-    ],
-    () => {
-      model.value = { ...cell_attribute }
-      if (cell_attribute.name) {
-        dataStyleStore.setAttributeSettings(
-          props.id,
-          "cell",
-          cell_attribute.name,
-          {
-            minimum: cell_attribute.minimum,
-            maximum: cell_attribute.maximum,
-            colorMap: cell_attribute.colorMap,
-          },
-        )
-      }
-    },
-  )
-
-  function onScalarRangeChange() {
-    if (
-      cell_attribute.minimum !== undefined &&
-      cell_attribute.maximum !== undefined
-    ) {
-      dataStyleStore.setMeshCellsCellAttributeRange(
-        props.id,
-        cell_attribute.minimum,
-        cell_attribute.maximum,
-      )
-      onColorMapChange()
+  function onScalarRangeChange(min, max) {
+    if (min !== undefined && max !== undefined) {
+      dataStyleStore.setMeshCellsCellAttributeRange(props.id, min, max)
+      onColorMapChange(colorMap.value, min, max)
     }
   }
 
-  function onColorMapChange() {
-    if (
-      cell_attribute.minimum !== undefined &&
-      cell_attribute.maximum !== undefined &&
-      cell_attribute.colorMap
-    ) {
+  function onColorMapChange(newColorMap, min, max) {
+    min = min ?? minimum.value
+    max = max ?? maximum.value
+    if (min !== undefined && max !== undefined && newColorMap) {
       dataStyleStore.setMeshCellsCellAttributeColorMap(
         props.id,
-        cell_attribute.colorMap,
-        cell_attribute.minimum,
-        cell_attribute.maximum,
+        newColorMap,
+        min,
+        max,
       )
       hybridViewerStore.remoteRender()
     }
@@ -166,13 +110,10 @@
   />
   <ViewerOptionsAttributeColorBar
     v-if="cell_attribute_name"
-    v-model:minimum="cell_attribute.minimum"
-    v-model:maximum="cell_attribute.maximum"
-    v-model:colorMap="cell_attribute.colorMap"
+    v-model:minimum="minimum"
+    v-model:maximum="maximum"
+    v-model:colorMap="colorMap"
     :auto-min="selectedAttributeRange[0]"
     :auto-max="selectedAttributeRange[1]"
-    @update:minimum="onScalarRangeChange"
-    @update:maximum="onScalarRangeChange"
-    @update:colorMap="onColorMapChange"
   />
 </template>

@@ -9,13 +9,33 @@
     id: { type: String, required: true },
   })
 
-  const model = defineModel()
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const polyhedron_attribute_name = ref("")
   const polyhedron_attribute_names = ref([])
+
+  const storePolyhedronAttribute = computed(() => {
+    return dataStyleStore.meshPolyhedraPolyhedronAttribute?.(props.id) || {}
+  })
+
+  const polyhedron_attribute_name = computed({
+    get: () => storePolyhedronAttribute.value?.name || "",
+    set: (newName) => {
+      if (newName) {
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
+          props.id,
+          newName,
+        )
+        const attribute = polyhedron_attribute_names.value.find(
+          (attr) => attr.attribute_name === newName,
+        )
+        if (attribute) {
+          onScalarRangeChange(attribute.min_value, attribute.max_value)
+        }
+      }
+    },
+  })
 
   const selectedAttributeRange = computed(() => {
     const attribute = polyhedron_attribute_names.value.find(
@@ -27,112 +47,43 @@
     return [0, 1]
   })
 
-  const polyhedron_attribute = reactive({
-    name: "",
-    minimum: undefined,
-    maximum: undefined,
-    colorMap: "Cool to Warm",
+  const minimum = computed({
+    get: () => storePolyhedronAttribute.value?.minimum,
+    set: (value) =>
+      onScalarRangeChange(value, storePolyhedronAttribute.value?.maximum),
   })
 
-  onMounted(() => {
-    if (model.value != null && model.value.name) {
-      polyhedron_attribute_name.value = model.value.name
-      loadSettingsForAttribute(model.value.name)
-    }
+  const maximum = computed({
+    get: () => storePolyhedronAttribute.value?.maximum,
+    set: (value) =>
+      onScalarRangeChange(storePolyhedronAttribute.value?.minimum, value),
   })
 
-  watch(polyhedron_attribute_name, (newName, oldName) => {
-    if (
-      oldName &&
-      polyhedron_attribute.minimum !== undefined &&
-      polyhedron_attribute.maximum !== undefined
-    ) {
-      dataStyleStore.setAttributeSettings(props.id, "polyhedron", oldName, {
-        minimum: polyhedron_attribute.minimum,
-        maximum: polyhedron_attribute.maximum,
-        colorMap: polyhedron_attribute.colorMap,
-      })
-    }
-    polyhedron_attribute.name = newName
-    if (newName) {
-      loadSettingsForAttribute(newName)
-    }
-    model.value = { ...polyhedron_attribute }
+  const colorMap = computed({
+    get: () => storePolyhedronAttribute.value?.colorMap || "Cool to Warm",
+    set: (value) => onColorMapChange(value),
   })
 
-  function loadSettingsForAttribute(attributeName) {
-    const cached = dataStyleStore.getAttributeSettings(
-      props.id,
-      "polyhedron",
-      attributeName,
-    )
-    if (cached) {
-      polyhedron_attribute.minimum = cached.minimum
-      polyhedron_attribute.maximum = cached.maximum
-      polyhedron_attribute.colorMap = cached.colorMap
-    } else {
-      const attribute = polyhedron_attribute_names.value.find(
-        (attr) => attr.attribute_name === attributeName,
-      )
-      polyhedron_attribute.minimum = attribute ? attribute.min_value : 0
-      polyhedron_attribute.maximum = attribute ? attribute.max_value : 1
-      polyhedron_attribute.colorMap = "Cool to Warm"
-    }
-    // Apply the loaded settings to the viewer
-    nextTick(() => {
-      onScalarRangeChange()
-      onColorMapChange()
-    })
-  }
-
-  watch(
-    () => [
-      polyhedron_attribute.minimum,
-      polyhedron_attribute.maximum,
-      polyhedron_attribute.colorMap,
-    ],
-    () => {
-      model.value = { ...polyhedron_attribute }
-      if (polyhedron_attribute.name) {
-        dataStyleStore.setAttributeSettings(
-          props.id,
-          "polyhedron",
-          polyhedron_attribute.name,
-          {
-            minimum: polyhedron_attribute.minimum,
-            maximum: polyhedron_attribute.maximum,
-            colorMap: polyhedron_attribute.colorMap,
-          },
-        )
-      }
-    },
-  )
-
-  function onScalarRangeChange() {
-    if (
-      polyhedron_attribute.minimum !== undefined &&
-      polyhedron_attribute.maximum !== undefined
-    ) {
+  function onScalarRangeChange(min, max) {
+    if (min !== undefined && max !== undefined) {
       dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(
         props.id,
-        polyhedron_attribute.minimum,
-        polyhedron_attribute.maximum,
+        min,
+        max,
       )
-      onColorMapChange()
+      onColorMapChange(colorMap.value, min, max)
     }
   }
 
-  function onColorMapChange() {
-    if (
-      polyhedron_attribute.minimum !== undefined &&
-      polyhedron_attribute.maximum !== undefined &&
-      polyhedron_attribute.colorMap
-    ) {
+  function onColorMapChange(newColorMap, min, max) {
+    min = min ?? minimum.value
+    max = max ?? maximum.value
+    if (min !== undefined && max !== undefined && newColorMap) {
       dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(
         props.id,
-        polyhedron_attribute.colorMap,
-        polyhedron_attribute.minimum,
-        polyhedron_attribute.maximum,
+        newColorMap,
+        min,
+        max,
       )
       hybridViewerStore.remoteRender()
     }
@@ -166,13 +117,10 @@
   />
   <ViewerOptionsAttributeColorBar
     v-if="polyhedron_attribute_name"
-    v-model:minimum="polyhedron_attribute.minimum"
-    v-model:maximum="polyhedron_attribute.maximum"
-    v-model:colorMap="polyhedron_attribute.colorMap"
+    v-model:minimum="minimum"
+    v-model:maximum="maximum"
+    v-model:colorMap="colorMap"
     :auto-min="selectedAttributeRange[0]"
     :auto-max="selectedAttributeRange[1]"
-    @update:minimum="onScalarRangeChange"
-    @update:maximum="onScalarRangeChange"
-    @update:colorMap="onColorMapChange"
   />
 </template>

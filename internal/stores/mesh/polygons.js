@@ -137,13 +137,14 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsVertexAttributeColorMap(
     id,
-    points,
+    colorMapName,
     minimum,
     maximum,
   ) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    if (typeof points === "string") {
-      points = getRGBPointsFromPreset(points)
+    let points = colorMapName
+    if (typeof colorMapName === "string") {
+      points = getRGBPointsFromPreset(colorMapName)
     }
     return viewerStore.request(
       mesh_polygons_schemas.attribute.vertex.color_map,
@@ -153,10 +154,10 @@ export function useMeshPolygonsStyle() {
           if (!coloring_style.vertex) {
             coloring_style.vertex = {}
           }
-          coloring_style.vertex.colorMap = points
+          coloring_style.vertex.colorMap = colorMapName
           console.log(setMeshPolygonsVertexAttributeColorMap.name, {
             id,
-            points,
+            colorMapName,
           })
         },
       },
@@ -220,13 +221,14 @@ export function useMeshPolygonsStyle() {
   }
   function setMeshPolygonsPolygonAttributeColorMap(
     id,
-    points,
+    colorMapName,
     minimum,
     maximum,
   ) {
     const coloring_style = meshPolygonsStyle(id).coloring
-    if (typeof points === "string") {
-      points = getRGBPointsFromPreset(points)
+    let points = colorMapName
+    if (typeof colorMapName === "string") {
+      points = getRGBPointsFromPreset(colorMapName)
     }
     return viewerStore.request(
       mesh_polygons_schemas.attribute.polygon.color_map,
@@ -236,10 +238,10 @@ export function useMeshPolygonsStyle() {
           if (!coloring_style.polygon) {
             coloring_style.polygon = {}
           }
-          coloring_style.polygon.colorMap = points
+          coloring_style.polygon.colorMap = colorMapName
           console.log(setMeshPolygonsPolygonAttributeColorMap.name, {
             id,
-            points,
+            colorMapName,
           })
         },
       },
@@ -265,13 +267,35 @@ export function useMeshPolygonsStyle() {
       }
       return setMeshPolygonsTextures(id, coloring.textures)
     } else if (type === "vertex") {
-      if (coloring.vertex && coloring.vertex.name) {
-        return setMeshPolygonsVertexAttributeName(id, coloring.vertex.name)
+      if (coloring.vertex === null) {
+        throw new Error("Vertex attribute not set")
+      }
+      if (coloring.vertex.name) {
+        return setMeshPolygonsVertexAttributeName(id, coloring.vertex.name).then(() => {
+          if (coloring.vertex.minimum !== undefined && coloring.vertex.maximum !== undefined) {
+            return setMeshPolygonsVertexAttributeRange(id, coloring.vertex.minimum, coloring.vertex.maximum).then(() => {
+              if (coloring.vertex.colorMap) {
+                return setMeshPolygonsVertexAttributeColorMap(id, coloring.vertex.colorMap, coloring.vertex.minimum, coloring.vertex.maximum)
+              }
+            })
+          }
+        })
       }
       return Promise.resolve()
     } else if (type === "polygon") {
-      if (coloring.polygon && coloring.polygon.name) {
-        return setMeshPolygonsPolygonAttributeName(id, coloring.polygon.name)
+      if (coloring.polygon === null) {
+        throw new Error("Polygon attribute not set")
+      }
+      if (coloring.polygon.name) {
+        return setMeshPolygonsPolygonAttributeName(id, coloring.polygon.name).then(() => {
+          if (coloring.polygon.minimum !== undefined && coloring.polygon.maximum !== undefined) {
+            return setMeshPolygonsPolygonAttributeRange(id, coloring.polygon.minimum, coloring.polygon.maximum).then(() => {
+              if (coloring.polygon.colorMap) {
+                return setMeshPolygonsPolygonAttributeColorMap(id, coloring.polygon.colorMap, coloring.polygon.minimum, coloring.polygon.maximum)
+              }
+            })
+          }
+        })
       }
       return Promise.resolve()
     } else {
@@ -281,50 +305,10 @@ export function useMeshPolygonsStyle() {
 
   function applyMeshPolygonsStyle(id) {
     const style = meshPolygonsStyle(id)
-    const promises = [
+    return Promise.all([
       setMeshPolygonsVisibility(id, style.visibility),
       setMeshPolygonsActiveColoring(id, style.coloring.active),
-    ]
-
-    if (style.coloring.active === "vertex" && style.coloring.vertex) {
-      const { name, minimum, maximum, colorMap } = style.coloring.vertex
-      if (name) {
-        promises.push(setMeshPolygonsVertexAttributeName(id, name))
-      }
-      if (minimum !== undefined && maximum !== undefined) {
-        promises.push(setMeshPolygonsVertexAttributeRange(id, minimum, maximum))
-        if (colorMap) {
-          promises.push(
-            setMeshPolygonsVertexAttributeColorMap(
-              id,
-              colorMap,
-              minimum,
-              maximum,
-            ),
-          )
-        }
-      }
-    } else if (style.coloring.active === "polygon" && style.coloring.polygon) {
-      const { name, minimum, maximum, colorMap } = style.coloring.polygon
-      if (name) {
-        promises.push(setMeshPolygonsPolygonAttributeName(id, name))
-      }
-      if (minimum !== undefined && maximum !== undefined) {
-        promises.push(setMeshPolygonsPolygonScalarRange(id, minimum, maximum))
-        if (colorMap) {
-          promises.push(
-            setMeshPolygonsPolygonColorMap(id, colorMap, minimum, maximum),
-          )
-        }
-      }
-    } else if (
-      style.coloring.active === "textures" &&
-      style.coloring.textures
-    ) {
-      promises.push(setMeshPolygonsTextures(id, style.coloring.textures))
-    }
-
-    return Promise.all(promises)
+    ])
   }
 
   return {

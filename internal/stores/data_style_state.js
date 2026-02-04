@@ -1,7 +1,5 @@
 import { reactive, computed } from "vue"
 
-const DEFAULT_COLOR_MAP = "Cool to Warm"
-
 export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   const styles = reactive({})
 
@@ -25,33 +23,10 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     return styles[id]
   }
 
-  function getAttributeSettings(meshId, attributeType, attributeName) {
-    const key = `${attributeType}:${attributeName}`
-    return styles[meshId]?.attributes?.[key] || null
-  }
-  function setAttributeSettings(
-    meshId,
-    attributeType,
-    attributeName,
-    settings,
-  ) {
-    const key = `${attributeType}:${attributeName}`
-    if (!styles[meshId].attributes) {
-      styles[meshId].attributes = {}
-    }
-    styles[meshId].attributes[key] = {
-      minimum: settings.minimum,
-      maximum: settings.maximum,
-      colorMap: settings.colorMap || DEFAULT_COLOR_MAP,
-    }
-  }
-
   return {
     getStyle,
     styles,
     objectVisibility,
     selectedObjects,
-    getAttributeSettings,
-    setAttributeSettings,
   }
 })
