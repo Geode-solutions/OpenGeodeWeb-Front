@@ -46,20 +46,6 @@
       hybridViewerStore.remoteRender()
     },
   })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshPolygonsVertexAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsVertexAttribute(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const polygon_attribute = computed({
-    get: () => dataStyleStore.meshPolygonsPolygonAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsPolygonAttribute(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
 </script>
 <template>
   <ViewerContextMenuItem
@@ -75,8 +61,8 @@
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
-          v-model:vertex_attribute="vertex_attribute"
-          v-model:polygon_attribute="polygon_attribute"
+          :vertex_attribute="{}"
+          :polygon_attribute="{}"
           mesh-type="polygons"
         />
       </template>

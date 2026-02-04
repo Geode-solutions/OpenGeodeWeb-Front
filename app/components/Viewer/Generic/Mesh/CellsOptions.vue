@@ -45,20 +45,6 @@
       hybridViewerStore.remoteRender()
     },
   })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshCellsVertexAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsVertexAttribute(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const cell_attribute = computed({
-    get: () => dataStyleStore.meshCellsCellAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsCellAttribute(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
 </script>
 <template>
   <ViewerContextMenuItem
@@ -74,8 +60,8 @@
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
-          v-model:vertex_attribute="vertex_attribute"
-          v-model:cell_attribute="cell_attribute"
+          :vertex_attribute="{}"
+          :cell_attribute="{}"
           mesh-type="cells"
         />
       </template>

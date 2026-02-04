@@ -38,20 +38,6 @@
       hybridViewerStore.remoteRender()
     },
   })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshPolyhedraVertexAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraVertexAttribute(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const polyhedron_attribute = computed({
-    get: () => dataStyleStore.meshPolyhedraPolyhedronAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraPolyhedronAttribute(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
 </script>
 <template>
   <ViewerContextMenuItem
@@ -66,8 +52,8 @@
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
-          v-model:vertex_attribute="vertex_attribute"
-          v-model:polyhedron_attribute="polyhedron_attribute"
+          :vertex_attribute="{}"
+          :polyhedron_attribute="{}"
           mesh-type="polyhedra"
         />
       </template>
