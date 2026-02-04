@@ -170,7 +170,12 @@ export function useMeshEdgesStyle() {
     const vertex = meshEdgesStyle(id).coloring.vertex
     return vertex ? vertex.colorMap : null
   }
-  function setMeshEdgesVertexAttributeColorMap(id, colorMapName, minimum, maximum) {
+  function setMeshEdgesVertexAttributeColorMap(
+    id,
+    colorMapName,
+    minimum,
+    maximum,
+  ) {
     const coloring_style = meshEdgesStyle(id).coloring
     let points = colorMapName
     if (typeof colorMapName === "string") {
@@ -185,7 +190,10 @@ export function useMeshEdgesStyle() {
             coloring_style.vertex = {}
           }
           coloring_style.vertex.colorMap = colorMapName
-          console.log(setMeshEdgesVertexAttributeColorMap.name, { id, colorMapName })
+          console.log(setMeshEdgesVertexAttributeColorMap.name, {
+            id,
+            colorMapName,
+          })
         },
       },
     )
@@ -251,7 +259,12 @@ export function useMeshEdgesStyle() {
     const edge = meshEdgesStyle(id).coloring.edge
     return edge ? edge.colorMap : null
   }
-  function setMeshEdgesEdgeAttributeColorMap(id, colorMapName, minimum, maximum) {
+  function setMeshEdgesEdgeAttributeColorMap(
+    id,
+    colorMapName,
+    minimum,
+    maximum,
+  ) {
     const coloring_style = meshEdgesStyle(id).coloring
     let points = colorMapName
     if (typeof colorMapName === "string") {
@@ -274,7 +287,10 @@ export function useMeshEdgesStyle() {
             coloring_style.edge = {}
           }
           coloring_style.edge.colorMap = colorMapName
-          console.log(setMeshEdgesEdgeAttributeColorMap.name, { id, colorMapName })
+          console.log(setMeshEdgesEdgeAttributeColorMap.name, {
+            id,
+            colorMapName,
+          })
         },
       },
     )
