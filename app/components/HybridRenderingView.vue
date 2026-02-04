@@ -4,6 +4,9 @@
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import { useViewerStore } from "@ogw_front/stores/viewer"
 
+
+  const DEFAULT_ELEMENT_HEIGHT = 100
+
   const emit = defineEmits(["click"])
 
   const container = useTemplateRef("viewer")
@@ -16,7 +19,7 @@
 
   const debouncedResize = debounce(() => {
     hybridViewerStore.resize(elementWidth.value, elementHeight.value)
-  }, 100)
+  }, DEFAULT_ELEMENT_HEIGHT)
 
   watch([elementWidth, elementHeight, windowWidth, windowHeight], (value) => {
     debouncedResize()
@@ -32,9 +35,9 @@
   })
 
   function debounce(func, wait) {
-    let timeout
+    let timeout = null
     return function executedFunction(...args) {
-      const later = () => {
+      function later() {
         clearTimeout(timeout)
         func(...args)
       }

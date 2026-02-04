@@ -1,7 +1,7 @@
 <script setup>
+  import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg"
   import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
   import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
-  import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
@@ -9,11 +9,11 @@
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const props = defineProps({
+  const { itemProps } = defineProps({
     itemProps: { type: Object, required: true },
   })
 
-  const id = toRef(() => props.itemProps.id)
+  const id = toRef(() => itemProps.id)
 
   const visibility = computed({
     get: () => dataStyleStore.modelEdgesVisibility(id.value),

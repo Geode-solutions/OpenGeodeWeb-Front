@@ -1,12 +1,24 @@
 <script setup>
-  import { useMenuStore } from "@ogw_front/stores/menu"
   import { useDataStore } from "@ogw_front/stores/data"
   import { useEventListener } from "@vueuse/core"
+  import { useMenuStore } from "@ogw_front/stores/menu"
+ 
+   const RADIUS = 80
+   const MARGIN_OFFSET = 40
+   const Z_INDEX_MENU = 1000
+   const Z_INDEX_ACTIVE_ITEM = 10
+   const Z_INDEX_BASE_ITEM = 1
+   const FULL_ANGLE = 360
+   const ANGLE_45 = 45
+   const ANGLE_135 = 135
+   const ANGLE_225 = 225
+   const ANGLE_315 = 315
+   const CLOSE_DELAY = 100
 
   const menuStore = useMenuStore()
   const dataStore = useDataStore()
 
-  const props = defineProps({
+  const { id, x, y, containerWidth, containerHeight } = defineProps({
     id: { type: String, required: true },
     x: { type: Number, required: true },
     y: { type: Number, required: true },
@@ -15,21 +27,20 @@
   })
 
   const meta_data = computed(() => {
-    const itemId = props.id || menuStore.current_id
+    const itemId = id || menuStore.current_id
     if (!itemId) return {}
     return dataStore.getItem(itemId).value || {}
   })
 
-  const radius = 80
   const show_menu = ref(true)
   const isDragging = ref(false)
   const dragStartX = ref(0)
   const dragStartY = ref(0)
-  const menuX = ref(props.x)
-  const menuY = ref(props.y)
+  const menuX = ref(x)
+  const menuY = ref(y)
 
   watch(
-    () => [props.x, props.y],
+    () => [x, y],
     ([newX, newY]) => {
       const { x, y } = clampPosition(newX, newY)
       menuX.value = x
@@ -42,92 +53,92 @@
   useEventListener(
     window,
     "mousemove",
-    (e) => {
+    (event) => {
       if (!isDragging.value) return
-      handleDrag(e)
+      handleDrag(event)
     },
     { passive: true },
   )
 
-  useEventListener(window, "mouseup", (e) => {
+  useEventListener(window, "mouseup", (event) => {
     if (!isDragging.value) return
-    stopDrag(e)
+    stopDrag(event)
   })
 
   const menu_items = shallowRef([])
   watch(
     () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
-    ([v, g]) => {
-      menu_items.value = menuStore.getMenuItems(v, g)
+    ([viewer_type, geode_object_type]) => {
+      menu_items.value = menuStore.getMenuItems(viewer_type, geode_object_type)
     },
     { immediate: true },
   )
 
   const menuItemCount = computed(() => menu_items.value.length)
 
-  function startDrag(e) {
+  function startDrag(event) {
     isDragging.value = true
-    dragStartX.value = e.clientX - menuX.value
-    dragStartY.value = e.clientY - menuY.value
-    e.preventDefault()
+    dragStartX.value = event.clientX - menuX.value
+    dragStartY.value = event.clientY - menuY.value
+    event.preventDefault()
   }
 
   function clampPosition(x, y) {
-    const margin = radius + 40
+    const margin = RADIUS + MARGIN_OFFSET
     return {
-      x: Math.min(Math.max(x, margin), props.containerWidth - margin),
-      y: Math.min(Math.max(y, margin), props.containerHeight - margin),
+      x: Math.min(Math.max(x, margin), containerWidth - margin),
+      y: Math.min(Math.max(y, margin), containerHeight - margin),
     }
   }
 
-  function handleDrag(e) {
+  function handleDrag(event) {
     const { x, y } = clampPosition(
-      e.clientX - dragStartX.value,
-      e.clientY - dragStartY.value,
+      event.clientX - dragStartX.value,
+      event.clientY - dragStartY.value,
     )
     menuX.value = x
     menuY.value = y
     menuStore.setMenuPosition(x, y)
   }
 
-  function stopDrag(e) {
+  function stopDrag(event) {
     isDragging.value = false
-    e.stopPropagation()
+    event.stopPropagation()
     menuStore.setMenuPosition(menuX.value, menuY.value)
   }
 
   function getMenuStyle() {
     return {
       position: "fixed",
-      left: `${menuStore.containerLeft + menuX.value - radius}px`,
-      top: `${menuStore.containerTop + menuY.value - radius}px`,
-      zIndex: 1000,
+      left: `${menuStore.containerLeft + menuX.value - RADIUS}px`,
+      top: `${menuStore.containerTop + menuY.value - RADIUS}px`,
+      zIndex: Z_INDEX_MENU,
     }
   }
 
   function getTooltipLocation(index) {
-    const angle = (index / menuItemCount.value) * 360
-    if (angle < 45 || angle >= 315) return "right"
-    if (angle >= 45 && angle < 135) return "top"
-    if (angle >= 135 && angle < 225) return "left"
+    const angle = (index / menuItemCount.value) * FULL_ANGLE
+    if (angle < ANGLE_45 || angle >= ANGLE_315) return "right"
+    if (angle >= ANGLE_45 && angle < ANGLE_135) return "top"
+    if (angle >= ANGLE_135 && angle < ANGLE_225) return "left"
     return "bottom"
   }
 
   function getTooltipOrigin(index) {
-    const angle = (index / menuItemCount.value) * 360
-    if (angle < 45 || angle >= 315) return "left"
-    if (angle >= 45 && angle < 135) return "bottom"
-    if (angle >= 135 && angle < 225) return "right"
+    const angle = (index / menuItemCount.value) * FULL_ANGLE
+    if (angle < ANGLE_45 || angle >= ANGLE_315) return "left"
+    if (angle >= ANGLE_45 && angle < ANGLE_135) return "bottom"
+    if (angle >= ANGLE_135 && angle < ANGLE_225) return "right"
     return "top"
   }
 
   function getItemStyle(index) {
     const angle = (index / menuItemCount.value) * 2 * Math.PI
     return {
-      transform: `translate(${Math.cos(angle) * radius}px, ${Math.sin(angle) * radius}px)`,
+      transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
       transition: "opacity 0.2s ease, transform 0.2s ease",
       position: "absolute",
-      zIndex: menuStore.active_item_index === index ? 10 : 1,
+      zIndex: menuStore.active_item_index === index ? Z_INDEX_ACTIVE_ITEM : Z_INDEX_BASE_ITEM,
     }
   }
 </script>
@@ -138,13 +149,13 @@
     content-class="circular-menu-container"
     :style="getMenuStyle()"
     :close-on-content-click="false"
-    :close-delay="100"
+    :close-delay="CLOSE_DELAY"
     :overlay="false"
   >
     <div class="circular-menu-drag-handle" @mousedown.stop="startDrag">
       <div
         class="circular-menu-items"
-        :style="{ width: `${radius * 2}px`, height: `${radius * 2}px` }"
+        :style="{ width: `${RADIUS * 2}px`, height: `${RADIUS * 2}px` }"
       >
         <component
           v-for="(item, index) in menu_items"
@@ -152,7 +163,7 @@
           :key="index"
           :index="index"
           :itemProps="{
-            id: props.id,
+            id: id,
             tooltip_location: getTooltipLocation(index),
             tooltip_origin: getTooltipOrigin(index),
             totalItems: menuItemCount,

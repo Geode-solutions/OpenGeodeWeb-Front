@@ -1,5 +1,5 @@
 <script setup>
-  const props = defineProps({
+  const { multiple, accept, loading, showExtensions, idleText, dropText, loadingText } = defineProps({
     multiple: { type: Boolean, default: false },
     accept: { type: String, default: "" },
     loading: { type: Boolean, default: false },
@@ -14,18 +14,20 @@
   const isDragging = ref(false)
   const fileInput = ref(null)
 
-  const triggerFileDialog = () => fileInput.value?.click()
+  function triggerFileDialog() {
+    fileInput.value?.click()
+  }
 
-  function handleDrop(e) {
+  function handleDrop(event) {
     isDragging.value = false
-    const files = Array.from(e.dataTransfer.files)
+    const files = [...event.dataTransfer.files]
     emit("files-selected", files)
   }
 
-  function handleFileSelect(e) {
-    const files = Array.from(e.target.files)
+  function handleFileSelect(event) {
+    const files = [...event.target.files]
     emit("files-selected", files)
-    e.target.value = ""
+    event.target.value = ""
   }
 </script>
 

@@ -3,14 +3,14 @@
 
   const textures = defineModel()
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
   const internal_textures = ref([])
 
   onMounted(() => {
-    if (textures.value != null) {
+    if (textures.value !== null) {
       internal_textures.value = textures.value
     } else {
       internal_textures.value = [{ id: "", texture_name: "" }]
@@ -19,9 +19,9 @@
 
   function update_value_event($event, index) {
     internal_textures.value[index][$event.key] = $event.value
-    const filtered = internal_textures.value.filter((texture) => {
-      return texture.texture_name !== "" && texture.id !== ""
-    })
+    const filtered = internal_textures.value.filter((texture) =>
+      texture.texture_name !== "" && texture.id !== "",
+    )
     if (filtered.length !== 0) {
       textures.value = filtered
     }

@@ -1,11 +1,15 @@
 <script setup>
   import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
+  const MARGIN_BETWEEN_SNACKERS = 60
+  const FIRST_SNACKER_MARGIN = 8
+
+
   const feedbackStore = useFeedbackStore()
   const show = ref(true)
 
   function calc_margin(index) {
-    return index * 60 + 8 + "px"
+    return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`
   }
 </script>
 

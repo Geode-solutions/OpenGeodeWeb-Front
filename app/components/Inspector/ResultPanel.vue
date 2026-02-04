@@ -1,13 +1,13 @@
 <script setup>
   import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
 
-  const props = defineProps({
+  const { inspection_result } = defineProps({
     inspection_result: { type: Array, required: true },
   })
   const opened_panels = ref([])
 
   onMounted(async () => {
-    opened_panels.value = props.inspection_result
+    opened_panels.value = inspection_result
       .map((result, i) => (result.nb_issues > 0 ? i : -1))
       .filter((index) => index !== -1)
   })
@@ -17,7 +17,7 @@
   <v-container class="pa-2">
     <v-expansion-panels v-model="opened_panels" multiple elevation="5">
       <v-expansion-panel
-        v-for="(result, index) in props.inspection_result"
+        v-for="(result, index) in inspection_result"
         :key="index"
         class="card"
       >

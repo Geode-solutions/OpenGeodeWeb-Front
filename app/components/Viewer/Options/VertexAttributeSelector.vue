@@ -6,7 +6,7 @@
 
   const model = defineModel()
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
@@ -14,7 +14,7 @@
   const vertex_attribute_names = ref([])
 
   onMounted(() => {
-    if (model.value != null) {
+    if (model.value !== null) {
       vertex_attribute_name.value = model.value.name
     }
   })
@@ -32,7 +32,7 @@
   function getVertexAttributes() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.vertex_attribute_names,
-      { id: props.id },
+      { id: id },
       {
         response_function: (response) => {
           vertex_attribute_names.value = response.vertex_attribute_names

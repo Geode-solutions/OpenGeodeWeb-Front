@@ -6,7 +6,7 @@
 
   const model = defineModel()
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
@@ -14,7 +14,7 @@
   const edge_attribute_names = ref([])
 
   onMounted(() => {
-    if (model.value != null) {
+    if (model.value !== null) {
       edge_attribute_name.value = model.value.name
     }
   })
@@ -29,7 +29,7 @@
   function get_edge_attribute_names() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.edge_attribute_names,
-      { id: props.id },
+      { id: id },
       {
         response_function: (response) => {
           edge_attribute_names.value = response.edge_attribute_names
@@ -43,7 +43,7 @@
   })
 
   watch(
-    () => props.id,
+    () => id,
     () => {
       get_edge_attribute_names()
     },

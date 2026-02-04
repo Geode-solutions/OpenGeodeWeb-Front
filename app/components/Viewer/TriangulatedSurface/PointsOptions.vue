@@ -1,15 +1,15 @@
 <script setup>
-  import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions"
   import TriangulatedSurfaceEdgesPoints from "@ogw_front/assets/viewer_svgs/surface_points.svg"
+  import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions"
 
-  const props = defineProps({
+  const { itemProps } = defineProps({
     itemProps: { type: Object, required: true },
   })
 </script>
 
 <template>
   <ViewerGenericMeshPointsOptions
-    :itemProps="props.itemProps"
+    :itemProps="itemProps"
     :btn_image="TriangulatedSurfaceEdgesPoints"
   />
 </template>

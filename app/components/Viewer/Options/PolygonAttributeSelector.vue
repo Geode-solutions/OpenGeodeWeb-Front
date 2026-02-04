@@ -2,7 +2,7 @@
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
@@ -13,7 +13,7 @@
   const geodeStore = useGeodeStore()
 
   onMounted(() => {
-    if (model.value != null) {
+    if (model.value !== null) {
       polygon_attribute_name.value = model.value.name
     }
   })
@@ -31,7 +31,7 @@
     geodeStore.request(
       back_schemas.opengeodeweb_back.polygon_attribute_names,
       {
-        id: props.id,
+        id: id,
       },
       {
         response_function: (response) => {

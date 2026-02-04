@@ -1,7 +1,7 @@
 <script setup>
-  import { useTreeviewStore } from "@ogw_front/stores/treeview"
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+  import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
   import { compareSelections } from "@ogw_front/utils/treeview"
 
@@ -18,19 +18,19 @@
   watch(
     () => treeviewStore.selection,
     async (current, previous) => {
-      if (!previous) previous = []
-      if (current.value === previous) {
+      const oldSelection = previous || []
+      if (current === oldSelection) {
         return
       }
-      const { added, removed } = compareSelections(current, previous)
+      const { added, removed } = compareSelections(current, oldSelection)
 
-      added.forEach((item) => {
+      for (const item of added) {
         dataStyleStore.setVisibility(item.id, true)
-      })
-
-      for (const item of removed) {
-        await dataStyleStore.setVisibility(item.id, false)
       }
+
+      await Promise.all(
+        removed.map((item) => dataStyleStore.setVisibility(item.id, false)),
+      )
       hybridViewerStore.remoteRender()
     },
   )
