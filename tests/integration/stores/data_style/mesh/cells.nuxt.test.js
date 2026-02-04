@@ -172,4 +172,13 @@ describe("Mesh cells", () => {
       }
     })
   })
+
+  test("Cells apply default style", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const result = dataStyleStore.applyMeshCellsStyle(id)
+    expect(result).toBeInstanceOf(Promise)
+    await result
+    expect(viewerStore.status).toBe(Status.CONNECTED)
+  })
 })

@@ -75,4 +75,14 @@ describe("Model points", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
+  describe("Points style", () => {
+    test("Points apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelPointsStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 })

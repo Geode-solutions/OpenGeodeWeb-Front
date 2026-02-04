@@ -58,4 +58,14 @@ describe("Model edges", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
+  describe("Edges style", () => {
+    test("Edges apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelEdgesStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 })

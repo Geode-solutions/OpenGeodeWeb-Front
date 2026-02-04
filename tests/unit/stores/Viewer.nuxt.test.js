@@ -1,5 +1,4 @@
 // Global imports
-import path from "path"
 
 // Third party imports
 import { setActivePinia } from "pinia"
@@ -16,13 +15,10 @@ import {
 } from "vitest"
 
 import { WebSocket } from "ws"
-
 // Local imports
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useInfraStore } from "@ogw_front/stores/infra"
-
 import { appMode } from "@ogw_front/utils/app_mode"
-import Status from "@ogw_front/utils/status"
 
 // Mock navigator.locks API
 const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
@@ -121,9 +117,10 @@ describe("Viewer Store", () => {
     describe("base_url", () => {
       test("test app_mode DESKTOP", () => {
         const infraStore = useInfraStore()
+        const viewerStore = useViewerStore()
         infraStore.app_mode = appMode.DESKTOP
         infraStore.domain_name = "localhost"
-        // expect(viewerStore.base_url).toBe("ws://localhost:1234/ws")
+        expect(viewerStore.base_url).toBe("ws://localhost:1234/ws")
       })
 
       test("test app_mode CLOUD", () => {
@@ -162,24 +159,6 @@ describe("Viewer Store", () => {
     })
   })
   describe("actions", () => {
-    // test("ws_connect", async () => {
-    //   const infraStore = useInfraStore()
-    //   const viewerStore = useViewerStore()
-    //   infraStore.app_mode = appMode.BROWSER
-    //   const viewer_path = path.join(
-    //     executable_path(
-    //       path.join("tests", "integration", "microservices", "viewer"),
-    //     ),
-    //     executable_name("opengeodeweb_viewer"),
-    //   )
-    //   const viewer_port = await run_viewer(viewer_path, {
-    //     port: 1234,
-    //     data_folder_path: "./data",
-    //   })
-    //   viewerStore.default_local_port = viewer_port
-    //   await viewerStore.ws_connect()
-    //   expect(viewerStore.status).toBe(Status.CONNECTED)
-    // }, 10000)
     describe("toggle_picking_mode", () => {
       test("test true", async () => {
         const viewerStore = useViewerStore()
