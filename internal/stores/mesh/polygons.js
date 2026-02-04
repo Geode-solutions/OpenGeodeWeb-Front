@@ -90,7 +90,12 @@ export function useMeshPolygonsStyle() {
     const vertex = meshPolygonsStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshPolygonsVertexAttributeName(id, name, defaultMin, defaultMax) {
+  function setMeshPolygonsVertexAttributeName(
+    id,
+    name,
+    defaultMin,
+    defaultMax,
+  ) {
     const coloring_style = meshPolygonsStyle(id).coloring
     return viewerStore.request(
       mesh_polygons_schemas.attribute.vertex.name,
@@ -216,7 +221,12 @@ export function useMeshPolygonsStyle() {
     const polygon = meshPolygonsStyle(id).coloring.polygon
     return polygon ? polygon.name : ""
   }
-  function setMeshPolygonsPolygonAttributeName(id, name, defaultMin, defaultMax) {
+  function setMeshPolygonsPolygonAttributeName(
+    id,
+    name,
+    defaultMin,
+    defaultMax,
+  ) {
     const coloring_style = meshPolygonsStyle(id).coloring
     return viewerStore.request(
       mesh_polygons_schemas.attribute.polygon.name,
