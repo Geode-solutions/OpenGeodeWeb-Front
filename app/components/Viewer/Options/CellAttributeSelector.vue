@@ -67,6 +67,11 @@
       })
     }
   })
+  const currentAttribute = computed(() => {
+    return cell_attributes.value.find(
+      (attr) => attr.attribute_name === selectedName.value,
+    )
+  })
 </script>
 
 <template>
@@ -83,5 +88,7 @@
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="cell_attribute_color_map"
+    :autoMin="currentAttribute?.min_value"
+    :autoMax="currentAttribute?.max_value"
   />
 </template>

@@ -13,10 +13,8 @@
   const edge_attribute_color_map = defineModel("edge_attribute_color_map")
   const edge_attributes = ref([])
 
-  // Local state for the v-select
   const selectedName = ref(edge_attribute_name.value)
 
-  // Sync local state when parent value changes externally
   watch(edge_attribute_name, (newVal) => {
     selectedName.value = newVal
   })
@@ -69,6 +67,11 @@
       })
     }
   })
+  const currentAttribute = computed(() => {
+    return edge_attributes.value.find(
+      (attr) => attr.attribute_name === selectedName.value,
+    )
+  })
 </script>
 
 <template>
@@ -85,5 +88,7 @@
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="edge_attribute_color_map"
+    :autoMin="currentAttribute?.min_value"
+    :autoMax="currentAttribute?.max_value"
   />
 </template>

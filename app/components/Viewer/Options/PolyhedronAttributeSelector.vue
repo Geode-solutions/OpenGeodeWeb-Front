@@ -15,10 +15,8 @@
   )
   const polyhedron_attributes = ref([])
 
-  // Local state for the v-select
   const selectedName = ref(polyhedron_attribute_name.value)
 
-  // Sync local state when parent value changes externally
   watch(polyhedron_attribute_name, (newVal) => {
     selectedName.value = newVal
   })
@@ -77,6 +75,11 @@
       })
     }
   })
+  const currentAttribute = computed(() => {
+    return polyhedron_attributes.value.find(
+      (attr) => attr.attribute_name === selectedName.value,
+    )
+  })
 </script>
 
 <template>
@@ -93,5 +96,7 @@
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="polyhedron_attribute_color_map"
+    :autoMin="currentAttribute?.min_value"
+    :autoMax="currentAttribute?.max_value"
   />
 </template>

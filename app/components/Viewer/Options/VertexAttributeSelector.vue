@@ -5,7 +5,6 @@
 
   const geodeStore = useGeodeStore()
 
-  // Use local state for the select, and sync with parent via events
   const vertex_attribute_name = defineModel("vertex_attribute_name")
   const vertex_attribute_range = defineModel("vertex_attribute_range", {
     type: Array,
@@ -14,10 +13,8 @@
   const vertex_attribute_color_map = defineModel("vertex_attribute_color_map")
   const vertex_attributes = ref([])
 
-  // Local state for the v-select (initialized from parent value)
   const selectedName = ref(vertex_attribute_name.value)
 
-  // Sync local state when parent value changes externally
   watch(vertex_attribute_name, (newVal) => {
     selectedName.value = newVal
   })
@@ -26,7 +23,6 @@
     id: { type: String, required: true },
   })
 
-  // Computed properties for min/max to handle reactivity properly
   const rangeMin = computed({
     get: () => vertex_attribute_range.value?.[0] ?? 0,
     set: (val) => {
@@ -62,10 +58,8 @@
     )
   }
 
-  // Emit to notify parent about attribute selection with default min/max
   const emit = defineEmits(["attribute-selected"])
 
-  // Watch local selection and emit event with default values
   watch(selectedName, (newName) => {
     if (!newName) return
     const attribute = vertex_attributes.value.find(
@@ -78,6 +72,11 @@
         defaultMax: attribute.max_value,
       })
     }
+  })
+  const currentAttribute = computed(() => {
+    return vertex_attributes.value.find(
+      (attr) => attr.attribute_name === selectedName.value,
+    )
   })
 </script>
 
@@ -95,5 +94,7 @@
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="vertex_attribute_color_map"
+    :autoMin="currentAttribute?.min_value"
+    :autoMax="currentAttribute?.max_value"
   />
 </template>
