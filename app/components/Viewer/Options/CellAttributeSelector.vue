@@ -13,10 +13,8 @@
   const cell_attribute_color_map = defineModel("cell_attribute_color_map")
   const cell_attributes = ref([])
 
-  // Local state for the v-select
   const selectedName = ref(cell_attribute_name.value)
 
-  // Sync local state when parent value changes externally
   watch(cell_attribute_name, (newVal) => {
     selectedName.value = newVal
   })

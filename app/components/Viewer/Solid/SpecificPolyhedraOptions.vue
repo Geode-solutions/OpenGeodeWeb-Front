@@ -40,9 +40,7 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
-    set: () => {
-      // Name is set via attribute-selected event to pass defaultMin/defaultMax
-    },
+    set: () => {},
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
@@ -52,7 +50,6 @@
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
       const colorMap = dataStyleStore.meshPolyhedraVertexAttributeColorMap(
         id.value,
       )
@@ -82,9 +79,7 @@
   })
   const polyhedron_attribute_name = computed({
     get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
-    set: () => {
-      // Name is set via attribute-selected event to pass defaultMin/defaultMax
-    },
+    set: () => {},
   })
   const polyhedron_attribute_range = computed({
     get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id.value),
@@ -94,7 +89,6 @@
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
       const colorMap = dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(
         id.value,
       )
@@ -126,7 +120,6 @@
     },
   })
 
-  // Event handlers for attribute selection with default min/max
   function onVertexAttributeSelected(data) {
     dataStyleStore.setMeshPolyhedraVertexAttributeName(
       id.value,

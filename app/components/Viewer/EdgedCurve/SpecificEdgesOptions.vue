@@ -46,9 +46,7 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
-    set: () => {
-      // Name is set via attribute-selected event to pass defaultMin/defaultMax
-    },
+    set: () => {},
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
@@ -58,7 +56,6 @@
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
       const colorMap = dataStyleStore.meshEdgesVertexAttributeColorMap(id.value)
       if (colorMap) {
         dataStyleStore.setMeshEdgesVertexAttributeColorMap(
@@ -86,9 +83,7 @@
   })
   const edge_attribute_name = computed({
     get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
-    set: () => {
-      // Name is set via attribute-selected event to pass defaultMin/defaultMax
-    },
+    set: () => {},
   })
   const edge_attribute_range = computed({
     get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
@@ -98,7 +93,6 @@
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
       const colorMap = dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value)
       if (colorMap) {
         dataStyleStore.setMeshEdgesEdgeAttributeColorMap(
@@ -125,7 +119,6 @@
     },
   })
 
-  // Event handlers for attribute selection with default min/max
   function onVertexAttributeSelected(data) {
     dataStyleStore.setMeshEdgesVertexAttributeName(
       id.value,

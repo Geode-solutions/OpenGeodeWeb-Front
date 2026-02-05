@@ -47,9 +47,7 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
-    set: (newValue) => {
-      // Called by parent when event fires with default values
-    },
+    set: () => {},
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
@@ -59,7 +57,6 @@
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
       const colorMap = dataStyleStore.meshPolygonsVertexAttributeColorMap(
         id.value,
       )
@@ -89,12 +86,9 @@
   })
   const polygon_attribute_name = computed({
     get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
-    set: (newValue) => {
-      // Called by parent when event fires with default values
-    },
+    set: () => {},
   })
 
-  // Event handlers for attribute selection with default min/max
   function onVertexAttributeSelected(data) {
     dataStyleStore.setMeshPolygonsVertexAttributeName(
       id.value,
@@ -102,7 +96,6 @@
       data.defaultMin,
       data.defaultMax,
     )
-    // Note: remoteRender is called by the store after the colormap is applied
   }
   function onPolygonAttributeSelected(data) {
     dataStyleStore.setMeshPolygonsPolygonAttributeName(

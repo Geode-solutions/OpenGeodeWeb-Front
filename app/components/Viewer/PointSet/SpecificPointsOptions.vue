@@ -46,9 +46,7 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
-    set: () => {
-      // Name is set via attribute-selected event to pass defaultMin/defaultMax
-    },
+    set: () => {},
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
@@ -58,7 +56,6 @@
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
       const colorMap = dataStyleStore.meshPointsVertexAttributeColorMap(
         id.value,
       )
@@ -87,7 +84,6 @@
     },
   })
 
-  // Event handler for attribute selection with default min/max
   function onVertexAttributeSelected(data) {
     dataStyleStore.setMeshPointsVertexAttributeName(
       id.value,

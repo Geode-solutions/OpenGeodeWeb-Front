@@ -47,9 +47,7 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
-    set: () => {
-      // Name is set via attribute-selected event to pass defaultMin/defaultMax
-    },
+    set: () => {},
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
@@ -59,7 +57,6 @@
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
       const colorMap = dataStyleStore.meshCellsVertexAttributeColorMap(id.value)
       if (colorMap) {
         dataStyleStore.setMeshCellsVertexAttributeColorMap(
@@ -87,9 +84,7 @@
   })
   const cell_attribute_name = computed({
     get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
-    set: () => {
-      // Name is set via attribute-selected event to pass defaultMin/defaultMax
-    },
+    set: () => {},
   })
   const cell_attribute_range = computed({
     get: () => dataStyleStore.meshCellsCellAttributeRange(id.value),
@@ -99,7 +94,6 @@
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
       const colorMap = dataStyleStore.meshCellsCellAttributeColorMap(id.value)
       if (colorMap) {
         dataStyleStore.setMeshCellsCellAttributeColorMap(
@@ -126,7 +120,6 @@
     },
   })
 
-  // Event handlers for attribute selection with default min/max
   function onVertexAttributeSelected(data) {
     dataStyleStore.setMeshCellsVertexAttributeName(
       id.value,

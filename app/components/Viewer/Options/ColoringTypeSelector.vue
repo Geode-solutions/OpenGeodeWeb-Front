@@ -12,27 +12,22 @@
   const color = defineModel("color")
   const textures = defineModel("textures")
 
-  // Vertex attribute models
   const vertex_attribute_name = defineModel("vertex_attribute_name")
   const vertex_attribute_range = defineModel("vertex_attribute_range")
   const vertex_attribute_color_map = defineModel("vertex_attribute_color_map")
 
-  // Edge attribute models
   const edge_attribute_name = defineModel("edge_attribute_name")
   const edge_attribute_range = defineModel("edge_attribute_range")
   const edge_attribute_color_map = defineModel("edge_attribute_color_map")
 
-  // Cell attribute models
   const cell_attribute_name = defineModel("cell_attribute_name")
   const cell_attribute_range = defineModel("cell_attribute_range")
   const cell_attribute_color_map = defineModel("cell_attribute_color_map")
 
-  // Polygon attribute models
   const polygon_attribute_name = defineModel("polygon_attribute_name")
   const polygon_attribute_range = defineModel("polygon_attribute_range")
   const polygon_attribute_color_map = defineModel("polygon_attribute_color_map")
 
-  // Polyhedron attribute models
   const polyhedron_attribute_name = defineModel("polyhedron_attribute_name")
   const polyhedron_attribute_range = defineModel("polyhedron_attribute_range")
   const polyhedron_attribute_color_map = defineModel(
@@ -71,8 +66,6 @@
   const has_textures = computed(() =>
     textures.value !== undefined ? true : false,
   )
-  // Check if parent component passes these v-models (not undefined means it's passed)
-  // We use a special marker: if the value is exactly undefined, the v-model wasn't passed
   const has_vertex = computed(() => vertex_attribute_range.value !== undefined)
   const has_edge = computed(() => edge_attribute_range.value !== undefined)
   const has_cells = computed(() => cell_attribute_range.value !== undefined)
