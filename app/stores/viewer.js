@@ -9,9 +9,8 @@ import { useInfraStore } from "@ogw_front/stores/infra"
 import { viewer_call } from "../../internal/utils/viewer_call"
 import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 
-const MS_IN_SECOND = 1000
-const REQUEST_TIMEOUT_IN_SECONDS = 10
-const REQUEST_TIMEOUT = REQUEST_TIMEOUT_IN_SECONDS * MS_IN_SECOND
+const MS_PER_SECOND = 1000
+const SECONDS_PER_REQUEST = 10
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -27,16 +26,15 @@ export const useViewerStore = defineStore("viewer", {
     protocol() {
       if (useInfraStore().app_mode === appMode.CLOUD) {
         return "wss"
-      } else {
-        return "ws"
       }
+      return "ws"
     },
     port() {
       if (useInfraStore().app_mode === appMode.CLOUD) {
         return "443"
       }
       const { VIEWER_PORT } = useRuntimeConfig().public
-      if (VIEWER_PORT !== null && VIEWER_PORT !== "") {
+      if (VIEWER_PORT !== undefined && VIEWER_PORT !== null && VIEWER_PORT !== "") {
         return VIEWER_PORT
       }
       return this.default_local_port
@@ -69,16 +67,19 @@ export const useViewerStore = defineStore("viewer", {
       this.picking_mode = false
     },
     async ws_connect() {
-      if (this.status === Status.CONNECTED) return
-      return navigator.locks.request("viewer.ws_connect", async (lock) => {
-        if (this.status === Status.CONNECTED) return
-        console.log("VIEWER LOCK GRANTED !", lock)
+      if (this.status === Status.CONNECTED) {
+        return
+      }
+      return navigator.locks.request("viewer.ws_connect", async (_lock) => {
+        if (this.status === Status.CONNECTED) {
+          return
+        }
+        console.log("VIEWER LOCK GRANTED !")
         this.status = Status.CONNECTING
-        const SmartConnect = await import("wslink/src/SmartConnect")
+        const { default: SmartConnect } = await import("wslink/src/SmartConnect")
         vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
-        const config = { application: "Viewer" }
-        config.sessionURL = this.base_url
+        const config = { application: "Viewer", sessionURL: this.base_url }
 
         const { client } = this
         if (this.status === Status.CONNECTED && client.isConnected()) {
@@ -99,17 +100,13 @@ export const useViewerStore = defineStore("viewer", {
 
         // Error
         clientToConnect.onConnectionError((httpReq) => {
-          const message =
-            (httpReq && httpReq.response && httpReq.response.error) ||
-            `Connection error`
+          const message = httpReq?.response?.error || `Connection error`
           console.error(message)
         })
 
         // Close
         clientToConnect.onConnectionClose((httpReq) => {
-          const message =
-            (httpReq && httpReq.response && httpReq.response.error) ||
-            `Connection close`
+          const message = httpReq?.response?.error || `Connection close`
           console.error(message)
         })
 
@@ -154,7 +151,7 @@ export const useViewerStore = defineStore("viewer", {
       await this.ws_connect()
       console.log("[VIEWER] Viewer connected successfully")
     },
-    request(schema, params = {}, callbacks = {}, timeout = REQUEST_TIMEOUT) {
+    request(schema, params = {}, callbacks = {}, timeout = MS_PER_SECOND * SECONDS_PER_REQUEST) {
       console.log("[VIEWER] Request:", schema.$id)
 
       return viewer_call(

@@ -1,4 +1,4 @@
-import Dexie from "dexie"
+import { Dexie } from "dexie"
 import { dataTable } from "./tables/data_table"
 import { modelComponentsTable } from "./tables/model_components"
 
