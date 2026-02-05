@@ -34,7 +34,11 @@ export const useViewerStore = defineStore("viewer", {
         return "443"
       }
       const { VIEWER_PORT } = useRuntimeConfig().public
-      if (VIEWER_PORT !== undefined && VIEWER_PORT !== null && VIEWER_PORT !== "") {
+      if (
+        VIEWER_PORT !== undefined &&
+        VIEWER_PORT !== null &&
+        VIEWER_PORT !== ""
+      ) {
         return VIEWER_PORT
       }
       return this.default_local_port
@@ -76,7 +80,8 @@ export const useViewerStore = defineStore("viewer", {
         }
         console.log("VIEWER LOCK GRANTED !")
         this.status = Status.CONNECTING
-        const { default: SmartConnect } = await import("wslink/src/SmartConnect")
+        const { default: SmartConnect } =
+          await import("wslink/src/SmartConnect")
         vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
         const config = { application: "Viewer", sessionURL: this.base_url }
@@ -150,7 +155,12 @@ export const useViewerStore = defineStore("viewer", {
       await this.ws_connect()
       console.log("[VIEWER] Viewer connected successfully")
     },
-    request(schema, params = {}, callbacks = {}, timeout = MS_PER_SECOND * SECONDS_PER_REQUEST) {
+    request(
+      schema,
+      params = {},
+      callbacks = {},
+      timeout = MS_PER_SECOND * SECONDS_PER_REQUEST,
+    ) {
       console.log("[VIEWER] Request:", schema.$id)
 
       return viewer_call(
