@@ -13,7 +13,6 @@ import { setupIntegrationTests } from "../../../setup"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
-
 // Local constants
 const INTERVAL_TIMEOUT = 20000
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells

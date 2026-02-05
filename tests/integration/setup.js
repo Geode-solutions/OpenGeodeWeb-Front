@@ -77,7 +77,9 @@ async function setupIntegrationTests(file_name, geode_object) {
   return { id, back_port, viewer_port, project_folder_path }
 }
 
-const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => await callback({ name }))
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name, callback) => await callback({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
