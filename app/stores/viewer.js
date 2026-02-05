@@ -12,10 +12,8 @@ const request_timeout = 10 * 1000
 export const useViewerStore = defineStore(
   "viewer",
   () => {
-    // Stores
     const infraStore = useInfraStore()
 
-    // State
     const default_local_port = ref("1234")
     const client = ref({})
     const config = ref(null)
@@ -24,7 +22,6 @@ export const useViewerStore = defineStore(
     const request_counter = ref(0)
     const status = ref(Status.NOT_CONNECTED)
 
-    // Getters
     const protocol = computed(() => {
       if (useInfraStore().app_mode == appMode.CLOUD) {
         return "wss"
@@ -60,7 +57,6 @@ export const useViewerStore = defineStore(
       return request_counter.value > 0
     })
 
-    // Actions
     function toggle_picking_mode(value) {
       picking_mode.value = value
     }
@@ -188,9 +184,7 @@ export const useViewerStore = defineStore(
       )
     }
 
-    // Return everything that should be exposed
     return {
-      // State
       default_local_port,
       client,
       config,
@@ -198,14 +192,10 @@ export const useViewerStore = defineStore(
       picked_point,
       request_counter,
       status,
-
-      // Getters
       protocol,
       port,
       base_url,
       is_busy,
-
-      // Actions
       toggle_picking_mode,
       set_picked_point,
       ws_connect,
