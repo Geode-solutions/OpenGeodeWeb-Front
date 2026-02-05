@@ -51,7 +51,9 @@
     toggle_loading()
     const geodeStore = useGeodeStore()
     const response = await geodeStore.request(schema, {})
-    accept.value = response.extensions.map((extension) => `.${extension}`).join(",")
+    accept.value = response.extensions
+      .map((extension) => `.${extension}`)
+      .join(",")
     toggle_loading()
   }
 
@@ -62,7 +64,12 @@
   <FetchingData v-if="loading" />
   <FileUploader
     v-else
-    v-bind="{ multiple, accept, files: internal_files, auto_upload: internal_auto_upload }"
+    v-bind="{
+      multiple,
+      accept,
+      files: internal_files,
+      auto_upload: internal_auto_upload,
+    }"
     @files_uploaded="files_uploaded_event"
   />
 </template>

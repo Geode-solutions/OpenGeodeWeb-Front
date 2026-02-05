@@ -4,7 +4,6 @@
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import { useViewerStore } from "@ogw_front/stores/viewer"
 
-
   const DEFAULT_ELEMENT_HEIGHT = 100
 
   const emit = defineEmits(["click"])

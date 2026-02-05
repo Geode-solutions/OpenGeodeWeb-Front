@@ -33,8 +33,6 @@
     document.addEventListener("mousemove", resize)
     document.addEventListener("mouseup", stopResize)
   }
-
-
 </script>
 
 <template>

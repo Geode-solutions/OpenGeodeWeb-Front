@@ -61,10 +61,12 @@
     allowed_objects.value = {}
 
     const promise_array = filenames.map((filename) =>
-      geodeStore.request(schema, { filename })
+      geodeStore.request(schema, { filename }),
     )
     const responses = await Promise.all(promise_array)
-    const allowed_objects_list = responses.map((response) => response.allowed_objects)
+    const allowed_objects_list = responses.map(
+      (response) => response.allowed_objects,
+    )
     const all_keys = [...new Set(allowed_objects_list.flatMap(Object.keys))]
     const common_keys = all_keys.filter((key) =>
       allowed_objects_list.every((obj) => key in obj),
