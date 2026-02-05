@@ -77,12 +77,11 @@ export const useViewerStore = defineStore("viewer", {
           const config = { application: "Viewer" }
           config.sessionURL = this.base_url
 
-          const { client } = this
-          if (this.status === Status.CONNECTED && client.isConnected()) {
-            client.disconnect(-1)
+          if (this.status === Status.CONNECTED && this.client.isConnected()) {
+            this.client.disconnect(-1)
             this.status = Status.NOT_CONNECTED
           }
-          let clientToConnect = client
+          let clientToConnect = this.client
           if (_.isEmpty(clientToConnect)) {
             clientToConnect = vtkWSLinkClient.newInstance()
           }
