@@ -3,29 +3,34 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_front/utils/status"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import {
   delete_folder_recursive,
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
+import Status from "@ogw_front/utils/status"
 import { setupIntegrationTests } from "../../../setup"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+
 
 // Local constants
+const INTERVAL_TIMEOUT = 20000
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells
 const file_name = "test.og_rgd2d"
 const geode_object = "RegularGrid2D"
 const vertex_attribute = { name: "points" }
 const cell_attribute = { name: "RGB_data" }
 
-let id, back_port, viewer_port, project_folder_path
+let back_port = 0,
+  id = "",
+  project_folder_path = "",
+  viewer_port = 0
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 20000)
+}, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
   console.log(
@@ -149,27 +154,29 @@ describe("Mesh cells", () => {
             dataStyleStore.setMeshCellsCellAttribute(id, cell_attribute),
         },
       ]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        if (coloringTypes[i].function) {
+
+      async function testColoring(coloringType, expectedColoringType) {
+        if (coloringType.function) {
           expect(() =>
-            dataStyleStore.setMeshCellsActiveColoring(
-              id,
-              coloringTypes[i].name,
-            ),
+            dataStyleStore.setMeshCellsActiveColoring(id, coloringType.name),
           ).toThrowError()
-          await coloringTypes[i].function()
+          await coloringType.function()
         }
         const result = dataStyleStore.setMeshCellsActiveColoring(
           id,
-          coloringTypes[i].name,
+          coloringType.name,
         )
         expect(result).toBeInstanceOf(Promise)
         await result
         expect(dataStyleStore.meshCellsActiveColoring(id)).toBe(
-          coloringTypes[i].name,
+          expectedColoringType,
         )
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
+
+      await testColoring(coloringTypes[0], "color")
+      await testColoring(coloringTypes[1], "vertex")
+      await testColoring(coloringTypes[2], "cell")
     })
   })
 

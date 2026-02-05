@@ -1,8 +1,9 @@
 import { Dexie } from "dexie"
+import { ExtendedDatabase } from "./extended_database"
 import { dataTable } from "./tables/data_table"
 import { modelComponentsTable } from "./tables/model_components"
 
-export class Database extends Dexie {
+class Database extends Dexie {
   constructor() {
     super("Database")
 
@@ -16,50 +17,34 @@ export class Database extends Dexie {
     const tempDb = new Database()
     await tempDb.open()
 
-    if (tempDb.tables.some((t) => t.name === tableName)) {
-      console.warn(`Table "${tableName}" already exists`)
+    if (tempDb.tables.some((table) => table.name === tableName)) {
       tempDb.close()
       return tempDb
     }
 
     const currentVersion = tempDb.verno
-
     const currentStores = {}
-    tempDb.tables.forEach((table) => {
+
+    for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src
-      const indexes = table.schema.indexes.map((idx) => idx.src)
+      const indexes = table.schema.indexes.map((index) => index.src)
       currentStores[table.name] = [keyPath, ...indexes].join(",")
-    })
+    }
 
     tempDb.close()
 
-    class ExtendedDatabase extends Dexie {
-      constructor() {
-        super("Database")
-
-        for (let v = 1; v <= currentVersion; v++) {
-          if (v === 1) {
-            this.version(1).stores({
-              [dataTable.name]: dataTable.schema,
-              [modelComponentsTable.name]: modelComponentsTable.schema,
-            })
-          } else {
-            this.version(v).stores(currentStores)
-          }
-        }
-
-        this.version(currentVersion + 1).stores({
-          ...currentStores,
-          [tableName]: schemaDefinition,
-        })
-      }
-    }
-
-    const newDb = new ExtendedDatabase()
+    const newDb = new ExtendedDatabase(
+      currentVersion,
+      currentStores,
+      tableName,
+      schemaDefinition,
+    )
     await newDb.open()
 
     return newDb
   }
 }
 
-export const database = new Database()
+const database = new Database()
+
+export { Database, database }

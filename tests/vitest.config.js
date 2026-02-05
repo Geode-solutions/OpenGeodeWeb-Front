@@ -1,6 +1,6 @@
 import { defineConfig } from "vitest/config"
 import { defineVitestProject } from "@nuxt/test-utils/config"
-import path from "path"
+import path from "node:path"
 
 const globalRetry = process.env.CI ? 3 : 0
 

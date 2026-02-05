@@ -3,29 +3,33 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_front/utils/status"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import {
   delete_folder_recursive,
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
+import Status from "@ogw_front/utils/status"
 import { setupIntegrationTests } from "../../../setup"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
+const INTERVAL_TIMEOUT = 25000
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges
 const file_name = "test.og_edc3d"
 const geode_object = "EdgedCurve3D"
 const vertex_attribute = { name: "vertex_attribute" }
 const edge_attribute = { name: "edge_attribute" }
 
-let id, back_port, viewer_port, project_folder_path
+let back_port = 0,
+  id = "",
+  project_folder_path = "",
+  viewer_port = 0
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 25000)
+}, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
   console.log(
@@ -119,40 +123,28 @@ describe("Mesh edges", () => {
     test("Edges active coloring", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const coloringTypes = [
-        { name: "color" },
-        {
-          name: "vertex",
-          function: () =>
-            dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute),
-        },
-        {
-          name: "edge",
-          function: () =>
-            dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute),
-        },
-      ]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        if (coloringTypes[i].function) {
+      async function testColoring(coloringType, expectedColoringType) {
+        if (coloringType.function) {
           expect(() =>
-            dataStyleStore.setMeshEdgesActiveColoring(
-              id,
-              coloringTypes[i].name,
-            ),
+            dataStyleStore.setMeshEdgesActiveColoring(id, coloringType.name),
           ).toThrowError()
-          await coloringTypes[i].function()
+          await coloringType.function()
         }
         const result = dataStyleStore.setMeshEdgesActiveColoring(
           id,
-          coloringTypes[i].name,
+          coloringType.name,
         )
         expect(result).toBeInstanceOf(Promise)
         await result
         expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
-          coloringTypes[i].name,
+          expectedColoringType,
         )
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
+
+      await testColoring(coloringTypes[0], "color")
+      await testColoring(coloringTypes[1], "vertex")
+      await testColoring(coloringTypes[2], "edge")
     })
     test("Edges apply style", async () => {
       const dataStyleStore = useDataStyleStore()

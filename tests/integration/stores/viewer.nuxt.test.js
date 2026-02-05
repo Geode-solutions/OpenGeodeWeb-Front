@@ -1,17 +1,19 @@
 // Global imports
 
 // Third party imports
-import { setActivePinia } from "pinia"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
-import { describe, test, expect, beforeEach, vi } from "vitest"
+import { setActivePinia } from "pinia"
 
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import Status from "@ogw_front/utils/status"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 import { runMicroservices } from "../../integration/setup"
+
+const CONNECT_TIMEOUT = 25000
 
 beforeEach(() => {
   const pinia = createTestingPinia({
@@ -29,7 +31,7 @@ describe("Viewer Store", () => {
         const viewerStore = useViewerStore()
         await viewerStore.ws_connect()
         expect(viewerStore.status).toBe(Status.CONNECTED)
-      }, 25000)
+      }, CONNECT_TIMEOUT)
     })
     describe("connect", () => {
       test("connect", async () => {
@@ -37,7 +39,7 @@ describe("Viewer Store", () => {
         const viewerStore = useViewerStore()
         await viewerStore.connect()
         expect(viewerStore.status).toBe(Status.CONNECTED)
-      }, 25000)
+      }, CONNECT_TIMEOUT)
     })
 
     describe("request", () => {
@@ -55,7 +57,7 @@ describe("Viewer Store", () => {
               `${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`,
             ),
         )
-      }, 25000)
+      }, CONNECT_TIMEOUT)
     })
   })
 })
