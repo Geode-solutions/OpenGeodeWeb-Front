@@ -2,18 +2,18 @@
   import { useDataStore } from "@ogw_front/stores/data"
   import { useEventListener } from "@vueuse/core"
   import { useMenuStore } from "@ogw_front/stores/menu"
- 
-   const RADIUS = 80
-   const MARGIN_OFFSET = 40
-   const Z_INDEX_MENU = 1000
-   const Z_INDEX_ACTIVE_ITEM = 10
-   const Z_INDEX_BASE_ITEM = 1
-   const FULL_ANGLE = 360
-   const ANGLE_45 = 45
-   const ANGLE_135 = 135
-   const ANGLE_225 = 225
-   const ANGLE_315 = 315
-   const CLOSE_DELAY = 100
+
+  const RADIUS = 80
+  const MARGIN_OFFSET = 40
+  const Z_INDEX_MENU = 1000
+  const Z_INDEX_ACTIVE_ITEM = 10
+  const Z_INDEX_BASE_ITEM = 1
+  const FULL_ANGLE = 360
+  const ANGLE_45 = 45
+  const ANGLE_135 = 135
+  const ANGLE_225 = 225
+  const ANGLE_315 = 315
+  const CLOSE_DELAY = 100
 
   const menuStore = useMenuStore()
   const dataStore = useDataStore()
@@ -138,7 +138,10 @@
       transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
       transition: "opacity 0.2s ease, transform 0.2s ease",
       position: "absolute",
-      zIndex: menuStore.active_item_index === index ? Z_INDEX_ACTIVE_ITEM : Z_INDEX_BASE_ITEM,
+      zIndex:
+        menuStore.active_item_index === index
+          ? Z_INDEX_ACTIVE_ITEM
+          : Z_INDEX_BASE_ITEM,
     }
   }
 </script>

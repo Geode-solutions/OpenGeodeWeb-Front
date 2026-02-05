@@ -76,7 +76,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     // oxlint-disable-next-line import/no-named-as-default-member
     const reader = vtkXMLPolyDataReader.newInstance()
     const textEncoder = new TextEncoder()
-    await reader.parseAsArrayBuffer(textEncoder.encode(value.binary_light_viewable))
+    await reader.parseAsArrayBuffer(
+      textEncoder.encode(value.binary_light_viewable),
+    )
     const polydata = reader.getOutputData(0)
     // oxlint-disable-next-line import/no-named-as-default-member
     const mapper = vtkMapper.newInstance()

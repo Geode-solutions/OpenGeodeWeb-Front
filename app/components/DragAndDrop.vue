@@ -1,5 +1,13 @@
 <script setup>
-  const { multiple, accept, loading, showExtensions, idleText, dropText, loadingText } = defineProps({
+  const {
+    multiple,
+    accept,
+    loading,
+    showExtensions,
+    idleText,
+    dropText,
+    loadingText,
+  } = defineProps({
     multiple: { type: Boolean, default: false },
     accept: { type: String, default: "" },
     loading: { type: Boolean, default: false },

@@ -38,7 +38,10 @@
 
     if (absoluteButtonY - height / 2 < margin) {
       dy = margin - (absoluteButtonY - height / 2)
-    } else if (absoluteButtonY + height / 2 > menuStore.containerHeight - margin) {
+    } else if (
+      absoluteButtonY + height / 2 >
+      menuStore.containerHeight - margin
+    ) {
       dy = menuStore.containerHeight - margin - (absoluteButtonY + height / 2)
     }
     return { top: `calc(50% + ${dy}px)` }
@@ -93,11 +96,7 @@
       color="transparent"
       @click.stop
     >
-      <OptionCard
-        :title="tooltip"
-        width="320"
-        :max-height="maxCardHeight"
-      >
+      <OptionCard :title="tooltip" width="320" :max-height="maxCardHeight">
         <slot name="options" />
       </OptionCard>
     </v-sheet>

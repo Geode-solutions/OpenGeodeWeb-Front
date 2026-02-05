@@ -1,5 +1,4 @@
 export const useTreeviewStore = defineStore("treeview", () => {
-
   const PANEL_WIDTH = 300
 
   const items = ref([])

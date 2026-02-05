@@ -15,8 +15,7 @@ export const useLambdaStore = defineStore("lambda", {
     base_url() {
       const public_runtime_config = useRuntimeConfig().public
       const domain_name = public_runtime_config.API_URL
-      const url =
-        `${this.protocol}://${domain_name}:${this.port}${public_runtime_config.SITE_BRANCH}${public_runtime_config.PROJECT}/createbackend`
+      const url = `${this.protocol}://${domain_name}:${this.port}${public_runtime_config.SITE_BRANCH}${public_runtime_config.PROJECT}/createbackend`
       return url
     },
     is_busy() {
