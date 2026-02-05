@@ -80,9 +80,8 @@ export const useViewerStore = defineStore("viewer", {
         }
         console.log("VIEWER LOCK GRANTED !")
         this.status = Status.CONNECTING
-        const { default: SmartConnect } = await import(
-          "wslink/src/SmartConnect"
-        )
+        const { default: SmartConnect } =
+          await import("wslink/src/SmartConnect")
         vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
         const config = { application: "Viewer", sessionURL: this.base_url }
@@ -117,9 +116,8 @@ export const useViewerStore = defineStore("viewer", {
         })
 
         // Connect
-        const { connectImageStream } = await import(
-          "@kitware/vtk.js/Rendering/Misc/RemoteView"
-        )
+        const { connectImageStream } =
+          await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
         try {
           const validClient = await clientToConnect.connect(config)
           connectImageStream(validClient.getConnection().getSession())

@@ -35,7 +35,10 @@ export async function viewer_call(
     microservice.start_request()
 
     try {
-      const value = await client.getConnection().getSession().call(schema.$id, [params])
+      const value = await client
+        .getConnection()
+        .getSession()
+        .call(schema.$id, [params])
       if (response_function) {
         response_function(value)
       }
