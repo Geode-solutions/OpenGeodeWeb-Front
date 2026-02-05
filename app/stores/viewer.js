@@ -94,9 +94,8 @@ export const useViewerStore = defineStore(
 
           // Connect to busy store
           clientToConnect.onBusyChange((count) => {
-            buzy.value = count
+            clientToConnect.beginBusy()
           })
-          clientToConnect.beginBusy()
 
           // Error
           clientToConnect.onConnectionError((httpReq) => {
@@ -115,8 +114,9 @@ export const useViewerStore = defineStore(
           })
 
           // Connect
-          const { connectImageStream } =
-            await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+          const { connectImageStream } = await import(
+            "@kitware/vtk.js/Rendering/Misc/RemoteView"
+          )
           client.value = await clientToConnect.connect(config_obj)
           connectImageStream(client.value.getConnection().getSession())
           client.value.endBusy()
