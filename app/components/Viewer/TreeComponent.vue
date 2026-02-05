@@ -13,14 +13,42 @@
 
   const emit = defineEmits(["show-menu"])
 
-  const items = dataStore.formatedMeshComponents(props.id)
-  const mesh_components_selection = ref(
-    dataStyleStore.visibleMeshComponents(props.id),
+  const items = ref([])
+  const mesh_components_selection = ref([])
+  const componentTypeMap = {}
+  let isUpdating = false
+
+  async function updateTree() {
+    isUpdating = true
+    const fetchedItems = await dataStore.formatedMeshComponents(props.id)
+    items.value = fetchedItems
+
+    for (const key in componentTypeMap) delete componentTypeMap[key]
+    fetchedItems.forEach((group) => {
+      group.children.forEach((child) => {
+        componentTypeMap[child.id] = group.id
+      })
+    })
+
+    mesh_components_selection.value = dataStyleStore.visibleMeshComponents(
+      props.id,
+    ).value
+    setTimeout(() => {
+      isUpdating = false
+    }, 0)
+  }
+
+  watch(
+    () => props.id,
+    async () => {
+      await updateTree()
+    },
   )
 
   watch(
     mesh_components_selection,
     (current, previous) => {
+      if (isUpdating) return
       if (!previous) previous = []
       else {
         const { added, removed } = compareSelections(current, previous)
@@ -80,23 +108,27 @@
         hybridViewerStore.remoteRender()
       }
     },
-    { immediate: true, deep: true },
+    { immediate: false, deep: true },
   )
 
-  function sortMeshComponents(items) {
+  function sortMeshComponents(ids) {
     var corner_ids = [],
       line_ids = [],
       surface_ids = [],
       block_ids = []
-    for (const item of items) {
-      const item_type = dataStore.meshComponentType(props.id, item)
-      if (item_type === "corner") corner_ids.push(item)
-      else if (item_type === "line") line_ids.push(item)
-      else if (item_type === "surface") surface_ids.push(item)
-      else if (item_type === "block") block_ids.push(item)
+    for (const id of ids) {
+      const item_type = componentTypeMap[id]
+      if (item_type === "Corner") corner_ids.push(id)
+      else if (item_type === "Line") line_ids.push(id)
+      else if (item_type === "Surface") surface_ids.push(id)
+      else if (item_type === "Block") block_ids.push(id)
     }
     return [corner_ids, line_ids, surface_ids, block_ids]
   }
+
+  onMounted(async () => {
+    await updateTree()
+  })
 </script>
 
 <template>
