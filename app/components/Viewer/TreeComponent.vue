@@ -15,7 +15,6 @@
 
   const items = ref([])
   const mesh_components_selection = ref([])
-  const componentTypeMap = {}
   let isUpdating = false
 
   async function updateTree() {
@@ -23,16 +22,17 @@
     const fetchedItems = await dataStore.formatedMeshComponents(props.id)
     items.value = fetchedItems
 
-    for (const key in componentTypeMap) delete componentTypeMap[key]
+    const visibleIds = dataStyleStore.visibleMeshComponents(props.id).value
+    const selection = []
     fetchedItems.forEach((group) => {
       group.children.forEach((child) => {
-        componentTypeMap[child.id] = group.id
+        if (visibleIds.includes(child.id)) {
+          selection.push(child)
+        }
       })
     })
+    mesh_components_selection.value = selection
 
-    mesh_components_selection.value = dataStyleStore.visibleMeshComponents(
-      props.id,
-    ).value
     setTimeout(() => {
       isUpdating = false
     }, 0)
@@ -47,84 +47,56 @@
 
   watch(
     mesh_components_selection,
-    (current, previous) => {
+    async (current, previous) => {
       if (isUpdating) return
-      if (!previous) previous = []
-      else {
-        const { added, removed } = compareSelections(current, previous)
+      if (!previous) return
+      const { added, removed } = compareSelections(current, previous)
 
-        const [added_corners, added_lines, added_surfaces, added_blocks] =
-          sortMeshComponents(added)
-        const [
-          removed_corners,
-          removed_lines,
-          removed_surfaces,
-          removed_blocks,
-        ] = sortMeshComponents(removed)
-        if (added_corners.length > 0) {
-          dataStyleStore.setModelCornersVisibility(
-            props.id,
-            added_corners,
-            true,
-          )
-        }
-        if (added_lines.length > 0) {
-          dataStyleStore.setModelLinesVisibility(props.id, added_lines, true)
-        }
-        if (added_surfaces.length > 0) {
-          dataStyleStore.setModelSurfacesVisibility(
-            props.id,
-            added_surfaces,
-            true,
-          )
-        }
-        if (added_blocks.length > 0) {
-          dataStyleStore.setModelBlocksVisibility(props.id, added_blocks, true)
-        }
-        if (removed_corners.length > 0) {
-          dataStyleStore.setModelCornersVisibility(
-            props.id,
-            removed_corners,
-            false,
-          )
-        }
-        if (removed_lines.length > 0) {
-          dataStyleStore.setModelLinesVisibility(props.id, removed_lines, false)
-        }
-        if (removed_surfaces.length > 0) {
-          dataStyleStore.setModelSurfacesVisibility(
-            props.id,
-            removed_surfaces,
-            false,
-          )
-        }
-        if (removed_blocks.length > 0) {
-          dataStyleStore.setModelBlocksVisibility(
-            props.id,
-            removed_blocks,
-            false,
-          )
-        }
-        hybridViewerStore.remoteRender()
+      const updateVisibility = async (items, visibility) => {
+        const grouped = items.reduce((acc, item) => {
+          if (!acc[item.category]) acc[item.category] = []
+          acc[item.category].push(item.id)
+          return acc
+        }, {})
+
+        const promises = Object.entries(grouped).map(([category, ids]) => {
+          if (category === "Corner") {
+            return dataStyleStore.setModelCornersVisibility(
+              props.id,
+              ids,
+              visibility,
+            )
+          } else if (category === "Line") {
+            return dataStyleStore.setModelLinesVisibility(
+              props.id,
+              ids,
+              visibility,
+            )
+          } else if (category === "Surface") {
+            return dataStyleStore.setModelSurfacesVisibility(
+              props.id,
+              ids,
+              visibility,
+            )
+          } else if (category === "Block") {
+            return dataStyleStore.setModelBlocksVisibility(
+              props.id,
+              ids,
+              visibility,
+            )
+          }
+        })
+        return Promise.all(promises)
       }
-    },
-    { immediate: false, deep: true },
-  )
 
-  function sortMeshComponents(ids) {
-    var corner_ids = [],
-      line_ids = [],
-      surface_ids = [],
-      block_ids = []
-    for (const id of ids) {
-      const item_type = componentTypeMap[id]
-      if (item_type === "Corner") corner_ids.push(id)
-      else if (item_type === "Line") line_ids.push(id)
-      else if (item_type === "Surface") surface_ids.push(id)
-      else if (item_type === "Block") block_ids.push(id)
-    }
-    return [corner_ids, line_ids, surface_ids, block_ids]
-  }
+      await Promise.all([
+        updateVisibility(added, true),
+        updateVisibility(removed, false),
+      ])
+      hybridViewerStore.remoteRender()
+    },
+    { immediate: true, deep: true },
+  )
 
   onMounted(async () => {
     await updateTree()
@@ -139,6 +111,7 @@
     item-value="id"
     select-strategy="classic"
     selectable
+    return-object
   >
     <template #title="{ item }">
       <span
