@@ -52,26 +52,30 @@ export function useMeshPointsStyle() {
     if (type === "color") {
       return setMeshPointsColor(id, coloring.color)
     } else if (type === "vertex") {
-      if (coloring.vertex?.name === undefined) {
+      const name = coloring.vertex.name
+      if (name === undefined) {
         return Promise.resolve()
       }
-      return setMeshPointsVertexAttributeName(id, coloring.vertex.name).then(
+      const attributes = coloring.vertex.attributes
+      const minimum = attributes[name].minimum
+      const maximum = attributes[name].maximum
+      return setMeshPointsVertexAttributeName(id, name).then(
         () => {
           if (
-            coloring.vertex.minimum !== undefined &&
-            coloring.vertex.maximum !== undefined
+            minimum !== undefined &&
+            maximum !== undefined
           ) {
             return setMeshPointsVertexAttributeRange(
               id,
-              coloring.vertex.minimum,
-              coloring.vertex.maximum,
+              minimum,
+              maximum,
             ).then(() => {
               if (coloring.vertex.colorMap) {
                 return setMeshPointsVertexAttributeColorMap(
                   id,
                   coloring.vertex.colorMap,
-                  coloring.vertex.minimum,
-                  coloring.vertex.maximum,
+                  minimum,
+                  maximum,
                 )
               }
             })
@@ -79,7 +83,7 @@ export function useMeshPointsStyle() {
         },
       )
     } else {
-      return Promise.resolve()
+      throw new Error("Unknown active coloring type: " + type)
     }
   }
 
@@ -110,8 +114,7 @@ export function useMeshPointsStyle() {
     return setMeshPointsVertexAttributeName(id, vertex_attribute.name)
   }
   function meshPointsVertexAttributeName(id) {
-    const vertex = meshPointsStyle(id).coloring.vertex
-    return vertex ? vertex.name : ""
+    return meshPointsStyle(id).coloring.vertex.name
   }
   function setMeshPointsVertexAttributeName(id, name, defaultMin, defaultMax) {
     const coloring_style = meshPointsStyle(id).coloring
@@ -120,74 +123,51 @@ export function useMeshPointsStyle() {
       { id, name },
       {
         response_function: () => {
-          if (!coloring_style.vertex) {
-            coloring_style.vertex = {}
-          }
-          const previousName = coloring_style.vertex.name
-          if (previousName) {
-            if (!coloring_style.vertex.attributes) {
-              coloring_style.vertex.attributes = {}
-            }
-            coloring_style.vertex.attributes[previousName] = {
-              minimum: coloring_style.vertex.minimum,
-              maximum: coloring_style.vertex.maximum,
-              colorMap: coloring_style.vertex.colorMap,
-            }
-          }
-
+          const saved_preset = coloring_style.vertex.attributes[name]
           coloring_style.vertex.name = name
 
-          if (
-            coloring_style.vertex.attributes &&
-            coloring_style.vertex.attributes[name]
-          ) {
-            const saved = coloring_style.vertex.attributes[name]
-            if (saved.minimum !== undefined && saved.maximum !== undefined) {
-              setMeshPointsVertexAttributeRange(
-                id,
-                saved.minimum,
-                saved.maximum,
-              )
-              if (saved.colorMap) {
-                setMeshPointsVertexAttributeColorMap(
-                  id,
-                  saved.colorMap,
-                  saved.minimum,
-                  saved.maximum,
-                )
-              }
+          if (saved_preset) {
+            let minimum, maximum, colorMap
+            if (saved_preset.minimum !== undefined && saved_preset.maximum !== undefined) {
+              minimum = saved_preset.minimum
+              maximum = saved_preset.maximum
+              colorMap = saved_preset.colorMap
             }
           } else if (defaultMin !== undefined && defaultMax !== undefined) {
-            setMeshPointsVertexAttributeRange(id, defaultMin, defaultMax)
-            setMeshPointsVertexAttributeColorMap(
-              id,
-              "Cool to Warm",
-              defaultMin,
-              defaultMax,
-            )
+            minimum = defaultMin
+            maximum = defaultMax
+            colorMap = "Cool to Warm"
           }
-          console.log(setMeshPointsVertexAttributeName.name, { id }, name)
+          setMeshPointsVertexAttributeRange(id, minimum, maximum)
+          setMeshPointsVertexAttributeColorMap(
+            id,
+            colorMap,
+            minimum,
+            maximum,
+          )
+
+          console.log(setMeshPointsVertexAttributeName.name, { id }, meshPointsVertexAttributeName(id))
         },
       },
     )
   }
   function meshPointsVertexAttributeRange(id) {
-    const vertex = meshPointsStyle(id).coloring.vertex
-    return vertex ? [vertex.minimum, vertex.maximum] : [0, 1]
+    const name = meshPointsVertexAttributeName(id)
+    const saved_preset = meshPointsStyle(id).coloring.vertex.attributes[name]
+    return saved_preset ? [saved_preset.minimum, saved_preset.maximum] : [0, 1]
   }
-  function setMeshPointsVertexAttributeRange(id, min, max) {
+  function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
     const coloring_style = meshPointsStyle(id).coloring
     return viewerStore.request(
       mesh_points_schemas.attribute.vertex.scalar_range,
-      { id, minimum: min, maximum: max },
+      { id, minimum, maximum },
       {
         response_function: () => {
-          if (!coloring_style.vertex) {
-            coloring_style.vertex = {}
-          }
-          coloring_style.vertex.minimum = min
-          coloring_style.vertex.maximum = max
-          console.log(setMeshPointsVertexAttributeRange.name, { id, min, max })
+          const name = coloring_style.vertex.name
+          const saved_preset = coloring_style.vertex.attributes[name]
+          saved_preset.minimum = minimum
+          saved_preset.maximum = maximum
+          console.log(setMeshPointsVertexAttributeRange.name, { id }, meshPointsVertexAttributeRange(id))
         },
       },
     )
@@ -212,10 +192,9 @@ export function useMeshPointsStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          if (!coloring_style.vertex) {
-            coloring_style.vertex = {}
-          }
-          coloring_style.vertex.colorMap = colorMapName
+          const name = coloring_style.vertex.name
+          const saved_preset = coloring_style.vertex.attributes[name]
+          saved_preset.colorMap = colorMapName
           console.log(setMeshPointsVertexAttributeColorMap.name, {
             id,
             colorMapName,

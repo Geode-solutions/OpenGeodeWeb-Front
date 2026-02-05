@@ -34,9 +34,9 @@ const meshPointsDefaultStyle = (
       color,
       vertex: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+
+
+        attributes: {}
       },
     },
     size,
@@ -55,15 +55,11 @@ const meshEdgesDefaultStyle = (
       color,
       edge: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+        attributes: {},
       },
       vertex: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+        attributes: {},
       },
     },
     width,
@@ -80,17 +76,13 @@ const meshCellsDefaultStyle = (
       active: "color",
       cell: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+        attributes: {},
       },
       color,
       textures: null,
       vertex: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+        attributes: {},
       },
     },
   }
@@ -108,15 +100,11 @@ const meshPolygonsDefaultStyle = (
       textures: null,
       polygon: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+        attributes: {},
       },
       vertex: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+        attributes: {},
       },
     },
   }
@@ -133,15 +121,11 @@ const meshPolyhedraDefaultStyle = (
       color,
       polyhedron: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+        attributes: {},
       },
       vertex: {
         name: undefined,
-        minimum: 0,
-        maximum: 1,
-        colorMap: "Cool to Warm",
+        attributes: {},
       },
     },
   }
