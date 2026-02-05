@@ -7,7 +7,9 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { viewer_call } from "../../internal/utils/viewer_call"
-import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
+import { useInfraStore } from "@ogw_front/stores/infra"
+
+const request_timeout = 10 * 1000
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -113,20 +115,31 @@ export const useViewerStore = defineStore("viewer", {
         const { connectImageStream } = await import(
           "@kitware/vtk.js/Rendering/Misc/RemoteView"
         )
-        try {
-          const validClient = await clientToConnect.connect(config)
-          connectImageStream(validClient.getConnection().getSession())
-          this.client = validClient
-          clientToConnect.endBusy()
-          viewer_call(this, {
-            schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
-          })
-          this.status = Status.CONNECTED
-        } catch (error) {
-          console.error("error", error)
-          this.status = Status.NOT_CONNECTED
-          throw error
-        }
+        const viewerStore = this
+        return new Promise((resolve, reject) => {
+          clientToConnect
+            .connect(config)
+            .then((validClient) => {
+              connectImageStream(validClient.getConnection().getSession())
+              viewerStore.client = validClient
+              clientToConnect.endBusy()
+              viewer_call(
+                viewerStore,
+                {
+                  schema:
+                    schemas.opengeodeweb_viewer.viewer.reset_visualization,
+                },
+                { timeout: undefined },
+              )
+              viewerStore.status = Status.CONNECTED
+              resolve()
+            })
+            .catch((error) => {
+              console.error("error", error)
+              viewerStore.status = Status.NOT_CONNECTED
+              reject(error)
+            })
+        })
       })
     },
     start_request() {
@@ -146,7 +159,7 @@ export const useViewerStore = defineStore("viewer", {
       await this.ws_connect()
       console.log("[VIEWER] Viewer connected successfully")
     },
-    request(schema, params = {}, callbacks = {}) {
+    request(schema, params = {}, callbacks = {}, timeout = request_timeout) {
       console.log("[VIEWER] Request:", schema.$id)
 
       return viewer_call(
@@ -161,6 +174,7 @@ export const useViewerStore = defineStore("viewer", {
             }
           },
         },
+        timeout,
       )
     },
   },

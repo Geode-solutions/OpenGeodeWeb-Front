@@ -97,4 +97,14 @@ describe("Model lines", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })
+  describe("Lines style", () => {
+    test("Lines apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelLinesStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
 })

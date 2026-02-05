@@ -22,10 +22,12 @@
       if (current === oldSelection) {
         return
       }
-      const { added, removed } = compareSelections(current, oldSelection)
-
+      const { added, removed } = compareSelections(current, previous)
       for (const item of added) {
-        dataStyleStore.setVisibility(item.id, true)
+        await dataStyleStore.setVisibility(item.id, true)
+      }
+      for (const item of removed) {
+        await dataStyleStore.setVisibility(item.id, false)
       }
 
       await Promise.all(
