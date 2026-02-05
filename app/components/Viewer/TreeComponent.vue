@@ -42,107 +42,33 @@
     async (current, previous) => {
       if (isUpdating) return
       if (!previous) previous = []
-      else {
-        const { added, removed } = compareSelections(current, previous)
+      const { added, removed } = compareSelections(current, previous)
 
-        const [added_corners, added_lines, added_surfaces, added_blocks] =
-          sortMeshComponents(added)
-        const [
-          removed_corners,
-          removed_lines,
-          removed_surfaces,
-          removed_blocks,
-        ] = sortMeshComponents(removed)
-
-        const promises = []
-        if (added_corners.length > 0) {
-          promises.push(
-            dataStyleStore.setModelCornersVisibility(
-              props.id,
-              added_corners,
-              true,
-            ),
-          )
-        }
-        if (added_lines.length > 0) {
-          promises.push(
-            dataStyleStore.setModelLinesVisibility(props.id, added_lines, true),
-          )
-        }
-        if (added_surfaces.length > 0) {
-          promises.push(
-            dataStyleStore.setModelSurfacesVisibility(
-              props.id,
-              added_surfaces,
-              true,
-            ),
-          )
-        }
-        if (added_blocks.length > 0) {
-          promises.push(
-            dataStyleStore.setModelBlocksVisibility(
-              props.id,
-              added_blocks,
-              true,
-            ),
-          )
-        }
-        if (removed_corners.length > 0) {
-          promises.push(
-            dataStyleStore.setModelCornersVisibility(
-              props.id,
-              removed_corners,
-              false,
-            ),
-          )
-        }
-        if (removed_lines.length > 0) {
-          promises.push(
-            dataStyleStore.setModelLinesVisibility(
-              props.id,
-              removed_lines,
-              false,
-            ),
-          )
-        }
-        if (removed_surfaces.length > 0) {
-          promises.push(
-            dataStyleStore.setModelSurfacesVisibility(
-              props.id,
-              removed_surfaces,
-              false,
-            ),
-          )
-        }
-        if (removed_blocks.length > 0) {
-          promises.push(
-            dataStyleStore.setModelBlocksVisibility(
-              props.id,
-              removed_blocks,
-              false,
-            ),
-          )
-        }
-        await Promise.all(promises)
-        hybridViewerStore.remoteRender()
+      const promises = []
+      for (const item of added) {
+        promises.push(
+          dataStyleStore.setModelMeshComponentVisibility(
+            props.id,
+            [item.id],
+            true,
+          ),
+        )
       }
+
+      for (const item of removed) {
+        promises.push(
+          dataStyleStore.setModelMeshComponentVisibility(
+            props.id,
+            [item.id],
+            false,
+          ),
+        )
+      }
+      await Promise.all(promises)
+      hybridViewerStore.remoteRender()
     },
     { immediate: true, deep: true },
   )
-
-  function sortMeshComponents(items) {
-    var corner_ids = [],
-      line_ids = [],
-      surface_ids = [],
-      block_ids = []
-    for (const item of items) {
-      if (item.category === "Corner") corner_ids.push(item.id)
-      else if (item.category === "Line") line_ids.push(item.id)
-      else if (item.category === "Surface") surface_ids.push(item.id)
-      else if (item.category === "Block") block_ids.push(item.id)
-    }
-    return [corner_ids, line_ids, surface_ids, block_ids]
-  }
 </script>
 
 <template>
