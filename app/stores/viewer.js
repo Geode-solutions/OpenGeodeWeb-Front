@@ -27,7 +27,7 @@ export const useViewerStore = defineStore("viewer", {
         return "ws"
       }
     },
-    port() {
+    port(state) {
       if (useInfraStore().app_mode == appMode.CLOUD) {
         return "443"
       }
@@ -35,11 +35,11 @@ export const useViewerStore = defineStore("viewer", {
       if (VIEWER_PORT != null && VIEWER_PORT !== "") {
         return VIEWER_PORT
       }
-      return this.default_local_port
+      return state.this.default_local_port
     },
-    base_url() {
+    base_url(state) {
       const infraStore = useInfraStore()
-      let viewer_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
+      let viewer_url = `${state.protocol}://${infraStore.domain_name}:${state.port}`
       if (infraStore.app_mode == appMode.CLOUD) {
         if (infraStore.ID == "") {
           throw new Error("ID must not be empty in cloud mode")
@@ -49,8 +49,8 @@ export const useViewerStore = defineStore("viewer", {
       viewer_url += "/ws"
       return viewer_url
     },
-    is_busy() {
-      return this.request_counter > 0
+    is_busy(state) {
+      return state.request_counter > 0
     },
   },
   actions: {
@@ -66,29 +66,30 @@ export const useViewerStore = defineStore("viewer", {
     },
     async ws_connect() {
       if (this.status === Status.CONNECTED) return
+      const self = this
       return navigator.locks.request("viewer.ws_connect", async (lock) => {
-        if (this.status === Status.CONNECTED) return
+        if (self.status === Status.CONNECTED) return
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
-          this.status = Status.CONNECTING
+          self.status = Status.CONNECTING
           const SmartConnect = await import("wslink/src/SmartConnect")
           vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
           const config = { application: "Viewer" }
-          config.sessionURL = this.base_url
+          config.sessionURL = self.base_url
 
-          if (this.status === Status.CONNECTED && this.client.isConnected()) {
-            this.client.disconnect(-1)
-            this.status = Status.NOT_CONNECTED
+          if (self.status === Status.CONNECTED && self.client.isConnected()) {
+            self.client.disconnect(-1)
+            self.status = Status.NOT_CONNECTED
           }
-          let clientToConnect = this.client
+          let clientToConnect = self.client
           if (_.isEmpty(clientToConnect)) {
             clientToConnect = vtkWSLinkClient.newInstance()
           }
 
           // Connect to busy store
           clientToConnect.onBusyChange((count) => {
-            this.buzy = count
+            self.buzy = count
           })
           clientToConnect.beginBusy()
 
@@ -112,19 +113,19 @@ export const useViewerStore = defineStore("viewer", {
           const { connectImageStream } = await import(
             "@kitware/vtk.js/Rendering/Misc/RemoteView"
           )
-          this.client = await clientToConnect.connect(config)
-          connectImageStream(this.client.getConnection().getSession())
-          this.client.endBusy()
-          await this.request(
+          self.client = await clientToConnect.connect(config)
+          connectImageStream(self.client.getConnection().getSession())
+          self.client.endBusy()
+          await self.request(
             schemas.opengeodeweb_viewer.viewer.reset_visualization,
             {},
             {},
             undefined,
           )
-          this.status = Status.CONNECTED
+          self.status = Status.CONNECTED
         } catch (error) {
           console.error("error", error)
-          this.status = Status.NOT_CONNECTED
+          self.status = Status.NOT_CONNECTED
           throw error
         }
       })
