@@ -46,7 +46,10 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
@@ -83,7 +86,10 @@
   })
   const edge_attribute_name = computed({
     get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshEdgesEdgeAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const edge_attribute_range = computed({
     get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
@@ -118,25 +124,6 @@
       hybridViewerStore.remoteRender()
     },
   })
-
-  function onVertexAttributeSelected(data) {
-    dataStyleStore.setMeshEdgesVertexAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-    hybridViewerStore.remoteRender()
-  }
-  function onEdgeAttributeSelected(data) {
-    dataStyleStore.setMeshEdgesEdgeAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-    hybridViewerStore.remoteRender()
-  }
 </script>
 <template>
   <ViewerContextMenuItem
@@ -176,8 +163,6 @@
               v-model:edge_attribute_name="edge_attribute_name"
               v-model:edge_attribute_range="edge_attribute_range"
               v-model:edge_attribute_color_map="edge_attribute_color_map"
-              @vertex-attribute-selected="onVertexAttributeSelected"
-              @edge-attribute-selected="onEdgeAttributeSelected"
             />
           </v-col>
         </v-row>

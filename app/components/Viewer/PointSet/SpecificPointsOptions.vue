@@ -46,7 +46,10 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshPointsVertexAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
@@ -83,16 +86,6 @@
       hybridViewerStore.remoteRender()
     },
   })
-
-  function onVertexAttributeSelected(data) {
-    dataStyleStore.setMeshPointsVertexAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-    hybridViewerStore.remoteRender()
-  }
 </script>
 <template>
   <ViewerContextMenuItem
@@ -129,7 +122,6 @@
               v-model:vertex_attribute_name="vertex_attribute_name"
               v-model:vertex_attribute_range="vertex_attribute_range"
               v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-              @vertex-attribute-selected="onVertexAttributeSelected"
             />
           </v-col>
         </v-row>

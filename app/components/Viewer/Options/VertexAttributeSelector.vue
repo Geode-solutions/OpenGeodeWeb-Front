@@ -13,12 +13,6 @@
   const vertex_attribute_color_map = defineModel("vertex_attribute_color_map")
   const vertex_attributes = ref([])
 
-  const selectedName = ref(vertex_attribute_name.value)
-
-  watch(vertex_attribute_name, (newVal) => {
-    selectedName.value = newVal
-  })
-
   const props = defineProps({
     id: { type: String, required: true },
   })
@@ -58,31 +52,39 @@
     )
   }
 
-  const emit = defineEmits(["attribute-selected"])
-
-  watch(selectedName, (newName) => {
-    if (!newName) return
-    const attribute = vertex_attributes.value.find(
-      (attr) => attr.attribute_name === newName,
-    )
-    if (attribute && attribute.min_value !== -1 && attribute.max_value !== -1) {
-      emit("attribute-selected", {
-        name: newName,
-        defaultMin: attribute.min_value,
-        defaultMax: attribute.max_value,
-      })
-    }
-  })
   const currentAttribute = computed(() => {
     return vertex_attributes.value.find(
-      (attr) => attr.attribute_name === selectedName.value,
+      (attr) => attr.attribute_name === vertex_attribute_name.value,
     )
+  })
+
+  watch(vertex_attribute_name, (newName) => {
+    if (newName) {
+      const attr = vertex_attributes.value.find(
+        (a) => a.attribute_name === newName,
+      )
+      if (
+        attr &&
+        attr.min_value !== undefined &&
+        attr.max_value !== undefined
+      ) {
+        const currentRange = vertex_attribute_range.value
+        const hasNoSavedPreset =
+          !currentRange || (currentRange[0] === 0 && currentRange[1] === 1)
+        if (hasNoSavedPreset) {
+          if (!vertex_attribute_color_map.value) {
+            vertex_attribute_color_map.value = "Cool to Warm"
+          }
+          vertex_attribute_range.value = [attr.min_value, attr.max_value]
+        }
+      }
+    }
   })
 </script>
 
 <template>
   <v-select
-    v-model="selectedName"
+    v-model="vertex_attribute_name"
     :items="vertex_attributes.map((attribute) => attribute.attribute_name)"
     item-title="attribute_name"
     item-value="attribute_name"
@@ -90,11 +92,9 @@
     density="compact"
   />
   <ViewerOptionsAttributeColorBar
-    v-if="vertex_attribute_name && vertex_attribute_range"
+    v-if="vertex_attribute_name"
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="vertex_attribute_color_map"
-    :autoMin="currentAttribute?.min_value"
-    :autoMax="currentAttribute?.max_value"
   />
 </template>

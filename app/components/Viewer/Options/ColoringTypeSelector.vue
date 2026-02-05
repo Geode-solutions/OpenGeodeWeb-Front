@@ -38,30 +38,6 @@
     id: { type: String, required: true },
   })
 
-  const emit = defineEmits([
-    "vertex-attribute-selected",
-    "edge-attribute-selected",
-    "cell-attribute-selected",
-    "polygon-attribute-selected",
-    "polyhedron-attribute-selected",
-  ])
-
-  function onVertexAttributeSelected(data) {
-    emit("vertex-attribute-selected", data)
-  }
-  function onEdgeAttributeSelected(data) {
-    emit("edge-attribute-selected", data)
-  }
-  function onCellAttributeSelected(data) {
-    emit("cell-attribute-selected", data)
-  }
-  function onPolygonAttributeSelected(data) {
-    emit("polygon-attribute-selected", data)
-  }
-  function onPolyhedronAttributeSelected(data) {
-    emit("polyhedron-attribute-selected", data)
-  }
-
   const has_color = computed(() => (color.value !== undefined ? true : false))
   const has_textures = computed(() =>
     textures.value !== undefined ? true : false,
@@ -153,7 +129,6 @@
               v-model:vertex_attribute_range="vertex_attribute_range"
               v-model:vertex_attribute_color_map="vertex_attribute_color_map"
               :id="id"
-              @attribute-selected="onVertexAttributeSelected"
             />
           </template>
           <template v-if="coloring_style_key === edge_dict['value']">
@@ -162,7 +137,6 @@
               v-model:edge_attribute_range="edge_attribute_range"
               v-model:edge_attribute_color_map="edge_attribute_color_map"
               :id="id"
-              @attribute-selected="onEdgeAttributeSelected"
             />
           </template>
           <template v-if="coloring_style_key === cell_dict['value']">
@@ -171,7 +145,6 @@
               v-model:cell_attribute_range="cell_attribute_range"
               v-model:cell_attribute_color_map="cell_attribute_color_map"
               :id="id"
-              @attribute-selected="onCellAttributeSelected"
             />
           </template>
           <template v-if="coloring_style_key === polygon_dict['value']">
@@ -180,7 +153,6 @@
               v-model:polygon_attribute_range="polygon_attribute_range"
               v-model:polygon_attribute_color_map="polygon_attribute_color_map"
               :id="id"
-              @attribute-selected="onPolygonAttributeSelected"
             />
           </template>
           <template v-if="coloring_style_key === polyhedron_dict['value']">
@@ -191,7 +163,6 @@
                 polyhedron_attribute_color_map
               "
               :id="id"
-              @attribute-selected="onPolyhedronAttributeSelected"
             />
           </template>
         </v-col>

@@ -40,7 +40,10 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshPolyhedraVertexAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
@@ -79,7 +82,10 @@
   })
   const polyhedron_attribute_name = computed({
     get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const polyhedron_attribute_range = computed({
     get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id.value),
@@ -119,25 +125,6 @@
       hybridViewerStore.remoteRender()
     },
   })
-
-  function onVertexAttributeSelected(data) {
-    dataStyleStore.setMeshPolyhedraVertexAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-    hybridViewerStore.remoteRender()
-  }
-  function onPolyhedronAttributeSelected(data) {
-    dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-    hybridViewerStore.remoteRender()
-  }
 </script>
 <template>
   <ViewerContextMenuItem
@@ -160,8 +147,6 @@
           v-model:polyhedron_attribute_color_map="
             polyhedron_attribute_color_map
           "
-          @vertex-attribute-selected="onVertexAttributeSelected"
-          @polyhedron-attribute-selected="onPolyhedronAttributeSelected"
         />
       </template>
     </template>

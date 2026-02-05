@@ -140,12 +140,7 @@ export function useMeshPolyhedraStyle() {
     const vertex = meshPolyhedraStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshPolyhedraVertexAttributeName(
-    id,
-    name,
-    defaultMin,
-    defaultMax,
-  ) {
+  function setMeshPolyhedraVertexAttributeName(id, name) {
     const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.attribute.vertex.name,
@@ -156,26 +151,14 @@ export function useMeshPolyhedraStyle() {
           coloring_style.vertex.name = name
 
           let minimum, maximum, colorMap
-          if (saved_preset) {
-            if (
-              saved_preset.minimum !== undefined &&
-              saved_preset.maximum !== undefined
-            ) {
-              minimum = saved_preset.minimum
-              maximum = saved_preset.maximum
-              colorMap = saved_preset.colorMap
-            }
-          } else if (defaultMin !== undefined && defaultMax !== undefined) {
-            minimum = defaultMin
-            maximum = defaultMax
-            colorMap = "Cool to Warm"
-            coloring_style.vertex.attributes[name] = {
-              minimum,
-              maximum,
-              colorMap,
-            }
-          }
-          if (minimum !== undefined && maximum !== undefined) {
+          if (
+            saved_preset &&
+            saved_preset.minimum !== undefined &&
+            saved_preset.maximum !== undefined
+          ) {
+            minimum = saved_preset.minimum
+            maximum = saved_preset.maximum
+            colorMap = saved_preset.colorMap
             setMeshPolyhedraVertexAttributeRange(id, minimum, maximum)
             setMeshPolyhedraVertexAttributeColorMap(
               id,
@@ -200,15 +183,18 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const coloring_style = meshPolyhedraStyle(id).coloring
+    const name = coloring_style.vertex.name
+    if (!coloring_style.vertex.attributes[name]) {
+      coloring_style.vertex.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.vertex.attributes[name]
+    saved_preset.minimum = minimum
+    saved_preset.maximum = maximum
     return viewerStore.request(
       mesh_polyhedra_schemas.attribute.vertex.scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.vertex.name
-          const saved_preset = coloring_style.vertex.attributes[name]
-          saved_preset.minimum = minimum
-          saved_preset.maximum = maximum
           console.log(
             setMeshPolyhedraVertexAttributeRange.name,
             { id },
@@ -230,6 +216,12 @@ export function useMeshPolyhedraStyle() {
     maximum,
   ) {
     const coloring_style = meshPolyhedraStyle(id).coloring
+    const name = coloring_style.vertex.name
+    if (!coloring_style.vertex.attributes[name]) {
+      coloring_style.vertex.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.vertex.attributes[name]
+    saved_preset.colorMap = colorMapName
     let points = colorMapName
     if (typeof colorMapName === "string") {
       points = getRGBPointsFromPreset(colorMapName)
@@ -239,9 +231,6 @@ export function useMeshPolyhedraStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.vertex.name
-          const saved_preset = coloring_style.vertex.attributes[name]
-          saved_preset.colorMap = colorMapName
           console.log(setMeshPolyhedraVertexAttributeColorMap.name, {
             id,
             colorMapName,
@@ -264,12 +253,7 @@ export function useMeshPolyhedraStyle() {
     const polyhedron = meshPolyhedraStyle(id).coloring.polyhedron
     return polyhedron ? polyhedron.name : ""
   }
-  function setMeshPolyhedraPolyhedronAttributeName(
-    id,
-    name,
-    defaultMin,
-    defaultMax,
-  ) {
+  function setMeshPolyhedraPolyhedronAttributeName(id, name) {
     const coloring_style = meshPolyhedraStyle(id).coloring
     return viewerStore.request(
       mesh_polyhedra_schemas.attribute.polyhedron.name,
@@ -280,26 +264,14 @@ export function useMeshPolyhedraStyle() {
           coloring_style.polyhedron.name = name
 
           let minimum, maximum, colorMap
-          if (saved_preset) {
-            if (
-              saved_preset.minimum !== undefined &&
-              saved_preset.maximum !== undefined
-            ) {
-              minimum = saved_preset.minimum
-              maximum = saved_preset.maximum
-              colorMap = saved_preset.colorMap
-            }
-          } else if (defaultMin !== undefined && defaultMax !== undefined) {
-            minimum = defaultMin
-            maximum = defaultMax
-            colorMap = "Cool to Warm"
-            coloring_style.polyhedron.attributes[name] = {
-              minimum,
-              maximum,
-              colorMap,
-            }
-          }
-          if (minimum !== undefined && maximum !== undefined) {
+          if (
+            saved_preset &&
+            saved_preset.minimum !== undefined &&
+            saved_preset.maximum !== undefined
+          ) {
+            minimum = saved_preset.minimum
+            maximum = saved_preset.maximum
+            colorMap = saved_preset.colorMap
             setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum)
             setMeshPolyhedraPolyhedronAttributeColorMap(
               id,
@@ -325,15 +297,18 @@ export function useMeshPolyhedraStyle() {
   }
   function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
     const coloring_style = meshPolyhedraStyle(id).coloring
+    const name = coloring_style.polyhedron.name
+    if (!coloring_style.polyhedron.attributes[name]) {
+      coloring_style.polyhedron.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.polyhedron.attributes[name]
+    saved_preset.minimum = minimum
+    saved_preset.maximum = maximum
     return viewerStore.request(
       mesh_polyhedra_schemas.attribute.polyhedron.scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.polyhedron.name
-          const saved_preset = coloring_style.polyhedron.attributes[name]
-          saved_preset.minimum = minimum
-          saved_preset.maximum = maximum
           console.log(
             setMeshPolyhedraPolyhedronAttributeRange.name,
             { id },
@@ -356,6 +331,12 @@ export function useMeshPolyhedraStyle() {
     maximum,
   ) {
     const coloring_style = meshPolyhedraStyle(id).coloring
+    const name = coloring_style.polyhedron.name
+    if (!coloring_style.polyhedron.attributes[name]) {
+      coloring_style.polyhedron.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.polyhedron.attributes[name]
+    saved_preset.colorMap = colorMapName
     let points = colorMapName
     if (typeof colorMapName === "string") {
       points = getRGBPointsFromPreset(colorMapName)
@@ -365,9 +346,6 @@ export function useMeshPolyhedraStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.polyhedron.name
-          const saved_preset = coloring_style.polyhedron.attributes[name]
-          saved_preset.colorMap = colorMapName
           console.log(setMeshPolyhedraPolyhedronAttributeColorMap.name, {
             id,
             colorMapName,

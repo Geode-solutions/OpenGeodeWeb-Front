@@ -15,12 +15,6 @@
   )
   const polyhedron_attributes = ref([])
 
-  const selectedName = ref(polyhedron_attribute_name.value)
-
-  watch(polyhedron_attribute_name, (newVal) => {
-    selectedName.value = newVal
-  })
-
   const props = defineProps({
     id: { type: String, required: true },
   })
@@ -60,31 +54,39 @@
     )
   }
 
-  const emit = defineEmits(["attribute-selected"])
-
-  watch(selectedName, (newName) => {
-    if (!newName) return
-    const attribute = polyhedron_attributes.value.find(
-      (attr) => attr.attribute_name === newName,
-    )
-    if (attribute && attribute.min_value !== -1 && attribute.max_value !== -1) {
-      emit("attribute-selected", {
-        name: newName,
-        defaultMin: attribute.min_value,
-        defaultMax: attribute.max_value,
-      })
-    }
-  })
   const currentAttribute = computed(() => {
     return polyhedron_attributes.value.find(
-      (attr) => attr.attribute_name === selectedName.value,
+      (attr) => attr.attribute_name === polyhedron_attribute_name.value,
     )
+  })
+
+  watch(polyhedron_attribute_name, (newName) => {
+    if (newName) {
+      const attr = polyhedron_attributes.value.find(
+        (a) => a.attribute_name === newName,
+      )
+      if (
+        attr &&
+        attr.min_value !== undefined &&
+        attr.max_value !== undefined
+      ) {
+        const currentRange = polyhedron_attribute_range.value
+        const hasNoSavedPreset =
+          !currentRange || (currentRange[0] === 0 && currentRange[1] === 1)
+        if (hasNoSavedPreset) {
+          if (!polyhedron_attribute_color_map.value) {
+            polyhedron_attribute_color_map.value = "Cool to Warm"
+          }
+          polyhedron_attribute_range.value = [attr.min_value, attr.max_value]
+        }
+      }
+    }
   })
 </script>
 
 <template>
   <v-select
-    v-model="selectedName"
+    v-model="polyhedron_attribute_name"
     :items="polyhedron_attributes.map((attribute) => attribute.attribute_name)"
     item-title="attribute_name"
     item-value="attribute_name"

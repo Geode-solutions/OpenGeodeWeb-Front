@@ -47,7 +47,10 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshPolygonsVertexAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
@@ -86,25 +89,11 @@
   })
   const polygon_attribute_name = computed({
     get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshPolygonsPolygonAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
-
-  function onVertexAttributeSelected(data) {
-    dataStyleStore.setMeshPolygonsVertexAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-  }
-  function onPolygonAttributeSelected(data) {
-    dataStyleStore.setMeshPolygonsPolygonAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-  }
   const polygon_attribute_range = computed({
     get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
     set: (newValue) => {
@@ -162,8 +151,6 @@
           v-model:polygon_attribute_name="polygon_attribute_name"
           v-model:polygon_attribute_range="polygon_attribute_range"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
-          @vertex-attribute-selected="onVertexAttributeSelected"
-          @polygon-attribute-selected="onPolygonAttributeSelected"
         />
       </template>
     </template>

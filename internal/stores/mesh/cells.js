@@ -86,7 +86,7 @@ export function useMeshCellsStyle() {
     const vertex = meshCellsStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshCellsVertexAttributeName(id, name, defaultMin, defaultMax) {
+  function setMeshCellsVertexAttributeName(id, name) {
     const coloring_style = meshCellsStyle(id).coloring
     return viewerStore.request(
       mesh_cells_schemas.attribute.vertex.name,
@@ -97,26 +97,14 @@ export function useMeshCellsStyle() {
           coloring_style.vertex.name = name
 
           let minimum, maximum, colorMap
-          if (saved_preset) {
-            if (
-              saved_preset.minimum !== undefined &&
-              saved_preset.maximum !== undefined
-            ) {
-              minimum = saved_preset.minimum
-              maximum = saved_preset.maximum
-              colorMap = saved_preset.colorMap
-            }
-          } else if (defaultMin !== undefined && defaultMax !== undefined) {
-            minimum = defaultMin
-            maximum = defaultMax
-            colorMap = "Cool to Warm"
-            coloring_style.vertex.attributes[name] = {
-              minimum,
-              maximum,
-              colorMap,
-            }
-          }
-          if (minimum !== undefined && maximum !== undefined) {
+          if (
+            saved_preset &&
+            saved_preset.minimum !== undefined &&
+            saved_preset.maximum !== undefined
+          ) {
+            minimum = saved_preset.minimum
+            maximum = saved_preset.maximum
+            colorMap = saved_preset.colorMap
             setMeshCellsVertexAttributeRange(id, minimum, maximum)
             setMeshCellsVertexAttributeColorMap(id, colorMap, minimum, maximum)
           }
@@ -136,15 +124,18 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
     const coloring_style = meshCellsStyle(id).coloring
+    const name = coloring_style.vertex.name
+    if (!coloring_style.vertex.attributes[name]) {
+      coloring_style.vertex.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.vertex.attributes[name]
+    saved_preset.minimum = minimum
+    saved_preset.maximum = maximum
     return viewerStore.request(
       mesh_cells_schemas.attribute.vertex.scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.vertex.name
-          const saved_preset = coloring_style.vertex.attributes[name]
-          saved_preset.minimum = minimum
-          saved_preset.maximum = maximum
           console.log(
             setMeshCellsVertexAttributeRange.name,
             { id },
@@ -166,6 +157,12 @@ export function useMeshCellsStyle() {
     maximum,
   ) {
     const coloring_style = meshCellsStyle(id).coloring
+    const name = coloring_style.vertex.name
+    if (!coloring_style.vertex.attributes[name]) {
+      coloring_style.vertex.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.vertex.attributes[name]
+    saved_preset.colorMap = colorMapName
     let points = colorMapName
     if (typeof colorMapName === "string") {
       points = getRGBPointsFromPreset(colorMapName)
@@ -175,9 +172,6 @@ export function useMeshCellsStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.vertex.name
-          const saved_preset = coloring_style.vertex.attributes[name]
-          saved_preset.colorMap = colorMapName
           console.log(setMeshCellsVertexAttributeColorMap.name, {
             id,
             colorMapName,
@@ -196,7 +190,7 @@ export function useMeshCellsStyle() {
   function meshCellsCellAttributeName(id) {
     return meshCellsStyle(id).coloring.cell?.name ?? ""
   }
-  function setMeshCellsCellAttributeName(id, name, defaultMin, defaultMax) {
+  function setMeshCellsCellAttributeName(id, name) {
     const coloring_style = meshCellsStyle(id).coloring
     return viewerStore.request(
       mesh_cells_schemas.attribute.cell.name,
@@ -207,26 +201,14 @@ export function useMeshCellsStyle() {
           coloring_style.cell.name = name
 
           let minimum, maximum, colorMap
-          if (saved_preset) {
-            if (
-              saved_preset.minimum !== undefined &&
-              saved_preset.maximum !== undefined
-            ) {
-              minimum = saved_preset.minimum
-              maximum = saved_preset.maximum
-              colorMap = saved_preset.colorMap
-            }
-          } else if (defaultMin !== undefined && defaultMax !== undefined) {
-            minimum = defaultMin
-            maximum = defaultMax
-            colorMap = "Cool to Warm"
-            coloring_style.cell.attributes[name] = {
-              minimum,
-              maximum,
-              colorMap,
-            }
-          }
-          if (minimum !== undefined && maximum !== undefined) {
+          if (
+            saved_preset &&
+            saved_preset.minimum !== undefined &&
+            saved_preset.maximum !== undefined
+          ) {
+            minimum = saved_preset.minimum
+            maximum = saved_preset.maximum
+            colorMap = saved_preset.colorMap
             setMeshCellsCellAttributeRange(id, minimum, maximum)
             setMeshCellsCellAttributeColorMap(id, colorMap, minimum, maximum)
           }
@@ -246,15 +228,18 @@ export function useMeshCellsStyle() {
   }
   function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const coloring_style = meshCellsStyle(id).coloring
+    const name = coloring_style.cell.name
+    if (!coloring_style.cell.attributes[name]) {
+      coloring_style.cell.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.cell.attributes[name]
+    saved_preset.minimum = minimum
+    saved_preset.maximum = maximum
     return viewerStore.request(
       mesh_cells_schemas.attribute.cell.scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.cell.name
-          const saved_preset = coloring_style.cell.attributes[name]
-          saved_preset.minimum = minimum
-          saved_preset.maximum = maximum
           console.log(
             setMeshCellsCellAttributeRange.name,
             { id },
@@ -276,6 +261,12 @@ export function useMeshCellsStyle() {
     maximum,
   ) {
     const coloring_style = meshCellsStyle(id).coloring
+    const name = coloring_style.cell.name
+    if (!coloring_style.cell.attributes[name]) {
+      coloring_style.cell.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.cell.attributes[name]
+    saved_preset.colorMap = colorMapName
     let points = colorMapName
     if (typeof colorMapName === "string") {
       points = getRGBPointsFromPreset(colorMapName)
@@ -285,9 +276,6 @@ export function useMeshCellsStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.cell.name
-          const saved_preset = coloring_style.cell.attributes[name]
-          saved_preset.colorMap = colorMapName
           console.log(setMeshCellsCellAttributeColorMap.name, {
             id,
             colorMapName,

@@ -47,7 +47,10 @@
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshCellsVertexAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
@@ -84,7 +87,10 @@
   })
   const cell_attribute_name = computed({
     get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
-    set: () => {},
+    set: (newValue) => {
+      dataStyleStore.setMeshCellsCellAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
   })
   const cell_attribute_range = computed({
     get: () => dataStyleStore.meshCellsCellAttributeRange(id.value),
@@ -119,25 +125,6 @@
       hybridViewerStore.remoteRender()
     },
   })
-
-  function onVertexAttributeSelected(data) {
-    dataStyleStore.setMeshCellsVertexAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-    hybridViewerStore.remoteRender()
-  }
-  function onCellAttributeSelected(data) {
-    dataStyleStore.setMeshCellsCellAttributeName(
-      id.value,
-      data.name,
-      data.defaultMin,
-      data.defaultMax,
-    )
-    hybridViewerStore.remoteRender()
-  }
 </script>
 <template>
   <ViewerContextMenuItem
@@ -159,8 +146,6 @@
           v-model:cell_attribute_name="cell_attribute_name"
           v-model:cell_attribute_range="cell_attribute_range"
           v-model:cell_attribute_color_map="cell_attribute_color_map"
-          @vertex-attribute-selected="onVertexAttributeSelected"
-          @cell-attribute-selected="onCellAttributeSelected"
         />
       </template>
     </template>

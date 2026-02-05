@@ -13,12 +13,6 @@
   const polygon_attribute_color_map = defineModel("polygon_attribute_color_map")
   const polygon_attributes = ref([])
 
-  const selectedName = ref(polygon_attribute_name.value)
-
-  watch(polygon_attribute_name, (newVal) => {
-    selectedName.value = newVal
-  })
-
   const props = defineProps({
     id: { type: String, required: true },
   })
@@ -58,31 +52,39 @@
     )
   }
 
-  const emit = defineEmits(["attribute-selected"])
-
-  watch(selectedName, (newName) => {
-    if (!newName) return
-    const attribute = polygon_attributes.value.find(
-      (attr) => attr.attribute_name === newName,
-    )
-    if (attribute && attribute.min_value !== -1 && attribute.max_value !== -1) {
-      emit("attribute-selected", {
-        name: newName,
-        defaultMin: attribute.min_value,
-        defaultMax: attribute.max_value,
-      })
-    }
-  })
   const currentAttribute = computed(() => {
     return polygon_attributes.value.find(
-      (attr) => attr.attribute_name === selectedName.value,
+      (attr) => attr.attribute_name === polygon_attribute_name.value,
     )
+  })
+
+  watch(polygon_attribute_name, (newName) => {
+    if (newName) {
+      const attr = polygon_attributes.value.find(
+        (a) => a.attribute_name === newName,
+      )
+      if (
+        attr &&
+        attr.min_value !== undefined &&
+        attr.max_value !== undefined
+      ) {
+        const currentRange = polygon_attribute_range.value
+        const hasNoSavedPreset =
+          !currentRange || (currentRange[0] === 0 && currentRange[1] === 1)
+        if (hasNoSavedPreset) {
+          if (!polygon_attribute_color_map.value) {
+            polygon_attribute_color_map.value = "Cool to Warm"
+          }
+          polygon_attribute_range.value = [attr.min_value, attr.max_value]
+        }
+      }
+    }
   })
 </script>
 
 <template>
   <v-select
-    v-model="selectedName"
+    v-model="polygon_attribute_name"
     :items="polygon_attributes.map((attribute) => attribute.attribute_name)"
     item-title="attribute_name"
     item-value="attribute_name"

@@ -153,7 +153,7 @@ export function useMeshEdgesStyle() {
     const vertex = meshEdgesStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
   }
-  function setMeshEdgesVertexAttributeName(id, name, defaultMin, defaultMax) {
+  function setMeshEdgesVertexAttributeName(id, name) {
     const coloring_style = meshEdgesStyle(id).coloring
     return viewerStore.request(
       mesh_edges_schemas.attribute.vertex.name,
@@ -164,26 +164,14 @@ export function useMeshEdgesStyle() {
           coloring_style.vertex.name = name
 
           let minimum, maximum, colorMap
-          if (saved_preset) {
-            if (
-              saved_preset.minimum !== undefined &&
-              saved_preset.maximum !== undefined
-            ) {
-              minimum = saved_preset.minimum
-              maximum = saved_preset.maximum
-              colorMap = saved_preset.colorMap
-            }
-          } else if (defaultMin !== undefined && defaultMax !== undefined) {
-            minimum = defaultMin
-            maximum = defaultMax
-            colorMap = "Cool to Warm"
-            coloring_style.vertex.attributes[name] = {
-              minimum,
-              maximum,
-              colorMap,
-            }
-          }
-          if (minimum !== undefined && maximum !== undefined) {
+          if (
+            saved_preset &&
+            saved_preset.minimum !== undefined &&
+            saved_preset.maximum !== undefined
+          ) {
+            minimum = saved_preset.minimum
+            maximum = saved_preset.maximum
+            colorMap = saved_preset.colorMap
             setMeshEdgesVertexAttributeRange(id, minimum, maximum)
             setMeshEdgesVertexAttributeColorMap(id, colorMap, minimum, maximum)
           }
@@ -203,15 +191,18 @@ export function useMeshEdgesStyle() {
   }
   function setMeshEdgesVertexAttributeRange(id, minimum, maximum) {
     const coloring_style = meshEdgesStyle(id).coloring
+    const name = coloring_style.vertex.name
+    if (!coloring_style.vertex.attributes[name]) {
+      coloring_style.vertex.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.vertex.attributes[name]
+    saved_preset.minimum = minimum
+    saved_preset.maximum = maximum
     return viewerStore.request(
       mesh_edges_schemas.attribute.vertex.scalar_range,
       { id, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.vertex.name
-          const saved_preset = coloring_style.vertex.attributes[name]
-          saved_preset.minimum = minimum
-          saved_preset.maximum = maximum
           console.log(
             setMeshEdgesVertexAttributeRange.name,
             { id },
@@ -233,6 +224,12 @@ export function useMeshEdgesStyle() {
     maximum,
   ) {
     const coloring_style = meshEdgesStyle(id).coloring
+    const name = coloring_style.vertex.name
+    if (!coloring_style.vertex.attributes[name]) {
+      coloring_style.vertex.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.vertex.attributes[name]
+    saved_preset.colorMap = colorMapName
     let points = colorMapName
     if (typeof colorMapName === "string") {
       points = getRGBPointsFromPreset(colorMapName)
@@ -242,9 +239,6 @@ export function useMeshEdgesStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.vertex.name
-          const saved_preset = coloring_style.vertex.attributes[name]
-          saved_preset.colorMap = colorMapName
           console.log(setMeshEdgesVertexAttributeColorMap.name, {
             id,
             colorMapName,
@@ -264,7 +258,7 @@ export function useMeshEdgesStyle() {
     const edge = meshEdgesStyle(id).coloring.edge
     return edge ? edge.name : ""
   }
-  function setMeshEdgesEdgeAttributeName(id, name, defaultMin, defaultMax) {
+  function setMeshEdgesEdgeAttributeName(id, name) {
     const coloring_style = meshEdgesStyle(id).coloring
     return viewerStore.request(
       mesh_edges_schemas.attribute.edge.name,
@@ -275,26 +269,14 @@ export function useMeshEdgesStyle() {
           coloring_style.edge.name = name
 
           let minimum, maximum, colorMap
-          if (saved_preset) {
-            if (
-              saved_preset.minimum !== undefined &&
-              saved_preset.maximum !== undefined
-            ) {
-              minimum = saved_preset.minimum
-              maximum = saved_preset.maximum
-              colorMap = saved_preset.colorMap
-            }
-          } else if (defaultMin !== undefined && defaultMax !== undefined) {
-            minimum = defaultMin
-            maximum = defaultMax
-            colorMap = "Cool to Warm"
-            coloring_style.edge.attributes[name] = {
-              minimum,
-              maximum,
-              colorMap,
-            }
-          }
-          if (minimum !== undefined && maximum !== undefined) {
+          if (
+            saved_preset &&
+            saved_preset.minimum !== undefined &&
+            saved_preset.maximum !== undefined
+          ) {
+            minimum = saved_preset.minimum
+            maximum = saved_preset.maximum
+            colorMap = saved_preset.colorMap
             setMeshEdgesEdgeAttributeRange(id, minimum, maximum)
             setMeshEdgesEdgeAttributeColorMap(id, colorMap, minimum, maximum)
           }
@@ -314,12 +296,15 @@ export function useMeshEdgesStyle() {
   }
   function setMeshEdgesEdgeAttributeRange(id, minimum, maximum) {
     const coloring_style = meshEdgesStyle(id).coloring
+    const name = coloring_style.edge.name
+    if (!coloring_style.edge.attributes[name]) {
+      coloring_style.edge.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.edge.attributes[name]
+    saved_preset.minimum = minimum
+    saved_preset.maximum = maximum
     if (!mesh_edges_schemas.edge_scalar_range) {
       console.warn("setMeshEdgesEdgeAttributeRange: RPC not available")
-      const name = coloring_style.edge.name
-      const saved_preset = coloring_style.edge.attributes[name]
-      saved_preset.minimum = minimum
-      saved_preset.maximum = maximum
       return Promise.resolve()
     }
     return viewerStore.request(
@@ -327,10 +312,6 @@ export function useMeshEdgesStyle() {
       { id, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.edge.name
-          const saved_preset = coloring_style.edge.attributes[name]
-          saved_preset.minimum = minimum
-          saved_preset.maximum = maximum
           console.log(
             setMeshEdgesEdgeAttributeRange.name,
             { id },
@@ -352,15 +333,18 @@ export function useMeshEdgesStyle() {
     maximum,
   ) {
     const coloring_style = meshEdgesStyle(id).coloring
+    const name = coloring_style.edge.name
+    if (!coloring_style.edge.attributes[name]) {
+      coloring_style.edge.attributes[name] = {}
+    }
+    const saved_preset = coloring_style.edge.attributes[name]
+    saved_preset.colorMap = colorMapName
     let points = colorMapName
     if (typeof colorMapName === "string") {
       points = getRGBPointsFromPreset(colorMapName)
     }
     if (!mesh_edges_schemas.edge_color_map) {
       console.warn("setMeshEdgesEdgeAttributeColorMap: RPC not available")
-      const name = coloring_style.edge.name
-      const saved_preset = coloring_style.edge.attributes[name]
-      saved_preset.colorMap = colorMapName
       return Promise.resolve()
     }
     return viewerStore.request(
@@ -368,9 +352,6 @@ export function useMeshEdgesStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          const name = coloring_style.edge.name
-          const saved_preset = coloring_style.edge.attributes[name]
-          saved_preset.colorMap = colorMapName
           console.log(setMeshEdgesEdgeAttributeColorMap.name, {
             id,
             colorMapName,
