@@ -1,5 +1,4 @@
 import _ from "lodash"
-import { ref, computed } from "vue"
 import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
@@ -120,8 +119,9 @@ export const useViewerStore = defineStore(
           })
 
           // Connect
-          const { connectImageStream } =
-            await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+          const { connectImageStream } = await import(
+            "@kitware/vtk.js/Rendering/Misc/RemoteView"
+          )
           client.value = await clientToConnect.connect(config_obj)
           connectImageStream(client.value.getConnection().getSession())
           client.value.endBusy()
