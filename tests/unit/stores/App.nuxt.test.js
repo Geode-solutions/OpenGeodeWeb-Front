@@ -146,7 +146,7 @@ describe("App Store", () => {
         expect(geodeStore.importStores).toHaveBeenCalledTimes(1)
       })
 
-      test("skip stores without importStores method", () => {
+      test("skip stores without importStores method", async () => {
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "withImport",
@@ -163,12 +163,12 @@ describe("App Store", () => {
           withImport: { data: "test" },
           withoutImport: { data: "ignored" },
         }
-        appStore.importStores(snapshot)
+        await appStore.importStores(snapshot)
         expect(mock_store_1.importStores).toHaveBeenCalledTimes(1)
         expect(mock_store_2.importStores).toBeUndefined()
       })
 
-      test("warn when store not found in snapshot", () => {
+      test("warn when store not found in snapshot", async () => {
         const appStore = useAppStore()
         const console_warn_spy = vi
           .spyOn(console, "warn")
@@ -178,7 +178,7 @@ describe("App Store", () => {
           importStores: vi.fn().mockImplementation(() => {}),
         }
         appStore.registerStore(mock_store)
-        appStore.importStores({})
+        await appStore.importStores({})
         expect(console_warn_spy).toHaveBeenCalledWith(
           expect.stringContaining("Stores not found in snapshot: testStore"),
         )

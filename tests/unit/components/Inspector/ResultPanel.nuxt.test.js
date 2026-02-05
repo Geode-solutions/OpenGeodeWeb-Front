@@ -22,7 +22,7 @@ describe("Inspector/ResultPanel", async () => {
     })
 
     expect(wrapper.exists()).toBe(true)
-    expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
+    expect(wrapper.componentVM.inspection_result).toStrictEqual(
       inspection_result,
     )
 
@@ -30,7 +30,7 @@ describe("Inspector/ResultPanel", async () => {
       await wrapper.findComponent(InspectorResultPanel)
     expect(child_result_panel_wrapper.exists()).toBe(true)
     expect(
-      child_result_panel_wrapper.componentVM.props.inspection_result,
+      child_result_panel_wrapper.componentVM.inspection_result,
     ).toStrictEqual(inspection_result[0].children)
   })
 
@@ -52,7 +52,7 @@ describe("Inspector/ResultPanel", async () => {
 
     console.log({ wrapper })
 
-    expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
+    expect(wrapper.componentVM.inspection_result).toStrictEqual(
       inspection_result,
     )
   })

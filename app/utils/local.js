@@ -1,10 +1,10 @@
-import { on, once } from "node:events"
+// Node.js imports
+import { WebSocket } from "ws"
 import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 
 // Third party imports
-import { WebSocket } from "ws"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" }
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
@@ -69,15 +69,6 @@ function commandExistsSync(executable_name) {
   })
 }
 
-async function wait_for_ready(child, expected_response) {
-  for await (const [data] of on(child.stdout, "data")) {
-    if (data.toString().includes(expected_response)) {
-      return child
-    }
-  }
-  throw new Error("Process closed before signal")
-}
-
 async function run_script(
   executable_name,
   executable_path,
@@ -85,6 +76,11 @@ async function run_script(
   expected_response,
   timeout_seconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
+  // eslint-disable-next-line promise/avoid-new
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Timed out after ${timeout_seconds} seconds`))
+    }, timeout_seconds * MILLISECONDS_PER_SECOND)
   const command = commandExistsSync(executable_name)
     ? executable_name
     : path.join(executable_path, executable_name)
@@ -93,10 +89,7 @@ async function run_script(
     encoding: "utf8",
     shell: true,
   })
-
-  child.stdout.on("data", (data) => console.log(data.toString()))
-  child.stderr.on("data", (data) => console.log(data.toString()))
-
+  child.stderr.setEncoding("utf8")
   child.on("error", async (error) => {
     const electron = await import("electron")
     electron.dialog.showMessageBox({
@@ -105,24 +98,25 @@ async function run_script(
       message: `Error occured.\r\n${error}`,
     })
   })
-
-  child.on("close", (code) =>
-    console.log(`Child Process exited with code ${code}`),
-  )
-  child.on("kill", () => {
-    console.log("Child Process killed")
-  })
-  child.name = command.replace(/^.*[\\/]/, "")
-
-  try {
-    return await pTimeout(wait_for_ready(child, expected_response), {
-      milliseconds: timeout_seconds * MILLISECONDS_PER_SECOND,
-      message: `Timed out after ${timeout_seconds} seconds`,
+  child.stdout.setEncoding("utf8")
+    child.stdout.on("data", (data) => {
+      data_string = data.toString()
+        if (data_string.includes(expected_response)) {
+        resolve(child)
+      }
+      console.log(data_string)
     })
-  } catch (error) {
-    child.kill()
-    throw error
-  }
+    child.stderr.on("data", (data) => {
+      console.log(data)
+    })
+    child.on("close", (code) => {
+      console.log(`Child Process exited with code ${code}`)
+    })
+    child.on("kill", () => {
+      console.log("Child Process killed")
+    })
+    child.name = command.replace(/^.*[\\/]/, "")
+  })
 }
 
 async function run_back(
@@ -133,28 +127,28 @@ async function run_back(
     upload_folder_path: undefined,
   },
 ) {
-  let { project_folder_path, upload_folder_path } = args
-  if (!upload_folder_path) {
-    upload_folder_path = path.join(project_folder_path, "uploads")
-  }
-  const port = await get_available_port()
-  const back_args = [
-    `--port ${port}`,
-    `--data_folder_path ${project_folder_path}`,
-    `--upload_folder_path ${upload_folder_path}`,
-    `--allowed_origin http://localhost:*`,
-    `--timeout ${0}`,
-  ]
-  if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
-    back_args.push("--debug")
-  }
-  console.log("run_back", executable_name, executable_path, back_args)
-  await run_script(
-    executable_name,
-    executable_path,
-    back_args,
-    "Serving Flask app",
-  )
+    let { project_folder_path, upload_folder_path } = args
+    if (!upload_folder_path) {
+      upload_folder_path = path.join(project_folder_path, "uploads")
+    }
+    const port = await get_available_port()
+    const back_args = [
+      `--port ${port}`,
+      `--data_folder_path ${project_folder_path}`,
+      `--upload_folder_path ${upload_folder_path}`,
+      `--allowed_origin http://localhost:*`,
+      `--timeout ${0}`,
+    ]
+    if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
+      back_args.push("--debug")
+    }
+    console.log("run_back", executable_name, executable_path, back_args)
+    await run_script(
+      executable_name,
+      executable_path,
+      back_args,
+      "Serving Flask app",
+    )
   return port
 }
 
@@ -163,20 +157,20 @@ async function run_viewer(
   executable_path,
   args = { project_folder_path },
 ) {
-  const port = await get_available_port()
-  const viewer_args = [
-    `--port ${port}`,
-    `--data_folder_path ${args.project_folder_path}`,
-    `--timeout ${0}`,
-  ]
-  console.log("run_viewer", executable_name, executable_path, viewer_args)
-  await run_script(
-    executable_name,
-    executable_path,
-    viewer_args,
-    "Starting factory",
-  )
-  return port
+    const port = await get_available_port()
+    const viewer_args = [
+      `--port ${port}`,
+      `--data_folder_path ${args.project_folder_path}`,
+      `--timeout ${0}`,
+    ]
+    console.log("run_viewer", executable_name, executable_path, viewer_args)
+    await run_script(
+      executable_name,
+      executable_path,
+      viewer_args,
+      "Starting factory",
+    )
+    return port
 }
 
 function delete_folder_recursive(data_folder_path) {
@@ -207,13 +201,14 @@ function kill_back(back_port) {
       )
       throw new Error("Failed to kill back")
     } catch {
-      console.log("Back closed")
+          console.log("Back closed")
     }
   }
   return pTimeout(do_kill, {
-    milliseconds: 500,
-    message: "Failed to kill back",
-  })
+      milliseconds: 500,
+      message: "Failed to kill back",
+    },
+  )
 }
 
 function kill_viewer(viewer_port) {
@@ -255,26 +250,10 @@ function kill_viewer(viewer_port) {
     }
   }
 
-  return pTimeout(do_kill, {
+  return pTimeout(do_kill(), {
     milliseconds: 500,
     message: "Failed to kill viewer",
   })
-}
-
-async function wait_nuxt(nuxt_process, back_port, viewer_port) {
-  for await (const [data] of on(nuxt_process.stdout, "data")) {
-    const output = data.toString()
-    const portMatch = output.match(
-      /Accepting connections at http:\/\/localhost:(\d+)/,
-    )
-    console.log("Nuxt:", output)
-    if (portMatch) {
-      const [, nuxt_port] = portMatch
-      process.env.NUXT_PORT = nuxt_port
-      return { geode_port: back_port, viewer_port, nuxt_port }
-    }
-  }
-  throw new Error("Nuxt process closed without accepting connections")
 }
 
 async function run_browser(
@@ -288,14 +267,18 @@ async function run_browser(
   const back_promise = run_back(
     microservices_options.back.executable_name,
     microservices_options.back.executable_path,
-    { ...microservices_options.back.args },
+    {
+      ...microservices_options.back.args,
+    },
   )
   console.log("back_promise", back_promise)
 
   const viewer_promise = run_viewer(
     microservices_options.viewer.executable_name,
     microservices_options.viewer.executable_path,
-    { ...microservices_options.viewer.args },
+    {
+      ...microservices_options.viewer.args,
+    },
   )
   console.log("viewer_promise", viewer_promise)
 
@@ -320,7 +303,21 @@ async function run_browser(
     shell: true,
     FORCE_COLOR: true,
   })
-  return wait_nuxt(nuxt_process, back_port, viewer_port)
+
+  // eslint-disable-next-line promise/avoid-new
+  return new Promise((resolve) => {
+    nuxt_process.stdout.on("data", function (data) {
+      const output = data.toString()
+      const portMatch = output.match(/Acceptingconnections at http:\/\/localhost:(\d+)/)
+      console.log("Nuxt:", output)
+      if (portMatch) {
+        const [, nuxt_port] = portMatch
+        process.env.NUXT_PORT = nuxt_port
+        resolve({ geode_port: back_port, viewer_port, nuxt_port })
+        return
+      }
+    })
+  })
 }
 
 export {
