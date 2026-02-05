@@ -7,9 +7,11 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { viewer_call } from "../../internal/utils/viewer_call"
-import { useInfraStore } from "@ogw_front/stores/infra"
+import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
 
-const request_timeout = 10 * 1000
+const MS_IN_SECOND = 1000
+const REQUEST_TIMEOUT_IN_SECONDS = 10
+const REQUEST_TIMEOUT = REQUEST_TIMEOUT_IN_SECONDS * MS_IN_SECOND
 
 export const useViewerStore = defineStore("viewer", {
   state: () => ({
@@ -115,31 +117,24 @@ export const useViewerStore = defineStore("viewer", {
         const { connectImageStream } = await import(
           "@kitware/vtk.js/Rendering/Misc/RemoteView"
         )
-        const viewerStore = this
-        return new Promise((resolve, reject) => {
-          clientToConnect
-            .connect(config)
-            .then((validClient) => {
-              connectImageStream(validClient.getConnection().getSession())
-              viewerStore.client = validClient
-              clientToConnect.endBusy()
-              viewer_call(
-                viewerStore,
-                {
-                  schema:
-                    schemas.opengeodeweb_viewer.viewer.reset_visualization,
-                },
-                { timeout: undefined },
-              )
-              viewerStore.status = Status.CONNECTED
-              resolve()
-            })
-            .catch((error) => {
-              console.error("error", error)
-              viewerStore.status = Status.NOT_CONNECTED
-              reject(error)
-            })
-        })
+        try {
+          const validClient = await clientToConnect.connect(config)
+          connectImageStream(validClient.getConnection().getSession())
+          this.client = validClient
+          clientToConnect.endBusy()
+          await viewer_call(
+            this,
+            {
+              schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
+            },
+            { timeout: undefined },
+          )
+          this.status = Status.CONNECTED
+        } catch (error) {
+          console.error("error", error)
+          this.status = Status.NOT_CONNECTED
+          throw error
+        }
       })
     },
     start_request() {
@@ -159,7 +154,7 @@ export const useViewerStore = defineStore("viewer", {
       await this.ws_connect()
       console.log("[VIEWER] Viewer connected successfully")
     },
-    request(schema, params = {}, callbacks = {}, timeout = request_timeout) {
+    request(schema, params = {}, callbacks = {}, timeout = REQUEST_TIMEOUT) {
       console.log("[VIEWER] Request:", schema.$id)
 
       return viewer_call(
