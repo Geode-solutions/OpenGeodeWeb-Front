@@ -110,9 +110,8 @@ export const useViewerStore = defineStore("viewer", {
           })
 
           // Connect
-          const { connectImageStream } = await import(
-            "@kitware/vtk.js/Rendering/Misc/RemoteView"
-          )
+          const { connectImageStream } =
+            await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
           self.client = await clientToConnect.connect(config)
           connectImageStream(self.client.getConnection().getSession())
           self.client.endBusy()
