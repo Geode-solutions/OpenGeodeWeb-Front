@@ -45,17 +45,106 @@
       hybridViewerStore.remoteRender()
     },
   })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshPolygonsVertexAttribute(id.value),
+  const vertex_attribute_name = computed({
+    get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshPolygonsVertexAttribute(id.value, newValue)
+      // Called by parent when event fires with default values
+    },
+  })
+  const vertex_attribute_range = computed({
+    get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolygonsVertexAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      // Re-apply colormap with new range
+      const colorMap = dataStyleStore.meshPolygonsVertexAttributeColorMap(
+        id.value,
+      )
+      if (colorMap) {
+        dataStyleStore.setMeshPolygonsVertexAttributeColorMap(
+          id.value,
+          colorMap,
+          newValue[0],
+          newValue[1],
+        )
+      }
       hybridViewerStore.remoteRender()
     },
   })
-  const polygon_attribute = computed({
-    get: () => dataStyleStore.meshPolygonsPolygonAttribute(id.value),
+  const vertex_attribute_color_map = computed({
+    get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshPolygonsPolygonAttribute(id.value, newValue)
+      const range = dataStyleStore.meshPolygonsVertexAttributeRange(id.value)
+      dataStyleStore.setMeshPolygonsVertexAttributeColorMap(
+        id.value,
+        newValue,
+        range[0],
+        range[1],
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const polygon_attribute_name = computed({
+    get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
+    set: (newValue) => {
+      // Called by parent when event fires with default values
+    },
+  })
+
+  // Event handlers for attribute selection with default min/max
+  function onVertexAttributeSelected(data) {
+    dataStyleStore.setMeshPolygonsVertexAttributeName(
+      id.value,
+      data.name,
+      data.defaultMin,
+      data.defaultMax,
+    )
+    // Note: remoteRender is called by the store after the colormap is applied
+  }
+  function onPolygonAttributeSelected(data) {
+    dataStyleStore.setMeshPolygonsPolygonAttributeName(
+      id.value,
+      data.name,
+      data.defaultMin,
+      data.defaultMax,
+    )
+  }
+  const polygon_attribute_range = computed({
+    get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshPolygonsPolygonAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      // Re-apply colormap with new range
+      const colorMap = dataStyleStore.meshPolygonsPolygonAttributeColorMap(
+        id.value,
+      )
+      if (colorMap) {
+        dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(
+          id.value,
+          colorMap,
+          newValue[0],
+          newValue[1],
+        )
+      }
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const polygon_attribute_color_map = computed({
+    get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id.value),
+    set: (newValue) => {
+      const range = dataStyleStore.meshPolygonsPolygonAttributeRange(id.value)
+      dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(
+        id.value,
+        newValue,
+        range[0],
+        range[1],
+      )
       hybridViewerStore.remoteRender()
     },
   })
@@ -74,9 +163,14 @@
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
-          v-model:vertex_attribute="vertex_attribute"
-          v-model:polygon_attribute="polygon_attribute"
-          mesh-type="polygons"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_range="vertex_attribute_range"
+          v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+          v-model:polygon_attribute_name="polygon_attribute_name"
+          v-model:polygon_attribute_range="polygon_attribute_range"
+          v-model:polygon_attribute_color_map="polygon_attribute_color_map"
+          @vertex-attribute-selected="onVertexAttributeSelected"
+          @polygon-attribute-selected="onPolygonAttributeSelected"
         />
       </template>
     </template>

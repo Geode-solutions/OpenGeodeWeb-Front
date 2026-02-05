@@ -8,10 +8,7 @@
 
   const minimum = defineModel("minimum", { type: Number })
   const maximum = defineModel("maximum", { type: Number })
-  const colorMap = defineModel("colorMap", {
-    type: String,
-    default: "Cool to Warm",
-  })
+  const colorMap = defineModel("colorMap", { type: String })
 
   const minValue = computed({
     get: () => minimum.value ?? props.autoMin,

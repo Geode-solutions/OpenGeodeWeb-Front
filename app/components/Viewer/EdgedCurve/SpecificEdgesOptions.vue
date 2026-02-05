@@ -44,20 +44,106 @@
       hybridViewerStore.remoteRender()
     },
   })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshEdgesVertexAttribute(id.value),
+  const vertex_attribute_name = computed({
+    get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
+    set: () => {
+      // Name is set via attribute-selected event to pass defaultMin/defaultMax
+    },
+  })
+  const vertex_attribute_range = computed({
+    get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshEdgesVertexAttribute(id.value, newValue)
+      dataStyleStore.setMeshEdgesVertexAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      // Re-apply colormap with new range
+      const colorMap = dataStyleStore.meshEdgesVertexAttributeColorMap(id.value)
+      if (colorMap) {
+        dataStyleStore.setMeshEdgesVertexAttributeColorMap(
+          id.value,
+          colorMap,
+          newValue[0],
+          newValue[1],
+        )
+      }
       hybridViewerStore.remoteRender()
     },
   })
-  const edge_attribute = computed({
-    get: () => dataStyleStore.meshEdgesEdgeAttribute(id.value),
+  const vertex_attribute_color_map = computed({
+    get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshEdgesEdgeAttribute(id.value, newValue)
+      const range = dataStyleStore.meshEdgesVertexAttributeRange(id.value)
+      dataStyleStore.setMeshEdgesVertexAttributeColorMap(
+        id.value,
+        newValue,
+        range[0],
+        range[1],
+      )
       hybridViewerStore.remoteRender()
     },
   })
+  const edge_attribute_name = computed({
+    get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
+    set: () => {
+      // Name is set via attribute-selected event to pass defaultMin/defaultMax
+    },
+  })
+  const edge_attribute_range = computed({
+    get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshEdgesEdgeAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      // Re-apply colormap with new range
+      const colorMap = dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value)
+      if (colorMap) {
+        dataStyleStore.setMeshEdgesEdgeAttributeColorMap(
+          id.value,
+          colorMap,
+          newValue[0],
+          newValue[1],
+        )
+      }
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const edge_attribute_color_map = computed({
+    get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value),
+    set: (newValue) => {
+      const range = dataStyleStore.meshEdgesEdgeAttributeRange(id.value)
+      dataStyleStore.setMeshEdgesEdgeAttributeColorMap(
+        id.value,
+        newValue,
+        range[0],
+        range[1],
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+
+  // Event handlers for attribute selection with default min/max
+  function onVertexAttributeSelected(data) {
+    dataStyleStore.setMeshEdgesVertexAttributeName(
+      id.value,
+      data.name,
+      data.defaultMin,
+      data.defaultMax,
+    )
+    hybridViewerStore.remoteRender()
+  }
+  function onEdgeAttributeSelected(data) {
+    dataStyleStore.setMeshEdgesEdgeAttributeName(
+      id.value,
+      data.name,
+      data.defaultMin,
+      data.defaultMax,
+    )
+    hybridViewerStore.remoteRender()
+  }
 </script>
 <template>
   <ViewerContextMenuItem
@@ -91,9 +177,14 @@
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
-              v-model:vertex_attribute="vertex_attribute"
-              v-model:edge_attribute="edge_attribute"
-              mesh-type="edges"
+              v-model:vertex_attribute_name="vertex_attribute_name"
+              v-model:vertex_attribute_range="vertex_attribute_range"
+              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+              v-model:edge_attribute_name="edge_attribute_name"
+              v-model:edge_attribute_range="edge_attribute_range"
+              v-model:edge_attribute_color_map="edge_attribute_color_map"
+              @vertex-attribute-selected="onVertexAttributeSelected"
+              @edge-attribute-selected="onEdgeAttributeSelected"
             />
           </v-col>
         </v-row>

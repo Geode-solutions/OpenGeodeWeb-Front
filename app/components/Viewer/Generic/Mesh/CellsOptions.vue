@@ -45,6 +45,106 @@
       hybridViewerStore.remoteRender()
     },
   })
+  const vertex_attribute_name = computed({
+    get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
+    set: () => {
+      // Name is set via attribute-selected event to pass defaultMin/defaultMax
+    },
+  })
+  const vertex_attribute_range = computed({
+    get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshCellsVertexAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      // Re-apply colormap with new range
+      const colorMap = dataStyleStore.meshCellsVertexAttributeColorMap(id.value)
+      if (colorMap) {
+        dataStyleStore.setMeshCellsVertexAttributeColorMap(
+          id.value,
+          colorMap,
+          newValue[0],
+          newValue[1],
+        )
+      }
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute_color_map = computed({
+    get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
+    set: (newValue) => {
+      const range = dataStyleStore.meshCellsVertexAttributeRange(id.value)
+      dataStyleStore.setMeshCellsVertexAttributeColorMap(
+        id.value,
+        newValue,
+        range[0],
+        range[1],
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const cell_attribute_name = computed({
+    get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
+    set: () => {
+      // Name is set via attribute-selected event to pass defaultMin/defaultMax
+    },
+  })
+  const cell_attribute_range = computed({
+    get: () => dataStyleStore.meshCellsCellAttributeRange(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshCellsCellAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      // Re-apply colormap with new range
+      const colorMap = dataStyleStore.meshCellsCellAttributeColorMap(id.value)
+      if (colorMap) {
+        dataStyleStore.setMeshCellsCellAttributeColorMap(
+          id.value,
+          colorMap,
+          newValue[0],
+          newValue[1],
+        )
+      }
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const cell_attribute_color_map = computed({
+    get: () => dataStyleStore.meshCellsCellAttributeColorMap(id.value),
+    set: (newValue) => {
+      const range = dataStyleStore.meshCellsCellAttributeRange(id.value)
+      dataStyleStore.setMeshCellsCellAttributeColorMap(
+        id.value,
+        newValue,
+        range[0],
+        range[1],
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+
+  // Event handlers for attribute selection with default min/max
+  function onVertexAttributeSelected(data) {
+    dataStyleStore.setMeshCellsVertexAttributeName(
+      id.value,
+      data.name,
+      data.defaultMin,
+      data.defaultMax,
+    )
+    hybridViewerStore.remoteRender()
+  }
+  function onCellAttributeSelected(data) {
+    dataStyleStore.setMeshCellsCellAttributeName(
+      id.value,
+      data.name,
+      data.defaultMin,
+      data.defaultMax,
+    )
+    hybridViewerStore.remoteRender()
+  }
 </script>
 <template>
   <ViewerContextMenuItem
@@ -60,7 +160,14 @@
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
-          mesh-type="cells"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_range="vertex_attribute_range"
+          v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+          v-model:cell_attribute_name="cell_attribute_name"
+          v-model:cell_attribute_range="cell_attribute_range"
+          v-model:cell_attribute_color_map="cell_attribute_color_map"
+          @vertex-attribute-selected="onVertexAttributeSelected"
+          @cell-attribute-selected="onCellAttributeSelected"
         />
       </template>
     </template>

@@ -44,13 +44,59 @@
       hybridViewerStore.remoteRender()
     },
   })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshPointsVertexAttribute(id.value),
+  const vertex_attribute_name = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
+    set: () => {
+      // Name is set via attribute-selected event to pass defaultMin/defaultMax
+    },
+  })
+  const vertex_attribute_range = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
     set: (newValue) => {
-      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue)
+      dataStyleStore.setMeshPointsVertexAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      // Re-apply colormap with new range
+      const colorMap = dataStyleStore.meshPointsVertexAttributeColorMap(
+        id.value,
+      )
+      if (colorMap) {
+        dataStyleStore.setMeshPointsVertexAttributeColorMap(
+          id.value,
+          colorMap,
+          newValue[0],
+          newValue[1],
+        )
+      }
       hybridViewerStore.remoteRender()
     },
   })
+  const vertex_attribute_color_map = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
+    set: (newValue) => {
+      const range = dataStyleStore.meshPointsVertexAttributeRange(id.value)
+      dataStyleStore.setMeshPointsVertexAttributeColorMap(
+        id.value,
+        newValue,
+        range[0],
+        range[1],
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+
+  // Event handler for attribute selection with default min/max
+  function onVertexAttributeSelected(data) {
+    dataStyleStore.setMeshPointsVertexAttributeName(
+      id.value,
+      data.name,
+      data.defaultMin,
+      data.defaultMax,
+    )
+    hybridViewerStore.remoteRender()
+  }
 </script>
 <template>
   <ViewerContextMenuItem
@@ -84,8 +130,10 @@
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
-              v-model:vertex_attribute="vertex_attribute"
-              mesh-type="points"
+              v-model:vertex_attribute_name="vertex_attribute_name"
+              v-model:vertex_attribute_range="vertex_attribute_range"
+              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+              @vertex-attribute-selected="onVertexAttributeSelected"
             />
           </v-col>
         </v-row>

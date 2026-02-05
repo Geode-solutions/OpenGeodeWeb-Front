@@ -4,6 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 
 // Local constants
@@ -12,6 +13,7 @@ const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 export function useMeshPolygonsStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
   const viewerStore = useViewerStore()
+  const hybridViewerStore = useHybridViewerStore()
 
   function meshPolygonsStyle(id) {
     return dataStyleStateStore.getStyle(id).polygons
@@ -202,6 +204,7 @@ export function useMeshPolygonsStyle() {
             coloring_style.vertex = {}
           }
           coloring_style.vertex.colorMap = colorMapName
+          hybridViewerStore.remoteRender()
           console.log(setMeshPolygonsVertexAttributeColorMap.name, {
             id,
             colorMapName,
@@ -333,6 +336,7 @@ export function useMeshPolygonsStyle() {
             coloring_style.polygon = {}
           }
           coloring_style.polygon.colorMap = colorMapName
+          hybridViewerStore.remoteRender()
           console.log(setMeshPolygonsPolygonAttributeColorMap.name, {
             id,
             colorMapName,
