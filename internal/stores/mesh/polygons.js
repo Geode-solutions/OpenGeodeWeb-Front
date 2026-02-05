@@ -380,18 +380,20 @@ export function useMeshPolygonsStyle() {
       const colorMap = attributes[name]?.colorMap
       return setMeshPolygonsPolygonAttributeName(id, name).then(() => {
         if (minimum !== undefined && maximum !== undefined) {
-          return setMeshPolygonsPolygonAttributeRange(id, minimum, maximum).then(
-            () => {
-              if (colorMap) {
-                return setMeshPolygonsPolygonAttributeColorMap(
-                  id,
-                  colorMap,
-                  minimum,
-                  maximum,
-                )
-              }
-            },
-          )
+          return setMeshPolygonsPolygonAttributeRange(
+            id,
+            minimum,
+            maximum,
+          ).then(() => {
+            if (colorMap) {
+              return setMeshPolygonsPolygonAttributeColorMap(
+                id,
+                colorMap,
+                minimum,
+                maximum,
+              )
+            }
+          })
         }
       })
     } else {

@@ -35,8 +35,7 @@ const meshPointsDefaultStyle = (
       vertex: {
         name: undefined,
 
-
-        attributes: {}
+        attributes: {},
       },
     },
     size,

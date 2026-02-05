@@ -61,18 +61,20 @@ export function useMeshPolyhedraStyle() {
       const colorMap = attributes[name]?.colorMap
       return setMeshPolyhedraVertexAttributeName(id, name).then(() => {
         if (minimum !== undefined && maximum !== undefined) {
-          return setMeshPolyhedraVertexAttributeRange(id, minimum, maximum).then(
-            () => {
-              if (colorMap) {
-                return setMeshPolyhedraVertexAttributeColorMap(
-                  id,
-                  colorMap,
-                  minimum,
-                  maximum,
-                )
-              }
-            },
-          )
+          return setMeshPolyhedraVertexAttributeRange(
+            id,
+            minimum,
+            maximum,
+          ).then(() => {
+            if (colorMap) {
+              return setMeshPolyhedraVertexAttributeColorMap(
+                id,
+                colorMap,
+                minimum,
+                maximum,
+              )
+            }
+          })
         }
       })
     } else if (type === "polyhedron") {
