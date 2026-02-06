@@ -1,84 +1,78 @@
-import { setActivePinia } from "pinia"
+import { describe, expect, expectTypeOf, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
+import { setActivePinia } from "pinia"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 
-beforeEach(async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
+// CONSTANTS
+const TIMEOUT_MS = 500
+const DELAY_MS = 1000
+const L1 = 1
+const L0 = 0
+const INDEX_0 = 0
+const STATUS_500 = 500
+
+function setup() {
+  const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
   setActivePinia(pinia)
+}
+
+describe("feedback store state", () => {
+  test("initial state", () => {
+    setup()
+    const fb = useFeedbackStore()
+    expectTypeOf(fb.feedbacks).toEqualTypeOf([])
+    expectTypeOf(fb.server_error).toBeBoolean()
+  })
 })
 
-describe("Feedback Store", () => {
-  describe("state", () => {
-    test("initial state", () => {
-      const feedbackStore = useFeedbackStore()
-      expectTypeOf(feedbackStore.feedbacks).toEqualTypeOf([])
-      expectTypeOf(feedbackStore.server_error).toBeBoolean()
+describe("feedback store", () => {
+  describe("add_error", () => {
+    test("basic addition", () => {
+      setup()
+      const fb = useFeedbackStore()
+      fb.add_error(STATUS_500, "/t", "m", "d")
+      expect(fb.feedbacks).toHaveLength(L1)
+      expect(fb.feedbacks[INDEX_0].type).toBe("error")
+    })
+
+    test("feedbacks_timeout", () => {
+      setup()
+      const fb = useFeedbackStore()
+      fb.feedbacks_timeout_miliseconds = TIMEOUT_MS
+      fb.add_error(STATUS_500, "/t", "m", "d")
+      expect(fb.feedbacks).toHaveLength(L1)
+      setTimeout(() => expect(fb.feedbacks).toHaveLength(L0), DELAY_MS)
     })
   })
-  describe("actions", () => {
-    describe("add_error", () => {
-      test("test add_error", () => {
-        const feedbackStore = useFeedbackStore()
-        feedbackStore.add_error(
-          500,
-          "/test",
-          "test message",
-          "test description",
-        )
-        expect(feedbackStore.feedbacks.length).toBe(1)
-        expect(feedbackStore.feedbacks[0].type).toBe("error")
-      })
-    })
 
-    describe("add_error", () => {
-      test("test feedbacks_timeout", () => {
-        const feedbackStore = useFeedbackStore()
-        feedbackStore.feedbacks_timeout_miliseconds = 500
-        feedbackStore.add_error(
-          500,
-          "/test",
-          "test message",
-          "test description",
-        )
-        expect(feedbackStore.feedbacks.length).toBe(1)
-        setTimeout(() => {
-          expect(feedbackStore.feedbacks.length).toBe(0)
-        }, 1000)
-      })
+  describe("add_success", () => {
+    test("basic success", () => {
+      setup()
+      const fb = useFeedbackStore()
+      fb.feedbacks_timeout_miliseconds = TIMEOUT_MS
+      fb.add_success("d")
+      expect(fb.feedbacks).toHaveLength(L1)
+      expect(fb.feedbacks[INDEX_0].type).toBe("success")
+      setTimeout(() => expect(fb.feedbacks).toHaveLength(L0), DELAY_MS)
     })
+  })
 
-    describe("add_success", () => {
-      test("test add_success", () => {
-        const feedbackStore = useFeedbackStore()
-        feedbackStore.feedbacks_timeout_miliseconds = 500
-        feedbackStore.add_success("test description")
-        expect(feedbackStore.feedbacks.length).toBe(1)
-        expect(feedbackStore.feedbacks[0].type).toBe("success")
-
-        setTimeout(() => {
-          expect(feedbackStore.feedbacks.length).toBe(0)
-        }, 1000)
-      })
+  describe("delete_feedback", () => {
+    test("removal by index", () => {
+      setup()
+      const fb = useFeedbackStore()
+      fb.delete_feedback(INDEX_0)
+      expect(fb.feedbacks).toHaveLength(L0)
     })
-    describe("delete_feedback", () => {
-      test("test", () => {
-        const feedbackStore = useFeedbackStore()
-        feedbackStore.delete_feedback(0)
-        expect(feedbackStore.feedbacks.length).toBe(0)
-      })
-    })
+  })
 
-    describe("delete_server_error", () => {
-      test("test", () => {
-        const feedbackStore = useFeedbackStore()
-        feedbackStore.$patch({ server_error: true })
-        feedbackStore.delete_server_error()
-        expect(feedbackStore.server_error).toBe(false)
-      })
+  describe("delete_server_error", () => {
+    test("reset server_error state", () => {
+      setup()
+      const fb = useFeedbackStore()
+      fb.$patch({ server_error: true })
+      fb.delete_server_error()
+      expect(fb.server_error).toBeFalsy()
     })
   })
 })

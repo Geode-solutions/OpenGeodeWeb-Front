@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
@@ -23,7 +23,7 @@ describe("upload_file test", () => {
     return { geodeStore, feedbackStore }
   }
 
-  it("throw error", async () => {
+  test("throw error", async () => {
     setup()
     const file = "toto"
 
@@ -32,7 +32,7 @@ describe("upload_file test", () => {
     )
   })
 
-  it("onResponse", async () => {
+  test("onResponse", async () => {
     const { feedbackStore } = setup()
     registerEndpoint(schema.$id, {
       method: "PUT",

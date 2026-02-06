@@ -3,9 +3,11 @@ import { defineVitestProject } from "@nuxt/test-utils/config"
 import path from "node:path"
 
 const RETRIES = 3
+const DEFAULT_RETRY = 0
 
-const globalRetry = process.env.CI ? RETRIES : 0
+const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   test: {
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],

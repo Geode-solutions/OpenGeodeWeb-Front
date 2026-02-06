@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { setActivePinia } from "pinia"
@@ -34,7 +34,7 @@ describe("geodeStore.request()", () => {
     additionalProperties: false,
   }
 
-  it("invalid schema", async () => {
+  test("invalid schema", async () => {
     const { geodeStore } = setup()
     const schema = {
       $id: "/test",
@@ -54,7 +54,7 @@ describe("geodeStore.request()", () => {
     )
   })
 
-  it("invalid params", async () => {
+  test("invalid params", async () => {
     const { geodeStore } = setup()
     const params = {}
     expect(() => geodeStore.request(schema, params)).toThrow(
@@ -62,7 +62,7 @@ describe("geodeStore.request()", () => {
     )
   })
 
-  it("request with callbacks", async () => {
+  test("request with callbacks", async () => {
     const { geodeStore } = setup()
     const params = { test: "hello" }
     let errorCalled = false

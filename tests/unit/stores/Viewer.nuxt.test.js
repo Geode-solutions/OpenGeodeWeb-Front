@@ -1,29 +1,25 @@
 // Global imports
-
-// Third party imports
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
-import {
-  afterAll,
-  beforeAll,
-  describe,
-  test,
-  expect,
-  expectTypeOf,
-  beforeEach,
-  vi,
-} from "vitest"
-
+import { describe, expect, expectTypeOf, test, vi } from "vitest"
 import { WebSocket } from "ws"
+import { createTestingPinia } from "@pinia/testing"
+import { setActivePinia } from "pinia"
+
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useInfraStore } from "@ogw_front/stores/infra"
 import { appMode } from "@ogw_front/utils/app_mode"
+import { useInfraStore } from "@ogw_front/stores/infra"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+
+// CONSTANTS
+const PORT_443 = "443"
+const PORT_8080 = "8080"
+const PORT_1234 = "1234"
+const ID_VAL = "123456"
+const L1 = 1
+const L0 = 0
+const LN1 = -1
 
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
-  return callback({ name })
-})
+const mockLockRequest = vi.fn().mockImplementation((name, fn) => fn({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -32,155 +28,110 @@ vi.stubGlobal("navigator", {
   },
 })
 
-beforeAll(() => {
-  global.WebSocket = WebSocket
-})
-
-afterAll(() => {
-  delete global.WebSocket
-})
-
-beforeEach(() => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
+function setup() {
+  const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
   setActivePinia(pinia)
+  global.WebSocket = WebSocket
+}
+
+describe("viewer store state", () => {
+  test("initial state", () => {
+    setup()
+    const viewerStore = useViewerStore()
+    expectTypeOf(viewerStore.default_local_port).toBeString()
+    expectTypeOf(viewerStore.client).toEqualTypeOf({})
+    expectTypeOf(viewerStore.picking_mode).toBeBoolean()
+    expectTypeOf(viewerStore.picked_point).toEqualTypeOf({ x: null, y: null })
+    expectTypeOf(viewerStore.picked_point).toBeNumber()
+    expectTypeOf(viewerStore.status).toBeString()
+  })
 })
 
-describe("Viewer Store", () => {
-  describe("state", () => {
-    test("initial state", () => {
-      const viewerStore = useViewerStore()
-      expectTypeOf(viewerStore.default_local_port).toBeString()
-      expectTypeOf(viewerStore.client).toEqualTypeOf({})
-      expectTypeOf(viewerStore.picking_mode).toBeBoolean()
-      expectTypeOf(viewerStore.picked_point).toEqualTypeOf({
-        x: null,
-        y: null,
-      })
-      expectTypeOf(viewerStore.picked_point).toBeNumber()
-      expectTypeOf(viewerStore.status).toBeString()
-    })
+describe("viewer store mode getters", () => {
+  test("protocol and domain mapping", () => {
+    setup()
+    const infra = useInfraStore()
+    const viewer = useViewerStore()
+
+    infra.app_mode = appMode.CLOUD
+    expect(viewer.protocol).toBe("wss")
+    infra.app_mode = appMode.BROWSER
+    expect(viewer.protocol).toBe("ws")
+    infra.app_mode = appMode.DESKTOP
+    expect(viewer.protocol).toBe("ws")
   })
 
-  describe("getters", () => {
-    describe("protocol", () => {
-      test("test app_mode CLOUD", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.CLOUD
-        expect(viewerStore.protocol).toBe("wss")
-      })
-      test("test app_mode BROWSER", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.BROWSER
-        expect(viewerStore.protocol).toBe("ws")
-      })
-      test("test app_mode DESKTOP", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.DESKTOP
-        expect(viewerStore.protocol).toBe("ws")
-      })
-    })
+  test("port mapping", () => {
+    setup()
+    const infra = useInfraStore()
+    const viewer = useViewerStore()
 
-    describe("port", () => {
-      test("test app_mode CLOUD", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.CLOUD
-        expect(viewerStore.port).toBe("443")
-      })
-      test("test app_mode BROWSER", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.BROWSER
-        expect(viewerStore.port).toBe(viewerStore.default_local_port)
-      })
-      test("test app_mode DESKTOP", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.DESKTOP
-        expect(viewerStore.port).toBe(viewerStore.default_local_port)
-      })
+    infra.app_mode = appMode.CLOUD
+    expect(viewer.port).toBe(PORT_443)
+    infra.app_mode = appMode.BROWSER
+    expect(viewer.port).toBe(viewer.default_local_port)
+    infra.app_mode = appMode.DESKTOP
+    expect(viewer.port).toBe(viewer.default_local_port)
 
-      test("test override default_local_port", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.DESKTOP
-        viewerStore.default_local_port = "8080"
-        expect(viewerStore.port).toBe("8080")
-      })
-    })
-    describe("base_url", () => {
-      test("test app_mode DESKTOP", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.DESKTOP
-        infraStore.domain_name = "localhost"
-        expect(viewerStore.base_url).toBe("ws://localhost:1234/ws")
-      })
-
-      test("test app_mode CLOUD", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.CLOUD
-        infraStore.ID = "123456"
-        infraStore.domain_name = "example.com"
-        expect(viewerStore.base_url).toBe(
-          "wss://example.com:443/123456/viewer/ws",
-        )
-      })
-
-      test("test app_mode CLOUD, ID empty", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.CLOUD
-        infraStore.ID = ""
-        infraStore.domain_name = "example.com"
-        expect(() => viewerStore.base_url).toThrowError(
-          "ID must not be empty in cloud mode",
-        )
-      })
-    })
-    describe("is_busy", () => {
-      test("test is_busy", () => {
-        const viewerStore = useViewerStore()
-        viewerStore.request_counter = 1
-        expect(viewerStore.is_busy).toBe(true)
-      })
-      test("test not is_busy", () => {
-        const viewerStore = useViewerStore()
-        viewerStore.request_counter = 0
-        expect(viewerStore.is_busy).toBe(false)
-      })
-    })
+    viewer.default_local_port = PORT_8080
+    expect(viewer.port).toBe(PORT_8080)
   })
-  describe("actions", () => {
-    describe("toggle_picking_mode", () => {
-      test("test true", async () => {
-        const viewerStore = useViewerStore()
-        await viewerStore.toggle_picking_mode(true)
-        expect(viewerStore.picking_mode).toBe(true)
-      })
-    })
+})
 
-    describe("start_request", () => {
-      test("test increment", async () => {
-        const viewerStore = useViewerStore()
-        await viewerStore.start_request()
-        expect(viewerStore.request_counter).toBe(1)
-      })
-    })
+describe("viewer store url and busy getters", () => {
+  test("base_url construction", () => {
+    setup()
+    const infra = useInfraStore()
+    const viewer = useViewerStore()
 
-    describe("stop_request", () => {
-      test("test decrement", async () => {
-        const viewerStore = useViewerStore()
-        await viewerStore.stop_request()
-        expect(viewerStore.request_counter).toBe(-1)
-      })
-    })
+    infra.app_mode = appMode.DESKTOP
+    infra.domain_name = "localhost"
+    expect(viewer.base_url).toBe(`ws://localhost:${PORT_1234}/ws`)
+
+    infra.app_mode = appMode.CLOUD
+    infra.ID = ID_VAL
+    infra.domain_name = "example.com"
+    expect(viewer.base_url).toBe(
+      `wss://example.com:${PORT_443}/${ID_VAL}/viewer/ws`,
+    )
+  })
+
+  test("base_url error", () => {
+    setup()
+    const infra = useInfraStore()
+    const viewer = useViewerStore()
+    infra.app_mode = appMode.CLOUD
+    infra.ID = ""
+    infra.domain_name = "example.com"
+    expect(() => viewer.base_url).toThrow("ID must not be empty in cloud mode")
+  })
+
+  test("busy status mapping", () => {
+    setup()
+    const viewer = useViewerStore()
+    viewer.request_counter = L1
+    expect(viewer.is_busy).toBeTruthy()
+    viewer.request_counter = L0
+    expect(viewer.is_busy).toBeFalsy()
+  })
+})
+
+describe("viewer store actions", () => {
+  test("toggle_picking_mode", async () => {
+    setup()
+    const viewer = useViewerStore()
+    await viewer.toggle_picking_mode(true)
+    expect(viewer.picking_mode).toBeTruthy()
+  })
+
+  test("request counter updates", async () => {
+    setup()
+    const viewer = useViewerStore()
+    await viewer.start_request()
+    expect(viewer.request_counter).toBe(L1)
+    await viewer.stop_request()
+    expect(viewer.request_counter).toBe(L0)
+    await viewer.stop_request()
+    expect(viewer.request_counter).toBe(LN1)
   })
 })

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import Status from "@ogw_front/utils/status"
 import { flushPromises } from "@vue/test-utils"
 
@@ -41,7 +41,7 @@ describe("when_microservices_connected_run_function", () => {
     return { infraStore, geodeStore, viewerStore }
   }
 
-  it("microservices not connected", async () => {
+  test("microservices not connected", async () => {
     const { infraStore, geodeStore, viewerStore } = setup()
     const spy = vi.spyOn(dumb_obj, "dumb_method")
     run_function_when_microservices_connected(dumb_obj.dumb_method)
@@ -54,7 +54,7 @@ describe("when_microservices_connected_run_function", () => {
     expect(spy).not.toHaveBeenCalled()
   })
 
-  it("microservices connected", async () => {
+  test("microservices connected", async () => {
     const { geodeStore, viewerStore } = setup()
     const spy = vi.spyOn(dumb_obj, "dumb_method")
     run_function_when_microservices_connected(dumb_obj.dumb_method)

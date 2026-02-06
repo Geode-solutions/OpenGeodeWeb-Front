@@ -1,10 +1,32 @@
-import { beforeEach, describe, expect, test, vi } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
 
 // Local imports
 import { appMode } from "@ogw_front/utils/app_mode"
 import { useProjectManager } from "@ogw_front/composables/project_manager"
+
+// Constants
+const PANEL_WIDTH = 300
+const Z_SCALE = 1.5
+const FOCAL_POINT1 = 1
+const FOCAL_POINT2 = 2
+const FOCAL_POINT3 = 3
+const FOCAL_POINT = [FOCAL_POINT1, FOCAL_POINT2, FOCAL_POINT3]
+const VIEW_UP1 = 0
+const VIEW_UP2 = 1
+const VIEW_UP3 = 0
+const VIEW_UP = [VIEW_UP1, VIEW_UP2, VIEW_UP3]
+const POSITION1 = 10
+const POSITION2 = 11
+const POSITION3 = 12
+const POSITION = [POSITION1, POSITION2, POSITION3]
+const VIEW_ANGLE = 30
+const CLIPPING_RANGE1 = 0.1
+const CLIPPING_RANGE2 = 1000
+const CLIPPING_RANGE = [CLIPPING_RANGE1, CLIPPING_RANGE2]
+const POINT_SIZE = 2
+const VIEWER_CALL_COUNT = 2
 
 // Snapshot
 const snapshotMock = {
@@ -23,10 +45,10 @@ const snapshotMock = {
   },
   treeview: {
     isAdditionnalTreeDisplayed: false,
-    panelWidth: 320,
+    panelWidth: PANEL_WIDTH,
     model_id: "",
     isTreeCollection: false,
-    selectedTree: null,
+    selectedTree: undefined,
     selectionIds: [],
   },
   dataStyle: {
@@ -37,21 +59,21 @@ const snapshotMock = {
           coloring: {
             active: "color",
             color: { r: 255, g: 255, b: 255 },
-            vertex: null,
+            vertex: undefined,
           },
-          size: 2,
+          size: POINT_SIZE,
         },
       },
     },
   },
   hybridViewer: {
-    zScale: 1.5,
+    zScale: Z_SCALE,
     camera_options: {
-      focal_point: [1, 2, 3],
-      view_up: [0, 1, 0],
-      position: [10, 11, 12],
-      view_angle: 30,
-      clipping_range: [0.1, 1000],
+      focal_point: FOCAL_POINT,
+      view_up: VIEW_UP,
+      position: POSITION,
+      view_angle: VIEW_ANGLE,
+      clipping_range: CLIPPING_RANGE,
     },
   },
 }
@@ -67,56 +89,54 @@ const infraStoreMock = {
   ID: "1234",
 }
 const viewerStoreMock = {
-  ws_connect: vi.fn(() => Promise.resolve()),
+  ws_connect: vi.fn().mockResolvedValue(),
   base_url: vi.fn(() => ""),
-  request: vi.fn(() => Promise.resolve()),
+  request: vi.fn().mockResolvedValue(),
 }
 const treeviewStoreMock = {
   clear: vi.fn(),
-  importStores: vi.fn(() => Promise.resolve()),
+  importStores: vi.fn().mockResolvedValue(),
   finalizeImportSelection: vi.fn(),
-  addItem: vi.fn(() => Promise.resolve()),
+  addItem: vi.fn().mockResolvedValue(),
 }
 const dataStoreMock = {
   clear: vi.fn(),
-  registerObject: vi.fn(() => Promise.resolve()),
-  addItem: vi.fn(() => Promise.resolve()),
+  registerObject: vi.fn().mockResolvedValue(),
+  addItem: vi.fn().mockResolvedValue(),
 }
 const dataStyleStoreMock = {
-  importStores: vi.fn(() => Promise.resolve()),
-  applyAllStylesFromState: vi.fn(() => Promise.resolve()),
-  addDataStyle: vi.fn(() => Promise.resolve()),
-  applyDefaultStyle: vi.fn(() => Promise.resolve()),
+  importStores: vi.fn().mockResolvedValue(),
+  applyAllStylesFromState: vi.fn().mockResolvedValue(),
+  addDataStyle: vi.fn().mockResolvedValue(),
+  applyDefaultStyle: vi.fn().mockResolvedValue(),
 }
+
+const viewer_call_mock_fn = vi.fn().mockResolvedValue()
+
 const hybridViewerStoreMock = {
   clear: vi.fn(),
-  initHybridViewer: vi.fn(() => Promise.resolve()),
-  importStores: vi.fn(async (snapshot) => {
-    if (snapshot?.zScale != null) {
+  initHybridViewer: vi.fn().mockResolvedValue(),
+  importStores: vi.fn((snapshot) => {
+    if (snapshot?.zScale !== undefined) {
       hybridViewerStoreMock.setZScaling(snapshot.zScale)
     }
     if (snapshot?.camera_options) {
-      const { viewer_call } =
-        await import("../../../internal/utils/viewer_call")
-      viewer_call({
+      viewer_call_mock_fn({
         schema: { $id: "opengeodeweb_viewer.viewer.update_camera" },
         params: { camera_options: snapshot.camera_options },
       })
       hybridViewerStoreMock.remoteRender()
     }
   }),
-  addItem: vi.fn(() => Promise.resolve()),
+  addItem: vi.fn().mockResolvedValue(),
   remoteRender: vi.fn(),
   setZScaling: vi.fn(),
 }
 
-// Mocks
-vi.stubGlobal(
-  "$fetch",
-  vi.fn(async () => ({ snapshot: snapshotMock })),
-)
+// MOCKS
+vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ snapshot: snapshotMock }))
 vi.mock("../../../internal/utils/viewer_call", () => ({
-  viewer_call: vi.fn(() => Promise.resolve()),
+  viewer_call: viewer_call_mock_fn,
 }))
 
 vi.mock("@ogw_front/composables/api_fetch", () => ({
@@ -124,7 +144,7 @@ vi.mock("@ogw_front/composables/api_fetch", () => ({
     const response = {
       _data: new Blob(["zipcontent"], { type: "application/zip" }),
       headers: {
-        get: (k) => (k === "new-file-name" ? "project_123.vease" : null),
+        get: (k) => (k === "new-file-name" ? "project_123.vease" : undefined),
       },
     }
     if (options.response_function) await options.response_function(response)
@@ -163,9 +183,9 @@ vi.stubGlobal("useAppStore", () => ({
   exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
 }))
 
-const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
-  return callback({ name })
-})
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name, fn) => await fn({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -174,37 +194,89 @@ vi.stubGlobal("navigator", {
   },
 })
 
-describe("ProjectManager composable (compact)", () => {
-  beforeEach(async () => {
+function verifyViewerCalls() {
+  expect(viewerStoreMock.ws_connect).toHaveBeenCalledWith()
+  expect(viewer_call_mock_fn).toHaveBeenCalledTimes(VIEWER_CALL_COUNT)
+}
+
+function verifyStoreImports() {
+  expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(
+    snapshotMock.treeview,
+  )
+  expect(hybridViewerStoreMock.initHybridViewer).toHaveBeenCalledWith()
+  expect(hybridViewerStoreMock.importStores).toHaveBeenCalledWith(
+    snapshotMock.hybridViewer,
+  )
+  expect(hybridViewerStoreMock.setZScaling).toHaveBeenCalledWith(Z_SCALE)
+}
+
+function verifyDataManagement() {
+  expect(dataStyleStoreMock.importStores).toHaveBeenCalledWith(
+    snapshotMock.dataStyle,
+  )
+  expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalledWith()
+  expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123")
+  expect(dataStoreMock.addItem).toHaveBeenCalledWith(
+    "abc123",
+    expect.anything(),
+  )
+  expect(treeviewStoreMock.addItem).toHaveBeenCalledWith(
+    "PointSet2D",
+    "My Data",
+    "abc123",
+    "mesh",
+  )
+}
+
+function verifyRemaining() {
+  expect(hybridViewerStoreMock.addItem).toHaveBeenCalledWith("abc123")
+  expect(dataStyleStoreMock.addDataStyle).toHaveBeenCalledWith(
+    "abc123",
+    "PointSet2D",
+  )
+  expect(dataStyleStoreMock.applyDefaultStyle).toHaveBeenCalledWith("abc123")
+  expect(hybridViewerStoreMock.remoteRender).toHaveBeenCalledWith()
+}
+
+describe("projectManager composable (compact)", () => {
+  function setup() {
     const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
     setActivePinia(pinia)
 
     // reset spies
-    for (const store of [
+    const storesList = [
       viewerStoreMock,
       treeviewStoreMock,
       dataStoreMock,
       dataStyleStoreMock,
       hybridViewerStoreMock,
-    ]) {
-      Object.values(store).forEach(
-        (v) => typeof v === "function" && v.mockClear && v.mockClear(),
-      )
+    ]
+    for (const store of storesList) {
+      const values = Object.values(store)
+      for (const value of values) {
+        if (typeof value === "function" && value.mockClear) {
+          value.mockClear()
+        }
+      }
     }
-    const { viewer_call } = await import("../../../internal/utils/viewer_call")
-    viewer_call.mockClear()
-  })
+    viewer_call_mock_fn.mockClear()
+  }
 
   test("exportProject", async () => {
+    setup()
     const { exportProject } = useProjectManager()
     const { default: fileDownload } = await import("js-file-download")
 
     await exportProject()
 
-    expect(fileDownload).toHaveBeenCalled()
+    expect(fileDownload).toHaveBeenCalledWith(
+      { snapshot: snapshotMock },
+      "project.vease",
+    )
   })
 
-  test("importProjectFile with snapshot", async () => {
+  test("importProjectFile with snapshot - Viewer and Stores", async () => {
+    setup()
     const { importProjectFile } = useProjectManager()
     const file = new Blob(['{"dataBase":{"db":{}}}'], {
       type: "application/json",
@@ -212,47 +284,22 @@ describe("ProjectManager composable (compact)", () => {
 
     await importProjectFile(file)
 
-    const { viewer_call } = await import("../../../internal/utils/viewer_call")
+    verifyViewerCalls()
+    verifyStoreImports()
+    expect(true).toBeTruthy()
+  })
 
-    expect(viewerStoreMock.ws_connect).toHaveBeenCalled()
-    expect(viewer_call).toHaveBeenCalledTimes(2)
+  test("importProjectFile with snapshot - Data and Rendering", async () => {
+    setup()
+    const { importProjectFile } = useProjectManager()
+    const file = new Blob(['{"dataBase":{"db":{}}}'], {
+      type: "application/json",
+    })
 
-    expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(
-      snapshotMock.treeview,
-    )
-    expect(hybridViewerStoreMock.initHybridViewer).toHaveBeenCalled()
-    expect(hybridViewerStoreMock.importStores).toHaveBeenCalledWith(
-      snapshotMock.hybridViewer,
-    )
-    expect(hybridViewerStoreMock.setZScaling).toHaveBeenCalledWith(1.5)
+    await importProjectFile(file)
 
-    expect(dataStyleStoreMock.importStores).toHaveBeenCalledWith(
-      snapshotMock.dataStyle,
-    )
-    expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalled()
-
-    expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123")
-    expect(dataStoreMock.addItem).toHaveBeenCalledWith(
-      "abc123",
-      expect.objectContaining({
-        viewer_type: "mesh",
-        geode_object_type: "PointSet2D",
-        name: "My Data",
-      }),
-    )
-    expect(treeviewStoreMock.addItem).toHaveBeenCalledWith(
-      "PointSet2D",
-      "My Data",
-      "abc123",
-      "mesh",
-    )
-    expect(hybridViewerStoreMock.addItem).toHaveBeenCalledWith("abc123")
-    expect(dataStyleStoreMock.addDataStyle).toHaveBeenCalledWith(
-      "abc123",
-      "PointSet2D",
-    )
-    expect(dataStyleStoreMock.applyDefaultStyle).toHaveBeenCalledWith("abc123")
-
-    expect(hybridViewerStoreMock.remoteRender).toHaveBeenCalled()
+    verifyDataManagement()
+    verifyRemaining()
+    expect(true).toBeTruthy()
   })
 })

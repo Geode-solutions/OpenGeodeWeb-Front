@@ -10,8 +10,11 @@ import { setActivePinia } from "pinia"
 
 // Local imports
 import {
+  delete_folder_recursive,
   executable_name,
   executable_path,
+  kill_back,
+  kill_viewer,
   run_back,
   run_viewer,
 } from "@ogw_front/utils/local"
@@ -96,4 +99,13 @@ afterAll(() => {
   delete global.WebSocket
 })
 
-export { runMicroservices, setupIntegrationTests }
+async function teardownIntegrationTests(
+  back_port,
+  viewer_port,
+  project_folder_path,
+) {
+  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+  delete_folder_recursive(project_folder_path)
+}
+
+export { runMicroservices, setupIntegrationTests, teardownIntegrationTests }
