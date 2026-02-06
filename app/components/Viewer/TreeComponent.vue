@@ -1,51 +1,53 @@
 <script setup>
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataStore } from "@ogw_front/stores/data"
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import { useDataStore } from "@ogw_front/stores/data"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 
-import { compareSelections } from "@ogw_front/utils/treeview"
+  import { compareSelections } from "@ogw_front/utils/treeview"
 
-const dataStyleStore = useDataStyleStore()
-const dataStore = useDataStore()
-const hybridViewerStore = useHybridViewerStore()
+  const dataStyleStore = useDataStyleStore()
+  const dataStore = useDataStore()
+  const hybridViewerStore = useHybridViewerStore()
 
-const props = defineProps({ id: { type: String, required: true } })
+  const props = defineProps({ id: { type: String, required: true } })
 
-const emit = defineEmits(["show-menu"])
+  const emit = defineEmits(["show-menu"])
 
-const items = ref([])
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(props.id)
+  const items = ref([])
+  const mesh_components_selection = dataStyleStore.visibleMeshComponents(
+    props.id,
+  )
 
-watchEffect(async () => {
-  items.value = await dataStore.formatedMeshComponents(props.id)
-})
+  watchEffect(async () => {
+    items.value = await dataStore.formatedMeshComponents(props.id)
+  })
 
-watch(
-  mesh_components_selection,
-  async (current, previous) => {
-    if (!previous) return
+  watch(
+    mesh_components_selection,
+    async (current, previous) => {
+      if (!previous) return
 
-    const { added, removed } = compareSelections(current, previous)
+      const { added, removed } = compareSelections(current, previous)
 
-    for (const item of added) {
-      await dataStyleStore.setModelMeshComponentsVisibility(
-        props.id,
-        [item],
-        true,
-      )
-    }
+      for (const item of added) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          props.id,
+          [item],
+          true,
+        )
+      }
 
-    for (const item of removed) {
-      await dataStyleStore.setModelMeshComponentsVisibility(
-        props.id,
-        [item],
-        false,
-      )
-    }
-    hybridViewerStore.remoteRender()
-  },
-  { deep: true },
-)
+      for (const item of removed) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          props.id,
+          [item],
+          false,
+        )
+      }
+      hybridViewerStore.remoteRender()
+    },
+    { deep: true },
+  )
 </script>
 
 <template>
@@ -70,16 +72,16 @@ watch(
 </template>
 
 <style scoped>
-.treeview-item {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  display: inline-block;
-}
+  .treeview-item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+  }
 
-.transparent-treeview {
-  background-color: transparent;
-  margin: 4px 0;
-}
+  .transparent-treeview {
+    background-color: transparent;
+    margin: 4px 0;
+  }
 </style>
