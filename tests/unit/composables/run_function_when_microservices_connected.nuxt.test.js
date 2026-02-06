@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, test, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import Status from "@ogw_front/utils/status"
+import { flushPromises } from "@vue/test-utils"
 
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
@@ -9,16 +10,15 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
-describe("run function when microservices are connected", () => {
+describe("when_microservices_connected_run_function", () => {
   const dumb_obj = { dumb_method: () => true }
 
-  beforeEach(async () => {
+  function setup() {
     const pinia = createTestingPinia({
       stubActions: false,
       createSpy: vi.fn,
     })
     setActivePinia(pinia)
-
     const infraStore = useInfraStore()
     const geodeStore = useGeodeStore()
     const viewerStore = useViewerStore()
@@ -35,18 +35,18 @@ describe("run function when microservices are connected", () => {
       launch: vi.fn(),
     })
 
-    await geodeStore.$patch({ status: Status.NOT_CONNECTED })
-    await viewerStore.$patch({ status: Status.NOT_CONNECTED })
-  })
+    geodeStore.$patch({ status: Status.NOT_CONNECTED })
+    viewerStore.$patch({ status: Status.NOT_CONNECTED })
 
-  it("fails when microservices are not connected", async () => {
-    const geodeStore = useGeodeStore()
-    const viewerStore = useViewerStore()
-    const infraStore = useInfraStore()
+    return { infraStore, geodeStore, viewerStore }
+  }
+
+  it("microservices not connected", async () => {
+    const { infraStore, geodeStore, viewerStore } = setup()
     const spy = vi.spyOn(dumb_obj, "dumb_method")
     run_function_when_microservices_connected(dumb_obj.dumb_method)
-    await geodeStore.$patch({ status: Status.NOT_CONNECTED })
-    await viewerStore.$patch({ status: Status.NOT_CONNECTED })
+    geodeStore.$patch({ status: Status.NOT_CONNECTED })
+    viewerStore.$patch({ status: Status.NOT_CONNECTED })
     console.log("geodeStore", geodeStore.status)
     console.log("viewerStore", viewerStore.status)
 
@@ -54,28 +54,13 @@ describe("run function when microservices are connected", () => {
     expect(spy).not.toHaveBeenCalled()
   })
 
-  it("doesn't run when microservices remain not connected", async () => {
-    const geodeStore = useGeodeStore()
-    const viewerStore = useViewerStore()
-    const infraStore = useInfraStore()
+  it("microservices connected", async () => {
+    const { geodeStore, viewerStore } = setup()
     const spy = vi.spyOn(dumb_obj, "dumb_method")
     run_function_when_microservices_connected(dumb_obj.dumb_method)
-    await geodeStore.$patch({ status: Status.NOT_CONNECTED })
-    await viewerStore.$patch({ status: Status.NOT_CONNECTED })
-    console.log("geodeStore", geodeStore.status)
-    console.log("viewerStore", viewerStore.status)
-
-    console.log("microservices_connected", infraStore.microservices_connected)
-    expect(spy).not.toHaveBeenCalled()
-  })
-
-  it("runs only when microservices are connected", async () => {
-    const geodeStore = useGeodeStore()
-    const viewerStore = useViewerStore()
-    const spy = vi.spyOn(dumb_obj, "dumb_method")
-    run_function_when_microservices_connected(dumb_obj.dumb_method)
-    await geodeStore.$patch({ status: Status.CONNECTED })
-    await viewerStore.$patch({ status: Status.CONNECTED })
+    geodeStore.$patch({ status: Status.CONNECTED })
+    viewerStore.$patch({ status: Status.CONNECTED })
+    await flushPromises()
     expect(spy).toHaveBeenCalledWith()
   })
 })
