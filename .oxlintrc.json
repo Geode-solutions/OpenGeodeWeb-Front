@@ -47,7 +47,8 @@
         "style:": "declaration"
       }
     ],
-    "vue/max-props": ["error", { "maxProps": 7 }]
+    "eslint/sort-keys": "off",
+    "eslint/no-ternary": "off"
   },
   "overrides": [
     {
