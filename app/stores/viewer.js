@@ -80,8 +80,9 @@ export const useViewerStore = defineStore("viewer", {
         }
         console.log("VIEWER LOCK GRANTED !")
         this.status = Status.CONNECTING
-        const { default: SmartConnect } =
-          await import("wslink/src/SmartConnect")
+        const { default: SmartConnect } = await import(
+          "wslink/src/SmartConnect"
+        )
         vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
         const config = { application: "Viewer", sessionURL: this.base_url }
@@ -105,37 +106,34 @@ export const useViewerStore = defineStore("viewer", {
 
         // Error
         clientToConnect.onConnectionError((httpReq) => {
-          const message = httpReq?.response?.error || `Connection error`
+          const message =
+            (httpReq && httpReq.response && httpReq.response.error) ||
+            `Connection error`
           console.error(message)
         })
 
         // Close
         clientToConnect.onConnectionClose((httpReq) => {
-          const message = httpReq?.response?.error || `Connection close`
+          const message =
+            (httpReq && httpReq.response && httpReq.response.error) ||
+            `Connection close`
           console.error(message)
         })
 
         // Connect
-        const { connectImageStream } =
-          await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
-        try {
-          const validClient = await clientToConnect.connect(config)
-          connectImageStream(validClient.getConnection().getSession())
-          this.client = validClient
-          clientToConnect.endBusy()
-          await viewer_call(
-            this,
-            {
-              schema: schemas.opengeodeweb_viewer.viewer.reset_visualization,
-            },
-            { timeout: undefined },
-          )
-          this.status = Status.CONNECTED
-        } catch (error) {
-          console.error("error", error)
-          this.status = Status.NOT_CONNECTED
-          throw error
-        }
+        const { connectImageStream } = await import(
+          "@kitware/vtk.js/Rendering/Misc/RemoteView"
+        )
+        this.client = await clientToConnect.connect(config)
+        connectImageStream(this.client.getConnection().getSession())
+        this.client.endBusy()
+        await this.request(
+          schemas.opengeodeweb_viewer.viewer.reset_visualization,
+          {},
+          {},
+          undefined,
+        )
+        this.status = Status.CONNECTED
       })
     },
     start_request() {
