@@ -1,3 +1,6 @@
+import vtkWSLinkClient, {
+  newInstance,
+} from "@kitware/vtk.js/IO/Core/WSLinkClient"
 // oxlint-disable-next-line id-length
 import _ from "lodash"
 // oxlint-disable-next-line no-unassigned-import
@@ -7,10 +10,17 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { viewer_call } from "../../internal/utils/viewer_call"
-import { newInstance as vtkWSLinkClient } from "@kitware/vtk.js/IO/Core/WSLinkClient"
 
 const MS_PER_SECOND = 1000
 const SECONDS_PER_REQUEST = 10
+const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST
+
+async function launch() {
+  console.log("[VIEWER] Launching viewer microservice...")
+  const port_value = await window.electronAPI.run_viewer()
+  console.log("[VIEWER] Viewer launched on port:", port_value)
+  return port_value
+}
 
 export const useViewerStore = defineStore(
   "viewer",
@@ -27,13 +37,14 @@ export const useViewerStore = defineStore(
     const buzy = ref(0)
 
     const protocol = computed(() => {
-      if (useInfraStore().app_mode == appMode.CLOUD) {
+      if (infraStore.app_mode === appMode.CLOUD) {
         return "wss"
       }
+      return "ws"
     })
 
     const port = computed(() => {
-      if (useInfraStore().app_mode == appMode.CLOUD) {
+      if (infraStore.app_mode === appMode.CLOUD) {
         return "443"
       }
       const { VIEWER_PORT } = useRuntimeConfig().public
@@ -49,8 +60,8 @@ export const useViewerStore = defineStore(
 
     const base_url = computed(() => {
       let viewer_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`
-      if (infraStore.app_mode == appMode.CLOUD) {
-        if (infraStore.ID == "") {
+      if (infraStore.app_mode === appMode.CLOUD) {
+        if (infraStore.ID === "") {
           throw new Error("ID must not be empty in cloud mode")
         }
         viewer_url += `/${infraStore.ID}/viewer`
@@ -59,16 +70,17 @@ export const useViewerStore = defineStore(
       return viewer_url
     })
 
-    const is_busy = computed(() => {
-      return request_counter.value > 0
-    })
+    const is_busy = computed(() => request_counter.value > 0)
 
     function toggle_picking_mode(value) {
       picking_mode.value = value
     }
 
     async function set_picked_point(x, y) {
-      const response = await get_point_position({ x, y })
+      const response = await request(
+        schemas.opengeodeweb_viewer.generic.get_point_position,
+        { x, y },
+      )
       const { x: world_x, y: world_y } = response
       picked_point.value.x = world_x
       picked_point.value.y = world_y
@@ -83,7 +95,9 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
           status.value = Status.CONNECTING
-          const SmartConnect = await import("wslink/src/SmartConnect")
+          const { default: SmartConnect } = await import(
+            "wslink/src/SmartConnect"
+          )
           vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
           const config_obj = { application: "Viewer" }
@@ -95,7 +109,7 @@ export const useViewerStore = defineStore(
           }
           let clientToConnect = client.value
           if (_.isEmpty(clientToConnect)) {
-            clientToConnect = vtkWSLinkClient.newInstance()
+            clientToConnect = newInstance()
           }
 
           // Connect to busy store
@@ -122,7 +136,7 @@ export const useViewerStore = defineStore(
           )
           client.value = await clientToConnect.connect(config_obj)
           connectImageStream(client.value.getConnection().getSession())
-          client.value.endBusy()
+          clientToConnect.endBusy()
           await request(
             schemas.opengeodeweb_viewer.viewer.reset_visualization,
             {},
@@ -139,18 +153,11 @@ export const useViewerStore = defineStore(
     }
 
     function start_request() {
-      request_counter.value++
+      request_counter.value += 1
     }
 
     function stop_request() {
-      request_counter.value--
-    }
-
-    async function launch() {
-      console.log("[VIEWER] Launching viewer microservice...")
-      const port = await window.electronAPI.run_viewer()
-      console.log("[VIEWER] Viewer launched on port:", port)
-      return port
+      request_counter.value -= 1
     }
 
     async function connect() {

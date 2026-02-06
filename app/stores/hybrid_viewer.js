@@ -131,11 +131,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const params = {
       camera_options: {
-        focal_point: camera.getFocalPoint(),
-        view_up: camera.getViewUp(),
-        position: camera.getPosition(),
+        focal_point: [...camera.getFocalPoint()],
+        view_up: [...camera.getViewUp()],
+        position: [...camera.getPosition()],
         view_angle: camera.getViewAngle(),
-        clipping_range: camera.getClippingRange(),
+        clipping_range: [...camera.getClippingRange()],
         distance: camera.getDistance(),
       },
     }
@@ -266,11 +266,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
       const payload = {
         camera_options: {
-          focal_point: camera_options.focal_point,
-          view_up: camera_options.view_up,
-          position: camera_options.position,
+          focal_point: [...camera_options.focal_point],
+          view_up: [...camera_options.view_up],
+          position: [...camera_options.position],
           view_angle: camera_options.view_angle,
-          clipping_range: camera_options.clipping_range,
+          clipping_range: [...camera_options.clipping_range],
         },
       }
       const viewerStore = useViewerStore()
