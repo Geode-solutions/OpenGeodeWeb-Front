@@ -89,13 +89,13 @@ export function useMeshPolyhedraStyle() {
     return meshPolyhedraStyle(id).coloring.vertex
   }
   function setMeshPolyhedraVertexAttribute(id, vertex_attribute) {
-    const { coloring_style } = meshPolyhedraStyle(id)
+    const { coloring } = meshPolyhedraStyle(id)
     return viewerStore.request(
       mesh_polyhedra_schemas.vertex_attribute,
       { id, ...vertex_attribute },
       {
         response_function: () => {
-          coloring_style.vertex = vertex_attribute
+          coloring.vertex = vertex_attribute
           console.log(
             setMeshPolyhedraVertexAttribute.name,
             { id },

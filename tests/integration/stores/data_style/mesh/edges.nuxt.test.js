@@ -123,6 +123,20 @@ describe("Mesh edges", () => {
     test("Edges active coloring", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
+      const coloringTypes = [
+        { name: "color" },
+        {
+          name: "vertex",
+          function: () =>
+            dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute),
+        },
+        {
+          name: "edge",
+          function: () =>
+            dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute),
+        },
+      ]
+
       async function testColoring(coloringType, expectedColoringType) {
         if (coloringType.function) {
           expect(() =>

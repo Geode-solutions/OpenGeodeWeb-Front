@@ -63,7 +63,7 @@ function meshCellsDefaultStyle(
     visibility,
     coloring: {
       active: "color",
-      cell: undefined,
+      cell: null,
       color,
       textures: null,
       vertex: null,
