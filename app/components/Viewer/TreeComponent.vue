@@ -29,24 +29,24 @@
 
       const { added, removed } = compareSelections(current, previous)
 
-    if (added.length > 0) {
-      await dataStyleStore.setModelMeshComponentsVisibility(
-        props.id,
-        added,
-        true,
-      )
-    }
-    if (removed.length > 0) {
-      await dataStyleStore.setModelMeshComponentsVisibility(
-        props.id,
-        removed,
-        false,
-      )
-    }
-    hybridViewerStore.remoteRender()
-  },
-  { deep: true },
-)
+      if (added.length > 0) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          props.id,
+          added,
+          true,
+        )
+      }
+      if (removed.length > 0) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          props.id,
+          removed,
+          false,
+        )
+      }
+      hybridViewerStore.remoteRender()
+    },
+    { deep: true },
+  )
 </script>
 
 <template>
