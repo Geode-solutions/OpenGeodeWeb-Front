@@ -21,7 +21,7 @@
     "oxc/no-async-await": "off",
     "oxc/no-rest-spread-properties": "off", // Enable if older browser support is needed
     "eslint/max-statements": ["warn", 20],
-    "eslint/id-length": ["error", { "exceptions": ["x", "y", "z", "i", "j", "k"], "min": 2 }],
+    "eslint/id-length": ["error", { "exceptions": ["x", "y", "z", "i", "j", "k", "r", "g", "b"], "min": 2 }],
     "eslint/no-console": "warn", // Disable for debugging. Disable later to not have browser logs
     "unicorn/numeric-separators-style": "off", // 1_000 ou 1000 ?
     "sort-imports": ["error", { "allowSeparatedGroups": true }],

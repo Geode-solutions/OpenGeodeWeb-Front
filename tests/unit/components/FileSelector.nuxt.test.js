@@ -13,10 +13,14 @@ import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { vuetify } from "../../utils"
 
+const EXPECTED_LENGTH = 1
+const FIRST_INDEX = 0
+const SECOND_INDEX = 1
+
 const allowed_files_schema = schemas.opengeodeweb_back.allowed_files
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
-describe("FileSelector", async () => {
+describe(FileSelector, async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -27,7 +31,7 @@ describe("FileSelector", async () => {
 
   test(`Select file`, async () => {
     registerEndpoint(allowed_files_schema.$id, {
-      method: allowed_files_schema.methods[0],
+      method: allowed_files_schema.methods[FIRST_INDEX],
       handler: () => ({
         extensions: ["1", "2", "3"],
       }),
@@ -42,7 +46,7 @@ describe("FileSelector", async () => {
     const file_uploader = wrapper.findComponent(FileUploader)
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[1],
+      method: upload_file_schema.methods[SECOND_INDEX],
       handler: () => ({}),
     })
 
@@ -59,23 +63,23 @@ describe("FileSelector", async () => {
     await flushPromises()
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
       files,
       auto_upload,
     })
   })
 
-  describe(`Files prop`, () => {
+  describe(FileSelector, () => {
     registerEndpoint(allowed_files_schema.$id, {
-      method: allowed_files_schema.methods[0],
+      method: allowed_files_schema.methods[FIRST_INDEX],
       handler: () => ({
         extensions: ["1", "2", "3"],
       }),
     })
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[1],
+      method: upload_file_schema.methods[SECOND_INDEX],
       handler: () => ({}),
     })
 
@@ -95,11 +99,13 @@ describe("FileSelector", async () => {
       await flushPromises()
       expect(wrapper.componentVM.files).toEqual(files)
       expect(wrapper.emitted()).toHaveProperty("update_values")
-      expect(wrapper.emitted().update_values).toHaveLength(1)
-      expect(wrapper.emitted().update_values[0][0]).toEqual({
-        files,
-        auto_upload: false,
-      })
+      expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+      expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual(
+        {
+          files,
+          auto_upload: false,
+        },
+      )
     })
 
     test("auto_upload false", async () => {

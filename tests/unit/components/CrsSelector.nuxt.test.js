@@ -9,7 +9,10 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 
 import { vuetify } from "../../utils"
 
-describe("CrsSelector", () => {
+const EXPECTED_LENGTH = 1
+const FIRST_INDEX = 0
+
+describe(CrsSelector, () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -47,9 +50,9 @@ describe("CrsSelector", () => {
     const input = await td.find("input")
     await input.trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
-      [key_to_update]: crs_list[0],
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
+      [key_to_update]: crs_list[FIRST_INDEX],
     })
   })
 })

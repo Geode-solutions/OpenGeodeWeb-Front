@@ -10,7 +10,7 @@ import { vuetify } from "../../utils"
 
 global.ResizeObserver = ResizeObserver
 
-describe("Step", () => {
+describe(Step, () => {
   test(`BRep`, async () => {
     const geode_object_type = ref("BRep")
     const files = ref([])
@@ -44,6 +44,6 @@ describe("Step", () => {
       },
       props: { step_index: 0 },
     })
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
   })
 })

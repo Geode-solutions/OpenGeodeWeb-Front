@@ -13,9 +13,12 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 
 import { vuetify } from "../../utils"
 
+const FIRST_INDEX = 0
+const SECOND_INDEX = 1
+
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
-describe("FileUploader", async () => {
+describe(FileUploader, async () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -25,11 +28,11 @@ describe("FileUploader", async () => {
   geodeStore.base_url = ""
 
   registerEndpoint(upload_file_schema.$id, {
-    method: upload_file_schema.methods[0],
+    method: upload_file_schema.methods[FIRST_INDEX],
     handler: () => ({}),
   })
   registerEndpoint(upload_file_schema.$id, {
-    method: upload_file_schema.methods[1],
+    method: upload_file_schema.methods[SECOND_INDEX],
     handler: () => ({}),
   })
 
@@ -55,7 +58,9 @@ describe("FileUploader", async () => {
       await v_btn.trigger("click")
       await flushPromises()
       await flushPromises()
-      expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
+      expect(
+        wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX],
+      ).toEqual(files)
     })
 
     test(`prop auto_upload true`, async () => {
@@ -66,7 +71,9 @@ describe("FileUploader", async () => {
         props: { multiple: false, accept: "*.txt", files, auto_upload: true },
       })
       await flushPromises()
-      expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
+      expect(
+        wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX],
+      ).toEqual(files)
     })
   })
 })

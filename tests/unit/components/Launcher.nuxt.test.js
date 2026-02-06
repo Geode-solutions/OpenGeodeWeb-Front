@@ -24,7 +24,7 @@ vi.stubGlobal("navigator", {
 
 global.ResizeObserver = ResizeObserver
 
-describe("Launcher", async () => {
+describe(Launcher, async () => {
   test(`Mount`, async () => {
     const pinia = createTestingPinia({
       stubActions: false,
@@ -37,7 +37,7 @@ describe("Launcher", async () => {
         plugins: [pinia, vuetify],
       },
     })
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
     await infraStore.$patch({ is_captcha_validated: true })
     await flushPromises()
     expect(infraStore.create_backend).toHaveBeenCalled()

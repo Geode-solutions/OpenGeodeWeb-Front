@@ -1,9 +1,9 @@
-import { describe, expect, test, beforeEach, vi } from "vitest"
-import { setActivePinia } from "pinia"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import upload_file from "@ogw_front/utils/upload_file"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import { setActivePinia } from "pinia"
+import upload_file from "@ogw_front/utils/upload_file"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 import { useGeodeStore } from "@ogw_front/stores/geode"

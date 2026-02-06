@@ -1,10 +1,10 @@
-import { describe, expect, test, beforeEach, vi } from "vitest"
-import { setActivePinia } from "pinia"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import { setActivePinia } from "pinia"
 
-import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
 describe("geodeStore.request()", () => {
   const pinia = createTestingPinia({
@@ -34,12 +34,6 @@ describe("geodeStore.request()", () => {
     await geodeStore.$reset()
     geodeStore.base_url = ""
   })
-
-  // test("valid schema and params", async () => {
-  //   const params = { test: "hello" }
-  //   const response = await api_fetch({ schema, params })
-  //   expect(response).toBeDefined()
-  // })
 
   test("invalid schema", async () => {
     const schema = {
@@ -82,24 +76,4 @@ describe("geodeStore.request()", () => {
     await geodeStore.request(schema, params, callbacks)
     expect(errorCalled).toBe(false)
   })
-
-  // test("response handling", async () => {
-  //   const schema = {
-  //     $id: "/test",
-  //     type: "object",
-  //     methods: ["POST"],
-  //     properties: {
-  //       test: {
-  //         type: "string",
-  //       },
-  //     },
-  //     required: ["test"],
-  //     additionalProperties: false,
-  //   }
-  //   const params = { test: "hello" }
-  //   // const responseFunction = jest.fn()
-  //   const response = await api_fetch({ schema, params }, { response_function })
-  //   expect(responseFunction).toHaveBeenCalledTimes(1)
-  //   expect(response).toBeDefined()
-  // })
 })

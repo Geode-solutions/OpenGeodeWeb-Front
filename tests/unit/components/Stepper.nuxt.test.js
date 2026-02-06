@@ -7,14 +7,16 @@ import Stepper from "@ogw_front/components/Stepper"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 import { vuetify } from "../../utils"
 
+const FIRST_INDEX = 0
+
 global.ResizeObserver = ResizeObserver
 
-describe("Stepper", () => {
+describe(Stepper, () => {
   test(`Mount`, async () => {
     const geode_object_type = ref("BRep")
     const files = ref([])
     const stepper_tree = reactive({
-      current_step_index: ref(0),
+      current_step_index: ref(FIRST_INDEX),
       geode_object_type,
       steps: [
         {
@@ -41,6 +43,6 @@ describe("Stepper", () => {
         provide: { stepper_tree },
       },
     })
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
   })
 })

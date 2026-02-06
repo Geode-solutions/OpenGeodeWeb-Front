@@ -7,7 +7,9 @@ import PackagesVersions from "@ogw_front/components/PackagesVersions"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { vuetify } from "../../utils"
 
-describe("PackagesVersions", async () => {
+const FIRST_INDEX = 0
+
+describe(PackagesVersions, async () => {
   test(`Mount`, async () => {
     const pinia = createTestingPinia({
       createSpy: vi.fn,
@@ -24,7 +26,7 @@ describe("PackagesVersions", async () => {
       additionalProperties: false,
     }
     registerEndpoint(schema.$id, {
-      method: schema.methods[0],
+      method: schema.methods[FIRST_INDEX],
       handler: () => ({
         versions: [
           {
@@ -40,6 +42,6 @@ describe("PackagesVersions", async () => {
       },
       props: { schema },
     })
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
   })
 })

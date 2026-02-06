@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
-import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
+import { setActivePinia } from "pinia"
 
 // Local imports
-import { useProjectManager } from "@ogw_front/composables/project_manager"
 import { appMode } from "@ogw_front/utils/app_mode"
+import { useProjectManager } from "@ogw_front/composables/project_manager"
 
 // Snapshot
 const snapshotMock = {
@@ -96,8 +96,9 @@ const hybridViewerStoreMock = {
       hybridViewerStoreMock.setZScaling(snapshot.zScale)
     }
     if (snapshot?.camera_options) {
-      const { viewer_call } =
-        await import("../../../internal/utils/viewer_call")
+      const { viewer_call } = await import(
+        "../../../internal/utils/viewer_call"
+      )
       viewer_call({
         schema: { $id: "opengeodeweb_viewer.viewer.update_camera" },
         params: { camera_options: snapshot.camera_options },

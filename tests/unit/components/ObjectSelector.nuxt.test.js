@@ -10,9 +10,15 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { vuetify } from "../../utils"
 
+const EXPECTED_LENGTH = 1
+const FIRST_INDEX = 0
+const LOADABLE_SCORE = 1
+const PRIORITY_1 = 1
+const PRIORITY_2 = 2
+
 const { allowed_objects } = schemas.opengeodeweb_back
 
-describe("ObjectSelector", () => {
+describe(ObjectSelector, () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -28,7 +34,7 @@ describe("ObjectSelector", () => {
     const geode_object_1 = "BRep"
     response["allowed_objects"][geode_object_1] = { is_loadable: true }
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[0],
+      method: allowed_objects.methods[FIRST_INDEX],
       handler: () => response,
     })
     const wrapper = await mountSuspended(ObjectSelector, {
@@ -41,8 +47,8 @@ describe("ObjectSelector", () => {
     const v_img = v_card.findComponent(components.VImg)
     expect(v_img.vm.src).toContain(`${geode_object_1}.svg`)
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
       geode_object_type: geode_object_1,
     })
     wrapper.unmount()
@@ -57,7 +63,7 @@ describe("ObjectSelector", () => {
     response["allowed_objects"][geode_object_1] = { is_loadable: true }
     response["allowed_objects"][geode_object_2] = { is_loadable: true }
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[0],
+      method: allowed_objects.methods[FIRST_INDEX],
       handler: () => response,
     })
     const wrapper = await mountSuspended(ObjectSelector, {
@@ -73,8 +79,8 @@ describe("ObjectSelector", () => {
     await v_card.trigger("click")
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
       geode_object_type: geode_object_1,
     })
     wrapper.unmount()
@@ -85,15 +91,15 @@ describe("ObjectSelector", () => {
     const geode_object_1 = "BRep"
     const geode_object_2 = "EdgedCurve3D"
     response["allowed_objects"][geode_object_1] = {
-      is_loadable: 1,
-      object_priority: 2,
+      is_loadable: LOADABLE_SCORE,
+      object_priority: PRIORITY_2,
     }
     response["allowed_objects"][geode_object_2] = {
-      is_loadable: 1,
-      object_priority: 1,
+      is_loadable: LOADABLE_SCORE,
+      object_priority: PRIORITY_1,
     }
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[0],
+      method: allowed_objects.methods[FIRST_INDEX],
       handler: () => response,
     })
     const wrapper = await mountSuspended(ObjectSelector, {
@@ -105,8 +111,8 @@ describe("ObjectSelector", () => {
 
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
       geode_object_type: geode_object_1,
     })
     wrapper.unmount()
