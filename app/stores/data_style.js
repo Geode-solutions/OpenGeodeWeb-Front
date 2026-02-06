@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia"
 import { getDefaultStyle } from "@ogw_front/utils/default_styles"
 import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStateStore } from "../../internal/stores/data_style_state"
