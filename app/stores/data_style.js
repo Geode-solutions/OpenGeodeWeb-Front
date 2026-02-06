@@ -18,13 +18,14 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const item = await dataStore.getItem(id).fetch()
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
-      throw new Error("Item not found or not loaded: " + id)
+      throw new Error(`Item not found or not loaded: ${id}`)
     }
 
     if (viewer_type === "mesh") {
-      return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
-    } else if (viewer_type === "model") {
-      return Promise.all([modelStyleStore.setModelVisibility(id, visibility)])
+      return meshStyleStore.setMeshVisibility(id, visibility)
+    }
+    if (viewer_type === "model") {
+      return modelStyleStore.setModelVisibility(id, visibility)
     }
     throw new Error("Unknown viewer_type")
   }
@@ -33,23 +34,23 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const item = await dataStore.getItem(id).fetch()
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
-      throw new Error("Item not found or not loaded: " + id)
+      throw new Error(`Item not found or not loaded: ${id}`)
     }
 
     if (viewer_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id)
-    } else if (viewer_type === "model") {
-      return modelStyleStore.applyModelStyle(id)
-    } else {
-      throw new Error("Unknown viewer_type: " + viewer_type)
     }
+    if (viewer_type === "model") {
+      return modelStyleStore.applyModelStyle(id)
+    }
+    throw new Error(`Unknown viewer_type: ${viewer_type}`)
   }
 
-  const exportStores = () => {
+  function exportStores() {
     return { styles: dataStyleState.styles }
   }
 
-  const importStores = (snapshot) => {
+  function importStores(snapshot) {
     const stylesSnapshot = snapshot.styles || {}
     for (const id of Object.keys(dataStyleState.styles)) {
       delete dataStyleState.styles[id]
@@ -59,7 +60,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
   }
 
-  const applyAllStylesFromState = () => {
+  function applyAllStylesFromState() {
     const ids = Object.keys(dataStyleState.styles || {})
     const promises = []
     for (const id of ids) {

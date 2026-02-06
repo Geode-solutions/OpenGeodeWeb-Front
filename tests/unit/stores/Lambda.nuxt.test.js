@@ -1,10 +1,8 @@
 // Global imports
-
-// Third party imports
+import { describe, expect, expectTypeOf, test, vi } from "vitest"
+import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
-import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
@@ -12,122 +10,114 @@ import { useLambdaStore } from "@ogw_front/stores/lambda"
 // Local imports
 import Status from "@ogw_front/utils/status"
 
-beforeEach(async () => {
+// CONSTANTS
+const PORT_443 = "443"
+const API_URL = "api.example.com"
+const SITE_BRANCH = "/test"
+const PROJECT = "/project"
+const TEST_ID = "test-id-123456"
+const STATUS_500 = 500
+
+function setup() {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
   })
   setActivePinia(pinia)
-})
+}
 
-describe("Lambda Store", () => {
-  describe("state", () => {
-    test("initial state", () => {
-      const lambdaStore = useLambdaStore()
-      expectTypeOf(lambdaStore.status).toBeString()
-      expect(lambdaStore.status).toBe(Status.NOT_CONNECTED)
-    })
+function setupConfig() {
+  const config = useRuntimeConfig()
+  config.public.API_URL = API_URL
+  config.public.SITE_BRANCH = SITE_BRANCH
+  config.public.PROJECT = PROJECT
+}
+
+describe("lambda store state and config", () => {
+  test("initial state", () => {
+    setup()
+    const lambdaStore = useLambdaStore()
+    expectTypeOf(lambdaStore.status).toBeString()
+    expect(lambdaStore.status).toBe(Status.NOT_CONNECTED)
   })
 
   describe("getters", () => {
-    describe("protocol", () => {
-      test("test protocol is always https", () => {
-        const lambdaStore = useLambdaStore()
-        expect(lambdaStore.protocol).toBe("https")
-      })
+    test("protocol and port", () => {
+      setup()
+      const lambdaStore = useLambdaStore()
+      expect(lambdaStore.protocol).toBe("https")
+      expect(lambdaStore.port).toBe(PORT_443)
     })
 
-    describe("port", () => {
-      test("test port is always 443", () => {
-        const lambdaStore = useLambdaStore()
-        expect(lambdaStore.port).toBe("443")
-      })
+    test("base_url construction", () => {
+      setup()
+      setupConfig()
+      const lambdaStore = useLambdaStore()
+      expect(lambdaStore.base_url).toBe(
+        `https://${API_URL}:${PORT_443}${SITE_BRANCH}${PROJECT}/createbackend`,
+      )
     })
 
-    describe("base_url", () => {
-      test("test base_url construction", () => {
-        const lambdaStore = useLambdaStore()
-        useRuntimeConfig().public.API_URL = "api.example.com"
-        useRuntimeConfig().public.SITE_BRANCH = "/test"
-        useRuntimeConfig().public.PROJECT = "/project"
-        expect(lambdaStore.base_url).toBe(
-          "https://api.example.com:443/test/project/createbackend",
-        )
+    test("is_busy is always false", () => {
+      setup()
+      const lambdaStore = useLambdaStore()
+      expect(lambdaStore.is_busy).toBeFalsy()
+    })
+  })
+})
+
+describe("lambda store actions", () => {
+  const postFakeCall = vi.fn()
+
+  describe("launch", () => {
+    test("successful launch", async () => {
+      setup()
+      setupConfig()
+      const lambdaStore = useLambdaStore()
+      const feedbackStore = useFeedbackStore()
+
+      lambdaStore.base_url = "test-base-url"
+      registerEndpoint(lambdaStore.base_url, {
+        method: "POST",
+        handler: postFakeCall,
       })
+      postFakeCall.mockImplementation(() => ({ ID: TEST_ID }))
+
+      const id = await lambdaStore.launch()
+      expect(lambdaStore.status).toBe(Status.CONNECTED)
+      expect(id).toBe(TEST_ID)
+      expect(feedbackStore.server_error).toBeFalsy()
     })
 
-    describe("is_busy", () => {
-      test("test is_busy is always false", () => {
-        const lambdaStore = useLambdaStore()
-        expect(lambdaStore.is_busy).toBe(false)
+    test("failed launch - error response", async () => {
+      setup()
+      setupConfig()
+      const lambdaStore = useLambdaStore()
+      const feedbackStore = useFeedbackStore()
+
+      registerEndpoint(lambdaStore.base_url, {
+        method: "POST",
+        handler: postFakeCall,
       })
+      postFakeCall.mockImplementation(() => {
+        throw createError({
+          status: STATUS_500,
+          statusMessage: "Internal Server Error",
+        })
+      })
+
+      await expect(lambdaStore.launch()).rejects.toThrow(
+        "Failed to launch lambda backend",
+      )
+      expect(lambdaStore.status).toBe(Status.NOT_CONNECTED)
+      expect(feedbackStore.server_error).toBeTruthy()
     })
   })
 
-  describe("actions", () => {
-    describe("launch", () => {
-      const postFakeCall = vi.fn()
-
-      test("successful launch", async () => {
-        const lambdaStore = useLambdaStore()
-        const feedbackStore = useFeedbackStore()
-
-        useRuntimeConfig().public.API_URL = "api.example.com"
-        useRuntimeConfig().public.SITE_BRANCH = "/test"
-        useRuntimeConfig().public.PROJECT = "/project"
-
-        lambdaStore.base_url = "test-base-url"
-        registerEndpoint(lambdaStore.base_url, {
-          method: "POST",
-          handler: postFakeCall,
-        })
-
-        postFakeCall.mockImplementation(() => ({
-          ID: "test-id-123456",
-        }))
-
-        const id = await lambdaStore.launch()
-
-        expect(lambdaStore.status).toBe(Status.CONNECTED)
-        expect(id).toBe("test-id-123456")
-        expect(feedbackStore.server_error).toBe(false)
-      })
-
-      test("failed launch - error response", async () => {
-        const lambdaStore = useLambdaStore()
-        const feedbackStore = useFeedbackStore()
-
-        useRuntimeConfig().public.API_URL = "api.example.com"
-        useRuntimeConfig().public.SITE_BRANCH = "/test"
-        useRuntimeConfig().public.PROJECT = "/project"
-
-        registerEndpoint(lambdaStore.base_url, {
-          method: "POST",
-          handler: postFakeCall,
-        })
-
-        postFakeCall.mockImplementation(() => {
-          throw createError({
-            status: 500,
-            statusMessage: "Internal Server Error",
-          })
-        })
-
-        await expect(lambdaStore.launch()).rejects.toThrow(
-          "Failed to launch lambda backend",
-        )
-
-        expect(lambdaStore.status).toBe(Status.NOT_CONNECTED)
-        expect(feedbackStore.server_error).toBe(true)
-      })
-    })
-
-    describe("connect", () => {
-      test("successful connect", async () => {
-        const lambdaStore = useLambdaStore()
-        await lambdaStore.connect()
-        expect(lambdaStore.status).toBe(Status.CONNECTED)
-      })
-    })
+  test("successful connect", async () => {
+    setup()
+    const lambdaStore = useLambdaStore()
+    await lambdaStore.connect()
+    expect(lambdaStore.status).toBe(Status.CONNECTED)
   })
 })

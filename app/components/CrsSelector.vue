@@ -1,7 +1,8 @@
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-  const schema = schemas.opengeodeweb_back.geographic_coordinate_systems
   import { useGeodeStore } from "@ogw_front/stores/geode"
+
+  const schema = schemas.opengeodeweb_back.geographic_coordinate_systems
 
   const emit = defineEmits([
     "update_values",
@@ -9,12 +10,10 @@
     "decrement_step",
   ])
 
-  const props = defineProps({
+  const { geode_object_type, key_to_update } = defineProps({
     geode_object_type: { type: String, required: true },
     key_to_update: { type: String, required: true },
   })
-
-  const { geode_object_type, key_to_update } = props
 
   const search = ref("")
   const data_table_loading = ref(false)
@@ -33,8 +32,8 @@
   })
 
   function get_selected_crs(crs_code) {
-    for (let i = 0; i <= crs_list.value.length; i++) {
-      if (crs_list.value[i]["code"] == crs_code) {
+    for (let i = 0; i <= crs_list.value.length; i += 1) {
+      if (crs_list.value[i]["code"] === crs_code) {
         return crs_list.value[i]
       }
     }

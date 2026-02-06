@@ -1,20 +1,19 @@
 <script setup>
-  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-
-  import geode_objects from "@ogw_front/assets/geode_objects"
   import FetchingData from "@ogw_front/components/FetchingData.vue"
+  import { geode_objects } from "@ogw_front/assets/geode_objects"
+  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const schema = schemas.opengeodeweb_back.allowed_objects
 
   const emit = defineEmits(["update_values", "increment_step"])
   console.log("ObjectSelector")
-  const props = defineProps({
+
+  const { filenames } = defineProps({
     filenames: { type: Array, required: true },
   })
 
   const geodeStore = useGeodeStore()
-  const { filenames } = props
 
   const loading = ref(false)
   const allowed_objects = ref({})
@@ -61,11 +60,13 @@
     toggle_loading()
     allowed_objects.value = {}
 
-    const promise_array = filenames.map((filename) => {
-      return geodeStore.request(schema, { filename })
-    })
+    const promise_array = filenames.map((filename) =>
+      geodeStore.request(schema, { filename }),
+    )
     const responses = await Promise.all(promise_array)
-    const allowed_objects_list = responses.map((r) => r.allowed_objects)
+    const allowed_objects_list = responses.map(
+      (response) => response.allowed_objects,
+    )
     const all_keys = [...new Set(allowed_objects_list.flatMap(Object.keys))]
     const common_keys = all_keys.filter((key) =>
       allowed_objects_list.every((obj) => key in obj),
@@ -77,7 +78,7 @@
       )
       const priorities = allowed_objects_list
         .map((obj) => obj[key].object_priority)
-        .filter((p) => p !== undefined && p !== null)
+        .filter((priority) => priority !== undefined && priority !== null)
       final_object[key] = { is_loadable: Math.min(...load_scores) }
       if (priorities.length) {
         final_object[key].object_priority = Math.max(...priorities)

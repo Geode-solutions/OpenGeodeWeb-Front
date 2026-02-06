@@ -41,7 +41,7 @@ export function useMeshPointsStyle() {
     return meshPointsStyle(id).coloring.active
   }
   function setMeshPointsActiveColoring(id, type) {
-    const coloring = meshPointsStyle(id).coloring
+    const { coloring } = meshPointsStyle(id)
     coloring.active = type
     console.log(
       setMeshPointsActiveColoring.name,
@@ -56,7 +56,7 @@ export function useMeshPointsStyle() {
       }
       return setMeshPointsVertexAttribute(id, coloring.vertex)
     } else {
-      throw new Error("Unknown mesh points coloring type: " + type)
+      throw new Error(`Unknown mesh points coloring type: ${type}`)
     }
   }
 
@@ -64,13 +64,13 @@ export function useMeshPointsStyle() {
     return meshPointsStyle(id).coloring.color
   }
   function setMeshPointsColor(id, color) {
-    const coloring_style = meshPointsStyle(id).coloring
+    const { coloring } = meshPointsStyle(id)
     return viewerStore.request(
       mesh_points_schemas.color,
       { id, color },
       {
         response_function: () => {
-          coloring_style.color = color
+          coloring.color = color
           console.log(
             setMeshPointsColor.name,
             { id },

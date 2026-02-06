@@ -1,4 +1,4 @@
-import { reactive, computed } from "vue"
+import { computed, reactive } from "vue"
 
 export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   const styles = reactive({})

@@ -1,22 +1,25 @@
-import { describe, expect, test, vi } from "vitest"
-import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-import { flushPromises } from "@vue/test-utils"
 import * as components from "vuetify/components"
-import { setActivePinia } from "pinia"
+import { describe, expect, test, vi } from "vitest"
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { createTestingPinia } from "@pinia/testing"
+import { flushPromises } from "@vue/test-utils"
+import { setActivePinia } from "pinia"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
-import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector"
 import FileUploader from "@ogw_front/components/FileUploader"
+import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
 import { vuetify } from "../../utils"
 
-const missing_files_schema = schemas.opengeodeweb_back.missing_files
+const EXPECTED_LENGTH = 1
+const FIRST_INDEX = 0
+const SECOND_INDEX = 1
+
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
-describe("MissingFilesSelector", async () => {
+describe(MissingFilesSelector, () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -53,7 +56,7 @@ describe("MissingFilesSelector", async () => {
     })
 
     const file_uploader = wrapper.findComponent(FileUploader)
-    expect(file_uploader.exists()).toBe(true)
+    expect(file_uploader.exists()).toBeTruthy()
 
     const v_file_input = file_uploader.find('input[type="file"]')
     const files = [new File(["fake_file"], "fake_file.txt")]
@@ -65,17 +68,17 @@ describe("MissingFilesSelector", async () => {
     const v_btn = file_uploader.findComponent(components.VBtn)
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[1],
+      method: upload_file_schema.methods[SECOND_INDEX],
       handler: () => ({}),
     })
     await v_btn.trigger("click")
     await flushPromises()
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
       additional_files: files,
     })
-    expect(wrapper.emitted().increment_step).toHaveLength(1)
+    expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH)
   })
 })

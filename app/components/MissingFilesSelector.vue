@@ -13,13 +13,11 @@
     "decrement_step",
   ])
 
-  const props = defineProps({
+  const { multiple, geode_object_type, filenames } = defineProps({
     multiple: { type: Boolean, required: true },
     geode_object_type: { type: String, required: true },
     filenames: { type: Array, required: true },
   })
-
-  const { multiple, geode_object_type, filenames } = props
 
   const accept = ref("")
   const loading = ref(false)
@@ -40,37 +38,33 @@
     additional_files.value = []
     const geodeStore = useGeodeStore()
 
-    const promise_array = filenames.map((filename) => {
-      const params = { geode_object_type, filename }
-      return new Promise((resolve, reject) => {
-        geodeStore.request(schema, params, {
-          request_error_function: () => reject(),
-          response_function: (response) => resolve(response),
-          response_error_function: () => reject(),
-        })
+    const promise_array = filenames.map(async (filename) => {
+      const response = await geodeStore.request(schema, {
+        geode_object_type,
+        filename,
       })
+      return response
     })
     const values = await Promise.all(promise_array)
     for (const value of values) {
-      has_missing_files.value = value.has_missing_files
-        ? true
-        : has_missing_files.value
-      mandatory_files.value = [].concat(
-        mandatory_files.value,
-        value.mandatory_files,
-      )
-      additional_files.value = [].concat(
-        additional_files.value,
-        value.additional_files,
-      )
+      if (value.has_missing_files) {
+        has_missing_files.value = true
+      }
+      mandatory_files.value = [
+        ...mandatory_files.value,
+        ...value.mandatory_files,
+      ]
+      additional_files.value = [
+        ...additional_files.value,
+        ...value.additional_files,
+      ]
     }
-    if (!has_missing_files.value) {
-      emit("increment_step")
-    } else {
-      accept.value = []
-        .concat(mandatory_files.value, additional_files.value)
-        .map((filename) => "." + filename.split(".").pop())
+    if (has_missing_files.value) {
+      accept.value = [...mandatory_files.value, ...additional_files.value]
+        .map((filename) => `.${filename.split(".").pop()}`)
         .join(",")
+    } else {
+      emit("increment_step")
     }
     toggle_loading()
   }
@@ -113,7 +107,7 @@
     </v-row>
     <v-row>
       <v-col
-        v-if="!mandatory_files.length && additional_files.length"
+        v-if="mandatory_files.length === 0 && additional_files.length > 0"
         cols="auto"
       >
         <v-btn @click="emit('increment_step')" color="warning">Skip step</v-btn>

@@ -40,7 +40,7 @@ export function useMeshEdgesStyle() {
     return meshEdgesStyle(id).coloring.active
   }
   function setMeshEdgesActiveColoring(id, type) {
-    const coloring = meshEdgesStyle(id).coloring
+    const { coloring } = meshEdgesStyle(id)
     coloring.active = type
     console.log(
       setMeshEdgesActiveColoring.name,
@@ -60,7 +60,7 @@ export function useMeshEdgesStyle() {
       }
       return setMeshEdgesEdgeAttribute(id, coloring.edge)
     } else {
-      throw new Error("Unknown mesh edges coloring type: " + type)
+      throw new Error(`Unknown mesh edges coloring type: ${type}`)
     }
   }
 
@@ -68,13 +68,13 @@ export function useMeshEdgesStyle() {
     return meshEdgesStyle(id).coloring.color
   }
   function setMeshEdgesColor(id, color) {
-    const coloring_style = meshEdgesStyle(id).coloring
+    const { coloring } = meshEdgesStyle(id)
     return viewerStore.request(
       mesh_edges_schemas.color,
       { id, color },
       {
         response_function: () => {
-          coloring_style.color = color
+          coloring.color = color
           console.log(
             setMeshEdgesColor.name,
             { id },

@@ -1,44 +1,45 @@
-import { describe, expect, test, beforeEach, vi } from "vitest"
-import { setActivePinia } from "pinia"
+import { describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import upload_file from "@ogw_front/utils/upload_file"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import { setActivePinia } from "pinia"
+import upload_file from "@ogw_front/utils/upload_file"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-
 import { useGeodeStore } from "@ogw_front/stores/geode"
+
+const ZERO = 0
 const schema = schemas.opengeodeweb_back.upload_file
 
-beforeEach(async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
-})
-
-describe("upload_file", () => {
-  beforeEach(() => {
+describe("upload_file test", () => {
+  function setup() {
+    const pinia = createTestingPinia({
+      stubActions: false,
+      createSpy: vi.fn,
+    })
+    setActivePinia(pinia)
     const geodeStore = useGeodeStore()
     geodeStore.base_url = ""
-  })
+    const feedbackStore = useFeedbackStore()
+    return { geodeStore, feedbackStore }
+  }
 
-  test("Throw error", async () => {
-    var file = "toto"
+  test("throw error", async () => {
+    setup()
+    const file = "toto"
 
-    expect(async () => {
-      await upload_file({ route: schema.$id, file })
-    }).rejects.toThrowError("file must be a instance of File")
+    await expect(upload_file({ route: schema.$id, file })).rejects.toThrow(
+      "file must be a instance of File",
+    )
   })
 
   test("onResponse", async () => {
-    const feedbackStore = useFeedbackStore()
+    const { feedbackStore } = setup()
     registerEndpoint(schema.$id, {
       method: "PUT",
       handler: () => ({ test: "ok" }),
     })
-    var file = new File(["fake_file"], "fake_file.txt")
-    var response_value
+    const file = new File(["fake_file"], "fake_file.txt")
+    let response_value = ""
     await upload_file(
       { route: schema.$id, file },
       {
@@ -47,7 +48,7 @@ describe("upload_file", () => {
         },
       },
     )
-    expect(feedbackStore.feedbacks.length).toBe(0)
+    expect(feedbackStore.feedbacks).toHaveLength(ZERO)
     expect(response_value).toBe("ok")
   })
 })

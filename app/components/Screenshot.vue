@@ -6,7 +6,7 @@
 
   const emit = defineEmits(["close"])
 
-  const props = defineProps({
+  const { show_dialog, width } = defineProps({
     show_dialog: { type: Boolean, required: true },
     width: { type: Number, required: false, default: 400 },
   })
@@ -31,7 +31,7 @@
         response_function: async (response) => {
           fileDownload(
             response.blob,
-            filename.value + "." + output_extension.value,
+            `${filename.value}.${output_extension.value}`,
           )
         },
       },
@@ -47,9 +47,9 @@
 </script>
 <template>
   <OptionCard
-    v-if="props.show_dialog"
+    v-if="show_dialog"
     title="Take a screenshot"
-    :width="props.width"
+    :width="width"
     class="position-absolute"
     style="z-index: 2; top: 90px; right: 55px"
   >

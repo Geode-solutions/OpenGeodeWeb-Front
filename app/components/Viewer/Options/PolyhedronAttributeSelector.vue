@@ -7,7 +7,7 @@
   const polyhedron_attribute_name = ref("")
 
   onMounted(() => {
-    if (model.value != null) {
+    if (model.value !== null) {
       polyhedron_attribute_name.value = model.value.name
     }
   })
@@ -20,7 +20,7 @@
     model.value = polyhedron_attribute
   })
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
@@ -34,7 +34,7 @@
   function getVertexAttributes() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.polyhedron_attribute_names,
-      { id: props.id },
+      { id: id },
       {
         response_function: (response) => {
           polyhedron_attribute_names.value = response.polyhedron_attribute_names

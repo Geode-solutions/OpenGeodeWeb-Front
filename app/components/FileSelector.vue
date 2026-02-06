@@ -13,31 +13,35 @@
     "decrement_step",
   ])
 
-  const props = defineProps({
+  const { multiple, files, auto_upload } = defineProps({
     multiple: { type: Boolean, required: true },
     files: { type: Array, default: () => [] },
     auto_upload: { type: Boolean, default: true },
   })
 
-  const internal_files = ref(props.files)
-  const auto_upload = ref(props.auto_upload)
+  const internal_files = ref(files)
+  const internal_auto_upload = ref(auto_upload)
   const accept = ref("")
   const loading = ref(false)
 
   watch(
-    () => props.files,
-    (val) => (internal_files.value = val),
+    () => files,
+    (val) => {
+      internal_files.value = val
+    },
   )
 
   watch(
-    () => props.auto_upload,
-    (val) => (auto_upload.value = val),
+    () => auto_upload,
+    (val) => {
+      internal_auto_upload.value = val
+    },
   )
 
   const toggle_loading = useToggle(loading)
 
   function files_uploaded_event(value) {
-    if (value.length) {
+    if (value.length > 0) {
       emit("update_values", { files: value, auto_upload: false })
       emit("increment_step")
     }
@@ -47,7 +51,9 @@
     toggle_loading()
     const geodeStore = useGeodeStore()
     const response = await geodeStore.request(schema, {})
-    accept.value = response.extensions.map((e) => `.${e}`).join(",")
+    accept.value = response.extensions
+      .map((extension) => `.${extension}`)
+      .join(",")
     toggle_loading()
   }
 
@@ -58,7 +64,12 @@
   <FetchingData v-if="loading" />
   <FileUploader
     v-else
-    v-bind="{ multiple, accept, files: internal_files, auto_upload }"
+    v-bind="{
+      multiple,
+      accept,
+      files: internal_files,
+      auto_upload: internal_auto_upload,
+    }"
     @files_uploaded="files_uploaded_event"
   />
 </template>

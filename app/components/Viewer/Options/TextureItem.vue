@@ -1,21 +1,21 @@
 <script setup>
-  import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import FileUploader from "@ogw_front/components/FileUploader"
+  import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const emit = defineEmits(["update_value"])
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
     texture_id: { type: String, required: true },
     texture_name: { type: String, required: true },
   })
 
   const texture_name = ref("")
-  texture_name.value = props.texture_name
+  texture_name.value = texture_name
 
   const texture_id = ref("")
-  texture_id.value = props.texture_id
+  texture_id.value = texture_id
 
   const texture_coordinates = ref([])
   const geodeStore = useGeodeStore()
@@ -27,7 +27,7 @@
   function getTextureCoordinates() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.texture_coordinates,
-      { id: props.id },
+      { id: id },
       {
         response_function: (response) => {
           texture_coordinates.value = response.texture_coordinates

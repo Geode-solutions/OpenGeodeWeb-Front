@@ -2,39 +2,39 @@
 import PointSetPointsOptions from "@ogw_front/components/Viewer/PointSet/SpecificPointsOptions"
 
 // EdgedCurve components
-import EdgedCurvePointsOptions from "@ogw_front/components/Viewer/EdgedCurve/PointsOptions"
 import EdgedCurveEdgesOptions from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesOptions"
+import EdgedCurvePointsOptions from "@ogw_front/components/Viewer/EdgedCurve/PointsOptions"
 
 // PolygonalSurface components
-import PolygonalSurfacePointsOptions from "@ogw_front/components/Viewer/PolygonalSurface/PointsOptions"
 import PolygonalSurfaceEdgesOptions from "@ogw_front/components/Viewer/PolygonalSurface/EdgesOptions"
+import PolygonalSurfacePointsOptions from "@ogw_front/components/Viewer/PolygonalSurface/PointsOptions"
 import PolygonalSurfacePolygonsOptions from "@ogw_front/components/Viewer/PolygonalSurface/SpecificPolygonsOptions"
 
 // TriangulatedSurface components
-import TriangulatedSurfacePointsOptions from "@ogw_front/components/Viewer/TriangulatedSurface/PointsOptions"
 import TriangulatedSurfaceEdgesOptions from "@ogw_front/components/Viewer/TriangulatedSurface/EdgesOptions"
+import TriangulatedSurfacePointsOptions from "@ogw_front/components/Viewer/TriangulatedSurface/PointsOptions"
 import TriangulatedSurfaceTrianglesOptions from "@ogw_front/components/Viewer/TriangulatedSurface/TrianglesOptions"
 
 // Grid 2D components
-import Grid2DPointsOptions from "@ogw_front/components/Viewer/Grid/2D/PointsOptions"
-import Grid2DEdgesOptions from "@ogw_front/components/Viewer/Grid/2D/EdgesOptions"
 import Grid2DCellsOptions from "@ogw_front/components/Viewer/Grid/2D/CellsOptions"
+import Grid2DEdgesOptions from "@ogw_front/components/Viewer/Grid/2D/EdgesOptions"
+import Grid2DPointsOptions from "@ogw_front/components/Viewer/Grid/2D/PointsOptions"
 
 // Grid 3D components
-import Grid3DPointsOptions from "@ogw_front/components/Viewer/Grid/3D/PointsOptions"
 import Grid3DEdgesOptions from "@ogw_front/components/Viewer/Grid/3D/EdgesOptions"
+import Grid3DPointsOptions from "@ogw_front/components/Viewer/Grid/3D/PointsOptions"
 // import Grid3DFacetsOptions from "@ogw_front/components/Viewer/Grid/3D/FacetsOptions"
 import Grid3DCellsOptions from "@ogw_front/components/Viewer/Grid/3D/CellsOptions"
 
 // Solid components
-import SolidPointsOptions from "@ogw_front/components/Viewer/Solid/PointsOptions"
 import SolidEdgesOptions from "@ogw_front/components/Viewer/Solid/EdgesOptions"
+import SolidPointsOptions from "@ogw_front/components/Viewer/Solid/PointsOptions"
 import SolidPolygonsOptions from "@ogw_front/components/Viewer/Solid/PolygonsOptions"
 import SolidPolyhedraOptions from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraOptions"
 
 // TetrahedralSolid components
-import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions"
 import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TetrahedraOptions"
+import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions"
 
 // Model components
 import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions"

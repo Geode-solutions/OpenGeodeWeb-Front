@@ -1,12 +1,12 @@
 import isElectron from "is-electron"
 
-export const appMode = {
+const appMode = {
   DESKTOP: "DESKTOP",
   BROWSER: "BROWSER",
   CLOUD: "CLOUD",
 }
 
-export function getAppMode() {
+function getAppMode() {
   if (isElectron()) {
     return appMode.DESKTOP
   }
@@ -15,4 +15,8 @@ export function getAppMode() {
   }
   return appMode.CLOUD
 }
-export default { appMode, getAppMode }
+
+const app_mode_utils = { appMode, getAppMode }
+
+export { appMode, getAppMode }
+export default app_mode_utils

@@ -1,20 +1,25 @@
-import { describe, expect, test, beforeEach, vi } from "vitest"
-import { setActivePinia } from "pinia"
+import { describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import { setActivePinia } from "pinia"
 
-import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+
+const FIRST_INDEX = 0
 
 describe("geodeStore.request()", () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
-  const geodeStore = useGeodeStore()
-  const feedbackStore = useFeedbackStore()
-  geodeStore.base_url = ""
+  function setup() {
+    const pinia = createTestingPinia({
+      stubActions: false,
+      createSpy: vi.fn,
+    })
+    setActivePinia(pinia)
+    const geodeStore = useGeodeStore()
+    const feedbackStore = useFeedbackStore()
+    geodeStore.base_url = ""
+    return { geodeStore, feedbackStore }
+  }
 
   const schema = {
     $id: "/test",
@@ -29,19 +34,8 @@ describe("geodeStore.request()", () => {
     additionalProperties: false,
   }
 
-  beforeEach(async () => {
-    await feedbackStore.$reset()
-    await geodeStore.$reset()
-    geodeStore.base_url = ""
-  })
-
-  // test("valid schema and params", async () => {
-  //   const params = { test: "hello" }
-  //   const response = await api_fetch({ schema, params })
-  //   expect(response).toBeDefined()
-  // })
-
   test("invalid schema", async () => {
+    const { geodeStore } = setup()
     const schema = {
       $id: "/test",
       type: "object",
@@ -55,19 +49,21 @@ describe("geodeStore.request()", () => {
       additionalProperties: false,
     }
     const params = { test: "hello" }
-    expect(() => geodeStore.request(schema, params)).toThrowError(
+    expect(() => geodeStore.request(schema, params)).toThrow(
       "data/test must be number",
     )
   })
 
   test("invalid params", async () => {
+    const { geodeStore } = setup()
     const params = {}
-    expect(() => geodeStore.request(schema, params)).toThrowError(
+    expect(() => geodeStore.request(schema, params)).toThrow(
       "data must have required property 'test'",
     )
   })
 
   test("request with callbacks", async () => {
+    const { geodeStore } = setup()
     const params = { test: "hello" }
     let errorCalled = false
     const callbacks = {
@@ -76,30 +72,10 @@ describe("geodeStore.request()", () => {
       },
     }
     registerEndpoint(schema.$id, {
-      method: schema.methods[0],
+      method: schema.methods[FIRST_INDEX],
       handler: () => ({ result: "success" }),
     })
     await geodeStore.request(schema, params, callbacks)
-    expect(errorCalled).toBe(false)
+    expect(errorCalled).toBeFalsy()
   })
-
-  // test("response handling", async () => {
-  //   const schema = {
-  //     $id: "/test",
-  //     type: "object",
-  //     methods: ["POST"],
-  //     properties: {
-  //       test: {
-  //         type: "string",
-  //       },
-  //     },
-  //     required: ["test"],
-  //     additionalProperties: false,
-  //   }
-  //   const params = { test: "hello" }
-  //   // const responseFunction = jest.fn()
-  //   const response = await api_fetch({ schema, params }, { response_function })
-  //   expect(responseFunction).toHaveBeenCalledTimes(1)
-  //   expect(response).toBeDefined()
-  // })
 })

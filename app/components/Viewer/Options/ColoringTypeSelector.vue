@@ -1,11 +1,11 @@
 <script setup>
+  import ViewerOptionsCellAttributeSelector from "@ogw_front/components/Viewer/Options/CellAttributeSelector"
   import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker"
-  import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector"
-  import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector"
   import ViewerOptionsEdgeAttributeSelector from "@ogw_front/components/Viewer/Options/EdgeAttributeSelector"
   import ViewerOptionsPolygonAttributeSelector from "@ogw_front/components/Viewer/Options/PolygonAttributeSelector"
-  import ViewerOptionsCellAttributeSelector from "@ogw_front/components/Viewer/Options/CellAttributeSelector"
   import ViewerOptionsPolyhedronAttributeSelector from "@ogw_front/components/Viewer/Options/PolyhedronAttributeSelector"
+  import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector"
+  import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector"
 
   const coloring_style_key = defineModel("coloring_style_key")
 
@@ -17,29 +17,17 @@
   const polygon_attribute = defineModel("polygon_attribute")
   const polyhedron_attribute = defineModel("polyhedron_attribute")
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
-  const has_color = computed(() => (color.value !== undefined ? true : false))
-  const has_textures = computed(() =>
-    textures.value !== undefined ? true : false,
-  )
-  const has_vertex = computed(() =>
-    vertex_attribute.value !== undefined ? true : false,
-  )
-  const has_edge = computed(() =>
-    edge_attribute.value !== undefined ? true : false,
-  )
-  const has_cells = computed(() =>
-    cell_attribute.value !== undefined ? true : false,
-  )
-  const has_polygons = computed(() =>
-    polygon_attribute.value !== undefined ? true : false,
-  )
-  const has_polyhedra = computed(() =>
-    polyhedron_attribute.value !== undefined ? true : false,
-  )
+  const has_color = computed(() => color.value !== undefined)
+  const has_textures = computed(() => textures.value !== undefined)
+  const has_vertex = computed(() => vertex_attribute.value !== undefined)
+  const has_edge = computed(() => edge_attribute.value !== undefined)
+  const has_cells = computed(() => cell_attribute.value !== undefined)
+  const has_polygons = computed(() => polygon_attribute.value !== undefined)
+  const has_polyhedra = computed(() => polyhedron_attribute.value !== undefined)
 
   const color_dict = { name: "Color", value: "color" }
   const textures_dict = { name: "Textures", value: "textures" }
@@ -61,12 +49,8 @@
     if (has_polygons.value) array.push(polygon_dict)
     if (has_polyhedra.value) array.push(polyhedron_dict)
 
-    const labels = array.map((coloring) => {
-      return coloring.name
-    })
-    const values = array.map((coloring) => {
-      return coloring.value
-    })
+    const labels = array.map((coloring) => coloring.name)
+    const values = array.map((coloring) => coloring.value)
 
     return { labels, values }
   })

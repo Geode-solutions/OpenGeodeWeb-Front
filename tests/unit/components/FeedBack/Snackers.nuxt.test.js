@@ -1,14 +1,15 @@
 // @vitest-environment nuxt
-vi.stubGlobal("visualViewport", new EventTarget())
-import { describe, expect, test, vi } from "vitest"
-import { mount } from "@vue/test-utils"
 import * as components from "vuetify/components"
-import { setActivePinia } from "pinia"
+import { describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
+import { mount } from "@vue/test-utils"
+import { setActivePinia } from "pinia"
 
 import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { vuetify } from "../../../utils"
+
+vi.stubGlobal("visualViewport", new EventTarget())
 
 describe("FeedBackSnackers", async () => {
   test(`Test delete error`, async () => {

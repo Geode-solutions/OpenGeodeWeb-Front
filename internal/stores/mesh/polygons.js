@@ -126,7 +126,7 @@ export function useMeshPolygonsStyle() {
     return meshPolygonsStyle(id).coloring.active
   }
   function setMeshPolygonsActiveColoring(id, type) {
-    const coloring = meshPolygonsStyle(id).coloring
+    const { coloring } = meshPolygonsStyle(id)
     coloring.active = type
     console.log(
       setMeshPolygonsActiveColoring.name,
@@ -151,7 +151,7 @@ export function useMeshPolygonsStyle() {
       }
       return setMeshPolygonsPolygonAttribute(id, coloring.polygon)
     } else {
-      throw new Error("Unknown mesh polygons coloring type: " + type)
+      throw new Error(`Unknown mesh polygons coloring type: ${type}`)
     }
   }
 

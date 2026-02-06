@@ -1,5 +1,5 @@
-import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
 export async function upload_file(
   { route, file },
@@ -18,7 +18,6 @@ export async function upload_file(
     method: "PUT",
     body: body,
   }
-
   geodeStore.start_request()
   return $fetch(route, {
     baseURL: geodeStore.base_url,

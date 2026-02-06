@@ -2,14 +2,14 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useDataStyleStateStore } from "../data_style_state"
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useMeshPointsStyle } from "./points"
-import { useMeshEdgesStyle } from "./edges"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useMeshCellsStyle } from "./cells"
+import { useMeshEdgesStyle } from "./edges"
+import { useMeshPointsStyle } from "./points"
 import { useMeshPolygonsStyle } from "./polygons"
 import { useMeshPolyhedraStyle } from "./polyhedra"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh
@@ -58,7 +58,7 @@ export default function useMeshStyle() {
       } else if (key === "polyhedra") {
         promise_array.push(meshPolyhedraStyleStore.applyMeshPolyhedraStyle(id))
       } else {
-        throw new Error("Unknown mesh key: " + key)
+        throw new Error(`Unknown mesh key: ${key}`)
       }
     }
     return Promise.all(promise_array)

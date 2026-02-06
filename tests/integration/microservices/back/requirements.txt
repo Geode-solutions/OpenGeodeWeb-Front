@@ -5,4 +5,3 @@
 #    pip-compile --output-file=tests/integration/microservices/back/requirements.txt tests/integration/microservices/back/requirements.in
 #
 
-opengeodeweb-back==6.*,>=6.1.0rc3

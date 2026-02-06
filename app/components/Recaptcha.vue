@@ -2,7 +2,9 @@
   import { appMode } from "@ogw_front/utils/app_mode"
   import { useInfraStore } from "@ogw_front/stores/infra"
 
-  const props = defineProps({
+  const RESPONSE_STATUS_OK = 200
+
+  const { button_label, button_color, color } = defineProps({
     button_label: {
       type: String,
       required: false,
@@ -58,7 +60,7 @@
       },
     })
     infraStore.$patch({
-      is_captcha_validated: response.status === 200,
+      is_captcha_validated: response.status === RESPONSE_STATUS_OK,
     })
   }
 </script>
@@ -95,8 +97,8 @@
   <VRow align="center" justify="center">
     <VCol cols="4" class="d-flex justify-center align-center">
       <VBtn
-        :text="props.button_label"
-        :color="props.color || props.button_color"
+        :text="button_label"
+        :color="color || button_color"
         @click="submit_recaptcha"
       />
     </VCol>

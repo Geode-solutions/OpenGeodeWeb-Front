@@ -2,16 +2,16 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import { useDataStyleStateStore } from "../data_style_state"
 import { useDataStore } from "@ogw_front/stores/data"
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useModelSurfacesStyle } from "./surfaces"
-import { useModelCornersStyle } from "./corners"
+import { useDataStyleStateStore } from "../data_style_state"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useModelBlocksStyle } from "./blocks"
-import { useModelLinesStyle } from "./lines"
+import { useModelCornersStyle } from "./corners"
 import { useModelEdgesStyle } from "./edges"
+import { useModelLinesStyle } from "./lines"
 import { useModelPointsStyle } from "./points"
+import { useModelSurfacesStyle } from "./surfaces"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model
@@ -50,21 +50,21 @@ export default function useModelStyle() {
     const styles = dataStyleStateStore.styles[id]
     if (!styles) return visible_mesh_components
 
-    Object.entries(styles.corners || {}).forEach(([corner_id, style]) => {
+    for (const [corner_id, style] of Object.entries(styles.corners || {})) {
       if (style.visibility) visible_mesh_components.value.push(corner_id)
-    })
+    }
 
-    Object.entries(styles.lines || {}).forEach(([line_id, style]) => {
+    for (const [line_id, style] of Object.entries(styles.lines || {})) {
       if (style.visibility) visible_mesh_components.value.push(line_id)
-    })
+    }
 
-    Object.entries(styles.surfaces || {}).forEach(([surface_id, style]) => {
+    for (const [surface_id, style] of Object.entries(styles.surfaces || {})) {
       if (style.visibility) visible_mesh_components.value.push(surface_id)
-    })
+    }
 
-    Object.entries(styles.blocks || {}).forEach(([block_id, style]) => {
+    for (const [block_id, style] of Object.entries(styles.blocks || {})) {
       if (style.visibility) visible_mesh_components.value.push(block_id)
-    })
+    }
 
     return visible_mesh_components
   }
@@ -79,7 +79,7 @@ export default function useModelStyle() {
     } else if (component_type === "Block") {
       return modelBlocksStyleStore.modelBlockVisibility(id, component_id)
     }
-    throw new Error("Unknown model component_type: " + component_type)
+    throw new Error(`Unknown model component_type: ${component_type}`)
   }
 
   function modelColor(id) {
@@ -132,7 +132,7 @@ export default function useModelStyle() {
         visibility,
       )
     } else {
-      throw new Error("Unknown model component_type: " + component_type)
+      throw new Error(`Unknown model component_type: ${component_type}`)
     }
   }
 
@@ -155,7 +155,7 @@ export default function useModelStyle() {
       } else if (key === "edges") {
         promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id))
       } else {
-        throw new Error("Unknown model key: " + key)
+        throw new Error(`Unknown model key: ${key}`)
       }
     }
     return Promise.all(promise_array)

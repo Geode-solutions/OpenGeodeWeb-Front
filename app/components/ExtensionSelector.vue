@@ -11,11 +11,10 @@
     "decrement_step",
   ])
 
-  const props = defineProps({
+  const { geode_object_type, filenames } = defineProps({
     geode_object_type: { type: String, required: true },
     filenames: { type: Array, required: true },
   })
-  const { geode_object_type, filenames } = props
   const geode_objects_and_output_extensions = ref({})
   const loading = ref(false)
 
@@ -25,27 +24,20 @@
     toggle_loading()
     geode_objects_and_output_extensions.value = {}
     const geodeStore = useGeodeStore()
-    const promise_array = filenames.map((filename) => {
-      return new Promise((resolve, reject) => {
-        const params = {
+    const values = await Promise.all(
+      filenames.map(async (filename) => {
+        const response = await geodeStore.request(schema, {
           geode_object_type,
           filename,
-        }
-        geodeStore.request(schema, params, {
-          request_error_function: () => reject(),
-          response_function: (response) => {
-            resolve(response.geode_objects_and_output_extensions)
-          },
-          response_error_function: () => reject(),
         })
-      })
-    })
-    const values = await Promise.all(promise_array)
+        return response.geode_objects_and_output_extensions
+      }),
+    )
     const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))]
     const common_keys = all_keys.filter(
       (i) => !values.some((j) => !Object.keys(j).includes(i)),
     )
-    var final_object = {}
+    const final_object = {}
     for (const key of common_keys) {
       final_object[key] = {}
       for (const value of values) {
@@ -61,7 +53,7 @@
   }
 
   function update_values(output_geode_object, output_extension) {
-    if (output_geode_object != "" && output_extension != "") {
+    if (output_geode_object !== "" && output_extension !== "") {
       emit("update_values", {
         output_geode_object,
         output_extension,
