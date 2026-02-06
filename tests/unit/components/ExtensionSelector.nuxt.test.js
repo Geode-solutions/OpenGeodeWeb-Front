@@ -1,11 +1,11 @@
-import { describe, expect, test, vi } from "vitest"
-import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
 import * as components from "vuetify/components"
+import { describe, expect, test, vi } from "vitest"
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
+import { createTestingPinia } from "@pinia/testing"
+import { setActivePinia } from "pinia"
 
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { vuetify } from "../../utils"
 

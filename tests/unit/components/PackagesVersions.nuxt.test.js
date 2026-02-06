@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
 import { createTestingPinia } from "@pinia/testing"
+import { setActivePinia } from "pinia"
 
 import PackagesVersions from "@ogw_front/components/PackagesVersions"
 import { useGeodeStore } from "@ogw_front/stores/geode"

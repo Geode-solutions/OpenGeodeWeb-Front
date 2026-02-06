@@ -1,18 +1,18 @@
-import { describe, expect, test, vi } from "vitest"
-import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-import { flushPromises } from "@vue/test-utils"
 import * as components from "vuetify/components"
-import { setActivePinia } from "pinia"
+import { describe, expect, test, vi } from "vitest"
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { createTestingPinia } from "@pinia/testing"
+import { flushPromises } from "@vue/test-utils"
+import { setActivePinia } from "pinia"
 
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import ObjectSelector from "@ogw_front/components/ObjectSelector"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { vuetify } from "../../utils"
 
-const allowed_objects = schemas.opengeodeweb_back.allowed_objects
+const { allowed_objects } = schemas.opengeodeweb_back
 
-describe("ObjectSelector", async () => {
+describe("ObjectSelector", () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -22,7 +22,7 @@ describe("ObjectSelector", async () => {
   geodeStore.base_url = ""
 
   test(`test loadable with one class`, async () => {
-    var response = {
+    const response = {
       allowed_objects: {},
     }
     const geode_object_1 = "BRep"
@@ -49,7 +49,7 @@ describe("ObjectSelector", async () => {
   })
 
   test(`test loabable with multiple classes`, async () => {
-    var response = {
+    const response = {
       allowed_objects: {},
     }
     const geode_object_1 = "BRep"
@@ -73,10 +73,6 @@ describe("ObjectSelector", async () => {
     await v_card.trigger("click")
     await flushPromises()
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    console.log(
-      "wrapper.emitted().update_values",
-      wrapper.emitted().update_values,
-    )
     expect(wrapper.emitted().update_values).toHaveLength(1)
     expect(wrapper.emitted().update_values[0][0]).toEqual({
       geode_object_type: geode_object_1,
@@ -85,15 +81,15 @@ describe("ObjectSelector", async () => {
   })
 
   test(`test object_priority when is_loadable scores equal`, async () => {
-    var response = { allowed_objects: {} }
+    const response = { allowed_objects: {} }
     const geode_object_1 = "BRep"
     const geode_object_2 = "EdgedCurve3D"
     response["allowed_objects"][geode_object_1] = {
-      is_loadable: 1.0,
+      is_loadable: 1,
       object_priority: 2,
     }
     response["allowed_objects"][geode_object_2] = {
-      is_loadable: 1.0,
+      is_loadable: 1,
       object_priority: 1,
     }
     registerEndpoint(allowed_objects.$id, {

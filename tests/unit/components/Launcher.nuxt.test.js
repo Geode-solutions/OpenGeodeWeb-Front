@@ -1,18 +1,19 @@
 import { describe, expect, test, vi } from "vitest"
+
+import Launcher from "@ogw_front/components/Launcher"
+import ResizeObserver from "resize-observer-polyfill"
+import { createTestingPinia } from "@pinia/testing"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
-
-import Launcher from "@ogw_front/components/Launcher"
 
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { vuetify } from "../../utils"
 
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
-  return callback({ name })
-})
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name, task) => await task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -21,7 +22,7 @@ vi.stubGlobal("navigator", {
   },
 })
 
-global.ResizeObserver = require("resize-observer-polyfill")
+global.ResizeObserver = ResizeObserver
 
 describe("Launcher", async () => {
   test(`Mount`, async () => {
