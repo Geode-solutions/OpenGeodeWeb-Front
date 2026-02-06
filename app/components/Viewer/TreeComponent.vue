@@ -1,74 +1,51 @@
 <script setup>
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useDataStore } from "@ogw_front/stores/data"
-  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useDataStore } from "@ogw_front/stores/data"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 
-  import { compareSelections } from "@ogw_front/utils/treeview"
+import { compareSelections } from "@ogw_front/utils/treeview"
 
-  const dataStyleStore = useDataStyleStore()
-  const dataStore = useDataStore()
-  const hybridViewerStore = useHybridViewerStore()
+const dataStyleStore = useDataStyleStore()
+const dataStore = useDataStore()
+const hybridViewerStore = useHybridViewerStore()
 
-  const props = defineProps({ id: { type: String, required: true } })
+const props = defineProps({ id: { type: String, required: true } })
 
-  const emit = defineEmits(["show-menu"])
+const emit = defineEmits(["show-menu"])
 
-  const items = ref([])
-  const mesh_components_selection = ref([])
-  let isUpdating = false
+const items = ref([])
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(props.id)
 
-  async function updateTree() {
-    isUpdating = true
-    items.value = await dataStore.formatedMeshComponents(props.id)
-    const visibleIds = dataStyleStore.visibleMeshComponents(props.id).value
-    mesh_components_selection.value = items.value
-      .flatMap((group) => group.children)
-      .filter((child) => visibleIds.includes(child.id))
-    setTimeout(() => {
-      isUpdating = false
-    }, 0)
-  }
+watchEffect(async () => {
+  items.value = await dataStore.formatedMeshComponents(props.id)
+})
 
-  watch(
-    () => props.id,
-    async () => {
-      await updateTree()
-    },
-    { immediate: true },
-  )
+watch(
+  mesh_components_selection,
+  async (current, previous) => {
+    if (!previous) return
 
-  watch(
-    mesh_components_selection,
-    async (current, previous) => {
-      if (isUpdating) return
-      if (!previous) previous = []
-      const { added, removed } = compareSelections(current, previous)
+    const { added, removed } = compareSelections(current, previous)
 
-      const promises = []
-      for (const item of added) {
-        promises.push(
-          dataStyleStore.setModelMeshComponentVisibility(
-            props.id,
-            [item.id],
-            true,
-          ),
-        )
-      }
+    for (const item of added) {
+      await dataStyleStore.setModelMeshComponentsVisibility(
+        props.id,
+        [item],
+        true,
+      )
+    }
 
-      for (const item of removed) {
-        promises.push(
-          dataStyleStore.setModelMeshComponentVisibility(
-            props.id,
-            [item.id],
-            false,
-          ),
-        )
-      }
-      await Promise.all(promises)
-      hybridViewerStore.remoteRender()
-    },
-    { immediate: true, deep: true },
-  )
+    for (const item of removed) {
+      await dataStyleStore.setModelMeshComponentsVisibility(
+        props.id,
+        [item],
+        false,
+      )
+    }
+    hybridViewerStore.remoteRender()
+  },
+  { deep: true },
+)
 </script>
 
 <template>
@@ -79,7 +56,6 @@
     item-value="id"
     select-strategy="classic"
     selectable
-    return-object
   >
     <template #title="{ item }">
       <span
@@ -94,16 +70,16 @@
 </template>
 
 <style scoped>
-  .treeview-item {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    display: inline-block;
-  }
+.treeview-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+}
 
-  .transparent-treeview {
-    background-color: transparent;
-    margin: 4px 0;
-  }
+.transparent-treeview {
+  background-color: transparent;
+  margin: 4px 0;
+}
 </style>
