@@ -7,7 +7,7 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { viewer_call } from "../../internal/utils/viewer_call"
-import vtkWSLinkClient from "@kitware/vtk.js/IO/Core/WSLinkClient"
+import { newInstance as vtkWSLinkClient } from "@kitware/vtk.js/IO/Core/WSLinkClient"
 
 const MS_PER_SECOND = 1000
 const SECONDS_PER_REQUEST = 10
@@ -94,8 +94,7 @@ export const useViewerStore = defineStore("viewer", {
         }
         let clientToConnect = client
         if (_.isEmpty(clientToConnect)) {
-          // oxlint-disable-next-line import/no-named-as-default-member
-          clientToConnect = vtkWSLinkClient.newInstance()
+          clientToConnect = vtkWSLinkClient()
         }
 
         // Connect to busy store
