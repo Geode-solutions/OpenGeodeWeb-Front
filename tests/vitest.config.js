@@ -6,6 +6,7 @@ const globalRetry = process.env.CI ? 3 : 0
 
 export default defineConfig({
   test: {
+    globals: true,
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
       defineVitestProject({
