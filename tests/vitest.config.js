@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
-      await defineVitestProject({
+      defineVitestProject({
         test: {
           name: "unit",
           include: ["tests/unit/**/*.test.js"],
@@ -22,7 +22,7 @@ export default defineConfig({
           retry: globalRetry,
         },
       }),
-      await defineVitestProject({
+      defineVitestProject({
         test: {
           name: "integration",
           include: ["tests/integration/**/*.test.js"],
