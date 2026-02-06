@@ -22,7 +22,7 @@ const vertex_attribute = { name: "points" }
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -89,7 +89,10 @@ describe("Mesh points", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute),
+            dataStyleStore.setMeshPointsVertexAttributeName(
+              id,
+              vertex_attribute.name,
+            ),
         },
       ]
       for (let i = 0; i < coloringTypes.length; i++) {
@@ -137,7 +140,10 @@ describe("Mesh points", () => {
       const viewerStore = useViewerStore()
 
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute)
+      await dataStyleStore.setMeshPointsVertexAttributeName(
+        id,
+        vertex_attribute.name,
+      )
       expect(spy).toHaveBeenCalledWith(
         mesh_points_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
@@ -145,8 +151,8 @@ describe("Mesh points", () => {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPointsVertexAttribute(id)).toMatchObject(
-        vertex_attribute,
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(
+        vertex_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })

@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
+import { ensureAttributeEntry } from "./utils"
 
 // Local constants
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells
@@ -76,12 +77,6 @@ export function useMeshCellsStyle() {
     )
   }
 
-  function meshCellsVertexAttribute(id) {
-    return meshCellsStyle(id).coloring.vertex
-  }
-  function setMeshCellsVertexAttribute(id, vertex_attribute) {
-    return setMeshCellsVertexAttributeName(id, vertex_attribute.name)
-  }
   function meshCellsVertexAttributeName(id) {
     const vertex = meshCellsStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
@@ -125,9 +120,7 @@ export function useMeshCellsStyle() {
   function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
     const coloring_style = meshCellsStyle(id).coloring
     const name = coloring_style.vertex.name
-    if (!coloring_style.vertex.attributes[name]) {
-      coloring_style.vertex.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.vertex, name)
     const saved_preset = coloring_style.vertex.attributes[name]
     saved_preset.minimum = minimum
     saved_preset.maximum = maximum
@@ -158,15 +151,13 @@ export function useMeshCellsStyle() {
   ) {
     const coloring_style = meshCellsStyle(id).coloring
     const name = coloring_style.vertex.name
-    if (!coloring_style.vertex.attributes[name]) {
-      coloring_style.vertex.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.vertex, name)
     const saved_preset = coloring_style.vertex.attributes[name]
     saved_preset.colorMap = colorMapName
-    let points = colorMapName
-    if (typeof colorMapName === "string") {
-      points = getRGBPointsFromPreset(colorMapName)
-    }
+    const points =
+      typeof colorMapName === "string"
+        ? getRGBPointsFromPreset(colorMapName)
+        : colorMapName
     return viewerStore.request(
       mesh_cells_schemas.attribute.vertex.color_map,
       { id, points, minimum, maximum },
@@ -174,19 +165,13 @@ export function useMeshCellsStyle() {
         response_function: () => {
           console.log(setMeshCellsVertexAttributeColorMap.name, {
             id,
-            colorMapName,
+            colorMapName: meshCellsVertexAttributeColorMap(id),
           })
         },
       },
     )
   }
 
-  function meshCellsCellAttribute(id) {
-    return meshCellsStyle(id).coloring.cell
-  }
-  function setMeshCellsCellAttribute(id, cell_attribute) {
-    return setMeshCellsCellAttributeName(id, cell_attribute.name)
-  }
   function meshCellsCellAttributeName(id) {
     return meshCellsStyle(id).coloring.cell?.name ?? ""
   }
@@ -229,9 +214,7 @@ export function useMeshCellsStyle() {
   function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const coloring_style = meshCellsStyle(id).coloring
     const name = coloring_style.cell.name
-    if (!coloring_style.cell.attributes[name]) {
-      coloring_style.cell.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.cell, name)
     const saved_preset = coloring_style.cell.attributes[name]
     saved_preset.minimum = minimum
     saved_preset.maximum = maximum
@@ -262,15 +245,13 @@ export function useMeshCellsStyle() {
   ) {
     const coloring_style = meshCellsStyle(id).coloring
     const name = coloring_style.cell.name
-    if (!coloring_style.cell.attributes[name]) {
-      coloring_style.cell.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.cell, name)
     const saved_preset = coloring_style.cell.attributes[name]
     saved_preset.colorMap = colorMapName
-    let points = colorMapName
-    if (typeof colorMapName === "string") {
-      points = getRGBPointsFromPreset(colorMapName)
-    }
+    const points =
+      typeof colorMapName === "string"
+        ? getRGBPointsFromPreset(colorMapName)
+        : colorMapName
     return viewerStore.request(
       mesh_cells_schemas.attribute.cell.color_map,
       { id, points, minimum, maximum },
@@ -278,7 +259,7 @@ export function useMeshCellsStyle() {
         response_function: () => {
           console.log(setMeshCellsCellAttributeColorMap.name, {
             id,
-            colorMapName,
+            colorMapName: meshCellsCellAttributeColorMap(id),
           })
         },
       },
@@ -288,7 +269,7 @@ export function useMeshCellsStyle() {
   function meshCellsActiveColoring(id) {
     return meshCellsStyle(id).coloring.active
   }
-  function setMeshCellsActiveColoring(id, type) {
+  async function setMeshCellsActiveColoring(id, type) {
     const coloring = meshCellsStyle(id).coloring
     coloring.active = type
     console.log(
@@ -312,22 +293,18 @@ export function useMeshCellsStyle() {
       const minimum = attributes[name]?.minimum
       const maximum = attributes[name]?.maximum
       const colorMap = attributes[name]?.colorMap
-      return setMeshCellsVertexAttributeName(id, name).then(() => {
-        if (minimum !== undefined && maximum !== undefined) {
-          return setMeshCellsVertexAttributeRange(id, minimum, maximum).then(
-            () => {
-              if (colorMap) {
-                return setMeshCellsVertexAttributeColorMap(
-                  id,
-                  colorMap,
-                  minimum,
-                  maximum,
-                )
-              }
-            },
+      await setMeshCellsVertexAttributeName(id, name)
+      if (minimum !== undefined && maximum !== undefined) {
+        await setMeshCellsVertexAttributeRange(id, minimum, maximum)
+        if (colorMap) {
+          await setMeshCellsVertexAttributeColorMap(
+            id,
+            colorMap,
+            minimum,
+            maximum,
           )
         }
-      })
+      }
     } else if (type === "cell") {
       const name = coloring.cell.name
       if (name === undefined) {
@@ -337,24 +314,20 @@ export function useMeshCellsStyle() {
       const minimum = attributes[name]?.minimum
       const maximum = attributes[name]?.maximum
       const colorMap = attributes[name]?.colorMap
-      return setMeshCellsCellAttributeName(id, name).then(() => {
-        if (minimum !== undefined && maximum !== undefined) {
-          return setMeshCellsCellAttributeRange(id, minimum, maximum).then(
-            () => {
-              if (colorMap) {
-                return setMeshCellsCellAttributeColorMap(
-                  id,
-                  colorMap,
-                  minimum,
-                  maximum,
-                )
-              }
-            },
+      await setMeshCellsCellAttributeName(id, name)
+      if (minimum !== undefined && maximum !== undefined) {
+        await setMeshCellsCellAttributeRange(id, minimum, maximum)
+        if (colorMap) {
+          await setMeshCellsCellAttributeColorMap(
+            id,
+            colorMap,
+            minimum,
+            maximum,
           )
         }
-      })
+      }
     } else {
-      throw new Error("Unknown active coloring type: " + type)
+      throw new Error("Unknown mesh cells active coloring type: " + type)
     }
   }
 
@@ -371,11 +344,9 @@ export function useMeshCellsStyle() {
     meshCellsActiveColoring: meshCellsActiveColoring,
     meshCellsColor: meshCellsColor,
     meshCellsTextures: meshCellsTextures,
-    meshCellsVertexAttribute: meshCellsVertexAttribute,
     meshCellsVertexAttributeName: meshCellsVertexAttributeName,
     meshCellsVertexAttributeRange: meshCellsVertexAttributeRange,
     meshCellsVertexAttributeColorMap: meshCellsVertexAttributeColorMap,
-    meshCellsCellAttribute: meshCellsCellAttribute,
     meshCellsCellAttributeName: meshCellsCellAttributeName,
     meshCellsCellAttributeRange: meshCellsCellAttributeRange,
     meshCellsCellAttributeColorMap: meshCellsCellAttributeColorMap,
@@ -383,11 +354,9 @@ export function useMeshCellsStyle() {
     setMeshCellsActiveColoring: setMeshCellsActiveColoring,
     setMeshCellsColor: setMeshCellsColor,
     setMeshCellsTextures: setMeshCellsTextures,
-    setMeshCellsVertexAttribute: setMeshCellsVertexAttribute,
     setMeshCellsVertexAttributeName: setMeshCellsVertexAttributeName,
     setMeshCellsVertexAttributeRange: setMeshCellsVertexAttributeRange,
     setMeshCellsVertexAttributeColorMap: setMeshCellsVertexAttributeColorMap,
-    setMeshCellsCellAttribute: setMeshCellsCellAttribute,
     setMeshCellsCellAttributeName: setMeshCellsCellAttributeName,
     setMeshCellsCellAttributeRange: setMeshCellsCellAttributeRange,
     setMeshCellsCellAttributeColorMap: setMeshCellsCellAttributeColorMap,

@@ -6,6 +6,7 @@ import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
+import { ensureAttributeEntry } from "./utils"
 
 // Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
@@ -82,12 +83,6 @@ export function useMeshPolygonsStyle() {
     )
   }
 
-  function meshPolygonsVertexAttribute(id) {
-    return meshPolygonsStyle(id).coloring.vertex
-  }
-  function setMeshPolygonsVertexAttribute(id, vertex_attribute) {
-    return setMeshPolygonsVertexAttributeName(id, vertex_attribute.name)
-  }
   function meshPolygonsVertexAttributeName(id) {
     const vertex = meshPolygonsStyle(id).coloring.vertex
     return vertex ? vertex.name : ""
@@ -136,9 +131,7 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsVertexAttributeRange(id, minimum, maximum) {
     const coloring_style = meshPolygonsStyle(id).coloring
     const name = coloring_style.vertex.name
-    if (!coloring_style.vertex.attributes[name]) {
-      coloring_style.vertex.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.vertex, name)
     const saved_preset = coloring_style.vertex.attributes[name]
     saved_preset.minimum = minimum
     saved_preset.maximum = maximum
@@ -169,15 +162,13 @@ export function useMeshPolygonsStyle() {
   ) {
     const coloring_style = meshPolygonsStyle(id).coloring
     const name = coloring_style.vertex.name
-    if (!coloring_style.vertex.attributes[name]) {
-      coloring_style.vertex.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.vertex, name)
     const saved_preset = coloring_style.vertex.attributes[name]
     saved_preset.colorMap = colorMapName
-    let points = colorMapName
-    if (typeof colorMapName === "string") {
-      points = getRGBPointsFromPreset(colorMapName)
-    }
+    const points =
+      typeof colorMapName === "string"
+        ? getRGBPointsFromPreset(colorMapName)
+        : colorMapName
     return viewerStore.request(
       mesh_polygons_schemas.attribute.vertex.color_map,
       { id, points, minimum, maximum },
@@ -186,19 +177,13 @@ export function useMeshPolygonsStyle() {
           hybridViewerStore.remoteRender()
           console.log(setMeshPolygonsVertexAttributeColorMap.name, {
             id,
-            colorMapName,
+            colorMapName: meshPolygonsVertexAttributeColorMap(id),
           })
         },
       },
     )
   }
 
-  function meshPolygonsPolygonAttribute(id) {
-    return meshPolygonsStyle(id).coloring.polygon
-  }
-  function setMeshPolygonsPolygonAttribute(id, polygon_attribute) {
-    return setMeshPolygonsPolygonAttributeName(id, polygon_attribute.name)
-  }
   function meshPolygonsPolygonAttributeName(id) {
     const polygon = meshPolygonsStyle(id).coloring.polygon
     return polygon ? polygon.name : ""
@@ -247,9 +232,7 @@ export function useMeshPolygonsStyle() {
   function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     const coloring_style = meshPolygonsStyle(id).coloring
     const name = coloring_style.polygon.name
-    if (!coloring_style.polygon.attributes[name]) {
-      coloring_style.polygon.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.polygon, name)
     const saved_preset = coloring_style.polygon.attributes[name]
     saved_preset.minimum = minimum
     saved_preset.maximum = maximum
@@ -280,15 +263,13 @@ export function useMeshPolygonsStyle() {
   ) {
     const coloring_style = meshPolygonsStyle(id).coloring
     const name = coloring_style.polygon.name
-    if (!coloring_style.polygon.attributes[name]) {
-      coloring_style.polygon.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.polygon, name)
     const saved_preset = coloring_style.polygon.attributes[name]
     saved_preset.colorMap = colorMapName
-    let points = colorMapName
-    if (typeof colorMapName === "string") {
-      points = getRGBPointsFromPreset(colorMapName)
-    }
+    const points =
+      typeof colorMapName === "string"
+        ? getRGBPointsFromPreset(colorMapName)
+        : colorMapName
     return viewerStore.request(
       mesh_polygons_schemas.attribute.polygon.color_map,
       { id, points, minimum, maximum },
@@ -297,7 +278,7 @@ export function useMeshPolygonsStyle() {
           hybridViewerStore.remoteRender()
           console.log(setMeshPolygonsPolygonAttributeColorMap.name, {
             id,
-            colorMapName,
+            colorMapName: meshPolygonsPolygonAttributeColorMap(id),
           })
         },
       },
@@ -307,7 +288,7 @@ export function useMeshPolygonsStyle() {
   function meshPolygonsActiveColoring(id) {
     return meshPolygonsStyle(id).coloring.active
   }
-  function setMeshPolygonsActiveColoring(id, type) {
+  async function setMeshPolygonsActiveColoring(id, type) {
     const coloring = meshPolygonsStyle(id).coloring
     coloring.active = type
     console.log(
@@ -331,22 +312,18 @@ export function useMeshPolygonsStyle() {
       const minimum = attributes[name]?.minimum
       const maximum = attributes[name]?.maximum
       const colorMap = attributes[name]?.colorMap
-      return setMeshPolygonsVertexAttributeName(id, name).then(() => {
-        if (minimum !== undefined && maximum !== undefined) {
-          return setMeshPolygonsVertexAttributeRange(id, minimum, maximum).then(
-            () => {
-              if (colorMap) {
-                return setMeshPolygonsVertexAttributeColorMap(
-                  id,
-                  colorMap,
-                  minimum,
-                  maximum,
-                )
-              }
-            },
+      await setMeshPolygonsVertexAttributeName(id, name)
+      if (minimum !== undefined && maximum !== undefined) {
+        await setMeshPolygonsVertexAttributeRange(id, minimum, maximum)
+        if (colorMap) {
+          await setMeshPolygonsVertexAttributeColorMap(
+            id,
+            colorMap,
+            minimum,
+            maximum,
           )
         }
-      })
+      }
     } else if (type === "polygon") {
       const name = coloring.polygon.name
       if (name === undefined) {
@@ -356,26 +333,20 @@ export function useMeshPolygonsStyle() {
       const minimum = attributes[name]?.minimum
       const maximum = attributes[name]?.maximum
       const colorMap = attributes[name]?.colorMap
-      return setMeshPolygonsPolygonAttributeName(id, name).then(() => {
-        if (minimum !== undefined && maximum !== undefined) {
-          return setMeshPolygonsPolygonAttributeRange(
+      await setMeshPolygonsPolygonAttributeName(id, name)
+      if (minimum !== undefined && maximum !== undefined) {
+        await setMeshPolygonsPolygonAttributeRange(id, minimum, maximum)
+        if (colorMap) {
+          await setMeshPolygonsPolygonAttributeColorMap(
             id,
+            colorMap,
             minimum,
             maximum,
-          ).then(() => {
-            if (colorMap) {
-              return setMeshPolygonsPolygonAttributeColorMap(
-                id,
-                colorMap,
-                minimum,
-                maximum,
-              )
-            }
-          })
+          )
         }
-      })
+      }
     } else {
-      throw new Error("Unknown active coloring type: " + type)
+      throw new Error("Unknown mesh polygons active coloring type: " + type)
     }
   }
 
@@ -392,11 +363,9 @@ export function useMeshPolygonsStyle() {
     meshPolygonsActiveColoring,
     meshPolygonsColor,
     meshPolygonsTextures,
-    meshPolygonsVertexAttribute,
     meshPolygonsVertexAttributeName,
     meshPolygonsVertexAttributeRange,
     meshPolygonsVertexAttributeColorMap,
-    meshPolygonsPolygonAttribute,
     meshPolygonsPolygonAttributeName,
     meshPolygonsPolygonAttributeRange,
     meshPolygonsPolygonAttributeColorMap,
@@ -404,11 +373,9 @@ export function useMeshPolygonsStyle() {
     setMeshPolygonsActiveColoring,
     setMeshPolygonsColor,
     setMeshPolygonsTextures,
-    setMeshPolygonsVertexAttribute,
     setMeshPolygonsVertexAttributeName,
     setMeshPolygonsVertexAttributeRange,
     setMeshPolygonsVertexAttributeColorMap,
-    setMeshPolygonsPolygonAttribute,
     setMeshPolygonsPolygonAttributeName,
     setMeshPolygonsPolygonAttributeRange,
     setMeshPolygonsPolygonAttributeColorMap,

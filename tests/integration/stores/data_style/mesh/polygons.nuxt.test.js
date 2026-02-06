@@ -23,7 +23,7 @@ const polygon_attribute = { name: "test_attribute" }
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -87,9 +87,9 @@ describe("Mesh polygons", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshPolygonsVertexAttribute(
+      const result = dataStyleStore.setMeshPolygonsVertexAttributeName(
         id,
-        vertex_attribute,
+        vertex_attribute.name,
       )
       expect(result).toBeInstanceOf(Promise)
       await result
@@ -100,8 +100,8 @@ describe("Mesh polygons", () => {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolygonsVertexAttribute(id)).toMatchObject(
-        vertex_attribute,
+      expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe(
+        vertex_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -112,9 +112,9 @@ describe("Mesh polygons", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshPolygonsPolygonAttribute(
+      const result = dataStyleStore.setMeshPolygonsPolygonAttributeName(
         id,
-        polygon_attribute,
+        polygon_attribute.name,
       )
       expect(result).toBeInstanceOf(Promise)
       await result
@@ -125,8 +125,8 @@ describe("Mesh polygons", () => {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolygonsPolygonAttribute(id)).toMatchObject(
-        polygon_attribute,
+      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe(
+        polygon_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -141,14 +141,17 @@ describe("Mesh polygons", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshPolygonsVertexAttribute(id, vertex_attribute),
+            dataStyleStore.setMeshPolygonsVertexAttributeName(
+              id,
+              vertex_attribute.name,
+            ),
         },
         {
           name: "polygon",
           function: () =>
-            dataStyleStore.setMeshPolygonsPolygonAttribute(
+            dataStyleStore.setMeshPolygonsPolygonAttributeName(
               id,
-              polygon_attribute,
+              polygon_attribute.name,
             ),
         },
       ]

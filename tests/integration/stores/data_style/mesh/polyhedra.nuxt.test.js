@@ -23,7 +23,7 @@ const polyhedron_attribute = { name: "toto_on_polyhedra" }
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -86,17 +86,17 @@ describe("Mesh polyhedra", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshPolyhedraVertexAttribute(
+            dataStyleStore.setMeshPolyhedraVertexAttributeName(
               id,
-              vertex_attribute,
+              vertex_attribute.name,
             ),
         },
         {
           name: "polyhedron",
           function: () =>
-            dataStyleStore.setMeshPolyhedraPolyhedronAttribute(
+            dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
               id,
-              polyhedron_attribute,
+              polyhedron_attribute.name,
             ),
         },
       ]
@@ -123,7 +123,10 @@ describe("Mesh polyhedra", () => {
     const viewerStore = useViewerStore()
 
     const spy = vi.spyOn(viewerStore, "request")
-    await dataStyleStore.setMeshPolyhedraVertexAttribute(id, vertex_attribute)
+    await dataStyleStore.setMeshPolyhedraVertexAttributeName(
+      id,
+      vertex_attribute.name,
+    )
     expect(spy).toHaveBeenCalledWith(
       mesh_polyhedra_schemas.attribute.vertex.name,
       { id, ...vertex_attribute },
@@ -131,8 +134,8 @@ describe("Mesh polyhedra", () => {
         response_function: expect.any(Function),
       },
     )
-    expect(dataStyleStore.meshPolyhedraVertexAttribute(id)).toMatchObject(
-      vertex_attribute,
+    expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe(
+      vertex_attribute.name,
     )
     expect(viewerStore.status).toBe(Status.CONNECTED)
   })
@@ -142,9 +145,9 @@ describe("Mesh polyhedra", () => {
     const viewerStore = useViewerStore()
 
     const spy = vi.spyOn(viewerStore, "request")
-    await dataStyleStore.setMeshPolyhedraPolyhedronAttribute(
+    await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
       id,
-      polyhedron_attribute,
+      polyhedron_attribute.name,
     )
     expect(spy).toHaveBeenCalledWith(
       mesh_polyhedra_schemas.attribute.polyhedron.name,
@@ -153,8 +156,8 @@ describe("Mesh polyhedra", () => {
         response_function: expect.any(Function),
       },
     )
-    expect(dataStyleStore.meshPolyhedraPolyhedronAttribute(id)).toMatchObject(
-      polyhedron_attribute,
+    expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe(
+      polyhedron_attribute.name,
     )
     expect(viewerStore.status).toBe(Status.CONNECTED)
   })

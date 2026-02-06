@@ -23,7 +23,7 @@ const cell_attribute = { name: "RGB_data" }
 let id, back_port, viewer_port, project_folder_path
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
+  ; ({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
 }, 20000)
 
@@ -87,9 +87,9 @@ describe("Mesh cells", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshCellsVertexAttribute(
+      const result = dataStyleStore.setMeshCellsVertexAttributeName(
         id,
-        vertex_attribute,
+        vertex_attribute.name,
       )
       expect(result).toBeInstanceOf(Promise)
       await result
@@ -100,8 +100,8 @@ describe("Mesh cells", () => {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshCellsVertexAttribute(id)).toMatchObject(
-        vertex_attribute,
+      expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe(
+        vertex_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -112,9 +112,9 @@ describe("Mesh cells", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshCellsCellAttribute(
+      const result = dataStyleStore.setMeshCellsCellAttributeName(
         id,
-        cell_attribute,
+        cell_attribute.name,
       )
       expect(result).toBeInstanceOf(Promise)
       await result
@@ -125,8 +125,8 @@ describe("Mesh cells", () => {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshCellsCellAttribute(id)).toMatchObject(
-        cell_attribute,
+      expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe(
+        cell_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -141,12 +141,18 @@ describe("Mesh cells", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshCellsVertexAttribute(id, vertex_attribute),
+            dataStyleStore.setMeshCellsVertexAttributeName(
+              id,
+              vertex_attribute.name,
+            ),
         },
         {
           name: "cell",
           function: () =>
-            dataStyleStore.setMeshCellsCellAttribute(id, cell_attribute),
+            dataStyleStore.setMeshCellsCellAttributeName(
+              id,
+              cell_attribute.name,
+            ),
         },
       ]
       for (let i = 0; i < coloringTypes.length; i++) {

@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { useDataStyleStateStore } from "../data_style_state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
+import { ensureAttributeEntry } from "./utils"
 
 // Local constants
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
@@ -41,7 +42,7 @@ export function useMeshPointsStyle() {
   function meshPointsActiveColoring(id) {
     return meshPointsStyle(id).coloring.active
   }
-  function setMeshPointsActiveColoring(id, type) {
+  async function setMeshPointsActiveColoring(id, type) {
     const coloring = meshPointsStyle(id).coloring
     coloring.active = type
     console.log(
@@ -60,24 +61,20 @@ export function useMeshPointsStyle() {
       const minimum = attributes[name]?.minimum
       const maximum = attributes[name]?.maximum
       const colorMap = attributes[name]?.colorMap
-      return setMeshPointsVertexAttributeName(id, name).then(() => {
-        if (minimum !== undefined && maximum !== undefined) {
-          return setMeshPointsVertexAttributeRange(id, minimum, maximum).then(
-            () => {
-              if (colorMap) {
-                return setMeshPointsVertexAttributeColorMap(
-                  id,
-                  colorMap,
-                  minimum,
-                  maximum,
-                )
-              }
-            },
+      await setMeshPointsVertexAttributeName(id, name)
+      if (minimum !== undefined && maximum !== undefined) {
+        await setMeshPointsVertexAttributeRange(id, minimum, maximum)
+        if (colorMap) {
+          await setMeshPointsVertexAttributeColorMap(
+            id,
+            colorMap,
+            minimum,
+            maximum,
           )
         }
-      })
+      }
     } else {
-      throw new Error("Unknown active coloring type: " + type)
+      throw new Error("Unknown mesh points active coloring type: " + type)
     }
   }
 
@@ -100,12 +97,6 @@ export function useMeshPointsStyle() {
         },
       },
     )
-  }
-  function meshPointsVertexAttribute(id) {
-    return meshPointsStyle(id).coloring.vertex
-  }
-  function setMeshPointsVertexAttribute(id, vertex_attribute) {
-    return setMeshPointsVertexAttributeName(id, vertex_attribute.name)
   }
   function meshPointsVertexAttributeName(id) {
     return meshPointsStyle(id).coloring.vertex.name
@@ -150,9 +141,7 @@ export function useMeshPointsStyle() {
   function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
     const coloring_style = meshPointsStyle(id).coloring
     const name = coloring_style.vertex.name
-    if (!coloring_style.vertex.attributes[name]) {
-      coloring_style.vertex.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.vertex, name)
     const saved_preset = coloring_style.vertex.attributes[name]
     saved_preset.minimum = minimum
     saved_preset.maximum = maximum
@@ -182,15 +171,13 @@ export function useMeshPointsStyle() {
   ) {
     const coloring_style = meshPointsStyle(id).coloring
     const name = coloring_style.vertex.name
-    if (!coloring_style.vertex.attributes[name]) {
-      coloring_style.vertex.attributes[name] = {}
-    }
+    ensureAttributeEntry(coloring_style.vertex, name)
     const saved_preset = coloring_style.vertex.attributes[name]
     saved_preset.colorMap = colorMapName
-    let points = colorMapName
-    if (typeof colorMapName === "string") {
-      points = getRGBPointsFromPreset(colorMapName)
-    }
+    const points =
+      typeof colorMapName === "string"
+        ? getRGBPointsFromPreset(colorMapName)
+        : colorMapName
     return viewerStore.request(
       mesh_points_schemas.attribute.vertex.color_map,
       { id, points, minimum, maximum },
@@ -198,7 +185,7 @@ export function useMeshPointsStyle() {
         response_function: () => {
           console.log(setMeshPointsVertexAttributeColorMap.name, {
             id,
-            colorMapName,
+            colorMapName: meshPointsVertexAttributeColorMap(id),
           })
         },
       },
@@ -234,7 +221,6 @@ export function useMeshPointsStyle() {
     meshPointsVisibility,
     meshPointsActiveColoring,
     meshPointsColor,
-    meshPointsVertexAttribute,
     meshPointsVertexAttributeName,
     meshPointsVertexAttributeRange,
     meshPointsVertexAttributeColorMap,
@@ -242,7 +228,6 @@ export function useMeshPointsStyle() {
     setMeshPointsVisibility,
     setMeshPointsActiveColoring,
     setMeshPointsColor,
-    setMeshPointsVertexAttribute,
     setMeshPointsVertexAttributeName,
     setMeshPointsVertexAttributeRange,
     setMeshPointsVertexAttributeColorMap,
