@@ -57,16 +57,17 @@ export function useMeshPointsStyle() {
         return Promise.resolve()
       }
       const attributes = coloring.vertex.attributes
-      const minimum = attributes[name].minimum
-      const maximum = attributes[name].maximum
+      const minimum = attributes[name]?.minimum
+      const maximum = attributes[name]?.maximum
+      const colorMap = attributes[name]?.colorMap
       return setMeshPointsVertexAttributeName(id, name).then(() => {
         if (minimum !== undefined && maximum !== undefined) {
           return setMeshPointsVertexAttributeRange(id, minimum, maximum).then(
             () => {
-              if (coloring.vertex.colorMap) {
+              if (colorMap) {
                 return setMeshPointsVertexAttributeColorMap(
                   id,
-                  coloring.vertex.colorMap,
+                  colorMap,
                   minimum,
                   maximum,
                 )

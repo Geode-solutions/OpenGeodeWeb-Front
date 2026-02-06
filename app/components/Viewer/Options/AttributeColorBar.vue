@@ -1,48 +1,25 @@
 <script setup>
   import ColorMapPicker from "./ColorMapPicker.vue"
 
-  const props = defineProps({
-    autoMin: { type: Number, default: 0 },
-    autoMax: { type: Number, default: 1 },
-  })
+  const emit = defineEmits(["reset"])
 
   const minimum = defineModel("minimum", { type: Number })
   const maximum = defineModel("maximum", { type: Number })
   const colorMap = defineModel("colorMap", { type: String })
 
-  const minValue = computed({
-    get: () => minimum.value ?? props.autoMin,
-    set: (val) => {
-      minimum.value = val
-    },
-  })
-
-  const maxValue = computed({
-    get: () => maximum.value ?? props.autoMax,
-    set: (val) => {
-      maximum.value = val
-    },
-  })
-
-  onMounted(() => {
-    if (minimum.value === undefined) minimum.value = props.autoMin
-    if (maximum.value === undefined) maximum.value = props.autoMax
-  })
-
   function reset() {
-    minimum.value = props.autoMin
-    maximum.value = props.autoMax
+    emit("reset")
   }
 </script>
 
 <template>
   <div class="attribute-colorbar mt-3">
-    <ColorMapPicker v-model="colorMap" :min="minValue" :max="maxValue" />
+    <ColorMapPicker v-model="colorMap" :min="minimum" :max="maximum" />
 
     <v-row dense align="center" class="mt-2">
       <v-col cols="5">
         <v-text-field
-          v-model.number="minValue"
+          v-model.number="minimum"
           label="Min"
           type="number"
           density="compact"
@@ -61,7 +38,7 @@
       </v-col>
       <v-col cols="5">
         <v-text-field
-          v-model.number="maxValue"
+          v-model.number="maximum"
           label="Max"
           type="number"
           density="compact"

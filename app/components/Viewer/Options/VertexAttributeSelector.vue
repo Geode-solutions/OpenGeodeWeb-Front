@@ -80,6 +80,15 @@
       }
     }
   })
+
+  function resetRange() {
+    if (currentAttribute.value) {
+      vertex_attribute_range.value = [
+        currentAttribute.value.min_value,
+        currentAttribute.value.max_value,
+      ]
+    }
+  }
 </script>
 
 <template>
@@ -96,5 +105,6 @@
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="vertex_attribute_color_map"
+    @reset="resetRange"
   />
 </template>

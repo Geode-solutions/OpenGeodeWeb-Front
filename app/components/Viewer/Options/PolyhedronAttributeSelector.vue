@@ -82,6 +82,15 @@
       }
     }
   })
+
+  function resetRange() {
+    if (currentAttribute.value) {
+      polyhedron_attribute_range.value = [
+        currentAttribute.value.min_value,
+        currentAttribute.value.max_value,
+      ]
+    }
+  }
 </script>
 
 <template>
@@ -94,11 +103,10 @@
     density="compact"
   />
   <ViewerOptionsAttributeColorBar
-    v-if="polyhedron_attribute_name && polyhedron_attribute_range"
+    v-if="polyhedron_attribute_name"
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="polyhedron_attribute_color_map"
-    :autoMin="currentAttribute?.min_value"
-    :autoMax="currentAttribute?.max_value"
+    @reset="resetRange"
   />
 </template>
