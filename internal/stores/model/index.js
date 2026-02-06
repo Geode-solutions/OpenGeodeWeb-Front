@@ -98,7 +98,7 @@ export default function useModelStyle() {
     )
   }
 
-  async function setModelMeshComponentVisibility(
+  async function setModelMeshComponentsVisibility(
     id,
     component_geode_ids,
     visibility,
@@ -188,7 +188,7 @@ export default function useModelStyle() {
     modelMeshComponentVisibility,
     setModelVisibility,
     setModelColor,
-    setModelMeshComponentVisibility,
+    setModelMeshComponentsVisibility,
     applyModelStyle,
     setModelMeshComponentsDefaultStyle,
     ...useModelBlocksStyle(),
