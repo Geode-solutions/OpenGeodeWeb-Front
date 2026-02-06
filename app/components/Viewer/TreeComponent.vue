@@ -27,18 +27,17 @@ watch(
 
     const { added, removed } = compareSelections(current, previous)
 
-    for (const item of added) {
+    if (added.length > 0) {
       await dataStyleStore.setModelMeshComponentsVisibility(
         props.id,
-        [item],
+        added,
         true,
       )
     }
-
-    for (const item of removed) {
+    if (removed.length > 0) {
       await dataStyleStore.setModelMeshComponentsVisibility(
         props.id,
-        [item],
+        removed,
         false,
       )
     }
