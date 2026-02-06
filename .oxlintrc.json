@@ -7,14 +7,12 @@
     "style": "error",
     "restriction": "error"
   },
-  "plugins": ["import", "node", "oxc", "promise", "unicorn", "vue"],
+  "plugins": ["import", "node", "oxc", "promise", "unicorn", "vitest"],
   "rules": {
     "unicorn/filename-case": [
       "error",
       {
-        "cases": {
-          "snakeCase": true
-        }
+        "case": "snakeCase"
       }
     ],
     "eslint/func-style": ["error", "declaration"],
@@ -46,15 +44,14 @@
     "eslint/no-magic-numbers": [
       "error",
       {
-        "ignore": [-1, 0, 1, 2, 4],
-        "ignoreArrayIndexes": true
+        "style:": "declaration"
       }
     ],
     "vue/max-props": ["error", { "maxProps": 7 }]
   },
   "overrides": [
     {
-      "files": ["app/components/**"],
+      "files": ["**/components/*"],
       "rules": {
         "unicorn/filename-case": [
           "error",
@@ -62,18 +59,6 @@
             "case": "PascalCase"
           }
         ]
-      }
-    },
-    {
-      "files": ["*.js", "app/plugins/**"],
-      "rules": {
-        "import/no-default-export": "off"
-      }
-    },
-    {
-      "files": ["utils/**"],
-      "rules": {
-        "promise/prefer-await-to-callbacks": "off"
       }
     }
   ]
