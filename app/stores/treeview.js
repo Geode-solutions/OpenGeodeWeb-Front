@@ -1,3 +1,4 @@
+import { defineStore } from 'pinia'
 export const useTreeviewStore = defineStore("treeview", () => {
   const items = ref([])
   const selection = ref([])

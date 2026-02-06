@@ -1,3 +1,4 @@
+import { defineStore } from 'pinia'
 import "@kitware/vtk.js/Rendering/Profiles/Geometry"
 import vtkGenericRenderWindow from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
 import vtkXMLPolyDataReader from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
@@ -210,13 +211,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const cameraSnapshot = camera
       ? {
-          focal_point: [...camera.getFocalPoint()],
-          view_up: [...camera.getViewUp()],
-          position: [...camera.getPosition()],
-          view_angle: camera.getViewAngle(),
-          clipping_range: [...camera.getClippingRange()],
-          distance: camera.getDistance(),
-        }
+        focal_point: [...camera.getFocalPoint()],
+        view_up: [...camera.getViewUp()],
+        position: [...camera.getPosition()],
+        view_angle: camera.getViewAngle(),
+        clipping_range: [...camera.getClippingRange()],
+        distance: camera.getDistance(),
+      }
       : camera_options
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }

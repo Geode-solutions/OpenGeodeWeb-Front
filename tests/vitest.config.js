@@ -9,9 +9,10 @@ export default defineConfig({
     globals: true,
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
-      defineVitestProject({
+      await defineVitestProject({
         test: {
           name: "unit",
+          globals: true,
           include: ["tests/unit/**/*.test.js"],
           environment: "nuxt",
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
@@ -23,9 +24,10 @@ export default defineConfig({
           retry: globalRetry,
         },
       }),
-      defineVitestProject({
+      await defineVitestProject({
         test: {
           name: "integration",
+          globals: true,
           include: ["tests/integration/**/*.test.js"],
           environment: "nuxt",
           fileParallelism: false,
