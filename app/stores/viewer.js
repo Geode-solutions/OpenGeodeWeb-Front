@@ -106,17 +106,13 @@ export const useViewerStore = defineStore("viewer", {
 
         // Error
         clientToConnect.onConnectionError((httpReq) => {
-          const message =
-            (httpReq && httpReq.response && httpReq.response.error) ||
-            `Connection error`
+          const message = httpReq?.response?.error || `Connection error`
           console.error(message)
         })
 
         // Close
         clientToConnect.onConnectionClose((httpReq) => {
-          const message =
-            (httpReq && httpReq.response && httpReq.response.error) ||
-            `Connection close`
+          const message = httpReq?.response?.error || `Connection close`
           console.error(message)
         })
 
@@ -124,16 +120,23 @@ export const useViewerStore = defineStore("viewer", {
         const { connectImageStream } = await import(
           "@kitware/vtk.js/Rendering/Misc/RemoteView"
         )
-        this.client = await clientToConnect.connect(config)
-        connectImageStream(this.client.getConnection().getSession())
-        this.client.endBusy()
-        await this.request(
-          schemas.opengeodeweb_viewer.viewer.reset_visualization,
-          {},
-          {},
-          undefined,
-        )
-        this.status = Status.CONNECTED
+        try {
+          const validClient = await clientToConnect.connect(config)
+          connectImageStream(validClient.getConnection().getSession())
+          this.client = validClient
+          clientToConnect.endBusy()
+          await this.request(
+            schemas.opengeodeweb_viewer.viewer.reset_visualization,
+            {},
+            {},
+            undefined,
+          )
+          this.status = Status.CONNECTED
+        } catch (error) {
+          console.error("error", error)
+          this.status = Status.NOT_CONNECTED
+          throw error
+        }
       })
     },
     start_request() {
