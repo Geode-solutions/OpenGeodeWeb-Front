@@ -1,9 +1,9 @@
 // oxlint-disable-next-line import/no-unassigned-import
 import "@kitware/vtk.js/Rendering/Profiles/Geometry"
-import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
-import vtkGenericRenderWindow from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
-import vtkMapper from "@kitware/vtk.js/Rendering/Core/Mapper"
-import vtkXMLPolyDataReader from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
+import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor"
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
+import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
+import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
 
 import Status from "@ogw_front/utils/status"
 import { useDataStore } from "@ogw_front/stores/data"
@@ -40,8 +40,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) return
     status.value = Status.CREATING
-    // oxlint-disable-next-line import/no-named-as-default-member
-    genericRenderWindow.value = vtkGenericRenderWindow.newInstance({
+    genericRenderWindow.value = vtkGenericRenderWindow({
       background: BACKGROUND_COLOR,
       listenWindowResize: false,
     })
@@ -73,18 +72,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const item = dataStore.getItem(id)
     const value = await item.fetch()
     console.log("hybridViewerStore.addItem", { value })
-    // oxlint-disable-next-line import/no-named-as-default-member
-    const reader = vtkXMLPolyDataReader.newInstance()
+    const reader = vtkXMLPolyDataReader()
     const textEncoder = new TextEncoder()
     await reader.parseAsArrayBuffer(
       textEncoder.encode(value.binary_light_viewable),
     )
     const polydata = reader.getOutputData(0)
-    // oxlint-disable-next-line import/no-named-as-default-member
-    const mapper = vtkMapper.newInstance()
+    const mapper = vtkMapper()
     mapper.setInputData(polydata)
-    // oxlint-disable-next-line import/no-named-as-default-member
-    const actor = vtkActor.newInstance()
+    const actor = vtkActor()
     actor.getProperty().setColor(ACTOR_COLOR)
     actor.setMapper(mapper)
     const renderer = genericRenderWindow.value.getRenderer()
