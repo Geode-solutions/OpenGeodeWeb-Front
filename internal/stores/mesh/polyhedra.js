@@ -49,10 +49,16 @@ export function useMeshPolyhedraStyle() {
     )
     if (type === "color") {
       return setMeshPolyhedraColor(id, coloring.color)
-      // } else if (type === "vertex" && coloring.vertex !== null) {
-      //   return setPolyhedraVertexAttribute(id, coloring.vertex)
-      // } else if (type === "polyhedron" && coloring.polyhedron !== null) {
-      //   return setPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
+    } else if (type === "vertex") {
+      if (coloring.vertex === null) {
+        throw new Error("Vertex attribute not set")
+      }
+      return setMeshPolyhedraVertexAttribute(id, coloring.vertex)
+    } else if (type === "polyhedron") {
+      if (coloring.polyhedron === null) {
+        throw new Error("Polyhedron attribute not set")
+      }
+      return setMeshPolyhedraPolyhedronAttribute(id, coloring.polyhedron)
     } else {
       throw new Error("Unknown mesh polyhedra coloring type: " + type)
     }
@@ -79,62 +85,47 @@ export function useMeshPolyhedraStyle() {
     )
   }
 
-  // function polyhedraVertexAttribute(id) {
-  //   return meshPolyhedraStyle(id).coloring.vertex
-  // }
-  // function setPolyhedraVertexAttribute(id, vertex_attribute) {
-  //   const coloring_style = meshPolyhedraStyle(id).coloring
-  //   return viewerStore.request(
-  //     mesh_polyhedra_schemas.vertex_attribute,
-  //     { id, ...vertex_attribute },
-  //     {
-  //       response_function: () => {
-  //         coloring_style.vertex = vertex_attribute
-  //         console.log(
-  //           setPolyhedraVertexAttribute.name} ${polyhedraVertexAttribute(id),
-  //         )
-  //       },
-  //     },
-  //   )
-  // }
+  function meshPolyhedraVertexAttribute(id) {
+    return meshPolyhedraStyle(id).coloring.vertex
+  }
+  function setMeshPolyhedraVertexAttribute(id, vertex_attribute) {
+    const coloring_style = meshPolyhedraStyle(id).coloring
+    return viewerStore.request(
+      mesh_polyhedra_schemas.vertex_attribute,
+      { id, ...vertex_attribute },
+      {
+        response_function: () => {
+          coloring_style.vertex = vertex_attribute
+          console.log(
+            setMeshPolyhedraVertexAttribute.name,
+            { id },
+            meshPolyhedraVertexAttribute(id),
+          )
+        },
+      },
+    )
+  }
 
-  // function polyhedraPolygonAttribute(id) {
-  //   return meshPolyhedraStyle(id).coloring.polygon
-  // }
-  // function setPolyhedraPolygonAttribute(id, polygon_attribute) {
-  //   const coloring_style = meshPolyhedraStyle(id).coloring
-  //   return viewerStore.request(
-  //     mesh_polyhedra_schemas.polygon_attribute,
-  //     { id, ...polygon_attribute },
-  //     {
-  //       response_function: () => {
-  //         coloring_style.polygon = polygon_attribute
-  //         console.log(
-  //           setPolyhedraPolygonAttribute.name} ${polyhedraPolygonAttribute(id),
-  //         )
-  //       },
-  //     },
-  //   )
-  // }
-
-  // function polyhedraPolyhedronAttribute(id) {
-  //   return meshPolyhedraStyle(id).coloring.polyhedron
-  // }
-  // function setPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
-  //   const coloring = meshPolyhedraStyle(id).coloring
-  //   return viewerStore.request(
-  //     mesh_polyhedra_schemas.polyhedron_attribute,
-  //     { id, ...polyhedron_attribute },
-  //     {
-  //       response_function: () => {
-  //         coloring.polyhedron = polyhedron_attribute
-  //         console.log(
-  //           setPolyhedraPolyhedronAttribute.name} ${polyhedraPolyhedronAttribute(id),
-  //         )
-  //       },
-  //     },
-  //   )
-  // }
+  function meshPolyhedraPolyhedronAttribute(id) {
+    return meshPolyhedraStyle(id).coloring.polyhedron
+  }
+  function setMeshPolyhedraPolyhedronAttribute(id, polyhedron_attribute) {
+    const coloring = meshPolyhedraStyle(id).coloring
+    return viewerStore.request(
+      mesh_polyhedra_schemas.polyhedron_attribute,
+      { id, ...polyhedron_attribute },
+      {
+        response_function: () => {
+          coloring.polyhedron = polyhedron_attribute
+          console.log(
+            setMeshPolyhedraPolyhedronAttribute.name,
+            { id },
+            meshPolyhedraPolyhedronAttribute(id),
+          )
+        },
+      },
+    )
+  }
 
   function applyMeshPolyhedraStyle(id) {
     const style = meshPolyhedraStyle(id)
@@ -148,15 +139,13 @@ export function useMeshPolyhedraStyle() {
     applyMeshPolyhedraStyle,
     meshPolyhedraActiveColoring,
     meshPolyhedraColor,
-    // polyhedraVertexAttribute,
+    meshPolyhedraVertexAttribute,
     meshPolyhedraVisibility,
-    // polyhedraPolyhedronAttribute,
-    // polyhedraPolygonAttribute,
+    meshPolyhedraPolyhedronAttribute,
     setMeshPolyhedraActiveColoring,
     setMeshPolyhedraColor,
-    // setPolyhedraPolyhedronAttribute,
-    // setPolyhedraPolygonAttribute,
-    // setPolyhedraVertexAttribute,
+    setMeshPolyhedraPolyhedronAttribute,
+    setMeshPolyhedraVertexAttribute,
     setMeshPolyhedraVisibility,
   }
 }

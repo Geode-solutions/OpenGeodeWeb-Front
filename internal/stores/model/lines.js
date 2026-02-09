@@ -32,6 +32,9 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).visibility = visibility
   }
   async function setModelLinesVisibility(id, line_ids, visibility) {
+    if (!line_ids || line_ids.length === 0) {
+      return
+    }
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       line_ids,
@@ -69,6 +72,9 @@ export function useModelLinesStyle() {
     modelLineStyle(id, line_id).color = color
   }
   async function setModelLinesColor(id, line_ids, color) {
+    if (!line_ids || line_ids.length === 0) {
+      return
+    }
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       line_ids,

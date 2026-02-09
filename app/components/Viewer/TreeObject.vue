@@ -1,3 +1,50 @@
+<script setup>
+  import { useTreeviewStore } from "@ogw_front/stores/treeview"
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+
+  import { compareSelections } from "@ogw_front/utils/treeview"
+
+  const treeviewStore = useTreeviewStore()
+  const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
+
+  const emit = defineEmits(["show-menu"])
+
+  function isLeafNode(item) {
+    return !item.children || item.children.length === 0
+  }
+
+  watch(
+    () => treeviewStore.selection,
+    async (current, previous) => {
+      if (!previous) previous = []
+      if (current.value === previous) {
+        return
+      }
+      const { added, removed } = compareSelections(current, previous)
+      for (const item of added) {
+        await dataStyleStore.setVisibility(item.id, true)
+      }
+      for (const item of removed) {
+        await dataStyleStore.setVisibility(item.id, false)
+      }
+      hybridViewerStore.remoteRender()
+    },
+  )
+
+  function isModel(item) {
+    return item.viewer_type === "model"
+  }
+
+  onMounted(() => {
+    const savedSelection = treeviewStore.selection
+    if (savedSelection && savedSelection.length > 0) {
+      treeviewStore.selection = savedSelection
+    }
+  })
+</script>
+
 <template>
   <v-treeview
     v-model:selected="treeviewStore.selection"
@@ -34,55 +81,6 @@
     </template>
   </v-treeview>
 </template>
-
-<script setup>
-  import { useTreeviewStore } from "@ogw_front/stores/treeview"
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-
-  import { compareSelections } from "@ogw_front/utils/treeview"
-
-  const treeviewStore = useTreeviewStore()
-  const dataStyleStore = useDataStyleStore()
-  const hybridViewerStore = useHybridViewerStore()
-
-  const emit = defineEmits(["show-menu"])
-
-  function isLeafNode(item) {
-    return !item.children || item.children.length === 0
-  }
-
-  watch(
-    () => treeviewStore.selection,
-    async (current, previous) => {
-      if (!previous) previous = []
-      if (current.value === previous) {
-        return
-      }
-      const { added, removed } = compareSelections(current, previous)
-
-      added.forEach((item) => {
-        dataStyleStore.setVisibility(item.id, true)
-      })
-
-      for (const item of removed) {
-        await dataStyleStore.setVisibility(item.id, false)
-      }
-      hybridViewerStore.remoteRender()
-    },
-  )
-
-  function isModel(item) {
-    return item.viewer_type === "model"
-  }
-
-  onMounted(() => {
-    const savedSelection = treeviewStore.selection
-    if (savedSelection && savedSelection.length > 0) {
-      treeviewStore.selection = savedSelection
-    }
-  })
-</script>
 
 <style scoped>
   .transparent-treeview {

@@ -1,12 +1,3 @@
-<template>
-  <FetchingData v-if="loading" />
-  <FileUploader
-    v-else
-    v-bind="{ multiple, accept, files: internal_files, auto_upload }"
-    @files_uploaded="files_uploaded_event"
-  />
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
@@ -15,6 +6,7 @@
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const schema = schemas.opengeodeweb_back.allowed_files
+
   const emit = defineEmits([
     "update_values",
     "increment_step",
@@ -23,11 +15,9 @@
 
   const props = defineProps({
     multiple: { type: Boolean, required: true },
-    files: { type: Array, required: false, default: [] },
-    auto_upload: { type: Boolean, required: false, default: true },
+    files: { type: Array, default: () => [] },
+    auto_upload: { type: Boolean, default: true },
   })
-
-  const { multiple } = props
 
   const internal_files = ref(props.files)
   const auto_upload = ref(props.auto_upload)
@@ -36,14 +26,13 @@
 
   watch(
     () => props.files,
-    (newVal) => {
-      internal_files.value = newVal
-    },
-    { deep: true },
+    (val) => (internal_files.value = val),
   )
-  watch(props.auto_upload, (newVal) => {
-    auto_upload.value = newVal
-  })
+
+  watch(
+    () => props.auto_upload,
+    (val) => (auto_upload.value = val),
+  )
 
   const toggle_loading = useToggle(loading)
 
@@ -58,10 +47,18 @@
     toggle_loading()
     const geodeStore = useGeodeStore()
     const response = await geodeStore.request(schema, {})
-    accept.value = response.extensions
-      .map((extension) => "." + extension)
-      .join(",")
+    accept.value = response.extensions.map((e) => `.${e}`).join(",")
     toggle_loading()
   }
+
   await get_allowed_files()
 </script>
+
+<template>
+  <FetchingData v-if="loading" />
+  <FileUploader
+    v-else
+    v-bind="{ multiple, accept, files: internal_files, auto_upload }"
+    @files_uploaded="files_uploaded_event"
+  />
+</template>

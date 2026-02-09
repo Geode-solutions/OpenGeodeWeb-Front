@@ -32,6 +32,9 @@ export function useModelCornersStyle() {
     modelCornerStyle(id, corner_id).visibility = visibility
   }
   async function setModelCornersVisibility(id, corner_ids, visibility) {
+    if (!corner_ids || corner_ids.length === 0) {
+      return
+    }
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       corner_ids,
@@ -71,6 +74,9 @@ export function useModelCornersStyle() {
   }
 
   async function setModelCornersColor(id, corner_ids, color) {
+    if (!corner_ids || corner_ids.length === 0) {
+      return
+    }
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       corner_ids,

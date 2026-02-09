@@ -39,7 +39,9 @@ describe("Model points", () => {
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
-      await dataStyleStore.setModelPointsVisibility(id, visibility)
+      const result = dataStyleStore.setModelPointsVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_points_schemas.visibility,
         { id, visibility },
@@ -59,7 +61,9 @@ describe("Model points", () => {
       const size = 20
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
-      await dataStyleStore.setModelPointsSize(id, size)
+      const result = dataStyleStore.setModelPointsSize(id, size)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_points_schemas.size,
         { id, size },
@@ -68,6 +72,16 @@ describe("Model points", () => {
         },
       )
       expect(dataStyleStore.modelPointsSize(id)).toBe(size)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
+  describe("Points style", () => {
+    test("Points apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelPointsStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })

@@ -1,53 +1,3 @@
-<template>
-  <FetchingData v-if="loading" />
-  <v-row v-else-if="Object.keys(allowed_objects).length" class="justify-left">
-    <v-col v-for="(value, key) in allowed_objects" :key="key" cols="3" md="4">
-      <v-tooltip
-        :text="
-          value['is_loadable']
-            ? geode_objects[key].tooltip
-            : `Data not loadable with this class (${key})`
-        "
-        location="bottom"
-      >
-        <template v-slot:activator="{ props }">
-          <span v-bind="props">
-            <v-card
-              v-ripple
-              class="card ma-2"
-              hover
-              rounded
-              @click="set_geode_object(key)"
-              :disabled="!value['is_loadable']"
-              :elevation="value['is_loadable'] ? 5 : 3"
-            >
-              <v-img
-                :src="geode_objects[key].image"
-                cover
-                :class="!value['is_loadable'] ? 'disabled' : undefined"
-              />
-            </v-card>
-          </span>
-        </template>
-      </v-tooltip>
-    </v-col>
-  </v-row>
-  <v-row v-else class="pa-5">
-    <v-card class="card" variant="tonal" rounded>
-      <v-card-text>
-        This file format isn't supported! Please check the
-        <a
-          href="https://docs.geode-solutions.com/guides/formats/"
-          target="_blank"
-        >
-          supported file formats documentation</a
-        >
-        for more information
-      </v-card-text>
-    </v-card>
-  </v-row>
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
@@ -150,6 +100,56 @@
   }
   await get_allowed_objects()
 </script>
+
+<template>
+  <FetchingData v-if="loading" />
+  <v-row v-else-if="Object.keys(allowed_objects).length" class="justify-left">
+    <v-col v-for="(value, key) in allowed_objects" :key="key" cols="3" md="4">
+      <v-tooltip
+        :text="
+          value['is_loadable']
+            ? geode_objects[key].tooltip
+            : `Data not loadable with this class (${key})`
+        "
+        location="bottom"
+      >
+        <template v-slot:activator="{ props }">
+          <span v-bind="props">
+            <v-card
+              v-ripple
+              class="card ma-2"
+              hover
+              rounded
+              @click="set_geode_object(key)"
+              :disabled="!value['is_loadable']"
+              :elevation="value['is_loadable'] ? 5 : 3"
+            >
+              <v-img
+                :src="geode_objects[key].image"
+                cover
+                :class="!value['is_loadable'] ? 'disabled' : undefined"
+              />
+            </v-card>
+          </span>
+        </template>
+      </v-tooltip>
+    </v-col>
+  </v-row>
+  <v-row v-else class="pa-5">
+    <v-card class="card" variant="tonal" rounded>
+      <v-card-text>
+        This file format isn't supported! Please check the
+        <a
+          href="https://docs.geode-solutions.com/guides/formats/"
+          target="_blank"
+        >
+          supported file formats documentation</a
+        >
+        for more information
+      </v-card-text>
+    </v-card>
+  </v-row>
+</template>
 
 <style scoped>
   .disabled {

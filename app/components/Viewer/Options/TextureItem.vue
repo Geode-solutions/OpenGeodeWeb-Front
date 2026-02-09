@@ -1,40 +1,3 @@
-<template>
-  <v-col cols="7" class="pa-1 ml-3">
-    <v-select
-      v-model="texture_name"
-      :items="texture_coordinates"
-      label="Select a texture"
-      density="compact"
-    />
-  </v-col>
-  <v-badge
-    :model-value="texture_file_name != ''"
-    color="white"
-    floating
-    dot
-    offset-x="10"
-    offset-y="10"
-  >
-    <v-col cols="1" class="ma-1" justify="center" align="center">
-      <FileUploader
-        @files_uploaded="files_uploaded_event($event, index)"
-        :accept="['image/png', 'image/jpeg', 'image/bmp']"
-        :auto_upload="true"
-        :multiple="true"
-        :mini="true"
-        class="mt-2"
-      />
-    </v-col>
-  </v-badge>
-  <v-col v-if="texture_name == '' || texture_file_name == ''" cols="1">
-    <v-icon
-      size="20"
-      icon="mdi-close-circle"
-      v-tooltip:bottom="'Invalid texture'"
-    />
-  </v-col>
-</template>
-
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import FileUploader from "@ogw_front/components/FileUploader"
@@ -107,3 +70,40 @@
     display: none;
   }
 </style>
+
+<template>
+  <v-col cols="7" class="pa-1 ml-3">
+    <v-select
+      v-model="texture_name"
+      :items="texture_coordinates"
+      label="Select a texture"
+      density="compact"
+    />
+  </v-col>
+  <v-badge
+    :model-value="texture_file_name != ''"
+    color="white"
+    floating
+    dot
+    offset-x="10"
+    offset-y="10"
+  >
+    <v-col cols="1" class="ma-1" justify="center" align="center">
+      <FileUploader
+        @files_uploaded="files_uploaded_event($event, index)"
+        :accept="['image/png', 'image/jpeg', 'image/bmp']"
+        :auto_upload="true"
+        :multiple="true"
+        :mini="true"
+        class="mt-2"
+      />
+    </v-col>
+  </v-badge>
+  <v-col v-if="texture_name == '' || texture_file_name == ''" cols="1">
+    <v-icon
+      size="20"
+      icon="mdi-close-circle"
+      v-tooltip:bottom="'Invalid texture'"
+    />
+  </v-col>
+</template>

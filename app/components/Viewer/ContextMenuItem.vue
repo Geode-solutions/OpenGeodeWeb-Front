@@ -1,50 +1,3 @@
-<template>
-  <v-sheet class="menu-item-container transition-swing" color="transparent">
-    <v-tooltip
-      :location="props.itemProps.tooltip_location"
-      :origin="props.itemProps.tooltip_origin"
-    >
-      <template v-slot:activator="{ props: tooltipProps }">
-        <v-btn
-          icon
-          :active="is_active"
-          @click.stop="toggleOptions"
-          v-bind="tooltipProps"
-          class="menu-btn bg-white border"
-          elevation="2"
-        >
-          <v-img :src="btn_image" height="28" width="28" />
-        </v-btn>
-      </template>
-      <span>{{ props.tooltip }}</span>
-    </v-tooltip>
-
-    <v-sheet
-      v-if="is_active"
-      ref="optionsRef"
-      class="menu-options d-flex align-center pa-0"
-      :class="optionsClass"
-      :style="optionsStyle"
-      color="transparent"
-      @click.stop
-    >
-      <v-card
-        @click.stop
-        :title="props.tooltip"
-        class="options-card rounded-xl border-thin elevation-24"
-        width="320"
-        :max-height="maxCardHeight"
-        :ripple="false"
-        theme="dark"
-      >
-        <v-card-text class="pa-5">
-          <slot name="options" />
-        </v-card-text>
-      </v-card>
-    </v-sheet>
-  </v-sheet>
-</template>
-
 <script setup>
   import { useTheme } from "vuetify"
   import { useMenuStore } from "@ogw_front/stores/menu"
@@ -103,6 +56,46 @@
 
   const toggleOptions = () => menuStore.toggleItemOptions(props.index)
 </script>
+<template>
+  <v-sheet class="menu-item-container transition-swing" color="transparent">
+    <v-tooltip
+      :location="props.itemProps.tooltip_location"
+      :origin="props.itemProps.tooltip_origin"
+    >
+      <template v-slot:activator="{ props: tooltipProps }">
+        <v-btn
+          icon
+          :active="is_active"
+          @click.stop="toggleOptions"
+          v-bind="tooltipProps"
+          class="menu-btn bg-white border"
+          elevation="2"
+        >
+          <v-img :src="btn_image" height="28" width="28" />
+        </v-btn>
+      </template>
+      <span>{{ props.tooltip }}</span>
+    </v-tooltip>
+
+    <v-sheet
+      v-if="is_active"
+      ref="optionsRef"
+      class="menu-options d-flex align-center pa-0"
+      :class="optionsClass"
+      :style="optionsStyle"
+      color="transparent"
+      @click.stop
+    >
+      <OptionCard
+        :title="props.tooltip"
+        width="320"
+        :max-height="maxCardHeight"
+      >
+        <slot name="options" />
+      </OptionCard>
+    </v-sheet>
+  </v-sheet>
+</template>
 
 <style scoped>
   .menu-item-container {
@@ -146,22 +139,8 @@
   .options-right {
     left: 60px;
   }
+
   .options-left {
     right: 60px;
-  }
-
-  .options-card {
-    background-color: rgba(30, 30, 30, 0.85) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-color: rgba(255, 255, 255, 0.15) !important;
-  }
-
-  ::v-deep(.v-list-item:hover) {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  ::v-deep(.v-slider-track__fill),
-  ::v-deep(.v-selection-control--dirty .v-switch__track) {
-    background-color: v-bind(primaryColor) !important;
   }
 </style>

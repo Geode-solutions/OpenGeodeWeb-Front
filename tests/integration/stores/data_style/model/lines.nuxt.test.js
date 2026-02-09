@@ -47,7 +47,13 @@ describe("Model lines", () => {
       const visibility = false
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
-      await dataStyleStore.setModelLinesVisibility(id, line_ids, visibility)
+      const result = dataStyleStore.setModelLinesVisibility(
+        id,
+        line_ids,
+        visibility,
+      )
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.visibility,
         { id, block_ids: lines_viewer_ids, visibility },
@@ -75,7 +81,9 @@ describe("Model lines", () => {
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       spy.mockClear()
-      await dataStyleStore.setModelLinesColor(id, line_ids, color)
+      const result = dataStyleStore.setModelLinesColor(id, line_ids, color)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.color,
         { id, block_ids: lines_viewer_ids, color },
@@ -86,6 +94,16 @@ describe("Model lines", () => {
       for (const line_id of line_ids) {
         expect(dataStyleStore.modelLineColor(id, line_id)).toStrictEqual(color)
       }
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
+  describe("Lines style", () => {
+    test("Lines apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelLinesStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })

@@ -1,19 +1,3 @@
-<template>
-  <div class="pa-0">
-    <v-btn
-      :loading="loading"
-      color="primary"
-      @click="get_inspection_results(props.geode_object_type, props.filename)"
-    >
-      Inspect
-      <template #loader>
-        <v-progress-circular indeterminate size="20" color="white" width="3" />
-      </template>
-    </v-btn>
-    <v-btn variant="text" @click="emit('decrement_step')">Cancel</v-btn>
-  </div>
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
@@ -47,3 +31,19 @@
     toggle_loading()
   }
 </script>
+
+<template>
+  <div class="pa-0">
+    <v-btn
+      :loading="loading"
+      color="primary"
+      @click="get_inspection_results(props.geode_object_type, props.filename)"
+    >
+      Inspect
+      <template #loader>
+        <v-progress-circular indeterminate size="20" color="white" width="3" />
+      </template>
+    </v-btn>
+    <v-btn variant="text" @click="emit('decrement_step')">Cancel</v-btn>
+  </div>
+</template>

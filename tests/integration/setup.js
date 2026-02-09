@@ -25,14 +25,8 @@ import {
 // Local constants
 const data_folder = path.join("tests", "integration", "data")
 
-async function setupIntegrationTests(file_name, geode_object) {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+async function runMicroservices() {
   const geodeStore = useGeodeStore()
-  // const hybridViewerStore = useHybridViewerStore()
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
@@ -61,11 +55,22 @@ async function setupIntegrationTests(file_name, geode_object) {
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   console.log("after ports")
-  await viewerStore.ws_connect()
-  // await hybridViewerStore.initHybridViewer()
-  console.log("after hybridViewerStore.initHybridViewer")
 
-  // await viewerStore.ws_connect()
+  return { back_port, viewer_port, project_folder_path }
+}
+
+async function setupIntegrationTests(file_name, geode_object) {
+  const pinia = createTestingPinia({
+    stubActions: false,
+    createSpy: vi.fn,
+  })
+  setActivePinia(pinia)
+  const viewerStore = useViewerStore()
+
+  const { back_port, viewer_port, project_folder_path } =
+    await runMicroservices()
+  await viewerStore.ws_connect()
+
   const id = await importFile(file_name, geode_object)
   expect(viewerStore.status).toBe(Status.CONNECTED)
   console.log("end of setupIntegrationTests")
@@ -91,4 +96,4 @@ afterAll(() => {
   delete global.WebSocket
 })
 
-export { setupIntegrationTests }
+export { runMicroservices, setupIntegrationTests }

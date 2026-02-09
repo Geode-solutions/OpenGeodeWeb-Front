@@ -2,6 +2,7 @@
   import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
   import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
   import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
+  import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
@@ -11,7 +12,6 @@
 
   const props = defineProps({
     itemProps: { type: Object, required: true },
-    btn_image: { type: String, required: true },
   })
 
   const id = toRef(() => props.itemProps.id)
@@ -51,13 +51,20 @@
       hybridViewerStore.remoteRender()
     },
   })
+  const edge_attribute = computed({
+    get: () => dataStyleStore.meshEdgesEdgeAttribute(id.value),
+    set: (newValue) => {
+      dataStyleStore.setMeshEdgesEdgeAttribute(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
 </script>
 
 <template>
   <ViewerContextMenuItem
     :itemProps="props.itemProps"
     tooltip="Edges options"
-    :btn_image="props.btn_image"
+    :btn_image="EdgedCurveEdges"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
@@ -85,6 +92,8 @@
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
+              v-model:vertex_attribute="vertex_attribute"
+              v-model:edge_attribute="edge_attribute"
             />
           </v-col>
         </v-row>

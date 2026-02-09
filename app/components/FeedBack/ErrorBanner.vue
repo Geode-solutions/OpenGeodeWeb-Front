@@ -1,3 +1,12 @@
+<script setup>
+  import { useFeedbackStore } from "@ogw_front/stores/feedback"
+  const feedbackStore = useFeedbackStore()
+
+  function reload() {
+    window.location.reload()
+  }
+</script>
+
 <template>
   <v-banner
     v-if="feedbackStore.server_error"
@@ -41,12 +50,3 @@
     </v-row>
   </v-banner>
 </template>
-
-<script setup>
-  import { useFeedbackStore } from "@ogw_front/stores/feedback"
-  const feedbackStore = useFeedbackStore()
-
-  function reload() {
-    window.location.reload()
-  }
-</script>

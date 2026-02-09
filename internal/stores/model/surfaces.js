@@ -31,6 +31,9 @@ export function useModelSurfacesStyle() {
     modelSurfaceStyle(id, surface_id).visibility = visibility
   }
   async function setModelSurfacesVisibility(id, surface_ids, visibility) {
+    if (!surface_ids || surface_ids.length === 0) {
+      return
+    }
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       surface_ids,
@@ -68,6 +71,9 @@ export function useModelSurfacesStyle() {
   }
 
   async function setModelSurfacesColor(id, surface_ids, color) {
+    if (!surface_ids || surface_ids.length === 0) {
+      return
+    }
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       surface_ids,

@@ -17,6 +17,7 @@ import { setupIntegrationTests } from "../../../setup"
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
 const file_name = "test.og_edc2d"
 const geode_object = "EdgedCurve2D"
+const vertex_attribute = { name: "points" }
 
 let id, back_port, viewer_port, project_folder_path
 
@@ -43,7 +44,9 @@ describe("Mesh points", () => {
       const viewerStore = useViewerStore()
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPointsVisibility(id, visibility)
+      const result = dataStyleStore.setMeshPointsVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         mesh_points_schemas.visibility,
         { id, visibility },
@@ -62,7 +65,9 @@ describe("Mesh points", () => {
       const viewerStore = useViewerStore()
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPointsColor(id, color)
+      const result = dataStyleStore.setMeshPointsColor(id, color)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         mesh_points_schemas.color,
         { id, color },
@@ -79,11 +84,32 @@ describe("Mesh points", () => {
     test("test coloring", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const coloringTypes = ["color"]
+      const coloringTypes = [
+        { name: "color" },
+        {
+          name: "vertex",
+          function: () =>
+            dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute),
+        },
+      ]
       for (let i = 0; i < coloringTypes.length; i++) {
-        dataStyleStore.setMeshPointsActiveColoring(id, coloringTypes[i])
+        if (coloringTypes[i].function) {
+          expect(() =>
+            dataStyleStore.setMeshPointsActiveColoring(
+              id,
+              coloringTypes[i].name,
+            ),
+          ).toThrowError()
+          await coloringTypes[i].function()
+        }
+        const result = dataStyleStore.setMeshPointsActiveColoring(
+          id,
+          coloringTypes[i].name,
+        )
+        expect(result).toBeInstanceOf(Promise)
+        await result
         expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(
-          coloringTypes[i],
+          coloringTypes[i].name,
         )
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
@@ -96,7 +122,9 @@ describe("Mesh points", () => {
       const viewerStore = useViewerStore()
       const size = 20
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPointsSize(id, size)
+      const result = dataStyleStore.setMeshPointsSize(id, size)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         mesh_points_schemas.size,
         { id, size },
@@ -107,5 +135,33 @@ describe("Mesh points", () => {
       expect(dataStyleStore.meshPointsSize(id)).toBe(size)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
+
+    test("Points vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+
+      const spy = vi.spyOn(viewerStore, "request")
+      await dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute)
+      expect(spy).toHaveBeenCalledWith(
+        mesh_points_schemas.vertex_attribute,
+        { id, ...vertex_attribute },
+        {
+          response_function: expect.any(Function),
+        },
+      )
+      expect(dataStyleStore.meshPointsVertexAttribute(id)).toStrictEqual(
+        vertex_attribute,
+      )
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
+
+  test("Points apply default style", async () => {
+    const dataStyleStore = useDataStyleStore()
+    const viewerStore = useViewerStore()
+    const result = dataStyleStore.applyMeshPointsStyle(id)
+    expect(result).toBeInstanceOf(Promise)
+    await result
+    expect(viewerStore.status).toBe(Status.CONNECTED)
   })
 })

@@ -48,9 +48,12 @@ export function useMeshPointsStyle() {
       { id },
       meshPointsActiveColoring(id),
     )
-    if (type == "color") {
+    if (type === "color") {
       return setMeshPointsColor(id, coloring.color)
-    } else if (type == "vertex" && coloring.vertex !== null) {
+    } else if (type === "vertex") {
+      if (coloring.vertex === null) {
+        throw new Error("Vertex attribute not set")
+      }
       return setMeshPointsVertexAttribute(id, coloring.vertex)
     } else {
       throw new Error("Unknown mesh points coloring type: " + type)
