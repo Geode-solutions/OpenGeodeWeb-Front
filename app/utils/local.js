@@ -5,6 +5,8 @@ import child_process from "child_process"
 import WebSocket from "ws"
 
 // Third party imports
+
+import JSZip from "jszip"
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
 import pTimeout from "p-timeout"
@@ -334,6 +336,42 @@ async function run_browser(
   })
 }
 
+async function unzipFile(
+  zipFilePath,
+  outputDir = zipFilePath.replace(/\.[^/.]+$/, ""), // Remove the file extension
+) {
+  console.log("Unzipping file...", zipFilePath, outputDir)
+  try {
+    const data = await fs.promises.readFile(zipFilePath)
+    const zip = await JSZip.loadAsync(data)
+    await fs.promises.mkdir(outputDir, { recursive: true })
+    const promises = []
+
+    zip.forEach((relativePath, zipEntry) => {
+      const outputPath = path.join(outputDir, relativePath)
+
+      if (zipEntry.dir) {
+        promises.push(fs.promises.mkdir(outputPath, { recursive: true }))
+      } else {
+        promises.push(
+          zipEntry.async("nodebuffer").then(async (content) => {
+            await fs.promises.mkdir(path.dirname(outputPath), {
+              recursive: true,
+            })
+            await fs.promises.writeFile(outputPath, content)
+          }),
+        )
+      }
+    })
+
+    await Promise.all(promises)
+    console.log("Extraction complete!")
+  } catch (error) {
+    console.error("Error unzipping file:", error)
+    throw error
+  }
+}
+
 export {
   create_path,
   delete_folder_recursive,
@@ -346,4 +384,5 @@ export {
   run_back,
   run_viewer,
   run_browser,
+  unzipFile,
 }

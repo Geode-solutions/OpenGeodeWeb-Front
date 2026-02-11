@@ -107,7 +107,7 @@ export const useAppStore = defineStore("app", () => {
         })
         finalURL = URL.createObjectURL(newBlob)
       }
-
+      /* @vite-ignore */
       const extensionModule = await import(finalURL)
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
