@@ -366,6 +366,7 @@ async function unzipFile(
 
     await Promise.all(promises)
     console.log("Extraction complete!")
+    return outputDir
   } catch (error) {
     console.error("Error unzipping file:", error)
     throw error

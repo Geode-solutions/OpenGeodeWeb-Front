@@ -1,4 +1,6 @@
 // Node.js imports
+import fs from "node:fs"
+import path from "node:path"
 
 // Third party imports
 import Conf from "conf"
@@ -56,7 +58,49 @@ async function runExtensions(projectName) {
     const { archivePath } = extensionsConfig[extensionId]
     console.log(runExtensions.name, { archivePath })
 
-    await unzipFile(archivePath)
+    const unzippedExtensionPath = await unzipFile(archivePath)
+
+    // Read and validate metadata.json
+    const metadataPath = path.join(unzippedExtensionPath, "metadata.json")
+    let metadata
+    try {
+      const metadataContent = await fs.promises.readFile(metadataPath, "utf-8")
+      metadata = JSON.parse(metadataContent)
+    } catch (error) {
+      throw new Error("Invalid .vext file: missing metadata.json")
+    }
+
+    // Look for backend executable and frontend JS
+    let backendExecutable = null
+    let frontendFile = null
+
+    const files = await fs.promises.readdir(unzippedExtensionPath)
+
+    for (const file of files) {
+      const filePath = path.join(unzippedExtensionPath, file)
+      const stats = await fs.promises.stat(filePath)
+
+      if (stats.isFile()) {
+        if (file.endsWith(".es.js")) {
+          frontendFile = filePath
+        } else if (!file.endsWith(".js") && !file.endsWith(".css")) {
+          backendExecutable = filePath
+          // Make executable (Unix-like systems)
+          await fs.promises.chmod(backendExecutable, 0o755)
+        }
+      }
+    }
+
+    // Validate required files
+    if (!frontendFile) {
+      throw new Error("Invalid .vext file: missing frontend JavaScript")
+    }
+    if (!backendExecutable) {
+      throw new Error("Invalid .vext file: missing backend executable")
+    }
+
+    // Read frontend content
+    const frontendContent = await fs.promises.readFile(frontendFile, "utf-8")
 
     try {
       const port = await getPort({ portRange: [MIN_PORT, MAX_PORT] })
@@ -72,6 +116,15 @@ async function runExtensions(projectName) {
         extensionProcesses.delete(extensionId)
       })
 
+      const test = {
+        extension_metadata: {
+          name: metadata.name,
+          version: metadata.version,
+        },
+        frontend_content: frontendContent,
+        backend_path: backendExecutable,
+      }
+      console.log("[Extensions] test return :", { test })
       return { success: true, port }
     } catch (error) {
       console.error(
