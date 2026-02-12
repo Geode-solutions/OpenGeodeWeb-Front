@@ -94,7 +94,7 @@ export function useMeshEdgesStyle() {
         }
       }
     } else {
-      throw new Error("Unknown mesh edges active coloring type: " + type)
+      throw new Error("Unknown mesh edges coloring type: " + type)
     }
   }
 

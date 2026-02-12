@@ -1,4 +1,3 @@
-import { defineStore } from "pinia"
 import "@kitware/vtk.js/Rendering/Profiles/Geometry"
 import vtkGenericRenderWindow from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
 import vtkXMLPolyDataReader from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"

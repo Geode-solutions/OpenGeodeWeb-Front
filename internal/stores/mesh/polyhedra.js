@@ -94,7 +94,7 @@ export function useMeshPolyhedraStyle() {
         }
       }
     } else {
-      throw new Error("Unknown mesh polyhedra active coloring type: " + type)
+      throw new Error("Unknown mesh polyhedra coloring type: " + type)
     }
   }
 

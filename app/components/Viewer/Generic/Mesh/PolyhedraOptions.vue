@@ -39,6 +39,7 @@
     },
   })
 </script>
+
 <template>
   <ViewerContextMenuItem
     :itemProps="props.itemProps"

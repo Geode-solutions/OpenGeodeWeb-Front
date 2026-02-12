@@ -346,7 +346,7 @@ export function useMeshPolygonsStyle() {
         }
       }
     } else {
-      throw new Error("Unknown mesh polygons active coloring type: " + type)
+      throw new Error("Unknown mesh polygons coloring type: " + type)
     }
   }
 

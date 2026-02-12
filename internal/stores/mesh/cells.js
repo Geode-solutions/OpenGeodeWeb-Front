@@ -327,7 +327,7 @@ export function useMeshCellsStyle() {
         }
       }
     } else {
-      throw new Error("Unknown mesh cells active coloring type: " + type)
+      throw new Error("Unknown mesh cells coloring type: " + type)
     }
   }
 
@@ -340,26 +340,26 @@ export function useMeshCellsStyle() {
   }
 
   return {
-    meshCellsVisibility: meshCellsVisibility,
-    meshCellsActiveColoring: meshCellsActiveColoring,
-    meshCellsColor: meshCellsColor,
-    meshCellsTextures: meshCellsTextures,
-    meshCellsVertexAttributeName: meshCellsVertexAttributeName,
-    meshCellsVertexAttributeRange: meshCellsVertexAttributeRange,
-    meshCellsVertexAttributeColorMap: meshCellsVertexAttributeColorMap,
-    meshCellsCellAttributeName: meshCellsCellAttributeName,
-    meshCellsCellAttributeRange: meshCellsCellAttributeRange,
-    meshCellsCellAttributeColorMap: meshCellsCellAttributeColorMap,
-    setMeshCellsVisibility: setMeshCellsVisibility,
-    setMeshCellsActiveColoring: setMeshCellsActiveColoring,
-    setMeshCellsColor: setMeshCellsColor,
-    setMeshCellsTextures: setMeshCellsTextures,
-    setMeshCellsVertexAttributeName: setMeshCellsVertexAttributeName,
-    setMeshCellsVertexAttributeRange: setMeshCellsVertexAttributeRange,
-    setMeshCellsVertexAttributeColorMap: setMeshCellsVertexAttributeColorMap,
-    setMeshCellsCellAttributeName: setMeshCellsCellAttributeName,
-    setMeshCellsCellAttributeRange: setMeshCellsCellAttributeRange,
-    setMeshCellsCellAttributeColorMap: setMeshCellsCellAttributeColorMap,
-    applyMeshCellsStyle: applyMeshCellsStyle,
+    meshCellsVisibility,
+    meshCellsActiveColoring,
+    meshCellsColor,
+    meshCellsTextures,
+    meshCellsVertexAttributeName,
+    meshCellsVertexAttributeRange,
+    meshCellsVertexAttributeColorMap,
+    meshCellsCellAttributeName,
+    meshCellsCellAttributeRange,
+    meshCellsCellAttributeColorMap,
+    setMeshCellsVisibility,
+    setMeshCellsActiveColoring,
+    setMeshCellsColor,
+    setMeshCellsTextures,
+    setMeshCellsVertexAttributeName,
+    setMeshCellsVertexAttributeRange,
+    setMeshCellsVertexAttributeColorMap,
+    setMeshCellsCellAttributeName,
+    setMeshCellsCellAttributeRange,
+    setMeshCellsCellAttributeColorMap,
+    applyMeshCellsStyle,
   }
 }

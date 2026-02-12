@@ -74,7 +74,7 @@ export function useMeshPointsStyle() {
         }
       }
     } else {
-      throw new Error("Unknown mesh points active coloring type: " + type)
+      throw new Error("Unknown mesh points coloring type: " + type)
     }
   }
 

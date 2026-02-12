@@ -1,4 +1,3 @@
-import { defineStore } from "pinia"
 // PointSet components
 import PointSetPointsOptions from "@ogw_front/components/Viewer/PointSet/SpecificPointsOptions"
 
