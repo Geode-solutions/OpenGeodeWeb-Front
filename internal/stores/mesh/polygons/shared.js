@@ -1,0 +1,23 @@
+import { useDataStyleStateStore } from "../../data_style_state"
+
+export function useMeshPolygonsSharedStore() {
+  const dataStyleStateStore = useDataStyleStateStore()
+
+  function meshPolygonsStyle(id) {
+    return dataStyleStateStore.getStyle(id).polygons
+  }
+
+  function meshPolygonsColoring(id) {
+    return meshPolygonsStyle(id).coloring
+  }
+
+  function meshPolygonsActiveColoring(id) {
+    return meshPolygonsColoring(id).active
+  }
+
+  return {
+    meshPolygonsStyle,
+    meshPolygonsColoring,
+    meshPolygonsActiveColoring,
+  }
+}

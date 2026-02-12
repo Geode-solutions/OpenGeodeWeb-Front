@@ -57,10 +57,10 @@ export function useMeshPointsStyle() {
       if (name === undefined) {
         return Promise.resolve()
       }
-      const attributes = coloring.vertex.attributes
-      const minimum = attributes[name]?.minimum
-      const maximum = attributes[name]?.maximum
-      const colorMap = attributes[name]?.colorMap
+      const storedConfigs = coloring.vertex.storedConfigs
+      const minimum = storedConfigs[name]?.minimum
+      const maximum = storedConfigs[name]?.maximum
+      const colorMap = storedConfigs[name]?.colorMap
       await setMeshPointsVertexAttributeName(id, name)
       if (minimum !== undefined && maximum !== undefined) {
         await setMeshPointsVertexAttributeRange(id, minimum, maximum)
@@ -108,18 +108,18 @@ export function useMeshPointsStyle() {
       { id, name },
       {
         response_function: () => {
-          const saved_preset = coloring_style.vertex.attributes[name]
+          const storedConfigs = coloring_style.vertex.storedConfigs[name]
           coloring_style.vertex.name = name
 
           let minimum, maximum, colorMap
           if (
-            saved_preset &&
-            saved_preset.minimum !== undefined &&
-            saved_preset.maximum !== undefined
+            storedConfigs &&
+            storedConfigs.minimum !== undefined &&
+            storedConfigs.maximum !== undefined
           ) {
-            minimum = saved_preset.minimum
-            maximum = saved_preset.maximum
-            colorMap = saved_preset.colorMap
+            minimum = storedConfigs.minimum
+            maximum = storedConfigs.maximum
+            colorMap = storedConfigs.colorMap
             setMeshPointsVertexAttributeRange(id, minimum, maximum)
             setMeshPointsVertexAttributeColorMap(id, colorMap, minimum, maximum)
           }
@@ -135,16 +135,19 @@ export function useMeshPointsStyle() {
   }
   function meshPointsVertexAttributeRange(id) {
     const name = meshPointsVertexAttributeName(id)
-    const saved_preset = meshPointsStyle(id).coloring.vertex.attributes[name]
-    return saved_preset ? [saved_preset.minimum, saved_preset.maximum] : [0, 1]
+    const storedConfigs =
+      meshPointsStyle(id).coloring.vertex.storedConfigs[name]
+    return storedConfigs
+      ? [storedConfigs.minimum, storedConfigs.maximum]
+      : [0, 1]
   }
   function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
     const coloring_style = meshPointsStyle(id).coloring
     const name = coloring_style.vertex.name
     ensureAttributeEntry(coloring_style.vertex, name)
-    const saved_preset = coloring_style.vertex.attributes[name]
-    saved_preset.minimum = minimum
-    saved_preset.maximum = maximum
+    const storedConfigs = coloring_style.vertex.storedConfigs[name]
+    storedConfigs.minimum = minimum
+    storedConfigs.maximum = maximum
     return viewerStore.request(
       mesh_points_schemas.attribute.vertex.scalar_range,
       { id, minimum, maximum },
@@ -172,8 +175,8 @@ export function useMeshPointsStyle() {
     const coloring_style = meshPointsStyle(id).coloring
     const name = coloring_style.vertex.name
     ensureAttributeEntry(coloring_style.vertex, name)
-    const saved_preset = coloring_style.vertex.attributes[name]
-    saved_preset.colorMap = colorMapName
+    const storedConfigs = coloring_style.vertex.storedConfigs[name]
+    storedConfigs.colorMap = colorMapName
     const points =
       typeof colorMapName === "string"
         ? getRGBPointsFromPreset(colorMapName)
@@ -209,11 +212,10 @@ export function useMeshPointsStyle() {
   }
 
   function applyMeshPointsStyle(id) {
-    const style = meshPointsStyle(id)
     return Promise.all([
-      setMeshPointsVisibility(id, style.visibility),
-      setMeshPointsActiveColoring(id, style.coloring.active),
-      setMeshPointsSize(id, style.size),
+      setMeshPointsVisibility(id, meshPointsVisibility(id)),
+      setMeshPointsActiveColoring(id, meshPointsActiveColoring(id)),
+      setMeshPointsSize(id, meshPointsSize(id)),
     ])
   }
 

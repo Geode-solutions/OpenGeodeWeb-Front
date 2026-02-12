@@ -115,12 +115,14 @@
   const cell_attribute_color_map = computed({
     get: () => dataStyleStore.meshCellsCellAttributeColorMap(id.value),
     set: (newValue) => {
-      const range = dataStyleStore.meshCellsCellAttributeRange(id.value)
+      const { minimum, maximum } = dataStyleStore.meshCellsCellAttributeRange(
+        id.value,
+      )
       dataStyleStore.setMeshCellsCellAttributeColorMap(
         id.value,
         newValue,
-        range[0],
-        range[1],
+        minimum,
+        maximum,
       )
       hybridViewerStore.remoteRender()
     },
