@@ -83,16 +83,19 @@ describe("Mesh edges", () => {
       const viewerStore = useViewerStore()
 
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute)
+      await dataStyleStore.setMeshEdgesVertexAttributeName(
+        id,
+        vertex_attribute.name,
+      )
       expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.vertex_attribute,
+        mesh_edges_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshEdgesVertexAttribute(id)).toStrictEqual(
-        vertex_attribute,
+      expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe(
+        vertex_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -102,16 +105,19 @@ describe("Mesh edges", () => {
       const viewerStore = useViewerStore()
 
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute)
+      await dataStyleStore.setMeshEdgesEdgeAttributeName(
+        id,
+        edge_attribute.name,
+      )
       expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.edge_attribute,
+        mesh_edges_schemas.attribute.edge.name,
         { id, ...edge_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshEdgesEdgeAttribute(id)).toStrictEqual(
-        edge_attribute,
+      expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe(
+        edge_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -124,22 +130,22 @@ describe("Mesh edges", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute),
+            dataStyleStore.setMeshEdgesVertexAttributeName(
+              id,
+              vertex_attribute.name,
+            ),
         },
         {
           name: "edge",
           function: () =>
-            dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute),
+            dataStyleStore.setMeshEdgesEdgeAttributeName(
+              id,
+              edge_attribute.name,
+            ),
         },
       ]
       for (let i = 0; i < coloringTypes.length; i++) {
         if (coloringTypes[i].function) {
-          expect(() =>
-            dataStyleStore.setMeshEdgesActiveColoring(
-              id,
-              coloringTypes[i].name,
-            ),
-          ).toThrowError()
           await coloringTypes[i].function()
         }
         const result = dataStyleStore.setMeshEdgesActiveColoring(

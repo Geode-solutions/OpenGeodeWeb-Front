@@ -6,11 +6,13 @@ const globalRetry = process.env.CI ? 3 : 0
 
 export default defineConfig({
   test: {
+    globals: true,
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
       await defineVitestProject({
         test: {
           name: "unit",
+          globals: true,
           include: ["tests/unit/**/*.test.js"],
           environment: "nuxt",
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
@@ -25,6 +27,7 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "integration",
+          globals: true,
           include: ["tests/integration/**/*.test.js"],
           environment: "nuxt",
           fileParallelism: false,
