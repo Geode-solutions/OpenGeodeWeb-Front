@@ -19,73 +19,86 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshPolyhedraActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshPolyhedraColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraVertexAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(
+        id.value,
+        newValue,
+      )
+      await dataStyleStore.updateMeshPolyhedraVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraVertexAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraVertexAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshPolyhedraVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_color_map = computed({
     get: () => dataStyleStore.meshPolyhedraVertexAttributeColorMap(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(
+        id.value,
+        newValue,
+      )
       hybridViewerStore.remoteRender()
     },
   })
   const polyhedron_attribute_name = computed({
     get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
+        id.value,
+        newValue,
+      )
+      await dataStyleStore.updateMeshPolyhedraPolyhedronAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const polyhedron_attribute_range = computed({
     get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshPolyhedraPolyhedronAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const polyhedron_attribute_color_map = computed({
     get: () =>
       dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(
         id.value,
         newValue,
       )

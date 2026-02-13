@@ -17,15 +17,15 @@
 
   const visibility = computed({
     get: () => dataStyleStore.modelPointsVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setModelPointsVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setModelPointsVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const size = computed({
     get: () => dataStyleStore.modelPointsSize(id.value),
-    set: (newValue) => {
-      dataStyleStore.setModelPointsSize(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setModelPointsSize(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

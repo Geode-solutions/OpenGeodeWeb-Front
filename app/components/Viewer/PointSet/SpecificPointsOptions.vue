@@ -18,54 +18,59 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshPointsVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const size = computed({
     get: () => dataStyleStore.meshPointsSize(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsSize(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsSize(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshPointsActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshPointsColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVertexAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshPointsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVertexAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshPointsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_color_map = computed({
     get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVertexAttributeColorMap(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeColorMap(
+        id.value,
+        newValue,
+      )
       hybridViewerStore.remoteRender()
     },
   })

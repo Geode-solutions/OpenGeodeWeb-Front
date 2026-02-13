@@ -18,68 +18,73 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshEdgesVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const size = computed({
     get: () => dataStyleStore.meshEdgesWidth(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesWidth(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesWidth(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshEdgesActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshEdgesColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesVertexAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVertexAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_color_map = computed({
     get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesVertexAttributeColorMap(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVertexAttributeColorMap(
+        id.value,
+        newValue,
+      )
       hybridViewerStore.remoteRender()
     },
   })
   const edge_attribute_name = computed({
     get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesEdgeAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesEdgeAttributeName(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const edge_attribute_range = computed({
     get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesEdgeAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesEdgeAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
@@ -89,8 +94,8 @@
   })
   const edge_attribute_color_map = computed({
     get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesEdgeAttributeColorMap(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesEdgeAttributeColorMap(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

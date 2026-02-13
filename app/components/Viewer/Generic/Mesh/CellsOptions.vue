@@ -19,85 +19,86 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshCellsVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshCellsActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshCellsColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const textures = computed({
     get: () => dataStyleStore.meshCellsTextures(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsTextures(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsTextures(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsVertexAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsVertexAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsVertexAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsVertexAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_color_map = computed({
     get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
-    set: (newValue) => {
-      const range = dataStyleStore.meshCellsVertexAttributeRange(id.value)
-      dataStyleStore.setMeshCellsVertexAttributeColorMap(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsVertexAttributeColorMap(
         id.value,
         newValue,
-        range[0],
-        range[1],
       )
       hybridViewerStore.remoteRender()
     },
   })
   const cell_attribute_name = computed({
     get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsCellAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsCellAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const cell_attribute_range = computed({
     get: () => dataStyleStore.meshCellsCellAttributeRange(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsCellAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsCellAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const cell_attribute_color_map = computed({
     get: () => dataStyleStore.meshCellsCellAttributeColorMap(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshCellsCellAttributeColorMap(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshCellsCellAttributeColorMap(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

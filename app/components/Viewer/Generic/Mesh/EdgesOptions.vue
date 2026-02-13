@@ -18,29 +18,29 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshEdgesVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const size = computed({
     get: () => dataStyleStore.meshEdgesWidth(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesWidth(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesWidth(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshEdgesActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshEdgesColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

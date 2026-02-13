@@ -19,80 +19,95 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshPolygonsVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshPolygonsActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshPolygonsColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const textures = computed({
     get: () => dataStyleStore.meshPolygonsTextures(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsTextures(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsTextures(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_name = computed({
     get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsVertexAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsVertexAttributeName(
+        id.value,
+        newValue,
+      )
+      await dataStyleStore.updateMeshPolygonsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_range = computed({
     get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsVertexAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsVertexAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshPolygonsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_color_map = computed({
     get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsVertexAttributeColorMap(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsVertexAttributeColorMap(
+        id.value,
+        newValue,
+      )
       hybridViewerStore.remoteRender()
     },
   })
   const polygon_attribute_name = computed({
     get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsPolygonAttributeName(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsPolygonAttributeName(
+        id.value,
+        newValue,
+      )
+      await dataStyleStore.updateMeshPolygonsPolygonAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const polygon_attribute_range = computed({
     get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
-    set: (newValue) => {
-      console.log("polygon_attribute_range", { newValue })
-      dataStyleStore.setMeshPolygonsPolygonAttributeRange(
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsPolygonAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshPolygonsPolygonAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
   const polygon_attribute_color_map = computed({
     get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(
+        id.value,
+        newValue,
+      )
       hybridViewerStore.remoteRender()
     },
   })
