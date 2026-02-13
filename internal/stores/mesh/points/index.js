@@ -66,13 +66,13 @@ export function useMeshPointsStyle() {
         id,
         meshPointsVisibility.meshPointsVisibility(id),
       ),
-      setMeshPointsActiveColoring(
-        id,
-        meshPointsCommonStyle.meshPointsActiveColoring(id),
-      ),
       meshPointsSizeStyle.setMeshPointsSize(
         id,
         meshPointsSizeStyle.meshPointsSize(id),
+      ),
+      setMeshPointsActiveColoring(
+        id,
+        meshPointsCommonStyle.meshPointsActiveColoring(id),
       ),
     ])
   }

@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useMeshPolygonsCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
+import { useMeshPolygonsCommonStyle } from "./common"
 
 // Local constants
 const meshPolygonsVertexAttributeSchemas =
@@ -15,11 +15,6 @@ export function useMeshPolygonsVertexAttributeStyle() {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle()
 
   function meshPolygonsVertexAttribute(id) {
-    console.log(
-      meshPolygonsVertexAttribute.name,
-      { id },
-      meshPolygonsCommonStyle.meshPolygonsColoring(id),
-    )
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).vertex
   }
 
