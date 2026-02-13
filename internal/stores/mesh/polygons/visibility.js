@@ -2,7 +2,7 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useMeshPolygonsSharedStore } from "./shared"
+import { useMeshPolygonsCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -11,10 +11,10 @@ const meshPolygonsVisibilitySchema =
 
 export function useMeshPolygonsVisibilityStyle() {
   const viewerStore = useViewerStore()
-  const meshPolygonsSharedStore = useMeshPolygonsSharedStore()
+  const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle()
 
   function meshPolygonsVisibility(id) {
-    return meshPolygonsSharedStore.meshPolygonsStyle(id).visibility
+    return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility
   }
   function setMeshPolygonsVisibility(id, visibility) {
     return viewerStore.request(
@@ -22,7 +22,7 @@ export function useMeshPolygonsVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          meshPolygonsSharedStore.meshPolygonsStyle(id).visibility = visibility
+          meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility = visibility
           console.log(
             setMeshPolygonsVisibility.name,
             { id },

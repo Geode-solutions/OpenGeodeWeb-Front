@@ -2,7 +2,7 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useMeshPolygonsSharedStore } from "./shared"
+import { useMeshPolygonsCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 
@@ -12,10 +12,10 @@ const meshPolygonsPolygonAttributeSchemas =
 
 export function useMeshPolygonsPolygonAttributeStyle() {
   const viewerStore = useViewerStore()
-  const meshPolygonsSharedStore = useMeshPolygonsSharedStore()
+  const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle()
 
   function meshPolygonsPolygonAttribute(id) {
-    return meshPolygonsSharedStore.meshPolygonsColoring(id).polygon
+    return meshPolygonsCommonStyle.meshPolygonsColoring(id).polygon
   }
 
   function meshPolygonsPolygonAttributeStoredConfig(id, name) {

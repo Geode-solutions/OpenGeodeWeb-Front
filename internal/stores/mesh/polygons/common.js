@@ -1,6 +1,6 @@
 import { useDataStyleStateStore } from "../../data_style_state"
 
-export function useMeshPolygonsSharedStore() {
+export function useMeshPolygonsCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
 
   function meshPolygonsStyle(id) {
