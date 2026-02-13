@@ -5,7 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
-import { useDataStyleStateStore } from "../data_style_state"
+import { useDataStyleStateStore } from "../state"
 import { useMeshPointsStyle } from "./points"
 import { useMeshEdgesStyle } from "./edges"
 import { useMeshCellsStyle } from "./cells"

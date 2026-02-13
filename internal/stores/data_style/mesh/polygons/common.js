@@ -1,4 +1,4 @@
-import { useDataStyleStateStore } from "../../data_style_state"
+import { useDataStyleStateStore } from "../../state"
 
 export function useMeshPolygonsCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
