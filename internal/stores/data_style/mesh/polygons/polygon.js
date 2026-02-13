@@ -18,6 +18,17 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).polygon
   }
 
+  async function updateMeshPolygonsPolygonAttribute(id) {
+    const name = meshPolygonsPolygonAttributeName(id)
+    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
+    await meshPolygonsPolygonAttributeRange(
+      id,
+      storedConfig.minimum,
+      storedConfig.maximum,
+    )
+    await meshPolygonsPolygonAttributeColorMap(id, storedConfig.colorMap)
+  }
+
   function meshPolygonsPolygonAttributeStoredConfig(id, name) {
     const storedConfigs = meshPolygonsPolygonAttribute(id).storedConfigs
     if (name in storedConfigs) {
@@ -48,13 +59,8 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       meshPolygonsPolygonAttributeSchemas.name,
       { id, name },
       {
-        response_function: async () => {
+        response_function: () => {
           meshPolygonsPolygonAttribute(id).name = name
-          const { minimum, maximum } = meshPolygonsPolygonAttributeStoredConfig(
-            id,
-            name,
-          )
-          await setMeshPolygonsPolygonAttributeRange(id, minimum, maximum)
           console.log(
             setMeshPolygonsPolygonAttributeName.name,
             { id },
@@ -75,7 +81,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     )
     return [minimum, maximum]
   }
-  function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
+  async function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     console.log(setMeshPolygonsPolygonAttributeRange.name, {
       id,
       minimum,
@@ -87,13 +93,9 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       meshPolygonsPolygonAttributeSchemas.scalar_range,
       { id, minimum, maximum },
       {
-        response_function: async () => {
+        response_function: () => {
           storedConfig.minimum = minimum
           storedConfig.maximum = maximum
-          await setMeshPolygonsPolygonAttributeColorMap(
-            id,
-            storedConfig.colorMap,
-          )
           console.log(
             setMeshPolygonsPolygonAttributeRange.name,
             { id },
@@ -138,5 +140,6 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     setMeshPolygonsPolygonAttributeName,
     setMeshPolygonsPolygonAttributeRange,
     setMeshPolygonsPolygonAttributeColorMap,
+    updateMeshPolygonsPolygonAttribute,
   }
 }

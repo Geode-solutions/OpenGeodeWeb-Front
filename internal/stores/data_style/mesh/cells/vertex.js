@@ -18,6 +18,17 @@ export function useMeshCellsVertexAttributeStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).vertex
   }
 
+  async function updateMeshCellsVertexAttribute(id) {
+    const name = meshCellsVertexAttributeName(id)
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
+    await meshCellsVertexAttributeRange(
+      id,
+      storedConfig.minimum,
+      storedConfig.maximum,
+    )
+    await meshCellsVertexAttributeColorMap(id, storedConfig.colorMap)
+  }
+
   function meshCellsVertexAttributeStoredConfig(id, name) {
     const storedConfigs = meshCellsVertexAttribute(id).storedConfigs
     if (name in storedConfigs) {
@@ -137,5 +148,6 @@ export function useMeshCellsVertexAttributeStyle() {
     setMeshCellsVertexAttributeName,
     setMeshCellsVertexAttributeRange,
     setMeshCellsVertexAttributeColorMap,
+    updateMeshCellsVertexAttribute,
   }
 }

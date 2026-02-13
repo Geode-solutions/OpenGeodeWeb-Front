@@ -18,6 +18,17 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).vertex
   }
 
+  async function updateMeshPolyhedraVertexAttribute(id) {
+    const name = meshPolyhedraVertexAttributeName(id)
+    const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
+    await meshPolyhedraVertexAttributeRange(
+      id,
+      storedConfig.minimum,
+      storedConfig.maximum,
+    )
+    await meshPolyhedraVertexAttributeColorMap(id, storedConfig.colorMap)
+  }
+
   function meshPolyhedraVertexAttributeStoredConfig(id, name) {
     const storedConfigs = meshPolyhedraVertexAttribute(id).storedConfigs
     if (name in storedConfigs) {
@@ -137,5 +148,6 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     setMeshPolyhedraVertexAttributeName,
     setMeshPolyhedraVertexAttributeRange,
     setMeshPolyhedraVertexAttributeColorMap,
+    updateMeshPolyhedraVertexAttribute,
   }
 }

@@ -18,6 +18,17 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).vertex
   }
 
+  async function updateMeshPolygonsVertexAttribute(id) {
+    const name = meshPolygonsVertexAttributeName(id)
+    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name)
+    await meshPolygonsVertexAttributeRange(
+      id,
+      storedConfig.minimum,
+      storedConfig.maximum,
+    )
+    await meshPolygonsVertexAttributeColorMap(id, storedConfig.colorMap)
+  }
+
   function meshPolygonsVertexAttributeStoredConfig(id, name) {
     const storedConfigs = meshPolygonsVertexAttribute(id).storedConfigs
     if (name in storedConfigs) {
@@ -137,5 +148,6 @@ export function useMeshPolygonsVertexAttributeStyle() {
     setMeshPolygonsVertexAttributeName,
     setMeshPolygonsVertexAttributeRange,
     setMeshPolygonsVertexAttributeColorMap,
+    updateMeshPolygonsVertexAttribute,
   }
 }
