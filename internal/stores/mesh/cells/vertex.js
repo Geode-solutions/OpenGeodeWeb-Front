@@ -3,7 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { getRGBCellsFromPreset } from "@ogw_front/utils/colormap"
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshCellsCommonStyle } from "./common"
 
 // Local constants
@@ -105,7 +105,7 @@ export function useMeshCellsVertexAttributeStyle() {
   function setMeshCellsVertexAttributeColorMap(id, colorMap) {
     const name = meshCellsVertexAttributeName(id)
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
-    const cells = getRGBCellsFromPreset(colorMap)
+    const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 
     console.log(setMeshCellsVertexAttributeColorMap.name, {
@@ -116,7 +116,7 @@ export function useMeshCellsVertexAttributeStyle() {
     })
     return viewerStore.request(
       meshCellsVertexAttributeSchemas.color_map,
-      { id, cells, minimum, maximum },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
           storedConfig.colorMap = colorMap

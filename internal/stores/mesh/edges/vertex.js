@@ -105,7 +105,7 @@ export function useMeshEdgesVertexAttributeStyle() {
   function setMeshEdgesVertexAttributeColorMap(id, colorMap) {
     const name = meshEdgesVertexAttributeName(id)
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
-    const edges = getRGBPointsFromPreset(colorMap)
+    const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 
     console.log(setMeshEdgesVertexAttributeColorMap.name, {
@@ -116,7 +116,7 @@ export function useMeshEdgesVertexAttributeStyle() {
     })
     return viewerStore.request(
       meshEdgesVertexAttributeSchemas.color_map,
-      { id, edges, minimum, maximum },
+      { id, points, minimum, maximum },
       {
         response_function: () => {
           storedConfig.colorMap = colorMap

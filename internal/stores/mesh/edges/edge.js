@@ -56,10 +56,10 @@ export function useMeshEdgesEdgeAttributeStyle() {
       {
         response_function: async () => {
           meshEdgesEdgeAttribute(id).name = name
-          const { minimum, maximum, colorMap } =
-            meshEdgesEdgeAttributeStoredConfig(id, name)
-          await setMeshEdgesEdgeAttributeRange(id, minimum, maximum)
-          await setMeshEdgesEdgeAttributeColorMap(id, colorMap)
+          // const { minimum, maximum, colorMap } =
+          //   meshEdgesEdgeAttributeStoredConfig(id, name)
+          // await setMeshEdgesEdgeAttributeRange(id, minimum, maximum)
+          // await setMeshEdgesEdgeAttributeColorMap(id, colorMap)
           console.log(
             setMeshEdgesEdgeAttributeName.name,
             { id },
@@ -70,72 +70,72 @@ export function useMeshEdgesEdgeAttributeStyle() {
     )
   }
 
-  function meshEdgesEdgeAttributeRange(id) {
-    const name = meshEdgesEdgeAttributeName(id)
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
-    const { minimum, maximum } = storedConfig
-    return [minimum, maximum]
-  }
-  function setMeshEdgesEdgeAttributeRange(id, minimum, maximum) {
-    const name = meshEdgesEdgeAttributeName(id)
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
-    return viewerStore.request(
-      meshEdgesEdgeAttributeSchemas.scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          console.log(
-            setMeshEdgesEdgeAttributeRange.name,
-            { id },
-            meshEdgesEdgeAttributeRange(id),
-          )
-        },
-      },
-    )
-  }
+  // function meshEdgesEdgeAttributeRange(id) {
+  //   const name = meshEdgesEdgeAttributeName(id)
+  //   const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
+  //   const { minimum, maximum } = storedConfig
+  //   return [minimum, maximum]
+  // }
+  // function setMeshEdgesEdgeAttributeRange(id, minimum, maximum) {
+  //   const name = meshEdgesEdgeAttributeName(id)
+  //   const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
+  //   return viewerStore.request(
+  //     meshEdgesEdgeAttributeSchemas.scalar_range,
+  //     { id, minimum, maximum },
+  //     {
+  //       response_function: () => {
+  //         storedConfig.minimum = minimum
+  //         storedConfig.maximum = maximum
+  //         console.log(
+  //           setMeshEdgesEdgeAttributeRange.name,
+  //           { id },
+  //           meshEdgesEdgeAttributeRange(id),
+  //         )
+  //       },
+  //     },
+  //   )
+  // }
 
-  function meshEdgesEdgeAttributeColorMap(id) {
-    const name = meshEdgesEdgeAttributeName(id)
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
-    const { colorMap } = storedConfig
-    return colorMap
-  }
-  function setMeshEdgesEdgeAttributeColorMap(id, colorMap) {
-    const name = meshEdgesEdgeAttributeName(id)
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
-    const edges = getRGBPointsFromPreset(colorMap)
-    const { minimum, maximum } = storedConfig
+  // function meshEdgesEdgeAttributeColorMap(id) {
+  //   const name = meshEdgesEdgeAttributeName(id)
+  //   const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
+  //   const { colorMap } = storedConfig
+  //   return colorMap
+  // }
+  // function setMeshEdgesEdgeAttributeColorMap(id, colorMap) {
+  //   const name = meshEdgesEdgeAttributeName(id)
+  //   const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
+  //   const points = getRGBPointsFromPreset(colorMap)
+  //   const { minimum, maximum } = storedConfig
 
-    console.log(setMeshEdgesEdgeAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    })
-    return viewerStore.request(
-      meshEdgesEdgeAttributeSchemas.color_map,
-      { id, edges, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.colorMap = colorMap
-          console.log(
-            setMeshEdgesEdgeAttributeColorMap.name,
-            { id },
-            meshEdgesEdgeAttributeColorMap(id),
-          )
-        },
-      },
-    )
-  }
+  //   console.log(setMeshEdgesEdgeAttributeColorMap.name, {
+  //     id,
+  //     minimum,
+  //     maximum,
+  //     colorMap,
+  //   })
+  //   return viewerStore.request(
+  //     meshEdgesEdgeAttributeSchemas.color_map,
+  //     { id, points, minimum, maximum },
+  //     {
+  //       response_function: () => {
+  //         storedConfig.colorMap = colorMap
+  //         console.log(
+  //           setMeshEdgesEdgeAttributeColorMap.name,
+  //           { id },
+  //           meshEdgesEdgeAttributeColorMap(id),
+  //         )
+  //       },
+  //     },
+  //   )
+  // }
 
   return {
     meshEdgesEdgeAttributeName,
-    meshEdgesEdgeAttributeRange,
-    meshEdgesEdgeAttributeColorMap,
+    // meshEdgesEdgeAttributeRange,
+    // meshEdgesEdgeAttributeColorMap,
     setMeshEdgesEdgeAttributeName,
-    setMeshEdgesEdgeAttributeRange,
-    setMeshEdgesEdgeAttributeColorMap,
+    // setMeshEdgesEdgeAttributeRange,
+    // setMeshEdgesEdgeAttributeColorMap,
   }
 }

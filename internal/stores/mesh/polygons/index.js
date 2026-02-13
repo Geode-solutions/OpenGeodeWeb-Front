@@ -14,7 +14,7 @@ export function useMeshPolygonsStyle() {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle()
   const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle()
   const meshPolygonsColorStyle = useMeshPolygonsColorStyle()
-  const meshPolygonsTexturesStore = useMeshPolygonsTexturesStyle()
+  const meshPolygonsTexturesStyle = useMeshPolygonsTexturesStyle()
   const meshPolygonsVertexAttributeStyle = useMeshPolygonsVertexAttributeStyle()
   const meshPolygonsPolygonAttributeStyle =
     useMeshPolygonsPolygonAttributeStyle()
@@ -33,11 +33,11 @@ export function useMeshPolygonsStyle() {
         meshPolygonsColorStyle.meshPolygonsColor(id),
       )
     } else if (type === "textures") {
-      const textures = meshPolygonsTexturesStore.meshPolygonsTextures(id)
+      const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id)
       if (textures === null) {
         return Promise.resolve()
       }
-      return meshPolygonsTexturesStore.setMeshPolygonsTextures(id, textures)
+      return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id)
@@ -77,12 +77,12 @@ export function useMeshPolygonsStyle() {
   }
 
   return {
-    ...meshPolygonsCommonStyle,
     setMeshPolygonsActiveColoring,
     applyMeshPolygonsStyle,
+    ...meshPolygonsCommonStyle,
     ...meshPolygonsVisibility,
     ...meshPolygonsColorStyle,
-    ...meshPolygonsTexturesStore,
+    ...meshPolygonsTexturesStyle,
     ...meshPolygonsVertexAttributeStyle,
     ...meshPolygonsPolygonAttributeStyle,
   }
