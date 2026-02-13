@@ -46,9 +46,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   const exportStores = () => {
-    return {
-      styles: dataStyleState.styles,
-    }
+    return { styles: dataStyleState.styles }
   }
 
   const importStores = (snapshot) => {

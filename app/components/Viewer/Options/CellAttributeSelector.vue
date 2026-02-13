@@ -5,12 +5,15 @@
 
   const geodeStore = useGeodeStore()
 
-  const cell_attribute_name = defineModel("cell_attribute_name")
+  const cell_attribute_name = defineModel("cell_attribute_name", {
+    type: String,
+  })
   const cell_attribute_range = defineModel("cell_attribute_range", {
     type: Array,
-    default: () => [0, 1],
   })
-  const cell_attribute_color_map = defineModel("cell_attribute_color_map")
+  const cell_attribute_color_map = defineModel("cell_attribute_color_map", {
+    type: String,
+  })
   const cell_attributes = ref([])
 
   const props = defineProps({
