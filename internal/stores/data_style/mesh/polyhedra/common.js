@@ -1,4 +1,4 @@
-import { useDataStyleStateStore } from "./../state"
+import { useDataStyleStateStore } from "../../state"
 
 export function useMeshPolyhedraCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()

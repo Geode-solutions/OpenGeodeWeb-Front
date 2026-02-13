@@ -1,4 +1,4 @@
-import { useDataStyleStateStore } from "./../state"
+import { useDataStyleStateStore } from "../../state"
 
 export function useMeshCellsCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
