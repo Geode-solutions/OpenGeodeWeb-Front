@@ -44,7 +44,7 @@ export function useMeshPolygonsStyle() {
         meshPolygonsVertexAttributeStyleStore.meshPolygonsVertexAttributeName(
           id,
         )
-      if (name === undefined) {
+      if (name === null) {
         return Promise.resolve()
       }
       return meshPolygonsVertexAttributeStyleStore.setMeshPolygonsVertexAttributeName(
@@ -56,7 +56,7 @@ export function useMeshPolygonsStyle() {
         meshPolygonsPolygonAttributeStyleStore.meshPolygonsPolygonAttributeName(
           id,
         )
-      if (name === undefined) {
+      if (name === null) {
         return Promise.resolve()
       }
       await meshPolygonsPolygonAttributeStyleStore.setMeshPolygonsPolygonAttributeName(

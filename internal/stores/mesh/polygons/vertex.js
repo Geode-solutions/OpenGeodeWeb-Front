@@ -54,6 +54,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return meshPolygonsVertexAttribute(id).name
   }
   function setMeshPolygonsVertexAttributeName(id, name) {
+    console.log(setMeshPolygonsVertexAttributeName.name, { id, name })
     return viewerStore.request(
       meshPolygonsVertexAttributeSchemas.name,
       { id, name },
@@ -111,6 +112,13 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name)
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
+
+    console.log(setMeshPolygonsVertexAttributeColorMap.name, {
+      id,
+      minimum,
+      maximum,
+      colorMap,
+    })
     return viewerStore.request(
       meshPolygonsVertexAttributeSchemas.color_map,
       { id, points, minimum, maximum },
