@@ -136,7 +136,7 @@ export function useMeshCellsStyle() {
     const name = meshCellsVertexAttributeName(id)
     const storedConfig = meshCellsVertexStoredConfig(id, name)
     let minimum, maximum
-    if (!storedConfig) (minimum = 0), (maximum = 1)
+    if (!storedConfig) ((minimum = 0), (maximum = 1))
     else {
       minimum = storedConfig.minimum
       maximum = storedConfig.maximum
@@ -246,7 +246,7 @@ export function useMeshCellsStyle() {
     const name = meshCellsCellAttributeName(id)
     const storedConfig = meshCellsCellStoredConfig(id, name)
     let minimum, maximum
-    if (!storedConfig) (minimum = 0), (maximum = 1)
+    if (!storedConfig) ((minimum = 0), (maximum = 1))
     else {
       minimum = storedConfig.minimum
       maximum = storedConfig.maximum
