@@ -15,11 +15,11 @@
 <template>
   <div class="attribute-colorbar mt-3">
     <ColorMapPicker v-model="colorMap" :min="minimum" :max="maximum" />
-
     <v-row dense align="center" class="mt-2">
       <v-col cols="5">
         <v-text-field
-          v-model.number="minimum"
+          :model-value="minimum"
+          @update:model-value="(value) => (minimum = Number(value))"
           label="Min"
           type="number"
           density="compact"
@@ -38,7 +38,8 @@
       </v-col>
       <v-col cols="5">
         <v-text-field
-          v-model.number="maximum"
+          :model-value="maximum"
+          @update:model-value="(value) => (maximum = Number(value))"
           label="Max"
           type="number"
           density="compact"

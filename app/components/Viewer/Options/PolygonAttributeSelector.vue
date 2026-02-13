@@ -5,12 +5,16 @@
 
   const geodeStore = useGeodeStore()
 
-  const polygon_attribute_name = defineModel("polygon_attribute_name")
+  const polygon_attribute_name = defineModel("polygon_attribute_name", {
+    type: String,
+  })
   const polygon_attribute_range = defineModel("polygon_attribute_range", {
     type: Array,
-    default: () => [0, 1],
   })
-  const polygon_attribute_color_map = defineModel("polygon_attribute_color_map")
+  const polygon_attribute_color_map = defineModel(
+    "polygon_attribute_color_map",
+    { type: String },
+  )
   const polygon_attributes = ref([])
 
   const props = defineProps({
@@ -18,21 +22,15 @@
   })
 
   const rangeMin = computed({
-    get: () => polygon_attribute_range.value?.[0] ?? 0,
+    get: () => polygon_attribute_range.value[0],
     set: (val) => {
-      polygon_attribute_range.value = [
-        val,
-        polygon_attribute_range.value?.[1] ?? 1,
-      ]
+      polygon_attribute_range.value = [val, polygon_attribute_range.value[1]]
     },
   })
   const rangeMax = computed({
-    get: () => polygon_attribute_range.value?.[1] ?? 1,
+    get: () => polygon_attribute_range.value[1],
     set: (val) => {
-      polygon_attribute_range.value = [
-        polygon_attribute_range.value?.[0] ?? 0,
-        val,
-      ]
+      polygon_attribute_range.value = [polygon_attribute_range.value[0], val]
     },
   })
 
@@ -56,29 +54,6 @@
     return polygon_attributes.value.find(
       (attr) => attr.attribute_name === polygon_attribute_name.value,
     )
-  })
-
-  watch(polygon_attribute_name, (newName) => {
-    if (newName) {
-      const attr = polygon_attributes.value.find(
-        (a) => a.attribute_name === newName,
-      )
-      if (
-        attr &&
-        attr.min_value !== undefined &&
-        attr.max_value !== undefined
-      ) {
-        const currentRange = polygon_attribute_range.value
-        const hasNoSavedPreset =
-          !currentRange || (currentRange[0] === 0 && currentRange[1] === 1)
-        if (hasNoSavedPreset) {
-          if (!polygon_attribute_color_map.value) {
-            polygon_attribute_color_map.value = "Cool to Warm"
-          }
-          polygon_attribute_range.value = [attr.min_value, attr.max_value]
-        }
-      }
-    }
   })
 
   function resetRange() {

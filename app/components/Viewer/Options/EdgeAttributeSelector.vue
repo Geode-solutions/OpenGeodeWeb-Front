@@ -5,12 +5,15 @@
 
   const geodeStore = useGeodeStore()
 
-  const edge_attribute_name = defineModel("edge_attribute_name")
+  const edge_attribute_name = defineModel("edge_attribute_name", {
+    type: String,
+  })
   const edge_attribute_range = defineModel("edge_attribute_range", {
     type: Array,
-    default: () => [0, 1],
   })
-  const edge_attribute_color_map = defineModel("edge_attribute_color_map")
+  const edge_attribute_color_map = defineModel("edge_attribute_color_map", {
+    type: String,
+  })
   const edge_attributes = ref([])
 
   const props = defineProps({
@@ -18,15 +21,15 @@
   })
 
   const rangeMin = computed({
-    get: () => edge_attribute_range.value?.[0] ?? 0,
+    get: () => edge_attribute_range.value[0],
     set: (val) => {
-      edge_attribute_range.value = [val, edge_attribute_range.value?.[1] ?? 1]
+      edge_attribute_range.value = [val, edge_attribute_range.value[1]]
     },
   })
   const rangeMax = computed({
-    get: () => edge_attribute_range.value?.[1] ?? 1,
+    get: () => edge_attribute_range.value[1],
     set: (val) => {
-      edge_attribute_range.value = [edge_attribute_range.value?.[0] ?? 0, val]
+      edge_attribute_range.value = [edge_attribute_range.value[0], val]
     },
   })
 
@@ -50,29 +53,6 @@
     return edge_attributes.value.find(
       (attr) => attr.attribute_name === edge_attribute_name.value,
     )
-  })
-
-  watch(edge_attribute_name, (newName) => {
-    if (newName) {
-      const attr = edge_attributes.value.find(
-        (a) => a.attribute_name === newName,
-      )
-      if (
-        attr &&
-        attr.min_value !== undefined &&
-        attr.max_value !== undefined
-      ) {
-        const currentRange = edge_attribute_range.value
-        const hasNoSavedPreset =
-          !currentRange || (currentRange[0] === 0 && currentRange[1] === 1)
-        if (hasNoSavedPreset) {
-          if (!edge_attribute_color_map.value) {
-            edge_attribute_color_map.value = "Cool to Warm"
-          }
-          edge_attribute_range.value = [attr.min_value, attr.max_value]
-        }
-      }
-    }
   })
 
   function resetRange() {

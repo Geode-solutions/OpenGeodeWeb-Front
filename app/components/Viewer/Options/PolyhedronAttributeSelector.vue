@@ -5,13 +5,15 @@
 
   const geodeStore = useGeodeStore()
 
-  const polyhedron_attribute_name = defineModel("polyhedron_attribute_name")
+  const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", {
+    type: String,
+  })
   const polyhedron_attribute_range = defineModel("polyhedron_attribute_range", {
     type: Array,
-    default: () => [0, 1],
   })
   const polyhedron_attribute_color_map = defineModel(
     "polyhedron_attribute_color_map",
+    { type: String },
   )
   const polyhedron_attributes = ref([])
 
@@ -20,19 +22,19 @@
   })
 
   const rangeMin = computed({
-    get: () => polyhedron_attribute_range.value?.[0] ?? 0,
+    get: () => polyhedron_attribute_range.value[0],
     set: (val) => {
       polyhedron_attribute_range.value = [
         val,
-        polyhedron_attribute_range.value?.[1] ?? 1,
+        polyhedron_attribute_range.value[1],
       ]
     },
   })
   const rangeMax = computed({
-    get: () => polyhedron_attribute_range.value?.[1] ?? 1,
+    get: () => polyhedron_attribute_range.value[1],
     set: (val) => {
       polyhedron_attribute_range.value = [
-        polyhedron_attribute_range.value?.[0] ?? 0,
+        polyhedron_attribute_range.value[0],
         val,
       ]
     },
@@ -58,29 +60,6 @@
     return polyhedron_attributes.value.find(
       (attr) => attr.attribute_name === polyhedron_attribute_name.value,
     )
-  })
-
-  watch(polyhedron_attribute_name, (newName) => {
-    if (newName) {
-      const attr = polyhedron_attributes.value.find(
-        (a) => a.attribute_name === newName,
-      )
-      if (
-        attr &&
-        attr.min_value !== undefined &&
-        attr.max_value !== undefined
-      ) {
-        const currentRange = polyhedron_attribute_range.value
-        const hasNoSavedPreset =
-          !currentRange || (currentRange[0] === 0 && currentRange[1] === 1)
-        if (hasNoSavedPreset) {
-          if (!polyhedron_attribute_color_map.value) {
-            polyhedron_attribute_color_map.value = "Cool to Warm"
-          }
-          polyhedron_attribute_range.value = [attr.min_value, attr.max_value]
-        }
-      }
-    }
   })
 
   function resetRange() {

@@ -18,15 +18,15 @@
   })
 
   const rangeMin = computed({
-    get: () => cell_attribute_range.value?.[0] ?? 0,
+    get: () => cell_attribute_range.value[0],
     set: (val) => {
-      cell_attribute_range.value = [val, cell_attribute_range.value?.[1] ?? 1]
+      cell_attribute_range.value = [val, cell_attribute_range.value[1]]
     },
   })
   const rangeMax = computed({
-    get: () => cell_attribute_range.value?.[1] ?? 1,
+    get: () => cell_attribute_range.value[1],
     set: (val) => {
-      cell_attribute_range.value = [cell_attribute_range.value?.[0] ?? 0, val]
+      cell_attribute_range.value = [cell_attribute_range.value[0], val]
     },
   })
 
@@ -50,29 +50,6 @@
     return cell_attributes.value.find(
       (attr) => attr.attribute_name === cell_attribute_name.value,
     )
-  })
-
-  watch(cell_attribute_name, (newName) => {
-    if (newName) {
-      const attr = cell_attributes.value.find(
-        (a) => a.attribute_name === newName,
-      )
-      if (
-        attr &&
-        attr.min_value !== undefined &&
-        attr.max_value !== undefined
-      ) {
-        const currentRange = cell_attribute_range.value
-        const hasNoSavedPreset =
-          !currentRange || (currentRange[0] === 0 && currentRange[1] === 1)
-        if (hasNoSavedPreset) {
-          if (!cell_attribute_color_map.value) {
-            cell_attribute_color_map.value = "Cool to Warm"
-          }
-          cell_attribute_range.value = [attr.min_value, attr.max_value]
-        }
-      }
-    }
   })
 
   function resetRange() {
