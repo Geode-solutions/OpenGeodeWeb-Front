@@ -53,30 +53,13 @@
         newValue[0],
         newValue[1],
       )
-      const colorMap = dataStyleStore.meshPolyhedraVertexAttributeColorMap(
-        id.value,
-      )
-      if (colorMap) {
-        dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(
-          id.value,
-          colorMap,
-          newValue[0],
-          newValue[1],
-        )
-      }
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_color_map = computed({
     get: () => dataStyleStore.meshPolyhedraVertexAttributeColorMap(id.value),
     set: (newValue) => {
-      const range = dataStyleStore.meshPolyhedraVertexAttributeRange(id.value)
-      dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(
-        id.value,
-        newValue,
-        range[0],
-        range[1],
-      )
+      dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
@@ -95,17 +78,6 @@
         newValue[0],
         newValue[1],
       )
-      const colorMap = dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(
-        id.value,
-      )
-      if (colorMap) {
-        dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(
-          id.value,
-          colorMap,
-          newValue[0],
-          newValue[1],
-        )
-      }
       hybridViewerStore.remoteRender()
     },
   })
@@ -113,14 +85,9 @@
     get: () =>
       dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id.value),
     set: (newValue) => {
-      const range = dataStyleStore.meshPolyhedraPolyhedronAttributeRange(
-        id.value,
-      )
       dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(
         id.value,
         newValue,
-        range[0],
-        range[1],
       )
       hybridViewerStore.remoteRender()
     },

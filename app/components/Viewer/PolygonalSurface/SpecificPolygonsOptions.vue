@@ -60,30 +60,13 @@
         newValue[0],
         newValue[1],
       )
-      const colorMap = dataStyleStore.meshPolygonsVertexAttributeColorMap(
-        id.value,
-      )
-      if (colorMap) {
-        dataStyleStore.setMeshPolygonsVertexAttributeColorMap(
-          id.value,
-          colorMap,
-          newValue[0],
-          newValue[1],
-        )
-      }
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_color_map = computed({
     get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id.value),
     set: (newValue) => {
-      const range = dataStyleStore.meshPolygonsVertexAttributeRange(id.value)
-      dataStyleStore.setMeshPolygonsVertexAttributeColorMap(
-        id.value,
-        newValue,
-        range[0],
-        range[1],
-      )
+      dataStyleStore.setMeshPolygonsVertexAttributeColorMap(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
@@ -97,36 +80,19 @@
   const polygon_attribute_range = computed({
     get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
     set: (newValue) => {
+      console.log("polygon_attribute_range", { newValue })
       dataStyleStore.setMeshPolygonsPolygonAttributeRange(
         id.value,
         newValue[0],
         newValue[1],
       )
-      // Re-apply colormap with new range
-      const colorMap = dataStyleStore.meshPolygonsPolygonAttributeColorMap(
-        id.value,
-      )
-      if (colorMap) {
-        dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(
-          id.value,
-          colorMap,
-          newValue[0],
-          newValue[1],
-        )
-      }
       hybridViewerStore.remoteRender()
     },
   })
   const polygon_attribute_color_map = computed({
     get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id.value),
     set: (newValue) => {
-      const range = dataStyleStore.meshPolygonsPolygonAttributeRange(id.value)
-      dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(
-        id.value,
-        newValue,
-        range[0],
-        range[1],
-      )
+      dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

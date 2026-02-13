@@ -59,30 +59,13 @@
         newValue[0],
         newValue[1],
       )
-      const colorMap = dataStyleStore.meshPointsVertexAttributeColorMap(
-        id.value,
-      )
-      if (colorMap) {
-        dataStyleStore.setMeshPointsVertexAttributeColorMap(
-          id.value,
-          colorMap,
-          newValue[0],
-          newValue[1],
-        )
-      }
       hybridViewerStore.remoteRender()
     },
   })
   const vertex_attribute_color_map = computed({
     get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
     set: (newValue) => {
-      const range = dataStyleStore.meshPointsVertexAttributeRange(id.value)
-      dataStyleStore.setMeshPointsVertexAttributeColorMap(
-        id.value,
-        newValue,
-        range[0],
-        range[1],
-      )
+      dataStyleStore.setMeshPointsVertexAttributeColorMap(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

@@ -60,15 +60,6 @@
         newValue[0],
         newValue[1],
       )
-      const colorMap = dataStyleStore.meshCellsVertexAttributeColorMap(id.value)
-      if (colorMap) {
-        dataStyleStore.setMeshCellsVertexAttributeColorMap(
-          id.value,
-          colorMap,
-          newValue[0],
-          newValue[1],
-        )
-      }
       hybridViewerStore.remoteRender()
     },
   })
@@ -100,30 +91,13 @@
         newValue[0],
         newValue[1],
       )
-      const colorMap = dataStyleStore.meshCellsCellAttributeColorMap(id.value)
-      if (colorMap) {
-        dataStyleStore.setMeshCellsCellAttributeColorMap(
-          id.value,
-          colorMap,
-          newValue[0],
-          newValue[1],
-        )
-      }
       hybridViewerStore.remoteRender()
     },
   })
   const cell_attribute_color_map = computed({
     get: () => dataStyleStore.meshCellsCellAttributeColorMap(id.value),
     set: (newValue) => {
-      const { minimum, maximum } = dataStyleStore.meshCellsCellAttributeRange(
-        id.value,
-      )
-      dataStyleStore.setMeshCellsCellAttributeColorMap(
-        id.value,
-        newValue,
-        minimum,
-        maximum,
-      )
+      dataStyleStore.setMeshCellsCellAttributeColorMap(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

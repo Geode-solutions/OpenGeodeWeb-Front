@@ -50,10 +50,11 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       {
         response_function: async () => {
           meshPolygonsPolygonAttribute(id).name = name
-          const { minimum, maximum, colorMap } =
-            meshPolygonsPolygonAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshPolygonsPolygonAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshPolygonsPolygonAttributeRange(id, minimum, maximum)
-          await setMeshPolygonsPolygonAttributeColorMap(id, colorMap)
           console.log(
             setMeshPolygonsPolygonAttributeName.name,
             { id },
@@ -67,18 +68,32 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
     const { minimum, maximum } = storedConfig
+    console.log(
+      meshPolygonsPolygonAttributeRange.name,
+      { id },
+      { minimum, maximum },
+    )
     return [minimum, maximum]
   }
   function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
+    console.log(setMeshPolygonsPolygonAttributeRange.name, {
+      id,
+      minimum,
+      maximum,
+    })
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
     return viewerStore.request(
       meshPolygonsPolygonAttributeSchemas.scalar_range,
       { id, minimum, maximum },
       {
-        response_function: () => {
+        response_function: async () => {
           storedConfig.minimum = minimum
           storedConfig.maximum = maximum
+          await setMeshPolygonsPolygonAttributeColorMap(
+            id,
+            storedConfig.colorMap,
+          )
           console.log(
             setMeshPolygonsPolygonAttributeRange.name,
             { id },
