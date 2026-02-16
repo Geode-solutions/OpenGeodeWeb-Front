@@ -1,12 +1,12 @@
 import { describe, expect, expectTypeOf, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
-import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
-import { useInfraStore } from "@ogw_front/stores/infra"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import { createTestingPinia } from "@pinia/testing"
+import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import { setActivePinia } from "pinia"
 import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useInfraStore } from "@ogw_front/stores/infra"
 
 // CONSTANTS
 const PORT_443 = "443"
