@@ -100,7 +100,7 @@
 
   <v-card-text v-if="internal_files.length" class="mt-6">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
-      <v-icon icon="mdi-file-check" class="mr-3" color="success" size="24" />
+      <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
       <span class="text-subtitle-1 font-weight-bold text-white">
         Selected Files
       </span>
@@ -126,7 +126,7 @@
         style="background: rgba(255, 255, 255, 0.05) !important"
         @click:close="removeFile(index)"
       >
-        <v-icon start size="18" color="success">mdi-file-outline</v-icon>
+        <v-icon start size="18" color="primary">mdi-file-outline</v-icon>
         <span class="text-white">{{ file.name }}</span>
         <template #close>
           <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100"
