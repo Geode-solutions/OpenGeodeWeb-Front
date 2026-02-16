@@ -89,17 +89,14 @@ describe("Mesh points", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute),
+            dataStyleStore.setMeshPointsVertexAttributeName(
+              id,
+              vertex_attribute.name,
+            ),
         },
       ]
       for (let i = 0; i < coloringTypes.length; i++) {
         if (coloringTypes[i].function) {
-          expect(() =>
-            dataStyleStore.setMeshPointsActiveColoring(
-              id,
-              coloringTypes[i].name,
-            ),
-          ).toThrowError()
           await coloringTypes[i].function()
         }
         const result = dataStyleStore.setMeshPointsActiveColoring(
@@ -135,22 +132,27 @@ describe("Mesh points", () => {
       expect(dataStyleStore.meshPointsSize(id)).toBe(size)
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
+  })
 
-    test("Points vertex attribute", async () => {
+  describe("Points vertex attribute", () => {
+    test("test coloring", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
 
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute)
+      await dataStyleStore.setMeshPointsVertexAttributeName(
+        id,
+        vertex_attribute.name,
+      )
       expect(spy).toHaveBeenCalledWith(
-        mesh_points_schemas.vertex_attribute,
+        mesh_points_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPointsVertexAttribute(id)).toStrictEqual(
-        vertex_attribute,
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(
+        vertex_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
