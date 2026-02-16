@@ -1,7 +1,7 @@
 // oxlint-disable-next-line import/no-unassigned-import
 import "@kitware/vtk.js/Rendering/Profiles/Geometry"
 import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
-import vtkGenericRenderWindow from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
 import vtkMapper from "@kitware/vtk.js/Rendering/Core/Mapper"
 import vtkXMLPolyDataReader from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
 
@@ -40,8 +40,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) return
     status.value = Status.CREATING
-    // oxlint-disable-next-line import/no-named-as-default-member
-    genericRenderWindow.value = vtkGenericRenderWindow.newInstance({
+    genericRenderWindow.value = vtkGenericRenderWindow({
       background: BACKGROUND_COLOR,
       listenWindowResize: false,
     })
