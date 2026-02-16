@@ -86,13 +86,20 @@
       color="transparent"
       @click.stop
     >
-      <OptionCard
+      <GlassCard
+        @click.stop
         :title="props.tooltip"
         width="320"
         :max-height="maxCardHeight"
+        :ripple="false"
+        variant="panel"
+        padding="pa-0"
+        class="elevation-24"
       >
-        <slot name="options" />
-      </OptionCard>
+        <v-card-text class="pa-5">
+          <slot name="options" />
+        </v-card-text>
+      </GlassCard>
     </v-sheet>
   </v-sheet>
 </template>

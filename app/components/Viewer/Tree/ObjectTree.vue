@@ -42,6 +42,7 @@
     class="treeview-container"
     :style="{ width: `${treeviewStore.panelWidth}px` }"
     @contextmenu.prevent
+    @mousedown.stop
   >
     <v-row
       class="resizable-panel"

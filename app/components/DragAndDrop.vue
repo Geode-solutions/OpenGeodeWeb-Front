@@ -31,16 +31,15 @@
 
 <template>
   <v-hover v-slot="{ isHovering, props: hoverProps }">
-    <v-card
+    <GlassCard
       v-bind="hoverProps"
-      class="text-center cursor-pointer glass-panel border-opacity-10 border-white"
+      class="text-center cursor-pointer overflow-hidden border-opacity-10 border-white"
       :class="{
         'elevation-4': isHovering || isDragging,
         'elevation-0': !(isHovering || isDragging),
       }"
       :style="{
         position: 'relative',
-        overflow: 'hidden',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         background:
           isHovering || isDragging
@@ -50,7 +49,8 @@
         pointerEvents: loading ? 'none' : 'auto',
         opacity: loading ? 0.6 : 1,
       }"
-      rounded="xl"
+      variant="panel"
+      padding="pa-0"
       @click="triggerFileDialog"
       @dragover.prevent="isDragging = true"
       @dragleave.prevent="isDragging = false"
@@ -95,7 +95,7 @@
         :accept="accept"
         @change="handleFileSelect"
       />
-    </v-card>
+    </GlassCard>
   </v-hover>
 </template>
 

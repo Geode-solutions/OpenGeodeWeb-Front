@@ -122,7 +122,7 @@
         size="default"
         color="white"
         variant="outlined"
-        class="font-weight-medium glass-panel border-opacity-10 px-4"
+        class="font-weight-medium glass-ui border-opacity-10 px-4"
         style="background: rgba(255, 255, 255, 0.05) !important"
         @click:close="removeFile(index)"
       >
