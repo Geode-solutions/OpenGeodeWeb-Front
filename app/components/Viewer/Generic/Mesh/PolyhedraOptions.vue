@@ -19,22 +19,22 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshPolyhedraActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshPolyhedraColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolyhedraColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolyhedraColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

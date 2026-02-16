@@ -2,7 +2,7 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStateStore } from "../data_style_state"
+import { useDataStyleStateStore } from "../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants

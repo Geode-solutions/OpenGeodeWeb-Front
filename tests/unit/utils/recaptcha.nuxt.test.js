@@ -14,54 +14,26 @@ describe("recaptcha", () => {
   describe("wrong params", () => {
     test("name", () => {
       const name = "test"
-      const event = {
-        body: JSON.stringify({
-          name,
-          email,
-          launch,
-        }),
-      }
-      const result = check_recaptcha_params(event)
+      const result = check_recaptcha_params(name, email, launch)
       expect(result.statusCode).toBe(internal_error)
     })
 
     test("email", () => {
       const email = "test"
-      const event = {
-        body: JSON.stringify({
-          name,
-          email,
-          launch,
-        }),
-      }
-      const result = check_recaptcha_params(event)
+      const result = check_recaptcha_params(name, email, launch)
       expect(result.statusCode).toBe(internal_error)
     })
 
     test("launch", () => {
       const launch = true
-      const event = {
-        body: JSON.stringify({
-          name,
-          email,
-          launch,
-        }),
-      }
-      const result = check_recaptcha_params(event)
+      const result = check_recaptcha_params(name, email, launch)
       expect(result.statusCode).toBe(internal_error)
     })
   })
 
   describe("right params", () => {
     test("name", () => {
-      const event = {
-        body: JSON.stringify({
-          name,
-          email,
-          launch,
-        }),
-      }
-      const result = check_recaptcha_params(event)
+      const result = check_recaptcha_params(name, email, launch)
       expect(result.statusCode).toBe(success)
     })
   })

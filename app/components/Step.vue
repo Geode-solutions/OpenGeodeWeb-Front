@@ -56,7 +56,7 @@
         color="transparent"
         class="d-flex flex-column justify-center ps-2"
       >
-        <v-text
+        <p
           tag="h3"
           class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
           :class="
@@ -66,7 +66,7 @@
           "
         >
           {{ steps[step_index].step_title }}
-        </v-text>
+        </p>
 
         <v-sheet
           v-if="sortedChips.length && current_step_index >= step_index"

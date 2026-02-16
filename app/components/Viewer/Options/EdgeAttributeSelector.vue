@@ -1,72 +1,84 @@
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
+  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
 
   const geodeStore = useGeodeStore()
 
-  const model = defineModel()
+  const edge_attribute_name = defineModel("edge_attribute_name", {
+    type: String,
+  })
+  const edge_attribute_range = defineModel("edge_attribute_range", {
+    type: Array,
+  })
+  const edge_attribute_color_map = defineModel("edge_attribute_color_map", {
+    type: String,
+  })
+  const edge_attributes = ref([])
 
   const { id } = defineProps({
     id: { type: String, required: true },
   })
 
-  const edge_attribute_name = ref("")
-  const edge_attribute_names = ref([])
+  const rangeMin = computed({
+    get: () => edge_attribute_range.value[0],
+    set: (val) => {
+      edge_attribute_range.value = [val, edge_attribute_range.value[1]]
+    },
+  })
+  const rangeMax = computed({
+    get: () => edge_attribute_range.value[1],
+    set: (val) => {
+      edge_attribute_range.value = [edge_attribute_range.value[0], val]
+    },
+  })
 
   onMounted(() => {
-    if (model.value !== null) {
-      edge_attribute_name.value = model.value.name
-    }
+    getEdgeAttributes()
   })
 
-  const edge_attribute = reactive({ name: edge_attribute_name.value })
-
-  watch(edge_attribute_name, (value) => {
-    edge_attribute.name = value
-    model.value = edge_attribute
-  })
-
-  function get_edge_attribute_names() {
+  function getEdgeAttributes() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.edge_attribute_names,
       { id: id },
       {
         response_function: (response) => {
-          edge_attribute_names.value = response.edge_attribute_names
+          edge_attributes.value = response.attributes
         },
       },
     )
   }
 
-  onMounted(() => {
-    get_edge_attribute_names()
+  const currentAttribute = computed(() => {
+    return edge_attributes.value.find(
+      (attr) => attr.attribute_name === edge_attribute_name.value,
+    )
   })
 
-  watch(
-    () => id,
-    () => {
-      get_edge_attribute_names()
-    },
-  )
+  function resetRange() {
+    if (currentAttribute.value) {
+      edge_attribute_range.value = [
+        currentAttribute.value.min_value,
+        currentAttribute.value.max_value,
+      ]
+    }
+  }
 </script>
 
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="auto">
-      <v-icon
-        size="30"
-        icon="mdi-ray-end-arrow"
-        v-tooltip:left="'Edge Attribute'"
-      />
-    </v-col>
-    <v-col>
-      <v-select
-        v-model="edge_attribute_name"
-        :items="edge_attribute_names"
-        label="Select an edge attribute"
-        density="compact"
-        hide-details
-      />
-    </v-col>
-  </v-row>
+  <v-select
+    v-model="edge_attribute_name"
+    :items="edge_attributes.map((attribute) => attribute.attribute_name)"
+    item-title="attribute_name"
+    item-value="attribute_name"
+    label="Select an attribute"
+    density="compact"
+  />
+  <ViewerOptionsAttributeColorBar
+    v-if="edge_attribute_name"
+    v-model:minimum="rangeMin"
+    v-model:maximum="rangeMax"
+    v-model:colorMap="edge_attribute_color_map"
+    @reset="resetRange"
+  />
 </template>

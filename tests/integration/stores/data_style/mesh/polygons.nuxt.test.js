@@ -91,21 +91,21 @@ describe("Mesh polygons", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshPolygonsVertexAttribute(
+      const result = dataStyleStore.setMeshPolygonsVertexAttributeName(
         id,
-        vertex_attribute,
+        vertex_attribute.name,
       )
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.vertex_attribute,
+        mesh_polygons_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolygonsVertexAttribute(id)).toStrictEqual(
-        vertex_attribute,
+      expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe(
+        vertex_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -116,21 +116,21 @@ describe("Mesh polygons", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshPolygonsPolygonAttribute(
+      const result = dataStyleStore.setMeshPolygonsPolygonAttributeName(
         id,
-        polygon_attribute,
+        polygon_attribute.name,
       )
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.polygon_attribute,
+        mesh_polygons_schemas.attribute.polygon.name,
         { id, ...polygon_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshPolygonsPolygonAttribute(id)).toStrictEqual(
-        polygon_attribute,
+      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe(
+        polygon_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -145,24 +145,24 @@ describe("Mesh polygons", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshPolygonsVertexAttribute(id, vertex_attribute),
+            dataStyleStore.setMeshPolygonsVertexAttributeName(
+              id,
+              vertex_attribute.name,
+            ),
         },
         {
           name: "polygon",
           function: () =>
-            dataStyleStore.setMeshPolygonsPolygonAttribute(
+            dataStyleStore.setMeshPolygonsPolygonAttributeName(
               id,
-              polygon_attribute,
+              polygon_attribute.name,
             ),
         },
       ]
 
-      async function testColoring(coloringType, expectedColoringType) {
-        if (coloringType.function) {
-          expect(() =>
-            dataStyleStore.setMeshPolygonsActiveColoring(id, coloringType.name),
-          ).toThrowError()
-          await coloringType.function()
+      for (let i = 0; i < coloringTypes.length; i++) {
+        if (coloringTypes[i].function) {
+          await coloringTypes[i].function()
         }
         const result = dataStyleStore.setMeshPolygonsActiveColoring(
           id,

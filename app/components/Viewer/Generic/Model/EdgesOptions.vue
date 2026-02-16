@@ -17,8 +17,8 @@
 
   const visibility = computed({
     get: () => dataStyleStore.modelEdgesVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setModelEdgesVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setModelEdgesVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

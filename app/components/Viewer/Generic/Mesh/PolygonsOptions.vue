@@ -19,29 +19,29 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshPolygonsVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshPolygonsActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshPolygonsColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const textures = computed({
     get: () => dataStyleStore.meshPolygonsTextures(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPolygonsTextures(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPolygonsTextures(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })

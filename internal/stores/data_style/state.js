@@ -1,5 +1,3 @@
-import { computed, reactive } from "vue"
-
 export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   const styles = reactive({})
 
@@ -23,5 +21,10 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     return styles[id]
   }
 
-  return { getStyle, styles, objectVisibility, selectedObjects }
+  return {
+    getStyle,
+    styles,
+    objectVisibility,
+    selectedObjects,
+  }
 })
