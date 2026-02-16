@@ -7,7 +7,7 @@
     "style": "error",
     "restriction": "error"
   },
-  "plugins": ["import", "node", "oxc", "promise", "unicorn", "vue"],
+  "plugins": ["import", "node", "oxc", "promise", "unicorn", "vitest"],
   "rules": {
     "unicorn/filename-case": [
       "error",
@@ -39,15 +39,15 @@
     "eslint/no-magic-numbers": [
       "error",
       {
-        "ignore": [-1, 0, 1, 2, 4],
-        "ignoreArrayIndexes": true
+        "style:": "declaration"
       }
     ],
-    "vue/max-props": ["error", { "maxProps": 7 }]
+    "eslint/sort-keys": "off",
+    "eslint/no-ternary": "off"
   },
   "overrides": [
     {
-      "files": ["app/components/**"],
+      "files": ["**/components/*"],
       "rules": {
         "unicorn/filename-case": [
           "error",
