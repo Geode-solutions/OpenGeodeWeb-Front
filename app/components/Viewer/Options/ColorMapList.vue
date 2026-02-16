@@ -50,7 +50,7 @@
 
     const ctx = canvas.getContext("2d")
     const { height, width } = canvas
-    const lut = vtkColorTransferFunction.newInstance()
+    const lut = vtkColorTransferFunction()
     const rgbPoints = preset.RGBPoints
 
     for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {

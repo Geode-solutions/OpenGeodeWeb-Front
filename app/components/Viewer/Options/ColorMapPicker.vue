@@ -1,7 +1,7 @@
 <script setup>
   import ColorMapList from "./ColorMapList.vue"
+  import { newInstance } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction"
   import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
-  import vtkColorTransferFunction from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction"
 
   const LAST_POINT_OFFSET = 4
   const THREE = 3

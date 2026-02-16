@@ -17,7 +17,7 @@
   )
   const polygon_attributes = ref([])
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
