@@ -59,7 +59,7 @@ describe("Mesh", () => {
   })
 
   describe("Apply mesh default style", () => {
-    test("test", async () => {
+    test("Apply mesh default style", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const result = dataStyleStore.applyMeshStyle(id)

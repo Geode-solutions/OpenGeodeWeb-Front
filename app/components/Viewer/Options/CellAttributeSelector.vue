@@ -1,26 +1,36 @@
 <script setup>
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
+  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
+
+  const geodeStore = useGeodeStore()
+
+  const cell_attribute_name = defineModel("cell_attribute_name", {
+    type: String,
+  })
+  const cell_attribute_range = defineModel("cell_attribute_range", {
+    type: Array,
+  })
+  const cell_attribute_color_map = defineModel("cell_attribute_color_map", {
+    type: String,
+  })
+  const cell_attributes = ref([])
 
   const props = defineProps({
     id: { type: String, required: true },
   })
 
-  const model = defineModel()
-  const cell_attribute_name = ref("")
-  const cell_attribute_names = ref([])
-  const cell_attribute = reactive({ name: cell_attribute_name.value })
-  const geodeStore = useGeodeStore()
-
-  onMounted(() => {
-    if (model.value != null) {
-      cell_attribute_name.value = model.value.name
-    }
+  const rangeMin = computed({
+    get: () => cell_attribute_range.value[0],
+    set: (val) => {
+      cell_attribute_range.value = [val, cell_attribute_range.value[1]]
+    },
   })
-
-  watch(cell_attribute_name, (value) => {
-    cell_attribute.name = value
-    model.value = cell_attribute
+  const rangeMax = computed({
+    get: () => cell_attribute_range.value[1],
+    set: (val) => {
+      cell_attribute_range.value = [cell_attribute_range.value[0], val]
+    },
   })
 
   onMounted(() => {
@@ -30,23 +40,45 @@
   function getCellAttributes() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.cell_attribute_names,
-      {
-        id: props.id,
-      },
+      { id: props.id },
       {
         response_function: (response) => {
-          cell_attribute_names.value = response.cell_attribute_names
+          cell_attributes.value = response.attributes
         },
       },
     )
+  }
+
+  const currentAttribute = computed(() => {
+    return cell_attributes.value.find(
+      (attr) => attr.attribute_name === cell_attribute_name.value,
+    )
+  })
+
+  function resetRange() {
+    if (currentAttribute.value) {
+      cell_attribute_range.value = [
+        currentAttribute.value.min_value,
+        currentAttribute.value.max_value,
+      ]
+    }
   }
 </script>
 
 <template>
   <v-select
     v-model="cell_attribute_name"
-    :items="cell_attribute_names"
+    :items="cell_attributes.map((attribute) => attribute.attribute_name)"
+    item-title="attribute_name"
+    item-value="attribute_name"
     label="Select an attribute"
     density="compact"
+  />
+  <ViewerOptionsAttributeColorBar
+    v-if="cell_attribute_name"
+    v-model:minimum="rangeMin"
+    v-model:maximum="rangeMax"
+    v-model:colorMap="cell_attribute_color_map"
+    @reset="resetRange"
   />
 </template>

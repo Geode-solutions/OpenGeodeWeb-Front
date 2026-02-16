@@ -18,48 +18,88 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshEdgesVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const size = computed({
     get: () => dataStyleStore.meshEdgesWidth(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesWidth(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesWidth(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshEdgesActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshEdgesColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshEdgesVertexAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesVertexAttribute(id.value, newValue)
+  const vertex_attribute_name = computed({
+    get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
-  const edge_attribute = computed({
-    get: () => dataStyleStore.meshEdgesEdgeAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshEdgesEdgeAttribute(id.value, newValue)
+  const vertex_attribute_range = computed({
+    get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVertexAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute_color_map = computed({
+    get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesVertexAttributeColorMap(
+        id.value,
+        newValue,
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const edge_attribute_name = computed({
+    get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesEdgeAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const edge_attribute_range = computed({
+    get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesEdgeAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const edge_attribute_color_map = computed({
+    get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshEdgesEdgeAttributeColorMap(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
 </script>
-
 <template>
   <ViewerContextMenuItem
     :itemProps="props.itemProps"
@@ -92,8 +132,12 @@
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
-              v-model:vertex_attribute="vertex_attribute"
-              v-model:edge_attribute="edge_attribute"
+              v-model:vertex_attribute_name="vertex_attribute_name"
+              v-model:vertex_attribute_range="vertex_attribute_range"
+              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+              v-model:edge_attribute_name="edge_attribute_name"
+              v-model:edge_attribute_range="edge_attribute_range"
+              v-model:edge_attribute_color_map="edge_attribute_color_map"
             />
           </v-col>
         </v-row>
