@@ -34,7 +34,7 @@ export function useMeshPolyhedraStyle() {
     } else if (type === "vertex") {
       const name =
         meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(
@@ -46,7 +46,7 @@ export function useMeshPolyhedraStyle() {
         meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(
           id,
         )
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       await meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(

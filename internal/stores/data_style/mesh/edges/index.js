@@ -33,14 +33,14 @@ export function useMeshEdgesStyle() {
       )
     } else if (type === "textures") {
       const textures = meshEdgesTexturesStore.meshEdgesTextures(id)
-      if (textures === null) {
+      if (textures === undefined) {
         return Promise.resolve()
       }
       return meshEdgesTexturesStore.setMeshEdgesTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(
@@ -49,7 +49,7 @@ export function useMeshEdgesStyle() {
       )
     } else if (type === "edge") {
       const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name)

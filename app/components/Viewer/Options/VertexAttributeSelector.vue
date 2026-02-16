@@ -11,9 +11,7 @@
   const vertex_attribute_range = defineModel("vertex_attribute_range", {
     type: Array,
   })
-  const vertex_attribute_color_map = defineModel(
-    "vertex_attribute_ color_map",
-    {
+  const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", {
       type: String,
     },
   )

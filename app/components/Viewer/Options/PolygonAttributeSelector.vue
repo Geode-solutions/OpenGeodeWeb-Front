@@ -41,7 +41,7 @@
   function getPolygonAttributes() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.polygon_attribute_names,
-      { id: props.id },
+      { id: id },
       {
         response_function: (response) => {
           polygon_attributes.value = response.attributes

@@ -33,14 +33,14 @@ export function useMeshCellsStyle() {
       )
     } else if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id)
-      if (textures === null) {
+      if (textures === undefined) {
         return Promise.resolve()
       }
       return meshCellsTexturesStore.setMeshCellsTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(
@@ -49,7 +49,7 @@ export function useMeshCellsStyle() {
       )
     } else if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       await meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name)

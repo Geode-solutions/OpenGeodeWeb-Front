@@ -34,14 +34,14 @@ export function useMeshPolygonsStyle() {
       )
     } else if (type === "textures") {
       const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id)
-      if (textures === null) {
+      if (textures === undefined) {
         return Promise.resolve()
       }
       return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(
@@ -51,7 +51,7 @@ export function useMeshPolygonsStyle() {
     } else if (type === "polygon") {
       const name =
         meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       await meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(
