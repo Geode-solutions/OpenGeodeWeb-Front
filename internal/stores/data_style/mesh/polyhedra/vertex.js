@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolyhedraCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshPolyhedraVertexAttributeSchemas =
@@ -30,7 +30,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   }
 
   function meshPolyhedraVertexAttributeStoredConfig(id, name) {
-    const storedConfigs = meshPolyhedraVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolyhedraVertexAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
@@ -46,7 +46,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshPolyhedraVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolyhedraVertexAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

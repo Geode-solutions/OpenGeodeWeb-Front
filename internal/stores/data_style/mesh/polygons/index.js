@@ -1,12 +1,12 @@
 // Third party imports
 
 // Local imports
-import { useMeshPolygonsCommonStyle } from "./common"
-import { useMeshPolygonsVisibilityStyle } from "./visibility"
 import { useMeshPolygonsColorStyle } from "./color"
+import { useMeshPolygonsCommonStyle } from "./common"
+import { useMeshPolygonsPolygonAttributeStyle } from "./polygon"
 import { useMeshPolygonsTexturesStyle } from "./textures"
 import { useMeshPolygonsVertexAttributeStyle } from "./vertex"
-import { useMeshPolygonsPolygonAttributeStyle } from "./polygon"
+import { useMeshPolygonsVisibilityStyle } from "./visibility"
 
 // Local constants
 
@@ -59,7 +59,7 @@ export function useMeshPolygonsStyle() {
         name,
       )
     } else {
-      throw new Error("Unknown mesh polygons coloring type: " + type)
+      throw new Error(`Unknown mesh polygons coloring type: ${type}`)
     }
   }
 

@@ -1,11 +1,11 @@
 // Third party imports
 
 // Local imports
-import { useMeshPointsCommonStyle } from "./common"
-import { useMeshPointsVisibilityStyle } from "./visibility"
 import { useMeshPointsColorStyle } from "./color"
+import { useMeshPointsCommonStyle } from "./common"
 import { useMeshPointsSizeStyle } from "./size"
 import { useMeshPointsVertexAttributeStyle } from "./vertex"
+import { useMeshPointsVisibilityStyle } from "./visibility"
 
 // Local constants
 
@@ -56,7 +56,7 @@ export function useMeshPointsStyle() {
         name,
       )
     } else {
-      throw new Error("Unknown mesh points coloring type: " + type)
+      throw new Error(`Unknown mesh points coloring type: ${type}`)
     }
   }
 

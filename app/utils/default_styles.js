@@ -5,21 +5,21 @@ const cells_defaultVisibility = true
 const polygons_defaultVisibility = true
 const polyhedra_defaultVisibility = true
 const points_defaultSize = 10
-const points_defaultColor = { r: 20, g: 20, b: 20 }
+const points_defaultColor = { red: 20, green: 20, blue: 20 }
 const edges_defaultWidth = 2
-const edges_defaultColor = { r: 20, g: 20, b: 20 }
-const cells_defaultColor = { r: 255, g: 255, b: 255 }
-const polygons_defaultColor = { r: 255, g: 255, b: 255 }
-const polyhedra_defaultColor = { r: 255, g: 255, b: 255 }
+const edges_defaultColor = { red: 20, green: 20, blue: 20 }
+const cells_defaultColor = { red: 255, green: 255, blue: 255 }
+const polygons_defaultColor = { red: 255, green: 255, blue: 255 }
+const polyhedra_defaultColor = { red: 255, green: 255, blue: 255 }
 
 const corners_defaultVisibility = true
-const corners_defaultColor = { r: 20, g: 20, b: 20 }
+const corners_defaultColor = { red: 20, green: 20, blue: 20 }
 const lines_defaultVisibility = true
-const lines_defaultColor = { r: 20, g: 20, b: 20 }
+const lines_defaultColor = { red: 20, green: 20, blue: 20 }
 const surfaces_defaultVisibility = true
-const surfaces_defaultColor = { r: 255, g: 255, b: 255 }
+const surfaces_defaultColor = { red: 255, green: 255, blue: 255 }
 const blocks_defaultVisibility = true
-const blocks_defaultColor = { r: 255, g: 255, b: 255 }
+const blocks_defaultColor = { red: 255, green: 255, blue: 255 }
 
 // Mesh functions
 function meshPointsDefaultStyle(

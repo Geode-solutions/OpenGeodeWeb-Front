@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshEdgesCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshEdgesVertexAttributeSchemas =
@@ -30,7 +30,7 @@ export function useMeshEdgesVertexAttributeStyle() {
   }
 
   function meshEdgesVertexAttributeStoredConfig(id, name) {
-    const storedConfigs = meshEdgesVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshEdgesVertexAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
@@ -46,7 +46,7 @@ export function useMeshEdgesVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshEdgesVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshEdgesVertexAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

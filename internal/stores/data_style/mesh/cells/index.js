@@ -1,12 +1,12 @@
 // Third party imports
 
 // Local imports
-import { useMeshCellsCommonStyle } from "./common"
-import { useMeshCellsVisibilityStyle } from "./visibility"
+import { useMeshCellsCellAttributeStyle } from "./cell"
 import { useMeshCellsColorStyle } from "./color"
+import { useMeshCellsCommonStyle } from "./common"
 import { useMeshCellsTexturesStyle } from "./textures"
 import { useMeshCellsVertexAttributeStyle } from "./vertex"
-import { useMeshCellsCellAttributeStyle } from "./cell"
+import { useMeshCellsVisibilityStyle } from "./visibility"
 
 // Local constants
 
@@ -54,7 +54,7 @@ export function useMeshCellsStyle() {
       }
       await meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name)
     } else {
-      throw new Error("Unknown mesh cells coloring type: " + type)
+      throw new Error(`Unknown mesh cells coloring type: ${type}`)
     }
   }
 

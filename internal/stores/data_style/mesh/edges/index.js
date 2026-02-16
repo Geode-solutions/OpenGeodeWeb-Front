@@ -1,12 +1,12 @@
 // Third party imports
 
 // Local imports
-import { useMeshEdgesCommonStyle } from "./common"
-import { useMeshEdgesVisibilityStyle } from "./visibility"
 import { useMeshEdgesColorStyle } from "./color"
-import { useMeshEdgesWidthStyle } from "./width"
-import { useMeshEdgesVertexAttributeStyle } from "./vertex"
+import { useMeshEdgesCommonStyle } from "./common"
 import { useMeshEdgesEdgeAttributeStyle } from "./edge"
+import { useMeshEdgesVertexAttributeStyle } from "./vertex"
+import { useMeshEdgesVisibilityStyle } from "./visibility"
+import { useMeshEdgesWidthStyle } from "./width"
 
 // Local constants
 
@@ -54,7 +54,7 @@ export function useMeshEdgesStyle() {
       }
       return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name)
     } else {
-      throw new Error("Unknown mesh edges coloring type: " + type)
+      throw new Error(`Unknown mesh edges coloring type: ${type}`)
     }
   }
 

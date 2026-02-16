@@ -1,11 +1,11 @@
 // Third party imports
 
 // Local imports
-import { useMeshPolyhedraCommonStyle } from "./common"
-import { useMeshPolyhedraVisibilityStyle } from "./visibility"
 import { useMeshPolyhedraColorStyle } from "./color"
-import { useMeshPolyhedraVertexAttributeStyle } from "./vertex"
+import { useMeshPolyhedraCommonStyle } from "./common"
 import { useMeshPolyhedraPolyhedronAttributeStyle } from "./polyhedron"
+import { useMeshPolyhedraVertexAttributeStyle } from "./vertex"
+import { useMeshPolyhedraVisibilityStyle } from "./visibility"
 
 // Local constants
 
@@ -54,7 +54,7 @@ export function useMeshPolyhedraStyle() {
         name,
       )
     } else {
-      throw new Error("Unknown mesh polyhedra coloring type: " + type)
+      throw new Error(`Unknown mesh polyhedra coloring type: ${type}`)
     }
   }
 
