@@ -17,7 +17,7 @@ const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST
 
 async function launch() {
   console.log("[VIEWER] Launching viewer microservice...")
-  const port_value = await window.electronAPI.run_viewer()
+  const port_value = await globalThis.electronAPI.run_viewer()
   console.log("[VIEWER] Viewer launched on port:", port_value)
   return port_value
 }
@@ -29,9 +29,9 @@ export const useViewerStore = defineStore(
 
     const default_local_port = ref("1234")
     const client = ref({})
-    const config = ref(null)
+    const config = ref(undefined)
     const picking_mode = ref(false)
-    const picked_point = ref({ x: null, y: null })
+    const picked_point = ref({ x: undefined, y: undefined })
     const request_counter = ref(0)
     const status = ref(Status.NOT_CONNECTED)
     const buzy = ref(0)
@@ -88,10 +88,13 @@ export const useViewerStore = defineStore(
     }
 
     async function ws_connect() {
-      if (status.value === Status.CONNECTED) return
-
+      if (status.value === Status.CONNECTED) {
+        return
+      }
       return navigator.locks.request("viewer.ws_connect", async (lock) => {
-        if (status.value === Status.CONNECTED) return
+        if (status.value === Status.CONNECTED) {
+          return
+        }
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
           status.value = Status.CONNECTING

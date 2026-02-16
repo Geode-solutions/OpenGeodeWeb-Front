@@ -93,7 +93,7 @@ export const useDataStore = defineStore("data", () => {
       created_at: value.created_at || new Date().toISOString(),
     }
 
-    const serializedData = JSON.parse(JSON.stringify(itemData))
+    const serializedData = structuredClone(itemData)
     await database.data.put(serializedData)
   }
   async function deleteItem(id) {
@@ -112,7 +112,7 @@ export const useDataStore = defineStore("data", () => {
     for (const value of values) {
       value.created_at = new Date().toISOString()
     }
-    const serializedData = JSON.parse(JSON.stringify(values))
+    const serializedData = structuredClone(values)
     await database.model_components.bulkAdd(serializedData)
   }
 

@@ -62,13 +62,27 @@
   }
   const coloring_styles = computed(() => {
     let array = []
-    if (has_color.value) array.push(color_dict)
-    if (has_textures.value) array.push(textures_dict)
-    if (has_vertex.value) array.push(vertex_dict)
-    if (has_edge.value) array.push(edge_dict)
-    if (has_cells.value) array.push(cell_dict)
-    if (has_polygons.value) array.push(polygon_dict)
-    if (has_polyhedra.value) array.push(polyhedron_dict)
+    if (has_color.value) {
+      array.push(color_dict)
+    }
+    if (has_textures.value) {
+      array.push(textures_dict)
+    }
+    if (has_vertex.value) {
+      array.push(vertex_dict)
+    }
+    if (has_edge.value) {
+      array.push(edge_dict)
+    }
+    if (has_cells.value) {
+      array.push(cell_dict)
+    }
+    if (has_polygons.value) {
+      array.push(polygon_dict)
+    }
+    if (has_polyhedra.value) {
+      array.push(polyhedron_dict)
+    }
 
     const labels = array.map((coloring) => coloring.name)
     const values = array.map((coloring) => coloring.value)

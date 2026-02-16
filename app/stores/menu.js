@@ -124,14 +124,14 @@ const menusData = {
 export const useMenuStore = defineStore("menu", () => {
   const menus = shallowRef(menusData)
   const display_menu = ref(false)
-  const current_id = ref(null)
+  const current_id = ref(undefined)
   const menuX = ref(0)
   const menuY = ref(0)
   const containerWidth = ref(window.innerWidth)
   const containerHeight = ref(window.innerHeight)
   const containerTop = ref(0)
   const containerLeft = ref(0)
-  const active_item_index = ref(null)
+  const active_item_index = ref(undefined)
 
   function getMenuItems(objectType, geodeObject) {
     if (!objectType || !geodeObject || !menus.value[objectType]) {
@@ -141,8 +141,8 @@ export const useMenuStore = defineStore("menu", () => {
   }
 
   function closeMenu() {
-    active_item_index.value = null
-    current_id.value = null
+    active_item_index.value = undefined
+    current_id.value = undefined
     menuX.value = 0
     menuY.value = 0
     display_menu.value = false
@@ -183,7 +183,7 @@ export const useMenuStore = defineStore("menu", () => {
 
   function toggleItemOptions(index) {
     if (active_item_index.value === index) {
-      active_item_index.value = null
+      active_item_index.value = undefined
     } else {
       active_item_index.value = index
     }

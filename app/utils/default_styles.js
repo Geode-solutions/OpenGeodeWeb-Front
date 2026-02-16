@@ -33,7 +33,7 @@ function meshPointsDefaultStyle(
       active: "color",
       color,
       vertex: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
     },
@@ -52,11 +52,11 @@ function meshEdgesDefaultStyle(
       active: "color",
       color,
       edge: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
       vertex: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
     },
@@ -73,13 +73,13 @@ function meshCellsDefaultStyle(
     coloring: {
       active: "color",
       cell: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
       color,
-      textures: null,
+      textures: undefined,
       vertex: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
     },
@@ -95,13 +95,13 @@ function meshPolygonsDefaultStyle(
     coloring: {
       active: "color",
       color,
-      textures: null,
+      textures: undefined,
       polygon: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
       vertex: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
     },
@@ -118,11 +118,11 @@ function meshPolyhedraDefaultStyle(
       active: "color",
       color,
       polyhedron: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
       vertex: {
-        name: null,
+        name: undefined,
         storedConfigs: {},
       },
     },

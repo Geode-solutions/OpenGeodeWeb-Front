@@ -23,16 +23,11 @@
         return
       }
       const { added, removed } = compareSelections(current, previous)
-      for (const item of added) {
-        await dataStyleStore.setVisibility(item.id, true)
-      }
-      for (const item of removed) {
-        await dataStyleStore.setVisibility(item.id, false)
-      }
-
-      await Promise.all(
-        removed.map((item) => dataStyleStore.setVisibility(item.id, false)),
-      )
+      const updates = [
+        ...added.map((item) => dataStyleStore.setVisibility(item.id, true)),
+        ...removed.map((item) => dataStyleStore.setVisibility(item.id, false)),
+      ]
+      await Promise.all(updates)
       hybridViewerStore.remoteRender()
     },
   )

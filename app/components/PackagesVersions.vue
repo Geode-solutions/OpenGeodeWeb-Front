@@ -24,7 +24,9 @@
   watch(
     () => geodeStore.status,
     (value) => {
-      if (value === Status.CONNECTED) get_packages_versions()
+      if (value === Status.CONNECTED) {
+        get_packages_versions()
+      }
     },
   )
 

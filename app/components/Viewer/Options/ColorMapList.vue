@@ -26,7 +26,9 @@
   }
 
   const filteredPresets = computed(() => {
-    if (!filterText.value) return presets
+    if (!filterText.value) {
+      return presets
+    }
     const term = filterText.value.toLowerCase()
 
     const result = []
@@ -35,7 +37,9 @@
         const children = item.Children.filter((child) =>
           child.Name.toLowerCase().includes(term),
         )
-        if (children.length > 0) result.push({ ...item, Children: children })
+        if (children.length > 0) {
+          result.push({ ...item, Children: children })
+        }
       } else if (item.Name.toLowerCase().includes(term)) {
         result.push(item)
       }
@@ -44,9 +48,13 @@
   })
 
   function drawPresetCanvas(presetName, canvas) {
-    if (!canvas) return
+    if (!canvas) {
+      return
+    }
     const preset = vtkColorMaps.getPresetByName(presetName)
-    if (!preset || !preset.RGBPoints) return
+    if (!preset || !preset.RGBPoints) {
+      return
+    }
 
     const ctx = canvas.getContext("2d")
     const { height, width } = canvas
@@ -88,7 +96,9 @@
 
   function processChunk(entries, index, jobId) {
     if (jobId !== renderJobId || index >= entries.length) {
-      if (jobId === renderJobId) loading.value = false
+      if (jobId === renderJobId) {
+        loading.value = false
+      }
       return
     }
 

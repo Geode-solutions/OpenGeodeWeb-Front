@@ -34,11 +34,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const genericRenderWindow = reactive({})
   const is_moving = ref(false)
   const zScale = ref(1)
-  let viewStream = null
-  let gridActor = null
+  let viewStream = undefined
+  let gridActor = undefined
 
   async function initHybridViewer() {
-    if (status.value !== Status.NOT_CREATED) return
+    if (status.value !== Status.NOT_CREATED) {
+      return
+    }
     status.value = Status.CREATING
     genericRenderWindow.value = vtkGenericRenderWindow({
       background: BACKGROUND_COLOR,
@@ -54,7 +56,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     await viewerStore.ws_connect()
     viewStream = viewerStore.client.getImageStream().createViewStream("-1")
     viewStream.onImageReady((event) => {
-      if (is_moving.value) return
+      if (is_moving.value) {
+        return
+      }
       const webGLRenderWindow =
         genericRenderWindow.value.getApiSpecificRenderWindow()
       const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style
@@ -92,7 +96,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function removeItem(id) {
-    if (!hybridDb[id]) return
+    if (!hybridDb[id]) {
+      return
+    }
     const renderer = genericRenderWindow.value.getRenderer()
     renderer.removeActor(hybridDb[id].actor)
     genericRenderWindow.value.getRenderWindow().render()
@@ -117,7 +123,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     renderer.resetCamera()
     genericRenderWindow.value.getRenderWindow().render()
     const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling
-    if (!schema) return
+    if (!schema) {
+      return
+    }
     const viewerStore = useViewerStore()
     await viewerStore.request(schema, {
       z_scale,
@@ -192,7 +200,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       },
     })
 
-    let wheelEventEndTimeout = null
+    let wheelEventEndTimeout = undefined
     useEventListener(container, "wheel", () => {
       is_moving.value = true
       imageStyle.opacity = 0

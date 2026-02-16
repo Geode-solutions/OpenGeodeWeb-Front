@@ -68,10 +68,15 @@
     const block_ids = []
     for (const item of items) {
       const item_type = dataStore.meshComponentType(id, item)
-      if (item_type === "corner") corner_ids.push(item)
-      else if (item_type === "line") line_ids.push(item)
-      else if (item_type === "surface") surface_ids.push(item)
-      else if (item_type === "block") block_ids.push(item)
+      if (item_type === "corner") {
+        corner_ids.push(item)
+      } else if (item_type === "line") {
+        line_ids.push(item)
+      } else if (item_type === "surface") {
+        surface_ids.push(item)
+      } else if (item_type === "block") {
+        block_ids.push(item)
+      }
     }
     return [corner_ids, line_ids, surface_ids, block_ids]
   }

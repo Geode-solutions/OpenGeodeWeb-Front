@@ -8,7 +8,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const panelWidth = ref(PANEL_WIDTH)
   const model_id = ref("")
   const isTreeCollection = ref(false)
-  const selectedTree = ref(null)
+  const selectedTree = ref(undefined)
   const isImporting = ref(false)
   const pendingSelectionIds = ref([])
 
@@ -78,7 +78,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH
     model_id.value = snapshot?.model_id || ""
     isTreeCollection.value = snapshot?.isTreeCollection || false
-    selectedTree.value = snapshot?.selectedTree || null
+    selectedTree.value = snapshot?.selectedTree || undefined
 
     pendingSelectionIds.value =
       snapshot?.selectionIds ||

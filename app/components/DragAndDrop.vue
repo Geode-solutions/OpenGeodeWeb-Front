@@ -20,7 +20,7 @@
   const emit = defineEmits(["files-selected"])
 
   const isDragging = ref(false)
-  const fileInput = ref(null)
+  const fileInput = ref(undefined)
 
   function triggerFileDialog() {
     fileInput.value?.click()

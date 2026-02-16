@@ -28,7 +28,9 @@
 
   const meta_data = computed(() => {
     const itemId = id || menuStore.current_id
-    if (!itemId) return {}
+    if (!itemId) {
+      return {}
+    }
     return dataStore.getItem(itemId).value || {}
   })
 
@@ -51,17 +53,21 @@
   )
 
   useEventListener(
-    window,
+    globalThis,
     "mousemove",
     (event) => {
-      if (!isDragging.value) return
+      if (!isDragging.value) {
+        return
+      }
       handleDrag(event)
     },
     { passive: true },
   )
 
-  useEventListener(window, "mouseup", (event) => {
-    if (!isDragging.value) return
+  useEventListener(globalThis, "mouseup", (event) => {
+    if (!isDragging.value) {
+      return
+    }
     stopDrag(event)
   })
 
@@ -118,17 +124,29 @@
 
   function getTooltipLocation(index) {
     const angle = (index / menuItemCount.value) * FULL_ANGLE
-    if (angle < ANGLE_45 || angle >= ANGLE_315) return "right"
-    if (angle >= ANGLE_45 && angle < ANGLE_135) return "top"
-    if (angle >= ANGLE_135 && angle < ANGLE_225) return "left"
+    if (angle < ANGLE_45 || angle >= ANGLE_315) {
+      return "right"
+    }
+    if (angle >= ANGLE_45 && angle < ANGLE_135) {
+      return "top"
+    }
+    if (angle >= ANGLE_135 && angle < ANGLE_225) {
+      return "left"
+    }
     return "bottom"
   }
 
   function getTooltipOrigin(index) {
     const angle = (index / menuItemCount.value) * FULL_ANGLE
-    if (angle < ANGLE_45 || angle >= ANGLE_315) return "left"
-    if (angle >= ANGLE_45 && angle < ANGLE_135) return "bottom"
-    if (angle >= ANGLE_135 && angle < ANGLE_225) return "right"
+    if (angle < ANGLE_45 || angle >= ANGLE_315) {
+      return "left"
+    }
+    if (angle >= ANGLE_45 && angle < ANGLE_135) {
+      return "bottom"
+    }
+    if (angle >= ANGLE_135 && angle < ANGLE_225) {
+      return "right"
+    }
     return "top"
   }
 

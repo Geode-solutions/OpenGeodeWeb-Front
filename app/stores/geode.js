@@ -83,7 +83,7 @@ export const useGeodeStore = defineStore("geode", {
     },
     launch() {
       console.log("[GEODE] Launching geode microservice...")
-      return window.electronAPI.run_back()
+      return globalThis.electronAPI.run_back()
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")

@@ -62,9 +62,13 @@
   })
 
   function drawLutCanvas() {
-    if (!lutCanvas.value) return
+    if (!lutCanvas.value) {
+      return
+    }
     const preset = vtkColorMaps.getPresetByName(selectedPresetName.value)
-    if (!preset || !preset.RGBPoints) return
+    if (!preset || !preset.RGBPoints) {
+      return
+    }
 
     const canvas = lutCanvas.value
     const ctx = canvas.getContext("2d")
@@ -117,7 +121,9 @@
   watch(
     () => modelValue,
     (nv) => {
-      if (nv !== selectedPresetName.value) selectedPresetName.value = nv
+      if (nv !== selectedPresetName.value) {
+        selectedPresetName.value = nv
+      }
     },
   )
 </script>

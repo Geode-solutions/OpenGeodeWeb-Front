@@ -34,7 +34,7 @@
   })
 
   function debounce(func, wait) {
-    let timeout = null
+    let timeout = undefined
     return function executedFunction(...args) {
       function later() {
         clearTimeout(timeout)

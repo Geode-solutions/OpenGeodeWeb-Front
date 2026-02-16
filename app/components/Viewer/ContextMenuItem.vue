@@ -20,7 +20,7 @@
   })
 
   const is_active = computed(() => menuStore.active_item_index === index)
-  const optionsRef = ref(null)
+  const optionsRef = ref(undefined)
   const { height: optionsHeight } = useElementSize(optionsRef)
 
   const maxCardHeight = computed(() =>
@@ -28,7 +28,9 @@
   )
 
   const optionsStyle = computed(() => {
-    if (!is_active.value || !optionsHeight.value) return {}
+    if (!is_active.value || !optionsHeight.value) {
+      return {}
+    }
     const angle = (index / itemProps.totalItems) * 2 * Math.PI
     const radius = RADIUS
     const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius

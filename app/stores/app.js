@@ -24,7 +24,9 @@ export const useAppStore = defineStore("app", () => {
     )
     await Promise.all(
       stores.map(async (store) => {
-        if (!store.exportStores) return
+        if (!store.exportStores) {
+          return
+        }
         const storeId = store.$id
         try {
           snapshot[storeId] = await store.exportStores(params)
@@ -52,7 +54,9 @@ export const useAppStore = defineStore("app", () => {
     const notFoundStores = []
     await Promise.all(
       stores.map(async (store) => {
-        if (!store.importStores) return
+        if (!store.importStores) {
+          return
+        }
         const storeId = store.$id
         if (!snapshot[storeId]) {
           notFoundStores.push(storeId)
@@ -75,8 +79,8 @@ export const useAppStore = defineStore("app", () => {
   }
 
   const loadedExtensions = ref(new Map())
-  const extensionAPI = ref(null)
-  const codeTransformer = ref(null)
+  const extensionAPI = ref(undefined)
+  const codeTransformer = ref(undefined)
 
   function setExtensionAPI(api) {
     extensionAPI.value = api
@@ -90,7 +94,7 @@ export const useAppStore = defineStore("app", () => {
     return loadedExtensions.value.get(id)
   }
 
-  async function loadExtension(path, backendPath = null) {
+  async function loadExtension(path, backendPath = undefined) {
     try {
       let finalURL = path
 
@@ -158,8 +162,9 @@ export const useAppStore = defineStore("app", () => {
 
   function unloadExtension(id) {
     const extensionData = getExtension(id)
-    if (!extensionData) return false
-
+    if (!extensionData) {
+      return false
+    }
     if (
       extensionData.module &&
       typeof extensionData.module.uninstall === "function"
@@ -186,8 +191,9 @@ export const useAppStore = defineStore("app", () => {
 
   function toggleExtension(id) {
     const extensionData = getExtension(id)
-    if (!extensionData) return false
-
+    if (!extensionData) {
+      return false
+    }
     extensionData.enabled = !extensionData.enabled
     console.log(
       `[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${id}`,
@@ -197,8 +203,9 @@ export const useAppStore = defineStore("app", () => {
 
   function setExtensionEnabled(id, enabled) {
     const extensionData = getExtension(id)
-    if (!extensionData) return false
-
+    if (!extensionData) {
+      return false
+    }
     extensionData.enabled = enabled
     console.log(
       `[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${id}`,

@@ -44,11 +44,15 @@ export const useInfraStore = defineStore("infra", {
         this.microservices.map((store) => store.$id),
       )
 
-      if (this.status === Status.CREATED) return
+      if (this.status === Status.CREATED) {
+        return
+      }
 
       return navigator.locks.request("infra.create_backend", async () => {
         this.status = Status.CREATING
-        if (this.status === Status.CREATED) return
+        if (this.status === Status.CREATED) {
+          return
+        }
         console.log("[INFRA] Lock granted for create_backend")
 
         if (this.app_mode === appMode.DESKTOP) {
