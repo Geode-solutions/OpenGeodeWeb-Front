@@ -50,7 +50,7 @@
 
 <template>
   <ClientOnly>
-    <div class="fill-height" style="position: relative">
+    <div class="fill-height" style="position: relative; height: 100%">
       <VeaseViewToolbar />
       <slot name="ui"></slot>
       <v-col

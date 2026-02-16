@@ -33,7 +33,7 @@
   <v-hover v-slot="{ isHovering, props: hoverProps }">
     <v-card
       v-bind="hoverProps"
-      class="text-center cursor-pointer"
+      class="text-center cursor-pointer glass-panel border-opacity-10 border-white"
       :class="{
         'elevation-4': isHovering || isDragging,
         'elevation-0': !(isHovering || isDragging),
@@ -41,14 +41,11 @@
       :style="{
         position: 'relative',
         overflow: 'hidden',
-        transition: 'all 0.3s ease',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         background:
           isHovering || isDragging
-            ? 'rgba(var(--v-theme-primary), 0.05)'
-            : 'rgba(0, 0, 0, 0.02)',
-        border: `2px dashed ${
-          isHovering || isDragging ? 'rgb(var(--v-theme-primary))' : '#e0e0e0'
-        }`,
+            ? 'rgba(255, 255, 255, 0.08) !important'
+            : 'rgba(255, 255, 255, 0.03) !important',
         transform: isHovering || isDragging ? 'translateY(-2px)' : 'none',
         pointerEvents: loading ? 'none' : 'auto',
         opacity: loading ? 0.6 : 1,
@@ -62,8 +59,9 @@
       <v-card-text class="pa-8">
         <v-sheet
           class="mx-auto mb-6 d-flex align-center justify-center"
-          :color="isHovering || isDragging ? 'primary' : 'grey-lighten-2'"
-          :elevation="isHovering || isDragging ? 4 : 0"
+          :color="
+            isHovering || isDragging ? 'white' : 'rgba(255, 255, 255, 0.1)'
+          "
           rounded="circle"
           width="80"
           height="80"
@@ -72,16 +70,13 @@
           <v-icon
             :icon="loading ? 'mdi-loading' : 'mdi-cloud-upload'"
             size="40"
-            :color="isHovering || isDragging ? 'white' : 'grey-darken-1'"
+            :color="isHovering || isDragging ? 'primary' : 'white'"
             :class="{ rotating: loading }"
           />
         </v-sheet>
 
         <v-card-title
-          class="text-h6 font-weight-bold justify-center pa-0 mb-1"
-          :class="
-            isHovering || isDragging ? 'text-primary' : 'text-grey-darken-2'
-          "
+          class="text-h6 font-weight-bold justify-center pa-0 mb-1 text-white"
           style="transition: color 0.3s ease"
         >
           {{ loading ? loadingText : isDragging ? dropText : idleText }}

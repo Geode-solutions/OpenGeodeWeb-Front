@@ -48,7 +48,8 @@
   <v-stepper-vertical-item
     :value="step_index + 1"
     :editable="step_index < current_step_index"
-    color="primary"
+    color="white"
+    class="text-white"
     hide-actions
   >
     <template #title>
@@ -56,17 +57,18 @@
         color="transparent"
         class="d-flex flex-column justify-center ps-2"
       >
-        <v-text
-          tag="h3"
-          class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
-          :class="
-            current_step_index === step_index
-              ? 'text-primary'
-              : 'text-grey-darken-1'
-          "
+        <h3
+          class="text-h6 font-weight-bold mb-0 transition-swing"
+          :style="{
+            color:
+              current_step_index === step_index
+                ? '#3c9983'
+                : 'rgba(255, 255, 255, 0.5)',
+            transition: 'color 0.3s ease',
+          }"
         >
           {{ steps[step_index].step_title }}
-        </v-text>
+        </h3>
 
         <v-sheet
           v-if="sortedChips.length && current_step_index >= step_index"
@@ -77,9 +79,10 @@
             v-for="(chip, chip_index) in sortedChips"
             :key="chip_index"
             size="small"
-            class="me-2 mb-1 font-weight-medium"
-            color="primary"
-            variant="tonal"
+            class="me-2 mb-1 font-weight-bold border-opacity-20"
+            color="white"
+            variant="outlined"
+            style="background: rgba(255, 255, 255, 0.05)"
           >
             {{ truncate(chip, 30) }}
           </v-chip>
@@ -88,8 +91,6 @@
     </template>
 
     <v-card-text class="pt-0">
-      <v-divider class="mb-6 opacity-10" />
-
       <component
         v-if="step_index === current_step_index"
         :key="step_index"

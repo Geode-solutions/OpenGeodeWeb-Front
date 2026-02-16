@@ -98,43 +98,60 @@
     @files-selected="processSelectedFiles"
   />
 
-  <v-card-text v-if="internal_files.length" class="mt-4">
-    <v-sheet class="d-flex align-center mb-3" color="transparent">
-      <v-icon icon="mdi-file-check" class="mr-2" color="primary" />
-      <span class="text-subtitle-2 font-weight-bold"> Selected Files </span>
-      <v-chip size="x-small" class="ml-2" color="primary" variant="flat">
+  <v-card-text v-if="internal_files.length" class="mt-6">
+    <v-sheet class="d-flex align-center mb-4" color="transparent">
+      <v-icon icon="mdi-file-check" class="mr-3" color="success" size="24" />
+      <span class="text-subtitle-1 font-weight-bold text-white">
+        Selected Files
+      </span>
+      <v-chip
+        size="small"
+        class="ml-3 bg-white-opacity-10"
+        color="white"
+        variant="flat"
+      >
         {{ internal_files.length }}
       </v-chip>
     </v-sheet>
 
-    <v-sheet class="d-flex flex-wrap gap-2" color="transparent">
+    <v-sheet class="d-flex flex-wrap ga-2" color="transparent">
       <v-chip
         v-for="(file, index) in internal_files"
         :key="index"
         closable
-        size="small"
-        color="primary"
-        variant="tonal"
-        class="font-weight-medium"
+        size="default"
+        color="white"
+        variant="outlined"
+        class="font-weight-medium glass-panel border-opacity-10 px-4"
+        style="background: rgba(255, 255, 255, 0.05) !important"
         @click:close="removeFile(index)"
       >
-        <v-icon start size="16">mdi-file-outline</v-icon>
-        {{ file.name }}
+        <v-icon start size="18" color="success">mdi-file-outline</v-icon>
+        <span class="text-white">{{ file.name }}</span>
+        <template #close>
+          <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100"
+            >mdi-close-circle</v-icon
+          >
+        </template>
       </v-chip>
     </v-sheet>
   </v-card-text>
 
-  <v-card-actions v-if="!props.auto_upload && internal_files.length">
+  <v-card-actions
+    v-if="!props.auto_upload && internal_files.length"
+    class="mt-6 pa-0"
+  >
     <v-btn
       color="primary"
-      variant="elevated"
+      variant="flat"
       size="large"
-      rounded="lg"
+      rounded="xl"
       :loading="loading"
-      class="text-none px-3 font-weight-bold"
+      class="text-none px-6 font-weight-bold custom-upload-btn"
+      block
       @click="upload_files"
     >
-      <v-icon start size="20">mdi-cloud-upload-outline</v-icon>
+      <v-icon start size="22">mdi-cloud-upload</v-icon>
       Upload {{ internal_files.length }} file<span
         v-if="internal_files.length > 1"
         >s</span
