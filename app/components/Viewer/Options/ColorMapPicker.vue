@@ -6,7 +6,6 @@
   const LAST_POINT_OFFSET = 4
   const THREE = 3
 
-
   const { max, min, modelValue } = defineProps({
     modelValue: { type: String, default: "Cool to Warm" },
     min: { type: Number, required: true },
@@ -114,10 +113,7 @@
   }
 
   onMounted(() => nextTick(drawLutCanvas))
-  watch(
-    [lutCanvas, selectedPresetName, () => min, () => max],
-    drawLutCanvas,
-  )
+  watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas)
   watch(
     () => modelValue,
     (nv) => {

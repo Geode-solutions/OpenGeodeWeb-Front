@@ -46,7 +46,8 @@
         id,
       },
       {
-        response_function: (response) => (cell_attributes.value = response.attributes),
+        response_function: (response) =>
+          (cell_attributes.value = response.attributes),
       },
     )
   }

@@ -91,7 +91,7 @@
       if (jobId === renderJobId) loading.value = false
       return
     }
-    
+
     const end = Math.min(index + CHUNK_SIZE, entries.length)
     for (let i = index; i < end; i += 1) {
       const [unusedKey, refValue] = entries[i]
@@ -107,7 +107,10 @@
     loading.value = true
     nextTick(() => {
       const WAIT_MS = 50
-      setTimeout(() => processChunk(Object.entries(canvasRefs.value), 0, jobId), WAIT_MS)
+      setTimeout(
+        () => processChunk(Object.entries(canvasRefs.value), 0, jobId),
+        WAIT_MS,
+      )
     })
   }
 
