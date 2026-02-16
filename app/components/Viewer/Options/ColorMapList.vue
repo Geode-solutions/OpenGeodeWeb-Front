@@ -1,8 +1,12 @@
 <script setup>
   import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
-  import vtkColorTransferFunction from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction"
+  import { newInstance as vtkColorTransferFunction } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction"
 
-  const props = defineProps({
+  const LAST_POINT_OFFSET = 4
+  const THREE = 3
+  const CHUNK_SIZE = 5
+
+  const { presets } = defineProps({
     presets: { type: Array, required: true },
   })
 
@@ -13,7 +17,7 @@
   const loading = ref(true)
   let renderJobId = 0
 
-  const setCanvasRef = (presetName, el, id) => {
+  function setCanvasRef(presetName, el, id) {
     if (el) {
       canvasRefs.value[id] = { el, presetName }
     } else {
@@ -22,20 +26,21 @@
   }
 
   const filteredPresets = computed(() => {
-    if (!filterText.value) return props.presets
+    if (!filterText.value) return presets
     const term = filterText.value.toLowerCase()
 
-    return props.presets.reduce((acc, item) => {
+    const result = []
+    for (const item of presets) {
       if (item.Children) {
-        const children = item.Children.filter((c) =>
-          c.Name.toLowerCase().includes(term),
+        const children = item.Children.filter((child) =>
+          child.Name.toLowerCase().includes(term),
         )
-        if (children.length) acc.push({ ...item, Children: children })
+        if (children.length > 0) result.push({ ...item, Children: children })
       } else if (item.Name.toLowerCase().includes(term)) {
-        acc.push(item)
+        result.push(item)
       }
-      return acc
-    }, [])
+    }
+    return result
   })
 
   function drawPresetCanvas(presetName, canvas) {
@@ -44,59 +49,66 @@
     if (!preset || !preset.RGBPoints) return
 
     const ctx = canvas.getContext("2d")
-    const { width, height } = canvas
+    const { height, width } = canvas
     const lut = vtkColorTransferFunction.newInstance()
     const rgbPoints = preset.RGBPoints
 
-    for (let i = 0; i < rgbPoints.length; i += 4) {
+    for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {
       lut.addRGBPoint(
-        rgbPoints[i],
-        rgbPoints[i + 1],
-        rgbPoints[i + 2],
-        rgbPoints[i + 3],
+        rgbPoints[pointIdx],
+        rgbPoints[pointIdx + 1],
+        rgbPoints[pointIdx + 2],
+        rgbPoints[pointIdx + THREE],
       )
     }
 
     const table = lut.getUint8Table(
       rgbPoints[0],
-      rgbPoints[rgbPoints.length - 4],
+      rgbPoints.at(-LAST_POINT_OFFSET),
       width,
       true,
     )
     const imageData = ctx.createImageData(width, height)
 
-    for (let x = 0; x < width; x++) {
-      const r = table[x * 4],
-        g = table[x * 4 + 1],
-        b = table[x * 4 + 2],
-        a = table[x * 4 + 3]
-      for (let y = 0; y < height; y++) {
-        const idx = (y * width + x) * 4
-        imageData.data[idx] = r
-        imageData.data[idx + 1] = g
-        imageData.data[idx + 2] = b
-        imageData.data[idx + 3] = a
+    for (let xCoord = 0; xCoord < width; xCoord += 1) {
+      const alpha = table[xCoord * 4 + THREE],
+        blue = table[xCoord * 4 + 2],
+        green = table[xCoord * 4 + 1],
+        red = table[xCoord * 4]
+      for (let yCoord = 0; yCoord < height; yCoord += 1) {
+        const pixelIdx = (yCoord * width + xCoord) * 4
+        imageData.data[pixelIdx] = red
+        imageData.data[pixelIdx + 1] = green
+        imageData.data[pixelIdx + 2] = blue
+        imageData.data[pixelIdx + THREE] = alpha
       }
     }
     ctx.putImageData(imageData, 0, 0)
   }
 
-  async function drawAllCanvases() {
-    renderJobId++
-    const currentJobId = renderJobId
-    loading.value = true
-    await nextTick()
-    await new Promise((r) => setTimeout(r, 50))
-
-    const entries = Object.entries(canvasRefs.value)
-    for (let i = 0; i < entries.length; i += 5) {
-      if (currentJobId !== renderJobId) return
-      entries
-        .slice(i, i + 5)
-        .forEach(([_, { presetName, el }]) => drawPresetCanvas(presetName, el))
-      await new Promise((r) => setTimeout(r, 0))
+  function processChunk(entries, index, jobId) {
+    if (jobId !== renderJobId || index >= entries.length) {
+      if (jobId === renderJobId) loading.value = false
+      return
     }
-    if (currentJobId === renderJobId) loading.value = false
+    
+    const end = Math.min(index + CHUNK_SIZE, entries.length)
+    for (let i = index; i < end; i += 1) {
+      const [unusedKey, refValue] = entries[i]
+      drawPresetCanvas(refValue.presetName, refValue.el)
+    }
+    const ZERO = 0
+    setTimeout(() => processChunk(entries, end, jobId), ZERO)
+  }
+
+  function drawAllCanvases() {
+    renderJobId += 1
+    const jobId = renderJobId
+    loading.value = true
+    nextTick(() => {
+      const WAIT_MS = 50
+      setTimeout(() => processChunk(Object.entries(canvasRefs.value), 0, jobId), WAIT_MS)
+    })
   }
 
   onMounted(drawAllCanvases)

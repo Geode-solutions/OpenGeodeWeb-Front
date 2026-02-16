@@ -34,14 +34,12 @@
     "polyhedron_attribute_color_map",
   )
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
-  const has_color = computed(() => (color.value !== undefined ? true : false))
-  const has_textures = computed(() =>
-    textures.value !== undefined ? true : false,
-  )
+  const has_color = computed(() => color.value !== undefined)
+  const has_textures = computed(() => textures.value !== undefined)
   const has_vertex = computed(() => vertex_attribute_range.value !== undefined)
   const has_edge = computed(() => edge_attribute_range.value !== undefined)
   const has_cells = computed(() => cell_attribute_range.value !== undefined)

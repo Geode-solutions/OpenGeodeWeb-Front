@@ -1,7 +1,7 @@
 <script setup>
+  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
-  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
 
   const geodeStore = useGeodeStore()
 
@@ -56,11 +56,11 @@
     )
   }
 
-  const currentAttribute = computed(() => {
-    return polyhedron_attributes.value.find(
+  const currentAttribute = computed(() =>
+    polyhedron_attributes.value.find(
       (attr) => attr.attribute_name === polyhedron_attribute_name.value,
-    )
-  })
+    ),
+  )
 
   function resetRange() {
     if (currentAttribute.value) {

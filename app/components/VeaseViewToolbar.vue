@@ -33,7 +33,7 @@
       action: () => {
         const { genericRenderWindow } = storeToRefs(hybridViewerStore)
         const renderWindow = genericRenderWindow.value.value.getRenderWindow()
-        const renderer = renderWindow.getRenderers()[0]
+        const [renderer] = renderWindow.getRenderers()
         renderer.resetCamera()
         renderWindow.render()
         hybridViewerStore.syncRemoteCamera()

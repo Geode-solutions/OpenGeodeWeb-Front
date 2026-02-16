@@ -1,6 +1,6 @@
 <script setup>
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useDataStore } from "@ogw_front/stores/data"
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 
   import { compareSelections } from "@ogw_front/utils/treeview"
@@ -20,10 +20,9 @@
 
   watch(
     mesh_components_selection,
-    (current, previous) => {
-      if (!previous) previous = []
-      else {
-        const { added, removed } = compareSelections(current, previous)
+    (current, prev) => {
+      const previous = prev || []
+      const { added, removed } = compareSelections(current, previous)
 
         const [added_corners, added_lines, added_surfaces, added_blocks] =
           sortMeshComponents(added)
@@ -58,7 +57,6 @@
           dataStyleStore.setModelBlocksVisibility(id, removed_blocks, false)
         }
         hybridViewerStore.remoteRender()
-      }
     },
     { immediate: true, deep: true },
   )

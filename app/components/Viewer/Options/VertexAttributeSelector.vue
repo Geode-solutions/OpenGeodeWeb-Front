@@ -1,7 +1,7 @@
 <script setup>
+  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
-  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
 
   const geodeStore = useGeodeStore()
 
@@ -11,7 +11,7 @@
   const vertex_attribute_range = defineModel("vertex_attribute_range", {
     type: Array,
   })
-  const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", {
+  const vertex_attribute_color_map = defineModel("vertex_attribute_ color_map", {
     type: String,
   })
   const vertex_attributes = ref([])
@@ -49,11 +49,11 @@
     )
   }
 
-  const currentAttribute = computed(() => {
-    return vertex_attributes.value.find(
+  const currentAttribute = computed(() =>
+    vertex_attributes.value.find(
       (attr) => attr.attribute_name === vertex_attribute_name.value,
-    )
-  })
+    ),
+  )
 
   function resetRange() {
     if (currentAttribute.value) {

@@ -1,7 +1,7 @@
 <script setup>
+  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
-  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
 
   const geodeStore = useGeodeStore()
 
@@ -21,13 +21,11 @@
   })
 
   const model = defineModel()
-  const cell_attribute_name = ref("")
   const cell_attribute_names = ref([])
   const cell_attribute = reactive({ name: cell_attribute_name.value })
-  const geodeStore = useGeodeStore()
 
   onMounted(() => {
-    if (model.value != null) {
+    if (model.value !== undefined) {
       cell_attribute_name.value = model.value.name
     }
   })
@@ -45,21 +43,19 @@
     geodeStore.request(
       back_schemas.opengeodeweb_back.cell_attribute_names,
       {
-        id: props.id,
+        id,
       },
       {
-        response_function: (response) => {
-          cell_attributes.value = response.attributes
-        },
+        response_function: (response) => (cell_attributes.value = response.attributes),
       },
     )
   }
 
-  const currentAttribute = computed(() => {
-    return cell_attributes.value.find(
+  const currentAttribute = computed(() =>
+    cell_attributes.value.find(
       (attr) => attr.attribute_name === cell_attribute_name.value,
-    )
-  })
+    ),
+  )
 
   function resetRange() {
     if (currentAttribute.value) {
