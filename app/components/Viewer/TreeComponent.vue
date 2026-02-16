@@ -18,47 +18,47 @@
     dataStyleStore.visibleMeshComponents(id),
   )
 
+  watchEffect(async () => {
+    items.value = await dataStore.formatedMeshComponents(props.id)
+  })
+
   watch(
     mesh_components_selection,
     (current, prev) => {
       const previous = prev || []
       const { added, removed } = compareSelections(current, previous)
 
-        const [added_corners, added_lines, added_surfaces, added_blocks] =
-          sortMeshComponents(added)
-        const [
-          removed_corners,
-          removed_lines,
-          removed_surfaces,
-          removed_blocks,
-        ] = sortMeshComponents(removed)
-        if (added_corners.length > 0) {
-          dataStyleStore.setModelCornersVisibility(id, added_corners, true)
-        }
-        if (added_lines.length > 0) {
-          dataStyleStore.setModelLinesVisibility(id, added_lines, true)
-        }
-        if (added_surfaces.length > 0) {
-          dataStyleStore.setModelSurfacesVisibility(id, added_surfaces, true)
-        }
-        if (added_blocks.length > 0) {
-          dataStyleStore.setModelBlocksVisibility(id, added_blocks, true)
-        }
-        if (removed_corners.length > 0) {
-          dataStyleStore.setModelCornersVisibility(id, removed_corners, false)
-        }
-        if (removed_lines.length > 0) {
-          dataStyleStore.setModelLinesVisibility(id, removed_lines, false)
-        }
-        if (removed_surfaces.length > 0) {
-          dataStyleStore.setModelSurfacesVisibility(id, removed_surfaces, false)
-        }
-        if (removed_blocks.length > 0) {
-          dataStyleStore.setModelBlocksVisibility(id, removed_blocks, false)
-        }
-        hybridViewerStore.remoteRender()
+      const [added_corners, added_lines, added_surfaces, added_blocks] =
+        sortMeshComponents(added)
+      const [removed_corners, removed_lines, removed_surfaces, removed_blocks] =
+        sortMeshComponents(removed)
+      if (added_corners.length > 0) {
+        dataStyleStore.setModelCornersVisibility(id, added_corners, true)
+      }
+      if (added_lines.length > 0) {
+        dataStyleStore.setModelLinesVisibility(id, added_lines, true)
+      }
+      if (added_surfaces.length > 0) {
+        dataStyleStore.setModelSurfacesVisibility(id, added_surfaces, true)
+      }
+      if (added_blocks.length > 0) {
+        dataStyleStore.setModelBlocksVisibility(id, added_blocks, true)
+      }
+      if (removed_corners.length > 0) {
+        dataStyleStore.setModelCornersVisibility(id, removed_corners, false)
+      }
+      if (removed_lines.length > 0) {
+        dataStyleStore.setModelLinesVisibility(id, removed_lines, false)
+      }
+      if (removed_surfaces.length > 0) {
+        dataStyleStore.setModelSurfacesVisibility(id, removed_surfaces, false)
+      }
+      if (removed_blocks.length > 0) {
+        dataStyleStore.setModelBlocksVisibility(id, removed_blocks, false)
+      }
+      hybridViewerStore.remoteRender()
     },
-    { immediate: true, deep: true },
+    { deep: true },
   )
 
   function sortMeshComponents(items) {
