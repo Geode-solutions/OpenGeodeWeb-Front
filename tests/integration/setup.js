@@ -92,11 +92,11 @@ vi.stubGlobal("navigator", {
 })
 
 beforeAll(() => {
-  global.WebSocket = WebSocket
+  globalThis.WebSocket = WebSocket
 })
 
 afterAll(() => {
-  delete global.WebSocket
+  delete globalThis.WebSocket
 })
 
 async function teardownIntegrationTests(

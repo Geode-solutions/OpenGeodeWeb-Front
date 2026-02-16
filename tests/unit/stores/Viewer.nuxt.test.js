@@ -31,7 +31,7 @@ vi.stubGlobal("navigator", {
 function setup() {
   const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
   setActivePinia(pinia)
-  global.WebSocket = WebSocket
+  globalThis.WebSocket = WebSocket
 }
 
 describe("viewer store state", () => {
@@ -41,7 +41,7 @@ describe("viewer store state", () => {
     expectTypeOf(viewerStore.default_local_port).toBeString()
     expectTypeOf(viewerStore.client).toEqualTypeOf({})
     expectTypeOf(viewerStore.picking_mode).toBeBoolean()
-    expectTypeOf(viewerStore.picked_point).toEqualTypeOf({ x: null, y: null })
+    expectTypeOf(viewerStore.picked_point).toEqualTypeOf({ x: undefined, y: undefined })
     expectTypeOf(viewerStore.picked_point).toBeNumber()
     expectTypeOf(viewerStore.status).toBeString()
   })

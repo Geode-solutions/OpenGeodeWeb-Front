@@ -9,7 +9,7 @@ import { vuetify } from "../../utils"
 
 const FIRST_INDEX = 0
 
-global.ResizeObserver = ResizeObserver
+globalThis.ResizeObserver = ResizeObserver
 
 describe(Stepper, () => {
   test(`Mount`, async () => {

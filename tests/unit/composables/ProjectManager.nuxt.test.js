@@ -147,7 +147,9 @@ vi.mock("@ogw_front/composables/api_fetch", () => ({
         get: (k) => (k === "new-file-name" ? "project_123.vease" : undefined),
       },
     }
-    if (options.response_function) await options.response_function(response)
+    if (options.response_function) {
+      await options.response_function(response)
+    }
     return response
   }),
 }))
