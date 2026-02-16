@@ -14,60 +14,38 @@
   const emit = defineEmits(["show-menu"])
 
   const items = ref([])
-  const mesh_components_selection = ref([])
-  let isUpdating = false
-
-  async function updateTree() {
-    isUpdating = true
-    items.value = await dataStore.formatedMeshComponents(props.id)
-    const visibleIds = dataStyleStore.visibleMeshComponents(props.id).value
-    mesh_components_selection.value = items.value
-      .flatMap((group) => group.children)
-      .filter((child) => visibleIds.includes(child.id))
-    setTimeout(() => {
-      isUpdating = false
-    }, 0)
-  }
-
-  watch(
-    () => props.id,
-    async () => {
-      await updateTree()
-    },
-    { immediate: true },
+  const mesh_components_selection = dataStyleStore.visibleMeshComponents(
+    props.id,
   )
+
+  watchEffect(async () => {
+    items.value = await dataStore.formatedMeshComponents(props.id)
+  })
 
   watch(
     mesh_components_selection,
     async (current, previous) => {
-      if (isUpdating) return
-      if (!previous) previous = []
+      if (!previous) return
+
       const { added, removed } = compareSelections(current, previous)
 
-      const promises = []
-      for (const item of added) {
-        promises.push(
-          dataStyleStore.setModelMeshComponentVisibility(
-            props.id,
-            [item.id],
-            true,
-          ),
+      if (added.length > 0) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          props.id,
+          added,
+          true,
         )
       }
-
-      for (const item of removed) {
-        promises.push(
-          dataStyleStore.setModelMeshComponentVisibility(
-            props.id,
-            [item.id],
-            false,
-          ),
+      if (removed.length > 0) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          props.id,
+          removed,
+          false,
         )
       }
-      await Promise.all(promises)
       hybridViewerStore.remoteRender()
     },
-    { immediate: true, deep: true },
+    { deep: true },
   )
 </script>
 
@@ -79,7 +57,6 @@
     item-value="id"
     select-strategy="classic"
     selectable
-    return-object
   >
     <template #title="{ item }">
       <span
