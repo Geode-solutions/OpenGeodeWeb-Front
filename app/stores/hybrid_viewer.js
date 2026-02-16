@@ -1,9 +1,9 @@
 // oxlint-disable-next-line import/no-unassigned-import
 import "@kitware/vtk.js/Rendering/Profiles/Geometry"
-import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
+import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor"
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
-import vtkMapper from "@kitware/vtk.js/Rendering/Core/Mapper"
-import vtkXMLPolyDataReader from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
+import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
+import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
 
 import Status from "@ogw_front/utils/status"
 import { useDataStore } from "@ogw_front/stores/data"
@@ -72,18 +72,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const item = dataStore.getItem(id)
     const value = await item.fetch()
     console.log("hybridViewerStore.addItem", { value })
-    // oxlint-disable-next-line import/no-named-as-default-member
-    const reader = vtkXMLPolyDataReader.newInstance()
+    const reader = vtkXMLPolyDataReader()
     const textEncoder = new TextEncoder()
     await reader.parseAsArrayBuffer(
       textEncoder.encode(value.binary_light_viewable),
     )
     const polydata = reader.getOutputData(0)
-    // oxlint-disable-next-line import/no-named-as-default-member
-    const mapper = vtkMapper.newInstance()
+    const mapper = vtkMapper()
     mapper.setInputData(polydata)
-    // oxlint-disable-next-line import/no-named-as-default-member
-    const actor = vtkActor.newInstance()
+    const actor = vtkActor()
     actor.getProperty().setColor(ACTOR_COLOR)
     actor.setMapper(mapper)
     const renderer = genericRenderWindow.value.getRenderer()
@@ -134,11 +131,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const params = {
       camera_options: {
-        focal_point: camera.getFocalPoint(),
-        view_up: camera.getViewUp(),
-        position: camera.getPosition(),
+        focal_point: [...camera.getFocalPoint()],
+        view_up: [...camera.getViewUp()],
+        position: [...camera.getPosition()],
         view_angle: camera.getViewAngle(),
-        clipping_range: camera.getClippingRange(),
+        clipping_range: [...camera.getClippingRange()],
         distance: camera.getDistance(),
       },
     }
@@ -269,11 +266,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
       const payload = {
         camera_options: {
-          focal_point: camera_options.focal_point,
-          view_up: camera_options.view_up,
-          position: camera_options.position,
+          focal_point: [...camera_options.focal_point],
+          view_up: [...camera_options.view_up],
+          position: [...camera_options.position],
           view_angle: camera_options.view_angle,
-          clipping_range: camera_options.clipping_range,
+          clipping_range: [...camera_options.clipping_range],
         },
       }
       const viewerStore = useViewerStore()

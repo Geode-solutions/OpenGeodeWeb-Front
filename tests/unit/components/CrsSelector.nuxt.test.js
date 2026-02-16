@@ -1,18 +1,18 @@
-import { mountSuspended } from "@nuxt/test-utils/runtime"
 import { describe, expect, test, vi } from "vitest"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
 
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import { createTestingPinia } from "@pinia/testing"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
+import { setActivePinia } from "pinia"
+
 import CrsSelector from "@ogw_front/components/CrsSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
 import { vuetify } from "../../utils"
 
-const crs_selector_schema =
-  schemas.opengeodeweb_back.geographic_coordinate_systems
+const EXPECTED_LENGTH = 1
+const FIRST_INDEX = 0
 
-describe("CrsSelector", () => {
+describe(CrsSelector, () => {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,
@@ -50,9 +50,9 @@ describe("CrsSelector", () => {
     const input = await td.find("input")
     await input.trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
-      [key_to_update]: crs_list[0],
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
+      [key_to_update]: crs_list[FIRST_INDEX],
     })
   })
 })

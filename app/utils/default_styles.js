@@ -72,10 +72,7 @@ function meshCellsDefaultStyle(
     visibility,
     coloring: {
       active: "color",
-      cell: {
-        name: null,
-        storedConfigs: {},
-      },
+      cell: null,
       color,
       textures: null,
       vertex: {

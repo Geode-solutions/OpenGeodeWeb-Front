@@ -1,66 +1,65 @@
-import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
+import { describe, expect, expectTypeOf, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
-
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
-beforeEach(async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
+// CONSTANTS
+const STEP_1 = 1
+
+function setup() {
+  const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
   setActivePinia(pinia)
+}
+
+describe("treeview store state", () => {
+  test("initial state", () => {
+    setup()
+    const treeviewStore = useTreeviewStore()
+    expectTypeOf(treeviewStore.items).toBeArray()
+  })
 })
 
-describe("Treeview Store", () => {
-  describe("state", () => {
-    test("initial state", () => {
-      const treeviewStore = useTreeviewStore()
-      expectTypeOf(treeviewStore.items).toBeArray()
-    })
-  })
+describe("treeview store actions", () => {
+  test("addItem sorted check", () => {
+    setup()
+    const treeviewStore = useTreeviewStore()
+    const testItems = [
+      {
+        geode_object_type: "BRep",
+        name: "test_brep.og_brep",
+        id: "1",
+        viewer_type: "model",
+      },
+      {
+        geode_object_type: "BRep",
+        name: "test_brep_2.og_brep",
+        id: "2",
+        viewer_type: "model",
+      },
+      {
+        geode_object_type: "EdgedCurve2D",
+        name: "test_edgedcurve.og_edc2d",
+        id: "2",
+        viewer_type: "mesh",
+      },
+    ]
 
-  describe("actions", () => {
-    describe("addItem", () => {
-      test("test items sorted", () => {
-        const treeviewStore = useTreeviewStore()
+    for (let i = 0; i < testItems.length; i += STEP_1) {
+      treeviewStore.addItem(
+        testItems[i].geode_object_type,
+        testItems[i].name,
+        testItems[i].id,
+        testItems[i].viewer_type,
+      )
+      const itemsCopy = [...treeviewStore.items]
+      expect(treeviewStore.items).toStrictEqual(itemsCopy.toSorted())
 
-        const testItems = [
-          {
-            geode_object_type: "BRep",
-            name: "test_brep.og_brep",
-            id: "1",
-            viewer_type: "model",
-          },
-          {
-            geode_object_type: "BRep",
-            name: "test_brep_2.og_brep",
-            id: "2",
-            viewer_type: "model",
-          },
-          {
-            geode_object_type: "EdgedCurve2D",
-            name: "test_edgedcurve.og_edc2d",
-            id: "2",
-            viewer_type: "mesh",
-          },
-        ]
-
-        for (let i = 0; i < testItems.length; i++) {
-          treeviewStore.addItem(
-            testItems[i].geode_object_type,
-            testItems[i].name,
-            testItems[i].id,
-            testItems[i].viewer_type,
-          )
-          expect(treeviewStore.items.sort()).toBe(treeviewStore.items)
-          for (let i = 0; i < treeviewStore.items.length; i++) {
-            expect(treeviewStore.items[i].children.sort()).toBe(
-              treeviewStore.items[i].children,
-            )
-          }
-        }
-      })
-    })
+      for (let j = 0; j < treeviewStore.items.length; j += STEP_1) {
+        const childrenCopy = [...treeviewStore.items[j].children]
+        expect(treeviewStore.items[j].children).toStrictEqual(
+          childrenCopy.toSorted(),
+        )
+      }
+    }
   })
 })

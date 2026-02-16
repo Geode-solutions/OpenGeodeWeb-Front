@@ -1,16 +1,13 @@
-import { describe, expect, test, vi } from "vitest"
-import { mountSuspended } from "@nuxt/test-utils/runtime"
-import { flushPromises } from "@vue/test-utils"
 import * as components from "vuetify/components"
-import { setActivePinia } from "pinia"
+import { describe, expect, test, vi } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
+import { flushPromises } from "@vue/test-utils"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
+import { setActivePinia } from "pinia"
 
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import InspectorInspectionButton from "@ogw_front/components/Inspector/InspectionButton"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { vuetify } from "../../../utils"
-
-const schema = schemas.opengeodeweb_back.inspect_file
 
 describe("Inspector/InspectionButton", async () => {
   const pinia = createTestingPinia({
@@ -22,7 +19,7 @@ describe("Inspector/InspectionButton", async () => {
   geodeStore.base_url = ""
 
   test(`Test with issues`, async () => {
-    var inspection_result = {
+    const inspection_result = {
       title: "Brep inspection",
       nb_issues: 3,
       children: [
@@ -39,7 +36,7 @@ describe("Inspector/InspectionButton", async () => {
       ],
     }
 
-    geodeStore.request = vi.fn((schema, params, callbacks) => {
+    geodeStore.request = vi.fn((_schema, params, callbacks) => {
       if (callbacks?.response_function) {
         callbacks.response_function({
           inspection_result,

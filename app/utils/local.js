@@ -1,4 +1,3 @@
-
 import { on, once } from "node:events"
 import child_process from "node:child_process"
 import fs from "node:fs"
@@ -107,7 +106,9 @@ async function run_script(
     })
   })
 
-  child.on("close", (code) => console.log(`Child Process exited with code ${code}`))
+  child.on("close", (code) =>
+    console.log(`Child Process exited with code ${code}`),
+  )
   child.on("kill", () => {
     console.log("Child Process killed")
   })
@@ -124,58 +125,53 @@ async function run_script(
   }
 }
 
-async function run_back(
-  executable_name,
-  executable_path,
-  args = {
-    project_folder_path,
-    upload_folder_path: undefined,
-  },
-) {
-    let { project_folder_path, upload_folder_path } = args
-    if (!upload_folder_path) {
-      upload_folder_path = path.join(project_folder_path, "uploads")
-    }
-    const port = await get_available_port()
-    const back_args = [
-      `--port ${port}`,
-      `--data_folder_path ${project_folder_path}`,
-      `--upload_folder_path ${upload_folder_path}`,
-      `--allowed_origin http://localhost:*`,
-      `--timeout ${0}`,
-    ]
-    if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
-      back_args.push("--debug")
-    }
-    console.log("run_back", executable_name, executable_path, back_args)
-    await run_script(
-      executable_name,
-      executable_path,
-      back_args,
-      "Serving Flask app",
-    )
+async function run_back(executable_name, executable_path, args = {}) {
+  let { project_folder_path, upload_folder_path } = args
+  if (!project_folder_path) {
+    throw new Error("project_folder_path is required")
+  }
+  if (!upload_folder_path) {
+    upload_folder_path = path.join(project_folder_path, "uploads")
+  }
+  const port = await get_available_port()
+  const back_args = [
+    `--port ${port}`,
+    `--data_folder_path ${project_folder_path}`,
+    `--upload_folder_path ${upload_folder_path}`,
+    `--allowed_origin http://localhost:*`,
+    `--timeout ${0}`,
+  ]
+  if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
+    back_args.push("--debug")
+  }
+  console.log("run_back", executable_name, executable_path, back_args)
+  await run_script(
+    executable_name,
+    executable_path,
+    back_args,
+    "Serving Flask app",
+  )
   return port
 }
 
-async function run_viewer(
-  executable_name,
-  executable_path,
-  args = { project_folder_path },
-) {
-    const port = await get_available_port()
-    const viewer_args = [
-      `--port ${port}`,
-      `--data_folder_path ${args.project_folder_path}`,
-      `--timeout ${0}`,
-    ]
-    console.log("run_viewer", executable_name, executable_path, viewer_args)
-    await run_script(
-      executable_name,
-      executable_path,
-      viewer_args,
-      "Starting factory",
-    )
-    return port
+async function run_viewer(executable_name, executable_path, args = {}) {
+  if (!args.project_folder_path) {
+    throw new Error("project_folder_path is required")
+  }
+  const port = await get_available_port()
+  const viewer_args = [
+    `--port ${port}`,
+    `--data_folder_path ${args.project_folder_path}`,
+    `--timeout ${0}`,
+  ]
+  console.log("run_viewer", executable_name, executable_path, viewer_args)
+  await run_script(
+    executable_name,
+    executable_path,
+    viewer_args,
+    "Starting factory",
+  )
+  return port
 }
 
 function delete_folder_recursive(data_folder_path) {
@@ -205,15 +201,14 @@ function kill_back(back_port) {
         },
       )
       throw new Error("Failed to kill back")
-    } catch {
-          console.log("Back closed")
+    } catch (error) {
+      console.log("Back closed", error)
     }
   }
-  return pTimeout(do_kill, {
-      milliseconds: 500,
-      message: "Failed to kill back",
-    },
-  )
+  return pTimeout(do_kill(), {
+    milliseconds: 500,
+    message: "Failed to kill back",
+  })
 }
 
 function kill_viewer(viewer_port) {
@@ -255,7 +250,7 @@ function kill_viewer(viewer_port) {
     }
   }
 
-  return pTimeout(do_kill, {
+  return pTimeout(do_kill(), {
     milliseconds: 500,
     message: "Failed to kill viewer",
   })
@@ -280,11 +275,39 @@ async function wait_nuxt(nuxt_process, back_port, viewer_port) {
 async function run_browser(
   script_name,
   microservices_options = {
-    back: { executable_name, executable_path, args: { project_folder_path } },
-    viewer: { executable_name, executable_path, args: { project_folder_path } },
+    back: {
+      executable_name: executable_name("opengeodeweb-back"),
+      executable_path: "",
+      args: { project_folder_path: "" },
+    },
+    viewer: {
+      executable_name: executable_name("opengeodeweb-viewer"),
+      executable_path: "",
+      args: { project_folder_path: "" },
+    },
   },
 ) {
-  console.log("microservices_options", microservices_options)
+  if (
+    microservices_options.back.executable_path === "" ||
+    microservices_options.back.args.project_folder_path === ""
+  ) {
+    const microservices_path = "microservices"
+    microservices_options.back.executable_path =
+      await executable_path(microservices_path)
+    microservices_options.back.args.project_folder_path = create_path(
+      path.join(process.cwd(), "data"),
+    )
+  }
+  if (
+    microservices_options.viewer.executable_path === "" ||
+    microservices_options.viewer.args.project_folder_path === ""
+  ) {
+    const microservices_path = "microservices"
+    microservices_options.viewer.executable_path =
+      await executable_path(microservices_path)
+    microservices_options.viewer.args.project_folder_path =
+      microservices_options.back.args.project_folder_path
+  }
   const back_promise = run_back(
     microservices_options.back.executable_name,
     microservices_options.back.executable_path,

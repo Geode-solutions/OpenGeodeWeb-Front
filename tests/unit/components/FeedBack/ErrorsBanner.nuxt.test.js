@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from "vitest"
+
 import { createTestingPinia } from "@pinia/testing"
 import { mount } from "@vue/test-utils"
 import { setActivePinia } from "pinia"
@@ -7,8 +8,8 @@ import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { vuetify } from "../../../utils"
 
-describe("FeedBackErrorBanner", async () => {
-  ;(test(`Test reload`, async () => {
+describe("FeedBackErrorBanner", () => {
+  test(`Test reload`, async () => {
     const pinia = createTestingPinia({
       stubActions: false,
       createSpy: vi.fn,
@@ -26,28 +27,29 @@ describe("FeedBackErrorBanner", async () => {
     const v_btn = wrapper.findAll(".v-btn")
     await v_btn[0].trigger("click")
     expect(reload_spy).toHaveBeenCalledTimes(1)
-  }),
-    test(`Test delete error`, async () => {
-      const wrapper = mount(FeedBackErrorBanner, {
-        global: {
-          plugins: [
-            createTestingPinia({
-              initialState: {
-                feedback: {
-                  server_error: true,
-                },
-              },
-              stubActions: false,
-              createSpy: vi.fn,
-            }),
-            vuetify,
-          ],
-        },
-      })
+  })
 
-      const feedbackStore = useFeedbackStore()
-      const v_btn = wrapper.findAll(".v-btn")
-      await v_btn[1].trigger("click")
-      expect(feedbackStore.server_error).toBe(false)
-    }))
+  test(`Test delete error`, async () => {
+    const wrapper = mount(FeedBackErrorBanner, {
+      global: {
+        plugins: [
+          createTestingPinia({
+            initialState: {
+              feedback: {
+                server_error: true,
+              },
+            },
+            stubActions: false,
+            createSpy: vi.fn,
+          }),
+          vuetify,
+        ],
+      },
+    })
+
+    const feedbackStore = useFeedbackStore()
+    const v_btn = wrapper.findAll(".v-btn")
+    await v_btn[1].trigger("click")
+    expect(feedbackStore.server_error).toBe(false)
+  })
 })

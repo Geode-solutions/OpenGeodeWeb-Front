@@ -134,23 +134,21 @@ describe("Mesh edges", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshEdgesVertexAttributeName(
-              id,
-              vertex_attribute.name,
-            ),
+            dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute),
         },
         {
           name: "edge",
           function: () =>
-            dataStyleStore.setMeshEdgesEdgeAttributeName(
-              id,
-              edge_attribute.name,
-            ),
+            dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute),
         },
       ]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        if (coloringTypes[i].function) {
-          await coloringTypes[i].function()
+
+      async function testColoring(coloringType, expectedColoringType) {
+        if (coloringType.function) {
+          expect(() =>
+            dataStyleStore.setMeshEdgesActiveColoring(id, coloringType.name),
+          ).toThrowError()
+          await coloringType.function()
         }
         const result = dataStyleStore.setMeshEdgesActiveColoring(
           id,

@@ -2,8 +2,12 @@ import { defineConfig } from "vitest/config"
 import { defineVitestProject } from "@nuxt/test-utils/config"
 import path from "node:path"
 
-const globalRetry = process.env.CI ? 3 : 0
+const RETRIES = 3
+const DEFAULT_RETRY = 0
 
+const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY
+
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   test: {
     globals: true,
