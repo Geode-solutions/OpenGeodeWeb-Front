@@ -2,15 +2,15 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStyleStateStore } from "../data_style_state"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 import { useDataStyleStateStore } from "../state"
+import { useMeshCellsStyle } from "./cells"
+import { useMeshEdgesStyle } from "./edges"
 import { useMeshPointsStyle } from "./points"
 import { useMeshPolygonsStyle } from "./polygons"
 import { useMeshPolyhedraStyle } from "./polyhedra"
-import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh
