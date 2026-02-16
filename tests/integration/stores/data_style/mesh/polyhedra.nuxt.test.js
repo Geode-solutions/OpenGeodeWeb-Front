@@ -104,9 +104,9 @@ describe("Mesh polyhedra", () => {
             ),
         },
       ]
-      for (let i = 0; i < coloringTypes.length; i++) {
-        if (coloringTypes[i].function) {
-          await coloringTypes[i].function()
+      async function testColoring(coloringType, expectedColoringType) {
+        if (coloringType.function) {
+          await coloringType.function()
         }
         const result = dataStyleStore.setMeshPolyhedraActiveColoring(
           id,

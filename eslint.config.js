@@ -12,7 +12,6 @@ export default [
       globals: {
         window: "readonly",
         document: "readonly",
-        // ajoute d'autres globals si nécessaire
       },
     },
     plugins: {

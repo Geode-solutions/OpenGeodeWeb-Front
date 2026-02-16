@@ -82,7 +82,7 @@ async function setupIntegrationTests(file_name, geode_object) {
 
 const mockLockRequest = vi
   .fn()
-  .mockImplementation(async (name, callback) => await callback({ name }))
+  .mockImplementation(async (name, task) => await task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,

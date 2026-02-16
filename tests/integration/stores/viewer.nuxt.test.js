@@ -18,7 +18,9 @@ import {
 
 const CONNECT_TIMEOUT = 25000
 
-let back_port, viewer_port, project_folder_path
+let back_port = 0,
+  viewer_port = 0,
+  project_folder_path = ""
 
 beforeEach(() => {
   const pinia = createTestingPinia({

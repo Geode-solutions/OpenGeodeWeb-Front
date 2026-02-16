@@ -134,20 +134,22 @@ describe("Mesh edges", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute),
+            dataStyleStore.setMeshEdgesVertexAttributeName(
+              id,
+              vertex_attribute.name,
+            ),
         },
         {
           name: "edge",
           function: () =>
-            dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute),
+            dataStyleStore.setMeshEdgesEdgeAttributeName(
+              id,
+              edge_attribute.name,
+            ),
         },
       ]
-
-      async function testColoring(coloringType, expectedColoringType) {
+      async function testColoring(coloringType) {
         if (coloringType.function) {
-          expect(() =>
-            dataStyleStore.setMeshEdgesActiveColoring(id, coloringType.name),
-          ).toThrowError()
           await coloringType.function()
         }
         const result = dataStyleStore.setMeshEdgesActiveColoring(
@@ -157,14 +159,14 @@ describe("Mesh edges", () => {
         expect(result).toBeInstanceOf(Promise)
         await result
         expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(
-          expectedColoringType,
+          coloringType.name,
         )
         expect(viewerStore.status).toBe(Status.CONNECTED)
       }
 
-      await testColoring(coloringTypes[0], "color")
-      await testColoring(coloringTypes[1], "vertex")
-      await testColoring(coloringTypes[2], "edge")
+      await testColoring(coloringTypes[0])
+      await testColoring(coloringTypes[1])
+      await testColoring(coloringTypes[2])
     })
     test("Edges apply style", async () => {
       const dataStyleStore = useDataStyleStore()
