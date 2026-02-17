@@ -22,7 +22,12 @@ describe("Feedback Store", () => {
     describe("add_error", () => {
       test("test add_error", () => {
         const feedbackStore = useFeedbackStore()
-        feedbackStore.add_error(500, "/test", "test message", "test description")
+        feedbackStore.add_error(
+          500,
+          "/test",
+          "test message",
+          "test description",
+        )
         expect(feedbackStore.feedbacks).toHaveLength(1)
         expect(feedbackStore.feedbacks[0].type).toBe("error")
       })
@@ -30,7 +35,12 @@ describe("Feedback Store", () => {
       test("test feedbacks_timeout", () => {
         const feedbackStore = useFeedbackStore()
         feedbackStore.feedbacks_timeout_miliseconds = 500
-        feedbackStore.add_error(500, "/test", "test message", "test description")
+        feedbackStore.add_error(
+          500,
+          "/test",
+          "test message",
+          "test description",
+        )
         expect(feedbackStore.feedbacks).toHaveLength(1)
         setTimeout(() => {
           expect(feedbackStore.feedbacks).toHaveLength(0)
