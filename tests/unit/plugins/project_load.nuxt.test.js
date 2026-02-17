@@ -1,6 +1,4 @@
 import { describe, expect, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
 import { useAppStore } from "@ogw_front/stores/app"
 import { useDataStore } from "@ogw_front/stores/data"
@@ -9,6 +7,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
 import { database } from "../../../internal/database/database.js"
+import { setupActivePinia } from "../../utils"
 
 const PANEL_WIDTH = 320
 const Z_SCALE = 1.5
@@ -61,12 +60,7 @@ const snapshot = {
 
 describe("project import", () => {
   function setup() {
-    setActivePinia(
-      createTestingPinia({
-        stubActions: false,
-        createSpy: vi.fn,
-      }),
-    )
+    setupActivePinia()
     const stores = {
       app: useAppStore(),
       dataBase: useDataStore(),

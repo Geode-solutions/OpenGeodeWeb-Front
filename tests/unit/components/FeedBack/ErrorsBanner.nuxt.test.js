@@ -1,25 +1,19 @@
 import { describe, expect, test, vi } from "vitest"
 
-import { createTestingPinia } from "@pinia/testing"
 import { mount } from "@vue/test-utils"
-import { setActivePinia } from "pinia"
 
+import { setupActivePinia, vuetify } from "../../../utils"
 import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import { vuetify } from "../../../utils"
 
 const CALLED_TIMES = 1
 
 describe(FeedBackErrorBanner, () => {
+  const pinia = setupActivePinia()
   test(`Test reload`, async () => {
-    const pinia = createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
     const wrapper = mount(FeedBackErrorBanner, {
       global: {
-        plugins: [pinia, vuetify],
+        plugins: [vuetify, pinia],
       },
     })
     const reload_spy = vi.spyOn(wrapper.vm, "reload")
@@ -34,21 +28,9 @@ describe(FeedBackErrorBanner, () => {
   test(`Test delete error`, async () => {
     const wrapper = mount(FeedBackErrorBanner, {
       global: {
-        plugins: [
-          createTestingPinia({
-            initialState: {
-              feedback: {
-                server_error: true,
-              },
-            },
-            stubActions: false,
-            createSpy: vi.fn,
-          }),
-          vuetify,
-        ],
+        plugins: [vuetify, pinia],
       },
     })
-
     const feedbackStore = useFeedbackStore()
     const v_btn = wrapper.findAll(".v-btn")
     await v_btn[1].trigger("click")

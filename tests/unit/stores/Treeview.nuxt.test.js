@@ -1,14 +1,14 @@
-import { describe, expect, expectTypeOf, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
+import { describe, expect, expectTypeOf, test } from "vitest"
+
+// Local imports
+import { setupActivePinia } from "../../utils"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
 // CONSTANTS
 const STEP_1 = 1
 
 function setup() {
-  const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
-  setActivePinia(pinia)
+  setupActivePinia()
 }
 
 describe("treeview store state", () => {

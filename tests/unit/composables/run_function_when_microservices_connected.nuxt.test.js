@@ -2,10 +2,8 @@ import { describe, expect, test, vi } from "vitest"
 import Status from "@ogw_front/utils/status"
 import { flushPromises } from "@vue/test-utils"
 
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
-
 import { run_function_when_microservices_connected } from "@ogw_front/composables/run_function_when_microservices_connected"
+import { setupActivePinia } from "../../utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
@@ -14,11 +12,7 @@ describe("when_microservices_connected_run_function", () => {
   const dumb_obj = { dumb_method: () => true }
 
   function setup() {
-    const pinia = createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
+    setupActivePinia()
     const infraStore = useInfraStore()
     const geodeStore = useGeodeStore()
     const viewerStore = useViewerStore()

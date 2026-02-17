@@ -1,14 +1,13 @@
 // Global imports
 import { describe, expect, expectTypeOf, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
 
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 
 // Local imports
 import Status from "@ogw_front/utils/status"
+import { setupActivePinia } from "../../utils"
 
 // CONSTANTS
 const PORT_443 = "443"
@@ -19,11 +18,7 @@ const TEST_ID = "test-id-123456"
 const STATUS_500 = 500
 
 function setup() {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  setupActivePinia()
 }
 
 function setupConfig() {

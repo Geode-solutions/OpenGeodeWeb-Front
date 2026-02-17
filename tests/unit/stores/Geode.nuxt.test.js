@@ -2,9 +2,8 @@ import { describe, expect, expectTypeOf, test, vi } from "vitest"
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import { createTestingPinia } from "@pinia/testing"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
+import { setupActivePinia } from "../../utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 
@@ -18,8 +17,7 @@ const EXPECTED_ONE_REQUEST = 1
 const EXPECTED_NO_REQUEST = 0
 
 function setup() {
-  const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
-  setActivePinia(pinia)
+  setupActivePinia()
 }
 
 describe("geode store", () => {

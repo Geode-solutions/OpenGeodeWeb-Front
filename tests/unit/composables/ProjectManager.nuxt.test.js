@@ -1,9 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
 // Local imports
 import { appMode } from "@ogw_front/utils/app_mode"
+import { setupActivePinia } from "../../utils"
 import { useProjectManager } from "@ogw_front/composables/project_manager"
 
 // Constants
@@ -242,8 +241,7 @@ function verifyRemaining() {
 
 describe("projectManager composable (compact)", () => {
   function setup() {
-    const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
-    setActivePinia(pinia)
+    setupActivePinia()
 
     // reset spies
     const storesList = [

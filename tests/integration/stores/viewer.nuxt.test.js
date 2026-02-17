@@ -1,9 +1,8 @@
 // Global imports
 
 // Third party imports
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
+import { afterEach, beforeEach, describe, expect, test } from "vitest"
+import { setupActivePinia } from "../../utils"
 
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
@@ -23,11 +22,7 @@ let back_port = 0,
   project_folder_path = ""
 
 beforeEach(() => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  setupActivePinia()
 })
 
 afterEach(async () => {

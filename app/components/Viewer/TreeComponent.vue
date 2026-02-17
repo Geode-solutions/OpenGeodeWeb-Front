@@ -13,73 +13,42 @@
 
   const emit = defineEmits(["show-menu"])
 
-  const items = dataStore.formatedMeshComponents(id)
-  const mesh_components_selection = ref(
-    dataStyleStore.visibleMeshComponents(id),
+  const items = ref([])
+  const mesh_components_selection = dataStyleStore.visibleMeshComponents(
+    id,
   )
 
   watchEffect(async () => {
-    items.value = await dataStore.formatedMeshComponents(props.id)
+    items.value = await dataStore.formatedMeshComponents(id)
   })
 
   watch(
     mesh_components_selection,
-    (current, prev) => {
-      const previous = prev || []
+    async (current, previous) => {
+      if (!previous) {
+        return
+      }
+
       const { added, removed } = compareSelections(current, previous)
 
-      const [added_corners, added_lines, added_surfaces, added_blocks] =
-        sortMeshComponents(added)
-      const [removed_corners, removed_lines, removed_surfaces, removed_blocks] =
-        sortMeshComponents(removed)
-      if (added_corners.length > 0) {
-        dataStyleStore.setModelCornersVisibility(id, added_corners, true)
+      if (added.length > 0) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          id,
+          added,
+          true,
+        )
       }
-      if (added_lines.length > 0) {
-        dataStyleStore.setModelLinesVisibility(id, added_lines, true)
-      }
-      if (added_surfaces.length > 0) {
-        dataStyleStore.setModelSurfacesVisibility(id, added_surfaces, true)
-      }
-      if (added_blocks.length > 0) {
-        dataStyleStore.setModelBlocksVisibility(id, added_blocks, true)
-      }
-      if (removed_corners.length > 0) {
-        dataStyleStore.setModelCornersVisibility(id, removed_corners, false)
-      }
-      if (removed_lines.length > 0) {
-        dataStyleStore.setModelLinesVisibility(id, removed_lines, false)
-      }
-      if (removed_surfaces.length > 0) {
-        dataStyleStore.setModelSurfacesVisibility(id, removed_surfaces, false)
-      }
-      if (removed_blocks.length > 0) {
-        dataStyleStore.setModelBlocksVisibility(id, removed_blocks, false)
+      if (removed.length > 0) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          id,
+          removed,
+          false,
+        )
       }
       hybridViewerStore.remoteRender()
     },
     { deep: true },
   )
-
-  function sortMeshComponents(items) {
-    const corner_ids = []
-    const line_ids = []
-    const surface_ids = []
-    const block_ids = []
-    for (const item of items) {
-      const item_type = dataStore.meshComponentType(id, item)
-      if (item_type === "corner") {
-        corner_ids.push(item)
-      } else if (item_type === "line") {
-        line_ids.push(item)
-      } else if (item_type === "surface") {
-        surface_ids.push(item)
-      } else if (item_type === "block") {
-        block_ids.push(item)
-      }
-    }
-    return [corner_ids, line_ids, surface_ids, block_ids]
-  }
 </script>
 
 <template>

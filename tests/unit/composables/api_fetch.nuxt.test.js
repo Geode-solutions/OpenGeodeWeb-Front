@@ -1,8 +1,7 @@
-import { describe, expect, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
+import { describe, expect, test } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
 
+import { setupActivePinia } from "../../utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
@@ -10,11 +9,7 @@ const FIRST_INDEX = 0
 
 describe("geodeStore.request()", () => {
   function setup() {
-    const pinia = createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
+    setupActivePinia()
     const geodeStore = useGeodeStore()
     const feedbackStore = useFeedbackStore()
     geodeStore.base_url = ""

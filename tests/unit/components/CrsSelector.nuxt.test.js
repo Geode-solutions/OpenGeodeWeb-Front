@@ -1,23 +1,17 @@
 import { describe, expect, test, vi } from "vitest"
 
-import { createTestingPinia } from "@pinia/testing"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
 
 import CrsSelector from "@ogw_front/components/CrsSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
-import { vuetify } from "../../utils"
+import { setupActivePinia, vuetify } from "../../utils"
 
 const EXPECTED_LENGTH = 1
 const FIRST_INDEX = 0
 
 describe(CrsSelector, () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  const pinia = setupActivePinia()
   const geodeStore = useGeodeStore()
   geodeStore.base_url = ""
 

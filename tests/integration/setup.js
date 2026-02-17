@@ -5,8 +5,7 @@ import { v4 as uuidv4 } from "uuid"
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
+import { setupActivePinia } from "../utils"
 
 // Local imports
 import {
@@ -63,11 +62,7 @@ async function runMicroservices() {
 }
 
 async function setupIntegrationTests(file_name, geode_object) {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  setupActivePinia()
   const viewerStore = useViewerStore()
 
   const { back_port, viewer_port, project_folder_path } =

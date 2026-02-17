@@ -2,13 +2,11 @@ import { describe, expect, test, vi } from "vitest"
 
 import Launcher from "@ogw_front/components/Launcher"
 import ResizeObserver from "resize-observer-polyfill"
-import { createTestingPinia } from "@pinia/testing"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
 
 import { useInfraStore } from "@ogw_front/stores/infra"
-import { vuetify } from "../../utils"
+import { setupActivePinia, vuetify } from "../../utils"
 
 // Mock navigator.locks API
 const mockLockRequest = vi
@@ -26,15 +24,11 @@ globalThis.ResizeObserver = ResizeObserver
 
 describe(Launcher, async () => {
   test(`Mount`, async () => {
-    const pinia = createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
+    const pinia = setupActivePinia()
     const infraStore = useInfraStore()
     const wrapper = await mountSuspended(Launcher, {
       global: {
-        plugins: [pinia, vuetify],
+        plugins: [vuetify, pinia],
       },
     })
     expect(wrapper.exists()).toBeTruthy()

@@ -1,13 +1,11 @@
 import * as components from "vuetify/components"
 import { describe, expect, test, vi } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
+import { setupActivePinia, vuetify } from "../../utils"
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-import { vuetify } from "../../utils"
 
 const EXPECTED_LENGTH = 1
 const FIRST_INDEX = 0
@@ -16,11 +14,7 @@ const SECOND_INDEX = 1
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
 
 describe(ExtensionSelector, async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  const pinia =setupActivePinia()
   const geodeStore = useGeodeStore()
   geodeStore.base_url = ""
 

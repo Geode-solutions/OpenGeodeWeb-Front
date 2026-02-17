@@ -1,9 +1,7 @@
 import * as components from "vuetify/components"
 import { describe, expect, test, vi } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
-import { createTestingPinia } from "@pinia/testing"
 import { flushPromises } from "@vue/test-utils"
-import { setActivePinia } from "pinia"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
@@ -11,7 +9,7 @@ import FileUploader from "@ogw_front/components/FileUploader"
 import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
-import { vuetify } from "../../utils"
+import { setupActivePinia, vuetify } from "../../utils"
 
 const EXPECTED_LENGTH = 1
 const FIRST_INDEX = 0
@@ -20,11 +18,7 @@ const SECOND_INDEX = 1
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
 describe(MissingFilesSelector, () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  const pinia = setupActivePinia()
   const geodeStore = useGeodeStore()
   geodeStore.base_url = ""
 

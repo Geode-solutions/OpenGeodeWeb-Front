@@ -1,20 +1,14 @@
 import * as components from "vuetify/components"
 import { describe, expect, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
 
+import { setupActivePinia, vuetify } from "../../../utils"
 import InspectorInspectionButton from "@ogw_front/components/Inspector/InspectionButton"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-import { vuetify } from "../../../utils"
 
 describe("Inspector/InspectionButton", async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  const pinia = setupActivePinia()
   const geodeStore = useGeodeStore()
   geodeStore.base_url = ""
 

@@ -1,20 +1,15 @@
-import { describe, expect, test, vi } from "vitest"
+import { describe, expect, test } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
+import { setupActivePinia, vuetify } from "../../utils"
 import PackagesVersions from "@ogw_front/components/PackagesVersions"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-import { vuetify } from "../../utils"
 
 const FIRST_INDEX = 0
 
 describe(PackagesVersions, async () => {
   test(`Mount`, async () => {
-    const pinia = createTestingPinia({
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
+    const pinia = setupActivePinia()
     const geodeStore = useGeodeStore()
     geodeStore.base_url = ""
 

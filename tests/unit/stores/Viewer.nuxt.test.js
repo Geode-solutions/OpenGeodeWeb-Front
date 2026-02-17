@@ -1,11 +1,20 @@
 // Global imports
-import { describe, expect, expectTypeOf, test, vi } from "vitest"
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  expectTypeOf,
+  test,
+  vi,
+} from "vitest"
+
 import { WebSocket } from "ws"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
 // Local imports
 import { appMode } from "@ogw_front/utils/app_mode"
+import { setupActivePinia } from "../../utils"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
@@ -30,15 +39,20 @@ vi.stubGlobal("navigator", {
   },
 })
 
-function setup() {
-  const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
-  setActivePinia(pinia)
+beforeAll(() => {
   globalThis.WebSocket = WebSocket
-}
+})
+
+afterAll(() => {
+  delete globalThis.WebSocket
+})
+
+beforeEach(() => {
+  setupActivePinia()
+})
 
 describe("viewer store state", () => {
   test("initial state", () => {
-    setup()
     const viewerStore = useViewerStore()
     expectTypeOf(viewerStore.default_local_port).toBeString()
     expectTypeOf(viewerStore.client).toEqualTypeOf({})
@@ -54,89 +68,84 @@ describe("viewer store state", () => {
 
 describe("viewer store mode getters", () => {
   test("protocol and domain mapping", () => {
-    setup()
-    const infra = useInfraStore()
-    const viewer = useViewerStore()
+    const infraStore = useInfraStore()
+    const viewerStore = useViewerStore()
 
-    infra.app_mode = appMode.CLOUD
-    expect(viewer.protocol).toBe("wss")
-    infra.app_mode = appMode.BROWSER
-    expect(viewer.protocol).toBe("ws")
-    infra.app_mode = appMode.DESKTOP
-    expect(viewer.protocol).toBe("ws")
+    infraStore.app_mode = appMode.CLOUD
+    expect(viewerStore.protocol).toBe("wss")
+    infraStore.app_mode = appMode.BROWSER
+    expect(viewerStore.protocol).toBe("ws")
+    infraStore.app_mode = appMode.DESKTOP
+    expect(viewerStore.protocol).toBe("ws")
   })
 
   test("port mapping", () => {
-    setup()
-    const infra = useInfraStore()
-    const viewer = useViewerStore()
+    const infraStore = useInfraStore()
+    const viewerStore = useViewerStore()
 
-    infra.app_mode = appMode.CLOUD
-    expect(viewer.port).toBe(PORT_443)
-    infra.app_mode = appMode.BROWSER
-    expect(viewer.port).toBe(viewer.default_local_port)
-    infra.app_mode = appMode.DESKTOP
-    expect(viewer.port).toBe(viewer.default_local_port)
+    infraStore.app_mode = appMode.CLOUD
+    expect(viewerStore.port).toBe(PORT_443)
+    infraStore.app_mode = appMode.BROWSER
+    expect(viewerStore.port).toBe(viewerStore.default_local_port)
+    infraStore.app_mode = appMode.DESKTOP
+    expect(viewerStore.port).toBe(viewerStore.default_local_port)
 
-    viewer.default_local_port = PORT_8080
-    expect(viewer.port).toBe(PORT_8080)
+    viewerStore.default_local_port = PORT_8080
+    expect(viewerStore.port).toBe(PORT_8080)
   })
 })
 
 describe("viewer store url and busy getters", () => {
   test("base_url construction", () => {
-    setup()
-    const infra = useInfraStore()
-    const viewer = useViewerStore()
+    const infraStore = useInfraStore()
+    const viewerStore = useViewerStore()
 
-    infra.app_mode = appMode.DESKTOP
-    infra.domain_name = "localhost"
-    expect(viewer.base_url).toBe(`ws://localhost:${PORT_1234}/ws`)
+    infraStore.app_mode = appMode.DESKTOP
+    infraStore.domain_name = "localhost"
+    expect(viewerStore.base_url).toBe(`ws://localhost:${PORT_1234}/ws`)
 
-    infra.app_mode = appMode.CLOUD
-    infra.ID = ID_VAL
-    infra.domain_name = "example.com"
-    expect(viewer.base_url).toBe(
+    infraStore.app_mode = appMode.CLOUD
+    infraStore.ID = ID_VAL
+    infraStore.domain_name = "example.com"
+    expect(viewerStore.base_url).toBe(
       `wss://example.com:${PORT_443}/${ID_VAL}/viewer/ws`,
     )
   })
 
   test("base_url error", () => {
-    setup()
-    const infra = useInfraStore()
-    const viewer = useViewerStore()
-    infra.app_mode = appMode.CLOUD
-    infra.ID = ""
-    infra.domain_name = "example.com"
-    expect(() => viewer.base_url).toThrow("ID must not be empty in cloud mode")
+    const infraStore = useInfraStore()
+    const viewerStore = useViewerStore()
+    infraStore.app_mode = appMode.CLOUD
+    infraStore.ID = ""
+    infraStore.domain_name = "example.com"
+    expect(() => viewerStore.base_url).toThrow(
+      "ID must not be empty in cloud mode",
+    )
   })
 
   test("busy status mapping", () => {
-    setup()
-    const viewer = useViewerStore()
-    viewer.request_counter = EXPECTED_ONE_REQUEST
-    expect(viewer.is_busy).toBeTruthy()
-    viewer.request_counter = EXPECTED_ZERO_REQUESTS
-    expect(viewer.is_busy).toBeFalsy()
+    const viewerStore = useViewerStore()
+    viewerStore.request_counter = EXPECTED_ONE_REQUEST
+    expect(viewerStore.is_busy).toBeTruthy()
+    viewerStore.request_counter = EXPECTED_ZERO_REQUESTS
+    expect(viewerStore.is_busy).toBeFalsy()
   })
 })
 
 describe("viewer store actions", () => {
   test("toggle_picking_mode", async () => {
-    setup()
-    const viewer = useViewerStore()
-    await viewer.toggle_picking_mode(true)
-    expect(viewer.picking_mode).toBeTruthy()
+    const viewerStore = useViewerStore()
+    await viewerStore.toggle_picking_mode(true)
+    expect(viewerStore.picking_mode).toBeTruthy()
   })
 
   test("request counter updates", async () => {
-    setup()
-    const viewer = useViewerStore()
-    await viewer.start_request()
-    expect(viewer.request_counter).toBe(EXPECTED_ONE_REQUEST)
-    await viewer.stop_request()
-    expect(viewer.request_counter).toBe(EXPECTED_ZERO_REQUESTS)
-    await viewer.stop_request()
-    expect(viewer.request_counter).toBe(EXPECTED_NEGATIVE_ONE_REQUEST)
+    const viewerStore = useViewerStore()
+    await viewerStore.start_request()
+    expect(viewerStore.request_counter).toBe(EXPECTED_ONE_REQUEST)
+    await viewerStore.stop_request()
+    expect(viewerStore.request_counter).toBe(EXPECTED_ZERO_REQUESTS)
+    await viewerStore.stop_request()
+    expect(viewerStore.request_counter).toBe(EXPECTED_NEGATIVE_ONE_REQUEST)
   })
 })

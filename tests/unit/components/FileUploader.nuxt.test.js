@@ -1,17 +1,14 @@
 import * as components from "vuetify/components"
-import { describe, expect, test, vi } from "vitest"
+import { describe, expect, test } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
-
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
-import { vuetify } from "../../utils"
+import { setupActivePinia, vuetify } from "../../utils"
 
 const FIRST_INDEX = 0
 const SECOND_INDEX = 1
@@ -19,11 +16,7 @@ const SECOND_INDEX = 1
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
 describe(FileUploader, async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  const pinia = setupActivePinia()
   const geodeStore = useGeodeStore()
   geodeStore.base_url = ""
 

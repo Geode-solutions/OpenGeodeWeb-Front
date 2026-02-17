@@ -1,8 +1,7 @@
-import { describe, expect, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
+import { describe, expect, test } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import { setActivePinia } from "pinia"
+import { setupActivePinia } from "../../utils"
 import upload_file from "@ogw_front/utils/upload_file"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useGeodeStore } from "@ogw_front/stores/geode"
@@ -12,11 +11,7 @@ const schema = schemas.opengeodeweb_back.upload_file
 
 describe("upload_file test", () => {
   function setup() {
-    const pinia = createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
+    setupActivePinia()
     const geodeStore = useGeodeStore()
     geodeStore.base_url = ""
     const feedbackStore = useFeedbackStore()

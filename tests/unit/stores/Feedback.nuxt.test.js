@@ -1,6 +1,5 @@
-import { describe, expect, expectTypeOf, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
+import { describe, expect, expectTypeOf, test } from "vitest"
+import { setupActivePinia } from "../../utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 // CONSTANTS
@@ -12,8 +11,7 @@ const INDEX_0 = 0
 const STATUS_500 = 500
 
 function setup() {
-  const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
-  setActivePinia(pinia)
+  setupActivePinia()
 }
 
 describe("feedback store state", () => {

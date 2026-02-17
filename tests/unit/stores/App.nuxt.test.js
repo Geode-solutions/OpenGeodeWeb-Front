@@ -1,8 +1,8 @@
 import { describe, expect, expectTypeOf, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
 import { useAppStore } from "@ogw_front/stores/app"
+
+import { setupActivePinia } from "../../utils"
 
 // Constants
 const SINGLE_STORE_LENGTH = 1
@@ -13,11 +13,7 @@ const CALL_COUNT_ONCE = 1
 
 describe("app store", () => {
   function setup() {
-    const pinia = createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
+    setupActivePinia()
   }
 
   describe("state", () => {
