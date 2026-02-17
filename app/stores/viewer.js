@@ -1,6 +1,4 @@
-import vtkWSLinkClient, {
-  newInstance,
-} from "@kitware/vtk.js/IO/Core/WSLinkClient"
+import {setSmartConnectClass, newInstance as vtkWSLinkClient } from "@kitware/vtk.js/IO/Core/WSLinkClient"
 // oxlint-disable-next-line id-length
 import _ from "lodash"
 // oxlint-disable-next-line no-unassigned-import
@@ -93,7 +91,7 @@ export const useViewerStore = defineStore(
           status.value = Status.CONNECTING
           const { default: SmartConnect } =
             await import("wslink/src/SmartConnect")
-          vtkWSLinkClient.setSmartConnectClass(SmartConnect)
+          setSmartConnectClass(SmartConnect)
 
           const config_obj = { application: "Viewer" }
           config_obj.sessionURL = base_url.value
@@ -104,7 +102,7 @@ export const useViewerStore = defineStore(
           }
           let clientToConnect = client.value
           if (_.isEmpty(clientToConnect)) {
-            clientToConnect = newInstance()
+            clientToConnect = vtkWSLinkClient()
           }
 
           // Connect to busy store

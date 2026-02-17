@@ -19,8 +19,10 @@ let back_port = 0,
   viewer_port = 0,
   project_folder_path = ""
 
-beforeEach(() => {
+beforeEach(async() => {
   setupActivePinia()
+  ;({ back_port, viewer_port, project_folder_path } =
+  await runMicroservices())
 })
 
 afterEach(async () => {
@@ -33,8 +35,6 @@ describe("Viewer Store", () => {
       test(
         "ws_connect",
         async () => {
-          ;({ back_port, viewer_port, project_folder_path } =
-            await runMicroservices())
           const viewerStore = useViewerStore()
           await viewerStore.ws_connect()
           expect(viewerStore.status).toBe(Status.CONNECTED)
@@ -46,8 +46,6 @@ describe("Viewer Store", () => {
       test(
         "connect",
         async () => {
-          ;({ back_port, viewer_port, project_folder_path } =
-            await runMicroservices())
           const viewerStore = useViewerStore()
           await viewerStore.connect()
           expect(viewerStore.status).toBe(Status.CONNECTED)
@@ -62,8 +60,6 @@ describe("Viewer Store", () => {
         async () => {
           const schema =
             opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.render
-          ;({ back_port, viewer_port, project_folder_path } =
-            await runMicroservices())
           const viewerStore = useViewerStore()
           const timeout = 1
           const params = {}
