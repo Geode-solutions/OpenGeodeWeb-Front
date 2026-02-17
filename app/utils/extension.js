@@ -42,7 +42,7 @@ function extensionsConf(projectConfig) {
   return extensionsConfig
 }
 
-async function runExtensions(projectName) {
+async function runExtensions(projectName, projectFolderPath) {
   const projectConfig = projectConf(projectName)
   console.log(runExtensions.name, { projectConfig })
   const extensionsConfig = extensionsConf(projectConfig)
@@ -58,7 +58,10 @@ async function runExtensions(projectName) {
     const { archivePath } = extensionsConfig[extensionId]
     console.log(runExtensions.name, { archivePath })
 
-    const unzippedExtensionPath = await unzipFile(archivePath)
+    const unzippedExtensionPath = await unzipFile(
+      archivePath,
+      projectFolderPath,
+    )
 
     // Read and validate metadata.json
     const metadataPath = path.join(unzippedExtensionPath, "metadata.json")
