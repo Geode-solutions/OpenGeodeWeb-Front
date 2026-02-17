@@ -16,7 +16,4 @@ function getAppMode() {
   return appMode.CLOUD
 }
 
-const app_mode_utils = { appMode, getAppMode }
-
 export { appMode, getAppMode }
-export default app_mode_utils

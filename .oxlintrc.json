@@ -13,7 +13,6 @@
       "error",
       {
         "case": "snakeCase"
-        "case": "snakeCase"
       }
     ],
     "eslint/func-style": ["error", "declaration"],
