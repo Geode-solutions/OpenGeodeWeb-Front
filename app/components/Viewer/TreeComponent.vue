@@ -14,9 +14,7 @@
   const emit = defineEmits(["show-menu"])
 
   const items = ref([])
-  const mesh_components_selection = dataStyleStore.visibleMeshComponents(
-    id,
-  )
+  const mesh_components_selection = dataStyleStore.visibleMeshComponents(id)
 
   watchEffect(async () => {
     items.value = await dataStore.formatedMeshComponents(id)
@@ -32,11 +30,7 @@
       const { added, removed } = compareSelections(current, previous)
 
       if (added.length > 0) {
-        await dataStyleStore.setModelMeshComponentsVisibility(
-          id,
-          added,
-          true,
-        )
+        await dataStyleStore.setModelMeshComponentsVisibility(id, added, true)
       }
       if (removed.length > 0) {
         await dataStyleStore.setModelMeshComponentsVisibility(
