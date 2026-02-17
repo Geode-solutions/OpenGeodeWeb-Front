@@ -11,9 +11,10 @@ import { useInfraStore } from "@ogw_front/stores/infra"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
-
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation(async (name, handler) => await handler({ name }))
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name, handler) => await handler({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
