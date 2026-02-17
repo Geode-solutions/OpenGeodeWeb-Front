@@ -14,8 +14,8 @@ const PORT_12 = "12"
 const PORT_5000 = "5000"
 const CLOUD_ID = "123456"
 const STATUS_500 = 500
-const L1 = 1
-const L0 = 0
+const EXPECTED_ONE_REQUEST = 1
+const EXPECTED_NO_REQUEST = 0
 
 function setup() {
   const pinia = createTestingPinia({ stubActions: false, createSpy: vi.fn })
@@ -119,14 +119,14 @@ describe("geode store", () => {
     test("is_busy", () => {
       setup()
       const geodeStore = useGeodeStore()
-      geodeStore.request_counter = L1
+      geodeStore.request_counter = EXPECTED_ONE_REQUEST
       expect(geodeStore.is_busy).toBeTruthy()
     })
 
     test("not is_busy", () => {
       setup()
       const geodeStore = useGeodeStore()
-      geodeStore.request_counter = L0
+      geodeStore.request_counter = EXPECTED_NO_REQUEST
       expect(geodeStore.is_busy).toBeFalsy()
     })
   })

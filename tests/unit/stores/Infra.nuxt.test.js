@@ -14,15 +14,15 @@ import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // CONSTANTS
 const ID_VAL = "123456"
-const L1 = 1
-const L2 = 2
-const L0 = 0
-const INDEX_0 = 0
+const EXPECTED_ONE_REQUEST = 1
+const EXPECTED_TWO_REQUESTS = 2
+const EXPECTED_NO_REQUEST = 0
+const EXPECTED_FIRST_INDEX = 0
 const LOCALHOST = "localhost"
 const CLOUD_DOMAIN = "api.geode-solutions.com"
 
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation((name, fn) => fn({ name }))
+const mockLockRequest = vi.fn().mockImplementation((name, task) => task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -112,15 +112,15 @@ describe("infra store busy getters", () => {
 
     infraStore.register_microservice(geodeStore, mockApi)
     infraStore.register_microservice(viewerStore, mockApi)
-    geodeStore.$patch({ request_counter: L0 })
-    viewerStore.$patch({ request_counter: L0 })
+    geodeStore.$patch({ request_counter: EXPECTED_NO_REQUEST })
+    viewerStore.$patch({ request_counter: EXPECTED_NO_REQUEST })
     expect(infraStore.microservices_busy).toBeFalsy()
 
-    geodeStore.$patch({ request_counter: L1 })
+    geodeStore.$patch({ request_counter: EXPECTED_ONE_REQUEST })
     expect(infraStore.microservices_busy).toBeTruthy()
 
-    geodeStore.$patch({ request_counter: L0 })
-    viewerStore.$patch({ request_counter: L1 })
+    geodeStore.$patch({ request_counter: EXPECTED_NO_REQUEST })
+    viewerStore.$patch({ request_counter: EXPECTED_ONE_REQUEST })
     expect(infraStore.microservices_busy).toBeTruthy()
   })
 })
@@ -134,11 +134,11 @@ describe("infra store registration actions", () => {
     const mockApi = { request: vi.fn(), connect: vi.fn(), launch: vi.fn() }
 
     infraStore.register_microservice(geodeStore, mockApi)
-    expect(infraStore.microservices).toHaveLength(L1)
-    expect(infraStore.microservices[INDEX_0].$id).toBe("geode")
+    expect(infraStore.microservices).toHaveLength(EXPECTED_ONE_REQUEST)
+    expect(infraStore.microservices[EXPECTED_FIRST_INDEX].$id).toBe("geode")
 
     infraStore.register_microservice(viewerStore, mockApi)
-    expect(infraStore.microservices).toHaveLength(L2)
+    expect(infraStore.microservices).toHaveLength(EXPECTED_TWO_REQUESTS)
   })
 })
 

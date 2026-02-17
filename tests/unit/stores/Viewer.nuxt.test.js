@@ -14,12 +14,12 @@ const PORT_443 = "443"
 const PORT_8080 = "8080"
 const PORT_1234 = "1234"
 const ID_VAL = "123456"
-const L1 = 1
-const L0 = 0
-const LN1 = -1
+const EXPECTED_ONE_REQUEST = 1
+const EXPECTED_ZERO_REQUESTS = 0
+const EXPECTED_NEGATIVE_ONE_REQUEST = -1
 
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation((name, fn) => fn({ name }))
+const mockLockRequest = vi.fn().mockImplementation((name, task) => task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -112,9 +112,9 @@ describe("viewer store url and busy getters", () => {
   test("busy status mapping", () => {
     setup()
     const viewer = useViewerStore()
-    viewer.request_counter = L1
+    viewer.request_counter = EXPECTED_ONE_REQUEST
     expect(viewer.is_busy).toBeTruthy()
-    viewer.request_counter = L0
+    viewer.request_counter = EXPECTED_ZERO_REQUESTS
     expect(viewer.is_busy).toBeFalsy()
   })
 })
@@ -131,10 +131,10 @@ describe("viewer store actions", () => {
     setup()
     const viewer = useViewerStore()
     await viewer.start_request()
-    expect(viewer.request_counter).toBe(L1)
+    expect(viewer.request_counter).toBe(EXPECTED_ONE_REQUEST)
     await viewer.stop_request()
-    expect(viewer.request_counter).toBe(L0)
+    expect(viewer.request_counter).toBe(EXPECTED_ZERO_REQUESTS)
     await viewer.stop_request()
-    expect(viewer.request_counter).toBe(LN1)
+    expect(viewer.request_counter).toBe(EXPECTED_NEGATIVE_ONE_REQUEST)
   })
 })

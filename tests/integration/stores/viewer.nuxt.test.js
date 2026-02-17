@@ -16,7 +16,7 @@ import {
   teardownIntegrationTests,
 } from "../../integration/setup"
 
-const CONNECT_TIMEOUT = 25000
+const CONNECT_TIMEOUT = 25_000
 
 let back_port = 0,
   viewer_port = 0,

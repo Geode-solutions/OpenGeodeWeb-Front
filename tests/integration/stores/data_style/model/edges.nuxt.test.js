@@ -14,7 +14,7 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
-const INTERVAL_TIMEOUT = 25000
+const INTERVAL_TIMEOUT = 25_000
 const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges
 const file_name = "test.og_brep"
 const geode_object = "BRep"

@@ -11,7 +11,7 @@ import { vuetify } from "../../../utils"
 
 vi.stubGlobal("visualViewport", new EventTarget())
 
-describe("FeedBackSnackers", async () => {
+describe(FeedBackSnackers, async () => {
   test(`Test delete error`, async () => {
     const pinia = createTestingPinia({
       initialState: {

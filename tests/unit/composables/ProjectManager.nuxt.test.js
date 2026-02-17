@@ -187,7 +187,7 @@ vi.stubGlobal("useAppStore", () => ({
 
 const mockLockRequest = vi
   .fn()
-  .mockImplementation(async (name, fn) => await fn({ name }))
+  .mockImplementation(async (name, task) => await task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,

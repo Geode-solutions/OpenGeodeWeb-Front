@@ -22,7 +22,7 @@ vi.stubGlobal("navigator", {
   },
 })
 
-global.ResizeObserver = ResizeObserver
+globalThis.ResizeObserver = ResizeObserver
 
 describe(Launcher, async () => {
   test(`Mount`, async () => {

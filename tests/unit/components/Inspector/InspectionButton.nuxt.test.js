@@ -57,7 +57,7 @@ describe("Inspector/InspectionButton", async () => {
       props: { geode_object_type, filename },
     })
 
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
     const v_btn = await wrapper.findComponent(components.VBtn)
     await v_btn.trigger("click")
     await flushPromises()

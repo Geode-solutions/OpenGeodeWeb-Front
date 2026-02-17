@@ -36,17 +36,17 @@
     const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius
     const height = optionsHeight.value
     const margin = MARGIN
-    let dy = 0
+    let offsetY = 0
 
     if (absoluteButtonY - height / 2 < margin) {
-      dy = margin - (absoluteButtonY - height / 2)
+      offsetY = margin - (absoluteButtonY - height / 2)
     } else if (
       absoluteButtonY + height / 2 >
       menuStore.containerHeight - margin
     ) {
-      dy = menuStore.containerHeight - margin - (absoluteButtonY + height / 2)
+      offsetY = menuStore.containerHeight - margin - (absoluteButtonY + height / 2)
     }
-    return { top: `calc(50% + ${dy}px)` }
+    return { top: `calc(50% + ${offsetY}px)` }
   })
 
   const optionsClass = computed(() => {

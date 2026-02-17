@@ -8,7 +8,7 @@ import Step from "@ogw_front/components/Step"
 
 import { vuetify } from "../../utils"
 
-global.ResizeObserver = ResizeObserver
+globalThis.ResizeObserver = ResizeObserver
 
 describe(Step, () => {
   test(`BRep`, async () => {

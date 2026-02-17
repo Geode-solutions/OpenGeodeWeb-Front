@@ -15,11 +15,11 @@
   const filterText = ref("")
   const canvasRefs = ref({})
   const loading = ref(true)
-  let renderJobId = 0
+  const renderJobId = ref(0)
 
-  function setCanvasRef(presetName, el, id) {
-    if (el) {
-      canvasRefs.value[id] = { el, presetName }
+  function setCanvasRef(presetName, element, id) {
+    if (element) {
+      canvasRefs.value[id] = { element, presetName }
     } else {
       delete canvasRefs.value[id]
     }
@@ -95,8 +95,8 @@
   }
 
   function processChunk(entries, index, jobId) {
-    if (jobId !== renderJobId || index >= entries.length) {
-      if (jobId === renderJobId) {
+    if (jobId !== renderJobId.value || index >= entries.length) {
+      if (jobId === renderJobId.value) {
         loading.value = false
       }
       return
@@ -112,8 +112,8 @@
   }
 
   function drawAllCanvases() {
-    renderJobId += 1
-    const jobId = renderJobId
+    renderJobId.value += 1
+    const jobId = renderJobId.value
     loading.value = true
     nextTick(() => {
       const WAIT_MS = 50

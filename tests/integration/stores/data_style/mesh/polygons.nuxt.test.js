@@ -14,7 +14,7 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
-const INTERVAL_TIMEOUT = 20000
+const INTERVAL_TIMEOUT = 20_000
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons
 const file_name = "test.og_psf3d"
 const geode_object = "PolygonalSurface3D"

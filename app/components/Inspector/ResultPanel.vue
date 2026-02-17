@@ -6,7 +6,7 @@
   })
   const opened_panels = ref([])
 
-  onMounted(async () => {
+  onMounted(() => {
     opened_panels.value = inspection_result
       .map((result, i) => (result.nb_issues > 0 ? i : -1))
       .filter((index) => index !== -1)
