@@ -44,7 +44,8 @@
       absoluteButtonY + height / 2 >
       menuStore.containerHeight - margin
     ) {
-      offsetY = menuStore.containerHeight - margin - (absoluteButtonY + height / 2)
+      offsetY =
+        menuStore.containerHeight - margin - (absoluteButtonY + height / 2)
     }
     return { top: `calc(50% + ${offsetY}px)` }
   })

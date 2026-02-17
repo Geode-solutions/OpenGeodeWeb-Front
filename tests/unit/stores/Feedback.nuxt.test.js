@@ -41,7 +41,10 @@ describe("feedback store", () => {
       fb_store.feedbacks_timeout_miliseconds = TIMEOUT_MS
       fb_store.add_error(STATUS_500, "/t", "m", "d")
       expect(fb_store.feedbacks).toHaveLength(EXPECTED_ONE_FEEDBACK)
-      setTimeout(() => expect(fb_store.feedbacks).toHaveLength(EXPECTED_NO_FEEDBACKS), DELAY_MS)
+      setTimeout(
+        () => expect(fb_store.feedbacks).toHaveLength(EXPECTED_NO_FEEDBACKS),
+        DELAY_MS,
+      )
     })
   })
 
@@ -53,7 +56,10 @@ describe("feedback store", () => {
       fb_store.add_success("d")
       expect(fb_store.feedbacks).toHaveLength(EXPECTED_ONE_FEEDBACK)
       expect(fb_store.feedbacks[INDEX_0].type).toBe("success")
-      setTimeout(() => expect(fb_store.feedbacks).toHaveLength(EXPECTED_NO_FEEDBACKS), DELAY_MS)
+      setTimeout(
+        () => expect(fb_store.feedbacks).toHaveLength(EXPECTED_NO_FEEDBACKS),
+        DELAY_MS,
+      )
     })
   })
 

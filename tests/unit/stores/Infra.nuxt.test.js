@@ -22,7 +22,9 @@ const LOCALHOST = "localhost"
 const CLOUD_DOMAIN = "api.geode-solutions.com"
 
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation((name, task) => task({ name }))
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation((name, task) => task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
