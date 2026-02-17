@@ -16,7 +16,7 @@ const SECOND_INDEX = 1
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
 
-describe(ExtensionSelector, () => {
+describe(ExtensionSelector, async () => {
   const pinia = setupActivePinia()
   const geodeStore = useGeodeStore()
 
