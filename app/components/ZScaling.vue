@@ -1,4 +1,6 @@
 <script setup>
+  import GlassCard from "~/components/GlassCard.vue"
+
   const zScale = defineModel({ type: Number, default: 1 })
   const props = defineProps({
     width: { type: Number, default: 400 },

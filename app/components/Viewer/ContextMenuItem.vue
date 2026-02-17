@@ -1,4 +1,5 @@
 <script setup>
+  import GlassCard from "~/components/GlassCard.vue"
   import { useTheme } from "vuetify"
   import { useMenuStore } from "@ogw_front/stores/menu"
   import { useElementSize } from "@vueuse/core"

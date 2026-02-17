@@ -1,4 +1,6 @@
 <script setup>
+  import GlassCard from "~/components/GlassCard.vue"
+
   const props = defineProps({
     multiple: { type: Boolean, default: false },
     accept: { type: String, default: "" },
