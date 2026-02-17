@@ -41,7 +41,6 @@ export const useViewerStore = defineStore(
       const { VIEWER_PORT } = useRuntimeConfig().public
       if (
         VIEWER_PORT !== undefined &&
-        VIEWER_PORT !== null &&
         VIEWER_PORT !== ""
       ) {
         return VIEWER_PORT
@@ -154,9 +153,9 @@ export const useViewerStore = defineStore(
 
     async function launch() {
       console.log("[VIEWER] Launching viewer microservice...")
-      const port_value = await globalThis.electronAPI.run_viewer()
-      console.log("[VIEWER] Viewer launched on port:", port_value)
-      return port_value
+      const port = await globalThis.electronAPI.run_viewer()
+      console.log("[VIEWER] Viewer launched on port:", port)
+      return port
     }
 
     async function connect() {
