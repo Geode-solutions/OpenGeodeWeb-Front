@@ -32,7 +32,10 @@ const meshPointsDefaultStyle = (
     coloring: {
       active: "color",
       color,
-      vertex: null,
+      vertex: {
+        name: null,
+        storedConfigs: {},
+      },
     },
     size,
   }
@@ -48,8 +51,14 @@ const meshEdgesDefaultStyle = (
     coloring: {
       active: "color",
       color,
-      edge: null,
-      vertex: null,
+      edge: {
+        name: null,
+        storedConfigs: {},
+      },
+      vertex: {
+        name: null,
+        storedConfigs: {},
+      },
     },
     width,
   }
@@ -63,10 +72,16 @@ const meshCellsDefaultStyle = (
     visibility,
     coloring: {
       active: "color",
-      cell: null,
+      cell: {
+        name: null,
+        storedConfigs: {},
+      },
       color,
       textures: null,
-      vertex: null,
+      vertex: {
+        name: null,
+        storedConfigs: {},
+      },
     },
   }
 }
@@ -81,8 +96,14 @@ const meshPolygonsDefaultStyle = (
       active: "color",
       color,
       textures: null,
-      polygon: null,
-      vertex: null,
+      polygon: {
+        name: null,
+        storedConfigs: {},
+      },
+      vertex: {
+        name: null,
+        storedConfigs: {},
+      },
     },
   }
 }
@@ -96,8 +117,14 @@ const meshPolyhedraDefaultStyle = (
     coloring: {
       active: "color",
       color,
-      polyhedron: null,
-      vertex: null,
+      polyhedron: {
+        name: null,
+        storedConfigs: {},
+      },
+      vertex: {
+        name: null,
+        storedConfigs: {},
+      },
     },
   }
 }

@@ -87,21 +87,21 @@ describe("Mesh cells", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshCellsVertexAttribute(
+      const result = dataStyleStore.setMeshCellsVertexAttributeName(
         id,
-        vertex_attribute,
+        vertex_attribute.name,
       )
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(
-        mesh_cells_schemas.vertex_attribute,
+        mesh_cells_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshCellsVertexAttribute(id)).toStrictEqual(
-        vertex_attribute,
+      expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe(
+        vertex_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -112,21 +112,21 @@ describe("Mesh cells", () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshCellsCellAttribute(
+      const result = dataStyleStore.setMeshCellsCellAttributeName(
         id,
-        cell_attribute,
+        cell_attribute.name,
       )
       expect(result).toBeInstanceOf(Promise)
       await result
       expect(spy).toHaveBeenCalledWith(
-        mesh_cells_schemas.cell_attribute,
+        mesh_cells_schemas.attribute.cell.name,
         { id, ...cell_attribute },
         {
           response_function: expect.any(Function),
         },
       )
-      expect(dataStyleStore.meshCellsCellAttribute(id)).toStrictEqual(
-        cell_attribute,
+      expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe(
+        cell_attribute.name,
       )
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
@@ -141,22 +141,22 @@ describe("Mesh cells", () => {
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshCellsVertexAttribute(id, vertex_attribute),
+            dataStyleStore.setMeshCellsVertexAttributeName(
+              id,
+              vertex_attribute.name,
+            ),
         },
         {
           name: "cell",
           function: () =>
-            dataStyleStore.setMeshCellsCellAttribute(id, cell_attribute),
+            dataStyleStore.setMeshCellsCellAttributeName(
+              id,
+              cell_attribute.name,
+            ),
         },
       ]
       for (let i = 0; i < coloringTypes.length; i++) {
         if (coloringTypes[i].function) {
-          expect(() =>
-            dataStyleStore.setMeshCellsActiveColoring(
-              id,
-              coloringTypes[i].name,
-            ),
-          ).toThrowError()
           await coloringTypes[i].function()
         }
         const result = dataStyleStore.setMeshCellsActiveColoring(

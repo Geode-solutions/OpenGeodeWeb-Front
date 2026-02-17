@@ -18,29 +18,29 @@
 
   const visibility = computed({
     get: () => dataStyleStore.meshPointsVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVisibility(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVisibility(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const size = computed({
     get: () => dataStyleStore.meshPointsSize(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsSize(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsSize(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const coloring_style_key = computed({
     get: () => dataStyleStore.meshPointsActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsActiveColoring(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsActiveColoring(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
   const color = computed({
     get: () => dataStyleStore.meshPointsColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsColor(id.value, newValue)
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsColor(id.value, newValue)
       hybridViewerStore.remoteRender()
     },
   })
@@ -70,7 +70,6 @@
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
-              v-model:vertex_attribute="vertex_attribute"
             />
           </v-col>
         </v-row>
