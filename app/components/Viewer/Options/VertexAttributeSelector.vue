@@ -12,9 +12,8 @@
     type: Array,
   })
   const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", {
-      type: String,
-    },
-  )
+    type: String,
+  })
   const vertex_attributes = ref([])
 
   const { id } = defineProps({
