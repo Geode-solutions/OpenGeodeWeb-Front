@@ -105,7 +105,7 @@
     const end = Math.min(index + CHUNK_SIZE, entries.length)
     for (let i = index; i < end; i += 1) {
       const [unusedKey, refValue] = entries[i]
-      drawPresetCanvas(refValue.presetName, refValue.el)
+      drawPresetCanvas(refValue.presetName, refValue.element)
     }
     const ZERO = 0
     setTimeout(() => processChunk(entries, end, jobId), ZERO)
