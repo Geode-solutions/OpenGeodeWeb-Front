@@ -19,7 +19,9 @@ const EXPECTED_ZERO_REQUESTS = 0
 const EXPECTED_NEGATIVE_ONE_REQUEST = -1
 
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation((name, task) => task({ name }))
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation((name, task) => task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
