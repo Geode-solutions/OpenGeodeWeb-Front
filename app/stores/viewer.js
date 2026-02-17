@@ -1,4 +1,7 @@
-import {setSmartConnectClass, newInstance as vtkWSLinkClient } from "@kitware/vtk.js/IO/Core/WSLinkClient"
+import {
+  setSmartConnectClass,
+  newInstance as vtkWSLinkClient,
+} from "@kitware/vtk.js/IO/Core/WSLinkClient"
 // oxlint-disable-next-line id-length
 import _ from "lodash"
 // oxlint-disable-next-line no-unassigned-import

@@ -19,10 +19,9 @@ let back_port = 0,
   viewer_port = 0,
   project_folder_path = ""
 
-beforeEach(async() => {
+beforeEach(async () => {
   setupActivePinia()
-  ;({ back_port, viewer_port, project_folder_path } =
-  await runMicroservices())
+  ;({ back_port, viewer_port, project_folder_path } = await runMicroservices())
 })
 
 afterEach(async () => {
