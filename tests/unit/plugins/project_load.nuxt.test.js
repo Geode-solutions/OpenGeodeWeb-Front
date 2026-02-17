@@ -61,7 +61,7 @@ const snapshot = {
 describe("project import", () => {
   function setup() {
     setupActivePinia()
-    const stores = {
+    stores = {
       app: useAppStore(),
       dataBase: useDataStore(),
       treeview: useTreeviewStore(),

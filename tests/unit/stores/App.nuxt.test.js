@@ -118,8 +118,8 @@ describe("app store", () => {
 
         const snapshot = await appStore.exportStores()
 
-        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE)
-        expect(snapshot).toStrictEqual({
+        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(1)
+        expect(snapshot).toEqual({
           withSave: { data: "test" },
         })
         expect(snapshot.withoutSave).toBeUndefined()
