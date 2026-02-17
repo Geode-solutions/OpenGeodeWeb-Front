@@ -42,10 +42,7 @@ export const useViewerStore = defineStore(
         return "443"
       }
       const { VIEWER_PORT } = useRuntimeConfig().public
-      if (
-        VIEWER_PORT !== undefined &&
-        VIEWER_PORT !== ""
-      ) {
+      if (VIEWER_PORT !== undefined && VIEWER_PORT !== "") {
         return VIEWER_PORT
       }
       return default_local_port.value
