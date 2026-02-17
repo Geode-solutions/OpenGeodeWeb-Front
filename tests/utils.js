@@ -1,8 +1,8 @@
+// Third party imports
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import { createVuetify } from "vuetify"
-
 import { createTestingPinia } from "@pinia/testing"
+import { createVuetify } from "vuetify"
 import { setActivePinia } from "pinia"
 
 const vuetify = createVuetify({ components, directives })

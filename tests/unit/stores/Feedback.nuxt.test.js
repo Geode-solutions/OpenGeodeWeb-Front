@@ -1,82 +1,72 @@
-import { describe, expect, expectTypeOf, test } from "vitest"
+// Third party imports
+import { beforeEach, describe, expect, expectTypeOf, test } from "vitest"
+
+// Local imports
 import { setupActivePinia } from "../../utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
-// CONSTANTS
-const TIMEOUT_MS = 500
-const DELAY_MS = 1000
-const EXPECTED_ONE_FEEDBACK = 1
-const EXPECTED_NO_FEEDBACKS = 0
-const INDEX_0 = 0
-const STATUS_500 = 500
-
-function setup() {
+beforeEach(() => {
   setupActivePinia()
-}
-
-describe("feedback store state", () => {
-  test("initial state", () => {
-    setup()
-    const fb_store = useFeedbackStore()
-    expectTypeOf(fb_store.feedbacks).toEqualTypeOf([])
-    expectTypeOf(fb_store.server_error).toBeBoolean()
-  })
 })
 
-describe("feedback store", () => {
-  describe("add_error", () => {
-    test("basic addition", () => {
-      setup()
-      const fb_store = useFeedbackStore()
-      fb_store.add_error(STATUS_500, "/t", "m", "d")
-      expect(fb_store.feedbacks).toHaveLength(EXPECTED_ONE_FEEDBACK)
-      expect(fb_store.feedbacks[INDEX_0].type).toBe("error")
-    })
-
-    test("feedbacks_timeout", () => {
-      setup()
-      const fb_store = useFeedbackStore()
-      fb_store.feedbacks_timeout_miliseconds = TIMEOUT_MS
-      fb_store.add_error(STATUS_500, "/t", "m", "d")
-      expect(fb_store.feedbacks).toHaveLength(EXPECTED_ONE_FEEDBACK)
-      setTimeout(
-        () => expect(fb_store.feedbacks).toHaveLength(EXPECTED_NO_FEEDBACKS),
-        DELAY_MS,
-      )
+describe("Feedback Store", () => {
+  describe("state", () => {
+    test("initial state", () => {
+      const feedbackStore = useFeedbackStore()
+      expectTypeOf(feedbackStore.feedbacks).toEqualTypeOf([])
+      expectTypeOf(feedbackStore.server_error).toBeBoolean()
     })
   })
 
-  describe("add_success", () => {
-    test("basic success", () => {
-      setup()
-      const fb_store = useFeedbackStore()
-      fb_store.feedbacks_timeout_miliseconds = TIMEOUT_MS
-      fb_store.add_success("d")
-      expect(fb_store.feedbacks).toHaveLength(EXPECTED_ONE_FEEDBACK)
-      expect(fb_store.feedbacks[INDEX_0].type).toBe("success")
-      setTimeout(
-        () => expect(fb_store.feedbacks).toHaveLength(EXPECTED_NO_FEEDBACKS),
-        DELAY_MS,
-      )
-    })
-  })
+  describe("actions", () => {
+    describe("add_error", () => {
+      test("test add_error", () => {
+        const feedbackStore = useFeedbackStore()
+        feedbackStore.add_error(500, "/test", "test message", "test description")
+        expect(feedbackStore.feedbacks).toHaveLength(1)
+        expect(feedbackStore.feedbacks[0].type).toBe("error")
+      })
 
-  describe("delete_feedback", () => {
-    test("removal by index", () => {
-      setup()
-      const fb_store = useFeedbackStore()
-      fb_store.delete_feedback(INDEX_0)
-      expect(fb_store.feedbacks).toHaveLength(EXPECTED_NO_FEEDBACKS)
+      test("test feedbacks_timeout", () => {
+        const feedbackStore = useFeedbackStore()
+        feedbackStore.feedbacks_timeout_miliseconds = 500
+        feedbackStore.add_error(500, "/test", "test message", "test description")
+        expect(feedbackStore.feedbacks).toHaveLength(1)
+        setTimeout(() => {
+          expect(feedbackStore.feedbacks).toHaveLength(0)
+        }, 1000)
+      })
     })
-  })
 
-  describe("delete_server_error", () => {
-    test("reset server_error state", () => {
-      setup()
-      const fb_store = useFeedbackStore()
-      fb_store.$patch({ server_error: true })
-      fb_store.delete_server_error()
-      expect(fb_store.server_error).toBeFalsy()
+    describe("add_success", () => {
+      test("test add_success", () => {
+        const feedbackStore = useFeedbackStore()
+        feedbackStore.feedbacks_timeout_miliseconds = 500
+        feedbackStore.add_success("test description")
+        expect(feedbackStore.feedbacks).toHaveLength(1)
+        expect(feedbackStore.feedbacks[0].type).toBe("success")
+
+        setTimeout(() => {
+          expect(feedbackStore.feedbacks).toHaveLength(0)
+        }, 1000)
+      })
+    })
+
+    describe("delete_feedback", () => {
+      test("test", () => {
+        const feedbackStore = useFeedbackStore()
+        feedbackStore.delete_feedback(0)
+        expect(feedbackStore.feedbacks).toHaveLength(0)
+      })
+    })
+
+    describe("delete_server_error", () => {
+      test("test", () => {
+        const feedbackStore = useFeedbackStore()
+        feedbackStore.$patch({ server_error: true })
+        feedbackStore.delete_server_error()
+        expect(feedbackStore.server_error).toBeFalsy()
+      })
     })
   })
 })

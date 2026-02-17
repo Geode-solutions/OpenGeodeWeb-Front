@@ -1,19 +1,24 @@
+// Third party imports
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 import { describe, expect, test, vi } from "vitest"
 
-import { mountSuspended } from "@nuxt/test-utils/runtime"
-
+// Local imports
 import CrsSelector from "@ogw_front/components/CrsSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-
 import { setupActivePinia, vuetify } from "../../utils"
 
 const EXPECTED_LENGTH = 1
 const FIRST_INDEX = 0
 
 describe(CrsSelector, () => {
-  const pinia = setupActivePinia()
-  const geodeStore = useGeodeStore()
-  geodeStore.base_url = ""
+  let pinia
+  let geodeStore
+
+  beforeEach(() => {
+    pinia = setupActivePinia()
+    geodeStore = useGeodeStore()
+    geodeStore.base_url = ""
+  })
 
   test(`Default behavior`, async () => {
     const crs_list = [

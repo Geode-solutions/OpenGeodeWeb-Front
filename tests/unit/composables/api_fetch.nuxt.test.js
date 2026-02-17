@@ -1,6 +1,8 @@
-import { describe, expect, test } from "vitest"
+// Third party imports
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
+// Local imports
 import { setupActivePinia } from "../../utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useGeodeStore } from "@ogw_front/stores/geode"
@@ -8,13 +10,10 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 const FIRST_INDEX = 0
 
 describe("geodeStore.request()", () => {
-  function setup() {
-    setupActivePinia()
-    const geodeStore = useGeodeStore()
-    const feedbackStore = useFeedbackStore()
-    geodeStore.base_url = ""
-    return { geodeStore, feedbackStore }
-  }
+  setupActivePinia()
+  const geodeStore = useGeodeStore()
+  const feedbackStore = useFeedbackStore()
+  geodeStore.base_url = ""
 
   const schema = {
     $id: "/test",
@@ -29,8 +28,13 @@ describe("geodeStore.request()", () => {
     additionalProperties: false,
   }
 
+  beforeEach(async () => {
+    await feedbackStore.$reset()
+    await geodeStore.$reset()
+    geodeStore.base_url = ""
+  })
+
   test("invalid schema", async () => {
-    const { geodeStore } = setup()
     const schema = {
       $id: "/test",
       type: "object",
@@ -50,7 +54,6 @@ describe("geodeStore.request()", () => {
   })
 
   test("invalid params", async () => {
-    const { geodeStore } = setup()
     const params = {}
     expect(() => geodeStore.request(schema, params)).toThrow(
       "data must have required property 'test'",
@@ -58,7 +61,6 @@ describe("geodeStore.request()", () => {
   })
 
   test("request with callbacks", async () => {
-    const { geodeStore } = setup()
     const params = { test: "hello" }
     let errorCalled = false
     const callbacks = {

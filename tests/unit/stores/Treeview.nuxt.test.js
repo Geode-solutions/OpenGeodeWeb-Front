@@ -1,3 +1,4 @@
+// Third party imports
 import { describe, expect, expectTypeOf, test } from "vitest"
 
 // Local imports
@@ -7,13 +8,12 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview"
 // CONSTANTS
 const STEP_1 = 1
 
-function setup() {
+beforeEach(() => {
   setupActivePinia()
-}
+})
 
 describe("treeview store state", () => {
   test("initial state", () => {
-    setup()
     const treeviewStore = useTreeviewStore()
     expectTypeOf(treeviewStore.items).toBeArray()
   })
@@ -21,7 +21,6 @@ describe("treeview store state", () => {
 
 describe("treeview store actions", () => {
   test("addItem sorted check", () => {
-    setup()
     const treeviewStore = useTreeviewStore()
     const testItems = [
       {

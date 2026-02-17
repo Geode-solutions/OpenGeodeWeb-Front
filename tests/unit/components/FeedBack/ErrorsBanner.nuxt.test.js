@@ -1,7 +1,8 @@
+// Third party imports
 import { describe, expect, test, vi } from "vitest"
-
 import { mount } from "@vue/test-utils"
 
+// Local imports
 import { setupActivePinia, vuetify } from "../../../utils"
 import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"

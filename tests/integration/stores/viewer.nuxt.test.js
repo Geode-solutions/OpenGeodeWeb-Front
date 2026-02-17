@@ -2,18 +2,16 @@
 
 // Third party imports
 import { afterEach, beforeEach, describe, expect, test } from "vitest"
-import { setupActivePinia } from "../../utils"
-
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import Status from "@ogw_front/utils/status"
-import { useViewerStore } from "@ogw_front/stores/viewer"
-
 import {
   runMicroservices,
   teardownIntegrationTests,
 } from "../../integration/setup"
+import Status from "@ogw_front/utils/status"
+import { setupActivePinia } from "../../utils"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 const CONNECT_TIMEOUT = 25_000
 

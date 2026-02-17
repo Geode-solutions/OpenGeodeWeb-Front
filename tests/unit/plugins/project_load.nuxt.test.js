@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from "vitest"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 
 import { useAppStore } from "@ogw_front/stores/app"
 import { useDataStore } from "@ogw_front/stores/data"
@@ -21,47 +21,22 @@ vi.mock("../../../internal/utils/viewer_call", () => ({
 vi.mock("../../../app/stores/hybrid_viewer", () => ({
   useHybridViewerStore: () => ({
     $id: "hybridViewer",
-    addItem: vi.fn(),
-    clear: vi.fn(),
     initHybridViewer: vi.fn(),
-    load: vi.fn(),
-    save: vi.fn(),
+    clear: vi.fn(),
+    addItem: vi.fn(),
     setZScaling: vi.fn(),
+    save: vi.fn(),
+    load: vi.fn(),
   }),
 }))
 
-const snapshot = {
-  data: {
-    items: [
-      {
-        id: "abc123",
-        viewer_type: "mesh",
-        geode_object_type: "PointSet2D",
-        native_file: "native.ext",
-        viewable_file: "viewable.ext",
-        name: "My Data",
-        binary_light_viewable: "VGxpZ2h0RGF0YQ==",
-      },
-    ],
-  },
-  treeview: {
-    items: [{ title: "PointSet2D", children: [] }],
-    selection: [],
-    components_selection: [],
-    isAdditionnalTreeDisplayed: false,
-    panelWidth: PANEL_WIDTH,
-    model_id: "",
-    isTreeCollection: false,
-    selectedTree: undefined,
-  },
-  dataStyle: { styles: { abc123: { some: "style" } } },
-  hybridViewer: { zScale: Z_SCALE },
-}
+beforeEach(() => {
+  setupActivePinia()
+})
 
-describe("project import", () => {
-  function setup() {
-    setupActivePinia()
-    stores = {
+describe("Project import", () => {
+  test("app.importStores restores stores", async () => {
+    const stores = {
       app: useAppStore(),
       dataBase: useDataStore(),
       treeview: useTreeviewStore(),
@@ -72,18 +47,41 @@ describe("project import", () => {
     for (const store of storesArray.slice(STORES_SLICE_START)) {
       stores.app.registerStore(store)
     }
-    return { stores }
-  }
-
-  test("app.importStores restores stores", async () => {
-    const { stores } = setup()
 
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(
       async (snapshot) => {
-        const { items } = snapshot
+        const items = snapshot?.items || []
         await Promise.all(items.map((item) => database.data.put(item)))
       },
     )
+
+    const snapshot = {
+      data: {
+        items: [
+          {
+            id: "abc123",
+            viewer_type: "mesh",
+            geode_object_type: "PointSet2D",
+            native_file: "native.ext",
+            viewable_file: "viewable.ext",
+            name: "My Data",
+            binary_light_viewable: "VGxpZ2h0RGF0YQ==",
+          },
+        ],
+      },
+      treeview: {
+        items: [{ title: "PointSet2D", children: [] }],
+        selection: [],
+        components_selection: [],
+        isAdditionnalTreeDisplayed: false,
+        panelWidth: PANEL_WIDTH,
+        model_id: "",
+        isTreeCollection: false,
+        selectedTree: undefined,
+      },
+      dataStyle: { styles: { abc123: { some: "style" } } },
+      hybridViewer: { zScale: Z_SCALE },
+    }
 
     await stores.app.importStores(snapshot)
 

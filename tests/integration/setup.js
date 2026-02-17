@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid"
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest"
-import { setupActivePinia } from "../utils"
 
 // Local imports
 import {
@@ -20,6 +19,7 @@ import {
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
+import { setupActivePinia } from "../utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"

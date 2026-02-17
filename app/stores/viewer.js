@@ -15,13 +15,6 @@ const MS_PER_SECOND = 1000
 const SECONDS_PER_REQUEST = 10
 const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST
 
-async function launch() {
-  console.log("[VIEWER] Launching viewer microservice...")
-  const port_value = await globalThis.electronAPI.run_viewer()
-  console.log("[VIEWER] Viewer launched on port:", port_value)
-  return port_value
-}
-
 export const useViewerStore = defineStore(
   "viewer",
   () => {
@@ -159,6 +152,13 @@ export const useViewerStore = defineStore(
 
     function stop_request() {
       request_counter.value -= 1
+    }
+
+    async function launch() {
+      console.log("[VIEWER] Launching viewer microservice...")
+      const port_value = await globalThis.electronAPI.run_viewer()
+      console.log("[VIEWER] Viewer launched on port:", port_value)
+      return port_value
     }
 
     async function connect() {

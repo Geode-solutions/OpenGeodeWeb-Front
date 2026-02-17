@@ -1,8 +1,10 @@
+// Third party imports
 import * as components from "vuetify/components"
 import { describe, expect, test, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
+// Local imports
 import { setupActivePinia, vuetify } from "../../../utils"
 import InspectorInspectionButton from "@ogw_front/components/Inspector/InspectionButton"
 import { useGeodeStore } from "@ogw_front/stores/geode"

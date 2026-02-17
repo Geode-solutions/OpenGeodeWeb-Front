@@ -1,9 +1,12 @@
-import { describe, expect, expectTypeOf, test, vi } from "vitest"
-import Status from "@ogw_front/utils/status"
-import { appMode } from "@ogw_front/utils/app_mode"
+// Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
+import { describe, expect, expectTypeOf, test, vi } from "vitest"
+
+// Local imports
+import { appMode } from "@ogw_front/utils/app_mode"
 import { setupActivePinia } from "../../utils"
+import Status from "@ogw_front/utils/status"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 
@@ -16,13 +19,12 @@ const STATUS_500 = 500
 const EXPECTED_ONE_REQUEST = 1
 const EXPECTED_NO_REQUEST = 0
 
-function setup() {
+beforeEach(() => {
   setupActivePinia()
-}
+})
 
 describe("geode store", () => {
   test("state", () => {
-    setup()
     const geodeStore = useGeodeStore()
     expectTypeOf(geodeStore.default_local_port).toBeString()
     expectTypeOf(geodeStore.request_counter).toBeNumber()
@@ -31,7 +33,6 @@ describe("geode store", () => {
 
   describe("protocol", () => {
     test("app_mode CLOUD", () => {
-      setup()
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.CLOUD
@@ -39,7 +40,6 @@ describe("geode store", () => {
     })
 
     test("app_mode BROWSER/DESKTOP", () => {
-      setup()
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.BROWSER
@@ -51,7 +51,6 @@ describe("geode store", () => {
 
   describe("port", () => {
     test("app_mode CLOUD", () => {
-      setup()
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.CLOUD
@@ -59,7 +58,6 @@ describe("geode store", () => {
     })
 
     test("app_mode BROWSER/DESKTOP", () => {
-      setup()
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.BROWSER
@@ -69,7 +67,6 @@ describe("geode store", () => {
     })
 
     test("override default_local_port", () => {
-      setup()
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.DESKTOP
@@ -80,7 +77,6 @@ describe("geode store", () => {
 
   describe("base_url", () => {
     test("app_mode BROWSER", () => {
-      setup()
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.BROWSER
@@ -89,7 +85,6 @@ describe("geode store", () => {
     })
 
     test("app_mode CLOUD", () => {
-      setup()
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.CLOUD
@@ -101,7 +96,6 @@ describe("geode store", () => {
     })
 
     test("app_mode CLOUD, ID empty", () => {
-      setup()
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.CLOUD
@@ -115,14 +109,12 @@ describe("geode store", () => {
 
   describe("is_busy", () => {
     test("is_busy", () => {
-      setup()
       const geodeStore = useGeodeStore()
       geodeStore.request_counter = EXPECTED_ONE_REQUEST
       expect(geodeStore.is_busy).toBeTruthy()
     })
 
     test("not is_busy", () => {
-      setup()
       const geodeStore = useGeodeStore()
       geodeStore.request_counter = EXPECTED_NO_REQUEST
       expect(geodeStore.is_busy).toBeFalsy()
@@ -133,14 +125,12 @@ describe("geode store", () => {
 describe("geode store actions", () => {
   const getFakeCall = vi.fn()
 
-  function setupActions() {
-    setup()
+  beforeEach(() => {
     registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, getFakeCall)
-  }
+  })
 
   describe("ping", () => {
     test("response", async () => {
-      setupActions()
       const geodeStore = useGeodeStore()
       geodeStore.base_url = ""
       getFakeCall.mockImplementation(() => ({}))
@@ -149,7 +139,6 @@ describe("geode store actions", () => {
     })
 
     test("response_error", async () => {
-      setupActions()
       const geodeStore = useGeodeStore()
       geodeStore.base_url = ""
       getFakeCall.mockImplementation(() => {
@@ -162,7 +151,6 @@ describe("geode store actions", () => {
 
   describe("request counter", () => {
     test("increment/decrement", async () => {
-      setupActions()
       const geodeStore = useGeodeStore()
       expect(geodeStore.request_counter).toBe(EXPECTED_NO_REQUEST)
       await geodeStore.start_request()

@@ -1,3 +1,4 @@
+// Third party imports
 import { describe, expect, test, vi } from "vitest"
 
 // Local imports
@@ -240,7 +241,7 @@ function verifyRemaining() {
 }
 
 describe("projectManager composable (compact)", () => {
-  function setup() {
+  beforeEach(() => {
     setupActivePinia()
 
     // reset spies
@@ -260,10 +261,9 @@ describe("projectManager composable (compact)", () => {
       }
     }
     viewer_call_mock_fn.mockClear()
-  }
+  })
 
   test("exportProject", async () => {
-    setup()
     const { exportProject } = useProjectManager()
     const { default: fileDownload } = await import("js-file-download")
 
@@ -276,7 +276,6 @@ describe("projectManager composable (compact)", () => {
   })
 
   test("importProjectFile with snapshot - Viewer and Stores", async () => {
-    setup()
     const { importProjectFile } = useProjectManager()
     const file = new Blob(['{"dataBase":{"db":{}}}'], {
       type: "application/json",
@@ -286,11 +285,9 @@ describe("projectManager composable (compact)", () => {
 
     verifyViewerCalls()
     verifyStoreImports()
-    expect(true).toBeTruthy()
   })
 
   test("importProjectFile with snapshot - Data and Rendering", async () => {
-    setup()
     const { importProjectFile } = useProjectManager()
     const file = new Blob(['{"dataBase":{"db":{}}}'], {
       type: "application/json",
@@ -300,6 +297,5 @@ describe("projectManager composable (compact)", () => {
 
     verifyDataManagement()
     verifyRemaining()
-    expect(true).toBeTruthy()
   })
 })

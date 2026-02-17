@@ -1,6 +1,9 @@
+// Third party imports
 import { describe, expect, test } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+
+// Local imports
 import { setupActivePinia } from "../../utils"
 import upload_file from "@ogw_front/utils/upload_file"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
@@ -10,16 +13,13 @@ const ZERO = 0
 const schema = schemas.opengeodeweb_back.upload_file
 
 describe("upload_file test", () => {
-  function setup() {
+  beforeEach(() => {
     setupActivePinia()
     const geodeStore = useGeodeStore()
     geodeStore.base_url = ""
-    const feedbackStore = useFeedbackStore()
-    return { geodeStore, feedbackStore }
-  }
+  })
 
   test("throw error", async () => {
-    setup()
     const file = "toto"
 
     await expect(upload_file({ route: schema.$id, file })).rejects.toThrow(
@@ -28,7 +28,7 @@ describe("upload_file test", () => {
   })
 
   test("onResponse", async () => {
-    const { feedbackStore } = setup()
+    const feedbackStore = useFeedbackStore()
     registerEndpoint(schema.$id, {
       method: "PUT",
       handler: () => ({ test: "ok" }),

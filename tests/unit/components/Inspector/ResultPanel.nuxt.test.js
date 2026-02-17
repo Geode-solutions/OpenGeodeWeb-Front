@@ -1,6 +1,8 @@
+// Third party imports
 import { describe, expect, test } from "vitest"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
+// Local imports
 import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
 import { vuetify } from "../../../utils"
 

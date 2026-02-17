@@ -1,14 +1,14 @@
+// Third party imports
 import * as components from "vuetify/components"
 import { describe, expect, test } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
-
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
+// Local imports
+import { setupActivePinia, vuetify } from "../../utils"
 import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-
-import { setupActivePinia, vuetify } from "../../utils"
 
 const FIRST_INDEX = 0
 const SECOND_INDEX = 1

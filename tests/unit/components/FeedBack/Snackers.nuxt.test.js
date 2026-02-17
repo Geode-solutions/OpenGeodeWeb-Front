@@ -1,8 +1,9 @@
-// @vitest-environment nuxt
+// Third party imports
 import * as components from "vuetify/components"
 import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
 
+// Local imports
 import { setupActivePinia, vuetify } from "../../../utils"
 import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"

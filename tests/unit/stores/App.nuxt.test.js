@@ -1,4 +1,6 @@
-import { describe, expect, expectTypeOf, test, vi } from "vitest"
+import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
+import { createTestingPinia } from "@pinia/testing"
+import { setActivePinia } from "pinia"
 
 import { useAppStore } from "@ogw_front/stores/app"
 
@@ -12,13 +14,12 @@ const SECOND_INDEX = 1
 const CALL_COUNT_ONCE = 1
 
 describe("app store", () => {
-  function setup() {
+  beforeEach(() => {
     setupActivePinia()
-  }
+  })
 
   describe("state", () => {
     test("initial state", () => {
-      setup()
       const appStore = useAppStore()
       expectTypeOf(appStore.stores).toBeArray()
       expectTypeOf(appStore.exportStores).toBeFunction()
@@ -30,7 +31,6 @@ describe("app store", () => {
   describe("actions", () => {
     describe("registerStore", () => {
       test("register single store", () => {
-        setup()
         const appStore = useAppStore()
         const mock_store = {
           $id: "testStore",
@@ -45,7 +45,6 @@ describe("app store", () => {
       })
 
       test("register multiple stores", () => {
-        setup()
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "userStore",
@@ -69,7 +68,6 @@ describe("app store", () => {
 
     describe("export", () => {
       test("export stores with exportStores method", async () => {
-        setup()
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "userStore",
@@ -101,7 +99,6 @@ describe("app store", () => {
       })
 
       test("skip stores without exportSave method", async () => {
-        setup()
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "withSave",
@@ -118,7 +115,7 @@ describe("app store", () => {
 
         const snapshot = await appStore.exportStores()
 
-        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(1)
+        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE)
         expect(snapshot).toEqual({
           withSave: { data: "test" },
         })
@@ -126,7 +123,6 @@ describe("app store", () => {
       })
 
       test("return empty snapshot when no stores registered", async () => {
-        setup()
         const appStore = useAppStore()
         const snapshot = await appStore.exportStores()
         expect(snapshot).toStrictEqual({})
@@ -135,7 +131,6 @@ describe("app store", () => {
 
     describe("load", () => {
       test("import stores with importStores method", async () => {
-        setup()
         const appStore = useAppStore()
         const userStore = {
           $id: "userStore",
@@ -157,7 +152,6 @@ describe("app store", () => {
       })
 
       test("skip stores without importStores method", async () => {
-        setup()
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "withImport",
@@ -180,7 +174,6 @@ describe("app store", () => {
       })
 
       test("warn when store not found in snapshot", async () => {
-        setup()
         const appStore = useAppStore()
         const console_warn_spy = vi.spyOn(console, "warn").mockImplementation()
         const mock_store = {

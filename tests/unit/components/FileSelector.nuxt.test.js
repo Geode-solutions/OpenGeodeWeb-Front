@@ -1,10 +1,11 @@
+// Third party imports
 import * as components from "vuetify/components"
 import { describe, expect, test, vi } from "vitest"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { flushPromises } from "@vue/test-utils"
-
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
+// Local imports
 import { setupActivePinia, vuetify } from "../../utils"
 import FileSelector from "@ogw_front/components/FileSelector"
 import FileUploader from "@ogw_front/components/FileUploader"
