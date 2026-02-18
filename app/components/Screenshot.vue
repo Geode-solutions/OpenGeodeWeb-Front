@@ -1,6 +1,6 @@
 <script setup>
   import fileDownload from "js-file-download"
-  import GlassCard from "~/components/GlassCard.vue"
+  import GlassCard from "@ogw_front/components/GlassCard"
   import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
   import { useViewerStore } from "@ogw_front/stores/viewer"
