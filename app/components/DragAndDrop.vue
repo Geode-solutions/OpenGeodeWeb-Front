@@ -1,5 +1,5 @@
 <script setup>
-  import GlassCard from "~/components/GlassCard.vue"
+  import GlassCard from "@ogw_front/components/GlassCard"
 
   const props = defineProps({
     multiple: { type: Boolean, default: false },
