@@ -20,6 +20,9 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
 
   async function updateMeshPolyhedraPolyhedronAttribute(id) {
     const name = meshPolyhedraPolyhedronAttributeName(id)
+    if (!name) {
+      return
+    }
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
     await setMeshPolyhedraPolyhedronAttributeRange(
       id,
@@ -55,12 +58,18 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     return meshPolyhedraPolyhedronAttribute(id).name
   }
   function setMeshPolyhedraPolyhedronAttributeName(id, name) {
-    meshPolyhedraPolyhedronAttribute(id).name = name
+    if (name === meshPolyhedraPolyhedronAttributeName(id)) {
+      return
+    }
     return viewerStore.request(
       meshPolyhedraPolyhedronAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
+          meshPolyhedraPolyhedronAttribute(id).name = name
+          if (!name) {
+            return
+          }
           const { minimum, maximum } =
             meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
           await setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum)

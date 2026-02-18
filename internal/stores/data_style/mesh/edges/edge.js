@@ -49,13 +49,19 @@ export function useMeshEdgesEdgeAttributeStyle() {
     return meshEdgesEdgeAttribute(id).name
   }
   function setMeshEdgesEdgeAttributeName(id, name) {
+    if (name === meshEdgesEdgeAttributeName(id)) {
+      return
+    }
     console.log(setMeshEdgesEdgeAttributeName.name, { id, name })
-    meshEdgesEdgeAttribute(id).name = name
     return viewerStore.request(
       meshEdgesEdgeAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
+          meshEdgesEdgeAttribute(id).name = name
+          if (!name) {
+            return
+          }
           const { minimum, maximum } = meshEdgesEdgeAttributeStoredConfig(
             id,
             name,
@@ -73,6 +79,9 @@ export function useMeshEdgesEdgeAttributeStyle() {
 
   async function updateMeshEdgesEdgeAttribute(id) {
     const name = meshEdgesEdgeAttributeName(id)
+    if (!name) {
+      return
+    }
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
     await setMeshEdgesEdgeAttributeRange(
       id,

@@ -20,6 +20,9 @@ export function useMeshPolygonsVertexAttributeStyle() {
 
   async function updateMeshPolygonsVertexAttribute(id) {
     const name = meshPolygonsVertexAttributeName(id)
+    if (!name) {
+      return
+    }
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name)
     await setMeshPolygonsVertexAttributeRange(
       id,
@@ -60,13 +63,19 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return meshPolygonsVertexAttribute(id).name
   }
   function setMeshPolygonsVertexAttributeName(id, name) {
+    if (name === meshPolygonsVertexAttributeName(id)) {
+      return
+    }
     console.log(setMeshPolygonsVertexAttributeName.name, { id, name })
-    meshPolygonsVertexAttribute(id).name = name
     return viewerStore.request(
       meshPolygonsVertexAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
+          meshPolygonsVertexAttribute(id).name = name
+          if (!name) {
+            return
+          }
           const { minimum, maximum } = meshPolygonsVertexAttributeStoredConfig(
             id,
             name,

@@ -20,6 +20,9 @@ export function useMeshPolyhedraVertexAttributeStyle() {
 
   async function updateMeshPolyhedraVertexAttribute(id) {
     const name = meshPolyhedraVertexAttributeName(id)
+    if (!name) {
+      return
+    }
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
     await setMeshPolyhedraVertexAttributeRange(
       id,
@@ -60,13 +63,19 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     return meshPolyhedraVertexAttribute(id).name
   }
   function setMeshPolyhedraVertexAttributeName(id, name) {
+    if (name === meshPolyhedraVertexAttributeName(id)) {
+      return
+    }
     console.log(setMeshPolyhedraVertexAttributeName.name, { id, name })
-    meshPolyhedraVertexAttribute(id).name = name
     return viewerStore.request(
       meshPolyhedraVertexAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
+          meshPolyhedraVertexAttribute(id).name = name
+          if (!name) {
+            return
+          }
           const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(
             id,
             name,

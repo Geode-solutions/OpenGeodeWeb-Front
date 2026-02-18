@@ -20,13 +20,16 @@ export function useMeshCellsVertexAttributeStyle() {
 
   async function updateMeshCellsVertexAttribute(id) {
     const name = meshCellsVertexAttributeName(id)
+    if (!name) {
+      return
+    }
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
-    await meshCellsVertexAttributeRange(
+    await setMeshCellsVertexAttributeRange(
       id,
       storedConfig.minimum,
       storedConfig.maximum,
     )
-    await meshCellsVertexAttributeColorMap(id, storedConfig.colorMap)
+    await setMeshCellsVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshCellsVertexAttributeStoredConfig(id, name) {
@@ -60,13 +63,19 @@ export function useMeshCellsVertexAttributeStyle() {
     return meshCellsVertexAttribute(id).name
   }
   function setMeshCellsVertexAttributeName(id, name) {
+    if (name === meshCellsVertexAttributeName(id)) {
+      return
+    }
     console.log(setMeshCellsVertexAttributeName.name, { id, name })
-    meshCellsVertexAttribute(id).name = name
     return viewerStore.request(
       meshCellsVertexAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
+          meshCellsVertexAttribute(id).name = name
+          if (!name) {
+            return
+          }
           const { minimum, maximum } = meshCellsVertexAttributeStoredConfig(
             id,
             name,

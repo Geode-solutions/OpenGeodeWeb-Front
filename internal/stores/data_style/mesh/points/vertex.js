@@ -20,6 +20,9 @@ export function useMeshPointsVertexAttributeStyle() {
 
   async function updateMeshPointsVertexAttribute(id) {
     const name = meshPointsVertexAttributeName(id)
+    if (!name) {
+      return
+    }
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name)
     await setMeshPointsVertexAttributeRange(
       id,
@@ -60,13 +63,19 @@ export function useMeshPointsVertexAttributeStyle() {
     return meshPointsVertexAttribute(id).name
   }
   function setMeshPointsVertexAttributeName(id, name) {
+    if (name === meshPointsVertexAttributeName(id)) {
+      return
+    }
     console.log(setMeshPointsVertexAttributeName.name, { id, name })
-    meshPointsVertexAttribute(id).name = name
     return viewerStore.request(
       meshPointsVertexAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
+          meshPointsVertexAttribute(id).name = name
+          if (!name) {
+            return
+          }
           const { minimum, maximum } = meshPointsVertexAttributeStoredConfig(
             id,
             name,
