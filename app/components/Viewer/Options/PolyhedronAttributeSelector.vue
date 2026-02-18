@@ -1,9 +1,8 @@
 <script setup>
-  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
+  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue"
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
 
   const geodeStore = useGeodeStore()
   const dataStyleStore = useDataStyleStore()
@@ -22,7 +21,7 @@
   )
   const polyhedron_attributes = ref([])
 
-  const { id } = defineProps({
+  const props = defineProps({
     id: { type: String, required: true },
     storePrefix: { type: String, default: "meshPolyhedraPolyhedron" },
   })
@@ -53,7 +52,7 @@
   function getPolyhedronAttributes() {
     geodeStore.request(
       back_schemas.opengeodeweb_back.polyhedron_attribute_names,
-      { id: id },
+      { id: props.id },
       {
         response_function: (response) => {
           polyhedron_attributes.value = response.attributes

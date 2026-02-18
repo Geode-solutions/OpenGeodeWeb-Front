@@ -1,11 +1,11 @@
 <script setup>
-  import ViewerOptionsCellAttributeSelector from "@ogw_front/components/Viewer/Options/CellAttributeSelector"
-  import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker"
-  import ViewerOptionsEdgeAttributeSelector from "@ogw_front/components/Viewer/Options/EdgeAttributeSelector"
-  import ViewerOptionsPolygonAttributeSelector from "@ogw_front/components/Viewer/Options/PolygonAttributeSelector"
-  import ViewerOptionsPolyhedronAttributeSelector from "@ogw_front/components/Viewer/Options/PolyhedronAttributeSelector"
-  import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector"
-  import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector"
+  import ViewerOptionsCellAttributeSelector from "@ogw_front/components/Viewer/Options/CellAttributeSelector.vue"
+  import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue"
+  import ViewerOptionsEdgeAttributeSelector from "@ogw_front/components/Viewer/Options/EdgeAttributeSelector.vue"
+  import ViewerOptionsPolygonAttributeSelector from "@ogw_front/components/Viewer/Options/PolygonAttributeSelector.vue"
+  import ViewerOptionsPolyhedronAttributeSelector from "@ogw_front/components/Viewer/Options/PolyhedronAttributeSelector.vue"
+  import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue"
+  import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector.vue"
 
   const coloring_style_key = defineModel("coloring_style_key")
 
