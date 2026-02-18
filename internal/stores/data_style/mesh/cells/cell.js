@@ -68,8 +68,10 @@ export function useMeshCellsCellAttributeStyle() {
       { id, name },
       {
         response_function: async () => {
-          const { minimum, maximum } =
-            meshCellsCellAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshCellsCellAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshCellsCellAttributeRange(id, minimum, maximum)
           console.log(
             setMeshCellsCellAttributeName.name,

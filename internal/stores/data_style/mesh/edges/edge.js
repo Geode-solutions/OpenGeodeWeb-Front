@@ -57,8 +57,10 @@ export function useMeshEdgesEdgeAttributeStyle() {
       { id, name },
       {
         response_function: async () => {
-          const { minimum, maximum } =
-            meshEdgesEdgeAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshEdgesEdgeAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshEdgesEdgeAttributeRange(id, minimum, maximum)
           console.log(
             setMeshEdgesEdgeAttributeName.name,

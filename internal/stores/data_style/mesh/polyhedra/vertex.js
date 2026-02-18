@@ -68,8 +68,10 @@ export function useMeshPolyhedraVertexAttributeStyle() {
       { id, name },
       {
         response_function: async () => {
-          const { minimum, maximum } =
-            meshPolyhedraVertexAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshPolyhedraVertexAttributeRange(id, minimum, maximum)
           console.log(
             setMeshPolyhedraVertexAttributeName.name,

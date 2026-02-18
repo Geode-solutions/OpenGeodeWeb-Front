@@ -68,8 +68,10 @@ export function useMeshPointsVertexAttributeStyle() {
       { id, name },
       {
         response_function: async () => {
-          const { minimum, maximum } =
-            meshPointsVertexAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshPointsVertexAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshPointsVertexAttributeRange(id, minimum, maximum)
           console.log(
             setMeshPointsVertexAttributeName.name,

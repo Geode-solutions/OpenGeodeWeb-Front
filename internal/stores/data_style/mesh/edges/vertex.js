@@ -68,8 +68,10 @@ export function useMeshEdgesVertexAttributeStyle() {
       { id, name },
       {
         response_function: async () => {
-          const { minimum, maximum } =
-            meshEdgesVertexAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshEdgesVertexAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshEdgesVertexAttributeRange(id, minimum, maximum)
           console.log(
             setMeshEdgesVertexAttributeName.name,

@@ -68,8 +68,10 @@ export function useMeshPolygonsVertexAttributeStyle() {
       { id, name },
       {
         response_function: async () => {
-          const { minimum, maximum } =
-            meshPolygonsVertexAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshPolygonsVertexAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshPolygonsVertexAttributeRange(id, minimum, maximum)
           console.log(
             setMeshPolygonsVertexAttributeName.name,

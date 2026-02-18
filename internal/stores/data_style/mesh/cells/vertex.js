@@ -68,8 +68,10 @@ export function useMeshCellsVertexAttributeStyle() {
       { id, name },
       {
         response_function: async () => {
-          const { minimum, maximum } =
-            meshCellsVertexAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshCellsVertexAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshCellsVertexAttributeRange(id, minimum, maximum)
           console.log(
             setMeshCellsVertexAttributeName.name,

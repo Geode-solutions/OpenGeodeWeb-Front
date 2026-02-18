@@ -86,7 +86,10 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     storedConfig.minimum = minimum
     storedConfig.maximum = maximum
     storedConfig.isAutoSet = true
-    return setMeshPolyhedraPolyhedronAttributeColorMap(id, storedConfig.colorMap)
+    return setMeshPolyhedraPolyhedronAttributeColorMap(
+      id,
+      storedConfig.colorMap,
+    )
   }
 
   function meshPolyhedraPolyhedronAttributeColorMap(id) {
