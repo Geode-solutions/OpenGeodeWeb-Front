@@ -1,11 +1,11 @@
 // Third party imports
 
 // Local imports
-import { useMeshPolyhedraCommonStyle } from "./common"
-import { useMeshPolyhedraVisibilityStyle } from "./visibility"
 import { useMeshPolyhedraColorStyle } from "./color"
-import { useMeshPolyhedraVertexAttributeStyle } from "./vertex"
+import { useMeshPolyhedraCommonStyle } from "./common"
 import { useMeshPolyhedraPolyhedronAttributeStyle } from "./polyhedron"
+import { useMeshPolyhedraVertexAttributeStyle } from "./vertex"
+import { useMeshPolyhedraVisibilityStyle } from "./visibility"
 
 // Local constants
 
@@ -34,7 +34,7 @@ export function useMeshPolyhedraStyle() {
     } else if (type === "vertex") {
       const name =
         meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(
@@ -46,7 +46,7 @@ export function useMeshPolyhedraStyle() {
         meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(
           id,
         )
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       await meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(
@@ -54,7 +54,7 @@ export function useMeshPolyhedraStyle() {
         name,
       )
     } else {
-      throw new Error("Unknown mesh polyhedra coloring type: " + type)
+      throw new Error(`Unknown mesh polyhedra coloring type: ${type}`)
     }
   }
 

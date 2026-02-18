@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolygonsCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshPolygonsPolygonAttributeSchemas =
@@ -30,7 +30,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   }
 
   function meshPolygonsPolygonAttributeStoredConfig(id, name) {
-    const storedConfigs = meshPolygonsPolygonAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolygonsPolygonAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
@@ -46,7 +46,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshPolygonsPolygonAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolygonsPolygonAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

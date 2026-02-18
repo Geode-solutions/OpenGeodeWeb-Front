@@ -6,8 +6,8 @@ export default defineNuxtConfig({
         process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
       PROJECT: process.env.NODE_ENV === "production" ? process.env.PROJECT : "",
       BROWSER: process.env.BROWSER ?? false,
-      GEODE_PORT: process.env.GEODE_PORT ?? null,
-      VIEWER_PORT: process.env.VIEWER_PORT ?? null,
+      GEODE_PORT: process.env.GEODE_PORT ?? undefined,
+      VIEWER_PORT: process.env.VIEWER_PORT ?? undefined,
     },
   },
 
@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   },
 
   alias: {
-    "@ogw_front": __dirname + "/app/",
+    "@ogw_front": `${__dirname}/app/`,
   },
 
   // ** Global CSS

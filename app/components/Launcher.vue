@@ -1,7 +1,7 @@
 <script setup>
-  import Status from "@ogw_front/utils/status"
   import Loading from "@ogw_front/components/Loading"
   import Recaptcha from "@ogw_front/components/Recaptcha"
+  import Status from "@ogw_front/utils/status"
   import { useInfraStore } from "@ogw_front/stores/infra"
 
   const infraStore = useInfraStore()

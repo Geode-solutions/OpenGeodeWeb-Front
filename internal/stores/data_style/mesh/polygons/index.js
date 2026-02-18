@@ -1,12 +1,12 @@
 // Third party imports
 
 // Local imports
-import { useMeshPolygonsCommonStyle } from "./common"
-import { useMeshPolygonsVisibilityStyle } from "./visibility"
 import { useMeshPolygonsColorStyle } from "./color"
+import { useMeshPolygonsCommonStyle } from "./common"
+import { useMeshPolygonsPolygonAttributeStyle } from "./polygon"
 import { useMeshPolygonsTexturesStyle } from "./textures"
 import { useMeshPolygonsVertexAttributeStyle } from "./vertex"
-import { useMeshPolygonsPolygonAttributeStyle } from "./polygon"
+import { useMeshPolygonsVisibilityStyle } from "./visibility"
 
 // Local constants
 
@@ -34,14 +34,14 @@ export function useMeshPolygonsStyle() {
       )
     } else if (type === "textures") {
       const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id)
-      if (textures === null) {
+      if (textures === undefined) {
         return Promise.resolve()
       }
       return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(
@@ -51,7 +51,7 @@ export function useMeshPolygonsStyle() {
     } else if (type === "polygon") {
       const name =
         meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       await meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(
@@ -59,7 +59,7 @@ export function useMeshPolygonsStyle() {
         name,
       )
     } else {
-      throw new Error("Unknown mesh polygons coloring type: " + type)
+      throw new Error(`Unknown mesh polygons coloring type: ${type}`)
     }
   }
 

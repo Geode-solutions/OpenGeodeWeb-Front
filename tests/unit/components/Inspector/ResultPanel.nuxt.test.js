@@ -1,6 +1,8 @@
+// Third party imports
 import { describe, expect, test } from "vitest"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
+// Local imports
 import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
 import { vuetify } from "../../../utils"
 
@@ -21,16 +23,16 @@ describe("Inspector/ResultPanel", async () => {
       props: { inspection_result },
     })
 
-    expect(wrapper.exists()).toBe(true)
-    expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
+    expect(wrapper.exists()).toBeTruthy()
+    expect(wrapper.componentVM.inspection_result).toStrictEqual(
       inspection_result,
     )
 
     const child_result_panel_wrapper =
       await wrapper.findComponent(InspectorResultPanel)
-    expect(child_result_panel_wrapper.exists()).toBe(true)
+    expect(child_result_panel_wrapper.exists()).toBeTruthy()
     expect(
-      child_result_panel_wrapper.componentVM.props.inspection_result,
+      child_result_panel_wrapper.componentVM.inspection_result,
     ).toStrictEqual(inspection_result[0].children)
   })
 
@@ -48,11 +50,11 @@ describe("Inspector/ResultPanel", async () => {
       props: { inspection_result },
     })
 
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
 
     console.log({ wrapper })
 
-    expect(wrapper.componentVM.props.inspection_result).toStrictEqual(
+    expect(wrapper.componentVM.inspection_result).toStrictEqual(
       inspection_result,
     )
   })

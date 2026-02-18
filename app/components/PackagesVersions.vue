@@ -2,7 +2,7 @@
   import Status from "@ogw_front/utils/status"
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
-  const props = defineProps({
+  const { schema } = defineProps({
     schema: { type: Object, required: true },
   })
 
@@ -11,7 +11,7 @@
 
   async function get_packages_versions() {
     await geodeStore.request(
-      props.schema,
+      schema,
       {},
       {
         response_function: (response) => {
@@ -24,7 +24,9 @@
   watch(
     () => geodeStore.status,
     (value) => {
-      if (value == Status.CONNECTED) get_packages_versions()
+      if (value === Status.CONNECTED) {
+        get_packages_versions()
+      }
     },
   )
 

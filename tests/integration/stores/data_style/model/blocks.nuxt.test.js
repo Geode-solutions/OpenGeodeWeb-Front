@@ -3,28 +3,32 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_front/utils/status"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataStore } from "@ogw_front/stores/data"
 import {
   delete_folder_recursive,
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
+import Status from "@ogw_front/utils/status"
 import { setupIntegrationTests } from "../../../setup"
+import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
+const INTERVAL_TIMEOUT = 20_000
 const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let id, back_port, viewer_port, project_folder_path
+let back_port = 0,
+  id = "",
+  project_folder_path = "",
+  viewer_port = 0
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 20000)
+}, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
   console.log(

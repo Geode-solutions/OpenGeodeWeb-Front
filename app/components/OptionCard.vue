@@ -4,7 +4,7 @@
   const theme = useTheme()
   const primaryColor = computed(() => theme.current.value.colors.primary)
 
-  defineProps({
+  const { title, width, maxHeight } = defineProps({
     title: { type: String, default: "" },
     width: { type: [Number, String], default: 320 },
     maxHeight: { type: [Number, String], default: 500 },

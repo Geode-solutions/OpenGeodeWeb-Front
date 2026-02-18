@@ -1,26 +1,27 @@
-import { describe, expect, test, vi } from "vitest"
-import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
+// Third party imports
 import * as components from "vuetify/components"
-
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
+import { beforeEach, describe, expect, test, vi } from "vitest"
+import { nextTick } from "vue"
+
+// Local imports
+import { setupActivePinia, vuetify } from "../../utils"
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-import { vuetify } from "../../utils"
+
+const EXPECTED_LENGTH = 1
+const FIRST_INDEX = 0
+const SECOND_INDEX = 1
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
 
-describe("ExtensionSelector", async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
-  const geodeStore = useGeodeStore()
+const pinia = setupActivePinia()
+const geodeStore = useGeodeStore()
+
+beforeEach(() => {
   geodeStore.base_url = ""
 
-  // Mock the request method to simulate API call
   geodeStore.request = vi.fn((schema, params, callbacks) => {
     const response = {
       geode_objects_and_output_extensions: {
@@ -32,13 +33,15 @@ describe("ExtensionSelector", async () => {
     }
     return Promise.resolve(response)
   })
+})
 
+describe(ExtensionSelector, () => {
   test(`Select geode_object & extension`, async () => {
     const output_geode_object = "BRep"
     const output_extension = "msh"
 
     registerEndpoint(schema.$id, {
-      method: schema.methods[0],
+      method: schema.methods[FIRST_INDEX],
       handler: () => ({
         geode_objects_and_output_extensions: {
           BRep: { msh: { is_saveable: true } },
@@ -52,12 +55,14 @@ describe("ExtensionSelector", async () => {
       props: { geode_object_type: "BRep", filenames: ["test.toto"] },
     })
     await nextTick()
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
     const v_card = await wrapper.findAllComponents(components.VCard)
-    await v_card[1].trigger("click")
+    await v_card[SECOND_INDEX].trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toStrictEqual({
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(
+      wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX],
+    ).toStrictEqual({
       output_geode_object,
       output_extension,
     })

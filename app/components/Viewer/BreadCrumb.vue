@@ -7,15 +7,13 @@
 
   const selectedTree = computed(() => treeviewStore.selectedTree)
 
-  const goBackToFileTree = () => {
+  function goBackToFileTree() {
     treeviewStore.displayFileTree()
   }
 
   const model_id = computed(() => treeviewStore.model_id)
 
-  const metaDatas = computed(() => {
-    return dataStore.getItem(model_id.value).value
-  })
+  const metaDatas = computed(() => dataStore.getItem(model_id.value).value)
 </script>
 
 <template>

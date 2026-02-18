@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
+// import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshEdgesCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshEdgesEdgeAttributeSchemas =
@@ -18,27 +18,27 @@ export function useMeshEdgesEdgeAttributeStyle() {
     return meshEdgesCommonStyle.meshEdgesColoring(id).edge
   }
 
-  function meshEdgesEdgeAttributeStoredConfig(id, name) {
-    const storedConfigs = meshEdgesEdgeAttribute(id).storedConfigs
-    if (name in storedConfigs) {
-      return storedConfigs[name]
-    }
-    return setMeshEdgesEdgeAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
-    })
-  }
+  // function meshEdgesEdgeAttributeStoredConfig(id, name) {
+  //   const { storedConfigs } = meshEdgesEdgeAttribute(id)
+  //   if (name in storedConfigs) {
+  //     return storedConfigs[name]
+  //   }
+  //   return setMeshEdgesEdgeAttributeStoredConfig(id, name, {
+  //     minimum: 0,
+  //     maximum: 1,
+  //     colorMap: "Cool to Warm",
+  //   })
+  // }
 
-  function setMeshEdgesEdgeAttributeStoredConfig(
-    id,
-    name,
-    { minimum, maximum, colorMap },
-  ) {
-    const storedConfigs = meshEdgesEdgeAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap }
-    return storedConfigs[name]
-  }
+  // function setMeshEdgesEdgeAttributeStoredConfig(
+  //   id,
+  //   name,
+  //   { minimum, maximum, colorMap },
+  // ) {
+  //   const { storedConfigs } = meshEdgesEdgeAttribute(id)
+  //   storedConfigs[name] = { minimum, maximum, colorMap }
+  //   return storedConfigs[name]
+  // }
 
   function meshEdgesEdgeAttributeName(id) {
     console.log(

@@ -1,8 +1,10 @@
 <script setup>
   import ViewerBreadCrumb from "@ogw_front/components/Viewer/BreadCrumb"
-  import ViewerTreeObject from "@ogw_front/components/Viewer/TreeObject"
   import ViewerTreeComponent from "@ogw_front/components/Viewer/TreeComponent"
+  import ViewerTreeObject from "@ogw_front/components/Viewer/TreeObject"
   import { useTreeviewStore } from "@ogw_front/stores/treeview"
+
+  const WIDTH_MIN = 150
 
   const treeviewStore = useTreeviewStore()
   const emit = defineEmits(["show-menu"])
@@ -14,16 +16,16 @@
   function onResizeStart(event) {
     const startWidth = treeviewStore.panelWidth
     const startX = event.clientX
-    const resize = (e) => {
-      const deltaX = e.clientX - startX
+    function resize(event) {
+      const deltaX = event.clientX - startX
       const newWidth = Math.max(
-        150,
+        WIDTH_MIN,
         Math.min(startWidth + deltaX, window.innerWidth),
       )
       treeviewStore.setPanelWidth(newWidth)
       document.body.style.userSelect = "none"
     }
-    const stopResize = () => {
+    function stopResize() {
       document.removeEventListener("mousemove", resize)
       document.removeEventListener("mouseup", stopResize)
       document.body.style.userSelect = ""
@@ -31,10 +33,6 @@
     document.addEventListener("mousemove", resize)
     document.addEventListener("mouseup", stopResize)
   }
-
-  onMounted(() => {})
-
-  onUnmounted(() => {})
 </script>
 
 <template>
