@@ -1,4 +1,6 @@
 <script setup>
+  import { useAttrs, computed } from "vue"
+
   defineProps({
     variant: {
       type: String,
@@ -9,6 +11,9 @@
     padding: { type: String, default: "pa-6" },
     theme: { type: String, default: null },
   })
+
+  const attrs = useAttrs()
+  const isInteractive = computed(() => !!attrs.onClick)
 </script>
 
 <template>
@@ -20,12 +25,14 @@
     @wheel.stop
     @contextmenu.stop
     flat
+    :ripple="isInteractive"
     :theme="theme || (variant === 'panel' ? 'dark' : undefined)"
     :class="[
       variant === 'panel' ? 'glass-panel' : 'glass-ui',
       'border-thin',
       `rounded-${rounded}`,
       padding,
+      { 'cursor-default': !isInteractive },
     ]"
   >
     <template v-for="(_, name) in $slots" #[name]="slotProps">
@@ -37,5 +44,9 @@
 <style scoped>
   .border-thin {
     border-style: solid !important;
+  }
+
+  .cursor-default {
+    cursor: default !important;
   }
 </style>
