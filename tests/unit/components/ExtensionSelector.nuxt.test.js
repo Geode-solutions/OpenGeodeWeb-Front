@@ -2,7 +2,7 @@
 import * as components from "vuetify/components"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
-import { describe, expect, test, vi } from "vitest"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import { nextTick } from "vue"
 
 // Local imports
@@ -16,26 +16,26 @@ const SECOND_INDEX = 1
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
 
-describe(ExtensionSelector, async () => {
-  const pinia = setupActivePinia()
-  const geodeStore = useGeodeStore()
+const pinia = setupActivePinia()
+const geodeStore = useGeodeStore()
 
-  beforeEach(() => {
-    geodeStore.base_url = ""
+beforeEach(() => {
+  geodeStore.base_url = ""
 
-    // Mock the request method to simulate API call
-    geodeStore.request = vi.fn((schema, params, callbacks) => {
-      const response = {
-        geode_objects_and_output_extensions: {
-          BRep: { msh: { is_saveable: true } },
-        },
-      }
-      if (callbacks?.response_function) {
-        callbacks.response_function(response)
-      }
-      return Promise.resolve(response)
-    })
+  geodeStore.request = vi.fn((schema, params, callbacks) => {
+    const response = {
+      geode_objects_and_output_extensions: {
+        BRep: { msh: { is_saveable: true } },
+      },
+    }
+    if (callbacks?.response_function) {
+      callbacks.response_function(response)
+    }
+    return Promise.resolve(response)
   })
+})
+
+describe(ExtensionSelector, () => {
 
   test(`Select geode_object & extension`, async () => {
     const output_geode_object = "BRep"

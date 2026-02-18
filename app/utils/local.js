@@ -95,7 +95,6 @@ async function run_script(
   })
 
   child.stdout.on("data", (data) => console.log(data.toString()))
-  child.stderr.on("data", (data) => console.log(data.toString()))
 
   child.on("error", async (error) => {
     const electron = await import("electron")

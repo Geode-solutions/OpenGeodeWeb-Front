@@ -1,5 +1,5 @@
 // Third party imports
-import { describe, expect, test } from "vitest"
+import { beforeEach, describe, expect, test } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
@@ -12,13 +12,13 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 const ZERO = 0
 const schema = schemas.opengeodeweb_back.upload_file
 
-describe("upload_file test", () => {
-  beforeEach(() => {
-    setupActivePinia()
-    const geodeStore = useGeodeStore()
-    geodeStore.base_url = ""
-  })
+beforeEach(() => {
+  setupActivePinia()
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
+})
 
+describe("upload_file test", () => {
   test("throw error", async () => {
     const file = "toto"
 

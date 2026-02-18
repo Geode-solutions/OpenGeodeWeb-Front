@@ -1,5 +1,5 @@
 // Third party imports
-import { describe, expect, test, vi } from "vitest"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 
 // Local imports
 import { appMode } from "@ogw_front/utils/app_mode"
@@ -240,28 +240,28 @@ function verifyRemaining() {
   expect(hybridViewerStoreMock.remoteRender).toHaveBeenCalledWith()
 }
 
-describe("projectManager composable (compact)", () => {
-  beforeEach(() => {
-    setupActivePinia()
-
-    // reset spies
-    const storesList = [
-      viewerStoreMock,
-      treeviewStoreMock,
-      dataStoreMock,
-      dataStyleStoreMock,
-      hybridViewerStoreMock,
-    ]
-    for (const store of storesList) {
-      const values = Object.values(store)
-      for (const value of values) {
-        if (typeof value === "function" && value.mockClear) {
-          value.mockClear()
-        }
+beforeEach(() => {
+  setupActivePinia()
+  // reset spies
+  const storesList = [
+    viewerStoreMock,
+    treeviewStoreMock,
+    dataStoreMock,
+    dataStyleStoreMock,
+    hybridViewerStoreMock,
+  ]
+  for (const store of storesList) {
+    const values = Object.values(store)
+    for (const value of values) {
+      if (typeof value === "function" && value.mockClear) {
+        value.mockClear()
       }
     }
-    viewer_call_mock_fn.mockClear()
-  })
+  }
+  viewer_call_mock_fn.mockClear()
+})
+
+describe("projectManager composable (compact)", () => {
 
   test("exportProject", async () => {
     const { exportProject } = useProjectManager()

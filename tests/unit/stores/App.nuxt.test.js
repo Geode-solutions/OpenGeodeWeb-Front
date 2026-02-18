@@ -13,10 +13,10 @@ const FIRST_INDEX = 0
 const SECOND_INDEX = 1
 const CALL_COUNT_ONCE = 1
 
+beforeEach(() => {
+  setupActivePinia()
+})
 describe("app store", () => {
-  beforeEach(() => {
-    setupActivePinia()
-  })
 
   describe("state", () => {
     test("initial state", () => {
