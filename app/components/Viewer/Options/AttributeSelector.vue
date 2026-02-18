@@ -8,8 +8,7 @@
   const range = defineModel("range", { type: Array })
   const colorMap = defineModel("colorMap", { type: String })
 
-  const props = defineProps({
-    label: { type: String, required: true },
+  const { label, id, schema } = defineProps({
     id: { type: String, required: true },
     schema: { type: Object, required: true },
   })
@@ -44,8 +43,8 @@
 
   function getAttributes() {
     geodeStore.request(
-      props.schema,
-      { id: props.id },
+      schema,
+      { id: id },
       {
         response_function: (response) => {
           attributes.value = response.attributes
@@ -59,7 +58,7 @@
   })
 
   watch(
-    () => [props.id, props.schema],
+    () => [id, schema],
     () => {
       getAttributes()
     },
@@ -72,7 +71,7 @@
     :items="attributes.map((attribute) => attribute.attribute_name)"
     item-title="attribute_name"
     item-value="attribute_name"
-    :label="props.label"
+    :label="label"
     density="compact"
   />
   <ViewerOptionsAttributeColorBar

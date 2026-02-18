@@ -133,7 +133,6 @@
               v-model:name="vertex_attribute_name"
               v-model:range="vertex_attribute_range"
               v-model:colorMap="vertex_attribute_color_map"
-              label="Select a vertex attribute"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.vertex_attribute_names"
             />
@@ -143,7 +142,6 @@
               v-model:name="edge_attribute_name"
               v-model:range="edge_attribute_range"
               v-model:colorMap="edge_attribute_color_map"
-              label="Select an edge attribute"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.edge_attribute_names"
             />
@@ -153,7 +151,6 @@
               v-model:name="cell_attribute_name"
               v-model:range="cell_attribute_range"
               v-model:colorMap="cell_attribute_color_map"
-              label="Select a cell attribute"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.cell_attribute_names"
             />
@@ -163,7 +160,6 @@
               v-model:name="polygon_attribute_name"
               v-model:range="polygon_attribute_range"
               v-model:colorMap="polygon_attribute_color_map"
-              label="Select a polygon attribute"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.polygon_attribute_names"
             />
@@ -173,7 +169,6 @@
               v-model:name="polyhedron_attribute_name"
               v-model:range="polyhedron_attribute_range"
               v-model:colorMap="polyhedron_attribute_color_map"
-              label="Select a polyhedron attribute"
               :id="id"
               :schema="
                 back_schemas.opengeodeweb_back.polyhedron_attribute_names
