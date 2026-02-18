@@ -36,7 +36,6 @@ beforeEach(() => {
 })
 
 describe(ExtensionSelector, () => {
-
   test(`Select geode_object & extension`, async () => {
     const output_geode_object = "BRep"
     const output_extension = "msh"

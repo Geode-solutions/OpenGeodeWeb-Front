@@ -262,7 +262,6 @@ beforeEach(() => {
 })
 
 describe("projectManager composable (compact)", () => {
-
   test("exportProject", async () => {
     const { exportProject } = useProjectManager()
     const { default: fileDownload } = await import("js-file-download")

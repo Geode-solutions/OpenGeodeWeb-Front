@@ -17,7 +17,6 @@ beforeEach(() => {
   setupActivePinia()
 })
 describe("app store", () => {
-
   describe("state", () => {
     test("initial state", () => {
       const appStore = useAppStore()

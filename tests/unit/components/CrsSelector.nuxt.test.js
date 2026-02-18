@@ -20,7 +20,6 @@ beforeEach(() => {
 })
 
 describe(CrsSelector, () => {
-
   test(`Default behavior`, async () => {
     const crs_list = [
       {
