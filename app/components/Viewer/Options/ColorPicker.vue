@@ -1,7 +1,7 @@
 <script setup>
-  const el = useTemplateRef("el")
+  const colorPickerRef = useTemplateRef("colorPickerRef")
   const model = defineModel()
-  const { pressed } = useMousePressed({ target: el })
+  const { pressed } = useMousePressed({ target: colorPickerRef })
 
   const color = ref(model)
 
@@ -14,7 +14,7 @@
 
 <template>
   <v-color-picker
-    ref="el"
+    ref="colorPickerRef"
     v-model="color"
     flat
     canvas-height="100"

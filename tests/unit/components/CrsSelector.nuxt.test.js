@@ -1,26 +1,25 @@
+// Third party imports
 import { mountSuspended } from "@nuxt/test-utils/runtime"
-import { describe, expect, test, vi } from "vitest"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+// Local imports
 import CrsSelector from "@ogw_front/components/CrsSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
+import { setupActivePinia, vuetify } from "../../utils"
 
-import { vuetify } from "../../utils"
+const EXPECTED_LENGTH = 1
+const FIRST_INDEX = 0
 
-const crs_selector_schema =
-  schemas.opengeodeweb_back.geographic_coordinate_systems
+let pinia
+let geodeStore
 
-describe("CrsSelector", () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
-  const geodeStore = useGeodeStore()
+beforeEach(() => {
+  pinia = setupActivePinia()
+  geodeStore = useGeodeStore()
   geodeStore.base_url = ""
+})
 
+describe(CrsSelector, () => {
   test(`Default behavior`, async () => {
     const crs_list = [
       {
@@ -45,14 +44,14 @@ describe("CrsSelector", () => {
       },
       props: { geode_object_type: "BRep", key_to_update },
     })
-    const td = await wrapper.find("td")
+    const td_wrapper = await wrapper.find("td")
     await wrapper.vm.$nextTick()
-    const input = await td.find("input")
+    const input = await td_wrapper.find("input")
     await input.trigger("click")
     expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(1)
-    expect(wrapper.emitted().update_values[0][0]).toEqual({
-      [key_to_update]: crs_list[0],
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
+      [key_to_update]: crs_list[FIRST_INDEX],
     })
   })
 })

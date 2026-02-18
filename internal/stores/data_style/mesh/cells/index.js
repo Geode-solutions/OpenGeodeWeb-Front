@@ -1,12 +1,12 @@
 // Third party imports
 
 // Local imports
-import { useMeshCellsCommonStyle } from "./common"
-import { useMeshCellsVisibilityStyle } from "./visibility"
+import { useMeshCellsCellAttributeStyle } from "./cell"
 import { useMeshCellsColorStyle } from "./color"
+import { useMeshCellsCommonStyle } from "./common"
 import { useMeshCellsTexturesStyle } from "./textures"
 import { useMeshCellsVertexAttributeStyle } from "./vertex"
-import { useMeshCellsCellAttributeStyle } from "./cell"
+import { useMeshCellsVisibilityStyle } from "./visibility"
 
 // Local constants
 
@@ -33,14 +33,14 @@ export function useMeshCellsStyle() {
       )
     } else if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id)
-      if (textures === null) {
+      if (textures === undefined) {
         return Promise.resolve()
       }
       return meshCellsTexturesStore.setMeshCellsTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(
@@ -49,12 +49,12 @@ export function useMeshCellsStyle() {
       )
     } else if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       await meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name)
     } else {
-      throw new Error("Unknown mesh cells coloring type: " + type)
+      throw new Error(`Unknown mesh cells coloring type: ${type}`)
     }
   }
 

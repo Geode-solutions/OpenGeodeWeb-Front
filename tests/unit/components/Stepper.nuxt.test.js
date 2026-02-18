@@ -1,19 +1,24 @@
+// Third party imports
+import { computed, reactive, ref, shallowRef } from "vue"
 import { describe, expect, test } from "vitest"
-import { mountSuspended } from "@vue/test-utils"
-
-import Stepper from "@ogw_front/components/Stepper"
-import ObjectSelector from "@ogw_front/components/ObjectSelector"
+import ResizeObserver from "resize-observer-polyfill"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
+
+// Local imports
+import ObjectSelector from "@ogw_front/components/ObjectSelector"
+import Stepper from "@ogw_front/components/Stepper"
 import { vuetify } from "../../utils"
 
-global.ResizeObserver = require("resize-observer-polyfill")
+const FIRST_INDEX = 0
 
-describe("Stepper", async () => {
+globalThis.ResizeObserver = ResizeObserver
+
+describe(Stepper, () => {
   test(`Mount`, async () => {
     const geode_object_type = ref("BRep")
     const files = ref([])
     const stepper_tree = reactive({
-      current_step_index: ref(0),
+      current_step_index: ref(FIRST_INDEX),
       geode_object_type,
       steps: [
         {
@@ -21,18 +26,15 @@ describe("Stepper", async () => {
           component: {
             component_name: shallowRef(ObjectSelector),
             component_options: {
-              filenames: computed(() => {
-                return files.value.map((file) => file.name)
-              }),
+              filenames: computed(() => files.value.map((file) => file.name)),
               key: "",
             },
           },
           chips: computed(() => {
             if (geode_object_type.value === "") {
               return []
-            } else {
-              return [geode_object_type.value]
             }
+            return [geode_object_type.value]
           }),
         },
       ],
@@ -43,6 +45,6 @@ describe("Stepper", async () => {
         provide: { stepper_tree },
       },
     })
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
   })
 })

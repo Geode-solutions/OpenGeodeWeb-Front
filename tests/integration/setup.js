@@ -1,26 +1,28 @@
 // Node.js imports
-import path from "path"
-import { v4 as uuidv4 } from "uuid"
 import { WebSocket } from "ws"
+import path from "node:path"
+import { v4 as uuidv4 } from "uuid"
 
 // Third party imports
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
 import { afterAll, beforeAll, expect, vi } from "vitest"
 
 // Local imports
-import { useGeodeStore } from "@ogw_front/stores/geode"
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useInfraStore } from "@ogw_front/stores/infra"
-import { appMode } from "@ogw_front/utils/app_mode"
-import { importFile } from "@ogw_front/utils/file_import_workflow"
-import Status from "@ogw_front/utils/status"
 import {
+  delete_folder_recursive,
   executable_name,
   executable_path,
+  kill_back,
+  kill_viewer,
   run_back,
   run_viewer,
 } from "@ogw_front/utils/local"
+import Status from "@ogw_front/utils/status"
+import { appMode } from "@ogw_front/utils/app_mode"
+import { importFile } from "@ogw_front/utils/file_import_workflow"
+import { setupActivePinia } from "../utils"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useInfraStore } from "@ogw_front/stores/infra"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const data_folder = path.join("tests", "integration", "data")
@@ -60,11 +62,7 @@ async function runMicroservices() {
 }
 
 async function setupIntegrationTests(file_name, geode_object) {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  setupActivePinia()
   const viewerStore = useViewerStore()
 
   const { back_port, viewer_port, project_folder_path } =
@@ -77,9 +75,9 @@ async function setupIntegrationTests(file_name, geode_object) {
   return { id, back_port, viewer_port, project_folder_path }
 }
 
-const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
-  return callback({ name })
-})
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name, task) => await task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -89,11 +87,20 @@ vi.stubGlobal("navigator", {
 })
 
 beforeAll(() => {
-  global.WebSocket = WebSocket
+  globalThis.WebSocket = WebSocket
 })
 
 afterAll(() => {
-  delete global.WebSocket
+  delete globalThis.WebSocket
 })
 
-export { runMicroservices, setupIntegrationTests }
+async function teardownIntegrationTests(
+  back_port,
+  viewer_port,
+  project_folder_path,
+) {
+  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+  delete_folder_recursive(project_folder_path)
+}
+
+export { runMicroservices, setupIntegrationTests, teardownIntegrationTests }

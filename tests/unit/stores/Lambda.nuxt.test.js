@@ -1,24 +1,31 @@
-// Global imports
-
 // Third party imports
-import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
-
-import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import { useLambdaStore } from "@ogw_front/stores/lambda"
+import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
 // Local imports
 import Status from "@ogw_front/utils/status"
+import { setupActivePinia } from "../../utils"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useLambdaStore } from "@ogw_front/stores/lambda"
+
+// CONSTANTS
+const PORT_443 = "443"
+const API_URL = "api.example.com"
+const SITE_BRANCH = "/test"
+const PROJECT = "/project"
+const TEST_ID = "test-id-123456"
+const STATUS_500 = 500
 
 beforeEach(async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  setupActivePinia()
 })
+
+function setupConfig() {
+  const config = useRuntimeConfig()
+  config.public.API_URL = API_URL
+  config.public.SITE_BRANCH = SITE_BRANCH
+  config.public.PROJECT = PROJECT
+}
 
 describe("Lambda Store", () => {
   describe("state", () => {
@@ -40,18 +47,16 @@ describe("Lambda Store", () => {
     describe("port", () => {
       test("test port is always 443", () => {
         const lambdaStore = useLambdaStore()
-        expect(lambdaStore.port).toBe("443")
+        expect(lambdaStore.port).toBe(PORT_443)
       })
     })
 
     describe("base_url", () => {
       test("test base_url construction", () => {
+        setupConfig()
         const lambdaStore = useLambdaStore()
-        useRuntimeConfig().public.API_URL = "api.example.com"
-        useRuntimeConfig().public.SITE_BRANCH = "/test"
-        useRuntimeConfig().public.PROJECT = "/project"
         expect(lambdaStore.base_url).toBe(
-          "https://api.example.com:443/test/project/createbackend",
+          `https://${API_URL}:${PORT_443}${SITE_BRANCH}${PROJECT}/createbackend`,
         )
       })
     })
@@ -59,7 +64,7 @@ describe("Lambda Store", () => {
     describe("is_busy", () => {
       test("test is_busy is always false", () => {
         const lambdaStore = useLambdaStore()
-        expect(lambdaStore.is_busy).toBe(false)
+        expect(lambdaStore.is_busy).toBeFalsy()
       })
     })
   })
@@ -69,12 +74,9 @@ describe("Lambda Store", () => {
       const postFakeCall = vi.fn()
 
       test("successful launch", async () => {
+        setupConfig()
         const lambdaStore = useLambdaStore()
         const feedbackStore = useFeedbackStore()
-
-        useRuntimeConfig().public.API_URL = "api.example.com"
-        useRuntimeConfig().public.SITE_BRANCH = "/test"
-        useRuntimeConfig().public.PROJECT = "/project"
 
         lambdaStore.base_url = "test-base-url"
         registerEndpoint(lambdaStore.base_url, {
@@ -83,23 +85,20 @@ describe("Lambda Store", () => {
         })
 
         postFakeCall.mockImplementation(() => ({
-          ID: "test-id-123456",
+          ID: TEST_ID,
         }))
 
         const id = await lambdaStore.launch()
 
         expect(lambdaStore.status).toBe(Status.CONNECTED)
-        expect(id).toBe("test-id-123456")
-        expect(feedbackStore.server_error).toBe(false)
+        expect(id).toBe(TEST_ID)
+        expect(feedbackStore.server_error).toBeFalsy()
       })
 
       test("failed launch - error response", async () => {
+        setupConfig()
         const lambdaStore = useLambdaStore()
         const feedbackStore = useFeedbackStore()
-
-        useRuntimeConfig().public.API_URL = "api.example.com"
-        useRuntimeConfig().public.SITE_BRANCH = "/test"
-        useRuntimeConfig().public.PROJECT = "/project"
 
         registerEndpoint(lambdaStore.base_url, {
           method: "POST",
@@ -108,7 +107,7 @@ describe("Lambda Store", () => {
 
         postFakeCall.mockImplementation(() => {
           throw createError({
-            status: 500,
+            status: STATUS_500,
             statusMessage: "Internal Server Error",
           })
         })
@@ -118,7 +117,7 @@ describe("Lambda Store", () => {
         )
 
         expect(lambdaStore.status).toBe(Status.NOT_CONNECTED)
-        expect(feedbackStore.server_error).toBe(true)
+        expect(feedbackStore.server_error).toBeTruthy()
       })
     })
 

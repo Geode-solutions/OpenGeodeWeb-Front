@@ -22,23 +22,20 @@ export const useAppStore = defineStore("app", () => {
     console.log(
       `[AppStore] Exporting stores, total registered: ${stores.length}`,
     )
-    for (const store of stores) {
-      console.log(
-        `[AppStore] Checking store: ${store.$id}, has exportStores: ${!!store.exportStores}`,
-      )
-      if (!store.exportStores) continue
-      const storeId = store.$id
-      try {
-        snapshot[storeId] = await store.exportStores(params)
-        console.log(
-          `[AppStore] Exported store "${storeId}":`,
-          snapshot[storeId],
-        )
-        exportCount++
-      } catch (error) {
-        console.error(`[AppStore] Error exporting store "${storeId}":`, error)
-      }
-    }
+    await Promise.all(
+      stores.map(async (store) => {
+        if (!store.exportStores) {
+          return
+        }
+        const storeId = store.$id
+        try {
+          snapshot[storeId] = await store.exportStores(params)
+          exportCount += 1
+        } catch (error) {
+          console.error(`[AppStore] Error exporting store "${storeId}":`, error)
+        }
+      }),
+    )
     console.log(
       `[AppStore] Exported ${exportCount} stores; snapshot keys:`,
       Object.keys(snapshot),
@@ -55,20 +52,24 @@ export const useAppStore = defineStore("app", () => {
 
     let importedCount = 0
     const notFoundStores = []
-    for (const store of stores) {
-      if (!store.importStores) continue
-      const storeId = store.$id
-      if (!snapshot[storeId]) {
-        notFoundStores.push(storeId)
-        continue
-      }
-      try {
-        await store.importStores(snapshot[storeId])
-        importedCount++
-      } catch (error) {
-        console.error(`[AppStore] Error importing store "${storeId}":`, error)
-      }
-    }
+    await Promise.all(
+      stores.map(async (store) => {
+        if (!store.importStores) {
+          return
+        }
+        const storeId = store.$id
+        if (!snapshot[storeId]) {
+          notFoundStores.push(storeId)
+          return
+        }
+        try {
+          await store.importStores(snapshot[storeId])
+          importedCount += 1
+        } catch (error) {
+          console.error(`[AppStore] Error importing store "${storeId}":`, error)
+        }
+      }),
+    )
     if (notFoundStores.length > 0) {
       console.warn(
         `[AppStore] Stores not found in snapshot: ${notFoundStores.join(", ")}`,
@@ -78,8 +79,8 @@ export const useAppStore = defineStore("app", () => {
   }
 
   const loadedExtensions = ref(new Map())
-  const extensionAPI = ref(null)
-  const codeTransformer = ref(null)
+  const extensionAPI = ref(undefined)
+  const codeTransformer = ref(undefined)
 
   function setExtensionAPI(api) {
     extensionAPI.value = api
@@ -93,7 +94,7 @@ export const useAppStore = defineStore("app", () => {
     return loadedExtensions.value.get(id)
   }
 
-  async function loadExtension(path, backendPath = null) {
+  async function loadExtension(path, backendPath = undefined) {
     try {
       let finalURL = path
 
@@ -156,13 +157,14 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function getLoadedExtensions() {
-    return Array.from(loadedExtensions.value.values())
+    return [...loadedExtensions.value.values()]
   }
 
   function unloadExtension(id) {
     const extensionData = getExtension(id)
-    if (!extensionData) return false
-
+    if (!extensionData) {
+      return false
+    }
     if (
       extensionData.module &&
       typeof extensionData.module.uninstall === "function"
@@ -189,8 +191,9 @@ export const useAppStore = defineStore("app", () => {
 
   function toggleExtension(id) {
     const extensionData = getExtension(id)
-    if (!extensionData) return false
-
+    if (!extensionData) {
+      return false
+    }
     extensionData.enabled = !extensionData.enabled
     console.log(
       `[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${id}`,
@@ -200,8 +203,9 @@ export const useAppStore = defineStore("app", () => {
 
   function setExtensionEnabled(id, enabled) {
     const extensionData = getExtension(id)
-    if (!extensionData) return false
-
+    if (!extensionData) {
+      return false
+    }
     extensionData.enabled = enabled
     console.log(
       `[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${id}`,

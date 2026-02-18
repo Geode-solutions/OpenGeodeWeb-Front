@@ -1,22 +1,20 @@
-// Global imports
-
 // Third party imports
-import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
+import { registerEndpoint } from "@nuxt/test-utils/runtime"
+
 // Local imports
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
-import { useInfraStore } from "@ogw_front/stores/infra"
+import { setupActivePinia } from "../../utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useInfraStore } from "@ogw_front/stores/infra"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
-  return callback({ name })
-})
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name, handler) => await handler({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -25,12 +23,8 @@ vi.stubGlobal("navigator", {
   },
 })
 
-beforeEach(async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+beforeEach(() => {
+  setupActivePinia()
 })
 
 describe("Infra Store", () => {
@@ -71,7 +65,7 @@ describe("Infra Store", () => {
     describe("microservices_connected", () => {
       test("test no microservices registered", () => {
         const infraStore = useInfraStore()
-        expect(infraStore.microservices_connected).toBe(true)
+        expect(infraStore.microservices_connected).toBeTruthy()
       })
       test("test geode false & viewer false", () => {
         const infraStore = useInfraStore()
@@ -91,7 +85,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ status: Status.NOT_CONNECTED })
         viewerStore.$patch({ status: Status.NOT_CONNECTED })
-        expect(infraStore.microservices_connected).toBe(false)
+        expect(infraStore.microservices_connected).toBeFalsy()
       })
       test("test geode true & viewer false", () => {
         const infraStore = useInfraStore()
@@ -111,7 +105,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ status: Status.CONNECTED })
         viewerStore.$patch({ status: Status.NOT_CONNECTED })
-        expect(infraStore.microservices_connected).toBe(false)
+        expect(infraStore.microservices_connected).toBeFalsy()
       })
       test("test geode false & viewer true", () => {
         const infraStore = useInfraStore()
@@ -131,7 +125,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ status: Status.NOT_CONNECTED })
         viewerStore.$patch({ status: Status.CONNECTED })
-        expect(infraStore.microservices_connected).toBe(false)
+        expect(infraStore.microservices_connected).toBeFalsy()
       })
       test("test geode true & viewer true", () => {
         const infraStore = useInfraStore()
@@ -151,14 +145,14 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ status: Status.CONNECTED })
         viewerStore.$patch({ status: Status.CONNECTED })
-        expect(infraStore.microservices_connected).toBe(true)
+        expect(infraStore.microservices_connected).toBeTruthy()
       })
     })
 
     describe("microservices_busy", () => {
       test("test no microservices registered", () => {
         const infraStore = useInfraStore()
-        expect(infraStore.microservices_busy).toBe(false)
+        expect(infraStore.microservices_busy).toBeFalsy()
       })
       test("test geode false & viewer false", () => {
         const infraStore = useInfraStore()
@@ -178,7 +172,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ request_counter: 0 })
         viewerStore.$patch({ request_counter: 0 })
-        expect(infraStore.microservices_busy).toBe(false)
+        expect(infraStore.microservices_busy).toBeFalsy()
       })
       test("test geode true & viewer false", () => {
         const infraStore = useInfraStore()
@@ -198,7 +192,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ request_counter: 1 })
         viewerStore.$patch({ request_counter: 0 })
-        expect(infraStore.microservices_busy).toBe(true)
+        expect(infraStore.microservices_busy).toBeTruthy()
       })
       test("test geode false & viewer true", () => {
         const infraStore = useInfraStore()
@@ -218,7 +212,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ request_counter: 0 })
         viewerStore.$patch({ request_counter: 1 })
-        expect(infraStore.microservices_busy).toBe(true)
+        expect(infraStore.microservices_busy).toBeTruthy()
       })
       test("test geode true & viewer true", () => {
         const infraStore = useInfraStore()
@@ -238,7 +232,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ request_counter: 1 })
         viewerStore.$patch({ request_counter: 1 })
-        expect(infraStore.microservices_busy).toBe(true)
+        expect(infraStore.microservices_busy).toBeTruthy()
       })
     })
   })

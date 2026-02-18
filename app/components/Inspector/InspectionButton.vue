@@ -8,7 +8,7 @@
     "increment_step",
     "decrement_step",
   ])
-  const props = defineProps({
+  const { geode_object_type, filename } = defineProps({
     geode_object_type: { type: String, required: true },
     filename: { type: String, required: true },
   })
@@ -37,7 +37,7 @@
     <v-btn
       :loading="loading"
       color="primary"
-      @click="get_inspection_results(props.geode_object_type, props.filename)"
+      @click="get_inspection_results(geode_object_type, filename)"
     >
       Inspect
       <template #loader>

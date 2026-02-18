@@ -3,7 +3,7 @@
   const feedbackStore = useFeedbackStore()
 
   function reload() {
-    window.location.reload()
+    globalThis.location.reload()
   }
 </script>
 

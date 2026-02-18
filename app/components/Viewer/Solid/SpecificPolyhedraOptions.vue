@@ -1,8 +1,8 @@
 <script setup>
-  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
-  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
-  import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
   import SolidPolyhedra from "@ogw_front/assets/viewer_svgs/solid_polyhedra.svg"
+  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
+  import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
+  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
@@ -10,12 +10,12 @@
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const props = defineProps({
+  const { itemProps } = defineProps({
     itemProps: { type: Object, required: true },
     tooltip: { type: String, required: false, default: "Polyhedra options" },
   })
 
-  const id = toRef(() => props.itemProps.id)
+  const id = toRef(() => itemProps.id)
 
   const visibility = computed({
     get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
@@ -108,8 +108,8 @@
 </script>
 <template>
   <ViewerContextMenuItem
-    :itemProps="props.itemProps"
-    :tooltip="props.tooltip"
+    :itemProps="itemProps"
+    :tooltip="tooltip"
     :btn_image="SolidPolyhedra"
   >
     <template #options>

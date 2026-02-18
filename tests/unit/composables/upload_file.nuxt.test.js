@@ -1,34 +1,30 @@
-import { describe, expect, test, beforeEach, vi } from "vitest"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
+// Third party imports
+import { beforeEach, describe, expect, test } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import upload_file from "@ogw_front/utils/upload_file"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
+// Local imports
+import { setupActivePinia } from "../../utils"
+import upload_file from "@ogw_front/utils/upload_file"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useGeodeStore } from "@ogw_front/stores/geode"
+
+const ZERO = 0
 const schema = schemas.opengeodeweb_back.upload_file
 
-beforeEach(async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+beforeEach(() => {
+  setupActivePinia()
+  const geodeStore = useGeodeStore()
+  geodeStore.base_url = ""
 })
 
-describe("upload_file", () => {
-  beforeEach(() => {
-    const geodeStore = useGeodeStore()
-    geodeStore.base_url = ""
-  })
+describe("upload_file test", () => {
+  test("throw error", async () => {
+    const file = "toto"
 
-  test("Throw error", async () => {
-    var file = "toto"
-
-    expect(async () => {
-      await upload_file({ route: schema.$id, file })
-    }).rejects.toThrowError("file must be a instance of File")
+    await expect(upload_file({ route: schema.$id, file })).rejects.toThrow(
+      "file must be a instance of File",
+    )
   })
 
   test("onResponse", async () => {
@@ -37,8 +33,8 @@ describe("upload_file", () => {
       method: "PUT",
       handler: () => ({ test: "ok" }),
     })
-    var file = new File(["fake_file"], "fake_file.txt")
-    var response_value
+    const file = new File(["fake_file"], "fake_file.txt")
+    let response_value = ""
     await upload_file(
       { route: schema.$id, file },
       {
@@ -47,7 +43,7 @@ describe("upload_file", () => {
         },
       },
     )
-    expect(feedbackStore.feedbacks.length).toBe(0)
+    expect(feedbackStore.feedbacks).toHaveLength(ZERO)
     expect(response_value).toBe("ok")
   })
 })

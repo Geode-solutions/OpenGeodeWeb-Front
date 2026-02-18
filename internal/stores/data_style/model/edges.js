@@ -38,7 +38,7 @@ export function useModelEdgesStyle() {
 
   function applyModelEdgesStyle(id) {
     const style = modelEdgesStyle(id)
-    return Promise.all([setModelEdgesVisibility(id, style.visibility)])
+    return Promise.resolve([setModelEdgesVisibility(id, style.visibility)])
   }
 
   return {

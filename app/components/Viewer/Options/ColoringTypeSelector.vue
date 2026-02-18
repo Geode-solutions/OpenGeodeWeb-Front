@@ -1,11 +1,11 @@
 <script setup>
+  import ViewerOptionsCellAttributeSelector from "@ogw_front/components/Viewer/Options/CellAttributeSelector"
   import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker"
-  import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector"
-  import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector"
   import ViewerOptionsEdgeAttributeSelector from "@ogw_front/components/Viewer/Options/EdgeAttributeSelector"
   import ViewerOptionsPolygonAttributeSelector from "@ogw_front/components/Viewer/Options/PolygonAttributeSelector"
-  import ViewerOptionsCellAttributeSelector from "@ogw_front/components/Viewer/Options/CellAttributeSelector"
   import ViewerOptionsPolyhedronAttributeSelector from "@ogw_front/components/Viewer/Options/PolyhedronAttributeSelector"
+  import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector"
+  import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector"
 
   const coloring_style_key = defineModel("coloring_style_key")
 
@@ -34,14 +34,12 @@
     "polyhedron_attribute_color_map",
   )
 
-  const props = defineProps({
+  const { id } = defineProps({
     id: { type: String, required: true },
   })
 
-  const has_color = computed(() => (color.value !== undefined ? true : false))
-  const has_textures = computed(() =>
-    textures.value !== undefined ? true : false,
-  )
+  const has_color = computed(() => color.value !== undefined)
+  const has_textures = computed(() => textures.value !== undefined)
   const has_vertex = computed(() => vertex_attribute_range.value !== undefined)
   const has_edge = computed(() => edge_attribute_range.value !== undefined)
   const has_cells = computed(() => cell_attribute_range.value !== undefined)
@@ -64,20 +62,30 @@
   }
   const coloring_styles = computed(() => {
     let array = []
-    if (has_color.value) array.push(color_dict)
-    if (has_textures.value) array.push(textures_dict)
-    if (has_vertex.value) array.push(vertex_dict)
-    if (has_edge.value) array.push(edge_dict)
-    if (has_cells.value) array.push(cell_dict)
-    if (has_polygons.value) array.push(polygon_dict)
-    if (has_polyhedra.value) array.push(polyhedron_dict)
+    if (has_color.value) {
+      array.push(color_dict)
+    }
+    if (has_textures.value) {
+      array.push(textures_dict)
+    }
+    if (has_vertex.value) {
+      array.push(vertex_dict)
+    }
+    if (has_edge.value) {
+      array.push(edge_dict)
+    }
+    if (has_cells.value) {
+      array.push(cell_dict)
+    }
+    if (has_polygons.value) {
+      array.push(polygon_dict)
+    }
+    if (has_polyhedra.value) {
+      array.push(polyhedron_dict)
+    }
 
-    const labels = array.map((coloring) => {
-      return coloring.name
-    })
-    const values = array.map((coloring) => {
-      return coloring.value
-    })
+    const labels = array.map((coloring) => coloring.name)
+    const values = array.map((coloring) => coloring.value)
 
     return { labels, values }
   })

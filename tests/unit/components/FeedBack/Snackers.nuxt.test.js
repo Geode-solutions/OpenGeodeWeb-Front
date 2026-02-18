@@ -1,36 +1,31 @@
-// @vitest-environment nuxt
-vi.stubGlobal("visualViewport", new EventTarget())
+// Third party imports
+import * as components from "vuetify/components"
 import { describe, expect, test, vi } from "vitest"
 import { mount } from "@vue/test-utils"
-import * as components from "vuetify/components"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
 
+// Local imports
+import { setupActivePinia, vuetify } from "../../../utils"
 import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import { vuetify } from "../../../utils"
 
-describe("FeedBackSnackers", async () => {
+vi.stubGlobal("visualViewport", new EventTarget())
+
+describe(FeedBackSnackers, async () => {
   test(`Test delete error`, async () => {
-    const pinia = createTestingPinia({
-      initialState: {
-        feedback: {
-          feedbacks: [
-            {
-              type: "error",
-              code: 500,
-              route: "/test",
-              name: "test message",
-              description: "test description",
-            },
-          ],
-        },
-      },
-      stubActions: false,
-      createSpy: vi.fn,
-    })
-    setActivePinia(pinia)
+    const pinia = setupActivePinia()
     const feedbackStore = useFeedbackStore()
+    feedbackStore.$patch({
+      feedbacks: [
+        {
+          type: "error",
+          code: 500,
+          route: "/test",
+          name: "test message",
+          description: "test description",
+        },
+      ],
+    })
+
     const wrapper = mount(
       {
         template: "<v-layout><FeedBackSnackers/></v-layout>",
@@ -41,7 +36,7 @@ describe("FeedBackSnackers", async () => {
           components: {
             FeedBackSnackers,
           },
-          plugins: [pinia, vuetify],
+          plugins: [vuetify, pinia],
         },
       },
     )

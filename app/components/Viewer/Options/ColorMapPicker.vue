@@ -1,9 +1,12 @@
 <script setup>
-  import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
-  import vtkColorTransferFunction from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction"
   import ColorMapList from "./ColorMapList.vue"
+  import { newInstance } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction"
+  import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps"
 
-  const props = defineProps({
+  const LAST_POINT_OFFSET = 4
+  const THREE = 3
+
+  const { max, min, modelValue } = defineProps({
     modelValue: { type: String, default: "Cool to Warm" },
     min: { type: Number, required: true },
     max: { type: Number, required: true },
@@ -12,8 +15,8 @@
   const emit = defineEmits(["update:modelValue"])
 
   const menuOpen = ref(false)
-  const lutCanvas = ref(null)
-  const selectedPresetName = ref(props.modelValue)
+  const lutCanvas = ref()
+  const selectedPresetName = ref(modelValue)
 
   const presets = computed(() => {
     const allPresets = vtkColorMaps.rgbPresetNames.map((name) =>
@@ -59,45 +62,49 @@
   })
 
   function drawLutCanvas() {
-    if (!lutCanvas.value) return
+    if (!lutCanvas.value) {
+      return
+    }
     const preset = vtkColorMaps.getPresetByName(selectedPresetName.value)
-    if (!preset || !preset.RGBPoints) return
+    if (!preset || !preset.RGBPoints) {
+      return
+    }
 
     const canvas = lutCanvas.value
     const ctx = canvas.getContext("2d")
-    const { width, height } = canvas
+    const { height, width } = canvas
 
-    const lut = vtkColorTransferFunction.newInstance()
+    const lut = newInstance()
     const rgbPoints = preset.RGBPoints
 
-    for (let i = 0; i < rgbPoints.length; i += 4) {
+    for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {
       lut.addRGBPoint(
-        rgbPoints[i],
-        rgbPoints[i + 1],
-        rgbPoints[i + 2],
-        rgbPoints[i + 3],
+        rgbPoints[pointIdx],
+        rgbPoints[pointIdx + 1],
+        rgbPoints[pointIdx + 2],
+        rgbPoints[pointIdx + THREE],
       )
     }
 
     const table = lut.getUint8Table(
       rgbPoints[0],
-      rgbPoints[rgbPoints.length - 4],
+      rgbPoints.at(-LAST_POINT_OFFSET),
       width,
       true,
     )
     const imageData = ctx.createImageData(width, height)
 
-    for (let x = 0; x < width; x++) {
-      const r = table[x * 4],
-        g = table[x * 4 + 1],
-        b = table[x * 4 + 2],
-        a = table[x * 4 + 3]
-      for (let y = 0; y < height; y++) {
-        const idx = (y * width + x) * 4
-        imageData.data[idx] = r
-        imageData.data[idx + 1] = g
-        imageData.data[idx + 2] = b
-        imageData.data[idx + 3] = a
+    for (let xCoord = 0; xCoord < width; xCoord += 1) {
+      const red = table[xCoord * 4]
+      const green = table[xCoord * 4 + 1]
+      const blue = table[xCoord * 4 + 2]
+      const alpha = table[xCoord * 4 + THREE]
+      for (let yCoord = 0; yCoord < height; yCoord += 1) {
+        const pixelIdx = (yCoord * width + xCoord) * 4
+        imageData.data[pixelIdx] = red
+        imageData.data[pixelIdx + 1] = green
+        imageData.data[pixelIdx + 2] = blue
+        imageData.data[pixelIdx + THREE] = alpha
       }
     }
     ctx.putImageData(imageData, 0, 0)
@@ -110,14 +117,13 @@
   }
 
   onMounted(() => nextTick(drawLutCanvas))
+  watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas)
   watch(
-    [lutCanvas, selectedPresetName, () => props.min, () => props.max],
-    drawLutCanvas,
-  )
-  watch(
-    () => props.modelValue,
+    () => modelValue,
     (nv) => {
-      if (nv !== selectedPresetName.value) selectedPresetName.value = nv
+      if (nv !== selectedPresetName.value) {
+        selectedPresetName.value = nv
+      }
     },
   )
 </script>

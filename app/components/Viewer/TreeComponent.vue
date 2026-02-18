@@ -1,6 +1,6 @@
 <script setup>
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useDataStore } from "@ogw_front/stores/data"
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 
   import { compareSelections } from "@ogw_front/utils/treeview"
@@ -9,36 +9,32 @@
   const dataStore = useDataStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const props = defineProps({ id: { type: String, required: true } })
+  const { id } = defineProps({ id: { type: String, required: true } })
 
   const emit = defineEmits(["show-menu"])
 
   const items = ref([])
-  const mesh_components_selection = dataStyleStore.visibleMeshComponents(
-    props.id,
-  )
+  const mesh_components_selection = dataStyleStore.visibleMeshComponents(id)
 
   watchEffect(async () => {
-    items.value = await dataStore.formatedMeshComponents(props.id)
+    items.value = await dataStore.formatedMeshComponents(id)
   })
 
   watch(
     mesh_components_selection,
     async (current, previous) => {
-      if (!previous) return
+      if (!previous) {
+        return
+      }
 
       const { added, removed } = compareSelections(current, previous)
 
       if (added.length > 0) {
-        await dataStyleStore.setModelMeshComponentsVisibility(
-          props.id,
-          added,
-          true,
-        )
+        await dataStyleStore.setModelMeshComponentsVisibility(id, added, true)
       }
       if (removed.length > 0) {
         await dataStyleStore.setModelMeshComponentsVisibility(
-          props.id,
+          id,
           removed,
           false,
         )

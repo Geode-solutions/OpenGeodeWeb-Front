@@ -4,8 +4,8 @@
   import Screenshot from "@ogw_front/components/Screenshot"
   import ZScaling from "@ogw_front/components/ZScaling"
 
-  import { useViewerStore } from "@ogw_front/stores/viewer"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+  import { useViewerStore } from "@ogw_front/stores/viewer"
 
   const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()
@@ -21,7 +21,7 @@
     },
   )
 
-  const handleZScalingClose = async () => {
+  async function handleZScalingClose() {
     await hybridViewerStore.setZScaling(zScale.value)
     showZScaling.value = false
   }
@@ -33,7 +33,7 @@
       action: () => {
         const { genericRenderWindow } = storeToRefs(hybridViewerStore)
         const renderWindow = genericRenderWindow.value.value.getRenderWindow()
-        const renderer = renderWindow.getRenderers()[0]
+        const [renderer] = renderWindow.getRenderers()
         renderer.resetCamera()
         renderWindow.render()
         hybridViewerStore.syncRemoteCamera()
