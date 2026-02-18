@@ -124,8 +124,6 @@
           v-model:polyhedron_attribute_color_map="
             polyhedron_attribute_color_map
           "
-          polyhedronStorePrefix="meshPolyhedraPolyhedron"
-          vertexStorePrefix="meshPolyhedraVertex"
         />
       </template>
     </template>

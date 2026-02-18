@@ -1,11 +1,8 @@
 <script setup>
-  import ViewerOptionsCellAttributeSelector from "@ogw_front/components/Viewer/Options/CellAttributeSelector.vue"
+  import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue"
   import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue"
-  import ViewerOptionsEdgeAttributeSelector from "@ogw_front/components/Viewer/Options/EdgeAttributeSelector.vue"
-  import ViewerOptionsPolygonAttributeSelector from "@ogw_front/components/Viewer/Options/PolygonAttributeSelector.vue"
-  import ViewerOptionsPolyhedronAttributeSelector from "@ogw_front/components/Viewer/Options/PolyhedronAttributeSelector.vue"
   import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue"
-  import ViewerOptionsVertexAttributeSelector from "@ogw_front/components/Viewer/Options/VertexAttributeSelector.vue"
+  import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
   const coloring_style_key = defineModel("coloring_style_key")
 
@@ -36,11 +33,6 @@
 
   const { id } = defineProps({
     id: { type: String, required: true },
-    vertexStorePrefix: { type: String, default: "" },
-    edgeStorePrefix: { type: String, default: "" },
-    cellStorePrefix: { type: String, default: "" },
-    polygonStorePrefix: { type: String, default: "" },
-    polyhedronStorePrefix: { type: String, default: "" },
   })
 
   const has_color = computed(() => color.value !== undefined)
@@ -137,50 +129,55 @@
             <ViewerOptionsTexturesSelector v-model="textures" :id="id" />
           </template>
           <template v-if="coloring_style_key === vertex_dict['value']">
-            <ViewerOptionsVertexAttributeSelector
-              v-model:vertex_attribute_name="vertex_attribute_name"
-              v-model:vertex_attribute_range="vertex_attribute_range"
-              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+            <ViewerOptionsAttributeSelector
+              v-model:name="vertex_attribute_name"
+              v-model:range="vertex_attribute_range"
+              v-model:colorMap="vertex_attribute_color_map"
+              label="Select a vertex attribute"
               :id="id"
-              :storePrefix="vertexStorePrefix"
+              :schema="back_schemas.opengeodeweb_back.vertex_attribute_names"
             />
           </template>
           <template v-if="coloring_style_key === edge_dict['value']">
-            <ViewerOptionsEdgeAttributeSelector
-              v-model:edge_attribute_name="edge_attribute_name"
-              v-model:edge_attribute_range="edge_attribute_range"
-              v-model:edge_attribute_color_map="edge_attribute_color_map"
+            <ViewerOptionsAttributeSelector
+              v-model:name="edge_attribute_name"
+              v-model:range="edge_attribute_range"
+              v-model:colorMap="edge_attribute_color_map"
+              label="Select an edge attribute"
               :id="id"
-              :storePrefix="edgeStorePrefix"
+              :schema="back_schemas.opengeodeweb_back.edge_attribute_names"
             />
           </template>
           <template v-if="coloring_style_key === cell_dict['value']">
-            <ViewerOptionsCellAttributeSelector
-              v-model:cell_attribute_name="cell_attribute_name"
-              v-model:cell_attribute_range="cell_attribute_range"
-              v-model:cell_attribute_color_map="cell_attribute_color_map"
+            <ViewerOptionsAttributeSelector
+              v-model:name="cell_attribute_name"
+              v-model:range="cell_attribute_range"
+              v-model:colorMap="cell_attribute_color_map"
+              label="Select a cell attribute"
               :id="id"
-              :storePrefix="cellStorePrefix"
+              :schema="back_schemas.opengeodeweb_back.cell_attribute_names"
             />
           </template>
           <template v-if="coloring_style_key === polygon_dict['value']">
-            <ViewerOptionsPolygonAttributeSelector
-              v-model:polygon_attribute_name="polygon_attribute_name"
-              v-model:polygon_attribute_range="polygon_attribute_range"
-              v-model:polygon_attribute_color_map="polygon_attribute_color_map"
+            <ViewerOptionsAttributeSelector
+              v-model:name="polygon_attribute_name"
+              v-model:range="polygon_attribute_range"
+              v-model:colorMap="polygon_attribute_color_map"
+              label="Select a polygon attribute"
               :id="id"
-              :storePrefix="polygonStorePrefix"
+              :schema="back_schemas.opengeodeweb_back.polygon_attribute_names"
             />
           </template>
           <template v-if="coloring_style_key === polyhedron_dict['value']">
-            <ViewerOptionsPolyhedronAttributeSelector
-              v-model:polyhedron_attribute_name="polyhedron_attribute_name"
-              v-model:polyhedron_attribute_range="polyhedron_attribute_range"
-              v-model:polyhedron_attribute_color_map="
-                polyhedron_attribute_color_map
-              "
+            <ViewerOptionsAttributeSelector
+              v-model:name="polyhedron_attribute_name"
+              v-model:range="polyhedron_attribute_range"
+              v-model:colorMap="polyhedron_attribute_color_map"
+              label="Select a polyhedron attribute"
               :id="id"
-              :storePrefix="polyhedronStorePrefix"
+              :schema="
+                back_schemas.opengeodeweb_back.polyhedron_attribute_names
+              "
             />
           </template>
         </v-col>

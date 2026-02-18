@@ -137,8 +137,6 @@
               v-model:edge_attribute_name="edge_attribute_name"
               v-model:edge_attribute_range="edge_attribute_range"
               v-model:edge_attribute_color_map="edge_attribute_color_map"
-              edgeStorePrefix="meshEdgesEdge"
-              vertexStorePrefix="meshEdgesVertex"
             />
           </v-col>
         </v-row>

@@ -120,8 +120,6 @@
           v-model:cell_attribute_name="cell_attribute_name"
           v-model:cell_attribute_range="cell_attribute_range"
           v-model:cell_attribute_color_map="cell_attribute_color_map"
-          cellStorePrefix="meshCellsCell"
-          vertexStorePrefix="meshCellsVertex"
         />
       </template>
     </template>

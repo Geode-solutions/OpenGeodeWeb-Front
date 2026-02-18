@@ -129,8 +129,6 @@
           v-model:polygon_attribute_name="polygon_attribute_name"
           v-model:polygon_attribute_range="polygon_attribute_range"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
-          polygonStorePrefix="meshPolygonsPolygon"
-          vertexStorePrefix="meshPolygonsVertex"
         />
       </template>
     </template>
