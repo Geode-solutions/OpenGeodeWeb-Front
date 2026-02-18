@@ -90,6 +90,7 @@
     item-title="attribute_name"
     item-value="attribute_name"
     density="compact"
+    label="Select an attribute"
   />
   <ViewerOptionsAttributeColorBar
     v-if="name"
