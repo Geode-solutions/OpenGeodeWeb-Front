@@ -20,9 +20,6 @@ export function useMeshCellsCellAttributeStyle() {
 
   async function updateMeshCellsCellAttribute(id) {
     const name = meshCellsCellAttributeName(id)
-    if (!name) {
-      return
-    }
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
     await setMeshCellsCellAttributeRange(
       id,
@@ -63,9 +60,6 @@ export function useMeshCellsCellAttributeStyle() {
     return meshCellsCellAttribute(id).name
   }
   function setMeshCellsCellAttributeName(id, name) {
-    if (name === meshCellsCellAttributeName(id)) {
-      return
-    }
     console.log(setMeshCellsCellAttributeName.name, { id, name })
     return viewerStore.request(
       meshCellsCellAttributeSchemas.name,
@@ -73,9 +67,6 @@ export function useMeshCellsCellAttributeStyle() {
       {
         response_function: async () => {
           meshCellsCellAttribute(id).name = name
-          if (!name) {
-            return
-          }
           const { minimum, maximum } = meshCellsCellAttributeStoredConfig(
             id,
             name,

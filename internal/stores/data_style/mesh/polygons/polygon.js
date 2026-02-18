@@ -20,9 +20,6 @@ export function useMeshPolygonsPolygonAttributeStyle() {
 
   async function updateMeshPolygonsPolygonAttribute(id) {
     const name = meshPolygonsPolygonAttributeName(id)
-    if (!name) {
-      return
-    }
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
     await setMeshPolygonsPolygonAttributeRange(
       id,
@@ -58,18 +55,12 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     return meshPolygonsPolygonAttribute(id).name
   }
   function setMeshPolygonsPolygonAttributeName(id, name) {
-    if (name === meshPolygonsPolygonAttributeName(id)) {
-      return
-    }
     return viewerStore.request(
       meshPolygonsPolygonAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
           meshPolygonsPolygonAttribute(id).name = name
-          if (!name) {
-            return
-          }
           const { minimum, maximum } = meshPolygonsPolygonAttributeStoredConfig(
             id,
             name,
