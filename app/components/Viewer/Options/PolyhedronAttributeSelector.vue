@@ -2,8 +2,11 @@
   import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
 
   const geodeStore = useGeodeStore()
+  const dataStyleStore = useDataStyleStore()
 
   const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", {
     type: String,
@@ -13,12 +16,15 @@
   })
   const polyhedron_attribute_color_map = defineModel(
     "polyhedron_attribute_color_map",
-    { type: String },
+    {
+      type: String,
+    },
   )
   const polyhedron_attributes = ref([])
 
   const { id } = defineProps({
     id: { type: String, required: true },
+    storePrefix: { type: String, default: "meshPolyhedraPolyhedron" },
   })
 
   const rangeMin = computed({
@@ -70,6 +76,17 @@
       ]
     }
   }
+
+  watch(currentAttribute, (newVal) => {
+    if (newVal) {
+      const storedConfig = dataStyleStore[
+        `${props.storePrefix}AttributeStoredConfig`
+      ](props.id, newVal.attribute_name)
+      if (!storedConfig.isAutoSet) {
+        resetRange()
+      }
+    }
+  })
 </script>
 
 <template>

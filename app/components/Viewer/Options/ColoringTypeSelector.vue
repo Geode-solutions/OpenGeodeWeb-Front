@@ -36,6 +36,11 @@
 
   const { id } = defineProps({
     id: { type: String, required: true },
+    vertexStorePrefix: { type: String, default: "" },
+    edgeStorePrefix: { type: String, default: "" },
+    cellStorePrefix: { type: String, default: "" },
+    polygonStorePrefix: { type: String, default: "" },
+    polyhedronStorePrefix: { type: String, default: "" },
   })
 
   const has_color = computed(() => color.value !== undefined)
@@ -137,6 +142,7 @@
               v-model:vertex_attribute_range="vertex_attribute_range"
               v-model:vertex_attribute_color_map="vertex_attribute_color_map"
               :id="id"
+              :storePrefix="vertexStorePrefix"
             />
           </template>
           <template v-if="coloring_style_key === edge_dict['value']">
@@ -145,6 +151,7 @@
               v-model:edge_attribute_range="edge_attribute_range"
               v-model:edge_attribute_color_map="edge_attribute_color_map"
               :id="id"
+              :storePrefix="edgeStorePrefix"
             />
           </template>
           <template v-if="coloring_style_key === cell_dict['value']">
@@ -153,6 +160,7 @@
               v-model:cell_attribute_range="cell_attribute_range"
               v-model:cell_attribute_color_map="cell_attribute_color_map"
               :id="id"
+              :storePrefix="cellStorePrefix"
             />
           </template>
           <template v-if="coloring_style_key === polygon_dict['value']">
@@ -161,6 +169,7 @@
               v-model:polygon_attribute_range="polygon_attribute_range"
               v-model:polygon_attribute_color_map="polygon_attribute_color_map"
               :id="id"
+              :storePrefix="polygonStorePrefix"
             />
           </template>
           <template v-if="coloring_style_key === polyhedron_dict['value']">
@@ -171,6 +180,7 @@
                 polyhedron_attribute_color_map
               "
               :id="id"
+              :storePrefix="polyhedronStorePrefix"
             />
           </template>
         </v-col>

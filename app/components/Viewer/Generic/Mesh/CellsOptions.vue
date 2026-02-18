@@ -49,7 +49,6 @@
     get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshCellsVertexAttributeName(id.value, newValue)
-      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -61,7 +60,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -79,7 +77,6 @@
     get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshCellsCellAttributeName(id.value, newValue)
-      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -91,7 +88,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -124,6 +120,8 @@
           v-model:cell_attribute_name="cell_attribute_name"
           v-model:cell_attribute_range="cell_attribute_range"
           v-model:cell_attribute_color_map="cell_attribute_color_map"
+          cellStorePrefix="meshCellsCell"
+          vertexStorePrefix="meshCellsVertex"
         />
       </template>
     </template>

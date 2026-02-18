@@ -44,6 +44,34 @@
       hybridViewerStore.remoteRender()
     },
   })
+  const vertex_attribute_name = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute_range = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute_color_map = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeColorMap(
+        id.value,
+        newValue,
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
 </script>
 
 <template>
@@ -78,6 +106,10 @@
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
+              v-model:vertex_attribute_name="vertex_attribute_name"
+              v-model:vertex_attribute_range="vertex_attribute_range"
+              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+              vertexStorePrefix="meshPointsVertex"
             />
           </v-col>
         </v-row>

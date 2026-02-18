@@ -48,7 +48,6 @@
     get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue)
-      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -60,7 +59,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -138,6 +136,8 @@
               v-model:edge_attribute_name="edge_attribute_name"
               v-model:edge_attribute_range="edge_attribute_range"
               v-model:edge_attribute_color_map="edge_attribute_color_map"
+              edgeStorePrefix="meshEdgesEdge"
+              vertexStorePrefix="meshEdgesVertex"
             />
           </v-col>
         </v-row>

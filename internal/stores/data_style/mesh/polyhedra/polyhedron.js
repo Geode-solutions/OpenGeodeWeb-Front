@@ -21,12 +21,12 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   async function updateMeshPolyhedraPolyhedronAttribute(id) {
     const name = meshPolyhedraPolyhedronAttributeName(id)
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
-    await meshPolyhedraPolyhedronAttributeRange(
+    await setMeshPolyhedraPolyhedronAttributeRange(
       id,
       storedConfig.minimum,
       storedConfig.maximum,
     )
-    await meshPolyhedraPolyhedronAttributeColorMap(id, storedConfig.colorMap)
+    await setMeshPolyhedraPolyhedronAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshPolyhedraPolyhedronAttributeStoredConfig(id, name) {
@@ -38,16 +38,17 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
       minimum: 0,
       maximum: 1,
       colorMap: "Cool to Warm",
+      isAutoSet: false,
     })
   }
 
   function setMeshPolyhedraPolyhedronAttributeStoredConfig(
     id,
     name,
-    { minimum, maximum, colorMap },
+    { minimum, maximum, colorMap, isAutoSet },
   ) {
-    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id)
-    storedConfigs[name] = { minimum, maximum, colorMap }
+    const storedConfigs = meshPolyhedraPolyhedronAttribute(id).storedConfigs
+    storedConfigs[name] = { minimum, maximum, colorMap, isAutoSet }
     return storedConfigs[name]
   }
 
@@ -55,16 +56,15 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     return meshPolyhedraPolyhedronAttribute(id).name
   }
   function setMeshPolyhedraPolyhedronAttributeName(id, name) {
+    meshPolyhedraPolyhedronAttribute(id).name = name
     return viewerStore.request(
       meshPolyhedraPolyhedronAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
-          meshPolyhedraPolyhedronAttribute(id).name = name
-          const { minimum, maximum, colorMap } =
+          const { minimum, maximum } =
             meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
           await setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum)
-          await setMeshPolyhedraPolyhedronAttributeColorMap(id, colorMap)
           console.log(
             setMeshPolyhedraPolyhedronAttributeName.name,
             { id },
@@ -83,21 +83,10 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraPolyhedronAttributeName(id)
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
-    return viewerStore.request(
-      meshPolyhedraPolyhedronAttributeSchemas.scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          console.log(
-            setMeshPolyhedraPolyhedronAttributeRange.name,
-            { id },
-            meshPolyhedraPolyhedronAttributeRange(id),
-          )
-        },
-      },
-    )
+    storedConfig.minimum = minimum
+    storedConfig.maximum = maximum
+    storedConfig.isAutoSet = true
+    return setMeshPolyhedraPolyhedronAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshPolyhedraPolyhedronAttributeColorMap(id) {
@@ -131,6 +120,7 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     meshPolyhedraPolyhedronAttributeName,
     meshPolyhedraPolyhedronAttributeRange,
     meshPolyhedraPolyhedronAttributeColorMap,
+    meshPolyhedraPolyhedronAttributeStoredConfig,
     setMeshPolyhedraPolyhedronAttributeName,
     setMeshPolyhedraPolyhedronAttributeRange,
     setMeshPolyhedraPolyhedronAttributeColorMap,

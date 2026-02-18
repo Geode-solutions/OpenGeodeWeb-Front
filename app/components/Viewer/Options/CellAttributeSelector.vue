@@ -2,8 +2,11 @@
   import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
   import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar"
 
   const geodeStore = useGeodeStore()
+  const dataStyleStore = useDataStyleStore()
 
   const cell_attribute_name = defineModel("cell_attribute_name", {
     type: String,
@@ -18,21 +21,20 @@
 
   const { id } = defineProps({
     id: { type: String, required: true },
+    storePrefix: { type: String, default: "meshCellsCell" },
   })
 
-  const model = defineModel()
-  const cell_attribute_names = ref([])
-  const cell_attribute = reactive({ name: cell_attribute_name.value })
-
-  onMounted(() => {
-    if (model.value !== undefined) {
-      cell_attribute_name.value = model.value.name
-    }
+  const rangeMin = computed({
+    get: () => cell_attribute_range.value[0],
+    set: (val) => {
+      cell_attribute_range.value = [val, cell_attribute_range.value[1]]
+    },
   })
-
-  watch(cell_attribute_name, (value) => {
-    cell_attribute.name = value
-    model.value = cell_attribute
+  const rangeMax = computed({
+    get: () => cell_attribute_range.value[1],
+    set: (val) => {
+      cell_attribute_range.value = [cell_attribute_range.value[0], val]
+    },
   })
 
   onMounted(() => {
@@ -66,6 +68,17 @@
       ]
     }
   }
+
+  watch(currentAttribute, (newVal) => {
+    if (newVal) {
+      const storedConfig = dataStyleStore[
+        `${props.storePrefix}AttributeStoredConfig`
+      ](props.id, newVal.attribute_name)
+      if (!storedConfig.isAutoSet) {
+        resetRange()
+      }
+    }
+  })
 </script>
 
 <template>

@@ -21,12 +21,12 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   async function updateMeshPolyhedraVertexAttribute(id) {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
-    await meshPolyhedraVertexAttributeRange(
+    await setMeshPolyhedraVertexAttributeRange(
       id,
       storedConfig.minimum,
       storedConfig.maximum,
     )
-    await meshPolyhedraVertexAttributeColorMap(id, storedConfig.colorMap)
+    await setMeshPolyhedraVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshPolyhedraVertexAttributeStoredConfig(id, name) {
@@ -38,16 +38,17 @@ export function useMeshPolyhedraVertexAttributeStyle() {
       minimum: 0,
       maximum: 1,
       colorMap: "Cool to Warm",
+      isAutoSet: false,
     })
   }
 
   function setMeshPolyhedraVertexAttributeStoredConfig(
     id,
     name,
-    { minimum, maximum, colorMap },
+    { minimum, maximum, colorMap, isAutoSet },
   ) {
-    const { storedConfigs } = meshPolyhedraVertexAttribute(id)
-    storedConfigs[name] = { minimum, maximum, colorMap }
+    const storedConfigs = meshPolyhedraVertexAttribute(id).storedConfigs
+    storedConfigs[name] = { minimum, maximum, colorMap, isAutoSet }
     return storedConfigs[name]
   }
 
@@ -61,16 +62,15 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   }
   function setMeshPolyhedraVertexAttributeName(id, name) {
     console.log(setMeshPolyhedraVertexAttributeName.name, { id, name })
+    meshPolyhedraVertexAttribute(id).name = name
     return viewerStore.request(
       meshPolyhedraVertexAttributeSchemas.name,
       { id, name },
       {
         response_function: async () => {
-          meshPolyhedraVertexAttribute(id).name = name
-          const { minimum, maximum, colorMap } =
+          const { minimum, maximum } =
             meshPolyhedraVertexAttributeStoredConfig(id, name)
           await setMeshPolyhedraVertexAttributeRange(id, minimum, maximum)
-          await setMeshPolyhedraVertexAttributeColorMap(id, colorMap)
           console.log(
             setMeshPolyhedraVertexAttributeName.name,
             { id },
@@ -90,21 +90,10 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
-    return viewerStore.request(
-      meshPolyhedraVertexAttributeSchemas.scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          console.log(
-            setMeshPolyhedraVertexAttributeRange.name,
-            { id },
-            meshPolyhedraVertexAttributeRange(id),
-          )
-        },
-      },
-    )
+    storedConfig.minimum = minimum
+    storedConfig.maximum = maximum
+    storedConfig.isAutoSet = true
+    return setMeshPolyhedraVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshPolyhedraVertexAttributeColorMap(id) {
@@ -145,6 +134,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     meshPolyhedraVertexAttributeName,
     meshPolyhedraVertexAttributeRange,
     meshPolyhedraVertexAttributeColorMap,
+    meshPolyhedraVertexAttributeStoredConfig,
     setMeshPolyhedraVertexAttributeName,
     setMeshPolyhedraVertexAttributeRange,
     setMeshPolyhedraVertexAttributeColorMap,
