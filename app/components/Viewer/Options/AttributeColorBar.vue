@@ -22,6 +22,7 @@
           @update:model-value="(value) => (minimum = Number(value))"
           label="Min"
           type="number"
+          :max="maximum"
           density="compact"
           hide-details
           variant="outlined"
@@ -42,6 +43,7 @@
           @update:model-value="(value) => (maximum = Number(value))"
           label="Max"
           type="number"
+          :min="minimum"
           density="compact"
           hide-details
           variant="outlined"

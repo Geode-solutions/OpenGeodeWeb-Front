@@ -18,13 +18,23 @@
   const rangeMin = computed({
     get: () => (range.value ? range.value[0] : undefined),
     set: (val) => {
-      range.value = [val, range.value ? range.value[1] : undefined]
+      const currentMax = range.value ? range.value[1] : undefined
+      let newMin = val
+      if (currentMax !== undefined && val > currentMax) {
+        newMin = currentMax
+      }
+      range.value = [newMin, currentMax]
     },
   })
   const rangeMax = computed({
     get: () => (range.value ? range.value[1] : undefined),
     set: (val) => {
-      range.value = [range.value ? range.value[0] : undefined, val]
+      const currentMin = range.value ? range.value[0] : undefined
+      let newMax = val
+      if (currentMin !== undefined && val < currentMin) {
+        newMax = currentMin
+      }
+      range.value = [currentMin, newMax]
     },
   })
 
