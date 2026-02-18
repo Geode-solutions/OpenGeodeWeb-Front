@@ -48,6 +48,7 @@
     get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshPointsVertexAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshPointsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -108,7 +109,6 @@
               v-model:vertex_attribute_name="vertex_attribute_name"
               v-model:vertex_attribute_range="vertex_attribute_range"
               v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-              vertexStorePrefix="meshPointsVertex"
             />
           </v-col>
         </v-row>

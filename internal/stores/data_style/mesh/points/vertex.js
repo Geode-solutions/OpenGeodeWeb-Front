@@ -35,20 +35,19 @@ export function useMeshPointsVertexAttributeStyle() {
       return storedConfigs[name]
     }
     return setMeshPointsVertexAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
-      isAutoSet: false,
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
   function setMeshPointsVertexAttributeStoredConfig(
     id,
     name,
-    { minimum, maximum, colorMap, isAutoSet },
+    { minimum, maximum, colorMap },
   ) {
     const storedConfigs = meshPointsVertexAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap, isAutoSet }
+    storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }
 
@@ -94,7 +93,6 @@ export function useMeshPointsVertexAttributeStyle() {
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name)
     storedConfig.minimum = minimum
     storedConfig.maximum = maximum
-    storedConfig.isAutoSet = true
     return setMeshPointsVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
@@ -107,6 +105,14 @@ export function useMeshPointsVertexAttributeStyle() {
   function setMeshPointsVertexAttributeColorMap(id, colorMap) {
     const name = meshPointsVertexAttributeName(id)
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 

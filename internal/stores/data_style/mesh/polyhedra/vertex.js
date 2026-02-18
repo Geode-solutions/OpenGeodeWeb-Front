@@ -35,20 +35,19 @@ export function useMeshPolyhedraVertexAttributeStyle() {
       return storedConfigs[name]
     }
     return setMeshPolyhedraVertexAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
-      isAutoSet: false,
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
   function setMeshPolyhedraVertexAttributeStoredConfig(
     id,
     name,
-    { minimum, maximum, colorMap, isAutoSet },
+    { minimum, maximum, colorMap },
   ) {
     const storedConfigs = meshPolyhedraVertexAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap, isAutoSet }
+    storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }
 
@@ -94,7 +93,6 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
     storedConfig.minimum = minimum
     storedConfig.maximum = maximum
-    storedConfig.isAutoSet = true
     return setMeshPolyhedraVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
@@ -107,6 +105,14 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   function setMeshPolyhedraVertexAttributeColorMap(id, colorMap) {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 

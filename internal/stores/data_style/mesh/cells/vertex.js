@@ -35,20 +35,19 @@ export function useMeshCellsVertexAttributeStyle() {
       return storedConfigs[name]
     }
     return setMeshCellsVertexAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
-      isAutoSet: false,
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
   function setMeshCellsVertexAttributeStoredConfig(
     id,
     name,
-    { minimum, maximum, colorMap, isAutoSet },
+    { minimum, maximum, colorMap },
   ) {
     const storedConfigs = meshCellsVertexAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap, isAutoSet }
+    storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }
 
@@ -94,7 +93,6 @@ export function useMeshCellsVertexAttributeStyle() {
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
     storedConfig.minimum = minimum
     storedConfig.maximum = maximum
-    storedConfig.isAutoSet = true
     return setMeshCellsVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
@@ -107,6 +105,14 @@ export function useMeshCellsVertexAttributeStyle() {
   function setMeshCellsVertexAttributeColorMap(id, colorMap) {
     const name = meshCellsVertexAttributeName(id)
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 

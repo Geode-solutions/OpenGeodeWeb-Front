@@ -35,20 +35,19 @@ export function useMeshEdgesVertexAttributeStyle() {
       return storedConfigs[name]
     }
     return setMeshEdgesVertexAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
-      isAutoSet: false,
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
   function setMeshEdgesVertexAttributeStoredConfig(
     id,
     name,
-    { minimum, maximum, colorMap, isAutoSet },
+    { minimum, maximum, colorMap },
   ) {
     const storedConfigs = meshEdgesVertexAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap, isAutoSet }
+    storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }
 
@@ -94,7 +93,6 @@ export function useMeshEdgesVertexAttributeStyle() {
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
     storedConfig.minimum = minimum
     storedConfig.maximum = maximum
-    storedConfig.isAutoSet = true
     return setMeshEdgesVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
@@ -107,6 +105,14 @@ export function useMeshEdgesVertexAttributeStyle() {
   function setMeshEdgesVertexAttributeColorMap(id, colorMap) {
     const name = meshEdgesVertexAttributeName(id)
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 

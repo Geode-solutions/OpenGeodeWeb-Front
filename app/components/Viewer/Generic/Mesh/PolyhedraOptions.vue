@@ -45,6 +45,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshPolyhedraVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -76,6 +77,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshPolyhedraPolyhedronAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })

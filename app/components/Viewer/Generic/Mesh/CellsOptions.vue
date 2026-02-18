@@ -49,6 +49,7 @@
     get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshCellsVertexAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -77,6 +78,7 @@
     get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshCellsCellAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })

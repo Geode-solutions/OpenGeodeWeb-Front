@@ -8,7 +8,7 @@
   const range = defineModel("range", { type: Array })
   const colorMap = defineModel("colorMap", { type: String })
 
-  const { label, id, schema } = defineProps({
+  const { id, schema } = defineProps({
     id: { type: String, required: true },
     schema: { type: Object, required: true },
   })
@@ -16,15 +16,15 @@
   const attributes = ref([])
 
   const rangeMin = computed({
-    get: () => range.value[0],
+    get: () => (range.value ? range.value[0] : undefined),
     set: (val) => {
-      range.value = [val, range.value[1]]
+      range.value = [val, range.value ? range.value[1] : undefined]
     },
   })
   const rangeMax = computed({
-    get: () => range.value[1],
+    get: () => (range.value ? range.value[1] : undefined),
     set: (val) => {
-      range.value = [range.value[0], val]
+      range.value = [range.value ? range.value[0] : undefined, val]
     },
   })
 
@@ -44,7 +44,7 @@
   function getAttributes() {
     geodeStore.request(
       schema,
-      { id: id },
+      { id },
       {
         response_function: (response) => {
           attributes.value = response.attributes
@@ -63,6 +63,24 @@
       getAttributes()
     },
   )
+
+  watch(
+    () => [name.value, attributes.value],
+    () => {
+      if (
+        name.value &&
+        attributes.value.length > 0 &&
+        (range.value === undefined ||
+          range.value[0] === undefined ||
+          colorMap.value === undefined)
+      ) {
+        resetRange()
+        if (colorMap.value === undefined) {
+          colorMap.value = "Cool to Warm"
+        }
+      }
+    },
+  )
 </script>
 
 <template>
@@ -71,7 +89,6 @@
     :items="attributes.map((attribute) => attribute.attribute_name)"
     item-title="attribute_name"
     item-value="attribute_name"
-    :label="label"
     density="compact"
   />
   <ViewerOptionsAttributeColorBar

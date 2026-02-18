@@ -35,20 +35,19 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       return storedConfigs[name]
     }
     return setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
-      isAutoSet: false,
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
   function setMeshPolygonsPolygonAttributeStoredConfig(
     id,
     name,
-    { minimum, maximum, colorMap, isAutoSet },
+    { minimum, maximum, colorMap },
   ) {
     const storedConfigs = meshPolygonsPolygonAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap, isAutoSet }
+    storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }
 
@@ -92,7 +91,6 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
     storedConfig.minimum = minimum
     storedConfig.maximum = maximum
-    storedConfig.isAutoSet = true
     return setMeshPolygonsPolygonAttributeColorMap(id, storedConfig.colorMap)
   }
 
@@ -105,6 +103,14 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   function setMeshPolygonsPolygonAttributeColorMap(id, colorMap) {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
     return viewerStore.request(

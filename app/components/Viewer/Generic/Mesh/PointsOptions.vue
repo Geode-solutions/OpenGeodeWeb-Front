@@ -48,6 +48,7 @@
     get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshPointsVertexAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshPointsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })

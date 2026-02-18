@@ -45,6 +45,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshPolyhedraVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -76,6 +77,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshPolyhedraPolyhedronAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -123,8 +125,6 @@
           v-model:polyhedron_attribute_color_map="
             polyhedron_attribute_color_map
           "
-          polyhedronStorePrefix="meshPolyhedraPolyhedron"
-          vertexStorePrefix="meshPolyhedraVertex"
         />
       </template>
     </template>

@@ -48,6 +48,7 @@
     get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -76,6 +77,7 @@
     get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshEdgesEdgeAttributeName(id.value, newValue)
+      await dataStyleStore.updateMeshEdgesEdgeAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
