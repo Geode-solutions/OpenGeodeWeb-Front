@@ -64,6 +64,7 @@
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshPolygonsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -74,6 +75,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshPolygonsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -96,6 +98,7 @@
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshPolygonsPolygonAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -106,6 +109,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshPolygonsPolygonAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })

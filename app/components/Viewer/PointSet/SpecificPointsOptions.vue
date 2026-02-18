@@ -60,6 +60,7 @@
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshPointsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -70,6 +71,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshPointsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })

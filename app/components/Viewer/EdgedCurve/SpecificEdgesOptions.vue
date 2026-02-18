@@ -60,6 +60,7 @@
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -70,6 +71,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -89,6 +91,7 @@
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshEdgesEdgeAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -96,6 +99,7 @@
     get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshEdgesEdgeAttributeColorMap(id.value, newValue)
+      await dataStyleStore.updateMeshEdgesEdgeAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })

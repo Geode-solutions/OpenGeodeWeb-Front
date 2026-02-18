@@ -61,6 +61,7 @@
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -71,6 +72,7 @@
         id.value,
         newValue,
       )
+      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -90,6 +92,7 @@
         newValue[0],
         newValue[1],
       )
+      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -97,6 +100,7 @@
     get: () => dataStyleStore.meshCellsCellAttributeColorMap(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshCellsCellAttributeColorMap(id.value, newValue)
+      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
