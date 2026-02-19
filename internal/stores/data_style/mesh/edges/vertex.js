@@ -18,7 +18,6 @@ export function useMeshEdgesVertexAttributeStyle() {
     return meshEdgesCommonStyle.meshEdgesColoring(id).vertex
   }
 
-
   function meshEdgesVertexAttributeStoredConfig(id, name) {
     const { storedConfigs } = meshEdgesVertexAttribute(id)
     if (name in storedConfigs) {
