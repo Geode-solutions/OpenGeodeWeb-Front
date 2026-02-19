@@ -7,10 +7,9 @@
 
   const infraStore = useInfraStore()
 
-  const props = defineProps({
+  const { versions_schema } = defineProps({
     versions_schema: { type: Object, required: true },
   })
-  const { versions_schema } = props
 </script>
 
 <template>

@@ -1,13 +1,13 @@
 <script setup>
+  import DragAndDrop from "@ogw_front/components/DragAndDrop"
   import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { upload_file } from "@ogw_front/utils/upload_file"
-  import DragAndDrop from "@ogw_front/components/DragAndDrop"
 
   const schema = schemas.opengeodeweb_back.upload_file
 
   const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"])
 
-  const props = defineProps({
+  const { multiple, accept, files, auto_upload, mini } = defineProps({
     multiple: { type: Boolean, required: true },
     accept: { type: String, required: true },
     files: { type: Array, required: false, default: [] },
@@ -15,14 +15,14 @@
     mini: { type: Boolean, required: false, default: false },
   })
 
-  const internal_files = ref(props.files)
+  const internal_files = ref(files)
   const loading = ref(false)
   const files_uploaded = ref(false)
 
   const toggle_loading = useToggle(loading)
 
   function processSelectedFiles(files) {
-    if (props.multiple) {
+    if (multiple) {
       internal_files.value = [...internal_files.value, ...files]
     } else {
       internal_files.value = [files[0]]
@@ -39,26 +39,9 @@
 
   async function upload_files() {
     toggle_loading()
-    var promise_array = []
-    for (const file of internal_files.value) {
-      const promise = new Promise((resolve, reject) => {
-        upload_file(
-          { route: schema.$id, file },
-          {
-            request_error_function: () => {
-              reject()
-            },
-            response_function: () => {
-              resolve()
-            },
-            response_error_function: () => {
-              reject()
-            },
-          },
-        )
-      })
-      promise_array.push(promise)
-    }
+    const promise_array = internal_files.value.map((file) =>
+      upload_file({ route: schema.$id, file }),
+    )
     await Promise.all(promise_array)
     files_uploaded.value = true
     emit("files_uploaded", internal_files.value)
@@ -66,15 +49,15 @@
     toggle_loading()
   }
 
-  if (props.files.length) {
-    internal_files.value = props.files
-    if (props.auto_upload) {
+  if (files.length > 0) {
+    internal_files.value = files
+    if (auto_upload) {
       upload_files()
     }
   }
 
   watch(
-    () => props.files,
+    () => files,
     (newVal) => {
       internal_files.value = newVal
     },
@@ -83,7 +66,7 @@
 
   watch(internal_files, (value) => {
     files_uploaded.value = false
-    if (props.auto_upload && value.length > 0) {
+    if (auto_upload && value.length > 0) {
       upload_files()
     }
   })
@@ -91,8 +74,8 @@
 
 <template>
   <DragAndDrop
-    :multiple="props.multiple"
-    :accept="props.accept"
+    :multiple="multiple"
+    :accept="accept"
     :loading="loading"
     :show-extensions="false"
     @files-selected="processSelectedFiles"

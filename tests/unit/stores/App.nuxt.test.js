@@ -4,15 +4,19 @@ import { setActivePinia } from "pinia"
 
 import { useAppStore } from "@ogw_front/stores/app"
 
-beforeEach(async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
-})
+import { setupActivePinia } from "../../utils"
 
-describe("App Store", () => {
+// Constants
+const SINGLE_STORE_LENGTH = 1
+const MULTIPLE_STORES_LENGTH = 2
+const FIRST_INDEX = 0
+const SECOND_INDEX = 1
+const CALL_COUNT_ONCE = 1
+
+beforeEach(() => {
+  setupActivePinia()
+})
+describe("app store", () => {
   describe("state", () => {
     test("initial state", () => {
       const appStore = useAppStore()
@@ -30,38 +34,38 @@ describe("App Store", () => {
         const mock_store = {
           $id: "testStore",
           save: vi.fn().mockImplementation(() => ({ data: "test" })),
-          load: vi.fn().mockImplementation(() => {}),
+          load: vi.fn().mockImplementation(),
         }
 
         appStore.registerStore(mock_store)
 
-        expect(appStore.stores.length).toBe(1)
-        expect(appStore.stores[0]).toStrictEqual(mock_store)
+        expect(appStore.stores).toHaveLength(SINGLE_STORE_LENGTH)
+        expect(appStore.stores[FIRST_INDEX]).toStrictEqual(mock_store)
       })
 
       test("register multiple stores", () => {
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "userStore",
-          save: vi.fn().mockImplementation(() => {}),
-          load: vi.fn().mockImplementation(() => {}),
+          save: vi.fn().mockImplementation(),
+          load: vi.fn().mockImplementation(),
         }
         const mock_store_2 = {
           $id: "geodeStore",
-          save: vi.fn().mockImplementation(() => {}),
-          load: vi.fn().mockImplementation(() => {}),
+          save: vi.fn().mockImplementation(),
+          load: vi.fn().mockImplementation(),
         }
 
         appStore.registerStore(mock_store_1)
         appStore.registerStore(mock_store_2)
 
-        expect(appStore.stores.length).toBe(2)
-        expect(appStore.stores[0].$id).toBe("userStore")
-        expect(appStore.stores[1].$id).toBe("geodeStore")
+        expect(appStore.stores).toHaveLength(MULTIPLE_STORES_LENGTH)
+        expect(appStore.stores[FIRST_INDEX].$id).toBe("userStore")
+        expect(appStore.stores[SECOND_INDEX].$id).toBe("geodeStore")
       })
     })
 
-    describe("Export", () => {
+    describe("export", () => {
       test("export stores with exportStores method", async () => {
         const appStore = useAppStore()
         const mock_store_1 = {
@@ -70,14 +74,14 @@ describe("App Store", () => {
             name: "toto",
             email: "toto@titi.com",
           })),
-          importStores: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(),
         }
         const mock_store_2 = {
           $id: "geodeStore",
           exportStores: vi
             .fn()
             .mockImplementation(() => ({ items: [], total: 0 })),
-          importStores: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(),
         }
 
         appStore.registerStore(mock_store_1)
@@ -85,9 +89,9 @@ describe("App Store", () => {
 
         const snapshot = await appStore.exportStores()
 
-        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(1)
-        expect(mock_store_2.exportStores).toHaveBeenCalledTimes(1)
-        expect(snapshot).toEqual({
+        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE)
+        expect(mock_store_2.exportStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE)
+        expect(snapshot).toStrictEqual({
           userStore: { name: "toto", email: "toto@titi.com" },
           geodeStore: { items: [], total: 0 },
         })
@@ -98,11 +102,11 @@ describe("App Store", () => {
         const mock_store_1 = {
           $id: "withSave",
           exportStores: vi.fn().mockImplementation(() => ({ data: "test" })),
-          importStores: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(),
         }
         const mock_store_2 = {
           $id: "withoutSave",
-          importStores: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(),
         }
 
         appStore.registerStore(mock_store_1)
@@ -110,7 +114,7 @@ describe("App Store", () => {
 
         const snapshot = await appStore.exportStores()
 
-        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(1)
+        expect(mock_store_1.exportStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE)
         expect(snapshot).toEqual({
           withSave: { data: "test" },
         })
@@ -120,12 +124,12 @@ describe("App Store", () => {
       test("return empty snapshot when no stores registered", async () => {
         const appStore = useAppStore()
         const snapshot = await appStore.exportStores()
-        expect(snapshot).toEqual({})
+        expect(snapshot).toStrictEqual({})
       })
     })
 
     describe("load", () => {
-      test("App Store > actions > importStores > import stores with importStores method", async () => {
+      test("import stores with importStores method", async () => {
         const appStore = useAppStore()
         const userStore = {
           $id: "userStore",
@@ -142,20 +146,20 @@ describe("App Store", () => {
           geodeStore: { other: "data" },
         }
         await appStore.importStores(snapshot)
-        expect(userStore.importStores).toHaveBeenCalledTimes(1)
-        expect(geodeStore.importStores).toHaveBeenCalledTimes(1)
+        expect(userStore.importStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE)
+        expect(geodeStore.importStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE)
       })
 
-      test("skip stores without importStores method", () => {
+      test("skip stores without importStores method", async () => {
         const appStore = useAppStore()
         const mock_store_1 = {
           $id: "withImport",
-          save: vi.fn().mockImplementation(() => {}),
-          importStores: vi.fn().mockImplementation(() => {}),
+          save: vi.fn().mockImplementation(),
+          importStores: vi.fn().mockImplementation(),
         }
         const mock_store_2 = {
           $id: "withoutImport",
-          save: vi.fn().mockImplementation(() => {}),
+          save: vi.fn().mockImplementation(),
         }
         appStore.registerStore(mock_store_1)
         appStore.registerStore(mock_store_2)
@@ -163,22 +167,20 @@ describe("App Store", () => {
           withImport: { data: "test" },
           withoutImport: { data: "ignored" },
         }
-        appStore.importStores(snapshot)
-        expect(mock_store_1.importStores).toHaveBeenCalledTimes(1)
+        await appStore.importStores(snapshot)
+        expect(mock_store_1.importStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE)
         expect(mock_store_2.importStores).toBeUndefined()
       })
 
-      test("warn when store not found in snapshot", () => {
+      test("warn when store not found in snapshot", async () => {
         const appStore = useAppStore()
-        const console_warn_spy = vi
-          .spyOn(console, "warn")
-          .mockImplementation(() => {})
+        const console_warn_spy = vi.spyOn(console, "warn").mockImplementation()
         const mock_store = {
           $id: "testStore",
-          importStores: vi.fn().mockImplementation(() => {}),
+          importStores: vi.fn().mockImplementation(),
         }
         appStore.registerStore(mock_store)
-        appStore.importStores({})
+        await appStore.importStores({})
         expect(console_warn_spy).toHaveBeenCalledWith(
           expect.stringContaining("Stores not found in snapshot: testStore"),
         )

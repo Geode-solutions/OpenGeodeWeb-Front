@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshCellsCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshCellsCellAttributeSchemas =
@@ -18,26 +18,15 @@ export function useMeshCellsCellAttributeStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).cell
   }
 
-  async function updateMeshCellsCellAttribute(id) {
-    const name = meshCellsCellAttributeName(id)
-    const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
-    await meshCellsCellAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await meshCellsCellAttributeColorMap(id, storedConfig.colorMap)
-  }
-
   function meshCellsCellAttributeStoredConfig(id, name) {
-    const storedConfigs = meshCellsCellAttribute(id).storedConfigs
+    const { storedConfigs } = meshCellsCellAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
     return setMeshCellsCellAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
@@ -67,10 +56,11 @@ export function useMeshCellsCellAttributeStyle() {
       {
         response_function: async () => {
           meshCellsCellAttribute(id).name = name
-          const { minimum, maximum, colorMap } =
-            meshCellsCellAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshCellsCellAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshCellsCellAttributeRange(id, minimum, maximum)
-          await setMeshCellsCellAttributeColorMap(id, colorMap)
           console.log(
             setMeshCellsCellAttributeName.name,
             { id },
@@ -90,21 +80,9 @@ export function useMeshCellsCellAttributeStyle() {
   function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const name = meshCellsCellAttributeName(id)
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
-    return viewerStore.request(
-      meshCellsCellAttributeSchemas.scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          console.log(
-            setMeshCellsCellAttributeRange.name,
-            { id },
-            meshCellsCellAttributeRange(id),
-          )
-        },
-      },
-    )
+    storedConfig.minimum = minimum
+    storedConfig.maximum = maximum
+    return setMeshCellsCellAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshCellsCellAttributeColorMap(id) {
@@ -116,6 +94,14 @@ export function useMeshCellsCellAttributeStyle() {
   function setMeshCellsCellAttributeColorMap(id, colorMap) {
     const name = meshCellsCellAttributeName(id)
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 
@@ -145,9 +131,9 @@ export function useMeshCellsCellAttributeStyle() {
     meshCellsCellAttributeName,
     meshCellsCellAttributeRange,
     meshCellsCellAttributeColorMap,
+    meshCellsCellAttributeStoredConfig,
     setMeshCellsCellAttributeName,
     setMeshCellsCellAttributeRange,
     setMeshCellsCellAttributeColorMap,
-    updateMeshCellsCellAttribute,
   }
 }

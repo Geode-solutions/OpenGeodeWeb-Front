@@ -6,9 +6,9 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 import { useDataStyleStateStore } from "../state"
-import { useMeshPointsStyle } from "./points"
-import { useMeshEdgesStyle } from "./edges"
 import { useMeshCellsStyle } from "./cells"
+import { useMeshEdgesStyle } from "./edges"
+import { useMeshPointsStyle } from "./points"
 import { useMeshPolygonsStyle } from "./polygons"
 import { useMeshPolyhedraStyle } from "./polyhedra"
 
@@ -58,9 +58,8 @@ export default function useMeshStyle() {
         promise_array.push(meshPolygonsStyle.applyMeshPolygonsStyle(id))
       } else if (key === "polyhedra") {
         promise_array.push(meshPolyhedraStyle.applyMeshPolyhedraStyle(id))
-      } else if (key === "attributes") {
-      } else {
-        throw new Error("Unknown mesh key: " + key)
+      } else if (key !== "attributes") {
+        throw new Error(`Unknown mesh key: ${key}`)
       }
     }
     return Promise.all(promise_array)

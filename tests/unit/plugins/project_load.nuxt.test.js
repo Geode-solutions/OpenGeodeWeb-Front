@@ -1,16 +1,22 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
-import { database } from "../../../internal/database/database.js"
 
-import { useTreeviewStore } from "@ogw_front/stores/treeview"
 import { useAppStore } from "@ogw_front/stores/app"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import { useDataStore } from "@ogw_front/stores/data"
+import { useTreeviewStore } from "@ogw_front/stores/treeview"
+
+import { database } from "../../../internal/database/database.js"
+import { setupActivePinia } from "../../utils"
+
+const PANEL_WIDTH = 320
+const Z_SCALE = 1.5
+const STORES_SLICE_START = 1
 
 vi.mock("../../../internal/utils/viewer_call", () => ({
-  viewer_call: vi.fn(() => Promise.resolve()),
+  viewer_call: vi.fn(async () => {
+    await Promise.resolve()
+  }),
 }))
 vi.mock("../../../app/stores/hybrid_viewer", () => ({
   useHybridViewerStore: () => ({
@@ -25,12 +31,7 @@ vi.mock("../../../app/stores/hybrid_viewer", () => ({
 }))
 
 beforeEach(() => {
-  setActivePinia(
-    createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    }),
-  )
+  setupActivePinia()
 })
 
 describe("Project import", () => {
@@ -42,15 +43,15 @@ describe("Project import", () => {
       dataStyle: useDataStyleStore(),
       hybrid: useHybridViewerStore(),
     }
-    Object.values(stores)
-      .slice(1)
-      .forEach((store) => stores.app.registerStore(store))
+    const storesArray = Object.values(stores)
+    for (const store of storesArray.slice(STORES_SLICE_START)) {
+      stores.app.registerStore(store)
+    }
 
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(
       async (snapshot) => {
-        for (const item of snapshot?.items || []) {
-          await database.data.put(item)
-        }
+        const items = snapshot?.items || []
+        await Promise.all(items.map((item) => database.data.put(item)))
       },
     )
 
@@ -73,13 +74,13 @@ describe("Project import", () => {
         selection: [],
         components_selection: [],
         isAdditionnalTreeDisplayed: false,
-        panelWidth: 320,
+        panelWidth: PANEL_WIDTH,
         model_id: "",
         isTreeCollection: false,
-        selectedTree: null,
+        selectedTree: undefined,
       },
       dataStyle: { styles: { abc123: { some: "style" } } },
-      hybridViewer: { zScale: 1.5 },
+      hybridViewer: { zScale: Z_SCALE },
     }
 
     await stores.app.importStores(snapshot)

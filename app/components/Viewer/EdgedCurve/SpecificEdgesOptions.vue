@@ -1,8 +1,8 @@
 <script setup>
-  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
-  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
-  import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
   import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg"
+  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
+  import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
+  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
@@ -10,11 +10,11 @@
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const props = defineProps({
+  const { itemProps } = defineProps({
     itemProps: { type: Object, required: true },
   })
 
-  const id = toRef(() => props.itemProps.id)
+  const id = toRef(() => itemProps.id)
 
   const visibility = computed({
     get: () => dataStyleStore.meshEdgesVisibility(id.value),
@@ -48,7 +48,6 @@
     get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue)
-      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -60,7 +59,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -102,7 +100,7 @@
 </script>
 <template>
   <ViewerContextMenuItem
-    :itemProps="props.itemProps"
+    :itemProps="itemProps"
     tooltip="Edges options"
     :btn_image="EdgedCurveEdges"
   >

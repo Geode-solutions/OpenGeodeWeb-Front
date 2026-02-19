@@ -2,10 +2,10 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 // Local imports
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import { useGeodeStore } from "@ogw_front/stores/geode"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
 async function importWorkflow(files) {
@@ -73,22 +73,9 @@ async function importFile(filename, geode_object_type) {
 
 async function importWorkflowFromSnapshot(items) {
   console.log("[importWorkflowFromSnapshot] start", { count: items?.length })
-  const dataStore = useDataStore()
-  const treeviewStore = useTreeviewStore()
-  const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const ids = []
-  for (const item of items) {
-    const id = await importItem(
-      item,
-      dataStore,
-      treeviewStore,
-      dataStyleStore,
-      hybridViewerStore,
-    )
-    ids.push(id)
-  }
+  const ids = await Promise.all(items.map((item) => importItem(item)))
   hybridViewerStore.remoteRender()
   console.log("[importWorkflowFromSnapshot] done", { ids })
   return ids

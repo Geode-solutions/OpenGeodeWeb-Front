@@ -1,13 +1,16 @@
+import { computed, reactive, ref, shallowRef } from "vue"
 import { describe, expect, test } from "vitest"
+import ResizeObserver from "resize-observer-polyfill"
 import { mount } from "@vue/test-utils"
-import Step from "@ogw_front/components/Step"
+
 import ObjectSelector from "@ogw_front/components/ObjectSelector"
+import Step from "@ogw_front/components/Step"
 
 import { vuetify } from "../../utils"
 
-global.ResizeObserver = require("resize-observer-polyfill")
+globalThis.ResizeObserver = ResizeObserver
 
-describe("Step", async () => {
+describe(Step, () => {
   test(`BRep`, async () => {
     const geode_object_type = ref("BRep")
     const files = ref([])
@@ -20,9 +23,7 @@ describe("Step", async () => {
           component: {
             component_name: shallowRef(ObjectSelector),
             component_options: {
-              filenames: computed(() => {
-                return files.value.map((file) => file.name)
-              }),
+              filenames: computed(() => files.value.map((file) => file.name)),
               key: "",
             },
           },
@@ -43,6 +44,6 @@ describe("Step", async () => {
       },
       props: { step_index: 0 },
     })
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper.exists()).toBeTruthy()
   })
 })

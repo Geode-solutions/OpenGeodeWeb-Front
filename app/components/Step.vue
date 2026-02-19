@@ -1,12 +1,12 @@
 <script setup>
   function truncate(text, maxLength) {
     if (text.length > maxLength) {
-      return text.slice(0, maxLength) + "..."
+      return `${text.slice(0, maxLength)}...`
     }
     return text
   }
 
-  const props = defineProps({
+  const { step_index } = defineProps({
     step_index: { type: Number, required: true },
   })
 
@@ -26,17 +26,17 @@
   }
 
   function increment_step() {
-    stepper_tree.current_step_index++
+    stepper_tree.current_step_index += 1
   }
 
   function decrement_step() {
-    stepper_tree.current_step_index--
+    stepper_tree.current_step_index -= 1
   }
 
   const sortedChips = computed(() => {
-    const chips = steps.value[props.step_index]?.chips || []
-    return [...chips].sort((a, b) =>
-      a.localeCompare(b, undefined, {
+    const chips = steps.value[step_index]?.chips || []
+    return chips.toSorted((chipA, chipB) =>
+      chipA.localeCompare(chipB, undefined, {
         numeric: true,
         sensitivity: "base",
       }),

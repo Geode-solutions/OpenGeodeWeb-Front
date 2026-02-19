@@ -2,66 +2,79 @@
   import GlassCard from "@ogw_front/components/GlassCard"
   import { useTheme } from "vuetify"
   import { useMenuStore } from "@ogw_front/stores/menu"
-  import { useElementSize } from "@vueuse/core"
+  import { useTheme } from "vuetify"
+
+  const CARD_WIDTH = 320
+  const CARD_HEIGHT = 500
+  const MARGIN = 60
+  const RADIUS = 80
+  const OFFSET = 40
 
   const menuStore = useMenuStore()
   const theme = useTheme()
   const primaryColor = computed(() => theme.current.value.colors.primary)
-  const props = defineProps({
+  const { index, itemProps, tooltip, btn_image } = defineProps({
     index: { type: Number, required: true },
     itemProps: { type: Object, required: true },
     tooltip: { type: String, required: true },
     btn_image: { type: String, required: true },
   })
 
-  const is_active = computed(() => menuStore.active_item_index === props.index)
-  const optionsRef = ref(null)
+  const is_active = computed(() => menuStore.active_item_index === index)
+  const optionsRef = ref(undefined)
   const { height: optionsHeight } = useElementSize(optionsRef)
 
   const maxCardHeight = computed(() =>
-    Math.min(500, menuStore.containerHeight - 40),
+    Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET),
   )
 
   const optionsStyle = computed(() => {
-    if (!is_active.value || !optionsHeight.value) return {}
-    const angle = (props.index / props.itemProps.totalItems) * 2 * Math.PI
-    const radius = 80
-    const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius
-    const h = optionsHeight.value
-    const margin = 20
-    let dy = 0
-
-    if (absoluteButtonY - h / 2 < margin) {
-      dy = margin - (absoluteButtonY - h / 2)
-    } else if (absoluteButtonY + h / 2 > menuStore.containerHeight - margin) {
-      dy = menuStore.containerHeight - margin - (absoluteButtonY + h / 2)
+    if (!is_active.value || !optionsHeight.value) {
+      return {}
     }
-    return { top: `calc(50% + ${dy}px)` }
+    const angle = (index / itemProps.totalItems) * 2 * Math.PI
+    const radius = RADIUS
+    const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius
+    const height = optionsHeight.value
+    const margin = MARGIN
+    let offsetY = 0
+
+    if (absoluteButtonY - height / 2 < margin) {
+      offsetY = margin - (absoluteButtonY - height / 2)
+    } else if (
+      absoluteButtonY + height / 2 >
+      menuStore.containerHeight - margin
+    ) {
+      offsetY =
+        menuStore.containerHeight - margin - (absoluteButtonY + height / 2)
+    }
+    return { top: `calc(50% + ${offsetY}px)` }
   })
 
   const optionsClass = computed(() => {
-    const loc = props.itemProps.tooltip_location
-    const cardWidth = 320
-    const margin = 60
-    const radius = 80
+    const loc = itemProps.tooltip_location
+    const margin = MARGIN
+    const radius = RADIUS
     if (loc === "right") {
-      return menuStore.menuX + radius + margin + cardWidth >
+      return menuStore.menuX + radius + margin + CARD_WIDTH >
         menuStore.containerWidth
         ? "options-left"
         : "options-right"
     }
-    return menuStore.menuX - radius - margin - cardWidth < 0
+    return menuStore.menuX - radius - margin - CARD_WIDTH < 0
       ? "options-right"
       : "options-left"
   })
 
-  const toggleOptions = () => menuStore.toggleItemOptions(props.index)
+  function toggleOptions() {
+    menuStore.toggleItemOptions(index)
+  }
 </script>
 <template>
   <v-sheet class="menu-item-container transition-swing" color="transparent">
     <v-tooltip
-      :location="props.itemProps.tooltip_location"
-      :origin="props.itemProps.tooltip_origin"
+      :location="itemProps.tooltip_location"
+      :origin="itemProps.tooltip_origin"
     >
       <template v-slot:activator="{ props: tooltipProps }">
         <v-btn
@@ -75,7 +88,7 @@
           <v-img :src="btn_image" height="28" width="28" />
         </v-btn>
       </template>
-      <span>{{ props.tooltip }}</span>
+      <span>{{ tooltip }}</span>
     </v-tooltip>
 
     <v-sheet

@@ -1,12 +1,12 @@
 // Third party imports
 
 // Local imports
-import { useMeshEdgesCommonStyle } from "./common"
-import { useMeshEdgesVisibilityStyle } from "./visibility"
 import { useMeshEdgesColorStyle } from "./color"
-import { useMeshEdgesWidthStyle } from "./width"
-import { useMeshEdgesVertexAttributeStyle } from "./vertex"
+import { useMeshEdgesCommonStyle } from "./common"
 import { useMeshEdgesEdgeAttributeStyle } from "./edge"
+import { useMeshEdgesVertexAttributeStyle } from "./vertex"
+import { useMeshEdgesVisibilityStyle } from "./visibility"
+import { useMeshEdgesWidthStyle } from "./width"
 
 // Local constants
 
@@ -33,14 +33,14 @@ export function useMeshEdgesStyle() {
       )
     } else if (type === "textures") {
       const textures = meshEdgesTexturesStore.meshEdgesTextures(id)
-      if (textures === null) {
+      if (textures === undefined) {
         return Promise.resolve()
       }
       return meshEdgesTexturesStore.setMeshEdgesTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(
@@ -49,12 +49,12 @@ export function useMeshEdgesStyle() {
       )
     } else if (type === "edge") {
       const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name)
     } else {
-      throw new Error("Unknown mesh edges coloring type: " + type)
+      throw new Error(`Unknown mesh edges coloring type: ${type}`)
     }
   }
 

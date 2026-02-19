@@ -1,7 +1,7 @@
 <script setup>
   import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
-  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
   import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
+  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
 
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
@@ -9,13 +9,13 @@
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const props = defineProps({
+  const { itemProps, btn_image, tooltip } = defineProps({
     itemProps: { type: Object, required: true },
     btn_image: { type: String, required: true },
     tooltip: { type: String, required: false, default: "Cells options" },
   })
 
-  const id = toRef(() => props.itemProps.id)
+  const id = toRef(() => itemProps.id)
 
   const visibility = computed({
     get: () => dataStyleStore.meshCellsVisibility(id.value),
@@ -49,7 +49,6 @@
     get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshCellsVertexAttributeName(id.value, newValue)
-      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -61,7 +60,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshCellsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -79,7 +77,6 @@
     get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshCellsCellAttributeName(id.value, newValue)
-      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -91,7 +88,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshCellsCellAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -106,9 +102,9 @@
 
 <template>
   <ViewerContextMenuItem
-    :itemProps="props.itemProps"
-    :tooltip="props.tooltip"
-    :btn_image="props.btn_image"
+    :itemProps="itemProps"
+    :tooltip="tooltip"
+    :btn_image="btn_image"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />

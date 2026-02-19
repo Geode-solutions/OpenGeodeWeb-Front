@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolygonsCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshPolygonsPolygonAttributeSchemas =
@@ -18,26 +18,15 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).polygon
   }
 
-  async function updateMeshPolygonsPolygonAttribute(id) {
-    const name = meshPolygonsPolygonAttributeName(id)
-    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
-    await meshPolygonsPolygonAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await meshPolygonsPolygonAttributeColorMap(id, storedConfig.colorMap)
-  }
-
   function meshPolygonsPolygonAttributeStoredConfig(id, name) {
-    const storedConfigs = meshPolygonsPolygonAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolygonsPolygonAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
     return setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
@@ -59,8 +48,13 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       meshPolygonsPolygonAttributeSchemas.name,
       { id, name },
       {
-        response_function: () => {
+        response_function: async () => {
           meshPolygonsPolygonAttribute(id).name = name
+          const { minimum, maximum } = meshPolygonsPolygonAttributeStoredConfig(
+            id,
+            name,
+          )
+          await setMeshPolygonsPolygonAttributeRange(id, minimum, maximum)
           console.log(
             setMeshPolygonsPolygonAttributeName.name,
             { id },
@@ -81,29 +75,12 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     )
     return [minimum, maximum]
   }
-  async function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
-    console.log(setMeshPolygonsPolygonAttributeRange.name, {
-      id,
-      minimum,
-      maximum,
-    })
+  function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
-    return viewerStore.request(
-      meshPolygonsPolygonAttributeSchemas.scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          console.log(
-            setMeshPolygonsPolygonAttributeRange.name,
-            { id },
-            meshPolygonsPolygonAttributeRange(id),
-          )
-        },
-      },
-    )
+    storedConfig.minimum = minimum
+    storedConfig.maximum = maximum
+    return setMeshPolygonsPolygonAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshPolygonsPolygonAttributeColorMap(id) {
@@ -115,6 +92,14 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   function setMeshPolygonsPolygonAttributeColorMap(id, colorMap) {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
     return viewerStore.request(
@@ -137,9 +122,9 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     meshPolygonsPolygonAttributeName,
     meshPolygonsPolygonAttributeRange,
     meshPolygonsPolygonAttributeColorMap,
+    meshPolygonsPolygonAttributeStoredConfig,
     setMeshPolygonsPolygonAttributeName,
     setMeshPolygonsPolygonAttributeRange,
     setMeshPolygonsPolygonAttributeColorMap,
-    updateMeshPolygonsPolygonAttribute,
   }
 }

@@ -1,11 +1,11 @@
 // Third party imports
 
 // Local imports
-import { useMeshPointsCommonStyle } from "./common"
-import { useMeshPointsVisibilityStyle } from "./visibility"
 import { useMeshPointsColorStyle } from "./color"
+import { useMeshPointsCommonStyle } from "./common"
 import { useMeshPointsSizeStyle } from "./size"
 import { useMeshPointsVertexAttributeStyle } from "./vertex"
+import { useMeshPointsVisibilityStyle } from "./visibility"
 
 // Local constants
 
@@ -31,14 +31,14 @@ export function useMeshPointsStyle() {
       )
     } else if (type === "textures") {
       const textures = meshPointsTexturesStore.meshPointsTextures(id)
-      if (textures === null) {
+      if (textures === undefined) {
         return Promise.resolve()
       }
       return meshPointsTexturesStore.setMeshPointsTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(
@@ -48,7 +48,7 @@ export function useMeshPointsStyle() {
     } else if (type === "polygon") {
       const name =
         meshPointsPolygonAttributeStyleStore.meshPointsPolygonAttributeName(id)
-      if (name === null) {
+      if (name === undefined) {
         return Promise.resolve()
       }
       await meshPointsPolygonAttributeStyleStore.setMeshPointsPolygonAttributeName(
@@ -56,7 +56,7 @@ export function useMeshPointsStyle() {
         name,
       )
     } else {
-      throw new Error("Unknown mesh points coloring type: " + type)
+      throw new Error(`Unknown mesh points coloring type: ${type}`)
     }
   }
 

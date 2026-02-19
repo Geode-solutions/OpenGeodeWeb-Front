@@ -1,16 +1,16 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { database } from "../../internal/database/database.js"
 import { liveQuery } from "dexie"
 import { useObservable } from "@vueuse/rxjs"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-// Local constants
+// Local imports
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useViewerStore } from "@ogw_front/stores/viewer"
+
 const back_model_schemas = back_schemas.opengeodeweb_back.models
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
-
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useGeodeStore } from "@ogw_front/stores/geode"
 
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
@@ -19,7 +19,7 @@ export const useDataStore = defineStore("data", () => {
   function getItem(id) {
     if (!id) {
       const emptyRef = ref({})
-      emptyRef.fetch = async () => null
+      emptyRef.fetch = async () => ({})
       return emptyRef
     }
     if (itemCache.has(id)) {
@@ -29,7 +29,7 @@ export const useDataStore = defineStore("data", () => {
       liveQuery(() => database.data.get(id)),
       { initialValue: {} },
     )
-    observable.fetch = async () => await database.data.get(id)
+    observable.fetch = () => database.data.get(id)
     itemCache.set(id, observable)
     return observable
   }
@@ -39,45 +39,48 @@ export const useDataStore = defineStore("data", () => {
       liveQuery(() => database.data.toArray()),
       { initialValue: [] },
     )
-    observable.fetch = async () => await database.data.toArray()
+    observable.fetch = () => database.data.toArray()
     return observable
   }
 
   async function formatedMeshComponents(id) {
     const items = await database.model_components.where({ id }).toArray()
     const distinctTypes = [...new Set(items.map((item) => item.type))]
-    const formated_mesh_components = []
-    for (const type of distinctTypes) {
-      const meshComponents = await database.model_components
-        .where({ id, type })
-        .toArray()
 
-      formated_mesh_components.push({
-        id: type,
-        title: type,
-        children: meshComponents.map((meshComponent) => ({
-          id: meshComponent.geode_id,
-          title: meshComponent.name,
-          category: meshComponent.type,
-        })),
-      })
-    }
+    const formated_mesh_components = await Promise.all(
+      distinctTypes.map(async (type) => {
+        const meshComponents = await database.model_components
+          .where({ id, type })
+          .toArray()
+
+        return {
+          id: type,
+          title: type,
+          children: meshComponents.map((meshComponent) => ({
+            id: meshComponent.geode_id,
+            title: meshComponent.name,
+            category: meshComponent.type,
+          })),
+        }
+      }),
+    )
 
     return formated_mesh_components
   }
 
   async function meshComponentType(id, geode_id) {
-    return (
-      await database.model_components.where({ id, geode_id }).toArray()
-    ).map((component) => component.type)[0]
+    const component = await database.model_components
+      .where({ id, geode_id })
+      .first()
+    return component?.type
   }
 
   async function registerObject(id) {
-    return viewerStore.request(viewer_generic_schemas.register, { id })
+    return await viewerStore.request(viewer_generic_schemas.register, { id })
   }
 
   async function deregisterObject(id) {
-    return viewerStore.request(viewer_generic_schemas.deregister, { id })
+    return await viewerStore.request(viewer_generic_schemas.deregister, { id })
   }
 
   async function addItem(id, value) {
@@ -90,7 +93,7 @@ export const useDataStore = defineStore("data", () => {
       created_at: value.created_at || new Date().toISOString(),
     }
 
-    const serializedData = JSON.parse(JSON.stringify(itemData))
+    const serializedData = structuredClone(itemData)
     await database.data.put(serializedData)
   }
   async function deleteItem(id) {
@@ -106,10 +109,10 @@ export const useDataStore = defineStore("data", () => {
       console.debug("[addModelComponents] No mesh components to add")
       return
     }
-    values.map((value) => {
+    for (const value of values) {
       value.created_at = new Date().toISOString()
-    })
-    const serializedData = JSON.parse(JSON.stringify(values))
+    }
+    const serializedData = structuredClone(values)
     await database.model_components.bulkAdd(serializedData)
   }
 
@@ -119,7 +122,7 @@ export const useDataStore = defineStore("data", () => {
 
   async function fetchMeshComponents(id) {
     const geodeStore = useGeodeStore()
-    return geodeStore.request(
+    return await geodeStore.request(
       back_model_schemas.mesh_components,
       { id },
       {
@@ -132,37 +135,35 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function getMeshComponentGeodeIds(id, meshComponentType) {
-    return (
-      await database.model_components
-        .where({ id, type: meshComponentType })
-        .toArray()
-    ).map((component) => component.geode_id)
+    const components = await database.model_components
+      .where({ id, type: meshComponentType })
+      .toArray()
+    return components.map((component) => component.geode_id)
   }
 
   async function getCornersGeodeIds(id) {
-    return getMeshComponentGeodeIds(id, "Corner")
+    return await getMeshComponentGeodeIds(id, "Corner")
   }
 
   async function getLinesGeodeIds(id) {
-    return getMeshComponentGeodeIds(id, "Line")
+    return await getMeshComponentGeodeIds(id, "Line")
   }
 
   async function getSurfacesGeodeIds(id) {
-    return getMeshComponentGeodeIds(id, "Surface")
+    return await getMeshComponentGeodeIds(id, "Surface")
   }
 
   async function getBlocksGeodeIds(id) {
-    return getMeshComponentGeodeIds(id, "Block")
+    return await getMeshComponentGeodeIds(id, "Block")
   }
 
   async function getMeshComponentsViewerIds(id, meshComponentGeodeIds) {
-    return (
-      await database.model_components
-        .where("id")
-        .equals(id)
-        .and((component) => meshComponentGeodeIds.includes(component.geode_id))
-        .toArray()
-    ).map((component) => component.viewer_id)
+    const components = await database.model_components
+      .where("id")
+      .equals(id)
+      .and((component) => meshComponentGeodeIds.includes(component.geode_id))
+      .toArray()
+    return components.map((component) => component.viewer_id)
   }
 
   async function exportStores() {
@@ -170,7 +171,7 @@ export const useDataStore = defineStore("data", () => {
     return { items }
   }
 
-  async function importStores(snapshot) {
+  async function importStores(_snapshot) {
     await clear()
   }
 

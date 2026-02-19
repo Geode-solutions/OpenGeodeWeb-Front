@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolygonsCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshPolygonsVertexAttributeSchemas =
@@ -18,26 +18,15 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).vertex
   }
 
-  async function updateMeshPolygonsVertexAttribute(id) {
-    const name = meshPolygonsVertexAttributeName(id)
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name)
-    await meshPolygonsVertexAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await meshPolygonsVertexAttributeColorMap(id, storedConfig.colorMap)
-  }
-
   function meshPolygonsVertexAttributeStoredConfig(id, name) {
-    const storedConfigs = meshPolygonsVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolygonsVertexAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
     return setMeshPolygonsVertexAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
@@ -67,10 +56,11 @@ export function useMeshPolygonsVertexAttributeStyle() {
       {
         response_function: async () => {
           meshPolygonsVertexAttribute(id).name = name
-          const { minimum, maximum, colorMap } =
-            meshPolygonsVertexAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshPolygonsVertexAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshPolygonsVertexAttributeRange(id, minimum, maximum)
-          await setMeshPolygonsVertexAttributeColorMap(id, colorMap)
           console.log(
             setMeshPolygonsVertexAttributeName.name,
             { id },
@@ -90,21 +80,9 @@ export function useMeshPolygonsVertexAttributeStyle() {
   function setMeshPolygonsVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsVertexAttributeName(id)
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name)
-    return viewerStore.request(
-      meshPolygonsVertexAttributeSchemas.scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          console.log(
-            setMeshPolygonsVertexAttributeRange.name,
-            { id },
-            meshPolygonsVertexAttributeRange(id),
-          )
-        },
-      },
-    )
+    storedConfig.minimum = minimum
+    storedConfig.maximum = maximum
+    return setMeshPolygonsVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshPolygonsVertexAttributeColorMap(id) {
@@ -116,6 +94,14 @@ export function useMeshPolygonsVertexAttributeStyle() {
   function setMeshPolygonsVertexAttributeColorMap(id, colorMap) {
     const name = meshPolygonsVertexAttributeName(id)
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 
@@ -145,9 +131,9 @@ export function useMeshPolygonsVertexAttributeStyle() {
     meshPolygonsVertexAttributeName,
     meshPolygonsVertexAttributeRange,
     meshPolygonsVertexAttributeColorMap,
+    meshPolygonsVertexAttributeStoredConfig,
     setMeshPolygonsVertexAttributeName,
     setMeshPolygonsVertexAttributeRange,
     setMeshPolygonsVertexAttributeColorMap,
-    updateMeshPolygonsVertexAttribute,
   }
 }

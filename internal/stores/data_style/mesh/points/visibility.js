@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useMeshPointsCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshPointsVisibilitySchema =

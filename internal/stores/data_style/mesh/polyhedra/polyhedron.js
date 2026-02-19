@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolyhedraCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshPolyhedraPolyhedronAttributeSchemas =
@@ -18,26 +18,15 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).polyhedron
   }
 
-  async function updateMeshPolyhedraPolyhedronAttribute(id) {
-    const name = meshPolyhedraPolyhedronAttributeName(id)
-    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
-    await meshPolyhedraPolyhedronAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await meshPolyhedraPolyhedronAttributeColorMap(id, storedConfig.colorMap)
-  }
-
   function meshPolyhedraPolyhedronAttributeStoredConfig(id, name) {
-    const storedConfigs = meshPolyhedraPolyhedronAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
     return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
@@ -61,10 +50,9 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
       {
         response_function: async () => {
           meshPolyhedraPolyhedronAttribute(id).name = name
-          const { minimum, maximum, colorMap } =
+          const { minimum, maximum } =
             meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
           await setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum)
-          await setMeshPolyhedraPolyhedronAttributeColorMap(id, colorMap)
           console.log(
             setMeshPolyhedraPolyhedronAttributeName.name,
             { id },
@@ -83,20 +71,11 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraPolyhedronAttributeName(id)
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
-    return viewerStore.request(
-      meshPolyhedraPolyhedronAttributeSchemas.scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          console.log(
-            setMeshPolyhedraPolyhedronAttributeRange.name,
-            { id },
-            meshPolyhedraPolyhedronAttributeRange(id),
-          )
-        },
-      },
+    storedConfig.minimum = minimum
+    storedConfig.maximum = maximum
+    return setMeshPolyhedraPolyhedronAttributeColorMap(
+      id,
+      storedConfig.colorMap,
     )
   }
 
@@ -109,6 +88,14 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   function setMeshPolyhedraPolyhedronAttributeColorMap(id, colorMap) {
     const name = meshPolyhedraPolyhedronAttributeName(id)
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
     return viewerStore.request(
@@ -131,9 +118,9 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     meshPolyhedraPolyhedronAttributeName,
     meshPolyhedraPolyhedronAttributeRange,
     meshPolyhedraPolyhedronAttributeColorMap,
+    meshPolyhedraPolyhedronAttributeStoredConfig,
     setMeshPolyhedraPolyhedronAttributeName,
     setMeshPolyhedraPolyhedronAttributeRange,
     setMeshPolyhedraPolyhedronAttributeColorMap,
-    updateMeshPolyhedraPolyhedronAttribute,
   }
 }

@@ -1,15 +1,15 @@
 <script setup>
-  import ying_yang from "@ogw_front/assets/img/energy_sobriety/ying_yang.png"
   import chemin from "@ogw_front/assets/img/energy_sobriety/chemin.png"
-  import vert from "@ogw_front/assets/img/energy_sobriety/vert.png"
-  import lampadaire from "@ogw_front/assets/img/energy_sobriety/lampadaire.png"
   import collegue from "@ogw_front/assets/img/energy_sobriety/collegue.png"
-  import sobene from "@ogw_front/assets/img/energy_sobriety/sobene.png"
+  import derniere from "@ogw_front/assets/img/energy_sobriety/derniere.png"
   import etincelle from "@ogw_front/assets/img/energy_sobriety/etincelle.png"
   import geste from "@ogw_front/assets/img/energy_sobriety/geste.png"
-  import socle from "@ogw_front/assets/img/energy_sobriety/socle.png"
-  import derniere from "@ogw_front/assets/img/energy_sobriety/derniere.png"
+  import lampadaire from "@ogw_front/assets/img/energy_sobriety/lampadaire.png"
   import salon from "@ogw_front/assets/img/energy_sobriety/salon.png"
+  import sobene from "@ogw_front/assets/img/energy_sobriety/sobene.png"
+  import socle from "@ogw_front/assets/img/energy_sobriety/socle.png"
+  import vert from "@ogw_front/assets/img/energy_sobriety/vert.png"
+  import ying_yang from "@ogw_front/assets/img/energy_sobriety/ying_yang.png"
 
   import Carousel from "@ogw_front/components/Carousel"
 

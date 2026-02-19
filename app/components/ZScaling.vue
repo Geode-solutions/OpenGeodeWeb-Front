@@ -2,7 +2,7 @@
   import GlassCard from "@ogw_front/components/GlassCard"
 
   const zScale = defineModel({ type: Number, default: 1 })
-  const props = defineProps({
+  const { width } = defineProps({
     width: { type: Number, default: 400 },
   })
 </script>

@@ -2,9 +2,9 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolyhedraCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
 const meshPolyhedraVertexAttributeSchemas =
@@ -18,26 +18,15 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).vertex
   }
 
-  async function updateMeshPolyhedraVertexAttribute(id) {
-    const name = meshPolyhedraVertexAttributeName(id)
-    const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
-    await meshPolyhedraVertexAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await meshPolyhedraVertexAttributeColorMap(id, storedConfig.colorMap)
-  }
-
   function meshPolyhedraVertexAttributeStoredConfig(id, name) {
-    const storedConfigs = meshPolyhedraVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolyhedraVertexAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
     return setMeshPolyhedraVertexAttributeStoredConfig(id, name, {
-      minimum: 0,
-      maximum: 1,
-      colorMap: "Cool to Warm",
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
     })
   }
 
@@ -67,10 +56,11 @@ export function useMeshPolyhedraVertexAttributeStyle() {
       {
         response_function: async () => {
           meshPolyhedraVertexAttribute(id).name = name
-          const { minimum, maximum, colorMap } =
-            meshPolyhedraVertexAttributeStoredConfig(id, name)
+          const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(
+            id,
+            name,
+          )
           await setMeshPolyhedraVertexAttributeRange(id, minimum, maximum)
-          await setMeshPolyhedraVertexAttributeColorMap(id, colorMap)
           console.log(
             setMeshPolyhedraVertexAttributeName.name,
             { id },
@@ -90,21 +80,9 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
-    return viewerStore.request(
-      meshPolyhedraVertexAttributeSchemas.scalar_range,
-      { id, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          console.log(
-            setMeshPolyhedraVertexAttributeRange.name,
-            { id },
-            meshPolyhedraVertexAttributeRange(id),
-          )
-        },
-      },
-    )
+    storedConfig.minimum = minimum
+    storedConfig.maximum = maximum
+    return setMeshPolyhedraVertexAttributeColorMap(id, storedConfig.colorMap)
   }
 
   function meshPolyhedraVertexAttributeColorMap(id) {
@@ -116,6 +94,14 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   function setMeshPolyhedraVertexAttributeColorMap(id, colorMap) {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
+    if (
+      storedConfig.minimum === undefined ||
+      storedConfig.maximum === undefined ||
+      colorMap === undefined
+    ) {
+      storedConfig.colorMap = colorMap
+      return
+    }
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
 
@@ -145,9 +131,9 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     meshPolyhedraVertexAttributeName,
     meshPolyhedraVertexAttributeRange,
     meshPolyhedraVertexAttributeColorMap,
+    meshPolyhedraVertexAttributeStoredConfig,
     setMeshPolyhedraVertexAttributeName,
     setMeshPolyhedraVertexAttributeRange,
     setMeshPolyhedraVertexAttributeColorMap,
-    updateMeshPolyhedraVertexAttribute,
   }
 }

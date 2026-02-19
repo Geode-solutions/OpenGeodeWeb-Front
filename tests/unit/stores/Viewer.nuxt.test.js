@@ -1,29 +1,26 @@
-// Global imports
-
 // Third party imports
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
 import {
   afterAll,
   beforeAll,
+  beforeEach,
   describe,
-  test,
   expect,
   expectTypeOf,
-  beforeEach,
+  test,
   vi,
 } from "vitest"
 
 import { WebSocket } from "ws"
 // Local imports
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useInfraStore } from "@ogw_front/stores/infra"
 import { appMode } from "@ogw_front/utils/app_mode"
+import { setupActivePinia } from "../../utils"
+import { useInfraStore } from "@ogw_front/stores/infra"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Mock navigator.locks API
-const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
-  return callback({ name })
-})
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name, handler) => await handler({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -33,19 +30,15 @@ vi.stubGlobal("navigator", {
 })
 
 beforeAll(() => {
-  global.WebSocket = WebSocket
+  globalThis.WebSocket = WebSocket
 })
 
 afterAll(() => {
-  delete global.WebSocket
+  delete globalThis.WebSocket
 })
 
 beforeEach(() => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+  setupActivePinia()
 })
 
 describe("Viewer Store", () => {
@@ -56,8 +49,8 @@ describe("Viewer Store", () => {
       expectTypeOf(viewerStore.client).toEqualTypeOf({})
       expectTypeOf(viewerStore.picking_mode).toBeBoolean()
       expectTypeOf(viewerStore.picked_point).toEqualTypeOf({
-        x: null,
-        y: null,
+        x: undefined,
+        y: undefined,
       })
       expectTypeOf(viewerStore.picked_point).toBeNumber()
       expectTypeOf(viewerStore.status).toBeString()
@@ -149,12 +142,12 @@ describe("Viewer Store", () => {
       test("test is_busy", () => {
         const viewerStore = useViewerStore()
         viewerStore.request_counter = 1
-        expect(viewerStore.is_busy).toBe(true)
+        expect(viewerStore.is_busy).toBeTruthy()
       })
       test("test not is_busy", () => {
         const viewerStore = useViewerStore()
         viewerStore.request_counter = 0
-        expect(viewerStore.is_busy).toBe(false)
+        expect(viewerStore.is_busy).toBeFalsy()
       })
     })
   })
@@ -163,7 +156,7 @@ describe("Viewer Store", () => {
       test("test true", async () => {
         const viewerStore = useViewerStore()
         await viewerStore.toggle_picking_mode(true)
-        expect(viewerStore.picking_mode).toBe(true)
+        expect(viewerStore.picking_mode).toBeTruthy()
       })
     })
 

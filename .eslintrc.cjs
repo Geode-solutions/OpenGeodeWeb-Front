@@ -1,3 +1,4 @@
+// oxlint-disable-next-line import/no-commonjs
 module.exports = {
   root: true,
   env: {
