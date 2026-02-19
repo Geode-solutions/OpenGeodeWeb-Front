@@ -18,7 +18,6 @@ export function useMeshPointsVertexAttributeStyle() {
     return meshPointsCommonStyle.meshPointsColoring(id).vertex
   }
 
-
   function meshPointsVertexAttributeStoredConfig(id, name) {
     const { storedConfigs } = meshPointsVertexAttribute(id)
     if (name in storedConfigs) {
