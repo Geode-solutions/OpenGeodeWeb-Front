@@ -101,7 +101,7 @@
 
 <template>
   <ClientOnly>
-    <div style="position: relative; width: 100%; height: calc(100vh - 80px)">
+    <div style="position: relative; width: 100%; height: 100%">
       <ViewToolbar />
       <slot name="ui"></slot>
       <v-col

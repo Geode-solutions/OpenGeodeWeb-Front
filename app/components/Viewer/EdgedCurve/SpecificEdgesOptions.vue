@@ -113,15 +113,7 @@
             <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Width'" />
           </v-col>
           <v-col justify="center">
-            <v-slider
-              v-model="size"
-              hide-details
-              min="0"
-              max="20"
-              step="2"
-              thumb-color="black"
-              ticks
-            />
+            <v-slider v-model="size" hide-details min="0" max="20" step="2" />
           </v-col>
         </v-row>
         <v-row>

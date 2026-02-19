@@ -8,16 +8,19 @@
 
 <template>
   <v-card-item class="flex-shrink-0 pa-0">
-    <v-card-title
-      class="text-h4 text-primary px-8 pt-6 pb-4 font-weight-bold d-flex align-center"
-    >
-      <v-icon icon="mdi-file-upload-outline" class="mr-3" />
-      Import Data
-    </v-card-title>
-
-    <v-card-subtitle class="px-8 pb-4 text-medium">
-      Choose a file to import.
-    </v-card-subtitle>
+    <div class="px-8 pt-8 pb-4">
+      <div class="d-flex align-center mb-2">
+        <v-icon
+          icon="mdi-file-upload-outline"
+          class="mr-3 title-text"
+          size="32"
+        />
+        <h2 class="title-text">Import Data</h2>
+      </div>
+      <p class="text-white text-body-1">
+        Select and configure your files for a seamless import.
+      </p>
+    </div>
   </v-card-item>
 
   <v-stepper-vertical
@@ -25,7 +28,7 @@
     @update:model-value="current_step_index = $event - 1"
     flat
     non-linear
-    class="pa-0 ma-0 bg-white rounded-xl overflow-hidden"
+    class="pa-0 ma-0 bg-transparent rounded-xl overflow-hidden custom-stepper"
   >
     <Step
       v-for="(step, index) in steps"
@@ -35,3 +38,33 @@
     />
   </v-stepper-vertical>
 </template>
+
+<style scoped>
+  .custom-stepper :deep(.v-stepper-vertical-item) {
+    background: transparent !important;
+  }
+
+  .custom-stepper :deep(.v-stepper-vertical-item__content) {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-radius: 12px;
+    margin: 8px 16px 16px 40px !important;
+    padding: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .custom-stepper :deep(.v-avatar) {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+  }
+
+  .custom-stepper :deep(.v-stepper-vertical-item--active .v-avatar) {
+    background: #3c9983 !important;
+    border-color: #3c9983;
+    color: #0a0f0e !important;
+  }
+
+  .custom-stepper :deep(.v-stepper-vertical-item__connector) {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+</style>
