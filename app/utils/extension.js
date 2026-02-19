@@ -36,10 +36,39 @@ function projectConf(projectName) {
 
 function extensionsConf(projectConfig) {
   const extensionsConfig = projectConfig.get("extensions")
-  if (_.isEqual(extensionsConfig, {})) {
-    projectConfig.set("extensions", {})
+  console.log(extensionsConf.name, { extensionsConfig })
+  if (_.isEqual(extensionsConfig, undefined)) {
+    projectConfig.set("extensions", [])
   }
   return extensionsConfig
+}
+
+async function uploadExtension(
+  archiveFileContent,
+  archiveFilename,
+  projectName,
+) {
+  console.log(uploadExtension.name, {
+    archiveFileContent,
+    archiveFilename,
+    projectName,
+  })
+  console.log("uploadExtension", { archiveFilename, projectName })
+  const projectConfig = projectConf(projectName)
+  console.log("uploadExtension", projectConfig.path)
+  const extensionsConfig = extensionsConf(projectConfig)
+  console.log("uploadExtension", { extensionsConfig })
+
+  const configFolderPath = path.dirname(projectConfig.path)
+  const outputPath = path.join(configFolderPath, archiveFilename)
+  console.log(uploadExtension.name, { outputPath })
+  await fs.promises.writeFile(outputPath, archiveFileContent)
+
+  extensionsConfig.push(outputPath)
+  console.log("uploadExtension", { extensionsConfig })
+  projectConfig.set("extensions", extensionsConfig)
+
+  console.log("Extension uploaded successfully", extensionsConfig)
 }
 
 async function runExtensions(projectName, projectFolderPath) {
@@ -156,6 +185,7 @@ function killExtensionMicroservices() {
 export {
   projectConf,
   extensionsConf,
+  uploadExtension,
   runExtensions,
   killExtensionMicroservices,
 }
