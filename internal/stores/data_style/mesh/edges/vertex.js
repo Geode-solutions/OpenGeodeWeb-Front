@@ -18,16 +18,6 @@ export function useMeshEdgesVertexAttributeStyle() {
     return meshEdgesCommonStyle.meshEdgesColoring(id).vertex
   }
 
-  async function updateMeshEdgesVertexAttribute(id) {
-    const name = meshEdgesVertexAttributeName(id)
-    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
-    await setMeshEdgesVertexAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await setMeshEdgesVertexAttributeColorMap(id, storedConfig.colorMap)
-  }
 
   function meshEdgesVertexAttributeStoredConfig(id, name) {
     const { storedConfigs } = meshEdgesVertexAttribute(id)
@@ -146,6 +136,5 @@ export function useMeshEdgesVertexAttributeStyle() {
     setMeshEdgesVertexAttributeName,
     setMeshEdgesVertexAttributeRange,
     setMeshEdgesVertexAttributeColorMap,
-    updateMeshEdgesVertexAttribute,
   }
 }
