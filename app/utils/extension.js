@@ -48,44 +48,29 @@ async function uploadExtension(
   archiveFilename,
   projectName,
 ) {
-  console.log(uploadExtension.name, {
-    archiveFileContent,
-    archiveFilename,
-    projectName,
-  })
-  console.log("uploadExtension", { archiveFilename, projectName })
   const projectConfig = projectConf(projectName)
-  console.log("uploadExtension", projectConfig.path)
   const extensionsConfig = extensionsConf(projectConfig)
-  console.log("uploadExtension", { extensionsConfig })
-
   const configFolderPath = path.dirname(projectConfig.path)
   const outputPath = path.join(configFolderPath, archiveFilename)
-  console.log(uploadExtension.name, { outputPath })
+
   await fs.promises.writeFile(outputPath, archiveFileContent)
 
   extensionsConfig.push(outputPath)
-  console.log("uploadExtension", { extensionsConfig })
   projectConfig.set("extensions", extensionsConfig)
-
-  console.log("Extension uploaded successfully", extensionsConfig)
 }
 
 async function runExtensions(projectName, projectFolderPath) {
   const projectConfig = projectConf(projectName)
-  console.log(runExtensions.name, { projectConfig })
+  console.log("runExtensions", { projectConfig })
   const extensionsConfig = extensionsConf(projectConfig)
-  console.log(runExtensions.name, { extensionsConfig })
+  console.log("runExtensions", { extensionsConfig })
 
   if (_.isEqual(extensionsConfig, {})) {
     return Promise.resolve()
   }
-  console.log("Found extensions config for project:", projectName)
-  const promiseArray = []
 
-  for (const extensionId of Object.keys(extensionsConfig)) {
-    const { archivePath } = extensionsConfig[extensionId]
-    console.log(runExtensions.name, { archivePath })
+  for (const archivePath of extensionsConfig) {
+    console.log("runExtensions", { archivePath })
 
     const unzippedExtensionPath = await unzipFile(
       archivePath,
@@ -102,62 +87,42 @@ async function runExtensions(projectName, projectFolderPath) {
       throw new Error("Invalid .vext file: missing metadata.json")
     }
 
-    // Look for backend executable and frontend JS
-    let backendExecutable = null
-    let frontendFile = null
+    const { name, version, backendExecutablePath, frontendFilePath } = metadata
 
-    const files = await fs.promises.readdir(unzippedExtensionPath)
-
-    for (const file of files) {
-      const filePath = path.join(unzippedExtensionPath, file)
-      const stats = await fs.promises.stat(filePath)
-
-      if (stats.isFile()) {
-        if (file.endsWith(".es.js")) {
-          frontendFile = filePath
-        } else if (!file.endsWith(".js") && !file.endsWith(".css")) {
-          backendExecutable = filePath
-          // Make executable (Unix-like systems)
-          await fs.promises.chmod(backendExecutable, 0o755)
-        }
-      }
-    }
-
-    // Validate required files
-    if (!frontendFile) {
+    if (!frontendFilePath) {
       throw new Error("Invalid .vext file: missing frontend JavaScript")
     }
-    if (!backendExecutable) {
+    if (!backendExecutablePath) {
       throw new Error("Invalid .vext file: missing backend executable")
     }
-
-    // Read frontend content
-    const frontendContent = await fs.promises.readFile(frontendFile, "utf-8")
+    const frontendFileAbsolutePath = path.resolve(frontendFilePath)
+    const frontendContent = await fs.promises.readFile(
+      frontendFileAbsolutePath,
+      "utf-8",
+    )
 
     try {
       const port = await getPort({ portRange: [MIN_PORT, MAX_PORT] })
-      console.log(`[Electron] Extension ${extensionId} will use port ${port}`)
-      extensionProcesses.set(extensionId, { process, port })
+      console.log(`[Electron] Extension ${name} will use port ${port}`)
+      extensionProcesses.set(name, { process, port })
 
       process.on("error", (error) => {
-        console.error(`[${extensionId}] Process error:`, error)
+        console.error(`[${name}] Process error:`, error)
       })
 
       process.on("exit", (code) => {
-        console.log(`[${extensionId}] Process exited with code ${code}`)
-        extensionProcesses.delete(extensionId)
+        console.log(`[${name}] Process exited with code ${code}`)
+        extensionProcesses.delete(name)
       })
 
       const test = {
-        extension_metadata: {
-          name: metadata.name,
-          version: metadata.version,
-        },
-        frontend_content: frontendContent,
-        backend_path: backendExecutable,
+        success: true,
+        extension_metadata: { name, version },
+        frontendContent,
+        backendPort: port,
       }
       console.log("[Extensions] test return :", { test })
-      return { success: true, port }
+      return test
     } catch (error) {
       console.error(
         `[Extensions] Failed to launch extension ${extensionId}:`,
