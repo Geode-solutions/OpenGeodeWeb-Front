@@ -18,16 +18,6 @@ export function useMeshPointsVertexAttributeStyle() {
     return meshPointsCommonStyle.meshPointsColoring(id).vertex
   }
 
-  async function updateMeshPointsVertexAttribute(id) {
-    const name = meshPointsVertexAttributeName(id)
-    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name)
-    await setMeshPointsVertexAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await setMeshPointsVertexAttributeColorMap(id, storedConfig.colorMap)
-  }
 
   function meshPointsVertexAttributeStoredConfig(id, name) {
     const { storedConfigs } = meshPointsVertexAttribute(id)
@@ -146,6 +136,5 @@ export function useMeshPointsVertexAttributeStyle() {
     setMeshPointsVertexAttributeName,
     setMeshPointsVertexAttributeRange,
     setMeshPointsVertexAttributeColorMap,
-    updateMeshPointsVertexAttribute,
   }
 }

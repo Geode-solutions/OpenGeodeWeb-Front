@@ -18,17 +18,6 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).polygon
   }
 
-  async function updateMeshPolygonsPolygonAttribute(id) {
-    const name = meshPolygonsPolygonAttributeName(id)
-    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
-    await setMeshPolygonsPolygonAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await setMeshPolygonsPolygonAttributeColorMap(id, storedConfig.colorMap)
-  }
-
   function meshPolygonsPolygonAttributeStoredConfig(id, name) {
     const { storedConfigs } = meshPolygonsPolygonAttribute(id)
     if (name in storedConfigs) {
@@ -137,6 +126,5 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     setMeshPolygonsPolygonAttributeName,
     setMeshPolygonsPolygonAttributeRange,
     setMeshPolygonsPolygonAttributeColorMap,
-    updateMeshPolygonsPolygonAttribute,
   }
 }

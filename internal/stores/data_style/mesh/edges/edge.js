@@ -71,17 +71,6 @@ export function useMeshEdgesEdgeAttributeStyle() {
     )
   }
 
-  async function updateMeshEdgesEdgeAttribute(id) {
-    const name = meshEdgesEdgeAttributeName(id)
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
-    await setMeshEdgesEdgeAttributeRange(
-      id,
-      storedConfig.minimum,
-      storedConfig.maximum,
-    )
-    await setMeshEdgesEdgeAttributeColorMap(id, storedConfig.colorMap)
-  }
-
   function meshEdgesEdgeAttributeRange(id) {
     const name = meshEdgesEdgeAttributeName(id)
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
@@ -146,6 +135,5 @@ export function useMeshEdgesEdgeAttributeStyle() {
     setMeshEdgesEdgeAttributeName,
     setMeshEdgesEdgeAttributeRange,
     setMeshEdgesEdgeAttributeColorMap,
-    updateMeshEdgesEdgeAttribute,
   }
 }
