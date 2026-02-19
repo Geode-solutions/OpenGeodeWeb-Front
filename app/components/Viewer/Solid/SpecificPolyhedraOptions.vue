@@ -45,7 +45,6 @@
         id.value,
         newValue,
       )
-      await dataStyleStore.updateMeshPolyhedraVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -57,7 +56,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshPolyhedraVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -68,7 +66,6 @@
         id.value,
         newValue,
       )
-      await dataStyleStore.updateMeshPolyhedraVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -79,7 +76,6 @@
         id.value,
         newValue,
       )
-      await dataStyleStore.updateMeshPolyhedraPolyhedronAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -91,7 +87,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshPolyhedraPolyhedronAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -103,7 +98,6 @@
         id.value,
         newValue,
       )
-      await dataStyleStore.updateMeshPolyhedraPolyhedronAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
