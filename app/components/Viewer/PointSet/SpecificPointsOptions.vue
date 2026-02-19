@@ -48,7 +48,6 @@
     get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshPointsVertexAttributeName(id.value, newValue)
-      await dataStyleStore.updateMeshPointsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -60,7 +59,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshPointsVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -90,15 +88,7 @@
             <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Size'" />
           </v-col>
           <v-col justify="center">
-            <v-slider
-              v-model="size"
-              hide-details
-              min="0"
-              max="20"
-              step="2"
-              thumb-color="black"
-              ticks
-            />
+            <v-slider v-model="size" hide-details min="0" max="20" step="2" />
           </v-col>
         </v-row>
         <v-row>

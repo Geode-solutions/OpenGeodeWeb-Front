@@ -48,7 +48,6 @@
     get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
     set: async (newValue) => {
       await dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue)
-      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -60,7 +59,6 @@
         newValue[0],
         newValue[1],
       )
-      await dataStyleStore.updateMeshEdgesVertexAttribute(id.value)
       hybridViewerStore.remoteRender()
     },
   })
@@ -115,15 +113,7 @@
             <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Width'" />
           </v-col>
           <v-col justify="center">
-            <v-slider
-              v-model="size"
-              hide-details
-              min="0"
-              max="20"
-              step="2"
-              thumb-color="black"
-              ticks
-            />
+            <v-slider v-model="size" hide-details min="0" max="20" step="2" />
           </v-col>
         </v-row>
         <v-row>

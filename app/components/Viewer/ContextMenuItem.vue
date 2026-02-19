@@ -1,7 +1,7 @@
 <script setup>
-  import { useElementSize } from "@vueuse/core"
-  import { useMenuStore } from "@ogw_front/stores/menu"
+  import GlassCard from "@ogw_front/components/GlassCard"
   import { useTheme } from "vuetify"
+  import { useMenuStore } from "@ogw_front/stores/menu"
 
   const CARD_WIDTH = 320
   const CARD_HEIGHT = 500
@@ -99,9 +99,20 @@
       color="transparent"
       @click.stop
     >
-      <OptionCard :title="tooltip" width="320" :max-height="maxCardHeight">
-        <slot name="options" />
-      </OptionCard>
+      <GlassCard
+        @click.stop
+        :title="tooltip"
+        width="320"
+        :max-height="maxCardHeight"
+        :ripple="false"
+        variant="panel"
+        padding="pa-0"
+        class="elevation-24"
+      >
+        <v-card-text class="pa-5">
+          <slot name="options" />
+        </v-card-text>
+      </GlassCard>
     </v-sheet>
   </v-sheet>
 </template>

@@ -1,6 +1,5 @@
 <script setup>
   import VeaseViewToolbar from "@ogw_front/components/VeaseViewToolbar"
-
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import { useViewerStore } from "@ogw_front/stores/viewer"
 
@@ -52,7 +51,7 @@
 
 <template>
   <ClientOnly>
-    <div class="fill-height" style="position: relative">
+    <div class="fill-height" style="position: relative; height: 100%">
       <VeaseViewToolbar />
       <slot name="ui"></slot>
       <v-col
