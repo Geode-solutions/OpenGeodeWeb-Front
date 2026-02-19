@@ -2,7 +2,6 @@
   import GlassCard from "@ogw_front/components/GlassCard"
   import { useTheme } from "vuetify"
   import { useMenuStore } from "@ogw_front/stores/menu"
-  import { useTheme } from "vuetify"
 
   const CARD_WIDTH = 320
   const CARD_HEIGHT = 500
@@ -102,7 +101,7 @@
     >
       <GlassCard
         @click.stop
-        :title="props.tooltip"
+        :title="tooltip"
         width="320"
         :max-height="maxCardHeight"
         :ripple="false"

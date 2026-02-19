@@ -121,7 +121,7 @@
   </v-card-text>
 
   <v-card-actions
-    v-if="!props.auto_upload && internal_files.length"
+    v-if="!auto_upload && internal_files.length"
     class="mt-6 pa-0"
   >
     <v-btn

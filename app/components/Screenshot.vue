@@ -48,10 +48,10 @@
 </script>
 <template>
   <GlassCard
-    v-if="props.show_dialog"
+    v-if="show_dialog"
     @click.stop
     title="Take a screenshot"
-    :width="props.width"
+    :width="width"
     :ripple="false"
     variant="panel"
     padding="pa-0"
