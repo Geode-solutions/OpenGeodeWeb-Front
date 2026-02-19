@@ -1,6 +1,4 @@
 <script setup>
-  import { useAttrs, computed } from "vue"
-
   defineProps({
     variant: {
       type: String,
