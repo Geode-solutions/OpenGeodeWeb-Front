@@ -3,45 +3,12 @@ import fs from "node:fs"
 import path from "node:path"
 
 // Third party imports
-import Conf from "conf"
 import { getPort } from "get-port-please"
 import _ from "lodash"
 
 // Local imports
 import { unzipFile } from "./local.js"
-
-const projectConfigSchema = {
-  properties: {
-    projectName: {
-      type: "string",
-      minLength: 1,
-    },
-  },
-  additionalProperties: false,
-  required: ["projectName"],
-}
-
-const MIN_PORT = 5001
-const MAX_PORT = 5999
-const KILL_TIMEOUT = 2000
-
-const extensionProcesses = new Map()
-
-function projectConf(projectName) {
-  const projectConfig = new Conf({ projectName })
-  // schema: projectConfigSchema
-  console.log(projectConf.name, { projectConfig })
-  return projectConfig
-}
-
-function extensionsConf(projectConfig) {
-  const extensionsConfig = projectConfig.get("extensions")
-  console.log(extensionsConf.name, { extensionsConfig })
-  if (_.isEqual(extensionsConfig, undefined)) {
-    projectConfig.set("extensions", [])
-  }
-  return extensionsConfig
-}
+import { projectConf, extensionsConf } from "./config"
 
 async function uploadExtension(
   archiveFileContent,
@@ -87,23 +54,23 @@ async function runExtensions(projectName, projectFolderPath) {
       throw new Error("Invalid .vext file: missing metadata.json")
     }
 
-    const { name, version, backendExecutablePath, frontendFilePath } = metadata
+    const { name, version, backendExecutable, frontendFile } = metadata
 
-    if (!frontendFilePath) {
+    if (!frontendFile) {
       throw new Error("Invalid .vext file: missing frontend JavaScript")
     }
-    if (!backendExecutablePath) {
+    if (!backendExecutable) {
       throw new Error("Invalid .vext file: missing backend executable")
     }
-    const frontendFileAbsolutePath = path.resolve(frontendFilePath)
+    const frontendFilePath = path.join(unzippedExtensionPath, frontendFile)
     const frontendContent = await fs.promises.readFile(
-      frontendFileAbsolutePath,
+      frontendFilePath,
       "utf-8",
     )
 
     try {
       const port = await getPort({ portRange: [MIN_PORT, MAX_PORT] })
-      console.log(`[Electron] Extension ${name} will use port ${port}`)
+      console.log(`Extension ${name} will use port ${port}`)
       extensionProcesses.set(name, { process, port })
 
       process.on("error", (error) => {
