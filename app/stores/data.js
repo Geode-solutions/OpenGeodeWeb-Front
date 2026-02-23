@@ -46,9 +46,11 @@ export const useDataStore = defineStore("data", () => {
     let sub = null
     const update = () => {
       if (sub) sub.unsubscribe()
-      sub = liveQuery(() => databaseRef.value.data.toArray()).subscribe((val) => {
-        items.value = val || []
-      })
+      sub = liveQuery(() => databaseRef.value.data.toArray()).subscribe(
+        (val) => {
+          items.value = val || []
+        },
+      )
     }
     watch(databaseRef, update, { immediate: true })
 
@@ -57,7 +59,9 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function formatedMeshComponents(id) {
-    const items = await databaseRef.value.model_components.where({ id }).toArray()
+    const items = await databaseRef.value.model_components
+      .where({ id })
+      .toArray()
     const distinctTypes = [...new Set(items.map((item) => item.type))]
 
     const formated_mesh_components = await Promise.all(
