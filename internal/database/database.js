@@ -14,30 +14,52 @@ class Database extends Dexie {
   }
 
   static async addTable(tableName, schemaDefinition) {
-    const tempDb = new Database()
-    await tempDb.open()
+    return this.addTables({ [tableName]: schemaDefinition })
+  }
 
-    if (tempDb.tables.some((table) => table.name === tableName)) {
-      tempDb.close()
-      return tempDb
-    }
+  static async addTables(newTables) {
+    const tempDb = new Dexie("Database")
+    await tempDb.open()
 
     const currentVersion = tempDb.verno
     const currentStores = {}
 
+    currentStores[dataTable.name] = dataTable.schema
+    currentStores[modelComponentsTable.name] = modelComponentsTable.schema
+
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src
       const indexes = table.schema.indexes.map((index) => index.src)
-      currentStores[table.name] = [keyPath, ...indexes].join(",")
+      const parts = keyPath ? [keyPath, ...indexes] : indexes
+      currentStores[table.name] = parts.join(",")
     }
 
     tempDb.close()
 
+    const allExisting = Object.keys(newTables).every(
+      (tableName) => currentStores[tableName],
+    )
+
+    if (allExisting) {
+      const existingDb = new Dexie("Database")
+      for (let version = 1; version <= currentVersion; version += 1) {
+        if (version === 1) {
+          existingDb.version(1).stores({
+            [dataTable.name]: dataTable.schema,
+            [modelComponentsTable.name]: modelComponentsTable.schema,
+          })
+        } else {
+          existingDb.version(version).stores(currentStores)
+        }
+      }
+      await existingDb.open()
+      return existingDb
+    }
+
     const newDb = new ExtendedDatabase(
       currentVersion,
       currentStores,
-      tableName,
-      schemaDefinition,
+      newTables,
     )
     await newDb.open()
 
