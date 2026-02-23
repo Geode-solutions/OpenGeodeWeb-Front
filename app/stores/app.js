@@ -143,7 +143,6 @@ export const useAppStore = defineStore("app", () => {
           enabled: true,
         }
         loadedExtensions.value.set(extensionId, extensionData)
-        loadedExtensions.value = new Map(loadedExtensions.value)
 
         console.log(`[AppStore] Extension loaded successfully: ${extensionId}`)
 
@@ -186,7 +185,6 @@ export const useAppStore = defineStore("app", () => {
     }
 
     loadedExtensions.value.delete(id)
-    loadedExtensions.value = new Map(loadedExtensions.value)
     console.log(`[AppStore] Extension unloaded: ${id}`)
     return true
   }
