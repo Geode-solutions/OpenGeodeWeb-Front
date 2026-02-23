@@ -56,11 +56,7 @@ class Database extends Dexie {
       return existingDb
     }
 
-    const newDb = new ExtendedDatabase(
-      currentVersion,
-      currentStores,
-      newTables,
-    )
+    const newDb = new ExtendedDatabase(currentVersion, currentStores, newTables)
     await newDb.open()
 
     return newDb
