@@ -1,4 +1,5 @@
 import { Dexie } from "dexie"
+import { shallowRef } from "vue"
 import { ExtendedDatabase } from "./extended_database"
 import { dataTable } from "./tables/data_table"
 import { modelComponentsTable } from "./tables/model_components"
@@ -7,18 +8,20 @@ class Database extends Dexie {
   constructor() {
     super("Database")
 
-    this.version(1).stores({
+    this.version(2).stores({
       [dataTable.name]: dataTable.schema,
       [modelComponentsTable.name]: modelComponentsTable.schema,
     })
   }
 
-  static async addTable(tableName, schemaDefinition) {
-    const tempDb = new Database()
-    await tempDb.open()
+  static async asyncAddTable(tableName, schemaDefinition) {
+    const tempDb = databaseRef.value
+
+    if (!tempDb.isOpen()) {
+      await tempDb.open()
+    }
 
     if (tempDb.tables.some((table) => table.name === tableName)) {
-      tempDb.close()
       return tempDb
     }
 
@@ -41,10 +44,16 @@ class Database extends Dexie {
     )
     await newDb.open()
 
+    databaseRef.value = newDb
     return newDb
+  }
+
+  static addTable(tableName, schemaDefinition) {
+    return Database.asyncAddTable(tableName, schemaDefinition)
   }
 }
 
-const database = new Database()
+const databaseInstance = new Database()
+export const databaseRef = shallowRef(databaseInstance)
 
-export { Database, database }
+export { Database }
