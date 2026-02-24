@@ -3,7 +3,7 @@ import { dataTable } from "./tables/data_table"
 import { modelComponentsTable } from "./tables/model_components"
 
 export class ExtendedDatabase extends Dexie {
-  constructor(currentVersion, currentStores, tableName, schemaDefinition) {
+  constructor(currentVersion, currentStores, newTables) {
     super("Database")
 
     for (let version = 1; version <= currentVersion; version += 1) {
@@ -19,7 +19,7 @@ export class ExtendedDatabase extends Dexie {
 
     this.version(currentVersion + 1).stores({
       ...currentStores,
-      [tableName]: schemaDefinition,
+      ...newTables,
     })
   }
 }

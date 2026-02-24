@@ -1,7 +1,7 @@
 <script setup>
   import Step from "@ogw_front/components/Step"
 
-  const emit = defineEmits(["reset_values"])
+  const emit = defineEmits(["reset_values", "close"])
   const stepper_tree = inject("stepper_tree")
   const { steps, current_step_index } = toRefs(stepper_tree)
 </script>
@@ -28,7 +28,7 @@
     @update:model-value="current_step_index = $event - 1"
     flat
     non-linear
-    class="pa-0 ma-0 bg-transparent rounded-xl overflow-hidden custom-stepper"
+    class="pa-0 ma-0 bg-transparent rounded-xl overflow-hidden custom-stepper flex-grow-1"
   >
     <Step
       v-for="(step, index) in steps"
