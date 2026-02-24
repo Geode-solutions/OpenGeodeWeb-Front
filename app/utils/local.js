@@ -2,7 +2,8 @@ import { on, once } from "node:events"
 import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
-import { setTimeout } from "timers/promises"
+import { setTimeout } from "node:timers/promises"
+import { kill } from "kill-port"
 
 // Third party imports
 import { WebSocket } from "ws"
@@ -195,66 +196,15 @@ async function delete_folder_recursive(data_folder_path) {
 }
 
 function kill_back(back_port) {
-  async function do_kill() {
-    try {
-      await fetch(
-        `http://localhost:${back_port}/${back_schemas.opengeodeweb_back.kill.$id}`,
-        {
-          method: back_schemas.opengeodeweb_back.kill.methods[0],
-        },
-      )
-      throw new Error("Failed to kill back")
-    } catch (error) {
-      console.log("Back closed", error)
-    }
-  }
-  return pTimeout(do_kill(), {
-    milliseconds: 500,
+  return pTimeout(kill(back_port), {
+    milliseconds: 5000,
     message: "Failed to kill back",
   })
 }
 
 function kill_viewer(viewer_port) {
-  async function do_kill() {
-    const socket = new WebSocket(`ws://localhost:${viewer_port}/ws`)
-    try {
-      await once(socket, "open")
-      console.log("Connected to WebSocket server")
-      socket.send(
-        JSON.stringify({
-          id: "system:hello",
-          method: "wslink.hello",
-          args: [{ secret: "wslink-secret" }],
-        }),
-      )
-
-      for await (const [data] of on(socket, "message")) {
-        const message = data.toString()
-        console.log("Received from server:", message)
-
-        if (message.includes("hello")) {
-          socket.send(
-            JSON.stringify({
-              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
-              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
-            }),
-          )
-          break
-        }
-      }
-      await once(socket, "close")
-      console.log("Disconnected from WebSocket server")
-    } catch (error) {
-      console.error("WebSocket error:", error)
-    } finally {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.close()
-      }
-    }
-  }
-
-  return pTimeout(do_kill(), {
-    milliseconds: 500,
+  return pTimeout(kill(viewer_port), {
+    milliseconds: 5000,
     message: "Failed to kill viewer",
   })
 }
