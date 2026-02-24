@@ -2,7 +2,7 @@ import { on, once } from "node:events"
 import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
-import { setTimeout } from "timers/promises";
+import { setTimeout } from "timers/promises"
 
 // Third party imports
 import { WebSocket } from "ws"
@@ -180,7 +180,7 @@ async function delete_folder_recursive(data_folder_path) {
     return
   }
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
-  try {
+    try {
       console.log(`Deleting folder: ${data_folder_path}`)
       fs.rmSync(data_folder_path, { recursive: true, force: true })
       console.log(`Deleted folder: ${data_folder_path}`)
