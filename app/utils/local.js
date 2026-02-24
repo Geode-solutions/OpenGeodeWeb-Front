@@ -3,7 +3,7 @@ import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 import { setTimeout } from "node:timers/promises"
-import { kill } from "kill-port"
+import kill from "kill-port"
 
 // Third party imports
 import { WebSocket } from "ws"
