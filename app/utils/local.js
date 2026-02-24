@@ -2,6 +2,7 @@ import { on, once } from "node:events"
 import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
+import { setTimeout } from "timers/promises"
 
 // Third party imports
 import { WebSocket } from "ws"
@@ -173,20 +174,23 @@ async function run_viewer(executable_name, executable_path, args = {}) {
   return port
 }
 
-function delete_folder_recursive(data_folder_path) {
+async function delete_folder_recursive(data_folder_path) {
   if (!fs.existsSync(data_folder_path)) {
     console.log(`Folder ${data_folder_path} does not exist.`)
     return
   }
-  try {
-    for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
+  for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
+    try {
       console.log(`Deleting folder: ${data_folder_path}`)
       fs.rmSync(data_folder_path, { recursive: true, force: true })
       console.log(`Deleted folder: ${data_folder_path}`)
       return
+    } catch (error) {
+      console.error(`Error deleting folder ${data_folder_path}:`, error)
+      // Wait before retrying
+      const DELAY = 1000 * (i + 1)
+      await setTimeout(DELAY)
     }
-  } catch (error) {
-    console.error(`Error deleting folder ${data_folder_path}:`, error)
   }
 }
 
