@@ -1,4 +1,5 @@
 import { getDefaultStyle } from "@ogw_front/utils/default_styles"
+import { database } from "../../internal/database/database.js"
 import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStateStore } from "../../internal/stores/data_style/state"
 import useMeshStyle from "../../internal/stores/data_style/mesh/index"
@@ -15,7 +16,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function setVisibility(id, visibility) {
-    const item = await dataStore.getItem(id).fetch()
+    const item = await database.data.get(id)
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
       throw new Error(`Item not found or not loaded: ${id}`)
@@ -31,7 +32,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function applyDefaultStyle(id) {
-    const item = await dataStore.getItem(id).fetch()
+    const item = await database.data.get(id)
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
       throw new Error(`Item not found or not loaded: ${id}`)

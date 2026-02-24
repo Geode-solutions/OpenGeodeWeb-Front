@@ -6,6 +6,7 @@ import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
 
 import Status from "@ogw_front/utils/status"
+import { database } from "../../internal/database/database.js"
 import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
@@ -73,8 +74,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return
     }
-    const item = dataStore.getItem(id)
-    const value = await item.fetch()
+    const value = await database.data.get(id)
     console.log("hybridViewerStore.addItem", { value })
     const reader = vtkXMLPolyDataReader()
     const textEncoder = new TextEncoder()
@@ -237,13 +237,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const cameraSnapshot = camera
       ? {
-          focal_point: [...camera.getFocalPoint()],
-          view_up: [...camera.getViewUp()],
-          position: [...camera.getPosition()],
-          view_angle: camera.getViewAngle(),
-          clipping_range: [...camera.getClippingRange()],
-          distance: camera.getDistance(),
-        }
+        focal_point: [...camera.getFocalPoint()],
+        view_up: [...camera.getViewUp()],
+        position: [...camera.getPosition()],
+        view_angle: camera.getViewAngle(),
+        clipping_range: [...camera.getClippingRange()],
+        distance: camera.getDistance(),
+      }
       : camera_options
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
