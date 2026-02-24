@@ -14,7 +14,7 @@ class Database extends Dexie {
   }
 
   static async addTable(tableName, schemaDefinition) {
-    return this.addTables({ [tableName]: schemaDefinition })
+    await this.addTables({ [tableName]: schemaDefinition })
   }
 
   static async addTables(newTables) {
@@ -40,6 +40,8 @@ class Database extends Dexie {
       (tableName) => currentStores[tableName],
     )
 
+    database.close()
+
     if (allExisting) {
       const existingDb = new Dexie("Database")
       for (let version = 1; version <= currentVersion; version += 1) {
@@ -53,16 +55,19 @@ class Database extends Dexie {
         }
       }
       await existingDb.open()
-      return existingDb
+      database = existingDb
+    } else {
+      const newDb = new ExtendedDatabase(
+        currentVersion,
+        currentStores,
+        newTables,
+      )
+      await newDb.open()
+      database = newDb
     }
-
-    const newDb = new ExtendedDatabase(currentVersion, currentStores, newTables)
-    await newDb.open()
-
-    return newDb
   }
 }
 
-const database = new Database()
+let database = new Database()
 
 export { Database, database }
