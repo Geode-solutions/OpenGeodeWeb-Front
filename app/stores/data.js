@@ -15,32 +15,21 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  const itemCache = new Map()
   function getItem(id) {
     if (!id) {
-      const emptyRef = ref({})
-      emptyRef.fetch = async () => ({})
-      return emptyRef
+      return ref({})
     }
-    if (itemCache.has(id)) {
-      return itemCache.get(id)
-    }
-    const observable = useObservable(
+    return useObservable(
       liveQuery(() => database.data.get(id)),
       { initialValue: {} },
     )
-    observable.fetch = () => database.data.get(id)
-    itemCache.set(id, observable)
-    return observable
   }
 
   function getAllItems() {
-    const observable = useObservable(
+    return useObservable(
       liveQuery(() => database.data.toArray()),
       { initialValue: [] },
     )
-    observable.fetch = () => database.data.toArray()
-    return observable
   }
 
   async function formatedMeshComponents(id) {
@@ -167,7 +156,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function exportStores() {
-    const items = await getAllItems().fetch()
+    const items = await database.data.toArray()
     return { items }
   }
 
