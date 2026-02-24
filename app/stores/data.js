@@ -120,15 +120,18 @@ export const useDataStore = defineStore("data", () => {
     await database.model_components.where({ id }).delete()
   }
 
-  async function fetchMeshComponents(id) {
+  async function fetchModelComponents(id) {
     const geodeStore = useGeodeStore()
     return await geodeStore.request(
-      back_model_schemas.mesh_components,
+      back_model_schemas.model_components,
       { id },
       {
         response_function: async (response) => {
-          const { mesh_components } = response
-          await addModelComponents(mesh_components)
+          const { mesh_components, collection_components } = response
+          await addModelComponents([
+            ...mesh_components,
+            ...collection_components,
+          ])
         },
       },
     )
@@ -189,7 +192,7 @@ export const useDataStore = defineStore("data", () => {
     addItem,
     deleteItem,
     updateItem,
-    fetchMeshComponents,
+    fetchModelComponents,
     getCornersGeodeIds,
     getLinesGeodeIds,
     getSurfacesGeodeIds,
