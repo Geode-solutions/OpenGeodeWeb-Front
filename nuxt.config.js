@@ -51,4 +51,10 @@ export default defineNuxtConfig({
       ],
     },
   },
+
+  nitro: {
+    routeRules: {
+      "/api/routes/extensions": { bodySize: 100 * 1024 * 1024 }, // 100MB
+    },
+  },
 })
