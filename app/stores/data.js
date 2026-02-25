@@ -41,29 +41,25 @@ export const useDataStore = defineStore("data", () => {
       Block: "Blocks",
     }
 
-    const distinctTypes = Object.keys(componentTitles).filter((type) =>
-      items.some((item) => item.type === type),
-    )
+    const componentsByType = items.reduce((acc, item) => {
+      if (componentTitles[item.type]) {
+        if (!acc[item.type]) acc[item.type] = []
+        acc[item.type].push(item)
+      }
+      return acc
+    }, {})
 
-    const formated_mesh_components = await Promise.all(
-      distinctTypes.map(async (type) => {
-        const meshComponents = await database.model_components
-          .where({ id, type })
-          .toArray()
-
-        return {
-          id: type,
-          title: componentTitles[type],
-          children: meshComponents.map((meshComponent) => ({
-            id: meshComponent.geode_id,
-            title: meshComponent.name,
-            category: meshComponent.type,
-          })),
-        }
-      }),
-    )
-
-    return formated_mesh_components
+    return Object.keys(componentTitles)
+      .filter((type) => componentsByType[type])
+      .map((type) => ({
+        id: type,
+        title: componentTitles[type],
+        children: componentsByType[type].map((meshComponent) => ({
+          id: meshComponent.geode_id,
+          title: meshComponent.name,
+          category: meshComponent.type,
+        })),
+      }))
   }
 
   async function meshComponentType(id, geode_id) {
