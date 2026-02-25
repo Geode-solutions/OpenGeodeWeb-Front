@@ -3,6 +3,7 @@ import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 import { setTimeout } from "timers/promises"
+import { rimraf } from "rimraf"
 
 // Third party imports
 import { WebSocket } from "ws"
@@ -182,7 +183,7 @@ async function delete_folder_recursive(data_folder_path) {
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
     try {
       console.log(`Deleting folder: ${data_folder_path}`)
-      fs.rmSync(data_folder_path, { recursive: true, force: true })
+      await rimraf(data_folder_path)
       console.log(`Deleted folder: ${data_folder_path}`)
       return
     } catch (error) {
@@ -190,6 +191,7 @@ async function delete_folder_recursive(data_folder_path) {
       // Wait before retrying
       const DELAY = 1000 * (i + 1)
       await setTimeout(DELAY)
+      console.log("Retrying delete folder")
     }
   }
 }
