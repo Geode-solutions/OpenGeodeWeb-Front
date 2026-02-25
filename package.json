@@ -1,9 +1,26 @@
 {
   "name": "@geode/opengeodeweb-front",
-  "description": "OpenSource Vue/Nuxt/Pinia/Vuetify framework for web applications",
-  "type": "module",
   "version": "0.0.0",
+  "description": "OpenSource Vue/Nuxt/Pinia/Vuetify framework for web applications",
+  "homepage": "https://github.com/Geode-solutions/OpenGeodeWeb-Front",
+  "bugs": {
+    "url": "https://github.com/Geode-solutions/OpenGeodeWeb-Front/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Geode-solutions",
+    "email": "contact@geode-solutions.com",
+    "url": "https://geode-solutions.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Front.git"
+  },
+  "type": "module",
   "main": "./nuxt.config.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
     "test": "npm run test:unit",
@@ -69,23 +86,13 @@
     "electron": "36.4.0"
   },
   "overrides": {
-    "vue": "latest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Front.git"
-  },
-  "author": {
-    "name": "Geode-solutions",
-    "email": "contact@geode-solutions.com",
-    "url": "https://geode-solutions.com/"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Geode-solutions/OpenGeodeWeb-Front/issues"
-  },
-  "homepage": "https://github.com/Geode-solutions/OpenGeodeWeb-Front",
-  "publishConfig": {
-    "access": "public"
+    "@vue/compiler-core": "3.5.28",
+    "@vue/compiler-dom": "3.5.28",
+    "@vue/compiler-sfc": "3.5.28",
+    "@vue/reactivity": "3.5.28",
+    "@vue/runtime-core": "3.5.28",
+    "@vue/runtime-dom": "3.5.28",
+    "@vue/shared": "3.5.28",
+    "vue": "3.5.28"
   }
 }
