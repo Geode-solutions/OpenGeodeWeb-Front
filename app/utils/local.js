@@ -209,7 +209,7 @@ function kill_back(back_port) {
     }
   }
   return pTimeout(do_kill(), {
-    milliseconds: 500,
+    milliseconds: 5000,
     message: "Failed to kill back",
   })
 }
@@ -254,7 +254,7 @@ function kill_viewer(viewer_port) {
   }
 
   return pTimeout(do_kill(), {
-    milliseconds: 500,
+    milliseconds: 5000,
     message: "Failed to kill viewer",
   })
 }
