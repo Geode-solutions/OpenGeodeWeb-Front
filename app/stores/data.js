@@ -34,7 +34,16 @@ export const useDataStore = defineStore("data", () => {
 
   async function formatedMeshComponents(id) {
     const items = await database.model_components.where({ id }).toArray()
-    const distinctTypes = [...new Set(items.map((item) => item.type))]
+    const componentTitles = {
+      Corner: "Corners",
+      Line: "Lines",
+      Surface: "Surfaces",
+      Block: "Blocks",
+    }
+
+    const distinctTypes = Object.keys(componentTitles).filter((type) =>
+      items.some((item) => item.type === type),
+    )
 
     const formated_mesh_components = await Promise.all(
       distinctTypes.map(async (type) => {
@@ -44,7 +53,7 @@ export const useDataStore = defineStore("data", () => {
 
         return {
           id: type,
-          title: type,
+          title: componentTitles[type],
           children: meshComponents.map((meshComponent) => ({
             id: meshComponent.geode_id,
             title: meshComponent.name,
@@ -117,10 +126,11 @@ export const useDataStore = defineStore("data", () => {
       {
         response_function: async (response) => {
           const { mesh_components, collection_components } = response
-          await addModelComponents([
+          const allComponents = [
             ...mesh_components,
             ...collection_components,
-          ])
+          ].map((component) => ({ ...component, id }))
+          await addModelComponents(allComponents)
         },
       },
     )
