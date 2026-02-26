@@ -240,6 +240,7 @@ function kill_viewer(viewer_port) {
               method: viewer_schemas.opengeodeweb_viewer.kill.$id,
             }),
           )
+          socket.close()
           resolve()
         }
       })
@@ -249,6 +250,7 @@ function kill_viewer(viewer_port) {
       })
       socket.on("error", (error) => {
         console.error("WebSocket error:", error)
+        socket.close()
         resolve()
       })
     })
