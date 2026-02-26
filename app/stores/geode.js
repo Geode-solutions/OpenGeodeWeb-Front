@@ -89,7 +89,9 @@ export const useGeodeStore = defineStore("geode", {
       console.log("[GEODE] Launching geode microservice...")
 
       const schema = { $id: "opengeodeweb_back.launch", methods: ["POST"] }
-      return appStore.request(back_schemas.opengeodeweb_back.launch, {}, {})
+      return appStore.request(schema, {}, (response_function) => {
+        console.log("[GEODE] Geode launched")
+      })
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")
