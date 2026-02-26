@@ -236,11 +236,12 @@ function kill_viewer(viewer_port) {
         if (message.includes("hello")) {
           socket.send(
             JSON.stringify({
-              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
-              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+              id: "application.exit",
+              method: "application.exit",
             }),
           )
           socket.close()
+          resolve()
         }
       })
       socket.on("close", () => {
