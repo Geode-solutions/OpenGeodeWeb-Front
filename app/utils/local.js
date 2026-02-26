@@ -217,8 +217,8 @@ function kill_back(back_port) {
 }
 
 function kill_viewer(viewer_port) {
-  async function do_kill() {
-    new Promise((resolve) => {
+  function do_kill() {
+    return new Promise((resolve) => {
       const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
       socket.on("open", () => {
         console.log("Connected to WebSocket server")
@@ -233,7 +233,6 @@ function kill_viewer(viewer_port) {
       socket.on("message", (data) => {
         const message = data.toString()
         console.log("Received from server:", message)
-
         if (message.includes("hello")) {
           socket.send(
             JSON.stringify({
@@ -254,7 +253,6 @@ function kill_viewer(viewer_port) {
       })
     })
   }
-
   return pTimeout(do_kill(), {
     milliseconds: 5000,
     message: "Failed to kill viewer",
