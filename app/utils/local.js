@@ -256,95 +256,95 @@ function kill_viewer(viewer_port) {
   })
 }
 
-async function wait_nuxt(nuxt_process, back_port, viewer_port) {
-  for await (const [data] of on(nuxt_process.stdout, "data")) {
-    const output = data.toString()
-    const portMatch = output.match(
-      /Accepting connections at http:\/\/localhost:(\d+)/,
-    )
-    console.log("Nuxt:", output)
-    if (portMatch) {
-      const [, nuxt_port] = portMatch
-      process.env.NUXT_PORT = nuxt_port
-      return { geode_port: back_port, viewer_port, nuxt_port }
-    }
-  }
-  throw new Error("Nuxt process closed without accepting connections")
-}
+// async function wait_nuxt(nuxt_process, back_port, viewer_port) {
+//   for await (const [data] of on(nuxt_process.stdout, "data")) {
+//     const output = data.toString()
+//     const portMatch = output.match(
+//       /Accepting connections at http:\/\/localhost:(\d+)/,
+//     )
+//     console.log("Nuxt:", output)
+//     if (portMatch) {
+//       const [, nuxt_port] = portMatch
+//       process.env.NUXT_PORT = nuxt_port
+//       return { geode_port: back_port, viewer_port, nuxt_port }
+//     }
+//   }
+//   throw new Error("Nuxt process closed without accepting connections")
+// }
 
-async function run_browser(
-  script_name,
-  microservices_options = {
-    back: {
-      executable_name: executable_name("opengeodeweb-back"),
-      executable_path: "",
-      args: { project_folder_path: "" },
-    },
-    viewer: {
-      executable_name: executable_name("opengeodeweb-viewer"),
-      executable_path: "",
-      args: { project_folder_path: "" },
-    },
-  },
-) {
-  if (
-    microservices_options.back.executable_path === "" ||
-    microservices_options.back.args.project_folder_path === ""
-  ) {
-    const microservices_path = "microservices"
-    microservices_options.back.executable_path =
-      await executable_path(microservices_path)
-    microservices_options.back.args.project_folder_path = create_path(
-      path.join(process.cwd(), "data"),
-    )
-  }
-  if (
-    microservices_options.viewer.executable_path === "" ||
-    microservices_options.viewer.args.project_folder_path === ""
-  ) {
-    const microservices_path = "microservices"
-    microservices_options.viewer.executable_path =
-      await executable_path(microservices_path)
-    microservices_options.viewer.args.project_folder_path =
-      microservices_options.back.args.project_folder_path
-  }
-  const back_promise = run_back(
-    microservices_options.back.executable_name,
-    microservices_options.back.executable_path,
-    { ...microservices_options.back.args },
-  )
-  console.log("back_promise", back_promise)
+// async function run_browser(
+//   script_name,
+//   microservices_options = {
+//     back: {
+//       executable_name: executable_name("opengeodeweb-back"),
+//       executable_path: "",
+//       args: { project_folder_path: "" },
+//     },
+//     viewer: {
+//       executable_name: executable_name("opengeodeweb-viewer"),
+//       executable_path: "",
+//       args: { project_folder_path: "" },
+//     },
+//   },
+// ) {
+//   if (
+//     microservices_options.back.executable_path === "" ||
+//     microservices_options.back.args.project_folder_path === ""
+//   ) {
+//     const microservices_path = "microservices"
+//     microservices_options.back.executable_path =
+//       await executable_path(microservices_path)
+//     microservices_options.back.args.project_folder_path = create_path(
+//       path.join(process.cwd(), "data"),
+//     )
+//   }
+//   if (
+//     microservices_options.viewer.executable_path === "" ||
+//     microservices_options.viewer.args.project_folder_path === ""
+//   ) {
+//     const microservices_path = "microservices"
+//     microservices_options.viewer.executable_path =
+//       await executable_path(microservices_path)
+//     microservices_options.viewer.args.project_folder_path =
+//       microservices_options.back.args.project_folder_path
+//   }
+//   const back_promise = run_back(
+//     microservices_options.back.executable_name,
+//     microservices_options.back.executable_path,
+//     { ...microservices_options.back.args },
+//   )
+//   console.log("back_promise", back_promise)
 
-  const viewer_promise = run_viewer(
-    microservices_options.viewer.executable_name,
-    microservices_options.viewer.executable_path,
-    { ...microservices_options.viewer.args },
-  )
-  console.log("viewer_promise", viewer_promise)
+//   const viewer_promise = run_viewer(
+//     microservices_options.viewer.executable_name,
+//     microservices_options.viewer.executable_path,
+//     { ...microservices_options.viewer.args },
+//   )
+//   console.log("viewer_promise", viewer_promise)
 
-  const [back_port, viewer_port] = await Promise.all([
-    back_promise,
-    viewer_promise,
-  ])
-  process.env.GEODE_PORT = back_port
-  process.env.VIEWER_PORT = viewer_port
-  console.log("back_port", back_port)
-  console.log("viewer_port", viewer_port)
+//   const [back_port, viewer_port] = await Promise.all([
+//     back_promise,
+//     viewer_promise,
+//   ])
+//   process.env.GEODE_PORT = back_port
+//   process.env.VIEWER_PORT = viewer_port
+//   console.log("back_port", back_port)
+//   console.log("viewer_port", viewer_port)
 
-  process.env.BROWSER = true
-  process.on("SIGINT", async () => {
-    console.log("Shutting down microservices")
-    await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-    console.log("Quitting App...")
-    process.exit(0)
-  })
+//   process.env.BROWSER = true
+//   process.on("SIGINT", async () => {
+//     console.log("Shutting down microservices")
+//     await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+//     console.log("Quitting App...")
+//     process.exit(0)
+//   })
 
-  const nuxt_process = child_process.spawn("npm", ["run", script_name], {
-    shell: true,
-    FORCE_COLOR: true,
-  })
-  return wait_nuxt(nuxt_process, back_port, viewer_port)
-}
+//   const nuxt_process = child_process.spawn("npm", ["run", script_name], {
+//     shell: true,
+//     FORCE_COLOR: true,
+//   })
+//   return wait_nuxt(nuxt_process, back_port, viewer_port)
+// }
 
 export {
   create_path,

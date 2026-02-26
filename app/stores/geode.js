@@ -4,9 +4,14 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useInfraStore } from "@ogw_front/stores/infra"
+import { useAppStore } from "@ogw_front/stores/app"
+import { upload_file } from "../../internal/utils/upload_file.js"
 
 const MILLISECONDS_IN_SECOND = 1000
 const DEFAULT_PING_INTERVAL_SECONDS = 10
+
+const appStore = useAppStore()
+const infraStore = useInfraStore()
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -16,13 +21,13 @@ export const useGeodeStore = defineStore("geode", {
   }),
   getters: {
     protocol() {
-      if (useInfraStore().app_mode === appMode.CLOUD) {
+      if (infraStore.app_mode === appMode.CLOUD) {
         return "https"
       }
       return "http"
     },
     port() {
-      if (useInfraStore().app_mode === appMode.CLOUD) {
+      if (infraStore.app_mode === appMode.CLOUD) {
         return "443"
       }
       const { GEODE_PORT } = useRuntimeConfig().public
@@ -32,7 +37,6 @@ export const useGeodeStore = defineStore("geode", {
       return this.default_local_port
     },
     base_url() {
-      const infraStore = useInfraStore()
       let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
       if (infraStore.app_mode === appMode.CLOUD) {
         if (infraStore.ID === "") {
@@ -83,7 +87,9 @@ export const useGeodeStore = defineStore("geode", {
     },
     launch() {
       console.log("[GEODE] Launching geode microservice...")
-      return globalThis.electronAPI.run_back()
+
+      const schema = { $id: "opengeodeweb_back.launch", methods: ["POST"] }
+      return appStore.request(back_schemas.opengeodeweb_back.launch, {}, {})
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")
@@ -100,6 +106,24 @@ export const useGeodeStore = defineStore("geode", {
           ...callbacks,
           response_function: async (response) => {
             console.log("[GEODE] Request completed:", schema.$id)
+            if (callbacks.response_function) {
+              await callbacks.response_function(response)
+            }
+          },
+        },
+      )
+    },
+    upload(file, callbacks = {}) {
+      return upload_file(
+        this,
+        {
+          route: back_schemas.opengeodeweb_back.upload_file.$id,
+          file,
+        },
+        {
+          ...callbacks,
+          response_function: async (response) => {
+            console.log("[GEODE] Request completed:", route)
             if (callbacks.response_function) {
               await callbacks.response_function(response)
             }

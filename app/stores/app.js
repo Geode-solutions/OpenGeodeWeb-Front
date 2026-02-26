@@ -1,3 +1,6 @@
+import { upload_file } from "../../internal/utils/upload_file.js"
+import { api_fetch } from "../../internal/utils/api_fetch.js"
+
 export const useAppStore = defineStore("app", () => {
   const stores = []
 
@@ -216,6 +219,49 @@ export const useAppStore = defineStore("app", () => {
     return getExtension(id)?.enabled ?? false
   }
 
+  function upload(file, callbacks = {}) {
+    const route = "/api/routes/extensions"
+    return upload_file(
+      this,
+      { route, file },
+      {
+        ...callbacks,
+        response_function: async (response) => {
+          console.log("[APP] Request completed:", route)
+          if (callbacks.response_function) {
+            await callbacks.response_function(response)
+          }
+        },
+      },
+    )
+  }
+
+  function request(schema, params, callbacks = {}) {
+    console.log("[APP] Request:", schema.$id)
+
+    return api_fetch(
+      this,
+      { schema, params },
+      {
+        ...callbacks,
+        response_function: async (response) => {
+          console.log("[APP] Request completed:", schema.$id)
+          if (callbacks.response_function) {
+            await callbacks.response_function(response)
+          }
+        },
+      },
+    )
+  }
+
+  const request_counter = ref(0)
+  function start_request() {
+    request_counter.value += 1
+  }
+  function stop_request() {
+    request_counter.value -= 1
+  }
+
   return {
     stores,
     registerStore,
@@ -232,5 +278,9 @@ export const useAppStore = defineStore("app", () => {
     toggleExtension,
     setExtensionEnabled,
     getExtensionEnabled,
+    request,
+    upload,
+    start_request,
+    stop_request,
   }
 })

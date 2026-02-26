@@ -55,8 +55,15 @@ export const useInfraStore = defineStore("infra", {
         }
         console.log("[INFRA] Lock granted for create_backend")
 
-        if (this.app_mode === appMode.DESKTOP) {
-          console.log("[INFRA] DESKTOP mode - Launching microservices...")
+        if (this.app_mode === appMode.CLOUD) {
+          console.log("[INFRA] CLOUD mode - Launching lambda...")
+          const lambdaStore = useLambdaStore()
+          this.ID = await lambdaStore.launch()
+          console.log("[INFRA] Lambda launched successfully")
+        } else {
+          console.log(
+            `[INFRA] ${this.app_mode} mode - Launching microservices...`,
+          )
           const microservices_with_launch = this.microservices.filter(
             (store) => store.launch,
           )
@@ -69,11 +76,6 @@ export const useInfraStore = defineStore("infra", {
           for (const [index, store] of microservices_with_launch.entries()) {
             store.$patch({ default_local_port: ports[index] })
           }
-        } else if (this.app_mode === appMode.CLOUD) {
-          console.log("[INFRA] CLOUD mode - Launching lambda...")
-          const lambdaStore = useLambdaStore()
-          this.ID = await lambdaStore.launch()
-          console.log("[INFRA] Lambda launched successfully")
         }
 
         this.status = Status.CREATED
