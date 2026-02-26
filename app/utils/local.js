@@ -217,20 +217,20 @@ function kill_back(back_port) {
 }
 
 function kill_viewer(viewer_port) {
-  async function do_kill() {
-    const socket = new WebSocket(`ws://localhost:${viewer_port}/ws`)
-    try {
-      await once(socket, "open")
-      console.log("Connected to WebSocket server")
-      socket.send(
-        JSON.stringify({
-          id: "system:hello",
-          method: "wslink.hello",
-          args: [{ secret: "wslink-secret" }],
-        }),
-      )
-
-      for await (const [data] of on(socket, "message")) {
+  return pTimeout(
+    new Promise((resolve) => {
+      const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
+      socket.on("open", () => {
+        console.log("Connected to WebSocket server")
+        socket.send(
+          JSON.stringify({
+            id: "system:hello",
+            method: "wslink.hello",
+            args: [{ secret: "wslink-secret" }],
+          }),
+        )
+      })
+      socket.on("message", (data) => {
         const message = data.toString()
         console.log("Received from server:", message)
 
@@ -241,18 +241,62 @@ function kill_viewer(viewer_port) {
               method: viewer_schemas.opengeodeweb_viewer.kill.$id,
             }),
           )
-          break
+          resolve()
         }
-      }
-      await once(socket, "close")
-      console.log("Disconnected from WebSocket server")
-    } catch (error) {
-      console.error("WebSocket error:", error)
-    } finally {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.close()
-      }
-    }
+      })
+      socket.on("close", () => {
+        console.log("Disconnected from WebSocket server")
+        resolve()
+      })
+      socket.on("error", (error) => {
+        console.error("WebSocket error:", error)
+        resolve()
+      })
+    }),
+    {
+      milliseconds: 500,
+      message: "Failed to kill viewer",
+    },
+  )
+}
+
+function kill_viewer(viewer_port) {
+  async function do_kill() {
+    new Promise((resolve) => {
+      const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
+      socket.on("open", () => {
+        console.log("Connected to WebSocket server")
+        socket.send(
+          JSON.stringify({
+            id: "system:hello",
+            method: "wslink.hello",
+            args: [{ secret: "wslink-secret" }],
+          }),
+        )
+      })
+      socket.on("message", (data) => {
+        const message = data.toString()
+        console.log("Received from server:", message)
+
+        if (message.includes("hello")) {
+          socket.send(
+            JSON.stringify({
+              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
+              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+            }),
+          )
+          resolve()
+        }
+      })
+      socket.on("close", () => {
+        console.log("Disconnected from WebSocket server")
+        resolve()
+      })
+      socket.on("error", (error) => {
+        console.error("WebSocket error:", error)
+        resolve()
+      })
+    })
   }
 
   return pTimeout(do_kill(), {
