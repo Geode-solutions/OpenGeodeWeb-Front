@@ -241,7 +241,6 @@ function kill_viewer(viewer_port) {
             }),
           )
           socket.close()
-          resolve()
         }
       })
       socket.on("close", () => {
