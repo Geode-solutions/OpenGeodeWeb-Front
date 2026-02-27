@@ -68,7 +68,7 @@ export const useViewerStore = defineStore(
 
     async function set_picked_point(x, y) {
       const response = await request(
-        schemas.openviewerweb_viewer.generic.get_point_position,
+        schemas.opengeodeweb_viewer.generic.get_point_position,
         { x, y },
       )
       const { x: world_x, y: world_y } = response

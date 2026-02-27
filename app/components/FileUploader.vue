@@ -1,9 +1,6 @@
 <script setup>
   import DragAndDrop from "@ogw_front/components/DragAndDrop"
-  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
   import { useGeodeStore } from "@ogw_front/stores/geode"
-
-  const schema = schemas.opengeodeweb_back.upload_file
 
   const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"])
 
@@ -42,7 +39,7 @@
   async function upload_files() {
     toggle_loading()
     const promise_array = internal_files.value.map((file) =>
-      geodeStore.upload({ route: schema.$id, file }),
+      geodeStore.upload(file),
     )
     await Promise.all(promise_array)
     files_uploaded.value = true

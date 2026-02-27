@@ -1,5 +1,7 @@
 import { upload_file } from "../../internal/utils/upload_file.js"
 import { api_fetch } from "../../internal/utils/api_fetch.js"
+import { appMode } from "@ogw_front/utils/app_mode.js"
+import { useInfraStore } from "@ogw_front/stores/infra.js"
 
 export const useAppStore = defineStore("app", () => {
   const stores = []
@@ -282,9 +284,15 @@ export const useAppStore = defineStore("app", () => {
       schema,
       { PROJECT },
       {
-        response_function: (response) => {
+        response_function: async (response) => {
           console.log("[GEODE] Request completed:", { response })
           projectFolderPath.value = response.projectFolderPath
+
+          if (useInfraStore().app_mode === appMode.CLOUD) {
+            await globalThis.electronAPI.project_folder_path(
+              projectFolderPath.value,
+            )
+          }
           console.log("[GEODE] Back launched")
         },
       },

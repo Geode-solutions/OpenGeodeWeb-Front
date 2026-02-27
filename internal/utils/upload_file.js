@@ -1,4 +1,4 @@
-import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
 
 export async function upload_file(
   microservice,
