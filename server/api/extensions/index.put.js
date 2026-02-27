@@ -18,7 +18,7 @@ import sanitize from "sanitize-filename"
 import {
   confFolderPath,
   addExtensionToConf,
-} from "../../../../app/utils/config.js"
+} from "../../../app/utils/config.js"
 // import { useRuntimeConfig } from "#imports"
 
 const CODE_201 = 201

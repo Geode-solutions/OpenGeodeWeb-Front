@@ -19,7 +19,7 @@ async function importExtensions(projectFolderPath) {
   console.log("importExtensions", { projectFolderPath })
   const params = { projectFolderPath }
   const schema = {
-    $id: "/api/routes/import_extensions",
+    $id: "/api/import_extensions",
     methods: ["POST"],
     type: "object",
     properties: {

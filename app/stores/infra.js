@@ -1,6 +1,7 @@
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import Status from "@ogw_front/utils/status"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
+import { useAppStore } from "@ogw_front/stores/app"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
@@ -64,18 +65,22 @@ export const useInfraStore = defineStore("infra", {
           console.log(
             `[INFRA] ${this.app_mode} mode - Launching microservices...`,
           )
+
+          const appStore = useAppStore()
+          await appStore.createProjectFolder()
+
           const microservices_with_launch = this.microservices.filter(
             (store) => store.launch,
           )
-
-          const port_promises = microservices_with_launch.map((store) =>
-            store.launch(),
+          console.log("TEST PROJECT FOLDER PATH", appStore.projectFolderPath)
+          const launch_promises = microservices_with_launch.map((store) =>
+            store.launch({ projectFolderPath: appStore.projectFolderPath }),
           )
-          const ports = await Promise.all(port_promises)
+          await Promise.all(launch_promises)
 
-          for (const [index, store] of microservices_with_launch.entries()) {
-            store.$patch({ default_local_port: ports[index] })
-          }
+          // for (const [index, store] of microservices_with_launch.entries()) {
+          //   store.$patch({ default_local_port: ports[index] })
+          // }
         }
 
         this.status = Status.CREATED

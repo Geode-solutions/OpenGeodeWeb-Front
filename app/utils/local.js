@@ -16,8 +16,8 @@ const MAX_DELETE_FOLDER_RETRIES = 5
 const DEFAULT_TIMEOUT_SECONDS = 30
 const MILLISECONDS_PER_SECOND = 1000
 
-function venv_script_path(root_path, microservice_path) {
-  const venv_path = path.join(root_path, microservice_path, "venv")
+function venv_script_path(microservice_path) {
+  const venv_path = path.join(microservice_path, "venv")
   let script_path = ""
   if (process.platform === "win32") {
     script_path = path.join(venv_path, "Scripts")
@@ -33,10 +33,10 @@ async function executable_path(microservice_path) {
     if (electron.app.isPackaged) {
       return process.resourcesPath
     } else {
-      return venv_script_path(electron.app.getAppPath(), microservice_path)
+      return venv_script_path(microservice_path)
     }
   } else {
-    return venv_script_path(process.cwd(), microservice_path)
+    return venv_script_path(microservice_path)
   }
 }
 
@@ -125,50 +125,50 @@ async function run_script(
   }
 }
 
-async function run_back(executable_name, executable_path, args = {}) {
-  let { project_folder_path, upload_folder_path } = args
-  if (!project_folder_path) {
-    throw new Error("project_folder_path is required")
+async function run_back(executableName, executablePath, args = {}) {
+  let { projectFolderPath, uploadFolderPath } = args
+  if (!projectFolderPath) {
+    throw new Error("projectFolderPath is required")
   }
-  if (!upload_folder_path) {
-    upload_folder_path = path.join(project_folder_path, "uploads")
+  if (!uploadFolderPath) {
+    uploadFolderPath = path.join(projectFolderPath, "uploads")
   }
   const port = await get_available_port()
   const back_args = [
     `--port ${port}`,
-    `--data_folder_path ${project_folder_path}`,
-    `--upload_folder_path ${upload_folder_path}`,
+    `--data_folder_path ${projectFolderPath}`,
+    `--upload_folder_path ${uploadFolderPath}`,
     `--allowed_origin http://localhost:*`,
     `--timeout ${0}`,
   ]
   if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
     back_args.push("--debug")
   }
-  console.log("run_back", executable_name, executable_path, back_args)
+  console.log("run_back", executableName, executablePath, back_args)
   await run_script(
-    executable_name,
-    executable_path,
+    executableName,
+    executablePath,
     back_args,
     "Serving Flask app",
   )
   return port
 }
 
-async function run_viewer(executable_name, executable_path, args = {}) {
-  if (!args.project_folder_path) {
-    throw new Error("project_folder_path is required")
+async function run_viewer(executableName, executablePath, args = {}) {
+  if (!args.projectFolderPath) {
+    throw new Error("projectFolderPath is required")
   }
   const port = await get_available_port()
-  const viewer_args = [
+  const viewerArgs = [
     `--port ${port}`,
-    `--data_folder_path ${args.project_folder_path}`,
+    `--data_folder_path ${args.projectFolderPath}`,
     `--timeout ${0}`,
   ]
-  console.log("run_viewer", executable_name, executable_path, viewer_args)
+  console.log("run_viewer", executableName, executablePath, viewerArgs)
   await run_script(
-    executable_name,
-    executable_path,
-    viewer_args,
+    executableName,
+    executablePath,
+    viewerArgs,
     "Starting factory",
   )
   return port
@@ -256,81 +256,6 @@ function kill_viewer(viewer_port) {
   })
 }
 
-// async function wait_nuxt(nuxt_process, back_port, viewer_port) {
-//   for await (const [data] of on(nuxt_process.stdout, "data")) {
-//     const output = data.toString()
-//     const portMatch = output.match(
-//       /Accepting connections at http:\/\/localhost:(\d+)/,
-//     )
-//     console.log("Nuxt:", output)
-//     if (portMatch) {
-//       const [, nuxt_port] = portMatch
-//       process.env.NUXT_PORT = nuxt_port
-//       return { geode_port: back_port, viewer_port, nuxt_port }
-//     }
-//   }
-//   throw new Error("Nuxt process closed without accepting connections")
-// }
-
-// async function run_browser(
-//   script_name,
-//   microservices_options = {
-//     back: {
-//       executable_name: executable_name("opengeodeweb-back"),
-//       executable_path: "",
-//       args: { project_folder_path: "" },
-//     },
-//     viewer: {
-//       executable_name: executable_name("opengeodeweb-viewer"),
-//       executable_path: "",
-//       args: { project_folder_path: "" },
-//     },
-//   },
-// ) {
-//   if (
-//     microservices_options.back.executable_path === "" ||
-//     microservices_options.back.args.project_folder_path === ""
-//   ) {
-//     const microservices_path = "microservices"
-//     microservices_options.back.executable_path =
-//       await executable_path(microservices_path)
-//     microservices_options.back.args.project_folder_path = create_path(
-//       path.join(process.cwd(), "data"),
-//     )
-//   }
-//   if (
-//     microservices_options.viewer.executable_path === "" ||
-//     microservices_options.viewer.args.project_folder_path === ""
-//   ) {
-//     const microservices_path = "microservices"
-//     microservices_options.viewer.executable_path =
-//       await executable_path(microservices_path)
-//     microservices_options.viewer.args.project_folder_path =
-//       microservices_options.back.args.project_folder_path
-//   }
-//   const back_promise = run_back(
-//     microservices_options.back.executable_name,
-//     microservices_options.back.executable_path,
-//     { ...microservices_options.back.args },
-//   )
-//   console.log("back_promise", back_promise)
-
-//   const viewer_promise = run_viewer(
-//     microservices_options.viewer.executable_name,
-//     microservices_options.viewer.executable_path,
-//     { ...microservices_options.viewer.args },
-//   )
-//   console.log("viewer_promise", viewer_promise)
-
-//   const [back_port, viewer_port] = await Promise.all([
-//     back_promise,
-//     viewer_promise,
-//   ])
-//   process.env.GEODE_PORT = back_port
-//   process.env.VIEWER_PORT = viewer_port
-//   console.log("back_port", back_port)
-//   console.log("viewer_port", viewer_port)
-
 //   process.env.BROWSER = true
 //   process.on("SIGINT", async () => {
 //     console.log("Shutting down microservices")
@@ -338,13 +263,6 @@ function kill_viewer(viewer_port) {
 //     console.log("Quitting App...")
 //     process.exit(0)
 //   })
-
-//   const nuxt_process = child_process.spawn("npm", ["run", script_name], {
-//     shell: true,
-//     FORCE_COLOR: true,
-//   })
-//   return wait_nuxt(nuxt_process, back_port, viewer_port)
-// }
 
 export {
   create_path,
@@ -357,5 +275,4 @@ export {
   run_script,
   run_back,
   run_viewer,
-  run_browser,
 }

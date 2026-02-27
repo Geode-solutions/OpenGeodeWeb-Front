@@ -1,3 +1,6 @@
+// Node imports
+import path from "node:path"
+
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
@@ -64,11 +67,21 @@ export default defineNuxtConfig({
         "seedrandom",
       ],
     },
+    server: {
+      watch: {
+        include: ["server/**"],
+      },
+    },
   },
 
   nitro: {
     routeRules: {
-      "/api/routes/extensions": { bodySize: 100 * 1024 * 1024 }, // 100MB
+      "/api/extensions": { bodySize: 100 * 1024 * 1024 }, // 100MB
+    },
+    watchOptions: {
+      include: ["server/**"],
     },
   },
+
+  watch: ["server"],
 })

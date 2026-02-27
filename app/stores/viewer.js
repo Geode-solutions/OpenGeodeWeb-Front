@@ -1,3 +1,4 @@
+// Third party imports
 import vtkWSLinkClient, {
   newInstance,
 } from "@kitware/vtk.js/IO/Core/WSLinkClient"
@@ -5,9 +6,13 @@ import vtkWSLinkClient, {
 import _ from "lodash"
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
+import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { useRuntimeConfig } from "nuxt/app"
+
+// Local imports
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
-import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { useAppStore } from "@ogw_front/stores/app"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { viewer_call } from "../../internal/utils/viewer_call"
 
@@ -40,10 +45,6 @@ export const useViewerStore = defineStore(
       if (infraStore.app_mode === appMode.CLOUD) {
         return "443"
       }
-      const { VIEWER_PORT } = useRuntimeConfig().public
-      if (VIEWER_PORT !== undefined && VIEWER_PORT !== "") {
-        return VIEWER_PORT
-      }
       return default_local_port.value
     })
 
@@ -67,7 +68,7 @@ export const useViewerStore = defineStore(
 
     async function set_picked_point(x, y) {
       const response = await request(
-        schemas.opengeodeweb_viewer.generic.get_point_position,
+        schemas.openviewerweb_viewer.generic.get_point_position,
         { x, y },
       )
       const { x: world_x, y: world_y } = response
@@ -87,8 +88,9 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
           status.value = Status.CONNECTING
-          const { default: SmartConnect } =
-            await import("wslink/src/SmartConnect")
+          const { default: SmartConnect } = await import(
+            "wslink/src/SmartConnect"
+          )
           vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
           const config_obj = { application: "Viewer" }
@@ -122,8 +124,9 @@ export const useViewerStore = defineStore(
           })
 
           // Connect
-          const { connectImageStream } =
-            await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+          const { connectImageStream } = await import(
+            "@kitware/vtk.js/Rendering/Misc/RemoteView"
+          )
           client.value = await clientToConnect.connect(config_obj)
           connectImageStream(client.value.getConnection().getSession())
           clientToConnect.endBusy()
@@ -150,11 +153,40 @@ export const useViewerStore = defineStore(
       request_counter.value -= 1
     }
 
-    async function launch() {
-      console.log("[VIEWER] Launching viewer microservice...")
-      const port = await globalThis.electronAPI.run_viewer()
-      console.log("[VIEWER] Viewer launched on port:", port)
-      return port
+    function launch(args = { projectFolderPath }) {
+      console.log("[VIEWER] Launching viewer microservice...", { args })
+      const appStore = useAppStore()
+
+      const { VIEWER_PATH, VIEWER_COMMAND } = useRuntimeConfig().public
+
+      console.log("[VIEWER] VIEWER_PATH", VIEWER_PATH)
+      console.log("[VIEWER] VIEWER_COMMAND", VIEWER_COMMAND)
+      const schema = {
+        $id: "/api/app/run_viewer",
+        methods: ["POST"],
+        type: "object",
+        properties: {
+          VIEWER_PATH: { type: "string" },
+          VIEWER_COMMAND: { type: "string" },
+        },
+        required: ["VIEWER_PATH", "VIEWER_COMMAND"],
+        additionalProperties: true,
+      }
+
+      const params = {
+        VIEWER_PATH,
+        VIEWER_COMMAND,
+        args,
+      }
+
+      console.log("[VIEWER] params", params)
+
+      return appStore.request(schema, params, {
+        response_function: (response) => {
+          this.default_local_port = response.port
+          console.log("[VIEWER] Viewer launched")
+        },
+      })
     }
 
     async function connect() {

@@ -10,9 +10,6 @@ import { upload_file } from "../../internal/utils/upload_file.js"
 const MILLISECONDS_IN_SECOND = 1000
 const DEFAULT_PING_INTERVAL_SECONDS = 10
 
-const appStore = useAppStore()
-const infraStore = useInfraStore()
-
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
     default_local_port: "5000",
@@ -21,22 +18,19 @@ export const useGeodeStore = defineStore("geode", {
   }),
   getters: {
     protocol() {
-      if (infraStore.app_mode === appMode.CLOUD) {
+      if (useInfraStore().app_mode === appMode.CLOUD) {
         return "https"
       }
       return "http"
     },
     port() {
-      if (infraStore.app_mode === appMode.CLOUD) {
+      if (useInfraStore().app_mode === appMode.CLOUD) {
         return "443"
-      }
-      const { GEODE_PORT } = useRuntimeConfig().public
-      if (GEODE_PORT !== null && GEODE_PORT !== "") {
-        return GEODE_PORT
       }
       return this.default_local_port
     },
     base_url() {
+      const infraStore = useInfraStore()
       let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
       if (infraStore.app_mode === appMode.CLOUD) {
         if (infraStore.ID === "") {
@@ -85,12 +79,39 @@ export const useGeodeStore = defineStore("geode", {
     stop_request() {
       this.request_counter -= 1
     },
-    launch() {
-      console.log("[GEODE] Launching geode microservice...")
+    launch(args) {
+      console.log("[GEODE] Launching back microservice...", { args })
+      const appStore = useAppStore()
 
-      const schema = { $id: "opengeodeweb_back.launch", methods: ["POST"] }
-      return appStore.request(schema, {}, (response_function) => {
-        console.log("[GEODE] Geode launched")
+      const { BACK_PATH, BACK_COMMAND } = useRuntimeConfig().public
+
+      console.log("[GEODE] BACK_PATH", BACK_PATH)
+      console.log("[GEODE] BACK_COMMAND", BACK_COMMAND)
+      const schema = {
+        $id: "/api/app/run_back",
+        methods: ["POST"],
+        type: "object",
+        properties: {
+          BACK_PATH: { type: "string" },
+          BACK_COMMAND: { type: "string" },
+        },
+        required: ["BACK_PATH", "BACK_COMMAND"],
+        additionalProperties: true,
+      }
+
+      const params = {
+        BACK_PATH,
+        BACK_COMMAND,
+        args,
+      }
+
+      console.log("[GEODE] params", params)
+      return appStore.request(schema, params, {
+        response_function: (response) => {
+          console.log("[GEODE] Back launched", { response })
+          this.default_local_port = response.port
+          console.log("[GEODE] Back launched", this.default_local_port)
+        },
       })
     },
     connect() {

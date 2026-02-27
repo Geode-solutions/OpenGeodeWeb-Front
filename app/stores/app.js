@@ -111,8 +111,7 @@ export const useAppStore = defineStore("app", () => {
         })
         finalURL = URL.createObjectURL(newBlob)
       }
-      /* @vite-ignore */
-      const extensionModule = await import(finalURL)
+      const extensionModule = await import(/* @vite-ignore */ finalURL)
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL)
@@ -220,7 +219,7 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function upload(file, callbacks = {}) {
-    const route = "/api/routes/extensions"
+    const route = "/api/extensions"
     return upload_file(
       this,
       { route, file },
@@ -239,8 +238,9 @@ export const useAppStore = defineStore("app", () => {
   function request(schema, params, callbacks = {}) {
     console.log("[APP] Request:", schema.$id)
 
+    const store = useAppStore()
     return api_fetch(
-      this,
+      store,
       { schema, params },
       {
         ...callbacks,
@@ -262,6 +262,35 @@ export const useAppStore = defineStore("app", () => {
     request_counter.value -= 1
   }
 
+  const projectFolderPath = ref("")
+  function createProjectFolder() {
+    const { PROJECT } = useRuntimeConfig().public
+    const schema = {
+      $id: "/api/app/project_folder_path",
+      methods: ["POST"],
+      type: "object",
+      properties: {
+        PROJECT: { type: "string" },
+      },
+      required: ["PROJECT"],
+      additionalProperties: false,
+    }
+
+    console.log(createProjectFolder.name, { PROJECT })
+
+    return request(
+      schema,
+      { PROJECT },
+      {
+        response_function: (response) => {
+          console.log("[GEODE] Request completed:", { response })
+          projectFolderPath.value = response.projectFolderPath
+          console.log("[GEODE] Back launched")
+        },
+      },
+    )
+  }
+
   return {
     stores,
     registerStore,
@@ -280,6 +309,8 @@ export const useAppStore = defineStore("app", () => {
     getExtensionEnabled,
     request,
     upload,
+    projectFolderPath,
+    createProjectFolder,
     start_request,
     stop_request,
   }
