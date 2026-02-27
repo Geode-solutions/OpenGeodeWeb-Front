@@ -1,3 +1,8 @@
+import { upload_file } from "../../internal/utils/upload_file.js"
+import { api_fetch } from "../../internal/utils/api_fetch.js"
+import { appMode } from "@ogw_front/utils/app_mode.js"
+import { useInfraStore } from "@ogw_front/stores/infra.js"
+
 export const useAppStore = defineStore("app", () => {
   const stores = []
 
@@ -108,8 +113,7 @@ export const useAppStore = defineStore("app", () => {
         })
         finalURL = URL.createObjectURL(newBlob)
       }
-
-      const extensionModule = await import(finalURL)
+      const extensionModule = await import(/* @vite-ignore */ finalURL)
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL)
@@ -145,7 +149,6 @@ export const useAppStore = defineStore("app", () => {
         loadedExtensions.value.set(extensionId, extensionData)
 
         console.log(`[AppStore] Extension loaded successfully: ${extensionId}`)
-
         return extensionModule
       } else {
         throw new Error("Extension must export an install function")
@@ -217,6 +220,85 @@ export const useAppStore = defineStore("app", () => {
     return getExtension(id)?.enabled ?? false
   }
 
+  function upload(file, callbacks = {}) {
+    const route = "/api/extensions"
+    return upload_file(
+      this,
+      { route, file },
+      {
+        ...callbacks,
+        response_function: async (response) => {
+          console.log("[APP] Request completed:", route)
+          if (callbacks.response_function) {
+            await callbacks.response_function(response)
+          }
+        },
+      },
+    )
+  }
+
+  function request(schema, params, callbacks = {}) {
+    console.log("[APP] Request:", schema.$id)
+
+    const store = useAppStore()
+    return api_fetch(
+      store,
+      { schema, params },
+      {
+        ...callbacks,
+        response_function: async (response) => {
+          console.log("[APP] Request completed:", schema.$id)
+          if (callbacks.response_function) {
+            await callbacks.response_function(response)
+          }
+        },
+      },
+    )
+  }
+
+  const request_counter = ref(0)
+  function start_request() {
+    request_counter.value += 1
+  }
+  function stop_request() {
+    request_counter.value -= 1
+  }
+
+  const projectFolderPath = ref("")
+  function createProjectFolder() {
+    const { PROJECT } = useRuntimeConfig().public
+    const schema = {
+      $id: "/api/app/project_folder_path",
+      methods: ["POST"],
+      type: "object",
+      properties: {
+        PROJECT: { type: "string" },
+      },
+      required: ["PROJECT"],
+      additionalProperties: false,
+    }
+
+    console.log(createProjectFolder.name, { PROJECT })
+
+    return request(
+      schema,
+      { PROJECT },
+      {
+        response_function: async (response) => {
+          console.log("[GEODE] Request completed:", { response })
+          projectFolderPath.value = response.projectFolderPath
+
+          if (useInfraStore().app_mode === appMode.CLOUD) {
+            await globalThis.electronAPI.project_folder_path(
+              projectFolderPath.value,
+            )
+          }
+          console.log("[GEODE] Back launched")
+        },
+      },
+    )
+  }
+
   return {
     stores,
     registerStore,
@@ -233,5 +315,11 @@ export const useAppStore = defineStore("app", () => {
     toggleExtension,
     setExtensionEnabled,
     getExtensionEnabled,
+    request,
+    upload,
+    projectFolderPath,
+    createProjectFolder,
+    start_request,
+    stop_request,
   }
 })

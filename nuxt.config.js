@@ -1,3 +1,6 @@
+// Node imports
+import path from "node:path"
+
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
@@ -6,8 +9,22 @@ export default defineNuxtConfig({
         process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
       PROJECT: process.env.NODE_ENV === "production" ? process.env.PROJECT : "",
       BROWSER: process.env.BROWSER ?? false,
-      GEODE_PORT: process.env.GEODE_PORT ?? undefined,
-      VIEWER_PORT: process.env.VIEWER_PORT ?? undefined,
+      BACK_PATH: path.join(
+        __dirname,
+        "tests",
+        "integration",
+        "microservices",
+        "back",
+      ),
+      BACK_COMMAND: "opengeodeweb-back",
+      VIEWER_PATH: path.join(
+        __dirname,
+        "tests",
+        "integration",
+        "microservices",
+        "viewer",
+      ),
+      VIEWER_COMMAND: "opengeodeweb-viewer",
     },
   },
 
@@ -50,5 +67,21 @@ export default defineNuxtConfig({
         "seedrandom",
       ],
     },
+    server: {
+      watch: {
+        include: ["server/**"],
+      },
+    },
   },
+
+  nitro: {
+    routeRules: {
+      "/api/extensions": { bodySize: 100 * 1024 * 1024 }, // 100MB
+    },
+    watchOptions: {
+      include: ["server/**"],
+    },
+  },
+
+  watch: ["server"],
 })
