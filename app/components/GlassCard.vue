@@ -1,4 +1,5 @@
 <script setup>
+  import { computed, useAttrs } from "vue"
   defineProps({
     variant: {
       type: String,
@@ -16,11 +17,9 @@
 
 <template>
   <v-card
-    v-bind="$attrs"
     @mousedown.stop
     @click.stop
     @dblclick.stop
-    @wheel.stop
     @contextmenu.stop
     flat
     :ripple="isInteractive"

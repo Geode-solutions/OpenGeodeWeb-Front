@@ -15,57 +15,51 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  const itemCache = new Map()
   function getItem(id) {
     if (!id) {
-      const emptyRef = ref({})
-      emptyRef.fetch = async () => ({})
-      return emptyRef
+      return ref({})
     }
-    if (itemCache.has(id)) {
-      return itemCache.get(id)
-    }
-    const observable = useObservable(
+    return useObservable(
       liveQuery(() => database.data.get(id)),
       { initialValue: {} },
     )
-    observable.fetch = () => database.data.get(id)
-    itemCache.set(id, observable)
-    return observable
   }
 
   function getAllItems() {
-    const observable = useObservable(
+    return useObservable(
       liveQuery(() => database.data.toArray()),
       { initialValue: [] },
     )
-    observable.fetch = () => database.data.toArray()
-    return observable
   }
 
   async function formatedMeshComponents(id) {
     const items = await database.model_components.where({ id }).toArray()
-    const distinctTypes = [...new Set(items.map((item) => item.type))]
+    const componentTitles = {
+      Corner: "Corners",
+      Line: "Lines",
+      Surface: "Surfaces",
+      Block: "Blocks",
+    }
 
-    const formated_mesh_components = await Promise.all(
-      distinctTypes.map(async (type) => {
-        const meshComponents = await database.model_components
-          .where({ id, type })
-          .toArray()
+    const componentsByType = items.reduce((accumulator, item) => {
+      if (componentTitles[item.type]) {
+        if (!accumulator[item.type]) accumulator[item.type] = []
+        accumulator[item.type].push(item)
+      }
+      return accumulator
+    }, {})
 
-        return {
-          id: type,
-          title: type,
-          children: meshComponents.map((meshComponent) => ({
-            id: meshComponent.geode_id,
-            title: meshComponent.name,
-            category: meshComponent.type,
-          })),
-        }
-      }),
-    )
-
-    return formated_mesh_components
+    return Object.keys(componentTitles)
+      .filter((type) => componentsByType[type])
+      .map((type) => ({
+        id: type,
+        title: componentTitles[type],
+        children: componentsByType[type].map((meshComponent) => ({
+          id: meshComponent.geode_id,
+          title: meshComponent.name,
+          category: meshComponent.type,
+        })),
+      }))
   }
 
   async function meshComponentType(id, geode_id) {
@@ -120,15 +114,22 @@ export const useDataStore = defineStore("data", () => {
     await database.model_components.where({ id }).delete()
   }
 
-  async function fetchMeshComponents(id) {
+  async function fetchModelComponents(id) {
     const geodeStore = useGeodeStore()
     return await geodeStore.request(
-      back_model_schemas.mesh_components,
+      back_model_schemas.model_components,
       { id },
       {
         response_function: async (response) => {
-          const { mesh_components } = response
-          await addModelComponents(mesh_components)
+          const allComponents = [
+            ...response.mesh_components.map(
+              ({ boundaries, internals, ...component }) => component,
+            ),
+            ...response.collection_components.map(
+              ({ items, ...component }) => component,
+            ),
+          ].map((component) => ({ ...component, id }))
+          await addModelComponents(allComponents)
         },
       },
     )
@@ -167,7 +168,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function exportStores() {
-    const items = await getAllItems().fetch()
+    const items = await database.data.toArray()
     return { items }
   }
 
@@ -189,7 +190,7 @@ export const useDataStore = defineStore("data", () => {
     addItem,
     deleteItem,
     updateItem,
-    fetchMeshComponents,
+    fetchModelComponents,
     getCornersGeodeIds,
     getLinesGeodeIds,
     getSurfacesGeodeIds,
