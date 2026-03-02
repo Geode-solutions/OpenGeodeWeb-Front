@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-  defineProps({
+const { modelValue, label } = defineProps({
     modelValue: {
       type: String,
       default: "",

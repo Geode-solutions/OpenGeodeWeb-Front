@@ -9,7 +9,7 @@ import {
   runMicroservices,
   teardownIntegrationTests,
 } from "../../integration/setup"
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { setupActivePinia } from "../../utils"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 

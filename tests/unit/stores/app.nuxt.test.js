@@ -1,6 +1,4 @@
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
 import { useAppStore } from "@ogw_front/stores/app"
 

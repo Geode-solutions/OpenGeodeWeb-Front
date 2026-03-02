@@ -5,7 +5,7 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 // Local imports
 import { setupActivePinia } from "../../utils"
-import upload_file from "@ogw_front/utils/upload_file"
+import { upload_file } from "@ogw_front/utils/upload_file"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 

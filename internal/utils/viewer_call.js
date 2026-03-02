@@ -1,6 +1,6 @@
 import pTimeout from "p-timeout"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import validate_schema from "@ogw_front/utils/validate_schema"
+import { validate_schema } from "@ogw_front/utils/validate_schema"
 
 const ERROR_400 = 400
 
@@ -71,5 +71,3 @@ export async function viewer_call(
 
   return await performCall()
 }
-
-export default viewer_call

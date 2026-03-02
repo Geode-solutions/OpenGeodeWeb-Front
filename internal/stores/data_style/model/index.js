@@ -16,7 +16,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer"
 // Local constants
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model
 
-export default function useModelStyle() {
+export function useModelStyle() {
   const dataStore = useDataStore()
   const dataStyleStateStore = useDataStyleStateStore()
   const modelCornersStyleStore = useModelCornersStyle()

@@ -1,12 +1,12 @@
 // Third party imports
+import { describe, expect, expectTypeOf, test, vi } from "vitest"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
-import { describe, expect, expectTypeOf, test, vi } from "vitest"
 
 // Local imports
+import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { setupActivePinia } from "../../utils"
-import Status from "@ogw_front/utils/status"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 

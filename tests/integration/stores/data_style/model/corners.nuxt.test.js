@@ -8,7 +8,7 @@ import {
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { setupIntegrationTests } from "../../../setup"
 import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"

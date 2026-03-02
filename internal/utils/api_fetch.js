@@ -1,7 +1,7 @@
 // oxlint-disable-next-line id-length
 import _ from "lodash"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import validate_schema from "@ogw_front/utils/validate_schema"
+import { validate_schema } from "@ogw_front/utils/validate_schema"
 
 const ERROR_400 = 400
 
@@ -74,5 +74,3 @@ export function api_fetch(
     },
   })
 }
-
-export default api_fetch

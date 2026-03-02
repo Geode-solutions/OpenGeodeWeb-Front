@@ -1,11 +1,11 @@
 // Third party imports
-import { mountSuspended } from "@nuxt/test-utils/runtime"
 import { beforeEach, describe, expect, test, vi } from "vitest"
+import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 // Local imports
+import { setupActivePinia, vuetify } from "../../utils"
 import CrsSelector from "@ogw_front/components/CrsSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
-import { setupActivePinia, vuetify } from "../../utils"
 
 const EXPECTED_LENGTH = 1
 const FIRST_INDEX = 0

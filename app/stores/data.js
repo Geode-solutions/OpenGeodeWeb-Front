@@ -41,13 +41,15 @@ export const useDataStore = defineStore("data", () => {
       Block: "Blocks",
     }
 
-    const componentsByType = items.reduce((accumulator, item) => {
+    const componentsByType = {}
+    for (const item of items) {
       if (componentTitles[item.type]) {
-        if (!accumulator[item.type]) accumulator[item.type] = []
-        accumulator[item.type].push(item)
+        if (!componentsByType[item.type]) {
+          componentsByType[item.type] = []
+        }
+        componentsByType[item.type].push(item)
       }
-      return accumulator
-    }, {})
+    }
 
     return Object.keys(componentTitles)
       .filter((type) => componentsByType[type])
@@ -123,12 +125,12 @@ export const useDataStore = defineStore("data", () => {
         response_function: async (response) => {
           const allComponents = [
             ...response.mesh_components.map(
-              ({ boundaries, internals, ...component }) => component,
+              ({ _boundaries, _internals, ...component }) => component,
             ),
             ...response.collection_components.map(
-              ({ items, ...component }) => component,
+              ({ _items, ...component }) => component,
             ),
-          ].map((component) => ({ ...component, id }))
+          ].map((component) => Object.assign(component, { id }))
           await addModelComponents(allComponents)
         },
       },

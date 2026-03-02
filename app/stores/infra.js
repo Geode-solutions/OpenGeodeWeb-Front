@@ -1,5 +1,5 @@
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 
 export const useInfraStore = defineStore("infra", {

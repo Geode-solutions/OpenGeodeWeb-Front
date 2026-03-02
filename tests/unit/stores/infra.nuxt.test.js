@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
 // Local imports
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { setupActivePinia } from "../../utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"

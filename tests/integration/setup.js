@@ -16,7 +16,7 @@ import {
   run_back,
   run_viewer,
 } from "@ogw_front/utils/local"
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
 import { setupActivePinia } from "../utils"

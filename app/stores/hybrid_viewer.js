@@ -5,9 +5,8 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
 
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { database } from "../../internal/database/database.js"
-import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
@@ -28,7 +27,6 @@ const WHEEL_TIME_OUT_MS = 600
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore()
-  const dataStore = useDataStore()
   const hybridDb = reactive({})
   const status = ref(Status.NOT_CREATED)
   const camera_options = reactive({})

@@ -15,7 +15,7 @@ import { useMeshPolyhedraStyle } from "./polyhedra"
 // Local constants
 const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh
 
-export default function useMeshStyle() {
+export function useMeshStyle() {
   const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()
   const dataStyleState = useDataStyleStateStore()

@@ -1,9 +1,10 @@
-import { on, once } from "node:events"
 import child_process from "node:child_process"
+// oxlint-disable-next-line id-length
 import fs from "node:fs"
+import { on } from "node:events"
 import path from "node:path"
-import { setTimeout } from "timers/promises"
 import { rimraf } from "rimraf"
+import { setTimeout } from "node:timers/promises"
 
 // Third party imports
 import { WebSocket } from "ws"
@@ -11,7 +12,6 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
 import pTimeout from "p-timeout"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 const MAX_DELETE_FOLDER_RETRIES = 5
 const DEFAULT_TIMEOUT_SECONDS = 30
@@ -183,13 +183,16 @@ async function delete_folder_recursive(data_folder_path) {
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
     try {
       console.log(`Deleting folder: ${data_folder_path}`)
+      // eslint-disable-next-line no-await-in-loop
       await rimraf(data_folder_path)
       console.log(`Deleted folder: ${data_folder_path}`)
       return
     } catch (error) {
       console.error(`Error deleting folder ${data_folder_path}:`, error)
       // Wait before retrying
-      const DELAY = 1000 * (i + 1)
+      const MILLISECONDS_PER_RETRY = 1000
+      const DELAY = MILLISECONDS_PER_RETRY * (i + 1)
+      // eslint-disable-next-line no-await-in-loop
       await setTimeout(DELAY)
       console.log("Retrying delete folder")
     }
@@ -218,8 +221,9 @@ function kill_back(back_port) {
 
 function kill_viewer(viewer_port) {
   function do_kill() {
+    // eslint-disable-next-line avoid-new
     return new Promise((resolve) => {
-      const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
+      const socket = new WebSocket(`ws://localhost:${viewer_port}/ws`)
       socket.on("open", () => {
         console.log("Connected to WebSocket server")
         socket.send(

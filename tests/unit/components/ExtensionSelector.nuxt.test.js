@@ -1,9 +1,9 @@
 // Third party imports
 import * as components from "vuetify/components"
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { beforeEach, describe, expect, test, vi } from "vitest"
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { nextTick } from "vue"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 // Local imports
 import { setupActivePinia, vuetify } from "../../utils"

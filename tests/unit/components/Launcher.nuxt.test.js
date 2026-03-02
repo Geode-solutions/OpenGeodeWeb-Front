@@ -5,8 +5,8 @@ import ResizeObserver from "resize-observer-polyfill"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
-import { useInfraStore } from "@ogw_front/stores/infra"
 import { setupActivePinia, vuetify } from "../../utils"
+import { useInfraStore } from "@ogw_front/stores/infra"
 
 // Mock navigator.locks API
 const mockLockRequest = vi
