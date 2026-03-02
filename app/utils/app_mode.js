@@ -1,4 +1,4 @@
-import isElectron from "is-electron"
+// import isElectron from "is-electron"
 
 const appMode = {
   DESKTOP: "DESKTOP",

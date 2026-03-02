@@ -4,6 +4,8 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useInfraStore } from "@ogw_front/stores/infra"
+import { useAppStore } from "@ogw_front/stores/app"
+import { upload_file } from "../../internal/utils/upload_file.js"
 
 const MILLISECONDS_IN_SECOND = 1000
 const DEFAULT_PING_INTERVAL_SECONDS = 10
@@ -24,10 +26,6 @@ export const useGeodeStore = defineStore("geode", {
     port() {
       if (useInfraStore().app_mode === appMode.CLOUD) {
         return "443"
-      }
-      const { GEODE_PORT } = useRuntimeConfig().public
-      if (GEODE_PORT !== null && GEODE_PORT !== "") {
-        return GEODE_PORT
       }
       return this.default_local_port
     },
@@ -81,9 +79,40 @@ export const useGeodeStore = defineStore("geode", {
     stop_request() {
       this.request_counter -= 1
     },
-    launch() {
-      console.log("[GEODE] Launching geode microservice...")
-      return globalThis.electronAPI.run_back()
+    launch(args) {
+      console.log("[GEODE] Launching back microservice...", { args })
+      const appStore = useAppStore()
+
+      const { BACK_PATH, BACK_COMMAND } = useRuntimeConfig().public
+
+      console.log("[GEODE] BACK_PATH", BACK_PATH)
+      console.log("[GEODE] BACK_COMMAND", BACK_COMMAND)
+      const schema = {
+        $id: "/api/app/run_back",
+        methods: ["POST"],
+        type: "object",
+        properties: {
+          BACK_PATH: { type: "string" },
+          BACK_COMMAND: { type: "string" },
+        },
+        required: ["BACK_PATH", "BACK_COMMAND"],
+        additionalProperties: true,
+      }
+
+      const params = {
+        BACK_PATH,
+        BACK_COMMAND,
+        args,
+      }
+
+      console.log("[GEODE] params", params)
+      return appStore.request(schema, params, {
+        response_function: (response) => {
+          console.log("[GEODE] Back launched", { response })
+          this.default_local_port = response.port
+          console.log("[GEODE] Back launched", this.default_local_port)
+        },
+      })
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")
@@ -100,6 +129,24 @@ export const useGeodeStore = defineStore("geode", {
           ...callbacks,
           response_function: async (response) => {
             console.log("[GEODE] Request completed:", schema.$id)
+            if (callbacks.response_function) {
+              await callbacks.response_function(response)
+            }
+          },
+        },
+      )
+    },
+    upload(file, callbacks = {}) {
+      return upload_file(
+        this,
+        {
+          route: back_schemas.opengeodeweb_back.upload_file.$id,
+          file,
+        },
+        {
+          ...callbacks,
+          response_function: async (response) => {
+            console.log("[GEODE] Request completed:", route)
             if (callbacks.response_function) {
               await callbacks.response_function(response)
             }
