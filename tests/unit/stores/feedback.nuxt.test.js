@@ -8,7 +8,6 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback"
 const ERROR_500 = 500
 const MILISECONDS_TIMEOUT = 1000
 
-
 beforeEach(() => {
   setupActivePinia()
 })
