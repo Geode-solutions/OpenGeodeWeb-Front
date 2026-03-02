@@ -1,4 +1,4 @@
-import { on, once } from "node:events"
+import { on } from "node:events"
 import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
@@ -12,7 +12,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
 import pTimeout from "p-timeout"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
+// import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 const MAX_DELETE_FOLDER_RETRIES = 5
 const DEFAULT_TIMEOUT_SECONDS = 30

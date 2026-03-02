@@ -73,12 +73,13 @@ afterAll(() => {
   delete globalThis.WebSocket
 })
 
-async function teardownIntegrationTests(
-  back_port,
-  viewer_port,
-  project_folder_path,
-) {
-  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+async function teardownIntegrationTests(project_folder_path) {
+  const geodeStore = useGeodeStore()
+  const viewerStore = useViewerStore()
+  await Promise.all([
+    kill_back(geodeStore.default_local_port),
+    kill_viewer(viewerStore.default_local_port),
+  ])
   delete_folder_recursive(project_folder_path)
 }
 
