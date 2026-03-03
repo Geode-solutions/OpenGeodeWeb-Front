@@ -11,8 +11,6 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 
 // Local imports
 import { runScript } from "./scripts.js"
-import { executableName, executablePath } from "./path.js"
-import { useRuntimeConfig } from "nuxt/app"
 
 function getAvailablePort() {
   return getPort({
@@ -45,17 +43,6 @@ async function runBack(executableName, executablePath, args = {}) {
   return port
 }
 
-async function runBackWrapper({
-  BACK_COMMAND = useRuntimeConfig().public.BACK_COMMAND,
-  BACK_PATH = useRuntimeConfig().public.BACK_PATH,
-  args = {},
-}) {
-  const backCommand = executableName(BACK_COMMAND)
-  const backPath = await executablePath(BACK_PATH)
-  const port = await runBack(backCommand, backPath, args)
-  return port
-}
-
 async function runViewer(executableName, executablePath, args = {}) {
   if (!args.projectFolderPath) {
     throw new Error("projectFolderPath is required")
@@ -73,17 +60,6 @@ async function runViewer(executableName, executablePath, args = {}) {
     viewerArgs,
     "Starting factory",
   )
-  return port
-}
-
-async function runViewerWrapper({
-  VIEWER_COMMAND = useRuntimeConfig().public.VIEWER_COMMAND,
-  VIEWER_PATH = useRuntimeConfig().public.VIEWER_PATH,
-  args = {},
-}) {
-  const viewerCommand = executableName(VIEWER_COMMAND)
-  const viewerPath = await executablePath(VIEWER_PATH)
-  const port = await runViewer(viewerCommand, viewerPath, args)
   return port
 }
 
@@ -268,7 +244,5 @@ export {
   addMicroserviceMetadatas,
   cleanupBackend,
   runBack,
-  runBackWrapper,
   runViewer,
-  runViewerWrapper,
 }

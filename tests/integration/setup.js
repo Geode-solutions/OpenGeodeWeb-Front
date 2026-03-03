@@ -15,14 +15,13 @@ import {
 import {
   killBack,
   killViewer,
-  runBackWrapper,
-  runViewerWrapper,
+  runBack,
+  runViewer,
 } from "@ogw_front/utils/local/microservices"
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
 import { setupActivePinia } from "../utils"
-import { useAppStore } from "@ogw_front/stores/app"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
@@ -36,14 +35,17 @@ async function runMicroservices() {
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
-  const PROJECT = useRuntimeConfig().public.PROJECT
+  const { BACK_COMMAND, BACK_PATH, PROJECT, VIEWER_COMMAND, VIEWER_PATH } =
+    useRuntimeConfig().public
   const projectFolderPath = generateProjectFolderPath(PROJECT)
   await createPath(projectFolderPath)
+
   const [back_port, viewer_port] = await Promise.all([
-    runBackWrapper({
-      args: { projectFolderPath, uploadFolderPath: data_folder },
+    runBack(BACK_COMMAND, BACK_PATH, {
+      projectFolderPath,
+      uploadFolderPath: data_folder,
     }),
-    runViewerWrapper({ args: { projectFolderPath } }),
+    runViewer(VIEWER_COMMAND, VIEWER_PATH, { projectFolderPath }),
   ])
 
   console.log("back_port", back_port)

@@ -7,10 +7,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       API_URL: "api.geode-solutions.com",
-      SITE_BRANCH:
-        process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
-      PROJECT: package_json.name,
-      BROWSER: process.env.BROWSER ?? false,
+      BACK_COMMAND: "opengeodeweb-back",
       BACK_PATH: path.join(
         __dirname,
         "tests",
@@ -18,7 +15,11 @@ export default defineNuxtConfig({
         "microservices",
         "back",
       ),
-      BACK_COMMAND: "opengeodeweb-back",
+      BROWSER: process.env.BROWSER ?? false,
+      PROJECT: package_json.name,
+      SITE_BRANCH:
+        process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
+      VIEWER_COMMAND: "opengeodeweb-viewer",
       VIEWER_PATH: path.join(
         __dirname,
         "tests",
@@ -26,8 +27,6 @@ export default defineNuxtConfig({
         "microservices",
         "viewer",
       ),
-      VIEWER_COMMAND: "opengeodeweb-viewer",
-      DATA_FOLDER_PATH: path.join(__dirname, "tests", "data"),
     },
   },
 

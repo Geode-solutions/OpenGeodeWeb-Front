@@ -280,29 +280,23 @@ export const useAppStore = defineStore("app", () => {
       required: ["PROJECT"],
       additionalProperties: true,
     }
+    const params = { PROJECT }
 
     console.log(createProjectFolder.name, { PROJECT })
 
-    return request(
-      schema,
-      { PROJECT },
-      {
-        response_function: async (response) => {
-          console.log("[GEODE] Request completed:", { response })
-          projectFolderPath.value = response.projectFolderPath
+    return request(schema, params, {
+      response_function: async (response) => {
+        console.log("[GEODE] Request completed:", { response })
+        projectFolderPath.value = response.projectFolderPath
 
-          if (useInfraStore().app_mode !== appMode.CLOUD) {
-            await initMicroservicesMetadatas(
-              path.join(projectFolderPath.value, "microservices.json"),
-            )
-            // await globalThis.electronAPI.project_folder_path(
-            //   projectFolderPath.value,
-            // )
-          }
-          console.log("[GEODE] Back launched")
-        },
+        if (useInfraStore().app_mode !== appMode.CLOUD) {
+          // await initMicroservicesMetadatas(
+          //   path.join(projectFolderPath.value, "microservices.json"),
+          // )
+        }
+        console.log("[GEODE] Back launched")
       },
-    )
+    })
   }
 
   return {
