@@ -144,10 +144,11 @@ export const useGeodeStore = defineStore("geode", {
       )
     },
     upload(file, callbacks = {}) {
+      const route = back_schemas.opengeodeweb_back.upload_file.$id
       return upload_file(
         this,
         {
-          route: back_schemas.opengeodeweb_back.upload_file.$id,
+          route,
           file,
         },
         {
