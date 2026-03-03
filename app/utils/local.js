@@ -1,5 +1,4 @@
 import child_process from "node:child_process"
-// oxlint-disable-next-line id-length
 import fs from "node:fs"
 import { on } from "node:events"
 import path from "node:path"
