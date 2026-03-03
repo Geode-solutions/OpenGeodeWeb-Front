@@ -86,6 +86,13 @@
       }
     },
     {
+      "files": ["tests/**"],
+      "rules": {
+        "vitest/require-hook": "off",
+        "vitest/no-hooks": "off"
+      }
+    },
+    {
       "files": ["**/preload.js"],
       "rules": {
         "import/no-commonjs": "off"
