@@ -242,7 +242,6 @@ function verifyRemaining() {
 
 beforeEach(() => {
   setupActivePinia()
-  // reset spies
   const storesList = [
     viewerStoreMock,
     treeviewStoreMock,

@@ -44,9 +44,6 @@
     }
   }
 
-  function get_x_y(event) {
-    emit("click", event)
-  }
 </script>
 
 <template>
@@ -58,7 +55,7 @@
         class="pa-0"
         ref="viewer"
         style="height: 100%; overflow: hidden; position: relative; z-index: 0"
-        @click="get_x_y"
+        @click="emit('click', $event)"
         @keydown.esc="viewerStore.toggle_picking_mode(false)"
       />
     </div>

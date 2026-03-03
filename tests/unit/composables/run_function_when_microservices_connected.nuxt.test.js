@@ -11,9 +11,9 @@ import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 const dumb_obj = { dumb_method: () => true }
-let infraStore
-let geodeStore
-let viewerStore
+let infraStore = undefined
+let geodeStore = undefined
+let viewerStore = undefined
 
 beforeEach(() => {
   setupActivePinia()

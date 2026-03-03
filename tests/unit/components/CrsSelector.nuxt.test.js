@@ -10,8 +10,8 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 const EXPECTED_LENGTH = 1
 const FIRST_INDEX = 0
 
-let pinia
-let geodeStore
+let pinia = undefined
+let geodeStore = undefined
 
 beforeEach(() => {
   pinia = setupActivePinia()

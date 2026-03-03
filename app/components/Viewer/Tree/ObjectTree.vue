@@ -9,10 +9,6 @@
   const treeviewStore = useTreeviewStore()
   const emit = defineEmits(["show-menu"])
 
-  function handleTreeMenu({ event, itemId }) {
-    emit("show-menu", { event, itemId })
-  }
-
   function onResizeStart(event) {
     const startWidth = treeviewStore.panelWidth
     const startX = event.clientX
@@ -60,11 +56,11 @@
             <v-col>
               <ViewerTreeObject
                 v-if="!treeviewStore.isAdditionnalTreeDisplayed"
-                @show-menu="handleTreeMenu"
+                @show-menu="emit('show-menu', $event)"
               />
               <ViewerTreeComponent
                 v-else
-                @show-menu="handleTreeMenu"
+                @show-menu="emit('show-menu', $event)"
                 :id="treeviewStore.model_id"
               />
             </v-col>
