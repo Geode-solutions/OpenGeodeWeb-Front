@@ -1,14 +1,14 @@
 <script setup>
-const { modelValue, label } = defineProps({
-  modelValue: { type: String, default: "" },
-  label: { type: String, default: "Search..." },
-})
+  const { modelValue, label } = defineProps({
+    modelValue: { type: String, default: "" },
+    label: { type: String, default: "Search..." },
+  })
 
-const emit = defineEmits(["update:modelValue"])
+  const emit = defineEmits(["update:modelValue"])
 
-function onUpdateModelValue(value) {
-  emit("update:modelValue", value)
-}
+  function onUpdateModelValue(value) {
+    emit("update:modelValue", value)
+  }
 </script>
 
 <template>
