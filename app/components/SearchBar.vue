@@ -5,16 +5,12 @@
   })
 
   const emit = defineEmits(["update:modelValue"])
-
-  function onUpdateModelValue(value) {
-    emit("update:modelValue", value)
-  }
 </script>
 
 <template>
   <v-text-field
     :model-value="modelValue"
-    @update:model-value="onUpdateModelValue"
+    @update:model-value="emit('update:modelValue', $event)"
     prepend-inner-icon="mdi-magnify"
     :label="label"
     variant="outlined"

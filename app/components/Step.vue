@@ -12,10 +12,6 @@
 
   const emit = defineEmits(["reset_values"])
 
-  function emitResetValues() {
-    emit("reset_values")
-  }
-
   const stepper_tree = inject("stepper_tree")
   const { current_step_index, steps } = toRefs(stepper_tree)
 
@@ -104,7 +100,7 @@
         @increment_step="increment_step"
         @decrement_step="decrement_step"
         @update_values="update_values_event"
-        @reset_values="emitResetValues"
+        @reset_values="emit('reset_values')"
       />
     </v-card-text>
   </v-stepper-vertical-item>

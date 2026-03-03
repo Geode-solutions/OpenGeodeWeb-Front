@@ -20,30 +20,30 @@ const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let back_port = 0,
-  id = "",
-  project_folder_path = "",
-  viewer_port = 0
+describe("model surfaces", () => {
+  let back_port = 0,
+    id = "",
+    project_folder_path = "",
+    viewer_port = 0
 
-beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
-    await setupIntegrationTests(file_name, geode_object))
-}, INTERVAL_TIMEOUT)
+  beforeEach(async () => {
+    ;({ id, back_port, viewer_port, project_folder_path } =
+      await setupIntegrationTests(file_name, geode_object))
+  }, INTERVAL_TIMEOUT)
 
-afterEach(async () => {
-  console.log(
-    "afterEach model surfaces kill",
-    back_port,
-    viewer_port,
-    project_folder_path,
-  )
-  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-  delete_folder_recursive(project_folder_path)
-})
+  afterEach(async () => {
+    console.log(
+      "afterEach model surfaces kill",
+      back_port,
+      viewer_port,
+      project_folder_path,
+    )
+    await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+    delete_folder_recursive(project_folder_path)
+  })
 
-describe("Model surfaces", () => {
-  describe("Surfaces visibility", () => {
-    test("Visibility true", async () => {
+  describe("surfaces visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
@@ -78,8 +78,8 @@ describe("Model surfaces", () => {
     })
   })
 
-  describe("Surfaces color", () => {
-    test("Color red", async () => {
+  describe("surfaces color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()

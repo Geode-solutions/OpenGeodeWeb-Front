@@ -32,11 +32,12 @@
     "oxc/no-optional-chaining": "off",
     "node/no-process-env": "off",
     "no-continue": "off",
+    "import/unambiguous": "off",
     "max-params": ["warn", { "max": 4 }],
     "eslint/no-magic-numbers": [
       "error",
       {
-        "ignore": [-1, 0, 1, 2, 4],
+        "ignore": [-1, 0, 1, 2, 3, 4],
         "ignoreArrayIndexes": true
       }
     ],
@@ -51,7 +52,6 @@
             "case": "pascalCase"
           }
         ],
-        "import/unambiguous": "warn"
       }
     },
     {
@@ -61,24 +61,20 @@
         "server/**",
         "*.config.js",      ],
       "rules": {
-        "import/no-default-export": "off",
-        "unicorn/prefer-structured-clone": "off",
-        "unicorn/require-post-message-target-origin": "off"
+        "import/no-default-export": "off"
       }
     },
     {
       "files": ["tests/**"],
       "rules": {
         "vitest/require-hook": "off",
-        "eslint/init-declarations": "off",
-        "vitest/require-top-level-describe": "off"
+        "vitest/no-hooks": "off"
       }
     },
     {
       "files": ["**/preload.js"],
       "rules": {
-        "import/no-commonjs": "off",
-        "import/unambiguous": "off"
+        "import/no-commonjs": "off"
       }
     }
   ]

@@ -61,18 +61,17 @@ async function runMicroservices() {
   return { back_port, viewer_port, project_folder_path }
 }
 
-async function setupIntegrationTests(file_name, geode_object) {
+async function setupIntegrationTests(file_name, geode_object, test_info) {
   setupActivePinia()
   const viewerStore = useViewerStore()
-
-  const { back_port, viewer_port, project_folder_path } =
-    await runMicroservices()
+  const microservices_info = await runMicroservices()
+  test_info.back_port = microservices_info.back_port
+  test_info.viewer_port = microservices_info.viewer_port
+  test_info.project_folder_path = microservices_info.project_folder_path
   await viewerStore.ws_connect()
-
-  const id = await importFile(file_name, geode_object)
+  test_info.id = await importFile(file_name, geode_object)
   expect(viewerStore.status).toBe(Status.CONNECTED)
   console.log("end of setupIntegrationTests")
-  return { id, back_port, viewer_port, project_folder_path }
 }
 
 const mockLockRequest = vi
