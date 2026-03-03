@@ -7,7 +7,7 @@ const DEFAULT_RETRY = 0
 
 const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY
 
-// eslint-disable-next-line import/no-default-export
+// oxlint-disable-next-line import/no-default-export
 export default defineConfig({
   test: {
     globals: true,

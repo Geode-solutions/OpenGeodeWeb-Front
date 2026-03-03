@@ -182,7 +182,7 @@ async function delete_folder_recursive(data_folder_path) {
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
     try {
       console.log(`Deleting folder: ${data_folder_path}`)
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       await rimraf(data_folder_path)
       console.log(`Deleted folder: ${data_folder_path}`)
       return
@@ -191,7 +191,7 @@ async function delete_folder_recursive(data_folder_path) {
       // Wait before retrying
       const MILLISECONDS_PER_RETRY = 1000
       const DELAY = MILLISECONDS_PER_RETRY * (i + 1)
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       await setTimeout(DELAY)
       console.log("Retrying delete folder")
     }
@@ -220,7 +220,7 @@ function kill_back(back_port) {
 
 function kill_viewer(viewer_port) {
   function do_kill() {
-    // eslint-disable-next-line avoid-new
+    // oxlint-disable-next-line avoid-new
     return new Promise((resolve) => {
       const socket = new WebSocket(`ws://localhost:${viewer_port}/ws`)
       socket.on("open", () => {
