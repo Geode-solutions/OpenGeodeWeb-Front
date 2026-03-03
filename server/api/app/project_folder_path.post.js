@@ -1,21 +1,19 @@
 // Node imports
-import path from "node:path"
-import os from "node:os"
 
 // Third party imports
 import { createError, defineEventHandler, readBody } from "h3"
-import { v4 as uuidv4 } from "uuid"
 
 // Local imports
-import { create_path } from "@geode/opengeodeweb-front/app/utils/local.js"
+import {
+  createPath,
+  generateProjectFolderPath,
+} from "@geode/opengeodeweb-front/app/utils/local/path.js"
 
 export default defineEventHandler(async (event) => {
   try {
     const { PROJECT } = await readBody(event)
-    const projectFolderPath = await create_path(
-      path.join(os.tmpdir(), PROJECT, uuidv4()),
-    )
-
+    const projectFolderPath = generateProjectFolderPath(PROJECT)
+    await createPath(projectFolderPath)
     console.log("createProject", { projectFolderPath })
 
     return {

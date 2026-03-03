@@ -1,7 +1,9 @@
 import { upload_file } from "../../internal/utils/upload_file.js"
 import { api_fetch } from "../../internal/utils/api_fetch.js"
-import { appMode } from "@ogw_front/utils/app_mode.js"
-import { useInfraStore } from "@ogw_front/stores/infra.js"
+import { appMode } from "@ogw_front/utils/app_mode"
+import { useInfraStore } from "@ogw_front/stores/infra"
+
+// import { initMicroservicesMetadatas } from "@ogw_front/utils/local/microservices.js"
 
 export const useAppStore = defineStore("app", () => {
   const stores = []
@@ -222,8 +224,9 @@ export const useAppStore = defineStore("app", () => {
 
   function upload(file, callbacks = {}) {
     const route = "/api/extensions"
+    const store = useAppStore()
     return upload_file(
-      this,
+      store,
       { route, file },
       {
         ...callbacks,
@@ -275,7 +278,7 @@ export const useAppStore = defineStore("app", () => {
         PROJECT: { type: "string" },
       },
       required: ["PROJECT"],
-      additionalProperties: false,
+      additionalProperties: true,
     }
 
     console.log(createProjectFolder.name, { PROJECT })
@@ -288,10 +291,13 @@ export const useAppStore = defineStore("app", () => {
           console.log("[GEODE] Request completed:", { response })
           projectFolderPath.value = response.projectFolderPath
 
-          if (useInfraStore().app_mode === appMode.CLOUD) {
-            await globalThis.electronAPI.project_folder_path(
-              projectFolderPath.value,
+          if (useInfraStore().app_mode !== appMode.CLOUD) {
+            await initMicroservicesMetadatas(
+              path.join(projectFolderPath.value, "microservices.json"),
             )
+            // await globalThis.electronAPI.project_folder_path(
+            //   projectFolderPath.value,
+            // )
           }
           console.log("[GEODE] Back launched")
         },

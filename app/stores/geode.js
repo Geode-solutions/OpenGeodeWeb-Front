@@ -30,6 +30,7 @@ export const useGeodeStore = defineStore("geode", {
       return this.default_local_port
     },
     base_url() {
+      // return "http://127.0.0.1:3000/"
       const infraStore = useInfraStore()
       let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
       if (infraStore.app_mode === appMode.CLOUD) {
@@ -39,6 +40,12 @@ export const useGeodeStore = defineStore("geode", {
         geode_url += `/${infraStore.ID}/geode`
       }
       return geode_url
+    },
+    kill_metadatas() {
+      return {
+        url: `${this.base_url}/${back_schemas.opengeodeweb_back.kill.$id}`,
+        method: back_schemas.opengeodeweb_back.kill.methods[0],
+      }
     },
     is_busy() {
       return this.request_counter > 0

@@ -4,13 +4,20 @@ import path from "node:path"
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest"
+// import { setup } from "@nuxt/test-utils/e2e"
 
 // Local imports
 import {
-  delete_folder_recursive,
-  kill_back,
-  kill_viewer,
-} from "@ogw_front/utils/local"
+  createPath,
+  deleteFolderRecursive,
+  generateProjectFolderPath,
+} from "@ogw_front/utils/local/path"
+import {
+  killBack,
+  killViewer,
+  runBackWrapper,
+  runViewerWrapper,
+} from "@ogw_front/utils/local/microservices"
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
@@ -19,24 +26,37 @@ import { useAppStore } from "@ogw_front/stores/app"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useRuntimeConfig } from "nuxt/app"
 
 // Local constants
-const data_folder = path.join("tests", "integration", "data")
+const data_folder = path.join("tests", "integration", "data", "uploads")
 
 async function runMicroservices() {
-  const appStore = useAppStore()
   const geodeStore = useGeodeStore()
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
+  const PROJECT = useRuntimeConfig().public.PROJECT
+  const projectFolderPath = generateProjectFolderPath(PROJECT)
+  await createPath(projectFolderPath)
+  const [back_port, viewer_port] = await Promise.all([
+    runBackWrapper({
+      args: { projectFolderPath, uploadFolderPath: data_folder },
+    }),
+    runViewerWrapper({ args: { projectFolderPath } }),
+  ])
 
-  await appStore.init()
-  await Promise.all([geodeStore.launch(), viewerStore.launch()])
+  console.log("back_port", back_port)
+  console.log("viewer_port", viewer_port)
+
+  geodeStore.default_local_port = back_port
+  viewerStore.default_local_port = viewer_port
+  console.log("after ports")
 
   return {
-    back_port: geodeStore.default_local_port,
-    viewer_port: viewerStore.default_local_port,
-    project_folder_path: appStore.project_folder_path,
+    back_port,
+    viewer_port,
+    project_folder_path: projectFolderPath,
   }
 }
 
@@ -73,14 +93,13 @@ afterAll(() => {
   delete globalThis.WebSocket
 })
 
-async function teardownIntegrationTests(project_folder_path) {
-  const geodeStore = useGeodeStore()
-  const viewerStore = useViewerStore()
-  await Promise.all([
-    kill_back(geodeStore.default_local_port),
-    kill_viewer(viewerStore.default_local_port),
-  ])
-  delete_folder_recursive(project_folder_path)
+async function teardownIntegrationTests(
+  back_port,
+  viewer_port,
+  project_folder_path,
+) {
+  await Promise.all([killBack(back_port), killViewer(viewer_port)])
+  deleteFolderRecursive(project_folder_path)
 }
 
 export { runMicroservices, setupIntegrationTests, teardownIntegrationTests }

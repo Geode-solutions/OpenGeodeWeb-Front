@@ -8,8 +8,8 @@ import _ from "lodash"
 import { getPort } from "get-port-please"
 
 // Local imports
-import { extensionsConf } from "../../../../app/utils/config.js"
-import { unzipFile } from "../../../../app/utils/server.js"
+import { extensionsConf } from "../../../app/utils/config.js"
+import { unzipFile } from "../../../app/utils/server.js"
 // import { useRuntimeConfig } from "#imports"
 
 const CODE_200 = 200

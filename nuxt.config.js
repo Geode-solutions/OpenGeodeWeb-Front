@@ -1,13 +1,15 @@
 // Node imports
 import path from "node:path"
 
+import package_json from "./package.json"
+
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       API_URL: "api.geode-solutions.com",
       SITE_BRANCH:
         process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
-      PROJECT: process.env.NODE_ENV === "production" ? process.env.PROJECT : "",
+      PROJECT: package_json.name,
       BROWSER: process.env.BROWSER ?? false,
       BACK_PATH: path.join(
         __dirname,
@@ -25,6 +27,7 @@ export default defineNuxtConfig({
         "viewer",
       ),
       VIEWER_COMMAND: "opengeodeweb-viewer",
+      DATA_FOLDER_PATH: path.join(__dirname, "tests", "data"),
     },
   },
 

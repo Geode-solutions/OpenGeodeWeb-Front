@@ -19,14 +19,10 @@ import {
   confFolderPath,
   addExtensionToConf,
 } from "../../../app/utils/config.js"
-// import { useRuntimeConfig } from "#imports"
 
 const CODE_201 = 201
 
 export default defineEventHandler(async (event) => {
-  // const config = useRuntimeConfig(event).public
-  // const { APP_NAME } = config
-  // console.log("defineEventHandler", { APP_NAME })
   const projectName = "vease"
   const writePromises = []
   const savedFiles = []
