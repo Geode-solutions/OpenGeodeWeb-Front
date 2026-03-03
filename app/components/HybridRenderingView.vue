@@ -43,7 +43,6 @@
       timeout = setTimeout(later, wait)
     }
   }
-
 </script>
 
 <template>
