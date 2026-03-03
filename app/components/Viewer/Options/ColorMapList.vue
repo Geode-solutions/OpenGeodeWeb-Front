@@ -12,6 +12,10 @@
 
   const emit = defineEmits(["select"])
 
+  function emitSelect(item) {
+    emit("select", item)
+  }
+
   const filterText = ref("")
   const canvasRefs = ref({})
   const loading = ref(true)
@@ -176,7 +180,7 @@
           <v-list-item
             v-for="(child, cIdx) in item.Children"
             :key="cIdx"
-            @click="$emit('select', child)"
+            @click="emitSelect(child)"
             class="px-2 mb-1"
             rounded="md"
           >
@@ -198,7 +202,7 @@
 
         <v-list-item
           v-else
-          @click="$emit('select', item)"
+          @click="emitSelect(item)"
           class="px-2 mb-1"
           rounded="md"
         >

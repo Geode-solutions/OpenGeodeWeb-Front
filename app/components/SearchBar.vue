@@ -1,7 +1,20 @@
+<script setup>
+const { modelValue, label } = defineProps({
+  modelValue: { type: String, default: "" },
+  label: { type: String, default: "Search..." },
+})
+
+const emit = defineEmits(["update:modelValue"])
+
+function onUpdateModelValue(value) {
+  emit("update:modelValue", value)
+}
+</script>
+
 <template>
   <v-text-field
     :model-value="modelValue"
-    @update:model-value="$emit('update:modelValue', $event)"
+    @update:model-value="onUpdateModelValue"
     prepend-inner-icon="mdi-magnify"
     :label="label"
     variant="outlined"
@@ -17,18 +30,3 @@
     </template>
   </v-text-field>
 </template>
-
-<script setup>
-const { modelValue, label } = defineProps({
-    modelValue: {
-      type: String,
-      default: "",
-    },
-    label: {
-      type: String,
-      default: "Search...",
-    },
-  })
-
-  defineEmits(["update:modelValue"])
-</script>

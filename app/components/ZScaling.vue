@@ -5,6 +5,12 @@
   const { width } = defineProps({
     width: { type: Number, default: 400 },
   })
+
+  const emit = defineEmits(["close"])
+
+  function emitClose() {
+    emit("close")
+  }
 </script>
 <template>
   <GlassCard
@@ -50,10 +56,10 @@
 
     <template #actions>
       <v-card-actions class="justify-center pb-4">
-        <v-btn variant="text" color="white" @click="$emit('close')"
+        <v-btn variant="text" color="white" @click="emitClose"
           >Close</v-btn
         >
-        <v-btn variant="outlined" color="white" @click="$emit('close')"
+        <v-btn variant="outlined" color="white" @click="emitClose"
           >Apply</v-btn
         >
       </v-card-actions>
