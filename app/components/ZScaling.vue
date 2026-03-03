@@ -56,12 +56,8 @@
 
     <template #actions>
       <v-card-actions class="justify-center pb-4">
-        <v-btn variant="text" color="white" @click="emitClose"
-          >Close</v-btn
-        >
-        <v-btn variant="outlined" color="white" @click="emitClose"
-          >Apply</v-btn
-        >
+        <v-btn variant="text" color="white" @click="emitClose">Close</v-btn>
+        <v-btn variant="outlined" color="white" @click="emitClose">Apply</v-btn>
       </v-card-actions>
     </template>
   </GlassCard>
