@@ -171,9 +171,9 @@ export function useModelStyle() {
     return Promise.all(promise_array)
   }
 
-  function setModelMeshComponentsDefaultStyle(id) {
-    const item = dataStore.getItem(id)
-    const { mesh_components } = item.value
+  async function setModelMeshComponentsDefaultStyle(id) {
+    const item = await dataStore.item(id)
+    const { mesh_components } = item
     const promise_array = []
     if ("Corner" in mesh_components) {
       promise_array.push(modelCornersStyleStore.setModelCornersDefaultStyle(id))

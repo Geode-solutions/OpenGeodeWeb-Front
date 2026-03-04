@@ -131,6 +131,7 @@ export const useMenuStore = defineStore("menu", () => {
   const containerTop = ref(0)
   const containerLeft = ref(0)
   const active_item_index = ref(undefined)
+  const current_meta_data = ref({})
 
   function getMenuItems(objectType, geodeObject) {
     if (!objectType || !geodeObject || !menus.value[objectType]) {
@@ -142,6 +143,7 @@ export const useMenuStore = defineStore("menu", () => {
   function closeMenu() {
     active_item_index.value = undefined
     current_id.value = undefined
+    current_meta_data.value = {}
     menuX.value = 0
     menuY.value = 0
     display_menu.value = false
@@ -161,6 +163,7 @@ export const useMenuStore = defineStore("menu", () => {
     }
 
     current_id.value = id
+    current_meta_data.value = meta_data || {}
 
     if (x !== undefined && y !== undefined) {
       menuX.value = x
@@ -201,6 +204,7 @@ export const useMenuStore = defineStore("menu", () => {
   return {
     display_menu,
     current_id,
+    current_meta_data,
     menuX,
     menuY,
     containerWidth,

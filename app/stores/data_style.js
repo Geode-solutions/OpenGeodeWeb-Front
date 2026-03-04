@@ -61,11 +61,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
   }
 
-  function applyAllStylesFromState() {
+  async function applyAllStylesFromState() {
     const ids = Object.keys(dataStyleState.styles || {})
     const promises = []
     for (const id of ids) {
-      const meta = dataStore.getItem(id).value
+      const meta = await dataStore.item(id)
       const viewerType = meta?.viewer_type
       const style = dataStyleState.styles[id]
       if (style && viewerType === "mesh") {

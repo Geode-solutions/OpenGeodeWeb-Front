@@ -1,5 +1,4 @@
 <script setup>
-  import { useDataStore } from "@ogw_front/stores/data"
   import { useEventListener } from "@vueuse/core"
   import { useMenuStore } from "@ogw_front/stores/menu"
 
@@ -16,7 +15,6 @@
   const CLOSE_DELAY = 100
 
   const menuStore = useMenuStore()
-  const dataStore = useDataStore()
 
   const { id, x, y, containerWidth, containerHeight } = defineProps({
     id: { type: String, required: true },
@@ -26,13 +24,7 @@
     containerHeight: { type: Number, required: true },
   })
 
-  const meta_data = computed(() => {
-    const itemId = id || menuStore.current_id
-    if (!itemId) {
-      return {}
-    }
-    return dataStore.getItem(itemId).value || {}
-  })
+  const meta_data = computed(() => menuStore.current_meta_data || {})
 
   const show_menu = ref(true)
   const isDragging = ref(false)
