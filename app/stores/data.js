@@ -15,7 +15,14 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  function getItem(id) {
+  async function item(id) {
+    if (!id) {
+      return {}
+    }
+    return (await database.data.get(id)) || {}
+  }
+
+  function refItem(id) {
     if (!id) {
       return ref({})
     }
@@ -182,7 +189,8 @@ export const useDataStore = defineStore("data", () => {
 
   return {
     getAllItems,
-    getItem,
+    item,
+    refItem,
     meshComponentType,
     formatedMeshComponents,
     registerObject,

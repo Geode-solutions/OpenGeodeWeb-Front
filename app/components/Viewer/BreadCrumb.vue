@@ -13,7 +13,7 @@
 
   const model_id = computed(() => treeviewStore.model_id)
 
-  const metaDatas = computed(() => dataStore.getItem(model_id.value).value)
+  const metaDatas = computed(() => dataStore.refItem(model_id.value).value)
 </script>
 
 <template>
