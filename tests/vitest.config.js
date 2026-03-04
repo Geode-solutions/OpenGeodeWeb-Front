@@ -1,6 +1,9 @@
 import { defineConfig } from "vitest/config"
 import { defineVitestProject } from "@nuxt/test-utils/config"
-import path from "node:path"
+import { dirname } from "node:path"
+import { fileURLToPath } from "node:url"
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const RETRIES = 3
 const DEFAULT_RETRY = 0

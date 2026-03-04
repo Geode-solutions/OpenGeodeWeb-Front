@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url"
+
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
@@ -20,7 +22,7 @@ export default defineNuxtConfig({
   },
 
   alias: {
-    "@ogw_front": `${__dirname}/app/`,
+    "@ogw_front": fileURLToPath(new URL("./app/", import.meta.url)),
   },
 
   // ** Global CSS

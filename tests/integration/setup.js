@@ -1,6 +1,7 @@
 // Node.js imports
+import { dirname, path } from "node:path"
 import { WebSocket } from "ws"
-import path from "node:path"
+import { fileURLToPath } from "node:url"
 import { v4 as uuidv4 } from "uuid"
 
 // Third party imports
@@ -25,6 +26,7 @@ import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
+const __dirname = dirname(fileURLToPath(import.meta.url))
 const data_folder = path.join("tests", "integration", "data")
 
 async function runMicroservices() {
