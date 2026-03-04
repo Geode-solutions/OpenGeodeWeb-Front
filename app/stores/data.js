@@ -20,9 +20,6 @@ export const useDataStore = defineStore("data", () => {
   }
 
   function refItem(id) {
-    if (!id) {
-      return ref({})
-    }
     return useObservable(
       liveQuery(() => database.data.get(id)),
       { initialValue: {} },
