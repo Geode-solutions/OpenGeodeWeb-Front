@@ -15,17 +15,18 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  function getItem(id) {
-    if (!id) {
-      return ref({})
-    }
+  function item(id) {
+    return database.data.get(id)
+  }
+
+  function refItem(id) {
     return useObservable(
       liveQuery(() => database.data.get(id)),
       { initialValue: {} },
     )
   }
 
-  function getAllItems() {
+  function refAllItems() {
     return useObservable(
       liveQuery(() => database.data.toArray()),
       { initialValue: [] },
@@ -181,8 +182,9 @@ export const useDataStore = defineStore("data", () => {
   }
 
   return {
-    getAllItems,
-    getItem,
+    refAllItems,
+    item,
+    refItem,
     meshComponentType,
     formatedMeshComponents,
     registerObject,
