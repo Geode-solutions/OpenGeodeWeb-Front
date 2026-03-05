@@ -5,7 +5,4 @@
 #    pip-compile --output-file=tests/integration/microservices/back/requirements.txt tests/integration/microservices/back/requirements.in
 #
 
-<<<<<<< HEAD
-=======
 opengeodeweb-back==6.*,>=6.3.1rc1
->>>>>>> ee3ce3786a254d86e5c0f0c47abc03ce697d30e9
