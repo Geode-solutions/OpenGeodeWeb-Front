@@ -43,7 +43,12 @@ async function runScript(
     shell: true,
   })
 
-  child.stdout.on("data", (data) => console.log(data.toString()))
+  child.stdout.on("data", (data) =>
+    console.log(`[${executableName}] ${data.toString()}`),
+  )
+  child.stderr.on("data", (data) =>
+    console.log(`[${executableName}] ${data.toString()}`),
+  )
 
   child.on("error", async (error) => {
     const electron = await import("electron")
@@ -55,10 +60,10 @@ async function runScript(
   })
 
   child.on("close", (code) =>
-    console.log(`Child Process exited with code ${code}`),
+    console.log(`[${executableName}] exited with code ${code}`),
   )
   child.on("kill", () => {
-    console.log("Child Process killed")
+    console.log(`[${executableName}] process killed`)
   })
   child.name = command.replace(/^.*[\\/]/, "")
 
@@ -73,4 +78,35 @@ async function runScript(
   }
 }
 
-export { runScript }
+async function waitNuxt(nuxt_process) {
+  for await (const [data] of on(nuxt_process.stdout, "data")) {
+    const output = data.toString()
+    const portMatch = output.match(
+      /Accepting connections at http:\/\/localhost:(\d+)/,
+    )
+    console.log("Nuxt:", output)
+    if (portMatch) {
+      const [, nuxt_port] = portMatch
+      process.env.NUXT_PORT = nuxt_port
+    }
+  }
+  throw new Error("Nuxt process closed without accepting connections")
+}
+
+async function runBrowser(script_name) {
+  process.env.BROWSER = true
+  process.on("SIGINT", async () => {
+    console.log("Shutting down microservices")
+    await Promise.all([killBack(back_port), kill_viewer(viewer_port)])
+    console.log("Quitting App...")
+    process.exit(0)
+  })
+
+  const nuxtProcess = child_process.spawn("npm", ["run", script_name], {
+    shell: true,
+    FORCE_COLOR: true,
+  })
+  return waitNuxt(nuxtProcess)
+}
+
+export { runBrowser, runScript }

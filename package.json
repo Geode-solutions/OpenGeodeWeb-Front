@@ -48,6 +48,7 @@
     "is-electron": "2.2.2",
     "js-file-download": "0.4.12",
     "jszip": "3.10.1",
+    "node-stream-zip": "1.15.0",
     "nuxt": "4.2.2",
     "p-timeout": "7.0.1",
     "pinia": "3.0.4",

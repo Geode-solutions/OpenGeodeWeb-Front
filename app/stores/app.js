@@ -223,7 +223,7 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function upload(file, callbacks = {}) {
-    const route = "/api/extensions"
+    const route = "/api/extensions/upload"
     const store = useAppStore()
     return upload_file(
       store,

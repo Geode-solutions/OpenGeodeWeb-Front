@@ -13,6 +13,7 @@ import {
 } from "h3"
 
 import sanitize from "sanitize-filename"
+import StreamZip from "node-stream-zip"
 
 // Local imports
 import {
@@ -87,7 +88,17 @@ export default defineEventHandler(async (event) => {
   }
 
   for (const file of savedFiles) {
-    await addExtensionToConf(projectName, file)
+    const zip = new StreamZip.async({
+      file,
+      storeEntries: true,
+    })
+    const metadataJson = await zip.entryData("metadata.json")
+    const metadata = JSON.parse(metadataJson)
+    const { id } = metadata
+    await addExtensionToConf(projectName, {
+      extensionID: id,
+      extensionPath: file,
+    })
   }
 
   return { statusCode: CODE_201 }

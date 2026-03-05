@@ -25,19 +25,28 @@ function extensionsConf(projectName) {
   console.log("extensionsConf", { projectName })
   const projectConfig = projectConf(projectName)
   if (!projectConfig.has("extensions")) {
-    projectConfig.set("extensions", [])
+    projectConfig.set("extensions", {})
   }
-
   const extensionsConfig = projectConfig.get("extensions")
   console.log("extensionsConf", { extensionsConfig })
-  return { extensionsConfig, path: extensionsConfig }
+  return extensionsConfig
 }
 
-function addExtensionToConf(projectName, extensionPath) {
+function addExtensionToConf(projectName, { extensionID, extensionPath }) {
+  console.log("addExtensionToConf", { projectName, extensionID, extensionPath })
   const projectConfig = projectConf(projectName)
-  const { extensionsConfig } = extensionsConf(projectName)
-  extensionsConfig.push(extensionPath)
-  projectConfig.set("extensions", extensionsConfig)
+  projectConfig.set(`extensions.${extensionID}.path`, extensionPath)
 }
 
-export { confFolderPath, projectConf, extensionsConf, addExtensionToConf }
+function extensionPathFromConf(projectName, extensionID) {
+  const projectConfig = projectConf(projectName)
+  return projectConfig.get(`extensions.${extensionID}.path`)
+}
+
+export {
+  confFolderPath,
+  projectConf,
+  extensionsConf,
+  addExtensionToConf,
+  extensionPathFromConf,
+}

@@ -84,6 +84,4 @@ export default defineNuxtConfig({
       include: ["server/**"],
     },
   },
-
-  watch: ["server"],
 })

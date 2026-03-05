@@ -12,12 +12,12 @@ async function uploadExtension(file) {
   await appStore.upload(file)
 }
 
-async function importExtensions() {
+async function runExtensions() {
   const projectFolderPath = appStore.projectFolderPath
-  console.log("importExtensions", { projectFolderPath })
+  console.log("runExtensions", { projectFolderPath })
   const params = { projectFolderPath }
   const schema = {
-    $id: "/api/import_extensions",
+    $id: "/api/extensions/run",
     methods: ["POST"],
     type: "object",
     properties: {
@@ -29,9 +29,10 @@ async function importExtensions() {
 
   return appStore.request(schema, params, {
     response_function: (response) => {
-      console.log("runExtensions", { response })
+      console.log("runExtensions TOTO", { response })
+      return response.extensionsArray
     },
   })
 }
 
-export { uploadExtension, importExtensions }
+export { uploadExtension, runExtensions }
