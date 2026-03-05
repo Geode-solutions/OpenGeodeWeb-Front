@@ -18,30 +18,11 @@
     "eslint/func-style": ["error", "declaration"],
     "eslint/sort-keys": "off",
     "eslint/no-ternary": "off", // A utiliser pour des opérations simples
+    "unicorn/prefer-ternary": "off",
     "oxc/no-async-await": "off",
     "oxc/no-rest-spread-properties": "off", // Enable if older browser support is needed
     "eslint/max-statements": ["warn", 20],
-    "eslint/id-length": [
-      "error",
-      {
-        "exceptions": [
-          "x",
-          "y",
-          "z",
-          "i",
-          "j",
-          "k",
-          "r",
-          "g",
-          "b",
-          "id",
-          "ID",
-          "fs",
-          "os"
-        ],
-        "min": 3
-      }
-    ],
+    "eslint/id-length": ["error", { "exceptions": ["x", "y", "z", "i", "j", "k", "r", "g", "b", "id", "ID", "fs", "os"], "min": 3 }],
     "eslint/no-console": "warn", // Disable for debugging. Disable later to not have browser logs
     "sort-imports": ["error", { "allowSeparatedGroups": true }],
     "eslint/no-undefined": "off", // Conflict with unicorn/no-typeof-undefined which prefers direct undefined comparison
@@ -55,6 +36,7 @@
     "import/unambiguous": "off",
     "max-params": ["warn", { "max": 4 }],
     "import/no-nodejs-modules": "off",
+    "import/no-relative-parent-imports": "warn", // Pour les imports relatifs et éviter de de créer des alias poour tous
     "eslint/no-magic-numbers": [
       "error",
       {
@@ -91,8 +73,7 @@
       "rules": {
         "vitest/require-hook": "off",
         "vitest/no-hooks": "off",
-        "vitest/no-importing-vitest-globals": "off",
-        "import/no-relative-parent-imports": "warn"
+        "vitest/no-importing-vitest-globals": "off"
       }
     },
     {

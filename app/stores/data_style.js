@@ -61,19 +61,19 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
   }
 
-  async function applyAllStylesFromState() {
+  function applyAllStylesFromState() {
     const ids = Object.keys(dataStyleState.styles || {})
-    const promises = []
-    for (const id of ids) {
+    const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id)
       const viewerType = meta?.viewer_type
       const style = dataStyleState.styles[id]
       if (style && viewerType === "mesh") {
-        promises.push(meshStyleStore.applyMeshStyle(id))
-      } else if (style && viewerType === "model") {
-        promises.push(modelStyleStore.applyModelStyle(id))
+        return meshStyleStore.applyMeshStyle(id)
       }
-    }
+      if (style && viewerType === "model") {
+        return modelStyleStore.applyModelStyle(id)
+      }
+    })
     return Promise.all(promises)
   }
 
