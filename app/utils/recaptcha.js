@@ -1,18 +1,26 @@
-function check_recaptcha_params(name, email, launch) {
-  console.log("check_recaptcha_params", { name, email, launch })
-  if (name !== "") {
+function check_recaptcha_params(
+  recaptcha_name,
+  recaptcha_email,
+  recaptcha_launch,
+) {
+  console.log("check_recaptcha_params", {
+    name: recaptcha_name,
+    email: recaptcha_email,
+    launch: recaptcha_launch,
+  })
+  if (recaptcha_name !== "") {
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "INTERNAL_ERROR" }),
     }
   }
-  if (email !== "") {
+  if (recaptcha_email !== "") {
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "INTERNAL_ERROR" }),
     }
   }
-  if (launch !== false) {
+  if (recaptcha_launch !== false) {
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "INTERNAL_ERROR" }),
