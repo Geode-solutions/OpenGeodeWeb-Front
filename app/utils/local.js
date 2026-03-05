@@ -126,7 +126,8 @@ async function run_script(
 }
 
 async function run_back(exec_name, exec_path, args = {}) {
-  const { project_folder_path, upload_folder_path: upload_folder_path_arg } = args
+  const { project_folder_path, upload_folder_path: upload_folder_path_arg } =
+    args
   let upload_folder_path = upload_folder_path_arg
   if (!project_folder_path) {
     throw new Error("project_folder_path is required")
@@ -146,12 +147,7 @@ async function run_back(exec_name, exec_path, args = {}) {
     back_args.push("--debug")
   }
   console.log("run_back", exec_name, exec_path, back_args)
-  await run_script(
-    exec_name,
-    exec_path,
-    back_args,
-    "Serving Flask app",
-  )
+  await run_script(exec_name, exec_path, back_args, "Serving Flask app")
   return port
 }
 
@@ -166,12 +162,7 @@ async function run_viewer(exec_name, exec_path, args = {}) {
     `--timeout ${0}`,
   ]
   console.log("run_viewer", exec_name, exec_path, viewer_args)
-  await run_script(
-    exec_name,
-    exec_path,
-    viewer_args,
-    "Starting factory",
-  )
+  await run_script(exec_name, exec_path, viewer_args, "Starting factory")
   return port
 }
 
