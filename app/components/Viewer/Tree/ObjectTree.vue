@@ -12,8 +12,8 @@
   function onResizeStart(event) {
     const startWidth = treeviewStore.panelWidth
     const startX = event.clientX
-    function resize(event) {
-      const deltaX = event.clientX - startX
+    function resize(move_event) {
+      const deltaX = move_event.clientX - startX
       const newWidth = Math.max(
         WIDTH_MIN,
         Math.min(startWidth + deltaX, window.innerWidth),
