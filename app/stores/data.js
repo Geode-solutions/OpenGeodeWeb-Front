@@ -33,6 +33,11 @@ export const useDataStore = defineStore("data", () => {
       component = await database.model_components
         .where({ viewer_id: id })
         .first()
+      if (!component && !isNaN(id)) {
+        component = await database.model_components
+          .where({ viewer_id: Number(id) })
+          .first()
+      }
     }
     if (component) {
       const parent = await database.data.get(component.id)
@@ -42,7 +47,6 @@ export const useDataStore = defineStore("data", () => {
           component_geode_id: component.geode_id,
           component_name: component.name,
           component_type: component.type,
-          // Fallbacks for menu identification
           viewer_type: parent.viewer_type || "model",
           geode_object_type: parent.geode_object_type || component.type,
         }
@@ -200,6 +204,15 @@ export const useDataStore = defineStore("data", () => {
     return components.map((component) => component.viewer_id)
   }
 
+  async function allComponentViewerIds() {
+    const components = await database.model_components.toArray()
+    return components
+      .map((component) =>
+        component.viewer_id !== undefined ? String(component.viewer_id) : "",
+      )
+      .filter((id) => id !== "")
+  }
+
   async function exportStores() {
     const items = await database.data.toArray()
     return { items }
@@ -230,6 +243,7 @@ export const useDataStore = defineStore("data", () => {
     getSurfacesGeodeIds,
     getBlocksGeodeIds,
     getMeshComponentsViewerIds,
+    allComponentViewerIds,
     exportStores,
     importStores,
     clear,
