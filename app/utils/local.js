@@ -47,12 +47,12 @@ function executable_name(name) {
   return name
 }
 
-function create_path(path) {
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path, { recursive: true })
-    console.log(`${path} directory created successfully!`)
+function create_path(dir_path) {
+  if (!fs.existsSync(dir_path)) {
+    fs.mkdirSync(dir_path, { recursive: true })
+    console.log(`${dir_path} directory created successfully!`)
   }
-  return path
+  return dir_path
 }
 
 function get_available_port() {
@@ -62,10 +62,10 @@ function get_available_port() {
   })
 }
 
-function commandExistsSync(executable_name) {
+function commandExistsSync(exec_name) {
   const envPath = process.env.PATH || ""
   return envPath.split(path.delimiter).some((dir) => {
-    const filePath = path.join(dir, executable_name)
+    const filePath = path.join(dir, exec_name)
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile()
   })
 }
@@ -80,15 +80,15 @@ async function wait_for_ready(child, expected_response) {
 }
 
 async function run_script(
-  executable_name,
-  executable_path,
+  exec_name,
+  exec_path,
   args,
   expected_response,
   timeout_seconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
-  const command = commandExistsSync(executable_name)
-    ? executable_name
-    : path.join(executable_path, executable_name)
+  const command = commandExistsSync(exec_name)
+    ? exec_name
+    : path.join(exec_path, exec_name)
   console.log("run_script", command, args)
   const child = child_process.spawn(command, args, {
     encoding: "utf8",
@@ -125,8 +125,9 @@ async function run_script(
   }
 }
 
-async function run_back(executable_name, executable_path, args = {}) {
-  let { project_folder_path, upload_folder_path } = args
+async function run_back(exec_name, exec_path, args = {}) {
+  const { project_folder_path, upload_folder_path: upload_folder_path_arg } = args
+  let upload_folder_path = upload_folder_path_arg
   if (!project_folder_path) {
     throw new Error("project_folder_path is required")
   }
@@ -144,17 +145,17 @@ async function run_back(executable_name, executable_path, args = {}) {
   if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
     back_args.push("--debug")
   }
-  console.log("run_back", executable_name, executable_path, back_args)
+  console.log("run_back", exec_name, exec_path, back_args)
   await run_script(
-    executable_name,
-    executable_path,
+    exec_name,
+    exec_path,
     back_args,
     "Serving Flask app",
   )
   return port
 }
 
-async function run_viewer(executable_name, executable_path, args = {}) {
+async function run_viewer(exec_name, exec_path, args = {}) {
   if (!args.project_folder_path) {
     throw new Error("project_folder_path is required")
   }
@@ -164,10 +165,10 @@ async function run_viewer(executable_name, executable_path, args = {}) {
     `--data_folder_path ${args.project_folder_path}`,
     `--timeout ${0}`,
   ]
-  console.log("run_viewer", executable_name, executable_path, viewer_args)
+  console.log("run_viewer", exec_name, exec_path, viewer_args)
   await run_script(
-    executable_name,
-    executable_path,
+    exec_name,
+    exec_path,
     viewer_args,
     "Starting factory",
   )
