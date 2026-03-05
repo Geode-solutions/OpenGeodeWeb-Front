@@ -13,7 +13,6 @@ export function useModelSurfacesVisibilityStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle()
-
   function modelSurfaceVisibility(id, surface_id) {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility
   }

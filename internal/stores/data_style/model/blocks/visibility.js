@@ -13,11 +13,9 @@ export function useModelBlocksVisibilityStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
   const modelBlocksCommonStyle = useModelBlocksCommonStyle()
-
   function modelBlockVisibility(id, block_id) {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility
   }
-
   function saveModelBlockVisibility(id, block_id, visibility) {
     modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility = visibility
   }

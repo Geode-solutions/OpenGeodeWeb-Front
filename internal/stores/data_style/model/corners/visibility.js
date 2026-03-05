@@ -13,16 +13,13 @@ export function useModelCornersVisibilityStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
   const modelCornersCommonStyle = useModelCornersCommonStyle()
-
   function modelCornerVisibility(id, corner_id) {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility
   }
-
   function saveModelCornerVisibility(id, corner_id, visibility) {
     modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility =
       visibility
   }
-
   async function setModelCornersVisibility(id, corner_ids, visibility) {
     if (!corner_ids || corner_ids.length === 0) {
       return

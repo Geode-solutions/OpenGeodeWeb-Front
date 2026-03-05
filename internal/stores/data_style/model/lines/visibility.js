@@ -13,15 +13,12 @@ export function useModelLinesVisibilityStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
   const modelLinesCommonStyle = useModelLinesCommonStyle()
-
   function modelLineVisibility(id, line_id) {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).visibility
   }
-
   function saveModelLineVisibility(id, line_id, visibility) {
     modelLinesCommonStyle.modelLineStyle(id, line_id).visibility = visibility
   }
-
   async function setModelLinesVisibility(id, line_ids, visibility) {
     if (!line_ids || line_ids.length === 0) {
       return

@@ -13,7 +13,7 @@ globalThis.ResizeObserver = ResizeObserver
 describe(Step, () => {
   test(`BRep`, async () => {
     const geode_object_type = ref("BRep")
-    const files = ref([])
+    const stepper_files = ref([])
     const stepper_tree = reactive({
       current_step_index: ref(0),
       geode_object_type,
@@ -23,7 +23,9 @@ describe(Step, () => {
           component: {
             component_name: shallowRef(ObjectSelector),
             component_options: {
-              filenames: computed(() => files.value.map((file) => file.name)),
+              filenames: computed(() =>
+                stepper_files.value.map((file) => file.name),
+              ),
               key: "",
             },
           },
