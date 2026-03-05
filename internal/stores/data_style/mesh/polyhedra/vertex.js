@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolyhedraCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 const meshPolyhedraVertexAttributeSchemas =
@@ -35,6 +36,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       style.polyhedra.coloring.vertex.storedConfigs[name] = {
         minimum,
@@ -54,6 +56,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     return meshPolyhedraVertexAttribute(id).name
   }
   function setMeshPolyhedraVertexAttributeName(id, name) {
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         const vertex = style.polyhedra.coloring.vertex
@@ -78,7 +81,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
       )
     }
 
-    if (meshPolyhedraVertexAttributeSchemas?.name) {
+    if (meshPolyhedraVertexAttributeSchemas?.name && name !== "") {
       return viewerStore.request(
         meshPolyhedraVertexAttributeSchemas.name,
         { id, name },
@@ -99,6 +102,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   }
   async function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraVertexAttributeName(id)
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       const storedConfig = style.polyhedra.coloring.vertex.storedConfigs[name]
       storedConfig.minimum = minimum
@@ -119,6 +123,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   function setMeshPolyhedraVertexAttributeColorMap(id, colorMap) {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         style.polyhedra.coloring.vertex.storedConfigs[name].colorMap =

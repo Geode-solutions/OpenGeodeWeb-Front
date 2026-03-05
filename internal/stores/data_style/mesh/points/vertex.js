@@ -4,6 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPointsCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -80,7 +81,7 @@ export function useMeshPointsVertexAttributeStyle() {
       )
     }
 
-    if (meshPointsVertexAttributeSchemas?.name) {
+    if (meshPointsVertexAttributeSchemas?.name && name !== "") {
       return viewerStore.request(
         meshPointsVertexAttributeSchemas.name,
         { id, name },

@@ -7,6 +7,7 @@ import { useMeshEdgesEdgeAttributeStyle } from "./edge"
 import { useMeshEdgesVertexAttributeStyle } from "./vertex"
 import { useMeshEdgesVisibilityStyle } from "./visibility"
 import { useMeshEdgesWidthStyle } from "./width"
+import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 
@@ -19,8 +20,10 @@ export function useMeshEdgesStyle() {
   const meshEdgesEdgeAttributeStyle = useMeshEdgesEdgeAttributeStyle()
 
   async function setMeshEdgesActiveColoring(id, type) {
-    const coloring = meshEdgesCommonStyle.meshEdgesColoring(id)
-    coloring.active = type
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      style.edges.coloring.active = type
+    })
     console.log(
       setMeshEdgesActiveColoring.name,
       { id },
@@ -31,12 +34,6 @@ export function useMeshEdgesStyle() {
         id,
         meshEdgesColorStyle.meshEdgesColor(id),
       )
-    } else if (type === "textures") {
-      const textures = meshEdgesTexturesStore.meshEdgesTextures(id)
-      if (textures === undefined) {
-        return Promise.resolve()
-      }
-      return meshEdgesTexturesStore.setMeshEdgesTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id)

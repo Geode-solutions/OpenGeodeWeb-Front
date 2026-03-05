@@ -4,6 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshCellsCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -35,6 +36,7 @@ export function useMeshCellsVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       style.cells.coloring.vertex.storedConfigs[name] = {
         minimum,
@@ -54,6 +56,7 @@ export function useMeshCellsVertexAttributeStyle() {
     return meshCellsVertexAttribute(id).name
   }
   function setMeshCellsVertexAttributeName(id, name) {
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         const vertex = style.cells.coloring.vertex
@@ -78,7 +81,7 @@ export function useMeshCellsVertexAttributeStyle() {
       )
     }
 
-    if (meshCellsVertexAttributeSchemas?.name) {
+    if (meshCellsVertexAttributeSchemas?.name && name !== "") {
       return viewerStore.request(
         meshCellsVertexAttributeSchemas.name,
         { id, name },
@@ -99,6 +102,7 @@ export function useMeshCellsVertexAttributeStyle() {
   }
   async function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
     const name = meshCellsVertexAttributeName(id)
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       const storedConfig = style.cells.coloring.vertex.storedConfigs[name]
       storedConfig.minimum = minimum
@@ -119,6 +123,7 @@ export function useMeshCellsVertexAttributeStyle() {
   function setMeshCellsVertexAttributeColorMap(id, colorMap) {
     const name = meshCellsVertexAttributeName(id)
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         style.cells.coloring.vertex.storedConfigs[name].colorMap = colorMap

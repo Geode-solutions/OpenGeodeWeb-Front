@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshPolyhedraCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -29,7 +30,7 @@ export function useMeshPolyhedraColorStyle() {
       )
     }
 
-    if (meshPolyhedraColorSchemas) {
+    if (meshPolyhedraColorSchemas && color !== undefined) {
       return viewerStore.request(
         meshPolyhedraColorSchemas,
         { id, color },

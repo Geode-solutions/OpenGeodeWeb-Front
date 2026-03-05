@@ -7,6 +7,7 @@ import { useMeshPolygonsPolygonAttributeStyle } from "./polygon"
 import { useMeshPolygonsTexturesStyle } from "./textures"
 import { useMeshPolygonsVertexAttributeStyle } from "./vertex"
 import { useMeshPolygonsVisibilityStyle } from "./visibility"
+import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 
@@ -20,8 +21,10 @@ export function useMeshPolygonsStyle() {
     useMeshPolygonsPolygonAttributeStyle()
 
   async function setMeshPolygonsActiveColoring(id, type) {
-    const coloring = meshPolygonsCommonStyle.meshPolygonsColoring(id)
-    coloring.active = type
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      style.polygons.coloring.active = type
+    })
     console.log(
       setMeshPolygonsActiveColoring.name,
       { id },

@@ -56,7 +56,8 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
       cells: {
         visibility: true,
         coloring: {
-          active_type: "cell",
+          active: "color",
+          color: { r: 1, g: 1, b: 1 },
           cell: { name: "", storedConfigs: {} },
           vertex: { name: "", storedConfigs: {} },
           textures: [],
@@ -65,7 +66,8 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
       polygons: {
         visibility: true,
         coloring: {
-          active_type: "polygon",
+          active: "color",
+          color: { r: 1, g: 1, b: 1 },
           polygon: { name: "", storedConfigs: {} },
           vertex: { name: "", storedConfigs: {} },
           textures: [],
@@ -74,7 +76,8 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
       polyhedra: {
         visibility: true,
         coloring: {
-          active_type: "polyhedron",
+          active: "color",
+          color: { r: 1, g: 1, b: 1 },
           polyhedron: { name: "", storedConfigs: {} },
           vertex: { name: "", storedConfigs: {} },
         },

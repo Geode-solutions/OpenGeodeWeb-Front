@@ -6,6 +6,7 @@ import { useMeshPointsCommonStyle } from "./common"
 import { useMeshPointsSizeStyle } from "./size"
 import { useMeshPointsVertexAttributeStyle } from "./vertex"
 import { useMeshPointsVisibilityStyle } from "./visibility"
+import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 
@@ -17,8 +18,10 @@ export function useMeshPointsStyle() {
   const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle()
 
   async function setMeshPointsActiveColoring(id, type) {
-    const coloring = meshPointsCommonStyle.meshPointsColoring(id)
-    coloring.active = type
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      style.points.coloring.active = type
+    })
     console.log(
       setMeshPointsActiveColoring.name,
       { id },
@@ -29,12 +32,6 @@ export function useMeshPointsStyle() {
         id,
         meshPointsColorStyle.meshPointsColor(id),
       )
-    } else if (type === "textures") {
-      const textures = meshPointsTexturesStore.meshPointsTextures(id)
-      if (textures === undefined) {
-        return Promise.resolve()
-      }
-      return meshPointsTexturesStore.setMeshPointsTextures(id, textures)
     } else if (type === "vertex") {
       const name =
         meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id)
@@ -42,16 +39,6 @@ export function useMeshPointsStyle() {
         return Promise.resolve()
       }
       return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(
-        id,
-        name,
-      )
-    } else if (type === "polygon") {
-      const name =
-        meshPointsPolygonAttributeStyleStore.meshPointsPolygonAttributeName(id)
-      if (name === undefined) {
-        return Promise.resolve()
-      }
-      await meshPointsPolygonAttributeStyleStore.setMeshPointsPolygonAttributeName(
         id,
         name,
       )

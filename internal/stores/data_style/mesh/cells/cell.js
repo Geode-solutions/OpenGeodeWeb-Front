@@ -4,6 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshCellsCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -35,6 +36,7 @@ export function useMeshCellsCellAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       style.cells.coloring.cell.storedConfigs[name] = {
         minimum,
@@ -54,6 +56,7 @@ export function useMeshCellsCellAttributeStyle() {
     return meshCellsCellAttribute(id).name
   }
   function setMeshCellsCellAttributeName(id, name) {
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         const cell = style.cells.coloring.cell
@@ -75,7 +78,7 @@ export function useMeshCellsCellAttributeStyle() {
       )
     }
 
-    if (meshCellsCellAttributeSchemas?.name) {
+    if (meshCellsCellAttributeSchemas?.name && name !== "") {
       return viewerStore.request(
         meshCellsCellAttributeSchemas.name,
         { id, name },
@@ -96,6 +99,7 @@ export function useMeshCellsCellAttributeStyle() {
   }
   async function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const name = meshCellsCellAttributeName(id)
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       const storedConfig = style.cells.coloring.cell.storedConfigs[name]
       storedConfig.minimum = minimum
@@ -116,6 +120,7 @@ export function useMeshCellsCellAttributeStyle() {
   function setMeshCellsCellAttributeColorMap(id, colorMap) {
     const name = meshCellsCellAttributeName(id)
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         style.cells.coloring.cell.storedConfigs[name].colorMap = colorMap

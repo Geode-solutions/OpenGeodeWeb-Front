@@ -24,8 +24,49 @@ async function importWorkflow(files) {
 
 function buildImportItemFromPayloadApi(value, geode_object_type) {
   console.log("buildImportItemFromPayloadApi", { value, geode_object_type })
+  const mesh_types = [
+    "EdgedCurve2D",
+    "EdgedCurve3D",
+    "Graph",
+    "HybridSolid3D",
+    "LightRegularGrid2D",
+    "LightRegularGrid3D",
+    "PointSet2D",
+    "PointSet3D",
+    "PolygonalSurface2D",
+    "PolygonalSurface3D",
+    "PolyhedralSolid3D",
+    "RasterImage2D",
+    "RasterImage3D",
+    "RegularGrid2D",
+    "RegularGrid3D",
+    "TetrahedralSolid3D",
+    "TriangulatedSurface2D",
+    "TriangulatedSurface3D",
+  ]
+  const model_types = [
+    "BRep",
+    "CrossSection",
+    "ImplicitCrossSection",
+    "ImplicitStructuralModel",
+    "Section",
+    "StructuralModel",
+  ]
+
+  let viewer_type = value.viewer_type
+  const geode_type = value.geode_object_type || geode_object_type
+  if (!viewer_type) {
+    if (mesh_types.includes(geode_type)) {
+      viewer_type = "mesh"
+    } else if (model_types.includes(geode_type)) {
+      viewer_type = "model"
+    }
+  }
+
   return {
     ...value,
+    geode_object_type: geode_type,
+    viewer_type: viewer_type,
   }
 }
 

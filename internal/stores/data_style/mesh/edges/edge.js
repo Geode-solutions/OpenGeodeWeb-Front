@@ -4,6 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshEdgesCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -77,7 +78,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
       )
     }
 
-    if (meshEdgesEdgeAttributeSchemas?.name) {
+    if (meshEdgesEdgeAttributeSchemas?.name && name !== "") {
       return viewerStore.request(
         meshEdgesEdgeAttributeSchemas.name,
         { id, name },

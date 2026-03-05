@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshEdgesCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -29,7 +30,7 @@ export function useMeshEdgesColorStyle() {
       )
     }
 
-    if (meshEdgesColorSchemas) {
+    if (meshEdgesColorSchemas && color !== undefined) {
       return viewerStore.request(
         meshEdgesColorSchemas,
         { id, color },

@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolygonsCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 const meshPolygonsPolygonAttributeSchemas =
@@ -35,6 +36,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       style.polygons.coloring.polygon.storedConfigs[name] = {
         minimum,
@@ -49,6 +51,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     return meshPolygonsPolygonAttribute(id).name
   }
   function setMeshPolygonsPolygonAttributeName(id, name) {
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         const polygon = style.polygons.coloring.polygon
@@ -73,7 +76,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       )
     }
 
-    if (meshPolygonsPolygonAttributeSchemas?.name) {
+    if (meshPolygonsPolygonAttributeSchemas?.name && name !== "") {
       return viewerStore.request(
         meshPolygonsPolygonAttributeSchemas.name,
         { id, name },
@@ -98,6 +101,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   }
   async function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsPolygonAttributeName(id)
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       const storedConfig = style.polygons.coloring.polygon.storedConfigs[name]
       storedConfig.minimum = minimum
@@ -118,6 +122,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   function setMeshPolygonsPolygonAttributeColorMap(id, colorMap) {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         style.polygons.coloring.polygon.storedConfigs[name].colorMap = colorMap

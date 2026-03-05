@@ -15,11 +15,40 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  function item(id) {
+  async function item(id) {
     if (!id) {
       return
     }
-    return database.data.get(id)
+    if (typeof id === "object") {
+      id = id.id || id.geode_id
+    }
+    let result = await database.data.get(id)
+    if (result) {
+      return result
+    }
+    let component = await database.model_components
+      .where({ geode_id: id })
+      .first()
+    if (!component) {
+      component = await database.model_components
+        .where({ viewer_id: id })
+        .first()
+    }
+    if (component) {
+      const parent = await database.data.get(component.id)
+      if (parent) {
+        return {
+          ...parent,
+          component_geode_id: component.geode_id,
+          component_name: component.name,
+          component_type: component.type,
+          // Fallbacks for menu identification
+          viewer_type: parent.viewer_type || "model",
+          geode_object_type: parent.geode_object_type || component.type,
+        }
+      }
+    }
+    return undefined
   }
 
   function refItem(id) {

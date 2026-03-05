@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolygonsCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 const meshPolygonsVertexAttributeSchemas =
@@ -35,6 +36,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       style.polygons.coloring.vertex.storedConfigs[name] = {
         minimum,
@@ -54,6 +56,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return meshPolygonsVertexAttribute(id).name
   }
   function setMeshPolygonsVertexAttributeName(id, name) {
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         const vertex = style.polygons.coloring.vertex
@@ -78,7 +81,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
       )
     }
 
-    if (meshPolygonsVertexAttributeSchemas?.name) {
+    if (meshPolygonsVertexAttributeSchemas?.name && name !== "") {
       return viewerStore.request(
         meshPolygonsVertexAttributeSchemas.name,
         { id, name },
@@ -99,6 +102,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
   }
   async function setMeshPolygonsVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsVertexAttributeName(id)
+    const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
       const storedConfig = style.polygons.coloring.vertex.storedConfigs[name]
       storedConfig.minimum = minimum
@@ -119,6 +123,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
   function setMeshPolygonsVertexAttributeColorMap(id, colorMap) {
     const name = meshPolygonsVertexAttributeName(id)
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name)
+    const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         style.polygons.coloring.vertex.storedConfigs[name].colorMap = colorMap

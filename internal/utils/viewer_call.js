@@ -40,7 +40,7 @@ export async function viewer_call(
         .getSession()
         .call(schema.$id, [params])
       if (response_function) {
-        response_function(value)
+        await response_function(value)
       }
       return value
     } catch (error) {
