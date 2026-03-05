@@ -9,28 +9,28 @@ import { useViewerStore } from "@ogw_front/stores/viewer"
 const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
 
 export function useModelPointsSizeStyle() {
-    const viewerStore = useViewerStore()
-    const modelPointsCommonStyle = useModelPointsCommonStyle()
+  const viewerStore = useViewerStore()
+  const modelPointsCommonStyle = useModelPointsCommonStyle()
 
-    function modelPointsSize(id) {
-        return modelPointsCommonStyle.modelPointsStyle(id).size
-    }
+  function modelPointsSize(id) {
+    return modelPointsCommonStyle.modelPointsStyle(id).size
+  }
 
-    function setModelPointsSize(id, size) {
-        return viewerStore.request(
-            model_points_schemas.size,
-            { id, size },
-            {
-                response_function: () => {
-                    modelPointsCommonStyle.modelPointsStyle(id).size = size
-                    console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
-                },
-            },
-        )
-    }
+  function setModelPointsSize(id, size) {
+    return viewerStore.request(
+      model_points_schemas.size,
+      { id, size },
+      {
+        response_function: () => {
+          modelPointsCommonStyle.modelPointsStyle(id).size = size
+          console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
+        },
+      },
+    )
+  }
 
-    return {
-        modelPointsSize,
-        setModelPointsSize,
-    }
+  return {
+    modelPointsSize,
+    setModelPointsSize,
+  }
 }

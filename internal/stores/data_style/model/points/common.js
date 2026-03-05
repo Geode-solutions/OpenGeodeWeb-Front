@@ -1,13 +1,13 @@
 import { useDataStyleStateStore } from "../../state"
 
 export function useModelPointsCommonStyle() {
-    const dataStyleStateStore = useDataStyleStateStore()
+  const dataStyleStateStore = useDataStyleStateStore()
 
-    function modelPointsStyle(id) {
-        return dataStyleStateStore.getStyle(id).points
-    }
+  function modelPointsStyle(id) {
+    return dataStyleStateStore.getStyle(id).points
+  }
 
-    return {
-        modelPointsStyle,
-    }
+  return {
+    modelPointsStyle,
+  }
 }

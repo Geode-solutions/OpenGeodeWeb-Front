@@ -9,32 +9,32 @@ import { useViewerStore } from "@ogw_front/stores/viewer"
 const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges
 
 export function useModelEdgesVisibilityStyle() {
-    const viewerStore = useViewerStore()
-    const modelEdgesCommonStyle = useModelEdgesCommonStyle()
+  const viewerStore = useViewerStore()
+  const modelEdgesCommonStyle = useModelEdgesCommonStyle()
 
-    function modelEdgesVisibility(id) {
-        return modelEdgesCommonStyle.modelEdgesStyle(id).visibility
-    }
+  function modelEdgesVisibility(id) {
+    return modelEdgesCommonStyle.modelEdgesStyle(id).visibility
+  }
 
-    function setModelEdgesVisibility(id, visibility) {
-        return viewerStore.request(
-            model_edges_schemas.visibility,
-            { id, visibility },
-            {
-                response_function: () => {
-                    modelEdgesCommonStyle.modelEdgesStyle(id).visibility = visibility
-                    console.log(
-                        setModelEdgesVisibility.name,
-                        { id },
-                        modelEdgesVisibility(id),
-                    )
-                },
-            },
-        )
-    }
+  function setModelEdgesVisibility(id, visibility) {
+    return viewerStore.request(
+      model_edges_schemas.visibility,
+      { id, visibility },
+      {
+        response_function: () => {
+          modelEdgesCommonStyle.modelEdgesStyle(id).visibility = visibility
+          console.log(
+            setModelEdgesVisibility.name,
+            { id },
+            modelEdgesVisibility(id),
+          )
+        },
+      },
+    )
+  }
 
-    return {
-        modelEdgesVisibility,
-        setModelEdgesVisibility,
-    }
+  return {
+    modelEdgesVisibility,
+    setModelEdgesVisibility,
+  }
 }
