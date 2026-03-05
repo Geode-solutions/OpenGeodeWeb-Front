@@ -36,10 +36,10 @@
   watch(
     () => [x, y],
     ([newX, newY]) => {
-      const { x, y } = clampPosition(newX, newY)
-      menuX.value = x
-      menuY.value = y
-      menuStore.setMenuPosition(x, y)
+      const { x: clampedX, y: clampedY } = clampPosition(newX, newY)
+      menuX.value = clampedX
+      menuY.value = clampedY
+      menuStore.setMenuPosition(clampedX, clampedY)
     },
     { immediate: true },
   )
@@ -81,22 +81,22 @@
     event.preventDefault()
   }
 
-  function clampPosition(x, y) {
+  function clampPosition(posX, posY) {
     const margin = RADIUS + MARGIN_OFFSET
     return {
-      x: Math.min(Math.max(x, margin), containerWidth - margin),
-      y: Math.min(Math.max(y, margin), containerHeight - margin),
+      x: Math.min(Math.max(posX, margin), containerWidth - margin),
+      y: Math.min(Math.max(posY, margin), containerHeight - margin),
     }
   }
 
   function handleDrag(event) {
-    const { x, y } = clampPosition(
+    const { x: clampedX, y: clampedY } = clampPosition(
       event.clientX - dragStartX.value,
       event.clientY - dragStartY.value,
     )
-    menuX.value = x
-    menuY.value = y
-    menuStore.setMenuPosition(x, y)
+    menuX.value = clampedX
+    menuY.value = clampedY
+    menuStore.setMenuPosition(clampedX, clampedY)
   }
 
   function stopDrag(event) {
