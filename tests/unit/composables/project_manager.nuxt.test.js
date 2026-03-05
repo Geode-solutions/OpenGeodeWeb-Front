@@ -135,71 +135,51 @@ const hybridViewerStoreMock = {
 
 // MOCKS
 vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ snapshot: snapshotMock }))
-vi.mock(
-  import("../../../internal/utils/viewer_call", () => ({
-    viewer_call: viewer_call_mock_fn,
-  })),
-)
+vi.mock("../../../internal/utils/viewer_call", () => ({
+  viewer_call: viewer_call_mock_fn,
+}))
 
-vi.mock(
-  import("@ogw_front/composables/api_fetch", () => ({
-    api_fetch: vi.fn(async (_req, options = {}) => {
-      const response = {
-        _data: new Blob(["zipcontent"], { type: "application/zip" }),
-        headers: {
-          get: (k) => (k === "new-file-name" ? "project_123.vease" : undefined),
-        },
-      }
-      if (options.response_function) {
-        await options.response_function(response)
-      }
-      return response
-    }),
-  })),
-)
-vi.mock(import("js-file-download", () => ({ default: vi.fn() })))
-vi.mock(
-  import("@ogw_front/stores/infra", () => ({
-    useInfraStore: () => infraStoreMock,
-  })),
-)
-vi.mock(
-  import("@ogw_front/stores/viewer", () => ({
-    useViewerStore: () => viewerStoreMock,
-  })),
-)
-vi.mock(
-  import("@ogw_front/stores/treeview", () => ({
-    useTreeviewStore: () => treeviewStoreMock,
-  })),
-)
-vi.mock(
-  import("@ogw_front/stores/data", () => ({
-    useDataStore: () => dataStoreMock,
-  })),
-)
-vi.mock(
-  import("@ogw_front/stores/data_style", () => ({
-    useDataStyleStore: () => dataStyleStoreMock,
-  })),
-)
-vi.mock(
-  import("@ogw_front/stores/hybrid_viewer", () => ({
-    useHybridViewerStore: () => hybridViewerStoreMock,
-  })),
-)
-vi.mock(
-  import("@ogw_front/stores/geode", () => ({
-    useGeodeStore: () => geodeStoreMock,
-  })),
-)
-vi.mock(
-  import("@ogw_front/stores/app", () => ({
-    useAppStore: () => ({
-      exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
-    }),
-  })),
-)
+vi.mock("@ogw_front/composables/api_fetch", () => ({
+  api_fetch: vi.fn(async (_req, options = {}) => {
+    const response = {
+      _data: new Blob(["zipcontent"], { type: "application/zip" }),
+      headers: {
+        get: (k) => (k === "new-file-name" ? "project_123.vease" : undefined),
+      },
+    }
+    if (options.response_function) {
+      await options.response_function(response)
+    }
+    return response
+  }),
+}))
+vi.mock("js-file-download", () => ({ default: vi.fn() }))
+vi.mock("@ogw_front/stores/infra", () => ({
+  useInfraStore: () => infraStoreMock,
+}))
+vi.mock("@ogw_front/stores/viewer", () => ({
+  useViewerStore: () => viewerStoreMock,
+}))
+vi.mock("@ogw_front/stores/treeview", () => ({
+  useTreeviewStore: () => treeviewStoreMock,
+}))
+vi.mock("@ogw_front/stores/data", () => ({
+  useDataStore: () => dataStoreMock,
+}))
+vi.mock("@ogw_front/stores/data_style", () => ({
+  useDataStyleStore: () => dataStyleStoreMock,
+}))
+vi.mock("@ogw_front/stores/hybrid_viewer", () => ({
+  useHybridViewerStore: () => hybridViewerStoreMock,
+}))
+vi.mock("@ogw_front/stores/geode", () => ({
+  useGeodeStore: () => geodeStoreMock,
+}))
+vi.mock("@ogw_front/stores/app", () => ({
+  useAppStore: () => ({
+    exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
+  }),
+}))
 
 vi.stubGlobal("useAppStore", () => ({
   exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
