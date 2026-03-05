@@ -35,7 +35,7 @@ describe("geodeStore.request()", () => {
   })
 
   test("invalid schema", async () => {
-    const schema = {
+    const invalid_schema = {
       $id: "/test",
       type: "object",
       methods: ["POST"],
@@ -48,7 +48,7 @@ describe("geodeStore.request()", () => {
       additionalProperties: false,
     }
     const params = { test: "hello" }
-    expect(() => geodeStore.request(schema, params)).toThrow(
+    expect(() => geodeStore.request(invalid_schema, params)).toThrow(
       "data/test must be number",
     )
   })
