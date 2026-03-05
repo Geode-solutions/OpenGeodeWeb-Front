@@ -21,9 +21,9 @@
     },
   })
   const infraStore = useInfraStore()
-  const form_name = ref("")
-  const form_email = ref("")
-  const form_launch = ref(false)
+  const name = ref("")
+  const email = ref("")
+  const launch = ref(false)
   const valid = ref(false)
   const emailRules = [
     (value) => {
@@ -54,9 +54,9 @@
     const response = await $fetch.raw(`/.netlify/functions/recaptcha`, {
       method: "POST",
       body: {
-        name: form_name.value,
-        email: form_email.value,
-        launch: form_launch.value,
+        name: name.value,
+        email: email.value,
+        launch: launch.value,
       },
     })
     infraStore.$patch({
@@ -72,13 +72,13 @@
         <VContainer>
           <VRow>
             <VCol>
-              <VTextField v-model="form_name" label="Name" required />
+              <VTextField v-model="name" label="Name" required />
             </VCol>
           </VRow>
           <VRow>
             <VCol>
               <VTextField
-                v-model="form_email"
+                v-model="email"
                 :rules="emailRules"
                 label="E-mail"
                 required
@@ -87,7 +87,7 @@
           </VRow>
           <VRow>
             <VCol>
-              <VCheckbox label="Launch the app" v-model="form_launch" />
+              <VCheckbox label="Launch the app" v-model="launch" />
             </VCol>
           </VRow>
         </VContainer>
