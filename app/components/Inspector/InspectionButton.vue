@@ -37,11 +37,7 @@
 
 <template>
   <div class="pa-0">
-    <v-btn
-      :loading="loading"
-      color="primary"
-      @click="get_inspection_results()"
-    >
+    <v-btn :loading="loading" color="primary" @click="get_inspection_results()">
       Inspect
       <template #loader>
         <v-progress-circular indeterminate size="20" color="white" width="3" />

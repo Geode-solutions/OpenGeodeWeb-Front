@@ -22,7 +22,6 @@
     "oxc/no-async-await": "off",
     "oxc/no-rest-spread-properties": "off", // Enable if older browser support is needed
     "eslint/max-statements": ["warn", 20],
-    "no-shadow": "error",
     "eslint/id-length": [
       "error",
       {
