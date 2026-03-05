@@ -15,9 +15,12 @@
   const loading = ref(false)
   const toggle_loading = useToggle(loading)
 
-  async function get_inspection_results(geode_object_type, filename) {
+  async function get_inspection_results() {
     toggle_loading()
-    const params = { geode_object_type, filename }
+    const params = {
+      geode_object_type: geode_object_type,
+      filename: filename,
+    }
     const geodeStore = useGeodeStore()
 
     await geodeStore.request(schema, params, {
@@ -37,7 +40,7 @@
     <v-btn
       :loading="loading"
       color="primary"
-      @click="get_inspection_results(geode_object_type, filename)"
+      @click="get_inspection_results()"
     >
       Inspect
       <template #loader>
