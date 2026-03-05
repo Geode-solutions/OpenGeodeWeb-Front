@@ -1,8 +1,12 @@
 // Local imports
+import { useDataStore } from "@ogw_front/stores/data"
 import { useModelCornersColorStyle } from "./color"
 import { useModelCornersCommonStyle } from "./common"
 import { useModelCornersVisibilityStyle } from "./visibility"
-import { useDataStore } from "@ogw_front/stores/data"
+
+async function setModelCornersDefaultStyle(_id) {
+  // Placeholder for oxlint
+}
 
 export function useModelCornersStyle() {
   const dataStore = useDataStore()
@@ -23,8 +27,6 @@ export function useModelCornersStyle() {
       modelCornersColorStyle.setModelCornersColor(id, corner_ids, style.color),
     ])
   }
-
-  async function setModelCornersDefaultStyle(id) {}
 
   return {
     applyModelCornersStyle,

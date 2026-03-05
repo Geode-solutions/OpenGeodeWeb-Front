@@ -8,9 +8,9 @@ import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb
 import {
   runMicroservices,
   teardownIntegrationTests,
-} from "../../integration/setup"
-import Status from "@ogw_front/utils/status"
-import { setupActivePinia } from "../../utils"
+} from "@ogw_tests/integration/setup"
+import { Status } from "@ogw_front/utils/status"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 const CONNECT_TIMEOUT = 25_000

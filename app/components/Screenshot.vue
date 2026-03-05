@@ -1,6 +1,6 @@
 <script setup>
-  import fileDownload from "js-file-download"
   import GlassCard from "@ogw_front/components/GlassCard"
+  import fileDownload from "js-file-download"
   import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
   import { useViewerStore } from "@ogw_front/stores/viewer"
@@ -29,7 +29,7 @@
         include_background: include_background.value,
       },
       {
-        response_function: async (response) => {
+        response_function: (response) => {
           fileDownload(
             response.blob,
             `${filename.value}.${output_extension.value}`,

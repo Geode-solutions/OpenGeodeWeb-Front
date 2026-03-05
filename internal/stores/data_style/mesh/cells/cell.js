@@ -35,7 +35,7 @@ export function useMeshCellsCellAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshCellsCellAttribute(id).storedConfigs
+    const { storedConfigs } = meshCellsCellAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

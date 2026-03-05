@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelSurfacesCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useModelSurfacesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -13,14 +13,12 @@ export function useModelSurfacesColorStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle()
-
   function modelSurfaceColor(id, surface_id) {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color
   }
   function saveModelSurfaceColor(id, surface_id, color) {
     modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color = color
   }
-
   async function setModelSurfacesColor(id, surface_ids, color) {
     if (!surface_ids || surface_ids.length === 0) {
       return
