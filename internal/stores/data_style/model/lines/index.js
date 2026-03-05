@@ -24,7 +24,6 @@ export function useModelLinesStyle() {
     }
 
     async function setModelLinesDefaultStyle(id) {
-        // Keep for compatibility
     }
 
     return {

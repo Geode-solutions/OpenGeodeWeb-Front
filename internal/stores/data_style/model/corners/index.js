@@ -25,7 +25,6 @@ export function useModelCornersStyle() {
     }
 
     async function setModelCornersDefaultStyle(id) {
-        // Keep for compatibility
     }
 
     return {

@@ -24,8 +24,6 @@ export function useModelBlocksStyle() {
     }
 
     async function setModelBlocksDefaultStyle(id) {
-        // This function logic was referenced in index.js but not fully implemented in blocks.js
-        // I will keep it for compatibility if needed, but it seems to be handled by appliers.
     }
 
     return {

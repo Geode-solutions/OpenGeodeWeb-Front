@@ -24,7 +24,6 @@ export function useModelSurfacesStyle() {
     }
 
     async function setModelSurfacesDefaultStyle(id) {
-        // Keep for compatibility
     }
 
     return {
