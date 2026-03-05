@@ -58,9 +58,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       if (is_moving.value) {
         return
       }
-      const webGLRenderWindow =
-        genericRenderWindow.value.getApiSpecificRenderWindow()
-      const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style
       webGLRenderWindow.setBackgroundImage(event.image)
       imageStyle.opacity = 1
     })
@@ -124,7 +121,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!schema) {
       return
     }
-    const viewerStore = useViewerStore()
     await viewerStore.request(schema, {
       z_scale,
     })
@@ -145,7 +141,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         distance: camera.getDistance(),
       },
     }
-    const viewerStore = useViewerStore()
     viewerStore.request(
       viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
       params,
@@ -163,7 +158,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function remoteRender() {
-    const viewerStore = useViewerStore()
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render)
   }
 
@@ -279,7 +273,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           clipping_range: [...camera_options.clipping_range],
         },
       }
-      const viewerStore = useViewerStore()
       return viewerStore.request(
         viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
         payload,
