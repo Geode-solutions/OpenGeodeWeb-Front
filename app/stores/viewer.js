@@ -152,9 +152,9 @@ export const useViewerStore = defineStore(
     async function launch() {
       status.value = Status.CREATING
       console.log("[VIEWER] Launching viewer microservice...")
-      const port = await globalThis.electronAPI.run_viewer()
-      console.log("[VIEWER] Viewer launched on port:", port)
-      return port
+      const launched_port = await globalThis.electronAPI.run_viewer()
+      console.log("[VIEWER] Viewer launched on port:", launched_port)
+      return launched_port
     }
 
     async function connect() {
