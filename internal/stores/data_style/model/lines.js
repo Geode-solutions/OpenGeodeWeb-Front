@@ -18,23 +18,32 @@ export function useModelLinesStyle() {
     return dataStyleStateStore.getStyle(id).lines
   }
   function modelLineStyle(id, line_id) {
-    if (!modelLinesStyle(id)[line_id]) {
-      modelLinesStyle(id)[line_id] = {}
-    }
-    return modelLinesStyle(id)[line_id]
+    return dataStyleStateStore.getComponentStyle(id, line_id)
   }
 
   function modelLineVisibility(id, line_id) {
     return modelLineStyle(id, line_id).visibility
   }
 
-  function saveModelLineVisibility(id, line_id, visibility) {
-    modelLineStyle(id, line_id).visibility = visibility
-  }
   async function setModelLinesVisibility(id, line_ids, visibility) {
     if (!line_ids || line_ids.length === 0) {
       return
     }
+
+    const updateState = async () => {
+      for (const line_id of line_ids) {
+        await dataStyleStateStore.mutateComponentStyle(id, line_id, (style) => {
+          style.visibility = visibility
+        })
+      }
+      console.log(
+        setModelLinesVisibility.name,
+        { id },
+        { line_ids },
+        modelLineVisibility(id, line_ids[0]),
+      )
+    }
+
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       line_ids,
@@ -44,37 +53,45 @@ export function useModelLinesStyle() {
         "[setModelLinesVisibility] No viewer IDs found, skipping visibility request",
         { id, line_ids },
       )
+      await updateState()
       return
     }
-    return viewerStore.request(
-      model_lines_schemas.visibility,
-      { id, block_ids: line_viewer_ids, visibility },
-      {
-        response_function: () => {
-          for (const line_id of line_ids) {
-            saveModelLineVisibility(id, line_id, visibility)
-          }
-          console.log(
-            setModelLinesVisibility.name,
-            { id },
-            { line_ids },
-            modelLineVisibility(id, line_ids[0]),
-          )
+
+    if (model_lines_schemas?.visibility) {
+      return viewerStore.request(
+        model_lines_schemas.visibility,
+        { id, block_ids: line_viewer_ids, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      await updateState()
+    }
   }
 
   function modelLineColor(id, line_id) {
     return modelLineStyle(id, line_id).color
   }
-  function saveModelLineColor(id, line_id, color) {
-    modelLineStyle(id, line_id).color = color
-  }
   async function setModelLinesColor(id, line_ids, color) {
     if (!line_ids || line_ids.length === 0) {
       return
     }
+
+    const updateState = async () => {
+      for (const line_id of line_ids) {
+        await dataStyleStateStore.mutateComponentStyle(id, line_id, (style) => {
+          style.color = color
+        })
+      }
+      console.log(
+        setModelLinesColor.name,
+        { id },
+        { line_ids },
+        JSON.stringify(modelLineColor(id, line_ids[0])),
+      )
+    }
+
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       line_ids,
@@ -84,28 +101,24 @@ export function useModelLinesStyle() {
         "[setModelLinesColor] No viewer IDs found, skipping color request",
         { id, line_ids },
       )
+      await updateState()
       return
     }
-    return viewerStore.request(
-      model_lines_schemas.color,
-      { id, block_ids: line_viewer_ids, color },
-      {
-        response_function: () => {
-          for (const line_id of line_ids) {
-            saveModelLineColor(id, line_id, color)
-          }
-          console.log(
-            setModelLinesColor.name,
-            { id },
-            { line_ids },
-            JSON.stringify(modelLineColor(id, line_ids[0])),
-          )
+
+    if (model_lines_schemas?.color) {
+      return viewerStore.request(
+        model_lines_schemas.color,
+        { id, block_ids: line_viewer_ids, color },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      await updateState()
+    }
   }
 
-  async function applyModelLinesStyle(id) {
+  async function setModelLinesDefaultStyle(id) {
     const style = modelLinesStyle(id)
     const line_ids = await dataStore.getLinesGeodeIds(id)
     return Promise.all([
@@ -114,11 +127,16 @@ export function useModelLinesStyle() {
     ])
   }
 
+  async function applyModelLinesStyle(id) {
+    return setModelLinesDefaultStyle(id)
+  }
+
   return {
     modelLineVisibility,
     modelLineColor,
     setModelLinesVisibility,
     setModelLinesColor,
     applyModelLinesStyle,
+    setModelLinesDefaultStyle,
   }
 }

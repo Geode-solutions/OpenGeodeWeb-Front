@@ -17,20 +17,25 @@ export function useMeshEdgesWidthStyle() {
     return meshEdgesCommonStyle.meshEdgesStyle(id).width
   }
   function setMeshEdgesWidth(id, width) {
-    return viewerStore.request(
-      meshEdgesWidthSchemas,
-      { id, width },
-      {
-        response_function: () => {
-          meshEdgesCommonStyle.meshEdgesStyle(id).width = width
-          console.log(
-            setMeshEdgesWidth.name,
-            { id },
-            JSON.stringify(meshEdgesWidth(id)),
-          )
+    const updateState = async () => {
+      const dataStyleStateStore = useDataStyleStateStore()
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.edges.width = width
+      })
+      console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
+    }
+
+    if (meshEdgesWidthSchemas) {
+      return viewerStore.request(
+        meshEdgesWidthSchemas,
+        { id, width },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

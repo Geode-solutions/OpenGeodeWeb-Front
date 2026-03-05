@@ -30,14 +30,20 @@ export function useMeshEdgesVertexAttributeStyle() {
     })
   }
 
-  function setMeshEdgesVertexAttributeStoredConfig(
+  async function setMeshEdgesVertexAttributeStoredConfig(
     id,
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshEdgesVertexAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap }
-    return storedConfigs[name]
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      style.edges.coloring.vertex.storedConfigs[name] = {
+        minimum,
+        maximum,
+        colorMap,
+      }
+    })
+    return meshEdgesVertexAttributeStoredConfig(id, name)
   }
 
   function meshEdgesVertexAttributeName(id) {
@@ -49,26 +55,42 @@ export function useMeshEdgesVertexAttributeStyle() {
     return meshEdgesVertexAttribute(id).name
   }
   function setMeshEdgesVertexAttributeName(id, name) {
-    console.log(setMeshEdgesVertexAttributeName.name, { id, name })
-    return viewerStore.request(
-      meshEdgesVertexAttributeSchemas.name,
-      { id, name },
-      {
-        response_function: async () => {
-          meshEdgesVertexAttribute(id).name = name
-          const { minimum, maximum } = meshEdgesVertexAttributeStoredConfig(
-            id,
-            name,
-          )
-          await setMeshEdgesVertexAttributeRange(id, minimum, maximum)
-          console.log(
-            setMeshEdgesVertexAttributeName.name,
-            { id },
-            meshEdgesVertexAttributeName(id),
-          )
+    const dataStyleStateStore = useDataStyleStateStore()
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        const vertex = style.edges.coloring.vertex
+        vertex.name = name
+        if (!(name in vertex.storedConfigs)) {
+          vertex.storedConfigs[name] = {
+            minimum: undefined,
+            maximum: undefined,
+            colorMap: undefined,
+          }
+        }
+      })
+      const { minimum, maximum } = meshEdgesVertexAttributeStoredConfig(
+        id,
+        name,
+      )
+      await setMeshEdgesVertexAttributeRange(id, minimum, maximum)
+      console.log(
+        setMeshEdgesVertexAttributeName.name,
+        { id },
+        meshEdgesVertexAttributeName(id),
+      )
+    }
+
+    if (meshEdgesVertexAttributeSchemas?.name) {
+      return viewerStore.request(
+        meshEdgesVertexAttributeSchemas.name,
+        { id, name },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   function meshEdgesVertexAttributeRange(id) {
@@ -77,12 +99,18 @@ export function useMeshEdgesVertexAttributeStyle() {
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
-  function setMeshEdgesVertexAttributeRange(id, minimum, maximum) {
+  async function setMeshEdgesVertexAttributeRange(id, minimum, maximum) {
     const name = meshEdgesVertexAttributeName(id)
-    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
-    storedConfig.minimum = minimum
-    storedConfig.maximum = maximum
-    return setMeshEdgesVertexAttributeColorMap(id, storedConfig.colorMap)
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      const storedConfig = style.edges.coloring.vertex.storedConfigs[name]
+      storedConfig.minimum = minimum
+      storedConfig.maximum = maximum
+    })
+    return setMeshEdgesVertexAttributeColorMap(
+      id,
+      meshEdgesVertexAttributeColorMap(id),
+    )
   }
 
   function meshEdgesVertexAttributeColorMap(id) {
@@ -94,37 +122,46 @@ export function useMeshEdgesVertexAttributeStyle() {
   function setMeshEdgesVertexAttributeColorMap(id, colorMap) {
     const name = meshEdgesVertexAttributeName(id)
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
+    const dataStyleStateStore = useDataStyleStateStore()
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.edges.coloring.vertex.storedConfigs[name].colorMap = colorMap
+      })
+      console.log(
+        setMeshEdgesVertexAttributeColorMap.name,
+        { id },
+        meshEdgesVertexAttributeColorMap(id),
+      )
+    }
+
     if (
       storedConfig.minimum === undefined ||
       storedConfig.maximum === undefined ||
       colorMap === undefined
     ) {
-      storedConfig.colorMap = colorMap
-      return
+      return updateState()
     }
-    const points = getRGBPointsFromPreset(colorMap)
-    const { minimum, maximum } = storedConfig
 
-    console.log(setMeshEdgesVertexAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    })
-    return viewerStore.request(
-      meshEdgesVertexAttributeSchemas.color_map,
-      { id, points, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.colorMap = colorMap
-          console.log(
-            setMeshEdgesVertexAttributeColorMap.name,
-            { id },
-            meshEdgesVertexAttributeColorMap(id),
-          )
+    if (meshEdgesVertexAttributeSchemas?.color_map) {
+      const points = getRGBPointsFromPreset(colorMap)
+      const { minimum, maximum } = storedConfig
+
+      console.log(setMeshEdgesVertexAttributeColorMap.name, {
+        id,
+        minimum,
+        maximum,
+        colorMap,
+      })
+      return viewerStore.request(
+        meshEdgesVertexAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

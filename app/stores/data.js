@@ -16,6 +16,9 @@ export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
   function item(id) {
+    if (!id) {
+      return
+    }
     return database.data.get(id)
   }
 

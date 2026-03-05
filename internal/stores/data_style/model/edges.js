@@ -13,27 +13,35 @@ export function useModelEdgesStyle() {
   const viewerStore = useViewerStore()
 
   function modelEdgesStyle(id) {
-    return dataStyleStateStore.styles[id].edges
+    return dataStyleStateStore.getStyle(id).edges
   }
   function modelEdgesVisibility(id) {
     return modelEdgesStyle(id).visibility
   }
 
   function setModelEdgesVisibility(id, visibility) {
-    return viewerStore.request(
-      model_edges_schemas.visibility,
-      { id, visibility },
-      {
-        response_function: () => {
-          modelEdgesStyle(id).visibility = visibility
-          console.log(
-            setModelEdgesVisibility.name,
-            { id },
-            modelEdgesVisibility(id),
-          )
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.edges.visibility = visibility
+      })
+      console.log(
+        setModelEdgesVisibility.name,
+        { id },
+        modelEdgesVisibility(id),
+      )
+    }
+
+    if (model_edges_schemas?.visibility) {
+      return viewerStore.request(
+        model_edges_schemas.visibility,
+        { id, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   function applyModelEdgesStyle(id) {

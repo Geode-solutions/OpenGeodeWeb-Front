@@ -11,6 +11,7 @@ import { useModelEdgesStyle } from "./edges"
 import { useModelLinesStyle } from "./lines"
 import { useModelPointsStyle } from "./points"
 import { useModelSurfacesStyle } from "./surfaces"
+import { ref, watch } from "vue"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -32,50 +33,40 @@ export default function useModelStyle() {
     return dataStyleStateStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
-    return viewerStore.request(
-      model_schemas.visibility,
-      { id, visibility },
-      {
-        response_function: () => {
-          dataStyleStateStore.getStyle(id).visibility = visibility
-          hybridViewerStore.setVisibility(id, visibility)
-          console.log(setModelVisibility.name, { id }, modelVisibility(id))
-        },
-      },
-    )
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.visibility = visibility
+      })
+      hybridViewerStore.setVisibility(id, visibility)
+      console.log(setModelVisibility.name, { id }, modelVisibility(id))
+    }
+
+    if (model_schemas.visibility) {
+      return viewerStore.request(model_schemas.visibility, { id, visibility }, {
+        response_function: updateState,
+      })
+    } else {
+      return updateState()
+    }
   }
 
   function visibleMeshComponents(id) {
     const visible_mesh_components = ref([])
-    const styles = dataStyleStateStore.styles[id]
-    if (!styles) {
-      return visible_mesh_components
-    }
-
-    for (const [corner_id, style] of Object.entries(styles.corners || {})) {
-      if (style.visibility) {
-        visible_mesh_components.value.push(corner_id)
-      }
-    }
-
-    for (const [line_id, style] of Object.entries(styles.lines || {})) {
-      if (style.visibility) {
-        visible_mesh_components.value.push(line_id)
-      }
-    }
-
-    for (const [surface_id, style] of Object.entries(styles.surfaces || {})) {
-      if (style.visibility) {
-        visible_mesh_components.value.push(surface_id)
-      }
-    }
-
-    for (const [block_id, style] of Object.entries(styles.blocks || {})) {
-      if (style.visibility) {
-        visible_mesh_components.value.push(block_id)
-      }
-    }
-
+    watch(
+      () => dataStyleStateStore.componentStyles,
+      (componentStyles) => {
+        const new_selection = Object.values(componentStyles)
+          .filter((style) => style.id_model === id && style.visibility)
+          .map((style) => style.id_component)
+        if (
+          JSON.stringify(visible_mesh_components.value) !==
+          JSON.stringify(new_selection)
+        ) {
+          visible_mesh_components.value = new_selection
+        }
+      },
+      { immediate: true, deep: true },
+    )
     return visible_mesh_components
   }
 
@@ -96,16 +87,20 @@ export default function useModelStyle() {
     return dataStyleStateStore.getStyle(id).color
   }
   function setModelColor(id, color) {
-    return viewerStore.request(
-      model_schemas.color,
-      { id, color },
-      {
-        response_function: () => {
-          dataStyleStateStore.styles[id].color = color
-          console.log(setModelColor.name, { id }, modelColor(id))
-        },
-      },
-    )
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.color = color
+      })
+      console.log(setModelColor.name, { id }, modelColor(id))
+    }
+
+    if (model_schemas.color) {
+      return viewerStore.request(model_schemas.color, { id, color }, {
+        response_function: updateState,
+      })
+    } else {
+      return updateState()
+    }
   }
 
   async function setModelMeshComponentsVisibility(
@@ -152,6 +147,8 @@ export default function useModelStyle() {
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
         promise_array.push(setModelVisibility(id, value))
+      } else if (key === "color") {
+        promise_array.push(setModelColor(id, value))
       } else if (key === "corners") {
         promise_array.push(modelCornersStyleStore.applyModelCornersStyle(id))
       } else if (key === "lines") {
@@ -164,6 +161,14 @@ export default function useModelStyle() {
         promise_array.push(modelPointsStyleStore.applyModelPointsStyle(id))
       } else if (key === "edges") {
         promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id))
+      } else if (
+        key === "cells" ||
+        key === "polygons" ||
+        key === "polyhedra" ||
+        key === "id"
+      ) {
+        // Mesh components or record ID style application is handled elsewhere or not needed here
+        continue
       } else {
         throw new Error(`Unknown model key: ${key}`)
       }
@@ -173,6 +178,9 @@ export default function useModelStyle() {
 
   async function setModelMeshComponentsDefaultStyle(id) {
     const item = await dataStore.item(id)
+    if (!item) {
+      return []
+    }
     const { mesh_components } = item
     const promise_array = []
     if ("Corner" in mesh_components) {

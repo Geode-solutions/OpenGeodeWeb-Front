@@ -21,8 +21,11 @@ export function useMeshPolygonsTexturesStyle() {
       meshPolygonsTexturesSchemas,
       { id, textures },
       {
-        response_function: () => {
-          meshPolygonsCommonStyle.meshPolygonsColoring(id).textures = textures
+        response_function: async () => {
+          const dataStyleStateStore = useDataStyleStateStore()
+          await dataStyleStateStore.mutateStyle(id, (style) => {
+            style.polygons.coloring.textures = textures
+          })
           console.log(
             setMeshPolygonsTextures.name,
             { id },

@@ -17,20 +17,29 @@ export function useMeshPolyhedraColorStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).color
   }
   function setMeshPolyhedraColor(id, color) {
-    return viewerStore.request(
-      meshPolyhedraColorSchemas,
-      { id, color },
-      {
-        response_function: () => {
-          meshPolyhedraCommonStyle.meshPolyhedraColoring(id).color = color
-          console.log(
-            setMeshPolyhedraColor.name,
-            { id },
-            JSON.stringify(meshPolyhedraColor(id)),
-          )
+    const updateState = async () => {
+      const dataStyleStateStore = useDataStyleStateStore()
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.polyhedra.coloring.color = color
+      })
+      console.log(
+        setMeshPolyhedraColor.name,
+        { id },
+        JSON.stringify(meshPolyhedraColor(id)),
+      )
+    }
+
+    if (meshPolyhedraColorSchemas) {
+      return viewerStore.request(
+        meshPolyhedraColorSchemas,
+        { id, color },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

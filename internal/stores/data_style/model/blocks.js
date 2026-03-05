@@ -18,23 +18,32 @@ export function useModelBlocksStyle() {
     return dataStyleStateStore.getStyle(id).blocks
   }
   function modelBlockStyle(id, block_id) {
-    if (!modelBlocksStyle(id)[block_id]) {
-      modelBlocksStyle(id)[block_id] = {}
-    }
-    return modelBlocksStyle(id)[block_id]
+    return dataStyleStateStore.getComponentStyle(id, block_id)
   }
 
   function modelBlockVisibility(id, block_id) {
     return modelBlockStyle(id, block_id).visibility
   }
 
-  function saveModelBlockVisibility(id, block_id, visibility) {
-    modelBlockStyle(id, block_id).visibility = visibility
-  }
   async function setModelBlocksVisibility(id, block_ids, visibility) {
     if (!block_ids || block_ids.length === 0) {
       return
     }
+
+    const updateState = async () => {
+      for (const block_id of block_ids) {
+        await dataStyleStateStore.mutateComponentStyle(id, block_id, (style) => {
+          style.visibility = visibility
+        })
+      }
+      console.log(
+        setModelBlocksVisibility.name,
+        { id },
+        { block_ids },
+        modelBlockVisibility(id, block_ids[0]),
+      )
+    }
+
     const blocks_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       block_ids,
@@ -44,38 +53,46 @@ export function useModelBlocksStyle() {
         "[setModelBlocksVisibility] No viewer IDs found, skipping visibility request",
         { id, block_ids },
       )
+      await updateState()
       return
     }
-    return viewerStore.request(
-      model_blocks_schemas.visibility,
-      { id, block_ids: blocks_viewer_ids, visibility },
-      {
-        response_function: () => {
-          for (const block_id of block_ids) {
-            saveModelBlockVisibility(id, block_id, visibility)
-          }
-          console.log(
-            setModelBlocksVisibility.name,
-            { id },
-            { block_ids },
-            modelBlockVisibility(id, block_ids[0]),
-          )
+
+    if (model_blocks_schemas?.visibility) {
+      return viewerStore.request(
+        model_blocks_schemas.visibility,
+        { id, block_ids: blocks_viewer_ids, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      await updateState()
+    }
   }
   function modelBlockColor(id, block_id) {
     return modelBlockStyle(id, block_id).color
   }
 
-  function saveModelBlockColor(id, block_id, color) {
-    modelBlockStyle(id, block_id).color = color
-  }
 
   async function setModelBlocksColor(id, block_ids, color) {
     if (!block_ids || block_ids.length === 0) {
       return
     }
+
+    const updateState = async () => {
+      for (const block_id of block_ids) {
+        await dataStyleStateStore.mutateComponentStyle(id, block_id, (style) => {
+          style.color = color
+        })
+      }
+      console.log(
+        setModelBlocksColor.name,
+        { id },
+        { block_ids },
+        JSON.stringify(modelBlockColor(id, block_ids[0])),
+      )
+    }
+
     const blocks_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       block_ids,
@@ -85,29 +102,24 @@ export function useModelBlocksStyle() {
         "[setModelBlocksColor] No viewer IDs found, skipping color request",
         { id, block_ids },
       )
+      await updateState()
       return
     }
-    return viewerStore.request(
-      model_blocks_schemas.color,
-      { id, block_ids: blocks_viewer_ids, color },
-      {
-        response_function: () => {
-          for (const block_id of block_ids) {
-            saveModelBlockColor(id, block_id, color)
-          }
 
-          console.log(
-            setModelBlocksColor.name,
-            { id },
-            { block_ids },
-            JSON.stringify(modelBlockColor(id, block_ids[0])),
-          )
+    if (model_blocks_schemas?.color) {
+      return viewerStore.request(
+        model_blocks_schemas.color,
+        { id, block_ids: blocks_viewer_ids, color },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      await updateState()
+    }
   }
 
-  async function applyModelBlocksStyle(id) {
+  async function setModelBlocksDefaultStyle(id) {
     const style = modelBlocksStyle(id)
     const blocks_ids = await dataStore.getBlocksGeodeIds(id)
     return Promise.all([
@@ -116,11 +128,16 @@ export function useModelBlocksStyle() {
     ])
   }
 
+  async function applyModelBlocksStyle(id) {
+    return setModelBlocksDefaultStyle(id)
+  }
+
   return {
     modelBlockVisibility,
     modelBlockColor,
     setModelBlocksVisibility,
     setModelBlocksColor,
     applyModelBlocksStyle,
+    setModelBlocksDefaultStyle,
   }
 }

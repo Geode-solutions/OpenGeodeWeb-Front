@@ -19,36 +19,52 @@ export function useModelPointsStyle() {
     return modelPointsStyle(id).visibility
   }
   function setModelPointsVisibility(id, visibility) {
-    return viewerStore.request(
-      model_points_schemas.visibility,
-      { id, visibility },
-      {
-        response_function: () => {
-          modelPointsStyle(id).visibility = visibility
-          console.log(
-            setModelPointsVisibility.name,
-            { id },
-            modelPointsVisibility(id),
-          )
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.points.visibility = visibility
+      })
+      console.log(
+        setModelPointsVisibility.name,
+        { id },
+        modelPointsVisibility(id),
+      )
+    }
+
+    if (model_points_schemas?.visibility) {
+      return viewerStore.request(
+        model_points_schemas.visibility,
+        { id, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   function modelPointsSize(id) {
     return modelPointsStyle(id).size
   }
   function setModelPointsSize(id, size) {
-    return viewerStore.request(
-      model_points_schemas.size,
-      { id, size },
-      {
-        response_function: () => {
-          modelPointsStyle(id).size = size
-          console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.points.size = size
+      })
+      console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
+    }
+
+    if (model_points_schemas?.size) {
+      return viewerStore.request(
+        model_points_schemas.size,
+        { id, size },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   function applyModelPointsStyle(id) {

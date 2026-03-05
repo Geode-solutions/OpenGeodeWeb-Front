@@ -17,20 +17,29 @@ export function useMeshCellsVisibilityStyle() {
     return meshCellsCommonStyle.meshCellsStyle(id).visibility
   }
   function setMeshCellsVisibility(id, visibility) {
-    return viewerStore.request(
-      meshCellsVisibilitySchema,
-      { id, visibility },
-      {
-        response_function: () => {
-          meshCellsCommonStyle.meshCellsStyle(id).visibility = visibility
-          console.log(
-            setMeshCellsVisibility.name,
-            { id },
-            meshCellsVisibility(id),
-          )
+    const updateState = async () => {
+      const dataStyleStateStore = useDataStyleStateStore()
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.cells.visibility = visibility
+      })
+      console.log(
+        setMeshCellsVisibility.name,
+        { id },
+        meshCellsVisibility(id),
+      )
+    }
+
+    if (meshCellsVisibilitySchema) {
+      return viewerStore.request(
+        meshCellsVisibilitySchema,
+        { id, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

@@ -18,22 +18,35 @@ export function useModelSurfacesStyle() {
     return dataStyleStateStore.getStyle(id).surfaces
   }
   function modelSurfaceStyle(id, surface_id) {
-    if (!modelSurfacesStyle(id)[surface_id]) {
-      modelSurfacesStyle(id)[surface_id] = {}
-    }
-    return modelSurfacesStyle(id)[surface_id]
+    return dataStyleStateStore.getComponentStyle(id, surface_id)
   }
 
   function modelSurfaceVisibility(id, surface_id) {
     return modelSurfaceStyle(id, surface_id).visibility
   }
-  function saveModelSurfaceVisibility(id, surface_id, visibility) {
-    modelSurfaceStyle(id, surface_id).visibility = visibility
-  }
   async function setModelSurfacesVisibility(id, surface_ids, visibility) {
     if (!surface_ids || surface_ids.length === 0) {
       return
     }
+
+    const updateState = async () => {
+      for (const surface_id of surface_ids) {
+        await dataStyleStateStore.mutateComponentStyle(
+          id,
+          surface_id,
+          (style) => {
+            style.visibility = visibility
+          },
+        )
+      }
+      console.log(
+        setModelSurfacesVisibility.name,
+        { id },
+        { surface_ids },
+        modelSurfaceVisibility(id, surface_ids[0]),
+      )
+    }
+
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       surface_ids,
@@ -43,37 +56,45 @@ export function useModelSurfacesStyle() {
         "[setModelSurfacesVisibility] No viewer IDs found, skipping visibility request",
         { id, surface_ids },
       )
+      await updateState()
       return
     }
-    return viewerStore.request(
-      model_surfaces_schemas.visibility,
-      { id, block_ids: surface_viewer_ids, visibility },
-      {
-        response_function: () => {
-          for (const surface_id of surface_ids) {
-            saveModelSurfaceVisibility(id, surface_id, visibility)
-          }
-          console.log(
-            setModelSurfacesVisibility.name,
-            { id },
-            { surface_ids },
-            modelSurfaceVisibility(id, surface_ids[0]),
-          )
+
+    if (model_surfaces_schemas?.visibility) {
+      return viewerStore.request(
+        model_surfaces_schemas.visibility,
+        { id, block_ids: surface_viewer_ids, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      await updateState()
+    }
   }
   function modelSurfaceColor(id, surface_id) {
     return modelSurfaceStyle(id, surface_id).color
-  }
-  function saveModelSurfaceColor(id, surface_id, color) {
-    modelSurfaceStyle(id, surface_id).color = color
   }
 
   async function setModelSurfacesColor(id, surface_ids, color) {
     if (!surface_ids || surface_ids.length === 0) {
       return
     }
+
+    const updateState = async () => {
+      for (const surface_id of surface_ids) {
+        await dataStyleStateStore.mutateComponentStyle(id, surface_id, (style) => {
+          style.color = color
+        })
+      }
+      console.log(
+        setModelSurfacesColor.name,
+        { id },
+        { surface_ids },
+        JSON.stringify(modelSurfaceColor(id, surface_ids[0])),
+      )
+    }
+
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       surface_ids,
@@ -83,28 +104,24 @@ export function useModelSurfacesStyle() {
         "[setModelSurfacesColor] No viewer IDs found, skipping color request",
         { id, surface_ids },
       )
+      await updateState()
       return
     }
-    return viewerStore.request(
-      model_surfaces_schemas.color,
-      { id, block_ids: surface_viewer_ids, color },
-      {
-        response_function: () => {
-          for (const surface_id of surface_ids) {
-            saveModelSurfaceColor(id, surface_id, color)
-          }
-          console.log(
-            setModelSurfacesColor.name,
-            { id },
-            { surface_ids },
-            JSON.stringify(modelSurfaceColor(id, surface_ids[0])),
-          )
+
+    if (model_surfaces_schemas?.color) {
+      return viewerStore.request(
+        model_surfaces_schemas.color,
+        { id, block_ids: surface_viewer_ids, color },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      await updateState()
+    }
   }
 
-  async function applyModelSurfacesStyle(id) {
+  async function setModelSurfacesDefaultStyle(id) {
     const style = modelSurfacesStyle(id)
     const surface_ids = await dataStore.getSurfacesGeodeIds(id)
     return Promise.all([
@@ -113,11 +130,16 @@ export function useModelSurfacesStyle() {
     ])
   }
 
+  async function applyModelSurfacesStyle(id) {
+    return setModelSurfacesDefaultStyle(id)
+  }
+
   return {
     modelSurfaceVisibility,
     modelSurfaceColor,
     setModelSurfacesVisibility,
     setModelSurfacesColor,
     applyModelSurfacesStyle,
+    setModelSurfacesDefaultStyle,
   }
 }

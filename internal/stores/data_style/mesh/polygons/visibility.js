@@ -17,20 +17,29 @@ export function useMeshPolygonsVisibilityStyle() {
     return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility
   }
   function setMeshPolygonsVisibility(id, visibility) {
-    return viewerStore.request(
-      meshPolygonsVisibilitySchema,
-      { id, visibility },
-      {
-        response_function: () => {
-          meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility = visibility
-          console.log(
-            setMeshPolygonsVisibility.name,
-            { id },
-            meshPolygonsVisibility(id),
-          )
+    const updateState = async () => {
+      const dataStyleStateStore = useDataStyleStateStore()
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.polygons.visibility = visibility
+      })
+      console.log(
+        setMeshPolygonsVisibility.name,
+        { id },
+        meshPolygonsVisibility(id),
+      )
+    }
+
+    if (meshPolygonsVisibilitySchema) {
+      return viewerStore.request(
+        meshPolygonsVisibilitySchema,
+        { id, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

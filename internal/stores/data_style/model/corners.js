@@ -18,23 +18,32 @@ export function useModelCornersStyle() {
     return dataStyleStateStore.getStyle(id).corners
   }
   function modelCornerStyle(id, corner_id) {
-    if (!modelCornersStyle(id)[corner_id]) {
-      modelCornersStyle(id)[corner_id] = {}
-    }
-    return modelCornersStyle(id)[corner_id]
+    return dataStyleStateStore.getComponentStyle(id, corner_id)
   }
 
   function modelCornerVisibility(id, corner_id) {
     return modelCornerStyle(id, corner_id).visibility
   }
 
-  function saveModelCornerVisibility(id, corner_id, visibility) {
-    modelCornerStyle(id, corner_id).visibility = visibility
-  }
   async function setModelCornersVisibility(id, corner_ids, visibility) {
     if (!corner_ids || corner_ids.length === 0) {
       return
     }
+
+    const updateState = async () => {
+      for (const corner_id of corner_ids) {
+        await dataStyleStateStore.mutateComponentStyle(id, corner_id, (style) => {
+          style.visibility = visibility
+        })
+      }
+      console.log(
+        setModelCornersVisibility.name,
+        { id },
+        { corner_ids },
+        modelCornerVisibility(id, corner_ids[0]),
+      )
+    }
+
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       corner_ids,
@@ -44,39 +53,47 @@ export function useModelCornersStyle() {
         "[setModelCornersVisibility] No viewer IDs found, skipping visibility request",
         { id, corner_ids },
       )
+      await updateState()
       return
     }
-    return viewerStore.request(
-      model_corners_schemas.visibility,
-      { id, block_ids: corner_viewer_ids, visibility },
-      {
-        response_function: () => {
-          for (const corner_id of corner_ids) {
-            saveModelCornerVisibility(id, corner_id, visibility)
-          }
-          console.log(
-            setModelCornersVisibility.name,
-            { id },
-            { corner_ids },
-            modelCornerVisibility(id, corner_ids[0]),
-          )
+
+    if (model_corners_schemas?.visibility) {
+      return viewerStore.request(
+        model_corners_schemas.visibility,
+        { id, block_ids: corner_viewer_ids, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      await updateState()
+    }
   }
 
   function modelCornerColor(id, corner_id) {
     return modelCornerStyle(id, corner_id).color
   }
 
-  function saveModelCornerColor(id, corner_id, color) {
-    modelCornerStyle(id, corner_id).color = color
-  }
 
   async function setModelCornersColor(id, corner_ids, color) {
     if (!corner_ids || corner_ids.length === 0) {
       return
     }
+
+    const updateState = async () => {
+      for (const corner_id of corner_ids) {
+        await dataStyleStateStore.mutateComponentStyle(id, corner_id, (style) => {
+          style.color = color
+        })
+      }
+      console.log(
+        setModelCornersColor.name,
+        { id },
+        { corner_ids },
+        JSON.stringify(modelCornerColor(id, corner_ids[0])),
+      )
+    }
+
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
       id,
       corner_ids,
@@ -86,35 +103,34 @@ export function useModelCornersStyle() {
         "[setModelCornersColor] No viewer IDs found, skipping color request",
         { id, corner_ids },
       )
+      await updateState()
       return
     }
-    return viewerStore.request(
-      model_corners_schemas.color,
-      { id, block_ids: corner_viewer_ids, color },
-      {
-        response_function: () => {
-          for (const corner_id of corner_ids) {
-            saveModelCornerColor(id, corner_id, color)
-          }
-          console.log(
-            setModelCornersColor.name,
-            { id },
-            { corner_ids },
-            JSON.stringify(modelCornerColor(id, corner_ids[0])),
-          )
+
+    if (model_corners_schemas?.color) {
+      return viewerStore.request(
+        model_corners_schemas.color,
+        { id, block_ids: corner_viewer_ids, color },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      await updateState()
+    }
   }
 
   async function applyModelCornersStyle(id) {
     const style = modelCornersStyle(id)
     const corner_ids = await dataStore.getCornersGeodeIds(id)
-    console.log(applyModelCornersStyle.name, { id }, { corner_ids })
     return Promise.all([
       setModelCornersVisibility(id, corner_ids, style.visibility),
       setModelCornersColor(id, corner_ids, style.color),
     ])
+  }
+
+  async function setModelCornersDefaultStyle(id) {
+    return applyModelCornersStyle(id)
   }
 
   return {
@@ -123,5 +139,6 @@ export function useModelCornersStyle() {
     setModelCornersVisibility,
     setModelCornersColor,
     applyModelCornersStyle,
+    setModelCornersDefaultStyle,
   }
 }

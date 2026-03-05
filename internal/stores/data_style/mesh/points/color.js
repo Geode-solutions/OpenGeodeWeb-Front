@@ -17,20 +17,29 @@ export function useMeshPointsColorStyle() {
     return meshPointsCommonStyle.meshPointsColoring(id).color
   }
   function setMeshPointsColor(id, color) {
-    return viewerStore.request(
-      meshPointsColorSchemas,
-      { id, color },
-      {
-        response_function: () => {
-          meshPointsCommonStyle.meshPointsColoring(id).color = color
-          console.log(
-            setMeshPointsColor.name,
-            { id },
-            JSON.stringify(meshPointsColor(id)),
-          )
+    const updateState = async () => {
+      const dataStyleStateStore = useDataStyleStateStore()
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.points.coloring.color = color
+      })
+      console.log(
+        setMeshPointsColor.name,
+        { id },
+        JSON.stringify(meshPointsColor(id)),
+      )
+    }
+
+    if (meshPointsColorSchemas) {
+      return viewerStore.request(
+        meshPointsColorSchemas,
+        { id, color },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

@@ -17,20 +17,29 @@ export function useMeshEdgesColorStyle() {
     return meshEdgesCommonStyle.meshEdgesColoring(id).color
   }
   function setMeshEdgesColor(id, color) {
-    return viewerStore.request(
-      meshEdgesColorSchemas,
-      { id, color },
-      {
-        response_function: () => {
-          meshEdgesCommonStyle.meshEdgesColoring(id).color = color
-          console.log(
-            setMeshEdgesColor.name,
-            { id },
-            JSON.stringify(meshEdgesColor(id)),
-          )
+    const updateState = async () => {
+      const dataStyleStateStore = useDataStyleStateStore()
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.edges.coloring.color = color
+      })
+      console.log(
+        setMeshEdgesColor.name,
+        { id },
+        JSON.stringify(meshEdgesColor(id)),
+      )
+    }
+
+    if (meshEdgesColorSchemas) {
+      return viewerStore.request(
+        meshEdgesColorSchemas,
+        { id, color },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

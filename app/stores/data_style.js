@@ -11,12 +11,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const modelStyleStore = useModelStyle()
   const dataStore = useDataStore()
 
-  function addDataStyle(id, geode_object) {
-    dataStyleState.styles[id] = getDefaultStyle(geode_object)
+  async function addDataStyle(id, geode_object) {
+    await dataStyleState.updateStyle(id, getDefaultStyle(geode_object))
   }
 
   async function setVisibility(id, visibility) {
-    const item = await database.data.get(id)
+    const item = await dataStore.item(id)
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
       throw new Error(`Item not found or not loaded: ${id}`)
@@ -32,7 +32,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function applyDefaultStyle(id) {
-    const item = await database.data.get(id)
+    const item = await dataStore.item(id)
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
       throw new Error(`Item not found or not loaded: ${id}`)
@@ -51,13 +51,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     return { styles: dataStyleState.styles }
   }
 
-  function importStores(snapshot) {
+  async function importStores(snapshot) {
     const stylesSnapshot = snapshot.styles || {}
-    for (const id of Object.keys(dataStyleState.styles)) {
-      delete dataStyleState.styles[id]
-    }
+    await database.data_style.clear()
     for (const [id, style] of Object.entries(stylesSnapshot)) {
-      dataStyleState.styles[id] = style
+      await dataStyleState.updateStyle(id, style)
     }
   }
 

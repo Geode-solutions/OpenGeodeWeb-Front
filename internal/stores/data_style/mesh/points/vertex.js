@@ -30,14 +30,20 @@ export function useMeshPointsVertexAttributeStyle() {
     })
   }
 
-  function setMeshPointsVertexAttributeStoredConfig(
+  async function setMeshPointsVertexAttributeStoredConfig(
     id,
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshPointsVertexAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap }
-    return storedConfigs[name]
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      style.points.coloring.vertex.storedConfigs[name] = {
+        minimum,
+        maximum,
+        colorMap,
+      }
+    })
+    return meshPointsVertexAttributeStoredConfig(id, name)
   }
 
   function meshPointsVertexAttributeName(id) {
@@ -49,26 +55,42 @@ export function useMeshPointsVertexAttributeStyle() {
     return meshPointsVertexAttribute(id).name
   }
   function setMeshPointsVertexAttributeName(id, name) {
-    console.log(setMeshPointsVertexAttributeName.name, { id, name })
-    return viewerStore.request(
-      meshPointsVertexAttributeSchemas.name,
-      { id, name },
-      {
-        response_function: async () => {
-          meshPointsVertexAttribute(id).name = name
-          const { minimum, maximum } = meshPointsVertexAttributeStoredConfig(
-            id,
-            name,
-          )
-          await setMeshPointsVertexAttributeRange(id, minimum, maximum)
-          console.log(
-            setMeshPointsVertexAttributeName.name,
-            { id },
-            meshPointsVertexAttributeName(id),
-          )
+    const dataStyleStateStore = useDataStyleStateStore()
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        const vertex = style.points.coloring.vertex
+        vertex.name = name
+        if (!(name in vertex.storedConfigs)) {
+          vertex.storedConfigs[name] = {
+            minimum: undefined,
+            maximum: undefined,
+            colorMap: undefined,
+          }
+        }
+      })
+      const { minimum, maximum } = meshPointsVertexAttributeStoredConfig(
+        id,
+        name,
+      )
+      await setMeshPointsVertexAttributeRange(id, minimum, maximum)
+      console.log(
+        setMeshPointsVertexAttributeName.name,
+        { id },
+        meshPointsVertexAttributeName(id),
+      )
+    }
+
+    if (meshPointsVertexAttributeSchemas?.name) {
+      return viewerStore.request(
+        meshPointsVertexAttributeSchemas.name,
+        { id, name },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   function meshPointsVertexAttributeRange(id) {
@@ -77,12 +99,18 @@ export function useMeshPointsVertexAttributeStyle() {
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
-  function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
+  async function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
     const name = meshPointsVertexAttributeName(id)
-    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name)
-    storedConfig.minimum = minimum
-    storedConfig.maximum = maximum
-    return setMeshPointsVertexAttributeColorMap(id, storedConfig.colorMap)
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      const storedConfig = style.points.coloring.vertex.storedConfigs[name]
+      storedConfig.minimum = minimum
+      storedConfig.maximum = maximum
+    })
+    return setMeshPointsVertexAttributeColorMap(
+      id,
+      meshPointsVertexAttributeColorMap(id),
+    )
   }
 
   function meshPointsVertexAttributeColorMap(id) {
@@ -94,37 +122,46 @@ export function useMeshPointsVertexAttributeStyle() {
   function setMeshPointsVertexAttributeColorMap(id, colorMap) {
     const name = meshPointsVertexAttributeName(id)
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name)
+    const dataStyleStateStore = useDataStyleStateStore()
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.points.coloring.vertex.storedConfigs[name].colorMap = colorMap
+      })
+      console.log(
+        setMeshPointsVertexAttributeColorMap.name,
+        { id },
+        meshPointsVertexAttributeColorMap(id),
+      )
+    }
+
     if (
       storedConfig.minimum === undefined ||
       storedConfig.maximum === undefined ||
       colorMap === undefined
     ) {
-      storedConfig.colorMap = colorMap
-      return
+      return updateState()
     }
-    const points = getRGBPointsFromPreset(colorMap)
-    const { minimum, maximum } = storedConfig
 
-    console.log(setMeshPointsVertexAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    })
-    return viewerStore.request(
-      meshPointsVertexAttributeSchemas.color_map,
-      { id, points, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.colorMap = colorMap
-          console.log(
-            setMeshPointsVertexAttributeColorMap.name,
-            { id },
-            meshPointsVertexAttributeColorMap(id),
-          )
+    if (meshPointsVertexAttributeSchemas?.color_map) {
+      const points = getRGBPointsFromPreset(colorMap)
+      const { minimum, maximum } = storedConfig
+
+      console.log(setMeshPointsVertexAttributeColorMap.name, {
+        id,
+        minimum,
+        maximum,
+        colorMap,
+      })
+      return viewerStore.request(
+        meshPointsVertexAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {
