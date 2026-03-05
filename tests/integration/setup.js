@@ -1,5 +1,5 @@
 // Node.js imports
-import { dirname, path } from "node:path"
+import path, { dirname } from "node:path"
 import { WebSocket } from "ws"
 import { fileURLToPath } from "node:url"
 import { v4 as uuidv4 } from "uuid"

@@ -22,14 +22,11 @@ const geodeStore = useGeodeStore()
 beforeEach(() => {
   geodeStore.base_url = ""
 
-  geodeStore.request = vi.fn((schema, params, callbacks) => {
+  geodeStore.request = vi.fn(() => {
     const response = {
       geode_objects_and_output_extensions: {
         BRep: { msh: { is_saveable: true } },
       },
-    }
-    if (callbacks?.response_function) {
-      callbacks.response_function(response)
     }
     return Promise.resolve(response)
   })

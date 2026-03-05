@@ -34,7 +34,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const is_moving = ref(false)
   const zScale = ref(1)
   let viewStream = undefined
-  let gridActor = undefined
+  const gridActor = undefined
 
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
@@ -248,29 +248,29 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const z_scale = snapshot.zScale
 
     function applyCamera() {
-      const { camera_options } = snapshot
-      if (!camera_options) {
+      const { camera_options: snapshot_camera_options } = snapshot
+      if (!snapshot_camera_options) {
         return
       }
 
       const renderer = genericRenderWindow.value.getRenderer()
       const camera = renderer.getActiveCamera()
 
-      camera.setFocalPoint(...camera_options.focal_point)
-      camera.setViewUp(...camera_options.view_up)
-      camera.setPosition(...camera_options.position)
-      camera.setViewAngle(camera_options.view_angle)
-      camera.setClippingRange(...camera_options.clipping_range)
+      camera.setFocalPoint(...snapshot_camera_options.focal_point)
+      camera.setViewUp(...snapshot_camera_options.view_up)
+      camera.setPosition(...snapshot_camera_options.position)
+      camera.setViewAngle(snapshot_camera_options.view_angle)
+      camera.setClippingRange(...snapshot_camera_options.clipping_range)
 
       genericRenderWindow.value.getRenderWindow().render()
 
       const payload = {
         camera_options: {
-          focal_point: [...camera_options.focal_point],
-          view_up: [...camera_options.view_up],
-          position: [...camera_options.position],
-          view_angle: camera_options.view_angle,
-          clipping_range: [...camera_options.clipping_range],
+          focal_point: [...snapshot_camera_options.focal_point],
+          view_up: [...snapshot_camera_options.view_up],
+          position: [...snapshot_camera_options.position],
+          view_angle: snapshot_camera_options.view_angle,
+          clipping_range: [...snapshot_camera_options.clipping_range],
         },
       }
       return viewerStore.request(
