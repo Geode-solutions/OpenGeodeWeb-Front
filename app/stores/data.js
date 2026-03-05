@@ -43,12 +43,12 @@ export const useDataStore = defineStore("data", () => {
     }
 
     const componentsByType = {}
-    for (const item of items) {
-      if (componentTitles[item.type]) {
-        if (!componentsByType[item.type]) {
-          componentsByType[item.type] = []
+    for (const component_item of items) {
+      if (componentTitles[component_item.type]) {
+        if (!componentsByType[component_item.type]) {
+          componentsByType[component_item.type] = []
         }
-        componentsByType[item.type].push(item)
+        componentsByType[component_item.type].push(component_item)
       }
     }
 
@@ -138,9 +138,9 @@ export const useDataStore = defineStore("data", () => {
     )
   }
 
-  async function getMeshComponentGeodeIds(id, meshComponentType) {
+  async function getMeshComponentGeodeIds(id, component_type) {
     const components = await database.model_components
-      .where({ id, type: meshComponentType })
+      .where({ id, type: component_type })
       .toArray()
     return components.map((component) => component.geode_id)
   }
