@@ -13,12 +13,12 @@ const PANEL_WIDTH = 320
 const Z_SCALE = 1.5
 const STORES_SLICE_START = 1
 
-vi.mock("../../../internal/utils/viewer_call", () => ({
+vi.mock(import("../../../internal/utils/viewer_call"), () => ({
   viewer_call: vi.fn(async () => {
     await Promise.resolve()
   }),
 }))
-vi.mock("../../../app/stores/hybrid_viewer", () => ({
+vi.mock(import("../../../app/stores/hybrid_viewer"), () => ({
   useHybridViewerStore: () => ({
     $id: "hybridViewer",
     initHybridViewer: vi.fn(),
