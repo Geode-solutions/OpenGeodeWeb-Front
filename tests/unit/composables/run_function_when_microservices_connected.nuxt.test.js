@@ -5,7 +5,7 @@ import { flushPromises } from "@vue/test-utils"
 // Local imports
 import { Status } from "@ogw_front/utils/status"
 import { run_function_when_microservices_connected } from "@ogw_front/composables/run_function_when_microservices_connected"
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"

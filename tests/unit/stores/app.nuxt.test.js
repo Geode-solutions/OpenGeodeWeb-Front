@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 
 import { useAppStore } from "@ogw_front/stores/app"
 
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 
 // Constants
 const SINGLE_STORE_LENGTH = 1

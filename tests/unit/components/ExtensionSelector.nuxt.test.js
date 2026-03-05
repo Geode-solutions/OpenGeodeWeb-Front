@@ -6,7 +6,7 @@ import { nextTick } from "vue"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 // Local imports
-import { setupActivePinia, vuetify } from "../../utils"
+import { setupActivePinia, vuetify } from "@ogw_tests/utils"
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 

@@ -12,6 +12,11 @@ const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY
 
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@ogw_tests": path.resolve(__dirname, "."),
+    },
+  },
   test: {
     globals: false,
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],

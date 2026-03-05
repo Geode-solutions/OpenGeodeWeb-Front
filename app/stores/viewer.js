@@ -9,7 +9,7 @@ import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { useInfraStore } from "@ogw_front/stores/infra"
-import { viewer_call } from "../../internal/utils/viewer_call"
+import { viewer_call } from "@ogw_internal/utils/viewer_call"
 
 const MS_PER_SECOND = 1000
 const SECONDS_PER_REQUEST = 10

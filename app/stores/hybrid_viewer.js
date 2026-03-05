@@ -6,7 +6,7 @@ import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
 
 import { Status } from "@ogw_front/utils/status"
-import { database } from "../../internal/database/database.js"
+import { database } from "@ogw_internal/database/database.js"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 

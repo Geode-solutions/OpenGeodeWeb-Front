@@ -3,7 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStore } from "@ogw_front/stores/data"
-import { useDataStyleStateStore } from "../state"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useModelBlocksStyle } from "./blocks"
 import { useModelCornersStyle } from "./corners"

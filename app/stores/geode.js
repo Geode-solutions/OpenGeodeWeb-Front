@@ -1,5 +1,5 @@
 import { Status } from "@ogw_front/utils/status"
-import { api_fetch } from "../../internal/utils/api_fetch"
+import { api_fetch } from "@ogw_internal/utils/api_fetch"
 import { appMode } from "@ogw_front/utils/app_mode"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"

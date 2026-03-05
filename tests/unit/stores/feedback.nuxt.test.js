@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, expectTypeOf, test } from "vitest"
 
 // Local imports
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 const ERROR_500 = 500

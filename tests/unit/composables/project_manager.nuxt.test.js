@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 
 // Local imports
 import { appMode } from "@ogw_front/utils/app_mode"
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useProjectManager } from "@ogw_front/composables/project_manager"
 
 // Constants
@@ -135,7 +135,7 @@ const hybridViewerStoreMock = {
 
 // MOCKS
 vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ snapshot: snapshotMock }))
-vi.mock(import("../../../internal/utils/viewer_call"), () => ({
+vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: viewer_call_mock_fn,
 }))
 

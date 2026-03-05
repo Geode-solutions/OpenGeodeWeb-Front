@@ -4,7 +4,7 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
 // Local imports
 import { Status } from "@ogw_front/utils/status"
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 
