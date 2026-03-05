@@ -33,7 +33,11 @@ describe("recaptcha", () => {
 
   describe("right params", () => {
     test("name", () => {
-      const result = check_recaptcha_params(default_name, default_email, default_launch)
+      const result = check_recaptcha_params(
+        default_name,
+        default_email,
+        default_launch,
+      )
       expect(result.statusCode).toBe(success)
     })
   })
