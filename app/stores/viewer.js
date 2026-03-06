@@ -87,8 +87,9 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
           status.value = Status.CONNECTING
-          const { default: SmartConnect } =
-            await import("wslink/src/SmartConnect")
+          const { default: SmartConnect } = await import(
+            "wslink/src/SmartConnect"
+          )
           vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
           const config_obj = { application: "Viewer" }
@@ -122,8 +123,9 @@ export const useViewerStore = defineStore(
           })
 
           // Connect
-          const { connectImageStream } =
-            await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+          const { connectImageStream } = await import(
+            "@kitware/vtk.js/Rendering/Misc/RemoteView"
+          )
           client.value = await clientToConnect.connect(config_obj)
           connectImageStream(client.value.getConnection().getSession())
           clientToConnect.endBusy()
@@ -170,6 +172,7 @@ export const useViewerStore = defineStore(
       timeout = request_timeout,
     ) {
       console.log("[VIEWER] Request:", schema.$id)
+      const start = Date.now()
 
       // Get current store instance to pass to viewer_call
       const store = useViewerStore()
@@ -180,7 +183,13 @@ export const useViewerStore = defineStore(
         {
           ...callbacks,
           response_function: async (response) => {
-            console.log("[VIEWER] Request completed:", schema.$id)
+            console.log(
+              "[VIEWER] Request completed:",
+              schema.$id,
+              "in",
+              (Date.now() - start) / 1_000,
+              "s",
+            )
             if (callbacks.response_function) {
               await callbacks.response_function(response)
             }
