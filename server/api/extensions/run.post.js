@@ -7,9 +7,9 @@ import { createError, defineEventHandler, readBody } from "h3"
 import _ from "lodash"
 
 // Local imports
-import { extensionsConf } from "../../../app/utils/config.js"
-import { unzipFile } from "../../../app/utils/server.js"
-import { runBack } from "../../../app/utils/local/microservices.js"
+import { extensionsConf } from "@geode/opengeodeweb-front/app/utils/config.js"
+import { unzipFile } from "@geode/opengeodeweb-front/app/utils/server.js"
+import { runBack } from "@geode/opengeodeweb-front/app/utils/local/microservices.js"
 
 const CODE_200 = 200
 

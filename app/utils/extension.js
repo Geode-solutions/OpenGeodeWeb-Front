@@ -15,11 +15,8 @@ async function uploadExtension(file) {
 
 async function runExtensions() {
   const projectFolderPath = appStore.projectFolderPath
-  console.log("runExtensions", { projectFolderPath })
   const { PROJECT: projectName } = useRuntimeConfig().public
-  console.log("runExtensions", { projectName })
   const params = { projectFolderPath, projectName }
-  console.log("runExtensions", { params })
 
   const schema = {
     $id: "/api/extensions/run",

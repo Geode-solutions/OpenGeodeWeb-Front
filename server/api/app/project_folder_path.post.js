@@ -14,7 +14,6 @@ export default defineEventHandler(async (event) => {
     const { PROJECT } = await readBody(event)
     const projectFolderPath = generateProjectFolderPath(PROJECT)
     await createPath(projectFolderPath)
-    console.log("createProject", { projectFolderPath })
 
     return {
       statusCode: 200,

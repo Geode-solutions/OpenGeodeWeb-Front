@@ -19,7 +19,7 @@ import StreamZip from "node-stream-zip"
 import {
   confFolderPath,
   addExtensionToConf,
-} from "../../../app/utils/config.js"
+} from "@geode/opengeodeweb-front/app/utils/config.js"
 
 const CODE_201 = 201
 

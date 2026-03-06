@@ -60,12 +60,6 @@ export const useViewerStore = defineStore(
       return viewer_url
     })
 
-    const kill_metadatas = computed(() => {
-      return {
-        url: base_url.value,
-      }
-    })
-
     const is_busy = computed(() => request_counter.value > 0)
 
     function toggle_picking_mode(value) {
@@ -94,8 +88,9 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
           status.value = Status.CONNECTING
-          const { default: SmartConnect } =
-            await import("wslink/src/SmartConnect")
+          const { default: SmartConnect } = await import(
+            "wslink/src/SmartConnect"
+          )
           vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
           const config_obj = { application: "Viewer" }
@@ -129,8 +124,9 @@ export const useViewerStore = defineStore(
           })
 
           // Connect
-          const { connectImageStream } =
-            await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+          const { connectImageStream } = await import(
+            "@kitware/vtk.js/Rendering/Misc/RemoteView"
+          )
           client.value = await clientToConnect.connect(config_obj)
           connectImageStream(client.value.getConnection().getSession())
           clientToConnect.endBusy()
@@ -187,8 +183,8 @@ export const useViewerStore = defineStore(
 
       return appStore.request(schema, params, {
         response_function: (response) => {
+          console.log(`[VIEWER] Viewer launched on port ${response.port}`)
           this.default_local_port = response.port
-          console.log("[VIEWER] Viewer launched")
         },
       })
     }
@@ -244,7 +240,6 @@ export const useViewerStore = defineStore(
       start_request,
       stop_request,
       launch,
-      kill_metadatas,
       connect,
       request,
     }

@@ -4,7 +4,6 @@ import path from "node:path"
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest"
-// import { setup } from "@nuxt/test-utils/e2e"
 
 // Local imports
 import {

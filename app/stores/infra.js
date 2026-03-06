@@ -72,15 +72,10 @@ export const useInfraStore = defineStore("infra", {
           const microservices_with_launch = this.microservices.filter(
             (store) => store.launch,
           )
-          console.log("TEST PROJECT FOLDER PATH", appStore.projectFolderPath)
           const launch_promises = microservices_with_launch.map((store) =>
             store.launch({ projectFolderPath: appStore.projectFolderPath }),
           )
           await Promise.all(launch_promises)
-
-          // for (const [index, store] of microservices_with_launch.entries()) {
-          //   store.$patch({ default_local_port: ports[index] })
-          // }
         }
 
         this.status = Status.CREATED

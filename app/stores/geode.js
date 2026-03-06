@@ -40,12 +40,6 @@ export const useGeodeStore = defineStore("geode", {
       }
       return geode_url
     },
-    kill_metadatas() {
-      return {
-        url: `${this.base_url}/${back_schemas.opengeodeweb_back.kill.$id}`,
-        method: back_schemas.opengeodeweb_back.kill.methods[0],
-      }
-    },
     is_busy() {
       return this.request_counter > 0
     },
@@ -114,9 +108,8 @@ export const useGeodeStore = defineStore("geode", {
       console.log("[GEODE] params", params)
       return appStore.request(schema, params, {
         response_function: (response) => {
-          console.log("[GEODE] Back launched", { response })
+          console.log(`[GEODE] Back launched on port ${response.port}`)
           this.default_local_port = response.port
-          console.log("[GEODE] Back launched", this.default_local_port)
         },
       })
     },

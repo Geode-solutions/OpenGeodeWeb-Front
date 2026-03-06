@@ -1,6 +1,7 @@
 // Node imports
 import path from "node:path"
 
+// Local imports
 import package_json from "./package.json"
 
 export default defineNuxtConfig({
@@ -68,20 +69,6 @@ export default defineNuxtConfig({
         "lodash",
         "seedrandom",
       ],
-    },
-    server: {
-      watch: {
-        include: ["server/**"],
-      },
-    },
-  },
-
-  nitro: {
-    routeRules: {
-      "/api/extensions": { bodySize: 100 * 1024 * 1024 }, // 100MB
-    },
-    watchOptions: {
-      include: ["server/**"],
     },
   },
 })

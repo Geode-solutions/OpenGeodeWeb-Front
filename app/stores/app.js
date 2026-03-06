@@ -3,8 +3,6 @@ import { api_fetch } from "../../internal/utils/api_fetch.js"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 
-// import { initMicroservicesMetadatas } from "@ogw_front/utils/local/microservices.js"
-
 export const useAppStore = defineStore("app", () => {
   const stores = []
 
@@ -286,15 +284,8 @@ export const useAppStore = defineStore("app", () => {
 
     return request(schema, params, {
       response_function: async (response) => {
-        console.log("[GEODE] Request completed:", { response })
+        console.log(`[APP] ${response.projectFolderPath} created`)
         projectFolderPath.value = response.projectFolderPath
-
-        if (useInfraStore().app_mode !== appMode.CLOUD) {
-          // await initMicroservicesMetadatas(
-          //   path.join(projectFolderPath.value, "microservices.json"),
-          // )
-        }
-        console.log("[GEODE] Back launched")
       },
     })
   }
