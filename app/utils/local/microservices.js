@@ -44,13 +44,14 @@ async function runBack(executableName, executablePath, args = {}) {
 }
 
 async function runViewer(executableName, executablePath, args = {}) {
-  if (!args.projectFolderPath) {
+  const { projectFolderPath } = args
+  if (!projectFolderPath) {
     throw new Error("projectFolderPath is required")
   }
   const port = await getAvailablePort()
   const viewerArgs = [
     `--port ${port}`,
-    `--data_folder_path ${args.projectFolderPath}`,
+    `--data_folder_path ${projectFolderPath}`,
     `--timeout ${0}`,
   ]
   console.log("runViewer", executableName, executablePath, viewerArgs)

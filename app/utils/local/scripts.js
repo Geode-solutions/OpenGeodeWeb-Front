@@ -7,6 +7,9 @@ import path from "node:path"
 // Third party imports
 import pTimeout from "p-timeout"
 
+// Local imports
+import { executablePath, executableName } from "./path.js"
+
 const DEFAULT_TIMEOUT_SECONDS = 30
 const MILLISECONDS_PER_SECOND = 1000
 
@@ -28,15 +31,18 @@ async function waitForReady(child, expectedResponse) {
 }
 
 async function runScript(
-  executableName,
-  executablePath,
+  _executableName,
+  _executablePath,
   args,
   expectedResponse,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
-  const command = commandExistsSync(executableName)
-    ? executableName
-    : path.join(executablePath, executableName)
+  const command = commandExistsSync(_executableName)
+    ? _executableName
+    : path.join(
+        executablePath(_executablePath),
+        executableName(_executableName),
+      )
   console.log("runScript", command, args)
   const child = child_process.spawn(command, args, {
     encoding: "utf8",
