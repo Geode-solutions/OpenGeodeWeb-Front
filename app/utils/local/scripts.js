@@ -45,7 +45,7 @@ async function runScript(
   const command = commandExistsSync(_executableName)
     ? _executableName
     : path.join(
-        executablePath(_executablePath),
+        await executablePath(_executablePath),
         executableName(_executableName),
       )
   console.log("runScript", command, args)
