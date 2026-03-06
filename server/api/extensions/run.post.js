@@ -13,34 +13,22 @@ import { runBack } from "../../../app/utils/local/microservices.js"
 
 const CODE_200 = 200
 
-const extensionProcesses = new Map()
-
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    const projectName = "vease"
-    const { projectFolderPath } = body
-    console.log("runExtensions", { projectName, projectFolderPath })
+    const { projectFolderPath, projectName } = body
     const extensionsConfig = extensionsConf(projectName)
-    console.log("runExtensions", { extensionsConfig })
 
     const extensionsArray = []
-    console.log("runExtensions", { extensionsArray })
 
     for (const extensionID of Object.keys(extensionsConfig)) {
-      console.log("runExtensions", { extensionID })
       const extensionPath = extensionsConfig[extensionID].path
-      console.log("runExtensions", { extensionPath })
-
       const unzippedExtensionPath = await unzipFile(
         extensionPath,
         path.join(projectFolderPath, "extensions"),
       )
-      console.log("runExtensions", { unzippedExtensionPath })
       const metadataPath = path.join(unzippedExtensionPath, "metadata.json")
-      console.log("runExtensions", { metadataPath })
       const metadataContent = await fs.promises.readFile(metadataPath, "utf-8")
-      console.log("runExtensions", { metadataContent })
 
       if (!metadataContent) {
         throw createError({
@@ -80,25 +68,21 @@ export default defineEventHandler(async (event) => {
       const port = await runBack(backendExecutable, backendExecutablePath, {
         projectFolderPath,
       })
-      console.log("runExtensions after runBack", { port })
-      extensionProcesses.set(name, { port })
       extensionsArray.push({
         id,
         name,
         version,
         frontendContent,
-        backendPort: port,
+        port,
       })
     }
 
-    console.log("runExtensions before RETURN", { extensionsArray })
     return {
       statusCode: CODE_200,
       extensionsArray,
-      extensionProcesses,
     }
   } catch (error) {
-    console.error("[s] Error running extensions:", error)
+    console.error("Error running extensions:", error)
     throw createError({
       statusCode: 500,
       statusMessage: error.message,
