@@ -168,14 +168,7 @@ export const useDataStore = defineStore("data", () => {
     return components.map((component) => component.viewer_id)
   }
 
-  async function allComponentViewerIds() {
-    const components = await database.model_components.toArray()
-    return components
-      .map((component) =>
-        component.viewer_id !== undefined ? String(component.viewer_id) : "",
-      )
-      .filter((id) => id !== "")
-  }
+
 
   async function exportStores() {
     const items = await database.data.toArray()
@@ -207,7 +200,7 @@ export const useDataStore = defineStore("data", () => {
     getSurfacesGeodeIds,
     getBlocksGeodeIds,
     getMeshComponentsViewerIds,
-    allComponentViewerIds,
+
     exportStores,
     importStores,
     clear,
