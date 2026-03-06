@@ -50,10 +50,10 @@ async function runScript(
   })
 
   child.stdout.on("data", (data) =>
-    console.log(`[${executableName}] ${data.toString()}`),
+    console.log(`[${_executableName}] ${data.toString()}`),
   )
   child.stderr.on("data", (data) =>
-    console.log(`[${executableName}] ${data.toString()}`),
+    console.log(`[${_executableName}] ${data.toString()}`),
   )
 
   child.on("error", async (error) => {
@@ -66,10 +66,10 @@ async function runScript(
   })
 
   child.on("close", (code) =>
-    console.log(`[${executableName}] exited with code ${code}`),
+    console.log(`[${_executableName}] exited with code ${code}`),
   )
   child.on("kill", () => {
-    console.log(`[${executableName}] process killed`)
+    console.log(`[${_executableName}] process killed`)
   })
   child.name = command.replace(/^.*[\\/]/, "")
 
