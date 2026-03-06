@@ -6,6 +6,7 @@ import { useMeshPolyhedraCommonStyle } from "./common"
 import { useMeshPolyhedraPolyhedronAttributeStyle } from "./polyhedron"
 import { useMeshPolyhedraVertexAttributeStyle } from "./vertex"
 import { useMeshPolyhedraVisibilityStyle } from "./visibility"
+import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 
@@ -19,8 +20,10 @@ export function useMeshPolyhedraStyle() {
     useMeshPolyhedraPolyhedronAttributeStyle()
 
   async function setMeshPolyhedraActiveColoring(id, type) {
-    const coloring = meshPolyhedraCommonStyle.meshPolyhedraColoring(id)
-    coloring.active = type
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      style.polyhedra.coloring.active = type
+    })
     console.log(
       setMeshPolyhedraActiveColoring.name,
       { id },

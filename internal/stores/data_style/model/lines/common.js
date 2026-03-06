@@ -4,14 +4,13 @@ export function useModelLinesCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
 
   function modelLinesStyle(id) {
-    return dataStyleStateStore.getStyle(id).lines
+    return dataStyleStateStore.styles[id].lines
   }
 
   function modelLineStyle(id, line_id) {
-    if (!modelLinesStyle(id)[line_id]) {
-      modelLinesStyle(id)[line_id] = {}
-    }
-    return modelLinesStyle(id)[line_id]
+    const groupStyle = modelLinesStyle(id)
+    const individualStyle = dataStyleStateStore.getComponentStyle(id, line_id)
+    return { ...groupStyle, ...individualStyle }
   }
 
   return {

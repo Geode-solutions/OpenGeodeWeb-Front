@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshPointsCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -17,20 +18,29 @@ export function useMeshPointsVisibilityStyle() {
     return meshPointsCommonStyle.meshPointsStyle(id).visibility
   }
   function setMeshPointsVisibility(id, visibility) {
-    return viewerStore.request(
-      meshPointsVisibilitySchema,
-      { id, visibility },
-      {
-        response_function: () => {
-          meshPointsCommonStyle.meshPointsStyle(id).visibility = visibility
-          console.log(
-            setMeshPointsVisibility.name,
-            { id },
-            meshPointsVisibility(id),
-          )
+    const updateState = async () => {
+      const dataStyleStateStore = useDataStyleStateStore()
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.points.visibility = visibility
+      })
+      console.log(
+        setMeshPointsVisibility.name,
+        { id },
+        meshPointsVisibility(id),
+      )
+    }
+
+    if (meshPointsVisibilitySchema) {
+      return viewerStore.request(
+        meshPointsVisibilitySchema,
+        { id, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

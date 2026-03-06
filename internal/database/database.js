@@ -2,6 +2,8 @@ import { Dexie } from "dexie"
 import { ExtendedDatabase } from "./extended_database"
 import { dataTable } from "./tables/data_table"
 import { modelComponentsTable } from "./tables/model_components"
+import { dataStyleTable } from "./tables/data_style"
+import { modelComponentDataStyleTable } from "./tables/model_component_datastyle"
 
 class Database extends Dexie {
   constructor() {
@@ -10,7 +12,13 @@ class Database extends Dexie {
     this.version(1).stores({
       [dataTable.name]: dataTable.schema,
       [modelComponentsTable.name]: modelComponentsTable.schema,
+      [dataStyleTable.name]: dataStyleTable.schema,
+      [modelComponentDataStyleTable.name]: modelComponentDataStyleTable.schema,
     })
+  }
+
+  async clear() {
+    return Promise.all(this.tables.map((table) => table.clear()))
   }
 
   static async addTable(tableName, schemaDefinition) {
@@ -26,6 +34,9 @@ class Database extends Dexie {
 
     currentStores[dataTable.name] = dataTable.schema
     currentStores[modelComponentsTable.name] = modelComponentsTable.schema
+    currentStores[dataStyleTable.name] = dataStyleTable.schema
+    currentStores[modelComponentDataStyleTable.name] =
+      modelComponentDataStyleTable.schema
 
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src
@@ -49,6 +60,9 @@ class Database extends Dexie {
           existingDb.version(1).stores({
             [dataTable.name]: dataTable.schema,
             [modelComponentsTable.name]: modelComponentsTable.schema,
+            [dataStyleTable.name]: dataStyleTable.schema,
+            [modelComponentDataStyleTable.name]:
+              modelComponentDataStyleTable.schema,
           })
         } else {
           existingDb.version(version).stores(currentStores)

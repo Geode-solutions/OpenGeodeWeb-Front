@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshCellsCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -21,8 +22,11 @@ export function useMeshCellsTexturesStyle() {
       meshCellsTexturesSchemas,
       { id, textures },
       {
-        response_function: () => {
-          meshCellsCommonStyle.meshCellsColoring(id).textures = textures
+        response_function: async () => {
+          const dataStyleStateStore = useDataStyleStateStore()
+          await dataStyleStateStore.mutateStyle(id, (style) => {
+            style.cells.coloring.textures = textures
+          })
           console.log(setMeshCellsTextures.name, { id }, meshCellsTextures(id))
         },
       },

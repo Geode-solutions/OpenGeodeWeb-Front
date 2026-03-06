@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { useModelSurfacesCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
@@ -12,6 +13,7 @@ const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 export function useModelSurfacesVisibilityStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
+  const dataStyleStateStore = useDataStyleStateStore()
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle()
 
   function modelSurfaceVisibility(id, surface_id) {
@@ -22,37 +24,46 @@ export function useModelSurfacesVisibilityStyle() {
       visibility
   }
   async function setModelSurfacesVisibility(id, surface_ids, visibility) {
+    const updateState = async () => {
+      for (const surface_id of surface_ids) {
+        await dataStyleStateStore.mutateComponentStyle(
+          id,
+          surface_id,
+          (style) => {
+            style.visibility = visibility
+          },
+        )
+      }
+      console.log(
+        setModelSurfacesVisibility.name,
+        { id },
+        { surface_ids },
+        modelSurfaceVisibility(id, surface_ids[0]),
+      )
+    }
+
     if (!surface_ids || surface_ids.length === 0) {
       return
     }
-    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
-      id,
-      surface_ids,
-    )
-    if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-      console.warn(
-        "[setModelSurfacesVisibility] No viewer IDs found, skipping visibility request",
-        { id, surface_ids },
+
+    if (model_surfaces_schemas?.visibility) {
+      const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+        id,
+        surface_ids,
       )
-      return
-    }
-    return viewerStore.request(
-      model_surfaces_schemas.visibility,
-      { id, block_ids: surface_viewer_ids, visibility },
-      {
-        response_function: () => {
-          for (const surface_id of surface_ids) {
-            saveModelSurfaceVisibility(id, surface_id, visibility)
-          }
-          console.log(
-            setModelSurfacesVisibility.name,
-            { id },
-            { surface_ids },
-            modelSurfaceVisibility(id, surface_ids[0]),
-          )
+      if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
+        return updateState()
+      }
+      return viewerStore.request(
+        model_surfaces_schemas.visibility,
+        { id, block_ids: surface_viewer_ids, visibility },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

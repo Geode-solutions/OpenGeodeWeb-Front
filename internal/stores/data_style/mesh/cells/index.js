@@ -1,6 +1,7 @@
 // Third party imports
 
 // Local imports
+import { useDataStyleStateStore } from "../../state"
 import { useMeshCellsCellAttributeStyle } from "./cell"
 import { useMeshCellsColorStyle } from "./color"
 import { useMeshCellsCommonStyle } from "./common"
@@ -19,8 +20,10 @@ export function useMeshCellsStyle() {
   const meshCellsCellAttributeStyle = useMeshCellsCellAttributeStyle()
 
   async function setMeshCellsActiveColoring(id, type) {
-    const coloring = meshCellsCommonStyle.meshCellsColoring(id)
-    coloring.active = type
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      style.cells.coloring.active = type
+    })
     console.log(
       setMeshCellsActiveColoring.name,
       { id },

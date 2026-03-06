@@ -22,4 +22,8 @@ export class ExtendedDatabase extends Dexie {
       ...newTables,
     })
   }
+
+  async clear() {
+    return Promise.all(this.tables.map((table) => table.clear()))
+  }
 }

@@ -1,6 +1,7 @@
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import Status from "@ogw_front/utils/status"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
+import { database } from "../../internal/database/database"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
@@ -39,6 +40,8 @@ export const useInfraStore = defineStore("infra", {
     },
     async create_backend() {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode)
+      await database.clear()
+
       console.log(
         "[INFRA] Registered microservices:",
         this.microservices.map((store) => store.$id),

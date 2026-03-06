@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshPolygonsCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -17,20 +18,29 @@ export function useMeshPolygonsColorStyle() {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).color
   }
   function setMeshPolygonsColor(id, color) {
-    return viewerStore.request(
-      meshPolygonsColorSchemas,
-      { id, color },
-      {
-        response_function: () => {
-          meshPolygonsCommonStyle.meshPolygonsColoring(id).color = color
-          console.log(
-            setMeshPolygonsColor.name,
-            { id },
-            JSON.stringify(meshPolygonsColor(id)),
-          )
+    const updateState = async () => {
+      const dataStyleStateStore = useDataStyleStateStore()
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.polygons.coloring.color = color
+      })
+      console.log(
+        setMeshPolygonsColor.name,
+        { id },
+        JSON.stringify(meshPolygonsColor(id)),
+      )
+    }
+
+    if (meshPolygonsColorSchemas && color !== undefined) {
+      return viewerStore.request(
+        meshPolygonsColorSchemas,
+        { id, color },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

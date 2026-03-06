@@ -4,6 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshEdgesCommonStyle } from "./common"
+import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -30,14 +31,20 @@ export function useMeshEdgesEdgeAttributeStyle() {
     })
   }
 
-  function setMeshEdgesEdgeAttributeStoredConfig(
+  async function setMeshEdgesEdgeAttributeStoredConfig(
     id,
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshEdgesEdgeAttribute(id).storedConfigs
-    storedConfigs[name] = { minimum, maximum, colorMap }
-    return storedConfigs[name]
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      style.edges.coloring.edge.storedConfigs[name] = {
+        minimum,
+        maximum,
+        colorMap,
+      }
+    })
+    return meshEdgesEdgeAttributeStoredConfig(id, name)
   }
 
   function meshEdgesEdgeAttributeName(id) {
@@ -49,26 +56,39 @@ export function useMeshEdgesEdgeAttributeStyle() {
     return meshEdgesEdgeAttribute(id).name
   }
   function setMeshEdgesEdgeAttributeName(id, name) {
-    console.log(setMeshEdgesEdgeAttributeName.name, { id, name })
-    return viewerStore.request(
-      meshEdgesEdgeAttributeSchemas.name,
-      { id, name },
-      {
-        response_function: async () => {
-          meshEdgesEdgeAttribute(id).name = name
-          const { minimum, maximum } = meshEdgesEdgeAttributeStoredConfig(
-            id,
-            name,
-          )
-          await setMeshEdgesEdgeAttributeRange(id, minimum, maximum)
-          console.log(
-            setMeshEdgesEdgeAttributeName.name,
-            { id },
-            meshEdgesEdgeAttributeName(id),
-          )
+    const dataStyleStateStore = useDataStyleStateStore()
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        const edge = style.edges.coloring.edge
+        edge.name = name
+        if (!(name in edge.storedConfigs)) {
+          edge.storedConfigs[name] = {
+            minimum: undefined,
+            maximum: undefined,
+            colorMap: undefined,
+          }
+        }
+      })
+      const { minimum, maximum } = meshEdgesEdgeAttributeStoredConfig(id, name)
+      await setMeshEdgesEdgeAttributeRange(id, minimum, maximum)
+      console.log(
+        setMeshEdgesEdgeAttributeName.name,
+        { id },
+        meshEdgesEdgeAttributeName(id),
+      )
+    }
+
+    if (meshEdgesEdgeAttributeSchemas?.name && name !== "") {
+      return viewerStore.request(
+        meshEdgesEdgeAttributeSchemas.name,
+        { id, name },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   function meshEdgesEdgeAttributeRange(id) {
@@ -77,12 +97,18 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
-  function setMeshEdgesEdgeAttributeRange(id, minimum, maximum) {
+  async function setMeshEdgesEdgeAttributeRange(id, minimum, maximum) {
     const name = meshEdgesEdgeAttributeName(id)
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
-    storedConfig.minimum = minimum
-    storedConfig.maximum = maximum
-    return setMeshEdgesEdgeAttributeColorMap(id, storedConfig.colorMap)
+    const dataStyleStateStore = useDataStyleStateStore()
+    await dataStyleStateStore.mutateStyle(id, (style) => {
+      const storedConfig = style.edges.coloring.edge.storedConfigs[name]
+      storedConfig.minimum = minimum
+      storedConfig.maximum = maximum
+    })
+    return setMeshEdgesEdgeAttributeColorMap(
+      id,
+      meshEdgesEdgeAttributeColorMap(id),
+    )
   }
 
   function meshEdgesEdgeAttributeColorMap(id) {
@@ -94,37 +120,46 @@ export function useMeshEdgesEdgeAttributeStyle() {
   function setMeshEdgesEdgeAttributeColorMap(id, colorMap) {
     const name = meshEdgesEdgeAttributeName(id)
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
+    const dataStyleStateStore = useDataStyleStateStore()
+    const updateState = async () => {
+      await dataStyleStateStore.mutateStyle(id, (style) => {
+        style.edges.coloring.edge.storedConfigs[name].colorMap = colorMap
+      })
+      console.log(
+        setMeshEdgesEdgeAttributeColorMap.name,
+        { id },
+        meshEdgesEdgeAttributeColorMap(id),
+      )
+    }
+
     if (
       storedConfig.minimum === undefined ||
       storedConfig.maximum === undefined ||
       colorMap === undefined
     ) {
-      storedConfig.colorMap = colorMap
-      return
+      return updateState()
     }
-    const points = getRGBPointsFromPreset(colorMap)
-    const { minimum, maximum } = storedConfig
 
-    console.log(setMeshEdgesEdgeAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    })
-    return viewerStore.request(
-      meshEdgesEdgeAttributeSchemas.color_map,
-      { id, points, minimum, maximum },
-      {
-        response_function: () => {
-          storedConfig.colorMap = colorMap
-          console.log(
-            setMeshEdgesEdgeAttributeColorMap.name,
-            { id },
-            meshEdgesEdgeAttributeColorMap(id),
-          )
+    if (meshEdgesEdgeAttributeSchemas?.color_map) {
+      const points = getRGBPointsFromPreset(colorMap)
+      const { minimum, maximum } = storedConfig
+
+      console.log(setMeshEdgesEdgeAttributeColorMap.name, {
+        id,
+        minimum,
+        maximum,
+        colorMap,
+      })
+      return viewerStore.request(
+        meshEdgesEdgeAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: updateState,
         },
-      },
-    )
+      )
+    } else {
+      return updateState()
+    }
   }
 
   return {

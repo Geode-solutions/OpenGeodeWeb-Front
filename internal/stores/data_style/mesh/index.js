@@ -29,17 +29,41 @@ export default function useMeshStyle() {
     return dataStyleState.getStyle(id).visibility
   }
   function setMeshVisibility(id, visibility) {
-    return viewerStore.request(
-      meshSchemas.visibility,
-      { id, visibility },
-      {
-        response_function: () => {
-          hybridViewerStore.setVisibility(id, visibility)
-          dataStyleState.getStyle(id).visibility = visibility
-          console.log(setMeshVisibility.name, { id }, meshVisibility(id))
-        },
-      },
-    )
+    const updateState = async () => {
+      await dataStyleState.mutateStyle(id, (style) => {
+        style.visibility = visibility
+      })
+      hybridViewerStore.setVisibility(id, visibility)
+      console.log(setMeshVisibility.name, { id }, meshVisibility(id))
+    }
+
+    if (meshSchemas.visibility) {
+      return viewerStore.request(meshSchemas.visibility, { id, visibility }, {
+        response_function: updateState,
+      })
+    } else {
+      return updateState()
+    }
+  }
+
+  function meshColor(id) {
+    return dataStyleState.getStyle(id).color
+  }
+  function setMeshColor(id, color) {
+    const updateState = async () => {
+      await dataStyleState.mutateStyle(id, (style) => {
+        style.color = color
+      })
+      console.log(setMeshColor.name, { id }, meshColor(id))
+    }
+
+    if (meshSchemas.color) {
+      return viewerStore.request(meshSchemas.color, { id, color }, {
+        response_function: updateState,
+      })
+    } else {
+      return updateState()
+    }
   }
 
   function applyMeshStyle(id) {
@@ -48,6 +72,8 @@ export default function useMeshStyle() {
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
         promise_array.push(setMeshVisibility(id, value))
+      } else if (key === "color") {
+        promise_array.push(setMeshColor(id, value))
       } else if (key === "points") {
         promise_array.push(meshPointsStyle.applyMeshPointsStyle(id))
       } else if (key === "edges") {
@@ -58,7 +84,17 @@ export default function useMeshStyle() {
         promise_array.push(meshPolygonsStyle.applyMeshPolygonsStyle(id))
       } else if (key === "polyhedra") {
         promise_array.push(meshPolyhedraStyle.applyMeshPolyhedraStyle(id))
-      } else if (key !== "attributes") {
+      } else if (
+        key === "corners" ||
+        key === "lines" ||
+        key === "surfaces" ||
+        key === "blocks" ||
+        key === "attributes" ||
+        key === "id"
+      ) {
+        // These keys are either handled elsewhere or not applicable to mesh objects
+        continue
+      } else {
         throw new Error(`Unknown mesh key: ${key}`)
       }
     }
@@ -68,6 +104,8 @@ export default function useMeshStyle() {
   return {
     meshVisibility,
     setMeshVisibility,
+    meshColor,
+    setMeshColor,
     applyMeshStyle,
     ...meshPointsStyle,
     ...meshEdgesStyle,

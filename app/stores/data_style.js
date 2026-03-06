@@ -11,12 +11,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const modelStyleStore = useModelStyle()
   const dataStore = useDataStore()
 
-  function addDataStyle(id, geode_object) {
-    dataStyleState.styles[id] = getDefaultStyle(geode_object)
+  async function addDataStyle(id, geode_object) {
+    await dataStyleState.updateStyle(id, getDefaultStyle(geode_object))
   }
 
   async function setVisibility(id, visibility) {
-    const item = await database.data.get(id)
+    const item = await dataStore.item(id)
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
       throw new Error(`Item not found or not loaded: ${id}`)
@@ -32,7 +32,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function applyDefaultStyle(id) {
-    const item = await database.data.get(id)
+    const item = await dataStore.item(id)
     const viewer_type = item?.viewer_type
     if (!viewer_type) {
       throw new Error(`Item not found or not loaded: ${id}`)
@@ -48,40 +48,55 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   function exportStores() {
-    return { styles: dataStyleState.styles }
+    return {
+      styles: dataStyleState.styles,
+      componentStyles: dataStyleState.componentStyles,
+    }
   }
 
-  function importStores(snapshot) {
+  async function importStores(snapshot) {
     const stylesSnapshot = snapshot.styles || {}
-    for (const id of Object.keys(dataStyleState.styles)) {
-      delete dataStyleState.styles[id]
-    }
+    const componentStylesSnapshot = snapshot.componentStyles || {}
+
+    await dataStyleState.clear()
+
     for (const [id, style] of Object.entries(stylesSnapshot)) {
-      dataStyleState.styles[id] = style
+      await dataStyleState.updateStyle(id, style)
+    }
+
+    for (const style of Object.values(componentStylesSnapshot)) {
+      await dataStyleState.updateComponentStyle(
+        style.id_model,
+        style.id_component,
+        style,
+      )
     }
   }
 
   async function applyAllStylesFromState() {
-    const ids = Object.keys(dataStyleState.styles || {})
+    const rootIds = Object.keys(dataStyleState.styles || {})
     const promises = []
-    for (const id of ids) {
+
+    // Apply root model/mesh styles
+    for (const id of rootIds) {
       const meta = await dataStore.item(id)
-      const viewerType = meta?.viewer_type
-      const style = dataStyleState.styles[id]
-      if (style && viewerType === "mesh") {
+      if (!meta) continue
+      const viewerType = meta.viewer_type
+      if (viewerType === "mesh") {
         promises.push(meshStyleStore.applyMeshStyle(id))
-      } else if (style && viewerType === "model") {
+      } else if (viewerType === "model") {
         promises.push(modelStyleStore.applyModelStyle(id))
       }
     }
+
     return Promise.all(promises)
   }
 
   return {
-    styles: dataStyleState.styles,
+    styles: computed(() => dataStyleState.styles),
     getStyle: dataStyleState.getStyle,
-    objectVisibility: dataStyleState.objectVisibility,
-    selectedObjects: dataStyleState.selectedObjects,
+    objectVisibility: computed(() => dataStyleState.objectVisibility),
+    selectedObjects: computed(() => dataStyleState.selectedObjects),
     ...meshStyleStore,
     ...modelStyleStore,
     addDataStyle,
