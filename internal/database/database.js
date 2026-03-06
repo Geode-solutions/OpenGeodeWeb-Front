@@ -17,6 +17,10 @@ class Database extends Dexie {
     })
   }
 
+  async clear() {
+    return Promise.all(this.tables.map((table) => table.clear()))
+  }
+
   static async addTable(tableName, schemaDefinition) {
     await this.addTables({ [tableName]: schemaDefinition })
   }
