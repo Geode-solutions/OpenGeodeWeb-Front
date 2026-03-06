@@ -17,6 +17,11 @@ function commandExistsSync(executableName) {
   const envPath = process.env.PATH || ""
   return envPath.split(path.delimiter).some((dir) => {
     const filePath = path.join(dir, executableName)
+    console.log(
+      "commandExistsSync",
+      fs.existsSync(filePath) && fs.statSync(filePath).isFile(),
+      { filePath },
+    )
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile()
   })
 }
