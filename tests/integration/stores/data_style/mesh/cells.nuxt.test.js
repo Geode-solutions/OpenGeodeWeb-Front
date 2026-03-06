@@ -3,11 +3,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import {
-  delete_folder_recursive,
-  kill_back,
-  kill_viewer,
-} from "@ogw_front/utils/local"
+import { deleteFolderRecursive } from "@ogw_front/utils/local/path"
+import { killBack, killViewer } from "@ogw_front/utils/local/microservices"
 import Status from "@ogw_front/utils/status"
 import { setupIntegrationTests } from "../../../setup"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
@@ -21,29 +18,28 @@ const geode_object = "RegularGrid2D"
 const vertex_attribute = { name: "points" }
 const cell_attribute = { name: "RGB_data" }
 
-let back_port = 0,
-  id = "",
-  project_folder_path = "",
-  viewer_port = 0
+describe("Mesh cells", async () => {
+  let back_port = 0,
+    id = "",
+    project_folder_path = "",
+    viewer_port = 0
 
-beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
-    await setupIntegrationTests(file_name, geode_object))
-}, INTERVAL_TIMEOUT)
+  beforeEach(async () => {
+    ;({ id, back_port, viewer_port, project_folder_path } =
+      await setupIntegrationTests(file_name, geode_object))
+  }, INTERVAL_TIMEOUT)
 
-afterEach(async () => {
-  console.log(
-    "afterEach mesh cells kill",
-    back_port,
-    viewer_port,
-    project_folder_path,
-  )
+  afterEach(async () => {
+    console.log(
+      "afterEach mesh cells kill",
+      back_port,
+      viewer_port,
+      project_folder_path,
+    )
+    await Promise.all([killBack(back_port), killViewer(viewer_port)])
+    deleteFolderRecursive(project_folder_path)
+  })
 
-  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-  delete_folder_recursive(project_folder_path)
-})
-
-describe("Mesh cells", () => {
   describe("Cells visibility", () => {
     test("Visibility true", async () => {
       const dataStyleStore = useDataStyleStore()

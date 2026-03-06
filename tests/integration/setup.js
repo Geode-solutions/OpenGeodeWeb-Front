@@ -1,21 +1,22 @@
 // Node.js imports
 import { WebSocket } from "ws"
 import path from "node:path"
-import { v4 as uuidv4 } from "uuid"
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest"
 
 // Local imports
 import {
-  delete_folder_recursive,
-  executable_name,
-  executable_path,
-  kill_back,
-  kill_viewer,
-  run_back,
-  run_viewer,
-} from "@ogw_front/utils/local"
+  createPath,
+  deleteFolderRecursive,
+  generateProjectFolderPath,
+} from "@ogw_front/utils/local/path"
+import {
+  killBack,
+  killViewer,
+  runBack,
+  runViewer,
+} from "@ogw_front/utils/local/microservices"
 import Status from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
@@ -23,34 +24,29 @@ import { setupActivePinia } from "../utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useRuntimeConfig } from "nuxt/app"
 
 // Local constants
-const data_folder = path.join("tests", "integration", "data")
+const data_folder = path.join("tests", "integration", "data", "uploads")
 
 async function runMicroservices() {
   const geodeStore = useGeodeStore()
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
+  const { BACK_COMMAND, BACK_PATH, PROJECT, VIEWER_COMMAND, VIEWER_PATH } =
+    useRuntimeConfig().public
+  const projectFolderPath = generateProjectFolderPath(PROJECT)
+  await createPath(projectFolderPath)
 
-  const microservices_path = path.join("tests", "integration", "microservices")
-  const project_folder_path = path.join(data_folder, uuidv4())
-  const upload_folder_path = path.join(__dirname, "data", "uploads")
-  const back_path = await executable_path(path.join(microservices_path, "back"))
-  const back_name = executable_name("opengeodeweb-back")
-  const viewer_path = await executable_path(
-    path.join(microservices_path, "viewer"),
-  )
-  const viewer_name = executable_name("opengeodeweb-viewer")
   const [back_port, viewer_port] = await Promise.all([
-    run_back(back_name, back_path, {
-      project_folder_path: project_folder_path,
-      upload_folder_path: upload_folder_path,
+    runBack(BACK_COMMAND, BACK_PATH, {
+      projectFolderPath,
+      uploadFolderPath: data_folder,
     }),
-    run_viewer(viewer_name, viewer_path, {
-      project_folder_path: project_folder_path,
-    }),
+    runViewer(VIEWER_COMMAND, VIEWER_PATH, { projectFolderPath }),
   ])
+
   console.log("back_port", back_port)
   console.log("viewer_port", viewer_port)
 
@@ -58,7 +54,11 @@ async function runMicroservices() {
   viewerStore.default_local_port = viewer_port
   console.log("after ports")
 
-  return { back_port, viewer_port, project_folder_path }
+  return {
+    back_port,
+    viewer_port,
+    project_folder_path: projectFolderPath,
+  }
 }
 
 async function setupIntegrationTests(file_name, geode_object) {
@@ -99,8 +99,8 @@ async function teardownIntegrationTests(
   viewer_port,
   project_folder_path,
 ) {
-  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-  delete_folder_recursive(project_folder_path)
+  await Promise.all([killBack(back_port), killViewer(viewer_port)])
+  deleteFolderRecursive(project_folder_path)
 }
 
 export { runMicroservices, setupIntegrationTests, teardownIntegrationTests }
