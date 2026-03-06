@@ -4,7 +4,7 @@ export function useModelPointsCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
 
   function modelPointsStyle(id) {
-    return dataStyleStateStore.getStyle(id).points
+    return dataStyleStateStore.styles[id].points
   }
 
   return {

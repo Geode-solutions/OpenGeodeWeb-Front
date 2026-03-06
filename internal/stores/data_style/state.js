@@ -122,6 +122,11 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     await updateComponentStyle(id_model, id_component, style)
   }
 
+  async function clear() {
+    await database.data_style.clear()
+    await database.model_component_datastyle.clear()
+  }
+
   return {
     getStyle,
     updateStyle,
@@ -133,5 +138,6 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     componentStyles,
     objectVisibility,
     selectedObjects,
+    clear,
   }
 })

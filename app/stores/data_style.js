@@ -48,30 +48,47 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   function exportStores() {
-    return { styles: dataStyleState.styles }
+    return {
+      styles: dataStyleState.styles,
+      componentStyles: dataStyleState.componentStyles,
+    }
   }
 
   async function importStores(snapshot) {
     const stylesSnapshot = snapshot.styles || {}
-    await database.data_style.clear()
+    const componentStylesSnapshot = snapshot.componentStyles || {}
+
+    await dataStyleState.clear()
+
     for (const [id, style] of Object.entries(stylesSnapshot)) {
       await dataStyleState.updateStyle(id, style)
+    }
+
+    for (const style of Object.values(componentStylesSnapshot)) {
+      await dataStyleState.updateComponentStyle(
+        style.id_model,
+        style.id_component,
+        style,
+      )
     }
   }
 
   async function applyAllStylesFromState() {
-    const ids = Object.keys(dataStyleState.styles || {})
+    const rootIds = Object.keys(dataStyleState.styles || {})
     const promises = []
-    for (const id of ids) {
+
+    // Apply root model/mesh styles
+    for (const id of rootIds) {
       const meta = await dataStore.item(id)
-      const viewerType = meta?.viewer_type
-      const style = dataStyleState.styles[id]
-      if (style && viewerType === "mesh") {
+      if (!meta) continue
+      const viewerType = meta.viewer_type
+      if (viewerType === "mesh") {
         promises.push(meshStyleStore.applyMeshStyle(id))
-      } else if (style && viewerType === "model") {
+      } else if (viewerType === "model") {
         promises.push(modelStyleStore.applyModelStyle(id))
       }
     }
+
     return Promise.all(promises)
   }
 

@@ -4,14 +4,13 @@ export function useModelCornersCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
 
   function modelCornersStyle(id) {
-    return dataStyleStateStore.getStyle(id).corners
+    return dataStyleStateStore.styles[id].corners
   }
 
   function modelCornerStyle(id, corner_id) {
-    if (!modelCornersStyle(id)[corner_id]) {
-      modelCornersStyle(id)[corner_id] = {}
-    }
-    return modelCornersStyle(id)[corner_id]
+    const groupStyle = modelCornersStyle(id)
+    const individualStyle = dataStyleStateStore.getComponentStyle(id, corner_id)
+    return { ...groupStyle, ...individualStyle }
   }
 
   return {
