@@ -93,7 +93,7 @@ async function waitNuxt(nuxt_process) {
     console.log("Nuxt:", output)
     if (portMatch) {
       const [, nuxt_port] = portMatch
-      process.env.NUXT_PORT = nuxt_port
+      return nuxt_port
     }
   }
   throw new Error("Nuxt process closed without accepting connections")
