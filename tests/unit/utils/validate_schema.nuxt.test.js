@@ -2,7 +2,7 @@
 import { describe, expect, test } from "vitest"
 
 // Local imports
-import validate_schema from "@ogw_front/utils/validate_schema"
+import { validate_schema } from "@ogw_front/utils/validate_schema"
 
 // CONSTANTS
 const MIN_0 = 0

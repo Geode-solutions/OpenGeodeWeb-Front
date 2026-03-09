@@ -1,8 +1,12 @@
 // Local imports
+import { useDataStore } from "@ogw_front/stores/data"
 import { useModelBlocksColorStyle } from "./color"
 import { useModelBlocksCommonStyle } from "./common"
 import { useModelBlocksVisibilityStyle } from "./visibility"
-import { useDataStore } from "@ogw_front/stores/data"
+
+async function setModelBlocksDefaultStyle(_id) {
+  // Placeholder for oxlint
+}
 
 export function useModelBlocksStyle() {
   const dataStore = useDataStore()
@@ -22,8 +26,6 @@ export function useModelBlocksStyle() {
       modelBlocksColorStyle.setModelBlocksColor(id, blocks_ids, style.color),
     ])
   }
-
-  async function setModelBlocksDefaultStyle(id) {}
 
   return {
     applyModelBlocksStyle,

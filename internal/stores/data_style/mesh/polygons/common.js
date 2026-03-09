@@ -1,4 +1,4 @@
-import { useDataStyleStateStore } from "../../state"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 export function useMeshPolygonsCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()

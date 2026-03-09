@@ -7,7 +7,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime"
 // Local imports
 import ObjectSelector from "@ogw_front/components/ObjectSelector"
 import Stepper from "@ogw_front/components/Stepper"
-import { vuetify } from "../../utils"
+import { vuetify } from "@ogw_tests/utils"
 
 const FIRST_INDEX = 0
 

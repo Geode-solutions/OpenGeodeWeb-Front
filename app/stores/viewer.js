@@ -5,11 +5,11 @@ import vtkWSLinkClient, {
 import _ from "lodash"
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { useInfraStore } from "@ogw_front/stores/infra"
-import { viewer_call } from "../../internal/utils/viewer_call"
+import { viewer_call } from "@ogw_internal/utils/viewer_call"
 
 const MS_PER_SECOND = 1000
 const SECONDS_PER_REQUEST = 10
@@ -19,7 +19,6 @@ export const useViewerStore = defineStore(
   "viewer",
   () => {
     const infraStore = useInfraStore()
-
     const default_local_port = ref("1234")
     const client = ref({})
     const config = ref(undefined)
@@ -151,10 +150,11 @@ export const useViewerStore = defineStore(
     }
 
     async function launch() {
+      status.value = Status.CREATING
       console.log("[VIEWER] Launching viewer microservice...")
-      const port = await globalThis.electronAPI.run_viewer()
-      console.log("[VIEWER] Viewer launched on port:", port)
-      return port
+      const launched_port = await globalThis.electronAPI.run_viewer()
+      console.log("[VIEWER] Viewer launched on port:", launched_port)
+      return launched_port
     }
 
     async function connect() {

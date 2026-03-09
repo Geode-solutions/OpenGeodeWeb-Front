@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelLinesCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useModelLinesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -13,15 +13,12 @@ export function useModelLinesColorStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
   const modelLinesCommonStyle = useModelLinesCommonStyle()
-
   function modelLineColor(id, line_id) {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).color
   }
-
   function saveModelLineColor(id, line_id, color) {
     modelLinesCommonStyle.modelLineStyle(id, line_id).color = color
   }
-
   async function setModelLinesColor(id, line_ids, color) {
     if (!line_ids || line_ids.length === 0) {
       return

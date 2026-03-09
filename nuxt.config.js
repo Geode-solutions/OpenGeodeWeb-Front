@@ -1,3 +1,8 @@
+import path, { dirname } from "node:path"
+import { fileURLToPath } from "node:url"
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
@@ -20,7 +25,9 @@ export default defineNuxtConfig({
   },
 
   alias: {
-    "@ogw_front": `${__dirname}/app/`,
+    "@ogw_front": path.resolve(__dirname, "app"),
+    "@ogw_internal": path.resolve(__dirname, "internal"),
+    "@ogw_tests": path.resolve(__dirname, "tests"),
   },
 
   // ** Global CSS
