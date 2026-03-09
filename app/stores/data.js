@@ -80,19 +80,82 @@ export const useDataStore = defineStore("data", () => {
     return await viewerStore.request(viewer_generic_schemas.deregister, { id })
   }
 
-  async function addItem(new_item) {
+  function addItem(new_item) {
     const itemData = {
       id: new_item.id,
       name: new_item.name || new_item.id,
       viewer_type: new_item.viewer_type,
       geode_object_type: new_item.geode_object_type,
-      visible: new_item.visible !== undefined ? new_item.visible : true,
-      created_at: new_item.created_at || new Date().toISOString(),
+      visible: true,
+      created_at: new Date().toISOString(),
+      binary_light_viewable: new_item.binary_light_viewable,
     }
-
-    const serializedData = structuredClone(itemData)
-    await database.data.put(serializedData)
+    return database.data.put(itemData)
   }
+
+  function addComponents(new_item) {
+    const allComponents = []
+    for (const component of new_item.mesh_components) {
+      component.id = new_item.id
+      component.created_at = new Date().toISOString()
+      if (component.boundaries) {
+        delete component.boundaries
+      }
+      if (component.internals) {
+        delete component.internals
+      }
+      allComponents.push(component)
+    }
+    for (const component of new_item.collection_components) {
+      component.id = new_item.id
+      component.created_at = new Date().toISOString()
+      if (component.items) {
+        delete component.items
+      }
+      allComponents.push(component)
+    }
+    return database.model_components.bulkPut(allComponents)
+  }
+
+  function addComponentRelations(new_item) {
+    const relations = []
+    for (const component of new_item.mesh_components) {
+      if (component.boundaries) {
+        for (const boundary_id of component.boundaries) {
+          relations.push({
+            id: new_item.id,
+            parent: component.geode_id,
+            child: boundary_id,
+            type: "boundary",
+          })
+        }
+      }
+      if (component.internals) {
+        for (const internal_id of component.internals) {
+          relations.push({
+            id: new_item.id,
+            parent: component.geode_id,
+            child: internal_id,
+            type: "internal",
+          })
+        }
+      }
+    }
+    for (const component of new_item.collection_components) {
+      if (component.items) {
+        for (const item_id of component.items) {
+          relations.push({
+            id: new_item.id,
+            parent: component.geode_id,
+            child: item_id,
+            type: "collection",
+          })
+        }
+      }
+    }
+    return database.model_components_relation.bulkPut(relations)
+  }
+
   async function deleteItem(id) {
     await database.data.delete(id)
     await deleteModelComponents(id)
@@ -100,84 +163,9 @@ export const useDataStore = defineStore("data", () => {
   async function updateItem(id, changes) {
     await database.data.update(id, changes)
   }
-
-  async function addModelComponents(id, values) {
-    if (!values || values.length === 0) {
-      console.debug("[addModelComponents] No components to add")
-      return
-    }
-
-    const { mesh_components, collection_components } = values
-    const allComponents = [
-      ...(mesh_components || []),
-      ...(collection_components || []),
-    ]
-
-    const relations = []
-    for (const component of allComponents) {
-      component.id = id
-      component.created_at = new Date().toISOString()
-
-      if (component.boundaries) {
-        for (const boundary_id of component.boundaries) {
-          relations.push({
-            id,
-            parent: component.geode_id,
-            child: boundary_id,
-            type: "boundary",
-          })
-        }
-        delete component.boundaries
-      }
-      if (component.internals) {
-        for (const internal_id of component.internals) {
-          relations.push({
-            id,
-            parent: component.geode_id,
-            child: internal_id,
-            type: "internal",
-          })
-        }
-        delete component.internals
-      }
-      if (component.items) {
-        for (const item_id of component.items) {
-          relations.push({
-            id,
-            parent: component.geode_id,
-            child: item_id,
-            type: "collection",
-          })
-        }
-        delete component.items
-      }
-    }
-
-    const serializedComponents = structuredClone(allComponents)
-    const serializedRelations = structuredClone(relations)
-
-    await database.model_components.bulkAdd(serializedComponents)
-    if (serializedRelations.length > 0) {
-      await database.model_components_relation.bulkAdd(serializedRelations)
-    }
-  }
-
   async function deleteModelComponents(id) {
     await database.model_components.where({ id }).delete()
     await database.model_components_relation.where({ id }).delete()
-  }
-
-  async function fetchModelComponents(id) {
-    const geodeStore = useGeodeStore()
-    return await geodeStore.request(
-      back_model_schemas.model_components,
-      { id },
-      {
-        response_function: async (response) => {
-          await addModelComponents(id, response)
-        },
-      },
-    )
   }
 
   async function getMeshComponentGeodeIds(id, component_type) {
@@ -203,11 +191,10 @@ export const useDataStore = defineStore("data", () => {
     return await getMeshComponentGeodeIds(id, "Block")
   }
 
-  async function getMeshComponentsViewerIds(id, meshComponentGeodeIds) {
+  async function getMeshComponentsViewerIds(modelId, meshComponentGeodeIds) {
     const components = await database.model_components
-      .where("id")
-      .equals(id)
-      .and((component) => meshComponentGeodeIds.includes(component.geode_id))
+      .where("[id+geode_id]")
+      .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray()
     return components.map((component) => component.viewer_id)
   }
@@ -234,9 +221,10 @@ export const useDataStore = defineStore("data", () => {
     registerObject,
     deregisterObject,
     addItem,
+    addComponents,
+    addComponentRelations,
     deleteItem,
     updateItem,
-    fetchModelComponents,
     getCornersGeodeIds,
     getLinesGeodeIds,
     getSurfacesGeodeIds,
