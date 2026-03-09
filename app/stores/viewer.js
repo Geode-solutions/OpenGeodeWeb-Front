@@ -201,6 +201,7 @@ export const useViewerStore = defineStore(
       timeout = request_timeout,
     ) {
       console.log("[VIEWER] Request:", schema.$id)
+      const start = Date.now()
 
       // Get current store instance to pass to viewer_call
       const store = useViewerStore()
@@ -211,7 +212,13 @@ export const useViewerStore = defineStore(
         {
           ...callbacks,
           response_function: async (response) => {
-            console.log("[VIEWER] Request completed:", schema.$id)
+            console.log(
+              "[VIEWER] Request completed:",
+              schema.$id,
+              "in",
+              (Date.now() - start) / 1_000,
+              "s",
+            )
             if (callbacks.response_function) {
               await callbacks.response_function(response)
             }

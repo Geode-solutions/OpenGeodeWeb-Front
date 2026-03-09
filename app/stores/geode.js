@@ -120,6 +120,7 @@ export const useGeodeStore = defineStore("geode", {
     },
     request(schema, params, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id)
+      const start = Date.now()
 
       return api_fetch(
         this,
@@ -127,7 +128,13 @@ export const useGeodeStore = defineStore("geode", {
         {
           ...callbacks,
           response_function: async (response) => {
-            console.log("[GEODE] Request completed:", schema.$id)
+            console.log(
+              "[GEODE] Request completed:",
+              schema.$id,
+              "in",
+              (Date.now() - start) / 1_000,
+              "s",
+            )
             if (callbacks.response_function) {
               await callbacks.response_function(response)
             }
