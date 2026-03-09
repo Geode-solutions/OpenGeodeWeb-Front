@@ -4,7 +4,6 @@ import { dataTable } from "./tables/data_table"
 import { modelComponentsTable } from "./tables/model_components"
 import { modelComponentsRelationTable } from "./tables/model_components_relation"
 
-
 class Database extends Dexie {
   constructor() {
     super("Database")
@@ -14,7 +13,6 @@ class Database extends Dexie {
       [modelComponentsTable.name]: modelComponentsTable.schema,
       [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
     })
-
   }
 
   static async addTable(tableName, schemaDefinition) {
@@ -32,8 +30,6 @@ class Database extends Dexie {
     currentStores[modelComponentsTable.name] = modelComponentsTable.schema
     currentStores[modelComponentsRelationTable.name] =
       modelComponentsRelationTable.schema
-
-
 
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src
@@ -60,7 +56,6 @@ class Database extends Dexie {
             [modelComponentsRelationTable.name]:
               modelComponentsRelationTable.schema,
           })
-
         } else {
           existingDb.version(version).stores(currentStores)
         }
