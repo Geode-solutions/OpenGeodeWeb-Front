@@ -1,5 +1,5 @@
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 import { useAppStore } from "@ogw_front/stores/app"
 
@@ -33,7 +33,11 @@ export const useInfraStore = defineStore("infra", {
       const store_name = store.$id
       console.log("[INFRA] Registering microservice:", store_name)
 
-      if (!this.microservices.find((store) => store.$id === store_name)) {
+      if (
+        !this.microservices.find(
+          (microservice) => microservice.$id === store_name,
+        )
+      ) {
         this.microservices.push(store)
         console.log("[INFRA] Microservice registered:", store_name)
       }

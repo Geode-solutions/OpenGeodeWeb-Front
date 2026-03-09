@@ -2,8 +2,11 @@
 import { beforeEach, describe, expect, expectTypeOf, test } from "vitest"
 
 // Local imports
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
+
+const ERROR_500 = 500
+const MILISECONDS_TIMEOUT = 1000
 
 beforeEach(() => {
   setupActivePinia()
@@ -23,7 +26,7 @@ describe("Feedback Store", () => {
       test("test add_error", () => {
         const feedbackStore = useFeedbackStore()
         feedbackStore.add_error(
-          500,
+          ERROR_500,
           "/test",
           "test message",
           "test description",
@@ -36,7 +39,7 @@ describe("Feedback Store", () => {
         const feedbackStore = useFeedbackStore()
         feedbackStore.feedbacks_timeout_miliseconds = 500
         feedbackStore.add_error(
-          500,
+          ERROR_500,
           "/test",
           "test message",
           "test description",
@@ -44,7 +47,7 @@ describe("Feedback Store", () => {
         expect(feedbackStore.feedbacks).toHaveLength(1)
         setTimeout(() => {
           expect(feedbackStore.feedbacks).toHaveLength(0)
-        }, 1000)
+        }, MILISECONDS_TIMEOUT)
       })
     })
 
@@ -58,7 +61,7 @@ describe("Feedback Store", () => {
 
         setTimeout(() => {
           expect(feedbackStore.feedbacks).toHaveLength(0)
-        }, 1000)
+        }, MILISECONDS_TIMEOUT)
       })
     })
 

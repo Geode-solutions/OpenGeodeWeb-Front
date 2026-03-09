@@ -10,11 +10,11 @@ import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json
 import { useRuntimeConfig } from "nuxt/app"
 
 // Local imports
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { useAppStore } from "@ogw_front/stores/app"
 import { useInfraStore } from "@ogw_front/stores/infra"
-import { viewer_call } from "../../internal/utils/viewer_call"
+import { viewer_call } from "@ogw_internal/utils/viewer_call"
 
 const MS_PER_SECOND = 1000
 const SECONDS_PER_REQUEST = 10
@@ -24,7 +24,6 @@ export const useViewerStore = defineStore(
   "viewer",
   () => {
     const infraStore = useInfraStore()
-
     const default_local_port = ref("1234")
     const client = ref({})
     const config = ref(undefined)
@@ -88,8 +87,9 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
           status.value = Status.CONNECTING
-          const { default: SmartConnect } =
-            await import("wslink/src/SmartConnect")
+          const { default: SmartConnect } = await import(
+            "wslink/src/SmartConnect"
+          )
           vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
           const config_obj = { application: "Viewer" }
@@ -123,8 +123,9 @@ export const useViewerStore = defineStore(
           })
 
           // Connect
-          const { connectImageStream } =
-            await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+          const { connectImageStream } = await import(
+            "@kitware/vtk.js/Rendering/Misc/RemoteView"
+          )
           client.value = await clientToConnect.connect(config_obj)
           connectImageStream(client.value.getConnection().getSession())
           clientToConnect.endBusy()

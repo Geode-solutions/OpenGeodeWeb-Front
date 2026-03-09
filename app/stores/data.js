@@ -1,6 +1,6 @@
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import { database } from "../../internal/database/database.js"
+import { database } from "@ogw_internal/database/database.js"
 import { liveQuery } from "dexie"
 import { useObservable } from "@vueuse/rxjs"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
@@ -42,13 +42,15 @@ export const useDataStore = defineStore("data", () => {
       Block: "Blocks",
     }
 
-    const componentsByType = items.reduce((accumulator, item) => {
-      if (componentTitles[item.type]) {
-        if (!accumulator[item.type]) accumulator[item.type] = []
-        accumulator[item.type].push(item)
+    const componentsByType = {}
+    for (const component_item of items) {
+      if (componentTitles[component_item.type]) {
+        if (!componentsByType[component_item.type]) {
+          componentsByType[component_item.type] = []
+        }
+        componentsByType[component_item.type].push(component_item)
       }
-      return accumulator
-    }, {})
+    }
 
     return Object.keys(componentTitles)
       .filter((type) => componentsByType[type])
@@ -99,20 +101,70 @@ export const useDataStore = defineStore("data", () => {
     await database.data.update(id, changes)
   }
 
-  async function addModelComponents(values) {
+  async function addModelComponents(id, values) {
     if (!values || values.length === 0) {
-      console.debug("[addModelComponents] No mesh components to add")
+      console.debug("[addModelComponents] No components to add")
       return
     }
-    for (const value of values) {
-      value.created_at = new Date().toISOString()
+
+    const { mesh_components, collection_components } = values
+    const allComponents = [
+      ...(mesh_components || []),
+      ...(collection_components || []),
+    ]
+
+    const relations = []
+    for (const component of allComponents) {
+      component.id = id
+      component.created_at = new Date().toISOString()
+
+      if (component.boundaries) {
+        for (const boundary_id of component.boundaries) {
+          relations.push({
+            id,
+            parent: component.geode_id,
+            child: boundary_id,
+            type: "boundary",
+          })
+        }
+        delete component.boundaries
+      }
+      if (component.internals) {
+        for (const internal_id of component.internals) {
+          relations.push({
+            id,
+            parent: component.geode_id,
+            child: internal_id,
+            type: "internal",
+          })
+        }
+        delete component.internals
+      }
+      if (component.items) {
+        for (const item_id of component.items) {
+          relations.push({
+            id,
+            parent: component.geode_id,
+            child: item_id,
+            type: "collection",
+          })
+        }
+        delete component.items
+      }
     }
-    const serializedData = structuredClone(values)
-    await database.model_components.bulkAdd(serializedData)
+
+    const serializedComponents = structuredClone(allComponents)
+    const serializedRelations = structuredClone(relations)
+
+    await database.model_components.bulkAdd(serializedComponents)
+    if (serializedRelations.length > 0) {
+      await database.model_components_relation.bulkAdd(serializedRelations)
+    }
   }
 
   async function deleteModelComponents(id) {
     await database.model_components.where({ id }).delete()
+    await database.model_components_relation.where({ id }).delete()
   }
 
   async function fetchModelComponents(id) {
@@ -122,23 +174,15 @@ export const useDataStore = defineStore("data", () => {
       { id },
       {
         response_function: async (response) => {
-          const allComponents = [
-            ...response.mesh_components.map(
-              ({ boundaries, internals, ...component }) => component,
-            ),
-            ...response.collection_components.map(
-              ({ items, ...component }) => component,
-            ),
-          ].map((component) => ({ ...component, id }))
-          await addModelComponents(allComponents)
+          await addModelComponents(id, response)
         },
       },
     )
   }
 
-  async function getMeshComponentGeodeIds(id, meshComponentType) {
+  async function getMeshComponentGeodeIds(id, component_type) {
     const components = await database.model_components
-      .where({ id, type: meshComponentType })
+      .where({ id, type: component_type })
       .toArray()
     return components.map((component) => component.geode_id)
   }

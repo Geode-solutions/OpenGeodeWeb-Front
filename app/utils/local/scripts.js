@@ -13,10 +13,10 @@ import { executablePath, executableName } from "./path.js"
 const DEFAULT_TIMEOUT_SECONDS = 30
 const MILLISECONDS_PER_SECOND = 1000
 
-function commandExistsSync(executableName) {
+function commandExistsSync(execName) {
   const envPath = process.env.PATH || ""
   return envPath.split(path.delimiter).some((dir) => {
-    const filePath = path.join(dir, executableName)
+    const filePath = path.join(dir, execName)
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile()
   })
 }
@@ -31,18 +31,15 @@ async function waitForReady(child, expectedResponse) {
 }
 
 async function runScript(
-  _executableName,
-  _executablePath,
+  execName,
+  execPath,
   args,
   expectedResponse,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
-  const command = commandExistsSync(_executableName)
-    ? _executableName
-    : path.join(
-        await executablePath(_executablePath),
-        executableName(_executableName),
-      )
+  const command = commandExistsSync(execName)
+    ? execName
+    : path.join(await executablePath(execPath), executableName(execName))
   console.log("runScript", command, args)
   const child = child_process.spawn(command, args, {
     encoding: "utf8",
@@ -50,10 +47,10 @@ async function runScript(
   })
 
   child.stdout.on("data", (data) =>
-    console.log(`[${_executableName}] ${data.toString()}`),
+    console.log(`[${execName}] ${data.toString()}`),
   )
   child.stderr.on("data", (data) =>
-    console.log(`[${_executableName}] ${data.toString()}`),
+    console.log(`[${execName}] ${data.toString()}`),
   )
 
   child.on("error", async (error) => {
@@ -66,10 +63,10 @@ async function runScript(
   })
 
   child.on("close", (code) =>
-    console.log(`[${_executableName}] exited with code ${code}`),
+    console.log(`[${execName}] exited with code ${code}`),
   )
   child.on("kill", () => {
-    console.log(`[${_executableName}] process killed`)
+    console.log(`[${execName}] process killed`)
   })
   child.name = command.replace(/^.*[\\/]/, "")
 
@@ -84,30 +81,29 @@ async function runScript(
   }
 }
 
-async function waitNuxt(nuxt_process) {
-  for await (const [data] of on(nuxt_process.stdout, "data")) {
+async function waitNuxt(nuxtProcess) {
+  for await (const [data] of on(nuxtProcess.stdout, "data")) {
     const output = data.toString()
     console.log("Nuxt:", output)
     const portMatch = output.match(/Listening on http:\/\/\[::\]:(\d+)/)
     if (portMatch) {
-      const [, nuxt_port] = portMatch
+      const [, nuxtPort] = portMatch
 
-      console.log("Nuxt listening on port", nuxt_port)
-      return nuxt_port
+      console.log("Nuxt listening on port", nuxtPort)
+      return nuxtPort
     }
   }
   throw new Error("Nuxt process closed without accepting connections")
 }
 
-async function runBrowser(script_name) {
+async function runBrowser(scriptName) {
   process.env.BROWSER = true
 
-  const nuxtProcess = child_process.spawn("npm", ["run", script_name], {
+  const nuxtProcess = child_process.spawn("npm", ["run", scriptName], {
     shell: true,
     FORCE_COLOR: true,
   })
-  const nuxtPort = await waitNuxt(nuxtProcess)
-  return nuxtPort
+  return await waitNuxt(nuxtProcess)
 }
 
 export { runBrowser, runScript }

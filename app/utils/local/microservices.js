@@ -19,11 +19,12 @@ function getAvailablePort() {
   })
 }
 
-async function runBack(executableName, executablePath, args = {}) {
-  let { projectFolderPath, uploadFolderPath } = args
+async function runBack(execName, execPath, args = {}) {
+  const { projectFolderPath } = args
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required")
   }
+  let { uploadFolderPath } = args
   if (!uploadFolderPath) {
     uploadFolderPath = path.join(projectFolderPath, "uploads")
   }
@@ -38,12 +39,12 @@ async function runBack(executableName, executablePath, args = {}) {
   if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
     backArgs.push("--debug")
   }
-  console.log("runBack", executableName, executablePath, backArgs)
-  await runScript(executableName, executablePath, backArgs, "Serving Flask app")
+  console.log("runBack", execName, execPath, backArgs)
+  await runScript(execName, execPath, backArgs, "Serving Flask app")
   return port
 }
 
-async function runViewer(executableName, executablePath, args = {}) {
+async function runViewer(execName, execPath, args = {}) {
   const { projectFolderPath } = args
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required")
@@ -54,13 +55,8 @@ async function runViewer(executableName, executablePath, args = {}) {
     `--data_folder_path ${projectFolderPath}`,
     `--timeout ${0}`,
   ]
-  console.log("runViewer", executableName, executablePath, viewerArgs)
-  await runScript(
-    executableName,
-    executablePath,
-    viewerArgs,
-    "Starting factory",
-  )
+  console.log("runViewer", execName, execPath, viewerArgs)
+  await runScript(execName, execPath, viewerArgs, "Starting factory")
   return port
 }
 
@@ -86,6 +82,7 @@ function killBack(back_port) {
 
 function killViewer(viewer_port) {
   function do_kill() {
+    // oxlint-disable-next-line avoid-new
     return new Promise((resolve) => {
       const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
       socket.on("open", () => {

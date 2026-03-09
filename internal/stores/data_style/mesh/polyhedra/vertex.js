@@ -35,7 +35,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshPolyhedraVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolyhedraVertexAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

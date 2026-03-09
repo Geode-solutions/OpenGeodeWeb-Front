@@ -2,6 +2,7 @@ import { Dexie } from "dexie"
 import { ExtendedDatabase } from "./extended_database"
 import { dataTable } from "./tables/data_table"
 import { modelComponentsTable } from "./tables/model_components"
+import { modelComponentsRelationTable } from "./tables/model_components_relation"
 
 class Database extends Dexie {
   constructor() {
@@ -10,6 +11,7 @@ class Database extends Dexie {
     this.version(1).stores({
       [dataTable.name]: dataTable.schema,
       [modelComponentsTable.name]: modelComponentsTable.schema,
+      [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
     })
   }
 
@@ -26,6 +28,8 @@ class Database extends Dexie {
 
     currentStores[dataTable.name] = dataTable.schema
     currentStores[modelComponentsTable.name] = modelComponentsTable.schema
+    currentStores[modelComponentsRelationTable.name] =
+      modelComponentsRelationTable.schema
 
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src
@@ -40,7 +44,7 @@ class Database extends Dexie {
       (tableName) => currentStores[tableName],
     )
 
-    database.close()
+    databaseContainer.instance.close()
 
     if (allExisting) {
       const existingDb = new Dexie("Database")
@@ -49,13 +53,15 @@ class Database extends Dexie {
           existingDb.version(1).stores({
             [dataTable.name]: dataTable.schema,
             [modelComponentsTable.name]: modelComponentsTable.schema,
+            [modelComponentsRelationTable.name]:
+              modelComponentsRelationTable.schema,
           })
         } else {
           existingDb.version(version).stores(currentStores)
         }
       }
       await existingDb.open()
-      database = existingDb
+      databaseContainer.instance = existingDb
     } else {
       const newDb = new ExtendedDatabase(
         currentVersion,
@@ -63,11 +69,24 @@ class Database extends Dexie {
         newTables,
       )
       await newDb.open()
-      database = newDb
+      databaseContainer.instance = newDb
     }
   }
 }
 
-let database = new Database()
+const databaseContainer = { instance: new Database() }
+
+const database = new Proxy(
+  {},
+  {
+    get(target, prop) {
+      const value = databaseContainer.instance[prop]
+      if (typeof value === "function") {
+        return value.bind(databaseContainer.instance)
+      }
+      return value
+    },
+  },
+)
 
 export { Database, database }

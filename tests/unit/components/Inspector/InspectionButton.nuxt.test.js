@@ -5,7 +5,7 @@ import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 // Local imports
-import { setupActivePinia, vuetify } from "../../../utils"
+import { setupActivePinia, vuetify } from "@ogw_tests/utils"
 import InspectorInspectionButton from "@ogw_front/components/Inspector/InspectionButton"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 

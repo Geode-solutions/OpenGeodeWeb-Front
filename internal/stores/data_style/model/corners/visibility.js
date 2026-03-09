@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelCornersCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useModelCornersCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -13,16 +13,13 @@ export function useModelCornersVisibilityStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
   const modelCornersCommonStyle = useModelCornersCommonStyle()
-
   function modelCornerVisibility(id, corner_id) {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility
   }
-
   function saveModelCornerVisibility(id, corner_id, visibility) {
     modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility =
       visibility
   }
-
   async function setModelCornersVisibility(id, corner_ids, visibility) {
     if (!corner_ids || corner_ids.length === 0) {
       return

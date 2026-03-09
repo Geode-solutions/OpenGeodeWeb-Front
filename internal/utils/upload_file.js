@@ -1,7 +1,6 @@
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
 
-export async function upload_file(
-  microservice,
+async function upload_file(
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
@@ -51,4 +50,4 @@ export async function upload_file(
   })
 }
 
-export default upload_file
+export { upload_file }

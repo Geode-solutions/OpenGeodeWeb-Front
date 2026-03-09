@@ -2,7 +2,7 @@
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
-import { setTimeout } from "timers/promises"
+import { setTimeout } from "node:timers/promises"
 
 // Third party imports
 import isElectron from "is-electron"
@@ -42,12 +42,12 @@ function executableName(name) {
   return name
 }
 
-function createPath(pathToCreate) {
-  if (!fs.existsSync(pathToCreate)) {
-    fs.mkdirSync(pathToCreate, { recursive: true })
-    console.log(`${pathToCreate} directory created successfully!`)
+function createPath(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true })
+    console.log(`${dirPath} directory created successfully!`)
   }
-  return pathToCreate
+  return dirPath
 }
 
 function generateProjectFolderPath(projectName) {
@@ -62,13 +62,16 @@ async function deleteFolderRecursive(folderPath) {
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
     try {
       console.log(`Deleting folder: ${folderPath}`)
+      // oxlint-disable-next-line no-await-in-loop
       await rimraf(folderPath)
       console.log(`Deleted folder: ${folderPath}`)
       return
     } catch (error) {
       console.error(`Error deleting folder ${folderPath}:`, error)
       // Wait before retrying
-      const DELAY = 1000 * (i + 1)
+      const MILLISECONDS_PER_RETRY = 1000
+      const DELAY = MILLISECONDS_PER_RETRY * (i + 1)
+      // oxlint-disable-next-line no-await-in-loop
       await setTimeout(DELAY)
       console.log("Retrying delete folder")
     }

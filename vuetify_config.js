@@ -19,4 +19,4 @@ const vuetify = {
   },
 }
 
-export default vuetify
+export { vuetify }
