@@ -1,9 +1,11 @@
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js"
 
 async function upload_file(
+  microservice,
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
+  console.log("[UPLOAD_FILE] Uploading file", { route, file })
   const feedbackStore = useFeedbackStore()
   if (!(file instanceof File)) {
     throw new Error("file must be a instance of File")

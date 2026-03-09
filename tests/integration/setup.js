@@ -4,6 +4,7 @@ import { WebSocket } from "ws"
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest"
+import { useRuntimeConfig } from "nuxt/app"
 
 // Local imports
 import {
@@ -20,11 +21,10 @@ import {
 import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
-import { setupActivePinia } from "@ogw_tests/utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useRuntimeConfig } from "nuxt/app"
+import { setupActivePinia } from "@ogw_tests/utils"
 
 // Local constants
 const data_folder = path.join("tests", "integration", "data", "uploads")

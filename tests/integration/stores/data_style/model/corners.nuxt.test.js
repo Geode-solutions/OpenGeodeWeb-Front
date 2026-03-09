@@ -9,7 +9,6 @@ import { Status } from "@ogw_front/utils/status"
 import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-
 import { setupIntegrationTests } from "@ogw_tests/integration/setup"
 
 // Local constants

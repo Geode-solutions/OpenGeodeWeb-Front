@@ -1,7 +1,5 @@
-import { upload_file } from "../../internal/utils/upload_file.js"
-import { api_fetch } from "../../internal/utils/api_fetch.js"
-import { appMode } from "@ogw_front/utils/app_mode"
-import { useInfraStore } from "@ogw_front/stores/infra"
+import { upload_file } from "@ogw_internal/utils/upload_file.js"
+import { api_fetch } from "@ogw_internal/utils/api_fetch.js"
 
 export const useAppStore = defineStore("app", () => {
   const stores = []

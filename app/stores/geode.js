@@ -5,7 +5,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useAppStore } from "@ogw_front/stores/app"
-import { upload_file } from "../../internal/utils/upload_file.js"
+import { upload_file } from "@ogw_internal/utils/upload_file.js"
 
 const MILLISECONDS_IN_SECOND = 1000
 const DEFAULT_PING_INTERVAL_SECONDS = 10
