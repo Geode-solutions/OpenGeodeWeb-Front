@@ -21,11 +21,11 @@
 
   const toggle_loading = useToggle(loading)
 
-  function processSelectedFiles(files) {
+  function processSelectedFiles(selected_files) {
     if (multiple) {
-      internal_files.value = [...internal_files.value, ...files]
+      internal_files.value = [...internal_files.value, ...selected_files]
     } else {
-      internal_files.value = [files[0]]
+      internal_files.value = [selected_files[0]]
     }
   }
 

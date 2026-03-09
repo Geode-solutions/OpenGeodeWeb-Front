@@ -1,4 +1,4 @@
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 export const useLambdaStore = defineStore("lambda", {

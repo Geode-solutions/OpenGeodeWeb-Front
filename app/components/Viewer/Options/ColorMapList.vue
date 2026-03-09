@@ -55,12 +55,10 @@
     if (!preset || !preset.RGBPoints) {
       return
     }
-
     const ctx = canvas.getContext("2d")
     const { height, width } = canvas
     const lut = vtkColorTransferFunction()
     const rgbPoints = preset.RGBPoints
-
     for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {
       lut.addRGBPoint(
         rgbPoints[pointIdx],
@@ -69,7 +67,6 @@
         rgbPoints[pointIdx + THREE],
       )
     }
-
     const table = lut.getUint8Table(
       rgbPoints[0],
       rgbPoints.at(-LAST_POINT_OFFSET),
@@ -77,7 +74,6 @@
       true,
     )
     const imageData = ctx.createImageData(width, height)
-
     for (let xCoord = 0; xCoord < width; xCoord += 1) {
       const alpha = table[xCoord * 4 + THREE],
         blue = table[xCoord * 4 + 2],
@@ -180,7 +176,7 @@
           <v-list-item
             v-for="(child, cIdx) in item.Children"
             :key="cIdx"
-            @click="$emit('select', child)"
+            @click="emit('select', child)"
             class="px-2 mb-1"
             rounded="md"
           >
@@ -202,7 +198,7 @@
 
         <v-list-item
           v-else
-          @click="$emit('select', item)"
+          @click="emit('select', item)"
           class="px-2 mb-1"
           rounded="md"
         >

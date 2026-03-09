@@ -1,12 +1,12 @@
 // Third party imports
 import * as components from "vuetify/components"
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { beforeEach, describe, expect, test, vi } from "vitest"
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
 import { nextTick } from "vue"
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 // Local imports
-import { setupActivePinia, vuetify } from "../../utils"
+import { setupActivePinia, vuetify } from "@ogw_tests/utils"
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
@@ -22,14 +22,11 @@ const geodeStore = useGeodeStore()
 beforeEach(() => {
   geodeStore.base_url = ""
 
-  geodeStore.request = vi.fn((schema, params, callbacks) => {
+  geodeStore.request = vi.fn(() => {
     const response = {
       geode_objects_and_output_extensions: {
         BRep: { msh: { is_saveable: true } },
       },
-    }
-    if (callbacks?.response_function) {
-      callbacks.response_function(response)
     }
     return Promise.resolve(response)
   })

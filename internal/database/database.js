@@ -44,7 +44,7 @@ class Database extends Dexie {
       (tableName) => currentStores[tableName],
     )
 
-    database.close()
+    databaseContainer.instance.close()
 
     if (allExisting) {
       const existingDb = new Dexie("Database")
@@ -61,7 +61,7 @@ class Database extends Dexie {
         }
       }
       await existingDb.open()
-      database = existingDb
+      databaseContainer.instance = existingDb
     } else {
       const newDb = new ExtendedDatabase(
         currentVersion,
@@ -69,11 +69,24 @@ class Database extends Dexie {
         newTables,
       )
       await newDb.open()
-      database = newDb
+      databaseContainer.instance = newDb
     }
   }
 }
 
-let database = new Database()
+const databaseContainer = { instance: new Database() }
+
+const database = new Proxy(
+  {},
+  {
+    get(target, prop) {
+      const value = databaseContainer.instance[prop]
+      if (typeof value === "function") {
+        return value.bind(databaseContainer.instance)
+      }
+      return value
+    },
+  },
+)
 
 export { Database, database }

@@ -1,8 +1,8 @@
 // Third party imports
-import { describe, expect, expectTypeOf, test } from "vitest"
+import { beforeEach, describe, expect, expectTypeOf, test } from "vitest"
 
 // Local imports
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
 // CONSTANTS
