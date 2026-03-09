@@ -78,14 +78,14 @@ export const useDataStore = defineStore("data", () => {
     return await viewerStore.request(viewer_generic_schemas.deregister, { id })
   }
 
-  async function addItem(id, value) {
+  async function addItem(new_item) {
     const itemData = {
-      ...value,
-      id,
-      name: value.name || id,
-      geode_object_type: value.geode_object_type,
-      visible: value.visible !== undefined ? value.visible : true,
-      created_at: value.created_at || new Date().toISOString(),
+      id: new_item.id,
+      name: new_item.name || new_item.id,
+      viewer_type: new_item.viewer_type,
+      geode_object_type: new_item.geode_object_type,
+      visible: new_item.visible !== undefined ? new_item.visible : true,
+      created_at: new_item.created_at || new Date().toISOString(),
     }
 
     const serializedData = structuredClone(itemData)

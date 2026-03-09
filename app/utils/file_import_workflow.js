@@ -35,9 +35,7 @@ async function importItem(item) {
   const hybridViewerStore = useHybridViewerStore()
   const treeviewStore = useTreeviewStore()
   await dataStore.registerObject(item.id)
-  await dataStore.addItem(item.id, {
-    ...item,
-  })
+  await dataStore.addItem(item)
 
   await treeviewStore.addItem(
     item.geode_object_type,
