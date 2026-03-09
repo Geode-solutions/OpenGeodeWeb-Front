@@ -4,7 +4,6 @@ import path from "node:path"
 
 // Third party imports
 import { createError, defineEventHandler, readBody } from "h3"
-import _ from "lodash"
 
 // Local imports
 import { extensionsConf } from "@geode/opengeodeweb-front/app/utils/config.js"
