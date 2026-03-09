@@ -15,17 +15,18 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  function getItem(id) {
-    if (!id) {
-      return ref({})
-    }
+  function item(id) {
+    return database.data.get(id)
+  }
+
+  function refItem(id) {
     return useObservable(
       liveQuery(() => database.data.get(id)),
       { initialValue: {} },
     )
   }
 
-  function getAllItems() {
+  function refAllItems() {
     return useObservable(
       liveQuery(() => database.data.toArray()),
       { initialValue: [] },
@@ -34,27 +35,32 @@ export const useDataStore = defineStore("data", () => {
 
   async function formatedMeshComponents(id) {
     const items = await database.model_components.where({ id }).toArray()
-    const distinctTypes = [...new Set(items.map((item) => item.type))]
+    const componentTitles = {
+      Corner: "Corners",
+      Line: "Lines",
+      Surface: "Surfaces",
+      Block: "Blocks",
+    }
 
-    const formated_mesh_components = await Promise.all(
-      distinctTypes.map(async (type) => {
-        const meshComponents = await database.model_components
-          .where({ id, type })
-          .toArray()
+    const componentsByType = items.reduce((accumulator, item) => {
+      if (componentTitles[item.type]) {
+        if (!accumulator[item.type]) accumulator[item.type] = []
+        accumulator[item.type].push(item)
+      }
+      return accumulator
+    }, {})
 
-        return {
-          id: type,
-          title: type,
-          children: meshComponents.map((meshComponent) => ({
-            id: meshComponent.geode_id,
-            title: meshComponent.name,
-            category: meshComponent.type,
-          })),
-        }
-      }),
-    )
-
-    return formated_mesh_components
+    return Object.keys(componentTitles)
+      .filter((type) => componentsByType[type])
+      .map((type) => ({
+        id: type,
+        title: componentTitles[type],
+        children: componentsByType[type].map((meshComponent) => ({
+          id: meshComponent.geode_id,
+          title: meshComponent.name,
+          category: meshComponent.type,
+        })),
+      }))
   }
 
   async function meshComponentType(id, geode_id) {
@@ -159,7 +165,7 @@ export const useDataStore = defineStore("data", () => {
     await database.model_components_relation.where({ id }).delete()
   }
 
-  async function fetchMeshComponents(id) {
+  async function fetchModelComponents(id) {
     const geodeStore = useGeodeStore()
     return await geodeStore.request(
       back_model_schemas.model_components,
@@ -171,7 +177,6 @@ export const useDataStore = defineStore("data", () => {
       },
     )
   }
-
 
   async function getMeshComponentGeodeIds(id, meshComponentType) {
     const components = await database.model_components
@@ -219,8 +224,9 @@ export const useDataStore = defineStore("data", () => {
   }
 
   return {
-    getAllItems,
-    getItem,
+    refAllItems,
+    item,
+    refItem,
     meshComponentType,
     formatedMeshComponents,
     registerObject,
@@ -228,7 +234,7 @@ export const useDataStore = defineStore("data", () => {
     addItem,
     deleteItem,
     updateItem,
-    fetchMeshComponents,
+    fetchModelComponents,
     getCornersGeodeIds,
     getLinesGeodeIds,
     getSurfacesGeodeIds,

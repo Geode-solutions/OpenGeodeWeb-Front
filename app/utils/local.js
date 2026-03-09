@@ -3,6 +3,7 @@ import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 import { setTimeout } from "timers/promises"
+import { rimraf } from "rimraf"
 
 // Third party imports
 import { WebSocket } from "ws"
@@ -182,7 +183,7 @@ async function delete_folder_recursive(data_folder_path) {
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
     try {
       console.log(`Deleting folder: ${data_folder_path}`)
-      fs.rmSync(data_folder_path, { recursive: true, force: true })
+      await rimraf(data_folder_path)
       console.log(`Deleted folder: ${data_folder_path}`)
       return
     } catch (error) {
@@ -190,6 +191,7 @@ async function delete_folder_recursive(data_folder_path) {
       // Wait before retrying
       const DELAY = 1000 * (i + 1)
       await setTimeout(DELAY)
+      console.log("Retrying delete folder")
     }
   }
 }
@@ -209,52 +211,52 @@ function kill_back(back_port) {
     }
   }
   return pTimeout(do_kill(), {
-    milliseconds: 500,
+    milliseconds: 5000,
     message: "Failed to kill back",
   })
 }
 
 function kill_viewer(viewer_port) {
-  async function do_kill() {
-    const socket = new WebSocket(`ws://localhost:${viewer_port}/ws`)
-    try {
-      await once(socket, "open")
-      console.log("Connected to WebSocket server")
-      socket.send(
-        JSON.stringify({
-          id: "system:hello",
-          method: "wslink.hello",
-          args: [{ secret: "wslink-secret" }],
-        }),
-      )
-
-      for await (const [data] of on(socket, "message")) {
+  function do_kill() {
+    return new Promise((resolve) => {
+      const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
+      socket.on("open", () => {
+        console.log("Connected to WebSocket server")
+        socket.send(
+          JSON.stringify({
+            id: "system:hello",
+            method: "wslink.hello",
+            args: [{ secret: "wslink-secret" }],
+          }),
+        )
+      })
+      socket.on("message", (data) => {
         const message = data.toString()
         console.log("Received from server:", message)
-
         if (message.includes("hello")) {
           socket.send(
             JSON.stringify({
-              id: viewer_schemas.opengeodeweb_viewer.kill.$id,
-              method: viewer_schemas.opengeodeweb_viewer.kill.$id,
+              id: "application.exit",
+              method: "application.exit",
             }),
           )
-          break
+          socket.close()
+          resolve()
         }
-      }
-      await once(socket, "close")
-      console.log("Disconnected from WebSocket server")
-    } catch (error) {
-      console.error("WebSocket error:", error)
-    } finally {
-      if (socket.readyState === WebSocket.OPEN) {
+      })
+      socket.on("close", () => {
+        console.log("Disconnected from WebSocket server")
+        resolve()
+      })
+      socket.on("error", (error) => {
+        console.error("WebSocket error:", error)
         socket.close()
-      }
-    }
+        resolve()
+      })
+    })
   }
-
   return pTimeout(do_kill(), {
-    milliseconds: 500,
+    milliseconds: 5000,
     message: "Failed to kill viewer",
   })
 }
