@@ -126,10 +126,14 @@ export const useDataStore = defineStore("data", () => {
         response_function: async (response) => {
           const allComponents = [
             ...response.mesh_components.map(
-              ({ _boundaries, _internals, ...component }) => component,
+              ({
+                boundaries: _boundaries,
+                internals: _internals,
+                ...component
+              }) => component,
             ),
             ...response.collection_components.map(
-              ({ _items, ...component }) => component,
+              ({ items: _items, ...component }) => component,
             ),
           ].map((component) => Object.assign(component, { id }))
           await addModelComponents(allComponents)
