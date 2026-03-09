@@ -101,20 +101,70 @@ export const useDataStore = defineStore("data", () => {
     await database.data.update(id, changes)
   }
 
-  async function addModelComponents(values) {
+  async function addModelComponents(id, values) {
     if (!values || values.length === 0) {
-      console.debug("[addModelComponents] No mesh components to add")
+      console.debug("[addModelComponents] No components to add")
       return
     }
-    for (const value of values) {
-      value.created_at = new Date().toISOString()
+
+    const { mesh_components, collection_components } = values
+    const allComponents = [
+      ...(mesh_components || []),
+      ...(collection_components || []),
+    ]
+
+    const relations = []
+    for (const component of allComponents) {
+      component.id = id
+      component.created_at = new Date().toISOString()
+
+      if (component.boundaries) {
+        for (const boundary_id of component.boundaries) {
+          relations.push({
+            id,
+            parent: component.geode_id,
+            child: boundary_id,
+            type: "boundary",
+          })
+        }
+        delete component.boundaries
+      }
+      if (component.internals) {
+        for (const internal_id of component.internals) {
+          relations.push({
+            id,
+            parent: component.geode_id,
+            child: internal_id,
+            type: "internal",
+          })
+        }
+        delete component.internals
+      }
+      if (component.items) {
+        for (const item_id of component.items) {
+          relations.push({
+            id,
+            parent: component.geode_id,
+            child: item_id,
+            type: "collection",
+          })
+        }
+        delete component.items
+      }
     }
-    const serializedData = structuredClone(values)
-    await database.model_components.bulkAdd(serializedData)
+
+    const serializedComponents = structuredClone(allComponents)
+    const serializedRelations = structuredClone(relations)
+
+    await database.model_components.bulkAdd(serializedComponents)
+    if (serializedRelations.length > 0) {
+      await database.model_components_relation.bulkAdd(serializedRelations)
+    }
   }
 
   async function deleteModelComponents(id) {
     await database.model_components.where({ id }).delete()
+    await database.model_components_relation.where({ id }).delete()
   }
 
   async function fetchModelComponents(id) {
@@ -124,19 +174,7 @@ export const useDataStore = defineStore("data", () => {
       { id },
       {
         response_function: async (response) => {
-          const allComponents = [
-            ...response.mesh_components.map(
-              ({
-                boundaries: _boundaries,
-                internals: _internals,
-                ...component
-              }) => component,
-            ),
-            ...response.collection_components.map(
-              ({ items: _items, ...component }) => component,
-            ),
-          ].map((component) => Object.assign(component, { id }))
-          await addModelComponents(allComponents)
+          await addModelComponents(id, response)
         },
       },
     )
