@@ -6,10 +6,6 @@
   const minimum = defineModel("minimum", { type: Number })
   const maximum = defineModel("maximum", { type: Number })
   const colorMap = defineModel("colorMap", { type: String })
-
-  function reset() {
-    emit("reset")
-  }
 </script>
 
 <template>
@@ -33,7 +29,7 @@
           icon="mdi-arrow-left-right"
           size="x-small"
           variant="text"
-          @click="reset"
+          @click="emit('reset')"
           v-tooltip="'Reset range'"
         />
       </v-col>

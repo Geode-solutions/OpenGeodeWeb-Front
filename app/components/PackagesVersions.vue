@@ -1,5 +1,5 @@
 <script setup>
-  import Status from "@ogw_front/utils/status"
+  import { Status } from "@ogw_front/utils/status"
   import { useGeodeStore } from "@ogw_front/stores/geode"
 
   const { schema } = defineProps({

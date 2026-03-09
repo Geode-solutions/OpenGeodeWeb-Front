@@ -35,7 +35,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshPolygonsVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolygonsVertexAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

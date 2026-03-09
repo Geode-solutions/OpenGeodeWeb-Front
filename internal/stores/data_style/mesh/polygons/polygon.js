@@ -35,7 +35,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshPolygonsPolygonAttribute(id).storedConfigs
+    const { storedConfigs } = meshPolygonsPolygonAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

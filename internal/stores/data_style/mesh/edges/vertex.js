@@ -35,7 +35,7 @@ export function useMeshEdgesVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshEdgesVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshEdgesVertexAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

@@ -108,5 +108,3 @@ export function useProjectManager() {
 
   return { exportProject, importProjectFile }
 }
-
-export default useProjectManager

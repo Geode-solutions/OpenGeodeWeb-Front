@@ -120,9 +120,9 @@
   watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas)
   watch(
     () => modelValue,
-    (nv) => {
-      if (nv !== selectedPresetName.value) {
-        selectedPresetName.value = nv
+    (newValue) => {
+      if (newValue !== selectedPresetName.value) {
+        selectedPresetName.value = newValue
       }
     },
   )

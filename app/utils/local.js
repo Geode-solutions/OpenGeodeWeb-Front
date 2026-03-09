@@ -1,9 +1,9 @@
-import { on, once } from "node:events"
 import child_process from "node:child_process"
 import fs from "node:fs"
+import { on } from "node:events"
 import path from "node:path"
-import { setTimeout } from "timers/promises"
 import { rimraf } from "rimraf"
+import { setTimeout } from "node:timers/promises"
 
 // Third party imports
 import { WebSocket } from "ws"
@@ -11,7 +11,6 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { getPort } from "get-port-please"
 import isElectron from "is-electron"
 import pTimeout from "p-timeout"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 const MAX_DELETE_FOLDER_RETRIES = 5
 const DEFAULT_TIMEOUT_SECONDS = 30
@@ -48,12 +47,12 @@ function executable_name(name) {
   return name
 }
 
-function create_path(path) {
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path, { recursive: true })
-    console.log(`${path} directory created successfully!`)
+function create_path(dir_path) {
+  if (!fs.existsSync(dir_path)) {
+    fs.mkdirSync(dir_path, { recursive: true })
+    console.log(`${dir_path} directory created successfully!`)
   }
-  return path
+  return dir_path
 }
 
 function get_available_port() {
@@ -63,10 +62,10 @@ function get_available_port() {
   })
 }
 
-function commandExistsSync(executable_name) {
+function commandExistsSync(exec_name) {
   const envPath = process.env.PATH || ""
   return envPath.split(path.delimiter).some((dir) => {
-    const filePath = path.join(dir, executable_name)
+    const filePath = path.join(dir, exec_name)
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile()
   })
 }
@@ -81,15 +80,15 @@ async function wait_for_ready(child, expected_response) {
 }
 
 async function run_script(
-  executable_name,
-  executable_path,
+  exec_name,
+  exec_path,
   args,
   expected_response,
   timeout_seconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
-  const command = commandExistsSync(executable_name)
-    ? executable_name
-    : path.join(executable_path, executable_name)
+  const command = commandExistsSync(exec_name)
+    ? exec_name
+    : path.join(exec_path, exec_name)
   console.log("run_script", command, args)
   const child = child_process.spawn(command, args, {
     encoding: "utf8",
@@ -126,8 +125,10 @@ async function run_script(
   }
 }
 
-async function run_back(executable_name, executable_path, args = {}) {
-  let { project_folder_path, upload_folder_path } = args
+async function run_back(exec_name, exec_path, args = {}) {
+  const { project_folder_path, upload_folder_path: upload_folder_path_arg } =
+    args
+  let upload_folder_path = upload_folder_path_arg
   if (!project_folder_path) {
     throw new Error("project_folder_path is required")
   }
@@ -145,17 +146,12 @@ async function run_back(executable_name, executable_path, args = {}) {
   if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
     back_args.push("--debug")
   }
-  console.log("run_back", executable_name, executable_path, back_args)
-  await run_script(
-    executable_name,
-    executable_path,
-    back_args,
-    "Serving Flask app",
-  )
+  console.log("run_back", exec_name, exec_path, back_args)
+  await run_script(exec_name, exec_path, back_args, "Serving Flask app")
   return port
 }
 
-async function run_viewer(executable_name, executable_path, args = {}) {
+async function run_viewer(exec_name, exec_path, args = {}) {
   if (!args.project_folder_path) {
     throw new Error("project_folder_path is required")
   }
@@ -165,13 +161,8 @@ async function run_viewer(executable_name, executable_path, args = {}) {
     `--data_folder_path ${args.project_folder_path}`,
     `--timeout ${0}`,
   ]
-  console.log("run_viewer", executable_name, executable_path, viewer_args)
-  await run_script(
-    executable_name,
-    executable_path,
-    viewer_args,
-    "Starting factory",
-  )
+  console.log("run_viewer", exec_name, exec_path, viewer_args)
+  await run_script(exec_name, exec_path, viewer_args, "Starting factory")
   return port
 }
 
@@ -183,13 +174,16 @@ async function delete_folder_recursive(data_folder_path) {
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
     try {
       console.log(`Deleting folder: ${data_folder_path}`)
+      // oxlint-disable-next-line no-await-in-loop
       await rimraf(data_folder_path)
       console.log(`Deleted folder: ${data_folder_path}`)
       return
     } catch (error) {
       console.error(`Error deleting folder ${data_folder_path}:`, error)
       // Wait before retrying
-      const DELAY = 1000 * (i + 1)
+      const MILLISECONDS_PER_RETRY = 1000
+      const DELAY = MILLISECONDS_PER_RETRY * (i + 1)
+      // oxlint-disable-next-line no-await-in-loop
       await setTimeout(DELAY)
       console.log("Retrying delete folder")
     }
@@ -218,8 +212,9 @@ function kill_back(back_port) {
 
 function kill_viewer(viewer_port) {
   function do_kill() {
+    // oxlint-disable-next-line avoid-new
     return new Promise((resolve) => {
-      const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
+      const socket = new WebSocket(`ws://localhost:${viewer_port}/ws`)
       socket.on("open", () => {
         console.log("Connected to WebSocket server")
         socket.send(

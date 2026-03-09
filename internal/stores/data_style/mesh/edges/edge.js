@@ -19,7 +19,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
   }
 
   function meshEdgesEdgeAttributeStoredConfig(id, name) {
-    const storedConfigs = meshEdgesEdgeAttribute(id).storedConfigs
+    const { storedConfigs } = meshEdgesEdgeAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
@@ -35,7 +35,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshEdgesEdgeAttribute(id).storedConfigs
+    const { storedConfigs } = meshEdgesEdgeAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }
