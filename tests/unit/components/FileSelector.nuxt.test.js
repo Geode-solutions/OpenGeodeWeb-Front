@@ -77,7 +77,7 @@ describe(FileSelector, async () => {
       handler: () => ({}),
     })
 
-    const files = [new File(["fake_file"], "fake_file.txt")]
+    const files_upload = [new File(["fake_file"], "fake_file.txt")]
     test("auto_upload true", async () => {
       const wrapper = await mountSuspended(FileSelector, {
         global: {
@@ -85,18 +85,18 @@ describe(FileSelector, async () => {
         },
         props: {
           multiple: false,
-          files: files,
+          files: files_upload,
           auto_upload: true,
         },
       })
 
       await flushPromises()
-      expect(wrapper.componentVM.files).toEqual(files)
+      expect(wrapper.componentVM.files).toEqual(files_upload)
       expect(wrapper.emitted()).toHaveProperty("update_values")
       expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
       expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual(
         {
-          files,
+          files: files_upload,
           auto_upload: false,
         },
       )
@@ -109,7 +109,7 @@ describe(FileSelector, async () => {
         },
         props: {
           multiple: false,
-          files: files,
+          files: files_upload,
           auto_upload: false,
         },
       })
@@ -117,7 +117,7 @@ describe(FileSelector, async () => {
       await flushPromises()
 
       const file_uploader = wrapper.findComponent(FileUploader)
-      expect(wrapper.vm.files).toEqual(files)
+      expect(wrapper.vm.files).toEqual(files_upload)
       const upload_files = vi.spyOn(file_uploader.vm, "upload_files")
       expect(upload_files).not.toHaveBeenCalled()
     })
