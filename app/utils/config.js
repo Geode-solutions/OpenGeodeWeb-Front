@@ -3,7 +3,6 @@ import path from "node:path"
 
 // Third party imports
 import Conf from "conf"
-import _ from "lodash"
 
 // Local imports
 

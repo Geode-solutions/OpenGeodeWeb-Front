@@ -87,12 +87,12 @@ async function runScript(
 async function waitNuxt(nuxt_process) {
   for await (const [data] of on(nuxt_process.stdout, "data")) {
     const output = data.toString()
-    const portMatch = output.match(
-      /Accepting connections at http:\/\/localhost:(\d+)/,
-    )
     console.log("Nuxt:", output)
+    const portMatch = output.match(/Listening on http:\/\/\[::\]:(\d+)/)
     if (portMatch) {
       const [, nuxt_port] = portMatch
+
+      console.log("Nuxt listening on port", nuxt_port)
       return nuxt_port
     }
   }
@@ -101,18 +101,13 @@ async function waitNuxt(nuxt_process) {
 
 async function runBrowser(script_name) {
   process.env.BROWSER = true
-  process.on("SIGINT", async () => {
-    console.log("Shutting down microservices")
-    await Promise.all([killBack(back_port), kill_viewer(viewer_port)])
-    console.log("Quitting App...")
-    process.exit(0)
-  })
 
   const nuxtProcess = child_process.spawn("npm", ["run", script_name], {
     shell: true,
     FORCE_COLOR: true,
   })
-  return waitNuxt(nuxtProcess)
+  const nuxtPort = await waitNuxt(nuxtProcess)
+  return nuxtPort
 }
 
 export { runBrowser, runScript }
