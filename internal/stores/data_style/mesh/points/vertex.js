@@ -35,7 +35,7 @@ export function useMeshPointsVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    const storedConfigs = meshPointsVertexAttribute(id).storedConfigs
+    const { storedConfigs } = meshPointsVertexAttribute(id)
     storedConfigs[name] = { minimum, maximum, colorMap }
     return storedConfigs[name]
   }

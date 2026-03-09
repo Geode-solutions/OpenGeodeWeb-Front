@@ -1,7 +1,7 @@
 // oxlint-disable-next-line id-length
 import _ from "lodash"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import validate_schema from "@ogw_front/utils/validate_schema"
+import { validate_schema } from "@ogw_front/utils/validate_schema"
 
 const ERROR_400 = 400
 
@@ -14,14 +14,14 @@ export function api_fetch(
 
   const body = params || {}
 
-  const { valid, error } = validate_schema(schema, body)
+  const { valid, error: schema_error } = validate_schema(schema, body)
 
   if (!valid) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Bad request", error, schema, params)
+      console.log("Bad request", schema_error, schema, params)
     }
-    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", error)
-    throw new Error(`${schema.$id}: ${error}`)
+    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", schema_error)
+    throw new Error(`${schema.$id}: ${schema_error}`)
   }
 
   microservice.start_request()
@@ -74,5 +74,3 @@ export function api_fetch(
     },
   })
 }
-
-export default api_fetch

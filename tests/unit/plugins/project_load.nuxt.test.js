@@ -6,19 +6,19 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
-import { database } from "../../../internal/database/database.js"
-import { setupActivePinia } from "../../utils"
+import { database } from "@ogw_internal/database/database.js"
+import { setupActivePinia } from "@ogw_tests/utils"
 
 const PANEL_WIDTH = 320
 const Z_SCALE = 1.5
 const STORES_SLICE_START = 1
 
-vi.mock("../../../internal/utils/viewer_call", () => ({
+vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: vi.fn(async () => {
     await Promise.resolve()
   }),
 }))
-vi.mock("../../../app/stores/hybrid_viewer", () => ({
+vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
   useHybridViewerStore: () => ({
     $id: "hybridViewer",
     initHybridViewer: vi.fn(),

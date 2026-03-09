@@ -10,10 +10,10 @@
   const internal_textures = ref([])
 
   onMounted(() => {
-    if (textures.value !== null) {
-      internal_textures.value = textures.value
-    } else {
+    if (textures.value === null) {
       internal_textures.value = [{ id: "", texture_name: "" }]
+    } else {
+      internal_textures.value = textures.value
     }
   })
 
@@ -22,7 +22,7 @@
     const filtered = internal_textures.value.filter(
       (texture) => texture.texture_name !== "" && texture.id !== "",
     )
-    if (filtered.length !== 0) {
+    if (filtered.length > 0) {
       textures.value = filtered
     }
   }

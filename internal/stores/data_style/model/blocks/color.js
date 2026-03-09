@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelBlocksCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useModelBlocksCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -17,11 +17,9 @@ export function useModelBlocksColorStyle() {
   function modelBlockColor(id, block_id) {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).color
   }
-
   function saveModelBlockColor(id, block_id, color) {
     modelBlocksCommonStyle.modelBlockStyle(id, block_id).color = color
   }
-
   async function setModelBlocksColor(id, block_ids, color) {
     if (!block_ids || block_ids.length === 0) {
       return
@@ -45,7 +43,6 @@ export function useModelBlocksColorStyle() {
           for (const block_id of block_ids) {
             saveModelBlockColor(id, block_id, color)
           }
-
           console.log(
             setModelBlocksColor.name,
             { id },

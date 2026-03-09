@@ -6,7 +6,7 @@ import { flushPromises } from "@vue/test-utils"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
 // Local imports
-import { setupActivePinia, vuetify } from "../../utils"
+import { setupActivePinia, vuetify } from "@ogw_tests/utils"
 import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
