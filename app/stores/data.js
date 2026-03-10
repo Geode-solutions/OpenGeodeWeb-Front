@@ -1,15 +1,12 @@
 // Third party imports
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { database } from "@ogw_internal/database/database.js"
 import { liveQuery } from "dexie"
 import { useObservable } from "@vueuse/rxjs"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
-const back_model_schemas = back_schemas.opengeodeweb_back.models
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 
 export const useDataStore = defineStore("data", () => {
