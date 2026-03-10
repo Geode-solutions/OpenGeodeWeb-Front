@@ -95,25 +95,19 @@ export const useDataStore = defineStore("data", () => {
 
   function addComponents(new_item) {
     const allComponents = []
-    for (const component of new_item.mesh_components) {
-      component.id = new_item.id
-      component.created_at = new Date().toISOString()
-      if (component.boundaries) {
-        delete component.boundaries
+    function addModelComponents(components) {
+      for (const component of components) {
+        allComponents.push({
+          id: new_item.id,
+          geode_id: component.geode_id,
+          type: component.type,
+          viewer_id: component.viewer_id,
+          name: component.name,
+        })
       }
-      if (component.internals) {
-        delete component.internals
-      }
-      allComponents.push(component)
     }
-    for (const component of new_item.collection_components) {
-      component.id = new_item.id
-      component.created_at = new Date().toISOString()
-      if (component.items) {
-        delete component.items
-      }
-      allComponents.push(component)
-    }
+    addModelComponents(new_item.mesh_components)
+    addModelComponents(new_item.collection_components)
     return database.model_components.bulkPut(allComponents)
   }
 
