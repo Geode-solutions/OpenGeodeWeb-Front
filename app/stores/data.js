@@ -30,8 +30,10 @@ export const useDataStore = defineStore("data", () => {
     )
   }
 
-  async function formatedMeshComponents(id) {
-    const items = await database.model_components.where({ id }).toArray()
+  async function formatedMeshComponents(modelId) {
+    const items = await database.model_components
+      .where({ id: modelId })
+      .toArray()
     const componentTitles = {
       Corner: "Corners",
       Line: "Lines",
@@ -62,9 +64,9 @@ export const useDataStore = defineStore("data", () => {
       }))
   }
 
-  async function meshComponentType(id, geode_id) {
+  async function meshComponentType(modelId, geode_id) {
     const component = await database.model_components
-      .where({ id, geode_id })
+      .where({ id: modelId, geode_id })
       .first()
     return component?.type
   }
@@ -157,32 +159,32 @@ export const useDataStore = defineStore("data", () => {
     await database.data.update(id, changes)
   }
 
-  async function deleteModelComponents(id) {
-    await database.model_components.where({ id }).delete()
-    await database.model_components_relation.where({ id }).delete()
+  async function deleteModelComponents(modelId) {
+    await database.model_components.where({ id: modelId }).delete()
+    await database.model_components_relation.where({ id: modelId }).delete()
   }
 
-  async function getMeshComponentGeodeIds(id, component_type) {
+  async function getMeshComponentGeodeIds(modelId, component_type) {
     const components = await database.model_components
-      .where({ id, type: component_type })
+      .where({ id: modelId, type: component_type })
       .toArray()
     return components.map((component) => component.geode_id)
   }
 
-  async function getCornersGeodeIds(id) {
-    return await getMeshComponentGeodeIds(id, "Corner")
+  async function getCornersGeodeIds(modelId) {
+    return await getMeshComponentGeodeIds(modelId, "Corner")
   }
 
-  async function getLinesGeodeIds(id) {
-    return await getMeshComponentGeodeIds(id, "Line")
+  async function getLinesGeodeIds(modelId) {
+    return await getMeshComponentGeodeIds(modelId, "Line")
   }
 
-  async function getSurfacesGeodeIds(id) {
-    return await getMeshComponentGeodeIds(id, "Surface")
+  async function getSurfacesGeodeIds(modelId) {
+    return await getMeshComponentGeodeIds(modelId, "Surface")
   }
 
-  async function getBlocksGeodeIds(id) {
-    return await getMeshComponentGeodeIds(id, "Block")
+  async function getBlocksGeodeIds(modelId) {
+    return await getMeshComponentGeodeIds(modelId, "Block")
   }
 
   async function getMeshComponentsViewerIds(modelId, meshComponentGeodeIds) {
