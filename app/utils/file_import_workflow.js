@@ -8,6 +8,8 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
+const SECOND = 1000
+
 async function importWorkflow(files) {
   console.log("importWorkflow", { files })
   const start = Date.now()
@@ -20,7 +22,7 @@ async function importWorkflow(files) {
   const results = await Promise.all(promise_array)
   const hybridViewerStore = useHybridViewerStore()
   hybridViewerStore.remoteRender()
-  console.log("importWorkflow completed in", (Date.now() - start) / 1000)
+  console.log("importWorkflow completed in", (Date.now() - start) / SECOND)
   return results
 }
 
@@ -38,8 +40,15 @@ async function importItem(item) {
   const treeviewStore = useTreeviewStore()
   const registerTask = dataStore.registerObject(item.id)
   const addDataTask = dataStore.addItem(item)
-  const addDataComponentsTask = dataStore.addComponents(item)
-  const addDataRelationsTask = dataStore.addComponentRelations(item)
+  console.log({ dataStore })
+  const addDataComponentsTask =
+    item.viewer_type === "model"
+      ? dataStore.addComponents(item)
+      : Promise.resolve()
+  const addDataRelationsTask =
+    item.viewer_type === "model"
+      ? dataStore.addComponentRelations(item)
+      : Promise.resolve()
   const addTreeviewTask = treeviewStore.addItem(
     item.geode_object_type,
     item.name,

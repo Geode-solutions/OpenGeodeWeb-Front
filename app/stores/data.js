@@ -1,10 +1,10 @@
 // Third party imports
-import { database } from "@ogw_internal/database/database.js"
 import { liveQuery } from "dexie"
 import { useObservable } from "@vueuse/rxjs"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
+import { database } from "@ogw_internal/database/database.js"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
@@ -152,9 +152,11 @@ export const useDataStore = defineStore("data", () => {
     await database.data.delete(id)
     await deleteModelComponents(id)
   }
+
   async function updateItem(id, changes) {
     await database.data.update(id, changes)
   }
+
   async function deleteModelComponents(id) {
     await database.model_components.where({ id }).delete()
     await database.model_components_relation.where({ id }).delete()
