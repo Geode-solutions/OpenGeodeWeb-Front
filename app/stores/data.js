@@ -113,38 +113,39 @@ export const useDataStore = defineStore("data", () => {
 
   function addComponentRelations(new_item) {
     const relations = []
+    function addModelComponentRelations(components, parent, type) {
+      for (const child of components) {
+        relations.push({
+          id: new_item.id,
+          parent,
+          child,
+          type,
+        })
+      }
+    }
     for (const component of new_item.mesh_components) {
       if (component.boundaries) {
-        for (const boundary_id of component.boundaries) {
-          relations.push({
-            id: new_item.id,
-            parent: component.geode_id,
-            child: boundary_id,
-            type: "boundary",
-          })
-        }
+        addModelComponentRelations(
+          component.boundaries,
+          component.geode_id,
+          "boundary",
+        )
       }
       if (component.internals) {
-        for (const internal_id of component.internals) {
-          relations.push({
-            id: new_item.id,
-            parent: component.geode_id,
-            child: internal_id,
-            type: "internal",
-          })
-        }
+        addModelComponentRelations(
+          component.internals,
+          component.geode_id,
+          "internal",
+        )
       }
     }
     for (const component of new_item.collection_components) {
       if (component.items) {
-        for (const item_id of component.items) {
-          relations.push({
-            id: new_item.id,
-            parent: component.geode_id,
-            child: item_id,
-            type: "collection",
-          })
-        }
+        addModelComponentRelations(
+          component.items,
+          component.geode_id,
+          "collection",
+        )
       }
     }
     return database.model_components_relation.bulkPut(relations)
