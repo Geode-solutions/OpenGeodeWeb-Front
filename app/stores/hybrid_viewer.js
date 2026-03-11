@@ -6,7 +6,7 @@ import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
 
 import { Status } from "@ogw_front/utils/status"
-import { database } from "@ogw_internal/database/database.js"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
@@ -26,6 +26,7 @@ const ACTOR_COLOR = [
 const WHEEL_TIME_OUT_MS = 600
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
   const hybridDb = reactive({})
   const status = ref(Status.NOT_CREATED)
@@ -69,7 +70,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return
     }
-    const value = await database.data.get(id)
+    const value = await dataStore.item(id)
     console.log("hybridViewerStore.addItem", { value })
     const reader = vtkXMLPolyDataReader()
     const textEncoder = new TextEncoder()

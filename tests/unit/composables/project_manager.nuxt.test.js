@@ -218,10 +218,7 @@ function verifyDataManagement() {
   )
   expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalledWith()
   expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123")
-  expect(dataStoreMock.addItem).toHaveBeenCalledWith(
-    "abc123",
-    expect.anything(),
-  )
+  expect(dataStoreMock.addItem).toHaveBeenCalledWith(snapshotMock.data.items[0])
   expect(treeviewStoreMock.addItem).toHaveBeenCalledWith(
     "PointSet2D",
     "My Data",
