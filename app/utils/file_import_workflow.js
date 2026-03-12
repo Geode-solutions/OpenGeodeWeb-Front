@@ -8,8 +8,11 @@ import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
+const SECOND = 1000
+
 async function importWorkflow(files) {
   console.log("importWorkflow", { files })
+  const start = Date.now()
   const promise_array = []
   for (const file of files) {
     const { filename, geode_object_type } = file
@@ -19,6 +22,7 @@ async function importWorkflow(files) {
   const results = await Promise.all(promise_array)
   const hybridViewerStore = useHybridViewerStore()
   hybridViewerStore.remoteRender()
+  console.log("importWorkflow completed in", (Date.now() - start) / SECOND)
   return results
 }
 
@@ -34,26 +38,45 @@ async function importItem(item) {
   const dataStyleStore = useDataStyleStore()
   const hybridViewerStore = useHybridViewerStore()
   const treeviewStore = useTreeviewStore()
-  await dataStore.registerObject(item.id)
-  await dataStore.addItem(item.id, {
-    ...item,
-  })
-
-  await treeviewStore.addItem(
+  const registerTask = dataStore.registerObject(item.id)
+  const addDataTask = dataStore.addItem(item)
+  console.log({ dataStore })
+  const addDataComponentsTask =
+    item.viewer_type === "model"
+      ? dataStore.addComponents(item)
+      : Promise.resolve()
+  const addDataRelationsTask =
+    item.viewer_type === "model"
+      ? dataStore.addComponentRelations(item)
+      : Promise.resolve()
+  const addTreeviewTask = treeviewStore.addItem(
     item.geode_object_type,
     item.name,
     item.id,
     item.viewer_type,
   )
-
-  await hybridViewerStore.addItem(item.id)
-  await dataStyleStore.addDataStyle(item.id, item.geode_object_type)
-
-  if (item.viewer_type === "model") {
-    await dataStore.fetchModelComponents(item.id)
-  }
-
-  await dataStyleStore.applyDefaultStyle(item.id)
+  const addStyleTask = dataStyleStore.addDataStyle(
+    item.id,
+    item.geode_object_type,
+  )
+  const addViewerTask = addDataTask.then(() =>
+    hybridViewerStore.addItem(item.id),
+  )
+  const applyStyleTask = Promise.all([
+    registerTask,
+    addDataComponentsTask,
+    addStyleTask,
+  ]).then(() => dataStyleStore.applyDefaultStyle(item.id))
+  await Promise.all([
+    registerTask,
+    addDataTask,
+    addDataComponentsTask,
+    addTreeviewTask,
+    addStyleTask,
+    addDataRelationsTask,
+    addViewerTask,
+    applyStyleTask,
+  ])
   return item.id
 }
 

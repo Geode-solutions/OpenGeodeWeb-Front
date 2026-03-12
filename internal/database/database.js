@@ -1,8 +1,8 @@
 import { Dexie } from "dexie"
 import { ExtendedDatabase } from "./extended_database"
-import { dataTable } from "./tables/data_table"
-import { modelComponentsTable } from "./tables/model_components"
+import { dataTable } from "./tables/data"
 import { modelComponentsRelationTable } from "./tables/model_components_relation"
+import { modelComponentsTable } from "./tables/model_components"
 
 class Database extends Dexie {
   constructor() {
