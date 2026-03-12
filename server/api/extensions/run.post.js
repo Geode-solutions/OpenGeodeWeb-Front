@@ -8,7 +8,10 @@ import { createError, defineEventHandler, readBody } from "h3"
 // Local imports
 import { extensionsConf } from "@geode/opengeodeweb-front/app/utils/config.js"
 import { unzipFile } from "@geode/opengeodeweb-front/app/utils/server.js"
-import { runBack } from "@geode/opengeodeweb-front/app/utils/local/microservices.js"
+import {
+  addMicroserviceMetadatas,
+  runBack,
+} from "@geode/opengeodeweb-front/app/utils/local/microservices.js"
 
 const CODE_200 = 200
 
@@ -72,6 +75,11 @@ export default defineEventHandler(async (event) => {
         name,
         version,
         frontendContent,
+        port,
+      })
+      await addMicroserviceMetadatas(projectFolderPath, {
+        type: "back",
+        name,
         port,
       })
     }
