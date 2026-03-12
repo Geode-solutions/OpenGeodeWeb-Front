@@ -4,15 +4,6 @@ import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 
-// Third party imports
-import pTimeout from "p-timeout"
-
-// Local imports
-import { executablePath, executableName } from "./path.js"
-
-const DEFAULT_TIMEOUT_SECONDS = 30
-const MILLISECONDS_PER_SECOND = 1000
-
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || ""
   return envPath.split(path.delimiter).some((dir) => {
@@ -28,57 +19,6 @@ async function waitForReady(child, expectedResponse) {
     }
   }
   throw new Error("Process closed before signal")
-}
-
-async function runScript(
-  execName,
-  execPath,
-  args,
-  expectedResponse,
-  timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
-) {
-  const command = commandExistsSync(execName)
-    ? execName
-    : path.join(await executablePath(execPath), executableName(execName))
-  console.log("runScript", command, args)
-  const child = child_process.spawn(command, args, {
-    encoding: "utf8",
-    shell: true,
-  })
-
-  child.stdout.on("data", (data) =>
-    console.log(`[${execName}] ${data.toString()}`),
-  )
-  child.stderr.on("data", (data) =>
-    console.log(`[${execName}] ${data.toString()}`),
-  )
-
-  child.on("error", async (error) => {
-    const electron = await import("electron")
-    electron.dialog.showMessageBox({
-      title: "Title",
-      type: "warning",
-      message: `Error occured.\r\n${error}`,
-    })
-  })
-
-  child.on("close", (code) =>
-    console.log(`[${execName}] exited with code ${code}`),
-  )
-  child.on("kill", () => {
-    console.log(`[${execName}] process killed`)
-  })
-  child.name = command.replace(/^.*[\\/]/, "")
-
-  try {
-    return await pTimeout(waitForReady(child, expectedResponse), {
-      milliseconds: timeoutSeconds * MILLISECONDS_PER_SECOND,
-      message: `Timed out after ${timeoutSeconds} seconds`,
-    })
-  } catch (error) {
-    child.kill()
-    throw error
-  }
 }
 
 async function waitNuxt(nuxtProcess) {
@@ -106,4 +46,4 @@ async function runBrowser(scriptName) {
   return await waitNuxt(nuxtProcess)
 }
 
-export { runBrowser, runScript }
+export { runBrowser, waitForReady, commandExistsSync }

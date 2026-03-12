@@ -1,4 +1,5 @@
 // Node imports
+import child_process from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 
@@ -6,17 +7,75 @@ import path from "node:path"
 import { WebSocket } from "ws"
 import { getPort } from "get-port-please"
 import pTimeout from "p-timeout"
-
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" }
 
 // Local imports
-import { runScript } from "./scripts.js"
+import {
+  deleteFolderRecursive,
+  executablePath,
+  executableName,
+} from "./path.js"
+import { commandExistsSync, waitForReady } from "./scripts.js"
+
+const DEFAULT_TIMEOUT_SECONDS = 30
+const MILLISECONDS_PER_SECOND = 1000
 
 function getAvailablePort() {
   return getPort({
     host: "localhost",
     random: true,
   })
+}
+
+async function runScript(
+  execName,
+  execPath,
+  args,
+  expectedResponse,
+  timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
+) {
+  const command = commandExistsSync(execName)
+    ? execName
+    : path.join(await executablePath(execPath), executableName(execName))
+  console.log("runScript", command, args)
+  const child = child_process.spawn(command, args, {
+    encoding: "utf8",
+    shell: true,
+  })
+
+  child.stdout.on("data", (data) =>
+    console.log(`[${execName}] ${data.toString()}`),
+  )
+  child.stderr.on("data", (data) =>
+    console.log(`[${execName}] ${data.toString()}`),
+  )
+
+  child.on("error", async (error) => {
+    const electron = await import("electron")
+    electron.dialog.showMessageBox({
+      title: "Title",
+      type: "warning",
+      message: `Error occured.\r\n${error}`,
+    })
+  })
+
+  child.on("close", (code) =>
+    console.log(`[${execName}] exited with code ${code}`),
+  )
+  child.on("kill", () => {
+    console.log(`[${execName}] process killed`)
+  })
+  child.name = command.replace(/^.*[\\/]/, "")
+
+  try {
+    return await pTimeout(waitForReady(child, expectedResponse), {
+      milliseconds: timeoutSeconds * MILLISECONDS_PER_SECOND,
+      message: `Timed out after ${timeoutSeconds} seconds`,
+    })
+  } catch (error) {
+    child.kill()
+    throw error
+  }
 }
 
 async function runBack(execName, execPath, args = {}) {
@@ -60,74 +119,9 @@ async function runViewer(execName, execPath, args = {}) {
   return port
 }
 
-function killBack(back_port) {
-  async function do_kill() {
-    try {
-      await fetch(
-        `http://localhost:${back_port}/${back_schemas.opengeodeweb_back.kill.$id}`,
-        {
-          method: back_schemas.opengeodeweb_back.kill.methods[0],
-        },
-      )
-      throw new Error("Failed to kill back")
-    } catch (error) {
-      console.log("Back closed", error)
-    }
-  }
-  return pTimeout(do_kill(), {
-    milliseconds: 5000,
-    message: "Failed to kill back",
-  })
-}
-
-function killViewer(viewer_port) {
-  function do_kill() {
-    // oxlint-disable-next-line avoid-new
-    return new Promise((resolve) => {
-      const socket = new WebSocket("ws://localhost:" + viewer_port + "/ws")
-      socket.on("open", () => {
-        console.log("Connected to WebSocket server")
-        socket.send(
-          JSON.stringify({
-            id: "system:hello",
-            method: "wslink.hello",
-            args: [{ secret: "wslink-secret" }],
-          }),
-        )
-      })
-      socket.on("message", (data) => {
-        const message = data.toString()
-        console.log("Received from server:", message)
-        if (message.includes("hello")) {
-          socket.send(
-            JSON.stringify({
-              id: "application.exit",
-              method: "application.exit",
-            }),
-          )
-          socket.close()
-          resolve()
-        }
-      })
-      socket.on("close", () => {
-        console.log("Disconnected from WebSocket server")
-        resolve()
-      })
-      socket.on("error", (error) => {
-        console.error("WebSocket error:", error)
-        socket.close()
-        resolve()
-      })
-    })
-  }
-  return pTimeout(do_kill(), {
-    milliseconds: 5000,
-    message: "Failed to kill viewer",
-  })
-}
-
 function killHttpMicroservice(microservice) {
-  const failMessage = `Failed to kill ${microservice}`
+  console.log("killHttpMicroservice", { ...microservice })
+  const failMessage = `Failed to kill ${microservice.name}`
   async function do_kill() {
     try {
       await fetch({
@@ -146,6 +140,7 @@ function killHttpMicroservice(microservice) {
 }
 
 function killWebsocketMicroservice(microservice) {
+  console.log("killWebsocketMicroservice", { ...microservice })
   const failMessage = `Failed to kill ${microservice.name}`
   const successMessage = `Disconnected from ${microservice.name} WebSocket server`
   function do_kill() {
@@ -194,53 +189,70 @@ function killWebsocketMicroservice(microservice) {
 }
 
 function killMicroservice(microservice) {
-  if ("http://" in microservice.url) {
-    killHttpMicroservice(microservice.url)
-  } else if ("ws://" in microservice.url) {
+  if (microservice.type === "back") {
+    killHttpMicroservice(microservice)
+  } else if (microservice.type === "viewer") {
     killWebsocketMicroservice(microservice)
+  } else {
+    throw new Error(`Unknown microservice type: ${microservice.type}`)
   }
 }
 
 function killMicroservices(microservices) {
+  console.log("killMicroservices", { microservices })
   return Promise.all(
     microservices.map((microservice) => killMicroservice(microservice)),
   )
 }
-
 function projectMicroservices(projectFolderPath) {
-  return JSON.parse(
-    fs.readFileSync(path.join(projectFolderPath, "microservices.json")),
-  )
+  console.log("projectMicroservices", { projectFolderPath })
+  const filePath = microservicesMetadatasPath(projectFolderPath)
+
+  if (!fs.existsSync(filePath)) {
+    const microservicesMetadatas = { microservices: [] }
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(microservicesMetadatas, null, 2),
+      "utf-8",
+    )
+  }
+  const content = JSON.parse(fs.readFileSync(filePath, "utf-8"))
+  return content.microservices
 }
 
 async function cleanupBackend(projectFolderPath) {
-  console.log("cleanupBackend", { projectFolderPath })
   const microservices = projectMicroservices(projectFolderPath)
   await killMicroservices(microservices)
-  deleteFolderRecursive(projectFolderPath)
+  await deleteFolderRecursive(projectFolderPath)
 }
 
-function initMicroservicesMetadatas(filePath) {
-  const microservicesMetadatas = {
-    microservices: [],
+function microservicesMetadatasPath(projectFolderPath) {
+  return path.join(projectFolderPath, "microservices.json")
+}
+
+function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
+  const microservices = projectMicroservices(projectFolderPath)
+  if (serviceObj.type === "back") {
+    const schema = back_schemas.opengeodeweb_back.kill
+    serviceObj.url = `http://localhost:${serviceObj.port}/${schema.$id}`
+    serviceObj.method = schema.methods[0]
+  } else if (serviceObj.type === "viewer") {
+    serviceObj.url = `ws://localhost:${serviceObj.port}/ws`
   }
-  fs.writeFileSync(filePath, JSON.stringify(microservicesMetadatas, null, 2))
-}
 
-function addMicroserviceMetadatas(filePath, serviceObj) {
-  const config = JSON.parse(fs.readFileSync(filePath, "utf-8"))
-  config.microservices.push(serviceObj)
-  fs.writeFileSync(filePath, JSON.stringify(config, null, 2))
+  microservices.push(serviceObj)
+  fs.writeFileSync(
+    microservicesMetadatasPath(projectFolderPath),
+    JSON.stringify({ microservices }, null, 2),
+  )
 }
 
 export {
-  getAvailablePort,
-  killMicroservices,
-  killBack,
-  killViewer,
-  initMicroservicesMetadatas,
   addMicroserviceMetadatas,
   cleanupBackend,
+  getAvailablePort,
+  killMicroservices,
+  projectMicroservices,
   runBack,
   runViewer,
 }

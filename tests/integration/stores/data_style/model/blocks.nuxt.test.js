@@ -3,8 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import { deleteFolderRecursive } from "@ogw_front/utils/local/path"
-import { killBack, killViewer } from "@ogw_front/utils/local/microservices"
+import { cleanupBackend } from "@ogw_front/utils/local/microservices"
 import { Status } from "@ogw_front/utils/status"
 import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
@@ -17,25 +16,19 @@ const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let back_port = 0,
-  id = "",
-  project_folder_path = "",
-  viewer_port = 0
+let id = "",
+  projectFolderPath = ""
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
-    await setupIntegrationTests(file_name, geode_object))
+  ;({ id, projectFolderPath } = await setupIntegrationTests(
+    file_name,
+    geode_object,
+  ))
 }, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
-  console.log(
-    "afterEach model blocks kill",
-    back_port,
-    viewer_port,
-    project_folder_path,
-  )
-  await Promise.all([killBack(back_port), killViewer(viewer_port)])
-  deleteFolderRecursive(project_folder_path)
+  console.log("afterEach model blocks kill", projectFolderPath)
+  await cleanupBackend(projectFolderPath)
 })
 
 describe("Model blocks", () => {

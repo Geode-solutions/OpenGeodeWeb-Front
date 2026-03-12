@@ -9,12 +9,10 @@ import { useRuntimeConfig } from "nuxt/app"
 // Local imports
 import {
   createPath,
-  deleteFolderRecursive,
   generateProjectFolderPath,
 } from "@ogw_front/utils/local/path"
 import {
-  killBack,
-  killViewer,
+  addMicroserviceMetadatas,
   runBack,
   runViewer,
 } from "@ogw_front/utils/local/microservices"
@@ -50,27 +48,34 @@ async function runMicroservices() {
   console.log("back_port", back_port)
   console.log("viewer_port", viewer_port)
 
+  await addMicroserviceMetadatas(projectFolderPath, {
+    type: "back",
+    name: BACK_COMMAND,
+    port: back_port,
+  })
+  await addMicroserviceMetadatas(projectFolderPath, {
+    type: "viewer",
+    name: VIEWER_COMMAND,
+    port: viewer_port,
+  })
+
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
-  console.log("after ports")
 
   return {
-    back_port,
-    viewer_port,
-    project_folder_path: projectFolderPath,
+    projectFolderPath,
   }
 }
 
 async function setupIntegrationTests(file_name, geode_object) {
   setupActivePinia()
   const viewerStore = useViewerStore()
-  const { back_port, viewer_port, project_folder_path } =
-    await runMicroservices()
+  const { projectFolderPath } = await runMicroservices()
   await viewerStore.ws_connect()
   const id = await importFile(file_name, geode_object)
   expect(viewerStore.status).toBe(Status.CONNECTED)
-  console.log("end of setupIntegrationTests")
-  return { id, back_port, viewer_port, project_folder_path }
+  console.log("end of setupIntegrationTests", { id, projectFolderPath })
+  return { id, projectFolderPath }
 }
 
 const mockLockRequest = vi
@@ -92,13 +97,4 @@ afterAll(() => {
   delete globalThis.WebSocket
 })
 
-async function teardownIntegrationTests(
-  back_port,
-  viewer_port,
-  project_folder_path,
-) {
-  await Promise.all([killBack(back_port), killViewer(viewer_port)])
-  deleteFolderRecursive(project_folder_path)
-}
-
-export { runMicroservices, setupIntegrationTests, teardownIntegrationTests }
+export { runMicroservices, setupIntegrationTests }

@@ -3,6 +3,8 @@ import { Status } from "@ogw_front/utils/status"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 import { useAppStore } from "@ogw_front/stores/app"
 
+import { registerRunningExtensions } from "@ogw_front/utils/extension"
+
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
@@ -73,6 +75,12 @@ export const useInfraStore = defineStore("infra", {
           const appStore = useAppStore()
           await appStore.createProjectFolder()
 
+          if (this.app_mode === appMode.DESKTOP) {
+            globalThis.electronAPI.project_folder_path({
+              projectFolderPath: appStore.projectFolderPath,
+            })
+          }
+
           const microservices_with_launch = this.microservices.filter(
             (store) => store.launch,
           )
@@ -80,6 +88,7 @@ export const useInfraStore = defineStore("infra", {
             store.launch({ projectFolderPath: appStore.projectFolderPath }),
           )
           await Promise.all(launch_promises)
+          await registerRunningExtensions()
         }
 
         this.status = Status.CREATED

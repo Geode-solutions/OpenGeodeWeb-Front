@@ -3,8 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import { deleteFolderRecursive } from "@ogw_front/utils/local/path"
-import { killBack, killViewer } from "@ogw_front/utils/local/microservices"
+import { cleanupBackend } from "@ogw_front/utils/local/microservices"
 import { Status } from "@ogw_front/utils/status"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
@@ -17,25 +16,19 @@ const file_name = "test.og_edc2d"
 const geode_object = "EdgedCurve2D"
 const vertex_attribute = { name: "points" }
 
-let back_port = 0,
-  id = "",
-  project_folder_path = "",
-  viewer_port = 0
+let id = "",
+  projectFolderPath = ""
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
-    await setupIntegrationTests(file_name, geode_object))
+  ;({ id, projectFolderPath } = await setupIntegrationTests(
+    file_name,
+    geode_object,
+  ))
 }, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
-  console.log(
-    "afterEach mesh points kill",
-    back_port,
-    viewer_port,
-    project_folder_path,
-  )
-  await Promise.all([killBack(back_port), killViewer(viewer_port)])
-  deleteFolderRecursive(project_folder_path)
+  console.log("afterEach mesh points kill", projectFolderPath)
+  await cleanupBackend(projectFolderPath)
 })
 
 describe("Mesh points", () => {
