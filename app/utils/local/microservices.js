@@ -190,9 +190,9 @@ function killWebsocketMicroservice(microservice) {
 
 function killMicroservice(microservice) {
   if (microservice.type === "back") {
-    killHttpMicroservice(microservice)
+    return killHttpMicroservice(microservice)
   } else if (microservice.type === "viewer") {
-    killWebsocketMicroservice(microservice)
+    return killWebsocketMicroservice(microservice)
   } else {
     throw new Error(`Unknown microservice type: ${microservice.type}`)
   }
@@ -201,7 +201,9 @@ function killMicroservice(microservice) {
 function killMicroservices(microservices) {
   console.log("killMicroservices", { microservices })
   return Promise.all(
-    microservices.map((microservice) => killMicroservice(microservice)),
+    microservices.map(
+      async (microservice) => await killMicroservice(microservice),
+    ),
   )
 }
 function projectMicroservices(projectFolderPath) {
