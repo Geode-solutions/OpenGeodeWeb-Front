@@ -84,11 +84,11 @@ export const useInfraStore = defineStore("infra", {
           const microservices_with_launch = this.microservices.filter(
             (store) => store.launch,
           )
+
           const launch_promises = microservices_with_launch.map((store) =>
             store.launch({ projectFolderPath: appStore.projectFolderPath }),
           )
-          await Promise.all(launch_promises)
-          await registerRunningExtensions()
+          await Promise.all(launch_promises, registerRunningExtensions())
         }
 
         this.status = Status.CREATED
