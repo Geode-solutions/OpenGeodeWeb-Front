@@ -1,3 +1,77 @@
+<script setup>
+  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+
+  import FetchingData from "@ogw_front/components/FetchingData"
+  import FileUploader from "@ogw_front/components/FileUploader"
+  import { useGeodeStore } from "@ogw_front/stores/geode"
+
+  const schema = schemas.opengeodeweb_back.missing_files
+
+  const emit = defineEmits([
+    "update_values",
+    "increment_step",
+    "decrement_step",
+  ])
+
+  const { multiple, geode_object_type, filenames } = defineProps({
+    multiple: { type: Boolean, required: true },
+    geode_object_type: { type: String, required: true },
+    filenames: { type: Array, required: true },
+  })
+
+  const accept = ref("")
+  const loading = ref(false)
+  const has_missing_files = ref(false)
+  const mandatory_files = ref([])
+  const additional_files = ref([])
+  const toggle_loading = useToggle(loading)
+
+  function files_uploaded_event(value) {
+    emit("update_values", { additional_files: value })
+    emit("increment_step")
+  }
+
+  async function missing_files() {
+    toggle_loading()
+    has_missing_files.value = false
+    mandatory_files.value = []
+    additional_files.value = []
+    const geodeStore = useGeodeStore()
+
+    const promise_array = filenames.map(async (filename) => {
+      const response = await geodeStore.request(schema, {
+        geode_object_type,
+        filename,
+      })
+      return response
+    })
+    const values = await Promise.all(promise_array)
+    for (const value of values) {
+      if (value.has_missing_files) {
+        has_missing_files.value = true
+      }
+      mandatory_files.value = [
+        ...mandatory_files.value,
+        ...value.mandatory_files,
+      ]
+      additional_files.value = [
+        ...additional_files.value,
+        ...value.additional_files,
+      ]
+    }
+    if (has_missing_files.value) {
+      accept.value = [...mandatory_files.value, ...additional_files.value]
+        .map((filename) => `.${filename.split(".").pop()}`)
+        .join(",")
+    } else {
+      emit("increment_step")
+    }
+    toggle_loading()
+  }
+
+  await missing_files()
+</script>
+
 <template>
   <FetchingData v-if="loading" />
   <v-container v-else-if="has_missing_files">
@@ -33,7 +107,7 @@
     </v-row>
     <v-row>
       <v-col
-        v-if="!mandatory_files.length && additional_files.length"
+        v-if="mandatory_files.length === 0 && additional_files.length > 0"
         cols="auto"
       >
         <v-btn @click="emit('increment_step')" color="warning">Skip step</v-btn>
@@ -41,83 +115,3 @@
     </v-row>
   </v-container>
 </template>
-
-<script setup>
-  import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-
-  import FetchingData from "@ogw_front/components/FetchingData"
-  import FileUploader from "@ogw_front/components/FileUploader"
-  import { useGeodeStore } from "@ogw_front/stores/geode"
-
-  const schema = schemas.opengeodeweb_back.missing_files
-
-  const emit = defineEmits([
-    "update_values",
-    "increment_step",
-    "decrement_step",
-  ])
-
-  const props = defineProps({
-    multiple: { type: Boolean, required: true },
-    geode_object_type: { type: String, required: true },
-    filenames: { type: Array, required: true },
-  })
-
-  const { multiple, geode_object_type, filenames } = props
-
-  const accept = ref("")
-  const loading = ref(false)
-  const has_missing_files = ref(false)
-  const mandatory_files = ref([])
-  const additional_files = ref([])
-  const toggle_loading = useToggle(loading)
-
-  function files_uploaded_event(value) {
-    emit("update_values", { additional_files: value })
-    emit("increment_step")
-  }
-
-  async function missing_files() {
-    toggle_loading()
-    has_missing_files.value = false
-    mandatory_files.value = []
-    additional_files.value = []
-    const geodeStore = useGeodeStore()
-
-    const promise_array = filenames.map((filename) => {
-      const params = { geode_object_type, filename }
-      return new Promise((resolve, reject) => {
-        geodeStore.request(schema, params, {
-          request_error_function: () => reject(),
-          response_function: (response) => resolve(response._data),
-          response_error_function: () => reject(),
-        })
-      })
-    })
-    const values = await Promise.all(promise_array)
-    for (const value of values) {
-      has_missing_files.value = value.has_missing_files
-        ? true
-        : has_missing_files.value
-      mandatory_files.value = [].concat(
-        mandatory_files.value,
-        value.mandatory_files,
-      )
-      additional_files.value = [].concat(
-        additional_files.value,
-        value.additional_files,
-      )
-    }
-    if (!has_missing_files.value) {
-      emit("increment_step")
-    } else {
-      accept.value = []
-        .concat(mandatory_files.value, additional_files.value)
-        .map((filename) => "." + filename.split(".").pop())
-        .join(",")
-    }
-    toggle_loading()
-  }
-
-  await missing_files()
-</script>

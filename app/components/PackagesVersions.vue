@@ -1,3 +1,38 @@
+<script setup>
+  import { Status } from "@ogw_front/utils/status"
+  import { useGeodeStore } from "@ogw_front/stores/geode"
+
+  const { schema } = defineProps({
+    schema: { type: Object, required: true },
+  })
+
+  const geodeStore = useGeodeStore()
+  const packages_versions = ref([])
+
+  async function get_packages_versions() {
+    await geodeStore.request(
+      schema,
+      {},
+      {
+        response_function: (response) => {
+          packages_versions.value = response.versions
+        },
+      },
+    )
+  }
+
+  watch(
+    () => geodeStore.status,
+    (value) => {
+      if (value === Status.CONNECTED) {
+        get_packages_versions()
+      }
+    },
+  )
+
+  await get_packages_versions()
+</script>
+
 <template>
   <v-container>
     This tool uses our Open-Source codes
@@ -17,36 +52,3 @@
     </v-tooltip>
   </v-container>
 </template>
-
-<script setup>
-  import Status from "@ogw_front/utils/status"
-  import { useGeodeStore } from "@ogw_front/stores/geode"
-
-  const props = defineProps({
-    schema: { type: Object, required: true },
-  })
-
-  const geodeStore = useGeodeStore()
-  const packages_versions = ref([])
-
-  async function get_packages_versions() {
-    await geodeStore.request(
-      props.schema,
-      {},
-      {
-        response_function: (response) => {
-          packages_versions.value = response._data.versions
-        },
-      },
-    )
-  }
-
-  watch(
-    () => geodeStore.status,
-    (value) => {
-      if (value == Status.CONNECTED) get_packages_versions()
-    },
-  )
-
-  await get_packages_versions()
-</script>

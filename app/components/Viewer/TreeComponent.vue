@@ -1,3 +1,50 @@
+<script setup>
+  import { useDataStore } from "@ogw_front/stores/data"
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+
+  import { compareSelections } from "@ogw_front/utils/treeview"
+
+  const dataStyleStore = useDataStyleStore()
+  const dataStore = useDataStore()
+  const hybridViewerStore = useHybridViewerStore()
+
+  const { id } = defineProps({ id: { type: String, required: true } })
+
+  const emit = defineEmits(["show-menu"])
+
+  const items = ref([])
+  const mesh_components_selection = dataStyleStore.visibleMeshComponents(id)
+
+  watchEffect(async () => {
+    items.value = await dataStore.formatedMeshComponents(id)
+  })
+
+  watch(
+    mesh_components_selection,
+    async (current, previous) => {
+      if (!previous) {
+        return
+      }
+
+      const { added, removed } = compareSelections(current, previous)
+
+      if (added.length > 0) {
+        await dataStyleStore.setModelMeshComponentsVisibility(id, added, true)
+      }
+      if (removed.length > 0) {
+        await dataStyleStore.setModelMeshComponentsVisibility(
+          id,
+          removed,
+          false,
+        )
+      }
+      hybridViewerStore.remoteRender()
+    },
+    { deep: true },
+  )
+</script>
+
 <template>
   <v-treeview
     v-model:selected="mesh_components_selection"
@@ -8,109 +55,16 @@
     selectable
   >
     <template #title="{ item }">
-      <span class="treeview-item">{{ item.title }}</span>
+      <span
+        class="treeview-item"
+        @contextmenu.prevent.stop="
+          emit('show-menu', { event: $event, itemId: item })
+        "
+        >{{ item.title }}</span
+      >
     </template>
   </v-treeview>
 </template>
-
-<script setup>
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useDataBaseStore } from "@ogw_front/stores/data_base"
-  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-
-  import { compareSelections } from "@ogw_front/utils/treeview"
-
-  const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
-  const hybridViewerStore = useHybridViewerStore()
-
-  const props = defineProps({ id: { type: String, required: true } })
-
-  const items = dataBaseStore.formatedMeshComponents(props.id)
-  const mesh_components_selection = ref(
-    dataStyleStore.visibleMeshComponents(props.id),
-  )
-
-  watch(
-    mesh_components_selection,
-    (current, previous) => {
-      if (!previous) previous = []
-      else {
-        const { added, removed } = compareSelections(current, previous)
-
-        const [added_corners, added_lines, added_surfaces, added_blocks] =
-          sortMeshComponents(added)
-        const [
-          removed_corners,
-          removed_lines,
-          removed_surfaces,
-          removed_blocks,
-        ] = sortMeshComponents(removed)
-        if (added_corners.length > 0) {
-          dataStyleStore.setModelCornersVisibility(
-            props.id,
-            added_corners,
-            true,
-          )
-        }
-        if (added_lines.length > 0) {
-          dataStyleStore.setModelLinesVisibility(props.id, added_lines, true)
-        }
-        if (added_surfaces.length > 0) {
-          dataStyleStore.setModelSurfacesVisibility(
-            props.id,
-            added_surfaces,
-            true,
-          )
-        }
-        if (added_blocks.length > 0) {
-          dataStyleStore.setModelBlocksVisibility(props.id, added_blocks, true)
-        }
-        if (removed_corners.length > 0) {
-          dataStyleStore.setModelCornersVisibility(
-            props.id,
-            removed_corners,
-            false,
-          )
-        }
-        if (removed_lines.length > 0) {
-          dataStyleStore.setModelLinesVisibility(props.id, removed_lines, false)
-        }
-        if (removed_surfaces.length > 0) {
-          dataStyleStore.setModelSurfacesVisibility(
-            props.id,
-            removed_surfaces,
-            false,
-          )
-        }
-        if (removed_blocks.length > 0) {
-          dataStyleStore.setModelBlocksVisibility(
-            props.id,
-            removed_blocks,
-            false,
-          )
-        }
-        hybridViewerStore.remoteRender()
-      }
-    },
-    { immediate: true, deep: true },
-  )
-
-  function sortMeshComponents(items) {
-    var corner_ids = [],
-      line_ids = [],
-      surface_ids = [],
-      block_ids = []
-    for (const item of items) {
-      const item_type = dataBaseStore.meshComponentType(props.id, item)
-      if (item_type === "corner") corner_ids.push(item)
-      else if (item_type === "line") line_ids.push(item)
-      else if (item_type === "surface") surface_ids.push(item)
-      else if (item_type === "block") block_ids.push(item)
-    }
-    return [corner_ids, line_ids, surface_ids, block_ids]
-  }
-</script>
 
 <style scoped>
   .treeview-item {

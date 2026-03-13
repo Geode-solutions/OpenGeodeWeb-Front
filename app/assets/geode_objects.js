@@ -24,7 +24,7 @@ import TriangulatedSurface2D from "@ogw_front/assets/img/geode_objects/Triangula
 import TriangulatedSurface3D from "@ogw_front/assets/img/geode_objects/TriangulatedSurface3D.svg"
 import VertexSet from "@ogw_front/assets/img/geode_objects/VertexSet.svg"
 
-const geode_objects = {
+export const geode_objects = {
   BRep: {
     tooltip: "BRep",
     image: BRep,
@@ -126,5 +126,3 @@ const geode_objects = {
     image: VertexSet,
   },
 }
-
-export default geode_objects

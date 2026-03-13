@@ -1,48 +1,10 @@
-<template>
-  <VRow align="center" justify="center" style="display: none">
-    <VCol cols="4">
-      <VForm v-model="valid">
-        <VContainer>
-          <VRow>
-            <VCol>
-              <VTextField v-model="name" label="Name" required />
-            </VCol>
-          </VRow>
-          <VRow>
-            <VCol>
-              <VTextField
-                v-model="email"
-                :rules="emailRules"
-                label="E-mail"
-                required
-              />
-            </VCol>
-          </VRow>
-          <VRow>
-            <VCol>
-              <VCheckbox label="Launch the app" v-model="launch" />
-            </VCol>
-          </VRow>
-        </VContainer>
-      </VForm>
-    </VCol>
-  </VRow>
-  <VRow align="center" justify="center">
-    <VCol cols="4" class="d-flex justify-center align-center">
-      <VBtn
-        :text="props.button_label"
-        :color="props.button_color"
-        @click="submit_recaptcha"
-      />
-    </VCol>
-  </VRow>
-</template>
-
 <script setup>
   import { appMode } from "@ogw_front/utils/app_mode"
   import { useInfraStore } from "@ogw_front/stores/infra"
 
-  const props = defineProps({
+  const RESPONSE_STATUS_OK = 200
+
+  const { button_label, button_color, color } = defineProps({
     button_label: {
       type: String,
       required: false,
@@ -53,11 +15,16 @@
       required: false,
       default: "white",
     },
+    color: {
+      type: String,
+      required: false,
+    },
   })
   const infraStore = useInfraStore()
   const name = ref("")
   const email = ref("")
   const launch = ref(false)
+  const valid = ref(false)
   const emailRules = [
     (value) => {
       if (value) {
@@ -93,7 +60,47 @@
       },
     })
     infraStore.$patch({
-      is_captcha_validated: response.status === 200,
+      is_captcha_validated: response.status === RESPONSE_STATUS_OK,
     })
   }
 </script>
+
+<template>
+  <VRow align="center" justify="center" style="display: none">
+    <VCol cols="4">
+      <VForm v-model="valid">
+        <VContainer>
+          <VRow>
+            <VCol>
+              <VTextField v-model="name" label="Name" required />
+            </VCol>
+          </VRow>
+          <VRow>
+            <VCol>
+              <VTextField
+                v-model="email"
+                :rules="emailRules"
+                label="E-mail"
+                required
+              />
+            </VCol>
+          </VRow>
+          <VRow>
+            <VCol>
+              <VCheckbox label="Launch the app" v-model="launch" />
+            </VCol>
+          </VRow>
+        </VContainer>
+      </VForm>
+    </VCol>
+  </VRow>
+  <VRow align="center" justify="center">
+    <VCol cols="4" class="d-flex justify-center align-center">
+      <VBtn
+        :text="button_label"
+        :color="color || button_color"
+        @click="submit_recaptcha"
+      />
+    </VCol>
+  </VRow>
+</template>

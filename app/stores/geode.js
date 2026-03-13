@@ -1,9 +1,12 @@
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
+import { api_fetch } from "@ogw_internal/utils/api_fetch"
 import { appMode } from "@ogw_front/utils/app_mode"
-import { api_fetch } from "../../internal/utils/api_fetch"
-import { useInfraStore } from "@ogw_front/stores/infra"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useInfraStore } from "@ogw_front/stores/infra"
+
+const MILLISECONDS_IN_SECOND = 1000
+const DEFAULT_PING_INTERVAL_SECONDS = 10
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -13,17 +16,17 @@ export const useGeodeStore = defineStore("geode", {
   }),
   getters: {
     protocol() {
-      if (useInfraStore().app_mode == appMode.CLOUD) {
+      if (useInfraStore().app_mode === appMode.CLOUD) {
         return "https"
       }
       return "http"
     },
     port() {
-      if (useInfraStore().app_mode == appMode.CLOUD) {
+      if (useInfraStore().app_mode === appMode.CLOUD) {
         return "443"
       }
-      const GEODE_PORT = useRuntimeConfig().public.GEODE_PORT
-      if (GEODE_PORT != null && GEODE_PORT !== "") {
+      const { GEODE_PORT } = useRuntimeConfig().public
+      if (GEODE_PORT !== null && GEODE_PORT !== "") {
         return GEODE_PORT
       }
       return this.default_local_port
@@ -31,8 +34,8 @@ export const useGeodeStore = defineStore("geode", {
     base_url() {
       const infraStore = useInfraStore()
       let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
-      if (infraStore.app_mode == appMode.CLOUD) {
-        if (infraStore.ID == "") {
+      if (infraStore.app_mode === appMode.CLOUD) {
+        if (infraStore.ID === "") {
           throw new Error("ID must not be empty in cloud mode")
         }
         geode_url += `/${infraStore.ID}/geode`
@@ -44,50 +47,52 @@ export const useGeodeStore = defineStore("geode", {
     },
   },
   actions: {
-    ping_task() {
+    set_ping() {
+      this.ping()
       setInterval(() => {
-        this.do_ping()
-      }, 10 * 1000)
+        this.ping()
+      }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND)
     },
-    do_ping() {
+    ping() {
       const geodeStore = this
       const feedbackStore = useFeedbackStore()
-      return useFetch(back_schemas.opengeodeweb_back.ping.$id, {
-        baseURL: this.base_url,
-        method: back_schemas.opengeodeweb_back.ping.methods[0],
-        body: {},
-        onRequestError({ error }) {
-          feedbackStore.$patch({ server_error: true })
-          geodeStore.status = Status.NOT_CONNECTED
-        },
-        onResponse({ response }) {
-          if (response.ok) {
+      return this.request(
+        back_schemas.opengeodeweb_back.ping,
+        {},
+        {
+          request_error_function: () => {
+            feedbackStore.$patch({ server_error: true })
+            geodeStore.status = Status.NOT_CONNECTED
+          },
+          response_function: () => {
             feedbackStore.$patch({ server_error: false })
             geodeStore.status = Status.CONNECTED
-          }
+          },
+          response_error_function: () => {
+            feedbackStore.$patch({ server_error: true })
+            geodeStore.status = Status.NOT_CONNECTED
+          },
         },
-        onResponseError({ response }) {
-          feedbackStore.$patch({ server_error: true })
-          geodeStore.status = Status.NOT_CONNECTED
-        },
-      })
+      )
     },
     start_request() {
-      this.request_counter++
+      this.request_counter += 1
     },
     stop_request() {
-      this.request_counter--
+      this.request_counter -= 1
     },
     launch() {
       console.log("[GEODE] Launching geode microservice...")
-      return window.electronAPI.run_back()
+      return globalThis.electronAPI.run_back()
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...")
-      return this.ping_task()
+      this.set_ping()
+      return Promise.resolve()
     },
     request(schema, params, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id)
+      const start = Date.now()
 
       return api_fetch(
         this,
@@ -95,7 +100,13 @@ export const useGeodeStore = defineStore("geode", {
         {
           ...callbacks,
           response_function: async (response) => {
-            console.log("[GEODE] Request completed:", schema.$id)
+            console.log(
+              "[GEODE] Request completed:",
+              schema.$id,
+              "in",
+              (Date.now() - start) / 1_000,
+              "s",
+            )
             if (callbacks.response_function) {
               await callbacks.response_function(response)
             }

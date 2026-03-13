@@ -1,7 +1,8 @@
+import nuxt from "eslint-plugin-nuxt"
 import vue from "eslint-plugin-vue"
 import vuetify from "eslint-plugin-vuetify"
-import nuxt from "eslint-plugin-nuxt"
 
+// oxlint-disable-next-line import/no-anonymous-default-export
 export default [
   {
     files: ["**/*.{js,ts,vue}"],
@@ -11,7 +12,6 @@ export default [
       globals: {
         window: "readonly",
         document: "readonly",
-        // ajoute d'autres globals si nécessaire
       },
     },
     plugins: {

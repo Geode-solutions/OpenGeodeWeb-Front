@@ -1,7 +1,42 @@
+<script setup>
+  import ViewerBreadCrumb from "@ogw_front/components/Viewer/BreadCrumb"
+  import ViewerTreeComponent from "@ogw_front/components/Viewer/TreeComponent"
+  import ViewerTreeObject from "@ogw_front/components/Viewer/TreeObject"
+  import { useTreeviewStore } from "@ogw_front/stores/treeview"
+
+  const WIDTH_MIN = 150
+
+  const treeviewStore = useTreeviewStore()
+  const emit = defineEmits(["show-menu"])
+
+  function onResizeStart(event) {
+    const startWidth = treeviewStore.panelWidth
+    const startX = event.clientX
+    function resize(move_event) {
+      const deltaX = move_event.clientX - startX
+      const newWidth = Math.max(
+        WIDTH_MIN,
+        Math.min(startWidth + deltaX, window.innerWidth),
+      )
+      treeviewStore.setPanelWidth(newWidth)
+      document.body.style.userSelect = "none"
+    }
+    function stopResize() {
+      document.removeEventListener("mousemove", resize)
+      document.removeEventListener("mouseup", stopResize)
+      document.body.style.userSelect = ""
+    }
+    document.addEventListener("mousemove", resize)
+    document.addEventListener("mouseup", stopResize)
+  }
+</script>
+
 <template>
   <v-container
     class="treeview-container"
     :style="{ width: `${treeviewStore.panelWidth}px` }"
+    @contextmenu.prevent
+    @mousedown.stop
   >
     <v-row
       class="resizable-panel"
@@ -14,22 +49,18 @@
         >
           <v-row v-if="treeviewStore.items.length > 0">
             <v-col>
-              <ViewerBreadCrumb
-                :selectedTree="selectedTree"
-                :treeOptions="treeOptions"
-                @update:selectedTree="selectedTree = $event"
-              />
+              <ViewerBreadCrumb />
             </v-col>
           </v-row>
           <v-row>
             <v-col>
               <ViewerTreeObject
                 v-if="!treeviewStore.isAdditionnalTreeDisplayed"
-                @show-menu="handleTreeMenu"
+                @show-menu="emit('show-menu', $event)"
               />
               <ViewerTreeComponent
                 v-else
-                @show-menu="handleTreeMenu"
+                @show-menu="emit('show-menu', $event)"
                 :id="treeviewStore.model_id"
               />
             </v-col>
@@ -40,66 +71,6 @@
     </v-row>
   </v-container>
 </template>
-
-<script setup>
-  import ViewerBreadCrumb from "@/components/Viewer/BreadCrumb"
-  import ViewerTreeObject from "@/components/Viewer/TreeObject"
-  import ViewerTreeComponent from "@/components/Viewer/TreeComponent"
-  import { useTreeviewStore } from "@ogw_front/stores/treeview"
-  import { useMenuStore } from "@ogw_front/stores/menu"
-
-  const treeviewStore = useTreeviewStore()
-  const menuStore = useMenuStore()
-  const cardContainer = useTemplateRef("cardContainer")
-  const containerWidth = ref(window.innerWidth)
-  const containerHeight = ref(window.innerHeight)
-  const menuX = ref(0)
-  const menuY = ref(0)
-  const id = ref(null)
-
-  const handleResize = () => {
-    containerWidth.value = window.innerWidth
-    containerHeight.value = window.innerHeight
-  }
-
-  function handleTreeMenu({ event, itemId }) {
-    menuX.value = event.clientX
-    menuY.value = event.clientY
-    id.value = itemId
-    menuStore.openMenu(itemId, event.clientX, event.clientY)
-  }
-
-  function onResizeStart(event) {
-    const startWidth = treeviewStore.panelWidth
-    const startX = event.clientX
-    const resize = (e) => {
-      const deltaX = e.clientX - startX
-      const newWidth = Math.max(
-        150,
-        Math.min(startWidth + deltaX, window.innerWidth),
-      )
-      treeviewStore.setPanelWidth(newWidth)
-      document.body.style.userSelect = "none"
-    }
-    const stopResize = () => {
-      document.removeEventListener("mousemove", resize)
-      document.removeEventListener("mouseup", stopResize)
-      document.body.style.userSelect = ""
-    }
-    document.addEventListener("mousemove", resize)
-    document.addEventListener("mouseup", stopResize)
-  }
-
-  onMounted(() => {
-    containerWidth.value = window.innerWidth
-    containerHeight.value = window.innerHeight
-    window.addEventListener("resize", handleResize)
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener("resize", handleResize)
-  })
-</script>
 
 <style scoped>
   .treeview-container {
@@ -113,17 +84,20 @@
     display: flex;
     box-sizing: border-box;
   }
+
   .resizable-panel {
     display: flex;
     height: 100%;
     position: relative;
     box-sizing: border-box;
   }
+
   .scrollable-wrapper {
     overflow-y: auto;
     padding-right: 6px;
     flex: 1;
   }
+
   .resizer {
     position: absolute;
     top: 0;
@@ -134,25 +108,32 @@
     background-color: transparent;
     z-index: 15;
   }
+
   .resizer:hover {
     background-color: #999;
   }
+
   .resizer:active {
     background-color: #666;
   }
+
   .transparent-treeview {
     background-color: transparent;
     margin: 4px 0;
   }
+
   .scrollbar-hover {
     overflow-x: hidden;
   }
+
   .scrollbar-hover::-webkit-scrollbar {
     width: 5px;
   }
+
   .scrollbar-hover::-webkit-scrollbar-thumb {
     background-color: transparent;
   }
+
   .scrollbar-hover:hover::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 10px;

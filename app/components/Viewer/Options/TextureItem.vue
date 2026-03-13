@@ -1,3 +1,76 @@
+<script setup>
+  import FileUploader from "@ogw_front/components/FileUploader"
+  import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+  import { useGeodeStore } from "@ogw_front/stores/geode"
+
+  const emit = defineEmits(["update_value"])
+
+  const { id } = defineProps({
+    id: { type: String, required: true },
+    texture_id: { type: String, required: true },
+    texture_name: { type: String, required: true },
+  })
+
+  const texture_name = ref("")
+  texture_name.value = texture_name
+
+  const texture_id = ref("")
+  texture_id.value = texture_id
+
+  const texture_coordinates = ref([])
+  const geodeStore = useGeodeStore()
+
+  onMounted(() => {
+    getTextureCoordinates()
+  })
+
+  function getTextureCoordinates() {
+    geodeStore.request(
+      back_schemas.opengeodeweb_back.texture_coordinates,
+      { id: id },
+      {
+        response_function: (response) => {
+          texture_coordinates.value = response.texture_coordinates
+        },
+      },
+    )
+  }
+
+  async function files_uploaded_event(value) {
+    if (value.length > 0) {
+      await geodeStore.request(
+        back_schemas.opengeodeweb_back.save_viewable_file,
+        {
+          schema: back_schemas.opengeodeweb_back.save_viewable_file,
+          params: {
+            geode_object_type: "RasterImage2D",
+            filename: value[0].name,
+          },
+        },
+        {
+          response_function: (response) => {
+            texture_id.value = response.id
+          },
+        },
+      )
+    }
+  }
+
+  watch(texture_name, (value) => {
+    emit("update_value", { key: "texture_name", value })
+  })
+
+  watch(texture_id, (value) => {
+    emit("update_value", { key: "id", value })
+  })
+</script>
+
+<style>
+  .v-input__details {
+    display: none;
+  }
+</style>
+
 <template>
   <v-col cols="7" class="pa-1 ml-3">
     <v-select
@@ -34,76 +107,3 @@
     />
   </v-col>
 </template>
-
-<script setup>
-  import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
-  import FileUploader from "@ogw_front/components/FileUploader"
-  import { useGeodeStore } from "@ogw_front/stores/geode"
-
-  const emit = defineEmits(["update_value"])
-
-  const props = defineProps({
-    id: { type: String, required: true },
-    texture_id: { type: String, required: true },
-    texture_name: { type: String, required: true },
-  })
-
-  const texture_name = ref("")
-  texture_name.value = props.texture_name
-
-  const texture_id = ref("")
-  texture_id.value = props.texture_id
-
-  const texture_coordinates = ref([])
-  const geodeStore = useGeodeStore()
-
-  onMounted(() => {
-    getTextureCoordinates()
-  })
-
-  function getTextureCoordinates() {
-    geodeStore.request(
-      back_schemas.opengeodeweb_back.texture_coordinates,
-      { id: props.id },
-      {
-        response_function: (response) => {
-          texture_coordinates.value = response._data.texture_coordinates
-        },
-      },
-    )
-  }
-
-  async function files_uploaded_event(value) {
-    if (value.length) {
-      await geodeStore.request(
-        back_schemas.opengeodeweb_back.save_viewable_file,
-        {
-          schema: back_schemas.opengeodeweb_back.save_viewable_file,
-          params: {
-            geode_object_type: "RasterImage2D",
-            filename: value[0].name,
-          },
-        },
-        {
-          response_function: async (response) => {
-            texture_id.value = response._data.id
-          },
-        },
-      )
-    }
-  }
-
-  watch(texture_name, (value) => {
-    emit("update_value", { key: "texture_name", value })
-  })
-
-  watch(texture_id, (value) => {
-    emit("update_value", { key: "id", value })
-  })
-</script>
-
-<style>
-  .v-input__details {
-    display: none;
-  }
-</style>

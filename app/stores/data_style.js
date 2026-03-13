@@ -1,49 +1,55 @@
-import { getDefaultStyle } from "../utils/default_styles"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
-import useDataStyleState from "../../internal/stores/data_style_state"
-import useMeshStyle from "../../internal/stores/mesh/index"
-import useModelStyle from "../../internal/stores/model/index"
+import { getDefaultStyle } from "@ogw_front/utils/default_styles"
+import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
+import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index"
+import { useModelStyle } from "@ogw_internal/stores/data_style/model/index"
 
 export const useDataStyleStore = defineStore("dataStyle", () => {
-  const dataStyleState = useDataStyleState()
+  const dataStyleState = useDataStyleStateStore()
   const meshStyleStore = useMeshStyle()
   const modelStyleStore = useModelStyle()
-  const dataBaseStore = useDataBaseStore()
+  const dataStore = useDataStore()
 
   function addDataStyle(id, geode_object) {
     dataStyleState.styles[id] = getDefaultStyle(geode_object)
   }
 
-  function setVisibility(id, visibility) {
-    console.log(
-      "dataBaseStore.itemMetaDatas(id)",
-      dataBaseStore.itemMetaDatas(id),
-    )
-    const { viewer_type } = dataBaseStore.itemMetaDatas(id)
+  async function setVisibility(id, visibility) {
+    const item = await dataStore.item(id)
+    const viewer_type = item?.viewer_type
+    if (!viewer_type) {
+      throw new Error(`Item not found or not loaded: ${id}`)
+    }
+
     if (viewer_type === "mesh") {
-      return Promise.all([meshStyleStore.setMeshVisibility(id, visibility)])
-    } else if (viewer_type === "model") {
-      return Promise.all([modelStyleStore.setModelVisibility(id, visibility)])
+      return meshStyleStore.setMeshVisibility(id, visibility)
+    }
+    if (viewer_type === "model") {
+      return modelStyleStore.setModelVisibility(id, visibility)
     }
     throw new Error("Unknown viewer_type")
   }
 
-  function applyDefaultStyle(id) {
-    const { viewer_type } = dataBaseStore.itemMetaDatas(id)
+  async function applyDefaultStyle(id) {
+    const item = await dataStore.item(id)
+    const viewer_type = item?.viewer_type
+    if (!viewer_type) {
+      throw new Error(`Item not found or not loaded: ${id}`)
+    }
     if (viewer_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id)
-    } else if (viewer_type === "model") {
-      return modelStyleStore.applyModelStyle(id)
-    } else {
-      throw new Error("Unknown viewer_type: " + viewer_type)
     }
+    if (viewer_type === "model") {
+      return modelStyleStore.applyModelStyle(id)
+    }
+    throw new Error(`Unknown viewer_type: ${viewer_type}`)
   }
 
-  const exportStores = () => {
+  function exportStores() {
     return { styles: dataStyleState.styles }
   }
 
-  const importStores = (snapshot) => {
+  function importStores(snapshot) {
     const stylesSnapshot = snapshot.styles || {}
     for (const id of Object.keys(dataStyleState.styles)) {
       delete dataStyleState.styles[id]
@@ -53,24 +59,27 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     }
   }
 
-  const applyAllStylesFromState = () => {
+  function applyAllStylesFromState() {
     const ids = Object.keys(dataStyleState.styles || {})
-    const promises = []
-    for (const id of ids) {
-      const meta = dataBaseStore.itemMetaDatas(id)
+    const promises = ids.map(async (id) => {
+      const meta = await dataStore.item(id)
       const viewerType = meta?.viewer_type
       const style = dataStyleState.styles[id]
       if (style && viewerType === "mesh") {
-        promises.push(meshStyleStore.applyMeshStyle(id))
-      } else if (style && viewerType === "model") {
-        promises.push(modelStyleStore.applyModelStyle(id))
+        return meshStyleStore.applyMeshStyle(id)
       }
-    }
+      if (style && viewerType === "model") {
+        return modelStyleStore.applyModelStyle(id)
+      }
+    })
     return Promise.all(promises)
   }
 
   return {
-    ...dataStyleState,
+    styles: dataStyleState.styles,
+    getStyle: dataStyleState.getStyle,
+    objectVisibility: dataStyleState.objectVisibility,
+    selectedObjects: dataStyleState.selectedObjects,
     ...meshStyleStore,
     ...modelStyleStore,
     addDataStyle,

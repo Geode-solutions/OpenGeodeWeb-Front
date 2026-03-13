@@ -1,24 +1,9 @@
-<template>
-  <ClientOnly>
-    <div class="fill-height" style="position: relative">
-      <VeaseViewToolbar />
-      <slot name="ui"></slot>
-      <v-col
-        class="pa-0"
-        ref="viewer"
-        style="height: 100%; overflow: hidden; position: relative; z-index: 0"
-        @click="get_x_y"
-        @keydown.esc="viewerStore.toggle_picking_mode(false)"
-      />
-    </div>
-  </ClientOnly>
-</template>
-
 <script setup>
   import VeaseViewToolbar from "@ogw_front/components/VeaseViewToolbar"
-
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
   import { useViewerStore } from "@ogw_front/stores/viewer"
+
+  const DEFAULT_ELEMENT_HEIGHT = 100
 
   const emit = defineEmits(["click"])
 
@@ -32,7 +17,7 @@
 
   const debouncedResize = debounce(() => {
     hybridViewerStore.resize(elementWidth.value, elementHeight.value)
-  }, 100)
+  }, DEFAULT_ELEMENT_HEIGHT)
 
   watch([elementWidth, elementHeight, windowWidth, windowHeight], (value) => {
     debouncedResize()
@@ -48,9 +33,9 @@
   })
 
   function debounce(func, wait) {
-    let timeout
+    let timeout = undefined
     return function executedFunction(...args) {
-      const later = () => {
+      function later() {
         clearTimeout(timeout)
         func(...args)
       }
@@ -58,11 +43,23 @@
       timeout = setTimeout(later, wait)
     }
   }
-
-  function get_x_y(event) {
-    emit("click", event)
-  }
 </script>
+
+<template>
+  <ClientOnly>
+    <div class="fill-height" style="position: relative; height: 100%">
+      <VeaseViewToolbar />
+      <slot name="ui"></slot>
+      <v-col
+        class="pa-0"
+        ref="viewer"
+        style="height: 100%; overflow: hidden; position: relative; z-index: 0"
+        @click="emit('click', $event)"
+        @keydown.esc="viewerStore.toggle_picking_mode(false)"
+      />
+    </div>
+  </ClientOnly>
+</template>
 
 <style>
   img {

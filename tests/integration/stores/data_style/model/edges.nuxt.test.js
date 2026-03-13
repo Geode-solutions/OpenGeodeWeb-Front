@@ -3,27 +3,31 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_front/utils/status"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import {
   delete_folder_recursive,
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import { setupIntegrationTests } from "../../../setup"
+import { Status } from "@ogw_front/utils/status"
+import { setupIntegrationTests } from "@ogw_tests/integration/setup"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
+const INTERVAL_TIMEOUT = 25_000
 const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let id, back_port, viewer_port, project_folder_path
+let back_port = 0,
+  id = "",
+  project_folder_path = "",
+  viewer_port = 0
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 25000)
+}, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
   console.log(
@@ -43,7 +47,10 @@ describe("Model edges", () => {
       const viewerStore = useViewerStore()
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setModelEdgesVisibility(id, visibility)
+      spy.mockClear()
+      const result = dataStyleStore.setModelEdgesVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_edges_schemas.visibility,
         { id, visibility },
@@ -52,6 +59,16 @@ describe("Model edges", () => {
         },
       )
       expect(dataStyleStore.modelEdgesVisibility(id)).toBe(visibility)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
+  describe("Edges style", () => {
+    test("Edges apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelEdgesStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })

@@ -1,31 +1,49 @@
+// oxlint-disable-next-line import/no-unassigned-import
 import "@kitware/vtk.js/Rendering/Profiles/Geometry"
-import vtkGenericRenderWindow from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
-import vtkXMLPolyDataReader from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
-import vtkMapper from "@kitware/vtk.js/Rendering/Core/Mapper"
-import vtkActor from "@kitware/vtk.js/Rendering/Core/Actor"
+import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor"
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow"
+import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
+import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader"
 
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+
+const RGB_MAX = 255
+const BACKGROUND_GREY_VALUE = 180
+const ACTOR_DARK_VALUE = 20
+const BACKGROUND_COLOR = [
+  BACKGROUND_GREY_VALUE / RGB_MAX,
+  BACKGROUND_GREY_VALUE / RGB_MAX,
+  BACKGROUND_GREY_VALUE / RGB_MAX,
+]
+const ACTOR_COLOR = [
+  ACTOR_DARK_VALUE / RGB_MAX,
+  ACTOR_DARK_VALUE / RGB_MAX,
+  ACTOR_DARK_VALUE / RGB_MAX,
+]
+const WHEEL_TIME_OUT_MS = 600
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
+  const dataStore = useDataStore()
   const viewerStore = useViewerStore()
-  const dataBaseStore = useDataBaseStore()
-  const db = reactive({})
+  const hybridDb = reactive({})
   const status = ref(Status.NOT_CREATED)
   const camera_options = reactive({})
   const genericRenderWindow = reactive({})
   const is_moving = ref(false)
-  const zScale = ref(1.0)
-  let viewStream
-  let gridActor = null
+  const zScale = ref(1)
+  let viewStream = undefined
+  const gridActor = undefined
 
   async function initHybridViewer() {
-    if (status.value !== Status.NOT_CREATED) return
+    if (status.value !== Status.NOT_CREATED) {
+      return
+    }
     status.value = Status.CREATING
-    genericRenderWindow.value = vtkGenericRenderWindow.newInstance({
-      background: [180 / 255, 180 / 255, 180 / 255],
+    genericRenderWindow.value = vtkGenericRenderWindow({
+      background: BACKGROUND_COLOR,
       listenWindowResize: false,
     })
 
@@ -37,12 +55,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
     await viewerStore.ws_connect()
     viewStream = viewerStore.client.getImageStream().createViewStream("-1")
-    viewStream.onImageReady((e) => {
-      if (is_moving.value) return
-      const webGLRenderWindow =
-        genericRenderWindow.value.getApiSpecificRenderWindow()
-      const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style
-      webGLRenderWindow.setBackgroundImage(e.image)
+    viewStream.onImageReady((event) => {
+      if (is_moving.value) {
+        return
+      }
+      webGLRenderWindow.setBackgroundImage(event.image)
       imageStyle.opacity = 1
     })
 
@@ -53,29 +70,39 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return
     }
-    const value = dataBaseStore.db[id]
+    const value = await dataStore.item(id)
     console.log("hybridViewerStore.addItem", { value })
-    const reader = vtkXMLPolyDataReader.newInstance()
+    const reader = vtkXMLPolyDataReader()
     const textEncoder = new TextEncoder()
     await reader.parseAsArrayBuffer(
       textEncoder.encode(value.binary_light_viewable),
     )
     const polydata = reader.getOutputData(0)
-    const mapper = vtkMapper.newInstance()
+    const mapper = vtkMapper()
     mapper.setInputData(polydata)
-    const actor = vtkActor.newInstance()
-    actor.getProperty().setColor(20 / 255, 20 / 255, 20 / 255)
+    const actor = vtkActor()
+    actor.getProperty().setColor(ACTOR_COLOR)
     actor.setMapper(mapper)
     const renderer = genericRenderWindow.value.getRenderer()
     const renderWindow = genericRenderWindow.value.getRenderWindow()
     renderer.addActor(actor)
     renderer.resetCamera()
     renderWindow.render()
-    db[id] = { actor, polydata, mapper }
+    hybridDb[id] = { actor, polydata, mapper }
+  }
+
+  async function removeItem(id) {
+    if (!hybridDb[id]) {
+      return
+    }
+    const renderer = genericRenderWindow.value.getRenderer()
+    renderer.removeActor(hybridDb[id].actor)
+    genericRenderWindow.value.getRenderWindow().render()
+    delete hybridDb[id]
   }
 
   async function setVisibility(id, visibility) {
-    db[id].actor.setVisibility(visibility)
+    hybridDb[id].actor.setVisibility(visibility)
     const renderWindow = genericRenderWindow.value.getRenderWindow()
     renderWindow.render()
   }
@@ -83,19 +110,20 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     zScale.value = z_scale
     const renderer = genericRenderWindow.value.getRenderer()
     const actors = renderer.getActors()
-    actors.forEach((actor) => {
+    for (const actor of actors) {
       if (actor !== gridActor) {
         const scale = actor.getScale()
         actor.setScale(scale[0], scale[1], z_scale)
       }
-    })
+    }
     renderer.resetCamera()
     genericRenderWindow.value.getRenderWindow().render()
     const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling
-    if (!schema) return
-    const viewerStore = useViewerStore()
+    if (!schema) {
+      return
+    }
     await viewerStore.request(schema, {
-      z_scale: z_scale,
+      z_scale,
     })
     remoteRender()
   }
@@ -106,15 +134,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer.getActiveCamera()
     const params = {
       camera_options: {
-        focal_point: camera.getFocalPoint(),
-        view_up: camera.getViewUp(),
-        position: camera.getPosition(),
+        focal_point: [...camera.getFocalPoint()],
+        view_up: [...camera.getViewUp()],
+        position: [...camera.getPosition()],
         view_angle: camera.getViewAngle(),
-        clipping_range: camera.getClippingRange(),
+        clipping_range: [...camera.getClippingRange()],
         distance: camera.getDistance(),
       },
     }
-    const viewerStore = useViewerStore()
     viewerStore.request(
       viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
       params,
@@ -122,7 +149,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         response_function: () => {
           remoteRender()
           for (const key in params.camera_options) {
-            camera_options[key] = params.camera_options[key]
+            if (Object.hasOwn(params.camera_options, key)) {
+              camera_options[key] = params.camera_options[key]
+            }
           }
         },
       },
@@ -130,8 +159,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function remoteRender() {
-    const viewerStore = useViewerStore()
-    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render)
+    return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render)
   }
 
   function setContainer(container) {
@@ -149,7 +177,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       target: container,
       onPressed: (event) => {
         console.log("onPressed")
-        if (event.button == 0) {
+        if (event.button === 0) {
           is_moving.value = true
           event.stopPropagation()
           imageStyle.opacity = 0
@@ -165,7 +193,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       },
     })
 
-    let wheelEventEndTimeout = null
+    let wheelEventEndTimeout = undefined
     useEventListener(container, "wheel", () => {
       is_moving.value = true
       imageStyle.opacity = 0
@@ -173,7 +201,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       wheelEventEndTimeout = setTimeout(() => {
         is_moving.value = false
         syncRemoteCamera()
-      }, 600)
+      }, WHEEL_TIME_OUT_MS)
     })
   }
 
@@ -197,7 +225,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender()
   }
 
-  const exportStores = () => {
+  function exportStores() {
     const renderer = genericRenderWindow.value.getRenderer()
     const camera = renderer.getActiveCamera()
     const cameraSnapshot = camera
@@ -213,40 +241,39 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return { zScale: zScale.value, camera_options: cameraSnapshot }
   }
 
-  const importStores = (snapshot) => {
+  async function importStores(snapshot) {
     if (!snapshot) {
       console.warn("importStores called with undefined snapshot")
       return
     }
     const z_scale = snapshot.zScale
 
-    const applyCamera = () => {
-      const { camera_options } = snapshot
-      if (!camera_options) {
+    function applyCamera() {
+      const { camera_options: snapshot_camera_options } = snapshot
+      if (!snapshot_camera_options) {
         return
       }
 
       const renderer = genericRenderWindow.value.getRenderer()
       const camera = renderer.getActiveCamera()
 
-      camera.setFocalPoint(...camera_options.focal_point)
-      camera.setViewUp(...camera_options.view_up)
-      camera.setPosition(...camera_options.position)
-      camera.setViewAngle(camera_options.view_angle)
-      camera.setClippingRange(...camera_options.clipping_range)
+      camera.setFocalPoint(...snapshot_camera_options.focal_point)
+      camera.setViewUp(...snapshot_camera_options.view_up)
+      camera.setPosition(...snapshot_camera_options.position)
+      camera.setViewAngle(snapshot_camera_options.view_angle)
+      camera.setClippingRange(...snapshot_camera_options.clipping_range)
 
       genericRenderWindow.value.getRenderWindow().render()
 
       const payload = {
         camera_options: {
-          focal_point: camera_options.focal_point,
-          view_up: camera_options.view_up,
-          position: camera_options.position,
-          view_angle: camera_options.view_angle,
-          clipping_range: camera_options.clipping_range,
+          focal_point: [...snapshot_camera_options.focal_point],
+          view_up: [...snapshot_camera_options.view_up],
+          position: [...snapshot_camera_options.position],
+          view_angle: snapshot_camera_options.view_angle,
+          clipping_range: [...snapshot_camera_options.clipping_range],
         },
       }
-      const viewerStore = useViewerStore()
       return viewerStore.request(
         viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
         payload,
@@ -260,27 +287,29 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     }
 
     if (typeof z_scale === "number") {
-      return setZScaling(z_scale).then(() => applyCamera())
+      await setZScaling(z_scale)
+      return await applyCamera()
     }
-    return applyCamera()
+    return await applyCamera()
   }
 
-  const clear = () => {
+  function clear() {
     const renderer = genericRenderWindow.value.getRenderer()
     const actors = renderer.getActors()
     for (const actor of actors) {
       renderer.removeActor(actor)
     }
     genericRenderWindow.value.getRenderWindow().render()
-    for (const id of Object.keys(db)) {
-      delete db[id]
+    for (const id of Object.keys(hybridDb)) {
+      delete hybridDb[id]
     }
   }
 
   return {
-    db,
+    hybridDb,
     genericRenderWindow,
     addItem,
+    removeItem,
     setVisibility,
     setZScaling,
     syncRemoteCamera,

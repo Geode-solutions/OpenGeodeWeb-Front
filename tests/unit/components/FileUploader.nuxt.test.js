@@ -1,34 +1,31 @@
-import { describe, expect, test, vi } from "vitest"
-import { registerEndpoint, mountSuspended } from "@nuxt/test-utils/runtime"
-import { flushPromises } from "@vue/test-utils"
+// Third party imports
 import * as components from "vuetify/components"
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
-
+import { describe, expect, test } from "vitest"
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
+import { flushPromises } from "@vue/test-utils"
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 
+// Local imports
+import { setupActivePinia, vuetify } from "@ogw_tests/utils"
 import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
-import { vuetify } from "../../utils"
+const FIRST_INDEX = 0
+const SECOND_INDEX = 1
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file
 
-describe("FileUploader", async () => {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+describe(FileUploader, async () => {
+  const pinia = setupActivePinia()
   const geodeStore = useGeodeStore()
   geodeStore.base_url = ""
 
   registerEndpoint(upload_file_schema.$id, {
-    method: upload_file_schema.methods[0],
+    method: upload_file_schema.methods[FIRST_INDEX],
     handler: () => ({}),
   })
   registerEndpoint(upload_file_schema.$id, {
-    method: upload_file_schema.methods[1],
+    method: upload_file_schema.methods[SECOND_INDEX],
     handler: () => ({}),
   })
 
@@ -43,17 +40,20 @@ describe("FileUploader", async () => {
         props: { multiple: false, accept: "*.txt" },
       })
 
-      const v_file_input = wrapper.findComponent(components.VFileInput)
-      await v_file_input.trigger("click")
-
-      await v_file_input.setValue(files)
+      const v_file_input = wrapper.find('input[type="file"]')
+      Object.defineProperty(v_file_input.element, "files", {
+        value: files,
+        writable: true,
+      })
       await v_file_input.trigger("change")
       const v_btn = wrapper.findComponent(components.VBtn)
 
       await v_btn.trigger("click")
       await flushPromises()
       await flushPromises()
-      expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
+      expect(
+        wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX],
+      ).toEqual(files)
     })
 
     test(`prop auto_upload true`, async () => {
@@ -64,7 +64,9 @@ describe("FileUploader", async () => {
         props: { multiple: false, accept: "*.txt", files, auto_upload: true },
       })
       await flushPromises()
-      expect(wrapper.emitted().files_uploaded[0][0]).toEqual(files)
+      expect(
+        wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX],
+      ).toEqual(files)
     })
   })
 })

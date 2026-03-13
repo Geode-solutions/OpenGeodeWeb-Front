@@ -1,12 +1,14 @@
 export const useTreeviewStore = defineStore("treeview", () => {
+  const PANEL_WIDTH = 300
+
   const items = ref([])
   const selection = ref([])
   const components_selection = ref([])
   const isAdditionnalTreeDisplayed = ref(false)
-  const panelWidth = ref(300)
+  const panelWidth = ref(PANEL_WIDTH)
   const model_id = ref("")
   const isTreeCollection = ref(false)
-  const selectedTree = ref(null)
+  const selectedTree = ref(undefined)
   const isImporting = ref(false)
   const pendingSelectionIds = ref([])
 
@@ -14,11 +16,11 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function addItem(geode_object_type, name, id, viewer_type) {
     const child = { title: name, id, viewer_type }
 
-    for (let i = 0; i < items.value.length; i++) {
+    for (let i = 0; i < items.value.length; i += 1) {
       if (items.value[i].title === geode_object_type) {
         items.value[i].children.push(child)
-        items.value[i].children.sort((a, b) =>
-          a.title.localeCompare(b.title, undefined, {
+        items.value[i].children.sort((element1, element2) =>
+          element1.title.localeCompare(element2.title, undefined, {
             numeric: true,
             sensitivity: "base",
           }),
@@ -28,6 +30,12 @@ export const useTreeviewStore = defineStore("treeview", () => {
       }
     }
     items.value.push({ title: geode_object_type, children: [child] })
+    items.value.sort((element1, element2) =>
+      element1.title.localeCompare(element2.title, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      }),
+    )
     selection.value.push(child)
   }
 
@@ -53,27 +61,28 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function exportStores() {
+    const selectionIds = selection.value.map((store) => store.id)
     return {
       isAdditionnalTreeDisplayed: isAdditionnalTreeDisplayed.value,
       panelWidth: panelWidth.value,
       model_id: model_id.value,
       isTreeCollection: isTreeCollection.value,
       selectedTree: selectedTree.value,
-      selectionIds: selection.value.map((c) => c.id),
+      selectionIds,
     }
   }
 
   async function importStores(snapshot) {
     isAdditionnalTreeDisplayed.value =
       snapshot?.isAdditionnalTreeDisplayed || false
-    panelWidth.value = snapshot?.panelWidth || 300
+    panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH
     model_id.value = snapshot?.model_id || ""
     isTreeCollection.value = snapshot?.isTreeCollection || false
-    selectedTree.value = snapshot?.selectedTree || null
+    selectedTree.value = snapshot?.selectedTree || undefined
 
     pendingSelectionIds.value =
       snapshot?.selectionIds ||
-      (snapshot?.selection || []).map((c) => c.id) ||
+      (snapshot?.selection || []).map((store) => store.id) ||
       []
   }
 
@@ -99,7 +108,31 @@ export const useTreeviewStore = defineStore("treeview", () => {
     pendingSelectionIds.value = []
   }
 
-  const clear = () => {
+  function removeItem(id) {
+    for (let i = 0; i < items.value.length; i += 1) {
+      const group = items.value[i]
+      const childIndex = group.children.findIndex((child) => child.id === id)
+
+      if (childIndex !== -1) {
+        group.children.splice(childIndex, 1)
+
+        if (group.children.length === 0) {
+          items.value.splice(i, 1)
+        }
+
+        const selectionIndex = selection.value.findIndex(
+          (item) => item.id === id,
+        )
+        if (selectionIndex !== -1) {
+          selection.value.splice(selectionIndex, 1)
+        }
+
+        return
+      }
+    }
+  }
+
+  function clear() {
     items.value = []
     selection.value = []
     components_selection.value = []
@@ -118,6 +151,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     selectedTree,
     isImporting,
     addItem,
+    removeItem,
     displayAdditionalTree,
     displayFileTree,
     toggleTreeView,

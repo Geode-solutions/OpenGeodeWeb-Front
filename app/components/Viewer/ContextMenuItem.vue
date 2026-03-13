@@ -1,54 +1,124 @@
-<template>
-  <template class="menu-item" :style="itemStyle">
-    <v-tooltip
-      :location="props.itemProps.tooltip_location"
-      :origin="props.itemProps.tooltip_origin"
-    >
-      <template v-slot:activator="{ props }">
-        <v-btn
-          icon
-          :active="display_options"
-          @click.stop="toggleOptions"
-          v-bind="props"
-        >
-          <v-img :src="btn_image" height="35" width="35" />
-        </v-btn>
-      </template>
-      <span>{{ props.tooltip }}</span>
-    </v-tooltip>
-    <div v-if="display_options" class="menu-options pa-0" @click.stop>
-      <v-card
-        @click.stop
-        :title="props.tooltip"
-        class="bg-primary"
-        width="320"
-        max-height="500"
-        :ripple="false"
-      >
-        <v-card-text class="bg-primary">
-          <slot name="options" />
-        </v-card-text>
-      </v-card>
-    </div>
-  </template>
-</template>
-
 <script setup>
-  const props = defineProps({
+  import GlassCard from "@ogw_front/components/GlassCard"
+  import { useMenuStore } from "@ogw_front/stores/menu"
+  import { useTheme } from "vuetify"
+
+  const CARD_WIDTH = 320
+  const CARD_HEIGHT = 500
+  const MARGIN = 60
+  const RADIUS = 80
+  const OFFSET = 40
+
+  const menuStore = useMenuStore()
+  const theme = useTheme()
+  const primaryColor = computed(() => theme.current.value.colors.primary)
+  const { index, itemProps, tooltip, btn_image } = defineProps({
+    index: { type: Number, required: true },
     itemProps: { type: Object, required: true },
     tooltip: { type: String, required: true },
     btn_image: { type: String, required: true },
   })
 
-  const display_options = ref(false)
+  const is_active = computed(() => menuStore.active_item_index === index)
+  const optionsRef = ref(undefined)
+  const { height: optionsHeight } = useElementSize(optionsRef)
+
+  const maxCardHeight = computed(() =>
+    Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET),
+  )
+
+  const optionsStyle = computed(() => {
+    if (!is_active.value || !optionsHeight.value) {
+      return {}
+    }
+    const angle = (index / itemProps.totalItems) * 2 * Math.PI
+    const radius = RADIUS
+    const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius
+    const height = optionsHeight.value
+    const margin = MARGIN
+    let offsetY = 0
+
+    if (absoluteButtonY - height / 2 < margin) {
+      offsetY = margin - (absoluteButtonY - height / 2)
+    } else if (
+      absoluteButtonY + height / 2 >
+      menuStore.containerHeight - margin
+    ) {
+      offsetY =
+        menuStore.containerHeight - margin - (absoluteButtonY + height / 2)
+    }
+    return { top: `calc(50% + ${offsetY}px)` }
+  })
+
+  const optionsClass = computed(() => {
+    const loc = itemProps.tooltip_location
+    const margin = MARGIN
+    const radius = RADIUS
+    if (loc === "right") {
+      return menuStore.menuX + radius + margin + CARD_WIDTH >
+        menuStore.containerWidth
+        ? "options-left"
+        : "options-right"
+    }
+    return menuStore.menuX - radius - margin - CARD_WIDTH < 0
+      ? "options-right"
+      : "options-left"
+  })
 
   function toggleOptions() {
-    display_options.value = !display_options.value
+    menuStore.toggleItemOptions(index)
   }
 </script>
+<template>
+  <v-sheet class="menu-item-container transition-swing" color="transparent">
+    <v-tooltip
+      :location="itemProps.tooltip_location"
+      :origin="itemProps.tooltip_origin"
+    >
+      <template v-slot:activator="{ props: tooltipProps }">
+        <v-btn
+          icon
+          :active="is_active"
+          @click.stop="toggleOptions"
+          v-bind="tooltipProps"
+          class="menu-btn bg-white border"
+          elevation="2"
+        >
+          <v-img :src="btn_image" height="28" width="28" />
+        </v-btn>
+      </template>
+      <span>{{ tooltip }}</span>
+    </v-tooltip>
+
+    <v-sheet
+      v-if="is_active"
+      ref="optionsRef"
+      class="menu-options d-flex align-center pa-0"
+      :class="optionsClass"
+      :style="optionsStyle"
+      color="transparent"
+      @click.stop
+    >
+      <GlassCard
+        @click.stop
+        :title="tooltip"
+        width="320"
+        :max-height="maxCardHeight"
+        :ripple="false"
+        variant="panel"
+        padding="pa-0"
+        class="elevation-24"
+      >
+        <v-card-text class="pa-5">
+          <slot name="options" />
+        </v-card-text>
+      </GlassCard>
+    </v-sheet>
+  </v-sheet>
+</template>
 
 <style scoped>
-  .menu-item {
+  .menu-item-container {
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -56,35 +126,41 @@
     justify-content: center;
     cursor: pointer;
     transition:
-      transform 0.3s ease,
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.3s ease;
+  }
+
+  .menu-btn {
+    transition: all 0.2s ease;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .menu-btn:hover {
+    transform: scale(1.1);
+    background-color: #e3f2fd !important;
+  }
+
+  .menu-btn.v-btn--active {
+    background-color: v-bind(primaryColor) !important;
+    color: white !important;
+  }
+
+  .menu-btn.v-btn--active ::v-deep(.v-img__img) {
+    filter: invert(100%);
   }
 
   .menu-options {
     position: absolute;
     top: 50%;
-    left: 430%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    z-index: 10;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-    min-width: 150px;
-    max-width: 320px;
-    padding: 8px 0;
-    overflow: hidden;
+    transform: translateY(-50%);
+    z-index: 1001;
   }
 
-  .menu-options ::v-deep(v-list-item) {
-    padding: 10px 16px;
-    white-space: nowrap; /* Empêche les retours à la ligne */
+  .options-right {
+    left: 60px;
   }
 
-  .menu-options ::v-deep(v-list-item:hover) {
-    background-color: #f5f5f5;
-    cursor: pointer;
+  .options-left {
+    right: 60px;
   }
 </style>

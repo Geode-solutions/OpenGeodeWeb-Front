@@ -1,3 +1,17 @@
+<script setup>
+  import Launcher from "@ogw_front/components/Launcher"
+  import PackagesVersions from "@ogw_front/components/PackagesVersions"
+  import Stepper from "@ogw_front/components/Stepper"
+
+  import { useInfraStore } from "@ogw_front/stores/infra"
+
+  const infraStore = useInfraStore()
+
+  const { versions_schema } = defineProps({
+    versions_schema: { type: Object, required: true },
+  })
+</script>
+
 <template>
   <v-container>
     <v-row class="flex-column">
@@ -17,18 +31,3 @@
     </v-row>
   </v-container>
 </template>
-
-<script setup>
-  import Launcher from "@ogw_front/components/Launcher"
-  import PackagesVersions from "@ogw_front/components/PackagesVersions"
-  import Stepper from "@ogw_front/components/Stepper"
-
-  import { useInfraStore } from "@ogw_front/stores/infra"
-
-  const infraStore = useInfraStore()
-
-  const props = defineProps({
-    versions_schema: { type: Object, required: true },
-  })
-  const { versions_schema } = props
-</script>

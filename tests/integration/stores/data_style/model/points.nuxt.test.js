@@ -3,27 +3,31 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_front/utils/status"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import {
   delete_folder_recursive,
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import { setupIntegrationTests } from "../../../setup"
+import { Status } from "@ogw_front/utils/status"
+import { setupIntegrationTests } from "@ogw_tests/integration/setup"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
+const INTERVAL_TIMEOUT = 20_000
 const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let id, back_port, viewer_port, project_folder_path
+let back_port = 0,
+  id = "",
+  project_folder_path = "",
+  viewer_port = 0
 
 beforeEach(async () => {
   ;({ id, back_port, viewer_port, project_folder_path } =
     await setupIntegrationTests(file_name, geode_object))
-}, 20000)
+}, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
   console.log("afterEach model points kill", back_port, viewer_port)
@@ -38,7 +42,10 @@ describe("Model points", () => {
       const viewerStore = useViewerStore()
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setModelPointsVisibility(id, visibility)
+      spy.mockClear()
+      const result = dataStyleStore.setModelPointsVisibility(id, visibility)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_points_schemas.visibility,
         { id, visibility },
@@ -57,7 +64,10 @@ describe("Model points", () => {
       const viewerStore = useViewerStore()
       const size = 20
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setModelPointsSize(id, size)
+      spy.mockClear()
+      const result = dataStyleStore.setModelPointsSize(id, size)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_points_schemas.size,
         { id, size },
@@ -66,6 +76,16 @@ describe("Model points", () => {
         },
       )
       expect(dataStyleStore.modelPointsSize(id)).toBe(size)
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
+  describe("Points style", () => {
+    test("Points apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelPointsStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })

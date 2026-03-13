@@ -1,34 +1,17 @@
-<template>
-  <ClientOnly>
-    <Carousel :settings="carrousel_settings">
-      <Slide
-        v-for="(item, index) in props.items"
-        :key="index"
-        class="carousel__slide"
-      >
-        <a :href="item.url" target="_blank">
-          <img :src="item.logo" class="carousel__item" />
-        </a>
-      </Slide>
-      <template #addons>
-        <Navigation />
-        <Pagination />
-      </template>
-    </Carousel>
-  </ClientOnly>
-</template>
-
 <script setup>
+  // oxlint-disable-next-line import/no-unassigned-import
   import "vue3-carousel/dist/carousel.css"
-  import { Carousel, Slide, Navigation, Pagination } from "vue3-carousel"
+  import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel"
   import { useDisplay } from "vuetify"
 
-  const props = defineProps({
+  const NB_ITEMS_TO_DISPLAY = 3
+
+  const { items } = defineProps({
     items: { type: Array, required: true },
   })
 
   const { name } = useDisplay()
-  const nb_items_to_display = ref(3)
+  const nb_items_to_display = ref(NB_ITEMS_TO_DISPLAY)
   watch(
     name,
     (value) => {
@@ -61,6 +44,26 @@
     wrapAround: true,
   })
 </script>
+
+<template>
+  <ClientOnly>
+    <Carousel :settings="carrousel_settings">
+      <Slide
+        v-for="(item, index) in items"
+        :key="index"
+        class="carousel__slide"
+      >
+        <a :href="item.url" target="_blank">
+          <img :src="item.logo" class="carousel__item" />
+        </a>
+      </Slide>
+      <template #addons>
+        <Navigation />
+        <Pagination />
+      </template>
+    </Carousel>
+  </ClientOnly>
+</template>
 
 <style scoped>
   .carousel__item {

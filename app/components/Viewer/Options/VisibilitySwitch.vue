@@ -1,3 +1,7 @@
+<script setup>
+  const visibility = defineModel()
+</script>
+
 <template>
   <v-row class="pa-0" align="center">
     <v-col cols="auto" justify="center">
@@ -8,7 +12,3 @@
     </v-col>
   </v-row>
 </template>
-
-<script setup>
-  const visibility = defineModel()
-</script>

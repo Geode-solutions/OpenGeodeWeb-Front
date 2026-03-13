@@ -5,42 +5,42 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/file_import_workflow"
 
 import { useAppStore } from "@ogw_front/stores/app"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useTreeviewStore } from "@ogw_front/stores/treeview"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 export function useProjectManager() {
-  const exportProject = async function () {
+  async function exportProject() {
     console.log("[export triggered]")
     const appStore = useAppStore()
     const geodeStore = useGeodeStore()
-    const snapshot = appStore.exportStores()
+    const snapshot = await appStore.exportStores()
     const schema = back_schemas.opengeodeweb_back.export_project
     const defaultName = "project.vease"
 
     const result = await $fetch(schema.$id, {
       baseURL: geodeStore.base_url,
-      method: schema.methods.filter((m) => m !== "OPTIONS")[0],
+      method: schema.methods.find((method) => method !== "OPTIONS"),
       body: { snapshot, filename: defaultName },
     })
     fileDownload(result, defaultName)
     return { result }
   }
 
-  const importProjectFile = async function (file) {
+  async function importProjectFile(file) {
     const geodeStore = useGeodeStore()
     const dataStyleStore = useDataStyleStore()
     const viewerStore = useViewerStore()
-    const dataBaseStore = useDataBaseStore()
+    const dataStore = useDataStore()
     const treeviewStore = useTreeviewStore()
     const hybridViewerStore = useHybridViewerStore()
 
     await viewerStore.ws_connect()
 
-    const client = viewerStore.client
+    const { client } = viewerStore
     if (client && client.getConnection && client.getConnection().getSession) {
       await client
         .getConnection()
@@ -51,10 +51,11 @@ export function useProjectManager() {
     await viewerStore.request(
       viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
       {},
+      undefined,
     )
 
     treeviewStore.clear()
-    dataBaseStore.clear()
+    dataStore.clear()
     hybridViewerStore.clear()
 
     const schemaImport = back_schemas.opengeodeweb_back.import_project
@@ -74,7 +75,7 @@ export function useProjectManager() {
 
     treeviewStore.isImporting = true
 
-    const client2 = viewerStore.client
+    const { client: client2 } = viewerStore
     if (
       client2 &&
       client2.getConnection &&
@@ -90,18 +91,7 @@ export function useProjectManager() {
     await hybridViewerStore.initHybridViewer()
     await hybridViewerStore.importStores(snapshot.hybridViewer || {})
 
-    const snapshotDataBase =
-      snapshot && snapshot.dataBase && snapshot.dataBase.db
-        ? snapshot.dataBase.db
-        : {}
-    const items = Object.entries(snapshotDataBase).map(function (pair) {
-      const id = pair[0]
-      const item = pair[1]
-      return {
-        id: id,
-        ...item,
-      }
-    })
+    const items = snapshot?.data?.items || []
 
     await importWorkflowFromSnapshot(items)
     await hybridViewerStore.importStores(snapshot.hybridViewer || {})
@@ -118,5 +108,3 @@ export function useProjectManager() {
 
   return { exportProject, importProjectFile }
 }
-
-export default useProjectManager

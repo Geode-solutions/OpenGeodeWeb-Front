@@ -1,38 +1,36 @@
 // Node.js imports
-import path from "path"
-import { v4 as uuidv4 } from "uuid"
+import path, { dirname } from "node:path"
 import { WebSocket } from "ws"
+import { fileURLToPath } from "node:url"
+import { v4 as uuidv4 } from "uuid"
 
 // Third party imports
-import { setActivePinia } from "pinia"
-import { createTestingPinia } from "@pinia/testing"
 import { afterAll, beforeAll, expect, vi } from "vitest"
 
 // Local imports
-import { useGeodeStore } from "@ogw_front/stores/geode"
-import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useInfraStore } from "@ogw_front/stores/infra"
-import { appMode } from "@ogw_front/utils/app_mode"
-import { importFile } from "@ogw_front/utils/file_import_workflow"
-import Status from "@ogw_front/utils/status"
 import {
+  delete_folder_recursive,
   executable_name,
   executable_path,
+  kill_back,
+  kill_viewer,
   run_back,
   run_viewer,
 } from "@ogw_front/utils/local"
+import { Status } from "@ogw_front/utils/status"
+import { appMode } from "@ogw_front/utils/app_mode"
+import { importFile } from "@ogw_front/utils/file_import_workflow"
+import { setupActivePinia } from "@ogw_tests/utils"
+import { useGeodeStore } from "@ogw_front/stores/geode"
+import { useInfraStore } from "@ogw_front/stores/infra"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
+const __dirname = dirname(fileURLToPath(import.meta.url))
 const data_folder = path.join("tests", "integration", "data")
 
-async function setupIntegrationTests(file_name, geode_object) {
-  const pinia = createTestingPinia({
-    stubActions: false,
-    createSpy: vi.fn,
-  })
-  setActivePinia(pinia)
+async function runMicroservices() {
   const geodeStore = useGeodeStore()
-  // const hybridViewerStore = useHybridViewerStore()
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
@@ -40,9 +38,11 @@ async function setupIntegrationTests(file_name, geode_object) {
   const microservices_path = path.join("tests", "integration", "microservices")
   const project_folder_path = path.join(data_folder, uuidv4())
   const upload_folder_path = path.join(__dirname, "data", "uploads")
-  const back_path = executable_path(path.join(microservices_path, "back"))
+  const back_path = await executable_path(path.join(microservices_path, "back"))
   const back_name = executable_name("opengeodeweb-back")
-  const viewer_path = executable_path(path.join(microservices_path, "viewer"))
+  const viewer_path = await executable_path(
+    path.join(microservices_path, "viewer"),
+  )
   const viewer_name = executable_name("opengeodeweb-viewer")
   const [back_port, viewer_port] = await Promise.all([
     run_back(back_name, back_path, {
@@ -59,20 +59,25 @@ async function setupIntegrationTests(file_name, geode_object) {
   geodeStore.default_local_port = back_port
   viewerStore.default_local_port = viewer_port
   console.log("after ports")
-  await viewerStore.ws_connect()
-  // await hybridViewerStore.initHybridViewer()
-  console.log("after hybridViewerStore.initHybridViewer")
 
-  // await viewerStore.ws_connect()
+  return { back_port, viewer_port, project_folder_path }
+}
+
+async function setupIntegrationTests(file_name, geode_object) {
+  setupActivePinia()
+  const viewerStore = useViewerStore()
+  const { back_port, viewer_port, project_folder_path } =
+    await runMicroservices()
+  await viewerStore.ws_connect()
   const id = await importFile(file_name, geode_object)
   expect(viewerStore.status).toBe(Status.CONNECTED)
   console.log("end of setupIntegrationTests")
   return { id, back_port, viewer_port, project_folder_path }
 }
 
-const mockLockRequest = vi.fn().mockImplementation(async (name, callback) => {
-  return callback({ name })
-})
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name, task) => await task({ name }))
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -82,11 +87,20 @@ vi.stubGlobal("navigator", {
 })
 
 beforeAll(() => {
-  global.WebSocket = WebSocket
+  globalThis.WebSocket = WebSocket
 })
 
 afterAll(() => {
-  delete global.WebSocket
+  delete globalThis.WebSocket
 })
 
-export { setupIntegrationTests }
+async function teardownIntegrationTests(
+  back_port,
+  viewer_port,
+  project_folder_path,
+) {
+  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+  delete_folder_recursive(project_folder_path)
+}
+
+export { runMicroservices, setupIntegrationTests, teardownIntegrationTests }

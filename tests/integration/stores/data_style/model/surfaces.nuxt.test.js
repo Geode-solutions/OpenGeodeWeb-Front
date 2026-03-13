@@ -3,58 +3,68 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import Status from "@ogw_front/utils/status"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
-import { useViewerStore } from "@ogw_front/stores/viewer"
 import {
   delete_folder_recursive,
   kill_back,
   kill_viewer,
 } from "@ogw_front/utils/local"
-import { setupIntegrationTests } from "../../../setup"
+import { Status } from "@ogw_front/utils/status"
+import { setupIntegrationTests } from "@ogw_tests/integration/setup"
+import { useDataStore } from "@ogw_front/stores/data"
+import { useDataStyleStore } from "@ogw_front/stores/data_style"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
+const INTERVAL_TIMEOUT = 20_000
 const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let id, back_port, viewer_port, project_folder_path
+describe("model surfaces", () => {
+  let back_port = 0,
+    id = "",
+    project_folder_path = "",
+    viewer_port = 0
 
-beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
-    await setupIntegrationTests(file_name, geode_object))
-}, 20000)
+  beforeEach(async () => {
+    ;({ id, back_port, viewer_port, project_folder_path } =
+      await setupIntegrationTests(file_name, geode_object))
+  }, INTERVAL_TIMEOUT)
 
-afterEach(async () => {
-  console.log(
-    "afterEach model surfaces kill",
-    back_port,
-    viewer_port,
-    project_folder_path,
-  )
-  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-  delete_folder_recursive(project_folder_path)
-})
+  afterEach(async () => {
+    console.log(
+      "afterEach model surfaces kill",
+      back_port,
+      viewer_port,
+      project_folder_path,
+    )
+    await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
+    delete_folder_recursive(project_folder_path)
+  })
 
-describe("Model surfaces", () => {
-  describe("Surfaces visibility", () => {
-    test("Visibility true", async () => {
+  describe("surfaces visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const dataBaseStore = useDataBaseStore()
-      const surface_ids = dataBaseStore.getSurfacesUuids(id)
-      const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+      const dataStore = useDataStore()
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id)
+      const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+        id,
+        surface_ids,
+      )
       const visibility = true
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setModelSurfacesVisibility(
+      spy.mockClear() // Clear calls from setup (applyDefaultStyle)
+      const result = dataStyleStore.setModelSurfacesVisibility(
         id,
         surface_ids,
         visibility,
       )
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.visibility,
-        { id, block_ids: surface_flat_indexes, visibility },
+        { id, block_ids: surface_viewer_ids, visibility },
         {
           response_function: expect.any(Function),
         },
@@ -68,19 +78,29 @@ describe("Model surfaces", () => {
     })
   })
 
-  describe("Surfaces color", () => {
-    test("Color red", async () => {
+  describe("surfaces color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
-      const dataBaseStore = useDataBaseStore()
-      const surface_ids = dataBaseStore.getSurfacesUuids(id)
-      const surface_flat_indexes = dataBaseStore.getFlatIndexes(id, surface_ids)
+      const dataStore = useDataStore()
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id)
+      const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+        id,
+        surface_ids,
+      )
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setModelSurfacesColor(id, surface_ids, color)
+      spy.mockClear() // Clear calls from setup (applyDefaultStyle)
+      const result = dataStyleStore.setModelSurfacesColor(
+        id,
+        surface_ids,
+        color,
+      )
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.color,
-        { id, block_ids: surface_flat_indexes, color },
+        { id, block_ids: surface_viewer_ids, color },
         {
           response_function: expect.any(Function),
         },
@@ -90,6 +110,16 @@ describe("Model surfaces", () => {
           color,
         )
       }
+      expect(viewerStore.status).toBe(Status.CONNECTED)
+    })
+  })
+  describe("Surfaces style", () => {
+    test("Surfaces apply style", async () => {
+      const dataStyleStore = useDataStyleStore()
+      const viewerStore = useViewerStore()
+      const result = dataStyleStore.applyModelSurfacesStyle(id)
+      expect(result).toBeInstanceOf(Promise)
+      await result
       expect(viewerStore.status).toBe(Status.CONNECTED)
     })
   })

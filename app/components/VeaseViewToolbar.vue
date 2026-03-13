@@ -1,39 +1,11 @@
-<template>
-  <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row
-      v-for="camera_option in camera_options"
-      :key="camera_option.icon"
-      dense
-    >
-      <v-col>
-        <v-btn
-          density="comfortable"
-          icon
-          @click.stop="camera_option.action"
-          v-tooltip:left="camera_option.tooltip"
-        >
-          <v-icon :icon="camera_option.icon" size="32" />
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
-  <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
-  <ZScaling
-    v-if="showZScaling"
-    v-model="zScale"
-    :width="400"
-    @close="handleZScalingClose"
-  />
-</template>
-
 <script setup>
   import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
   import Screenshot from "@ogw_front/components/Screenshot"
   import ZScaling from "@ogw_front/components/ZScaling"
 
-  import { useViewerStore } from "@ogw_front/stores/viewer"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+  import { useViewerStore } from "@ogw_front/stores/viewer"
 
   const hybridViewerStore = useHybridViewerStore()
   const viewerStore = useViewerStore()
@@ -49,7 +21,7 @@
     },
   )
 
-  const handleZScalingClose = async () => {
+  async function handleZScalingClose() {
     await hybridViewerStore.setZScaling(zScale.value)
     showZScaling.value = false
   }
@@ -61,7 +33,7 @@
       action: () => {
         const { genericRenderWindow } = storeToRefs(hybridViewerStore)
         const renderWindow = genericRenderWindow.value.value.getRenderWindow()
-        const renderer = renderWindow.getRenderers()[0]
+        const [renderer] = renderWindow.getRenderers()
         renderer.resetCamera()
         renderWindow.render()
         hybridViewerStore.syncRemoteCamera()
@@ -99,6 +71,34 @@
     },
   ]
 </script>
+
+<template>
+  <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
+    <v-row
+      v-for="camera_option in camera_options"
+      :key="camera_option.icon"
+      dense
+    >
+      <v-col>
+        <v-btn
+          density="comfortable"
+          icon
+          @click.stop="camera_option.action"
+          v-tooltip:left="camera_option.tooltip"
+        >
+          <v-icon :icon="camera_option.icon" size="32" />
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
+  <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
+  <ZScaling
+    v-if="showZScaling"
+    v-model="zScale"
+    :width="400"
+    @close="handleZScalingClose"
+  />
+</template>
 
 <style module>
   .floatToolbar {

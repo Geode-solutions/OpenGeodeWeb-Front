@@ -1,7 +1,7 @@
-import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useGeodeStore } from "@ogw_front/stores/geode"
 
-export async function upload_file(
+async function upload_file(
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
@@ -18,7 +18,6 @@ export async function upload_file(
     method: "PUT",
     body: body,
   }
-
   geodeStore.start_request()
   return $fetch(route, {
     baseURL: geodeStore.base_url,
@@ -43,8 +42,8 @@ export async function upload_file(
       feedbackStore.add_error(
         response.status,
         route,
-        response._data.name,
-        response._data.description,
+        response.name,
+        response.description,
       )
       if (response_error_function) {
         response_error_function(response)
@@ -53,4 +52,4 @@ export async function upload_file(
   })
 }
 
-export default upload_file
+export { upload_file }

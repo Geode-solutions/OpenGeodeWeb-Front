@@ -1,5 +1,4 @@
-function check_recaptcha_params(event) {
-  const { name, email, launch } = JSON.parse(event.body)
+function check_recaptcha_params(name, email, launch) {
   console.log("check_recaptcha_params", { name, email, launch })
   if (name !== "") {
     return {

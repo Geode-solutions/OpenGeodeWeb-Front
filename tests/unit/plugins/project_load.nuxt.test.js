@@ -1,17 +1,24 @@
 import { beforeEach, describe, expect, test, vi } from "vitest"
-import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
 
-import { useTreeviewStore } from "@ogw_front/stores/treeview"
 import { useAppStore } from "@ogw_front/stores/app"
+import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import { useDataBaseStore } from "@ogw_front/stores/data_base"
+import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
-vi.mock("../../../internal/utils/viewer_call", () => ({
-  viewer_call: vi.fn(() => Promise.resolve()),
+import { database } from "@ogw_internal/database/database.js"
+import { setupActivePinia } from "@ogw_tests/utils"
+
+const PANEL_WIDTH = 320
+const Z_SCALE = 1.5
+const STORES_SLICE_START = 1
+
+vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
+  viewer_call: vi.fn(async () => {
+    await Promise.resolve()
+  }),
 }))
-vi.mock("@/stores/hybrid_viewer", () => ({
+vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
   useHybridViewerStore: () => ({
     $id: "hybridViewer",
     initHybridViewer: vi.fn(),
@@ -24,39 +31,35 @@ vi.mock("@/stores/hybrid_viewer", () => ({
 }))
 
 beforeEach(() => {
-  setActivePinia(
-    createTestingPinia({
-      stubActions: false,
-      createSpy: vi.fn,
-    }),
-  )
+  setupActivePinia()
 })
 
 describe("Project import", () => {
   test("app.importStores restores stores", async () => {
     const stores = {
       app: useAppStore(),
-      dataBase: useDataBaseStore(),
+      dataBase: useDataStore(),
       treeview: useTreeviewStore(),
       dataStyle: useDataStyleStore(),
       hybrid: useHybridViewerStore(),
     }
-    Object.values(stores)
-      .slice(1)
-      .forEach((store) => stores.app.registerStore(store))
+    const storesArray = Object.values(stores)
+    for (const store of storesArray.slice(STORES_SLICE_START)) {
+      stores.app.registerStore(store)
+    }
 
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(
       async (snapshot) => {
-        for (const [id, item] of Object.entries(snapshot?.db || {})) {
-          stores.dataBase.db[id] = item
-        }
+        const items = snapshot?.items || []
+        await Promise.all(items.map((item) => database.data.put(item)))
       },
     )
 
     const snapshot = {
-      dataBase: {
-        db: {
-          abc123: {
+      data: {
+        items: [
+          {
+            id: "abc123",
             viewer_type: "mesh",
             geode_object_type: "PointSet2D",
             native_file: "native.ext",
@@ -64,25 +67,27 @@ describe("Project import", () => {
             name: "My Data",
             binary_light_viewable: "VGxpZ2h0RGF0YQ==",
           },
-        },
+        ],
       },
       treeview: {
         items: [{ title: "PointSet2D", children: [] }],
         selection: [],
         components_selection: [],
         isAdditionnalTreeDisplayed: false,
-        panelWidth: 320,
+        panelWidth: PANEL_WIDTH,
         model_id: "",
         isTreeCollection: false,
-        selectedTree: null,
+        selectedTree: undefined,
       },
       dataStyle: { styles: { abc123: { some: "style" } } },
-      hybridViewer: { zScale: 1.5 },
+      hybridViewer: { zScale: Z_SCALE },
     }
 
     await stores.app.importStores(snapshot)
 
-    expect(stores.dataBase.db.abc123).toBeDefined()
+    const item = await database.data.get("abc123")
+    expect(item).toBeDefined()
+    expect(item.id).toBe("abc123")
     expect(stores.dataStyle.styles.abc123).toBeDefined()
   })
 })

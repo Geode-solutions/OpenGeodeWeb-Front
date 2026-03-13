@@ -1,3 +1,21 @@
+<script setup>
+  import { useDataStore } from "@ogw_front/stores/data"
+  import { useTreeviewStore } from "@ogw_front/stores/treeview"
+
+  const dataStore = useDataStore()
+  const treeviewStore = useTreeviewStore()
+
+  const selectedTree = computed(() => treeviewStore.selectedTree)
+
+  function goBackToFileTree() {
+    treeviewStore.displayFileTree()
+  }
+
+  const model_id = computed(() => treeviewStore.model_id)
+
+  const metaDatas = dataStore.refItem(model_id.value)
+</script>
+
 <template>
   <v-breadcrumbs class="mb-n10 breadcrumb-container">
     <div class="d-flex align-center gap-2 ml-2 mt-2 mb-1">
@@ -35,24 +53,6 @@
     </div>
   </v-breadcrumbs>
 </template>
-
-<script setup>
-  import { useDataBaseStore } from "@ogw_front/stores/data_base"
-  import { useTreeviewStore } from "@ogw_front/stores/treeview"
-
-  const dataBaseStore = useDataBaseStore()
-  const treeviewStore = useTreeviewStore()
-
-  const selectedTree = computed(() => treeviewStore.selectedTree)
-
-  const goBackToFileTree = () => {
-    treeviewStore.displayFileTree()
-  }
-
-  const model_id = computed(() => treeviewStore.model_id)
-
-  const metaDatas = computed(() => dataBaseStore.itemMetaDatas(model_id.value))
-</script>
 
 <style scoped>
   .breadcrumb-container {

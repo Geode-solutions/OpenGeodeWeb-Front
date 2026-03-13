@@ -1,34 +1,12 @@
-<template>
-  <ClientOnly>
-    <div style="position: relative; width: 100%; height: calc(100vh - 80px)">
-      <ViewToolbar />
-      <slot name="ui"></slot>
-      <v-col
-        ref="viewer"
-        style="
-          overflow: hidden;
-          position: relative;
-          z-index: 0;
-          height: 100%;
-          width: 100%;
-        "
-        class="pa-0"
-        @click="get_x_y"
-        @keydown.esc="viewerStore.toggle_picking_mode(false)"
-      />
-    </div>
-  </ClientOnly>
-</template>
-
 <script setup>
-  import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
   import { useElementSize, useWindowSize } from "@vueuse/core"
-  import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-  import Status from "@ogw_front/utils/status"
+  import { Status } from "@ogw_front/utils/status"
   import ViewToolbar from "@ogw_front/components/ViewToolbar"
   import { useViewerStore } from "@ogw_front/stores/viewer"
+  import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+  import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView"
 
-  const props = defineProps({
+  const { viewId } = defineProps({
     viewId: { type: String, default: "-1" },
   })
 
@@ -50,6 +28,7 @@
   }
 
   const connected = ref(false)
+  // oxlint-disable-next-line import/no-named-as-default-member
   const view = vtkRemoteView.newInstance({
     rpcWheelEvent: "viewport.mouse.zoom.wheel",
   })
@@ -119,6 +98,28 @@
     }
   })
 </script>
+
+<template>
+  <ClientOnly>
+    <div style="position: relative; width: 100%; height: 100%">
+      <ViewToolbar />
+      <slot name="ui"></slot>
+      <v-col
+        ref="viewer"
+        style="
+          overflow: hidden;
+          position: relative;
+          z-index: 0;
+          height: 100%;
+          width: 100%;
+        "
+        class="pa-0"
+        @click="get_x_y"
+        @keydown.esc="viewerStore.toggle_picking_mode(false)"
+      />
+    </div>
+  </ClientOnly>
+</template>
 
 <style scoped>
   .list {

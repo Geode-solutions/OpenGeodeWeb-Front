@@ -1,3 +1,49 @@
+<script setup>
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+  import { useTreeviewStore } from "@ogw_front/stores/treeview"
+
+  import { compareSelections } from "@ogw_front/utils/treeview"
+
+  const treeviewStore = useTreeviewStore()
+  const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
+
+  const emit = defineEmits(["show-menu"])
+
+  function isLeafNode(item) {
+    return !item.children || item.children.length === 0
+  }
+
+  watch(
+    () => treeviewStore.selection,
+    async (current, previous) => {
+      const oldSelection = previous || []
+      if (current === oldSelection) {
+        return
+      }
+      const { added, removed } = compareSelections(current, previous)
+      const updates = [
+        ...added.map((item) => dataStyleStore.setVisibility(item.id, true)),
+        ...removed.map((item) => dataStyleStore.setVisibility(item.id, false)),
+      ]
+      await Promise.all(updates)
+      hybridViewerStore.remoteRender()
+    },
+  )
+
+  function isModel(item) {
+    return item.viewer_type === "model"
+  }
+
+  onMounted(() => {
+    const savedSelection = treeviewStore.selection
+    if (savedSelection && savedSelection.length > 0) {
+      treeviewStore.selection = savedSelection
+    }
+  })
+</script>
+
 <template>
   <v-treeview
     v-model:selected="treeviewStore.selection"
@@ -11,7 +57,7 @@
     <template #title="{ item }">
       <span
         class="treeview-item"
-        @click.right.stop="
+        @contextmenu.prevent.stop="
           isLeafNode(item)
             ? emit('show-menu', { event: $event, itemId: item.id })
             : null
@@ -34,67 +80,6 @@
     </template>
   </v-treeview>
 </template>
-
-<script setup>
-  import { useTreeviewStore } from "@ogw_front/stores/treeview"
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useDataBaseStore } from "@ogw_front/stores/data_base"
-  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-
-  import { compareSelections } from "@ogw_front/utils/treeview"
-
-  const treeviewStore = useTreeviewStore()
-  const dataStyleStore = useDataStyleStore()
-  const dataBaseStore = useDataBaseStore()
-  const hybridViewerStore = useHybridViewerStore()
-
-  const emit = defineEmits(["show-menu"])
-
-  function isLeafNode(item) {
-    return !item.children || item.children.length === 0
-  }
-
-  watch(
-    () => treeviewStore.selection,
-    (current, previous) => {
-      if (!previous) previous = []
-      if (current.value === previous) {
-        return
-      }
-      const { added, removed } = compareSelections(current, previous)
-
-      added.forEach((item) => {
-        dataStyleStore.setVisibility(item.id, true)
-      })
-
-      removed.forEach((item) => {
-        dataStyleStore.setVisibility(item.id, false)
-
-        const objectMeta = dataBaseStore.itemMetaDatas(item.id)
-        if (objectMeta.viewer_type === "mesh") {
-          if (dataBaseStore.db[item.id]?.mesh_components_selection) {
-            dataBaseStore.db[item.id].mesh_components_selection = []
-          }
-          if (dataStyleStore.visibleMeshComponentIds?.[item.id]) {
-            dataStyleStore.updateVisibleMeshComponents(item.id, [])
-          }
-        }
-      })
-      hybridViewerStore.remoteRender()
-    },
-  )
-
-  function isModel(item) {
-    return item.viewer_type === "model"
-  }
-
-  onMounted(() => {
-    const savedSelection = treeviewStore.selection
-    if (savedSelection && savedSelection.length > 0) {
-      treeviewStore.selection = savedSelection
-    }
-  })
-</script>
 
 <style scoped>
   .transparent-treeview {

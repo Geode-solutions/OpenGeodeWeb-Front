@@ -1,8 +1,83 @@
+<script setup>
+  import PointSetPoints from "@ogw_front/assets/viewer_svgs/point_set_points.svg"
+  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
+  import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
+  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
+
+  import { useDataStyleStore } from "@ogw_front/stores/data_style"
+  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+
+  const dataStyleStore = useDataStyleStore()
+  const hybridViewerStore = useHybridViewerStore()
+
+  const { itemProps } = defineProps({
+    itemProps: { type: Object, required: true },
+  })
+
+  const id = toRef(() => itemProps.id)
+
+  const visibility = computed({
+    get: () => dataStyleStore.meshPointsVisibility(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVisibility(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const size = computed({
+    get: () => dataStyleStore.meshPointsSize(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsSize(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const coloring_style_key = computed({
+    get: () => dataStyleStore.meshPointsActiveColoring(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsActiveColoring(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const color = computed({
+    get: () => dataStyleStore.meshPointsColor(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsColor(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute_name = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeName(id.value, newValue)
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute_range = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeRange(
+        id.value,
+        newValue[0],
+        newValue[1],
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+  const vertex_attribute_color_map = computed({
+    get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
+    set: async (newValue) => {
+      await dataStyleStore.setMeshPointsVertexAttributeColorMap(
+        id.value,
+        newValue,
+      )
+      hybridViewerStore.remoteRender()
+    },
+  })
+</script>
 <template>
   <ViewerContextMenuItem
-    :itemProps="props.itemProps"
+    :itemProps="itemProps"
     tooltip="Points options"
-    :btn_image="props.btn_image"
+    :btn_image="PointSetPoints"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
@@ -13,15 +88,7 @@
             <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Size'" />
           </v-col>
           <v-col justify="center">
-            <v-slider
-              v-model="size"
-              hide-details
-              min="0"
-              max="20"
-              step="2"
-              thumb-color="black"
-              ticks
-            />
+            <v-slider v-model="size" hide-details min="0" max="20" step="2" />
           </v-col>
         </v-row>
         <v-row>
@@ -30,7 +97,9 @@
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
-              v-model:vertex_attribute="vertex_attribute"
+              v-model:vertex_attribute_name="vertex_attribute_name"
+              v-model:vertex_attribute_range="vertex_attribute_range"
+              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
             />
           </v-col>
         </v-row>
@@ -38,58 +107,3 @@
     </template>
   </ViewerContextMenuItem>
 </template>
-
-<script setup>
-  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
-  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
-  import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector"
-
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-
-  const dataStyleStore = useDataStyleStore()
-  const hybridViewerStore = useHybridViewerStore()
-
-  const props = defineProps({
-    itemProps: { type: Object, required: true },
-    btn_image: { type: String, required: true },
-  })
-
-  const id = toRef(() => props.itemProps.id)
-
-  const visibility = computed({
-    get: () => dataStyleStore.meshPointsVisibility(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVisibility(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const size = computed({
-    get: () => dataStyleStore.meshPointsSize(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsSize(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const coloring_style_key = computed({
-    get: () => dataStyleStore.meshPointsActiveColoring(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsActiveColoring(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const color = computed({
-    get: () => dataStyleStore.meshPointsColor(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsColor(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-  const vertex_attribute = computed({
-    get: () => dataStyleStore.meshPointsVertexAttribute(id.value),
-    set: (newValue) => {
-      dataStyleStore.setMeshPointsVertexAttribute(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
-</script>
