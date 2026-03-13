@@ -5,27 +5,23 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest"
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import {
-  runMicroservices,
-  teardownIntegrationTests,
-} from "@ogw_tests/integration/setup"
+import { cleanupBackend } from "@ogw_front/utils/local/microservices"
 import { Status } from "@ogw_front/utils/status"
-import { setupActivePinia } from "@ogw_tests/utils"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { runMicroservices } from "@ogw_tests/integration/setup"
+import { setupActivePinia } from "@ogw_tests/utils"
 
 const CONNECT_TIMEOUT = 25_000
 
-let back_port = 0,
-  viewer_port = 0,
-  project_folder_path = ""
+let projectFolderPath = ""
 
 beforeEach(async () => {
   setupActivePinia()
-  ;({ back_port, viewer_port, project_folder_path } = await runMicroservices())
+  ;({ projectFolderPath } = await runMicroservices())
 })
 
 afterEach(async () => {
-  await teardownIntegrationTests(back_port, viewer_port, project_folder_path)
+  await cleanupBackend(projectFolderPath)
 })
 
 describe("Viewer Store", () => {

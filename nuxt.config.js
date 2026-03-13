@@ -1,5 +1,9 @@
+// Node imports
 import path, { dirname } from "node:path"
 import { fileURLToPath } from "node:url"
+
+// Local imports
+import package_json from "./package.json"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -7,12 +11,26 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       API_URL: "api.geode-solutions.com",
+      BACK_COMMAND: "opengeodeweb-back",
+      BACK_PATH: path.join(
+        __dirname,
+        "tests",
+        "integration",
+        "microservices",
+        "back",
+      ),
+      BROWSER: process.env.BROWSER ?? false,
+      PROJECT: package_json.name,
       SITE_BRANCH:
         process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
-      PROJECT: process.env.NODE_ENV === "production" ? process.env.PROJECT : "",
-      BROWSER: process.env.BROWSER ?? false,
-      GEODE_PORT: process.env.GEODE_PORT ?? undefined,
-      VIEWER_PORT: process.env.VIEWER_PORT ?? undefined,
+      VIEWER_COMMAND: "opengeodeweb-viewer",
+      VIEWER_PATH: path.join(
+        __dirname,
+        "tests",
+        "integration",
+        "microservices",
+        "viewer",
+      ),
     },
   },
 
