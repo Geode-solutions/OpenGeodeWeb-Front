@@ -1,5 +1,4 @@
 import path, { dirname } from "node:path"
-import branchName from "current-git-branch"
 import { fileURLToPath } from "node:url"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -14,7 +13,6 @@ export default defineNuxtConfig({
       BROWSER: process.env.BROWSER ?? false,
       GEODE_PORT: process.env.GEODE_PORT ?? undefined,
       VIEWER_PORT: process.env.VIEWER_PORT ?? undefined,
-      GIT_BRANCH: branchName(),
     },
   },
 
