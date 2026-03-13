@@ -10,6 +10,7 @@ import { setupActivePinia, vuetify } from "@ogw_tests/utils"
 import FileSelector from "@ogw_front/components/FileSelector"
 import FileUploader from "@ogw_front/components/FileUploader"
 import { useGeodeStore } from "@ogw_front/stores/geode"
+import { vuetify } from "../../utils"
 
 const EXPECTED_LENGTH = 1
 const FIRST_INDEX = 0

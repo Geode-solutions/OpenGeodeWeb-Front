@@ -2,7 +2,6 @@ import { computed, reactive, ref, shallowRef } from "vue"
 import { describe, expect, test } from "vitest"
 import ResizeObserver from "resize-observer-polyfill"
 import { mount } from "@vue/test-utils"
-
 import ObjectSelector from "@ogw_front/components/ObjectSelector"
 import Step from "@ogw_front/components/Step"
 
