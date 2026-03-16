@@ -21,10 +21,9 @@ import Grid2DEdgesOptions from "@ogw_front/components/Viewer/Grid/2D/EdgesOption
 import Grid2DPointsOptions from "@ogw_front/components/Viewer/Grid/2D/PointsOptions"
 
 // Grid 3D components
+import Grid3DCellsOptions from "@ogw_front/components/Viewer/Grid/3D/CellsOptions"
 import Grid3DEdgesOptions from "@ogw_front/components/Viewer/Grid/3D/EdgesOptions"
 import Grid3DPointsOptions from "@ogw_front/components/Viewer/Grid/3D/PointsOptions"
-// import Grid3DFacetsOptions from "@ogw_front/components/Viewer/Grid/3D/FacetsOptions"
-import Grid3DCellsOptions from "@ogw_front/components/Viewer/Grid/3D/CellsOptions"
 
 // Solid components
 import SolidEdgesOptions from "@ogw_front/components/Viewer/Solid/EdgesOptions"

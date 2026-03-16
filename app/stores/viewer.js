@@ -1,3 +1,4 @@
+// Third party imports
 import vtkWSLinkClient, {
   newInstance,
 } from "@kitware/vtk.js/IO/Core/WSLinkClient"
@@ -5,11 +6,15 @@ import vtkWSLinkClient, {
 import _ from "lodash"
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
-import Status from "@ogw_front/utils/status"
-import { appMode } from "@ogw_front/utils/app_mode"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { useRuntimeConfig } from "nuxt/app"
+
+// Local imports
+import { Status } from "@ogw_front/utils/status"
+import { appMode } from "@ogw_front/utils/app_mode"
+import { useAppStore } from "@ogw_front/stores/app"
 import { useInfraStore } from "@ogw_front/stores/infra"
-import { viewer_call } from "../../internal/utils/viewer_call"
+import { viewer_call } from "@ogw_internal/utils/viewer_call"
 
 const MS_PER_SECOND = 1000
 const SECONDS_PER_REQUEST = 10
@@ -19,7 +24,6 @@ export const useViewerStore = defineStore(
   "viewer",
   () => {
     const infraStore = useInfraStore()
-
     const default_local_port = ref("1234")
     const client = ref({})
     const config = ref(undefined)
@@ -39,10 +43,6 @@ export const useViewerStore = defineStore(
     const port = computed(() => {
       if (infraStore.app_mode === appMode.CLOUD) {
         return "443"
-      }
-      const { VIEWER_PORT } = useRuntimeConfig().public
-      if (VIEWER_PORT !== undefined && VIEWER_PORT !== "") {
-        return VIEWER_PORT
       }
       return default_local_port.value
     })
@@ -150,11 +150,40 @@ export const useViewerStore = defineStore(
       request_counter.value -= 1
     }
 
-    async function launch() {
-      console.log("[VIEWER] Launching viewer microservice...")
-      const port = await globalThis.electronAPI.run_viewer()
-      console.log("[VIEWER] Viewer launched on port:", port)
-      return port
+    function launch(args = { projectFolderPath }) {
+      console.log("[VIEWER] Launching viewer microservice...", { args })
+      const appStore = useAppStore()
+
+      const { VIEWER_PATH, VIEWER_COMMAND } = useRuntimeConfig().public
+
+      console.log("[VIEWER] VIEWER_PATH", VIEWER_PATH)
+      console.log("[VIEWER] VIEWER_COMMAND", VIEWER_COMMAND)
+      const schema = {
+        $id: "/api/app/run_viewer",
+        methods: ["POST"],
+        type: "object",
+        properties: {
+          VIEWER_PATH: { type: "string" },
+          VIEWER_COMMAND: { type: "string" },
+        },
+        required: ["VIEWER_PATH", "VIEWER_COMMAND"],
+        additionalProperties: true,
+      }
+
+      const params = {
+        VIEWER_PATH,
+        VIEWER_COMMAND,
+        args,
+      }
+
+      console.log("[VIEWER] params", params)
+
+      return appStore.request(schema, params, {
+        response_function: (response) => {
+          console.log(`[VIEWER] Viewer launched on port ${response.port}`)
+          this.default_local_port = response.port
+        },
+      })
     }
 
     async function connect() {
@@ -170,6 +199,7 @@ export const useViewerStore = defineStore(
       timeout = request_timeout,
     ) {
       console.log("[VIEWER] Request:", schema.$id)
+      const start = Date.now()
 
       // Get current store instance to pass to viewer_call
       const store = useViewerStore()
@@ -180,7 +210,13 @@ export const useViewerStore = defineStore(
         {
           ...callbacks,
           response_function: async (response) => {
-            console.log("[VIEWER] Request completed:", schema.$id)
+            console.log(
+              "[VIEWER] Request completed:",
+              schema.$id,
+              "in",
+              (Date.now() - start) / 1_000,
+              "s",
+            )
             if (callbacks.response_function) {
               await callbacks.response_function(response)
             }

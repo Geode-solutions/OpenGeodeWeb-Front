@@ -4,7 +4,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime"
 
 // Local imports
 import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel"
-import { vuetify } from "../../../utils"
+import { vuetify } from "@ogw_tests/utils"
 
 describe("Inspector/ResultPanel", async () => {
   test(`Test with issues`, async () => {

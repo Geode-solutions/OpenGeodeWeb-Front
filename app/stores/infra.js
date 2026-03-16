@@ -2,6 +2,8 @@ import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import Status from "@ogw_front/utils/status"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 import { database } from "../../internal/database/database"
+import { useAppStore } from "@ogw_front/stores/app"
+import { registerRunningExtensions } from "@ogw_front/utils/extension"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
@@ -33,7 +35,11 @@ export const useInfraStore = defineStore("infra", {
       const store_name = store.$id
       console.log("[INFRA] Registering microservice:", store_name)
 
-      if (!this.microservices.find((store) => store.$id === store_name)) {
+      if (
+        !this.microservices.find(
+          (microservice) => microservice.$id === store_name,
+        )
+      ) {
         this.microservices.push(store)
         console.log("[INFRA] Microservice registered:", store_name)
       }
@@ -58,25 +64,33 @@ export const useInfraStore = defineStore("infra", {
         }
         console.log("[INFRA] Lock granted for create_backend")
 
-        if (this.app_mode === appMode.DESKTOP) {
-          console.log("[INFRA] DESKTOP mode - Launching microservices...")
-          const microservices_with_launch = this.microservices.filter(
-            (store) => store.launch,
-          )
-
-          const port_promises = microservices_with_launch.map((store) =>
-            store.launch(),
-          )
-          const ports = await Promise.all(port_promises)
-
-          for (const [index, store] of microservices_with_launch.entries()) {
-            store.$patch({ default_local_port: ports[index] })
-          }
-        } else if (this.app_mode === appMode.CLOUD) {
+        if (this.app_mode === appMode.CLOUD) {
           console.log("[INFRA] CLOUD mode - Launching lambda...")
           const lambdaStore = useLambdaStore()
           this.ID = await lambdaStore.launch()
           console.log("[INFRA] Lambda launched successfully")
+        } else {
+          console.log(
+            `[INFRA] ${this.app_mode} mode - Launching microservices...`,
+          )
+
+          const appStore = useAppStore()
+          await appStore.createProjectFolder()
+
+          if (this.app_mode === appMode.DESKTOP) {
+            globalThis.electronAPI.project_folder_path({
+              projectFolderPath: appStore.projectFolderPath,
+            })
+          }
+
+          const microservices_with_launch = this.microservices.filter(
+            (store) => store.launch,
+          )
+
+          const launch_promises = microservices_with_launch.map((store) =>
+            store.launch({ projectFolderPath: appStore.projectFolderPath }),
+          )
+          await Promise.all([...launch_promises, registerRunningExtensions()])
         }
 
         this.status = Status.CREATED

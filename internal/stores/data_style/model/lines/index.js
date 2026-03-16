@@ -1,8 +1,12 @@
 // Local imports
+import { useDataStore } from "@ogw_front/stores/data"
 import { useModelLinesColorStyle } from "./color"
 import { useModelLinesCommonStyle } from "./common"
 import { useModelLinesVisibilityStyle } from "./visibility"
-import { useDataStore } from "@ogw_front/stores/data"
+
+async function setModelLinesDefaultStyle(_id) {
+  // Placeholder for oxlint
+}
 
 export function useModelLinesStyle() {
   const dataStore = useDataStore()

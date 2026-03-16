@@ -8,7 +8,7 @@
     },
     item: {
       type: Object,
-      default: null,
+      default: undefined,
     },
     selectedCount: {
       type: Number,

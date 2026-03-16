@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelBlocksCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useModelBlocksCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useDataStyleStateStore } from "../../state"
 
@@ -15,11 +15,9 @@ export function useModelBlocksVisibilityStyle() {
   const viewerStore = useViewerStore()
   const dataStyleStateStore = useDataStyleStateStore()
   const modelBlocksCommonStyle = useModelBlocksCommonStyle()
-
   function modelBlockVisibility(id, block_id) {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility
   }
-
   function saveModelBlockVisibility(id, block_id, visibility) {
     modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility = visibility
   }

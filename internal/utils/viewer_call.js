@@ -1,6 +1,6 @@
 import pTimeout from "p-timeout"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import validate_schema from "@ogw_front/utils/validate_schema"
+import { validate_schema } from "@ogw_front/utils/validate_schema"
 
 const ERROR_400 = 400
 
@@ -16,14 +16,14 @@ export async function viewer_call(
 ) {
   const feedbackStore = useFeedbackStore()
 
-  const { valid, error } = validate_schema(schema, params)
+  const { valid, error: schema_error } = validate_schema(schema, params)
 
   if (!valid) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Bad request", error, schema, params)
+      console.log("Bad request", schema_error, schema, params)
     }
-    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", error)
-    throw new Error(`${schema.$id}: ${error}`)
+    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", schema_error)
+    throw new Error(`${schema.$id}: ${schema_error}`)
   }
 
   const { client } = microservice
@@ -71,5 +71,3 @@ export async function viewer_call(
 
   return await performCall()
 }
-
-export default viewer_call

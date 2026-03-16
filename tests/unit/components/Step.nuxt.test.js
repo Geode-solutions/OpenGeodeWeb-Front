@@ -6,7 +6,7 @@ import { mount } from "@vue/test-utils"
 import ObjectSelector from "@ogw_front/components/ObjectSelector"
 import Step from "@ogw_front/components/Step"
 
-import { vuetify } from "../../utils"
+import { vuetify } from "@ogw_tests/utils"
 
 globalThis.ResizeObserver = ResizeObserver
 

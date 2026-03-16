@@ -14,5 +14,3 @@ export function run_function_when_microservices_connected(function_to_run) {
     })
   }
 }
-
-export default run_function_when_microservices_connected

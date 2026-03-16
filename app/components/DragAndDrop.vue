@@ -1,14 +1,11 @@
 <script setup>
   import GlassCard from "@ogw_front/components/GlassCard"
 
-  const props = defineProps({
+  const { multiple, accept, loading, showExtensions } = defineProps({
     multiple: { type: Boolean, default: false },
     accept: { type: String, default: "" },
     loading: { type: Boolean, default: false },
     showExtensions: { type: Boolean, default: true },
-    idleText: { type: String, default: "Click or Drag & Drop files" },
-    dropText: { type: String, default: "Drop to upload" },
-    loadingText: { type: String, default: "Uploading..." },
   })
 
   const emit = defineEmits(["files-selected"])
@@ -83,7 +80,13 @@
           class="text-h6 font-weight-bold justify-center pa-0 mb-1 text-white"
           style="transition: color 0.3s ease"
         >
-          {{ loading ? loadingText : isDragging ? dropText : idleText }}
+          {{
+            loading
+              ? "Uploading..."
+              : isDragging
+                ? "Drop to upload"
+                : "Click or Drag & Drop files"
+          }}
         </v-card-title>
 
         <v-card-subtitle v-if="showExtensions" class="text-body-2 pa-0">

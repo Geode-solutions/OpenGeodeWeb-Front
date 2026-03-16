@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelLinesCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useModelLinesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useDataStyleStateStore } from "../../state"
 
