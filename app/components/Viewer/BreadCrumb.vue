@@ -12,8 +12,23 @@
   }
 
   const model_id = computed(() => treeviewStore.model_id)
+  const metaDatas = ref({})
 
-  const metaDatas = dataStore.refItem(model_id.value)
+  watchEffect((onCleanup) => {
+    if (model_id.value) {
+      const item = dataStore.refItem(model_id.value)
+      const stop = watch(
+        item,
+        (val) => {
+          metaDatas.value = val || {}
+        },
+        { immediate: true },
+      )
+      onCleanup(stop)
+    } else {
+      metaDatas.value = {}
+    }
+  })
 </script>
 
 <template>
@@ -32,7 +47,7 @@
           }}
         </v-icon>
         <span class="text-subtitle-1 font-weight-regular align-center mt-1">
-          Model Explorer ({{ metaDatas.name }})
+          Model Explorer ({{ metaDatas?.name || "" }})
         </span>
       </template>
 
