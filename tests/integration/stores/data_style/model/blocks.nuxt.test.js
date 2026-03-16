@@ -23,7 +23,7 @@ let id = "",
   projectFolderPath = ""
 
 beforeEach(async () => {
-  ; ({ id, projectFolderPath } = await setupIntegrationTests(
+  ;({ id, projectFolderPath } = await setupIntegrationTests(
     file_name,
     geode_object,
   ))
