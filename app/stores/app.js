@@ -1,7 +1,3 @@
-// Third party imports
-import { defineStore } from "pinia"
-import { useRuntimeConfig } from "nuxt/app"
-
 // Local imports
 import { upload_file } from "@ogw_internal/utils/upload_file.js"
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js"
