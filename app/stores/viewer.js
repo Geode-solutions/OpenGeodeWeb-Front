@@ -2,7 +2,6 @@
 import vtkWSLinkClient, {
   newInstance,
 } from "@kitware/vtk.js/IO/Core/WSLinkClient"
-// oxlint-disable-next-line id-length
 import _ from "lodash"
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"

@@ -7,5 +7,6 @@ import { defineEventHandler } from "h3"
 
 export default defineEventHandler(() => {
   console.log("Killing node server process")
+  // oxlint-disable-next-line no-process-exit
   process.exit()
 })

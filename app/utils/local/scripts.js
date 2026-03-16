@@ -1,7 +1,7 @@
 // Node imports
-import { on } from "node:events"
 import child_process from "node:child_process"
 import fs from "node:fs"
+import { on } from "node:events"
 import path from "node:path"
 
 function commandExistsSync(execName) {

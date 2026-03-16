@@ -2,10 +2,10 @@ import { Status } from "@ogw_front/utils/status"
 import { api_fetch } from "@ogw_internal/utils/api_fetch"
 import { appMode } from "@ogw_front/utils/app_mode"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import { upload_file } from "@ogw_internal/utils/upload_file.js"
+import { useAppStore } from "@ogw_front/stores/app"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useInfraStore } from "@ogw_front/stores/infra"
-import { useAppStore } from "@ogw_front/stores/app"
-import { upload_file } from "@ogw_internal/utils/upload_file.js"
 
 const MILLISECONDS_IN_SECOND = 1000
 const DEFAULT_PING_INTERVAL_SECONDS = 10
@@ -132,7 +132,7 @@ export const useGeodeStore = defineStore("geode", {
               "[GEODE] Request completed:",
               schema.$id,
               "in",
-              (Date.now() - start) / 1_000,
+              (Date.now() - start) / MILLISECONDS_IN_SECOND,
               "s",
             )
             if (callbacks.response_function) {
