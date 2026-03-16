@@ -4,8 +4,9 @@ import { ref } from "vue"
 import { useRuntimeConfig } from "nuxt/app"
 
 // Local imports
-import { upload_file } from "@ogw_front/utils/upload_file"
-import { api_fetch } from "../../internal/utils/api_fetch"
+import { upload_file } from "@ogw_internal/utils/upload_file.js"
+import { api_fetch } from "@ogw_internal/utils/api_fetch.js"
+
 
 export const useAppStore = defineStore("app", () => {
   const stores = []

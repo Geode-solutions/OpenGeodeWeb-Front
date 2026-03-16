@@ -1,18 +1,18 @@
 <script setup>
   import { computed, useAttrs } from "vue"
-  defineProps({
+  const { variant, rounded, padding, theme } = defineProps({
     variant: {
       type: String,
       default: "panel",
-      validator: (v) => ["panel", "ui"].includes(v),
+      validator: (valid) => ["panel", "ui"].includes(valid),
     },
     rounded: { type: String, default: "xl" },
     padding: { type: String, default: "pa-6" },
-    theme: { type: String, default: null },
+    theme: { type: String, default: undefined },
   })
 
   const attrs = useAttrs()
-  const isInteractive = computed(() => !!attrs.onClick)
+  const isInteractive = computed(() => Boolean(attrs.onClick))
 </script>
 
 <template>

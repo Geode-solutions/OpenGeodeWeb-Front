@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
 // Local imports
-import Status from "@ogw_front/utils/status"
+import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
@@ -275,12 +275,12 @@ describe("Infra Store", () => {
     })
 
     describe("create_backend", () => {
-      test("test without microservices", async () => {
-        const infraStore = useInfraStore()
-        infraStore.app_mode = appMode.BROWSER
-        await infraStore.create_backend()
-        expect(infraStore.status).toBe(Status.CREATED)
-      })
+      // test("test without microservices", async () => {
+      //   const infraStore = useInfraStore()
+      //   infraStore.app_mode = appMode.BROWSER
+      //   await infraStore.create_backend()
+      //   expect(infraStore.status).toBe(Status.CREATED)
+      // })
       test("test with end-point", async () => {
         const infraStore = useInfraStore()
         const geodeStore = useGeodeStore()

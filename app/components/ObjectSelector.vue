@@ -80,7 +80,7 @@
         .map((obj) => obj[key].object_priority)
         .filter((priority) => priority !== undefined && priority !== null)
       final_object[key] = { is_loadable: Math.min(...load_scores) }
-      if (priorities.length) {
+      if (priorities.length > 0) {
         final_object[key].object_priority = Math.max(...priorities)
       }
     }

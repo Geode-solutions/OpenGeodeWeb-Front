@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
 // Local imports
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 
@@ -35,7 +35,7 @@ describe("geodeStore.request()", () => {
   })
 
   test("invalid schema", async () => {
-    const schema = {
+    const invalid_schema = {
       $id: "/test",
       type: "object",
       methods: ["POST"],
@@ -48,7 +48,7 @@ describe("geodeStore.request()", () => {
       additionalProperties: false,
     }
     const params = { test: "hello" }
-    expect(() => geodeStore.request(schema, params)).toThrow(
+    expect(() => geodeStore.request(invalid_schema, params)).toThrow(
       "data/test must be number",
     )
   })

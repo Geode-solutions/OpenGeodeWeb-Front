@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 import { registerEndpoint } from "@nuxt/test-utils/runtime"
 
 // Local imports
-import Status from "@ogw_front/utils/status"
-import { setupActivePinia } from "../../utils"
+import { Status } from "@ogw_front/utils/status"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 
@@ -12,7 +12,7 @@ import { useLambdaStore } from "@ogw_front/stores/lambda"
 const PORT_443 = "443"
 const API_URL = "api.example.com"
 const SITE_BRANCH = "/test"
-const PROJECT = "/project"
+const PROJECT = "project"
 const TEST_ID = "test-id-123456"
 const STATUS_500 = 500
 
@@ -56,7 +56,7 @@ describe("Lambda Store", () => {
         setupConfig()
         const lambdaStore = useLambdaStore()
         expect(lambdaStore.base_url).toBe(
-          `https://${API_URL}:${PORT_443}${SITE_BRANCH}${PROJECT}/createbackend`,
+          `https://${API_URL}:${PORT_443}${SITE_BRANCH}/${PROJECT}/createbackend`,
         )
       })
     })

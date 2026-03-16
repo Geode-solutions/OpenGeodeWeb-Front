@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 
 // Local imports
 import { appMode } from "@ogw_front/utils/app_mode"
-import { setupActivePinia } from "../../utils"
+import { setupActivePinia } from "@ogw_tests/utils"
 import { useProjectManager } from "@ogw_front/composables/project_manager"
 
 // Constants
@@ -135,11 +135,11 @@ const hybridViewerStoreMock = {
 
 // MOCKS
 vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ snapshot: snapshotMock }))
-vi.mock("../../../internal/utils/viewer_call", () => ({
+vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: viewer_call_mock_fn,
 }))
 
-vi.mock("@ogw_front/composables/api_fetch", () => ({
+vi.mock(import("@ogw_front/composables/api_fetch"), () => ({
   api_fetch: vi.fn(async (_req, options = {}) => {
     const response = {
       _data: new Blob(["zipcontent"], { type: "application/zip" }),
@@ -153,29 +153,29 @@ vi.mock("@ogw_front/composables/api_fetch", () => ({
     return response
   }),
 }))
-vi.mock("js-file-download", () => ({ default: vi.fn() }))
-vi.mock("@ogw_front/stores/infra", () => ({
+vi.mock(import("js-file-download"), () => ({ default: vi.fn() }))
+vi.mock(import("@ogw_front/stores/infra"), () => ({
   useInfraStore: () => infraStoreMock,
 }))
-vi.mock("@ogw_front/stores/viewer", () => ({
+vi.mock(import("@ogw_front/stores/viewer"), () => ({
   useViewerStore: () => viewerStoreMock,
 }))
-vi.mock("@ogw_front/stores/treeview", () => ({
+vi.mock(import("@ogw_front/stores/treeview"), () => ({
   useTreeviewStore: () => treeviewStoreMock,
 }))
-vi.mock("@ogw_front/stores/data", () => ({
+vi.mock(import("@ogw_front/stores/data"), () => ({
   useDataStore: () => dataStoreMock,
 }))
-vi.mock("@ogw_front/stores/data_style", () => ({
+vi.mock(import("@ogw_front/stores/data_style"), () => ({
   useDataStyleStore: () => dataStyleStoreMock,
 }))
-vi.mock("@ogw_front/stores/hybrid_viewer", () => ({
+vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
   useHybridViewerStore: () => hybridViewerStoreMock,
 }))
-vi.mock("@ogw_front/stores/geode", () => ({
+vi.mock(import("@ogw_front/stores/geode"), () => ({
   useGeodeStore: () => geodeStoreMock,
 }))
-vi.mock("@ogw_front/stores/app", () => ({
+vi.mock(import("@ogw_front/stores/app"), () => ({
   useAppStore: () => ({
     exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
   }),
@@ -218,10 +218,7 @@ function verifyDataManagement() {
   )
   expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalledWith()
   expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123")
-  expect(dataStoreMock.addItem).toHaveBeenCalledWith(
-    "abc123",
-    expect.anything(),
-  )
+  expect(dataStoreMock.addItem).toHaveBeenCalledWith(snapshotMock.data.items[0])
   expect(treeviewStoreMock.addItem).toHaveBeenCalledWith(
     "PointSet2D",
     "My Data",
@@ -242,7 +239,6 @@ function verifyRemaining() {
 
 beforeEach(() => {
   setupActivePinia()
-  // reset spies
   const storesList = [
     viewerStoreMock,
     treeviewStoreMock,

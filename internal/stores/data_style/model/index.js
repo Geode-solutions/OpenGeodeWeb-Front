@@ -4,8 +4,8 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStore } from "@ogw_front/stores/data"
-import { useDataStyleStateStore } from "../state"
-import { database } from "../../../database/database"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
+import { database } from "@ogw_internal/database/database"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useModelBlocksStyle } from "./blocks"
 import { useModelCornersStyle } from "./corners"
@@ -19,7 +19,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer"
 // Local constants
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model
 
-export default function useModelStyle() {
+export function useModelStyle() {
   const dataStore = useDataStore()
   const dataStyleStateStore = useDataStyleStateStore()
   const modelCornersStyleStore = useModelCornersStyle()
@@ -44,9 +44,13 @@ export default function useModelStyle() {
     }
 
     if (model_schemas.visibility) {
-      return viewerStore.request(model_schemas.visibility, { id, visibility }, {
-        response_function: updateState,
-      })
+      return viewerStore.request(
+        model_schemas.visibility,
+        { id, visibility },
+        {
+          response_function: updateState,
+        },
+      )
     } else {
       return updateState()
     }
@@ -98,7 +102,10 @@ export default function useModelStyle() {
               current_selection.push(type)
             }
           }
-          console.log("visibleMeshComponents result:", { id: newId, selection: current_selection })
+          console.log("visibleMeshComponents result:", {
+            id: newId,
+            selection: current_selection,
+          })
           return current_selection
         })
 
@@ -146,9 +153,13 @@ export default function useModelStyle() {
     }
 
     if (model_schemas.color) {
-      return viewerStore.request(model_schemas.color, { id, color }, {
-        response_function: updateState,
-      })
+      return viewerStore.request(
+        model_schemas.color,
+        { id, color },
+        {
+          response_function: updateState,
+        },
+      )
     } else {
       return updateState()
     }
@@ -163,7 +174,9 @@ export default function useModelStyle() {
     const expanded_ids = []
     let found_type = null
 
-    const all_components = await database.model_components.where({ id }).toArray()
+    const all_components = await database.model_components
+      .where({ id })
+      .toArray()
     const mesh_components = all_components.reduce((acc, c) => {
       if (!acc[c.type]) acc[c.type] = []
       acc[c.type].push(c)

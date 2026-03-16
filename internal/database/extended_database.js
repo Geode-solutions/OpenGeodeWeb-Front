@@ -1,9 +1,9 @@
 import { Dexie } from "dexie"
-import { dataTable } from "./tables/data_table"
+import { dataTable } from "./tables/data"
+import { modelComponentsRelationTable } from "./tables/model_components_relation"
 import { modelComponentsTable } from "./tables/model_components"
 import { dataStyleTable } from "./tables/data_style"
 import { modelComponentDataStyleTable } from "./tables/model_component_datastyle"
-import { modelComponentsRelationTable } from "./tables/model_components_relation"
 
 export class ExtendedDatabase extends Dexie {
   constructor(currentVersion, currentStores, newTables) {
@@ -20,6 +20,7 @@ export class ExtendedDatabase extends Dexie {
           [modelComponentsRelationTable.name]:
             modelComponentsRelationTable.schema,
         })
+
       } else {
         this.version(version).stores(currentStores)
       }

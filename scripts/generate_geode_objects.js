@@ -1,4 +1,4 @@
-// oxlint-disable-next-line id-length
+/* oxlint-disable vitest/require-hook */
 import fs from "node:fs"
 import path from "node:path"
 import process from "node:process"

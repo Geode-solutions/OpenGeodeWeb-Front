@@ -3,16 +3,12 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import {
-  delete_folder_recursive,
-  kill_back,
-  kill_viewer,
-} from "@ogw_front/utils/local"
-import Status from "@ogw_front/utils/status"
-import { setupIntegrationTests } from "../../../setup"
+import { cleanupBackend } from "@ogw_front/utils/local/microservices"
+import { Status } from "@ogw_front/utils/status"
 import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { setupIntegrationTests } from "@ogw_tests/integration/setup"
 
 // Local constants
 const INTERVAL_TIMEOUT = 20_000
@@ -20,30 +16,23 @@ const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
-let back_port = 0,
-  id = "",
-  project_folder_path = "",
-  viewer_port = 0
+let id = "",
+  projectFolderPath = ""
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
-    await setupIntegrationTests(file_name, geode_object))
+  ;({ id, projectFolderPath } = await setupIntegrationTests(
+    file_name,
+    geode_object,
+  ))
 }, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
-  console.log(
-    "afterEach model surfaces kill",
-    back_port,
-    viewer_port,
-    project_folder_path,
-  )
-  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-  delete_folder_recursive(project_folder_path)
+  console.log("afterEach model surfaces kill", projectFolderPath)
+  await cleanupBackend(projectFolderPath)
 })
-
-describe("Model surfaces", () => {
-  describe("Surfaces visibility", () => {
-    test("Visibility true", async () => {
+describe("model surfaces", () => {
+  describe("surfaces visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()
@@ -78,8 +67,8 @@ describe("Model surfaces", () => {
     })
   })
 
-  describe("Surfaces color", () => {
-    test("Color red", async () => {
+  describe("surfaces color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore()
       const viewerStore = useViewerStore()
       const dataStore = useDataStore()

@@ -27,7 +27,6 @@
       tooltip: "Toggle grid scale",
       icon: "mdi-ruler-square",
       action: () => {
-        const viewerStore = useViewerStore()
         viewerStore.request(
           schemas.opengeodeweb_viewer.viewer.grid_scale,
           { visibility: !grid_scale.value },

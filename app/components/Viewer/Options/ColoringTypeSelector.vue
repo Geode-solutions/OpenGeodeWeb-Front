@@ -58,7 +58,7 @@
     value: "polyhedron",
   }
   const coloring_styles = computed(() => {
-    let array = []
+    const array = []
     if (has_color.value) {
       array.push(color_dict)
     }

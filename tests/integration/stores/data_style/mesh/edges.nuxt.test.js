@@ -3,15 +3,11 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import {
-  delete_folder_recursive,
-  kill_back,
-  kill_viewer,
-} from "@ogw_front/utils/local"
-import Status from "@ogw_front/utils/status"
-import { setupIntegrationTests } from "../../../setup"
+import { cleanupBackend } from "@ogw_front/utils/local/microservices"
+import { Status } from "@ogw_front/utils/status"
 import { useDataStyleStore } from "@ogw_front/stores/data_style"
 import { useViewerStore } from "@ogw_front/stores/viewer"
+import { setupIntegrationTests } from "@ogw_tests/integration/setup"
 
 // Local constants
 const INTERVAL_TIMEOUT = 25_000
@@ -21,25 +17,19 @@ const geode_object = "EdgedCurve3D"
 const vertex_attribute = { name: "vertex_attribute" }
 const edge_attribute = { name: "edge_attribute" }
 
-let back_port = 0,
-  id = "",
-  project_folder_path = "",
-  viewer_port = 0
+let id = "",
+  projectFolderPath = ""
 
 beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
-    await setupIntegrationTests(file_name, geode_object))
+  ;({ id, projectFolderPath } = await setupIntegrationTests(
+    file_name,
+    geode_object,
+  ))
 }, INTERVAL_TIMEOUT)
 
 afterEach(async () => {
-  console.log(
-    "afterEach mesh edges kill",
-    back_port,
-    viewer_port,
-    project_folder_path,
-  )
-  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-  delete_folder_recursive(project_folder_path)
+  console.log("afterEach mesh edges kill", projectFolderPath)
+  await cleanupBackend(projectFolderPath)
 })
 
 describe("Mesh edges", () => {

@@ -37,7 +37,7 @@
   }
 
   async function files_uploaded_event(value) {
-    if (value.length) {
+    if (value.length > 0) {
       await geodeStore.request(
         back_schemas.opengeodeweb_back.save_viewable_file,
         {
@@ -48,7 +48,7 @@
           },
         },
         {
-          response_function: async (response) => {
+          response_function: (response) => {
             texture_id.value = response.id
           },
         },

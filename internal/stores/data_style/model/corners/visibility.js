@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelCornersCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useModelCornersCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useDataStyleStateStore } from "../../state"
 
@@ -11,57 +11,61 @@ import { useDataStyleStateStore } from "../../state"
 const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners
 
 export function useModelCornersVisibilityStyle() {
-    const dataStore = useDataStore()
-    const viewerStore = useViewerStore()
-    const modelCornersCommonStyle = useModelCornersCommonStyle()
+  const dataStore = useDataStore()
+  const viewerStore = useViewerStore()
+  const modelCornersCommonStyle = useModelCornersCommonStyle()
 
-    function modelCornerVisibility(id, corner_id) {
-        return modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility
+  function modelCornerVisibility(id, corner_id) {
+    const style = modelCornersCommonStyle.modelCornerStyle(id, corner_id)
+    if (style.visibility === undefined) {
+      return true
+    }
+    return style.visibility
+  }
+
+  async function setModelCornersVisibility(id, corner_ids, visibility) {
+    const dataStyleStateStore = useDataStyleStateStore()
+    const updateState = async () => {
+      await dataStyleStateStore.mutateComponentStyles(
+        id,
+        corner_ids,
+        (style) => {
+          style.visibility = visibility
+        },
+      )
+      console.log(
+        setModelCornersVisibility.name,
+        { id },
+        { corner_ids },
+        modelCornerVisibility(id, corner_ids[0]),
+      )
     }
 
-    async function setModelCornersVisibility(id, corner_ids, visibility) {
-        const dataStyleStateStore = useDataStyleStateStore()
-        const updateState = async () => {
-            await dataStyleStateStore.mutateComponentStyles(
-                id,
-                corner_ids,
-                (style) => {
-                    style.visibility = visibility
-                },
-            )
-            console.log(
-                setModelCornersVisibility.name,
-                { id },
-                { corner_ids },
-                modelCornerVisibility(id, corner_ids[0]),
-            )
-        }
-
-        if (!corner_ids || corner_ids.length === 0) {
-            return
-        }
-        const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
-            id,
-            corner_ids,
-        )
-        if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
-            console.warn(
-                "[setModelCornersVisibility] No viewer IDs found, skipping visibility request",
-                { id, corner_ids },
-            )
-            return updateState()
-        }
-        return viewerStore.request(
-            model_corners_schemas.visibility,
-            { id, block_ids: corner_viewer_ids, visibility },
-            {
-                response_function: updateState,
-            },
-        )
+    if (!corner_ids || corner_ids.length === 0) {
+      return
     }
-
-    return {
-        modelCornerVisibility,
-        setModelCornersVisibility,
+    const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+      id,
+      corner_ids,
+    )
+    if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
+      console.warn(
+        "[setModelCornersVisibility] No viewer IDs found, skipping visibility request",
+        { id, corner_ids },
+      )
+      return updateState()
     }
+    return viewerStore.request(
+      model_corners_schemas.visibility,
+      { id, block_ids: corner_viewer_ids, visibility },
+      {
+        response_function: updateState,
+      },
+    )
+  }
+
+  return {
+    modelCornerVisibility,
+    setModelCornersVisibility,
+  }
 }

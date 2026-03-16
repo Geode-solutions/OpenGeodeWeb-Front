@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelLinesCommonStyle } from "./common"
 import { useDataStore } from "@ogw_front/stores/data"
+import { useModelLinesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 import { useDataStyleStateStore } from "../../state"
 
@@ -15,15 +15,12 @@ export function useModelLinesVisibilityStyle() {
   const viewerStore = useViewerStore()
   const dataStyleStateStore = useDataStyleStateStore()
   const modelLinesCommonStyle = useModelLinesCommonStyle()
-
   function modelLineVisibility(id, line_id) {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).visibility
   }
-
   function saveModelLineVisibility(id, line_id, visibility) {
     modelLinesCommonStyle.modelLineStyle(id, line_id).visibility = visibility
   }
-
   async function setModelLinesVisibility(id, line_ids, visibility) {
     const updateState = async () => {
       await dataStyleStateStore.mutateComponentStyles(

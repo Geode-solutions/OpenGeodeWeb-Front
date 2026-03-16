@@ -64,8 +64,10 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
           }
         }
       })
-      const { minimum, maximum } =
-        meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
+      const { minimum, maximum } = meshPolyhedraPolyhedronAttributeStoredConfig(
+        id,
+        name,
+      )
       await setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum)
       console.log(
         setMeshPolyhedraPolyhedronAttributeName.name,
@@ -92,11 +94,16 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
-  async function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
+  async function setMeshPolyhedraPolyhedronAttributeRange(
+    id,
+    minimum,
+    maximum,
+  ) {
     const name = meshPolyhedraPolyhedronAttributeName(id)
     const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
-      const storedConfig = style.polyhedra.coloring.polyhedron.storedConfigs[name]
+      const storedConfig =
+        style.polyhedra.coloring.polyhedron.storedConfigs[name]
       storedConfig.minimum = minimum
       storedConfig.maximum = maximum
     })

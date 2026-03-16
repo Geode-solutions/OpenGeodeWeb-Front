@@ -23,11 +23,7 @@ export function useMeshCellsVisibilityStyle() {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         style.cells.visibility = visibility
       })
-      console.log(
-        setMeshCellsVisibility.name,
-        { id },
-        meshCellsVisibility(id),
-      )
+      console.log(setMeshCellsVisibility.name, { id }, meshCellsVisibility(id))
     }
 
     if (meshCellsVisibilitySchema) {
