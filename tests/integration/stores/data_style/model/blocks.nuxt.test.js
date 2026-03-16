@@ -17,6 +17,8 @@ const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks
 const file_name = "test.og_brep"
 const geode_object = "BRep"
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 let id = "",
   projectFolderPath = ""
 
