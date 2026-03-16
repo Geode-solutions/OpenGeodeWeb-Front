@@ -63,6 +63,13 @@ export const useDataStore = defineStore("data", () => {
       }))
   }
 
+  function refFormatedMeshComponents(id) {
+    return useObservable(
+      liveQuery(() => formatedMeshComponents(id)),
+      { initialValue: [] },
+    )
+  }
+
   async function meshComponentType(id, geode_id) {
     const component = await database.model_components
       .where({ id, geode_id })
@@ -129,7 +136,14 @@ export const useDataStore = defineStore("data", () => {
             ...response.collection_components.map(
               ({ items, ...component }) => component,
             ),
-          ].map((component) => ({ ...component, id }))
+          ].map((component) => ({
+            ...component,
+            id,
+            viewer_id:
+              component.viewer_id !== undefined
+                ? parseInt(component.viewer_id)
+                : undefined,
+          }))
           await addModelComponents(allComponents)
         },
       },
@@ -165,7 +179,10 @@ export const useDataStore = defineStore("data", () => {
       .equals(id)
       .and((component) => meshComponentGeodeIds.includes(component.geode_id))
       .toArray()
-    return components.map((component) => component.viewer_id)
+    return components
+      .map((component) => component.viewer_id)
+      .filter((vid) => vid !== null && vid !== undefined)
+      .map((vid) => parseInt(vid))
   }
 
 
@@ -189,6 +206,7 @@ export const useDataStore = defineStore("data", () => {
     refItem,
     meshComponentType,
     formatedMeshComponents,
+    refFormatedMeshComponents,
     registerObject,
     deregisterObject,
     addItem,

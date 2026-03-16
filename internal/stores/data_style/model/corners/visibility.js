@@ -22,11 +22,13 @@ export function useModelCornersVisibilityStyle() {
     async function setModelCornersVisibility(id, corner_ids, visibility) {
         const dataStyleStateStore = useDataStyleStateStore()
         const updateState = async () => {
-            for (const corner_id of corner_ids) {
-                await dataStyleStateStore.mutateComponentStyle(id, corner_id, (style) => {
+            await dataStyleStateStore.mutateComponentStyles(
+                id,
+                corner_ids,
+                (style) => {
                     style.visibility = visibility
-                })
-            }
+                },
+            )
             console.log(
                 setModelCornersVisibility.name,
                 { id },

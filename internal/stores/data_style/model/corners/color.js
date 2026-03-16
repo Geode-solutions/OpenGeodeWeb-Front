@@ -22,11 +22,13 @@ export function useModelCornersColorStyle() {
     async function setModelCornersColor(id, corner_ids, color) {
         const dataStyleStateStore = useDataStyleStateStore()
         const updateState = async () => {
-            for (const corner_id of corner_ids) {
-                await dataStyleStateStore.mutateComponentStyle(id, corner_id, (style) => {
+            await dataStyleStateStore.mutateComponentStyles(
+                id,
+                corner_ids,
+                (style) => {
                     style.color = color
-                })
-            }
+                },
+            )
             console.log(
                 setModelCornersColor.name,
                 { id },

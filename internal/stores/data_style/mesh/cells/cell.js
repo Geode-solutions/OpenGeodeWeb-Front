@@ -46,7 +46,6 @@ export function useMeshCellsCellAttributeStyle() {
     })
     return meshCellsCellAttributeStoredConfig(id, name)
   }
-
   function meshCellsCellAttributeName(id) {
     console.log(
       meshCellsCellAttributeName.name,

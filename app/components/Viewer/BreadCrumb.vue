@@ -13,7 +13,10 @@
 
   const model_id = computed(() => treeviewStore.model_id)
 
-  const metaDatas = dataStore.refItem(model_id.value)
+  const metaDatas = computed(() => {
+    if (!model_id.value) return {}
+    return dataStore.refItem(model_id.value).value || {}
+  })
 </script>
 
 <template>
@@ -39,7 +42,7 @@
             }}
           </v-icon>
           <span class="text-subtitle-1 font-weight-regular align-center mt-1">
-            Model Explorer ({{ metaDatas.name }})
+            Model Explorer ({{ metaDatas?.name || "..." }})
           </span>
         </template>
       </v-menu>

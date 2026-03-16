@@ -22,11 +22,13 @@ export function useModelLinesColorStyle() {
     async function setModelLinesColor(id, line_ids, color) {
         const dataStyleStateStore = useDataStyleStateStore()
         const updateState = async () => {
-            for (const line_id of line_ids) {
-                await dataStyleStateStore.mutateComponentStyle(id, line_id, (style) => {
+            await dataStyleStateStore.mutateComponentStyles(
+                id,
+                line_ids,
+                (style) => {
                     style.color = color
-                })
-            }
+                },
+            )
             console.log(
                 setModelLinesColor.name,
                 { id },

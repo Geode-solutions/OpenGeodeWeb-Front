@@ -116,10 +116,39 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     )
   }
 
+  async function bulkUpdateComponentStyles(updates) {
+    await database.model_component_datastyle.bulkPut(
+      JSON.parse(JSON.stringify(updates)),
+    )
+  }
+
   async function mutateComponentStyle(id_model, id_component, mutationCallback) {
     const style = getComponentStyle(id_model, id_component)
     mutationCallback(style)
     await updateComponentStyle(id_model, id_component, style)
+  }
+
+  async function mutateComponentStyles(
+    id_model,
+    id_components,
+    mutationCallback,
+  ) {
+    const all_styles = await database.model_component_datastyle
+      .where("id_model")
+      .equals(id_model)
+      .toArray()
+    const stylesMap = all_styles.reduce((acc, s) => {
+      acc[s.id_component] = s
+      return acc
+    }, {})
+
+    const updates = id_components.map((id_component) => {
+      const style = stylesMap[id_component] || { id_model, id_component }
+      mutationCallback(style)
+      return style
+    })
+
+    await bulkUpdateComponentStyles(updates)
   }
 
   async function clear() {
@@ -134,6 +163,7 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     getComponentStyle,
     updateComponentStyle,
     mutateComponentStyle,
+    mutateComponentStyles,
     styles,
     componentStyles,
     objectVisibility,

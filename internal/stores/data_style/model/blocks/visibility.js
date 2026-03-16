@@ -26,11 +26,13 @@ export function useModelBlocksVisibilityStyle() {
 
   async function setModelBlocksVisibility(id, block_ids, visibility) {
     const updateState = async () => {
-      for (const block_id of block_ids) {
-        await dataStyleStateStore.mutateComponentStyle(id, block_id, (style) => {
+      await dataStyleStateStore.mutateComponentStyles(
+        id,
+        block_ids,
+        (style) => {
           style.visibility = visibility
-        })
-      }
+        },
+      )
       console.log(
         setModelBlocksVisibility.name,
         { id },

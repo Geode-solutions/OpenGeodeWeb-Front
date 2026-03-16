@@ -1,9 +1,11 @@
-// Third party imports
+import { liveQuery } from "dexie"
+import { useObservable } from "@vueuse/rxjs"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
 import { useDataStore } from "@ogw_front/stores/data"
 import { useDataStyleStateStore } from "../state"
+import { database } from "../../../database/database"
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
 import { useModelBlocksStyle } from "./blocks"
 import { useModelCornersStyle } from "./corners"
@@ -11,7 +13,7 @@ import { useModelEdgesStyle } from "./edges"
 import { useModelLinesStyle } from "./lines"
 import { useModelPointsStyle } from "./points"
 import { useModelSurfacesStyle } from "./surfaces"
-import { ref, watch } from "vue"
+import { ref, watch, isRef } from "vue"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -50,24 +52,73 @@ export default function useModelStyle() {
     }
   }
 
-  function visibleMeshComponents(id) {
-    const visible_mesh_components = ref([])
+  function visibleMeshComponents(id_ref) {
+    const selection = ref([])
     watch(
-      () => dataStyleStateStore.componentStyles,
-      (componentStyles) => {
-        const new_selection = Object.values(componentStyles)
-          .filter((style) => style.id_model === id && style.visibility)
-          .map((style) => style.id_component)
-        if (
-          JSON.stringify(visible_mesh_components.value) !==
-          JSON.stringify(new_selection)
-        ) {
-          visible_mesh_components.value = new_selection
-        }
+      () => (isRef(id_ref) ? id_ref.value : id_ref),
+      (newId, oldId, onCleanup) => {
+        if (!newId) return
+        const observable = liveQuery(async () => {
+          const components = await database.model_components
+            .where("id")
+            .equals(newId)
+            .toArray()
+          if (components.length === 0) return []
+
+          const all_styles = await database.model_component_datastyle
+            .where("id_model")
+            .equals(newId)
+            .toArray()
+          const styles = all_styles.reduce((acc, s) => {
+            acc[s.id_component] = s
+            return acc
+          }, {})
+
+          const current_selection = []
+          const meshTypes = ["Corner", "Line", "Surface", "Block"]
+          const componentsByType = components.reduce((acc, c) => {
+            if (!meshTypes.includes(c.type)) return acc
+            if (!acc[c.type]) acc[c.type] = []
+            acc[c.type].push(c.geode_id)
+            return acc
+          }, {})
+
+          for (const [type, geode_ids] of Object.entries(componentsByType)) {
+            let all_visible = true
+            for (const gid of geode_ids) {
+              const style = styles[gid]
+              const is_visible = style === undefined ? true : style.visibility
+              if (is_visible) {
+                current_selection.push(gid)
+              } else {
+                all_visible = false
+              }
+            }
+            if (all_visible) {
+              current_selection.push(type)
+            }
+          }
+          console.log("visibleMeshComponents result:", { id: newId, selection: current_selection })
+          return current_selection
+        })
+
+        const subscription = observable.subscribe({
+          next: (val) => {
+            if (JSON.stringify(val) === JSON.stringify(selection.value)) return
+            console.log("visibleMeshComponents update:", { id: newId, val })
+            selection.value = val
+          },
+          error: (err) => console.error("visibleMeshComponents error:", err),
+        })
+
+        onCleanup(() => {
+          console.log("visibleMeshComponents cleanup:", { id: newId })
+          subscription.unsubscribe()
+        })
       },
-      { immediate: true, deep: true },
+      { immediate: true },
     )
-    return visible_mesh_components
+    return selection
   }
 
   function modelMeshComponentVisibility(id, component_type, component_id) {
@@ -108,36 +159,60 @@ export default function useModelStyle() {
     component_geode_ids,
     visibility,
   ) {
-    const component_type = await dataStore.meshComponentType(
-      id,
-      component_geode_ids[0],
-    )
+    const categoryIds = ["Corner", "Line", "Surface", "Block"]
+    const expanded_ids = []
+    let found_type = null
+
+    const all_components = await database.model_components.where({ id }).toArray()
+    const mesh_components = all_components.reduce((acc, c) => {
+      if (!acc[c.type]) acc[c.type] = []
+      acc[c.type].push(c)
+      return acc
+    }, {})
+
+    for (const gid of component_geode_ids) {
+      if (categoryIds.includes(gid)) {
+        // Part 2: Robust Toggling - Expand category ID to all its children
+        const children = mesh_components[gid] || []
+        expanded_ids.push(...children.map((c) => c.geode_id))
+        found_type = gid
+      } else {
+        expanded_ids.push(gid)
+      }
+    }
+
+    const filtered_ids = [...new Set(expanded_ids)] // Unique IDs only
+    if (filtered_ids.length === 0) return
+
+    const component_type =
+      found_type || (await dataStore.meshComponentType(id, filtered_ids[0]))
+
     if (component_type === "Corner") {
       return modelCornersStyleStore.setModelCornersVisibility(
         id,
-        component_geode_ids,
+        filtered_ids,
         visibility,
       )
     } else if (component_type === "Line") {
       return modelLinesStyleStore.setModelLinesVisibility(
         id,
-        component_geode_ids,
+        filtered_ids,
         visibility,
       )
     } else if (component_type === "Surface") {
       return modelSurfacesStyleStore.setModelSurfacesVisibility(
         id,
-        component_geode_ids,
+        filtered_ids,
         visibility,
       )
     } else if (component_type === "Block") {
       return modelBlocksStyleStore.setModelBlocksVisibility(
         id,
-        component_geode_ids,
+        filtered_ids,
         visibility,
       )
     } else {
-      throw new Error(`Unknown model component_type: ${component_type}`)
+      console.warn(`Unknown model component_type: ${component_type}`)
     }
   }
 

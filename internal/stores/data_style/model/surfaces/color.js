@@ -22,11 +22,13 @@ export function useModelSurfacesColorStyle() {
     async function setModelSurfacesColor(id, surface_ids, color) {
         const dataStyleStateStore = useDataStyleStateStore()
         const updateState = async () => {
-            for (const surface_id of surface_ids) {
-                await dataStyleStateStore.mutateComponentStyle(id, surface_id, (style) => {
+            await dataStyleStateStore.mutateComponentStyles(
+                id,
+                surface_ids,
+                (style) => {
                     style.color = color
-                })
-            }
+                },
+            )
             console.log(
                 setModelSurfacesColor.name,
                 { id },

@@ -25,15 +25,13 @@ export function useModelSurfacesVisibilityStyle() {
   }
   async function setModelSurfacesVisibility(id, surface_ids, visibility) {
     const updateState = async () => {
-      for (const surface_id of surface_ids) {
-        await dataStyleStateStore.mutateComponentStyle(
-          id,
-          surface_id,
-          (style) => {
-            style.visibility = visibility
-          },
-        )
-      }
+      await dataStyleStateStore.mutateComponentStyles(
+        id,
+        surface_ids,
+        (style) => {
+          style.visibility = visibility
+        },
+      )
       console.log(
         setModelSurfacesVisibility.name,
         { id },

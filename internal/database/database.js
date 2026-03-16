@@ -1,6 +1,7 @@
 import { Dexie } from "dexie"
 import { ExtendedDatabase } from "./extended_database"
 import { dataTable } from "./tables/data_table"
+import { modelComponentsRelationTable } from "./tables/model_components_relation"
 import { modelComponentsTable } from "./tables/model_components"
 import { dataStyleTable } from "./tables/data_style"
 import { modelComponentDataStyleTable } from "./tables/model_component_datastyle"
@@ -14,6 +15,7 @@ class Database extends Dexie {
       [modelComponentsTable.name]: modelComponentsTable.schema,
       [dataStyleTable.name]: dataStyleTable.schema,
       [modelComponentDataStyleTable.name]: modelComponentDataStyleTable.schema,
+      [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
     })
   }
 
@@ -37,6 +39,8 @@ class Database extends Dexie {
     currentStores[dataStyleTable.name] = dataStyleTable.schema
     currentStores[modelComponentDataStyleTable.name] =
       modelComponentDataStyleTable.schema
+    currentStores[modelComponentsRelationTable.name] =
+      modelComponentsRelationTable.schema
 
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src
@@ -51,7 +55,7 @@ class Database extends Dexie {
       (tableName) => currentStores[tableName],
     )
 
-    database.close()
+    databaseContainer.instance.close()
 
     if (allExisting) {
       const existingDb = new Dexie("Database")
@@ -63,13 +67,15 @@ class Database extends Dexie {
             [dataStyleTable.name]: dataStyleTable.schema,
             [modelComponentDataStyleTable.name]:
               modelComponentDataStyleTable.schema,
+            [modelComponentsRelationTable.name]:
+              modelComponentsRelationTable.schema,
           })
         } else {
           existingDb.version(version).stores(currentStores)
         }
       }
       await existingDb.open()
-      database = existingDb
+      databaseContainer.instance = existingDb
     } else {
       const newDb = new ExtendedDatabase(
         currentVersion,
@@ -77,11 +83,24 @@ class Database extends Dexie {
         newTables,
       )
       await newDb.open()
-      database = newDb
+      databaseContainer.instance = newDb
     }
   }
 }
 
-let database = new Database()
+const databaseContainer = { instance: new Database() }
+
+const database = new Proxy(
+  {},
+  {
+    get(target, prop) {
+      const value = databaseContainer.instance[prop]
+      if (typeof value === "function") {
+        return value.bind(databaseContainer.instance)
+      }
+      return value
+    },
+  },
+)
 
 export { Database, database }
