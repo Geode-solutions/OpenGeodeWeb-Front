@@ -1,21 +1,22 @@
 // Node imports
 import child_process from "node:child_process"
 import fs from "node:fs"
+import { once } from "node:events"
 import path from "node:path"
 
 // Third party imports
 import { WebSocket } from "ws"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" }
 import { getPort } from "get-port-please"
 import pTimeout from "p-timeout"
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" }
 
 // Local imports
+import { commandExistsSync, waitForReady } from "./scripts.js"
 import {
   deleteFolderRecursive,
-  executablePath,
   executableName,
+  executablePath,
 } from "./path.js"
-import { commandExistsSync, waitForReady } from "./scripts.js"
 
 const DEFAULT_TIMEOUT_SECONDS = 30
 const MILLISECONDS_PER_SECOND = 1000
@@ -142,44 +143,34 @@ function killWebsocketMicroservice(microservice) {
   console.log("killWebsocketMicroservice", { ...microservice })
   const failMessage = `Failed to kill ${microservice.name}`
   const successMessage = `Disconnected from ${microservice.name} WebSocket server`
-  function do_kill() {
-    return new Promise((resolve) => {
-      const socket = new WebSocket(microservice.url)
-      socket.on("open", () => {
-        console.log("Connected to WebSocket server")
+  async function do_kill() {
+    const socket = new WebSocket(microservice.url)
+    await once(socket, "open")
+    console.log("Connected to WebSocket server")
+    socket.send(
+      JSON.stringify({
+        id: "system:hello",
+        method: "wslink.hello",
+        args: [{ secret: "wslink-secret" }],
+      }),
+    )
+
+    for await (const [data] of once.iterator(socket, "message")) {
+      const message = data.toString()
+      console.log("Received from server:", message)
+      if (message.includes("hello")) {
         socket.send(
           JSON.stringify({
-            id: "system:hello",
-            method: "wslink.hello",
-            args: [{ secret: "wslink-secret" }],
+            id: "application.exit",
+            method: "application.exit",
           }),
         )
-      })
-      socket.on("message", (data) => {
-        const message = data.toString()
-        console.log("Received from server:", message)
-        if (message.includes("hello")) {
-          socket.send(
-            JSON.stringify({
-              id: "application.exit",
-              method: "application.exit",
-            }),
-          )
-          console.log(successMessage)
-          socket.close()
-          resolve()
-        }
-      })
-      socket.on("close", () => {
         console.log(successMessage)
-        resolve()
-      })
-      socket.on("error", (error) => {
-        console.error("WebSocket error:", error)
         socket.close()
-        resolve()
-      })
-    })
+        break
+      }
+    }
+    console.log(successMessage)
   }
   return pTimeout(do_kill(), {
     milliseconds: 5000,
@@ -213,11 +204,11 @@ function projectMicroservices(projectFolderPath) {
     const microservicesMetadatas = { microservices: [] }
     fs.writeFileSync(
       filePath,
-      JSON.stringify(microservicesMetadatas, null, 2),
-      "utf-8",
+      JSON.stringify(microservicesMetadatas, undefined, 2),
+      "utf8",
     )
   }
-  const content = JSON.parse(fs.readFileSync(filePath, "utf-8"))
+  const content = JSON.parse(fs.readFileSync(filePath, "utf8"))
   return content.microservices
 }
 
@@ -236,7 +227,7 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   if (serviceObj.type === "back") {
     const schema = back_schemas.opengeodeweb_back.kill
     serviceObj.url = `http://localhost:${serviceObj.port}/${schema.$id}`
-    serviceObj.method = schema.methods[0]
+    ;[serviceObj.method] = schema.methods
   } else if (serviceObj.type === "viewer") {
     serviceObj.url = `ws://localhost:${serviceObj.port}/ws`
   }
@@ -244,7 +235,7 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   microservices.push(serviceObj)
   fs.writeFileSync(
     microservicesMetadatasPath(projectFolderPath),
-    JSON.stringify({ microservices }, null, 2),
+    JSON.stringify({ microservices }, undefined, 2),
   )
 }
 

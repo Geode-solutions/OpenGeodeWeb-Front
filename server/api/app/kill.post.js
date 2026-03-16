@@ -7,5 +7,5 @@ import { defineEventHandler } from "h3"
 
 export default defineEventHandler(() => {
   console.log("Killing node server process")
-  process.exit()
+  throw new Error("Killing node server process")
 })

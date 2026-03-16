@@ -1,7 +1,7 @@
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import { Status } from "@ogw_front/utils/status"
-import { useLambdaStore } from "@ogw_front/stores/lambda"
 import { useAppStore } from "@ogw_front/stores/app"
+import { useLambdaStore } from "@ogw_front/stores/lambda"
 
 import { registerRunningExtensions } from "@ogw_front/utils/extension"
 
@@ -88,7 +88,8 @@ export const useInfraStore = defineStore("infra", {
           const launch_promises = microservices_with_launch.map((store) =>
             store.launch({ projectFolderPath: appStore.projectFolderPath }),
           )
-          await Promise.all(launch_promises, registerRunningExtensions())
+          await Promise.all(launch_promises)
+          await registerRunningExtensions()
         }
 
         this.status = Status.CREATED
