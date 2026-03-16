@@ -3,63 +3,63 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
-import { useMeshCellsCommonStyle } from "./common"
+import { useMeshEdgesCommonStyle } from "./common"
 import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
-const meshCellsVertexAttributeSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex
+const meshEdgesVertexAttributeSchemas =
+  viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.vertex
 
-export function useMeshCellsVertexAttributeStyle() {
+export function useMeshEdgesVertexAttributeStyle() {
   const viewerStore = useViewerStore()
-  const meshCellsCommonStyle = useMeshCellsCommonStyle()
+  const meshEdgesCommonStyle = useMeshEdgesCommonStyle()
 
-  function meshCellsVertexAttribute(id) {
-    return meshCellsCommonStyle.meshCellsColoring(id).vertex
+  function meshEdgesVertexAttribute(id) {
+    return meshEdgesCommonStyle.meshEdgesColoring(id).vertex
   }
 
-  function meshCellsVertexAttributeStoredConfig(id, name) {
-    const { storedConfigs } = meshCellsVertexAttribute(id)
+  function meshEdgesVertexAttributeStoredConfig(id, name) {
+    const { storedConfigs } = meshEdgesVertexAttribute(id)
     if (name in storedConfigs) {
       return storedConfigs[name]
     }
-    return setMeshCellsVertexAttributeStoredConfig(id, name, {
+    return setMeshEdgesVertexAttributeStoredConfig(id, name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
     })
   }
 
-  async function setMeshCellsVertexAttributeStoredConfig(
+  async function setMeshEdgesVertexAttributeStoredConfig(
     id,
     name,
     { minimum, maximum, colorMap },
   ) {
     const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.cells.coloring.vertex.storedConfigs[name] = {
+      style.edges.coloring.vertex.storedConfigs[name] = {
         minimum,
         maximum,
         colorMap,
       }
     })
-    return meshCellsVertexAttributeStoredConfig(id, name)
+    return meshEdgesVertexAttributeStoredConfig(id, name)
   }
 
-  function meshCellsVertexAttributeName(id) {
+  function meshEdgesVertexAttributeName(id) {
     console.log(
-      meshCellsVertexAttributeName.name,
+      meshEdgesVertexAttributeName.name,
       { id },
-      meshCellsVertexAttribute(id),
+      meshEdgesVertexAttribute(id),
     )
-    return meshCellsVertexAttribute(id).name
+    return meshEdgesVertexAttribute(id).name
   }
-  function setMeshCellsVertexAttributeName(id, name) {
+  function setMeshEdgesVertexAttributeName(id, name) {
     const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
-        const vertex = style.cells.coloring.vertex
+        const vertex = style.edges.coloring.vertex
         vertex.name = name
         if (!(name in vertex.storedConfigs)) {
           vertex.storedConfigs[name] = {
@@ -69,21 +69,21 @@ export function useMeshCellsVertexAttributeStyle() {
           }
         }
       })
-      const { minimum, maximum } = meshCellsVertexAttributeStoredConfig(
+      const { minimum, maximum } = meshEdgesVertexAttributeStoredConfig(
         id,
         name,
       )
-      await setMeshCellsVertexAttributeRange(id, minimum, maximum)
+      await setMeshEdgesVertexAttributeRange(id, minimum, maximum)
       console.log(
-        setMeshCellsVertexAttributeName.name,
+        setMeshEdgesVertexAttributeName.name,
         { id },
-        meshCellsVertexAttributeName(id),
+        meshEdgesVertexAttributeName(id),
       )
     }
 
-    if (meshCellsVertexAttributeSchemas?.name && name !== "") {
+    if (meshEdgesVertexAttributeSchemas?.name && name !== "") {
       return viewerStore.request(
-        meshCellsVertexAttributeSchemas.name,
+        meshEdgesVertexAttributeSchemas.name,
         { id, name },
         {
           response_function: updateState,
@@ -94,44 +94,44 @@ export function useMeshCellsVertexAttributeStyle() {
     }
   }
 
-  function meshCellsVertexAttributeRange(id) {
-    const name = meshCellsVertexAttributeName(id)
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
+  function meshEdgesVertexAttributeRange(id) {
+    const name = meshEdgesVertexAttributeName(id)
+    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
-  async function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
-    const name = meshCellsVertexAttributeName(id)
+  async function setMeshEdgesVertexAttributeRange(id, minimum, maximum) {
+    const name = meshEdgesVertexAttributeName(id)
     const dataStyleStateStore = useDataStyleStateStore()
     await dataStyleStateStore.mutateStyle(id, (style) => {
-      const storedConfig = style.cells.coloring.vertex.storedConfigs[name]
+      const storedConfig = style.edges.coloring.vertex.storedConfigs[name]
       storedConfig.minimum = minimum
       storedConfig.maximum = maximum
     })
-    return setMeshCellsVertexAttributeColorMap(
+    return setMeshEdgesVertexAttributeColorMap(
       id,
-      meshCellsVertexAttributeColorMap(id),
+      meshEdgesVertexAttributeColorMap(id),
     )
   }
 
-  function meshCellsVertexAttributeColorMap(id) {
-    const name = meshCellsVertexAttributeName(id)
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
+  function meshEdgesVertexAttributeColorMap(id) {
+    const name = meshEdgesVertexAttributeName(id)
+    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
     const { colorMap } = storedConfig
     return colorMap
   }
-  function setMeshCellsVertexAttributeColorMap(id, colorMap) {
-    const name = meshCellsVertexAttributeName(id)
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
+  function setMeshEdgesVertexAttributeColorMap(id, colorMap) {
+    const name = meshEdgesVertexAttributeName(id)
+    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
     const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.cells.coloring.vertex.storedConfigs[name].colorMap = colorMap
+        style.edges.coloring.vertex.storedConfigs[name].colorMap = colorMap
       })
       console.log(
-        setMeshCellsVertexAttributeColorMap.name,
+        setMeshEdgesVertexAttributeColorMap.name,
         { id },
-        meshCellsVertexAttributeColorMap(id),
+        meshEdgesVertexAttributeColorMap(id),
       )
     }
 
@@ -143,18 +143,18 @@ export function useMeshCellsVertexAttributeStyle() {
       return updateState()
     }
 
-    if (meshCellsVertexAttributeSchemas?.color_map) {
+    if (meshEdgesVertexAttributeSchemas?.color_map) {
       const points = getRGBPointsFromPreset(colorMap)
       const { minimum, maximum } = storedConfig
 
-      console.log(setMeshCellsVertexAttributeColorMap.name, {
+      console.log(setMeshEdgesVertexAttributeColorMap.name, {
         id,
         minimum,
         maximum,
         colorMap,
       })
       return viewerStore.request(
-        meshCellsVertexAttributeSchemas.color_map,
+        meshEdgesVertexAttributeSchemas.color_map,
         { id, points, minimum, maximum },
         {
           response_function: updateState,
@@ -166,12 +166,12 @@ export function useMeshCellsVertexAttributeStyle() {
   }
 
   return {
-    meshCellsVertexAttributeName,
-    meshCellsVertexAttributeRange,
-    meshCellsVertexAttributeColorMap,
-    meshCellsVertexAttributeStoredConfig,
-    setMeshCellsVertexAttributeName,
-    setMeshCellsVertexAttributeRange,
-    setMeshCellsVertexAttributeColorMap,
+    meshEdgesVertexAttributeName,
+    meshEdgesVertexAttributeRange,
+    meshEdgesVertexAttributeColorMap,
+    meshEdgesVertexAttributeStoredConfig,
+    setMeshEdgesVertexAttributeName,
+    setMeshEdgesVertexAttributeRange,
+    setMeshEdgesVertexAttributeColorMap,
   }
 }

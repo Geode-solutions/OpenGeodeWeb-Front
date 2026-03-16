@@ -1,6 +1,6 @@
 import { Dexie } from "dexie"
 import { ExtendedDatabase } from "./extended_database"
-import { dataTable } from "./tables/data_table"
+import { dataTable } from "./tables/data"
 import { modelComponentsRelationTable } from "./tables/model_components_relation"
 import { modelComponentsTable } from "./tables/model_components"
 import { dataStyleTable } from "./tables/data_style"
