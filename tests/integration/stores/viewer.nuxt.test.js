@@ -5,11 +5,11 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest"
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { cleanupBackend } from "@ogw_front/utils/local/microservices"
 import { Status } from "@ogw_front/utils/status"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { cleanupBackend } from "@ogw_front/utils/local/microservices"
 import { runMicroservices } from "@ogw_tests/integration/setup"
 import { setupActivePinia } from "@ogw_tests/utils"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 const CONNECT_TIMEOUT = 25_000
 

@@ -18,33 +18,35 @@ async function registerRunningExtensions() {
   const infraStore = useInfraStore()
   const { extensionsArray } = await runExtensions()
 
-  for (const extension of extensionsArray) {
-    const { id, name, version, frontendContent, port } = extension
-    const blob = new Blob([frontendContent], {
-      type: "application/javascript",
-    })
-    const blobUrl = URL.createObjectURL(blob)
-    const extensionModule = await appStore.loadExtension(blobUrl)
-    console.log("[ExtensionManager] Extension loaded:", id)
-
-    if (extensionModule.metadata?.store) {
-      const storeFactory = extensionModule.metadata.store
-      const store = storeFactory()
-      store.$patch((state) => {
-        state.default_local_port = port
+  return Promise.all(
+    extensionsArray.map(async (extension) => {
+      const { name, version, frontendContent, port } = extension
+      const blob = new Blob([frontendContent], {
+        type: "application/javascript",
       })
-      appStore.registerStore(store)
-      console.log("[ExtensionManager] Store registered:", store.$id)
-      await store.connect()
-      console.log("[ExtensionManager] Microservice connected:", store.$id)
-      infraStore.register_microservice(store)
-    }
-    return {
-      name,
-      version,
-      extensionModule,
-    }
-  }
+      const blobUrl = URL.createObjectURL(blob)
+      const extensionModule = await appStore.loadExtension(blobUrl)
+      console.log("[ExtensionManager] Extension loaded:", id)
+
+      if (extensionModule.metadata?.store) {
+        const storeFactory = extensionModule.metadata.store
+        const store = storeFactory()
+        store.$patch((state) => {
+          state.default_local_port = port
+        })
+        appStore.registerStore(store)
+        console.log("[ExtensionManager] Store registered:", store.$id)
+        await store.connect()
+        console.log("[ExtensionManager] Microservice connected:", store.$id)
+        infraStore.register_microservice(store)
+      }
+      return {
+        name,
+        version,
+        extensionModule,
+      }
+    }),
+  )
 }
 
 async function unloadExtension(extensionId) {
@@ -79,9 +81,9 @@ async function uploadExtension(file) {
   await appStore.upload(file)
 }
 
-async function runExtensions() {
+function runExtensions() {
   const appStore = useAppStore()
-  const projectFolderPath = appStore.projectFolderPath
+  const { projectFolderPath } = appStore
   const { PROJECT: projectName } = useRuntimeConfig().public
   const params = { projectFolderPath, projectName }
 
