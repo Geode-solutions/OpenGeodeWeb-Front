@@ -275,12 +275,7 @@ describe("Infra Store", () => {
     })
 
     describe("create_backend", () => {
-      // test("test without microservices", async () => {
-      //   const infraStore = useInfraStore()
-      //   infraStore.app_mode = appMode.BROWSER
-      //   await infraStore.create_backend()
-      //   expect(infraStore.status).toBe(Status.CREATED)
-      // })
+      // Test without microservices
       test("test with end-point", async () => {
         const infraStore = useInfraStore()
         const geodeStore = useGeodeStore()
