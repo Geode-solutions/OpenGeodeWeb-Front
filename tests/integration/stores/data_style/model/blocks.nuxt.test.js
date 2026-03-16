@@ -1,5 +1,6 @@
 // Third party imports
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
+import { nextTick } from "vue"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
@@ -20,7 +21,7 @@ let id = "",
   projectFolderPath = ""
 
 beforeEach(async () => {
-  ;({ id, projectFolderPath } = await setupIntegrationTests(
+  ; ({ id, projectFolderPath } = await setupIntegrationTests(
     file_name,
     geode_object,
   ))
@@ -81,6 +82,7 @@ describe("Model blocks", () => {
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelBlocksColor(id, block_ids, color)
+      await nextTick()
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.color,
         { id, block_ids: block_viewer_ids, color },

@@ -46,18 +46,18 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   function getStyle(id) {
     const default_style = {
       visibility: true,
-      color: { r: 1, g: 1, b: 1 },
-      corners: { visibility: true, color: { r: 1, g: 1, b: 1 } },
-      lines: { visibility: true, color: { r: 1, g: 1, b: 1 } },
-      surfaces: { visibility: true, color: { r: 1, g: 1, b: 1 } },
-      blocks: { visibility: true, color: { r: 1, g: 1, b: 1 } },
+      color: { r: 255, g: 255, b: 255 },
+      corners: { visibility: true, color: { r: 20, g: 20, b: 20 } },
+      lines: { visibility: true, color: { r: 20, g: 20, b: 20 } },
+      surfaces: { visibility: true, color: { r: 255, g: 255, b: 255 } },
+      blocks: { visibility: true, color: { r: 255, g: 255, b: 255 } },
       points: { visibility: true, size: 10 },
       edges: { visibility: true },
       cells: {
         visibility: true,
         coloring: {
           active: "color",
-          color: { r: 1, g: 1, b: 1 },
+          color: { r: 255, g: 255, b: 255 },
           cell: { name: "", storedConfigs: {} },
           vertex: { name: "", storedConfigs: {} },
           textures: [],
@@ -67,7 +67,7 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
         visibility: true,
         coloring: {
           active: "color",
-          color: { r: 1, g: 1, b: 1 },
+          color: { r: 255, g: 255, b: 255 },
           polygon: { name: "", storedConfigs: {} },
           vertex: { name: "", storedConfigs: {} },
           textures: [],
@@ -77,7 +77,7 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
         visibility: true,
         coloring: {
           active: "color",
-          color: { r: 1, g: 1, b: 1 },
+          color: { r: 255, g: 255, b: 255 },
           polyhedron: { name: "", storedConfigs: {} },
           vertex: { name: "", storedConfigs: {} },
         },
@@ -127,7 +127,11 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     id_component,
     mutationCallback,
   ) {
-    const style = getComponentStyle(id_model, id_component)
+    const style =
+      (await database.model_component_datastyle.get([
+        id_model,
+        id_component,
+      ])) || {}
     mutationCallback(style)
     await updateComponentStyle(id_model, id_component, style)
   }

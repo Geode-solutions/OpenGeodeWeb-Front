@@ -4,7 +4,7 @@ export function useModelBlocksCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
 
   function modelBlocksStyle(id) {
-    return dataStyleStateStore.styles[id].blocks
+    return dataStyleStateStore.getStyle(id).blocks
   }
 
   function modelBlockStyle(id, block_id) {

@@ -4,7 +4,7 @@ export function useModelEdgesCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
 
   function modelEdgesStyle(id) {
-    return dataStyleStateStore.styles[id].edges
+    return dataStyleStateStore.getStyle(id).edges
   }
 
   return {

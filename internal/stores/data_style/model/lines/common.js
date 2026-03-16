@@ -4,7 +4,7 @@ export function useModelLinesCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
 
   function modelLinesStyle(id) {
-    return dataStyleStateStore.styles[id].lines
+    return dataStyleStateStore.getStyle(id).lines
   }
 
   function modelLineStyle(id, line_id) {
