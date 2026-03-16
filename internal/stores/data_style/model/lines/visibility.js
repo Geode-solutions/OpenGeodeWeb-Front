@@ -23,13 +23,9 @@ export function useModelLinesVisibilityStyle() {
   }
   async function setModelLinesVisibility(id, line_ids, visibility) {
     const updateState = async () => {
-      await dataStyleStateStore.mutateComponentStyles(
-        id,
-        line_ids,
-        (style) => {
-          style.visibility = visibility
-        },
-      )
+      await dataStyleStateStore.mutateComponentStyles(id, line_ids, (style) => {
+        style.visibility = visibility
+      })
       console.log(
         setModelLinesVisibility.name,
         { id },

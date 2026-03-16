@@ -20,7 +20,6 @@ export class ExtendedDatabase extends Dexie {
           [modelComponentsRelationTable.name]:
             modelComponentsRelationTable.schema,
         })
-
       } else {
         this.version(version).stores(currentStores)
       }
