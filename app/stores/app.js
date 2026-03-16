@@ -1,6 +1,5 @@
 // Third party imports
 import { defineStore } from "pinia"
-import { ref } from "vue"
 import { useRuntimeConfig } from "nuxt/app"
 
 // Local imports

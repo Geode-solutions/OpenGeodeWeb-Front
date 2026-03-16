@@ -1,9 +1,9 @@
 import { getDefaultStyle } from "@ogw_front/utils/default_styles"
-import { database } from "../../internal/database/database.js"
+import { database } from "@ogw_internal//database/database.js"
 import { useDataStore } from "@ogw_front/stores/data"
-import { useDataStyleStateStore } from "../../internal/stores/data_style/state"
-import { useMeshStyle } from "../../internal/stores/data_style/mesh/index"
-import { useModelStyle } from "../../internal/stores/data_style/model/index"
+import { useDataStyleStateStore } from "@ogw_internal//stores/data_style/state"
+import { useMeshStyle } from "@ogw_internal//stores/data_style/mesh/index"
+import { useModelStyle } from "@ogw_internal//stores/data_style/model/index"
 
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleStateStore()
@@ -89,10 +89,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   return {
-    styles: computed(() => dataStyleState.styles),
+    styles: dataStyleState.styles,
     getStyle: dataStyleState.getStyle,
-    objectVisibility: computed(() => dataStyleState.objectVisibility),
-    selectedObjects: computed(() => dataStyleState.selectedObjects),
+    objectVisibility: dataStyleState.objectVisibility,
+    selectedObjects: dataStyleState.selectedObjects,
     ...meshStyleStore,
     ...modelStyleStore,
     addDataStyle,

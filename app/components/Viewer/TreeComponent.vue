@@ -2,20 +2,18 @@
   import { useDataStore } from "@ogw_front/stores/data"
   import { useDataStyleStore } from "@ogw_front/stores/data_style"
   import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-
-  import { toRef } from "vue"
   import { compareSelections } from "@ogw_front/utils/treeview"
 
   const dataStyleStore = useDataStyleStore()
   const dataStore = useDataStore()
   const hybridViewerStore = useHybridViewerStore()
 
-  const props = defineProps({ id: { type: String, required: true } })
+  const { id } = defineProps({ id: { type: String, required: true } })
   const emit = defineEmits(["show-menu"])
 
-  const items = dataStore.refFormatedMeshComponents(props.id)
+  const items = dataStore.refFormatedMeshComponents(id)
   const mesh_components_selection = dataStyleStore.visibleMeshComponents(
-    toRef(props, "id"),
+    toRef(() => id),
   )
 
   watch(
@@ -33,15 +31,11 @@
       })
 
       if (added.length > 0) {
-        await dataStyleStore.setModelMeshComponentsVisibility(
-          props.id,
-          added,
-          true,
-        )
+        await dataStyleStore.setModelMeshComponentsVisibility(id, added, true)
       }
       if (removed.length > 0) {
         await dataStyleStore.setModelMeshComponentsVisibility(
-          props.id,
+          id,
           removed,
           false,
         )

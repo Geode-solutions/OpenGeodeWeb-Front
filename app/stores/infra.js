@@ -1,7 +1,7 @@
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import { Status } from "@ogw_front/utils/status"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
-import { database } from "../../internal/database/database"
+import { database } from "@ogw_internal//database/database"
 import { useAppStore } from "@ogw_front/stores/app"
 import { registerRunningExtensions } from "@ogw_front/utils/extension"
 

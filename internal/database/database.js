@@ -1,26 +1,11 @@
-import { Dexie } from "dexie"
+import { BaseDatabase } from "./base_database"
 import { ExtendedDatabase } from "./extended_database"
-import { dataTable } from "./tables/data"
-import { modelComponentsRelationTable } from "./tables/model_components_relation"
-import { modelComponentsTable } from "./tables/model_components"
-import { dataStyleTable } from "./tables/data_style"
-import { modelComponentDataStyleTable } from "./tables/model_component_datastyle"
 
-class Database extends Dexie {
+class Database extends BaseDatabase {
   constructor() {
     super("Database")
 
-    this.version(1).stores({
-      [dataTable.name]: dataTable.schema,
-      [modelComponentsTable.name]: modelComponentsTable.schema,
-      [dataStyleTable.name]: dataStyleTable.schema,
-      [modelComponentDataStyleTable.name]: modelComponentDataStyleTable.schema,
-      [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
-    })
-  }
-
-  async clear() {
-    return Promise.all(this.tables.map((table) => table.clear()))
+    this.version(1).stores(BaseDatabase.initialStores)
   }
 
   static async addTable(tableName, schemaDefinition) {
@@ -34,13 +19,7 @@ class Database extends Dexie {
     const currentVersion = tempDb.verno
     const currentStores = {}
 
-    currentStores[dataTable.name] = dataTable.schema
-    currentStores[modelComponentsTable.name] = modelComponentsTable.schema
-    currentStores[dataStyleTable.name] = dataStyleTable.schema
-    currentStores[modelComponentDataStyleTable.name] =
-      modelComponentDataStyleTable.schema
-    currentStores[modelComponentsRelationTable.name] =
-      modelComponentsRelationTable.schema
+    Object.assign(currentStores, BaseDatabase.initialStores)
 
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src
@@ -61,15 +40,7 @@ class Database extends Dexie {
       const existingDb = new Dexie("Database")
       for (let version = 1; version <= currentVersion; version += 1) {
         if (version === 1) {
-          existingDb.version(1).stores({
-            [dataTable.name]: dataTable.schema,
-            [modelComponentsTable.name]: modelComponentsTable.schema,
-            [dataStyleTable.name]: dataStyleTable.schema,
-            [modelComponentDataStyleTable.name]:
-              modelComponentDataStyleTable.schema,
-            [modelComponentsRelationTable.name]:
-              modelComponentsRelationTable.schema,
-          })
+          existingDb.version(1).stores(BaseDatabase.initialStores)
         } else {
           existingDb.version(version).stores(currentStores)
         }

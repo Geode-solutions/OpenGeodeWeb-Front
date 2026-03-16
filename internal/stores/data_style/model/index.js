@@ -13,7 +13,6 @@ import { useModelEdgesStyle } from "./edges"
 import { useModelLinesStyle } from "./lines"
 import { useModelPointsStyle } from "./points"
 import { useModelSurfacesStyle } from "./surfaces"
-import { ref, watch, isRef } from "vue"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants

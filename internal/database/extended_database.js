@@ -1,25 +1,12 @@
-import { Dexie } from "dexie"
-import { dataTable } from "./tables/data"
-import { modelComponentsRelationTable } from "./tables/model_components_relation"
-import { modelComponentsTable } from "./tables/model_components"
-import { dataStyleTable } from "./tables/data_style"
-import { modelComponentDataStyleTable } from "./tables/model_component_datastyle"
+import { BaseDatabase } from "./base_database"
 
-export class ExtendedDatabase extends Dexie {
+export class ExtendedDatabase extends BaseDatabase {
   constructor(currentVersion, currentStores, newTables) {
     super("Database")
 
     for (let version = 1; version <= currentVersion; version += 1) {
       if (version === 1) {
-        this.version(1).stores({
-          [dataTable.name]: dataTable.schema,
-          [modelComponentsTable.name]: modelComponentsTable.schema,
-          [dataStyleTable.name]: dataStyleTable.schema,
-          [modelComponentDataStyleTable.name]:
-            modelComponentDataStyleTable.schema,
-          [modelComponentsRelationTable.name]:
-            modelComponentsRelationTable.schema,
-        })
+        this.version(1).stores(BaseDatabase.initialStores)
       } else {
         this.version(version).stores(currentStores)
       }
@@ -29,9 +16,5 @@ export class ExtendedDatabase extends Dexie {
       ...currentStores,
       ...newTables,
     })
-  }
-
-  async clear() {
-    return Promise.all(this.tables.map((table) => table.clear()))
   }
 }
