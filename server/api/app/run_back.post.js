@@ -11,11 +11,11 @@ import {
 
 export default defineEventHandler(async (event) => {
   try {
-    const { BACK_COMMAND, BACK_PATH, args } = await readBody(event)
-    const port = await runBack(BACK_COMMAND, BACK_PATH, args)
+    const { COMMAND_BACK, args } = await readBody(event)
+    const port = await runBack(COMMAND_BACK, args)
     await addMicroserviceMetadatas(args.projectFolderPath, {
       type: "back",
-      name: BACK_COMMAND,
+      name: COMMAND_BACK,
       port,
     })
 

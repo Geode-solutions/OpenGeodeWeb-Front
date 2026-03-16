@@ -11,27 +11,16 @@ import { v4 as uuidv4 } from "uuid"
 
 const MAX_DELETE_FOLDER_RETRIES = 5
 
-function venvScriptPath(microservicePath) {
-  const venvPath = path.join(microservicePath, "venv")
-  let scriptPath = ""
-  if (process.platform === "win32") {
-    scriptPath = path.join(venvPath, "Scripts")
-  } else {
-    scriptPath = path.join(venvPath, "bin")
-  }
-  return scriptPath
-}
-
-async function executablePath(microservicePath) {
+async function executablePath(cwdPath) {
   if (isElectron()) {
     const electron = await import("electron")
     if (electron.app.isPackaged) {
       return process.resourcesPath
     } else {
-      return venvScriptPath(microservicePath)
+      return cwdPath
     }
   } else {
-    return venvScriptPath(microservicePath)
+    return cwdPath
   }
 }
 

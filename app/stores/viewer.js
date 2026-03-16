@@ -87,8 +87,9 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
           status.value = Status.CONNECTING
-          const { default: SmartConnect } =
-            await import("wslink/src/SmartConnect")
+          const { default: SmartConnect } = await import(
+            "wslink/src/SmartConnect"
+          )
           vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
           const config_obj = { application: "Viewer" }
@@ -122,8 +123,9 @@ export const useViewerStore = defineStore(
           })
 
           // Connect
-          const { connectImageStream } =
-            await import("@kitware/vtk.js/Rendering/Misc/RemoteView")
+          const { connectImageStream } = await import(
+            "@kitware/vtk.js/Rendering/Misc/RemoteView"
+          )
           client.value = await clientToConnect.connect(config_obj)
           connectImageStream(client.value.getConnection().getSession())
           clientToConnect.endBusy()
@@ -154,28 +156,21 @@ export const useViewerStore = defineStore(
       console.log("[VIEWER] Launching viewer microservice...", { args })
       const appStore = useAppStore()
 
-      const { VIEWER_PATH, VIEWER_COMMAND } = useRuntimeConfig().public
+      const { COMMAND_VIEWER } = useRuntimeConfig().public
 
-      console.log("[VIEWER] VIEWER_PATH", VIEWER_PATH)
-      console.log("[VIEWER] VIEWER_COMMAND", VIEWER_COMMAND)
+      console.log("[VIEWER] COMMAND_VIEWER", COMMAND_VIEWER)
       const schema = {
         $id: "/api/app/run_viewer",
         methods: ["POST"],
         type: "object",
         properties: {
-          VIEWER_PATH: { type: "string" },
-          VIEWER_COMMAND: { type: "string" },
+          COMMAND_VIEWER: { type: "string" },
         },
-        required: ["VIEWER_PATH", "VIEWER_COMMAND"],
+        required: ["COMMAND_VIEWER"],
         additionalProperties: true,
       }
 
-      const params = {
-        VIEWER_PATH,
-        VIEWER_COMMAND,
-        args,
-      }
-
+      const params = { COMMAND_VIEWER, args }
       console.log("[VIEWER] params", params)
 
       return appStore.request(schema, params, {

@@ -83,25 +83,22 @@ export const useGeodeStore = defineStore("geode", {
       console.log("[GEODE] Launching back microservice...", { args })
       const appStore = useAppStore()
 
-      const { BACK_PATH, BACK_COMMAND } = useRuntimeConfig().public
+      const { COMMAND_BACK } = useRuntimeConfig().public
 
-      console.log("[GEODE] BACK_PATH", BACK_PATH)
-      console.log("[GEODE] BACK_COMMAND", BACK_COMMAND)
+      console.log("[GEODE] COMMAND_BACK", COMMAND_BACK)
       const schema = {
         $id: "/api/app/run_back",
         methods: ["POST"],
         type: "object",
         properties: {
-          BACK_PATH: { type: "string" },
-          BACK_COMMAND: { type: "string" },
+          COMMAND_BACK: { type: "string" },
         },
-        required: ["BACK_PATH", "BACK_COMMAND"],
+        required: ["COMMAND_BACK"],
         additionalProperties: true,
       }
 
       const params = {
-        BACK_PATH,
-        BACK_COMMAND,
+        COMMAND_BACK,
         args,
       }
 

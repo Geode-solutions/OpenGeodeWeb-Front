@@ -32,17 +32,16 @@ async function runMicroservices() {
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
-  const { BACK_COMMAND, BACK_PATH, PROJECT, VIEWER_COMMAND, VIEWER_PATH } =
-    useRuntimeConfig().public
+  const { COMMAND_BACK, PROJECT, COMMAND_VIEWER } = useRuntimeConfig().public
   const projectFolderPath = generateProjectFolderPath(PROJECT)
   await createPath(projectFolderPath)
 
   const [back_port, viewer_port] = await Promise.all([
-    runBack(BACK_COMMAND, BACK_PATH, {
+    runBack(COMMAND_BACK, {
       projectFolderPath,
       uploadFolderPath: data_folder,
     }),
-    runViewer(VIEWER_COMMAND, VIEWER_PATH, { projectFolderPath }),
+    runViewer(COMMAND_VIEWER, { projectFolderPath }),
   ])
 
   console.log("back_port", back_port)
@@ -50,12 +49,12 @@ async function runMicroservices() {
 
   await addMicroserviceMetadatas(projectFolderPath, {
     type: "back",
-    name: BACK_COMMAND,
+    name: COMMAND_BACK,
     port: back_port,
   })
   await addMicroserviceMetadatas(projectFolderPath, {
     type: "viewer",
-    name: VIEWER_COMMAND,
+    name: COMMAND_VIEWER,
     port: viewer_port,
   })
 
