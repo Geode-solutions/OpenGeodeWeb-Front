@@ -216,7 +216,7 @@ export const useViewerStore = defineStore(
               "[VIEWER] Request completed:",
               schema.$id,
               "in",
-              (Date.now() - start) / MILLISECONDS_IN_SECOND,
+              (Date.now() - start) / MS_PER_SECOND,
               "s",
             )
             if (callbacks.response_function) {

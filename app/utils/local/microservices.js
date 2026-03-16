@@ -1,7 +1,6 @@
 // Node imports
 import child_process from "node:child_process"
 import fs from "node:fs"
-import { once } from "node:events"
 import path from "node:path"
 
 // Third party imports
@@ -143,34 +142,45 @@ function killWebsocketMicroservice(microservice) {
   console.log("killWebsocketMicroservice", { ...microservice })
   const failMessage = `Failed to kill ${microservice.name}`
   const successMessage = `Disconnected from ${microservice.name} WebSocket server`
-  async function do_kill() {
-    const socket = new WebSocket(microservice.url)
-    await once(socket, "open")
-    console.log("Connected to WebSocket server")
-    socket.send(
-      JSON.stringify({
-        id: "system:hello",
-        method: "wslink.hello",
-        args: [{ secret: "wslink-secret" }],
-      }),
-    )
-
-    for await (const [data] of once.iterator(socket, "message")) {
-      const message = data.toString()
-      console.log("Received from server:", message)
-      if (message.includes("hello")) {
+  function do_kill() {
+    // oxlint-disable-next-line promise/avoid-new
+    return new Promise((resolve) => {
+      const socket = new WebSocket(microservice.url)
+      socket.on("open", () => {
+        console.log("Connected to WebSocket server")
         socket.send(
           JSON.stringify({
-            id: "application.exit",
-            method: "application.exit",
+            id: "system:hello",
+            method: "wslink.hello",
+            args: [{ secret: "wslink-secret" }],
           }),
         )
+      })
+      socket.on("message", (data) => {
+        const message = data.toString()
+        console.log("Received from server:", message)
+        if (message.includes("hello")) {
+          socket.send(
+            JSON.stringify({
+              id: "application.exit",
+              method: "application.exit",
+            }),
+          )
+          console.log(successMessage)
+          socket.close()
+          resolve()
+        }
+      })
+      socket.on("close", () => {
         console.log(successMessage)
+        resolve()
+      })
+      socket.on("error", (error) => {
+        console.error("WebSocket error:", error)
         socket.close()
-        break
-      }
-    }
-    console.log(successMessage)
+        resolve()
+      })
+    })
   }
   return pTimeout(do_kill(), {
     milliseconds: 5000,
