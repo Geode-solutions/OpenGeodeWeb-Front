@@ -9,7 +9,10 @@ export function useModelSurfacesCommonStyle() {
 
   function modelSurfaceStyle(id, surface_id) {
     const groupStyle = modelSurfacesStyle(id)
-    const individualStyle = dataStyleStateStore.getComponentStyle(id, surface_id)
+    const individualStyle = dataStyleStateStore.getComponentStyle(
+      id,
+      surface_id,
+    )
     return { ...groupStyle, ...individualStyle }
   }
 

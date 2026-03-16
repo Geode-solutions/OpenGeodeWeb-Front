@@ -116,7 +116,11 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     )
   }
 
-  async function mutateComponentStyle(id_model, id_component, mutationCallback) {
+  async function mutateComponentStyle(
+    id_model,
+    id_component,
+    mutationCallback,
+  ) {
     const style = getComponentStyle(id_model, id_component)
     mutationCallback(style)
     await updateComponentStyle(id_model, id_component, style)

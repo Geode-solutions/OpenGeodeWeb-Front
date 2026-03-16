@@ -42,9 +42,13 @@ export function useModelStyle() {
     }
 
     if (model_schemas.visibility) {
-      return viewerStore.request(model_schemas.visibility, { id, visibility }, {
-        response_function: updateState,
-      })
+      return viewerStore.request(
+        model_schemas.visibility,
+        { id, visibility },
+        {
+          response_function: updateState,
+        },
+      )
     } else {
       return updateState()
     }
@@ -95,9 +99,13 @@ export function useModelStyle() {
     }
 
     if (model_schemas.color) {
-      return viewerStore.request(model_schemas.color, { id, color }, {
-        response_function: updateState,
-      })
+      return viewerStore.request(
+        model_schemas.color,
+        { id, color },
+        {
+          response_function: updateState,
+        },
+      )
     } else {
       return updateState()
     }

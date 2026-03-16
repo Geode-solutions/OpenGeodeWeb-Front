@@ -126,8 +126,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const dataStyleStateStore = useDataStyleStateStore()
     const updateState = async () => {
       await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.polyhedra.coloring.vertex.storedConfigs[name].colorMap =
-          colorMap
+        style.polyhedra.coloring.vertex.storedConfigs[name].colorMap = colorMap
       })
       console.log(
         setMeshPolyhedraVertexAttributeColorMap.name,

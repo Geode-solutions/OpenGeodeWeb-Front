@@ -38,9 +38,13 @@ export function useMeshStyle() {
     }
 
     if (meshSchemas.visibility) {
-      return viewerStore.request(meshSchemas.visibility, { id, visibility }, {
-        response_function: updateState,
-      })
+      return viewerStore.request(
+        meshSchemas.visibility,
+        { id, visibility },
+        {
+          response_function: updateState,
+        },
+      )
     } else {
       return updateState()
     }
@@ -58,9 +62,13 @@ export function useMeshStyle() {
     }
 
     if (meshSchemas.color) {
-      return viewerStore.request(meshSchemas.color, { id, color }, {
-        response_function: updateState,
-      })
+      return viewerStore.request(
+        meshSchemas.color,
+        { id, color },
+        {
+          response_function: updateState,
+        },
+      )
     } else {
       return updateState()
     }

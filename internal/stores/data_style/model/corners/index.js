@@ -63,7 +63,7 @@ export function useModelCornersStyle() {
     return Promise.all(promises)
   }
 
-  async function setModelCornersDefaultStyle(id) { }
+  async function setModelCornersDefaultStyle(id) {}
 
   return {
     applyModelCornersStyle,

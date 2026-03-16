@@ -23,11 +23,7 @@ export function useMeshEdgesVisibilityStyle() {
       await dataStyleStateStore.mutateStyle(id, (style) => {
         style.edges.visibility = visibility
       })
-      console.log(
-        setMeshEdgesVisibility.name,
-        { id },
-        meshEdgesVisibility(id),
-      )
+      console.log(setMeshEdgesVisibility.name, { id }, meshEdgesVisibility(id))
     }
 
     if (meshEdgesVisibilitySchema) {

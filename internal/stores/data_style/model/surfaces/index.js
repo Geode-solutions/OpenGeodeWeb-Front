@@ -58,7 +58,7 @@ export function useModelSurfacesStyle() {
     return Promise.all(promises)
   }
 
-  async function setModelSurfacesDefaultStyle(id) { }
+  async function setModelSurfacesDefaultStyle(id) {}
 
   return {
     applyModelSurfacesStyle,

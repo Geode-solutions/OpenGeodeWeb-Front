@@ -54,7 +54,7 @@ export function useModelBlocksStyle() {
     return Promise.all(promises)
   }
 
-  async function setModelBlocksDefaultStyle(id) { }
+  async function setModelBlocksDefaultStyle(id) {}
 
   return {
     applyModelBlocksStyle,

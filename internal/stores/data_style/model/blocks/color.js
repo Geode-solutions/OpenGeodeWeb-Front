@@ -25,9 +25,13 @@ export function useModelBlocksColorStyle() {
   async function setModelBlocksColor(id, block_ids, color) {
     const updateState = async () => {
       for (const block_id of block_ids) {
-        await dataStyleStateStore.mutateComponentStyle(id, block_id, (style) => {
-          style.color = color
-        })
+        await dataStyleStateStore.mutateComponentStyle(
+          id,
+          block_id,
+          (style) => {
+            style.color = color
+          },
+        )
       }
       console.log(
         setModelBlocksColor.name,

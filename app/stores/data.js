@@ -195,8 +195,6 @@ export const useDataStore = defineStore("data", () => {
     return components.map((component) => component.viewer_id)
   }
 
-
-
   async function exportStores() {
     const items = await database.data.toArray()
     return { items }
