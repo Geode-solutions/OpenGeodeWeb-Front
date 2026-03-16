@@ -1,7 +1,6 @@
 // Node.js imports
 
 // Third party imports
-// oxlint-disable-next-line id-length
 import _ from "lodash"
 import { useRuntimeConfig } from "nuxt/app"
 
