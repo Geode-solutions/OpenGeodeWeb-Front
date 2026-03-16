@@ -47,7 +47,7 @@
           style="max-height: calc(85vh)"
           class="transparent-treeview scrollbar-hover"
         >
-          <v-row v-if="treeviewStore.items.length > 0">
+          <v-row v-if="treeviewStore.items.length > 0" class="breadcrumb-row">
             <v-col>
               <ViewerBreadCrumb />
             </v-col>
