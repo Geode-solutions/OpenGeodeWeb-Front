@@ -21,7 +21,7 @@ let id = "",
   projectFolderPath = ""
 
 beforeEach(async () => {
-  ;({ id, projectFolderPath } = await setupIntegrationTests(
+  ; ({ id, projectFolderPath } = await setupIntegrationTests(
     file_name,
     geode_object,
   ))
@@ -53,6 +53,7 @@ describe("Model blocks", () => {
       )
       expect(result).toBeInstanceOf(Promise)
       await result
+      await sleep(200)
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.visibility,
         { id, block_ids: block_viewer_ids, visibility },
@@ -82,7 +83,7 @@ describe("Model blocks", () => {
       const color = { r: 255, g: 0, b: 0 }
       const spy = vi.spyOn(viewerStore, "request")
       await dataStyleStore.setModelBlocksColor(id, block_ids, color)
-      await nextTick()
+      await sleep(200)
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.color,
         { id, block_ids: block_viewer_ids, color },
