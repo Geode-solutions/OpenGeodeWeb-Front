@@ -237,7 +237,8 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   if (serviceObj.type === "back") {
     const schema = back_schemas.opengeodeweb_back.kill
     serviceObj.url = `http://localhost:${serviceObj.port}/${schema.$id}`
-    ;[serviceObj.method] = schema.methods
+    const [method] = schema.methods
+    serviceObj.method = method
   } else if (serviceObj.type === "viewer") {
     serviceObj.url = `ws://localhost:${serviceObj.port}/ws`
   }
