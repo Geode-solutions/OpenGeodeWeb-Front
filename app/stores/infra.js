@@ -1,25 +1,18 @@
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import { Status } from "@ogw_front/utils/status"
 import { useAppStore } from "@ogw_front/stores/app"
-import { useLambdaStore } from "@ogw_front/stores/lambda"
+import { useCloudStore } from "@ogw_front/stores/cloud"
 
 import { registerRunningExtensions } from "@ogw_front/utils/extension"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: getAppMode(),
-    ID: "",
-    is_captcha_validated: false,
     status: Status.NOT_CREATED,
     microservices: [],
+    domain_name: "localhost",
   }),
   getters: {
-    domain_name() {
-      if (this.app_mode === appMode.CLOUD) {
-        return useRuntimeConfig().public.API_URL
-      }
-      return "localhost"
-    },
     microservices_connected() {
       console.log("microservices", this.microservices)
       return this.microservices.every(
@@ -60,10 +53,10 @@ export const useInfraStore = defineStore("infra", {
         }
         console.log("[INFRA] Lock granted for create_backend")
         if (this.app_mode === appMode.CLOUD) {
-          console.log("[INFRA] CLOUD mode - Launching lambda...")
-          const lambdaStore = useLambdaStore()
-          this.ID = await lambdaStore.launch()
-          console.log("[INFRA] Lambda launched successfully")
+          console.log("[INFRA] CLOUD mode - Launching cloud...")
+          const cloudStore = useCloudStore()
+          this.ID = await cloudStore.launch()
+          console.log("[INFRA] Cloud launched successfully")
         } else {
           console.log(
             `[INFRA] ${this.app_mode} mode - Launching microservices...`,

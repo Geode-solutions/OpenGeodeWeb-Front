@@ -6,7 +6,7 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { Status } from "@ogw_front/utils/status"
 import { setupActivePinia } from "@ogw_tests/utils"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import { useLambdaStore } from "@ogw_front/stores/lambda"
+import { useCloudStore } from "@ogw_front/stores/cloud"
 
 // CONSTANTS
 const PORT_443 = "443"
@@ -27,35 +27,35 @@ function setupConfig() {
   config.public.PROJECT = PROJECT
 }
 
-describe("Lambda Store", () => {
+describe("Cloud Store", () => {
   describe("state", () => {
     test("initial state", () => {
-      const lambdaStore = useLambdaStore()
-      expectTypeOf(lambdaStore.status).toBeString()
-      expect(lambdaStore.status).toBe(Status.NOT_CONNECTED)
+      const cloudStore = useCloudStore()
+      expectTypeOf(cloudStore.status).toBeString()
+      expect(cloudStore.status).toBe(Status.NOT_CONNECTED)
     })
   })
 
   describe("getters", () => {
     describe("protocol", () => {
       test("test protocol is always https", () => {
-        const lambdaStore = useLambdaStore()
-        expect(lambdaStore.protocol).toBe("https")
+        const cloudStore = useCloudStore()
+        expect(cloudStore.protocol).toBe("https")
       })
     })
 
     describe("port", () => {
       test("test port is always 443", () => {
-        const lambdaStore = useLambdaStore()
-        expect(lambdaStore.port).toBe(PORT_443)
+        const cloudStore = useCloudStore()
+        expect(cloudStore.port).toBe(PORT_443)
       })
     })
 
     describe("base_url", () => {
       test("test base_url construction", () => {
         setupConfig()
-        const lambdaStore = useLambdaStore()
-        expect(lambdaStore.base_url).toBe(
+        const cloudStore = useCloudStore()
+        expect(cloudStore.base_url).toBe(
           `https://${API_URL}:${PORT_443}${SITE_BRANCH}/${PROJECT}/createbackend`,
         )
       })
@@ -63,8 +63,8 @@ describe("Lambda Store", () => {
 
     describe("is_busy", () => {
       test("test is_busy is always false", () => {
-        const lambdaStore = useLambdaStore()
-        expect(lambdaStore.is_busy).toBeFalsy()
+        const cloudStore = useCloudStore()
+        expect(cloudStore.is_busy).toBeFalsy()
       })
     })
   })
@@ -75,11 +75,11 @@ describe("Lambda Store", () => {
 
       test("successful launch", async () => {
         setupConfig()
-        const lambdaStore = useLambdaStore()
+        const cloudStore = useCloudStore()
         const feedbackStore = useFeedbackStore()
 
-        lambdaStore.base_url = "test-base-url"
-        registerEndpoint(lambdaStore.base_url, {
+        cloudStore.base_url = "test-base-url"
+        registerEndpoint(cloudStore.base_url, {
           method: "POST",
           handler: postFakeCall,
         })
@@ -88,19 +88,19 @@ describe("Lambda Store", () => {
           ID: TEST_ID,
         }))
 
-        const id = await lambdaStore.launch()
+        const id = await cloudStore.launch()
 
-        expect(lambdaStore.status).toBe(Status.CONNECTED)
+        expect(cloudStore.status).toBe(Status.CONNECTED)
         expect(id).toBe(TEST_ID)
         expect(feedbackStore.server_error).toBeFalsy()
       })
 
       test("failed launch - error response", async () => {
         setupConfig()
-        const lambdaStore = useLambdaStore()
+        const cloudStore = useCloudStore()
         const feedbackStore = useFeedbackStore()
 
-        registerEndpoint(lambdaStore.base_url, {
+        registerEndpoint(cloudStore.base_url, {
           method: "POST",
           handler: postFakeCall,
         })
@@ -112,20 +112,20 @@ describe("Lambda Store", () => {
           })
         })
 
-        await expect(lambdaStore.launch()).rejects.toThrow(
-          "Failed to launch lambda backend",
+        await expect(cloudStore.launch()).rejects.toThrow(
+          "Failed to launch cloud backend",
         )
 
-        expect(lambdaStore.status).toBe(Status.NOT_CONNECTED)
+        expect(cloudStore.status).toBe(Status.NOT_CONNECTED)
         expect(feedbackStore.server_error).toBeTruthy()
       })
     })
 
     describe("connect", () => {
       test("successful connect", async () => {
-        const lambdaStore = useLambdaStore()
-        await lambdaStore.connect()
-        expect(lambdaStore.status).toBe(Status.CONNECTED)
+        const cloudStore = useCloudStore()
+        await cloudStore.connect()
+        expect(cloudStore.status).toBe(Status.CONNECTED)
       })
     })
   })

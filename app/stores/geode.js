@@ -33,10 +33,7 @@ export const useGeodeStore = defineStore("geode", {
       const infraStore = useInfraStore()
       let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
       if (infraStore.app_mode === appMode.CLOUD) {
-        if (infraStore.ID === "") {
-          throw new Error("ID must not be empty in cloud mode")
-        }
-        geode_url += `/${infraStore.ID}/geode`
+        geode_url += `/geode`
       }
       return geode_url
     },

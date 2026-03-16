@@ -8,7 +8,7 @@ import { appMode } from "@ogw_front/utils/app_mode"
 import { setupActivePinia } from "@ogw_tests/utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
-import { useLambdaStore } from "@ogw_front/stores/lambda"
+import { useCloudStore } from "@ogw_front/stores/cloud"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Mock navigator.locks API
@@ -31,8 +31,7 @@ describe("Infra Store", () => {
   describe("state", () => {
     test("initial state", () => {
       const infraStore = useInfraStore()
-      expectTypeOf(infraStore.ID).toBeString()
-      expectTypeOf(infraStore.is_captcha_validated).toBeBoolean()
+      expectTypeOf(infraStore.domain_name).toBeString()
       expectTypeOf(infraStore.status).toBeString()
     })
   })
@@ -280,11 +279,11 @@ describe("Infra Store", () => {
         const infraStore = useInfraStore()
         const geodeStore = useGeodeStore()
         const viewerStore = useViewerStore()
-        const lambdaStore = useLambdaStore()
+        const cloudStore = useCloudStore()
 
         infraStore.app_mode = appMode.CLOUD
         const ID = "123456"
-        registerEndpoint(lambdaStore.base_url, {
+        registerEndpoint(cloudStore.base_url, {
           method: "POST",
           handler: () => ({ ID }),
         })

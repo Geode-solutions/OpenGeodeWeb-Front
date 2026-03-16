@@ -1,8 +1,5 @@
 <script setup>
-  import { appMode } from "@ogw_front/utils/app_mode"
-  import { useInfraStore } from "@ogw_front/stores/infra"
-
-  const RESPONSE_STATUS_OK = 200
+  import { useCloudStore } from "@ogw_front/stores/cloud"
 
   const { button_label, button_color, color } = defineProps({
     button_label: {
@@ -20,7 +17,7 @@
       required: false,
     },
   })
-  const infraStore = useInfraStore()
+
   const name = ref("")
   const email = ref("")
   const launch = ref(false)
@@ -40,28 +37,9 @@
     },
   ]
 
-  onMounted(() => {
-    if (import.meta.client) {
-      if (
-        process.env.NODE_ENV !== "production" ||
-        infraStore.app_mode !== appMode.CLOUD
-      ) {
-        infraStore.$patch({ is_captcha_validated: true })
-      }
-    }
-  })
-  async function submit_recaptcha() {
-    const response = await $fetch.raw(`/.netlify/functions/recaptcha`, {
-      method: "POST",
-      body: {
-        name: name.value,
-        email: email.value,
-        launch: launch.value,
-      },
-    })
-    infraStore.$patch({
-      is_captcha_validated: response.status === RESPONSE_STATUS_OK,
-    })
+  function submit() {
+    const cloudStore = useCloudStore()
+    return cloudStore.launch(name.value, email.value, launch.value)
   }
 </script>
 
@@ -99,7 +77,7 @@
       <VBtn
         :text="button_label"
         :color="color || button_color"
-        @click="submit_recaptcha"
+        @click="submit"
       />
     </VCol>
   </VRow>

@@ -5,22 +5,13 @@
   import { useInfraStore } from "@ogw_front/stores/infra"
 
   const infraStore = useInfraStore()
-
-  watch(
-    () => infraStore.is_captcha_validated,
-    (value, oldValue) => {
-      if (value && !oldValue && import.meta.client) {
-        infraStore.create_backend()
-      }
-    },
-  )
 </script>
 
 <template>
   <v-container class="justify">
     <v-row align-content="center" align="center">
       <v-col
-        v-if="!infraStore.is_captcha_validated"
+        v-if="!infraStore.status == Status.NOT_CREATED"
         class="align"
         cols="12"
         align-self="center"
