@@ -18,18 +18,17 @@ export function useMeshPolygonsColorStyle() {
   }
   function setMeshPolygonsColor(id, color) {
     const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsColoringStyle(
-        id,
-        (coloring) => {
+      return meshPolygonsCommonStyle
+        .mutateMeshPolygonsColoringStyle(id, (coloring) => {
           coloring.color = color
-        },
-      ).then(() => {
-        console.log(
-          setMeshPolygonsColor.name,
-          { id },
-          JSON.stringify(meshPolygonsColor(id)),
-        )
-      })
+        })
+        .then(() => {
+          console.log(
+            setMeshPolygonsColor.name,
+            { id },
+            JSON.stringify(meshPolygonsColor(id)),
+          )
+        })
     }
 
     if (meshPolygonsColorSchemas && color !== undefined) {

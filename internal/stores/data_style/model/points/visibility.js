@@ -18,15 +18,17 @@ export function useModelPointsVisibilityStyle() {
 
   function setModelPointsVisibility(id, visibility) {
     const mutate = () => {
-      return modelPointsCommonStyle.mutateModelPointsStyle(id, (points) => {
-        points.visibility = visibility
-      }).then(() => {
-        console.log(
-          setModelPointsVisibility.name,
-          { id },
-          modelPointsVisibility(id),
-        )
-      })
+      return modelPointsCommonStyle
+        .mutateModelPointsStyle(id, (points) => {
+          points.visibility = visibility
+        })
+        .then(() => {
+          console.log(
+            setModelPointsVisibility.name,
+            { id },
+            modelPointsVisibility(id),
+          )
+        })
     }
 
     if (model_points_schemas?.visibility) {

@@ -18,11 +18,13 @@ export function useModelPointsSizeStyle() {
 
   function setModelPointsSize(id, size) {
     const mutate = () => {
-      return modelPointsCommonStyle.mutateModelPointsStyle(id, (points) => {
-        points.size = size
-      }).then(() => {
-        console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
-      })
+      return modelPointsCommonStyle
+        .mutateModelPointsStyle(id, (points) => {
+          points.size = size
+        })
+        .then(() => {
+          console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
+        })
     }
 
     if (model_points_schemas?.size) {

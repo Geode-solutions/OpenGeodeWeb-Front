@@ -18,15 +18,17 @@ export function useModelEdgesVisibilityStyle() {
 
   function setModelEdgesVisibility(id, visibility) {
     const mutate = () => {
-      return modelEdgesCommonStyle.mutateModelEdgesStyle(id, (edges) => {
-        edges.visibility = visibility
-      }).then(() => {
-        console.log(
-          setModelEdgesVisibility.name,
-          { id },
-          modelEdgesVisibility(id),
-        )
-      })
+      return modelEdgesCommonStyle
+        .mutateModelEdgesStyle(id, (edges) => {
+          edges.visibility = visibility
+        })
+        .then(() => {
+          console.log(
+            setModelEdgesVisibility.name,
+            { id },
+            modelEdgesVisibility(id),
+          )
+        })
     }
 
     if (model_edges_schemas?.visibility) {

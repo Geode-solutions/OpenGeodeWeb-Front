@@ -20,27 +20,26 @@ export function useModelBlocksColorStyle() {
 
   function setModelBlocksColor(id, block_ids, color) {
     const mutate = () => {
-      return modelBlocksCommonStyle.mutateModelBlocksStyle(
-        id,
-        block_ids,
-        (style) => {
+      return modelBlocksCommonStyle
+        .mutateModelBlocksStyle(id, block_ids, (style) => {
           style.color = color
-        },
-      ).then(() => {
-        console.log(
-          setModelBlocksColor.name,
-          { id },
-          { block_ids },
-          JSON.stringify(modelBlockColor(id, block_ids[0])),
-        )
-      })
+        })
+        .then(() => {
+          console.log(
+            setModelBlocksColor.name,
+            { id },
+            { block_ids },
+            JSON.stringify(modelBlockColor(id, block_ids[0])),
+          )
+        })
     }
 
     if (!block_ids || block_ids.length === 0) {
       return Promise.resolve()
     }
-    return dataStore.getMeshComponentsViewerIds(id, block_ids).then(
-      (block_viewer_ids) => {
+    return dataStore
+      .getMeshComponentsViewerIds(id, block_ids)
+      .then((block_viewer_ids) => {
         if (!block_viewer_ids || block_viewer_ids.length === 0) {
           console.warn(
             "[setModelBlocksColor] No viewer IDs found, skipping color request",
@@ -55,8 +54,7 @@ export function useModelBlocksColorStyle() {
             response_function: mutate,
           },
         )
-      },
-    )
+      })
   }
 
   return {

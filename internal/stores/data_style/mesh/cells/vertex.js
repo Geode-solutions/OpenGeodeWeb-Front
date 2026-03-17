@@ -35,15 +35,17 @@ export function useMeshCellsVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
-      vertex.storedConfigs[name] = {
-        minimum,
-        maximum,
-        colorMap,
-      }
-    }).then(() => {
-      return meshCellsVertexAttributeStoredConfig(id, name)
-    })
+    return meshCellsCommonStyle
+      .mutateMeshCellsVertexStyle(id, (vertex) => {
+        vertex.storedConfigs[name] = {
+          minimum,
+          maximum,
+          colorMap,
+        }
+      })
+      .then(() => {
+        return meshCellsVertexAttributeStoredConfig(id, name)
+      })
   }
 
   function meshCellsVertexAttributeName(id) {
@@ -56,28 +58,32 @@ export function useMeshCellsVertexAttributeStyle() {
   }
   function setMeshCellsVertexAttributeName(id, name) {
     const mutate = () => {
-      return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
-        vertex.name = name
-        if (!(name in vertex.storedConfigs)) {
-          vertex.storedConfigs[name] = {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
+      return meshCellsCommonStyle
+        .mutateMeshCellsVertexStyle(id, (vertex) => {
+          vertex.name = name
+          if (!(name in vertex.storedConfigs)) {
+            vertex.storedConfigs[name] = {
+              minimum: undefined,
+              maximum: undefined,
+              colorMap: undefined,
+            }
           }
-        }
-      }).then(() => {
-        const { minimum, maximum } = meshCellsVertexAttributeStoredConfig(
-          id,
-          name,
-        )
-        return setMeshCellsVertexAttributeRange(id, minimum, maximum).then(() => {
-          console.log(
-            setMeshCellsVertexAttributeName.name,
-            { id },
-            meshCellsVertexAttributeName(id),
+        })
+        .then(() => {
+          const { minimum, maximum } = meshCellsVertexAttributeStoredConfig(
+            id,
+            name,
+          )
+          return setMeshCellsVertexAttributeRange(id, minimum, maximum).then(
+            () => {
+              console.log(
+                setMeshCellsVertexAttributeName.name,
+                { id },
+                meshCellsVertexAttributeName(id),
+              )
+            },
           )
         })
-      })
     }
 
     if (meshCellsVertexAttributeSchemas?.name && name !== "") {
@@ -101,16 +107,18 @@ export function useMeshCellsVertexAttributeStyle() {
   }
   function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
     const name = meshCellsVertexAttributeName(id)
-    return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
-      const storedConfig = vertex.storedConfigs[name]
-      storedConfig.minimum = minimum
-      storedConfig.maximum = maximum
-    }).then(() => {
-      return setMeshCellsVertexAttributeColorMap(
-        id,
-        meshCellsVertexAttributeColorMap(id),
-      )
-    })
+    return meshCellsCommonStyle
+      .mutateMeshCellsVertexStyle(id, (vertex) => {
+        const storedConfig = vertex.storedConfigs[name]
+        storedConfig.minimum = minimum
+        storedConfig.maximum = maximum
+      })
+      .then(() => {
+        return setMeshCellsVertexAttributeColorMap(
+          id,
+          meshCellsVertexAttributeColorMap(id),
+        )
+      })
   }
 
   function meshCellsVertexAttributeColorMap(id) {
@@ -123,15 +131,17 @@ export function useMeshCellsVertexAttributeStyle() {
     const name = meshCellsVertexAttributeName(id)
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
     const mutate = () => {
-      return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
-        vertex.storedConfigs[name].colorMap = colorMap
-      }).then(() => {
-        console.log(
-          setMeshCellsVertexAttributeColorMap.name,
-          { id },
-          meshCellsVertexAttributeColorMap(id),
-        )
-      })
+      return meshCellsCommonStyle
+        .mutateMeshCellsVertexStyle(id, (vertex) => {
+          vertex.storedConfigs[name].colorMap = colorMap
+        })
+        .then(() => {
+          console.log(
+            setMeshCellsVertexAttributeColorMap.name,
+            { id },
+            meshCellsVertexAttributeColorMap(id),
+          )
+        })
     }
 
     if (

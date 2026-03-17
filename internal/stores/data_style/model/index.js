@@ -35,12 +35,14 @@ export function useModelStyle() {
   }
   function setModelVisibility(id, visibility) {
     const mutate = () => {
-      return dataStyleStateStore.mutateStyle(id, (style) => {
-        style.visibility = visibility
-      }).then(() => {
-        hybridViewerStore.setVisibility(id, visibility)
-        console.log(setModelVisibility.name, { id }, modelVisibility(id))
-      })
+      return dataStyleStateStore
+        .mutateStyle(id, (style) => {
+          style.visibility = visibility
+        })
+        .then(() => {
+          hybridViewerStore.setVisibility(id, visibility)
+          console.log(setModelVisibility.name, { id }, modelVisibility(id))
+        })
     }
 
     if (model_schemas.visibility) {
@@ -146,11 +148,13 @@ export function useModelStyle() {
   }
   function setModelColor(id, color) {
     const mutate = () => {
-      return dataStyleStateStore.mutateStyle(id, (style) => {
-        style.color = color
-      }).then(() => {
-        console.log(setModelColor.name, { id }, modelColor(id))
-      })
+      return dataStyleStateStore
+        .mutateStyle(id, (style) => {
+          style.color = color
+        })
+        .then(() => {
+          console.log(setModelColor.name, { id }, modelColor(id))
+        })
     }
 
     if (model_schemas.color) {
@@ -278,7 +282,9 @@ export function useModelStyle() {
       const { mesh_components } = item
       const promise_array = []
       if ("Corner" in mesh_components) {
-        promise_array.push(modelCornersStyleStore.setModelCornersDefaultStyle(id))
+        promise_array.push(
+          modelCornersStyleStore.setModelCornersDefaultStyle(id),
+        )
       }
       if ("Line" in mesh_components) {
         promise_array.push(modelLinesStyleStore.setModelLinesDefaultStyle(id))

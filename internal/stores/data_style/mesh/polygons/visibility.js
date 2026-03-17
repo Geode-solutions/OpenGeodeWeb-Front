@@ -18,15 +18,17 @@ export function useMeshPolygonsVisibilityStyle() {
   }
   function setMeshPolygonsVisibility(id, visibility) {
     const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, (polygons) => {
-        polygons.visibility = visibility
-      }).then(() => {
-        console.log(
-          setMeshPolygonsVisibility.name,
-          { id },
-          meshPolygonsVisibility(id),
-        )
-      })
+      return meshPolygonsCommonStyle
+        .mutateMeshPolygonsStyle(id, (polygons) => {
+          polygons.visibility = visibility
+        })
+        .then(() => {
+          console.log(
+            setMeshPolygonsVisibility.name,
+            { id },
+            meshPolygonsVisibility(id),
+          )
+        })
     }
 
     if (meshPolygonsVisibilitySchema) {

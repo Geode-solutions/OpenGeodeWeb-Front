@@ -35,18 +35,17 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
-      id,
-      (vertex) => {
+    return meshPolyhedraCommonStyle
+      .mutateMeshPolyhedraVertexStyle(id, (vertex) => {
         vertex.storedConfigs[name] = {
           minimum,
           maximum,
           colorMap,
         }
-      },
-    ).then(() => {
-      return meshPolyhedraVertexAttributeStoredConfig(id, name)
-    })
+      })
+      .then(() => {
+        return meshPolyhedraVertexAttributeStoredConfig(id, name)
+      })
   }
 
   function meshPolyhedraVertexAttributeName(id) {
@@ -59,9 +58,8 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   }
   function setMeshPolyhedraVertexAttributeName(id, name) {
     const mutate = () => {
-      return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
-        id,
-        (vertex) => {
+      return meshPolyhedraCommonStyle
+        .mutateMeshPolyhedraVertexStyle(id, (vertex) => {
           vertex.name = name
           if (!(name in vertex.storedConfigs)) {
             vertex.storedConfigs[name] = {
@@ -70,22 +68,24 @@ export function useMeshPolyhedraVertexAttributeStyle() {
               colorMap: undefined,
             }
           }
-        },
-      ).then(() => {
-        const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(
-          id,
-          name,
-        )
-        return setMeshPolyhedraVertexAttributeRange(id, minimum, maximum).then(
-          () => {
+        })
+        .then(() => {
+          const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(
+            id,
+            name,
+          )
+          return setMeshPolyhedraVertexAttributeRange(
+            id,
+            minimum,
+            maximum,
+          ).then(() => {
             console.log(
               setMeshPolyhedraVertexAttributeName.name,
               { id },
               meshPolyhedraVertexAttributeName(id),
             )
-          },
-        )
-      })
+          })
+        })
     }
 
     if (meshPolyhedraVertexAttributeSchemas?.name && name !== "") {
@@ -109,19 +109,18 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   }
   function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraVertexAttributeName(id)
-    return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
-      id,
-      (vertex) => {
+    return meshPolyhedraCommonStyle
+      .mutateMeshPolyhedraVertexStyle(id, (vertex) => {
         const storedConfig = vertex.storedConfigs[name]
         storedConfig.minimum = minimum
         storedConfig.maximum = maximum
-      },
-    ).then(() => {
-      return setMeshPolyhedraVertexAttributeColorMap(
-        id,
-        meshPolyhedraVertexAttributeColorMap(id),
-      )
-    })
+      })
+      .then(() => {
+        return setMeshPolyhedraVertexAttributeColorMap(
+          id,
+          meshPolyhedraVertexAttributeColorMap(id),
+        )
+      })
   }
 
   function meshPolyhedraVertexAttributeColorMap(id) {
@@ -134,18 +133,17 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
     const mutate = () => {
-      return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
-        id,
-        (vertex) => {
+      return meshPolyhedraCommonStyle
+        .mutateMeshPolyhedraVertexStyle(id, (vertex) => {
           vertex.storedConfigs[name].colorMap = colorMap
-        },
-      ).then(() => {
-        console.log(
-          setMeshPolyhedraVertexAttributeColorMap.name,
-          { id },
-          meshPolyhedraVertexAttributeColorMap(id),
-        )
-      })
+        })
+        .then(() => {
+          console.log(
+            setMeshPolyhedraVertexAttributeColorMap.name,
+            { id },
+            meshPolyhedraVertexAttributeColorMap(id),
+          )
+        })
     }
 
     if (

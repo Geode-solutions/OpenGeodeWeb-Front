@@ -18,18 +18,17 @@ export function useMeshPolyhedraColorStyle() {
   }
   function setMeshPolyhedraColor(id, color) {
     const mutate = () => {
-      return meshPolyhedraCommonStyle.mutateMeshPolyhedraColoringStyle(
-        id,
-        (coloring) => {
+      return meshPolyhedraCommonStyle
+        .mutateMeshPolyhedraColoringStyle(id, (coloring) => {
           coloring.color = color
-        },
-      ).then(() => {
-        console.log(
-          setMeshPolyhedraColor.name,
-          { id },
-          JSON.stringify(meshPolyhedraColor(id)),
-        )
-      })
+        })
+        .then(() => {
+          console.log(
+            setMeshPolyhedraColor.name,
+            { id },
+            JSON.stringify(meshPolyhedraColor(id)),
+          )
+        })
     }
 
     if (meshPolyhedraColorSchemas && color !== undefined) {

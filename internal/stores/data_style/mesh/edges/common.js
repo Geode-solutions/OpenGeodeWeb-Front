@@ -49,6 +49,3 @@ export function useMeshEdgesCommonStyle() {
     mutateMeshEdgesEdgeStyle,
   }
 }
-
-
-

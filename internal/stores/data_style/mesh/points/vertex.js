@@ -35,15 +35,17 @@ export function useMeshPointsVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    return meshPointsCommonStyle.mutateMeshPointsVertexStyle(id, (vertex) => {
-      vertex.storedConfigs[name] = {
-        minimum,
-        maximum,
-        colorMap,
-      }
-    }).then(() => {
-      return meshPointsVertexAttributeStoredConfig(id, name)
-    })
+    return meshPointsCommonStyle
+      .mutateMeshPointsVertexStyle(id, (vertex) => {
+        vertex.storedConfigs[name] = {
+          minimum,
+          maximum,
+          colorMap,
+        }
+      })
+      .then(() => {
+        return meshPointsVertexAttributeStoredConfig(id, name)
+      })
   }
 
   function meshPointsVertexAttributeName(id) {
@@ -56,28 +58,32 @@ export function useMeshPointsVertexAttributeStyle() {
   }
   function setMeshPointsVertexAttributeName(id, name) {
     const mutate = () => {
-      return meshPointsCommonStyle.mutateMeshPointsVertexStyle(id, (vertex) => {
-        vertex.name = name
-        if (!(name in vertex.storedConfigs)) {
-          vertex.storedConfigs[name] = {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
+      return meshPointsCommonStyle
+        .mutateMeshPointsVertexStyle(id, (vertex) => {
+          vertex.name = name
+          if (!(name in vertex.storedConfigs)) {
+            vertex.storedConfigs[name] = {
+              minimum: undefined,
+              maximum: undefined,
+              colorMap: undefined,
+            }
           }
-        }
-      }).then(() => {
-        const { minimum, maximum } = meshPointsVertexAttributeStoredConfig(
-          id,
-          name,
-        )
-        return setMeshPointsVertexAttributeRange(id, minimum, maximum).then(() => {
-          console.log(
-            setMeshPointsVertexAttributeName.name,
-            { id },
-            meshPointsVertexAttributeName(id),
+        })
+        .then(() => {
+          const { minimum, maximum } = meshPointsVertexAttributeStoredConfig(
+            id,
+            name,
+          )
+          return setMeshPointsVertexAttributeRange(id, minimum, maximum).then(
+            () => {
+              console.log(
+                setMeshPointsVertexAttributeName.name,
+                { id },
+                meshPointsVertexAttributeName(id),
+              )
+            },
           )
         })
-      })
     }
 
     if (meshPointsVertexAttributeSchemas?.name && name !== "") {
@@ -101,16 +107,18 @@ export function useMeshPointsVertexAttributeStyle() {
   }
   function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
     const name = meshPointsVertexAttributeName(id)
-    return meshPointsCommonStyle.mutateMeshPointsVertexStyle(id, (vertex) => {
-      const storedConfig = vertex.storedConfigs[name]
-      storedConfig.minimum = minimum
-      storedConfig.maximum = maximum
-    }).then(() => {
-      return setMeshPointsVertexAttributeColorMap(
-        id,
-        meshPointsVertexAttributeColorMap(id),
-      )
-    })
+    return meshPointsCommonStyle
+      .mutateMeshPointsVertexStyle(id, (vertex) => {
+        const storedConfig = vertex.storedConfigs[name]
+        storedConfig.minimum = minimum
+        storedConfig.maximum = maximum
+      })
+      .then(() => {
+        return setMeshPointsVertexAttributeColorMap(
+          id,
+          meshPointsVertexAttributeColorMap(id),
+        )
+      })
   }
 
   function meshPointsVertexAttributeColorMap(id) {
@@ -123,15 +131,17 @@ export function useMeshPointsVertexAttributeStyle() {
     const name = meshPointsVertexAttributeName(id)
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name)
     const mutate = () => {
-      return meshPointsCommonStyle.mutateMeshPointsVertexStyle(id, (vertex) => {
-        vertex.storedConfigs[name].colorMap = colorMap
-      }).then(() => {
-        console.log(
-          setMeshPointsVertexAttributeColorMap.name,
-          { id },
-          meshPointsVertexAttributeColorMap(id),
-        )
-      })
+      return meshPointsCommonStyle
+        .mutateMeshPointsVertexStyle(id, (vertex) => {
+          vertex.storedConfigs[name].colorMap = colorMap
+        })
+        .then(() => {
+          console.log(
+            setMeshPointsVertexAttributeColorMap.name,
+            { id },
+            meshPointsVertexAttributeColorMap(id),
+          )
+        })
     }
 
     if (

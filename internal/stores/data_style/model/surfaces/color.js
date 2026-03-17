@@ -20,27 +20,26 @@ export function useModelSurfacesColorStyle() {
 
   function setModelSurfacesColor(id, surface_ids, color) {
     const mutate = () => {
-      return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
-        id,
-        surface_ids,
-        (style) => {
+      return modelSurfacesCommonStyle
+        .mutateModelSurfacesStyle(id, surface_ids, (style) => {
           style.color = color
-        },
-      ).then(() => {
-        console.log(
-          setModelSurfacesColor.name,
-          { id },
-          { surface_ids },
-          JSON.stringify(modelSurfaceColor(id, surface_ids[0])),
-        )
-      })
+        })
+        .then(() => {
+          console.log(
+            setModelSurfacesColor.name,
+            { id },
+            { surface_ids },
+            JSON.stringify(modelSurfaceColor(id, surface_ids[0])),
+          )
+        })
     }
 
     if (!surface_ids || surface_ids.length === 0) {
       return Promise.resolve()
     }
-    return dataStore.getMeshComponentsViewerIds(id, surface_ids).then(
-      (surface_viewer_ids) => {
+    return dataStore
+      .getMeshComponentsViewerIds(id, surface_ids)
+      .then((surface_viewer_ids) => {
         if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
           console.warn(
             "[setModelSurfacesColor] No viewer IDs found, skipping color request",
@@ -55,8 +54,7 @@ export function useModelSurfacesColorStyle() {
             response_function: mutate,
           },
         )
-      },
-    )
+      })
   }
 
   return {

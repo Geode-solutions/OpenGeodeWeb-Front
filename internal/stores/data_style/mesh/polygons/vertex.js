@@ -35,18 +35,17 @@ export function useMeshPolygonsVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    return meshPolygonsCommonStyle.mutateMeshPolygonsVertexStyle(
-      id,
-      (vertex) => {
+    return meshPolygonsCommonStyle
+      .mutateMeshPolygonsVertexStyle(id, (vertex) => {
         vertex.storedConfigs[name] = {
           minimum,
           maximum,
           colorMap,
         }
-      },
-    ).then(() => {
-      return meshPolygonsVertexAttributeStoredConfig(id, name)
-    })
+      })
+      .then(() => {
+        return meshPolygonsVertexAttributeStoredConfig(id, name)
+      })
   }
 
   function meshPolygonsVertexAttributeName(id) {
@@ -59,9 +58,8 @@ export function useMeshPolygonsVertexAttributeStyle() {
   }
   function setMeshPolygonsVertexAttributeName(id, name) {
     const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsVertexStyle(
-        id,
-        (vertex) => {
+      return meshPolygonsCommonStyle
+        .mutateMeshPolygonsVertexStyle(id, (vertex) => {
           vertex.name = name
           if (!(name in vertex.storedConfigs)) {
             vertex.storedConfigs[name] = {
@@ -70,22 +68,22 @@ export function useMeshPolygonsVertexAttributeStyle() {
               colorMap: undefined,
             }
           }
-        },
-      ).then(() => {
-        const { minimum, maximum } = meshPolygonsVertexAttributeStoredConfig(
-          id,
-          name,
-        )
-        return setMeshPolygonsVertexAttributeRange(id, minimum, maximum).then(
-          () => {
-            console.log(
-              setMeshPolygonsVertexAttributeName.name,
-              { id },
-              meshPolygonsVertexAttributeName(id),
-            )
-          },
-        )
-      })
+        })
+        .then(() => {
+          const { minimum, maximum } = meshPolygonsVertexAttributeStoredConfig(
+            id,
+            name,
+          )
+          return setMeshPolygonsVertexAttributeRange(id, minimum, maximum).then(
+            () => {
+              console.log(
+                setMeshPolygonsVertexAttributeName.name,
+                { id },
+                meshPolygonsVertexAttributeName(id),
+              )
+            },
+          )
+        })
     }
 
     if (meshPolygonsVertexAttributeSchemas?.name && name !== "") {
@@ -109,19 +107,18 @@ export function useMeshPolygonsVertexAttributeStyle() {
   }
   function setMeshPolygonsVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsVertexAttributeName(id)
-    return meshPolygonsCommonStyle.mutateMeshPolygonsVertexStyle(
-      id,
-      (vertex) => {
+    return meshPolygonsCommonStyle
+      .mutateMeshPolygonsVertexStyle(id, (vertex) => {
         const storedConfig = vertex.storedConfigs[name]
         storedConfig.minimum = minimum
         storedConfig.maximum = maximum
-      },
-    ).then(() => {
-      return setMeshPolygonsVertexAttributeColorMap(
-        id,
-        meshPolygonsVertexAttributeColorMap(id),
-      )
-    })
+      })
+      .then(() => {
+        return setMeshPolygonsVertexAttributeColorMap(
+          id,
+          meshPolygonsVertexAttributeColorMap(id),
+        )
+      })
   }
 
   function meshPolygonsVertexAttributeColorMap(id) {
@@ -134,18 +131,17 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const name = meshPolygonsVertexAttributeName(id)
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name)
     const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsVertexStyle(
-        id,
-        (vertex) => {
+      return meshPolygonsCommonStyle
+        .mutateMeshPolygonsVertexStyle(id, (vertex) => {
           vertex.storedConfigs[name].colorMap = colorMap
-        },
-      ).then(() => {
-        console.log(
-          setMeshPolygonsVertexAttributeColorMap.name,
-          { id },
-          meshPolygonsVertexAttributeColorMap(id),
-        )
-      })
+        })
+        .then(() => {
+          console.log(
+            setMeshPolygonsVertexAttributeColorMap.name,
+            { id },
+            meshPolygonsVertexAttributeColorMap(id),
+          )
+        })
     }
 
     if (

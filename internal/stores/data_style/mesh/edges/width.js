@@ -18,11 +18,13 @@ export function useMeshEdgesWidthStyle() {
   }
   function setMeshEdgesWidth(id, width) {
     const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, (edges) => {
-        edges.width = width
-      }).then(() => {
-        console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
-      })
+      return meshEdgesCommonStyle
+        .mutateMeshEdgesStyle(id, (edges) => {
+          edges.width = width
+        })
+        .then(() => {
+          console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
+        })
     }
 
     if (meshEdgesWidthSchemas) {

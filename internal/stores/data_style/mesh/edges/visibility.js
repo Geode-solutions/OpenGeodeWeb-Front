@@ -18,11 +18,17 @@ export function useMeshEdgesVisibilityStyle() {
   }
   function setMeshEdgesVisibility(id, visibility) {
     const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, (edges) => {
-        edges.visibility = visibility
-      }).then(() => {
-        console.log(setMeshEdgesVisibility.name, { id }, meshEdgesVisibility(id))
-      })
+      return meshEdgesCommonStyle
+        .mutateMeshEdgesStyle(id, (edges) => {
+          edges.visibility = visibility
+        })
+        .then(() => {
+          console.log(
+            setMeshEdgesVisibility.name,
+            { id },
+            meshEdgesVisibility(id),
+          )
+        })
     }
 
     if (meshEdgesVisibilitySchema) {

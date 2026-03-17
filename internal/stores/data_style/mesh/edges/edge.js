@@ -35,15 +35,17 @@ export function useMeshEdgesEdgeAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
-    return meshEdgesCommonStyle.mutateMeshEdgesEdgeStyle(id, (edge) => {
-      edge.storedConfigs[name] = {
-        minimum,
-        maximum,
-        colorMap,
-      }
-    }).then(() => {
-      return meshEdgesEdgeAttributeStoredConfig(id, name)
-    })
+    return meshEdgesCommonStyle
+      .mutateMeshEdgesEdgeStyle(id, (edge) => {
+        edge.storedConfigs[name] = {
+          minimum,
+          maximum,
+          colorMap,
+        }
+      })
+      .then(() => {
+        return meshEdgesEdgeAttributeStoredConfig(id, name)
+      })
   }
 
   function meshEdgesEdgeAttributeName(id) {
@@ -56,25 +58,32 @@ export function useMeshEdgesEdgeAttributeStyle() {
   }
   function setMeshEdgesEdgeAttributeName(id, name) {
     const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesEdgeStyle(id, (edge) => {
-        edge.name = name
-        if (!(name in edge.storedConfigs)) {
-          edge.storedConfigs[name] = {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
+      return meshEdgesCommonStyle
+        .mutateMeshEdgesEdgeStyle(id, (edge) => {
+          edge.name = name
+          if (!(name in edge.storedConfigs)) {
+            edge.storedConfigs[name] = {
+              minimum: undefined,
+              maximum: undefined,
+              colorMap: undefined,
+            }
           }
-        }
-      }).then(() => {
-        const { minimum, maximum } = meshEdgesEdgeAttributeStoredConfig(id, name)
-        return setMeshEdgesEdgeAttributeRange(id, minimum, maximum).then(() => {
-          console.log(
-            setMeshEdgesEdgeAttributeName.name,
-            { id },
-            meshEdgesEdgeAttributeName(id),
+        })
+        .then(() => {
+          const { minimum, maximum } = meshEdgesEdgeAttributeStoredConfig(
+            id,
+            name,
+          )
+          return setMeshEdgesEdgeAttributeRange(id, minimum, maximum).then(
+            () => {
+              console.log(
+                setMeshEdgesEdgeAttributeName.name,
+                { id },
+                meshEdgesEdgeAttributeName(id),
+              )
+            },
           )
         })
-      })
     }
 
     if (meshEdgesEdgeAttributeSchemas?.name && name !== "") {
@@ -98,16 +107,18 @@ export function useMeshEdgesEdgeAttributeStyle() {
   }
   function setMeshEdgesEdgeAttributeRange(id, minimum, maximum) {
     const name = meshEdgesEdgeAttributeName(id)
-    return meshEdgesCommonStyle.mutateMeshEdgesEdgeStyle(id, (edge) => {
-      const storedConfig = edge.storedConfigs[name]
-      storedConfig.minimum = minimum
-      storedConfig.maximum = maximum
-    }).then(() => {
-      return setMeshEdgesEdgeAttributeColorMap(
-        id,
-        meshEdgesEdgeAttributeColorMap(id),
-      )
-    })
+    return meshEdgesCommonStyle
+      .mutateMeshEdgesEdgeStyle(id, (edge) => {
+        const storedConfig = edge.storedConfigs[name]
+        storedConfig.minimum = minimum
+        storedConfig.maximum = maximum
+      })
+      .then(() => {
+        return setMeshEdgesEdgeAttributeColorMap(
+          id,
+          meshEdgesEdgeAttributeColorMap(id),
+        )
+      })
   }
 
   function meshEdgesEdgeAttributeColorMap(id) {
@@ -120,15 +131,17 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const name = meshEdgesEdgeAttributeName(id)
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
     const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesEdgeStyle(id, (edge) => {
-        edge.storedConfigs[name].colorMap = colorMap
-      }).then(() => {
-        console.log(
-          setMeshEdgesEdgeAttributeColorMap.name,
-          { id },
-          meshEdgesEdgeAttributeColorMap(id),
-        )
-      })
+      return meshEdgesCommonStyle
+        .mutateMeshEdgesEdgeStyle(id, (edge) => {
+          edge.storedConfigs[name].colorMap = colorMap
+        })
+        .then(() => {
+          console.log(
+            setMeshEdgesEdgeAttributeColorMap.name,
+            { id },
+            meshEdgesEdgeAttributeColorMap(id),
+          )
+        })
     }
 
     if (

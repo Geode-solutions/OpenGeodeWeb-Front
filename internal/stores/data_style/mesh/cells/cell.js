@@ -56,18 +56,25 @@ export function useMeshCellsCellAttributeStyle() {
 
   function setMeshCellsCellAttributeName(id, name) {
     const mutate = () => {
-      return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
-        cell.name = name
-      }).then(() => {
-        const { minimum, maximum } = meshCellsCellAttributeStoredConfig(id, name)
-        return setMeshCellsCellAttributeRange(id, minimum, maximum).then(() => {
-          console.log(
-            setMeshCellsCellAttributeName.name,
-            { id },
-            meshCellsCellAttributeName(id),
+      return meshCellsCommonStyle
+        .mutateCellsStyle(id, (cell) => {
+          cell.name = name
+        })
+        .then(() => {
+          const { minimum, maximum } = meshCellsCellAttributeStoredConfig(
+            id,
+            name,
+          )
+          return setMeshCellsCellAttributeRange(id, minimum, maximum).then(
+            () => {
+              console.log(
+                setMeshCellsCellAttributeName.name,
+                { id },
+                meshCellsCellAttributeName(id),
+              )
+            },
           )
         })
-      })
     }
 
     if (meshCellsCellAttributeSchemas?.name && name !== "") {
@@ -91,16 +98,18 @@ export function useMeshCellsCellAttributeStyle() {
   }
   function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const name = meshCellsCellAttributeName(id)
-    return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
-      const storedConfig = cell.storedConfigs[name]
-      storedConfig.minimum = minimum
-      storedConfig.maximum = maximum
-    }).then(() => {
-      return setMeshCellsCellAttributeColorMap(
-        id,
-        meshCellsCellAttributeColorMap(id),
-      )
-    })
+    return meshCellsCommonStyle
+      .mutateCellsStyle(id, (cell) => {
+        const storedConfig = cell.storedConfigs[name]
+        storedConfig.minimum = minimum
+        storedConfig.maximum = maximum
+      })
+      .then(() => {
+        return setMeshCellsCellAttributeColorMap(
+          id,
+          meshCellsCellAttributeColorMap(id),
+        )
+      })
   }
 
   function meshCellsCellAttributeColorMap(id) {
@@ -113,15 +122,17 @@ export function useMeshCellsCellAttributeStyle() {
     const name = meshCellsCellAttributeName(id)
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
     const mutate = () => {
-      return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
-        cell.storedConfigs[name].colorMap = colorMap
-      }).then(() => {
-        console.log(
-          setMeshCellsCellAttributeColorMap.name,
-          { id },
-          meshCellsCellAttributeColorMap(id),
-        )
-      })
+      return meshCellsCommonStyle
+        .mutateCellsStyle(id, (cell) => {
+          cell.storedConfigs[name].colorMap = colorMap
+        })
+        .then(() => {
+          console.log(
+            setMeshCellsCellAttributeColorMap.name,
+            { id },
+            meshCellsCellAttributeColorMap(id),
+          )
+        })
     }
 
     if (

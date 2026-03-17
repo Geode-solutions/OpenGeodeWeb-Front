@@ -21,20 +21,18 @@ export function useModelLinesVisibilityStyle() {
   }
   function setModelLinesVisibility(id, line_ids, visibility) {
     const mutate = () => {
-      return modelLinesCommonStyle.mutateModelLinesStyle(
-        id,
-        line_ids,
-        (style) => {
+      return modelLinesCommonStyle
+        .mutateModelLinesStyle(id, line_ids, (style) => {
           style.visibility = visibility
-        },
-      ).then(() => {
-        console.log(
-          setModelLinesVisibility.name,
-          { id },
-          { line_ids },
-          modelLineVisibility(id, line_ids[0]),
-        )
-      })
+        })
+        .then(() => {
+          console.log(
+            setModelLinesVisibility.name,
+            { id },
+            { line_ids },
+            modelLineVisibility(id, line_ids[0]),
+          )
+        })
     }
 
     if (!line_ids || line_ids.length === 0) {
@@ -42,8 +40,9 @@ export function useModelLinesVisibilityStyle() {
     }
 
     if (model_lines_schemas?.visibility) {
-      return dataStore.getMeshComponentsViewerIds(id, line_ids).then(
-        (line_viewer_ids) => {
+      return dataStore
+        .getMeshComponentsViewerIds(id, line_ids)
+        .then((line_viewer_ids) => {
           if (!line_viewer_ids || line_viewer_ids.length === 0) {
             return mutate()
           }
@@ -54,8 +53,7 @@ export function useModelLinesVisibilityStyle() {
               response_function: mutate,
             },
           )
-        },
-      )
+        })
     } else {
       return mutate()
     }

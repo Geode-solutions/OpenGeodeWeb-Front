@@ -18,15 +18,17 @@ export function useMeshEdgesColorStyle() {
   }
   function setMeshEdgesColor(id, color) {
     const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesColoringStyle(id, (coloring) => {
-        coloring.color = color
-      }).then(() => {
-        console.log(
-          setMeshEdgesColor.name,
-          { id },
-          JSON.stringify(meshEdgesColor(id)),
-        )
-      })
+      return meshEdgesCommonStyle
+        .mutateMeshEdgesColoringStyle(id, (coloring) => {
+          coloring.color = color
+        })
+        .then(() => {
+          console.log(
+            setMeshEdgesColor.name,
+            { id },
+            JSON.stringify(meshEdgesColor(id)),
+          )
+        })
     }
 
     if (meshEdgesColorSchemas && color !== undefined) {
