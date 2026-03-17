@@ -20,8 +20,10 @@ export function useModelSurfacesColorStyle() {
 
   function setModelSurfacesColor(id, surface_ids, color) {
     const mutate = () => {
-      return modelSurfacesCommonStyle
-        .mutateModelSurfacesStyle(id, surface_ids, (style) => {
+      return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
+        id,
+        surface_ids,
+        (style) => {
           style.color = color
           console.log(
             setModelSurfacesColor.name,
@@ -29,7 +31,8 @@ export function useModelSurfacesColorStyle() {
             { surface_ids },
             JSON.stringify(style.color),
           )
-        })
+        },
+      )
     }
 
     if (!surface_ids || surface_ids.length === 0) {

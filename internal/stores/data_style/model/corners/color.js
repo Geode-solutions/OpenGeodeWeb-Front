@@ -20,8 +20,10 @@ export function useModelCornersColorStyle() {
 
   function setModelCornersColor(id, corner_ids, color) {
     const mutate = () => {
-      return modelCornersCommonStyle
-        .mutateModelCornersStyle(id, corner_ids, (style) => {
+      return modelCornersCommonStyle.mutateModelCornersStyle(
+        id,
+        corner_ids,
+        (style) => {
           style.color = color
           console.log(
             setModelCornersColor.name,
@@ -29,7 +31,8 @@ export function useModelCornersColorStyle() {
             { corner_ids },
             JSON.stringify(style.color),
           )
-        })
+        },
+      )
     }
 
     if (!corner_ids || corner_ids.length === 0) {

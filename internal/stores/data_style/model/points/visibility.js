@@ -20,11 +20,7 @@ export function useModelPointsVisibilityStyle() {
     const mutate = () => {
       return modelPointsCommonStyle.mutateModelPointsStyle(id, (points) => {
         points.visibility = visibility
-        console.log(
-          setModelPointsVisibility.name,
-          { id },
-          points.visibility,
-        )
+        console.log(setModelPointsVisibility.name, { id }, points.visibility)
       })
     }
 

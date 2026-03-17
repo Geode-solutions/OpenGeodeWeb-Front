@@ -20,8 +20,10 @@ export function useModelBlocksColorStyle() {
 
   function setModelBlocksColor(id, block_ids, color) {
     const mutate = () => {
-      return modelBlocksCommonStyle
-        .mutateModelBlocksStyle(id, block_ids, (style) => {
+      return modelBlocksCommonStyle.mutateModelBlocksStyle(
+        id,
+        block_ids,
+        (style) => {
           style.color = color
           console.log(
             setModelBlocksColor.name,
@@ -29,7 +31,8 @@ export function useModelBlocksColorStyle() {
             { block_ids },
             JSON.stringify(style.color),
           )
-        })
+        },
+      )
     }
 
     if (!block_ids || block_ids.length === 0) {

@@ -36,9 +36,11 @@ export function useMeshEdgesEdgeAttributeStyle() {
     { minimum, maximum, colorMap },
   ) {
     const config = { minimum, maximum, colorMap }
-    return meshEdgesCommonStyle.mutateMeshEdgesEdgeStyle(id, (edge) => {
-      edge.storedConfigs[name] = config
-    }).then(() => config)
+    return meshEdgesCommonStyle
+      .mutateMeshEdgesEdgeStyle(id, (edge) => {
+        edge.storedConfigs[name] = config
+      })
+      .then(() => config)
   }
 
   function meshEdgesEdgeAttributeName(id) {

@@ -36,9 +36,11 @@ export function useMeshCellsVertexAttributeStyle() {
     { minimum, maximum, colorMap },
   ) {
     const config = { minimum, maximum, colorMap }
-    return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
-      vertex.storedConfigs[name] = config
-    }).then(() => config)
+    return meshCellsCommonStyle
+      .mutateMeshCellsVertexStyle(id, (vertex) => {
+        vertex.storedConfigs[name] = config
+      })
+      .then(() => config)
   }
 
   function meshCellsVertexAttributeName(id) {

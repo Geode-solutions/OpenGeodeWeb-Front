@@ -24,8 +24,10 @@ export function useModelCornersVisibilityStyle() {
 
   function setModelCornersVisibility(id, corner_ids, visibility) {
     const mutate = () => {
-      return modelCornersCommonStyle
-        .mutateModelCornersStyle(id, corner_ids, (style) => {
+      return modelCornersCommonStyle.mutateModelCornersStyle(
+        id,
+        corner_ids,
+        (style) => {
           style.visibility = visibility
           console.log(
             setModelCornersVisibility.name,
@@ -33,7 +35,8 @@ export function useModelCornersVisibilityStyle() {
             { corner_ids },
             style.visibility,
           )
-        })
+        },
+      )
     }
 
     if (!corner_ids || corner_ids.length === 0) {

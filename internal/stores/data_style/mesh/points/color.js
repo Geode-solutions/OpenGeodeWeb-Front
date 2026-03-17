@@ -18,15 +18,17 @@ export function useMeshPointsColorStyle() {
   }
   function setMeshPointsColor(id, color) {
     const mutate = () => {
-      return meshPointsCommonStyle
-        .mutateMeshPointsColoringStyle(id, (coloring) => {
+      return meshPointsCommonStyle.mutateMeshPointsColoringStyle(
+        id,
+        (coloring) => {
           coloring.color = color
           console.log(
             setMeshPointsColor.name,
             { id },
             JSON.stringify(coloring.color),
           )
-        })
+        },
+      )
     }
 
     if (meshPointsColorSchemas && color !== undefined) {

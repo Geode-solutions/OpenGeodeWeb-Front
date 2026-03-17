@@ -18,15 +18,17 @@ export function useMeshPolyhedraVisibilityStyle() {
   }
   function setMeshPolyhedraVisibility(id, visibility) {
     const mutate = () => {
-      return meshPolyhedraCommonStyle
-        .mutateMeshPolyhedraStyle(id, (polyhedra) => {
+      return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(
+        id,
+        (polyhedra) => {
           polyhedra.visibility = visibility
           console.log(
             setMeshPolyhedraVisibility.name,
             { id },
             polyhedra.visibility,
           )
-        })
+        },
+      )
     }
 
     if (meshPolyhedraVisibilitySchema) {

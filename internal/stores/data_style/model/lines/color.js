@@ -20,8 +20,10 @@ export function useModelLinesColorStyle() {
 
   function setModelLinesColor(id, line_ids, color) {
     const mutate = () => {
-      return modelLinesCommonStyle
-        .mutateModelLinesStyle(id, line_ids, (style) => {
+      return modelLinesCommonStyle.mutateModelLinesStyle(
+        id,
+        line_ids,
+        (style) => {
           style.color = color
           console.log(
             setModelLinesColor.name,
@@ -30,7 +32,7 @@ export function useModelLinesColorStyle() {
             JSON.stringify(style.color),
           )
         },
-        )
+      )
     }
 
     if (!line_ids || line_ids.length === 0) {
