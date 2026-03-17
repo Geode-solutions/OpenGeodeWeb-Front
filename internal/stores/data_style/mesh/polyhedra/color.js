@@ -3,7 +3,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshPolyhedraCommonStyle } from "./common"
-import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -18,16 +17,19 @@ export function useMeshPolyhedraColorStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).color
   }
   function setMeshPolyhedraColor(id, color) {
-    const updateState = async () => {
-      const dataStyleStateStore = useDataStyleStateStore()
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.polyhedra.coloring.color = color
+    const mutate = () => {
+      return meshPolyhedraCommonStyle.mutateMeshPolyhedraColoringStyle(
+        id,
+        (coloring) => {
+          coloring.color = color
+        },
+      ).then(() => {
+        console.log(
+          setMeshPolyhedraColor.name,
+          { id },
+          JSON.stringify(meshPolyhedraColor(id)),
+        )
       })
-      console.log(
-        setMeshPolyhedraColor.name,
-        { id },
-        JSON.stringify(meshPolyhedraColor(id)),
-      )
     }
 
     if (meshPolyhedraColorSchemas && color !== undefined) {
@@ -35,11 +37,11 @@ export function useMeshPolyhedraColorStyle() {
         meshPolyhedraColorSchemas,
         { id, color },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

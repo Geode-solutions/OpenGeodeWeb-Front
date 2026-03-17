@@ -7,7 +7,16 @@ export function useModelEdgesCommonStyle() {
     return dataStyleStateStore.getStyle(id).edges
   }
 
+  function mutateModelEdgesStyle(id, mutationCallback) {
+    return dataStyleStateStore.mutateStyle(id, (style) => {
+      mutationCallback(style.edges)
+    })
+  }
+
   return {
     modelEdgesStyle,
+    mutateModelEdgesStyle,
   }
 }
+
+

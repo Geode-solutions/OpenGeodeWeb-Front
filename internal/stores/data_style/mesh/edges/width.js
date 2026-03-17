@@ -3,7 +3,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshEdgesCommonStyle } from "./common"
-import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -18,12 +17,12 @@ export function useMeshEdgesWidthStyle() {
     return meshEdgesCommonStyle.meshEdgesStyle(id).width
   }
   function setMeshEdgesWidth(id, width) {
-    const updateState = async () => {
-      const dataStyleStateStore = useDataStyleStateStore()
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.edges.width = width
+    const mutate = () => {
+      return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, (edges) => {
+        edges.width = width
+      }).then(() => {
+        console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
       })
-      console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
     }
 
     if (meshEdgesWidthSchemas) {
@@ -31,11 +30,11 @@ export function useMeshEdgesWidthStyle() {
         meshEdgesWidthSchemas,
         { id, width },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

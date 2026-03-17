@@ -13,8 +13,18 @@ export function useModelLinesCommonStyle() {
     return { ...groupStyle, ...individualStyle }
   }
 
+  function mutateModelLinesStyle(id, line_ids, mutationCallback) {
+    return dataStyleStateStore.mutateComponentStyles(
+      id,
+      line_ids,
+      mutationCallback,
+    )
+  }
+
   return {
     modelLinesStyle,
     modelLineStyle,
+    mutateModelLinesStyle,
   }
 }
+

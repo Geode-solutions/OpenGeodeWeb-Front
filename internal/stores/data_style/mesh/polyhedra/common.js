@@ -15,9 +15,39 @@ export function useMeshPolyhedraCommonStyle() {
     return meshPolyhedraColoring(id).active
   }
 
+  function mutateMeshPolyhedraStyle(id, mutationCallback) {
+    return dataStyleStateStore.mutateStyle(id, (style) => {
+      mutationCallback(style.polyhedra)
+    })
+  }
+
+  function mutateMeshPolyhedraColoringStyle(id, mutationCallback) {
+    return mutateMeshPolyhedraStyle(id, (polyhedra) => {
+      mutationCallback(polyhedra.coloring)
+    })
+  }
+
+  function mutateMeshPolyhedraPolyhedronStyle(id, mutationCallback) {
+    return mutateMeshPolyhedraColoringStyle(id, (coloring) => {
+      mutationCallback(coloring.polyhedron)
+    })
+  }
+
+  function mutateMeshPolyhedraVertexStyle(id, mutationCallback) {
+    return mutateMeshPolyhedraColoringStyle(id, (coloring) => {
+      mutationCallback(coloring.vertex)
+    })
+  }
+
   return {
     meshPolyhedraStyle,
     meshPolyhedraColoring,
     meshPolyhedraActiveColoring,
+    mutateMeshPolyhedraStyle,
+    mutateMeshPolyhedraColoringStyle,
+    mutateMeshPolyhedraPolyhedronStyle,
+    mutateMeshPolyhedraVertexStyle,
   }
 }
+
+

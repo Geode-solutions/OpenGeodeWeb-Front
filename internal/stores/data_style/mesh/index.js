@@ -29,12 +29,13 @@ export function useMeshStyle() {
     return dataStyleState.getStyle(id).visibility
   }
   function setMeshVisibility(id, visibility) {
-    const updateState = async () => {
-      await dataStyleState.mutateStyle(id, (style) => {
+    const mutate = () => {
+      return dataStyleState.mutateStyle(id, (style) => {
         style.visibility = visibility
+      }).then(() => {
+        hybridViewerStore.setVisibility(id, visibility)
+        console.log(setMeshVisibility.name, { id }, meshVisibility(id))
       })
-      hybridViewerStore.setVisibility(id, visibility)
-      console.log(setMeshVisibility.name, { id }, meshVisibility(id))
     }
 
     if (meshSchemas.visibility) {
@@ -42,11 +43,11 @@ export function useMeshStyle() {
         meshSchemas.visibility,
         { id, visibility },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 
@@ -54,11 +55,12 @@ export function useMeshStyle() {
     return dataStyleState.getStyle(id).color
   }
   function setMeshColor(id, color) {
-    const updateState = async () => {
-      await dataStyleState.mutateStyle(id, (style) => {
+    const mutate = () => {
+      return dataStyleState.mutateStyle(id, (style) => {
         style.color = color
+      }).then(() => {
+        console.log(setMeshColor.name, { id }, meshColor(id))
       })
-      console.log(setMeshColor.name, { id }, meshColor(id))
     }
 
     if (meshSchemas.color) {
@@ -66,11 +68,11 @@ export function useMeshStyle() {
         meshSchemas.color,
         { id, color },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

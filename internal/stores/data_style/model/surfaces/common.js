@@ -16,8 +16,18 @@ export function useModelSurfacesCommonStyle() {
     return { ...groupStyle, ...individualStyle }
   }
 
+  function mutateModelSurfacesStyle(id, surface_ids, mutationCallback) {
+    return dataStyleStateStore.mutateComponentStyles(
+      id,
+      surface_ids,
+      mutationCallback,
+    )
+  }
+
   return {
     modelSurfacesStyle,
     modelSurfaceStyle,
+    mutateModelSurfacesStyle,
   }
 }
+

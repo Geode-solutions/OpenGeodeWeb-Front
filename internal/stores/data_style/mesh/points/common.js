@@ -15,9 +15,32 @@ export function useMeshPointsCommonStyle() {
     return meshPointsColoring(id).active
   }
 
+  function mutateMeshPointsStyle(id, mutationCallback) {
+    return dataStyleStateStore.mutateStyle(id, (style) => {
+      mutationCallback(style.points)
+    })
+  }
+
+  function mutateMeshPointsColoringStyle(id, mutationCallback) {
+    return mutateMeshPointsStyle(id, (points) => {
+      mutationCallback(points.coloring)
+    })
+  }
+
+  function mutateMeshPointsVertexStyle(id, mutationCallback) {
+    return mutateMeshPointsColoringStyle(id, (coloring) => {
+      mutationCallback(coloring.vertex)
+    })
+  }
+
   return {
     meshPointsStyle,
     meshPointsColoring,
     meshPointsActiveColoring,
+    mutateMeshPointsStyle,
+    mutateMeshPointsColoringStyle,
+    mutateMeshPointsVertexStyle,
   }
 }
+
+

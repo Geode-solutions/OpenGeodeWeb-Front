@@ -34,12 +34,13 @@ export function useModelStyle() {
     return dataStyleStateStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
-    const updateState = async () => {
-      await dataStyleStateStore.mutateStyle(id, (style) => {
+    const mutate = () => {
+      return dataStyleStateStore.mutateStyle(id, (style) => {
         style.visibility = visibility
+      }).then(() => {
+        hybridViewerStore.setVisibility(id, visibility)
+        console.log(setModelVisibility.name, { id }, modelVisibility(id))
       })
-      hybridViewerStore.setVisibility(id, visibility)
-      console.log(setModelVisibility.name, { id }, modelVisibility(id))
     }
 
     if (model_schemas.visibility) {
@@ -47,11 +48,11 @@ export function useModelStyle() {
         model_schemas.visibility,
         { id, visibility },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 
@@ -144,11 +145,12 @@ export function useModelStyle() {
     return dataStyleStateStore.getStyle(id).color
   }
   function setModelColor(id, color) {
-    const updateState = async () => {
-      await dataStyleStateStore.mutateStyle(id, (style) => {
+    const mutate = () => {
+      return dataStyleStateStore.mutateStyle(id, (style) => {
         style.color = color
+      }).then(() => {
+        console.log(setModelColor.name, { id }, modelColor(id))
       })
-      console.log(setModelColor.name, { id }, modelColor(id))
     }
 
     if (model_schemas.color) {
@@ -156,15 +158,15 @@ export function useModelStyle() {
         model_schemas.color,
         { id, color },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 
-  async function setModelMeshComponentsVisibility(
+  function setModelMeshComponentsVisibility(
     id,
     component_geode_ids,
     visibility,
@@ -173,59 +175,64 @@ export function useModelStyle() {
     const expanded_ids = []
     let found_type = null
 
-    const all_components = await database.model_components
+    return database.model_components
       .where({ id })
       .toArray()
-    const mesh_components = all_components.reduce((acc, c) => {
-      if (!acc[c.type]) acc[c.type] = []
-      acc[c.type].push(c)
-      return acc
-    }, {})
+      .then((all_components) => {
+        const mesh_components = all_components.reduce((acc, c) => {
+          if (!acc[c.type]) acc[c.type] = []
+          acc[c.type].push(c)
+          return acc
+        }, {})
 
-    for (const gid of component_geode_ids) {
-      if (categoryIds.includes(gid)) {
-        // Part 2: Robust Toggling - Expand category ID to all its children
-        const children = mesh_components[gid] || []
-        expanded_ids.push(...children.map((c) => c.geode_id))
-        found_type = gid
-      } else {
-        expanded_ids.push(gid)
-      }
-    }
+        for (const gid of component_geode_ids) {
+          if (categoryIds.includes(gid)) {
+            // Part 2: Robust Toggling - Expand category ID to all its children
+            const children = mesh_components[gid] || []
+            expanded_ids.push(...children.map((c) => c.geode_id))
+            found_type = gid
+          } else {
+            expanded_ids.push(gid)
+          }
+        }
 
-    const filtered_ids = [...new Set(expanded_ids)] // Unique IDs only
-    if (filtered_ids.length === 0) return
+        const filtered_ids = [...new Set(expanded_ids)] // Unique IDs only
+        if (filtered_ids.length === 0) return Promise.resolve()
 
-    const component_type =
-      found_type || (await dataStore.meshComponentType(id, filtered_ids[0]))
-
-    if (component_type === "Corner") {
-      return modelCornersStyleStore.setModelCornersVisibility(
-        id,
-        filtered_ids,
-        visibility,
-      )
-    } else if (component_type === "Line") {
-      return modelLinesStyleStore.setModelLinesVisibility(
-        id,
-        filtered_ids,
-        visibility,
-      )
-    } else if (component_type === "Surface") {
-      return modelSurfacesStyleStore.setModelSurfacesVisibility(
-        id,
-        filtered_ids,
-        visibility,
-      )
-    } else if (component_type === "Block") {
-      return modelBlocksStyleStore.setModelBlocksVisibility(
-        id,
-        filtered_ids,
-        visibility,
-      )
-    } else {
-      console.warn(`Unknown model component_type: ${component_type}`)
-    }
+        return (
+          found_type
+            ? Promise.resolve(found_type)
+            : dataStore.meshComponentType(id, filtered_ids[0])
+        ).then((component_type) => {
+          if (component_type === "Corner") {
+            return modelCornersStyleStore.setModelCornersVisibility(
+              id,
+              filtered_ids,
+              visibility,
+            )
+          } else if (component_type === "Line") {
+            return modelLinesStyleStore.setModelLinesVisibility(
+              id,
+              filtered_ids,
+              visibility,
+            )
+          } else if (component_type === "Surface") {
+            return modelSurfacesStyleStore.setModelSurfacesVisibility(
+              id,
+              filtered_ids,
+              visibility,
+            )
+          } else if (component_type === "Block") {
+            return modelBlocksStyleStore.setModelBlocksVisibility(
+              id,
+              filtered_ids,
+              visibility,
+            )
+          } else {
+            console.warn(`Unknown model component_type: ${component_type}`)
+          }
+        })
+      })
   }
 
   function applyModelStyle(id) {
@@ -263,28 +270,29 @@ export function useModelStyle() {
     return Promise.all(promise_array)
   }
 
-  async function setModelMeshComponentsDefaultStyle(id) {
-    const item = await dataStore.item(id)
-    if (!item) {
-      return []
-    }
-    const { mesh_components } = item
-    const promise_array = []
-    if ("Corner" in mesh_components) {
-      promise_array.push(modelCornersStyleStore.setModelCornersDefaultStyle(id))
-    }
-    if ("Line" in mesh_components) {
-      promise_array.push(modelLinesStyleStore.setModelLinesDefaultStyle(id))
-    }
-    if ("Surface" in mesh_components) {
-      promise_array.push(
-        modelSurfacesStyleStore.setModelSurfacesDefaultStyle(id),
-      )
-    }
-    if ("Block" in mesh_components) {
-      promise_array.push(modelBlocksStyleStore.setModelBlocksDefaultStyle(id))
-    }
-    return promise_array
+  function setModelMeshComponentsDefaultStyle(id) {
+    return dataStore.item(id).then((item) => {
+      if (!item) {
+        return []
+      }
+      const { mesh_components } = item
+      const promise_array = []
+      if ("Corner" in mesh_components) {
+        promise_array.push(modelCornersStyleStore.setModelCornersDefaultStyle(id))
+      }
+      if ("Line" in mesh_components) {
+        promise_array.push(modelLinesStyleStore.setModelLinesDefaultStyle(id))
+      }
+      if ("Surface" in mesh_components) {
+        promise_array.push(
+          modelSurfacesStyleStore.setModelSurfacesDefaultStyle(id),
+        )
+      }
+      if ("Block" in mesh_components) {
+        promise_array.push(modelBlocksStyleStore.setModelBlocksDefaultStyle(id))
+      }
+      return Promise.all(promise_array)
+    })
   }
 
   return {

@@ -31,21 +31,20 @@ export function useMeshCellsCellAttributeStyle() {
     })
   }
 
-  async function setMeshCellsCellAttributeStoredConfig(
+  function setMeshCellsCellAttributeStoredConfig(
     id,
     name,
     { minimum, maximum, colorMap },
   ) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.cells.coloring.cell.storedConfigs[name] = {
+    return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
+      cell.storedConfigs[name] = {
         minimum,
         maximum,
         colorMap,
       }
     })
-    return meshCellsCellAttributeStoredConfig(id, name)
   }
+
   function meshCellsCellAttributeName(id) {
     console.log(
       meshCellsCellAttributeName.name,
@@ -54,27 +53,21 @@ export function useMeshCellsCellAttributeStyle() {
     )
     return meshCellsCellAttribute(id).name
   }
+
   function setMeshCellsCellAttributeName(id, name) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    const updateState = async () => {
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        const cell = style.cells.coloring.cell
+    const mutate = () => {
+      return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
         cell.name = name
-        if (!(name in cell.storedConfigs)) {
-          cell.storedConfigs[name] = {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
-          }
-        }
+      }).then(() => {
+        const { minimum, maximum } = meshCellsCellAttributeStoredConfig(id, name)
+        return setMeshCellsCellAttributeRange(id, minimum, maximum).then(() => {
+          console.log(
+            setMeshCellsCellAttributeName.name,
+            { id },
+            meshCellsCellAttributeName(id),
+          )
+        })
       })
-      const { minimum, maximum } = meshCellsCellAttributeStoredConfig(id, name)
-      await setMeshCellsCellAttributeRange(id, minimum, maximum)
-      console.log(
-        setMeshCellsCellAttributeName.name,
-        { id },
-        meshCellsCellAttributeName(id),
-      )
     }
 
     if (meshCellsCellAttributeSchemas?.name && name !== "") {
@@ -82,11 +75,11 @@ export function useMeshCellsCellAttributeStyle() {
         meshCellsCellAttributeSchemas.name,
         { id, name },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 
@@ -96,18 +89,18 @@ export function useMeshCellsCellAttributeStyle() {
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
-  async function setMeshCellsCellAttributeRange(id, minimum, maximum) {
+  function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const name = meshCellsCellAttributeName(id)
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      const storedConfig = style.cells.coloring.cell.storedConfigs[name]
+    return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
+      const storedConfig = cell.storedConfigs[name]
       storedConfig.minimum = minimum
       storedConfig.maximum = maximum
+    }).then(() => {
+      return setMeshCellsCellAttributeColorMap(
+        id,
+        meshCellsCellAttributeColorMap(id),
+      )
     })
-    return setMeshCellsCellAttributeColorMap(
-      id,
-      meshCellsCellAttributeColorMap(id),
-    )
   }
 
   function meshCellsCellAttributeColorMap(id) {
@@ -119,16 +112,16 @@ export function useMeshCellsCellAttributeStyle() {
   function setMeshCellsCellAttributeColorMap(id, colorMap) {
     const name = meshCellsCellAttributeName(id)
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
-    const dataStyleStateStore = useDataStyleStateStore()
-    const updateState = async () => {
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.cells.coloring.cell.storedConfigs[name].colorMap = colorMap
+    const mutate = () => {
+      return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
+        cell.storedConfigs[name].colorMap = colorMap
+      }).then(() => {
+        console.log(
+          setMeshCellsCellAttributeColorMap.name,
+          { id },
+          meshCellsCellAttributeColorMap(id),
+        )
       })
-      console.log(
-        setMeshCellsCellAttributeColorMap.name,
-        { id },
-        meshCellsCellAttributeColorMap(id),
-      )
     }
 
     if (
@@ -136,7 +129,7 @@ export function useMeshCellsCellAttributeStyle() {
       storedConfig.maximum === undefined ||
       colorMap === undefined
     ) {
-      return updateState()
+      return mutate()
     }
 
     if (meshCellsCellAttributeSchemas?.color_map) {
@@ -153,11 +146,11 @@ export function useMeshCellsCellAttributeStyle() {
         meshCellsCellAttributeSchemas.color_map,
         { id, points, minimum, maximum },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

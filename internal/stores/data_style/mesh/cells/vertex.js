@@ -4,7 +4,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshCellsCommonStyle } from "./common"
-import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -31,20 +30,20 @@ export function useMeshCellsVertexAttributeStyle() {
     })
   }
 
-  async function setMeshCellsVertexAttributeStoredConfig(
+  function setMeshCellsVertexAttributeStoredConfig(
     id,
     name,
     { minimum, maximum, colorMap },
   ) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.cells.coloring.vertex.storedConfigs[name] = {
+    return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
+      vertex.storedConfigs[name] = {
         minimum,
         maximum,
         colorMap,
       }
+    }).then(() => {
+      return meshCellsVertexAttributeStoredConfig(id, name)
     })
-    return meshCellsVertexAttributeStoredConfig(id, name)
   }
 
   function meshCellsVertexAttributeName(id) {
@@ -56,10 +55,8 @@ export function useMeshCellsVertexAttributeStyle() {
     return meshCellsVertexAttribute(id).name
   }
   function setMeshCellsVertexAttributeName(id, name) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    const updateState = async () => {
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        const vertex = style.cells.coloring.vertex
+    const mutate = () => {
+      return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
         vertex.name = name
         if (!(name in vertex.storedConfigs)) {
           vertex.storedConfigs[name] = {
@@ -68,17 +65,19 @@ export function useMeshCellsVertexAttributeStyle() {
             colorMap: undefined,
           }
         }
+      }).then(() => {
+        const { minimum, maximum } = meshCellsVertexAttributeStoredConfig(
+          id,
+          name,
+        )
+        return setMeshCellsVertexAttributeRange(id, minimum, maximum).then(() => {
+          console.log(
+            setMeshCellsVertexAttributeName.name,
+            { id },
+            meshCellsVertexAttributeName(id),
+          )
+        })
       })
-      const { minimum, maximum } = meshCellsVertexAttributeStoredConfig(
-        id,
-        name,
-      )
-      await setMeshCellsVertexAttributeRange(id, minimum, maximum)
-      console.log(
-        setMeshCellsVertexAttributeName.name,
-        { id },
-        meshCellsVertexAttributeName(id),
-      )
     }
 
     if (meshCellsVertexAttributeSchemas?.name && name !== "") {
@@ -86,11 +85,11 @@ export function useMeshCellsVertexAttributeStyle() {
         meshCellsVertexAttributeSchemas.name,
         { id, name },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 
@@ -100,18 +99,18 @@ export function useMeshCellsVertexAttributeStyle() {
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
-  async function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
+  function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
     const name = meshCellsVertexAttributeName(id)
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      const storedConfig = style.cells.coloring.vertex.storedConfigs[name]
+    return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
+      const storedConfig = vertex.storedConfigs[name]
       storedConfig.minimum = minimum
       storedConfig.maximum = maximum
+    }).then(() => {
+      return setMeshCellsVertexAttributeColorMap(
+        id,
+        meshCellsVertexAttributeColorMap(id),
+      )
     })
-    return setMeshCellsVertexAttributeColorMap(
-      id,
-      meshCellsVertexAttributeColorMap(id),
-    )
   }
 
   function meshCellsVertexAttributeColorMap(id) {
@@ -123,16 +122,16 @@ export function useMeshCellsVertexAttributeStyle() {
   function setMeshCellsVertexAttributeColorMap(id, colorMap) {
     const name = meshCellsVertexAttributeName(id)
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
-    const dataStyleStateStore = useDataStyleStateStore()
-    const updateState = async () => {
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.cells.coloring.vertex.storedConfigs[name].colorMap = colorMap
+    const mutate = () => {
+      return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
+        vertex.storedConfigs[name].colorMap = colorMap
+      }).then(() => {
+        console.log(
+          setMeshCellsVertexAttributeColorMap.name,
+          { id },
+          meshCellsVertexAttributeColorMap(id),
+        )
       })
-      console.log(
-        setMeshCellsVertexAttributeColorMap.name,
-        { id },
-        meshCellsVertexAttributeColorMap(id),
-      )
     }
 
     if (
@@ -140,7 +139,7 @@ export function useMeshCellsVertexAttributeStyle() {
       storedConfig.maximum === undefined ||
       colorMap === undefined
     ) {
-      return updateState()
+      return mutate()
     }
 
     if (meshCellsVertexAttributeSchemas?.color_map) {
@@ -157,11 +156,11 @@ export function useMeshCellsVertexAttributeStyle() {
         meshCellsVertexAttributeSchemas.color_map,
         { id, points, minimum, maximum },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

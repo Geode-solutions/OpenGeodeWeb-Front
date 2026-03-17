@@ -15,9 +15,40 @@ export function useMeshCellsCommonStyle() {
     return meshCellsColoring(id).active
   }
 
+  function mutateMeshCellsStyle(id, mutationCallback) {
+    return dataStyleStateStore.mutateStyle(id, (style) => {
+      mutationCallback(style.cells)
+    })
+  }
+
+  function mutateMeshCellsColoringStyle(id, mutationCallback) {
+    return mutateMeshCellsStyle(id, (cells) => {
+      mutationCallback(cells.coloring)
+    })
+  }
+
+  function mutateMeshCellsCellStyle(id, mutationCallback) {
+    return mutateMeshCellsColoringStyle(id, (coloring) => {
+      mutationCallback(coloring.cell)
+    })
+  }
+
+  function mutateMeshCellsVertexStyle(id, mutationCallback) {
+    return mutateMeshCellsColoringStyle(id, (coloring) => {
+      mutationCallback(coloring.vertex)
+    })
+  }
+
   return {
     meshCellsStyle,
     meshCellsColoring,
     meshCellsActiveColoring,
+    mutateMeshCellsStyle,
+    mutateMeshCellsColoringStyle,
+    mutateMeshCellsCellStyle,
+    mutateCellsStyle: mutateMeshCellsCellStyle,
+    mutateMeshCellsVertexStyle,
   }
 }
+
+

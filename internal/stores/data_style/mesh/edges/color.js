@@ -3,7 +3,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshEdgesCommonStyle } from "./common"
-import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -18,16 +17,16 @@ export function useMeshEdgesColorStyle() {
     return meshEdgesCommonStyle.meshEdgesColoring(id).color
   }
   function setMeshEdgesColor(id, color) {
-    const updateState = async () => {
-      const dataStyleStateStore = useDataStyleStateStore()
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.edges.coloring.color = color
+    const mutate = () => {
+      return meshEdgesCommonStyle.mutateMeshEdgesColoringStyle(id, (coloring) => {
+        coloring.color = color
+      }).then(() => {
+        console.log(
+          setMeshEdgesColor.name,
+          { id },
+          JSON.stringify(meshEdgesColor(id)),
+        )
       })
-      console.log(
-        setMeshEdgesColor.name,
-        { id },
-        JSON.stringify(meshEdgesColor(id)),
-      )
     }
 
     if (meshEdgesColorSchemas && color !== undefined) {
@@ -35,11 +34,11 @@ export function useMeshEdgesColorStyle() {
         meshEdgesColorSchemas,
         { id, color },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

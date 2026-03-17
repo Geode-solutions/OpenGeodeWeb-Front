@@ -13,8 +13,18 @@ export function useModelBlocksCommonStyle() {
     return { ...groupStyle, ...individualStyle }
   }
 
+  function mutateModelBlocksStyle(id, block_ids, mutationCallback) {
+    return dataStyleStateStore.mutateComponentStyles(
+      id,
+      block_ids,
+      mutationCallback,
+    )
+  }
+
   return {
     modelBlocksStyle,
     modelBlockStyle,
+    mutateModelBlocksStyle,
   }
 }
+

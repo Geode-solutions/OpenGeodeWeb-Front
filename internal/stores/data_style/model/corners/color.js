@@ -5,7 +5,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { useDataStore } from "@ogw_front/stores/data"
 import { useModelCornersCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners
@@ -19,43 +18,43 @@ export function useModelCornersColorStyle() {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).color
   }
 
-  async function setModelCornersColor(id, corner_ids, color) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    const updateState = async () => {
-      await dataStyleStateStore.mutateComponentStyles(
+  function setModelCornersColor(id, corner_ids, color) {
+    const mutate = () => {
+      return modelCornersCommonStyle.mutateModelCornersStyle(
         id,
         corner_ids,
         (style) => {
           style.color = color
         },
-      )
-      console.log(
-        setModelCornersColor.name,
-        { id },
-        { corner_ids },
-        JSON.stringify(modelCornerColor(id, corner_ids[0])),
-      )
+      ).then(() => {
+        console.log(
+          setModelCornersColor.name,
+          { id },
+          { corner_ids },
+          JSON.stringify(modelCornerColor(id, corner_ids[0])),
+        )
+      })
     }
 
     if (!corner_ids || corner_ids.length === 0) {
-      return
+      return Promise.resolve()
     }
-    const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(
-      id,
-      corner_ids,
-    )
-    if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
-      console.warn(
-        "[setModelCornersColor] No viewer IDs found, skipping color request",
-        { id, corner_ids },
-      )
-      return updateState()
-    }
-    return viewerStore.request(
-      model_corners_schemas.color,
-      { id, block_ids: corner_viewer_ids, color },
-      {
-        response_function: updateState,
+    return dataStore.getMeshComponentsViewerIds(id, corner_ids).then(
+      (corner_viewer_ids) => {
+        if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
+          console.warn(
+            "[setModelCornersColor] No viewer IDs found, skipping color request",
+            { id, corner_ids },
+          )
+          return mutate()
+        }
+        return viewerStore.request(
+          model_corners_schemas.color,
+          { id, block_ids: corner_viewer_ids, color },
+          {
+            response_function: mutate,
+          },
+        )
       },
     )
   }

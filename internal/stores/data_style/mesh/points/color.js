@@ -3,7 +3,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshPointsCommonStyle } from "./common"
-import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -18,16 +17,19 @@ export function useMeshPointsColorStyle() {
     return meshPointsCommonStyle.meshPointsColoring(id).color
   }
   function setMeshPointsColor(id, color) {
-    const updateState = async () => {
-      const dataStyleStateStore = useDataStyleStateStore()
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.points.coloring.color = color
+    const mutate = () => {
+      return meshPointsCommonStyle.mutateMeshPointsColoringStyle(
+        id,
+        (coloring) => {
+          coloring.color = color
+        },
+      ).then(() => {
+        console.log(
+          setMeshPointsColor.name,
+          { id },
+          JSON.stringify(meshPointsColor(id)),
+        )
       })
-      console.log(
-        setMeshPointsColor.name,
-        { id },
-        JSON.stringify(meshPointsColor(id)),
-      )
     }
 
     if (meshPointsColorSchemas && color !== undefined) {
@@ -35,11 +37,11 @@ export function useMeshPointsColorStyle() {
         meshPointsColorSchemas,
         { id, color },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

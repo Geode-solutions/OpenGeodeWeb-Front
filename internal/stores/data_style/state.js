@@ -89,14 +89,10 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     return default_style
   }
 
-  async function updateStyle(id, style) {
-    await database.data_style.put(JSON.parse(JSON.stringify({ id, ...style })))
-  }
-
-  async function mutateStyle(id, mutationCallback) {
+  function mutateStyle(id, mutationCallback) {
     const style = getStyle(id)
     mutationCallback(style)
-    await updateStyle(id, style)
+    return database.data_style.put(JSON.parse(JSON.stringify({ id, ...style })))
   }
 
   function getComponentStyle(id_model, id_component) {
@@ -104,72 +100,52 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     return componentStyles.value[key] || {}
   }
 
-  async function updateComponentStyle(id_model, id_component, style) {
-    await database.model_component_datastyle.put(
-      JSON.parse(
-        JSON.stringify({
-          id_model,
-          id_component,
-          ...style,
-        }),
-      ),
-    )
+  function mutateComponentStyle(id_model, id_component, mutationCallback) {
+    return database.model_component_datastyle
+      .get([id_model, id_component])
+      .then((style) => {
+        const s = style || { id_model, id_component }
+        mutationCallback(s)
+        return database.model_component_datastyle.put(
+          JSON.parse(JSON.stringify(s)),
+        )
+      })
   }
 
-  async function bulkUpdateComponentStyles(updates) {
-    await database.model_component_datastyle.bulkPut(
-      JSON.parse(JSON.stringify(updates)),
-    )
-  }
-
-  async function mutateComponentStyle(
-    id_model,
-    id_component,
-    mutationCallback,
-  ) {
-    const style =
-      (await database.model_component_datastyle.get([
-        id_model,
-        id_component,
-      ])) || {}
-    mutationCallback(style)
-    await updateComponentStyle(id_model, id_component, style)
-  }
-
-  async function mutateComponentStyles(
-    id_model,
-    id_components,
-    mutationCallback,
-  ) {
-    const all_styles = await database.model_component_datastyle
+  function mutateComponentStyles(id_model, id_components, mutationCallback) {
+    return database.model_component_datastyle
       .where("id_model")
       .equals(id_model)
       .toArray()
-    const stylesMap = all_styles.reduce((acc, s) => {
-      acc[s.id_component] = s
-      return acc
-    }, {})
+      .then((all_styles) => {
+        const stylesMap = all_styles.reduce((acc, s) => {
+          acc[s.id_component] = s
+          return acc
+        }, {})
 
-    const updates = id_components.map((id_component) => {
-      const style = stylesMap[id_component] || { id_model, id_component }
-      mutationCallback(style)
-      return style
-    })
+        const updates = id_components.map((id_component) => {
+          const style = stylesMap[id_component] || { id_model, id_component }
+          mutationCallback(style)
+          return style
+        })
 
-    await bulkUpdateComponentStyles(updates)
+        return database.model_component_datastyle.bulkPut(
+          JSON.parse(JSON.stringify(updates)),
+        )
+      })
   }
 
-  async function clear() {
-    await database.data_style.clear()
-    await database.model_component_datastyle.clear()
+  function clear() {
+    return Promise.all([
+      database.data_style.clear(),
+      database.model_component_datastyle.clear(),
+    ])
   }
 
   return {
     getStyle,
-    updateStyle,
     mutateStyle,
     getComponentStyle,
-    updateComponentStyle,
     mutateComponentStyle,
     mutateComponentStyles,
     styles,

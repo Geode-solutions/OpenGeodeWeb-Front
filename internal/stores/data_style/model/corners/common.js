@@ -13,8 +13,18 @@ export function useModelCornersCommonStyle() {
     return { ...groupStyle, ...individualStyle }
   }
 
+  function mutateModelCornersStyle(id, corner_ids, mutationCallback) {
+    return dataStyleStateStore.mutateComponentStyles(
+      id,
+      corner_ids,
+      mutationCallback,
+    )
+  }
+
   return {
     modelCornersStyle,
     modelCornerStyle,
+    mutateModelCornersStyle,
   }
 }
+

@@ -3,7 +3,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshPolyhedraCommonStyle } from "./common"
-import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -18,16 +17,19 @@ export function useMeshPolyhedraVisibilityStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).visibility
   }
   function setMeshPolyhedraVisibility(id, visibility) {
-    const updateState = async () => {
-      const dataStyleStateStore = useDataStyleStateStore()
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.polyhedra.visibility = visibility
+    const mutate = () => {
+      return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(
+        id,
+        (polyhedra) => {
+          polyhedra.visibility = visibility
+        },
+      ).then(() => {
+        console.log(
+          setMeshPolyhedraVisibility.name,
+          { id },
+          meshPolyhedraVisibility(id),
+        )
       })
-      console.log(
-        setMeshPolyhedraVisibility.name,
-        { id },
-        meshPolyhedraVisibility(id),
-      )
     }
 
     if (meshPolyhedraVisibilitySchema) {
@@ -35,11 +37,11 @@ export function useMeshPolyhedraVisibilityStyle() {
         meshPolyhedraVisibilitySchema,
         { id, visibility },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

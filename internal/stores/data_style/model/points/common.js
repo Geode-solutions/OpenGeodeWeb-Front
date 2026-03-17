@@ -7,7 +7,15 @@ export function useModelPointsCommonStyle() {
     return dataStyleStateStore.getStyle(id).points
   }
 
+  function mutateModelPointsStyle(id, mutationCallback) {
+    return dataStyleStateStore.mutateStyle(id, (style) => {
+      mutationCallback(style.points)
+    })
+  }
+
   return {
     modelPointsStyle,
+    mutateModelPointsStyle,
   }
 }
+

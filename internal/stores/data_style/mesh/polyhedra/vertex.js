@@ -5,7 +5,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshPolyhedraCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 const meshPolyhedraVertexAttributeSchemas =
@@ -31,20 +30,23 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     })
   }
 
-  async function setMeshPolyhedraVertexAttributeStoredConfig(
+  function setMeshPolyhedraVertexAttributeStoredConfig(
     id,
     name,
     { minimum, maximum, colorMap },
   ) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.polyhedra.coloring.vertex.storedConfigs[name] = {
-        minimum,
-        maximum,
-        colorMap,
-      }
+    return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
+      id,
+      (vertex) => {
+        vertex.storedConfigs[name] = {
+          minimum,
+          maximum,
+          colorMap,
+        }
+      },
+    ).then(() => {
+      return meshPolyhedraVertexAttributeStoredConfig(id, name)
     })
-    return meshPolyhedraVertexAttributeStoredConfig(id, name)
   }
 
   function meshPolyhedraVertexAttributeName(id) {
@@ -56,29 +58,34 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     return meshPolyhedraVertexAttribute(id).name
   }
   function setMeshPolyhedraVertexAttributeName(id, name) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    const updateState = async () => {
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        const vertex = style.polyhedra.coloring.vertex
-        vertex.name = name
-        if (!(name in vertex.storedConfigs)) {
-          vertex.storedConfigs[name] = {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
-          }
-        }
-      })
-      const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(
+    const mutate = () => {
+      return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
         id,
-        name,
-      )
-      await setMeshPolyhedraVertexAttributeRange(id, minimum, maximum)
-      console.log(
-        setMeshPolyhedraVertexAttributeName.name,
-        { id },
-        meshPolyhedraVertexAttributeName(id),
-      )
+        (vertex) => {
+          vertex.name = name
+          if (!(name in vertex.storedConfigs)) {
+            vertex.storedConfigs[name] = {
+              minimum: undefined,
+              maximum: undefined,
+              colorMap: undefined,
+            }
+          }
+        },
+      ).then(() => {
+        const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(
+          id,
+          name,
+        )
+        return setMeshPolyhedraVertexAttributeRange(id, minimum, maximum).then(
+          () => {
+            console.log(
+              setMeshPolyhedraVertexAttributeName.name,
+              { id },
+              meshPolyhedraVertexAttributeName(id),
+            )
+          },
+        )
+      })
     }
 
     if (meshPolyhedraVertexAttributeSchemas?.name && name !== "") {
@@ -86,11 +93,11 @@ export function useMeshPolyhedraVertexAttributeStyle() {
         meshPolyhedraVertexAttributeSchemas.name,
         { id, name },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 
@@ -100,18 +107,21 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
-  async function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
+  function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraVertexAttributeName(id)
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      const storedConfig = style.polyhedra.coloring.vertex.storedConfigs[name]
-      storedConfig.minimum = minimum
-      storedConfig.maximum = maximum
-    })
-    return setMeshPolyhedraVertexAttributeColorMap(
+    return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
       id,
-      meshPolyhedraVertexAttributeColorMap(id),
-    )
+      (vertex) => {
+        const storedConfig = vertex.storedConfigs[name]
+        storedConfig.minimum = minimum
+        storedConfig.maximum = maximum
+      },
+    ).then(() => {
+      return setMeshPolyhedraVertexAttributeColorMap(
+        id,
+        meshPolyhedraVertexAttributeColorMap(id),
+      )
+    })
   }
 
   function meshPolyhedraVertexAttributeColorMap(id) {
@@ -123,16 +133,19 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   function setMeshPolyhedraVertexAttributeColorMap(id, colorMap) {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
-    const dataStyleStateStore = useDataStyleStateStore()
-    const updateState = async () => {
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.polyhedra.coloring.vertex.storedConfigs[name].colorMap = colorMap
+    const mutate = () => {
+      return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
+        id,
+        (vertex) => {
+          vertex.storedConfigs[name].colorMap = colorMap
+        },
+      ).then(() => {
+        console.log(
+          setMeshPolyhedraVertexAttributeColorMap.name,
+          { id },
+          meshPolyhedraVertexAttributeColorMap(id),
+        )
       })
-      console.log(
-        setMeshPolyhedraVertexAttributeColorMap.name,
-        { id },
-        meshPolyhedraVertexAttributeColorMap(id),
-      )
     }
 
     if (
@@ -140,7 +153,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
       storedConfig.maximum === undefined ||
       colorMap === undefined
     ) {
-      return updateState()
+      return mutate()
     }
 
     if (meshPolyhedraVertexAttributeSchemas?.color_map) {
@@ -157,11 +170,11 @@ export function useMeshPolyhedraVertexAttributeStyle() {
         meshPolyhedraVertexAttributeSchemas.color_map,
         { id, points, minimum, maximum },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

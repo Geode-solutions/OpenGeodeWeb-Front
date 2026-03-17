@@ -3,7 +3,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useMeshCellsCommonStyle } from "./common"
-import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -18,12 +17,12 @@ export function useMeshCellsVisibilityStyle() {
     return meshCellsCommonStyle.meshCellsStyle(id).visibility
   }
   function setMeshCellsVisibility(id, visibility) {
-    const updateState = async () => {
-      const dataStyleStateStore = useDataStyleStateStore()
-      await dataStyleStateStore.mutateStyle(id, (style) => {
-        style.cells.visibility = visibility
+    const mutate = () => {
+      return meshCellsCommonStyle.mutateMeshCellsStyle(id, (cells) => {
+        cells.visibility = visibility
+      }).then(() => {
+        console.log(setMeshCellsVisibility.name, { id }, meshCellsVisibility(id))
       })
-      console.log(setMeshCellsVisibility.name, { id }, meshCellsVisibility(id))
     }
 
     if (meshCellsVisibilitySchema) {
@@ -31,11 +30,11 @@ export function useMeshCellsVisibilityStyle() {
         meshCellsVisibilitySchema,
         { id, visibility },
         {
-          response_function: updateState,
+          response_function: mutate,
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 

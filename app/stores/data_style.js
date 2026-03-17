@@ -12,7 +12,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStore = useDataStore()
 
   async function addDataStyle(id, geode_object) {
-    await dataStyleState.updateStyle(id, getDefaultStyle(geode_object))
+    await database.data_style.put(
+      JSON.parse(JSON.stringify({ id, ...getDefaultStyle(geode_object) })),
+    )
   }
 
   async function setVisibility(id, visibility) {
@@ -61,14 +63,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     await dataStyleState.clear()
 
     for (const [id, style] of Object.entries(stylesSnapshot)) {
-      await dataStyleState.updateStyle(id, style)
+      await database.data_style.put(JSON.parse(JSON.stringify({ id, ...style })))
     }
 
     for (const style of Object.values(componentStylesSnapshot)) {
-      await dataStyleState.updateComponentStyle(
-        style.id_model,
-        style.id_component,
-        style,
+      await database.model_component_datastyle.put(
+        JSON.parse(JSON.stringify(style)),
       )
     }
   }

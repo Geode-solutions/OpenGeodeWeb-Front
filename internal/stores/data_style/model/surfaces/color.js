@@ -5,7 +5,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { useDataStore } from "@ogw_front/stores/data"
 import { useModelSurfacesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
@@ -19,43 +18,43 @@ export function useModelSurfacesColorStyle() {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color
   }
 
-  async function setModelSurfacesColor(id, surface_ids, color) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    const updateState = async () => {
-      await dataStyleStateStore.mutateComponentStyles(
+  function setModelSurfacesColor(id, surface_ids, color) {
+    const mutate = () => {
+      return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
         id,
         surface_ids,
         (style) => {
           style.color = color
         },
-      )
-      console.log(
-        setModelSurfacesColor.name,
-        { id },
-        { surface_ids },
-        JSON.stringify(modelSurfaceColor(id, surface_ids[0])),
-      )
+      ).then(() => {
+        console.log(
+          setModelSurfacesColor.name,
+          { id },
+          { surface_ids },
+          JSON.stringify(modelSurfaceColor(id, surface_ids[0])),
+        )
+      })
     }
 
     if (!surface_ids || surface_ids.length === 0) {
-      return
+      return Promise.resolve()
     }
-    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(
-      id,
-      surface_ids,
-    )
-    if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-      console.warn(
-        "[setModelSurfacesColor] No viewer IDs found, skipping color request",
-        { id, surface_ids },
-      )
-      return updateState()
-    }
-    return viewerStore.request(
-      model_surfaces_schemas.color,
-      { id, block_ids: surface_viewer_ids, color },
-      {
-        response_function: updateState,
+    return dataStore.getMeshComponentsViewerIds(id, surface_ids).then(
+      (surface_viewer_ids) => {
+        if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
+          console.warn(
+            "[setModelSurfacesColor] No viewer IDs found, skipping color request",
+            { id, surface_ids },
+          )
+          return mutate()
+        }
+        return viewerStore.request(
+          model_surfaces_schemas.color,
+          { id, block_ids: surface_viewer_ids, color },
+          {
+            response_function: mutate,
+          },
+        )
       },
     )
   }

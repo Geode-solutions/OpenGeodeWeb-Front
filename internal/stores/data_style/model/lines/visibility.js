@@ -5,7 +5,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { useDataStore } from "@ogw_front/stores/data"
 import { useModelLinesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
-import { useDataStyleStateStore } from "../../state"
 
 // Local constants
 const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
@@ -13,7 +12,6 @@ const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
 export function useModelLinesVisibilityStyle() {
   const dataStore = useDataStore()
   const viewerStore = useViewerStore()
-  const dataStyleStateStore = useDataStyleStateStore()
   const modelLinesCommonStyle = useModelLinesCommonStyle()
   function modelLineVisibility(id, line_id) {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).visibility
@@ -21,40 +19,45 @@ export function useModelLinesVisibilityStyle() {
   function saveModelLineVisibility(id, line_id, visibility) {
     modelLinesCommonStyle.modelLineStyle(id, line_id).visibility = visibility
   }
-  async function setModelLinesVisibility(id, line_ids, visibility) {
-    const updateState = async () => {
-      await dataStyleStateStore.mutateComponentStyles(id, line_ids, (style) => {
-        style.visibility = visibility
+  function setModelLinesVisibility(id, line_ids, visibility) {
+    const mutate = () => {
+      return modelLinesCommonStyle.mutateModelLinesStyle(
+        id,
+        line_ids,
+        (style) => {
+          style.visibility = visibility
+        },
+      ).then(() => {
+        console.log(
+          setModelLinesVisibility.name,
+          { id },
+          { line_ids },
+          modelLineVisibility(id, line_ids[0]),
+        )
       })
-      console.log(
-        setModelLinesVisibility.name,
-        { id },
-        { line_ids },
-        modelLineVisibility(id, line_ids[0]),
-      )
     }
 
     if (!line_ids || line_ids.length === 0) {
-      return
+      return Promise.resolve()
     }
 
     if (model_lines_schemas?.visibility) {
-      const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(
-        id,
-        line_ids,
-      )
-      if (!line_viewer_ids || line_viewer_ids.length === 0) {
-        return updateState()
-      }
-      return viewerStore.request(
-        model_lines_schemas.visibility,
-        { id, block_ids: line_viewer_ids, visibility },
-        {
-          response_function: updateState,
+      return dataStore.getMeshComponentsViewerIds(id, line_ids).then(
+        (line_viewer_ids) => {
+          if (!line_viewer_ids || line_viewer_ids.length === 0) {
+            return mutate()
+          }
+          return viewerStore.request(
+            model_lines_schemas.visibility,
+            { id, block_ids: line_viewer_ids, visibility },
+            {
+              response_function: mutate,
+            },
+          )
         },
       )
     } else {
-      return updateState()
+      return mutate()
     }
   }
 
