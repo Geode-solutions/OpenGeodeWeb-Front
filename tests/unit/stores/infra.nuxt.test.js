@@ -6,9 +6,9 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime"
 import { Status } from "@ogw_front/utils/status"
 import { appMode } from "@ogw_front/utils/app_mode"
 import { setupActivePinia } from "@ogw_tests/utils"
+import { useCloudStore } from "@ogw_front/stores/cloud"
 import { useGeodeStore } from "@ogw_front/stores/geode"
 import { useInfraStore } from "@ogw_front/stores/infra"
-import { useCloudStore } from "@ogw_front/stores/cloud"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Mock navigator.locks API
@@ -57,7 +57,7 @@ describe("Infra Store", () => {
       test("test app_mode CLOUD", () => {
         const infraStore = useInfraStore()
         infraStore.app_mode = appMode.CLOUD
-        expect(infraStore.domain_name).toBe("api.geode-solutions.com")
+        expect(infraStore.domain_name).toBe("localhost")
       })
     })
 
@@ -282,14 +282,14 @@ describe("Infra Store", () => {
         const cloudStore = useCloudStore()
 
         infraStore.app_mode = appMode.CLOUD
-        const ID = "123456"
+        const url = "http://test.com"
         registerEndpoint(cloudStore.base_url, {
           method: "POST",
-          handler: () => ({ ID }),
+          handler: () => ({ url }),
         })
         await infraStore.create_backend()
         expect(infraStore.status).toBe(Status.CREATED)
-        expect(infraStore.ID).toBe(ID)
+        expect(infraStore.url).toBe(url)
 
         expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
         expect(viewerStore.status).toBe(Status.NOT_CONNECTED)

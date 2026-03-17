@@ -88,22 +88,8 @@ describe("geode store", () => {
       const infraStore = useInfraStore()
       const geodeStore = useGeodeStore()
       infraStore.app_mode = appMode.CLOUD
-      infraStore.ID = CLOUD_ID
       infraStore.domain_name = "example.com"
-      expect(geodeStore.base_url).toBe(
-        `https://example.com:${PORT_443}/${CLOUD_ID}/geode`,
-      )
-    })
-
-    test("app_mode CLOUD, ID empty", () => {
-      const infraStore = useInfraStore()
-      const geodeStore = useGeodeStore()
-      infraStore.app_mode = appMode.CLOUD
-      infraStore.ID = ""
-      infraStore.domain_name = "example.com"
-      expect(() => geodeStore.base_url).toThrow(
-        "ID must not be empty in cloud mode",
-      )
+      expect(geodeStore.base_url).toBe(`https://example.com:${PORT_443}/geode`)
     })
   })
 

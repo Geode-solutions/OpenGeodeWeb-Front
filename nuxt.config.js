@@ -10,7 +10,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      API_URL: "api.geode-solutions.com",
       BACK_COMMAND: "opengeodeweb-back",
       BACK_PATH: path.join(
         __dirname,
@@ -21,8 +20,6 @@ export default defineNuxtConfig({
       ),
       BROWSER: process.env.BROWSER ?? false,
       PROJECT: package_json.name,
-      SITE_BRANCH:
-        process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
       VIEWER_COMMAND: "opengeodeweb-viewer",
       VIEWER_PATH: path.join(
         __dirname,

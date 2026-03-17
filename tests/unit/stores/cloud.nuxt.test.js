@@ -5,15 +5,12 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime"
 // Local imports
 import { Status } from "@ogw_front/utils/status"
 import { setupActivePinia } from "@ogw_tests/utils"
-import { useFeedbackStore } from "@ogw_front/stores/feedback"
 import { useCloudStore } from "@ogw_front/stores/cloud"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 // CONSTANTS
 const PORT_443 = "443"
-const API_URL = "api.example.com"
-const SITE_BRANCH = "/test"
 const PROJECT = "project"
-const TEST_ID = "test-id-123456"
 const STATUS_500 = 500
 
 beforeEach(async () => {
@@ -22,8 +19,6 @@ beforeEach(async () => {
 
 function setupConfig() {
   const config = useRuntimeConfig()
-  config.public.API_URL = API_URL
-  config.public.SITE_BRANCH = SITE_BRANCH
   config.public.PROJECT = PROJECT
 }
 
@@ -56,7 +51,7 @@ describe("Cloud Store", () => {
         setupConfig()
         const cloudStore = useCloudStore()
         expect(cloudStore.base_url).toBe(
-          `https://${API_URL}:${PORT_443}${SITE_BRANCH}/${PROJECT}/createbackend`,
+          `https://localhost:${PORT_443}/${PROJECT}/createbackend`,
         )
       })
     })
@@ -85,13 +80,12 @@ describe("Cloud Store", () => {
         })
 
         postFakeCall.mockImplementation(() => ({
-          ID: TEST_ID,
+          url: "http://test.com",
         }))
 
-        const id = await cloudStore.launch()
+        await cloudStore.launch()
 
         expect(cloudStore.status).toBe(Status.CONNECTED)
-        expect(id).toBe(TEST_ID)
         expect(feedbackStore.server_error).toBeFalsy()
       })
 

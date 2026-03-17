@@ -37,7 +37,7 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Microservice registered:", store_name)
       }
     },
-    async create_backend() {
+    async create_backend(name, email, launch) {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode)
       console.log(
         "[INFRA] Registered microservices:",
@@ -54,7 +54,7 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Lock granted for create_backend")
         if (this.app_mode === appMode.CLOUD) {
           const cloudStore = useCloudStore()
-          await cloudStore.launch()
+          await cloudStore.launch(name, email, launch)
         } else {
           const appStore = useAppStore()
           await appStore.createProjectFolder()
