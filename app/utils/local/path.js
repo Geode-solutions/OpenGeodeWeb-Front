@@ -19,9 +19,8 @@ async function executablePath(microservicePath) {
       console.log("electron.app.isPackaged", electron.app.isPackaged)
       return process.resourcesPath
     }
-  } else if (process.env.NODE_ENV === "production") {
-    return microservicePath
   }
+  return microservicePath
 }
 
 function executableName(name) {
