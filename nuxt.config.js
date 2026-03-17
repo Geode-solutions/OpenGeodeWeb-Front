@@ -42,6 +42,7 @@ export default defineNuxtConfig({
   alias: {
     "@ogw_front": path.resolve(__dirname, "app"),
     "@ogw_internal": path.resolve(__dirname, "internal"),
+    "@ogw_server": path.resolve(__dirname, "server"),
     "@ogw_tests": path.resolve(__dirname, "tests"),
   },
 
