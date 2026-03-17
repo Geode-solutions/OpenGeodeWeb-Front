@@ -5,19 +5,17 @@ import path from "node:path"
 import { setTimeout } from "node:timers/promises"
 
 // Third party imports
-import isElectron from "is-electron"
 import { rimraf } from "rimraf"
 import { v4 as uuidv4 } from "uuid"
+
+// Local imports
+import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 
 const MAX_DELETE_FOLDER_RETRIES = 5
 
 async function executablePath(microservicePath) {
-  console.log(
-    "[executablePath] microservicePath",
-    microservicePath,
-    isElectron(),
-  )
-  if (isElectron()) {
+  console.log("[executablePath] microservicePath", microservicePath)
+  if (getAppMode() === appMode.DESKTOP) {
     const electron = await import("electron")
     console.log(
       "[executablePath] electron.app.isPackaged",

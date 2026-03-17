@@ -11,7 +11,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       API_URL: "api.geode-solutions.com",
-      BROWSER: process.env.BROWSER ?? false,
       COMMAND_BACK: "opengeodeweb-back",
       COMMAND_VIEWER: "opengeodeweb-viewer",
       NUXT_ROOT_PATH: __dirname,
@@ -56,7 +55,6 @@ export default defineNuxtConfig({
         "fast-deep-equal",
         "globalthis",
         "h3",
-        "is-electron",
         "js-file-download",
         "lodash",
         "seedrandom",
