@@ -51,22 +51,23 @@ export function useMeshEdgesVertexAttributeStyle() {
   }
   function setMeshEdgesVertexAttributeName(id, name) {
     const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesVertexStyle(id, (vertex) => {
-        vertex.name = name
-        if (!(name in vertex.storedConfigs)) {
-          vertex.storedConfigs[name] = {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
+      return meshEdgesCommonStyle
+        .mutateMeshEdgesVertexStyle(id, (vertex) => {
+          vertex.name = name
+          if (!(name in vertex.storedConfigs)) {
+            vertex.storedConfigs[name] = {
+              minimum: undefined,
+              maximum: undefined,
+              colorMap: undefined,
+            }
           }
-        }
-        const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
-        const storedConfig = vertex.storedConfigs[name]
-        storedConfig.minimum = minimum
-        storedConfig.maximum = maximum
-        vertex.storedConfigs[name].colorMap = colorMap
-        console.log(setMeshEdgesVertexAttributeName.name, { id }, name)
-      })
+          const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
+          const storedConfig = vertex.storedConfigs[name]
+          storedConfig.minimum = minimum
+          storedConfig.maximum = maximum
+          vertex.storedConfigs[name].colorMap = colorMap
+          console.log(setMeshEdgesVertexAttributeName.name, { id }, name)
+        })
     }
 
     if (meshEdgesVertexAttributeSchemas?.name && name !== "") {

@@ -20,10 +20,8 @@ export function useModelLinesColorStyle() {
 
   function setModelLinesColor(id, line_ids, color) {
     const mutate = () => {
-      return modelLinesCommonStyle.mutateModelLinesStyle(
-        id,
-        line_ids,
-        (style) => {
+      return modelLinesCommonStyle
+        .mutateModelLinesStyle(id, line_ids, (style) => {
           style.color = color
           console.log(
             setModelLinesColor.name,
@@ -32,14 +30,15 @@ export function useModelLinesColorStyle() {
             JSON.stringify(style.color),
           )
         },
-      )
+        )
     }
 
     if (!line_ids || line_ids.length === 0) {
       return Promise.resolve()
     }
-    return dataStore.getMeshComponentsViewerIds(id, line_ids).then(
-      (line_viewer_ids) => {
+    return dataStore
+      .getMeshComponentsViewerIds(id, line_ids)
+      .then((line_viewer_ids) => {
         if (!line_viewer_ids || line_viewer_ids.length === 0) {
           console.warn(
             "[setModelLinesColor] No viewer IDs found, skipping color request",
@@ -54,8 +53,7 @@ export function useModelLinesColorStyle() {
             response_function: mutate,
           },
         )
-      },
-    )
+      })
   }
 
   return {

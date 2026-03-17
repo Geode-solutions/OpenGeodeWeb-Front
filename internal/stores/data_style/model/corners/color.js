@@ -20,10 +20,8 @@ export function useModelCornersColorStyle() {
 
   function setModelCornersColor(id, corner_ids, color) {
     const mutate = () => {
-      return modelCornersCommonStyle.mutateModelCornersStyle(
-        id,
-        corner_ids,
-        (style) => {
+      return modelCornersCommonStyle
+        .mutateModelCornersStyle(id, corner_ids, (style) => {
           style.color = color
           console.log(
             setModelCornersColor.name,
@@ -31,15 +29,15 @@ export function useModelCornersColorStyle() {
             { corner_ids },
             JSON.stringify(style.color),
           )
-        },
-      )
+        })
     }
 
     if (!corner_ids || corner_ids.length === 0) {
       return Promise.resolve()
     }
-    return dataStore.getMeshComponentsViewerIds(id, corner_ids).then(
-      (corner_viewer_ids) => {
+    return dataStore
+      .getMeshComponentsViewerIds(id, corner_ids)
+      .then((corner_viewer_ids) => {
         if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
           console.warn(
             "[setModelCornersColor] No viewer IDs found, skipping color request",
@@ -54,8 +52,7 @@ export function useModelCornersColorStyle() {
             response_function: mutate,
           },
         )
-      },
-    )
+      })
   }
 
   return {

@@ -27,4 +27,3 @@ export function useModelCornersCommonStyle() {
     mutateModelCornersStyle,
   }
 }
-

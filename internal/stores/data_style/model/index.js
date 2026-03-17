@@ -276,7 +276,9 @@ export function useModelStyle() {
       const { mesh_components } = item
       const promise_array = []
       if ("Corner" in mesh_components) {
-        promise_array.push(modelCornersStyleStore.setModelCornersDefaultStyle(id))
+        promise_array.push(
+          modelCornersStyleStore.setModelCornersDefaultStyle(id),
+        )
       }
       if ("Line" in mesh_components) {
         promise_array.push(modelLinesStyleStore.setModelLinesDefaultStyle(id))

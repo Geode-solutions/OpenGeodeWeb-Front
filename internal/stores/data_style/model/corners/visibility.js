@@ -24,10 +24,8 @@ export function useModelCornersVisibilityStyle() {
 
   function setModelCornersVisibility(id, corner_ids, visibility) {
     const mutate = () => {
-      return modelCornersCommonStyle.mutateModelCornersStyle(
-        id,
-        corner_ids,
-        (style) => {
+      return modelCornersCommonStyle
+        .mutateModelCornersStyle(id, corner_ids, (style) => {
           style.visibility = visibility
           console.log(
             setModelCornersVisibility.name,
@@ -35,15 +33,15 @@ export function useModelCornersVisibilityStyle() {
             { corner_ids },
             style.visibility,
           )
-        },
-      )
+        })
     }
 
     if (!corner_ids || corner_ids.length === 0) {
       return Promise.resolve()
     }
-    return dataStore.getMeshComponentsViewerIds(id, corner_ids).then(
-      (corner_viewer_ids) => {
+    return dataStore
+      .getMeshComponentsViewerIds(id, corner_ids)
+      .then((corner_viewer_ids) => {
         if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
           console.warn(
             "[setModelCornersVisibility] No viewer IDs found, skipping visibility request",
@@ -58,8 +56,7 @@ export function useModelCornersVisibilityStyle() {
             response_function: mutate,
           },
         )
-      },
-    )
+      })
   }
 
   return {

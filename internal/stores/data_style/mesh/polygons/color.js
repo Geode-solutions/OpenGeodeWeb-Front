@@ -18,17 +18,15 @@ export function useMeshPolygonsColorStyle() {
   }
   function setMeshPolygonsColor(id, color) {
     const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsColoringStyle(
-        id,
-        (coloring) => {
+      return meshPolygonsCommonStyle
+        .mutateMeshPolygonsColoringStyle(id, (coloring) => {
           coloring.color = color
           console.log(
             setMeshPolygonsColor.name,
             { id },
             JSON.stringify(coloring.color),
           )
-        },
-      )
+        })
     }
 
     if (meshPolygonsColorSchemas && color !== undefined) {

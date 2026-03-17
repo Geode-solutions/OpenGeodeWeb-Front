@@ -22,14 +22,17 @@ export function useMeshCellsTexturesStyle() {
       { id, textures },
       {
         response_function: () => {
-          return meshCellsCommonStyle.mutateMeshCellsColoringStyle(
-            id,
-            (coloring) => {
+          return meshCellsCommonStyle
+            .mutateMeshCellsColoringStyle(id, (coloring) => {
               coloring.textures = textures
-            },
-          ).then(() => {
-            console.log(setMeshCellsTextures.name, { id }, meshCellsTextures(id))
-          })
+            })
+            .then(() => {
+              console.log(
+                setMeshCellsTextures.name,
+                { id },
+                meshCellsTextures(id),
+              )
+            })
         },
       },
     )

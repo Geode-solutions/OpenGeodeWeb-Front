@@ -51,22 +51,23 @@ export function useMeshPointsVertexAttributeStyle() {
   }
   function setMeshPointsVertexAttributeName(id, name) {
     const mutate = () => {
-      return meshPointsCommonStyle.mutateMeshPointsVertexStyle(id, (vertex) => {
-        vertex.name = name
-        if (!(name in vertex.storedConfigs)) {
-          vertex.storedConfigs[name] = {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
+      return meshPointsCommonStyle
+        .mutateMeshPointsVertexStyle(id, (vertex) => {
+          vertex.name = name
+          if (!(name in vertex.storedConfigs)) {
+            vertex.storedConfigs[name] = {
+              minimum: undefined,
+              maximum: undefined,
+              colorMap: undefined,
+            }
           }
-        }
-        const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
-        const storedConfig = vertex.storedConfigs[name]
-        storedConfig.minimum = minimum
-        storedConfig.maximum = maximum
-        vertex.storedConfigs[name].colorMap = colorMap
-        console.log(setMeshPointsVertexAttributeName.name, { id }, name)
-      })
+          const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
+          const storedConfig = vertex.storedConfigs[name]
+          storedConfig.minimum = minimum
+          storedConfig.maximum = maximum
+          vertex.storedConfigs[name].colorMap = colorMap
+          console.log(setMeshPointsVertexAttributeName.name, { id }, name)
+        })
     }
 
     if (meshPointsVertexAttributeSchemas?.name && name !== "") {

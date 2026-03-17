@@ -54,9 +54,8 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   }
   function setMeshPolyhedraVertexAttributeName(id, name) {
     const mutate = () => {
-      return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
-        id,
-        (vertex) => {
+      return meshPolyhedraCommonStyle
+        .mutateMeshPolyhedraVertexStyle(id, (vertex) => {
           vertex.name = name
           if (!(name in vertex.storedConfigs)) {
             vertex.storedConfigs[name] = {
@@ -71,8 +70,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
           storedConfig.maximum = maximum
           vertex.storedConfigs[name].colorMap = colorMap
           console.log(setMeshPolyhedraVertexAttributeName.name, { id }, name)
-        },
-      )
+        })
     }
 
     if (meshPolyhedraVertexAttributeSchemas?.name && name !== "") {
@@ -96,17 +94,14 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   }
   function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraVertexAttributeName(id)
-    return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
-      id,
-      (vertex) => {
-        const storedConfig = vertex.storedConfigs[name]
-        storedConfig.minimum = minimum
-        storedConfig.maximum = maximum
-        // Update color map synchronously
-        const colorMap = vertex.storedConfigs[name].colorMap
-        vertex.storedConfigs[name].colorMap = colorMap
-      },
-    )
+    return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(id, (vertex) => {
+      const storedConfig = vertex.storedConfigs[name]
+      storedConfig.minimum = minimum
+      storedConfig.maximum = maximum
+      // Update color map synchronously
+      const colorMap = vertex.storedConfigs[name].colorMap
+      vertex.storedConfigs[name].colorMap = colorMap
+    })
   }
 
   function meshPolyhedraVertexAttributeColorMap(id) {
@@ -119,17 +114,15 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const name = meshPolyhedraVertexAttributeName(id)
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name)
     const mutate = () => {
-      return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
-        id,
-        (vertex) => {
+      return meshPolyhedraCommonStyle
+        .mutateMeshPolyhedraVertexStyle(id, (vertex) => {
           vertex.storedConfigs[name].colorMap = colorMap
           console.log(
             setMeshPolyhedraVertexAttributeColorMap.name,
             { id },
             vertex.storedConfigs[name].colorMap,
           )
-        },
-      )
+        })
     }
 
     if (

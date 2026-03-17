@@ -49,9 +49,8 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   }
   function setMeshPolygonsPolygonAttributeName(id, name) {
     const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
-        id,
-        (polygon) => {
+      return meshPolygonsCommonStyle
+        .mutateMeshPolygonsPolygonStyle(id, (polygon) => {
           polygon.name = name
           if (!(name in polygon.storedConfigs)) {
             polygon.storedConfigs[name] = {
@@ -66,8 +65,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
           storedConfig.maximum = maximum
           polygon.storedConfigs[name].colorMap = colorMap
           console.log(setMeshPolygonsPolygonAttributeName.name, { id }, name)
-        },
-      )
+        })
     }
 
     if (meshPolygonsPolygonAttributeSchemas?.name && name !== "") {
@@ -95,17 +93,15 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   }
   function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsPolygonAttributeName(id)
-    return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
-      id,
-      (polygon) => {
+    return meshPolygonsCommonStyle
+      .mutateMeshPolygonsPolygonStyle(id, (polygon) => {
         const storedConfig = polygon.storedConfigs[name]
         storedConfig.minimum = minimum
         storedConfig.maximum = maximum
         // Update color map synchronously
         const colorMap = polygon.storedConfigs[name].colorMap
         polygon.storedConfigs[name].colorMap = colorMap
-      },
-    )
+      })
   }
 
   function meshPolygonsPolygonAttributeColorMap(id) {
@@ -118,17 +114,16 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
     const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
-        id,
-        (polygon) => {
+      return meshPolygonsCommonStyle
+        .mutateMeshPolygonsPolygonStyle(id, (polygon) => {
+          polygon.storedConfigs[name].colorMap = colorMap
           polygon.storedConfigs[name].colorMap = colorMap
           console.log(
             setMeshPolygonsPolygonAttributeColorMap.name,
             { id },
             polygon.storedConfigs[name].colorMap,
           )
-        },
-      )
+        })
     }
 
     if (

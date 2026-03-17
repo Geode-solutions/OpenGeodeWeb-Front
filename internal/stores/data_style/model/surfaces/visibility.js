@@ -22,10 +22,8 @@ export function useModelSurfacesVisibilityStyle() {
   }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
     const mutate = () => {
-      return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
-        id,
-        surface_ids,
-        (style) => {
+      return modelSurfacesCommonStyle
+        .mutateModelSurfacesStyle(id, surface_ids, (style) => {
           style.visibility = visibility
           console.log(
             setModelSurfacesVisibility.name,
@@ -33,8 +31,7 @@ export function useModelSurfacesVisibilityStyle() {
             { surface_ids },
             style.visibility,
           )
-        },
-      )
+        })
     }
 
     if (!surface_ids || surface_ids.length === 0) {
@@ -42,8 +39,9 @@ export function useModelSurfacesVisibilityStyle() {
     }
 
     if (model_surfaces_schemas?.visibility) {
-      return dataStore.getMeshComponentsViewerIds(id, surface_ids).then(
-        (surface_viewer_ids) => {
+      return dataStore
+        .getMeshComponentsViewerIds(id, surface_ids)
+        .then((surface_viewer_ids) => {
           if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
             return mutate()
           }
@@ -54,8 +52,7 @@ export function useModelSurfacesVisibilityStyle() {
               response_function: mutate,
             },
           )
-        },
-      )
+        })
     } else {
       return mutate()
     }

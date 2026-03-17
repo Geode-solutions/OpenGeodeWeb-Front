@@ -42,5 +42,3 @@ export function useMeshPointsCommonStyle() {
     mutateMeshPointsVertexStyle,
   }
 }
-
-

@@ -18,5 +18,3 @@ export function useModelEdgesCommonStyle() {
     mutateModelEdgesStyle,
   }
 }
-
-
