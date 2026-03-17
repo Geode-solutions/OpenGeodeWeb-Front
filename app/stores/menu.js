@@ -150,17 +150,17 @@ export const useMenuStore = defineStore("menu", () => {
   }
 
   async function openMenu(id, x, y, width, height, top, left, meta_data) {
-    if (!id || !meta_data) {
-      return
-    }
-    const items = getMenuItems(
-      meta_data.viewer_type,
-      meta_data.geode_object_type,
-    )
-    if (items.length === 0) {
-      return
-    }
     await closeMenu()
+
+    if (meta_data) {
+      const items = getMenuItems(
+        meta_data.viewer_type,
+        meta_data.geode_object_type,
+      )
+      if (items.length === 0) {
+        return
+      }
+    }
 
     current_id.value = id
     current_meta_data.value = meta_data || {}
