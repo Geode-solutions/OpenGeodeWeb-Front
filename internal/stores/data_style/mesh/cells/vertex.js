@@ -35,15 +35,10 @@ export function useMeshCellsVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const config = { minimum, maximum, colorMap }
     return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
-      vertex.storedConfigs[name] = {
-        minimum,
-        maximum,
-        colorMap,
-      }
-    }).then(() => {
-      return meshCellsVertexAttributeStoredConfig(id, name)
-    })
+      vertex.storedConfigs[name] = config
+    }).then(() => config)
   }
 
   function meshCellsVertexAttributeName(id) {
@@ -65,18 +60,12 @@ export function useMeshCellsVertexAttributeStyle() {
             colorMap: undefined,
           }
         }
-      }).then(() => {
-        const { minimum, maximum } = meshCellsVertexAttributeStoredConfig(
-          id,
-          name,
-        )
-        return setMeshCellsVertexAttributeRange(id, minimum, maximum).then(() => {
-          console.log(
-            setMeshCellsVertexAttributeName.name,
-            { id },
-            meshCellsVertexAttributeName(id),
-          )
-        })
+        const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
+        const storedConfig = vertex.storedConfigs[name]
+        storedConfig.minimum = minimum
+        storedConfig.maximum = maximum
+        vertex.storedConfigs[name].colorMap = colorMap
+        console.log(setMeshCellsVertexAttributeName.name, { id }, name)
       })
     }
 
@@ -105,11 +94,9 @@ export function useMeshCellsVertexAttributeStyle() {
       const storedConfig = vertex.storedConfigs[name]
       storedConfig.minimum = minimum
       storedConfig.maximum = maximum
-    }).then(() => {
-      return setMeshCellsVertexAttributeColorMap(
-        id,
-        meshCellsVertexAttributeColorMap(id),
-      )
+      // Update color map in the same mutation
+      const colorMap = vertex.storedConfigs[name].colorMap
+      vertex.storedConfigs[name].colorMap = colorMap
     })
   }
 
@@ -125,11 +112,10 @@ export function useMeshCellsVertexAttributeStyle() {
     const mutate = () => {
       return meshCellsCommonStyle.mutateMeshCellsVertexStyle(id, (vertex) => {
         vertex.storedConfigs[name].colorMap = colorMap
-      }).then(() => {
         console.log(
           setMeshCellsVertexAttributeColorMap.name,
           { id },
-          meshCellsVertexAttributeColorMap(id),
+          vertex.storedConfigs[name].colorMap,
         )
       })
     }

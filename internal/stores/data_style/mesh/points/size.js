@@ -20,11 +20,10 @@ export function useMeshPointsSizeStyle() {
     const mutate = () => {
       return meshPointsCommonStyle.mutateMeshPointsStyle(id, (points) => {
         points.size = size
-      }).then(() => {
         console.log(
           setMeshPointsSize.name,
           { id },
-          JSON.stringify(meshPointsSize(id)),
+          JSON.stringify(points.size),
         )
       })
     }

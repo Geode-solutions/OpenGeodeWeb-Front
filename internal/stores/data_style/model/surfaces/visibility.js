@@ -27,15 +27,14 @@ export function useModelSurfacesVisibilityStyle() {
         surface_ids,
         (style) => {
           style.visibility = visibility
+          console.log(
+            setModelSurfacesVisibility.name,
+            { id },
+            { surface_ids },
+            style.visibility,
+          )
         },
-      ).then(() => {
-        console.log(
-          setModelSurfacesVisibility.name,
-          { id },
-          { surface_ids },
-          modelSurfaceVisibility(id, surface_ids[0]),
-        )
-      })
+      )
     }
 
     if (!surface_ids || surface_ids.length === 0) {

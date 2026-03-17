@@ -22,14 +22,13 @@ export function useMeshPolyhedraVisibilityStyle() {
         id,
         (polyhedra) => {
           polyhedra.visibility = visibility
+          console.log(
+            setMeshPolyhedraVisibility.name,
+            { id },
+            polyhedra.visibility,
+          )
         },
-      ).then(() => {
-        console.log(
-          setMeshPolyhedraVisibility.name,
-          { id },
-          meshPolyhedraVisibility(id),
-        )
-      })
+      )
     }
 
     if (meshPolyhedraVisibilitySchema) {

@@ -22,14 +22,13 @@ export function useMeshPolygonsColorStyle() {
         id,
         (coloring) => {
           coloring.color = color
+          console.log(
+            setMeshPolygonsColor.name,
+            { id },
+            JSON.stringify(coloring.color),
+          )
         },
-      ).then(() => {
-        console.log(
-          setMeshPolygonsColor.name,
-          { id },
-          JSON.stringify(meshPolygonsColor(id)),
-        )
-      })
+      )
     }
 
     if (meshPolygonsColorSchemas && color !== undefined) {

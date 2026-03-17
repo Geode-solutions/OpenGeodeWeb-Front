@@ -37,7 +37,6 @@ export function useModelStyle() {
     const mutate = () => {
       return dataStyleStateStore.mutateStyle(id, (style) => {
         style.visibility = visibility
-      }).then(() => {
         hybridViewerStore.setVisibility(id, visibility)
         console.log(setModelVisibility.name, { id }, modelVisibility(id))
       })
@@ -148,7 +147,6 @@ export function useModelStyle() {
     const mutate = () => {
       return dataStyleStateStore.mutateStyle(id, (style) => {
         style.color = color
-      }).then(() => {
         console.log(setModelColor.name, { id }, modelColor(id))
       })
     }

@@ -20,11 +20,10 @@ export function useMeshPolygonsVisibilityStyle() {
     const mutate = () => {
       return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, (polygons) => {
         polygons.visibility = visibility
-      }).then(() => {
         console.log(
           setMeshPolygonsVisibility.name,
           { id },
-          meshPolygonsVisibility(id),
+          polygons.visibility,
         )
       })
     }

@@ -25,15 +25,14 @@ export function useModelBlocksColorStyle() {
         block_ids,
         (style) => {
           style.color = color
+          console.log(
+            setModelBlocksColor.name,
+            { id },
+            { block_ids },
+            JSON.stringify(style.color),
+          )
         },
-      ).then(() => {
-        console.log(
-          setModelBlocksColor.name,
-          { id },
-          { block_ids },
-          JSON.stringify(modelBlockColor(id, block_ids[0])),
-        )
-      })
+      )
     }
 
     if (!block_ids || block_ids.length === 0) {

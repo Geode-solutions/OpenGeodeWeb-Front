@@ -25,15 +25,14 @@ export function useModelSurfacesColorStyle() {
         surface_ids,
         (style) => {
           style.color = color
+          console.log(
+            setModelSurfacesColor.name,
+            { id },
+            { surface_ids },
+            JSON.stringify(style.color),
+          )
         },
-      ).then(() => {
-        console.log(
-          setModelSurfacesColor.name,
-          { id },
-          { surface_ids },
-          JSON.stringify(modelSurfaceColor(id, surface_ids[0])),
-        )
-      })
+      )
     }
 
     if (!surface_ids || surface_ids.length === 0) {

@@ -20,8 +20,7 @@ export function useMeshEdgesWidthStyle() {
     const mutate = () => {
       return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, (edges) => {
         edges.width = width
-      }).then(() => {
-        console.log(setMeshEdgesWidth.name, { id }, meshEdgesWidth(id))
+        console.log(setMeshEdgesWidth.name, { id }, edges.width)
       })
     }
 

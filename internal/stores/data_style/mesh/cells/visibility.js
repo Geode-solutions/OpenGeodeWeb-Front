@@ -20,8 +20,7 @@ export function useMeshCellsVisibilityStyle() {
     const mutate = () => {
       return meshCellsCommonStyle.mutateMeshCellsStyle(id, (cells) => {
         cells.visibility = visibility
-      }).then(() => {
-        console.log(setMeshCellsVisibility.name, { id }, meshCellsVisibility(id))
+        console.log(setMeshCellsVisibility.name, { id }, cells.visibility)
       })
     }
 

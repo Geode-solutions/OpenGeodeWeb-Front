@@ -26,15 +26,14 @@ export function useModelLinesVisibilityStyle() {
         line_ids,
         (style) => {
           style.visibility = visibility
+          console.log(
+            setModelLinesVisibility.name,
+            { id },
+            { line_ids },
+            style.visibility,
+          )
         },
-      ).then(() => {
-        console.log(
-          setModelLinesVisibility.name,
-          { id },
-          { line_ids },
-          modelLineVisibility(id, line_ids[0]),
-        )
-      })
+      )
     }
 
     if (!line_ids || line_ids.length === 0) {

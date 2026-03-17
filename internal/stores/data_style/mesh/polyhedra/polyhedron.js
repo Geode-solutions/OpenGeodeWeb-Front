@@ -35,18 +35,13 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const config = { minimum, maximum, colorMap }
     return meshPolyhedraCommonStyle.mutateMeshPolyhedraPolyhedronStyle(
       id,
       (polyhedron) => {
-        polyhedron.storedConfigs[name] = {
-          minimum,
-          maximum,
-          colorMap,
-        }
+        polyhedron.storedConfigs[name] = config
       },
-    ).then(() => {
-      return meshPolyhedraPolyhedronAttributeStoredConfig(id, name)
-    })
+    ).then(() => config)
   }
 
   function meshPolyhedraPolyhedronAttributeName(id) {
@@ -65,22 +60,14 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
               colorMap: undefined,
             }
           }
+          const { minimum, maximum, colorMap } = polyhedron.storedConfigs[name]
+          const storedConfig = polyhedron.storedConfigs[name]
+          storedConfig.minimum = minimum
+          storedConfig.maximum = maximum
+          polyhedron.storedConfigs[name].colorMap = colorMap
+          console.log(setMeshPolyhedraPolyhedronAttributeName.name, { id }, name)
         },
-      ).then(() => {
-        const { minimum, maximum } = meshPolyhedraPolyhedronAttributeStoredConfig(
-          id,
-          name,
-        )
-        return setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum).then(
-          () => {
-            console.log(
-              setMeshPolyhedraPolyhedronAttributeName.name,
-              { id },
-              meshPolyhedraPolyhedronAttributeName(id),
-            )
-          },
-        )
-      })
+      )
     }
 
     if (meshPolyhedraPolyhedronAttributeSchemas?.name && name !== "") {
@@ -109,13 +96,11 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
         const storedConfig = polyhedron.storedConfigs[name]
         storedConfig.minimum = minimum
         storedConfig.maximum = maximum
+        // Update color map synchronously
+        const colorMap = polyhedron.storedConfigs[name].colorMap
+        polyhedron.storedConfigs[name].colorMap = colorMap
       },
-    ).then(() => {
-      return setMeshPolyhedraPolyhedronAttributeColorMap(
-        id,
-        meshPolyhedraPolyhedronAttributeColorMap(id),
-      )
-    })
+    )
   }
 
   function meshPolyhedraPolyhedronAttributeColorMap(id) {
@@ -131,15 +116,14 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
       return meshPolyhedraCommonStyle.mutateMeshPolyhedraPolyhedronStyle(
         id,
         (polyhedron) => {
-          polyhedron.storedConfigs[name].colorMap = colorMap
+          polyhedra.storedConfigs[name].colorMap = colorMap
+          console.log(
+            setMeshPolyhedraPolyhedronAttributeColorMap.name,
+            { id },
+            polyhedra.storedConfigs[name].colorMap,
+          )
         },
-      ).then(() => {
-        console.log(
-          setMeshPolyhedraPolyhedronAttributeColorMap.name,
-          { id },
-          meshPolyhedraPolyhedronAttributeColorMap(id),
-        )
-      })
+      )
     }
 
     if (

@@ -20,11 +20,10 @@ export function useModelEdgesVisibilityStyle() {
     const mutate = () => {
       return modelEdgesCommonStyle.mutateModelEdgesStyle(id, (edges) => {
         edges.visibility = visibility
-      }).then(() => {
         console.log(
           setModelEdgesVisibility.name,
           { id },
-          modelEdgesVisibility(id),
+          edges.visibility,
         )
       })
     }

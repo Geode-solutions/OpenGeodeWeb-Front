@@ -22,14 +22,13 @@ export function useMeshPolyhedraColorStyle() {
         id,
         (coloring) => {
           coloring.color = color
+          console.log(
+            setMeshPolyhedraColor.name,
+            { id },
+            JSON.stringify(coloring.color),
+          )
         },
-      ).then(() => {
-        console.log(
-          setMeshPolyhedraColor.name,
-          { id },
-          JSON.stringify(meshPolyhedraColor(id)),
-        )
-      })
+      )
     }
 
     if (meshPolyhedraColorSchemas && color !== undefined) {

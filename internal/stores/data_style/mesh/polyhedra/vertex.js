@@ -35,18 +35,13 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const config = { minimum, maximum, colorMap }
     return meshPolyhedraCommonStyle.mutateMeshPolyhedraVertexStyle(
       id,
       (vertex) => {
-        vertex.storedConfigs[name] = {
-          minimum,
-          maximum,
-          colorMap,
-        }
+        vertex.storedConfigs[name] = config
       },
-    ).then(() => {
-      return meshPolyhedraVertexAttributeStoredConfig(id, name)
-    })
+    ).then(() => config)
   }
 
   function meshPolyhedraVertexAttributeName(id) {
@@ -70,22 +65,14 @@ export function useMeshPolyhedraVertexAttributeStyle() {
               colorMap: undefined,
             }
           }
+          const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
+          const storedConfig = vertex.storedConfigs[name]
+          storedConfig.minimum = minimum
+          storedConfig.maximum = maximum
+          vertex.storedConfigs[name].colorMap = colorMap
+          console.log(setMeshPolyhedraVertexAttributeName.name, { id }, name)
         },
-      ).then(() => {
-        const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(
-          id,
-          name,
-        )
-        return setMeshPolyhedraVertexAttributeRange(id, minimum, maximum).then(
-          () => {
-            console.log(
-              setMeshPolyhedraVertexAttributeName.name,
-              { id },
-              meshPolyhedraVertexAttributeName(id),
-            )
-          },
-        )
-      })
+      )
     }
 
     if (meshPolyhedraVertexAttributeSchemas?.name && name !== "") {
@@ -115,13 +102,11 @@ export function useMeshPolyhedraVertexAttributeStyle() {
         const storedConfig = vertex.storedConfigs[name]
         storedConfig.minimum = minimum
         storedConfig.maximum = maximum
+        // Update color map synchronously
+        const colorMap = vertex.storedConfigs[name].colorMap
+        vertex.storedConfigs[name].colorMap = colorMap
       },
-    ).then(() => {
-      return setMeshPolyhedraVertexAttributeColorMap(
-        id,
-        meshPolyhedraVertexAttributeColorMap(id),
-      )
-    })
+    )
   }
 
   function meshPolyhedraVertexAttributeColorMap(id) {
@@ -138,14 +123,13 @@ export function useMeshPolyhedraVertexAttributeStyle() {
         id,
         (vertex) => {
           vertex.storedConfigs[name].colorMap = colorMap
+          console.log(
+            setMeshPolyhedraVertexAttributeColorMap.name,
+            { id },
+            vertex.storedConfigs[name].colorMap,
+          )
         },
-      ).then(() => {
-        console.log(
-          setMeshPolyhedraVertexAttributeColorMap.name,
-          { id },
-          meshPolyhedraVertexAttributeColorMap(id),
-        )
-      })
+      )
     }
 
     if (

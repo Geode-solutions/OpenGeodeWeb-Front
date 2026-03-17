@@ -29,15 +29,14 @@ export function useModelBlocksVisibilityStyle() {
         block_ids,
         (style) => {
           style.visibility = visibility
+          console.log(
+            setModelBlocksVisibility.name,
+            { id },
+            { block_ids },
+            style.visibility,
+          )
         },
-      ).then(() => {
-        console.log(
-          setModelBlocksVisibility.name,
-          { id },
-          { block_ids },
-          modelBlockVisibility(id, block_ids[0]),
-        )
-      })
+      )
     }
 
     if (!block_ids || block_ids.length === 0) {

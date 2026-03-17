@@ -20,8 +20,7 @@ export function useModelPointsSizeStyle() {
     const mutate = () => {
       return modelPointsCommonStyle.mutateModelPointsStyle(id, (points) => {
         points.size = size
-      }).then(() => {
-        console.log(setModelPointsSize.name, { id }, modelPointsSize(id))
+        console.log(setModelPointsSize.name, { id }, points.size)
       })
     }
 

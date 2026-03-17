@@ -20,11 +20,10 @@ export function useMeshCellsColorStyle() {
     const mutate = () => {
       return meshCellsCommonStyle.mutateMeshCellsColoringStyle(id, (coloring) => {
         coloring.color = color
-      }).then(() => {
         console.log(
           setMeshCellsColor.name,
           { id },
-          JSON.stringify(meshCellsColor(id)),
+          JSON.stringify(coloring.color),
         )
       })
     }

@@ -22,14 +22,13 @@ export function useMeshPointsColorStyle() {
         id,
         (coloring) => {
           coloring.color = color
+          console.log(
+            setMeshPointsColor.name,
+            { id },
+            JSON.stringify(coloring.color),
+          )
         },
-      ).then(() => {
-        console.log(
-          setMeshPointsColor.name,
-          { id },
-          JSON.stringify(meshPointsColor(id)),
-        )
-      })
+      )
     }
 
     if (meshPointsColorSchemas && color !== undefined) {

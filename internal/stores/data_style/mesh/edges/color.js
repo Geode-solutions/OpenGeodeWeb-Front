@@ -20,11 +20,10 @@ export function useMeshEdgesColorStyle() {
     const mutate = () => {
       return meshEdgesCommonStyle.mutateMeshEdgesColoringStyle(id, (coloring) => {
         coloring.color = color
-      }).then(() => {
         console.log(
           setMeshEdgesColor.name,
           { id },
-          JSON.stringify(meshEdgesColor(id)),
+          JSON.stringify(coloring.color),
         )
       })
     }

@@ -35,18 +35,13 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     name,
     { minimum, maximum, colorMap },
   ) {
+    const config = { minimum, maximum, colorMap }
     return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
       id,
       (polygon) => {
-        polygon.storedConfigs[name] = {
-          minimum,
-          maximum,
-          colorMap,
-        }
+        polygon.storedConfigs[name] = config
       },
-    ).then(() => {
-      return meshPolygonsPolygonAttributeStoredConfig(id, name)
-    })
+    ).then(() => config)
   }
 
   function meshPolygonsPolygonAttributeName(id) {
@@ -65,22 +60,14 @@ export function useMeshPolygonsPolygonAttributeStyle() {
               colorMap: undefined,
             }
           }
+          const { minimum, maximum, colorMap } = polygon.storedConfigs[name]
+          const storedConfig = polygon.storedConfigs[name]
+          storedConfig.minimum = minimum
+          storedConfig.maximum = maximum
+          polygon.storedConfigs[name].colorMap = colorMap
+          console.log(setMeshPolygonsPolygonAttributeName.name, { id }, name)
         },
-      ).then(() => {
-        const { minimum, maximum } = meshPolygonsPolygonAttributeStoredConfig(
-          id,
-          name,
-        )
-        return setMeshPolygonsPolygonAttributeRange(id, minimum, maximum).then(
-          () => {
-            console.log(
-              setMeshPolygonsPolygonAttributeName.name,
-              { id },
-              meshPolygonsPolygonAttributeName(id),
-            )
-          },
-        )
-      })
+      )
     }
 
     if (meshPolygonsPolygonAttributeSchemas?.name && name !== "") {
@@ -114,13 +101,11 @@ export function useMeshPolygonsPolygonAttributeStyle() {
         const storedConfig = polygon.storedConfigs[name]
         storedConfig.minimum = minimum
         storedConfig.maximum = maximum
+        // Update color map synchronously
+        const colorMap = polygon.storedConfigs[name].colorMap
+        polygon.storedConfigs[name].colorMap = colorMap
       },
-    ).then(() => {
-      return setMeshPolygonsPolygonAttributeColorMap(
-        id,
-        meshPolygonsPolygonAttributeColorMap(id),
-      )
-    })
+    )
   }
 
   function meshPolygonsPolygonAttributeColorMap(id) {
@@ -137,14 +122,13 @@ export function useMeshPolygonsPolygonAttributeStyle() {
         id,
         (polygon) => {
           polygon.storedConfigs[name].colorMap = colorMap
+          console.log(
+            setMeshPolygonsPolygonAttributeColorMap.name,
+            { id },
+            polygon.storedConfigs[name].colorMap,
+          )
         },
-      ).then(() => {
-        console.log(
-          setMeshPolygonsPolygonAttributeColorMap.name,
-          { id },
-          meshPolygonsPolygonAttributeColorMap(id),
-        )
-      })
+      )
     }
 
     if (

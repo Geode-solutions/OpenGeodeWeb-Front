@@ -25,15 +25,14 @@ export function useModelCornersColorStyle() {
         corner_ids,
         (style) => {
           style.color = color
+          console.log(
+            setModelCornersColor.name,
+            { id },
+            { corner_ids },
+            JSON.stringify(style.color),
+          )
         },
-      ).then(() => {
-        console.log(
-          setModelCornersColor.name,
-          { id },
-          { corner_ids },
-          JSON.stringify(modelCornerColor(id, corner_ids[0])),
-        )
-      })
+      )
     }
 
     if (!corner_ids || corner_ids.length === 0) {

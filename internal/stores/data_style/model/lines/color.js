@@ -25,15 +25,14 @@ export function useModelLinesColorStyle() {
         line_ids,
         (style) => {
           style.color = color
+          console.log(
+            setModelLinesColor.name,
+            { id },
+            { line_ids },
+            JSON.stringify(style.color),
+          )
         },
-      ).then(() => {
-        console.log(
-          setModelLinesColor.name,
-          { id },
-          { line_ids },
-          JSON.stringify(modelLineColor(id, line_ids[0])),
-        )
-      })
+      )
     }
 
     if (!line_ids || line_ids.length === 0) {

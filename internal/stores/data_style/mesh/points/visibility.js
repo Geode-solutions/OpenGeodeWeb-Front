@@ -20,11 +20,10 @@ export function useMeshPointsVisibilityStyle() {
     const mutate = () => {
       return meshPointsCommonStyle.mutateMeshPointsStyle(id, (points) => {
         points.visibility = visibility
-      }).then(() => {
         console.log(
           setMeshPointsVisibility.name,
           { id },
-          meshPointsVisibility(id),
+          points.visibility,
         )
       })
     }

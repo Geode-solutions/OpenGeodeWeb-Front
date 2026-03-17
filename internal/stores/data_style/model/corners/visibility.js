@@ -29,15 +29,14 @@ export function useModelCornersVisibilityStyle() {
         corner_ids,
         (style) => {
           style.visibility = visibility
+          console.log(
+            setModelCornersVisibility.name,
+            { id },
+            { corner_ids },
+            style.visibility,
+          )
         },
-      ).then(() => {
-        console.log(
-          setModelCornersVisibility.name,
-          { id },
-          { corner_ids },
-          modelCornerVisibility(id, corner_ids[0]),
-        )
-      })
+      )
     }
 
     if (!corner_ids || corner_ids.length === 0) {

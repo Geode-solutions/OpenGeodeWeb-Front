@@ -32,7 +32,6 @@ export function useMeshStyle() {
     const mutate = () => {
       return dataStyleState.mutateStyle(id, (style) => {
         style.visibility = visibility
-      }).then(() => {
         hybridViewerStore.setVisibility(id, visibility)
         console.log(setMeshVisibility.name, { id }, meshVisibility(id))
       })
@@ -58,7 +57,6 @@ export function useMeshStyle() {
     const mutate = () => {
       return dataStyleState.mutateStyle(id, (style) => {
         style.color = color
-      }).then(() => {
         console.log(setMeshColor.name, { id }, meshColor(id))
       })
     }
