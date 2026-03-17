@@ -2,10 +2,11 @@
 import vtkWSLinkClient, {
   newInstance,
 } from "@kitware/vtk.js/IO/Core/WSLinkClient"
-// oxlint-disable-next-line id-length
 import _ from "lodash"
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
+import SmartConnect from "wslink/src/SmartConnect"
+import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 import { useRuntimeConfig } from "nuxt/app"
 
@@ -22,6 +23,7 @@ const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST
 
 export const useViewerStore = defineStore(
   "viewer",
+  // oxlint-disable-next-line max-lines-per-function max-statements
   () => {
     const infraStore = useInfraStore()
     const default_local_port = ref("1234")
@@ -76,7 +78,7 @@ export const useViewerStore = defineStore(
       picking_mode.value = false
     }
 
-    async function ws_connect() {
+    function ws_connect() {
       if (status.value === Status.CONNECTED) {
         return
       }
@@ -87,48 +89,31 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock)
           status.value = Status.CONNECTING
-          const { default: SmartConnect } = await import(
-            "wslink/src/SmartConnect"
-          )
           vtkWSLinkClient.setSmartConnectClass(SmartConnect)
 
-          const config_obj = { application: "Viewer" }
-          config_obj.sessionURL = base_url.value
-
-          if (status.value === Status.CONNECTED && client.value.isConnected()) {
-            client.value.disconnect(-1)
-            status.value = Status.NOT_CONNECTED
-          }
-          let clientToConnect = client.value
-          if (_.isEmpty(clientToConnect)) {
-            clientToConnect = newInstance()
+          if (_.isEmpty(client.value)) {
+            client.value = newInstance()
           }
 
-          // Connect to busy store
-          clientToConnect.onBusyChange((count) => {
+          client.value.onBusyChange((count) => {
             buzy.value = count
           })
-          clientToConnect.beginBusy()
-
-          // Error
-          clientToConnect.onConnectionError((httpReq) => {
+          client.value.onConnectionError((httpReq) => {
             const message = httpReq?.response?.error || `Connection error`
             console.error(message)
           })
-
-          // Close
-          clientToConnect.onConnectionClose((httpReq) => {
+          client.value.onConnectionClose((httpReq) => {
             const message = httpReq?.response?.error || `Connection close`
             console.error(message)
           })
 
-          // Connect
-          const { connectImageStream } = await import(
-            "@kitware/vtk.js/Rendering/Misc/RemoteView"
-          )
-          client.value = await clientToConnect.connect(config_obj)
+          client.value.beginBusy()
+          await client.value.connect({
+            application: "Viewer",
+            sessionURL: base_url.value,
+          })
           connectImageStream(client.value.getConnection().getSession())
-          clientToConnect.endBusy()
+          client.value.endBusy()
           await request(
             schemas.opengeodeweb_viewer.viewer.reset_visualization,
             {},
@@ -137,7 +122,7 @@ export const useViewerStore = defineStore(
           )
           status.value = Status.CONNECTED
         } catch (error) {
-          console.error("error", error)
+          console.error("ws_connect error", error)
           status.value = Status.NOT_CONNECTED
           throw error
         }
@@ -214,7 +199,7 @@ export const useViewerStore = defineStore(
               "[VIEWER] Request completed:",
               schema.$id,
               "in",
-              (Date.now() - start) / 1_000,
+              (Date.now() - start) / MS_PER_SECOND,
               "s",
             )
             if (callbacks.response_function) {

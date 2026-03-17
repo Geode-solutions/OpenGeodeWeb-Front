@@ -1,7 +1,7 @@
 import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import { Status } from "@ogw_front/utils/status"
-import { useLambdaStore } from "@ogw_front/stores/lambda"
 import { useAppStore } from "@ogw_front/stores/app"
+import { useLambdaStore } from "@ogw_front/stores/lambda"
 
 import { registerRunningExtensions } from "@ogw_front/utils/extension"
 
@@ -50,18 +50,15 @@ export const useInfraStore = defineStore("infra", {
         "[INFRA] Registered microservices:",
         this.microservices.map((store) => store.$id),
       )
-
       if (this.status === Status.CREATED) {
         return
       }
-
       return navigator.locks.request("infra.create_backend", async () => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) {
           return
         }
         console.log("[INFRA] Lock granted for create_backend")
-
         if (this.app_mode === appMode.CLOUD) {
           console.log("[INFRA] CLOUD mode - Launching lambda...")
           const lambdaStore = useLambdaStore()
@@ -71,26 +68,22 @@ export const useInfraStore = defineStore("infra", {
           console.log(
             `[INFRA] ${this.app_mode} mode - Launching microservices...`,
           )
-
           const appStore = useAppStore()
           await appStore.createProjectFolder()
-
           if (this.app_mode === appMode.DESKTOP) {
             globalThis.electronAPI.project_folder_path({
               projectFolderPath: appStore.projectFolderPath,
             })
           }
-
           const microservices_with_launch = this.microservices.filter(
             (store) => store.launch,
           )
-
           const launch_promises = microservices_with_launch.map((store) =>
             store.launch({ projectFolderPath: appStore.projectFolderPath }),
           )
-          await Promise.all(launch_promises, registerRunningExtensions())
+          launch_promises.push(registerRunningExtensions())
+          await Promise.all(launch_promises)
         }
-
         this.status = Status.CREATED
         console.log("[INFRA] Backend created successfully")
         return this.create_connection()

@@ -16,22 +16,23 @@ async function unzipFile(
     await fs.promises.mkdir(outputDir, { recursive: true })
     const promises = []
 
-    zip.forEach((relativePath, zipEntry) => {
+    for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
       const outputPath = path.join(outputDir, relativePath)
 
       if (zipEntry.dir) {
         promises.push(fs.promises.mkdir(outputPath, { recursive: true }))
       } else {
         promises.push(
-          zipEntry.async("nodebuffer").then(async (content) => {
+          (async () => {
+            const content = await zipEntry.async("nodebuffer")
             await fs.promises.mkdir(path.dirname(outputPath), {
               recursive: true,
             })
             await fs.promises.writeFile(outputPath, content)
-          }),
+          })(),
         )
       }
-    })
+    }
 
     await Promise.all(promises)
     console.log("Extraction complete!")
