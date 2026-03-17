@@ -5,6 +5,9 @@
   import { useInfraStore } from "@ogw_front/stores/infra"
 
   const infraStore = useInfraStore()
+  if (infraStore.app_mode !== appMode.CLOUD) {
+    infraStore.create_backend()
+  }
 </script>
 
 <template>

@@ -272,28 +272,27 @@ describe("Infra Store", () => {
         expect(infraStore.microservices.length).toBe(2)
       })
     })
+  })
 
-    describe("create_backend", () => {
-      // Test without microservices
-      test("test with end-point", async () => {
-        const infraStore = useInfraStore()
-        const geodeStore = useGeodeStore()
-        const viewerStore = useViewerStore()
-        const cloudStore = useCloudStore()
+  describe("create_backend", () => {
+    // Test without microservices
+    test("test with end-point", async () => {
+      const infraStore = useInfraStore()
+      const geodeStore = useGeodeStore()
+      const viewerStore = useViewerStore()
 
-        infraStore.app_mode = appMode.CLOUD
-        const url = "http://test.com"
-        registerEndpoint(cloudStore.base_url, {
-          method: "POST",
-          handler: () => ({ url }),
-        })
-        await infraStore.create_backend()
-        expect(infraStore.status).toBe(Status.CREATED)
-        expect(infraStore.url).toBe(url)
-
-        expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
-        expect(viewerStore.status).toBe(Status.NOT_CONNECTED)
+      infraStore.app_mode = appMode.CLOUD
+      const url = "test.com"
+      registerEndpoint("/api/app/run_cloud", {
+        method: "POST",
+        handler: () => ({ url }),
       })
+      await infraStore.create_backend("", "", false)
+      expect(infraStore.status).toBe(Status.CREATED)
+      expect(infraStore.domain_name).toBe(url)
+
+      expect(geodeStore.status).toBe(Status.NOT_CONNECTED)
+      expect(viewerStore.status).toBe(Status.NOT_CONNECTED)
     })
   })
 })

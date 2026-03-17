@@ -1,5 +1,5 @@
 <script setup>
-  import { useCloudStore } from "@ogw_front/stores/cloud"
+  import { useInfraStore } from "@ogw_front/stores/infra"
 
   const { button_label, button_color, color } = defineProps({
     button_label: {
@@ -38,8 +38,8 @@
   ]
 
   function submit() {
-    const cloudStore = useCloudStore()
-    return cloudStore.launch(name.value, email.value, launch.value)
+    const infraStore = useInfraStore()
+    return infraStore.create_backend(name.value, email.value, launch.value)
   }
 </script>
 

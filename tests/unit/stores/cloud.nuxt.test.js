@@ -9,7 +9,6 @@ import { useCloudStore } from "@ogw_front/stores/cloud"
 import { useFeedbackStore } from "@ogw_front/stores/feedback"
 
 // CONSTANTS
-const PORT_443 = "443"
 const PROJECT = "project"
 const STATUS_500 = 500
 
@@ -31,39 +30,6 @@ describe("Cloud Store", () => {
     })
   })
 
-  describe("getters", () => {
-    describe("protocol", () => {
-      test("test protocol is always https", () => {
-        const cloudStore = useCloudStore()
-        expect(cloudStore.protocol).toBe("https")
-      })
-    })
-
-    describe("port", () => {
-      test("test port is always 443", () => {
-        const cloudStore = useCloudStore()
-        expect(cloudStore.port).toBe(PORT_443)
-      })
-    })
-
-    describe("base_url", () => {
-      test("test base_url construction", () => {
-        setupConfig()
-        const cloudStore = useCloudStore()
-        expect(cloudStore.base_url).toBe(
-          `https://localhost:${PORT_443}/${PROJECT}/createbackend`,
-        )
-      })
-    })
-
-    describe("is_busy", () => {
-      test("test is_busy is always false", () => {
-        const cloudStore = useCloudStore()
-        expect(cloudStore.is_busy).toBeFalsy()
-      })
-    })
-  })
-
   describe("actions", () => {
     describe("launch", () => {
       const postFakeCall = vi.fn()
@@ -73,8 +39,7 @@ describe("Cloud Store", () => {
         const cloudStore = useCloudStore()
         const feedbackStore = useFeedbackStore()
 
-        cloudStore.base_url = "test-base-url"
-        registerEndpoint(cloudStore.base_url, {
+        registerEndpoint("/api/app/run_cloud", {
           method: "POST",
           handler: postFakeCall,
         })
@@ -83,7 +48,7 @@ describe("Cloud Store", () => {
           url: "http://test.com",
         }))
 
-        await cloudStore.launch()
+        await cloudStore.launch("", "", false)
 
         expect(cloudStore.status).toBe(Status.CONNECTED)
         expect(feedbackStore.server_error).toBeFalsy()
@@ -94,7 +59,7 @@ describe("Cloud Store", () => {
         const cloudStore = useCloudStore()
         const feedbackStore = useFeedbackStore()
 
-        registerEndpoint(cloudStore.base_url, {
+        registerEndpoint("/api/app/run_cloud", {
           method: "POST",
           handler: postFakeCall,
         })
@@ -106,8 +71,8 @@ describe("Cloud Store", () => {
           })
         })
 
-        await expect(cloudStore.launch()).rejects.toThrow(
-          "Failed to launch cloud backend",
+        await expect(cloudStore.launch("", "", false)).rejects.toThrow(
+          "500 Internal Server Error",
         )
 
         expect(cloudStore.status).toBe(Status.NOT_CONNECTED)

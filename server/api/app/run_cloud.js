@@ -127,7 +127,7 @@ export default defineEventHandler(async (event) => {
     return {
       statusCode: 200,
       projectFolderPath,
-      url: response.uri,
+      url: response.uri.replace(/^https?:\/\//i, ""),
     }
   } catch (error) {
     console.log(error)

@@ -18,7 +18,7 @@ export const useCloudStore = defineStore("cloud", {
         properties: {
           name: { type: "string" },
           email: { type: "string" },
-          launch: { type: "string" },
+          launch: { type: "boolean" },
         },
         required: ["name", "email", "launch"],
         additionalProperties: true,
@@ -36,7 +36,7 @@ export const useCloudStore = defineStore("cloud", {
           feedbackStore.$patch({ server_error: true })
           this.status = Status.NOT_CONNECTED
         },
-        response_function: () => {
+        response_function: (response) => {
           feedbackStore.$patch({ server_error: false })
           console.log(`[CLOUD] Cloud launched on ${response.url}`)
           this.status = Status.CONNECTED
