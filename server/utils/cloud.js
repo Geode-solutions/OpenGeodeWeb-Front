@@ -5,7 +5,7 @@ import { google } from "googleapis"
 
 // Local imports
 
-function check_recaptcha_params(name, email, launch) {
+function checkRecaptchaParams(name, email, launch) {
   console.log("check_recaptcha_params", { name, email, launch })
   return name === "" && email === "" && launch === false
 }
@@ -94,4 +94,4 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
   }
 }
 
-export { check_recaptcha_params, artifactImages, requestConfig }
+export { checkRecaptchaParams, artifactImages, requestConfig }

@@ -8,14 +8,14 @@ import { ServicesClient } from "@google-cloud/run"
 // Local imports
 import {
   artifactImages,
-  check_recaptcha_params,
+  checkRecaptchaParams,
   requestConfig,
 } from "@ogw_server/utils/cloud"
 
 export default defineEventHandler(async (event) => {
   try {
     const { name, email, launch } = await readBody(event)
-    if (!check_recaptcha_params(name, email, launch)) {
+    if (!checkRecaptchaParams(name, email, launch)) {
       return {
         statusCode: 500,
         body: JSON.stringify({ message: "INTERNAL_ERROR" }),
