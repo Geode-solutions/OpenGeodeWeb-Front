@@ -52,10 +52,7 @@ export const useViewerStore = defineStore(
     const base_url = computed(() => {
       let viewer_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`
       if (infraStore.app_mode === appMode.CLOUD) {
-        if (infraStore.ID === "") {
-          throw new Error("ID must not be empty in cloud mode")
-        }
-        viewer_url += `/${infraStore.ID}/viewer`
+        viewer_url += `/viewer`
       }
       viewer_url += "/ws"
       return viewer_url

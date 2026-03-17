@@ -86,7 +86,6 @@ const geodeStoreMock = {
 }
 const infraStoreMock = {
   app_mode: appMode.BROWSER,
-  ID: "1234",
 }
 const viewerStoreMock = {
   ws_connect: vi.fn().mockResolvedValue(),

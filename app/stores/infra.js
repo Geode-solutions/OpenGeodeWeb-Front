@@ -47,20 +47,15 @@ export const useInfraStore = defineStore("infra", {
         return
       }
       return navigator.locks.request("infra.create_backend", async () => {
-        this.status = Status.CREATING
         if (this.status === Status.CREATED) {
           return
         }
+        this.status = Status.CREATING
         console.log("[INFRA] Lock granted for create_backend")
         if (this.app_mode === appMode.CLOUD) {
-          console.log("[INFRA] CLOUD mode - Launching cloud...")
           const cloudStore = useCloudStore()
-          this.ID = await cloudStore.launch()
-          console.log("[INFRA] Cloud launched successfully")
+          await cloudStore.launch()
         } else {
-          console.log(
-            `[INFRA] ${this.app_mode} mode - Launching microservices...`,
-          )
           const appStore = useAppStore()
           await appStore.createProjectFolder()
           if (this.app_mode === appMode.DESKTOP) {
