@@ -11,11 +11,11 @@ import {
 
 export default defineEventHandler(async (event) => {
   try {
-    const { COMMAND_VIEWER, args } = await readBody(event)
-    const port = await runViewer(COMMAND_VIEWER, args)
+    const { execName, execPath, args } = await readBody(event)
+    const port = await runViewer(execName, execPath, args)
     await addMicroserviceMetadatas(args.projectFolderPath, {
       type: "viewer",
-      name: COMMAND_VIEWER,
+      name: execName,
       port,
     })
 

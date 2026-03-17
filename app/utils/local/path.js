@@ -11,16 +11,16 @@ import { v4 as uuidv4 } from "uuid"
 
 const MAX_DELETE_FOLDER_RETRIES = 5
 
-async function executablePath(cwdPath) {
+async function executablePath(microservicePath) {
+  console.log("executablePath", { microservicePath })
   if (isElectron()) {
     const electron = await import("electron")
     if (electron.app.isPackaged) {
+      console.log("electron.app.isPackaged", electron.app.isPackaged)
       return process.resourcesPath
-    } else {
-      return cwdPath
     }
-  } else {
-    return cwdPath
+  } else if (process.env.NODE_ENV === "production") {
+    return microservicePath
   }
 }
 

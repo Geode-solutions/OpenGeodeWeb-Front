@@ -32,16 +32,17 @@ async function runMicroservices() {
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
-  const { COMMAND_BACK, PROJECT, COMMAND_VIEWER } = useRuntimeConfig().public
+  const { COMMAND_BACK, PROJECT, COMMAND_VIEWER, NUXT_ROOT_PATH } =
+    useRuntimeConfig().public
   const projectFolderPath = generateProjectFolderPath(PROJECT)
   await createPath(projectFolderPath)
 
   const [back_port, viewer_port] = await Promise.all([
-    runBack(COMMAND_BACK, {
+    runBack(COMMAND_BACK, NUXT_ROOT_PATH, {
       projectFolderPath,
       uploadFolderPath: data_folder,
     }),
-    runViewer(COMMAND_VIEWER, { projectFolderPath }),
+    runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, { projectFolderPath }),
   ])
 
   console.log("back_port", back_port)

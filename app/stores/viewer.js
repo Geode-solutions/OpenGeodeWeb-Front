@@ -156,7 +156,7 @@ export const useViewerStore = defineStore(
       console.log("[VIEWER] Launching viewer microservice...", { args })
       const appStore = useAppStore()
 
-      const { COMMAND_VIEWER } = useRuntimeConfig().public
+      const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public
 
       console.log("[VIEWER] COMMAND_VIEWER", COMMAND_VIEWER)
       const schema = {
@@ -164,13 +164,18 @@ export const useViewerStore = defineStore(
         methods: ["POST"],
         type: "object",
         properties: {
-          COMMAND_VIEWER: { type: "string" },
+          execName: { type: "string" },
+          execPath: { type: "string" },
         },
-        required: ["COMMAND_VIEWER"],
+        required: ["execName", "execPath"],
         additionalProperties: true,
       }
 
-      const params = { COMMAND_VIEWER, args }
+      const params = {
+        execName: COMMAND_VIEWER,
+        execPath: NUXT_ROOT_PATH,
+        args,
+      }
       console.log("[VIEWER] params", params)
 
       return appStore.request(schema, params, {
