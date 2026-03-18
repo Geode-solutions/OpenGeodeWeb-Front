@@ -24,17 +24,13 @@ export function useMeshCellsVisibilityStyle() {
       })
     }
 
-    if (meshCellsVisibilitySchema) {
-      return viewerStore.request(
-        meshCellsVisibilitySchema,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshCellsVisibilitySchema,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

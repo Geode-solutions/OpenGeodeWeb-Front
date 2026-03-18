@@ -69,17 +69,13 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       )
     }
 
-    if (meshPolygonsPolygonAttributeSchemas?.name && name !== "") {
-      return viewerStore.request(
-        meshPolygonsPolygonAttributeSchemas.name,
-        { id, name },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPolygonsPolygonAttributeSchemas.name,
+      { id, name },
+      {
+        response_function: mutate,
+      },
+    )
   }
   function meshPolygonsPolygonAttributeRange(id) {
     const name = meshPolygonsPolygonAttributeName(id)
@@ -139,19 +135,15 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       return mutate()
     }
 
-    if (meshPolygonsPolygonAttributeSchemas?.color_map) {
-      const points = getRGBPointsFromPreset(colorMap)
-      const { minimum, maximum } = storedConfig
-      return viewerStore.request(
-        meshPolygonsPolygonAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    const points = getRGBPointsFromPreset(colorMap)
+    const { minimum, maximum } = storedConfig
+    return viewerStore.request(
+      meshPolygonsPolygonAttributeSchemas.color_map,
+      { id, points, minimum, maximum },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

@@ -24,17 +24,13 @@ export function useModelPointsVisibilityStyle() {
       })
     }
 
-    if (model_points_schemas?.visibility) {
-      return viewerStore.request(
-        model_points_schemas.visibility,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      model_points_schemas.visibility,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

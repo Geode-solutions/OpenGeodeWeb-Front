@@ -24,17 +24,13 @@ export function useModelPointsSizeStyle() {
       })
     }
 
-    if (model_points_schemas?.size) {
-      return viewerStore.request(
-        model_points_schemas.size,
-        { id, size },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      model_points_schemas.size,
+      { id, size },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

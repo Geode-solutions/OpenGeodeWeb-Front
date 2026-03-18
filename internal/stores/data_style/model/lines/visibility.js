@@ -40,24 +40,20 @@ export function useModelLinesVisibilityStyle() {
       return Promise.resolve()
     }
 
-    if (model_lines_schemas?.visibility) {
-      return dataStore
-        .getMeshComponentsViewerIds(id, line_ids)
-        .then((line_viewer_ids) => {
-          if (!line_viewer_ids || line_viewer_ids.length === 0) {
-            return mutate()
-          }
-          return viewerStore.request(
-            model_lines_schemas.visibility,
-            { id, block_ids: line_viewer_ids, visibility },
-            {
-              response_function: mutate,
-            },
-          )
-        })
-    } else {
-      return mutate()
-    }
+    return dataStore
+      .getMeshComponentsViewerIds(id, line_ids)
+      .then((line_viewer_ids) => {
+        if (!line_viewer_ids || line_viewer_ids.length === 0) {
+          return mutate()
+        }
+        return viewerStore.request(
+          model_lines_schemas.visibility,
+          { id, block_ids: line_viewer_ids, visibility },
+          {
+            response_function: mutate,
+          },
+        )
+      })
   }
 
   return {

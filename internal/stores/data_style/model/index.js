@@ -42,17 +42,13 @@ export function useModelStyle() {
       })
     }
 
-    if (model_schemas.visibility) {
-      return viewerStore.request(
-        model_schemas.visibility,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      model_schemas.visibility,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function visibleMeshComponents(id_ref) {
@@ -151,17 +147,13 @@ export function useModelStyle() {
       })
     }
 
-    if (model_schemas.color) {
-      return viewerStore.request(
-        model_schemas.color,
-        { id, color },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      model_schemas.color,
+      { id, color },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function setModelMeshComponentsVisibility(

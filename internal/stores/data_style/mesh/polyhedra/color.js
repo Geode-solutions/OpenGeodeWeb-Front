@@ -31,17 +31,13 @@ export function useMeshPolyhedraColorStyle() {
       )
     }
 
-    if (meshPolyhedraColorSchemas && color !== undefined) {
-      return viewerStore.request(
-        meshPolyhedraColorSchemas,
-        { id, color },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPolyhedraColorSchemas,
+      { id, color },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

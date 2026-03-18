@@ -71,17 +71,13 @@ export function useMeshPointsVertexAttributeStyle() {
       })
     }
 
-    if (meshPointsVertexAttributeSchemas?.name && name !== "") {
-      return viewerStore.request(
-        meshPointsVertexAttributeSchemas.name,
-        { id, name },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPointsVertexAttributeSchemas.name,
+      { id, name },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function meshPointsVertexAttributeRange(id) {
@@ -130,26 +126,22 @@ export function useMeshPointsVertexAttributeStyle() {
       return mutate()
     }
 
-    if (meshPointsVertexAttributeSchemas?.color_map) {
-      const points = getRGBPointsFromPreset(colorMap)
-      const { minimum, maximum } = storedConfig
+    const points = getRGBPointsFromPreset(colorMap)
+    const { minimum, maximum } = storedConfig
 
-      console.log(setMeshPointsVertexAttributeColorMap.name, {
-        id,
-        minimum,
-        maximum,
-        colorMap,
-      })
-      return viewerStore.request(
-        meshPointsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    console.log(setMeshPointsVertexAttributeColorMap.name, {
+      id,
+      minimum,
+      maximum,
+      colorMap,
+    })
+    return viewerStore.request(
+      meshPointsVertexAttributeSchemas.color_map,
+      { id, points, minimum, maximum },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

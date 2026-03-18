@@ -24,17 +24,13 @@ export function useMeshPointsVisibilityStyle() {
       })
     }
 
-    if (meshPointsVisibilitySchema) {
-      return viewerStore.request(
-        meshPointsVisibilitySchema,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPointsVisibilitySchema,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

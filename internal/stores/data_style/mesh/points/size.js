@@ -24,17 +24,13 @@ export function useMeshPointsSizeStyle() {
       })
     }
 
-    if (meshPointsSizeSchemas) {
-      return viewerStore.request(
-        meshPointsSizeSchemas,
-        { id, size },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPointsSizeSchemas,
+      { id, size },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

@@ -37,17 +37,13 @@ export function useMeshStyle() {
       })
     }
 
-    if (meshSchemas.visibility) {
-      return viewerStore.request(
-        meshSchemas.visibility,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshSchemas.visibility,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function meshColor(id) {
@@ -61,17 +57,13 @@ export function useMeshStyle() {
       })
     }
 
-    if (meshSchemas.color) {
-      return viewerStore.request(
-        meshSchemas.color,
-        { id, color },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshSchemas.color,
+      { id, color },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function applyMeshStyle(id) {

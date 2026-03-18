@@ -24,17 +24,13 @@ export function useModelEdgesVisibilityStyle() {
       })
     }
 
-    if (model_edges_schemas?.visibility) {
-      return viewerStore.request(
-        model_edges_schemas.visibility,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      model_edges_schemas.visibility,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function applyModelEdgesStyle(id) {

@@ -74,17 +74,13 @@ export function useMeshPolygonsVertexAttributeStyle() {
       )
     }
 
-    if (meshPolygonsVertexAttributeSchemas?.name && name !== "") {
-      return viewerStore.request(
-        meshPolygonsVertexAttributeSchemas.name,
-        { id, name },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPolygonsVertexAttributeSchemas.name,
+      { id, name },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function meshPolygonsVertexAttributeRange(id) {
@@ -140,26 +136,22 @@ export function useMeshPolygonsVertexAttributeStyle() {
       return mutate()
     }
 
-    if (meshPolygonsVertexAttributeSchemas?.color_map) {
-      const points = getRGBPointsFromPreset(colorMap)
-      const { minimum, maximum } = storedConfig
+    const points = getRGBPointsFromPreset(colorMap)
+    const { minimum, maximum } = storedConfig
 
-      console.log(setMeshPolygonsVertexAttributeColorMap.name, {
-        id,
-        minimum,
-        maximum,
-        colorMap,
-      })
-      return viewerStore.request(
-        meshPolygonsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    console.log(setMeshPolygonsVertexAttributeColorMap.name, {
+      id,
+      minimum,
+      maximum,
+      colorMap,
+    })
+    return viewerStore.request(
+      meshPolygonsVertexAttributeSchemas.color_map,
+      { id, points, minimum, maximum },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

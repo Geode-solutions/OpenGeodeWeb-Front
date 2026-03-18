@@ -24,17 +24,13 @@ export function useMeshPolygonsVisibilityStyle() {
       })
     }
 
-    if (meshPolygonsVisibilitySchema) {
-      return viewerStore.request(
-        meshPolygonsVisibilitySchema,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPolygonsVisibilitySchema,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

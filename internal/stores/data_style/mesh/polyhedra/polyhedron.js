@@ -73,17 +73,13 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
       )
     }
 
-    if (meshPolyhedraPolyhedronAttributeSchemas?.name && name !== "") {
-      return viewerStore.request(
-        meshPolyhedraPolyhedronAttributeSchemas.name,
-        { id, name },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPolyhedraPolyhedronAttributeSchemas.name,
+      { id, name },
+      {
+        response_function: mutate,
+      },
+    )
   }
   function meshPolyhedraPolyhedronAttributeRange(id) {
     const name = meshPolyhedraPolyhedronAttributeName(id)
@@ -137,19 +133,15 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
       return mutate()
     }
 
-    if (meshPolyhedraPolyhedronAttributeSchemas?.color_map) {
-      const points = getRGBPointsFromPreset(colorMap)
-      const { minimum, maximum } = storedConfig
-      return viewerStore.request(
-        meshPolyhedraPolyhedronAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    const points = getRGBPointsFromPreset(colorMap)
+    const { minimum, maximum } = storedConfig
+    return viewerStore.request(
+      meshPolyhedraPolyhedronAttributeSchemas.color_map,
+      { id, points, minimum, maximum },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

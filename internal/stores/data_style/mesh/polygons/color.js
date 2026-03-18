@@ -31,17 +31,13 @@ export function useMeshPolygonsColorStyle() {
       )
     }
 
-    if (meshPolygonsColorSchemas && color !== undefined) {
-      return viewerStore.request(
-        meshPolygonsColorSchemas,
-        { id, color },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPolygonsColorSchemas,
+      { id, color },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

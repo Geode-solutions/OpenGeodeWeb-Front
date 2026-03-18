@@ -24,17 +24,13 @@ export function useMeshEdgesWidthStyle() {
       })
     }
 
-    if (meshEdgesWidthSchemas) {
-      return viewerStore.request(
-        meshEdgesWidthSchemas,
-        { id, width },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshEdgesWidthSchemas,
+      { id, width },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

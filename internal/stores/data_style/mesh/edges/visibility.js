@@ -24,17 +24,13 @@ export function useMeshEdgesVisibilityStyle() {
       })
     }
 
-    if (meshEdgesVisibilitySchema) {
-      return viewerStore.request(
-        meshEdgesVisibilitySchema,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshEdgesVisibilitySchema,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

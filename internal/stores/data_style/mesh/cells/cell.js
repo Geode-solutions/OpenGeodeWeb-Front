@@ -67,17 +67,13 @@ export function useMeshCellsCellAttributeStyle() {
       })
     }
 
-    if (meshCellsCellAttributeSchemas?.name && name !== "") {
-      return viewerStore.request(
-        meshCellsCellAttributeSchemas.name,
-        { id, name },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshCellsCellAttributeSchemas.name,
+      { id, name },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function meshCellsCellAttributeRange(id) {
@@ -126,26 +122,22 @@ export function useMeshCellsCellAttributeStyle() {
       return mutate()
     }
 
-    if (meshCellsCellAttributeSchemas?.color_map) {
-      const points = getRGBPointsFromPreset(colorMap)
-      const { minimum, maximum } = storedConfig
+    const points = getRGBPointsFromPreset(colorMap)
+    const { minimum, maximum } = storedConfig
 
-      console.log(setMeshCellsCellAttributeColorMap.name, {
-        id,
-        minimum,
-        maximum,
-        colorMap,
-      })
-      return viewerStore.request(
-        meshCellsCellAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    console.log(setMeshCellsCellAttributeColorMap.name, {
+      id,
+      minimum,
+      maximum,
+      colorMap,
+    })
+    return viewerStore.request(
+      meshCellsCellAttributeSchemas.color_map,
+      { id, points, minimum, maximum },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

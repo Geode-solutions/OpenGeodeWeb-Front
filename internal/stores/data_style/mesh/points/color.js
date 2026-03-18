@@ -31,17 +31,13 @@ export function useMeshPointsColorStyle() {
       )
     }
 
-    if (meshPointsColorSchemas && color !== undefined) {
-      return viewerStore.request(
-        meshPointsColorSchemas,
-        { id, color },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPointsColorSchemas,
+      { id, color },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

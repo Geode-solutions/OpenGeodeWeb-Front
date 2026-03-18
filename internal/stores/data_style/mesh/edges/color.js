@@ -31,17 +31,13 @@ export function useMeshEdgesColorStyle() {
       )
     }
 
-    if (meshEdgesColorSchemas && color !== undefined) {
-      return viewerStore.request(
-        meshEdgesColorSchemas,
-        { id, color },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshEdgesColorSchemas,
+      { id, color },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

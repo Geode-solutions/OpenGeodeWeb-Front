@@ -71,17 +71,13 @@ export function useMeshEdgesEdgeAttributeStyle() {
       })
     }
 
-    if (meshEdgesEdgeAttributeSchemas?.name && name !== "") {
-      return viewerStore.request(
-        meshEdgesEdgeAttributeSchemas.name,
-        { id, name },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshEdgesEdgeAttributeSchemas.name,
+      { id, name },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   function meshEdgesEdgeAttributeRange(id) {
@@ -130,26 +126,22 @@ export function useMeshEdgesEdgeAttributeStyle() {
       return mutate()
     }
 
-    if (meshEdgesEdgeAttributeSchemas?.color_map) {
-      const points = getRGBPointsFromPreset(colorMap)
-      const { minimum, maximum } = storedConfig
+    const points = getRGBPointsFromPreset(colorMap)
+    const { minimum, maximum } = storedConfig
 
-      console.log(setMeshEdgesEdgeAttributeColorMap.name, {
-        id,
-        minimum,
-        maximum,
-        colorMap,
-      })
-      return viewerStore.request(
-        meshEdgesEdgeAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    console.log(setMeshEdgesEdgeAttributeColorMap.name, {
+      id,
+      minimum,
+      maximum,
+      colorMap,
+    })
+    return viewerStore.request(
+      meshEdgesEdgeAttributeSchemas.color_map,
+      { id, points, minimum, maximum },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

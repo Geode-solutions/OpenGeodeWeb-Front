@@ -31,17 +31,13 @@ export function useMeshPolyhedraVisibilityStyle() {
       )
     }
 
-    if (meshPolyhedraVisibilitySchema) {
-      return viewerStore.request(
-        meshPolyhedraVisibilitySchema,
-        { id, visibility },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshPolyhedraVisibilitySchema,
+      { id, visibility },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

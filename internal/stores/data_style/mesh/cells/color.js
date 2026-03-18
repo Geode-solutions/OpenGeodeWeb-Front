@@ -31,17 +31,13 @@ export function useMeshCellsColorStyle() {
       )
     }
 
-    if (meshCellsColorSchemas && color !== undefined) {
-      return viewerStore.request(
-        meshCellsColorSchemas,
-        { id, color },
-        {
-          response_function: mutate,
-        },
-      )
-    } else {
-      return mutate()
-    }
+    return viewerStore.request(
+      meshCellsColorSchemas,
+      { id, color },
+      {
+        response_function: mutate,
+      },
+    )
   }
 
   return {

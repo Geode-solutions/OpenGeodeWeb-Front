@@ -41,24 +41,20 @@ export function useModelSurfacesVisibilityStyle() {
       return Promise.resolve()
     }
 
-    if (model_surfaces_schemas?.visibility) {
-      return dataStore
-        .getMeshComponentsViewerIds(id, surface_ids)
-        .then((surface_viewer_ids) => {
-          if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-            return mutate()
-          }
-          return viewerStore.request(
-            model_surfaces_schemas.visibility,
-            { id, block_ids: surface_viewer_ids, visibility },
-            {
-              response_function: mutate,
-            },
-          )
-        })
-    } else {
-      return mutate()
-    }
+    return dataStore
+      .getMeshComponentsViewerIds(id, surface_ids)
+      .then((surface_viewer_ids) => {
+        if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
+          return mutate()
+        }
+        return viewerStore.request(
+          model_surfaces_schemas.visibility,
+          { id, block_ids: surface_viewer_ids, visibility },
+          {
+            response_function: mutate,
+          },
+        )
+      })
   }
 
   return {
