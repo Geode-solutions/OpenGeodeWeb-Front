@@ -34,11 +34,17 @@ async function runScript(
   expectedResponse,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
-  const command = commandExistsSync(execName)
-    ? execName
-    : path.join(await executablePath(execPath), executableName(execName))
+  let command
+  if (commandExistsSync(execName)) {
+    command = execName
+  } else {
+    command = path.join(
+      await executablePath(execPath),
+      executableName(execName),
+    )
+    fs.chmodSync(command, "755")
+  }
   console.log("runScript", command, args)
-  fs.chmodSync(command, "755")
   const child = child_process.spawn(command, args, {
     encoding: "utf8",
     shell: true,
