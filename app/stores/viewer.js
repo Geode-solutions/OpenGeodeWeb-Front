@@ -12,7 +12,7 @@ import { useRuntimeConfig } from "nuxt/app"
 
 // Local imports
 import { Status } from "@ogw_front/utils/status"
-import { appMode } from "@ogw_front/utils/app_mode"
+import { appMode } from "@ogw_front/utils/local/app_mode"
 import { useAppStore } from "@ogw_front/stores/app"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { viewer_call } from "@ogw_internal/utils/viewer_call"

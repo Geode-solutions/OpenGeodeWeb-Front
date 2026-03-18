@@ -17,7 +17,7 @@ import {
   generateProjectFolderPath,
 } from "@ogw_front/utils/local/path"
 import { Status } from "@ogw_front/utils/status"
-import { appMode } from "@ogw_front/utils/app_mode"
+import { appMode } from "@ogw_front/utils/local/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
 import { setupActivePinia } from "@ogw_tests/utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"

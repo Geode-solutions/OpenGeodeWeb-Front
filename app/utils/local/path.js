@@ -7,7 +7,7 @@ import path from "node:path"
 import { v4 as uuidv4 } from "uuid"
 
 // Local imports
-import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
+import { appMode, getAppMode } from "./app_mode"
 
 async function executablePath(microservicePath) {
   console.log("[executablePath] microservicePath", microservicePath)
