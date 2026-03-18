@@ -7,11 +7,11 @@ import path from "node:path"
 import { v4 as uuidv4 } from "uuid"
 
 // Local imports
-import { appMode, getAppMode } from "./app_mode.js"
+import { appMode } from "./app_mode.js"
 
 async function executablePath(microservicePath) {
   console.log("[executablePath] microservicePath", microservicePath)
-  if (getAppMode() === appMode.DESKTOP) {
+  if (useRuntimeConfig().public.MODE === appMode.DESKTOP) {
     const electron = await import("electron")
     console.log(
       "[executablePath] electron.app.isPackaged",

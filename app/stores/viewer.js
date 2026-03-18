@@ -8,7 +8,6 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry"
 import SmartConnect from "wslink/src/SmartConnect"
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView"
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
-import { useRuntimeConfig } from "nuxt/app"
 
 // Local imports
 import { Status } from "@ogw_front/utils/status"
@@ -140,27 +139,16 @@ export const useViewerStore = defineStore(
     function launch(args = { projectFolderPath }) {
       console.log("[VIEWER] Launching viewer microservice...", { args })
       const appStore = useAppStore()
-
-      const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public
-
-      console.log("[VIEWER] COMMAND_VIEWER", COMMAND_VIEWER)
       const schema = {
         $id: "/api/app/run_viewer",
         methods: ["POST"],
         type: "object",
-        properties: {
-          execName: { type: "string" },
-          execPath: { type: "string" },
-        },
-        required: ["execName", "execPath"],
+        properties: {},
+        required: [],
         additionalProperties: true,
       }
 
-      const params = {
-        execName: COMMAND_VIEWER,
-        execPath: NUXT_ROOT_PATH,
-        args,
-      }
+      const params = { args }
       console.log("[VIEWER] params", params)
 
       return appStore.request(schema, params, {

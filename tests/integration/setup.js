@@ -4,7 +4,6 @@ import path from "node:path"
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest"
-import { useRuntimeConfig } from "nuxt/app"
 
 // Local imports
 import {

@@ -9,13 +9,17 @@ import {
   runViewer,
 } from "@geode/opengeodeweb-front/app/utils/local/microservices.js"
 
+import { useRuntimeConfig } from "nitropack/runtime"
+
 export default defineEventHandler(async (event) => {
   try {
-    const { execName, execPath, args } = await readBody(event)
-    const port = await runViewer(execName, execPath, args)
+    const config = useRuntimeConfig(event).public
+    const { COMMAND_VIEWER, NUXT_ROOT_PATH } = config
+    const { args } = await readBody(event)
+    const port = await runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, args)
     await addMicroserviceMetadatas(args.projectFolderPath, {
       type: "viewer",
-      name: execName,
+      name: COMMAND_VIEWER,
       port,
     })
 

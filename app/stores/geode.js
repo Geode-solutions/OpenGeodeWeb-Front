@@ -82,27 +82,16 @@ export const useGeodeStore = defineStore("geode", {
     launch(args) {
       console.log("[GEODE] Launching back microservice...", { args })
       const appStore = useAppStore()
-
-      const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public
-
-      console.log("[GEODE] COMMAND_BACK", COMMAND_BACK, NUXT_ROOT_PATH)
       const schema = {
         $id: "/api/app/run_back",
         methods: ["POST"],
         type: "object",
-        properties: {
-          execName: { type: "string" },
-          execPath: { type: "string" },
-        },
-        required: ["execName", "execPath"],
+        properties: {},
+        required: [],
         additionalProperties: true,
       }
 
-      const params = {
-        execName: COMMAND_BACK,
-        execPath: NUXT_ROOT_PATH,
-        args,
-      }
+      const params = { args }
 
       console.log("[GEODE] params", params)
       return appStore.request(schema, params, {
