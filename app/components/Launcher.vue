@@ -4,6 +4,13 @@
   import { Status } from "@ogw_front/utils/status"
   import { useInfraStore } from "@ogw_front/stores/infra"
 
+  const { logo } = defineProps({
+    logo: {
+      type: String,
+      required: true,
+    },
+  })
+
   const infraStore = useInfraStore()
 
   watch(
@@ -29,7 +36,7 @@
         <Recaptcha :button_color="'secondary'" />
       </v-col>
       <v-col v-else-if="infraStore.status == Status.CREATING">
-        <Loading />
+        <Loading :logo="logo" />
       </v-col>
     </v-row>
   </v-container>
