@@ -54,10 +54,16 @@ export function useModelStyle() {
       (newId, oldId, onCleanup) => {
         if (!newId) return
         const observable = liveQuery(async () => {
-          const components = await database.model_components.where("id").equals(newId).toArray()
+          const components = await database.model_components
+            .where("id")
+            .equals(newId)
+            .toArray()
           if (components.length === 0) return []
 
-          const all_styles = await database.model_component_datastyle.where("id_model").equals(newId).toArray()
+          const all_styles = await database.model_component_datastyle
+            .where("id_model")
+            .equals(newId)
+            .toArray()
           const styles = all_styles.reduce((acc, s) => {
             acc[s.id_component] = s
             return acc
@@ -76,7 +82,8 @@ export function useModelStyle() {
           for (const [type, geode_ids] of Object.entries(componentsByType)) {
             let all_visible = true
             for (const gid of geode_ids) {
-              const is_visible = styles[gid] === undefined ? true : styles[gid].visibility
+              const is_visible =
+                styles[gid] === undefined ? true : styles[gid].visibility
               if (is_visible) current_selection.push(gid)
               else all_visible = false
             }
@@ -86,8 +93,10 @@ export function useModelStyle() {
         })
 
         const subscription = observable.subscribe({
-          next: (val) => { selection.value = val },
-          error: (err) => console.error(err)
+          next: (val) => {
+            selection.value = val
+          },
+          error: (err) => console.error(err),
         })
         onCleanup(() => subscription.unsubscribe())
       },
@@ -105,12 +114,12 @@ export function useModelStyle() {
       surfaces: () => modelSurfacesStyleStore.applyModelSurfacesStyle(id),
       blocks: () => modelBlocksStyleStore.applyModelBlocksStyle(id),
       points: () => modelPointsStyleStore.applyModelPointsStyle(id),
-      edges: () => modelEdgesStyleStore.applyModelEdgesStyle(id)
+      edges: () => modelEdgesStyleStore.applyModelEdgesStyle(id),
     }
 
     const promises = Object.keys(style)
-      .filter(key => handlers[key])
-      .map(key => handlers[key]())
+      .filter((key) => handlers[key])
+      .map((key) => handlers[key]())
 
     return Promise.all(promises)
   }
@@ -123,9 +132,13 @@ export function useModelStyle() {
         Corner: () => modelCornersStyleStore.setModelCornersDefaultStyle(id),
         Line: () => modelLinesStyleStore.setModelLinesDefaultStyle(id),
         Surface: () => modelSurfacesStyleStore.setModelSurfacesDefaultStyle(id),
-        Block: () => modelBlocksStyleStore.setModelBlocksDefaultStyle(id)
+        Block: () => modelBlocksStyleStore.setModelBlocksDefaultStyle(id),
       }
-      return Promise.all(Object.keys(mesh_components).filter(k => handlers[k]).map(k => handlers[k]()))
+      return Promise.all(
+        Object.keys(mesh_components)
+          .filter((k) => handlers[k])
+          .map((k) => handlers[k]()),
+      )
     })
   }
 
