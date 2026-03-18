@@ -5,7 +5,11 @@ const appMode = {
 }
 
 function getAppMode() {
-  return process.env.MODE || appMode.CLOUD
+  console.log(
+    "[getAppMode] useRuntimeConfig().public.MODE",
+    useRuntimeConfig().public.MODE,
+  )
+  return useRuntimeConfig().public.MODE
 }
 
 export { appMode, getAppMode }

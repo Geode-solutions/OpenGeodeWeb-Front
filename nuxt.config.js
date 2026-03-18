@@ -14,6 +14,7 @@ export default defineNuxtConfig({
       COMMAND_BACK: "opengeodeweb-back",
       COMMAND_VIEWER: "opengeodeweb-viewer",
       NUXT_ROOT_PATH: __dirname,
+      MODE: process.env.MODE || "CLOUD",
       PROJECT: package_json.name,
       SITE_BRANCH:
         process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
