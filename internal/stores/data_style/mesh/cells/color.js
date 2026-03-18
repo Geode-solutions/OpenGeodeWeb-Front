@@ -17,25 +17,23 @@ export function useMeshCellsColorStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).color
   }
   function setMeshCellsColor(id, color) {
-    const mutate = () => {
-      return meshCellsCommonStyle.mutateMeshCellsColoringStyle(
-        id,
-        (coloring) => {
-          coloring.color = color
-          console.log(
-            setMeshCellsColor.name,
-            { id },
-            JSON.stringify(coloring.color),
-          )
-        },
-      )
-    }
-
     return viewerStore.request(
       meshCellsColorSchemas,
       { id, color },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshCellsCommonStyle.mutateMeshCellsColoringStyle(
+            id,
+            (coloring) => {
+              coloring.color = color
+              console.log(
+                setMeshCellsColor.name,
+                { id },
+                JSON.stringify(coloring.color),
+              )
+            },
+          )
+        },
       },
     )
   }

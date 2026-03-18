@@ -34,19 +34,17 @@ export function useModelStyle() {
     return dataStyleStateStore.getStyle(id).visibility
   }
   function setModelVisibility(id, visibility) {
-    const mutate = () => {
-      return dataStyleStateStore.mutateStyle(id, (style) => {
-        style.visibility = visibility
-        hybridViewerStore.setVisibility(id, visibility)
-        console.log(setModelVisibility.name, { id }, modelVisibility(id))
-      })
-    }
-
     return viewerStore.request(
       model_schemas.visibility,
       { id, visibility },
       {
-        response_function: mutate,
+        response_function: () => {
+          return dataStyleStateStore.mutateStyle(id, (style) => {
+            style.visibility = visibility
+            hybridViewerStore.setVisibility(id, visibility)
+            console.log(setModelVisibility.name, { id }, modelVisibility(id))
+          })
+        },
       },
     )
   }
@@ -140,18 +138,16 @@ export function useModelStyle() {
     return dataStyleStateStore.getStyle(id).color
   }
   function setModelColor(id, color) {
-    const mutate = () => {
-      return dataStyleStateStore.mutateStyle(id, (style) => {
-        style.color = color
-        console.log(setModelColor.name, { id }, modelColor(id))
-      })
-    }
-
     return viewerStore.request(
       model_schemas.color,
       { id, color },
       {
-        response_function: mutate,
+        response_function: () => {
+          return dataStyleStateStore.mutateStyle(id, (style) => {
+            style.color = color
+            console.log(setModelColor.name, { id }, modelColor(id))
+          })
+        },
       },
     )
   }

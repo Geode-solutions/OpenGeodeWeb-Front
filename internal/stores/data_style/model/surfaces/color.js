@@ -19,22 +19,6 @@ export function useModelSurfacesColorStyle() {
   }
 
   function setModelSurfacesColor(id, surface_ids, color) {
-    const mutate = () => {
-      return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
-        id,
-        surface_ids,
-        (style) => {
-          style.color = color
-          console.log(
-            setModelSurfacesColor.name,
-            { id },
-            { surface_ids },
-            JSON.stringify(style.color),
-          )
-        },
-      )
-    }
-
     if (!surface_ids || surface_ids.length === 0) {
       return Promise.resolve()
     }
@@ -46,13 +30,39 @@ export function useModelSurfacesColorStyle() {
             "[setModelSurfacesColor] No viewer IDs found, skipping color request",
             { id, surface_ids },
           )
-          return mutate()
+          return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
+            id,
+            surface_ids,
+            (style) => {
+              style.color = color
+              console.log(
+                setModelSurfacesColor.name,
+                { id },
+                { surface_ids },
+                JSON.stringify(style.color),
+              )
+            },
+          )
         }
         return viewerStore.request(
           model_surfaces_schemas.color,
           { id, block_ids: surface_viewer_ids, color },
           {
-            response_function: mutate,
+            response_function: () => {
+              return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
+                id,
+                surface_ids,
+                (style) => {
+                  style.color = color
+                  console.log(
+                    setModelSurfacesColor.name,
+                    { id },
+                    { surface_ids },
+                    JSON.stringify(style.color),
+                  )
+                },
+              )
+            },
           },
         )
       })

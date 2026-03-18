@@ -7,7 +7,7 @@ import { useMeshEdgesEdgeAttributeStyle } from "./edge"
 import { useMeshEdgesVertexAttributeStyle } from "./vertex"
 import { useMeshEdgesVisibilityStyle } from "./visibility"
 import { useMeshEdgesWidthStyle } from "./width"
-import { useDataStyleStateStore } from "../../state"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 // Local constants
 

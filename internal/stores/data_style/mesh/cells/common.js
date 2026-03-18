@@ -27,17 +27,7 @@ export function useMeshCellsCommonStyle() {
     })
   }
 
-  function mutateMeshCellsCellStyle(id, mutationCallback) {
-    return mutateMeshCellsColoringStyle(id, (coloring) => {
-      mutationCallback(coloring.cell)
-    })
-  }
 
-  function mutateMeshCellsVertexStyle(id, mutationCallback) {
-    return mutateMeshCellsColoringStyle(id, (coloring) => {
-      mutationCallback(coloring.vertex)
-    })
-  }
 
   return {
     meshCellsStyle,
@@ -45,8 +35,5 @@ export function useMeshCellsCommonStyle() {
     meshCellsActiveColoring,
     mutateMeshCellsStyle,
     mutateMeshCellsColoringStyle,
-    mutateMeshCellsCellStyle,
-    mutateCellsStyle: mutateMeshCellsCellStyle,
-    mutateMeshCellsVertexStyle,
   }
 }

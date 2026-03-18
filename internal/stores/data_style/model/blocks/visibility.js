@@ -23,22 +23,6 @@ export function useModelBlocksVisibilityStyle() {
   }
 
   function setModelBlocksVisibility(id, block_ids, visibility) {
-    const mutate = () => {
-      return modelBlocksCommonStyle.mutateModelBlocksStyle(
-        id,
-        block_ids,
-        (style) => {
-          style.visibility = visibility
-          console.log(
-            setModelBlocksVisibility.name,
-            { id },
-            { block_ids },
-            style.visibility,
-          )
-        },
-      )
-    }
-
     if (!block_ids || block_ids.length === 0) {
       return Promise.resolve()
     }
@@ -50,13 +34,39 @@ export function useModelBlocksVisibilityStyle() {
             "[setModelBlocksVisibility] No viewer IDs found, skipping visibility request",
             { id, block_ids },
           )
-          return mutate()
+          return modelBlocksCommonStyle.mutateModelBlocksStyle(
+            id,
+            block_ids,
+            (style) => {
+              style.visibility = visibility
+              console.log(
+                setModelBlocksVisibility.name,
+                { id },
+                { block_ids },
+                style.visibility,
+              )
+            },
+          )
         }
         return viewerStore.request(
           model_blocks_schemas.visibility,
           { id, block_ids: block_viewer_ids, visibility },
           {
-            response_function: mutate,
+            response_function: () => {
+              return modelBlocksCommonStyle.mutateModelBlocksStyle(
+                id,
+                block_ids,
+                (style) => {
+                  style.visibility = visibility
+                  console.log(
+                    setModelBlocksVisibility.name,
+                    { id },
+                    { block_ids },
+                    style.visibility,
+                  )
+                },
+              )
+            },
           },
         )
       })

@@ -7,7 +7,7 @@ import { useMeshPolygonsPolygonAttributeStyle } from "./polygon"
 import { useMeshPolygonsTexturesStyle } from "./textures"
 import { useMeshPolygonsVertexAttributeStyle } from "./vertex"
 import { useMeshPolygonsVisibilityStyle } from "./visibility"
-import { useDataStyleStateStore } from "../../state"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 // Local constants
 

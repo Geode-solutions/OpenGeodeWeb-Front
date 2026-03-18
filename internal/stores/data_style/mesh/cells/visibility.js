@@ -17,18 +17,16 @@ export function useMeshCellsVisibilityStyle() {
     return meshCellsCommonStyle.meshCellsStyle(id).visibility
   }
   function setMeshCellsVisibility(id, visibility) {
-    const mutate = () => {
-      return meshCellsCommonStyle.mutateMeshCellsStyle(id, (cells) => {
-        cells.visibility = visibility
-        console.log(setMeshCellsVisibility.name, { id }, cells.visibility)
-      })
-    }
-
     return viewerStore.request(
       meshCellsVisibilitySchema,
       { id, visibility },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshCellsCommonStyle.mutateMeshCellsStyle(id, (cells) => {
+            cells.visibility = visibility
+            console.log(setMeshCellsVisibility.name, { id }, cells.visibility)
+          })
+        },
       },
     )
   }

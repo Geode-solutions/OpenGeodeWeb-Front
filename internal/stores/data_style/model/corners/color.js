@@ -19,22 +19,6 @@ export function useModelCornersColorStyle() {
   }
 
   function setModelCornersColor(id, corner_ids, color) {
-    const mutate = () => {
-      return modelCornersCommonStyle.mutateModelCornersStyle(
-        id,
-        corner_ids,
-        (style) => {
-          style.color = color
-          console.log(
-            setModelCornersColor.name,
-            { id },
-            { corner_ids },
-            JSON.stringify(style.color),
-          )
-        },
-      )
-    }
-
     if (!corner_ids || corner_ids.length === 0) {
       return Promise.resolve()
     }
@@ -46,13 +30,39 @@ export function useModelCornersColorStyle() {
             "[setModelCornersColor] No viewer IDs found, skipping color request",
             { id, corner_ids },
           )
-          return mutate()
+          return modelCornersCommonStyle.mutateModelCornersStyle(
+            id,
+            corner_ids,
+            (style) => {
+              style.color = color
+              console.log(
+                setModelCornersColor.name,
+                { id },
+                { corner_ids },
+                JSON.stringify(style.color),
+              )
+            },
+          )
         }
         return viewerStore.request(
           model_corners_schemas.color,
           { id, block_ids: corner_viewer_ids, color },
           {
-            response_function: mutate,
+            response_function: () => {
+              return modelCornersCommonStyle.mutateModelCornersStyle(
+                id,
+                corner_ids,
+                (style) => {
+                  style.color = color
+                  console.log(
+                    setModelCornersColor.name,
+                    { id },
+                    { corner_ids },
+                    JSON.stringify(style.color),
+                  )
+                },
+              )
+            },
           },
         )
       })

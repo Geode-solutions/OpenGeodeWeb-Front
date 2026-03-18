@@ -1,7 +1,7 @@
 // Third party imports
 
 // Local imports
-import { useDataStyleStateStore } from "../../state"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 import { useMeshCellsCellAttributeStyle } from "./cell"
 import { useMeshCellsColorStyle } from "./color"
 import { useMeshCellsCommonStyle } from "./common"

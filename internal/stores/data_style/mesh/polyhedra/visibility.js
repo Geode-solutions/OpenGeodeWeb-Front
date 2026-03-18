@@ -17,25 +17,23 @@ export function useMeshPolyhedraVisibilityStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).visibility
   }
   function setMeshPolyhedraVisibility(id, visibility) {
-    const mutate = () => {
-      return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(
-        id,
-        (polyhedra) => {
-          polyhedra.visibility = visibility
-          console.log(
-            setMeshPolyhedraVisibility.name,
-            { id },
-            polyhedra.visibility,
-          )
-        },
-      )
-    }
-
     return viewerStore.request(
       meshPolyhedraVisibilitySchema,
       { id, visibility },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(
+            id,
+            (polyhedra) => {
+              polyhedra.visibility = visibility
+              console.log(
+                setMeshPolyhedraVisibility.name,
+                { id },
+                polyhedra.visibility,
+              )
+            },
+          )
+        },
       },
     )
   }

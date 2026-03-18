@@ -47,33 +47,35 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     return meshPolygonsPolygonAttribute(id).name
   }
   function setMeshPolygonsPolygonAttributeName(id, name) {
-    const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
-        id,
-        (polygon) => {
-          polygon.name = name
-          if (!(name in polygon.storedConfigs)) {
-            polygon.storedConfigs[name] = {
-              minimum: undefined,
-              maximum: undefined,
-              colorMap: undefined,
-            }
-          }
-          const { minimum, maximum, colorMap } = polygon.storedConfigs[name]
-          const storedConfig = polygon.storedConfigs[name]
-          storedConfig.minimum = minimum
-          storedConfig.maximum = maximum
-          polygon.storedConfigs[name].colorMap = colorMap
-          console.log(setMeshPolygonsPolygonAttributeName.name, { id }, name)
-        },
-      )
-    }
-
     return viewerStore.request(
       meshPolygonsPolygonAttributeSchemas.name,
       { id, name },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
+            id,
+            (polygon) => {
+              polygon.name = name
+              if (!(name in polygon.storedConfigs)) {
+                polygon.storedConfigs[name] = {
+                  minimum: undefined,
+                  maximum: undefined,
+                  colorMap: undefined,
+                }
+              }
+              const { minimum, maximum, colorMap } = polygon.storedConfigs[name]
+              const storedConfig = polygon.storedConfigs[name]
+              storedConfig.minimum = minimum
+              storedConfig.maximum = maximum
+              polygon.storedConfigs[name].colorMap = colorMap
+              console.log(
+                setMeshPolygonsPolygonAttributeName.name,
+                { id },
+                name,
+              )
+            },
+          )
+        },
       },
     )
   }
@@ -112,36 +114,25 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   function setMeshPolygonsPolygonAttributeColorMap(id, colorMap) {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
-    const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
-        id,
-        (polygon) => {
-          polygon.storedConfigs[name].colorMap = colorMap
-          polygon.storedConfigs[name].colorMap = colorMap
-          console.log(
-            setMeshPolygonsPolygonAttributeColorMap.name,
-            { id },
-            polygon.storedConfigs[name].colorMap,
-          )
-        },
-      )
-    }
-
-    if (
-      storedConfig.minimum === undefined ||
-      storedConfig.maximum === undefined ||
-      colorMap === undefined
-    ) {
-      return mutate()
-    }
-
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
     return viewerStore.request(
       meshPolygonsPolygonAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
+            id,
+            (polygon) => {
+              polygon.storedConfigs[name].colorMap = colorMap
+              console.log(
+                setMeshPolygonsPolygonAttributeColorMap.name,
+                { id },
+                polygon.storedConfigs[name].colorMap,
+              )
+            },
+          )
+        },
       },
     )
   }

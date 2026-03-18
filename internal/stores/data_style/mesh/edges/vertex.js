@@ -52,30 +52,31 @@ export function useMeshEdgesVertexAttributeStyle() {
     return meshEdgesVertexAttribute(id).name
   }
   function setMeshEdgesVertexAttributeName(id, name) {
-    const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesVertexStyle(id, (vertex) => {
-        vertex.name = name
-        if (!(name in vertex.storedConfigs)) {
-          vertex.storedConfigs[name] = {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
-          }
-        }
-        const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
-        const storedConfig = vertex.storedConfigs[name]
-        storedConfig.minimum = minimum
-        storedConfig.maximum = maximum
-        vertex.storedConfigs[name].colorMap = colorMap
-        console.log(setMeshEdgesVertexAttributeName.name, { id }, name)
-      })
-    }
-
     return viewerStore.request(
       meshEdgesVertexAttributeSchemas.name,
       { id, name },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshEdgesCommonStyle.mutateMeshEdgesVertexStyle(
+            id,
+            (vertex) => {
+              vertex.name = name
+              if (!(name in vertex.storedConfigs)) {
+                vertex.storedConfigs[name] = {
+                  minimum: undefined,
+                  maximum: undefined,
+                  colorMap: undefined,
+                }
+              }
+              const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
+              const storedConfig = vertex.storedConfigs[name]
+              storedConfig.minimum = minimum
+              storedConfig.maximum = maximum
+              vertex.storedConfigs[name].colorMap = colorMap
+              console.log(setMeshEdgesVertexAttributeName.name, { id }, name)
+            },
+          )
+        },
       },
     )
   }
@@ -107,28 +108,8 @@ export function useMeshEdgesVertexAttributeStyle() {
   function setMeshEdgesVertexAttributeColorMap(id, colorMap) {
     const name = meshEdgesVertexAttributeName(id)
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
-    const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesVertexStyle(id, (vertex) => {
-        vertex.storedConfigs[name].colorMap = colorMap
-        console.log(
-          setMeshEdgesVertexAttributeColorMap.name,
-          { id },
-          vertex.storedConfigs[name].colorMap,
-        )
-      })
-    }
-
-    if (
-      storedConfig.minimum === undefined ||
-      storedConfig.maximum === undefined ||
-      colorMap === undefined
-    ) {
-      return mutate()
-    }
-
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
-
     console.log(setMeshEdgesVertexAttributeColorMap.name, {
       id,
       minimum,
@@ -139,7 +120,19 @@ export function useMeshEdgesVertexAttributeStyle() {
       meshEdgesVertexAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshEdgesCommonStyle.mutateMeshEdgesVertexStyle(
+            id,
+            (vertex) => {
+              vertex.storedConfigs[name].colorMap = colorMap
+              console.log(
+                setMeshEdgesVertexAttributeColorMap.name,
+                { id },
+                vertex.storedConfigs[name].colorMap,
+              )
+            },
+          )
+        },
       },
     )
   }

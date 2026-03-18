@@ -17,25 +17,23 @@ export function useMeshPolygonsColorStyle() {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).color
   }
   function setMeshPolygonsColor(id, color) {
-    const mutate = () => {
-      return meshPolygonsCommonStyle.mutateMeshPolygonsColoringStyle(
-        id,
-        (coloring) => {
-          coloring.color = color
-          console.log(
-            setMeshPolygonsColor.name,
-            { id },
-            JSON.stringify(coloring.color),
-          )
-        },
-      )
-    }
-
     return viewerStore.request(
       meshPolygonsColorSchemas,
       { id, color },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshPolygonsCommonStyle.mutateMeshPolygonsColoringStyle(
+            id,
+            (coloring) => {
+              coloring.color = color
+              console.log(
+                setMeshPolygonsColor.name,
+                { id },
+                JSON.stringify(coloring.color),
+              )
+            },
+          )
+        },
       },
     )
   }

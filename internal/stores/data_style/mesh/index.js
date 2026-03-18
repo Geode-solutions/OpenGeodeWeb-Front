@@ -29,19 +29,17 @@ export function useMeshStyle() {
     return dataStyleState.getStyle(id).visibility
   }
   function setMeshVisibility(id, visibility) {
-    const mutate = () => {
-      return dataStyleState.mutateStyle(id, (style) => {
-        style.visibility = visibility
-        hybridViewerStore.setVisibility(id, visibility)
-        console.log(setMeshVisibility.name, { id }, meshVisibility(id))
-      })
-    }
-
     return viewerStore.request(
       meshSchemas.visibility,
       { id, visibility },
       {
-        response_function: mutate,
+        response_function: () => {
+          return dataStyleState.mutateStyle(id, (style) => {
+            style.visibility = visibility
+            hybridViewerStore.setVisibility(id, visibility)
+            console.log(setMeshVisibility.name, { id }, meshVisibility(id))
+          })
+        },
       },
     )
   }
@@ -50,18 +48,16 @@ export function useMeshStyle() {
     return dataStyleState.getStyle(id).color
   }
   function setMeshColor(id, color) {
-    const mutate = () => {
-      return dataStyleState.mutateStyle(id, (style) => {
-        style.color = color
-        console.log(setMeshColor.name, { id }, meshColor(id))
-      })
-    }
-
     return viewerStore.request(
       meshSchemas.color,
       { id, color },
       {
-        response_function: mutate,
+        response_function: () => {
+          return dataStyleState.mutateStyle(id, (style) => {
+            style.color = color
+            console.log(setMeshColor.name, { id }, meshColor(id))
+          })
+        },
       },
     )
   }

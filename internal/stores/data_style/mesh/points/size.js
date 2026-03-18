@@ -17,18 +17,20 @@ export function useMeshPointsSizeStyle() {
     return meshPointsCommonStyle.meshPointsStyle(id).size
   }
   function setMeshPointsSize(id, size) {
-    const mutate = () => {
-      return meshPointsCommonStyle.mutateMeshPointsStyle(id, (points) => {
-        points.size = size
-        console.log(setMeshPointsSize.name, { id }, JSON.stringify(points.size))
-      })
-    }
-
     return viewerStore.request(
       meshPointsSizeSchemas,
       { id, size },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshPointsCommonStyle.mutateMeshPointsStyle(id, (points) => {
+            points.size = size
+            console.log(
+              setMeshPointsSize.name,
+              { id },
+              JSON.stringify(points.size),
+            )
+          })
+        },
       },
     )
   }

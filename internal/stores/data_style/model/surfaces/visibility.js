@@ -21,22 +21,6 @@ export function useModelSurfacesVisibilityStyle() {
       visibility
   }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
-    const mutate = () => {
-      return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
-        id,
-        surface_ids,
-        (style) => {
-          style.visibility = visibility
-          console.log(
-            setModelSurfacesVisibility.name,
-            { id },
-            { surface_ids },
-            style.visibility,
-          )
-        },
-      )
-    }
-
     if (!surface_ids || surface_ids.length === 0) {
       return Promise.resolve()
     }
@@ -45,13 +29,39 @@ export function useModelSurfacesVisibilityStyle() {
       .getMeshComponentsViewerIds(id, surface_ids)
       .then((surface_viewer_ids) => {
         if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-          return mutate()
+          return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
+            id,
+            surface_ids,
+            (style) => {
+              style.visibility = visibility
+              console.log(
+                setModelSurfacesVisibility.name,
+                { id },
+                { surface_ids },
+                style.visibility,
+              )
+            },
+          )
         }
         return viewerStore.request(
           model_surfaces_schemas.visibility,
           { id, block_ids: surface_viewer_ids, visibility },
           {
-            response_function: mutate,
+            response_function: () => {
+              return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
+                id,
+                surface_ids,
+                (style) => {
+                  style.visibility = visibility
+                  console.log(
+                    setModelSurfacesVisibility.name,
+                    { id },
+                    { surface_ids },
+                    style.visibility,
+                  )
+                },
+              )
+            },
           },
         )
       })

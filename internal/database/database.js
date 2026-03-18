@@ -17,9 +17,7 @@ class Database extends BaseDatabase {
     await tempDb.open()
 
     const currentVersion = tempDb.verno
-    const currentStores = {}
-
-    Object.assign(currentStores, BaseDatabase.initialStores)
+    const currentStores = { ...BaseDatabase.initialStores }
 
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src

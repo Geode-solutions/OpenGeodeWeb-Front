@@ -17,25 +17,23 @@ export function useMeshPointsColorStyle() {
     return meshPointsCommonStyle.meshPointsColoring(id).color
   }
   function setMeshPointsColor(id, color) {
-    const mutate = () => {
-      return meshPointsCommonStyle.mutateMeshPointsColoringStyle(
-        id,
-        (coloring) => {
-          coloring.color = color
-          console.log(
-            setMeshPointsColor.name,
-            { id },
-            JSON.stringify(coloring.color),
-          )
-        },
-      )
-    }
-
     return viewerStore.request(
       meshPointsColorSchemas,
       { id, color },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshPointsCommonStyle.mutateMeshPointsColoringStyle(
+            id,
+            (coloring) => {
+              coloring.color = color
+              console.log(
+                setMeshPointsColor.name,
+                { id },
+                JSON.stringify(coloring.color),
+              )
+            },
+          )
+        },
       },
     )
   }

@@ -6,7 +6,7 @@ import { useMeshPointsCommonStyle } from "./common"
 import { useMeshPointsSizeStyle } from "./size"
 import { useMeshPointsVertexAttributeStyle } from "./vertex"
 import { useMeshPointsVisibilityStyle } from "./visibility"
-import { useDataStyleStateStore } from "../../state"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 // Local constants
 

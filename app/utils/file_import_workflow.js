@@ -31,9 +31,8 @@ function buildImportItemFromPayloadApi(value, geode_object_type) {
   console.log("buildImportItemFromPayloadApi", { value, geode_object_type })
 
   return {
+    geode_object_type,
     ...value,
-    geode_object_type: value.geode_object_type || geode_object_type,
-    viewer_type: value.viewer_type,
   }
 }
 

@@ -23,22 +23,6 @@ export function useModelCornersVisibilityStyle() {
   }
 
   function setModelCornersVisibility(id, corner_ids, visibility) {
-    const mutate = () => {
-      return modelCornersCommonStyle.mutateModelCornersStyle(
-        id,
-        corner_ids,
-        (style) => {
-          style.visibility = visibility
-          console.log(
-            setModelCornersVisibility.name,
-            { id },
-            { corner_ids },
-            style.visibility,
-          )
-        },
-      )
-    }
-
     if (!corner_ids || corner_ids.length === 0) {
       return Promise.resolve()
     }
@@ -50,13 +34,39 @@ export function useModelCornersVisibilityStyle() {
             "[setModelCornersVisibility] No viewer IDs found, skipping visibility request",
             { id, corner_ids },
           )
-          return mutate()
+          return modelCornersCommonStyle.mutateModelCornersStyle(
+            id,
+            corner_ids,
+            (style) => {
+              style.visibility = visibility
+              console.log(
+                setModelCornersVisibility.name,
+                { id },
+                { corner_ids },
+                style.visibility,
+              )
+            },
+          )
         }
         return viewerStore.request(
           model_corners_schemas.visibility,
           { id, block_ids: corner_viewer_ids, visibility },
           {
-            response_function: mutate,
+            response_function: () => {
+              return modelCornersCommonStyle.mutateModelCornersStyle(
+                id,
+                corner_ids,
+                (style) => {
+                  style.visibility = visibility
+                  console.log(
+                    setModelCornersVisibility.name,
+                    { id },
+                    { corner_ids },
+                    style.visibility,
+                  )
+                },
+              )
+            },
           },
         )
       })

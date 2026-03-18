@@ -19,22 +19,6 @@ export function useModelLinesColorStyle() {
   }
 
   function setModelLinesColor(id, line_ids, color) {
-    const mutate = () => {
-      return modelLinesCommonStyle.mutateModelLinesStyle(
-        id,
-        line_ids,
-        (style) => {
-          style.color = color
-          console.log(
-            setModelLinesColor.name,
-            { id },
-            { line_ids },
-            JSON.stringify(style.color),
-          )
-        },
-      )
-    }
-
     if (!line_ids || line_ids.length === 0) {
       return Promise.resolve()
     }
@@ -46,13 +30,39 @@ export function useModelLinesColorStyle() {
             "[setModelLinesColor] No viewer IDs found, skipping color request",
             { id, line_ids },
           )
-          return mutate()
+          return modelLinesCommonStyle.mutateModelLinesStyle(
+            id,
+            line_ids,
+            (style) => {
+              style.color = color
+              console.log(
+                setModelLinesColor.name,
+                { id },
+                { line_ids },
+                JSON.stringify(style.color),
+              )
+            },
+          )
         }
         return viewerStore.request(
           model_lines_schemas.color,
           { id, block_ids: line_viewer_ids, color },
           {
-            response_function: mutate,
+            response_function: () => {
+              return modelLinesCommonStyle.mutateModelLinesStyle(
+                id,
+                line_ids,
+                (style) => {
+                  style.color = color
+                  console.log(
+                    setModelLinesColor.name,
+                    { id },
+                    { line_ids },
+                    JSON.stringify(style.color),
+                  )
+                },
+              )
+            },
           },
         )
       })

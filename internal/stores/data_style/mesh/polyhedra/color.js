@@ -17,25 +17,23 @@ export function useMeshPolyhedraColorStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).color
   }
   function setMeshPolyhedraColor(id, color) {
-    const mutate = () => {
-      return meshPolyhedraCommonStyle.mutateMeshPolyhedraColoringStyle(
-        id,
-        (coloring) => {
-          coloring.color = color
-          console.log(
-            setMeshPolyhedraColor.name,
-            { id },
-            JSON.stringify(coloring.color),
-          )
-        },
-      )
-    }
-
     return viewerStore.request(
       meshPolyhedraColorSchemas,
       { id, color },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshPolyhedraCommonStyle.mutateMeshPolyhedraColoringStyle(
+            id,
+            (coloring) => {
+              coloring.color = color
+              console.log(
+                setMeshPolyhedraColor.name,
+                { id },
+                JSON.stringify(coloring.color),
+              )
+            },
+          )
+        },
       },
     )
   }

@@ -19,22 +19,6 @@ export function useModelBlocksColorStyle() {
   }
 
   function setModelBlocksColor(id, block_ids, color) {
-    const mutate = () => {
-      return modelBlocksCommonStyle.mutateModelBlocksStyle(
-        id,
-        block_ids,
-        (style) => {
-          style.color = color
-          console.log(
-            setModelBlocksColor.name,
-            { id },
-            { block_ids },
-            JSON.stringify(style.color),
-          )
-        },
-      )
-    }
-
     if (!block_ids || block_ids.length === 0) {
       return Promise.resolve()
     }
@@ -46,13 +30,39 @@ export function useModelBlocksColorStyle() {
             "[setModelBlocksColor] No viewer IDs found, skipping color request",
             { id, block_ids },
           )
-          return mutate()
+          return modelBlocksCommonStyle.mutateModelBlocksStyle(
+            id,
+            block_ids,
+            (style) => {
+              style.color = color
+              console.log(
+                setModelBlocksColor.name,
+                { id },
+                { block_ids },
+                JSON.stringify(style.color),
+              )
+            },
+          )
         }
         return viewerStore.request(
           model_blocks_schemas.color,
           { id, block_ids: block_viewer_ids, color },
           {
-            response_function: mutate,
+            response_function: () => {
+              return modelBlocksCommonStyle.mutateModelBlocksStyle(
+                id,
+                block_ids,
+                (style) => {
+                  style.color = color
+                  console.log(
+                    setModelBlocksColor.name,
+                    { id },
+                    { block_ids },
+                    JSON.stringify(style.color),
+                  )
+                },
+              )
+            },
           },
         )
       })

@@ -6,7 +6,7 @@ import { useMeshPolyhedraCommonStyle } from "./common"
 import { useMeshPolyhedraPolyhedronAttributeStyle } from "./polyhedron"
 import { useMeshPolyhedraVertexAttributeStyle } from "./vertex"
 import { useMeshPolyhedraVisibilityStyle } from "./visibility"
-import { useDataStyleStateStore } from "../../state"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 // Local constants
 

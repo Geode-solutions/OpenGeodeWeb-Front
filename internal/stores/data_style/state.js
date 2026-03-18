@@ -1,6 +1,6 @@
 import { liveQuery } from "dexie"
 import { useObservable } from "@vueuse/rxjs"
-import { database } from "../../database/database"
+import { database } from "@ogw_internal/database/database"
 
 export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   const styles = useObservable(

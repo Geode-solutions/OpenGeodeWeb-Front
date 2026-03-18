@@ -4,7 +4,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshCellsCommonStyle } from "./common"
-import { useDataStyleStateStore } from "../../state"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
@@ -31,12 +30,18 @@ export function useMeshCellsCellAttributeStyle() {
     })
   }
 
+  function mutateMeshCellsCellStyle(id, mutationCallback) {
+    return meshCellsCommonStyle.mutateMeshCellsColoringStyle(id, (coloring) => {
+      mutationCallback(coloring.cell)
+    })
+  }
+
   function setMeshCellsCellAttributeStoredConfig(
     id,
     name,
     { minimum, maximum, colorMap },
   ) {
-    return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
+    return mutateMeshCellsCellStyle(id, (cell) => {
       cell.storedConfigs[name] = {
         minimum,
         maximum,
@@ -55,23 +60,21 @@ export function useMeshCellsCellAttributeStyle() {
   }
 
   function setMeshCellsCellAttributeName(id, name) {
-    const mutate = () => {
-      return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
-        cell.name = name
-        const { minimum, maximum, colorMap } = cell.storedConfigs[name]
-        const storedConfig = cell.storedConfigs[name]
-        storedConfig.minimum = minimum
-        storedConfig.maximum = maximum
-        cell.storedConfigs[name].colorMap = colorMap
-        console.log(setMeshCellsCellAttributeName.name, { id }, name)
-      })
-    }
-
     return viewerStore.request(
       meshCellsCellAttributeSchemas.name,
       { id, name },
       {
-        response_function: mutate,
+        response_function: () => {
+          return mutateMeshCellsCellStyle(id, (cell) => {
+            cell.name = name
+            const { minimum, maximum, colorMap } = cell.storedConfigs[name]
+            const storedConfig = cell.storedConfigs[name]
+            storedConfig.minimum = minimum
+            storedConfig.maximum = maximum
+            cell.storedConfigs[name].colorMap = colorMap
+            console.log(setMeshCellsCellAttributeName.name, { id }, name)
+          })
+        },
       },
     )
   }
@@ -84,7 +87,7 @@ export function useMeshCellsCellAttributeStyle() {
   }
   function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const name = meshCellsCellAttributeName(id)
-    return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
+    return mutateMeshCellsCellStyle(id, (cell) => {
       const storedConfig = cell.storedConfigs[name]
       storedConfig.minimum = minimum
       storedConfig.maximum = maximum
@@ -103,28 +106,8 @@ export function useMeshCellsCellAttributeStyle() {
   function setMeshCellsCellAttributeColorMap(id, colorMap) {
     const name = meshCellsCellAttributeName(id)
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
-    const mutate = () => {
-      return meshCellsCommonStyle.mutateCellsStyle(id, (cell) => {
-        cell.storedConfigs[name].colorMap = colorMap
-        console.log(
-          setMeshCellsCellAttributeColorMap.name,
-          { id },
-          cell.storedConfigs[name].colorMap,
-        )
-      })
-    }
-
-    if (
-      storedConfig.minimum === undefined ||
-      storedConfig.maximum === undefined ||
-      colorMap === undefined
-    ) {
-      return mutate()
-    }
-
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
-
     console.log(setMeshCellsCellAttributeColorMap.name, {
       id,
       minimum,
@@ -135,7 +118,16 @@ export function useMeshCellsCellAttributeStyle() {
       meshCellsCellAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: mutate,
+        response_function: () => {
+          return mutateMeshCellsCellStyle(id, (cell) => {
+            cell.storedConfigs[name].colorMap = colorMap
+            console.log(
+              setMeshCellsCellAttributeColorMap.name,
+              { id },
+              cell.storedConfigs[name].colorMap,
+            )
+          })
+        },
       },
     )
   }

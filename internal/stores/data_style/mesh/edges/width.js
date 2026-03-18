@@ -17,18 +17,16 @@ export function useMeshEdgesWidthStyle() {
     return meshEdgesCommonStyle.meshEdgesStyle(id).width
   }
   function setMeshEdgesWidth(id, width) {
-    const mutate = () => {
-      return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, (edges) => {
-        edges.width = width
-        console.log(setMeshEdgesWidth.name, { id }, edges.width)
-      })
-    }
-
     return viewerStore.request(
       meshEdgesWidthSchemas,
       { id, width },
       {
-        response_function: mutate,
+        response_function: () => {
+          return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, (edges) => {
+            edges.width = width
+            console.log(setMeshEdgesWidth.name, { id }, edges.width)
+          })
+        },
       },
     )
   }
