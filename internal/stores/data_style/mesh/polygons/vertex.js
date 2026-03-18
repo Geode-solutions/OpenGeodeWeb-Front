@@ -73,11 +73,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
               storedConfig.minimum = minimum
               storedConfig.maximum = maximum
               vertex.storedConfigs[name].colorMap = colorMap
-              console.log(
-                setMeshPolygonsVertexAttributeName.name,
-                { id },
-                name,
-              )
+              console.log(setMeshPolygonsVertexAttributeName.name, { id }, name)
             },
           )
         },

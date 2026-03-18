@@ -27,8 +27,6 @@ export function useMeshCellsCommonStyle() {
     })
   }
 
-
-
   return {
     meshCellsStyle,
     meshCellsColoring,
