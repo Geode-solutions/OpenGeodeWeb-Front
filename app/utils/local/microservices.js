@@ -34,7 +34,7 @@ async function runScript(
   expectedResponse,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
-  let command
+  let command = ""
   if (commandExistsSync(execName)) {
     command = execName
   } else {
