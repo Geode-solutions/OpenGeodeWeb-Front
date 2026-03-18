@@ -34,10 +34,7 @@ async function runScript(
   if (commandExistsSync(execName)) {
     command = execName
   } else {
-    command = path.join(
-      await executablePath(execPath),
-      executableName(execName),
-    )
+    command = path.join(executablePath(execPath), executableName(execName))
     fs.chmodSync(command, "755")
   }
   console.log("runScript", command, args)
