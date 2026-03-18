@@ -63,15 +63,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     await dataStyleState.clear()
 
     for (const [id, style] of Object.entries(stylesSnapshot)) {
-      await database.data_style.put(
-        structuredClone({ id, ...style }),
-      )
+      await database.data_style.put(structuredClone({ id, ...style }))
     }
 
     for (const style of Object.values(componentStylesSnapshot)) {
-      await database.model_component_datastyle.put(
-        structuredClone(style),
-      )
+      await database.model_component_datastyle.put(structuredClone(style))
     }
   }
 
