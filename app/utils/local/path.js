@@ -7,7 +7,7 @@ import path from "node:path"
 import { v4 as uuidv4 } from "uuid"
 
 // Local imports
-import { appMode, getAppMode } from "./app_mode"
+import { appMode, getAppMode } from "./app_mode.js"
 
 async function executablePath(microservicePath) {
   console.log("[executablePath] microservicePath", microservicePath)

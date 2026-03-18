@@ -4,7 +4,7 @@ import fs from "node:fs"
 import { on } from "node:events"
 import path from "node:path"
 
-import { appMode } from "./app_mode"
+import { appMode } from "./app_mode.js"
 
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || ""
