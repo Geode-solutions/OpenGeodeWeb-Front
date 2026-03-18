@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     const port = await runBack(COMMAND_BACK, NUXT_ROOT_PATH, args)
     await addMicroserviceMetadatas(args.projectFolderPath, {
       type: "back",
-      name: execName,
+      name: COMMAND_BACK,
       port,
     })
 
