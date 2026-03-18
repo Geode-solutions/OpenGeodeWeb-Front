@@ -106,9 +106,7 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
       .then((style) => {
         const s = style || { id_model, id_component }
         mutationCallback(s)
-        return database.model_component_datastyle.put(
-          structuredClone(s),
-        )
+        return database.model_component_datastyle.put(structuredClone(s))
       })
   }
 
