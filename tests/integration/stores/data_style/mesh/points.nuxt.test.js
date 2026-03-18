@@ -1,166 +1,150 @@
 // Third party imports
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
-import { Status } from "@ogw_front/utils/status"
-import { cleanupBackend } from "@ogw_front/utils/local/microservices"
-import { setupIntegrationTests } from "@ogw_tests/integration/setup"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { Status } from "@ogw_front/utils/status";
+import { cleanupBackend } from "@ogw_front/utils/local/microservices";
+import { setupIntegrationTests } from "@ogw_tests/integration/setup";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const INTERVAL_TIMEOUT = 20_000
-const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points
-const file_name = "test.og_edc2d"
-const geode_object = "EdgedCurve2D"
-const vertex_attribute = { name: "points" }
+const INTERVAL_TIMEOUT = 20_000;
+const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points;
+const file_name = "test.og_edc2d";
+const geode_object = "EdgedCurve2D";
+const vertex_attribute = { name: "points" };
 
 let id = "",
-  projectFolderPath = ""
+  projectFolderPath = "";
 
 beforeEach(async () => {
-  ;({ id, projectFolderPath } = await setupIntegrationTests(
-    file_name,
-    geode_object,
-  ))
-}, INTERVAL_TIMEOUT)
+  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+}, INTERVAL_TIMEOUT);
 
 afterEach(async () => {
-  console.log("afterEach mesh points kill", projectFolderPath)
-  await cleanupBackend(projectFolderPath)
-})
+  console.log("afterEach mesh points kill", projectFolderPath);
+  await cleanupBackend(projectFolderPath);
+});
 
 describe("Mesh points", () => {
   describe("Points visibility", () => {
     test("Visibility true", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const visibility = true
-      const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshPointsVisibility(id, visibility)
-      expect(result).toBeInstanceOf(Promise)
-      await result
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const visibility = true;
+      const spy = vi.spyOn(viewerStore, "request");
+      const result = dataStyleStore.setMeshPointsVisibility(id, visibility);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
       expect(spy).toHaveBeenCalledWith(
         mesh_points_schemas.visibility,
         { id, visibility },
         {
           response_function: expect.any(Function),
         },
-      )
-      expect(dataStyleStore.meshPointsVisibility(id)).toBe(visibility)
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
+      );
+      expect(dataStyleStore.meshPointsVisibility(id)).toBe(visibility);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 
   describe("Points color", () => {
     test("Color red", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshPointsColor(id, color)
-      expect(result).toBeInstanceOf(Promise)
-      await result
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const color = { r: 255, g: 0, b: 0 };
+      const spy = vi.spyOn(viewerStore, "request");
+      const result = dataStyleStore.setMeshPointsColor(id, color);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
       expect(spy).toHaveBeenCalledWith(
         mesh_points_schemas.color,
         { id, color },
         {
           response_function: expect.any(Function),
         },
-      )
-      expect(dataStyleStore.meshPointsColor(id)).toStrictEqual(color)
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
+      );
+      expect(dataStyleStore.meshPointsColor(id)).toStrictEqual(color);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 
   describe("Points active coloring", () => {
     test("test coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
       const coloringTypes = [
         { name: "color" },
         {
           name: "vertex",
           function: () =>
-            dataStyleStore.setMeshPointsVertexAttributeName(
-              id,
-              vertex_attribute.name,
-            ),
+            dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name),
         },
-      ]
+      ];
       async function testColoring(coloringType, expectedColoringType) {
         if (coloringType.function) {
-          await coloringType.function()
+          await coloringType.function();
         }
-        const result = dataStyleStore.setMeshPointsActiveColoring(
-          id,
-          coloringType.name,
-        )
-        expect(result).toBeInstanceOf(Promise)
-        await result
-        expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(
-          expectedColoringType,
-        )
-        expect(viewerStore.status).toBe(Status.CONNECTED)
+        const result = dataStyleStore.setMeshPointsActiveColoring(id, coloringType.name);
+        expect(result).toBeInstanceOf(Promise);
+        await result;
+        expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(expectedColoringType);
+        expect(viewerStore.status).toBe(Status.CONNECTED);
       }
 
-      await testColoring(coloringTypes[0], "color")
-      await testColoring(coloringTypes[1], "vertex")
-    })
-  })
+      await testColoring(coloringTypes[0], "color");
+      await testColoring(coloringTypes[1], "vertex");
+    });
+  });
 
   describe("Points size", () => {
     test("Size 20", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const size = 20
-      const spy = vi.spyOn(viewerStore, "request")
-      const result = dataStyleStore.setMeshPointsSize(id, size)
-      expect(result).toBeInstanceOf(Promise)
-      await result
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const size = 20;
+      const spy = vi.spyOn(viewerStore, "request");
+      const result = dataStyleStore.setMeshPointsSize(id, size);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
       expect(spy).toHaveBeenCalledWith(
         mesh_points_schemas.size,
         { id, size },
         {
           response_function: expect.any(Function),
         },
-      )
-      expect(dataStyleStore.meshPointsSize(id)).toBe(size)
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
+      );
+      expect(dataStyleStore.meshPointsSize(id)).toBe(size);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 
   describe("Points vertex attribute", () => {
     test("test coloring", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
 
-      const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setMeshPointsVertexAttributeName(
-        id,
-        vertex_attribute.name,
-      )
+      const spy = vi.spyOn(viewerStore, "request");
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name);
       expect(spy).toHaveBeenCalledWith(
         mesh_points_schemas.attribute.vertex.name,
         { id, ...vertex_attribute },
         {
           response_function: expect.any(Function),
         },
-      )
-      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(
-        vertex_attribute.name,
-      )
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
+      );
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(vertex_attribute.name);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 
   test("Points apply default style", async () => {
-    const dataStyleStore = useDataStyleStore()
-    const viewerStore = useViewerStore()
-    const result = dataStyleStore.applyMeshPointsStyle(id)
-    expect(result).toBeInstanceOf(Promise)
-    await result
-    expect(viewerStore.status).toBe(Status.CONNECTED)
-  })
-})
+    const dataStyleStore = useDataStyleStore();
+    const viewerStore = useViewerStore();
+    const result = dataStyleStore.applyMeshPointsStyle(id);
+    expect(result).toBeInstanceOf(Promise);
+    await result;
+    expect(viewerStore.status).toBe(Status.CONNECTED);
+  });
+});
