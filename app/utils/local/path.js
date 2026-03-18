@@ -9,10 +9,7 @@ import { rimraf } from "rimraf"
 import { v4 as uuidv4 } from "uuid"
 
 // Local imports
-import {
-  appMode,
-  getAppMode,
-} from "@geode/opengeodeweb-front/app/utils/app_mode.js"
+import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 
 const MAX_DELETE_FOLDER_RETRIES = 5
 
