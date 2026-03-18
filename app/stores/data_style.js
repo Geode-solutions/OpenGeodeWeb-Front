@@ -13,7 +13,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function addDataStyle(id, geode_object) {
     await database.data_style.put(
-      JSON.parse(JSON.stringify({ id, ...getDefaultStyle(geode_object) })),
+      structuredClone({ id, ...getDefaultStyle(geode_object) }),
     )
   }
 
@@ -64,13 +64,13 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     for (const [id, style] of Object.entries(stylesSnapshot)) {
       await database.data_style.put(
-        JSON.parse(JSON.stringify({ id, ...style })),
+        structuredClone({ id, ...style }),
       )
     }
 
     for (const style of Object.values(componentStylesSnapshot)) {
       await database.model_component_datastyle.put(
-        JSON.parse(JSON.stringify(style)),
+        structuredClone(style),
       )
     }
   }

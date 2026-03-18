@@ -13,7 +13,7 @@
 
   const items = dataStore.refFormatedMeshComponents(id)
   const mesh_components_selection = dataStyleStore.visibleMeshComponents(
-    toRef(() => id),
+    computed(() => id),
   )
 
   watch(

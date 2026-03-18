@@ -92,7 +92,7 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   function mutateStyle(id, mutationCallback) {
     const style = getStyle(id)
     mutationCallback(style)
-    return database.data_style.put(JSON.parse(JSON.stringify({ id, ...style })))
+    return database.data_style.put(structuredClone({ id, ...style }))
   }
 
   function getComponentStyle(id_model, id_component) {
@@ -107,7 +107,7 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
         const s = style || { id_model, id_component }
         mutationCallback(s)
         return database.model_component_datastyle.put(
-          JSON.parse(JSON.stringify(s)),
+          structuredClone(s),
         )
       })
   }
@@ -130,7 +130,7 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
         })
 
         return database.model_component_datastyle.bulkPut(
-          JSON.parse(JSON.stringify(updates)),
+          structuredClone(updates),
         )
       })
   }
