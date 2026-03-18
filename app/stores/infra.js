@@ -63,7 +63,6 @@ export const useInfraStore = defineStore("infra", {
           return
         }
         console.log("[INFRA] Lock granted for create_backend")
-
         if (this.app_mode === appMode.CLOUD) {
           console.log("[INFRA] CLOUD mode - Launching lambda...")
           const lambdaStore = useLambdaStore()
@@ -82,11 +81,9 @@ export const useInfraStore = defineStore("infra", {
               projectFolderPath: appStore.projectFolderPath,
             })
           }
-
           const microservices_with_launch = this.microservices.filter(
             (store) => store.launch,
           )
-
           const launch_promises = microservices_with_launch.map((store) =>
             store.launch({ projectFolderPath: appStore.projectFolderPath }),
           )
