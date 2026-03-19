@@ -34,7 +34,6 @@ export const useInfraStore = defineStore("infra", {
     register_microservice(store) {
       const store_name = store.$id
       console.log("[INFRA] Registering microservice:", store_name)
-
       if (
         !this.microservices.find(
           (microservice) => microservice.$id === store_name,
@@ -44,19 +43,17 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Microservice registered:", store_name)
       }
     },
+
     async create_backend() {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode)
       await database.clear()
-
       console.log(
         "[INFRA] Registered microservices:",
         this.microservices.map((store) => store.$id),
       )
-
       if (this.status === Status.CREATED) {
         return
       }
-
       return navigator.locks.request("infra.create_backend", async () => {
         this.status = Status.CREATING
         if (this.status === Status.CREATED) {
@@ -72,10 +69,8 @@ export const useInfraStore = defineStore("infra", {
           console.log(
             `[INFRA] ${this.app_mode} mode - Launching microservices...`,
           )
-
           const appStore = useAppStore()
           await appStore.createProjectFolder()
-
           if (this.app_mode === appMode.DESKTOP) {
             globalThis.electronAPI.project_folder_path({
               projectFolderPath: appStore.projectFolderPath,
@@ -90,19 +85,18 @@ export const useInfraStore = defineStore("infra", {
           launch_promises.push(registerRunningExtensions())
           await Promise.all(launch_promises)
         }
-
         this.status = Status.CREATED
         console.log("[INFRA] Backend created successfully")
         return this.create_connection()
       })
     },
+
     async create_connection() {
       console.log("[INFRA] Starting create_connection")
       console.log(
         "[INFRA] Connecting microservices:",
         this.microservices.map((store) => store.$id),
       )
-
       await Promise.all(
         this.microservices.map(async (store) => {
           await store.connect()
@@ -111,6 +105,7 @@ export const useInfraStore = defineStore("infra", {
       )
       console.log("[INFRA] All microservices connected")
     },
+
   },
   share: {
     omit: ["microservices"],

@@ -13,8 +13,13 @@ export function useMeshCellsCommonStyle() {
     return dataStyleStateStore.getStyle(id).cells
   }
 
+  function meshCellsColoring(id) {
+    return meshCellsStyle(id).coloring
+  }
+
   return {
     meshCellsStyle,
+    meshCellsColoring,
     mutateMeshCellsStyle,
   }
 }

@@ -13,8 +13,13 @@ export function useMeshPolyhedraCommonStyle() {
     return dataStyleStateStore.getStyle(id).polyhedra
   }
 
+  function meshPolyhedraColoring(id) {
+    return meshPolyhedraStyle(id).coloring
+  }
+
   return {
     meshPolyhedraStyle,
+    meshPolyhedraColoring,
     mutateMeshPolyhedraStyle,
   }
 }

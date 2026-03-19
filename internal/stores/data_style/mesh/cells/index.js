@@ -16,12 +16,13 @@ export function useMeshCellsStyle() {
   const meshCellsVisibility = useMeshCellsVisibilityStyle()
   const meshCellsColorStyle = useMeshCellsColorStyle()
   const meshCellsTexturesStore = useMeshCellsTexturesStyle()
+ 
+  function meshCellsColoring(id) {
+    return meshCellsCommonStyle.meshCellsColoring(id)
+  }
   const meshCellsVertexAttributeStyle = useMeshCellsVertexAttributeStyle()
   const meshCellsCellAttributeStyle = useMeshCellsCellAttributeStyle()
 
-  function meshCellsColoring(id) {
-    return meshCellsCommonStyle.meshCellsStyle(id).coloring
-  }
 
   function meshCellsActiveColoring(id) {
     return meshCellsColoring(id).active

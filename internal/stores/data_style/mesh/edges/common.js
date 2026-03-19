@@ -13,8 +13,13 @@ export function useMeshEdgesCommonStyle() {
     return dataStyleStateStore.getStyle(id).edges
   }
 
+  function meshEdgesColoring(id) {
+    return meshEdgesStyle(id).coloring
+  }
+
   return {
     meshEdgesStyle,
+    meshEdgesColoring,
     mutateMeshEdgesStyle,
   }
 }

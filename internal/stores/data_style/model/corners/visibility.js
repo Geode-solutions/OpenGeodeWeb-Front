@@ -14,6 +14,10 @@ export function useModelCornersVisibilityStyle() {
   const viewerStore = useViewerStore()
   const modelCornersCommonStyle = useModelCornersCommonStyle()
 
+  function modelCornerVisibility(id, corner_id) {
+    return modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility
+  }
+
   function setModelCornersVisibility(id, corner_ids, visibility) {
     if (!corner_ids || corner_ids.length === 0) {
       return Promise.resolve()

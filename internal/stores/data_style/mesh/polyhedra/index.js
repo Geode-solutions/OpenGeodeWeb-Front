@@ -14,14 +14,15 @@ export function useMeshPolyhedraStyle() {
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle()
   const meshPolyhedraVisibility = useMeshPolyhedraVisibilityStyle()
   const meshPolyhedraColorStyle = useMeshPolyhedraColorStyle()
+ 
+  function meshPolyhedraColoring(id) {
+    return meshPolyhedraCommonStyle.meshPolyhedraColoring(id)
+  }
   const meshPolyhedraVertexAttributeStyle =
     useMeshPolyhedraVertexAttributeStyle()
   const meshPolyhedraPolyhedronAttributeStyle =
     useMeshPolyhedraPolyhedronAttributeStyle()
 
-  function meshPolyhedraColoring(id) {
-    return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).coloring
-  }
 
   function meshPolyhedraActiveColoring(id) {
     return meshPolyhedraColoring(id).active

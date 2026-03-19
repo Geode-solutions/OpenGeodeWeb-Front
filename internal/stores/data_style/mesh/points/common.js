@@ -13,8 +13,13 @@ export function useMeshPointsCommonStyle() {
     return dataStyleStateStore.getStyle(id).points
   }
 
+  function meshPointsColoring(id) {
+    return meshPointsStyle(id).coloring
+  }
+
   return {
     meshPointsStyle,
+    meshPointsColoring,
     mutateMeshPointsStyle,
   }
 }

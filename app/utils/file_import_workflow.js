@@ -27,13 +27,9 @@ async function importWorkflow(files) {
   return results
 }
 
-function buildImportItemFromPayloadApi(value, geode_object_type) {
-  console.log("buildImportItemFromPayloadApi", { value, geode_object_type })
-
-  return {
-    geode_object_type,
-    ...value,
-  }
+function buildImportItemFromPayloadApi(value) {
+  console.log("buildImportItemFromPayloadApi", { value })
+  return value
 }
 
 async function importItem(item) {
@@ -92,15 +88,13 @@ async function importFile(filename, geode_object_type) {
       filename,
     },
   )
-
-  const item = buildImportItemFromPayloadApi(response, geode_object_type)
+  const item = buildImportItemFromPayloadApi(response)
   return importItem(item)
 }
 
 async function importWorkflowFromSnapshot(items) {
   console.log("[importWorkflowFromSnapshot] start", { count: items?.length })
   const hybridViewerStore = useHybridViewerStore()
-
   const ids = await Promise.all(items.map((item) => importItem(item)))
   hybridViewerStore.remoteRender()
   console.log("[importWorkflowFromSnapshot] done", { ids })

@@ -13,8 +13,13 @@ export function useMeshPolygonsCommonStyle() {
     return dataStyleStateStore.getStyle(id).polygons
   }
 
+  function meshPolygonsColoring(id) {
+    return meshPolygonsStyle(id).coloring
+  }
+
   return {
     meshPolygonsStyle,
+    meshPolygonsColoring,
     mutateMeshPolygonsStyle,
   }
 }
