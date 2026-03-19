@@ -35,7 +35,6 @@ async function runScript(
     command = execName
   } else {
     command = path.join(executablePath(execPath), executableName(execName))
-    fs.chmodSync(command, "755")
   }
   console.log("runScript", command, args)
   const child = child_process.spawn(command, args, {
