@@ -1,6 +1,6 @@
 import { Status } from "@ogw_front/utils/status"
 import { api_fetch } from "@ogw_internal/utils/api_fetch"
-import { appMode } from "@ogw_front/utils/app_mode"
+import { appMode } from "@ogw_front/utils/local/app_mode"
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
 import { upload_file } from "@ogw_internal/utils/upload_file.js"
 import { useAppStore } from "@ogw_front/stores/app"
@@ -82,28 +82,16 @@ export const useGeodeStore = defineStore("geode", {
     launch(args) {
       console.log("[GEODE] Launching back microservice...", { args })
       const appStore = useAppStore()
-
-      const { BACK_PATH, BACK_COMMAND } = useRuntimeConfig().public
-
-      console.log("[GEODE] BACK_PATH", BACK_PATH)
-      console.log("[GEODE] BACK_COMMAND", BACK_COMMAND)
       const schema = {
         $id: "/api/app/run_back",
         methods: ["POST"],
         type: "object",
-        properties: {
-          BACK_PATH: { type: "string" },
-          BACK_COMMAND: { type: "string" },
-        },
-        required: ["BACK_PATH", "BACK_COMMAND"],
+        properties: {},
+        required: [],
         additionalProperties: true,
       }
 
-      const params = {
-        BACK_PATH,
-        BACK_COMMAND,
-        args,
-      }
+      const params = { args }
 
       console.log("[GEODE] params", params)
       return appStore.request(schema, params, {

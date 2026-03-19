@@ -4,6 +4,8 @@ import fs from "node:fs"
 import { on } from "node:events"
 import path from "node:path"
 
+import { appMode } from "./app_mode.js"
+
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || ""
   return envPath.split(path.delimiter).some((dir) => {
@@ -37,7 +39,7 @@ async function waitNuxt(nuxtProcess) {
 }
 
 async function runBrowser(scriptName) {
-  process.env.BROWSER = true
+  process.env.MODE = appMode.BROWSER
 
   const nuxtProcess = child_process.spawn("npm", ["run", scriptName], {
     shell: true,

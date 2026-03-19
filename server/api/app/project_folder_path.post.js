@@ -1,7 +1,7 @@
 // Node imports
 
 // Third party imports
-import { createError, defineEventHandler, readBody } from "h3"
+import { createError, defineEventHandler } from "h3"
 
 // Local imports
 import {
@@ -9,9 +9,12 @@ import {
   generateProjectFolderPath,
 } from "@geode/opengeodeweb-front/app/utils/local/path.js"
 
+import { useRuntimeConfig } from "nitropack/runtime"
+
 export default defineEventHandler(async (event) => {
   try {
-    const { PROJECT } = await readBody(event)
+    const config = useRuntimeConfig(event).public
+    const { PROJECT } = config
     const projectFolderPath = generateProjectFolderPath(PROJECT)
     await createPath(projectFolderPath)
 
