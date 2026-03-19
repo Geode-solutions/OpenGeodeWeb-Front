@@ -26,7 +26,7 @@ export function useMeshEdgesColorStyle() {
       {
         response_function: () => {
           return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
-            coloring: { ...meshEdgesColoring(id), color },
+            coloring: { color },
           })
         },
       },

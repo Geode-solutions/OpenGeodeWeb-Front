@@ -28,7 +28,7 @@ export function useMeshEdgesStyle() {
 
   async function setMeshEdgesActiveColoring(id, type) {
     await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
-      coloring: { ...meshEdgesColoring(id), active: type },
+      coloring: { active: type },
     })
     if (type === "color") {
       return meshEdgesColorStyle.setMeshEdgesColor(

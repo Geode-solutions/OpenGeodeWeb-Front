@@ -36,24 +36,15 @@ export function useMeshEdgesVertexAttributeStyle() {
   function mutateMeshEdgesVertexStyle(id, values) {
     return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
       coloring: {
-        ...meshEdgesColoring(id),
-        vertex: {
-          ...meshEdgesVertexAttribute(id),
-          ...values,
-        },
+        vertex: values,
       },
     })
   }
 
   function setMeshEdgesVertexAttributeStoredConfig(id, name, config) {
-    const vertex = meshEdgesVertexAttribute(id)
     return mutateMeshEdgesVertexStyle(id, {
       storedConfigs: {
-        ...vertex.storedConfigs,
-        [name]: {
-          ...vertex.storedConfigs[name],
-          ...config,
-        },
+        [name]: config,
       },
     }).then(() => config)
   }
@@ -67,11 +58,10 @@ export function useMeshEdgesVertexAttributeStyle() {
       { id, name },
       {
         response_function: () => {
-          const vertex = meshEdgesVertexAttribute(id)
           const updates = { name }
+          const vertex = meshEdgesVertexAttribute(id)
           if (!(name in vertex.storedConfigs)) {
             updates.storedConfigs = {
-              ...vertex.storedConfigs,
               [name]: {
                 minimum: undefined,
                 maximum: undefined,
