@@ -1,14 +1,14 @@
-import { Status } from "@ogw_front/utils/status";
-import { api_fetch } from "@ogw_internal/utils/api_fetch";
-import { appMode } from "@ogw_front/utils/app_mode";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { upload_file } from "@ogw_internal/utils/upload_file.js";
-import { useAppStore } from "@ogw_front/stores/app";
-import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import { useInfraStore } from "@ogw_front/stores/infra";
+import { Status } from "@ogw_front/utils/status"
+import { api_fetch } from "@ogw_internal/utils/api_fetch"
+import { appMode } from "@ogw_front/utils/app_mode"
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import { upload_file } from "@ogw_internal/utils/upload_file.js"
+import { useAppStore } from "@ogw_front/stores/app"
+import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useInfraStore } from "@ogw_front/stores/infra"
 
-const MILLISECONDS_IN_SECOND = 1000;
-const DEFAULT_PING_INTERVAL_SECONDS = 10;
+const MILLISECONDS_IN_SECOND = 1000
+const DEFAULT_PING_INTERVAL_SECONDS = 10
 
 export const useGeodeStore = defineStore("geode", {
   state: () => ({
@@ -19,74 +19,74 @@ export const useGeodeStore = defineStore("geode", {
   getters: {
     protocol() {
       if (useInfraStore().app_mode === appMode.CLOUD) {
-        return "https";
+        return "https"
       }
-      return "http";
+      return "http"
     },
     port() {
       if (useInfraStore().app_mode === appMode.CLOUD) {
-        return "443";
+        return "443"
       }
-      return this.default_local_port;
+      return this.default_local_port
     },
     base_url() {
-      const infraStore = useInfraStore();
-      let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`;
+      const infraStore = useInfraStore()
+      let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`
       if (infraStore.app_mode === appMode.CLOUD) {
         if (infraStore.ID === "") {
-          throw new Error("ID must not be empty in cloud mode");
+          throw new Error("ID must not be empty in cloud mode")
         }
-        geode_url += `/${infraStore.ID}/geode`;
+        geode_url += `/${infraStore.ID}/geode`
       }
-      return geode_url;
+      return geode_url
     },
     is_busy() {
-      return this.request_counter > 0;
+      return this.request_counter > 0
     },
   },
   actions: {
     set_ping() {
-      this.ping();
+      this.ping()
       setInterval(() => {
-        this.ping();
-      }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
+        this.ping()
+      }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND)
     },
     ping() {
-      const geodeStore = this;
-      const feedbackStore = useFeedbackStore();
+      const geodeStore = this
+      const feedbackStore = useFeedbackStore()
       return this.request(
         back_schemas.opengeodeweb_back.ping,
         {},
         {
           request_error_function: () => {
-            feedbackStore.$patch({ server_error: true });
-            geodeStore.status = Status.NOT_CONNECTED;
+            feedbackStore.$patch({ server_error: true })
+            geodeStore.status = Status.NOT_CONNECTED
           },
           response_function: () => {
-            feedbackStore.$patch({ server_error: false });
-            geodeStore.status = Status.CONNECTED;
+            feedbackStore.$patch({ server_error: false })
+            geodeStore.status = Status.CONNECTED
           },
           response_error_function: () => {
-            feedbackStore.$patch({ server_error: true });
-            geodeStore.status = Status.NOT_CONNECTED;
+            feedbackStore.$patch({ server_error: true })
+            geodeStore.status = Status.NOT_CONNECTED
           },
         },
-      );
+      )
     },
     start_request() {
-      this.request_counter += 1;
+      this.request_counter += 1
     },
     stop_request() {
-      this.request_counter -= 1;
+      this.request_counter -= 1
     },
     launch(args) {
-      console.log("[GEODE] Launching back microservice...", { args });
-      const appStore = useAppStore();
+      console.log("[GEODE] Launching back microservice...", { args })
+      const appStore = useAppStore()
 
-      const { BACK_PATH, BACK_COMMAND } = useRuntimeConfig().public;
+      const { BACK_PATH, BACK_COMMAND } = useRuntimeConfig().public
 
-      console.log("[GEODE] BACK_PATH", BACK_PATH);
-      console.log("[GEODE] BACK_COMMAND", BACK_COMMAND);
+      console.log("[GEODE] BACK_PATH", BACK_PATH)
+      console.log("[GEODE] BACK_COMMAND", BACK_COMMAND)
       const schema = {
         $id: "/api/app/run_back",
         methods: ["POST"],
@@ -97,30 +97,30 @@ export const useGeodeStore = defineStore("geode", {
         },
         required: ["BACK_PATH", "BACK_COMMAND"],
         additionalProperties: true,
-      };
+      }
 
       const params = {
         BACK_PATH,
         BACK_COMMAND,
         args,
-      };
+      }
 
-      console.log("[GEODE] params", params);
+      console.log("[GEODE] params", params)
       return appStore.request(schema, params, {
         response_function: (response) => {
-          console.log(`[GEODE] Back launched on port ${response.port}`);
-          this.default_local_port = response.port;
+          console.log(`[GEODE] Back launched on port ${response.port}`)
+          this.default_local_port = response.port
         },
-      });
+      })
     },
     connect() {
-      console.log("[GEODE] Connecting to geode microservice...");
-      this.set_ping();
-      return Promise.resolve();
+      console.log("[GEODE] Connecting to geode microservice...")
+      this.set_ping()
+      return Promise.resolve()
     },
     request(schema, params, callbacks = {}) {
-      console.log("[GEODE] Request:", schema.$id);
-      const start = Date.now();
+      console.log("[GEODE] Request:", schema.$id)
+      const start = Date.now()
 
       return api_fetch(
         this,
@@ -134,16 +134,16 @@ export const useGeodeStore = defineStore("geode", {
               "in",
               (Date.now() - start) / MILLISECONDS_IN_SECOND,
               "s",
-            );
+            )
             if (callbacks.response_function) {
-              await callbacks.response_function(response);
+              await callbacks.response_function(response)
             }
           },
         },
-      );
+      )
     },
     upload(file, callbacks = {}) {
-      const route = back_schemas.opengeodeweb_back.upload_file.$id;
+      const route = back_schemas.opengeodeweb_back.upload_file.$id
       return upload_file(
         this,
         {
@@ -153,16 +153,16 @@ export const useGeodeStore = defineStore("geode", {
         {
           ...callbacks,
           response_function: async (response) => {
-            console.log("[GEODE] Request completed:", route);
+            console.log("[GEODE] Request completed:", route)
             if (callbacks.response_function) {
-              await callbacks.response_function(response);
+              await callbacks.response_function(response)
             }
           },
         },
-      );
+      )
     },
   },
   share: {
     omit: ["status"],
   },
-});
+})

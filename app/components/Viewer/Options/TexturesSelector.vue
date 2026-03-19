@@ -1,35 +1,39 @@
 <script setup>
-import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem";
+  import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem"
 
-const textures = defineModel();
+  const textures = defineModel()
 
-const { id } = defineProps({
-  id: { type: String, required: true },
-});
+  const { id } = defineProps({
+    id: { type: String, required: true },
+  })
 
-const internal_textures = ref([]);
+  const internal_textures = ref([])
 
-onMounted(() => {
-  if (textures.value === null) {
-    internal_textures.value = [{ id: "", texture_name: "" }];
-  } else {
-    internal_textures.value = textures.value;
+  onMounted(() => {
+    if (textures.value === null) {
+      internal_textures.value = [{ id: "", texture_name: "" }]
+    } else {
+      internal_textures.value = textures.value
+    }
+  })
+
+  function update_value_event($event, index) {
+    internal_textures.value[index][$event.key] = $event.value
+    const filtered = internal_textures.value.filter(
+      (texture) => texture.texture_name !== "" && texture.id !== "",
+    )
+    if (filtered.length > 0) {
+      textures.value = filtered
+    }
   }
-});
-
-function update_value_event($event, index) {
-  internal_textures.value[index][$event.key] = $event.value;
-  const filtered = internal_textures.value.filter(
-    (texture) => texture.texture_name !== "" && texture.id !== "",
-  );
-  if (filtered.length > 0) {
-    textures.value = filtered;
-  }
-}
 </script>
 
 <template>
-  <v-row v-for="(texture, index) in internal_textures" :key="texture" align="center">
+  <v-row
+    v-for="(texture, index) in internal_textures"
+    :key="texture"
+    align="center"
+  >
     <br />
     <v-col cols="1" class="pa-0">
       <v-icon

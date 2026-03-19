@@ -5,6 +5,6 @@ const Status = {
   NOT_CONNECTED: "NOT_CONNECTED",
   CONNECTING: "CONNECTING",
   CONNECTED: "CONNECTED",
-};
+}
 
-export { Status };
+export { Status }

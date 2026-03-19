@@ -1,15 +1,15 @@
 <script setup>
-const colorPickerRef = useTemplateRef("colorPickerRef");
-const model = defineModel();
-const { pressed } = useMousePressed({ target: colorPickerRef });
+  const colorPickerRef = useTemplateRef("colorPickerRef")
+  const model = defineModel()
+  const { pressed } = useMousePressed({ target: colorPickerRef })
 
-const color = ref(model);
+  const color = ref(model)
 
-watch(pressed, (value) => {
-  if (!value) {
-    model.value = color.value;
-  }
-});
+  watch(pressed, (value) => {
+    if (!value) {
+      model.value = color.value
+    }
+  })
 </script>
 
 <template>

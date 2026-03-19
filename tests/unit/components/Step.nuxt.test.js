@@ -1,19 +1,19 @@
-import { computed, reactive, ref, shallowRef } from "vue";
-import { describe, expect, test } from "vitest";
-import ResizeObserver from "resize-observer-polyfill";
-import { mount } from "@vue/test-utils";
+import { computed, reactive, ref, shallowRef } from "vue"
+import { describe, expect, test } from "vitest"
+import ResizeObserver from "resize-observer-polyfill"
+import { mount } from "@vue/test-utils"
 
-import ObjectSelector from "@ogw_front/components/ObjectSelector";
-import Step from "@ogw_front/components/Step";
+import ObjectSelector from "@ogw_front/components/ObjectSelector"
+import Step from "@ogw_front/components/Step"
 
-import { vuetify } from "@ogw_tests/utils";
+import { vuetify } from "@ogw_tests/utils"
 
-globalThis.ResizeObserver = ResizeObserver;
+globalThis.ResizeObserver = ResizeObserver
 
 describe(Step, () => {
   test(`BRep`, async () => {
-    const geode_object_type = ref("BRep");
-    const files = ref([]);
+    const geode_object_type = ref("BRep")
+    const files = ref([])
     const stepper_tree = reactive({
       current_step_index: ref(0),
       geode_object_type,
@@ -29,21 +29,21 @@ describe(Step, () => {
           },
           chips: computed(() => {
             if (geode_object_type.value === "") {
-              return [];
+              return []
             } else {
-              return [geode_object_type.value];
+              return [geode_object_type.value]
             }
           }),
         },
       ],
-    });
+    })
     const wrapper = mount(Step, {
       global: {
         plugins: [vuetify],
         provide: { stepper_tree },
       },
       props: { step_index: 0 },
-    });
-    expect(wrapper.exists()).toBeTruthy();
-  });
-});
+    })
+    expect(wrapper.exists()).toBeTruthy()
+  })
+})

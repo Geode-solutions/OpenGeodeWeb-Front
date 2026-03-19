@@ -1,62 +1,78 @@
 // Third party imports
 
 // Local imports
-import { useMeshEdgesColorStyle } from "./color";
-import { useMeshEdgesCommonStyle } from "./common";
-import { useMeshEdgesEdgeAttributeStyle } from "./edge";
-import { useMeshEdgesVertexAttributeStyle } from "./vertex";
-import { useMeshEdgesVisibilityStyle } from "./visibility";
-import { useMeshEdgesWidthStyle } from "./width";
+import { useMeshEdgesColorStyle } from "./color"
+import { useMeshEdgesCommonStyle } from "./common"
+import { useMeshEdgesEdgeAttributeStyle } from "./edge"
+import { useMeshEdgesVertexAttributeStyle } from "./vertex"
+import { useMeshEdgesVisibilityStyle } from "./visibility"
+import { useMeshEdgesWidthStyle } from "./width"
 
 // Local constants
 
 export function useMeshEdgesStyle() {
-  const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
-  const meshEdgesVisibility = useMeshEdgesVisibilityStyle();
-  const meshEdgesColorStyle = useMeshEdgesColorStyle();
-  const meshEdgesWidthStyle = useMeshEdgesWidthStyle();
-  const meshEdgesVertexAttributeStyle = useMeshEdgesVertexAttributeStyle();
-  const meshEdgesEdgeAttributeStyle = useMeshEdgesEdgeAttributeStyle();
+  const meshEdgesCommonStyle = useMeshEdgesCommonStyle()
+  const meshEdgesVisibility = useMeshEdgesVisibilityStyle()
+  const meshEdgesColorStyle = useMeshEdgesColorStyle()
+  const meshEdgesWidthStyle = useMeshEdgesWidthStyle()
+  const meshEdgesVertexAttributeStyle = useMeshEdgesVertexAttributeStyle()
+  const meshEdgesEdgeAttributeStyle = useMeshEdgesEdgeAttributeStyle()
 
   async function setMeshEdgesActiveColoring(id, type) {
-    const coloring = meshEdgesCommonStyle.meshEdgesColoring(id);
-    coloring.active = type;
+    const coloring = meshEdgesCommonStyle.meshEdgesColoring(id)
+    coloring.active = type
     console.log(
       setMeshEdgesActiveColoring.name,
       { id },
       meshEdgesCommonStyle.meshEdgesActiveColoring(id),
-    );
+    )
     if (type === "color") {
-      return meshEdgesColorStyle.setMeshEdgesColor(id, meshEdgesColorStyle.meshEdgesColor(id));
+      return meshEdgesColorStyle.setMeshEdgesColor(
+        id,
+        meshEdgesColorStyle.meshEdgesColor(id),
+      )
     } else if (type === "textures") {
-      const textures = meshEdgesTexturesStore.meshEdgesTextures(id);
+      const textures = meshEdgesTexturesStore.meshEdgesTextures(id)
       if (textures === undefined) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
-      return meshEdgesTexturesStore.setMeshEdgesTextures(id, textures);
+      return meshEdgesTexturesStore.setMeshEdgesTextures(id, textures)
     } else if (type === "vertex") {
-      const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
+      const name =
+        meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id)
       if (name === undefined) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
-      return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name);
+      return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(
+        id,
+        name,
+      )
     } else if (type === "edge") {
-      const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
+      const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id)
       if (name === undefined) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
-      return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name);
+      return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name)
     } else {
-      throw new Error(`Unknown mesh edges coloring type: ${type}`);
+      throw new Error(`Unknown mesh edges coloring type: ${type}`)
     }
   }
 
   function applyMeshEdgesStyle(id) {
     return Promise.all([
-      meshEdgesVisibility.setMeshEdgesVisibility(id, meshEdgesVisibility.meshEdgesVisibility(id)),
-      meshEdgesWidthStyle.setMeshEdgesWidth(id, meshEdgesWidthStyle.meshEdgesWidth(id)),
-      setMeshEdgesActiveColoring(id, meshEdgesCommonStyle.meshEdgesActiveColoring(id)),
-    ]);
+      meshEdgesVisibility.setMeshEdgesVisibility(
+        id,
+        meshEdgesVisibility.meshEdgesVisibility(id),
+      ),
+      meshEdgesWidthStyle.setMeshEdgesWidth(
+        id,
+        meshEdgesWidthStyle.meshEdgesWidth(id),
+      ),
+      setMeshEdgesActiveColoring(
+        id,
+        meshEdgesCommonStyle.meshEdgesActiveColoring(id),
+      ),
+    ])
   }
 
   return {
@@ -68,5 +84,5 @@ export function useMeshEdgesStyle() {
     ...meshEdgesWidthStyle,
     ...meshEdgesVertexAttributeStyle,
     ...meshEdgesEdgeAttributeStyle,
-  };
+  }
 }

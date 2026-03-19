@@ -1,10 +1,10 @@
 <script setup>
-import { useFeedbackStore } from "@ogw_front/stores/feedback";
-const feedbackStore = useFeedbackStore();
+  import { useFeedbackStore } from "@ogw_front/stores/feedback"
+  const feedbackStore = useFeedbackStore()
 
-function reload() {
-  globalThis.location.reload();
-}
+  function reload() {
+    globalThis.location.reload()
+  }
 </script>
 
 <template>
@@ -20,13 +20,16 @@ function reload() {
           v-bind="props"
           color="white"
           class="justify-right"
-          v-tooltip:bottom="'We turn off our server automatically after 5 minutes of inactivity'"
+          v-tooltip:bottom="
+            'We turn off our server automatically after 5 minutes of inactivity'
+          "
         >
           mdi-information-outline
         </v-icon>
       </v-col>
       <v-col cols="auto" class="text-white font-weight-bold">
-        Server timed out due to inactivity, please reload this page or click here:
+        Server timed out due to inactivity, please reload this page or click
+        here:
       </v-col>
       <v-col class="align-items" cols="auto">
         <v-btn color="grey" density="compact" @click="reload()"> Reload </v-btn>

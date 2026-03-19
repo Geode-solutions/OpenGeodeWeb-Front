@@ -1,35 +1,41 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useDataStore } from "@ogw_front/stores/data";
-import { useModelLinesCommonStyle } from "./common";
-import { useViewerStore } from "@ogw_front/stores/viewer";
+import { useDataStore } from "@ogw_front/stores/data"
+import { useModelLinesCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
-const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines;
+const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines
 
 export function useModelLinesColorStyle() {
-  const dataStore = useDataStore();
-  const viewerStore = useViewerStore();
-  const modelLinesCommonStyle = useModelLinesCommonStyle();
+  const dataStore = useDataStore()
+  const viewerStore = useViewerStore()
+  const modelLinesCommonStyle = useModelLinesCommonStyle()
   function modelLineColor(id, line_id) {
-    return modelLinesCommonStyle.modelLineStyle(id, line_id).color;
+    return modelLinesCommonStyle.modelLineStyle(id, line_id).color
   }
   function saveModelLineColor(id, line_id, color) {
-    modelLinesCommonStyle.modelLineStyle(id, line_id).color = color;
+    modelLinesCommonStyle.modelLineStyle(id, line_id).color = color
   }
   async function setModelLinesColor(id, line_ids, color) {
     if (!line_ids || line_ids.length === 0) {
-      return;
+      return
     }
-    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
+    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(
+      id,
+      line_ids,
+    )
     if (!line_viewer_ids || line_viewer_ids.length === 0) {
-      console.warn("[setModelLinesColor] No viewer IDs found, skipping color request", {
-        id,
-        line_ids,
-      });
-      return;
+      console.warn(
+        "[setModelLinesColor] No viewer IDs found, skipping color request",
+        {
+          id,
+          line_ids,
+        },
+      )
+      return
     }
     return viewerStore.request(
       model_lines_schemas.color,
@@ -37,21 +43,21 @@ export function useModelLinesColorStyle() {
       {
         response_function: () => {
           for (const line_id of line_ids) {
-            saveModelLineColor(id, line_id, color);
+            saveModelLineColor(id, line_id, color)
           }
           console.log(
             setModelLinesColor.name,
             { id },
             { line_ids },
             JSON.stringify(modelLineColor(id, line_ids[0])),
-          );
+          )
         },
       },
-    );
+    )
   }
 
   return {
     modelLineColor,
     setModelLinesColor,
-  };
+  }
 }

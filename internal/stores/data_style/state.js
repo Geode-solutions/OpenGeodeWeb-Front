@@ -1,24 +1,24 @@
 export const useDataStyleStateStore = defineStore("dataStyleState", () => {
-  const styles = reactive({});
+  const styles = reactive({})
 
   const objectVisibility = computed(() => (id) => {
     if (styles[id]) {
-      return styles[id].visibility;
+      return styles[id].visibility
     }
-    return false;
-  });
+    return false
+  })
   const selectedObjects = computed(() => {
-    const selection = [];
+    const selection = []
     for (const [id, value] of Object.entries(styles)) {
       if (value.visibility === true) {
-        selection.push(id);
+        selection.push(id)
       }
     }
-    return selection;
-  });
+    return selection
+  })
 
   function getStyle(id) {
-    return styles[id];
+    return styles[id]
   }
 
   return {
@@ -26,5 +26,5 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     styles,
     objectVisibility,
     selectedObjects,
-  };
-});
+  }
+})

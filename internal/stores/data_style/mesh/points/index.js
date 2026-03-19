@@ -1,51 +1,62 @@
 // Third party imports
 
 // Local imports
-import { useMeshPointsColorStyle } from "./color";
-import { useMeshPointsCommonStyle } from "./common";
-import { useMeshPointsSizeStyle } from "./size";
-import { useMeshPointsVertexAttributeStyle } from "./vertex";
-import { useMeshPointsVisibilityStyle } from "./visibility";
+import { useMeshPointsColorStyle } from "./color"
+import { useMeshPointsCommonStyle } from "./common"
+import { useMeshPointsSizeStyle } from "./size"
+import { useMeshPointsVertexAttributeStyle } from "./vertex"
+import { useMeshPointsVisibilityStyle } from "./visibility"
 
 // Local constants
 
 export function useMeshPointsStyle() {
-  const meshPointsCommonStyle = useMeshPointsCommonStyle();
-  const meshPointsVisibility = useMeshPointsVisibilityStyle();
-  const meshPointsColorStyle = useMeshPointsColorStyle();
-  const meshPointsSizeStyle = useMeshPointsSizeStyle();
-  const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle();
+  const meshPointsCommonStyle = useMeshPointsCommonStyle()
+  const meshPointsVisibility = useMeshPointsVisibilityStyle()
+  const meshPointsColorStyle = useMeshPointsColorStyle()
+  const meshPointsSizeStyle = useMeshPointsSizeStyle()
+  const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle()
 
   async function setMeshPointsActiveColoring(id, type) {
-    const coloring = meshPointsCommonStyle.meshPointsColoring(id);
-    coloring.active = type;
+    const coloring = meshPointsCommonStyle.meshPointsColoring(id)
+    coloring.active = type
     console.log(
       setMeshPointsActiveColoring.name,
       { id },
       meshPointsCommonStyle.meshPointsActiveColoring(id),
-    );
+    )
     if (type === "color") {
-      return meshPointsColorStyle.setMeshPointsColor(id, meshPointsColorStyle.meshPointsColor(id));
+      return meshPointsColorStyle.setMeshPointsColor(
+        id,
+        meshPointsColorStyle.meshPointsColor(id),
+      )
     } else if (type === "textures") {
-      const textures = meshPointsTexturesStore.meshPointsTextures(id);
+      const textures = meshPointsTexturesStore.meshPointsTextures(id)
       if (textures === undefined) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
-      return meshPointsTexturesStore.setMeshPointsTextures(id, textures);
+      return meshPointsTexturesStore.setMeshPointsTextures(id, textures)
     } else if (type === "vertex") {
-      const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
+      const name =
+        meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id)
       if (name === undefined) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
-      return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
+      return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(
+        id,
+        name,
+      )
     } else if (type === "polygon") {
-      const name = meshPointsPolygonAttributeStyleStore.meshPointsPolygonAttributeName(id);
+      const name =
+        meshPointsPolygonAttributeStyleStore.meshPointsPolygonAttributeName(id)
       if (name === undefined) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
-      await meshPointsPolygonAttributeStyleStore.setMeshPointsPolygonAttributeName(id, name);
+      await meshPointsPolygonAttributeStyleStore.setMeshPointsPolygonAttributeName(
+        id,
+        name,
+      )
     } else {
-      throw new Error(`Unknown mesh points coloring type: ${type}`);
+      throw new Error(`Unknown mesh points coloring type: ${type}`)
     }
   }
 
@@ -55,9 +66,15 @@ export function useMeshPointsStyle() {
         id,
         meshPointsVisibility.meshPointsVisibility(id),
       ),
-      meshPointsSizeStyle.setMeshPointsSize(id, meshPointsSizeStyle.meshPointsSize(id)),
-      setMeshPointsActiveColoring(id, meshPointsCommonStyle.meshPointsActiveColoring(id)),
-    ]);
+      meshPointsSizeStyle.setMeshPointsSize(
+        id,
+        meshPointsSizeStyle.meshPointsSize(id),
+      ),
+      setMeshPointsActiveColoring(
+        id,
+        meshPointsCommonStyle.meshPointsActiveColoring(id),
+      ),
+    ])
   }
 
   return {
@@ -68,5 +85,5 @@ export function useMeshPointsStyle() {
     ...meshPointsColorStyle,
     ...meshPointsSizeStyle,
     ...meshPointsVertexAttributeStyle,
-  };
+  }
 }
