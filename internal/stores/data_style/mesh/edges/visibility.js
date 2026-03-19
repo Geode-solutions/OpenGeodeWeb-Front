@@ -1,7 +1,6 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-// Local imports
 import { useMeshEdgesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
@@ -22,10 +21,7 @@ export function useMeshEdgesVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, (edges) => {
-            edges.visibility = visibility
-            console.log(setMeshEdgesVisibility.name, { id }, edges.visibility)
-          })
+          return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { visibility })
         },
       },
     )

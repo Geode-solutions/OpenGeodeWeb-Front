@@ -2,7 +2,6 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
 import { useMeshEdgesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
@@ -14,8 +13,12 @@ export function useMeshEdgesEdgeAttributeStyle() {
   const viewerStore = useViewerStore()
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle()
 
+  function meshEdgesColoring(id) {
+    return meshEdgesCommonStyle.meshEdgesStyle(id).coloring
+  }
+
   function meshEdgesEdgeAttribute(id) {
-    return meshEdgesCommonStyle.meshEdgesColoring(id).edge
+    return meshEdgesColoring(id).edge
   }
 
   function meshEdgesEdgeAttributeStoredConfig(id, name) {
@@ -30,25 +33,32 @@ export function useMeshEdgesEdgeAttributeStyle() {
     })
   }
 
-  function setMeshEdgesEdgeAttributeStoredConfig(
-    id,
-    name,
-    { minimum, maximum, colorMap },
-  ) {
-    const config = { minimum, maximum, colorMap }
-    return meshEdgesCommonStyle
-      .mutateMeshEdgesEdgeStyle(id, (edge) => {
-        edge.storedConfigs[name] = config
-      })
-      .then(() => config)
+  function mutateMeshEdgesEdgeStyle(id, values) {
+    return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
+      coloring: {
+        ...meshEdgesColoring(id),
+        edge: {
+          ...meshEdgesEdgeAttribute(id),
+          ...values,
+        },
+      },
+    })
+  }
+
+  function setMeshEdgesEdgeAttributeStoredConfig(id, name, config) {
+    const edge = meshEdgesEdgeAttribute(id)
+    return mutateMeshEdgesEdgeStyle(id, {
+      storedConfigs: {
+        ...edge.storedConfigs,
+        [name]: {
+          ...edge.storedConfigs[name],
+          ...config,
+        },
+      },
+    }).then(() => config)
   }
 
   function meshEdgesEdgeAttributeName(id) {
-    console.log(
-      meshEdgesEdgeAttributeName.name,
-      { id },
-      meshEdgesEdgeAttribute(id),
-    )
     return meshEdgesEdgeAttribute(id).name
   }
   function setMeshEdgesEdgeAttributeName(id, name) {
@@ -57,22 +67,19 @@ export function useMeshEdgesEdgeAttributeStyle() {
       { id, name },
       {
         response_function: () => {
-          return meshEdgesCommonStyle.mutateMeshEdgesEdgeStyle(id, (edge) => {
-            edge.name = name
-            if (!(name in edge.storedConfigs)) {
-              edge.storedConfigs[name] = {
+          const edge = meshEdgesEdgeAttribute(id)
+          const updates = { name }
+          if (!(name in edge.storedConfigs)) {
+            updates.storedConfigs = {
+              ...edge.storedConfigs,
+              [name]: {
                 minimum: undefined,
                 maximum: undefined,
                 colorMap: undefined,
-              }
+              },
             }
-            const { minimum, maximum, colorMap } = edge.storedConfigs[name]
-            const storedConfig = edge.storedConfigs[name]
-            storedConfig.minimum = minimum
-            storedConfig.maximum = maximum
-            edge.storedConfigs[name].colorMap = colorMap
-            console.log(setMeshEdgesEdgeAttributeName.name, { id }, name)
-          })
+          }
+          return mutateMeshEdgesEdgeStyle(id, updates)
         },
       },
     )
@@ -86,13 +93,9 @@ export function useMeshEdgesEdgeAttributeStyle() {
   }
   function setMeshEdgesEdgeAttributeRange(id, minimum, maximum) {
     const name = meshEdgesEdgeAttributeName(id)
-    return meshEdgesCommonStyle.mutateMeshEdgesEdgeStyle(id, (edge) => {
-      const storedConfig = edge.storedConfigs[name]
-      storedConfig.minimum = minimum
-      storedConfig.maximum = maximum
-      // Update color map synchronously
-      const colorMap = edge.storedConfigs[name].colorMap
-      edge.storedConfigs[name].colorMap = colorMap
+    return setMeshEdgesEdgeAttributeStoredConfig(id, name, {
+      minimum,
+      maximum,
     })
   }
 
@@ -107,25 +110,12 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name)
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
-    console.log(setMeshEdgesEdgeAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    })
     return viewerStore.request(
       meshEdgesEdgeAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          return meshEdgesCommonStyle.mutateMeshEdgesEdgeStyle(id, (edge) => {
-            edge.storedConfigs[name].colorMap = colorMap
-            console.log(
-              setMeshEdgesEdgeAttributeColorMap.name,
-              { id },
-              edge.storedConfigs[name].colorMap,
-            )
-          })
+          return setMeshEdgesEdgeAttributeStoredConfig(id, name, { colorMap })
         },
       },
     )

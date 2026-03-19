@@ -7,28 +7,29 @@ import { useMeshEdgesEdgeAttributeStyle } from "./edge"
 import { useMeshEdgesVertexAttributeStyle } from "./vertex"
 import { useMeshEdgesVisibilityStyle } from "./visibility"
 import { useMeshEdgesWidthStyle } from "./width"
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 // Local constants
 
 export function useMeshEdgesStyle() {
-  const meshEdgesCommonStyle = useMeshEdgesCommonStyle()
   const meshEdgesVisibility = useMeshEdgesVisibilityStyle()
   const meshEdgesColorStyle = useMeshEdgesColorStyle()
   const meshEdgesWidthStyle = useMeshEdgesWidthStyle()
   const meshEdgesVertexAttributeStyle = useMeshEdgesVertexAttributeStyle()
   const meshEdgesEdgeAttributeStyle = useMeshEdgesEdgeAttributeStyle()
+  const meshEdgesCommonStyle = useMeshEdgesCommonStyle()
+
+  function meshEdgesColoring(id) {
+    return meshEdgesCommonStyle.meshEdgesStyle(id).coloring
+  }
+
+  function meshEdgesActiveColoring(id) {
+    return meshEdgesColoring(id).active
+  }
 
   async function setMeshEdgesActiveColoring(id, type) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.edges.coloring.active = type
+    await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
+      coloring: { ...meshEdgesColoring(id), active: type },
     })
-    console.log(
-      setMeshEdgesActiveColoring.name,
-      { id },
-      meshEdgesCommonStyle.meshEdgesActiveColoring(id),
-    )
     if (type === "color") {
       return meshEdgesColorStyle.setMeshEdgesColor(
         id,
@@ -65,14 +66,13 @@ export function useMeshEdgesStyle() {
         id,
         meshEdgesWidthStyle.meshEdgesWidth(id),
       ),
-      setMeshEdgesActiveColoring(
-        id,
-        meshEdgesCommonStyle.meshEdgesActiveColoring(id),
-      ),
+      setMeshEdgesActiveColoring(id, meshEdgesActiveColoring(id)),
     ])
   }
 
   return {
+    meshEdgesColoring,
+    meshEdgesActiveColoring,
     setMeshEdgesActiveColoring,
     applyMeshEdgesStyle,
     ...meshEdgesCommonStyle,

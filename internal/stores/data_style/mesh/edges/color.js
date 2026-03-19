@@ -13,8 +13,11 @@ export function useMeshEdgesColorStyle() {
   const viewerStore = useViewerStore()
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle()
 
+  function meshEdgesColoring(id) {
+    return meshEdgesCommonStyle.meshEdgesStyle(id).coloring
+  }
   function meshEdgesColor(id) {
-    return meshEdgesCommonStyle.meshEdgesColoring(id).color
+    return meshEdgesColoring(id).color
   }
   function setMeshEdgesColor(id, color) {
     return viewerStore.request(
@@ -22,17 +25,9 @@ export function useMeshEdgesColorStyle() {
       { id, color },
       {
         response_function: () => {
-          return meshEdgesCommonStyle.mutateMeshEdgesColoringStyle(
-            id,
-            (coloring) => {
-              coloring.color = color
-              console.log(
-                setMeshEdgesColor.name,
-                { id },
-                JSON.stringify(coloring.color),
-              )
-            },
-          )
+          return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
+            coloring: { ...meshEdgesColoring(id), color },
+          })
         },
       },
     )

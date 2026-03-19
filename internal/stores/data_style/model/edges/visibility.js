@@ -1,7 +1,6 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
-// Local imports
 import { useModelEdgesCommonStyle } from "./common"
 import { useViewerStore } from "@ogw_front/stores/viewer"
 
@@ -22,22 +21,20 @@ export function useModelEdgesVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          return modelEdgesCommonStyle.mutateModelEdgesStyle(id, (edges) => {
-            edges.visibility = visibility
-            console.log(setModelEdgesVisibility.name, { id }, edges.visibility)
-          })
+          return modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility })
         },
       },
     )
   }
 
   function applyModelEdgesStyle(id) {
-    const style = modelEdgesStyle(id)
-    return Promise.resolve([setModelEdgesVisibility(id, style.visibility)])
+    const visibility = modelEdgesVisibility(id)
+    return Promise.resolve([setModelEdgesVisibility(id, visibility)])
   }
 
   return {
     modelEdgesVisibility,
     setModelEdgesVisibility,
+    applyModelEdgesStyle,
   }
 }
