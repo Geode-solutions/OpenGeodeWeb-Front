@@ -14,6 +14,6 @@ export function useMeshEdgesCommonStyle() {
 
   return {
     meshEdgesStyle,
-    mutateMeshEdgesStyle
+    mutateMeshEdgesStyle,
   }
 }
