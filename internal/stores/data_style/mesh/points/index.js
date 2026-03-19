@@ -16,11 +16,10 @@ export function useMeshPointsStyle() {
   const meshPointsColorStyle = useMeshPointsColorStyle()
   const meshPointsSizeStyle = useMeshPointsSizeStyle()
   const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle()
- 
+
   function meshPointsColoring(id) {
     return meshPointsCommonStyle.meshPointsColoring(id)
   }
-
 
   function meshPointsActiveColoring(id) {
     return meshPointsColoring(id).active

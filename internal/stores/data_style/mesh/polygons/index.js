@@ -16,14 +16,13 @@ export function useMeshPolygonsStyle() {
   const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle()
   const meshPolygonsColorStyle = useMeshPolygonsColorStyle()
   const meshPolygonsTexturesStyle = useMeshPolygonsTexturesStyle()
- 
+
   function meshPolygonsColoring(id) {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id)
   }
   const meshPolygonsVertexAttributeStyle = useMeshPolygonsVertexAttributeStyle()
   const meshPolygonsPolygonAttributeStyle =
     useMeshPolygonsPolygonAttributeStyle()
-
 
   function meshPolygonsActiveColoring(id) {
     return meshPolygonsColoring(id).active

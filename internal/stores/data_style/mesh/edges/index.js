@@ -13,7 +13,7 @@ import { useMeshEdgesWidthStyle } from "./width"
 export function useMeshEdgesStyle() {
   const meshEdgesVisibility = useMeshEdgesVisibilityStyle()
   const meshEdgesColorStyle = useMeshEdgesColorStyle()
- 
+
   function meshEdgesColoring(id) {
     return meshEdgesCommonStyle.meshEdgesColoring(id)
   }

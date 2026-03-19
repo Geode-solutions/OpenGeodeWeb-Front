@@ -105,7 +105,6 @@ export const useInfraStore = defineStore("infra", {
       )
       console.log("[INFRA] All microservices connected")
     },
-
   },
   share: {
     omit: ["microservices"],

@@ -14,7 +14,7 @@ export function useMeshPolyhedraStyle() {
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle()
   const meshPolyhedraVisibility = useMeshPolyhedraVisibilityStyle()
   const meshPolyhedraColorStyle = useMeshPolyhedraColorStyle()
- 
+
   function meshPolyhedraColoring(id) {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id)
   }
@@ -22,7 +22,6 @@ export function useMeshPolyhedraStyle() {
     useMeshPolyhedraVertexAttributeStyle()
   const meshPolyhedraPolyhedronAttributeStyle =
     useMeshPolyhedraPolyhedronAttributeStyle()
-
 
   function meshPolyhedraActiveColoring(id) {
     return meshPolyhedraColoring(id).active
