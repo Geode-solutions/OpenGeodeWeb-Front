@@ -99,6 +99,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setVisibility(id, visibility) {
+    if (!hybridDb[id]) {
+      return;
+    }
     hybridDb[id].actor.setVisibility(visibility);
     const renderWindow = genericRenderWindow.value.getRenderWindow();
     renderWindow.render();

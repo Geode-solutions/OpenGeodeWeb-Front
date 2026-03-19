@@ -56,7 +56,7 @@
       {
         "max": 50,
         "skipBlankLines": true,
-        "skipComments": true,
+        "skipComments": true
       }
     ],
     "unicorn/no-useless-undefined": "off",
@@ -64,7 +64,7 @@
       "error",
       {
         "skipBlankLines": true,
-        "skipComments": true,
+        "skipComments": true
       }
     ],
     "vue/max-props": [

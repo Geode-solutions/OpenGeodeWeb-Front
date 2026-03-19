@@ -1,6 +1,6 @@
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
-function upload_file(
+async function upload_file(
   microservice,
   { route, file },
   { request_error_function, response_function, response_error_function } = {},
@@ -19,7 +19,7 @@ function upload_file(
     body: body,
   };
   microservice.start_request();
-  return $fetch(route, {
+  return await $fetch(route, {
     baseURL: microservice.base_url || "",
     ...request_options,
     onRequestError({ error }) {
