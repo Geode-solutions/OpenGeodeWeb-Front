@@ -85,8 +85,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     actor.setMapper(mapper)
     const renderer = genericRenderWindow.value.getRenderer()
     const renderWindow = genericRenderWindow.value.getRenderWindow()
+    const isFirst = renderer.getActors().length === 0
     renderer.addActor(actor)
-    renderer.resetCamera()
+    if (isFirst) {
+      renderer.resetCamera()
+    }
     renderWindow.render()
     hybridDb[id] = { actor, polydata, mapper }
   }
