@@ -1,23 +1,23 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 export function useMeshEdgesCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore();
+  const dataStyleStateStore = useDataStyleStateStore()
 
   function meshEdgesStyle(id) {
-    return dataStyleStateStore.getStyle(id).edges;
+    return dataStyleStateStore.getStyle(id).edges
   }
 
   function meshEdgesColoring(id) {
-    return meshEdgesStyle(id).coloring;
+    return meshEdgesStyle(id).coloring
   }
 
   function meshEdgesActiveColoring(id) {
-    return meshEdgesColoring(id).active;
+    return meshEdgesColoring(id).active
   }
 
   return {
     meshEdgesStyle,
     meshEdgesColoring,
     meshEdgesActiveColoring,
-  };
+  }
 }

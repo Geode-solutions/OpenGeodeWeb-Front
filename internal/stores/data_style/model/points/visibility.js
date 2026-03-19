@@ -1,19 +1,19 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
 
 // Local imports
-import { useModelPointsCommonStyle } from "./common";
-import { useViewerStore } from "@ogw_front/stores/viewer";
+import { useModelPointsCommonStyle } from "./common"
+import { useViewerStore } from "@ogw_front/stores/viewer"
 
 // Local constants
-const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points;
+const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
 
 export function useModelPointsVisibilityStyle() {
-  const viewerStore = useViewerStore();
-  const modelPointsCommonStyle = useModelPointsCommonStyle();
+  const viewerStore = useViewerStore()
+  const modelPointsCommonStyle = useModelPointsCommonStyle()
 
   function modelPointsVisibility(id) {
-    return modelPointsCommonStyle.modelPointsStyle(id).visibility;
+    return modelPointsCommonStyle.modelPointsStyle(id).visibility
   }
 
   function setModelPointsVisibility(id, visibility) {
@@ -22,15 +22,19 @@ export function useModelPointsVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          modelPointsCommonStyle.modelPointsStyle(id).visibility = visibility;
-          console.log(setModelPointsVisibility.name, { id }, modelPointsVisibility(id));
+          modelPointsCommonStyle.modelPointsStyle(id).visibility = visibility
+          console.log(
+            setModelPointsVisibility.name,
+            { id },
+            modelPointsVisibility(id),
+          )
         },
       },
-    );
+    )
   }
 
   return {
     modelPointsVisibility,
     setModelPointsVisibility,
-  };
+  }
 }

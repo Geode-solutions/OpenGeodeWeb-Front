@@ -1,27 +1,27 @@
 // Third party imports
-import { beforeEach, describe, expect, expectTypeOf, test } from "vitest";
+import { beforeEach, describe, expect, expectTypeOf, test } from "vitest"
 
 // Local imports
-import { setupActivePinia } from "@ogw_tests/utils";
-import { useTreeviewStore } from "@ogw_front/stores/treeview";
+import { setupActivePinia } from "@ogw_tests/utils"
+import { useTreeviewStore } from "@ogw_front/stores/treeview"
 
 // CONSTANTS
-const STEP_1 = 1;
+const STEP_1 = 1
 
 beforeEach(() => {
-  setupActivePinia();
-});
+  setupActivePinia()
+})
 
 describe("treeview store state", () => {
   test("initial state", () => {
-    const treeviewStore = useTreeviewStore();
-    expectTypeOf(treeviewStore.items).toBeArray();
-  });
-});
+    const treeviewStore = useTreeviewStore()
+    expectTypeOf(treeviewStore.items).toBeArray()
+  })
+})
 
 describe("treeview store actions", () => {
   test("addItem sorted check", () => {
-    const treeviewStore = useTreeviewStore();
+    const treeviewStore = useTreeviewStore()
     const testItems = [
       {
         geode_object_type: "BRep",
@@ -41,7 +41,7 @@ describe("treeview store actions", () => {
         id: "2",
         viewer_type: "mesh",
       },
-    ];
+    ]
 
     for (let i = 0; i < testItems.length; i += STEP_1) {
       treeviewStore.addItem(
@@ -49,14 +49,16 @@ describe("treeview store actions", () => {
         testItems[i].name,
         testItems[i].id,
         testItems[i].viewer_type,
-      );
-      const itemsCopy = [...treeviewStore.items];
-      expect(treeviewStore.items).toStrictEqual(itemsCopy.toSorted());
+      )
+      const itemsCopy = [...treeviewStore.items]
+      expect(treeviewStore.items).toStrictEqual(itemsCopy.toSorted())
 
       for (let j = 0; j < treeviewStore.items.length; j += STEP_1) {
-        const childrenCopy = [...treeviewStore.items[j].children];
-        expect(treeviewStore.items[j].children).toStrictEqual(childrenCopy.toSorted());
+        const childrenCopy = [...treeviewStore.items[j].children]
+        expect(treeviewStore.items[j].children).toStrictEqual(
+          childrenCopy.toSorted(),
+        )
       }
     }
-  });
-});
+  })
+})

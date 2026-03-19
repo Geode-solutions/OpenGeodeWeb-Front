@@ -1,19 +1,19 @@
 <script setup>
-import Loading from "@ogw_front/components/Loading";
-import Recaptcha from "@ogw_front/components/Recaptcha";
-import { Status } from "@ogw_front/utils/status";
-import { useInfraStore } from "@ogw_front/stores/infra";
+  import Loading from "@ogw_front/components/Loading"
+  import Recaptcha from "@ogw_front/components/Recaptcha"
+  import { Status } from "@ogw_front/utils/status"
+  import { useInfraStore } from "@ogw_front/stores/infra"
 
-const infraStore = useInfraStore();
+  const infraStore = useInfraStore()
 
-watch(
-  () => infraStore.is_captcha_validated,
-  (value, oldValue) => {
-    if (value && !oldValue && import.meta.client) {
-      infraStore.create_backend();
-    }
-  },
-);
+  watch(
+    () => infraStore.is_captcha_validated,
+    (value, oldValue) => {
+      if (value && !oldValue && import.meta.client) {
+        infraStore.create_backend()
+      }
+    },
+  )
 </script>
 
 <template>

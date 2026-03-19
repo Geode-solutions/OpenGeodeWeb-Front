@@ -1,26 +1,28 @@
-import { useAppStore } from "@ogw_front/stores/app";
+import { useAppStore } from "@ogw_front/stores/app"
 
 function autoStoreRegister({ store }) {
   if (store.$id === "app") {
-    return;
+    return
   }
 
-  const appStore = useAppStore();
-  appStore.registerStore(store);
-  console.log(`[AutoRegister] Store "${store.$id}" processed`);
+  const appStore = useAppStore()
+  appStore.registerStore(store)
+  console.log(`[AutoRegister] Store "${store.$id}" processed`)
 }
 
 export default defineNuxtPlugin({
   name: "auto-store-register",
   dependsOn: ["pinia"],
   setup(nuxtApp) {
-    const { $pinia } = nuxtApp;
+    const { $pinia } = nuxtApp
     if (!$pinia) {
-      console.warn("Pinia instance not available.");
-      return;
+      console.warn("Pinia instance not available.")
+      return
     }
 
-    $pinia.use(autoStoreRegister);
-    console.log("[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front");
+    $pinia.use(autoStoreRegister)
+    console.log(
+      "[AUTOREGISTER PLUGIN] Loaded automatically from OpenGeodeWeb-Front",
+    )
   },
-});
+})

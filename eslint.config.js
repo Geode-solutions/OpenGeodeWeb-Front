@@ -1,6 +1,6 @@
-import nuxt from "eslint-plugin-nuxt";
-import vue from "eslint-plugin-vue";
-import vuetify from "eslint-plugin-vuetify";
+import nuxt from "eslint-plugin-nuxt"
+import vue from "eslint-plugin-vue"
+import vuetify from "eslint-plugin-vuetify"
 
 // oxlint-disable-next-line import/no-anonymous-default-export
 export default [
@@ -25,4 +25,4 @@ export default [
       ...nuxt.configs.recommended.rules,
     },
   },
-];
+]

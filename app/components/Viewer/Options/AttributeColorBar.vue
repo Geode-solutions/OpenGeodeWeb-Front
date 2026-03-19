@@ -1,11 +1,11 @@
 <script setup>
-import ColorMapPicker from "./ColorMapPicker.vue";
+  import ColorMapPicker from "./ColorMapPicker.vue"
 
-const emit = defineEmits(["reset"]);
+  const emit = defineEmits(["reset"])
 
-const minimum = defineModel("minimum", { type: Number });
-const maximum = defineModel("maximum", { type: Number });
-const colorMap = defineModel("colorMap", { type: String });
+  const minimum = defineModel("minimum", { type: Number })
+  const maximum = defineModel("maximum", { type: Number })
+  const colorMap = defineModel("colorMap", { type: String })
 </script>
 
 <template>
@@ -50,7 +50,7 @@ const colorMap = defineModel("colorMap", { type: String });
 </template>
 
 <style scoped>
-.attribute-colorbar {
-  width: 100%;
-}
+  .attribute-colorbar {
+    width: 100%;
+  }
 </style>
