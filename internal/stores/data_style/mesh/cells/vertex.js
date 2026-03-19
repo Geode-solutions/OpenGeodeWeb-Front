@@ -30,53 +30,44 @@ export function useMeshCellsVertexAttributeStyle() {
     })
   }
 
-  function mutateMeshCellsVertexStyle(id, mutationCallback) {
-    return meshCellsCommonStyle.mutateMeshCellsColoringStyle(id, (coloring) => {
-      mutationCallback(coloring.vertex)
+  function mutateMeshCellsVertexStyle(id, values) {
+    return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+      coloring: {
+        vertex: values,
+      },
     })
   }
 
-  function setMeshCellsVertexAttributeStoredConfig(
-    id,
-    name,
-    { minimum, maximum, colorMap },
-  ) {
-    const config = { minimum, maximum, colorMap }
-    return mutateMeshCellsVertexStyle(id, (vertex) => {
-      vertex.storedConfigs[name] = config
-    }).then(() => config)
+  function setMeshCellsVertexAttributeStoredConfig(id, name, config) {
+    return mutateMeshCellsVertexStyle(id, {
+      storedConfigs: {
+        [name]: config,
+      },
+    })
   }
 
   function meshCellsVertexAttributeName(id) {
-    console.log(
-      meshCellsVertexAttributeName.name,
-      { id },
-      meshCellsVertexAttribute(id),
-    )
     return meshCellsVertexAttribute(id).name
   }
+
   function setMeshCellsVertexAttributeName(id, name) {
     return viewerStore.request(
       meshCellsVertexAttributeSchemas.name,
       { id, name },
       {
         response_function: () => {
-          return mutateMeshCellsVertexStyle(id, (vertex) => {
-            vertex.name = name
-            if (!(name in vertex.storedConfigs)) {
-              vertex.storedConfigs[name] = {
+          const updates = { name }
+          const vertex = meshCellsVertexAttribute(id)
+          if (!(name in vertex.storedConfigs)) {
+            updates.storedConfigs = {
+              [name]: {
                 minimum: undefined,
                 maximum: undefined,
                 colorMap: undefined,
-              }
+              },
             }
-            const { minimum, maximum, colorMap } = vertex.storedConfigs[name]
-            const storedConfig = vertex.storedConfigs[name]
-            storedConfig.minimum = minimum
-            storedConfig.maximum = maximum
-            vertex.storedConfigs[name].colorMap = colorMap
-            console.log(setMeshCellsVertexAttributeName.name, { id }, name)
-          })
+          }
+          return mutateMeshCellsVertexStyle(id, updates)
         },
       },
     )
@@ -88,15 +79,12 @@ export function useMeshCellsVertexAttributeStyle() {
     const { minimum, maximum } = storedConfig
     return [minimum, maximum]
   }
+
   function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
     const name = meshCellsVertexAttributeName(id)
-    return mutateMeshCellsVertexStyle(id, (vertex) => {
-      const storedConfig = vertex.storedConfigs[name]
-      storedConfig.minimum = minimum
-      storedConfig.maximum = maximum
-      // Update color map in the same mutation
-      const colorMap = vertex.storedConfigs[name].colorMap
-      vertex.storedConfigs[name].colorMap = colorMap
+    return setMeshCellsVertexAttributeStoredConfig(id, name, {
+      minimum,
+      maximum,
     })
   }
 
@@ -106,30 +94,18 @@ export function useMeshCellsVertexAttributeStyle() {
     const { colorMap } = storedConfig
     return colorMap
   }
+
   function setMeshCellsVertexAttributeColorMap(id, colorMap) {
     const name = meshCellsVertexAttributeName(id)
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
     const points = getRGBPointsFromPreset(colorMap)
     const { minimum, maximum } = storedConfig
-    console.log(setMeshCellsVertexAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    })
     return viewerStore.request(
       meshCellsVertexAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          return mutateMeshCellsVertexStyle(id, (vertex) => {
-            vertex.storedConfigs[name].colorMap = colorMap
-            console.log(
-              setMeshCellsVertexAttributeColorMap.name,
-              { id },
-              vertex.storedConfigs[name].colorMap,
-            )
-          })
+          return setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap })
         },
       },
     )

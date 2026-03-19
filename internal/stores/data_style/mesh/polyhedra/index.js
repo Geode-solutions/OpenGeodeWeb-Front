@@ -19,16 +19,19 @@ export function useMeshPolyhedraStyle() {
   const meshPolyhedraPolyhedronAttributeStyle =
     useMeshPolyhedraPolyhedronAttributeStyle()
 
+  function meshPolyhedraColoring(id) {
+    return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).coloring
+  }
+
+  function meshPolyhedraActiveColoring(id) {
+    return meshPolyhedraColoring(id).active
+  }
+
   async function setMeshPolyhedraActiveColoring(id, type) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.polyhedra.coloring.active = type
+    await meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
+      coloring: { active: type },
     })
-    console.log(
-      setMeshPolyhedraActiveColoring.name,
-      { id },
-      meshPolyhedraCommonStyle.meshPolyhedraActiveColoring(id),
-    )
+    console.log(setMeshPolyhedraActiveColoring.name, { id }, type)
     if (type === "color") {
       return meshPolyhedraColorStyle.setMeshPolyhedraColor(
         id,
@@ -52,7 +55,7 @@ export function useMeshPolyhedraStyle() {
       if (name === undefined) {
         return Promise.resolve()
       }
-      await meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(
+      return meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(
         id,
         name,
       )
@@ -67,17 +70,16 @@ export function useMeshPolyhedraStyle() {
         id,
         meshPolyhedraVisibility.meshPolyhedraVisibility(id),
       ),
-      setMeshPolyhedraActiveColoring(
-        id,
-        meshPolyhedraCommonStyle.meshPolyhedraActiveColoring(id),
-      ),
+      setMeshPolyhedraActiveColoring(id, meshPolyhedraActiveColoring(id)),
     ])
   }
 
   return {
+    ...meshPolyhedraCommonStyle,
+    meshPolyhedraColoring,
+    meshPolyhedraActiveColoring,
     setMeshPolyhedraActiveColoring,
     applyMeshPolyhedraStyle,
-    ...meshPolyhedraCommonStyle,
     ...meshPolyhedraVisibility,
     ...meshPolyhedraColorStyle,
     ...meshPolyhedraVertexAttributeStyle,

@@ -1,3 +1,4 @@
+import merge from "lodash/merge"
 import { liveQuery } from "dexie"
 import { useObservable } from "@vueuse/rxjs"
 import { database } from "@ogw_internal/database/database"
@@ -89,9 +90,9 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     return default_style
   }
 
-  function mutateStyle(id, mutationCallback) {
+  function mutateStyle(id, values) {
     const style = getStyle(id)
-    mutationCallback(style)
+    merge(style, values)
     return database.data_style.put(structuredClone({ id, ...toRaw(style) }))
   }
 
@@ -100,17 +101,17 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     return componentStyles.value[key] || {}
   }
 
-  function mutateComponentStyle(id_model, id_component, mutationCallback) {
+  function mutateComponentStyle(id_model, id_component, values) {
     return database.model_component_datastyle
       .get([id_model, id_component])
       .then((style) => {
         const s = style || { id_model, id_component }
-        mutationCallback(s)
+        merge(s, values)
         return database.model_component_datastyle.put(structuredClone(toRaw(s)))
       })
   }
 
-  function mutateComponentStyles(id_model, id_components, mutationCallback) {
+  function mutateComponentStyles(id_model, id_components, values) {
     return database.model_component_datastyle
       .where("id_model")
       .equals(id_model)
@@ -123,7 +124,7 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
 
         const updates = id_components.map((id_component) => {
           const style = stylesMap[id_component] || { id_model, id_component }
-          mutationCallback(style)
+          merge(style, values)
           return toRaw(style)
         })
 

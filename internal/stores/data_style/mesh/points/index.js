@@ -17,16 +17,19 @@ export function useMeshPointsStyle() {
   const meshPointsSizeStyle = useMeshPointsSizeStyle()
   const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle()
 
+  function meshPointsColoring(id) {
+    return meshPointsCommonStyle.meshPointsStyle(id).coloring
+  }
+
+  function meshPointsActiveColoring(id) {
+    return meshPointsColoring(id).active
+  }
+
   async function setMeshPointsActiveColoring(id, type) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.points.coloring.active = type
+    await meshPointsCommonStyle.mutateMeshPointsStyle(id, {
+      coloring: { active: type },
     })
-    console.log(
-      setMeshPointsActiveColoring.name,
-      { id },
-      meshPointsCommonStyle.meshPointsActiveColoring(id),
-    )
+    console.log(setMeshPointsActiveColoring.name, { id }, type)
     if (type === "color") {
       return meshPointsColorStyle.setMeshPointsColor(
         id,
@@ -57,17 +60,16 @@ export function useMeshPointsStyle() {
         id,
         meshPointsSizeStyle.meshPointsSize(id),
       ),
-      setMeshPointsActiveColoring(
-        id,
-        meshPointsCommonStyle.meshPointsActiveColoring(id),
-      ),
+      setMeshPointsActiveColoring(id, meshPointsActiveColoring(id)),
     ])
   }
 
   return {
+    ...meshPointsCommonStyle,
+    meshPointsColoring,
+    meshPointsActiveColoring,
     setMeshPointsActiveColoring,
     applyMeshPointsStyle,
-    ...meshPointsCommonStyle,
     ...meshPointsVisibility,
     ...meshPointsColorStyle,
     ...meshPointsSizeStyle,

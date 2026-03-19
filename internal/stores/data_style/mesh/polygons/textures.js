@@ -22,17 +22,9 @@ export function useMeshPolygonsTexturesStyle() {
       { id, textures },
       {
         response_function: () => {
-          return meshPolygonsCommonStyle
-            .mutateMeshPolygonsColoringStyle(id, (coloring) => {
-              coloring.textures = textures
-            })
-            .then(() => {
-              console.log(
-                setMeshPolygonsTextures.name,
-                { id },
-                meshPolygonsTextures(id),
-              )
-            })
+          return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+            coloring: { textures },
+          })
         },
       },
     )

@@ -16,10 +16,6 @@ export function useModelSurfacesVisibilityStyle() {
   function modelSurfaceVisibility(id, surface_id) {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility
   }
-  function saveModelSurfaceVisibility(id, surface_id, visibility) {
-    modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility =
-      visibility
-  }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
     if (!surface_ids || surface_ids.length === 0) {
       return Promise.resolve()
@@ -32,15 +28,7 @@ export function useModelSurfacesVisibilityStyle() {
           return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
             id,
             surface_ids,
-            (style) => {
-              style.visibility = visibility
-              console.log(
-                setModelSurfacesVisibility.name,
-                { id },
-                { surface_ids },
-                style.visibility,
-              )
-            },
+            { visibility },
           )
         }
         return viewerStore.request(
@@ -51,15 +39,7 @@ export function useModelSurfacesVisibilityStyle() {
               return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
                 id,
                 surface_ids,
-                (style) => {
-                  style.visibility = visibility
-                  console.log(
-                    setModelSurfacesVisibility.name,
-                    { id },
-                    { surface_ids },
-                    style.visibility,
-                  )
-                },
+                { visibility },
               )
             },
           },

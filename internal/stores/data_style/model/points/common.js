@@ -3,14 +3,14 @@ import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 export function useModelPointsCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore()
 
-  function modelPointsStyle(id) {
-    return dataStyleStateStore.getStyle(id).points
+  function mutateModelPointsStyle(id, values) {
+    return dataStyleStateStore.mutateStyle(id, {
+      points: values,
+    })
   }
 
-  function mutateModelPointsStyle(id, mutationCallback) {
-    return dataStyleStateStore.mutateStyle(id, (style) => {
-      mutationCallback(style.points)
-    })
+  function modelPointsStyle(id) {
+    return dataStyleStateStore.getStyle(id).points
   }
 
   return {

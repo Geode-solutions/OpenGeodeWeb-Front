@@ -33,15 +33,7 @@ export function useModelSurfacesColorStyle() {
           return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
             id,
             surface_ids,
-            (style) => {
-              style.color = color
-              console.log(
-                setModelSurfacesColor.name,
-                { id },
-                { surface_ids },
-                JSON.stringify(style.color),
-              )
-            },
+            { color },
           )
         }
         return viewerStore.request(
@@ -52,15 +44,7 @@ export function useModelSurfacesColorStyle() {
               return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
                 id,
                 surface_ids,
-                (style) => {
-                  style.color = color
-                  console.log(
-                    setModelSurfacesColor.name,
-                    { id },
-                    { surface_ids },
-                    JSON.stringify(style.color),
-                  )
-                },
+                { color },
               )
             },
           },

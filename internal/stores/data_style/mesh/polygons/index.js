@@ -20,16 +20,19 @@ export function useMeshPolygonsStyle() {
   const meshPolygonsPolygonAttributeStyle =
     useMeshPolygonsPolygonAttributeStyle()
 
+  function meshPolygonsColoring(id) {
+    return meshPolygonsCommonStyle.meshPolygonsStyle(id).coloring
+  }
+
+  function meshPolygonsActiveColoring(id) {
+    return meshPolygonsColoring(id).active
+  }
+
   async function setMeshPolygonsActiveColoring(id, type) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.polygons.coloring.active = type
+    await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+      coloring: { active: type },
     })
-    console.log(
-      setMeshPolygonsActiveColoring.name,
-      { id },
-      meshPolygonsCommonStyle.meshPolygonsActiveColoring(id),
-    )
+    console.log(setMeshPolygonsActiveColoring.name, { id }, type)
     if (type === "color") {
       return meshPolygonsColorStyle.setMeshPolygonsColor(
         id,
@@ -57,7 +60,7 @@ export function useMeshPolygonsStyle() {
       if (name === undefined) {
         return Promise.resolve()
       }
-      await meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(
+      return meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(
         id,
         name,
       )
@@ -72,17 +75,16 @@ export function useMeshPolygonsStyle() {
         id,
         meshPolygonsVisibility.meshPolygonsVisibility(id),
       ),
-      setMeshPolygonsActiveColoring(
-        id,
-        meshPolygonsCommonStyle.meshPolygonsActiveColoring(id),
-      ),
+      setMeshPolygonsActiveColoring(id, meshPolygonsActiveColoring(id)),
     ])
   }
 
   return {
+    ...meshPolygonsCommonStyle,
+    meshPolygonsColoring,
+    meshPolygonsActiveColoring,
     setMeshPolygonsActiveColoring,
     applyMeshPolygonsStyle,
-    ...meshPolygonsCommonStyle,
     ...meshPolygonsVisibility,
     ...meshPolygonsColorStyle,
     ...meshPolygonsTexturesStyle,

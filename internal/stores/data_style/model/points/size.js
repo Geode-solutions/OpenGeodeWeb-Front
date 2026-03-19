@@ -22,10 +22,7 @@ export function useModelPointsSizeStyle() {
       { id, size },
       {
         response_function: () => {
-          return modelPointsCommonStyle.mutateModelPointsStyle(id, (points) => {
-            points.size = size
-            console.log(setModelPointsSize.name, { id }, points.size)
-          })
+          return modelPointsCommonStyle.mutateModelPointsStyle(id, { size })
         },
       },
     )

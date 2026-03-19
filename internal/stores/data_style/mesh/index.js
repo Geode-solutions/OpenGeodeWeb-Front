@@ -33,12 +33,9 @@ export function useMeshStyle() {
       meshSchemas.visibility,
       { id, visibility },
       {
-        response_function: () => {
-          return dataStyleState.mutateStyle(id, (style) => {
-            style.visibility = visibility
-            hybridViewerStore.setVisibility(id, visibility)
-            console.log(setMeshVisibility.name, { id }, meshVisibility(id))
-          })
+        response_function: async () => {
+          await hybridViewerStore.setVisibility(id, visibility)
+          return dataStyleState.mutateStyle(id, { visibility })
         },
       },
     )
@@ -47,16 +44,14 @@ export function useMeshStyle() {
   function meshColor(id) {
     return dataStyleState.getStyle(id).color
   }
+
   function setMeshColor(id, color) {
     return viewerStore.request(
       meshSchemas.color,
       { id, color },
       {
         response_function: () => {
-          return dataStyleState.mutateStyle(id, (style) => {
-            style.color = color
-            console.log(setMeshColor.name, { id }, meshColor(id))
-          })
+          return dataStyleState.mutateStyle(id, { color })
         },
       },
     )

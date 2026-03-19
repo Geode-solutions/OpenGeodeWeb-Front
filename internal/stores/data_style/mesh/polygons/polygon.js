@@ -30,79 +30,62 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     })
   }
 
-  function setMeshPolygonsPolygonAttributeStoredConfig(
-    id,
-    name,
-    { minimum, maximum, colorMap },
-  ) {
-    const config = { minimum, maximum, colorMap }
-    return meshPolygonsCommonStyle
-      .mutateMeshPolygonsPolygonStyle(id, (polygon) => {
-        polygon.storedConfigs[name] = config
-      })
-      .then(() => config)
+  function mutateMeshPolygonsPolygonStyle(id, values) {
+    return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+      coloring: {
+        polygon: values,
+      },
+    })
+  }
+
+  function setMeshPolygonsPolygonAttributeStoredConfig(id, name, config) {
+    return mutateMeshPolygonsPolygonStyle(id, {
+      storedConfigs: {
+        [name]: config,
+      },
+    })
   }
 
   function meshPolygonsPolygonAttributeName(id) {
     return meshPolygonsPolygonAttribute(id).name
   }
+
   function setMeshPolygonsPolygonAttributeName(id, name) {
     return viewerStore.request(
       meshPolygonsPolygonAttributeSchemas.name,
       { id, name },
       {
         response_function: () => {
-          return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
-            id,
-            (polygon) => {
-              polygon.name = name
-              if (!(name in polygon.storedConfigs)) {
-                polygon.storedConfigs[name] = {
-                  minimum: undefined,
-                  maximum: undefined,
-                  colorMap: undefined,
-                }
-              }
-              const { minimum, maximum, colorMap } = polygon.storedConfigs[name]
-              const storedConfig = polygon.storedConfigs[name]
-              storedConfig.minimum = minimum
-              storedConfig.maximum = maximum
-              polygon.storedConfigs[name].colorMap = colorMap
-              console.log(
-                setMeshPolygonsPolygonAttributeName.name,
-                { id },
-                name,
-              )
-            },
-          )
+          const updates = { name }
+          const polygon = meshPolygonsPolygonAttribute(id)
+          if (!(name in polygon.storedConfigs)) {
+            updates.storedConfigs = {
+              [name]: {
+                minimum: undefined,
+                maximum: undefined,
+                colorMap: undefined,
+              },
+            }
+          }
+          return mutateMeshPolygonsPolygonStyle(id, updates)
         },
       },
     )
   }
+
   function meshPolygonsPolygonAttributeRange(id) {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
     const { minimum, maximum } = storedConfig
-    console.log(
-      meshPolygonsPolygonAttributeRange.name,
-      { id },
-      { minimum, maximum },
-    )
     return [minimum, maximum]
   }
+
   function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsPolygonAttributeName(id)
-    return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
-      id,
-      (polygon) => {
-        const storedConfig = polygon.storedConfigs[name]
-        storedConfig.minimum = minimum
-        storedConfig.maximum = maximum
-        // Update color map synchronously
-        const colorMap = polygon.storedConfigs[name].colorMap
-        polygon.storedConfigs[name].colorMap = colorMap
-      },
-    )
+    return setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
+      minimum,
+      maximum,
+    })
   }
 
   function meshPolygonsPolygonAttributeColorMap(id) {
@@ -111,6 +94,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const { colorMap } = storedConfig
     return colorMap
   }
+
   function setMeshPolygonsPolygonAttributeColorMap(id, colorMap) {
     const name = meshPolygonsPolygonAttributeName(id)
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name)
@@ -121,17 +105,9 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          return meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(
-            id,
-            (polygon) => {
-              polygon.storedConfigs[name].colorMap = colorMap
-              console.log(
-                setMeshPolygonsPolygonAttributeColorMap.name,
-                { id },
-                polygon.storedConfigs[name].colorMap,
-              )
-            },
-          )
+          return setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
+            colorMap,
+          })
         },
       },
     )

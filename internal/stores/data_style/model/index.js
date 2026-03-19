@@ -38,9 +38,7 @@ export function useModelStyle() {
       {
         response_function: async () => {
           await hybridViewerStore.setVisibility(id, visibility)
-          await dataStyleStateStore.mutateStyle(id, (style) => {
-            style.visibility = visibility
-          })
+          await dataStyleStateStore.mutateStyle(id, { visibility })
           return { id, visibility }
         },
       },

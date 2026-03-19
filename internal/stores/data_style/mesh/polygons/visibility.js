@@ -22,17 +22,9 @@ export function useMeshPolygonsVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(
-            id,
-            (polygons) => {
-              polygons.visibility = visibility
-              console.log(
-                setMeshPolygonsVisibility.name,
-                { id },
-                polygons.visibility,
-              )
-            },
-          )
+          return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+            visibility,
+          })
         },
       },
     )

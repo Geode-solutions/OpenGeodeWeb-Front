@@ -22,10 +22,7 @@ export function useMeshPointsVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          return meshPointsCommonStyle.mutateMeshPointsStyle(id, (points) => {
-            points.visibility = visibility
-            console.log(setMeshPointsVisibility.name, { id }, points.visibility)
-          })
+          return meshPointsCommonStyle.mutateMeshPointsStyle(id, { visibility })
         },
       },
     )

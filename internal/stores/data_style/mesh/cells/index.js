@@ -19,16 +19,19 @@ export function useMeshCellsStyle() {
   const meshCellsVertexAttributeStyle = useMeshCellsVertexAttributeStyle()
   const meshCellsCellAttributeStyle = useMeshCellsCellAttributeStyle()
 
+  function meshCellsColoring(id) {
+    return meshCellsCommonStyle.meshCellsStyle(id).coloring
+  }
+
+  function meshCellsActiveColoring(id) {
+    return meshCellsColoring(id).active
+  }
+
   async function setMeshCellsActiveColoring(id, type) {
-    const dataStyleStateStore = useDataStyleStateStore()
-    await dataStyleStateStore.mutateStyle(id, (style) => {
-      style.cells.coloring.active = type
+    await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+      coloring: { active: type },
     })
-    console.log(
-      setMeshCellsActiveColoring.name,
-      { id },
-      meshCellsCommonStyle.meshCellsActiveColoring(id),
-    )
+    console.log(setMeshCellsActiveColoring.name, { id }, type)
     if (type === "color") {
       return meshCellsColorStyle.setMeshCellsColor(
         id,
@@ -55,7 +58,7 @@ export function useMeshCellsStyle() {
       if (name === undefined) {
         return Promise.resolve()
       }
-      await meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name)
+      return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name)
     } else {
       throw new Error(`Unknown mesh cells coloring type: ${type}`)
     }
@@ -67,15 +70,14 @@ export function useMeshCellsStyle() {
         id,
         meshCellsVisibility.meshCellsVisibility(id),
       ),
-      setMeshCellsActiveColoring(
-        id,
-        meshCellsCommonStyle.meshCellsActiveColoring(id),
-      ),
+      setMeshCellsActiveColoring(id, meshCellsActiveColoring(id)),
     ])
   }
 
   return {
     ...meshCellsCommonStyle,
+    meshCellsColoring,
+    meshCellsActiveColoring,
     setMeshCellsActiveColoring,
     applyMeshCellsStyle,
     ...meshCellsVisibility,

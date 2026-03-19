@@ -1,3 +1,4 @@
+import merge from "lodash/merge"
 import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 export function useModelSurfacesCommonStyle() {
@@ -13,20 +14,21 @@ export function useModelSurfacesCommonStyle() {
       id,
       surface_id,
     )
-    return { ...groupStyle, ...individualStyle }
+    return merge({}, groupStyle, individualStyle)
   }
 
-  function mutateModelSurfacesStyle(id, surface_ids, mutationCallback) {
-    return dataStyleStateStore.mutateComponentStyles(
-      id,
-      surface_ids,
-      mutationCallback,
-    )
+  function mutateModelSurfacesStyle(id, surface_ids, values) {
+    return dataStyleStateStore.mutateComponentStyles(id, surface_ids, values)
+  }
+
+  function mutateModelSurfaceStyle(id, surface_id, values) {
+    return dataStyleStateStore.mutateComponentStyle(id, surface_id, values)
   }
 
   return {
     modelSurfacesStyle,
     modelSurfaceStyle,
     mutateModelSurfacesStyle,
+    mutateModelSurfaceStyle,
   }
 }

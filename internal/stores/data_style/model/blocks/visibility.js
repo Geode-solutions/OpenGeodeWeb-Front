@@ -16,10 +16,7 @@ export function useModelBlocksVisibilityStyle() {
 
   function modelBlockVisibility(id, block_id) {
     const style = modelBlocksCommonStyle.modelBlockStyle(id, block_id)
-    if (style.visibility === undefined) {
-      return true
-    }
-    return style.visibility
+    return style.visibility ?? true
   }
 
   function setModelBlocksVisibility(id, block_ids, visibility) {
@@ -30,23 +27,9 @@ export function useModelBlocksVisibilityStyle() {
       .getMeshComponentsViewerIds(id, block_ids)
       .then((block_viewer_ids) => {
         if (!block_viewer_ids || block_viewer_ids.length === 0) {
-          console.warn(
-            "[setModelBlocksVisibility] No viewer IDs found, skipping visibility request",
-            { id, block_ids },
-          )
-          return modelBlocksCommonStyle.mutateModelBlocksStyle(
-            id,
-            block_ids,
-            (style) => {
-              style.visibility = visibility
-              console.log(
-                setModelBlocksVisibility.name,
-                { id },
-                { block_ids },
-                style.visibility,
-              )
-            },
-          )
+          return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
+            visibility,
+          })
         }
         return viewerStore.request(
           model_blocks_schemas.visibility,
@@ -56,15 +39,7 @@ export function useModelBlocksVisibilityStyle() {
               return modelBlocksCommonStyle.mutateModelBlocksStyle(
                 id,
                 block_ids,
-                (style) => {
-                  style.visibility = visibility
-                  console.log(
-                    setModelBlocksVisibility.name,
-                    { id },
-                    { block_ids },
-                    style.visibility,
-                  )
-                },
+                { visibility },
               )
             },
           },

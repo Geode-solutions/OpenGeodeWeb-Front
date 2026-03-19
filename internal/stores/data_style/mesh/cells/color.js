@@ -22,17 +22,9 @@ export function useMeshCellsColorStyle() {
       { id, color },
       {
         response_function: () => {
-          return meshCellsCommonStyle.mutateMeshCellsColoringStyle(
-            id,
-            (coloring) => {
-              coloring.color = color
-              console.log(
-                setMeshCellsColor.name,
-                { id },
-                JSON.stringify(coloring.color),
-              )
-            },
-          )
+          return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+            coloring: { color },
+          })
         },
       },
     )

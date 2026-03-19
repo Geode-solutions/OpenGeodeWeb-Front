@@ -33,15 +33,7 @@ export function useModelCornersColorStyle() {
           return modelCornersCommonStyle.mutateModelCornersStyle(
             id,
             corner_ids,
-            (style) => {
-              style.color = color
-              console.log(
-                setModelCornersColor.name,
-                { id },
-                { corner_ids },
-                JSON.stringify(style.color),
-              )
-            },
+            { color },
           )
         }
         return viewerStore.request(
@@ -52,15 +44,7 @@ export function useModelCornersColorStyle() {
               return modelCornersCommonStyle.mutateModelCornersStyle(
                 id,
                 corner_ids,
-                (style) => {
-                  style.color = color
-                  console.log(
-                    setModelCornersColor.name,
-                    { id },
-                    { corner_ids },
-                    JSON.stringify(style.color),
-                  )
-                },
+                { color },
               )
             },
           },
