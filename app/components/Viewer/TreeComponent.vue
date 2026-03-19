@@ -12,8 +12,8 @@
   const emit = defineEmits(["show-menu"])
 
   const items = dataStore.refFormatedMeshComponents(id)
-  const mesh_components_selection = dataStyleStore.visibleMeshComponents(
-    computed(() => id),
+  const mesh_components_selection = computed(() =>
+    dataStyleStore.visibleMeshComponents(id),
   )
 
   watch(

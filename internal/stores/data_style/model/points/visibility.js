@@ -22,7 +22,9 @@ export function useModelPointsVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          return modelPointsCommonStyle.mutateModelPointsStyle(id, { visibility })
+          return modelPointsCommonStyle.mutateModelPointsStyle(id, {
+            visibility,
+          })
         },
       },
     )
