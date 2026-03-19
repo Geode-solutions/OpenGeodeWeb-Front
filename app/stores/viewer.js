@@ -70,7 +70,10 @@ export const useViewerStore = defineStore(
     async function set_picked_point(x, y) {
       const response = await request(
         schemas.opengeodeweb_viewer.generic.get_point_position,
-        { x, y },
+        {
+          x,
+          y,
+        },
       )
       const { x: world_x, y: world_y } = response
       picked_point.value.x = world_x
@@ -137,7 +140,7 @@ export const useViewerStore = defineStore(
       request_counter.value -= 1
     }
 
-    function launch(args = { projectFolderPath }) {
+    function launch(args = ({ projectFolderPath } = {})) {
       console.log("[VIEWER] Launching viewer microservice...", { args })
       const appStore = useAppStore()
 
