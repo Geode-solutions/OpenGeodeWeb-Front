@@ -66,6 +66,22 @@
         "max": 10
       }
     ],
+    "max-lines-per-function": [
+      "warn",
+      {
+        "max": 50,
+        "skipBlankLines": true,
+        "skipComments": true
+      }
+    ],
+    "unicorn/no-useless-undefined": "off",
+    "max-lines": [
+      "error",
+      {
+        "skipBlankLines": true,
+        "skipComments": true
+      }
+    ],
     "vue/max-props": [
       "error",
       {
