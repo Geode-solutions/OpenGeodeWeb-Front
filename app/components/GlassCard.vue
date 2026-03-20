@@ -1,18 +1,18 @@
 <script setup>
-  import { computed, useAttrs } from "vue"
-  const { variant, rounded, padding, theme } = defineProps({
-    variant: {
-      type: String,
-      default: "panel",
-      validator: (valid) => ["panel", "ui"].includes(valid),
-    },
-    rounded: { type: String, default: "xl" },
-    padding: { type: String, default: "pa-6" },
-    theme: { type: String, default: undefined },
-  })
+import { computed, useAttrs } from "vue";
+const { variant, rounded, padding, theme } = defineProps({
+  variant: {
+    type: String,
+    default: "panel",
+    validator: (valid) => ["panel", "ui"].includes(valid),
+  },
+  rounded: { type: String, default: "xl" },
+  padding: { type: String, default: "pa-6" },
+  theme: { type: String, default: undefined },
+});
 
-  const attrs = useAttrs()
-  const isInteractive = computed(() => Boolean(attrs.onClick))
+const attrs = useAttrs();
+const isInteractive = computed(() => Boolean(attrs.onClick));
 </script>
 
 <template>
@@ -39,11 +39,11 @@
 </template>
 
 <style scoped>
-  .border-thin {
-    border-style: solid !important;
-  }
+.border-thin {
+  border-style: solid !important;
+}
 
-  .cursor-default {
-    cursor: default !important;
-  }
+.cursor-default {
+  cursor: default !important;
+}
 </style>
