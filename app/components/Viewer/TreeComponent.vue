@@ -1,49 +1,43 @@
 <script setup>
-  import { useDataStore } from "@ogw_front/stores/data"
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-  import { compareSelections } from "@ogw_front/utils/treeview"
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { compareSelections } from "@ogw_front/utils/treeview";
 
-  const dataStyleStore = useDataStyleStore()
-  const dataStore = useDataStore()
-  const hybridViewerStore = useHybridViewerStore()
+const dataStyleStore = useDataStyleStore();
+const dataStore = useDataStore();
+const hybridViewerStore = useHybridViewerStore();
 
-  const { id } = defineProps({ id: { type: String, required: true } })
-  const emit = defineEmits(["show-menu"])
+const { id } = defineProps({ id: { type: String, required: true } });
+const emit = defineEmits(["show-menu"]);
 
-  const items = dataStore.refFormatedMeshComponents(id)
-  const mesh_components_selection = computed(() =>
-    dataStyleStore.visibleMeshComponents(id),
-  )
+const items = dataStore.refFormatedMeshComponents(id);
+const mesh_components_selection = computed(() => dataStyleStore.visibleMeshComponents(id));
 
-  watch(
-    mesh_components_selection,
-    async (current, previous) => {
-      if (!previous) {
-        return
-      }
+watch(
+  mesh_components_selection,
+  async (current, previous) => {
+    if (!previous) {
+      return;
+    }
 
-      const { added, removed } = compareSelections(current, previous)
-      console.log("TreeComponent selection change:", {
-        id: props.id,
-        added,
-        removed,
-      })
+    const { added, removed } = compareSelections(current, previous);
+    console.log("TreeComponent selection change:", {
+      id: props.id,
+      added,
+      removed,
+    });
 
-      if (added.length > 0) {
-        await dataStyleStore.setModelMeshComponentsVisibility(id, added, true)
-      }
-      if (removed.length > 0) {
-        await dataStyleStore.setModelMeshComponentsVisibility(
-          id,
-          removed,
-          false,
-        )
-      }
-      hybridViewerStore.remoteRender()
-    },
-    { deep: true },
-  )
+    if (added.length > 0) {
+      await dataStyleStore.setModelMeshComponentsVisibility(id, added, true);
+    }
+    if (removed.length > 0) {
+      await dataStyleStore.setModelMeshComponentsVisibility(id, removed, false);
+    }
+    hybridViewerStore.remoteRender();
+  },
+  { deep: true },
+);
 </script>
 
 <template>
@@ -58,9 +52,7 @@
     <template #title="{ item }">
       <span
         class="treeview-item"
-        @contextmenu.prevent.stop="
-          emit('show-menu', { event: $event, itemId: item })
-        "
+        @contextmenu.prevent.stop="emit('show-menu', { event: $event, itemId: item })"
         >{{ item.title }}</span
       >
     </template>
@@ -68,16 +60,16 @@
 </template>
 
 <style scoped>
-  .treeview-item {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    display: inline-block;
-  }
+.treeview-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+}
 
-  .transparent-treeview {
-    background-color: transparent;
-    margin: 4px 0;
-  }
+.transparent-treeview {
+  background-color: transparent;
+  margin: 4px 0;
+}
 </style>

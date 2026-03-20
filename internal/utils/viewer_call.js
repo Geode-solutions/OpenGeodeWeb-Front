@@ -1,64 +1,51 @@
-import pTimeout from "p-timeout"
-import { useFeedbackStore } from "@ogw_front/stores/feedback"
-import { validate_schema } from "@ogw_front/utils/validate_schema"
+import pTimeout from "p-timeout";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { validate_schema } from "@ogw_front/utils/validate_schema";
 
-const ERROR_400 = 400
+const ERROR_400 = 400;
 
 export async function viewer_call(
   microservice,
   { schema, params = {} },
-  {
-    request_error_function,
-    response_function,
-    response_error_function,
-    timeout,
-  } = {},
+  { request_error_function, response_function, response_error_function, timeout } = {},
 ) {
-  const feedbackStore = useFeedbackStore()
+  const feedbackStore = useFeedbackStore();
 
-  const { valid, error: schema_error } = validate_schema(schema, params)
+  const { valid, error: schema_error } = validate_schema(schema, params);
 
   if (!valid) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Bad request", schema_error, schema, params)
+      console.log("Bad request", schema_error, schema, params);
     }
-    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", schema_error)
-    throw new Error(`${schema.$id}: ${schema_error}`)
+    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", schema_error);
+    throw new Error(`${schema.$id}: ${schema_error}`);
   }
 
-  const { client } = microservice
+  const { client } = microservice;
 
   async function performCall() {
     if (!client.getConnection) {
-      return
+      return;
     }
-    microservice.start_request()
+    microservice.start_request();
 
     try {
-      const value = await client
-        .getConnection()
-        .getSession()
-        .call(schema.$id, [params])
+      const value = await client.getConnection().getSession().call(schema.$id, [params]);
       if (response_function) {
-        await response_function(value)
+        await response_function(value);
       }
-      return value
+      return value;
     } catch (error) {
-      feedbackStore.add_error(
-        error.code,
-        schema.$id,
-        error.message,
-        error.message,
-      )
+      feedbackStore.add_error(error.code, schema.$id, error.message, error.message);
       if (request_error_function) {
-        request_error_function(error)
+        request_error_function(error);
       }
       if (response_error_function) {
-        response_error_function(error)
+        response_error_function(error);
       }
-      throw error
+      throw error;
     } finally {
-      microservice.stop_request()
+      microservice.stop_request();
     }
   }
 
@@ -66,8 +53,8 @@ export async function viewer_call(
     return await pTimeout(performCall(), {
       milliseconds: timeout,
       message: `${schema.$id}: Timed out after ${timeout}ms`,
-    })
+    });
   }
 
-  return await performCall()
+  return await performCall();
 }

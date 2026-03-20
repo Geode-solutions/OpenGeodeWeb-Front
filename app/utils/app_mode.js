@@ -1,19 +1,19 @@
-import isElectron from "is-electron"
+import isElectron from "is-electron";
 
 const appMode = {
   DESKTOP: "DESKTOP",
   BROWSER: "BROWSER",
   CLOUD: "CLOUD",
-}
+};
 
 function getAppMode() {
   if (isElectron()) {
-    return appMode.DESKTOP
+    return appMode.DESKTOP;
   }
   if (useRuntimeConfig().public.BROWSER === "true") {
-    return appMode.BROWSER
+    return appMode.BROWSER;
   }
-  return appMode.CLOUD
+  return appMode.CLOUD;
 }
 
-export { appMode, getAppMode }
+export { appMode, getAppMode };

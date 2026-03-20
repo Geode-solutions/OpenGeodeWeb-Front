@@ -1,19 +1,19 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { useModelPointsCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useModelPointsCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points
+const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points;
 
 export function useModelPointsSizeStyle() {
-  const viewerStore = useViewerStore()
-  const modelPointsCommonStyle = useModelPointsCommonStyle()
+  const viewerStore = useViewerStore();
+  const modelPointsCommonStyle = useModelPointsCommonStyle();
 
   function modelPointsSize(id) {
-    return modelPointsCommonStyle.modelPointsStyle(id).size
+    return modelPointsCommonStyle.modelPointsStyle(id).size;
   }
 
   function setModelPointsSize(id, size) {
@@ -22,14 +22,14 @@ export function useModelPointsSizeStyle() {
       { id, size },
       {
         response_function: () => {
-          return modelPointsCommonStyle.mutateModelPointsStyle(id, { size })
+          return modelPointsCommonStyle.mutateModelPointsStyle(id, { size });
         },
       },
-    )
+    );
   }
 
   return {
     modelPointsSize,
     setModelPointsSize,
-  }
+  };
 }

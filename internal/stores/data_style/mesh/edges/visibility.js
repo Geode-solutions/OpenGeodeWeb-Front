@@ -1,19 +1,18 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-import { useMeshEdgesCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useMeshEdgesCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshEdgesVisibilitySchema =
-  viewer_schemas.opengeodeweb_viewer.mesh.edges.visibility
+const meshEdgesVisibilitySchema = viewer_schemas.opengeodeweb_viewer.mesh.edges.visibility;
 
 export function useMeshEdgesVisibilityStyle() {
-  const viewerStore = useViewerStore()
-  const meshEdgesCommonStyle = useMeshEdgesCommonStyle()
+  const viewerStore = useViewerStore();
+  const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
   function meshEdgesVisibility(id) {
-    return meshEdgesCommonStyle.meshEdgesStyle(id).visibility
+    return meshEdgesCommonStyle.meshEdgesStyle(id).visibility;
   }
   function setMeshEdgesVisibility(id, visibility) {
     return viewerStore.request(
@@ -21,14 +20,14 @@ export function useMeshEdgesVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { visibility })
+          return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { visibility });
         },
       },
-    )
+    );
   }
 
   return {
     meshEdgesVisibility,
     setMeshEdgesVisibility,
-  }
+  };
 }
