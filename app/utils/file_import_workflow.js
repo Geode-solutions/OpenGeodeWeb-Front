@@ -27,11 +27,6 @@ async function importWorkflow(files) {
   return results
 }
 
-function buildImportItemFromPayloadApi(value) {
-  console.log("buildImportItemFromPayloadApi", { value })
-  return value
-}
-
 async function importItem(item) {
   const dataStore = useDataStore()
   const dataStyleStore = useDataStyleStore()
