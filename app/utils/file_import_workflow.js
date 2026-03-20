@@ -41,7 +41,7 @@ async function importItem(item) {
   const treeviewStore = useTreeviewStore()
   const registerTask = dataStore.registerObject(item.id)
   const addDataTask = dataStore.addItem(item)
-  console.log({ dataStore })
+
   const addDataComponentsTask =
     item.viewer_type === "model"
       ? dataStore.addComponents(item)
