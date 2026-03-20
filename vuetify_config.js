@@ -17,6 +17,6 @@ const vuetify = {
       style: "border-radius: 15px;",
     },
   },
-}
+};
 
-export { vuetify }
+export { vuetify };

@@ -1,5 +1,5 @@
-import { Status } from "@ogw_front/utils/status"
-import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { Status } from "@ogw_front/utils/status";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 export const useLambdaStore = defineStore("lambda", {
   state: () => ({
@@ -7,51 +7,51 @@ export const useLambdaStore = defineStore("lambda", {
   }),
   getters: {
     protocol() {
-      return "https"
+      return "https";
     },
     port() {
-      return "443"
+      return "443";
     },
     base_url() {
-      const public_runtime_config = useRuntimeConfig().public
-      const domain_name = public_runtime_config.API_URL
-      const projectPath = `/${public_runtime_config.PROJECT}`
-      const url = `${this.protocol}://${domain_name}:${this.port}${public_runtime_config.SITE_BRANCH}${projectPath}/createbackend`
-      return url
+      const public_runtime_config = useRuntimeConfig().public;
+      const domain_name = public_runtime_config.API_URL;
+      const projectPath = `/${public_runtime_config.PROJECT}`;
+      const url = `${this.protocol}://${domain_name}:${this.port}${public_runtime_config.SITE_BRANCH}${projectPath}/createbackend`;
+      return url;
     },
     is_busy() {
-      return false
+      return false;
     },
   },
   actions: {
     async launch() {
-      console.log("[LAMBDA] Launching lambda backend...")
-      const feedbackStore = useFeedbackStore()
+      console.log("[LAMBDA] Launching lambda backend...");
+      const feedbackStore = useFeedbackStore();
 
       const { data, error } = await useFetch(this.base_url, {
         method: "POST",
-      })
+      });
 
       if (error.value || !data.value) {
-        this.status = Status.NOT_CONNECTED
-        feedbackStore.server_error = true
-        console.error("[LAMBDA] Failed to launch lambda backend", error.value)
-        throw new Error("Failed to launch lambda backend")
+        this.status = Status.NOT_CONNECTED;
+        feedbackStore.server_error = true;
+        console.error("[LAMBDA] Failed to launch lambda backend", error.value);
+        throw new Error("Failed to launch lambda backend");
       }
 
-      this.status = Status.CONNECTED
-      const id = data.value.ID
+      this.status = Status.CONNECTED;
+      const id = data.value.ID;
 
-      console.log("[LAMBDA] Lambda launched, ID:", id)
-      return id
+      console.log("[LAMBDA] Lambda launched, ID:", id);
+      return id;
     },
     connect() {
-      console.log("[LAMBDA] Lambda connected")
-      this.status = Status.CONNECTED
-      return Promise.resolve()
+      console.log("[LAMBDA] Lambda connected");
+      this.status = Status.CONNECTED;
+      return Promise.resolve();
     },
   },
   share: {
     omit: ["status"],
   },
-})
+});

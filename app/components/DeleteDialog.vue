@@ -1,39 +1,29 @@
 <script setup>
-  import GlassCard from "./GlassCard.vue"
+import GlassCard from "./GlassCard.vue";
 
-  const { show, item, selectedCount } = defineProps({
-    show: {
-      type: Boolean,
-      default: false,
-    },
-    item: {
-      type: Object,
-      default: undefined,
-    },
-    selectedCount: {
-      type: Number,
-      default: 0,
-    },
-  })
+const { show, item, selectedCount } = defineProps({
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  item: {
+    type: Object,
+    default: undefined,
+  },
+  selectedCount: {
+    type: Number,
+    default: 0,
+  },
+});
 
-  const emit = defineEmits(["update:show", "confirm"])
+const emit = defineEmits(["update:show", "confirm"]);
 </script>
 
 <template>
-  <v-dialog
-    :model-value="show"
-    @update:model-value="emit('update:show', $event)"
-    max-width="400"
-  >
+  <v-dialog :model-value="show" @update:model-value="emit('update:show', $event)" max-width="400">
     <GlassCard v-if="item" variant="panel" padding="pa-8">
-      <v-card-title
-        class="pb-2 text-h5 font-weight-bold d-flex align-center text-white"
-      >
-        <v-icon
-          icon="mdi-trash-can-outline"
-          class="mr-3 text-h4"
-          color="error"
-        ></v-icon>
+      <v-card-title class="pb-2 text-h5 font-weight-bold d-flex align-center text-white">
+        <v-icon icon="mdi-trash-can-outline" class="mr-3 text-h4" color="error"></v-icon>
         Delete Item
       </v-card-title>
 
@@ -75,14 +65,8 @@
     </GlassCard>
 
     <GlassCard v-else variant="panel" padding="pa-8">
-      <v-card-title
-        class="pb-2 text-h5 font-weight-bold d-flex align-center text-white"
-      >
-        <v-icon
-          icon="mdi-alert-circle-outline"
-          class="mr-3 text-h4"
-          color="error"
-        ></v-icon>
+      <v-card-title class="pb-2 text-h5 font-weight-bold d-flex align-center text-white">
+        <v-icon icon="mdi-alert-circle-outline" class="mr-3 text-h4" color="error"></v-icon>
         Delete Items
       </v-card-title>
 
