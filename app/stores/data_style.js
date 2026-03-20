@@ -57,8 +57,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function importStores(snapshot) {
-    const stylesSnapshot = snapshot.styles || {}
-    const componentStylesSnapshot = snapshot.componentStyles || {}
+    const stylesSnapshot = snapshot.styles
+    const componentStylesSnapshot = snapshot.componentStyles
 
     await dataStyleState.clear()
 
@@ -72,7 +72,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   async function applyAllStylesFromState() {
-    const ids = Object.keys(dataStyleState.styles || {})
+    const ids = Object.keys(dataStyleState.styles)
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id)
       if (!meta) return
