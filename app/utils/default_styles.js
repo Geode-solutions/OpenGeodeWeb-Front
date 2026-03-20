@@ -1,25 +1,25 @@
 // Global variables
-const points_defaultVisibility = true
-const edges_defaultVisibility = true
-const cells_defaultVisibility = true
-const polygons_defaultVisibility = true
-const polyhedra_defaultVisibility = true
-const points_defaultSize = 10
-const points_defaultColor = { r: 20, g: 20, b: 20 }
-const edges_defaultWidth = 2
-const edges_defaultColor = { r: 20, g: 20, b: 20 }
-const cells_defaultColor = { r: 255, g: 255, b: 255 }
-const polygons_defaultColor = { r: 255, g: 255, b: 255 }
-const polyhedra_defaultColor = { r: 255, g: 255, b: 255 }
+const points_defaultVisibility = true;
+const edges_defaultVisibility = true;
+const cells_defaultVisibility = true;
+const polygons_defaultVisibility = true;
+const polyhedra_defaultVisibility = true;
+const points_defaultSize = 10;
+const points_defaultColor = { r: 20, g: 20, b: 20 };
+const edges_defaultWidth = 2;
+const edges_defaultColor = { r: 20, g: 20, b: 20 };
+const cells_defaultColor = { r: 255, g: 255, b: 255 };
+const polygons_defaultColor = { r: 255, g: 255, b: 255 };
+const polyhedra_defaultColor = { r: 255, g: 255, b: 255 };
 
-const corners_defaultVisibility = true
-const corners_defaultColor = { r: 20, g: 20, b: 20 }
-const lines_defaultVisibility = true
-const lines_defaultColor = { r: 20, g: 20, b: 20 }
-const surfaces_defaultVisibility = true
-const surfaces_defaultColor = { r: 255, g: 255, b: 255 }
-const blocks_defaultVisibility = true
-const blocks_defaultColor = { r: 255, g: 255, b: 255 }
+const corners_defaultVisibility = true;
+const corners_defaultColor = { r: 20, g: 20, b: 20 };
+const lines_defaultVisibility = true;
+const lines_defaultColor = { r: 20, g: 20, b: 20 };
+const surfaces_defaultVisibility = true;
+const surfaces_defaultColor = { r: 255, g: 255, b: 255 };
+const blocks_defaultVisibility = true;
+const blocks_defaultColor = { r: 255, g: 255, b: 255 };
 
 // Mesh functions
 function meshPointsDefaultStyle(
@@ -38,7 +38,7 @@ function meshPointsDefaultStyle(
       },
     },
     size,
-  }
+  };
 }
 
 function meshEdgesDefaultStyle(
@@ -61,13 +61,10 @@ function meshEdgesDefaultStyle(
       },
     },
     width,
-  }
+  };
 }
 
-function meshCellsDefaultStyle(
-  visibility = cells_defaultVisibility,
-  color = cells_defaultColor,
-) {
+function meshCellsDefaultStyle(visibility = cells_defaultVisibility, color = cells_defaultColor) {
   return {
     visibility,
     coloring: {
@@ -83,7 +80,7 @@ function meshCellsDefaultStyle(
         storedConfigs: {},
       },
     },
-  }
+  };
 }
 
 function meshPolygonsDefaultStyle(
@@ -105,7 +102,7 @@ function meshPolygonsDefaultStyle(
         storedConfigs: {},
       },
     },
-  }
+  };
 }
 
 function meshPolyhedraDefaultStyle(
@@ -126,14 +123,14 @@ function meshPolyhedraDefaultStyle(
         storedConfigs: {},
       },
     },
-  }
+  };
 }
 
 function pointSet_defaultStyle() {
   return {
     visibility: true,
     points: meshPointsDefaultStyle(),
-  }
+  };
 }
 
 function edgedCurve_defaultStyle() {
@@ -141,7 +138,7 @@ function edgedCurve_defaultStyle() {
     visibility: true,
     points: meshPointsDefaultStyle(),
     edges: meshEdgesDefaultStyle(),
-  }
+  };
 }
 
 function grid2d_defaultStyle() {
@@ -150,7 +147,7 @@ function grid2d_defaultStyle() {
     points: meshPointsDefaultStyle(false),
     edges: meshEdgesDefaultStyle(false),
     cells: meshCellsDefaultStyle(),
-  }
+  };
 }
 
 function grid3d_defaultStyle() {
@@ -160,7 +157,7 @@ function grid3d_defaultStyle() {
     edges: meshEdgesDefaultStyle(false),
     cells: meshCellsDefaultStyle(),
     polyhedra: meshPolyhedraDefaultStyle(),
-  }
+  };
 }
 function surface_defaultStyle() {
   return {
@@ -168,7 +165,7 @@ function surface_defaultStyle() {
     points: meshPointsDefaultStyle(false),
     edges: meshEdgesDefaultStyle(false),
     polygons: meshPolygonsDefaultStyle(),
-  }
+  };
 }
 
 function solid_defaultStyle() {
@@ -178,7 +175,7 @@ function solid_defaultStyle() {
     edges: meshEdgesDefaultStyle(false),
     polygons: meshPolygonsDefaultStyle(),
     polyhedra: meshPolyhedraDefaultStyle(),
-  }
+  };
 }
 
 // Model functions
@@ -186,42 +183,33 @@ function modelCornersDefaultStyle(
   visibility = corners_defaultVisibility,
   color = corners_defaultColor,
 ) {
-  return { visibility, color }
+  return { visibility, color };
 }
 
-function modelLinesDefaultStyle(
-  visibility = lines_defaultVisibility,
-  color = lines_defaultColor,
-) {
-  return { visibility, color }
+function modelLinesDefaultStyle(visibility = lines_defaultVisibility, color = lines_defaultColor) {
+  return { visibility, color };
 }
 
 function modelSurfacesDefaultStyle(
   visibility = surfaces_defaultVisibility,
   color = surfaces_defaultColor,
 ) {
-  return { visibility, color }
+  return { visibility, color };
 }
 
 function modelBlocksDefaultStyle(
   visibility = blocks_defaultVisibility,
   color = blocks_defaultColor,
 ) {
-  return { visibility, color }
+  return { visibility, color };
 }
 
-function modelPointsDefaultStyle(
-  visibility = points_defaultVisibility,
-  size = points_defaultSize,
-) {
-  return { visibility, size }
+function modelPointsDefaultStyle(visibility = points_defaultVisibility, size = points_defaultSize) {
+  return { visibility, size };
 }
 
-function modelEdgesDefaultStyle(
-  visibility = edges_defaultVisibility,
-  width = edges_defaultWidth,
-) {
-  return { visibility, width }
+function modelEdgesDefaultStyle(visibility = edges_defaultVisibility, width = edges_defaultWidth) {
+  return { visibility, width };
 }
 
 function brep_defaultStyle() {
@@ -233,7 +221,7 @@ function brep_defaultStyle() {
     blocks: modelBlocksDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
     edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
-  }
+  };
 }
 
 function crossSection_defaultStyle() {
@@ -244,7 +232,7 @@ function crossSection_defaultStyle() {
     surfaces: modelSurfacesDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
     edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
-  }
+  };
 }
 
 function structuralModel_defaultStyle() {
@@ -256,7 +244,7 @@ function structuralModel_defaultStyle() {
     blocks: modelBlocksDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
     edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
-  }
+  };
 }
 
 function section_defaultStyle() {
@@ -267,7 +255,7 @@ function section_defaultStyle() {
     surfaces: modelSurfacesDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
     edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
-  }
+  };
 }
 
 function implicitCrossSection_defaultStyle() {
@@ -278,7 +266,7 @@ function implicitCrossSection_defaultStyle() {
     surfaces: modelSurfacesDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
     edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
-  }
+  };
 }
 
 function implicitStructuralModel_defaultStyle() {
@@ -290,7 +278,7 @@ function implicitStructuralModel_defaultStyle() {
     blocks: modelBlocksDefaultStyle(),
     points: modelPointsDefaultStyle(false, points_defaultSize),
     edges: modelEdgesDefaultStyle(false, edges_defaultWidth),
-  }
+  };
 }
 
 function default_styles() {
@@ -320,11 +308,11 @@ function default_styles() {
     TriangulatedSurface2D: surface_defaultStyle(),
     TriangulatedSurface3D: surface_defaultStyle(),
     VertexSet: {},
-  }
+  };
 }
 
 function getDefaultStyle(type) {
-  return default_styles()[type]
+  return default_styles()[type];
 }
 
-export { getDefaultStyle }
+export { getDefaultStyle };

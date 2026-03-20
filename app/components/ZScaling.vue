@@ -1,12 +1,12 @@
 <script setup>
-  import GlassCard from "@ogw_front/components/GlassCard"
+import GlassCard from "@ogw_front/components/GlassCard";
 
-  const zScale = defineModel({ type: Number, default: 1 })
-  const { width } = defineProps({
-    width: { type: Number, default: 400 },
-  })
+const zScale = defineModel({ type: Number, default: 1 });
+const { width } = defineProps({
+  width: { type: Number, default: 400 },
+});
 
-  const emit = defineEmits(["close"])
+const emit = defineEmits(["close"]);
 </script>
 <template>
   <GlassCard
@@ -23,14 +23,7 @@
       <v-container>
         <v-row>
           <v-col cols="12" class="py-2">
-            <v-slider
-              v-model="zScale"
-              :min="1"
-              :max="10"
-              :step="0.2"
-              label="Z Scale"
-              thumb-label
-            />
+            <v-slider v-model="zScale" :min="1" :max="10" :step="0.2" label="Z Scale" thumb-label />
           </v-col>
         </v-row>
         <v-row>
@@ -53,24 +46,22 @@
     <template #actions>
       <v-card-actions class="justify-center pb-4">
         <v-btn variant="text" color="white" @click="emit('close')">Close</v-btn>
-        <v-btn variant="outlined" color="white" @click="emit('close')"
-          >Apply</v-btn
-        >
+        <v-btn variant="outlined" color="white" @click="emit('close')">Apply</v-btn>
       </v-card-actions>
     </template>
   </GlassCard>
 </template>
 
 <style scoped>
-  .z-scaling-menu {
-    position: absolute;
-    z-index: 2;
-    top: 90px;
-    right: 55px;
-    border-radius: 12px !important;
-  }
+.z-scaling-menu {
+  position: absolute;
+  z-index: 2;
+  top: 90px;
+  right: 55px;
+  border-radius: 12px !important;
+}
 
-  .custom-number-input :deep(.v-input__control) {
-    min-height: 48px;
-  }
+.custom-number-input :deep(.v-input__control) {
+  min-height: 48px;
+}
 </style>
