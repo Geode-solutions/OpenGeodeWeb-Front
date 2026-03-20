@@ -199,10 +199,7 @@ export const useDataStore = defineStore("data", () => {
       .where("[id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray()
-    return components
-      .map((component) => component.viewer_id)
-      .filter((vid) => vid !== null && vid !== undefined)
-      .map((vid) => parseInt(vid))
+    return components.map((component) => parseInt(component.viewer_id))
   }
 
   async function exportStores() {
