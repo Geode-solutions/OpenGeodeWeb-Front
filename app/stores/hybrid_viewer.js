@@ -98,10 +98,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     delete hybridDb[id];
   }
 
-  function setVisibility(id, visibility) {
-    if (!hybridDb[id]) {
-      return;
-    }
+  async function setVisibility(id, visibility) {
     hybridDb[id].actor.setVisibility(visibility);
     const renderWindow = genericRenderWindow.value.getRenderWindow();
     renderWindow.render();

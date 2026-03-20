@@ -32,12 +32,12 @@ export const useInfraStore = defineStore("infra", {
       const store_name = store.$id;
       console.log("[INFRA] Registering microservice:", store_name);
 
-      if (!this.microservices.some((microservice) => microservice.$id === store_name)) {
+      if (!this.microservices.find((microservice) => microservice.$id === store_name)) {
         this.microservices.push(store);
         console.log("[INFRA] Microservice registered:", store_name);
       }
     },
-    create_backend() {
+    async create_backend() {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
       console.log(
         "[INFRA] Registered microservices:",

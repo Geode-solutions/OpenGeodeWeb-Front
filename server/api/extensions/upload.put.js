@@ -14,7 +14,7 @@ import sanitize from "sanitize-filename";
 import { addExtensionToConf, confFolderPath } from "@geode/opengeodeweb-front/app/utils/config.js";
 
 const CODE_201 = 201;
-const FILE_SIZE_LIMIT = 107_374_182;
+const FILE_SIZE_LIMIT = 107_374_182; // 100 MB
 
 export default defineEventHandler(async (event) => {
   const projectName = "vease";

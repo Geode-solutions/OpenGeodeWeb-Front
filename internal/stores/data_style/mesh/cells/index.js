@@ -28,28 +28,26 @@ export function useMeshCellsStyle() {
     );
     if (type === "color") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
-    }
-    if (type === "textures") {
+    } else if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id);
       if (textures === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
-    }
-    if (type === "vertex") {
+    } else if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name);
-    }
-    if (type === "cell") {
+    } else if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       await meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
-      return;
+    } else {
+      throw new Error(`Unknown mesh cells coloring type: ${type}`);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }

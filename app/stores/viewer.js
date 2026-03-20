@@ -129,7 +129,7 @@ export const useViewerStore = defineStore(
       request_counter.value -= 1;
     }
 
-    function launch(args = ({ projectFolderPath } = {})) {
+    function launch(args = { projectFolderPath }) {
       console.log("[VIEWER] Launching viewer microservice...", { args });
       const appStore = useAppStore();
       const schema = {

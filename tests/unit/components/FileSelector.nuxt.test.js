@@ -18,7 +18,7 @@ const SECOND_INDEX = 1;
 const allowed_files_schema = schemas.opengeodeweb_back.allowed_files;
 const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 
-describe(FileSelector, () => {
+describe(FileSelector, async () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
   geodeStore.base_url = "";

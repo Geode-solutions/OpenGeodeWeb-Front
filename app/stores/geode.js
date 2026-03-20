@@ -52,6 +52,7 @@ export const useGeodeStore = defineStore("geode", {
       }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
     },
     ping() {
+      const geodeStore = this;
       const feedbackStore = useFeedbackStore();
       return this.request(
         back_schemas.opengeodeweb_back.ping,
@@ -59,15 +60,15 @@ export const useGeodeStore = defineStore("geode", {
         {
           request_error_function: () => {
             feedbackStore.$patch({ server_error: true });
-            this.status = Status.NOT_CONNECTED;
+            geodeStore.status = Status.NOT_CONNECTED;
           },
           response_function: () => {
             feedbackStore.$patch({ server_error: false });
-            this.status = Status.CONNECTED;
+            geodeStore.status = Status.CONNECTED;
           },
           response_error_function: () => {
             feedbackStore.$patch({ server_error: true });
-            this.status = Status.NOT_CONNECTED;
+            geodeStore.status = Status.NOT_CONNECTED;
           },
         },
       );

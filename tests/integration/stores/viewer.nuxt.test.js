@@ -52,7 +52,7 @@ describe("Viewer Store", () => {
     describe("request", () => {
       test(
         "request",
-        () => {
+        async () => {
           const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.render;
           const viewerStore = useViewerStore();
           const timeout = 1;

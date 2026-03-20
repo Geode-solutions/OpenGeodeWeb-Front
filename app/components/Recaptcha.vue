@@ -41,11 +41,10 @@ const emailRules = [
 ];
 
 onMounted(() => {
-  if (
-    import.meta.client &&
-    (process.env.NODE_ENV !== "production" || infraStore.app_mode !== appMode.CLOUD)
-  ) {
-    infraStore.$patch({ is_captcha_validated: true });
+  if (import.meta.client) {
+    if (process.env.NODE_ENV !== "production" || infraStore.app_mode !== appMode.CLOUD) {
+      infraStore.$patch({ is_captcha_validated: true });
+    }
   }
 });
 async function submit_recaptcha() {

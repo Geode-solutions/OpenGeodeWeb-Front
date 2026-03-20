@@ -15,7 +15,7 @@ const SECOND_INDEX = 1;
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 
-describe(FileUploader, () => {
+describe(FileUploader, async () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
   geodeStore.base_url = "";

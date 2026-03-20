@@ -21,7 +21,7 @@ const toggle_loading = useToggle(loading);
 
 function select_geode_object(object_map) {
   const object_keys = Object.keys(object_map);
-  if (object_keys.length === 0) {
+  if (!object_keys.length) {
     return undefined;
   }
   if (object_keys.length === 1 && object_map[object_keys[0]].is_loadable > 0) {
@@ -56,7 +56,7 @@ async function get_allowed_objects() {
   const promise_array = filenames.map((filename) => geodeStore.request(schema, { filename }));
   const responses = await Promise.all(promise_array);
   const allowed_objects_list = responses.map((response) => response.allowed_objects);
-  const all_keys = [...new Set(allowed_objects_list.flatMap((obj) => Object.keys(obj)))];
+  const all_keys = [...new Set(allowed_objects_list.flatMap(Object.keys))];
   const common_keys = all_keys.filter((key) => allowed_objects_list.every((obj) => key in obj));
   const final_object = {};
   for (const key of common_keys) {

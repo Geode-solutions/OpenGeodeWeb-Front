@@ -31,30 +31,27 @@ export function useMeshPolygonsStyle() {
         id,
         meshPolygonsColorStyle.meshPolygonsColor(id),
       );
-    }
-    if (type === "textures") {
+    } else if (type === "textures") {
       const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id);
       if (textures === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures);
-    }
-    if (type === "vertex") {
+    } else if (type === "vertex") {
       const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name);
-    }
-    if (type === "polygon") {
+    } else if (type === "polygon") {
       const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       await meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name);
-      return;
+    } else {
+      throw new Error(`Unknown mesh polygons coloring type: ${type}`);
     }
-    throw new Error(`Unknown mesh polygons coloring type: ${type}`);
   }
 
   function applyMeshPolygonsStyle(id) {

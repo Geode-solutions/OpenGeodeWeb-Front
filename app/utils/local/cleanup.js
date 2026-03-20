@@ -106,11 +106,11 @@ function killWebsocketMicroservice(microservice) {
 function killMicroservice(microservice) {
   if (microservice.type === "back") {
     return killHttpMicroservice(microservice);
-  }
-  if (microservice.type === "viewer") {
+  } else if (microservice.type === "viewer") {
     return killWebsocketMicroservice(microservice);
+  } else {
+    throw new Error(`Unknown microservice type: ${microservice.type}`);
   }
-  throw new Error(`Unknown microservice type: ${microservice.type}`);
 }
 
 function killMicroservices(microservices) {

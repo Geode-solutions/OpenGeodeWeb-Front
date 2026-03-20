@@ -38,7 +38,7 @@ beforeEach(() => {
 });
 
 describe("when_microservices_connected_run_function", () => {
-  test("microservices not connected", () => {
+  test("microservices not connected", async () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method");
     run_function_when_microservices_connected(dumb_obj.dumb_method);
     geodeStore.$patch({ status: Status.NOT_CONNECTED });

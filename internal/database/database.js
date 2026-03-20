@@ -24,11 +24,11 @@ class Database extends Dexie {
     await tempDb.open();
 
     const currentVersion = tempDb.verno;
-    const currentStores = {
-      [dataTable.name]: dataTable.schema,
-      [modelComponentsTable.name]: modelComponentsTable.schema,
-      [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
-    };
+    const currentStores = {};
+
+    currentStores[dataTable.name] = dataTable.schema;
+    currentStores[modelComponentsTable.name] = modelComponentsTable.schema;
+    currentStores[modelComponentsRelationTable.name] = modelComponentsRelationTable.schema;
 
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src;

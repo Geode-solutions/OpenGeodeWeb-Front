@@ -26,30 +26,27 @@ export function useMeshPointsStyle() {
     );
     if (type === "color") {
       return meshPointsColorStyle.setMeshPointsColor(id, meshPointsColorStyle.meshPointsColor(id));
-    }
-    if (type === "textures") {
+    } else if (type === "textures") {
       const textures = meshPointsTexturesStore.meshPointsTextures(id);
       if (textures === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshPointsTexturesStore.setMeshPointsTextures(id, textures);
-    }
-    if (type === "vertex") {
+    } else if (type === "vertex") {
       const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
-    }
-    if (type === "polygon") {
+    } else if (type === "polygon") {
       const name = meshPointsPolygonAttributeStyleStore.meshPointsPolygonAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       await meshPointsPolygonAttributeStyleStore.setMeshPointsPolygonAttributeName(id, name);
-      return;
+    } else {
+      throw new Error(`Unknown mesh points coloring type: ${type}`);
     }
-    throw new Error(`Unknown mesh points coloring type: ${type}`);
   }
 
   function applyMeshPointsStyle(id) {

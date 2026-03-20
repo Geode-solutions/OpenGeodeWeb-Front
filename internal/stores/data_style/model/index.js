@@ -82,14 +82,11 @@ export function useModelStyle() {
   function modelMeshComponentVisibility(id, component_type, component_id) {
     if (component_type === "Corner") {
       return modelCornersStyleStore.modelCornerVisibility(id, component_id);
-    }
-    if (component_type === "Line") {
+    } else if (component_type === "Line") {
       return modelLinesStyleStore.modelLineVisibility(id, component_id);
-    }
-    if (component_type === "Surface") {
+    } else if (component_type === "Surface") {
       return modelSurfacesStyleStore.modelSurfaceVisibility(id, component_id);
-    }
-    if (component_type === "Block") {
+    } else if (component_type === "Block") {
       return modelBlocksStyleStore.modelBlockVisibility(id, component_id);
     }
     throw new Error(`Unknown model component_type: ${component_type}`);
@@ -115,21 +112,19 @@ export function useModelStyle() {
     const component_type = await dataStore.meshComponentType(id, component_geode_ids[0]);
     if (component_type === "Corner") {
       return modelCornersStyleStore.setModelCornersVisibility(id, component_geode_ids, visibility);
-    }
-    if (component_type === "Line") {
+    } else if (component_type === "Line") {
       return modelLinesStyleStore.setModelLinesVisibility(id, component_geode_ids, visibility);
-    }
-    if (component_type === "Surface") {
+    } else if (component_type === "Surface") {
       return modelSurfacesStyleStore.setModelSurfacesVisibility(
         id,
         component_geode_ids,
         visibility,
       );
-    }
-    if (component_type === "Block") {
+    } else if (component_type === "Block") {
       return modelBlocksStyleStore.setModelBlocksVisibility(id, component_geode_ids, visibility);
+    } else {
+      throw new Error(`Unknown model component_type: ${component_type}`);
     }
-    throw new Error(`Unknown model component_type: ${component_type}`);
   }
 
   function applyModelStyle(id) {

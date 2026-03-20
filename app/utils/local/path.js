@@ -33,7 +33,7 @@ function createPath(dirPath) {
 }
 
 function generateProjectFolderPath(projectName) {
-  return path.join(os.tmpdir(), projectName.replaceAll("/", "_"), uuidv4());
+  return path.join(os.tmpdir(), projectName.replace(/\//g, "_"), uuidv4());
 }
 
 export { createPath, executablePath, executableName, generateProjectFolderPath };

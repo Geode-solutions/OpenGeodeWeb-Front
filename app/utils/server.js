@@ -5,7 +5,10 @@ import path from "node:path";
 // Third party imports
 import JSZip from "jszip";
 
-async function unzipFile(zipFilePath, outputDir = zipFilePath.replace(/\.[^/.]+$/, "")) {
+async function unzipFile(
+  zipFilePath,
+  outputDir = zipFilePath.replace(/\.[^/.]+$/, ""), // Remove the file extension
+) {
   console.log("Unzipping file...", zipFilePath, outputDir);
   try {
     const data = await fs.promises.readFile(zipFilePath);

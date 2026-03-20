@@ -69,7 +69,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     };
   }
 
-  function importStores(snapshot) {
+  async function importStores(snapshot) {
     isAdditionnalTreeDisplayed.value = snapshot?.isAdditionnalTreeDisplayed || false;
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
     model_id.value = snapshot?.model_id || "";
@@ -83,7 +83,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function finalizeImportSelection() {
     const ids = pendingSelectionIds.value || [];
     const rebuilt = [];
-    if (ids.length === 0) {
+    if (!ids.length) {
       for (const group of items.value) {
         for (const child of group.children) {
           rebuilt.push(child);

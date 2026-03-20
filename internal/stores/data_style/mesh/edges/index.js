@@ -18,7 +18,7 @@ export function useMeshEdgesStyle() {
   const meshEdgesVertexAttributeStyle = useMeshEdgesVertexAttributeStyle();
   const meshEdgesEdgeAttributeStyle = useMeshEdgesEdgeAttributeStyle();
 
-  function setMeshEdgesActiveColoring(id, type) {
+  async function setMeshEdgesActiveColoring(id, type) {
     const coloring = meshEdgesCommonStyle.meshEdgesColoring(id);
     coloring.active = type;
     console.log(
@@ -28,27 +28,26 @@ export function useMeshEdgesStyle() {
     );
     if (type === "color") {
       return meshEdgesColorStyle.setMeshEdgesColor(id, meshEdgesColorStyle.meshEdgesColor(id));
-    }
-    if (type === "textures") {
+    } else if (type === "textures") {
       const textures = meshEdgesTexturesStore.meshEdgesTextures(id);
       if (textures === undefined) {
         return Promise.resolve();
       }
       return meshEdgesTexturesStore.setMeshEdgesTextures(id, textures);
-    }
-    if (type === "vertex") {
+    } else if (type === "vertex") {
       const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
       if (name === undefined) {
         return Promise.resolve();
       }
       return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name);
-    }
-    if (type === "edge") {
+    } else if (type === "edge") {
       const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
       if (name === undefined) {
         return Promise.resolve();
       }
       return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name);
+    } else {
+      throw new Error(`Unknown mesh edges coloring type: ${type}`);
     }
     throw new Error(`Unknown mesh edges coloring type: ${type}`);
   }

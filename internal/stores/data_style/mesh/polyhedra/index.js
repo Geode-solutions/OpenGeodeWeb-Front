@@ -29,23 +29,21 @@ export function useMeshPolyhedraStyle() {
         id,
         meshPolyhedraColorStyle.meshPolyhedraColor(id),
       );
-    }
-    if (type === "vertex") {
+    } else if (type === "vertex") {
       const name = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name);
-    }
-    if (type === "polyhedron") {
+    } else if (type === "polyhedron") {
       const name = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       await meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(id, name);
-      return;
+    } else {
+      throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
     }
-    throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
   }
 
   function applyMeshPolyhedraStyle(id) {
