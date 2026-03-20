@@ -1,15 +1,15 @@
 <script setup>
-  import { useFeedbackStore } from "@ogw_front/stores/feedback"
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
-  const MARGIN_BETWEEN_SNACKERS = 60
-  const FIRST_SNACKER_MARGIN = 8
+const MARGIN_BETWEEN_SNACKERS = 60;
+const FIRST_SNACKER_MARGIN = 8;
 
-  const feedbackStore = useFeedbackStore()
-  const show = ref(true)
+const feedbackStore = useFeedbackStore();
+const show = ref(true);
 
-  function calc_margin(index) {
-    return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`
-  }
+function calc_margin(index) {
+  return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`;
+}
 </script>
 
 <template>
@@ -40,9 +40,7 @@
           </template>
         </v-tooltip>
         <v-tooltip v-else-if="feedback.type === 'success'" location="left">
-          <v-icon color="white" class="justify-right">
-            mdi-check-circle-outline
-          </v-icon>
+          <v-icon color="white" class="justify-right"> mdi-check-circle-outline </v-icon>
         </v-tooltip>
       </v-col>
       <v-col cols="9" class="text-no-wrap overflow-hidden">
@@ -75,7 +73,7 @@
 </template>
 
 <style scoped>
-  .v-snackbar :deep(.v-snackbar__content) {
-    width: 100%;
-  }
+.v-snackbar :deep(.v-snackbar__content) {
+  width: 100%;
+}
 </style>
