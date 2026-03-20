@@ -17,9 +17,16 @@ export function useMeshEdgesCommonStyle() {
     return meshEdgesStyle(id).coloring
   }
 
+  function mutateMeshEdgesColoring(id, values) {
+    return mutateMeshEdgesStyle(id, {
+      coloring: values,
+    })
+  }
+
   return {
     meshEdgesStyle,
     meshEdgesColoring,
     mutateMeshEdgesStyle,
+    mutateMeshEdgesColoring,
   }
 }

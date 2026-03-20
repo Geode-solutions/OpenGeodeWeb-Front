@@ -22,8 +22,8 @@ export function useMeshPolygonsColorStyle() {
       { id, color },
       {
         response_function: () => {
-          return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
-            coloring: { color },
+          return meshPolygonsCommonStyle.mutateMeshPolygonsColoring(id, {
+            color,
           })
         },
       },

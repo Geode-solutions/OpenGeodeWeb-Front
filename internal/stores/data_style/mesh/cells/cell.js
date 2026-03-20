@@ -30,16 +30,9 @@ export function useMeshCellsCellAttributeStyle() {
     })
   }
 
-  function mutateMeshCellsCellStyle(id, values) {
-    return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
-      coloring: {
-        cell: values,
-      },
-    })
-  }
 
   function setMeshCellsCellAttributeStoredConfig(id, name, config) {
-    return mutateMeshCellsCellStyle(id, {
+    return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, {
       storedConfigs: {
         [name]: config,
       },
@@ -56,7 +49,7 @@ export function useMeshCellsCellAttributeStyle() {
       { id, name },
       {
         response_function: () => {
-          return mutateMeshCellsCellStyle(id, { name })
+          return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name })
         },
       },
     )

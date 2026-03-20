@@ -22,8 +22,8 @@ export function useMeshCellsColorStyle() {
       { id, color },
       {
         response_function: () => {
-          return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
-            coloring: { color },
+          return meshCellsCommonStyle.mutateMeshCellsColoring(id, {
+            color,
           })
         },
       },

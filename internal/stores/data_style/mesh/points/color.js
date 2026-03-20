@@ -22,8 +22,8 @@ export function useMeshPointsColorStyle() {
       { id, color },
       {
         response_function: () => {
-          return meshPointsCommonStyle.mutateMeshPointsStyle(id, {
-            coloring: { color },
+          return meshPointsCommonStyle.mutateMeshPointsColoring(id, {
+            color,
           })
         },
       },

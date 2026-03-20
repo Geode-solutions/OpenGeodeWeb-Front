@@ -17,9 +17,16 @@ export function useMeshPolygonsCommonStyle() {
     return meshPolygonsStyle(id).coloring
   }
 
+  function mutateMeshPolygonsColoring(id, values) {
+    return mutateMeshPolygonsStyle(id, {
+      coloring: values,
+    })
+  }
+
   return {
     meshPolygonsStyle,
     meshPolygonsColoring,
     mutateMeshPolygonsStyle,
+    mutateMeshPolygonsColoring,
   }
 }

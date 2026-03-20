@@ -17,9 +17,16 @@ export function useMeshPointsCommonStyle() {
     return meshPointsStyle(id).coloring
   }
 
+  function mutateMeshPointsColoring(id, values) {
+    return mutateMeshPointsStyle(id, {
+      coloring: values,
+    })
+  }
+
   return {
     meshPointsStyle,
     meshPointsColoring,
     mutateMeshPointsStyle,
+    mutateMeshPointsColoring,
   }
 }

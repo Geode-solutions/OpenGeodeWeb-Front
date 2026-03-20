@@ -17,9 +17,16 @@ export function useMeshPolyhedraCommonStyle() {
     return meshPolyhedraStyle(id).coloring
   }
 
+  function mutateMeshPolyhedraColoring(id, values) {
+    return mutateMeshPolyhedraStyle(id, {
+      coloring: values,
+    })
+  }
+
   return {
     meshPolyhedraStyle,
     meshPolyhedraColoring,
     mutateMeshPolyhedraStyle,
+    mutateMeshPolyhedraColoring,
   }
 }

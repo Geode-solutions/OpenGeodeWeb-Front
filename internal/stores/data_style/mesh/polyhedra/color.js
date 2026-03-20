@@ -22,8 +22,8 @@ export function useMeshPolyhedraColorStyle() {
       { id, color },
       {
         response_function: () => {
-          return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
-            coloring: { color },
+          return meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
+            color,
           })
         },
       },
