@@ -2,14 +2,13 @@
 
 // Third party imports
 import { createError, defineEventHandler, readBody } from "h3";
+import { useRuntimeConfig } from "nitropack/runtime";
 
 // Local imports
 import {
   addMicroserviceMetadatas,
   runViewer,
 } from "@geode/opengeodeweb-front/app/utils/local/microservices.js";
-
-import { useRuntimeConfig } from "nitropack/runtime";
 
 export default defineEventHandler(async (event) => {
   try {
