@@ -71,7 +71,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return
     }
     const value = await dataStore.item(id)
-    console.log("hybridViewerStore.addItem", { value })
     const reader = vtkXMLPolyDataReader()
     const textEncoder = new TextEncoder()
     await reader.parseAsArrayBuffer(

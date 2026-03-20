@@ -19,10 +19,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function setVisibility(id, visibility) {
     const item = await dataStore.item(id)
-    const viewer_type = item?.viewer_type
-    if (!viewer_type) {
-      throw new Error(`Item not found or not loaded: ${id}`)
-    }
+    const viewer_type = item.viewer_type
 
     if (viewer_type === "mesh") {
       return meshStyleStore.setMeshVisibility(id, visibility)
@@ -35,10 +32,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyDefaultStyle(id) {
     const item = await dataStore.item(id)
-    const viewer_type = item?.viewer_type
-    if (!viewer_type) {
-      throw new Error(`Item not found or not loaded: ${id}`)
-    }
+    const viewer_type = item.viewer_type
 
     if (viewer_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id)
@@ -75,7 +69,6 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const ids = Object.keys(dataStyleState.styles)
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id)
-      if (!meta) return
       const viewerType = meta.viewer_type
       if (viewerType === "mesh") {
         return meshStyleStore.applyMeshStyle(id)

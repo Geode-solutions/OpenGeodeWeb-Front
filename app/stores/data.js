@@ -12,8 +12,12 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore()
 
-  function item(id) {
-    return database.data.get(id)
+  async function item(id) {
+    const item = await database.data.get(id)
+    if (!item) {
+      throw new Error(`Item not found: ${id}`)
+    }
+    return item
   }
 
   function refItem(id) {
