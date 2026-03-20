@@ -1,179 +1,166 @@
 // Third party imports
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  expectTypeOf,
-  test,
-  vi,
-} from "vitest"
+import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 
-import { WebSocket } from "ws"
+import { WebSocket } from "ws";
 // Local imports
-import { appMode } from "@ogw_front/utils/app_mode"
-import { setupActivePinia } from "@ogw_tests/utils"
-import { useInfraStore } from "@ogw_front/stores/infra"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { appMode } from "@ogw_front/utils/local/app_mode";
+import { setupActivePinia } from "@ogw_tests/utils";
+import { useInfraStore } from "@ogw_front/stores/infra";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Mock navigator.locks API
 const mockLockRequest = vi
   .fn()
-  .mockImplementation(async (name, handler) => await handler({ name }))
+  .mockImplementation(async (name, handler) => await handler({ name }));
 
 vi.stubGlobal("navigator", {
   ...navigator,
   locks: {
     request: mockLockRequest,
   },
-})
+});
 
 beforeAll(() => {
-  globalThis.WebSocket = WebSocket
-})
+  globalThis.WebSocket = WebSocket;
+});
 
 afterAll(() => {
-  delete globalThis.WebSocket
-})
+  delete globalThis.WebSocket;
+});
 
 beforeEach(() => {
-  setupActivePinia()
-})
+  setupActivePinia();
+});
 
 describe("Viewer Store", () => {
   describe("state", () => {
     test("initial state", () => {
-      const viewerStore = useViewerStore()
-      expectTypeOf(viewerStore.default_local_port).toBeString()
-      expectTypeOf(viewerStore.client).toEqualTypeOf({})
-      expectTypeOf(viewerStore.picking_mode).toBeBoolean()
+      const viewerStore = useViewerStore();
+      expectTypeOf(viewerStore.default_local_port).toBeString();
+      expectTypeOf(viewerStore.client).toEqualTypeOf({});
+      expectTypeOf(viewerStore.picking_mode).toBeBoolean();
       expectTypeOf(viewerStore.picked_point).toEqualTypeOf({
         x: undefined,
         y: undefined,
-      })
-      expectTypeOf(viewerStore.picked_point).toBeNumber()
-      expectTypeOf(viewerStore.status).toBeString()
-    })
-  })
+      });
+      expectTypeOf(viewerStore.picked_point).toBeNumber();
+      expectTypeOf(viewerStore.status).toBeString();
+    });
+  });
 
   describe("getters", () => {
     describe("protocol", () => {
       test("test app_mode CLOUD", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.CLOUD
-        expect(viewerStore.protocol).toBe("wss")
-      })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.CLOUD;
+        expect(viewerStore.protocol).toBe("wss");
+      });
       test("test app_mode BROWSER", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.BROWSER
-        expect(viewerStore.protocol).toBe("ws")
-      })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.BROWSER;
+        expect(viewerStore.protocol).toBe("ws");
+      });
       test("test app_mode DESKTOP", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.DESKTOP
-        expect(viewerStore.protocol).toBe("ws")
-      })
-    })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.DESKTOP;
+        expect(viewerStore.protocol).toBe("ws");
+      });
+    });
 
     describe("port", () => {
       test("test app_mode CLOUD", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.CLOUD
-        expect(viewerStore.port).toBe("443")
-      })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.CLOUD;
+        expect(viewerStore.port).toBe("443");
+      });
       test("test app_mode BROWSER", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.BROWSER
-        expect(viewerStore.port).toBe(viewerStore.default_local_port)
-      })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.BROWSER;
+        expect(viewerStore.port).toBe(viewerStore.default_local_port);
+      });
       test("test app_mode DESKTOP", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.DESKTOP
-        expect(viewerStore.port).toBe(viewerStore.default_local_port)
-      })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.DESKTOP;
+        expect(viewerStore.port).toBe(viewerStore.default_local_port);
+      });
 
       test("test override default_local_port", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.DESKTOP
-        viewerStore.default_local_port = "8080"
-        expect(viewerStore.port).toBe("8080")
-      })
-    })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.DESKTOP;
+        viewerStore.default_local_port = "8080";
+        expect(viewerStore.port).toBe("8080");
+      });
+    });
     describe("base_url", () => {
       test("test app_mode DESKTOP", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.DESKTOP
-        infraStore.domain_name = "localhost"
-        expect(viewerStore.base_url).toBe("ws://localhost:1234/ws")
-      })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.DESKTOP;
+        infraStore.domain_name = "localhost";
+        expect(viewerStore.base_url).toBe("ws://localhost:1234/ws");
+      });
 
       test("test app_mode CLOUD", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.CLOUD
-        infraStore.ID = "123456"
-        infraStore.domain_name = "example.com"
-        expect(viewerStore.base_url).toBe(
-          "wss://example.com:443/123456/viewer/ws",
-        )
-      })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.CLOUD;
+        infraStore.ID = "123456";
+        infraStore.domain_name = "example.com";
+        expect(viewerStore.base_url).toBe("wss://example.com:443/123456/viewer/ws");
+      });
 
       test("test app_mode CLOUD, ID empty", () => {
-        const infraStore = useInfraStore()
-        const viewerStore = useViewerStore()
-        infraStore.app_mode = appMode.CLOUD
-        infraStore.ID = ""
-        infraStore.domain_name = "example.com"
-        expect(() => viewerStore.base_url).toThrowError(
-          "ID must not be empty in cloud mode",
-        )
-      })
-    })
+        const infraStore = useInfraStore();
+        const viewerStore = useViewerStore();
+        infraStore.app_mode = appMode.CLOUD;
+        infraStore.ID = "";
+        infraStore.domain_name = "example.com";
+        expect(() => viewerStore.base_url).toThrowError("ID must not be empty in cloud mode");
+      });
+    });
     describe("is_busy", () => {
       test("test is_busy", () => {
-        const viewerStore = useViewerStore()
-        viewerStore.request_counter = 1
-        expect(viewerStore.is_busy).toBeTruthy()
-      })
+        const viewerStore = useViewerStore();
+        viewerStore.request_counter = 1;
+        expect(viewerStore.is_busy).toBeTruthy();
+      });
       test("test not is_busy", () => {
-        const viewerStore = useViewerStore()
-        viewerStore.request_counter = 0
-        expect(viewerStore.is_busy).toBeFalsy()
-      })
-    })
-  })
+        const viewerStore = useViewerStore();
+        viewerStore.request_counter = 0;
+        expect(viewerStore.is_busy).toBeFalsy();
+      });
+    });
+  });
   describe("actions", () => {
     describe("toggle_picking_mode", () => {
       test("test true", async () => {
-        const viewerStore = useViewerStore()
-        await viewerStore.toggle_picking_mode(true)
-        expect(viewerStore.picking_mode).toBeTruthy()
-      })
-    })
+        const viewerStore = useViewerStore();
+        await viewerStore.toggle_picking_mode(true);
+        expect(viewerStore.picking_mode).toBeTruthy();
+      });
+    });
 
     describe("start_request", () => {
       test("test increment", async () => {
-        const viewerStore = useViewerStore()
-        await viewerStore.start_request()
-        expect(viewerStore.request_counter).toBe(1)
-      })
-    })
+        const viewerStore = useViewerStore();
+        await viewerStore.start_request();
+        expect(viewerStore.request_counter).toBe(1);
+      });
+    });
 
     describe("stop_request", () => {
       test("test decrement", async () => {
-        const viewerStore = useViewerStore()
-        await viewerStore.stop_request()
-        expect(viewerStore.request_counter).toBe(-1)
-      })
-    })
-  })
-})
+        const viewerStore = useViewerStore();
+        await viewerStore.stop_request();
+        expect(viewerStore.request_counter).toBe(-1);
+      });
+    });
+  });
+});
