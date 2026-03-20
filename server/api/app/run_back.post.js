@@ -9,13 +9,17 @@ import {
   runBack,
 } from "@geode/opengeodeweb-front/app/utils/local/microservices.js"
 
+import { useRuntimeConfig } from "nitropack/runtime"
+
 export default defineEventHandler(async (event) => {
   try {
-    const { BACK_COMMAND, BACK_PATH, args } = await readBody(event)
-    const port = await runBack(BACK_COMMAND, BACK_PATH, args)
+    const config = useRuntimeConfig(event).public
+    const { COMMAND_BACK, NUXT_ROOT_PATH } = config
+    const { args } = await readBody(event)
+    const port = await runBack(COMMAND_BACK, NUXT_ROOT_PATH, args)
     await addMicroserviceMetadatas(args.projectFolderPath, {
       type: "back",
-      name: BACK_COMMAND,
+      name: COMMAND_BACK,
       port,
     })
 

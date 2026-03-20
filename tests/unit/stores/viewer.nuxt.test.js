@@ -12,7 +12,7 @@ import {
 
 import { WebSocket } from "ws"
 // Local imports
-import { appMode } from "@ogw_front/utils/app_mode"
+import { appMode } from "@ogw_front/utils/local/app_mode"
 import { setupActivePinia } from "@ogw_tests/utils"
 import { useInfraStore } from "@ogw_front/stores/infra"
 import { useViewerStore } from "@ogw_front/stores/viewer"

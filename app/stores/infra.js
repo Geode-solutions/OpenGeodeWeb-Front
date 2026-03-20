@@ -1,13 +1,12 @@
-import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
 import { Status } from "@ogw_front/utils/status"
+import { appMode } from "@ogw_front/utils/local/app_mode"
+import { registerRunningExtensions } from "@ogw_front/utils/extension"
 import { useAppStore } from "@ogw_front/stores/app"
 import { useLambdaStore } from "@ogw_front/stores/lambda"
 
-import { registerRunningExtensions } from "@ogw_front/utils/extension"
-
 export const useInfraStore = defineStore("infra", {
   state: () => ({
-    app_mode: getAppMode(),
+    app_mode: useRuntimeConfig().public.MODE,
     ID: "",
     is_captcha_validated: false,
     status: Status.NOT_CREATED,

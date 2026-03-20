@@ -4,7 +4,6 @@ import path from "node:path"
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest"
-import { useRuntimeConfig } from "nuxt/app"
 
 // Local imports
 import {
@@ -17,7 +16,7 @@ import {
   generateProjectFolderPath,
 } from "@ogw_front/utils/local/path"
 import { Status } from "@ogw_front/utils/status"
-import { appMode } from "@ogw_front/utils/app_mode"
+import { appMode } from "@ogw_front/utils/local/app_mode"
 import { importFile } from "@ogw_front/utils/file_import_workflow"
 import { setupActivePinia } from "@ogw_tests/utils"
 import { useGeodeStore } from "@ogw_front/stores/geode"
@@ -32,17 +31,17 @@ async function runMicroservices() {
   const infraStore = useInfraStore()
   const viewerStore = useViewerStore()
   infraStore.app_mode = appMode.BROWSER
-  const { BACK_COMMAND, BACK_PATH, PROJECT, VIEWER_COMMAND, VIEWER_PATH } =
+  const { COMMAND_BACK, PROJECT, COMMAND_VIEWER, NUXT_ROOT_PATH } =
     useRuntimeConfig().public
   const projectFolderPath = generateProjectFolderPath(PROJECT)
   await createPath(projectFolderPath)
 
   const [back_port, viewer_port] = await Promise.all([
-    runBack(BACK_COMMAND, BACK_PATH, {
+    runBack(COMMAND_BACK, NUXT_ROOT_PATH, {
       projectFolderPath,
       uploadFolderPath: data_folder,
     }),
-    runViewer(VIEWER_COMMAND, VIEWER_PATH, { projectFolderPath }),
+    runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, { projectFolderPath }),
   ])
 
   console.log("back_port", back_port)
@@ -50,12 +49,12 @@ async function runMicroservices() {
 
   await addMicroserviceMetadatas(projectFolderPath, {
     type: "back",
-    name: BACK_COMMAND,
+    name: COMMAND_BACK,
     port: back_port,
   })
   await addMicroserviceMetadatas(projectFolderPath, {
     type: "viewer",
-    name: VIEWER_COMMAND,
+    name: COMMAND_VIEWER,
     port: viewer_port,
   })
 
