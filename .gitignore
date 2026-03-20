@@ -29,7 +29,4 @@ __snapshots__
 coverage
 *.db
 package-lock.json
-/build
-/opengeodeweb-back
-/opengeodeweb-viewer
 VTK.txt

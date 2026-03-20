@@ -21,8 +21,9 @@ export function useMeshPolygonsTexturesStyle() {
       { id, textures },
       {
         response_function: () => {
-          meshPolygonsCommonStyle.meshPolygonsColoring(id).textures = textures;
-          console.log(setMeshPolygonsTextures.name, { id }, meshPolygonsTextures(id));
+          return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+            coloring: { textures },
+          });
         },
       },
     );

@@ -1,5 +1,6 @@
-import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
+// Local imports
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
+import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
 
 export const useAppStore = defineStore("app", () => {
   const stores = [];
@@ -100,7 +101,6 @@ export const useAppStore = defineStore("app", () => {
         });
         finalURL = URL.createObjectURL(newBlob);
       }
-      // oxlint-disable-next-line no-inline-comments
       const extensionModule = await import(/* @vite-ignore */ finalURL);
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
@@ -122,25 +122,25 @@ export const useAppStore = defineStore("app", () => {
         throw new Error("Extension API not initialized");
       }
 
-      if (typeof extensionModule.install !== "function") {
-        throw new TypeError("Extension must export an install function");
+      if (typeof extensionModule.install === "function") {
+        await extensionModule.install(extensionAPI.value, backendPath);
+
+        const extensionData = {
+          module: extensionModule,
+          id: extensionId,
+          path,
+          backendPath,
+          loadedAt: new Date().toISOString(),
+          metadata: extensionModule.metadata,
+          enabled: true,
+        };
+        loadedExtensions.value.set(extensionId, extensionData);
+
+        console.log(`[AppStore] Extension loaded successfully: ${extensionId}`);
+        return extensionModule;
+      } else {
+        throw new Error("Extension must export an install function");
       }
-
-      await extensionModule.install(extensionAPI.value, backendPath);
-
-      const extensionData = {
-        module: extensionModule,
-        id: extensionId,
-        path,
-        backendPath,
-        loadedAt: new Date().toISOString(),
-        metadata: extensionModule.metadata,
-        enabled: true,
-      };
-      loadedExtensions.value.set(extensionId, extensionData);
-
-      console.log(`[AppStore] Extension loaded successfully: ${extensionId}`);
-      return extensionModule;
     } catch (error) {
       console.error(`[AppStore] Failed to load extension from ${path}:`, error);
       throw error;
@@ -245,25 +245,27 @@ export const useAppStore = defineStore("app", () => {
 
   const projectFolderPath = ref("");
   function createProjectFolder() {
+    const { PROJECT } = useRuntimeConfig().public;
     const schema = {
       $id: "/api/app/project_folder_path",
       methods: ["POST"],
       type: "object",
-      properties: {},
-      required: [],
+      properties: {
+        PROJECT: { type: "string" },
+      },
+      required: ["PROJECT"],
       additionalProperties: true,
     };
+    const params = { PROJECT };
 
-    return request(
-      schema,
-      {},
-      {
-        response_function: (response) => {
-          console.log(`[APP] ${response.projectFolderPath} created`);
-          projectFolderPath.value = response.projectFolderPath;
-        },
+    console.log(createProjectFolder.name, { PROJECT });
+
+    return request(schema, params, {
+      response_function: async (response) => {
+        console.log(`[APP] ${response.projectFolderPath} created`);
+        projectFolderPath.value = response.projectFolderPath;
       },
-    );
+    });
   }
 
   return {

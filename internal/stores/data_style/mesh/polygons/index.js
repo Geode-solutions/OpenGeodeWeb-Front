@@ -7,6 +7,7 @@ import { useMeshPolygonsPolygonAttributeStyle } from "./polygon";
 import { useMeshPolygonsTexturesStyle } from "./textures";
 import { useMeshPolygonsVertexAttributeStyle } from "./vertex";
 import { useMeshPolygonsVisibilityStyle } from "./visibility";
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
 
 // Local constants
 
@@ -15,46 +16,48 @@ export function useMeshPolygonsStyle() {
   const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle();
   const meshPolygonsColorStyle = useMeshPolygonsColorStyle();
   const meshPolygonsTexturesStyle = useMeshPolygonsTexturesStyle();
+
+  function meshPolygonsColoring(id) {
+    return meshPolygonsCommonStyle.meshPolygonsColoring(id);
+  }
   const meshPolygonsVertexAttributeStyle = useMeshPolygonsVertexAttributeStyle();
   const meshPolygonsPolygonAttributeStyle = useMeshPolygonsPolygonAttributeStyle();
 
+  function meshPolygonsActiveColoring(id) {
+    return meshPolygonsColoring(id).active;
+  }
+
   async function setMeshPolygonsActiveColoring(id, type) {
-    const coloring = meshPolygonsCommonStyle.meshPolygonsColoring(id);
-    coloring.active = type;
-    console.log(
-      setMeshPolygonsActiveColoring.name,
-      { id },
-      meshPolygonsCommonStyle.meshPolygonsActiveColoring(id),
-    );
+    await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+      coloring: { active: type },
+    });
+    console.log(setMeshPolygonsActiveColoring.name, { id }, type);
     if (type === "color") {
       return meshPolygonsColorStyle.setMeshPolygonsColor(
         id,
         meshPolygonsColorStyle.meshPolygonsColor(id),
       );
-    }
-    if (type === "textures") {
+    } else if (type === "textures") {
       const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id);
       if (textures === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures);
-    }
-    if (type === "vertex") {
+    } else if (type === "vertex") {
       const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
       return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name);
-    }
-    if (type === "polygon") {
+    } else if (type === "polygon") {
       const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
       if (name === undefined) {
-        return;
+        return Promise.resolve();
       }
-      await meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name);
-      return;
+      return meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name);
+    } else {
+      throw new Error(`Unknown mesh polygons coloring type: ${type}`);
     }
-    throw new Error(`Unknown mesh polygons coloring type: ${type}`);
   }
 
   function applyMeshPolygonsStyle(id) {
@@ -63,14 +66,16 @@ export function useMeshPolygonsStyle() {
         id,
         meshPolygonsVisibility.meshPolygonsVisibility(id),
       ),
-      setMeshPolygonsActiveColoring(id, meshPolygonsCommonStyle.meshPolygonsActiveColoring(id)),
+      setMeshPolygonsActiveColoring(id, meshPolygonsActiveColoring(id)),
     ]);
   }
 
   return {
+    ...meshPolygonsCommonStyle,
+    meshPolygonsColoring,
+    meshPolygonsActiveColoring,
     setMeshPolygonsActiveColoring,
     applyMeshPolygonsStyle,
-    ...meshPolygonsCommonStyle,
     ...meshPolygonsVisibility,
     ...meshPolygonsColorStyle,
     ...meshPolygonsTexturesStyle,

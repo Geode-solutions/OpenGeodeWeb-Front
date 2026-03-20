@@ -4,7 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { cleanupBackend } from "@ogw_front/utils/local/microservices";
 import { setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -29,7 +29,7 @@ afterEach(async () => {
   await cleanupBackend(projectFolderPath);
 });
 
-describe("Mesh cells", () => {
+describe("Mesh cells", async () => {
   describe("Cells visibility", () => {
     test("Visibility true", async () => {
       const dataStyleStore = useDataStyleStore();

@@ -1,10 +1,11 @@
 // Third party imports
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { nextTick } from "vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { cleanupBackend } from "@ogw_front/utils/local/microservices";
 import { setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -15,6 +16,8 @@ const INTERVAL_TIMEOUT = 20_000;
 const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let id = "",
   projectFolderPath = "";
@@ -42,6 +45,7 @@ describe("Model blocks", () => {
       const result = dataStyleStore.setModelBlocksVisibility(id, block_ids, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      await sleep(200);
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.visibility,
         { id, block_ids: block_viewer_ids, visibility },
@@ -66,6 +70,7 @@ describe("Model blocks", () => {
       const color = { r: 255, g: 0, b: 0 };
       const spy = vi.spyOn(viewerStore, "request");
       await dataStyleStore.setModelBlocksColor(id, block_ids, color);
+      await sleep(200);
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.color,
         { id, block_ids: block_viewer_ids, color },

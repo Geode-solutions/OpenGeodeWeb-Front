@@ -9,7 +9,7 @@ import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import InspectorInspectionButton from "@ogw_front/components/Inspector/InspectionButton";
 import { useGeodeStore } from "@ogw_front/stores/geode";
 
-describe("Inspector/InspectionButton", () => {
+describe("Inspector/InspectionButton", async () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
   geodeStore.base_url = "";

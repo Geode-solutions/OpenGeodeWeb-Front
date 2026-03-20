@@ -13,7 +13,10 @@ function goBackToFileTree() {
 
 const model_id = computed(() => treeviewStore.model_id);
 
-const metaDatas = dataStore.refItem(model_id.value);
+const metaDatas = computed(() => {
+  if (!model_id.value) return {};
+  return dataStore.refItem(model_id.value).value || {};
+});
 </script>
 
 <template>

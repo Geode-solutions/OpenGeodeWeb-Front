@@ -34,7 +34,7 @@ describe("geodeStore.request()", () => {
     geodeStore.base_url = "";
   });
 
-  test("invalid schema", () => {
+  test("invalid schema", async () => {
     const invalid_schema = {
       $id: "/test",
       type: "object",
@@ -51,7 +51,7 @@ describe("geodeStore.request()", () => {
     expect(() => geodeStore.request(invalid_schema, params)).toThrow("data/test must be number");
   });
 
-  test("invalid params", () => {
+  test("invalid params", async () => {
     const params = {};
     expect(() => geodeStore.request(schema, params)).toThrow(
       "data must have required property 'test'",
@@ -62,7 +62,7 @@ describe("geodeStore.request()", () => {
     const params = { test: "hello" };
     let errorCalled = false;
     const callbacks = {
-      request_error_function: () => {
+      request_error_function: async () => {
         errorCalled = true;
       },
     };

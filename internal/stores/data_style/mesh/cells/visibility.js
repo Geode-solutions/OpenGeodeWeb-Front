@@ -21,8 +21,7 @@ export function useMeshCellsVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          meshCellsCommonStyle.meshCellsStyle(id).visibility = visibility;
-          console.log(setMeshCellsVisibility.name, { id }, meshCellsVisibility(id));
+          return meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility });
         },
       },
     );

@@ -10,7 +10,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 vi.stubGlobal("visualViewport", new EventTarget());
 
-describe(FeedBackSnackers, () => {
+describe(FeedBackSnackers, async () => {
   test(`Test delete error`, async () => {
     const pinia = setupActivePinia();
     const feedbackStore = useFeedbackStore();

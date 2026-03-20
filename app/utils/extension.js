@@ -2,6 +2,7 @@
 
 // Third party imports
 import _ from "lodash";
+import { useRuntimeConfig } from "nuxt/app";
 
 // Local imports
 import { useAppStore } from "@ogw_front/stores/app";

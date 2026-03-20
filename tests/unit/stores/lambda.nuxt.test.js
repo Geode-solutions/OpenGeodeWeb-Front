@@ -16,7 +16,7 @@ const PROJECT = "project";
 const TEST_ID = "test-id-123456";
 const STATUS_500 = 500;
 
-beforeEach(() => {
+beforeEach(async () => {
   setupActivePinia();
 });
 

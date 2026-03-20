@@ -19,7 +19,7 @@ async function upload_file(
     body: body,
   };
   microservice.start_request();
-  return await $fetch(route, {
+  return $fetch(route, {
     baseURL: microservice.base_url || "",
     ...request_options,
     onRequestError({ error }) {

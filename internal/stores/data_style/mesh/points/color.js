@@ -21,8 +21,9 @@ export function useMeshPointsColorStyle() {
       { id, color },
       {
         response_function: () => {
-          meshPointsCommonStyle.meshPointsColoring(id).color = color;
-          console.log(setMeshPointsColor.name, { id }, JSON.stringify(meshPointsColor(id)));
+          return meshPointsCommonStyle.mutateMeshPointsColoring(id, {
+            color,
+          });
         },
       },
     );

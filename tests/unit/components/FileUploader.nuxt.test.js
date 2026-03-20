@@ -15,7 +15,7 @@ const SECOND_INDEX = 1;
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 
-describe(FileUploader, () => {
+describe(FileUploader, async () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
   geodeStore.base_url = "";
@@ -31,7 +31,7 @@ describe(FileUploader, () => {
 
   const files = [new File(["fake_file"], "fake_file.txt")];
 
-  describe(`Upload file`, () => {
+  describe(`Upload file`, async () => {
     test(`prop auto_upload false`, async () => {
       const wrapper = await mountSuspended(FileUploader, {
         global: {

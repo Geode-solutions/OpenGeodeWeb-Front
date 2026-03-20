@@ -70,7 +70,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return;
     }
     const value = await dataStore.item(id);
-    console.log("hybridViewerStore.addItem", { value });
     const reader = vtkXMLPolyDataReader();
     const textEncoder = new TextEncoder();
     await reader.parseAsArrayBuffer(textEncoder.encode(value.binary_light_viewable));
@@ -88,7 +87,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     hybridDb[id] = { actor, polydata, mapper };
   }
 
-  function removeItem(id) {
+  async function removeItem(id) {
     if (!hybridDb[id]) {
       return;
     }
@@ -98,10 +97,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     delete hybridDb[id];
   }
 
-  function setVisibility(id, visibility) {
-    if (!hybridDb[id]) {
-      return;
-    }
+  async function setVisibility(id, visibility) {
     hybridDb[id].actor.setVisibility(visibility);
     const renderWindow = genericRenderWindow.value.getRenderWindow();
     renderWindow.render();

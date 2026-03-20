@@ -21,8 +21,9 @@ export function useMeshPolyhedraVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          meshPolyhedraCommonStyle.meshPolyhedraStyle(id).visibility = visibility;
-          console.log(setMeshPolyhedraVisibility.name, { id }, meshPolyhedraVisibility(id));
+          return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
+            visibility,
+          });
         },
       },
     );

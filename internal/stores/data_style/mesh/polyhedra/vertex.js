@@ -30,31 +30,44 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     });
   }
 
-  function setMeshPolyhedraVertexAttributeStoredConfig(id, name, { minimum, maximum, colorMap }) {
-    const { storedConfigs } = meshPolyhedraVertexAttribute(id);
-    storedConfigs[name] = { minimum, maximum, colorMap };
-    return storedConfigs[name];
+  function mutateMeshPolyhedraVertexStyle(id, values) {
+    return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
+      coloring: {
+        vertex: values,
+      },
+    });
+  }
+
+  function setMeshPolyhedraVertexAttributeStoredConfig(id, name, config) {
+    return mutateMeshPolyhedraVertexStyle(id, {
+      storedConfigs: {
+        [name]: config,
+      },
+    });
   }
 
   function meshPolyhedraVertexAttributeName(id) {
-    console.log(meshPolyhedraVertexAttributeName.name, { id }, meshPolyhedraVertexAttribute(id));
     return meshPolyhedraVertexAttribute(id).name;
   }
+
   function setMeshPolyhedraVertexAttributeName(id, name) {
-    console.log(setMeshPolyhedraVertexAttributeName.name, { id, name });
     return viewerStore.request(
       meshPolyhedraVertexAttributeSchemas.name,
       { id, name },
       {
-        response_function: async () => {
-          meshPolyhedraVertexAttribute(id).name = name;
-          const { minimum, maximum } = meshPolyhedraVertexAttributeStoredConfig(id, name);
-          await setMeshPolyhedraVertexAttributeRange(id, minimum, maximum);
-          console.log(
-            setMeshPolyhedraVertexAttributeName.name,
-            { id },
-            meshPolyhedraVertexAttributeName(id),
-          );
+        response_function: () => {
+          const updates = { name };
+          const vertex = meshPolyhedraVertexAttribute(id);
+          if (!(name in vertex.storedConfigs)) {
+            updates.storedConfigs = {
+              [name]: {
+                minimum: undefined,
+                maximum: undefined,
+                colorMap: undefined,
+              },
+            };
+          }
+          return mutateMeshPolyhedraVertexStyle(id, updates);
         },
       },
     );
@@ -66,12 +79,13 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
+
   function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraVertexAttributeName(id);
-    const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name);
-    storedConfig.minimum = minimum;
-    storedConfig.maximum = maximum;
-    return setMeshPolyhedraVertexAttributeColorMap(id, storedConfig.colorMap);
+    return setMeshPolyhedraVertexAttributeStoredConfig(id, name, {
+      minimum,
+      maximum,
+    });
   }
 
   function meshPolyhedraVertexAttributeColorMap(id) {
@@ -80,37 +94,20 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const { colorMap } = storedConfig;
     return colorMap;
   }
+
   function setMeshPolyhedraVertexAttributeColorMap(id, colorMap) {
     const name = meshPolyhedraVertexAttributeName(id);
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name);
-    if (
-      storedConfig.minimum === undefined ||
-      storedConfig.maximum === undefined ||
-      colorMap === undefined
-    ) {
-      storedConfig.colorMap = colorMap;
-      return;
-    }
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
-
-    console.log(setMeshPolyhedraVertexAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    });
     return viewerStore.request(
       meshPolyhedraVertexAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          storedConfig.colorMap = colorMap;
-          console.log(
-            setMeshPolyhedraVertexAttributeColorMap.name,
-            { id },
-            meshPolyhedraVertexAttributeColorMap(id),
-          );
+          return setMeshPolyhedraVertexAttributeStoredConfig(id, name, {
+            colorMap,
+          });
         },
       },
     );

@@ -6,7 +6,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel";
 import { vuetify } from "@ogw_tests/utils";
 
-describe("Inspector/ResultPanel", () => {
+describe("Inspector/ResultPanel", async () => {
   test(`Test with issues`, async () => {
     const inspection_result = [
       {

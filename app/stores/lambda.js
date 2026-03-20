@@ -45,7 +45,7 @@ export const useLambdaStore = defineStore("lambda", {
       console.log("[LAMBDA] Lambda launched, ID:", id);
       return id;
     },
-    connect() {
+    async connect() {
       console.log("[LAMBDA] Lambda connected");
       this.status = Status.CONNECTED;
       return Promise.resolve();

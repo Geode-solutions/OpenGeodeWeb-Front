@@ -29,27 +29,25 @@ export function useMeshCellsCellAttributeStyle() {
     });
   }
 
-  function setMeshCellsCellAttributeStoredConfig(id, name, { minimum, maximum, colorMap }) {
-    const { storedConfigs } = meshCellsCellAttribute(id);
-    storedConfigs[name] = { minimum, maximum, colorMap };
-    return storedConfigs[name];
+  function setMeshCellsCellAttributeStoredConfig(id, name, config) {
+    return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, {
+      storedConfigs: {
+        [name]: config,
+      },
+    });
   }
 
   function meshCellsCellAttributeName(id) {
-    console.log(meshCellsCellAttributeName.name, { id }, meshCellsCellAttribute(id));
     return meshCellsCellAttribute(id).name;
   }
+
   function setMeshCellsCellAttributeName(id, name) {
-    console.log(setMeshCellsCellAttributeName.name, { id, name });
     return viewerStore.request(
       meshCellsCellAttributeSchemas.name,
       { id, name },
       {
-        response_function: async () => {
-          meshCellsCellAttribute(id).name = name;
-          const { minimum, maximum } = meshCellsCellAttributeStoredConfig(id, name);
-          await setMeshCellsCellAttributeRange(id, minimum, maximum);
-          console.log(setMeshCellsCellAttributeName.name, { id }, meshCellsCellAttributeName(id));
+        response_function: () => {
+          return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name });
         },
       },
     );
@@ -61,12 +59,10 @@ export function useMeshCellsCellAttributeStyle() {
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
+
   function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const name = meshCellsCellAttributeName(id);
-    const storedConfig = meshCellsCellAttributeStoredConfig(id, name);
-    storedConfig.minimum = minimum;
-    storedConfig.maximum = maximum;
-    return setMeshCellsCellAttributeColorMap(id, storedConfig.colorMap);
+    return setMeshCellsCellAttributeStoredConfig(id, name, { minimum, maximum });
   }
 
   function meshCellsCellAttributeColorMap(id) {
@@ -75,37 +71,18 @@ export function useMeshCellsCellAttributeStyle() {
     const { colorMap } = storedConfig;
     return colorMap;
   }
+
   function setMeshCellsCellAttributeColorMap(id, colorMap) {
     const name = meshCellsCellAttributeName(id);
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name);
-    if (
-      storedConfig.minimum === undefined ||
-      storedConfig.maximum === undefined ||
-      colorMap === undefined
-    ) {
-      storedConfig.colorMap = colorMap;
-      return;
-    }
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
-
-    console.log(setMeshCellsCellAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    });
     return viewerStore.request(
       meshCellsCellAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          storedConfig.colorMap = colorMap;
-          console.log(
-            setMeshCellsCellAttributeColorMap.name,
-            { id },
-            meshCellsCellAttributeColorMap(id),
-          );
+          return setMeshCellsCellAttributeStoredConfig(id, name, { colorMap });
         },
       },
     );

@@ -30,49 +30,62 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     });
   }
 
-  function setMeshPolyhedraPolyhedronAttributeStoredConfig(
-    id,
-    name,
-    { minimum, maximum, colorMap },
-  ) {
-    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    storedConfigs[name] = { minimum, maximum, colorMap };
-    return storedConfigs[name];
+  function mutateMeshPolyhedraPolyhedronStyle(id, values) {
+    return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
+      coloring: {
+        polyhedron: values,
+      },
+    });
+  }
+
+  function setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, config) {
+    return mutateMeshPolyhedraPolyhedronStyle(id, {
+      storedConfigs: {
+        [name]: config,
+      },
+    });
   }
 
   function meshPolyhedraPolyhedronAttributeName(id) {
     return meshPolyhedraPolyhedronAttribute(id).name;
   }
+
   function setMeshPolyhedraPolyhedronAttributeName(id, name) {
     return viewerStore.request(
       meshPolyhedraPolyhedronAttributeSchemas.name,
       { id, name },
       {
-        response_function: async () => {
-          meshPolyhedraPolyhedronAttribute(id).name = name;
-          const { minimum, maximum } = meshPolyhedraPolyhedronAttributeStoredConfig(id, name);
-          await setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum);
-          console.log(
-            setMeshPolyhedraPolyhedronAttributeName.name,
-            { id },
-            meshPolyhedraPolyhedronAttributeName(id),
-          );
+        response_function: () => {
+          const updates = { name };
+          const polyhedron = meshPolyhedraPolyhedronAttribute(id);
+          if (!(name in polyhedron.storedConfigs)) {
+            updates.storedConfigs = {
+              [name]: {
+                minimum: undefined,
+                maximum: undefined,
+                colorMap: undefined,
+              },
+            };
+          }
+          return mutateMeshPolyhedraPolyhedronStyle(id, updates);
         },
       },
     );
   }
+
   function meshPolyhedraPolyhedronAttributeRange(id) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name);
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
+
   function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
-    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name);
-    storedConfig.minimum = minimum;
-    storedConfig.maximum = maximum;
-    return setMeshPolyhedraPolyhedronAttributeColorMap(id, storedConfig.colorMap);
+    return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, {
+      minimum,
+      maximum,
+    });
   }
 
   function meshPolyhedraPolyhedronAttributeColorMap(id) {
@@ -81,17 +94,10 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     const { colorMap } = storedConfig;
     return colorMap;
   }
+
   function setMeshPolyhedraPolyhedronAttributeColorMap(id, colorMap) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name);
-    if (
-      storedConfig.minimum === undefined ||
-      storedConfig.maximum === undefined ||
-      colorMap === undefined
-    ) {
-      storedConfig.colorMap = colorMap;
-      return;
-    }
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     return viewerStore.request(
@@ -99,12 +105,9 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          storedConfig.colorMap = colorMap;
-          console.log(
-            setMeshPolyhedraPolyhedronAttributeColorMap.name,
-            { id },
-            meshPolyhedraPolyhedronAttributeColorMap(id),
-          );
+          return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, {
+            colorMap,
+          });
         },
       },
     );

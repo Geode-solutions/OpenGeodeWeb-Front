@@ -21,8 +21,9 @@ export function useMeshEdgesColorStyle() {
       { id, color },
       {
         response_function: () => {
-          meshEdgesCommonStyle.meshEdgesColoring(id).color = color;
-          console.log(setMeshEdgesColor.name, { id }, JSON.stringify(meshEdgesColor(id)));
+          return meshEdgesCommonStyle.mutateMeshEdgesColoring(id, {
+            color,
+          });
         },
       },
     );

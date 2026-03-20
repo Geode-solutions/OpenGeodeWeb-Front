@@ -4,7 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { cleanupBackend } from "@ogw_front/utils/local/microservices";
 import { setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";

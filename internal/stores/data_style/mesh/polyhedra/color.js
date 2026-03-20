@@ -21,8 +21,9 @@ export function useMeshPolyhedraColorStyle() {
       { id, color },
       {
         response_function: () => {
-          meshPolyhedraCommonStyle.meshPolyhedraColoring(id).color = color;
-          console.log(setMeshPolyhedraColor.name, { id }, JSON.stringify(meshPolyhedraColor(id)));
+          return meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
+            color,
+          });
         },
       },
     );

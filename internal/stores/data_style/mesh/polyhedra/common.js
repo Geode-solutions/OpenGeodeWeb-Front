@@ -3,6 +3,12 @@ import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
 export function useMeshPolyhedraCommonStyle() {
   const dataStyleStateStore = useDataStyleStateStore();
 
+  function mutateMeshPolyhedraStyle(id, values) {
+    return dataStyleStateStore.mutateStyle(id, {
+      polyhedra: values,
+    });
+  }
+
   function meshPolyhedraStyle(id) {
     return dataStyleStateStore.getStyle(id).polyhedra;
   }
@@ -11,13 +17,16 @@ export function useMeshPolyhedraCommonStyle() {
     return meshPolyhedraStyle(id).coloring;
   }
 
-  function meshPolyhedraActiveColoring(id) {
-    return meshPolyhedraColoring(id).active;
+  function mutateMeshPolyhedraColoring(id, values) {
+    return mutateMeshPolyhedraStyle(id, {
+      coloring: values,
+    });
   }
 
   return {
     meshPolyhedraStyle,
     meshPolyhedraColoring,
-    meshPolyhedraActiveColoring,
+    mutateMeshPolyhedraStyle,
+    mutateMeshPolyhedraColoring,
   };
 }

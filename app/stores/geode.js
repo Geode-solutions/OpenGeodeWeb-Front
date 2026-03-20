@@ -1,6 +1,6 @@
 import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
-import { appMode } from "@ogw_front/utils/local/app_mode";
+import { appMode } from "@ogw_front/utils/app_mode";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useAppStore } from "@ogw_front/stores/app";
@@ -52,6 +52,7 @@ export const useGeodeStore = defineStore("geode", {
       }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
     },
     ping() {
+      const geodeStore = this;
       const feedbackStore = useFeedbackStore();
       return this.request(
         back_schemas.opengeodeweb_back.ping,
@@ -59,15 +60,15 @@ export const useGeodeStore = defineStore("geode", {
         {
           request_error_function: () => {
             feedbackStore.$patch({ server_error: true });
-            this.status = Status.NOT_CONNECTED;
+            geodeStore.status = Status.NOT_CONNECTED;
           },
           response_function: () => {
             feedbackStore.$patch({ server_error: false });
-            this.status = Status.CONNECTED;
+            geodeStore.status = Status.CONNECTED;
           },
           response_error_function: () => {
             feedbackStore.$patch({ server_error: true });
-            this.status = Status.NOT_CONNECTED;
+            geodeStore.status = Status.NOT_CONNECTED;
           },
         },
       );
@@ -81,16 +82,28 @@ export const useGeodeStore = defineStore("geode", {
     launch(args) {
       console.log("[GEODE] Launching back microservice...", { args });
       const appStore = useAppStore();
+
+      const { BACK_PATH, BACK_COMMAND } = useRuntimeConfig().public;
+
+      console.log("[GEODE] BACK_PATH", BACK_PATH);
+      console.log("[GEODE] BACK_COMMAND", BACK_COMMAND);
       const schema = {
         $id: "/api/app/run_back",
         methods: ["POST"],
         type: "object",
-        properties: {},
-        required: [],
+        properties: {
+          BACK_PATH: { type: "string" },
+          BACK_COMMAND: { type: "string" },
+        },
+        required: ["BACK_PATH", "BACK_COMMAND"],
         additionalProperties: true,
       };
 
-      const params = { args };
+      const params = {
+        BACK_PATH,
+        BACK_COMMAND,
+        args,
+      };
 
       console.log("[GEODE] params", params);
       return appStore.request(schema, params, {

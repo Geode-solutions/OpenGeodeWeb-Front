@@ -1,12 +1,13 @@
+import { appMode, getAppMode } from "@ogw_front/utils/app_mode";
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/local/app_mode";
-import { registerRunningExtensions } from "@ogw_front/utils/extension";
-import { useAppStore } from "@ogw_front/stores/app";
 import { useLambdaStore } from "@ogw_front/stores/lambda";
+import { database } from "@ogw_internal/database/database";
+import { useAppStore } from "@ogw_front/stores/app";
+import { registerRunningExtensions } from "@ogw_front/utils/extension";
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
-    app_mode: useRuntimeConfig().public.MODE,
+    app_mode: getAppMode(),
     ID: "",
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
@@ -31,14 +32,15 @@ export const useInfraStore = defineStore("infra", {
     register_microservice(store) {
       const store_name = store.$id;
       console.log("[INFRA] Registering microservice:", store_name);
-
-      if (!this.microservices.some((microservice) => microservice.$id === store_name)) {
+      if (!this.microservices.find((microservice) => microservice.$id === store_name)) {
         this.microservices.push(store);
         console.log("[INFRA] Microservice registered:", store_name);
       }
     },
-    create_backend() {
+
+    async create_backend() {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
+      await database.clear();
       console.log(
         "[INFRA] Registered microservices:",
         this.microservices.map((store) => store.$id),
@@ -78,13 +80,13 @@ export const useInfraStore = defineStore("infra", {
         return this.create_connection();
       });
     },
+
     async create_connection() {
       console.log("[INFRA] Starting create_connection");
       console.log(
         "[INFRA] Connecting microservices:",
         this.microservices.map((store) => store.$id),
       );
-
       await Promise.all(
         this.microservices.map(async (store) => {
           await store.connect();

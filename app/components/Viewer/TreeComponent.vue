@@ -2,7 +2,6 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-
 import { compareSelections } from "@ogw_front/utils/treeview";
 
 const dataStyleStore = useDataStyleStore();
@@ -10,15 +9,10 @@ const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const { id } = defineProps({ id: { type: String, required: true } });
-
 const emit = defineEmits(["show-menu"]);
 
-const items = ref([]);
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(id);
-
-watchEffect(async () => {
-  items.value = await dataStore.formatedMeshComponents(id);
-});
+const items = dataStore.refFormatedMeshComponents(id);
+const mesh_components_selection = computed(() => dataStyleStore.visibleMeshComponents(id));
 
 watch(
   mesh_components_selection,
@@ -28,6 +22,11 @@ watch(
     }
 
     const { added, removed } = compareSelections(current, previous);
+    console.log("TreeComponent selection change:", {
+      id: props.id,
+      added,
+      removed,
+    });
 
     if (added.length > 0) {
       await dataStyleStore.setModelMeshComponentsVisibility(id, added, true);

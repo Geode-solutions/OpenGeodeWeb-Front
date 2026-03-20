@@ -21,8 +21,9 @@ export function useMeshCellsTexturesStyle() {
       { id, textures },
       {
         response_function: () => {
-          meshCellsCommonStyle.meshCellsColoring(id).textures = textures;
-          console.log(setMeshCellsTextures.name, { id }, meshCellsTextures(id));
+          return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+            coloring: { textures },
+          });
         },
       },
     );

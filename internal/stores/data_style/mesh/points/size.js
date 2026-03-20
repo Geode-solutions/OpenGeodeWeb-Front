@@ -21,8 +21,7 @@ export function useMeshPointsSizeStyle() {
       { id, size },
       {
         response_function: () => {
-          meshPointsCommonStyle.meshPointsStyle(id).size = size;
-          console.log(setMeshPointsSize.name, { id }, JSON.stringify(meshPointsSize(id)));
+          return meshPointsCommonStyle.mutateMeshPointsStyle(id, { size });
         },
       },
     );

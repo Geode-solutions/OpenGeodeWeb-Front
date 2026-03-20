@@ -6,10 +6,11 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
 import SmartConnect from "wslink/src/SmartConnect";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import { useRuntimeConfig } from "nuxt/app";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/local/app_mode";
+import { appMode } from "@ogw_front/utils/app_mode";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
@@ -129,19 +130,32 @@ export const useViewerStore = defineStore(
       request_counter.value -= 1;
     }
 
-    function launch(args = ({ projectFolderPath } = {})) {
+    function launch(args = { projectFolderPath }) {
       console.log("[VIEWER] Launching viewer microservice...", { args });
       const appStore = useAppStore();
+
+      const { VIEWER_PATH, VIEWER_COMMAND } = useRuntimeConfig().public;
+
+      console.log("[VIEWER] VIEWER_PATH", VIEWER_PATH);
+      console.log("[VIEWER] VIEWER_COMMAND", VIEWER_COMMAND);
       const schema = {
         $id: "/api/app/run_viewer",
         methods: ["POST"],
         type: "object",
-        properties: {},
-        required: [],
+        properties: {
+          VIEWER_PATH: { type: "string" },
+          VIEWER_COMMAND: { type: "string" },
+        },
+        required: ["VIEWER_PATH", "VIEWER_COMMAND"],
         additionalProperties: true,
       };
 
-      const params = { args };
+      const params = {
+        VIEWER_PATH,
+        VIEWER_COMMAND,
+        args,
+      };
+
       console.log("[VIEWER] params", params);
 
       return appStore.request(schema, params, {

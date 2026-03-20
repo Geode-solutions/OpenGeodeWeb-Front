@@ -16,38 +16,29 @@ export function useModelLinesVisibilityStyle() {
   function modelLineVisibility(id, line_id) {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).visibility;
   }
-  function saveModelLineVisibility(id, line_id, visibility) {
-    modelLinesCommonStyle.modelLineStyle(id, line_id).visibility = visibility;
-  }
-  async function setModelLinesVisibility(id, line_ids, visibility) {
+  function setModelLinesVisibility(id, line_ids, visibility) {
     if (!line_ids || line_ids.length === 0) {
-      return;
+      return Promise.resolve();
     }
-    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
-    if (!line_viewer_ids || line_viewer_ids.length === 0) {
-      console.warn("[setModelLinesVisibility] No viewer IDs found, skipping visibility request", {
-        id,
-        line_ids,
-      });
-      return;
-    }
-    return viewerStore.request(
-      model_lines_schemas.visibility,
-      { id, block_ids: line_viewer_ids, visibility },
-      {
-        response_function: () => {
-          for (const line_id of line_ids) {
-            saveModelLineVisibility(id, line_id, visibility);
-          }
-          console.log(
-            setModelLinesVisibility.name,
-            { id },
-            { line_ids },
-            modelLineVisibility(id, line_ids[0]),
-          );
+
+    return dataStore.getMeshComponentsViewerIds(id, line_ids).then((line_viewer_ids) => {
+      if (!line_viewer_ids || line_viewer_ids.length === 0) {
+        return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
+          visibility,
+        });
+      }
+      return viewerStore.request(
+        model_lines_schemas.visibility,
+        { id, block_ids: line_viewer_ids, visibility },
+        {
+          response_function: () => {
+            return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
+              visibility,
+            });
+          },
         },
-      },
-    );
+      );
+    });
   }
 
   return {

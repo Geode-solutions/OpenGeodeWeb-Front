@@ -13,41 +13,37 @@ export function useModelLinesColorStyle() {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
+
   function modelLineColor(id, line_id) {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).color;
   }
-  function saveModelLineColor(id, line_id, color) {
-    modelLinesCommonStyle.modelLineStyle(id, line_id).color = color;
-  }
-  async function setModelLinesColor(id, line_ids, color) {
+
+  function setModelLinesColor(id, line_ids, color) {
     if (!line_ids || line_ids.length === 0) {
-      return;
+      return Promise.resolve();
     }
-    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
-    if (!line_viewer_ids || line_viewer_ids.length === 0) {
-      console.warn("[setModelLinesColor] No viewer IDs found, skipping color request", {
-        id,
-        line_ids,
-      });
-      return;
-    }
-    return viewerStore.request(
-      model_lines_schemas.color,
-      { id, block_ids: line_viewer_ids, color },
-      {
-        response_function: () => {
-          for (const line_id of line_ids) {
-            saveModelLineColor(id, line_id, color);
-          }
-          console.log(
-            setModelLinesColor.name,
-            { id },
-            { line_ids },
-            JSON.stringify(modelLineColor(id, line_ids[0])),
-          );
+    return dataStore.getMeshComponentsViewerIds(id, line_ids).then((line_viewer_ids) => {
+      if (!line_viewer_ids || line_viewer_ids.length === 0) {
+        console.warn("[setModelLinesColor] No viewer IDs found, skipping color request", {
+          id,
+          line_ids,
+        });
+        return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
+          color,
+        });
+      }
+      return viewerStore.request(
+        model_lines_schemas.color,
+        { id, block_ids: line_viewer_ids, color },
+        {
+          response_function: () => {
+            return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
+              color,
+            });
+          },
         },
-      },
-    );
+      );
+    });
   }
 
   return {

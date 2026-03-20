@@ -6,7 +6,7 @@ import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { cleanupBackend } from "@ogw_front/utils/local/microservices";
 import { runMicroservices } from "@ogw_tests/integration/setup";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -52,7 +52,7 @@ describe("Viewer Store", () => {
     describe("request", () => {
       test(
         "request",
-        () => {
+        async () => {
           const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.render;
           const viewerStore = useViewerStore();
           const timeout = 1;

@@ -20,7 +20,7 @@ vi.stubGlobal("navigator", {
 
 globalThis.ResizeObserver = ResizeObserver;
 
-describe(Launcher, () => {
+describe(Launcher, async () => {
   test(`Mount`, async () => {
     const pinia = setupActivePinia();
     const infraStore = useInfraStore();
