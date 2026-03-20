@@ -21,7 +21,7 @@
 
   function select_geode_object(object_map) {
     const object_keys = Object.keys(object_map)
-    if (!object_keys.length) {
+    if (object_keys.length === 0) {
       return undefined
     }
     if (
@@ -67,7 +67,7 @@
     const allowed_objects_list = responses.map(
       (response) => response.allowed_objects,
     )
-    const all_keys = [...new Set(allowed_objects_list.flatMap(Object.keys))]
+    const all_keys = [...new Set(allowed_objects_list.flatMap((obj) => Object.keys(obj)))]
     const common_keys = all_keys.filter((key) =>
       allowed_objects_list.every((obj) => key in obj),
     )
