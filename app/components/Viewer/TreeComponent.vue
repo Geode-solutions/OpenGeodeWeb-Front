@@ -57,6 +57,7 @@
     <template #title="{ item }">
       <span
         class="treeview-item"
+        :class="{ 'inactive-item': item.is_active === false }"
         @contextmenu.prevent.stop="
           emit('show-menu', { event: $event, itemId: item })
         "
@@ -73,6 +74,10 @@
     text-overflow: ellipsis;
     max-width: 100%;
     display: inline-block;
+  }
+  .inactive-item {
+    opacity: 0.5;
+    font-style: italic;
   }
 
   .transparent-treeview {
