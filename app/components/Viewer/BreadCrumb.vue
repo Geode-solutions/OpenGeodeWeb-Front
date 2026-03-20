@@ -42,7 +42,7 @@
             }}
           </v-icon>
           <span class="text-subtitle-1 font-weight-regular align-center mt-1">
-            Model Explorer ({{ metaDatas?.name || "..." }})
+            Model Explorer ({{ metaDatas.name }})
           </span>
         </template>
       </v-menu>
