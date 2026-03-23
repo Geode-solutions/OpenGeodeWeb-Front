@@ -54,8 +54,6 @@ export function useModelSurfacesStyle() {
     return Promise.all(promises);
   }
 
-
-
   return {
     applyModelSurfacesStyle,
     setModelSurfacesDefaultStyle,
