@@ -12,7 +12,9 @@ export function useModelBlocksStyle() {
 
   async function applyModelBlocksStyle(id) {
     const block_ids = await dataStore.getBlocksGeodeIds(id);
-    if (block_ids.length === 0) return;
+    if (block_ids.length === 0) {
+      return;
+    }
 
     const visibilityGroups = {};
     const colorGroups = {};
@@ -21,11 +23,15 @@ export function useModelBlocksStyle() {
       const style = modelBlocksCommonStyle.modelBlockStyle(id, block_id);
 
       const vKey = String(style.visibility);
-      if (!visibilityGroups[vKey]) visibilityGroups[vKey] = [];
+      if (!visibilityGroups[vKey]) {
+        visibilityGroups[vKey] = [];
+      }
       visibilityGroups[vKey].push(block_id);
 
       const cKey = JSON.stringify(style.color);
-      if (!colorGroups[cKey]) colorGroups[cKey] = [];
+      if (!colorGroups[cKey]) {
+        colorGroups[cKey] = [];
+      }
       colorGroups[cKey].push(block_id);
     }
 
@@ -44,7 +50,9 @@ export function useModelBlocksStyle() {
     return Promise.all(promises);
   }
 
-  async function setModelBlocksDefaultStyle(_id) {}
+function setModelBlocksDefaultStyle(_id) {
+  // Placeholder
+}
 
   return {
     applyModelBlocksStyle,

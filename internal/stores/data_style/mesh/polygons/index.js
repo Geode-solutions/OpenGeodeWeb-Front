@@ -7,21 +7,19 @@ import { useMeshPolygonsPolygonAttributeStyle } from "./polygon";
 import { useMeshPolygonsTexturesStyle } from "./textures";
 import { useMeshPolygonsVertexAttributeStyle } from "./vertex";
 import { useMeshPolygonsVisibilityStyle } from "./visibility";
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
 
 // Local constants
 
-export function useMeshPolygonsStyle() {
+function useMeshPolygonsColoringStyle() {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
-  const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle();
   const meshPolygonsColorStyle = useMeshPolygonsColorStyle();
   const meshPolygonsTexturesStyle = useMeshPolygonsTexturesStyle();
+  const meshPolygonsVertexAttributeStyle = useMeshPolygonsVertexAttributeStyle();
+  const meshPolygonsPolygonAttributeStyle = useMeshPolygonsPolygonAttributeStyle();
 
   function meshPolygonsColoring(id) {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id);
   }
-  const meshPolygonsVertexAttributeStyle = useMeshPolygonsVertexAttributeStyle();
-  const meshPolygonsPolygonAttributeStyle = useMeshPolygonsPolygonAttributeStyle();
 
   function meshPolygonsActiveColoring(id) {
     return meshPolygonsColoring(id).active;
@@ -31,7 +29,6 @@ export function useMeshPolygonsStyle() {
     await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
       coloring: { active: type },
     });
-    console.log(setMeshPolygonsActiveColoring.name, { id }, type);
     if (type === "color") {
       return meshPolygonsColorStyle.setMeshPolygonsColor(
         id,
@@ -55,33 +52,25 @@ export function useMeshPolygonsStyle() {
         return Promise.resolve();
       }
       return meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name);
-    } else {
-      throw new Error(`Unknown mesh polygons coloring type: ${type}`);
-    }
-    if (type === "textures") {
-      const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id);
-      if (textures === undefined) {
-        return;
-      }
-      return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures);
-    }
-    if (type === "vertex") {
-      const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
-      return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name);
-    }
-    if (type === "polygon") {
-      const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
-      await meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name);
-      return;
     }
     throw new Error(`Unknown mesh polygons coloring type: ${type}`);
   }
+
+  return {
+    meshPolygonsColoring,
+    meshPolygonsActiveColoring,
+    setMeshPolygonsActiveColoring,
+    ...meshPolygonsColorStyle,
+    ...meshPolygonsTexturesStyle,
+    ...meshPolygonsVertexAttributeStyle,
+    ...meshPolygonsPolygonAttributeStyle,
+  };
+}
+
+export function useMeshPolygonsStyle() {
+  const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
+  const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle();
+  const coloringStyle = useMeshPolygonsColoringStyle();
 
   function applyMeshPolygonsStyle(id) {
     return Promise.all([
@@ -89,20 +78,14 @@ export function useMeshPolygonsStyle() {
         id,
         meshPolygonsVisibility.meshPolygonsVisibility(id),
       ),
-      setMeshPolygonsActiveColoring(id, meshPolygonsActiveColoring(id)),
+      coloringStyle.setMeshPolygonsActiveColoring(id, coloringStyle.meshPolygonsActiveColoring(id)),
     ]);
   }
 
   return {
     ...meshPolygonsCommonStyle,
-    meshPolygonsColoring,
-    meshPolygonsActiveColoring,
-    setMeshPolygonsActiveColoring,
+    ...coloringStyle,
     applyMeshPolygonsStyle,
     ...meshPolygonsVisibility,
-    ...meshPolygonsColorStyle,
-    ...meshPolygonsTexturesStyle,
-    ...meshPolygonsVertexAttributeStyle,
-    ...meshPolygonsPolygonAttributeStyle,
   };
 }

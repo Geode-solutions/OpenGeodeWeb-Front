@@ -32,9 +32,8 @@ export function useModelBlocksColorStyle() {
         model_blocks_schemas.color,
         { id, block_ids: block_viewer_ids, color },
         {
-          response_function: () => {
-            return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color });
-          },
+          response_function: () =>
+            modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color }),
         },
       );
     });

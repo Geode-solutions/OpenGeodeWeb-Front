@@ -20,11 +20,10 @@ export function useMeshCellsTexturesStyle() {
       meshCellsTexturesSchemas,
       { id, textures },
       {
-        response_function: () => {
-          return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+        response_function: () =>
+          meshCellsCommonStyle.mutateMeshCellsStyle(id, {
             coloring: { textures },
-          });
-        },
+          }),
       },
     );
   }

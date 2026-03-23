@@ -24,10 +24,7 @@ export function useModelLinesColorStyle() {
     }
     return dataStore.getMeshComponentsViewerIds(id, line_ids).then((line_viewer_ids) => {
       if (!line_viewer_ids || line_viewer_ids.length === 0) {
-        console.warn("[setModelLinesColor] No viewer IDs found, skipping color request", {
-          id,
-          line_ids,
-        });
+
         return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
           color,
         });
@@ -36,11 +33,10 @@ export function useModelLinesColorStyle() {
         model_lines_schemas.color,
         { id, block_ids: line_viewer_ids, color },
         {
-          response_function: () => {
-            return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
+          response_function: () =>
+            modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
               color,
-            });
-          },
+            }),
         },
       );
     });

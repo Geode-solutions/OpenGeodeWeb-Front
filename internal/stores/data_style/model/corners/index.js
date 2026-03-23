@@ -4,9 +4,7 @@ import { useModelCornersColorStyle } from "./color";
 import { useModelCornersCommonStyle } from "./common";
 import { useModelCornersVisibilityStyle } from "./visibility";
 
-async function setModelCornersDefaultStyle(_id) {
-  // Placeholder for oxlint
-}
+
 
 export function useModelCornersStyle() {
   const dataStore = useDataStore();
@@ -53,7 +51,7 @@ export function useModelCornersStyle() {
     return Promise.all(promises);
   }
 
-  async function setModelCornersDefaultStyle(id) {}
+  async function setModelCornersDefaultStyle(_id) {}
 
   return {
     applyModelCornersStyle,

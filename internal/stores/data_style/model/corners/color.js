@@ -24,10 +24,7 @@ export function useModelCornersColorStyle() {
     }
     return dataStore.getMeshComponentsViewerIds(id, corner_ids).then((corner_viewer_ids) => {
       if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
-        console.warn("[setModelCornersColor] No viewer IDs found, skipping color request", {
-          id,
-          corner_ids,
-        });
+
         return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color });
       }
       return viewerStore.request(
