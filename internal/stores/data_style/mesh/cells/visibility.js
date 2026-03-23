@@ -20,9 +20,7 @@ export function useMeshCellsVisibilityStyle() {
       meshCellsVisibilitySchema,
       { id, visibility },
       {
-        response_function: () => {
-          return meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility });
-        },
+        response_function: () => meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility }),
       },
     );
   }

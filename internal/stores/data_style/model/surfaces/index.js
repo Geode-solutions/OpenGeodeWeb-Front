@@ -5,7 +5,7 @@ import { useModelSurfacesCommonStyle } from "./common";
 import { useModelSurfacesVisibilityStyle } from "./visibility";
 
 async function setModelSurfacesDefaultStyle(_id) {
-  // Placeholder for oxlint
+  // Placeholder
 }
 
 export function useModelSurfacesStyle() {
@@ -16,7 +16,9 @@ export function useModelSurfacesStyle() {
 
   async function applyModelSurfacesStyle(id) {
     const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-    if (surface_ids.length === 0) return;
+    if (surface_ids.length === 0) {
+      return;
+    }
 
     const visibilityGroups = {};
     const colorGroups = {};
@@ -25,11 +27,15 @@ export function useModelSurfacesStyle() {
       const style = modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id);
 
       const vKey = String(style.visibility);
-      if (!visibilityGroups[vKey]) visibilityGroups[vKey] = [];
+      if (!visibilityGroups[vKey]) {
+        visibilityGroups[vKey] = [];
+      }
       visibilityGroups[vKey].push(surface_id);
 
       const cKey = JSON.stringify(style.color);
-      if (!colorGroups[cKey]) colorGroups[cKey] = [];
+      if (!colorGroups[cKey]) {
+        colorGroups[cKey] = [];
+      }
       colorGroups[cKey].push(surface_id);
     }
 
@@ -48,7 +54,7 @@ export function useModelSurfacesStyle() {
     return Promise.all(promises);
   }
 
-  async function setModelSurfacesDefaultStyle(id) {}
+
 
   return {
     applyModelSurfacesStyle,

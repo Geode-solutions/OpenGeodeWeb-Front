@@ -6,7 +6,7 @@ export function useModelEdgesStyle() {
   const modelEdgesVisibilityStyle = useModelEdgesVisibilityStyle();
 
   function applyModelEdgesStyle(id) {
-    const visibility = modelEdgesCommonStyle.modelEdgesStyle(id).visibility;
+    const { visibility } = modelEdgesCommonStyle.modelEdgesStyle(id);
     return modelEdgesVisibilityStyle.setModelEdgesVisibility(id, visibility);
   }
 

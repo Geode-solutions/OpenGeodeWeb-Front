@@ -24,19 +24,15 @@ export function useModelSurfacesColorStyle() {
     }
     return dataStore.getMeshComponentsViewerIds(id, surface_ids).then((surface_viewer_ids) => {
       if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-        console.warn("[setModelSurfacesColor] No viewer IDs found, skipping color request", {
-          id,
-          surface_ids,
-        });
+
         return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color });
       }
       return viewerStore.request(
         model_surfaces_schemas.color,
         { id, block_ids: surface_viewer_ids, color },
         {
-          response_function: () => {
-            return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color });
-          },
+          response_function: () =>
+            modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color }),
         },
       );
     });
