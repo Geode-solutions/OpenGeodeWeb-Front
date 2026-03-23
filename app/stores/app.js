@@ -246,25 +246,22 @@ export const useAppStore = defineStore("app", () => {
 
   const projectFolderPath = ref("");
   function createProjectFolder() {
+    const { PROJECT } = useRuntimeConfig().public;
     const schema = {
       $id: "/api/app/project_folder_path",
       methods: ["POST"],
       type: "object",
-      properties: {},
-      required: [],
+      properties: { PROJECT: { type: "string" } },
+      required: ["PROJECT"],
       additionalProperties: true,
     };
-
-    return request(
-      schema,
-      {},
-      {
-        response_function: (response) => {
-          console.log(`[APP] ${response.projectFolderPath} created`);
-          projectFolderPath.value = response.projectFolderPath;
-        },
+    const params = { PROJECT };
+    return request(schema, params, {
+      response_function: (response) => {
+        console.log(`[APP] ${response.projectFolderPath} created`);
+        projectFolderPath.value = response.projectFolderPath;
       },
-    );
+    });
   }
 
   return {
