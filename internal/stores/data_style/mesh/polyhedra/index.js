@@ -54,7 +54,6 @@ export function useMeshPolyhedraStyle() {
       );
     }
     throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
-
   }
 
   function applyMeshPolyhedraStyle(id) {
