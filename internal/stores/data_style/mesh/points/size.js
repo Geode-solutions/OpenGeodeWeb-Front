@@ -20,9 +20,7 @@ export function useMeshPointsSizeStyle() {
       meshPointsSizeSchemas,
       { id, size },
       {
-        response_function: () => {
-          return meshPointsCommonStyle.mutateMeshPointsStyle(id, { size });
-        },
+        response_function: () => meshPointsCommonStyle.mutateMeshPointsStyle(id, { size }),
       },
     );
   }

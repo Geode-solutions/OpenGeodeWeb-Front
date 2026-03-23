@@ -4,9 +4,7 @@ import { useModelBlocksColorStyle } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelBlocksVisibilityStyle } from "./visibility";
 
-async function setModelBlocksDefaultStyle(_id) {
-  // Placeholder for oxlint
-}
+
 
 export function useModelBlocksStyle() {
   const dataStore = useDataStore();
@@ -48,7 +46,7 @@ export function useModelBlocksStyle() {
     return Promise.all(promises);
   }
 
-  async function setModelBlocksDefaultStyle(id) {}
+  async function setModelBlocksDefaultStyle(_id) {}
 
   return {
     applyModelBlocksStyle,

@@ -24,10 +24,7 @@ export function useModelBlocksColorStyle() {
     }
     return dataStore.getMeshComponentsViewerIds(id, block_ids).then((block_viewer_ids) => {
       if (!block_viewer_ids || block_viewer_ids.length === 0) {
-        console.warn("[setModelBlocksColor] No viewer IDs found, skipping color request", {
-          id,
-          block_ids,
-        });
+
         return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
           color,
         });

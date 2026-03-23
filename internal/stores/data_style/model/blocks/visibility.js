@@ -33,9 +33,8 @@ export function useModelBlocksVisibilityStyle() {
         model_blocks_schemas.visibility,
         { id, block_ids: block_viewer_ids, visibility },
         {
-          response_function: () => {
-            return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { visibility });
-          },
+          response_function: () =>
+            modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { visibility }),
         },
       );
     });

@@ -6,15 +6,12 @@ import { useMeshPointsCommonStyle } from "./common";
 import { useMeshPointsSizeStyle } from "./size";
 import { useMeshPointsVertexAttributeStyle } from "./vertex";
 import { useMeshPointsVisibilityStyle } from "./visibility";
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
 
 // Local constants
 
-export function useMeshPointsStyle() {
+function useMeshPointsColoringStyle() {
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
-  const meshPointsVisibility = useMeshPointsVisibilityStyle();
   const meshPointsColorStyle = useMeshPointsColorStyle();
-  const meshPointsSizeStyle = useMeshPointsSizeStyle();
   const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle();
 
   function meshPointsColoring(id) {
@@ -29,7 +26,6 @@ export function useMeshPointsStyle() {
     await meshPointsCommonStyle.mutateMeshPointsStyle(id, {
       coloring: { active: type },
     });
-    console.log(setMeshPointsActiveColoring.name, { id }, type);
     if (type === "color") {
       return meshPointsColorStyle.setMeshPointsColor(id, meshPointsColorStyle.meshPointsColor(id));
     } else if (type === "vertex") {
@@ -38,33 +34,24 @@ export function useMeshPointsStyle() {
         return Promise.resolve();
       }
       return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
-    } else {
-      throw new Error(`Unknown mesh points coloring type: ${type}`);
-    }
-    if (type === "textures") {
-      const textures = meshPointsTexturesStore.meshPointsTextures(id);
-      if (textures === undefined) {
-        return;
-      }
-      return meshPointsTexturesStore.setMeshPointsTextures(id, textures);
-    }
-    if (type === "vertex") {
-      const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
-      return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
-    }
-    if (type === "polygon") {
-      const name = meshPointsPolygonAttributeStyleStore.meshPointsPolygonAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
-      await meshPointsPolygonAttributeStyleStore.setMeshPointsPolygonAttributeName(id, name);
-      return;
     }
     throw new Error(`Unknown mesh points coloring type: ${type}`);
   }
+
+  return {
+    meshPointsColoring,
+    meshPointsActiveColoring,
+    setMeshPointsActiveColoring,
+    ...meshPointsColorStyle,
+    ...meshPointsVertexAttributeStyle,
+  };
+}
+
+export function useMeshPointsStyle() {
+  const meshPointsCommonStyle = useMeshPointsCommonStyle();
+  const meshPointsVisibility = useMeshPointsVisibilityStyle();
+  const meshPointsSizeStyle = useMeshPointsSizeStyle();
+  const meshPointsColoringStyle = useMeshPointsColoringStyle();
 
   function applyMeshPointsStyle(id) {
     return Promise.all([
@@ -73,19 +60,18 @@ export function useMeshPointsStyle() {
         meshPointsVisibility.meshPointsVisibility(id),
       ),
       meshPointsSizeStyle.setMeshPointsSize(id, meshPointsSizeStyle.meshPointsSize(id)),
-      setMeshPointsActiveColoring(id, meshPointsActiveColoring(id)),
+      meshPointsColoringStyle.setMeshPointsActiveColoring(
+        id,
+        meshPointsColoringStyle.meshPointsActiveColoring(id),
+      ),
     ]);
   }
 
   return {
     ...meshPointsCommonStyle,
-    meshPointsColoring,
-    meshPointsActiveColoring,
-    setMeshPointsActiveColoring,
+    ...meshPointsColoringStyle,
     applyMeshPointsStyle,
     ...meshPointsVisibility,
-    ...meshPointsColorStyle,
     ...meshPointsSizeStyle,
-    ...meshPointsVertexAttributeStyle,
   };
 }

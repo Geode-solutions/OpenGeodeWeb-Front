@@ -20,9 +20,7 @@ export function useMeshPointsVisibilityStyle() {
       meshPointsVisibilitySchema,
       { id, visibility },
       {
-        response_function: () => {
-          return meshPointsCommonStyle.mutateMeshPointsStyle(id, { visibility });
-        },
+        response_function: () => meshPointsCommonStyle.mutateMeshPointsStyle(id, { visibility }),
       },
     );
   }

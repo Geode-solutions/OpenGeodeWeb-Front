@@ -19,9 +19,7 @@ export function useMeshEdgesVisibilityStyle() {
       meshEdgesVisibilitySchema,
       { id, visibility },
       {
-        response_function: () => {
-          return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { visibility });
-        },
+        response_function: () => meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { visibility }),
       },
     );
   }

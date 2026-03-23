@@ -31,11 +31,10 @@ export function useModelLinesVisibilityStyle() {
         model_lines_schemas.visibility,
         { id, block_ids: line_viewer_ids, visibility },
         {
-          response_function: () => {
-            return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
+          response_function: () =>
+            modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
               visibility,
-            });
-          },
+            }),
         },
       );
     });

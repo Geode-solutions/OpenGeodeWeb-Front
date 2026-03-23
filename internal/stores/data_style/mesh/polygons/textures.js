@@ -20,11 +20,10 @@ export function useMeshPolygonsTexturesStyle() {
       meshPolygonsTexturesSchemas,
       { id, textures },
       {
-        response_function: () => {
-          return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+        response_function: () =>
+          meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
             coloring: { textures },
-          });
-        },
+          }),
       },
     );
   }

@@ -20,9 +20,7 @@ export function useModelEdgesVisibilityStyle() {
       model_edges_schemas.visibility,
       { id, visibility },
       {
-        response_function: () => {
-          return modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility });
-        },
+        response_function: () => modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility }),
       },
     );
   }

@@ -20,11 +20,10 @@ export function useMeshPointsColorStyle() {
       meshPointsColorSchemas,
       { id, color },
       {
-        response_function: () => {
-          return meshPointsCommonStyle.mutateMeshPointsColoring(id, {
+        response_function: () =>
+          meshPointsCommonStyle.mutateMeshPointsColoring(id, {
             color,
-          });
-        },
+          }),
       },
     );
   }
