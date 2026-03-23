@@ -1,35 +1,31 @@
 <script setup>
-  import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg"
-  import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem"
-  import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch"
+import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
-  import { useDataStyleStore } from "@ogw_front/stores/data_style"
-  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-  const dataStyleStore = useDataStyleStore()
-  const hybridViewerStore = useHybridViewerStore()
+const dataStyleStore = useDataStyleStore();
+const hybridViewerStore = useHybridViewerStore();
 
-  const { itemProps } = defineProps({
-    itemProps: { type: Object, required: true },
-  })
+const { itemProps } = defineProps({
+  itemProps: { type: Object, required: true },
+});
 
-  const id = toRef(() => itemProps.id)
+const id = toRef(() => itemProps.id);
 
-  const visibility = computed({
-    get: () => dataStyleStore.modelEdgesVisibility(id.value),
-    set: async (newValue) => {
-      await dataStyleStore.setModelEdgesVisibility(id.value, newValue)
-      hybridViewerStore.remoteRender()
-    },
-  })
+const visibility = computed({
+  get: () => dataStyleStore.modelEdgesVisibility(id.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelEdgesVisibility(id.value, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
 </script>
 
 <template>
-  <ViewerContextMenuItem
-    :itemProps="itemProps"
-    tooltip="Edges options"
-    :btn_image="SurfaceEdges"
-  >
+  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Edges options" :btn_image="SurfaceEdges">
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
     </template>

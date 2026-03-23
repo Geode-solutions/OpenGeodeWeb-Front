@@ -1,33 +1,33 @@
 <script setup>
-  import GlassCard from "@ogw_front/components/GlassCard"
+import GlassCard from "@ogw_front/components/GlassCard";
 
-  const { multiple, accept, loading, showExtensions } = defineProps({
-    multiple: { type: Boolean, default: false },
-    accept: { type: String, default: "" },
-    loading: { type: Boolean, default: false },
-    showExtensions: { type: Boolean, default: true },
-  })
+const { multiple, accept, loading, showExtensions } = defineProps({
+  multiple: { type: Boolean, default: false },
+  accept: { type: String, default: "" },
+  loading: { type: Boolean, default: false },
+  showExtensions: { type: Boolean, default: true },
+});
 
-  const emit = defineEmits(["files-selected"])
+const emit = defineEmits(["files-selected"]);
 
-  const isDragging = ref(false)
-  const fileInput = ref(undefined)
+const isDragging = ref(false);
+const fileInput = ref(undefined);
 
-  function triggerFileDialog() {
-    fileInput.value?.click()
-  }
+function triggerFileDialog() {
+  fileInput.value?.click();
+}
 
-  function handleDrop(event) {
-    isDragging.value = false
-    const files = [...event.dataTransfer.files]
-    emit("files-selected", files)
-  }
+function handleDrop(event) {
+  isDragging.value = false;
+  const files = [...event.dataTransfer.files];
+  emit("files-selected", files);
+}
 
-  function handleFileSelect(event) {
-    const files = [...event.target.files]
-    emit("files-selected", files)
-    event.target.value = ""
-  }
+function handleFileSelect(event) {
+  const files = [...event.target.files];
+  emit("files-selected", files);
+  event.target.value = "";
+}
 </script>
 
 <template>
@@ -60,9 +60,7 @@
       <v-card-text class="pa-8">
         <v-sheet
           class="mx-auto mb-6 d-flex align-center justify-center"
-          :color="
-            isHovering || isDragging ? 'white' : 'rgba(255, 255, 255, 0.1)'
-          "
+          :color="isHovering || isDragging ? 'white' : 'rgba(255, 255, 255, 0.1)'"
           rounded="circle"
           width="80"
           height="80"
@@ -81,11 +79,7 @@
           style="transition: color 0.3s ease"
         >
           {{
-            loading
-              ? "Uploading..."
-              : isDragging
-                ? "Drop to upload"
-                : "Click or Drag & Drop files"
+            loading ? "Uploading..." : isDragging ? "Drop to upload" : "Click or Drag & Drop files"
           }}
         </v-card-title>
 
@@ -107,16 +101,16 @@
 </template>
 
 <style scoped>
-  .rotating {
-    animation: rotate 1s linear infinite;
-  }
+.rotating {
+  animation: rotate 1s linear infinite;
+}
 
-  @keyframes rotate {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
   }
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>
