@@ -3,6 +3,9 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColorStyle } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelBlocksVisibilityStyle } from "./visibility";
+async function setModelBlocksDefaultStyle(_id) {
+  // Placeholder
+}
 
 export function useModelBlocksStyle() {
   const dataStore = useDataStore();
@@ -50,9 +53,7 @@ export function useModelBlocksStyle() {
     return Promise.all(promises);
   }
 
-  function setModelBlocksDefaultStyle(_id) {
-    // Placeholder
-  }
+
 
   return {
     applyModelBlocksStyle,

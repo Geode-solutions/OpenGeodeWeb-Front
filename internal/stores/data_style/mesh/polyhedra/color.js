@@ -20,11 +20,10 @@ export function useMeshPolyhedraColorStyle() {
       meshPolyhedraColorSchemas,
       { id, color },
       {
-        response_function: () => {
-          return meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
+        response_function: () =>
+          meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
             color,
-          });
-        },
+          }),
       },
     );
   }

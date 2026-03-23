@@ -3,6 +3,9 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersColorStyle } from "./color";
 import { useModelCornersCommonStyle } from "./common";
 import { useModelCornersVisibilityStyle } from "./visibility";
+async function setModelCornersDefaultStyle(_id) {
+  // Placeholder
+}
 
 export function useModelCornersStyle() {
   const dataStore = useDataStore();
@@ -12,7 +15,9 @@ export function useModelCornersStyle() {
 
   async function applyModelCornersStyle(id) {
     const corner_ids = await dataStore.getCornersGeodeIds(id);
-    if (corner_ids.length === 0) return;
+    if (corner_ids.length === 0) {
+      return;
+    }
 
     // Group corners by their effective style to minimize RPC calls
     const visibilityGroups = {};
@@ -23,12 +28,16 @@ export function useModelCornersStyle() {
 
       // Group by visibility
       const vKey = String(style.visibility);
-      if (!visibilityGroups[vKey]) visibilityGroups[vKey] = [];
+      if (!visibilityGroups[vKey]) {
+        visibilityGroups[vKey] = [];
+      }
       visibilityGroups[vKey].push(corner_id);
 
       // Group by color
       const cKey = JSON.stringify(style.color);
-      if (!colorGroups[cKey]) colorGroups[cKey] = [];
+      if (!colorGroups[cKey]) {
+        colorGroups[cKey] = [];
+      }
       colorGroups[cKey].push(corner_id);
     }
 
@@ -49,7 +58,7 @@ export function useModelCornersStyle() {
     return Promise.all(promises);
   }
 
-  async function setModelCornersDefaultStyle(_id) {}
+
 
   return {
     applyModelCornersStyle,

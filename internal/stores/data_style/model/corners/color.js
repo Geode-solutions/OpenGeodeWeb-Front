@@ -30,9 +30,8 @@ export function useModelCornersColorStyle() {
         model_corners_schemas.color,
         { id, block_ids: corner_viewer_ids, color },
         {
-          response_function: () => {
-            return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color });
-          },
+          response_function: () =>
+            modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color }),
         },
       );
     });
