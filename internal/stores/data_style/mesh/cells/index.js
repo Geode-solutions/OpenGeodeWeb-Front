@@ -56,7 +56,6 @@ export function useMeshCellsStyle() {
       return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
-
   }
 
   function applyMeshCellsStyle(id) {

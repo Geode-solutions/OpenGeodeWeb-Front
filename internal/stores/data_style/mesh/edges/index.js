@@ -48,7 +48,6 @@ export function useMeshEdgesStyle() {
       return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name);
     }
     throw new Error(`Unknown mesh edges coloring type: ${type}`);
-
   }
 
   function applyMeshEdgesStyle(id) {

@@ -52,8 +52,6 @@ export function useModelLinesStyle() {
     return Promise.all(promises);
   }
 
-
-
   return {
     applyModelLinesStyle,
     setModelLinesDefaultStyle,

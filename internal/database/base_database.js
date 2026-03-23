@@ -6,8 +6,6 @@ import { modelComponentsRelationTable } from "./tables/model_components_relation
 import { modelComponentsTable } from "./tables/model_components";
 
 export class BaseDatabase extends Dexie {
-
-
   static get initialStores() {
     return {
       [dataTable.name]: dataTable.schema,
