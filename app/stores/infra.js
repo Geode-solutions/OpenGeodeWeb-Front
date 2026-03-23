@@ -1,4 +1,4 @@
-import { appMode, getAppMode } from "@ogw_front/utils/app_mode";
+import { appMode, getAppMode } from "@ogw_front/utils/local/app_mode";
 import { Status } from "@ogw_front/utils/status";
 import { useLambdaStore } from "@ogw_front/stores/lambda";
 import { database } from "@ogw_internal/database/database";
