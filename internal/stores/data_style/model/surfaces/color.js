@@ -24,7 +24,6 @@ export function useModelSurfacesColorStyle() {
     }
     return dataStore.getMeshComponentsViewerIds(id, surface_ids).then((surface_viewer_ids) => {
       if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-
         return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color });
       }
       return viewerStore.request(
