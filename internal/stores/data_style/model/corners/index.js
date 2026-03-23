@@ -4,8 +4,6 @@ import { useModelCornersColorStyle } from "./color";
 import { useModelCornersCommonStyle } from "./common";
 import { useModelCornersVisibilityStyle } from "./visibility";
 
-
-
 export function useModelCornersStyle() {
   const dataStore = useDataStore();
   const modelCornersCommonStyle = useModelCornersCommonStyle();

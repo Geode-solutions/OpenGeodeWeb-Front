@@ -24,7 +24,6 @@ export function useModelLinesColorStyle() {
     }
     return dataStore.getMeshComponentsViewerIds(id, line_ids).then((line_viewer_ids) => {
       if (!line_viewer_ids || line_viewer_ids.length === 0) {
-
         return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
           color,
         });

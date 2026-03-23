@@ -50,9 +50,9 @@ export function useModelBlocksStyle() {
     return Promise.all(promises);
   }
 
-function setModelBlocksDefaultStyle(_id) {
-  // Placeholder
-}
+  function setModelBlocksDefaultStyle(_id) {
+    // Placeholder
+  }
 
   return {
     applyModelBlocksStyle,
