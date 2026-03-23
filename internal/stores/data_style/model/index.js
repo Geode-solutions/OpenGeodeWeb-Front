@@ -1,9 +1,7 @@
+import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
-import { database } from "@ogw_internal/database/database";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelBlocksStyle } from "./blocks";
 import { useModelCornersStyle } from "./corners";
@@ -12,6 +10,7 @@ import { useModelLinesStyle } from "./lines";
 import { useModelPointsStyle } from "./points";
 import { useModelSurfacesStyle } from "./surfaces";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 
@@ -63,31 +62,36 @@ export function useModelStyle() {
             .where("id_model")
             .equals(newId)
             .toArray();
-          const styles = all_styles.reduce((acc, s) => {
-            acc[s.id_component] = s;
-            return acc;
-          }, {});
+          const styles = {};
+          for (const style of all_styles) {
+            styles[style.id_component] = style;
+          }
 
           const current_selection = [];
-          const meshTypes = ["Corner", "Line", "Surface", "Block"];
-          const componentsByType = components.reduce((acc, c) => {
-            if (meshTypes.includes(c.type)) {
-              if (!acc[c.type]) {
-                acc[c.type] = [];
+          const meshTypes = new Set(["Corner", "Line", "Surface", "Block"]);
+          const componentsByType = {};
+          for (const component of components) {
+            if (meshTypes.has(component.type)) {
+              if (!componentsByType[component.type]) {
+                componentsByType[component.type] = [];
               }
-              acc[c.type].push(c.geode_id);
+              componentsByType[component.type].push(component.geode_id);
             }
-            return acc;
-          }, {});
+          }
 
           for (const [type, geode_ids] of Object.entries(componentsByType)) {
             let all_visible = true;
             for (const gid of geode_ids) {
               const is_visible = styles[gid] === undefined ? true : styles[gid].visibility;
-              if (is_visible) current_selection.push(gid);
-              else all_visible = false;
+              if (is_visible) {
+                current_selection.push(gid);
+              } else {
+                all_visible = false;
+              }
             }
-            if (all_visible) current_selection.push(type);
+            if (all_visible) {
+              current_selection.push(type);
+            }
           }
           return current_selection;
         });
@@ -126,7 +130,9 @@ export function useModelStyle() {
 
   function setModelMeshComponentsDefaultStyle(id) {
     return dataStore.item(id).then((item) => {
-      if (!item) return [];
+      if (!item) {
+        return [];
+      }
       const { mesh_components } = item;
       const handlers = {
         Corner: () => modelCornersStyleStore.setModelCornersDefaultStyle(id),

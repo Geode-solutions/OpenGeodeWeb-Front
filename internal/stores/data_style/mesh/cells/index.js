@@ -33,26 +33,6 @@ export function useMeshCellsStyle() {
     console.log(setMeshCellsActiveColoring.name, { id }, type);
     if (type === "color") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
-    } else if (type === "textures") {
-      const textures = meshCellsTexturesStore.meshCellsTextures(id);
-      if (textures === undefined) {
-        return Promise.resolve();
-      }
-      return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
-    } else if (type === "vertex") {
-      const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
-      if (name === undefined) {
-        return Promise.resolve();
-      }
-      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name);
-    } else if (type === "cell") {
-      const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
-      if (name === undefined) {
-        return Promise.resolve();
-      }
-      return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
-    } else {
-      throw new Error(`Unknown mesh cells coloring type: ${type}`);
     }
     if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id);
@@ -73,10 +53,10 @@ export function useMeshCellsStyle() {
       if (name === undefined) {
         return;
       }
-      await meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
-      return;
+      return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
+
   }
 
   function applyMeshCellsStyle(id) {

@@ -1,8 +1,8 @@
 <script setup>
+import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { compareSelections } from "@ogw_front/utils/treeview";
 
 const dataStyleStore = useDataStyleStore();
 const dataStore = useDataStore();

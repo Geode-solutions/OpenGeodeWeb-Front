@@ -5,7 +5,7 @@ import { useModelLinesCommonStyle } from "./common";
 import { useModelLinesVisibilityStyle } from "./visibility";
 
 async function setModelLinesDefaultStyle(_id) {
-  // Placeholder for oxlint
+  // Placeholder
 }
 
 export function useModelLinesStyle() {
@@ -16,7 +16,9 @@ export function useModelLinesStyle() {
 
   async function applyModelLinesStyle(id) {
     const line_ids = await dataStore.getLinesGeodeIds(id);
-    if (line_ids.length === 0) return;
+    if (line_ids.length === 0) {
+      return;
+    }
 
     const visibilityGroups = {};
     const colorGroups = {};
@@ -25,11 +27,15 @@ export function useModelLinesStyle() {
       const style = modelLinesCommonStyle.modelLineStyle(id, line_id);
 
       const vKey = String(style.visibility);
-      if (!visibilityGroups[vKey]) visibilityGroups[vKey] = [];
+      if (!visibilityGroups[vKey]) {
+        visibilityGroups[vKey] = [];
+      }
       visibilityGroups[vKey].push(line_id);
 
       const cKey = JSON.stringify(style.color);
-      if (!colorGroups[cKey]) colorGroups[cKey] = [];
+      if (!colorGroups[cKey]) {
+        colorGroups[cKey] = [];
+      }
       colorGroups[cKey].push(line_id);
     }
 
@@ -46,7 +52,7 @@ export function useModelLinesStyle() {
     return Promise.all(promises);
   }
 
-  async function setModelLinesDefaultStyle(id) {}
+
 
   return {
     applyModelLinesStyle,

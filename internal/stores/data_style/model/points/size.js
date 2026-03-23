@@ -21,9 +21,7 @@ export function useModelPointsSizeStyle() {
       model_points_schemas.size,
       { id, size },
       {
-        response_function: () => {
-          return modelPointsCommonStyle.mutateModelPointsStyle(id, { size });
-        },
+        response_function: () => modelPointsCommonStyle.mutateModelPointsStyle(id, { size }),
       },
     );
   }

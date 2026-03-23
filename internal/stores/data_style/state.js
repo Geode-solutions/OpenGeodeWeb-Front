@@ -1,16 +1,17 @@
-import merge from "lodash/merge";
-import { liveQuery } from "dexie";
-import { useObservable } from "@vueuse/rxjs";
 import { database } from "@ogw_internal/database/database";
+import { liveQuery } from "dexie";
+import merge from "lodash/merge";
+import { useObservable } from "@vueuse/rxjs";
 
 export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   const styles = useObservable(
     liveQuery(async () => {
       const allStyles = await database.data_style.toArray();
-      return allStyles.reduce((acc, style) => {
-        acc[style.id] = style;
-        return acc;
-      }, {});
+      const accumulator = {};
+      for (const style of allStyles) {
+        accumulator[style.id] = style;
+      }
+      return accumulator;
     }),
     { initialValue: {} },
   );
@@ -35,11 +36,12 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   const componentStyles = useObservable(
     liveQuery(async () => {
       const all = await database.model_component_datastyle.toArray();
-      return all.reduce((acc, style) => {
+      const accumulator = {};
+      for (const style of all) {
         const key = `${style.id_model}_${style.id_component}`;
-        acc[key] = style;
-        return acc;
-      }, {});
+        accumulator[key] = style;
+      }
+      return accumulator;
     }),
     { initialValue: {} },
   );
@@ -103,9 +105,9 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
 
   function mutateComponentStyle(id_model, id_component, values) {
     return database.model_component_datastyle.get([id_model, id_component]).then((style) => {
-      const s = style || { id_model, id_component };
-      merge(s, values);
-      return database.model_component_datastyle.put(structuredClone(toRaw(s)));
+      const component_style = style || { id_model, id_component };
+      merge(component_style, values);
+      return database.model_component_datastyle.put(structuredClone(toRaw(component_style)));
     });
   }
 
@@ -115,13 +117,13 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
       .equals(id_model)
       .toArray()
       .then((all_styles) => {
-        const stylesMap = all_styles.reduce((acc, s) => {
-          acc[s.id_component] = s;
-          return acc;
-        }, {});
+        const style_map = {};
+        for (const style of all_styles) {
+          style_map[style.id_component] = style;
+        }
 
         const updates = id_components.map((id_component) => {
-          const style = stylesMap[id_component] || { id_model, id_component };
+          const style = style_map[id_component] || { id_model, id_component };
           merge(style, values);
           return toRaw(style);
         });

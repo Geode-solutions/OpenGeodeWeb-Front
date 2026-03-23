@@ -31,7 +31,7 @@ function useMeshPointsColoringStyle() {
     } else if (type === "vertex") {
       const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
       if (name === undefined) {
-        return Promise.resolve();
+        return;
       }
       return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
     }

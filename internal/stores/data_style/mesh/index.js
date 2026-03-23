@@ -50,9 +50,7 @@ export function useMeshStyle() {
       meshSchemas.color,
       { id, color },
       {
-        response_function: () => {
-          return dataStyleState.mutateStyle(id, { color });
-        },
+        response_function: () => dataStyleState.mutateStyle(id, { color }),
       },
     );
   }

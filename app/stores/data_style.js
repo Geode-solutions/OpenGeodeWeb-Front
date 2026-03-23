@@ -1,5 +1,5 @@
-import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database.js";
+import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
 import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
@@ -17,7 +17,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function setVisibility(id, visibility) {
     const item = await dataStore.item(id);
-    const viewer_type = item.viewer_type;
+    const { viewer_type } = item;
 
     if (viewer_type === "mesh") {
       return meshStyleStore.setMeshVisibility(id, visibility);
@@ -30,7 +30,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyDefaultStyle(id) {
     const item = await dataStore.item(id);
-    const viewer_type = item.viewer_type;
+    const { viewer_type } = item;
 
     if (viewer_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id);
@@ -54,16 +54,17 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     await dataStyleState.clear();
 
-    for (const [id, style] of Object.entries(stylesSnapshot)) {
-      await database.data_style.put(structuredClone({ id, ...style }));
-    }
+    const style_promises = Object.entries(stylesSnapshot).map(([id, style]) =>
+      database.data_style.put(structuredClone({ id, ...style })),
+    );
+    const component_style_promises = Object.values(componentStylesSnapshot).map((style) =>
+      database.model_component_datastyle.put(structuredClone(style)),
+    );
 
-    for (const style of Object.values(componentStylesSnapshot)) {
-      await database.model_component_datastyle.put(structuredClone(style));
-    }
+    await Promise.all([...style_promises, ...component_style_promises]);
   }
 
-  async function applyAllStylesFromState() {
+  function applyAllStylesFromState() {
     const ids = Object.keys(dataStyleState.styles);
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id);

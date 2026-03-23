@@ -19,9 +19,7 @@ export function useMeshEdgesWidthStyle() {
       meshEdgesWidthSchemas,
       { id, width },
       {
-        response_function: () => {
-          return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { width });
-        },
+        response_function: () => meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { width }),
       },
     );
   }

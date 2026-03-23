@@ -46,9 +46,7 @@ export function useMeshCellsCellAttributeStyle() {
       meshCellsCellAttributeSchemas.name,
       { id, name },
       {
-        response_function: () => {
-          return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name });
-        },
+        response_function: () => meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name }),
       },
     );
   }
@@ -81,9 +79,7 @@ export function useMeshCellsCellAttributeStyle() {
       meshCellsCellAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: () => {
-          return setMeshCellsCellAttributeStoredConfig(id, name, { colorMap });
-        },
+        response_function: () => setMeshCellsCellAttributeStoredConfig(id, name, { colorMap }),
       },
     );
   }

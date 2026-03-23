@@ -32,43 +32,23 @@ export function useMeshEdgesStyle() {
     });
     if (type === "color") {
       return meshEdgesColorStyle.setMeshEdgesColor(id, meshEdgesColorStyle.meshEdgesColor(id));
-    } else if (type === "vertex") {
-      const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
-      if (name === undefined) {
-        return Promise.resolve();
-      }
-      return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name);
-    } else if (type === "edge") {
-      const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
-      if (name === undefined) {
-        return Promise.resolve();
-      }
-      return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name);
-    } else {
-      throw new Error(`Unknown mesh edges coloring type: ${type}`);
-    }
-    if (type === "textures") {
-      const textures = meshEdgesTexturesStore.meshEdgesTextures(id);
-      if (textures === undefined) {
-        return Promise.resolve();
-      }
-      return meshEdgesTexturesStore.setMeshEdgesTextures(id, textures);
     }
     if (type === "vertex") {
       const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
       if (name === undefined) {
-        return Promise.resolve();
+        return;
       }
       return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name);
     }
     if (type === "edge") {
       const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
       if (name === undefined) {
-        return Promise.resolve();
+        return;
       }
       return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name);
     }
     throw new Error(`Unknown mesh edges coloring type: ${type}`);
+
   }
 
   function applyMeshEdgesStyle(id) {

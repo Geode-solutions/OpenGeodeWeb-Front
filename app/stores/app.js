@@ -1,6 +1,6 @@
 // Local imports
-import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
+import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
 export const useAppStore = defineStore("app", () => {
   const stores = [];

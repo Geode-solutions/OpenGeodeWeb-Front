@@ -13,11 +13,11 @@ export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
 
   async function item(id) {
-    const item = await database.data.get(id);
-    if (!item) {
+    const data_item = await database.data.get(id);
+    if (!data_item) {
       throw new Error(`Item not found: ${id}`);
     }
-    return item;
+    return data_item;
   }
 
   function refItem(id) {
@@ -187,7 +187,7 @@ export const useDataStore = defineStore("data", () => {
       .where("[id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray();
-    return components.map((component) => parseInt(component.viewer_id));
+    return components.map((component) => Number.parseInt(component.viewer_id, 10));
   }
 
   async function exportStores() {
