@@ -58,8 +58,6 @@ export function useModelCornersStyle() {
     return Promise.all(promises);
   }
 
-
-
   return {
     applyModelCornersStyle,
     setModelCornersDefaultStyle,
