@@ -20,34 +20,28 @@ export function useModelBlocksColorStyle() {
 
   function setModelBlocksColor(id, block_ids, color) {
     if (!block_ids || block_ids.length === 0) {
-      return Promise.resolve()
+      return Promise.resolve();
     }
-    return dataStore
-      .getMeshComponentsViewerIds(id, block_ids)
-      .then((block_viewer_ids) => {
-        if (!block_viewer_ids || block_viewer_ids.length === 0) {
-          console.warn(
-            "[setModelBlocksColor] No viewer IDs found, skipping color request",
-            { id, block_ids },
-          )
-          return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
-            color,
-          })
-        }
-        return viewerStore.request(
-          model_blocks_schemas.color,
-          { id, block_ids: block_viewer_ids, color },
-          {
-            response_function: () => {
-              return modelBlocksCommonStyle.mutateModelBlocksStyle(
-                id,
-                block_ids,
-                { color },
-              )
-            },
+    return dataStore.getMeshComponentsViewerIds(id, block_ids).then((block_viewer_ids) => {
+      if (!block_viewer_ids || block_viewer_ids.length === 0) {
+        console.warn("[setModelBlocksColor] No viewer IDs found, skipping color request", {
+          id,
+          block_ids,
+        });
+        return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
+          color,
+        });
+      }
+      return viewerStore.request(
+        model_blocks_schemas.color,
+        { id, block_ids: block_viewer_ids, color },
+        {
+          response_function: () => {
+            return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color });
           },
-        )
-      })
+        },
+      );
+    });
   }
 
   return {

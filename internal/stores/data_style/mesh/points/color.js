@@ -23,7 +23,7 @@ export function useMeshPointsColorStyle() {
         response_function: () => {
           return meshPointsCommonStyle.mutateMeshPointsColoring(id, {
             color,
-          })
+          });
         },
       },
     );

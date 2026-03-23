@@ -10,9 +10,9 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners;
 
 export function useModelCornersColorStyle() {
-  const dataStore = useDataStore()
-  const viewerStore = useViewerStore()
-  const modelCornersCommonStyle = useModelCornersCommonStyle()
+  const dataStore = useDataStore();
+  const viewerStore = useViewerStore();
+  const modelCornersCommonStyle = useModelCornersCommonStyle();
 
   function modelCornerColor(id, corner_id) {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).color;
@@ -20,36 +20,26 @@ export function useModelCornersColorStyle() {
 
   function setModelCornersColor(id, corner_ids, color) {
     if (!corner_ids || corner_ids.length === 0) {
-      return Promise.resolve()
+      return Promise.resolve();
     }
-    return dataStore
-      .getMeshComponentsViewerIds(id, corner_ids)
-      .then((corner_viewer_ids) => {
-        if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
-          console.warn(
-            "[setModelCornersColor] No viewer IDs found, skipping color request",
-            { id, corner_ids },
-          )
-          return modelCornersCommonStyle.mutateModelCornersStyle(
-            id,
-            corner_ids,
-            { color },
-          )
-        }
-        return viewerStore.request(
-          model_corners_schemas.color,
-          { id, block_ids: corner_viewer_ids, color },
-          {
-            response_function: () => {
-              return modelCornersCommonStyle.mutateModelCornersStyle(
-                id,
-                corner_ids,
-                { color },
-              )
-            },
+    return dataStore.getMeshComponentsViewerIds(id, corner_ids).then((corner_viewer_ids) => {
+      if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
+        console.warn("[setModelCornersColor] No viewer IDs found, skipping color request", {
+          id,
+          corner_ids,
+        });
+        return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color });
+      }
+      return viewerStore.request(
+        model_corners_schemas.color,
+        { id, block_ids: corner_viewer_ids, color },
+        {
+          response_function: () => {
+            return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color });
           },
-        )
-      })
+        },
+      );
+    });
   }
 
   return {

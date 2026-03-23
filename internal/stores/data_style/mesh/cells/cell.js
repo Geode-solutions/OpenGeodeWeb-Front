@@ -29,17 +29,16 @@ export function useMeshCellsCellAttributeStyle() {
     });
   }
 
-
   function setMeshCellsCellAttributeStoredConfig(id, name, config) {
     return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, {
       storedConfigs: {
         [name]: config,
       },
-    })
+    });
   }
 
   function meshCellsCellAttributeName(id) {
-    return meshCellsCellAttribute(id).name
+    return meshCellsCellAttribute(id).name;
   }
 
   function setMeshCellsCellAttributeName(id, name) {
@@ -48,7 +47,7 @@ export function useMeshCellsCellAttributeStyle() {
       { id, name },
       {
         response_function: () => {
-          return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name })
+          return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name });
         },
       },
     );
@@ -62,8 +61,8 @@ export function useMeshCellsCellAttributeStyle() {
   }
 
   function setMeshCellsCellAttributeRange(id, minimum, maximum) {
-    const name = meshCellsCellAttributeName(id)
-    return setMeshCellsCellAttributeStoredConfig(id, name, { minimum, maximum })
+    const name = meshCellsCellAttributeName(id);
+    return setMeshCellsCellAttributeStoredConfig(id, name, { minimum, maximum });
   }
 
   function meshCellsCellAttributeColorMap(id) {
@@ -74,16 +73,16 @@ export function useMeshCellsCellAttributeStyle() {
   }
 
   function setMeshCellsCellAttributeColorMap(id, colorMap) {
-    const name = meshCellsCellAttributeName(id)
-    const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
-    const points = getRGBPointsFromPreset(colorMap)
-    const { minimum, maximum } = storedConfig
+    const name = meshCellsCellAttributeName(id);
+    const storedConfig = meshCellsCellAttributeStoredConfig(id, name);
+    const points = getRGBPointsFromPreset(colorMap);
+    const { minimum, maximum } = storedConfig;
     return viewerStore.request(
       meshCellsCellAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          return setMeshCellsCellAttributeStoredConfig(id, name, { colorMap })
+          return setMeshCellsCellAttributeStoredConfig(id, name, { colorMap });
         },
       },
     );

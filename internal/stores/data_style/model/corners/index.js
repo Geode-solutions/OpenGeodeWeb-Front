@@ -15,52 +15,42 @@ export function useModelCornersStyle() {
   const modelCornersColorStyle = useModelCornersColorStyle();
 
   async function applyModelCornersStyle(id) {
-    const corner_ids = await dataStore.getCornersGeodeIds(id)
-    if (corner_ids.length === 0) return
+    const corner_ids = await dataStore.getCornersGeodeIds(id);
+    if (corner_ids.length === 0) return;
 
     // Group corners by their effective style to minimize RPC calls
-    const visibilityGroups = {}
-    const colorGroups = {}
+    const visibilityGroups = {};
+    const colorGroups = {};
 
     for (const corner_id of corner_ids) {
-      const style = modelCornersCommonStyle.modelCornerStyle(id, corner_id)
+      const style = modelCornersCommonStyle.modelCornerStyle(id, corner_id);
 
       // Group by visibility
-      const vKey = String(style.visibility)
-      if (!visibilityGroups[vKey]) visibilityGroups[vKey] = []
-      visibilityGroups[vKey].push(corner_id)
+      const vKey = String(style.visibility);
+      if (!visibilityGroups[vKey]) visibilityGroups[vKey] = [];
+      visibilityGroups[vKey].push(corner_id);
 
       // Group by color
-      const cKey = JSON.stringify(style.color)
-      if (!colorGroups[cKey]) colorGroups[cKey] = []
-      colorGroups[cKey].push(corner_id)
+      const cKey = JSON.stringify(style.color);
+      if (!colorGroups[cKey]) colorGroups[cKey] = [];
+      colorGroups[cKey].push(corner_id);
     }
 
-    const promises = []
+    const promises = [];
 
     // Apply visibility groups
     for (const [vValue, ids] of Object.entries(visibilityGroups)) {
       promises.push(
-        modelCornersVisibilityStyle.setModelCornersVisibility(
-          id,
-          ids,
-          vValue === "true",
-        ),
-      )
+        modelCornersVisibilityStyle.setModelCornersVisibility(id, ids, vValue === "true"),
+      );
     }
 
     // Apply color groups
     for (const [cValue, ids] of Object.entries(colorGroups)) {
-      promises.push(
-        modelCornersColorStyle.setModelCornersColor(
-          id,
-          ids,
-          JSON.parse(cValue),
-        ),
-      )
+      promises.push(modelCornersColorStyle.setModelCornersColor(id, ids, JSON.parse(cValue)));
     }
 
-    return Promise.all(promises)
+    return Promise.all(promises);
   }
 
   async function setModelCornersDefaultStyle(id) { }

@@ -11,55 +11,48 @@ import { useMeshCellsVisibilityStyle } from "./visibility";
 // Local constants
 
 export function useMeshCellsStyle() {
-  const meshCellsCommonStyle = useMeshCellsCommonStyle()
-  const meshCellsVisibility = useMeshCellsVisibilityStyle()
-  const meshCellsColorStyle = useMeshCellsColorStyle()
-  const meshCellsTexturesStore = useMeshCellsTexturesStyle()
+  const meshCellsCommonStyle = useMeshCellsCommonStyle();
+  const meshCellsVisibility = useMeshCellsVisibilityStyle();
+  const meshCellsColorStyle = useMeshCellsColorStyle();
+  const meshCellsTexturesStore = useMeshCellsTexturesStyle();
 
   function meshCellsColoring(id) {
-    return meshCellsCommonStyle.meshCellsColoring(id)
+    return meshCellsCommonStyle.meshCellsColoring(id);
   }
-  const meshCellsVertexAttributeStyle = useMeshCellsVertexAttributeStyle()
-  const meshCellsCellAttributeStyle = useMeshCellsCellAttributeStyle()
+  const meshCellsVertexAttributeStyle = useMeshCellsVertexAttributeStyle();
+  const meshCellsCellAttributeStyle = useMeshCellsCellAttributeStyle();
 
   function meshCellsActiveColoring(id) {
-    return meshCellsColoring(id).active
+    return meshCellsColoring(id).active;
   }
 
   async function setMeshCellsActiveColoring(id, type) {
     await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: { active: type },
-    })
-    console.log(setMeshCellsActiveColoring.name, { id }, type)
+    });
+    console.log(setMeshCellsActiveColoring.name, { id }, type);
     if (type === "color") {
-      return meshCellsColorStyle.setMeshCellsColor(
-        id,
-        meshCellsColorStyle.meshCellsColor(id),
-      )
+      return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
     } else if (type === "textures") {
-      const textures = meshCellsTexturesStore.meshCellsTextures(id)
+      const textures = meshCellsTexturesStore.meshCellsTextures(id);
       if (textures === undefined) {
-        return Promise.resolve()
+        return Promise.resolve();
       }
-      return meshCellsTexturesStore.setMeshCellsTextures(id, textures)
+      return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
     } else if (type === "vertex") {
-      const name =
-        meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id)
+      const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
       if (name === undefined) {
-        return Promise.resolve()
+        return Promise.resolve();
       }
-      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(
-        id,
-        name,
-      )
+      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name);
     } else if (type === "cell") {
-      const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id)
+      const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
       if (name === undefined) {
-        return Promise.resolve()
+        return Promise.resolve();
       }
-      return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name)
+      return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
     } else {
-      throw new Error(`Unknown mesh cells coloring type: ${type}`)
+      throw new Error(`Unknown mesh cells coloring type: ${type}`);
     }
     if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id);
@@ -88,12 +81,9 @@ export function useMeshCellsStyle() {
 
   function applyMeshCellsStyle(id) {
     return Promise.all([
-      meshCellsVisibility.setMeshCellsVisibility(
-        id,
-        meshCellsVisibility.meshCellsVisibility(id),
-      ),
+      meshCellsVisibility.setMeshCellsVisibility(id, meshCellsVisibility.meshCellsVisibility(id)),
       setMeshCellsActiveColoring(id, meshCellsActiveColoring(id)),
-    ])
+    ]);
   }
 
   return {

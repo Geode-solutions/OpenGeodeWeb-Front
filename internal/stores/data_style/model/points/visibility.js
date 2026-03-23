@@ -24,7 +24,7 @@ export function useModelPointsVisibilityStyle() {
         response_function: () => {
           return modelPointsCommonStyle.mutateModelPointsStyle(id, {
             visibility,
-          })
+          });
         },
       },
     );

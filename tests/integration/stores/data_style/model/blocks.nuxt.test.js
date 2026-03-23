@@ -1,7 +1,7 @@
 // Third party imports
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
-import { nextTick } from "vue"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { nextTick } from "vue";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
@@ -17,7 +17,7 @@ const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let id = "",
   projectFolderPath = "";
@@ -34,25 +34,18 @@ afterEach(async () => {
 describe("Model blocks", () => {
   describe("Blocks visibility", () => {
     test("Visibility false", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const dataStore = useDataStore()
-      const block_ids = await dataStore.getBlocksGeodeIds(id)
-      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(
-        id,
-        block_ids,
-      )
-      const visibility = false
-      const spy = vi.spyOn(viewerStore, "request")
-      spy.mockClear()
-      const result = dataStyleStore.setModelBlocksVisibility(
-        id,
-        block_ids,
-        visibility,
-      )
-      expect(result).toBeInstanceOf(Promise)
-      await result
-      await sleep(200)
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const visibility = false;
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelBlocksVisibility(id, block_ids, visibility);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(200);
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.visibility,
         { id, block_ids: block_viewer_ids, visibility },
@@ -69,18 +62,15 @@ describe("Model blocks", () => {
 
   describe("Blocks color", () => {
     test("Color red", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const dataStore = useDataStore()
-      const block_ids = await dataStore.getBlocksGeodeIds(id)
-      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(
-        id,
-        block_ids,
-      )
-      const color = { r: 255, g: 0, b: 0 }
-      const spy = vi.spyOn(viewerStore, "request")
-      await dataStyleStore.setModelBlocksColor(id, block_ids, color)
-      await sleep(200)
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const color = { r: 255, g: 0, b: 0 };
+      const spy = vi.spyOn(viewerStore, "request");
+      await dataStyleStore.setModelBlocksColor(id, block_ids, color);
+      await sleep(200);
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.color,
         { id, block_ids: block_viewer_ids, color },

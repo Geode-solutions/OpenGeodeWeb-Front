@@ -23,7 +23,7 @@ export function useMeshPolyhedraColorStyle() {
         response_function: () => {
           return meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
             color,
-          })
+          });
         },
       },
     );

@@ -23,7 +23,7 @@ export function useMeshCellsTexturesStyle() {
         response_function: () => {
           return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
             coloring: { textures },
-          })
+          });
         },
       },
     );

@@ -18,33 +18,25 @@ export function useModelSurfacesVisibilityStyle() {
   }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
     if (!surface_ids || surface_ids.length === 0) {
-      return Promise.resolve()
+      return Promise.resolve();
     }
 
-    return dataStore
-      .getMeshComponentsViewerIds(id, surface_ids)
-      .then((surface_viewer_ids) => {
-        if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-          return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
-            id,
-            surface_ids,
-            { visibility },
-          )
-        }
-        return viewerStore.request(
-          model_surfaces_schemas.visibility,
-          { id, block_ids: surface_viewer_ids, visibility },
-          {
-            response_function: () => {
-              return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
-                id,
-                surface_ids,
-                { visibility },
-              )
-            },
+    return dataStore.getMeshComponentsViewerIds(id, surface_ids).then((surface_viewer_ids) => {
+      if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
+        return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { visibility });
+      }
+      return viewerStore.request(
+        model_surfaces_schemas.visibility,
+        { id, block_ids: surface_viewer_ids, visibility },
+        {
+          response_function: () => {
+            return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, {
+              visibility,
+            });
           },
-        )
-      })
+        },
+      );
+    });
   }
 
   return {

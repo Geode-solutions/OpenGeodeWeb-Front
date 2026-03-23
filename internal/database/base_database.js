@@ -1,13 +1,13 @@
-import { Dexie } from "dexie"
-import { dataTable } from "./tables/data"
-import { modelComponentsRelationTable } from "./tables/model_components_relation"
-import { modelComponentsTable } from "./tables/model_components"
-import { dataStyleTable } from "./tables/data_style"
-import { modelComponentDataStyleTable } from "./tables/model_component_datastyle"
+import { Dexie } from "dexie";
+import { dataTable } from "./tables/data";
+import { modelComponentsRelationTable } from "./tables/model_components_relation";
+import { modelComponentsTable } from "./tables/model_components";
+import { dataStyleTable } from "./tables/data_style";
+import { modelComponentDataStyleTable } from "./tables/model_component_datastyle";
 
 export class BaseDatabase extends Dexie {
   constructor(name) {
-    super(name)
+    super(name);
   }
 
   static get initialStores() {
@@ -17,10 +17,10 @@ export class BaseDatabase extends Dexie {
       [dataStyleTable.name]: dataStyleTable.schema,
       [modelComponentDataStyleTable.name]: modelComponentDataStyleTable.schema,
       [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
-    }
+    };
   }
 
   async clear() {
-    return Promise.all(this.tables.map((table) => table.clear()))
+    return Promise.all(this.tables.map((table) => table.clear()));
   }
 }

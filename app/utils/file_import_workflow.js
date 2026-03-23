@@ -34,7 +34,6 @@ async function importItem(item) {
   const treeviewStore = useTreeviewStore();
   const registerTask = dataStore.registerObject(item.id);
   const addDataTask = dataStore.addItem(item);
-
   const addDataComponentsTask =
     item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
   const addDataRelationsTask =
@@ -64,25 +63,22 @@ async function importItem(item) {
 }
 
 async function importFile(filename, geode_object_type) {
-  const geodeStore = useGeodeStore()
-  const response = await geodeStore.request(
-    back_schemas.opengeodeweb_back.save_viewable_file,
-    {
-      geode_object_type,
-      filename,
-    },
-  )
-  const item = buildImportItemFromPayloadApi(response)
-  return importItem(item)
+  const geodeStore = useGeodeStore();
+  const response = await geodeStore.request(back_schemas.opengeodeweb_back.save_viewable_file, {
+    geode_object_type,
+    filename,
+  });
+  const item = buildImportItemFromPayloadApi(response);
+  return importItem(item);
 }
 
 async function importWorkflowFromSnapshot(items) {
-  console.log("[importWorkflowFromSnapshot] start", { count: items?.length })
-  const hybridViewerStore = useHybridViewerStore()
-  const ids = await Promise.all(items.map((item) => importItem(item)))
-  hybridViewerStore.remoteRender()
-  console.log("[importWorkflowFromSnapshot] done", { ids })
-  return ids
+  console.log("[importWorkflowFromSnapshot] start", { count: items?.length });
+  const hybridViewerStore = useHybridViewerStore();
+  const ids = await Promise.all(items.map((item) => importItem(item)));
+  hybridViewerStore.remoteRender();
+  console.log("[importWorkflowFromSnapshot] done", { ids });
+  return ids;
 }
 
 export { importFile, importWorkflow, importWorkflowFromSnapshot, importItem };

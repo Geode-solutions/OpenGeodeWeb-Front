@@ -6,7 +6,7 @@ export function useModelPointsCommonStyle() {
   function mutateModelPointsStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
       points: values,
-    })
+    });
   }
 
   function modelPointsStyle(id) {
@@ -16,5 +16,5 @@ export function useModelPointsCommonStyle() {
   return {
     modelPointsStyle,
     mutateModelPointsStyle,
-  }
+  };
 }

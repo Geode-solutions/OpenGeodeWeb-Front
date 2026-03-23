@@ -23,7 +23,7 @@ export function useMeshPolygonsTexturesStyle() {
         response_function: () => {
           return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
             coloring: { textures },
-          })
+          });
         },
       },
     );

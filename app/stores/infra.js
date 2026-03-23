@@ -1,9 +1,9 @@
-import { appMode, getAppMode } from "@ogw_front/utils/app_mode"
-import { Status } from "@ogw_front/utils/status"
-import { useLambdaStore } from "@ogw_front/stores/lambda"
-import { database } from "@ogw_internal/database/database"
-import { useAppStore } from "@ogw_front/stores/app"
-import { registerRunningExtensions } from "@ogw_front/utils/extension"
+import { appMode, getAppMode } from "@ogw_front/utils/app_mode";
+import { Status } from "@ogw_front/utils/status";
+import { useLambdaStore } from "@ogw_front/stores/lambda";
+import { database } from "@ogw_internal/database/database";
+import { useAppStore } from "@ogw_front/stores/app";
+import { registerRunningExtensions } from "@ogw_front/utils/extension";
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
@@ -30,21 +30,17 @@ export const useInfraStore = defineStore("infra", {
   },
   actions: {
     register_microservice(store) {
-      const store_name = store.$id
-      console.log("[INFRA] Registering microservice:", store_name)
-      if (
-        !this.microservices.find(
-          (microservice) => microservice.$id === store_name,
-        )
-      ) {
-        this.microservices.push(store)
-        console.log("[INFRA] Microservice registered:", store_name)
+      const store_name = store.$id;
+      console.log("[INFRA] Registering microservice:", store_name);
+      if (!this.microservices.find((microservice) => microservice.$id === store_name)) {
+        this.microservices.push(store);
+        console.log("[INFRA] Microservice registered:", store_name);
       }
     },
 
     async create_backend() {
-      console.log("[INFRA] Starting create_backend - Mode:", this.app_mode)
-      await database.clear()
+      console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
+      await database.clear();
       console.log(
         "[INFRA] Registered microservices:",
         this.microservices.map((store) => store.$id),
@@ -90,7 +86,7 @@ export const useInfraStore = defineStore("infra", {
       console.log(
         "[INFRA] Connecting microservices:",
         this.microservices.map((store) => store.$id),
-      )
+      );
       await Promise.all(
         this.microservices.map(async (store) => {
           await store.connect();

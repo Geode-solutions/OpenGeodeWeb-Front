@@ -23,7 +23,7 @@ export function useMeshCellsColorStyle() {
         response_function: () => {
           return meshCellsCommonStyle.mutateMeshCellsColoring(id, {
             color,
-          })
+          });
         },
       },
     );

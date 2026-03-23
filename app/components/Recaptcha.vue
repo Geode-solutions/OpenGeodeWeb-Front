@@ -1,5 +1,5 @@
 <script setup>
-import { appMode } from "@ogw_front/utils/local/app_mode";
+import { appMode } from "@ogw_front/utils/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 const RESPONSE_STATUS_OK = 200;
@@ -41,11 +41,13 @@ const emailRules = [
 ];
 
 onMounted(() => {
-  if (
-    import.meta.client &&
-    (process.env.NODE_ENV !== "production" || infraStore.app_mode !== appMode.CLOUD)
-  ) {
-    infraStore.$patch({ is_captcha_validated: true });
+  if (import.meta.client) {
+    if (
+      process.env.NODE_ENV !== "production" ||
+      infraStore.app_mode !== appMode.CLOUD
+    ) {
+      infraStore.$patch({ is_captcha_validated: true });
+    }
   }
 });
 async function submit_recaptcha() {
@@ -75,7 +77,12 @@ async function submit_recaptcha() {
           </VRow>
           <VRow>
             <VCol>
-              <VTextField v-model="email" :rules="emailRules" label="E-mail" required />
+              <VTextField
+                v-model="email"
+                :rules="emailRules"
+                label="E-mail"
+                required
+              />
             </VCol>
           </VRow>
           <VRow>
@@ -89,7 +96,11 @@ async function submit_recaptcha() {
   </VRow>
   <VRow align="center" justify="center">
     <VCol cols="4" class="d-flex justify-center align-center">
-      <VBtn :text="button_label" :color="color || button_color" @click="submit_recaptcha" />
+      <VBtn
+        :text="button_label"
+        :color="color || button_color"
+        @click="submit_recaptcha"
+      />
     </VCol>
   </VRow>
 </template>

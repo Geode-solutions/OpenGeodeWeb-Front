@@ -6,7 +6,7 @@ export function useMeshPolyhedraCommonStyle() {
   function mutateMeshPolyhedraStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
       polyhedra: values,
-    })
+    });
   }
 
   function meshPolyhedraStyle(id) {
@@ -20,7 +20,7 @@ export function useMeshPolyhedraCommonStyle() {
   function mutateMeshPolyhedraColoring(id, values) {
     return mutateMeshPolyhedraStyle(id, {
       coloring: values,
-    })
+    });
   }
 
   return {
@@ -28,5 +28,5 @@ export function useMeshPolyhedraCommonStyle() {
     meshPolyhedraColoring,
     mutateMeshPolyhedraStyle,
     mutateMeshPolyhedraColoring,
-  }
+  };
 }

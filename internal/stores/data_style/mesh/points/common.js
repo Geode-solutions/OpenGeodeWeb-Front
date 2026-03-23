@@ -6,7 +6,7 @@ export function useMeshPointsCommonStyle() {
   function mutateMeshPointsStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
       points: values,
-    })
+    });
   }
 
   function meshPointsStyle(id) {
@@ -20,7 +20,7 @@ export function useMeshPointsCommonStyle() {
   function mutateMeshPointsColoring(id, values) {
     return mutateMeshPointsStyle(id, {
       coloring: values,
-    })
+    });
   }
 
   return {
@@ -28,5 +28,5 @@ export function useMeshPointsCommonStyle() {
     meshPointsColoring,
     mutateMeshPointsStyle,
     mutateMeshPointsColoring,
-  }
+  };
 }

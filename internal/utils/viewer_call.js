@@ -32,7 +32,7 @@ export async function viewer_call(
     try {
       const value = await client.getConnection().getSession().call(schema.$id, [params]);
       if (response_function) {
-        await response_function(value)
+        await response_function(value);
       }
       return value;
     } catch (error) {

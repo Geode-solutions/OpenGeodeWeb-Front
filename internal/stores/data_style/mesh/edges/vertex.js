@@ -2,8 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { useMeshEdgesCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useMeshEdgesCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const meshEdgesVertexAttributeSchemas =
@@ -14,11 +14,11 @@ export function useMeshEdgesVertexAttributeStyle() {
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
   function meshEdgesColoring(id) {
-    return meshEdgesCommonStyle.meshEdgesStyle(id).coloring
+    return meshEdgesCommonStyle.meshEdgesStyle(id).coloring;
   }
 
   function meshEdgesVertexAttribute(id) {
-    return meshEdgesColoring(id).vertex
+    return meshEdgesColoring(id).vertex;
   }
 
   function meshEdgesVertexAttributeStoredConfig(id, name) {
@@ -38,7 +38,7 @@ export function useMeshEdgesVertexAttributeStyle() {
       coloring: {
         vertex: values,
       },
-    })
+    });
   }
 
   function setMeshEdgesVertexAttributeStoredConfig(id, name, config) {
@@ -46,11 +46,11 @@ export function useMeshEdgesVertexAttributeStyle() {
       storedConfigs: {
         [name]: config,
       },
-    }).then(() => config)
+    }).then(() => config);
   }
 
   function meshEdgesVertexAttributeName(id) {
-    return meshEdgesVertexAttribute(id).name
+    return meshEdgesVertexAttribute(id).name;
   }
   function setMeshEdgesVertexAttributeName(id, name) {
     return viewerStore.request(
@@ -58,8 +58,8 @@ export function useMeshEdgesVertexAttributeStyle() {
       { id, name },
       {
         response_function: () => {
-          const updates = { name }
-          const vertex = meshEdgesVertexAttribute(id)
+          const updates = { name };
+          const vertex = meshEdgesVertexAttribute(id);
           if (!(name in vertex.storedConfigs)) {
             updates.storedConfigs = {
               [name]: {
@@ -67,9 +67,9 @@ export function useMeshEdgesVertexAttributeStyle() {
                 maximum: undefined,
                 colorMap: undefined,
               },
-            }
+            };
           }
-          return mutateMeshEdgesVertexStyle(id, updates)
+          return mutateMeshEdgesVertexStyle(id, updates);
         },
       },
     );
@@ -82,11 +82,11 @@ export function useMeshEdgesVertexAttributeStyle() {
     return [minimum, maximum];
   }
   function setMeshEdgesVertexAttributeRange(id, minimum, maximum) {
-    const name = meshEdgesVertexAttributeName(id)
+    const name = meshEdgesVertexAttributeName(id);
     return setMeshEdgesVertexAttributeStoredConfig(id, name, {
       minimum,
       maximum,
-    })
+    });
   }
 
   function meshEdgesVertexAttributeColorMap(id) {
@@ -96,16 +96,16 @@ export function useMeshEdgesVertexAttributeStyle() {
     return colorMap;
   }
   function setMeshEdgesVertexAttributeColorMap(id, colorMap) {
-    const name = meshEdgesVertexAttributeName(id)
-    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name)
-    const points = getRGBPointsFromPreset(colorMap)
-    const { minimum, maximum } = storedConfig
+    const name = meshEdgesVertexAttributeName(id);
+    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name);
+    const points = getRGBPointsFromPreset(colorMap);
+    const { minimum, maximum } = storedConfig;
     return viewerStore.request(
       meshEdgesVertexAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
         response_function: () => {
-          return setMeshEdgesVertexAttributeStoredConfig(id, name, { colorMap })
+          return setMeshEdgesVertexAttributeStoredConfig(id, name, { colorMap });
         },
       },
     );

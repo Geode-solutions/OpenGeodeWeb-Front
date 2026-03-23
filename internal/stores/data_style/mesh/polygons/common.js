@@ -6,7 +6,7 @@ export function useMeshPolygonsCommonStyle() {
   function mutateMeshPolygonsStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
       polygons: values,
-    })
+    });
   }
 
   function meshPolygonsStyle(id) {
@@ -20,7 +20,7 @@ export function useMeshPolygonsCommonStyle() {
   function mutateMeshPolygonsColoring(id, values) {
     return mutateMeshPolygonsStyle(id, {
       coloring: values,
-    })
+    });
   }
 
   return {
@@ -28,5 +28,5 @@ export function useMeshPolygonsCommonStyle() {
     meshPolygonsColoring,
     mutateMeshPolygonsStyle,
     mutateMeshPolygonsColoring,
-  }
+  };
 }

@@ -23,7 +23,7 @@ export function useMeshPolyhedraVisibilityStyle() {
         response_function: () => {
           return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
             visibility,
-          })
+          });
         },
       },
     );

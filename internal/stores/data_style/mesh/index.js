@@ -34,15 +34,15 @@ export function useMeshStyle() {
       { id, visibility },
       {
         response_function: async () => {
-          await hybridViewerStore.setVisibility(id, visibility)
-          return dataStyleState.mutateStyle(id, { visibility })
+          await hybridViewerStore.setVisibility(id, visibility);
+          return dataStyleState.mutateStyle(id, { visibility });
         },
       },
-    )
+    );
   }
 
   function meshColor(id) {
-    return dataStyleState.getStyle(id).color
+    return dataStyleState.getStyle(id).color;
   }
 
   function setMeshColor(id, color) {
@@ -51,7 +51,7 @@ export function useMeshStyle() {
       { id, color },
       {
         response_function: () => {
-          return dataStyleState.mutateStyle(id, { color })
+          return dataStyleState.mutateStyle(id, { color });
         },
       },
     );
@@ -62,9 +62,9 @@ export function useMeshStyle() {
     const promise_array = [];
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
-        promise_array.push(setMeshVisibility(id, value))
+        promise_array.push(setMeshVisibility(id, value));
       } else if (key === "color") {
-        promise_array.push(setMeshColor(id, value))
+        promise_array.push(setMeshColor(id, value));
       } else if (key === "points") {
         promise_array.push(meshPointsStyle.applyMeshPointsStyle(id));
       } else if (key === "edges") {
@@ -74,7 +74,7 @@ export function useMeshStyle() {
       } else if (key === "polygons") {
         promise_array.push(meshPolygonsStyle.applyMeshPolygonsStyle(id));
       } else if (key === "polyhedra") {
-        promise_array.push(meshPolyhedraStyle.applyMeshPolyhedraStyle(id))
+        promise_array.push(meshPolyhedraStyle.applyMeshPolyhedraStyle(id));
       } else if (
         key === "corners" ||
         key === "lines" ||
@@ -84,9 +84,9 @@ export function useMeshStyle() {
         key === "id"
       ) {
         // These keys are either handled elsewhere or not applicable to mesh objects
-        continue
+        continue;
       } else {
-        throw new Error(`Unknown mesh key: ${key}`)
+        throw new Error(`Unknown mesh key: ${key}`);
       }
     }
     return Promise.all(promise_array);

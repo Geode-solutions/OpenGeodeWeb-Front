@@ -21,7 +21,7 @@ export function useMeshCellsVisibilityStyle() {
       { id, visibility },
       {
         response_function: () => {
-          return meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility })
+          return meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility });
         },
       },
     );

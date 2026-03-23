@@ -6,7 +6,7 @@ export function useMeshEdgesCommonStyle() {
   function mutateMeshEdgesStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
       edges: values,
-    })
+    });
   }
 
   function meshEdgesStyle(id) {
@@ -20,7 +20,7 @@ export function useMeshEdgesCommonStyle() {
   function mutateMeshEdgesColoring(id, values) {
     return mutateMeshEdgesStyle(id, {
       coloring: values,
-    })
+    });
   }
 
   return {
@@ -28,5 +28,5 @@ export function useMeshEdgesCommonStyle() {
     meshEdgesColoring,
     mutateMeshEdgesStyle,
     mutateMeshEdgesColoring,
-  }
+  };
 }

@@ -35,7 +35,7 @@ export function useMeshPointsVertexAttributeStyle() {
       coloring: {
         vertex: values,
       },
-    })
+    });
   }
 
   function setMeshPointsVertexAttributeStoredConfig(id, name, config) {
@@ -43,11 +43,11 @@ export function useMeshPointsVertexAttributeStyle() {
       storedConfigs: {
         [name]: config,
       },
-    })
+    });
   }
 
   function meshPointsVertexAttributeName(id) {
-    return meshPointsVertexAttribute(id).name
+    return meshPointsVertexAttribute(id).name;
   }
 
   function setMeshPointsVertexAttributeName(id, name) {
@@ -56,8 +56,8 @@ export function useMeshPointsVertexAttributeStyle() {
       { id, name },
       {
         response_function: () => {
-          const updates = { name }
-          const vertex = meshPointsVertexAttribute(id)
+          const updates = { name };
+          const vertex = meshPointsVertexAttribute(id);
           if (!(name in vertex.storedConfigs)) {
             updates.storedConfigs = {
               [name]: {
@@ -65,9 +65,9 @@ export function useMeshPointsVertexAttributeStyle() {
                 maximum: undefined,
                 colorMap: undefined,
               },
-            }
+            };
           }
-          return mutateMeshPointsVertexStyle(id, updates)
+          return mutateMeshPointsVertexStyle(id, updates);
         },
       },
     );
@@ -81,11 +81,11 @@ export function useMeshPointsVertexAttributeStyle() {
   }
 
   function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
-    const name = meshPointsVertexAttributeName(id)
+    const name = meshPointsVertexAttributeName(id);
     return setMeshPointsVertexAttributeStoredConfig(id, name, {
       minimum,
       maximum,
-    })
+    });
   }
 
   function meshPointsVertexAttributeColorMap(id) {
@@ -96,10 +96,10 @@ export function useMeshPointsVertexAttributeStyle() {
   }
 
   function setMeshPointsVertexAttributeColorMap(id, colorMap) {
-    const name = meshPointsVertexAttributeName(id)
-    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name)
-    const points = getRGBPointsFromPreset(colorMap)
-    const { minimum, maximum } = storedConfig
+    const name = meshPointsVertexAttributeName(id);
+    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name);
+    const points = getRGBPointsFromPreset(colorMap);
+    const { minimum, maximum } = storedConfig;
     return viewerStore.request(
       meshPointsVertexAttributeSchemas.color_map,
       { id, points, minimum, maximum },
@@ -107,7 +107,7 @@ export function useMeshPointsVertexAttributeStyle() {
         response_function: () => {
           return setMeshPointsVertexAttributeStoredConfig(id, name, {
             colorMap,
-          })
+          });
         },
       },
     );

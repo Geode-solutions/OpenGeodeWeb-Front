@@ -23,7 +23,7 @@ export function useMeshPolygonsVisibilityStyle() {
         response_function: () => {
           return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
             visibility,
-          })
+          });
         },
       },
     );

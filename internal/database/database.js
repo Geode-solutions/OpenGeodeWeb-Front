@@ -1,11 +1,11 @@
-import { BaseDatabase } from "./base_database"
-import { ExtendedDatabase } from "./extended_database"
+import { BaseDatabase } from "./base_database";
+import { ExtendedDatabase } from "./extended_database";
 
 class Database extends BaseDatabase {
   constructor() {
     super("Database");
 
-    this.version(1).stores(BaseDatabase.initialStores)
+    this.version(1).stores(BaseDatabase.initialStores);
   }
 
   static async addTable(tableName, schemaDefinition) {
@@ -16,8 +16,8 @@ class Database extends BaseDatabase {
     const tempDb = new Dexie("Database");
     await tempDb.open();
 
-    const currentVersion = tempDb.verno
-    const currentStores = { ...BaseDatabase.initialStores }
+    const currentVersion = tempDb.verno;
+    const currentStores = { ...BaseDatabase.initialStores };
 
     for (const table of tempDb.tables) {
       const keyPath = table.schema.primKey.src;
@@ -36,7 +36,7 @@ class Database extends BaseDatabase {
       const existingDb = new Dexie("Database");
       for (let version = 1; version <= currentVersion; version += 1) {
         if (version === 1) {
-          existingDb.version(1).stores(BaseDatabase.initialStores)
+          existingDb.version(1).stores(BaseDatabase.initialStores);
         } else {
           existingDb.version(version).stores(currentStores);
         }

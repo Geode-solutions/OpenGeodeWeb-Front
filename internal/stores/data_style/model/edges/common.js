@@ -6,15 +6,15 @@ export function useModelEdgesCommonStyle() {
   function mutateModelEdgesStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
       edges: values,
-    })
+    });
   }
 
   function modelEdgesStyle(id) {
-    return dataStyleStateStore.getStyle(id).edges
+    return dataStyleStateStore.getStyle(id).edges;
   }
 
   return {
     modelEdgesStyle,
     mutateModelEdgesStyle,
-  }
+  };
 }

@@ -23,7 +23,7 @@ export function useMeshEdgesColorStyle() {
         response_function: () => {
           return meshEdgesCommonStyle.mutateMeshEdgesColoring(id, {
             color,
-          })
+          });
         },
       },
     );

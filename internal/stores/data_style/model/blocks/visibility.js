@@ -10,41 +10,35 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks;
 
 export function useModelBlocksVisibilityStyle() {
-  const dataStore = useDataStore()
-  const viewerStore = useViewerStore()
-  const modelBlocksCommonStyle = useModelBlocksCommonStyle()
+  const dataStore = useDataStore();
+  const viewerStore = useViewerStore();
+  const modelBlocksCommonStyle = useModelBlocksCommonStyle();
 
   function modelBlockVisibility(id, block_id) {
-    const style = modelBlocksCommonStyle.modelBlockStyle(id, block_id)
-    return style.visibility ?? true
+    const style = modelBlocksCommonStyle.modelBlockStyle(id, block_id);
+    return style.visibility ?? true;
   }
 
   function setModelBlocksVisibility(id, block_ids, visibility) {
     if (!block_ids || block_ids.length === 0) {
-      return Promise.resolve()
+      return Promise.resolve();
     }
-    return dataStore
-      .getMeshComponentsViewerIds(id, block_ids)
-      .then((block_viewer_ids) => {
-        if (!block_viewer_ids || block_viewer_ids.length === 0) {
-          return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
-            visibility,
-          })
-        }
-        return viewerStore.request(
-          model_blocks_schemas.visibility,
-          { id, block_ids: block_viewer_ids, visibility },
-          {
-            response_function: () => {
-              return modelBlocksCommonStyle.mutateModelBlocksStyle(
-                id,
-                block_ids,
-                { visibility },
-              )
-            },
+    return dataStore.getMeshComponentsViewerIds(id, block_ids).then((block_viewer_ids) => {
+      if (!block_viewer_ids || block_viewer_ids.length === 0) {
+        return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
+          visibility,
+        });
+      }
+      return viewerStore.request(
+        model_blocks_schemas.visibility,
+        { id, block_ids: block_viewer_ids, visibility },
+        {
+          response_function: () => {
+            return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { visibility });
           },
-        )
-      })
+        },
+      );
+    });
   }
 
   return {

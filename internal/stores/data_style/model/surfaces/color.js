@@ -10,9 +10,9 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces;
 
 export function useModelSurfacesColorStyle() {
-  const dataStore = useDataStore()
-  const viewerStore = useViewerStore()
-  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle()
+  const dataStore = useDataStore();
+  const viewerStore = useViewerStore();
+  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
 
   function modelSurfaceColor(id, surface_id) {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color;
@@ -20,36 +20,26 @@ export function useModelSurfacesColorStyle() {
 
   function setModelSurfacesColor(id, surface_ids, color) {
     if (!surface_ids || surface_ids.length === 0) {
-      return Promise.resolve()
+      return Promise.resolve();
     }
-    return dataStore
-      .getMeshComponentsViewerIds(id, surface_ids)
-      .then((surface_viewer_ids) => {
-        if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-          console.warn(
-            "[setModelSurfacesColor] No viewer IDs found, skipping color request",
-            { id, surface_ids },
-          )
-          return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
-            id,
-            surface_ids,
-            { color },
-          )
-        }
-        return viewerStore.request(
-          model_surfaces_schemas.color,
-          { id, block_ids: surface_viewer_ids, color },
-          {
-            response_function: () => {
-              return modelSurfacesCommonStyle.mutateModelSurfacesStyle(
-                id,
-                surface_ids,
-                { color },
-              )
-            },
+    return dataStore.getMeshComponentsViewerIds(id, surface_ids).then((surface_viewer_ids) => {
+      if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
+        console.warn("[setModelSurfacesColor] No viewer IDs found, skipping color request", {
+          id,
+          surface_ids,
+        });
+        return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color });
+      }
+      return viewerStore.request(
+        model_surfaces_schemas.color,
+        { id, block_ids: surface_viewer_ids, color },
+        {
+          response_function: () => {
+            return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color });
           },
-        )
-      })
+        },
+      );
+    });
   }
 
   return {

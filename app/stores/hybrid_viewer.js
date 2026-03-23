@@ -69,24 +69,22 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return;
     }
-    const value = await dataStore.item(id)
-    const reader = vtkXMLPolyDataReader()
-    const textEncoder = new TextEncoder()
-    await reader.parseAsArrayBuffer(
-      textEncoder.encode(value.binary_light_viewable),
-    )
-    const polydata = reader.getOutputData(0)
-    const mapper = vtkMapper()
-    mapper.setInputData(polydata)
-    const actor = vtkActor()
-    actor.getProperty().setColor(ACTOR_COLOR)
-    actor.setMapper(mapper)
-    const renderer = genericRenderWindow.value.getRenderer()
-    const renderWindow = genericRenderWindow.value.getRenderWindow()
-    renderer.addActor(actor)
-    renderer.resetCamera()
-    renderWindow.render()
-    hybridDb[id] = { actor, polydata, mapper }
+    const value = await dataStore.item(id);
+    const reader = vtkXMLPolyDataReader();
+    const textEncoder = new TextEncoder();
+    await reader.parseAsArrayBuffer(textEncoder.encode(value.binary_light_viewable));
+    const polydata = reader.getOutputData(0);
+    const mapper = vtkMapper();
+    mapper.setInputData(polydata);
+    const actor = vtkActor();
+    actor.getProperty().setColor(ACTOR_COLOR);
+    actor.setMapper(mapper);
+    const renderer = genericRenderWindow.value.getRenderer();
+    const renderWindow = genericRenderWindow.value.getRenderWindow();
+    renderer.addActor(actor);
+    renderer.resetCamera();
+    renderWindow.render();
+    hybridDb[id] = { actor, polydata, mapper };
   }
 
   function removeItem(id) {

@@ -6,7 +6,7 @@ export function useMeshCellsCommonStyle() {
   function mutateMeshCellsStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
       cells: values,
-    })
+    });
   }
 
   function meshCellsStyle(id) {
@@ -20,13 +20,13 @@ export function useMeshCellsCommonStyle() {
   function mutateMeshCellsColoring(id, values) {
     return mutateMeshCellsStyle(id, {
       coloring: values,
-    })
+    });
   }
 
   function mutateMeshCellsCellStyle(id, values) {
     return mutateMeshCellsColoring(id, {
       cell: values,
-    })
+    });
   }
 
   return {
@@ -35,5 +35,5 @@ export function useMeshCellsCommonStyle() {
     mutateMeshCellsStyle,
     mutateMeshCellsColoring,
     mutateMeshCellsCellStyle,
-  }
+  };
 }

@@ -13,11 +13,11 @@ export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
 
   async function item(id) {
-    const item = await database.data.get(id)
+    const item = await database.data.get(id);
     if (!item) {
-      throw new Error(`Item not found: ${id}`)
+      throw new Error(`Item not found: ${id}`);
     }
-    return item
+    return item;
   }
 
   function refItem(id) {
@@ -70,7 +70,7 @@ export const useDataStore = defineStore("data", () => {
     return useObservable(
       liveQuery(() => formatedMeshComponents(id)),
       { initialValue: [] },
-    )
+    );
   }
 
   async function meshComponentType(modelId, geode_id) {
@@ -186,8 +186,8 @@ export const useDataStore = defineStore("data", () => {
     const components = await database.model_components
       .where("[id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
-      .toArray()
-    return components.map((component) => parseInt(component.viewer_id))
+      .toArray();
+    return components.map((component) => parseInt(component.viewer_id));
   }
 
   async function exportStores() {
