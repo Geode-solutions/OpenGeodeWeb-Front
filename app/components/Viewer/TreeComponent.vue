@@ -12,9 +12,7 @@ const { id } = defineProps({ id: { type: String, required: true } });
 const emit = defineEmits(["show-menu"]);
 
 const items = dataStore.refFormatedMeshComponents(id);
-const mesh_components_selection = computed(() =>
-  dataStyleStore.visibleMeshComponents(id),
-);
+const mesh_components_selection = computed(() => dataStyleStore.visibleMeshComponents(id));
 
 watch(
   mesh_components_selection,
@@ -54,9 +52,7 @@ watch(
     <template #title="{ item }">
       <span
         class="treeview-item"
-        @contextmenu.prevent.stop="
-          emit('show-menu', { event: $event, itemId: item })
-        "
+        @contextmenu.prevent.stop="emit('show-menu', { event: $event, itemId: item })"
         >{{ item.title }}</span
       >
     </template>

@@ -27,9 +27,7 @@ function select_geode_object(object_map) {
   if (object_keys.length === 1 && object_map[object_keys[0]].is_loadable > 0) {
     return object_keys[0];
   }
-  const highest_load_score = Math.max(
-    ...object_keys.map((key) => object_map[key].is_loadable),
-  );
+  const highest_load_score = Math.max(...object_keys.map((key) => object_map[key].is_loadable));
   if (highest_load_score <= 0) {
     return undefined;
   }
@@ -40,9 +38,7 @@ function select_geode_object(object_map) {
     return best_score_objects[0];
   }
   const highest_priority = Math.max(
-    ...best_score_objects.map(
-      (key) => object_map[key].object_priority ?? -Infinity,
-    ),
+    ...best_score_objects.map((key) => object_map[key].object_priority ?? -Infinity),
   );
   const best_priority_objects = best_score_objects.filter(
     (key) => object_map[key].object_priority === highest_priority,
@@ -57,17 +53,11 @@ async function get_allowed_objects() {
   toggle_loading();
   allowed_objects.value = {};
 
-  const promise_array = filenames.map((filename) =>
-    geodeStore.request(schema, { filename }),
-  );
+  const promise_array = filenames.map((filename) => geodeStore.request(schema, { filename }));
   const responses = await Promise.all(promise_array);
-  const allowed_objects_list = responses.map(
-    (response) => response.allowed_objects,
-  );
+  const allowed_objects_list = responses.map((response) => response.allowed_objects);
   const all_keys = [...new Set(allowed_objects_list.flatMap(Object.keys))];
-  const common_keys = all_keys.filter((key) =>
-    allowed_objects_list.every((obj) => key in obj),
-  );
+  const common_keys = all_keys.filter((key) => allowed_objects_list.every((obj) => key in obj));
   const final_object = {};
   for (const key of common_keys) {
     const load_scores = allowed_objects_list.map((obj) => obj[key].is_loadable);
@@ -135,10 +125,7 @@ await get_allowed_objects();
     <v-card class="card" variant="tonal" rounded>
       <v-card-text>
         This file format isn't supported! Please check the
-        <a
-          href="https://docs.geode-solutions.com/guides/formats/"
-          target="_blank"
-        >
+        <a href="https://docs.geode-solutions.com/guides/formats/" target="_blank">
           supported file formats documentation</a
         >
         for more information
