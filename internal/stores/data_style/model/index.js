@@ -50,10 +50,14 @@ export function useModelStyle() {
     watch(
       () => (isRef(id_ref) ? id_ref.value : id_ref),
       (newId, oldId, onCleanup) => {
-        if (!newId) return;
+        if (!newId) {
+          return;
+        }
         const observable = liveQuery(async () => {
           const components = await database.model_components.where("id").equals(newId).toArray();
-          if (components.length === 0) return [];
+          if (components.length === 0) {
+            return [];
+          }
 
           const all_styles = await database.model_component_datastyle
             .where("id_model")
@@ -68,7 +72,9 @@ export function useModelStyle() {
           const meshTypes = ["Corner", "Line", "Surface", "Block"];
           const componentsByType = components.reduce((acc, c) => {
             if (meshTypes.includes(c.type)) {
-              if (!acc[c.type]) acc[c.type] = [];
+              if (!acc[c.type]) {
+                acc[c.type] = [];
+              }
               acc[c.type].push(c.geode_id);
             }
             return acc;

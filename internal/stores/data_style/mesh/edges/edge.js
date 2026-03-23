@@ -106,9 +106,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
       meshEdgesEdgeAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: () => {
-          return setMeshEdgesEdgeAttributeStoredConfig(id, name, { colorMap });
-        },
+        response_function: () => setMeshEdgesEdgeAttributeStoredConfig(id, name, { colorMap }),
       },
     );
   }

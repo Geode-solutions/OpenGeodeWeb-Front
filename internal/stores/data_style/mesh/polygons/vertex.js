@@ -104,11 +104,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
       meshPolygonsVertexAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: () => {
-          return setMeshPolygonsVertexAttributeStoredConfig(id, name, {
-            colorMap,
-          });
-        },
+        response_function: () => setMeshPolygonsVertexAttributeStoredConfig(id, name, { colorMap }),
       },
     );
   }

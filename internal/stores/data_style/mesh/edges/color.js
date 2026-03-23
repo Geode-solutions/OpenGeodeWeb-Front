@@ -20,11 +20,10 @@ export function useMeshEdgesColorStyle() {
       meshEdgesColorSchemas,
       { id, color },
       {
-        response_function: () => {
-          return meshEdgesCommonStyle.mutateMeshEdgesColoring(id, {
+        response_function: () =>
+          meshEdgesCommonStyle.mutateMeshEdgesColoring(id, {
             color,
-          });
-        },
+          }),
       },
     );
   }
