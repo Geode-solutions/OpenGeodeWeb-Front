@@ -24,7 +24,6 @@ export function useModelBlocksColorStyle() {
     }
     return dataStore.getMeshComponentsViewerIds(id, block_ids).then((block_viewer_ids) => {
       if (!block_viewer_ids || block_viewer_ids.length === 0) {
-
         return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
           color,
         });

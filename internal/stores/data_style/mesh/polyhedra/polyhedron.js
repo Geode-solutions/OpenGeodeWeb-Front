@@ -115,7 +115,8 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
       meshPolyhedraPolyhedronAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: () => config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { colorMap }),
+        response_function: () =>
+          config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { colorMap }),
       },
     );
   }
