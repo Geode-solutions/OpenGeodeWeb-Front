@@ -1,9 +1,9 @@
-import { appMode, getAppMode } from "@ogw_front/utils/local/app_mode";
+
 import { Status } from "@ogw_front/utils/status";
-import { useLambdaStore } from "@ogw_front/stores/lambda";
-import { database } from "@ogw_internal/database/database";
-import { useAppStore } from "@ogw_front/stores/app";
+import { appMode } from "@ogw_front/utils/local/app_mode";
 import { registerRunningExtensions } from "@ogw_front/utils/extension";
+import { useAppStore } from "@ogw_front/stores/app";
+import { useLambdaStore } from "@ogw_front/stores/lambda";
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
@@ -32,15 +32,14 @@ export const useInfraStore = defineStore("infra", {
     register_microservice(store) {
       const store_name = store.$id;
       console.log("[INFRA] Registering microservice:", store_name);
-      if (!this.microservices.find((microservice) => microservice.$id === store_name)) {
+
+      if (!this.microservices.some((microservice) => microservice.$id === store_name)) {
         this.microservices.push(store);
         console.log("[INFRA] Microservice registered:", store_name);
       }
     },
-
-    async create_backend() {
+    create_backend() {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
-      await database.clear();
       console.log(
         "[INFRA] Registered microservices:",
         this.microservices.map((store) => store.$id),
@@ -80,13 +79,13 @@ export const useInfraStore = defineStore("infra", {
         return this.create_connection();
       });
     },
-
     async create_connection() {
       console.log("[INFRA] Starting create_connection");
       console.log(
         "[INFRA] Connecting microservices:",
         this.microservices.map((store) => store.$id),
       );
+
       await Promise.all(
         this.microservices.map(async (store) => {
           await store.connect();
