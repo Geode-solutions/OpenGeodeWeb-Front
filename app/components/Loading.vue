@@ -42,10 +42,7 @@ onMounted(() => {
 
 <style scoped>
 .bg-grid-pattern {
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 0.08) 1px,
-    transparent 0
-  );
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
   background-size: 40px 40px;
   background-position: center;
 }

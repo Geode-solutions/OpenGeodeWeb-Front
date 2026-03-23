@@ -1,10 +1,10 @@
 <script setup>
-  const { logo } = defineProps({
-    logo: {
-      type: String,
-      required: true,
-    },
-  })
+const { logo } = defineProps({
+  logo: {
+    type: String,
+    required: true,
+  },
+});
 </script>
 
 <template>
@@ -24,12 +24,7 @@
     >
       STARTING UP
     </v-card-title>
-    <v-divider
-      thickness="3"
-      class="border-opacity-100 mx-auto my-4"
-      color="primary"
-      width="60"
-    />
+    <v-divider thickness="3" class="border-opacity-100 mx-auto my-4" color="primary" width="60" />
     <v-card-subtitle
       class="text-subtitle-2 font-weight-bold text-white ls-widest pa-0 text-wrap"
       style="opacity: 0.9"
@@ -40,7 +35,7 @@
 </template>
 
 <style scoped>
-  .ls-widest {
-    letter-spacing: 0.6em !important;
-  }
+.ls-widest {
+  letter-spacing: 0.6em !important;
+}
 </style>

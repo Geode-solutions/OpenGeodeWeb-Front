@@ -1,10 +1,10 @@
 <script setup>
-  const { progress } = defineProps({
-    progress: {
-      type: Number,
-      required: true,
-    },
-  })
+const { progress } = defineProps({
+  progress: {
+    type: Number,
+    required: true,
+  },
+});
 </script>
 
 <template>
@@ -32,11 +32,7 @@
             size="small"
             variant="flat"
             class="position-absolute font-weight-black"
-            style="
-              top: -40px;
-              right: -20px;
-              box-shadow: 0 0 12px rgba(var(--v-theme-primary), 0.6);
-            "
+            style="top: -40px; right: -20px; box-shadow: 0 0 12px rgba(var(--v-theme-primary), 0.6)"
           >
             {{ Math.round(value) }}%
           </v-chip>

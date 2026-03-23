@@ -1,44 +1,38 @@
 <script setup>
-  const ecoMessages = [
-    {
-      icon: "mdi-leaf",
-      title: "Why the wait?",
-      message: "Your workspace starts on demand, no idle servers running 24/7.",
-    },
-    {
-      icon: "mdi-lightning-bolt-outline",
-      title: "Lower carbon footprint",
-      message:
-        "On-demand computing uses up to 70% less energy than always-on servers.",
-    },
-    {
-      icon: "mdi-earth",
-      title: "Your choice matters",
-      message:
-        "By using Vease, you're part of a more sustainable way to work with data.",
-    },
-  ]
+const ecoMessages = [
+  {
+    icon: "mdi-leaf",
+    title: "Why the wait?",
+    message: "Your workspace starts on demand, no idle servers running 24/7.",
+  },
+  {
+    icon: "mdi-lightning-bolt-outline",
+    title: "Lower carbon footprint",
+    message: "On-demand computing uses up to 70% less energy than always-on servers.",
+  },
+  {
+    icon: "mdi-earth",
+    title: "Your choice matters",
+    message: "By using Vease, you're part of a more sustainable way to work with data.",
+  },
+];
 
-  const currentMessage = ref(0)
-  let interval = null
+const currentMessage = ref(0);
+let interval = null;
 
-  onMounted(() => {
-    interval = setInterval(() => {
-      currentMessage.value = (currentMessage.value + 1) % ecoMessages.length
-    }, 3000)
-  })
+onMounted(() => {
+  interval = setInterval(() => {
+    currentMessage.value = (currentMessage.value + 1) % ecoMessages.length;
+  }, 3000);
+});
 
-  onUnmounted(() => {
-    clearInterval(interval)
-  })
+onUnmounted(() => {
+  clearInterval(interval);
+});
 </script>
 
 <template>
-  <v-sheet
-    color="transparent"
-    height="160"
-    class="position-relative overflow-visible mb-4"
-  >
+  <v-sheet color="transparent" height="160" class="position-relative overflow-visible mb-4">
     <v-scroll-y-reverse-transition mode="out-in">
       <v-card
         :key="currentMessage"
