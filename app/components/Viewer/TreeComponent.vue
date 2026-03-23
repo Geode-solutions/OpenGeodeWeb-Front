@@ -56,7 +56,7 @@ watch(
         :class="{ 'inactive-item': item.is_active === false }"
         @contextmenu.prevent.stop="emit('show-menu', { event: $event, itemId: item })"
       >
-        {{ item.title || item.id }}
+        {{ item.title }}
         <v-tooltip v-if="item.category" activator="parent" location="right">
           <div class="d-flex flex-column pa-1">
             <span class="text-caption"><strong>ID:</strong> {{ item.id }}</span>
