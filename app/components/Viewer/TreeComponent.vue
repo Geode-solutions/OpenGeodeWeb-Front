@@ -55,8 +55,20 @@ watch(
         class="treeview-item"
         :class="{ 'inactive-item': item.is_active === false }"
         @contextmenu.prevent.stop="emit('show-menu', { event: $event, itemId: item })"
-        >{{ item.title }}</span
       >
+        {{ item.title || item.id }}
+        <v-tooltip v-if="item.category" activator="parent" location="right">
+          <div class="d-flex flex-column pa-1">
+            <span class="text-caption"><strong>ID:</strong> {{ item.id }}</span>
+            <span v-if="item.title" class="text-caption"
+              ><strong>Name:</strong> {{ item.title }}</span
+            >
+            <span class="text-caption font-italic border-t-sm d-flex align-center">
+              <strong class="mr-1">Status:</strong> {{ item.is_active ? "Active" : "Inactive" }}
+            </span>
+          </div>
+        </v-tooltip>
+      </span>
     </template>
   </v-treeview>
 </template>
@@ -70,7 +82,7 @@ watch(
   display: inline-block;
 }
 .inactive-item {
-  opacity: 0.5;
+  opacity: 0.4;
   font-style: italic;
 }
 
