@@ -1,18 +1,18 @@
 // Local imports
-import { useDataStore } from "@ogw_front/stores/data"
-import { useModelSurfacesColorStyle } from "./color"
-import { useModelSurfacesCommonStyle } from "./common"
-import { useModelSurfacesVisibilityStyle } from "./visibility"
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelSurfacesColorStyle } from "./color";
+import { useModelSurfacesCommonStyle } from "./common";
+import { useModelSurfacesVisibilityStyle } from "./visibility";
 
 async function setModelSurfacesDefaultStyle(_id) {
   // Placeholder for oxlint
 }
 
 export function useModelSurfacesStyle() {
-  const dataStore = useDataStore()
-  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle()
-  const modelSurfacesVisibilityStyle = useModelSurfacesVisibilityStyle()
-  const modelSurfacesColorStyle = useModelSurfacesColorStyle()
+  const dataStore = useDataStore();
+  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
+  const modelSurfacesVisibilityStyle = useModelSurfacesVisibilityStyle();
+  const modelSurfacesColorStyle = useModelSurfacesColorStyle();
 
   async function applyModelSurfacesStyle(id) {
     const surface_ids = await dataStore.getSurfacesGeodeIds(id)
@@ -58,7 +58,7 @@ export function useModelSurfacesStyle() {
     return Promise.all(promises)
   }
 
-  async function setModelSurfacesDefaultStyle(id) {}
+  async function setModelSurfacesDefaultStyle(id) { }
 
   return {
     applyModelSurfacesStyle,
@@ -66,5 +66,5 @@ export function useModelSurfacesStyle() {
     ...modelSurfacesCommonStyle,
     ...modelSurfacesVisibilityStyle,
     ...modelSurfacesColorStyle,
-  }
+  };
 }

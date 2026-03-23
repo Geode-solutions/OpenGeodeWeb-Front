@@ -1,33 +1,32 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
-import { useMeshCellsCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useMeshCellsCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshCellsCellAttributeSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell
+const meshCellsCellAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
 
 export function useMeshCellsCellAttributeStyle() {
-  const viewerStore = useViewerStore()
-  const meshCellsCommonStyle = useMeshCellsCommonStyle()
+  const viewerStore = useViewerStore();
+  const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
   function meshCellsCellAttribute(id) {
-    return meshCellsCommonStyle.meshCellsColoring(id).cell
+    return meshCellsCommonStyle.meshCellsColoring(id).cell;
   }
 
   function meshCellsCellAttributeStoredConfig(id, name) {
-    const { storedConfigs } = meshCellsCellAttribute(id)
+    const { storedConfigs } = meshCellsCellAttribute(id);
     if (name in storedConfigs) {
-      return storedConfigs[name]
+      return storedConfigs[name];
     }
     return setMeshCellsCellAttributeStoredConfig(id, name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    })
+    });
   }
 
 
@@ -52,14 +51,14 @@ export function useMeshCellsCellAttributeStyle() {
           return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name })
         },
       },
-    )
+    );
   }
 
   function meshCellsCellAttributeRange(id) {
-    const name = meshCellsCellAttributeName(id)
-    const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
-    const { minimum, maximum } = storedConfig
-    return [minimum, maximum]
+    const name = meshCellsCellAttributeName(id);
+    const storedConfig = meshCellsCellAttributeStoredConfig(id, name);
+    const { minimum, maximum } = storedConfig;
+    return [minimum, maximum];
   }
 
   function setMeshCellsCellAttributeRange(id, minimum, maximum) {
@@ -68,10 +67,10 @@ export function useMeshCellsCellAttributeStyle() {
   }
 
   function meshCellsCellAttributeColorMap(id) {
-    const name = meshCellsCellAttributeName(id)
-    const storedConfig = meshCellsCellAttributeStoredConfig(id, name)
-    const { colorMap } = storedConfig
-    return colorMap
+    const name = meshCellsCellAttributeName(id);
+    const storedConfig = meshCellsCellAttributeStoredConfig(id, name);
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   function setMeshCellsCellAttributeColorMap(id, colorMap) {
@@ -87,7 +86,7 @@ export function useMeshCellsCellAttributeStyle() {
           return setMeshCellsCellAttributeStoredConfig(id, name, { colorMap })
         },
       },
-    )
+    );
   }
 
   return {
@@ -98,5 +97,5 @@ export function useMeshCellsCellAttributeStyle() {
     setMeshCellsCellAttributeName,
     setMeshCellsCellAttributeRange,
     setMeshCellsCellAttributeColorMap,
-  }
+  };
 }

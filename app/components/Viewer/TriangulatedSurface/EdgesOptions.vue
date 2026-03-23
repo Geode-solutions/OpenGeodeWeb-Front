@@ -1,15 +1,12 @@
 <script setup>
-  import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg"
-  import ViewerGenericMeshEdgesOptions from "@ogw_front/components/Viewer/Generic/Mesh/EdgesOptions"
+import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
+import ViewerGenericMeshEdgesOptions from "@ogw_front/components/Viewer/Generic/Mesh/EdgesOptions";
 
-  const { itemProps } = defineProps({
-    itemProps: { type: Object, required: true },
-  })
+const { itemProps } = defineProps({
+  itemProps: { type: Object, required: true },
+});
 </script>
 
 <template>
-  <ViewerGenericMeshEdgesOptions
-    :itemProps="itemProps"
-    :btn_image="SurfaceEdges"
-  />
+  <ViewerGenericMeshEdgesOptions :itemProps="itemProps" :btn_image="SurfaceEdges" />
 </template>

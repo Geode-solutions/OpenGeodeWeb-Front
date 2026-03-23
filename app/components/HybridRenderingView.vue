@@ -1,48 +1,47 @@
 <script setup>
-  import VeaseViewToolbar from "@ogw_front/components/VeaseViewToolbar"
-  import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-  import { useViewerStore } from "@ogw_front/stores/viewer"
+import VeaseViewToolbar from "@ogw_front/components/VeaseViewToolbar";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
-  const DEFAULT_ELEMENT_HEIGHT = 100
+const DEFAULT_ELEMENT_HEIGHT = 100;
 
-  const emit = defineEmits(["click"])
+const emit = defineEmits(["click"]);
 
-  const container = useTemplateRef("viewer")
-  const hybridViewerStore = useHybridViewerStore()
-  const viewerStore = useViewerStore()
+const container = useTemplateRef("viewer");
+const hybridViewerStore = useHybridViewerStore();
+const viewerStore = useViewerStore();
 
-  const { width: elementWidth, height: elementHeight } =
-    useElementSize(container)
-  const { width: windowWidth, height: windowHeight } = useWindowSize()
+const { width: elementWidth, height: elementHeight } = useElementSize(container);
+const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-  const debouncedResize = debounce(() => {
-    hybridViewerStore.resize(elementWidth.value, elementHeight.value)
-  }, DEFAULT_ELEMENT_HEIGHT)
+const debouncedResize = debounce(() => {
+  hybridViewerStore.resize(elementWidth.value, elementHeight.value);
+}, DEFAULT_ELEMENT_HEIGHT);
 
-  watch([elementWidth, elementHeight, windowWidth, windowHeight], (value) => {
-    debouncedResize()
-  })
+watch([elementWidth, elementHeight, windowWidth, windowHeight], (value) => {
+  debouncedResize();
+});
 
-  onMounted(async () => {
-    if (import.meta.client) {
-      await hybridViewerStore.initHybridViewer()
-      await nextTick()
-      hybridViewerStore.setContainer(container)
-      debouncedResize()
-    }
-  })
-
-  function debounce(func, wait) {
-    let timeout = undefined
-    return function executedFunction(...args) {
-      function later() {
-        clearTimeout(timeout)
-        func(...args)
-      }
-      clearTimeout(timeout)
-      timeout = setTimeout(later, wait)
-    }
+onMounted(async () => {
+  if (import.meta.client) {
+    await hybridViewerStore.initHybridViewer();
+    await nextTick();
+    hybridViewerStore.setContainer(container);
+    debouncedResize();
   }
+});
+
+function debounce(func, wait) {
+  let timeout = undefined;
+  return function executedFunction(...args) {
+    function later() {
+      clearTimeout(timeout);
+      func(...args);
+    }
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 </script>
 
 <template>
@@ -62,7 +61,7 @@
 </template>
 
 <style>
-  img {
-    pointer-events: none;
-  }
+img {
+  pointer-events: none;
+}
 </style>

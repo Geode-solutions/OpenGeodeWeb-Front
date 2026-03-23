@@ -1,22 +1,22 @@
 <script setup>
-  import { useDataStore } from "@ogw_front/stores/data"
-  import { useTreeviewStore } from "@ogw_front/stores/treeview"
+import { useDataStore } from "@ogw_front/stores/data";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-  const dataStore = useDataStore()
-  const treeviewStore = useTreeviewStore()
+const dataStore = useDataStore();
+const treeviewStore = useTreeviewStore();
 
-  const selectedTree = computed(() => treeviewStore.selectedTree)
+const selectedTree = computed(() => treeviewStore.selectedTree);
 
-  function goBackToFileTree() {
-    treeviewStore.displayFileTree()
-  }
+function goBackToFileTree() {
+  treeviewStore.displayFileTree();
+}
 
-  const model_id = computed(() => treeviewStore.model_id)
+const model_id = computed(() => treeviewStore.model_id);
 
-  const metaDatas = computed(() => {
-    if (!model_id.value) return {}
-    return dataStore.refItem(model_id.value).value || {}
-  })
+const metaDatas = computed(() => {
+  if (!model_id.value) return {};
+  return dataStore.refItem(model_id.value).value || {};
+});
 </script>
 
 <template>
@@ -58,9 +58,9 @@
 </template>
 
 <style scoped>
-  .breadcrumb-container {
-    max-width: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-  }
+.breadcrumb-container {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
 </style>

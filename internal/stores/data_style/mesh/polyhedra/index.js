@@ -62,6 +62,22 @@ export function useMeshPolyhedraStyle() {
     } else {
       throw new Error(`Unknown mesh polyhedra coloring type: ${type}`)
     }
+    if (type === "vertex") {
+      const name = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
+      return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name);
+    }
+    if (type === "polyhedron") {
+      const name = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
+      await meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(id, name);
+      return;
+    }
+    throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
   }
 
   function applyMeshPolyhedraStyle(id) {
@@ -84,5 +100,5 @@ export function useMeshPolyhedraStyle() {
     ...meshPolyhedraColorStyle,
     ...meshPolyhedraVertexAttributeStyle,
     ...meshPolyhedraPolyhedronAttributeStyle,
-  }
+  };
 }

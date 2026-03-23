@@ -2,10 +2,10 @@ import merge from "lodash/merge"
 import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 export function useModelLinesCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStyleStateStore = useDataStyleStateStore();
 
   function modelLinesStyle(id) {
-    return dataStyleStateStore.getStyle(id).lines
+    return dataStyleStateStore.getStyle(id).lines;
   }
 
   function modelLineStyle(id, line_id) {

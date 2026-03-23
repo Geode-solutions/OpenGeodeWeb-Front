@@ -2,10 +2,10 @@ import merge from "lodash/merge"
 import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 
 export function useModelSurfacesCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStyleStateStore = useDataStyleStateStore();
 
   function modelSurfacesStyle(id) {
-    return dataStyleStateStore.getStyle(id).surfaces
+    return dataStyleStateStore.getStyle(id).surfaces;
   }
 
   function modelSurfaceStyle(id, surface_id) {

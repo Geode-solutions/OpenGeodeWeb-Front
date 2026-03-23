@@ -16,19 +16,19 @@ import { useViewerStore } from "@ogw_front/stores/viewer"
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model
 
 export function useModelStyle() {
-  const dataStore = useDataStore()
-  const dataStyleStateStore = useDataStyleStateStore()
-  const modelCornersStyleStore = useModelCornersStyle()
-  const modelBlocksStyleStore = useModelBlocksStyle()
-  const modelEdgesStyleStore = useModelEdgesStyle()
-  const modelLinesStyleStore = useModelLinesStyle()
-  const modelPointsStyleStore = useModelPointsStyle()
-  const modelSurfacesStyleStore = useModelSurfacesStyle()
-  const hybridViewerStore = useHybridViewerStore()
-  const viewerStore = useViewerStore()
+  const dataStore = useDataStore();
+  const dataStyleStateStore = useDataStyleStateStore();
+  const modelCornersStyleStore = useModelCornersStyle();
+  const modelBlocksStyleStore = useModelBlocksStyle();
+  const modelEdgesStyleStore = useModelEdgesStyle();
+  const modelLinesStyleStore = useModelLinesStyle();
+  const modelPointsStyleStore = useModelPointsStyle();
+  const modelSurfacesStyleStore = useModelSurfacesStyle();
+  const hybridViewerStore = useHybridViewerStore();
+  const viewerStore = useViewerStore();
 
   function modelVisibility(id) {
-    return dataStyleStateStore.getStyle(id).visibility
+    return dataStyleStateStore.getStyle(id).visibility;
   }
 
   function setModelVisibility(id, visibility) {
@@ -42,7 +42,7 @@ export function useModelStyle() {
           return { id, visibility }
         },
       },
-    )
+    );
   }
 
   function visibleMeshComponents(id_ref) {
@@ -152,5 +152,5 @@ export function useModelStyle() {
     ...useModelLinesStyle(),
     ...useModelPointsStyle(),
     ...useModelSurfacesStyle(),
-  }
+  };
 }

@@ -1,7 +1,7 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
+import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshCellsCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStyleStateStore = useDataStyleStateStore();
 
   function mutateMeshCellsStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
@@ -10,11 +10,11 @@ export function useMeshCellsCommonStyle() {
   }
 
   function meshCellsStyle(id) {
-    return dataStyleStateStore.getStyle(id).cells
+    return dataStyleStateStore.getStyle(id).cells;
   }
 
   function meshCellsColoring(id) {
-    return meshCellsStyle(id).coloring
+    return meshCellsStyle(id).coloring;
   }
 
   function mutateMeshCellsColoring(id, values) {

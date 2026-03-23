@@ -1,18 +1,18 @@
 // Local imports
-import { useDataStore } from "@ogw_front/stores/data"
-import { useModelLinesColorStyle } from "./color"
-import { useModelLinesCommonStyle } from "./common"
-import { useModelLinesVisibilityStyle } from "./visibility"
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelLinesColorStyle } from "./color";
+import { useModelLinesCommonStyle } from "./common";
+import { useModelLinesVisibilityStyle } from "./visibility";
 
 async function setModelLinesDefaultStyle(_id) {
   // Placeholder for oxlint
 }
 
 export function useModelLinesStyle() {
-  const dataStore = useDataStore()
-  const modelLinesCommonStyle = useModelLinesCommonStyle()
-  const modelLinesVisibilityStyle = useModelLinesVisibilityStyle()
-  const modelLinesColorStyle = useModelLinesColorStyle()
+  const dataStore = useDataStore();
+  const modelLinesCommonStyle = useModelLinesCommonStyle();
+  const modelLinesVisibilityStyle = useModelLinesVisibilityStyle();
+  const modelLinesColorStyle = useModelLinesColorStyle();
 
   async function applyModelLinesStyle(id) {
     const line_ids = await dataStore.getLinesGeodeIds(id)
@@ -54,7 +54,7 @@ export function useModelLinesStyle() {
     return Promise.all(promises)
   }
 
-  async function setModelLinesDefaultStyle(id) {}
+  async function setModelLinesDefaultStyle(id) { }
 
   return {
     applyModelLinesStyle,
@@ -62,5 +62,5 @@ export function useModelLinesStyle() {
     ...modelLinesCommonStyle,
     ...modelLinesVisibilityStyle,
     ...modelLinesColorStyle,
-  }
+  };
 }

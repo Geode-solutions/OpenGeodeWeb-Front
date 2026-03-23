@@ -11,11 +11,11 @@ import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
 // Local constants
 
 export function useMeshPointsStyle() {
-  const meshPointsCommonStyle = useMeshPointsCommonStyle()
-  const meshPointsVisibility = useMeshPointsVisibilityStyle()
-  const meshPointsColorStyle = useMeshPointsColorStyle()
-  const meshPointsSizeStyle = useMeshPointsSizeStyle()
-  const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle()
+  const meshPointsCommonStyle = useMeshPointsCommonStyle();
+  const meshPointsVisibility = useMeshPointsVisibilityStyle();
+  const meshPointsColorStyle = useMeshPointsColorStyle();
+  const meshPointsSizeStyle = useMeshPointsSizeStyle();
+  const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle();
 
   function meshPointsColoring(id) {
     return meshPointsCommonStyle.meshPointsColoring(id)
@@ -48,6 +48,29 @@ export function useMeshPointsStyle() {
     } else {
       throw new Error(`Unknown mesh points coloring type: ${type}`)
     }
+    if (type === "textures") {
+      const textures = meshPointsTexturesStore.meshPointsTextures(id);
+      if (textures === undefined) {
+        return;
+      }
+      return meshPointsTexturesStore.setMeshPointsTextures(id, textures);
+    }
+    if (type === "vertex") {
+      const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
+      return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
+    }
+    if (type === "polygon") {
+      const name = meshPointsPolygonAttributeStyleStore.meshPointsPolygonAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
+      await meshPointsPolygonAttributeStyleStore.setMeshPointsPolygonAttributeName(id, name);
+      return;
+    }
+    throw new Error(`Unknown mesh points coloring type: ${type}`);
   }
 
   function applyMeshPointsStyle(id) {
@@ -74,5 +97,5 @@ export function useMeshPointsStyle() {
     ...meshPointsColorStyle,
     ...meshPointsSizeStyle,
     ...meshPointsVertexAttributeStyle,
-  }
+  };
 }

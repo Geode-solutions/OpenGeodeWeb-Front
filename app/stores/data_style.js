@@ -6,10 +6,10 @@ import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index"
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index"
 
 export const useDataStyleStore = defineStore("dataStyle", () => {
-  const dataStyleState = useDataStyleStateStore()
-  const meshStyleStore = useMeshStyle()
-  const modelStyleStore = useModelStyle()
-  const dataStore = useDataStore()
+  const dataStyleState = useDataStyleStateStore();
+  const meshStyleStore = useMeshStyle();
+  const modelStyleStore = useModelStyle();
+  const dataStore = useDataStore();
 
   async function addDataStyle(id, geode_object) {
     await database.data_style.put(
@@ -22,12 +22,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const viewer_type = item.viewer_type
 
     if (viewer_type === "mesh") {
-      return meshStyleStore.setMeshVisibility(id, visibility)
+      return meshStyleStore.setMeshVisibility(id, visibility);
     }
     if (viewer_type === "model") {
-      return modelStyleStore.setModelVisibility(id, visibility)
+      return modelStyleStore.setModelVisibility(id, visibility);
     }
-    throw new Error("Unknown viewer_type")
+    throw new Error("Unknown viewer_type");
   }
 
   async function applyDefaultStyle(id) {
@@ -35,12 +35,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const viewer_type = item.viewer_type
 
     if (viewer_type === "mesh") {
-      return meshStyleStore.applyMeshStyle(id)
+      return meshStyleStore.applyMeshStyle(id);
     }
     if (viewer_type === "model") {
-      return modelStyleStore.applyModelStyle(id)
+      return modelStyleStore.applyModelStyle(id);
     }
-    throw new Error(`Unknown viewer_type: ${viewer_type}`)
+    throw new Error(`Unknown viewer_type: ${viewer_type}`);
   }
 
   function exportStores() {
@@ -75,8 +75,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       } else if (viewerType === "model") {
         return modelStyleStore.applyModelStyle(id)
       }
-    })
-    return Promise.all(promises)
+    });
+    return Promise.all(promises);
   }
 
   return {
@@ -92,5 +92,5 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     exportStores,
     importStores,
     applyAllStylesFromState,
-  }
-})
+  };
+});

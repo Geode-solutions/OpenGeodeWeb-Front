@@ -1,20 +1,19 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { useMeshCellsCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useMeshCellsCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshCellsTexturesSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.cells.apply_textures
+const meshCellsTexturesSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.apply_textures;
 
 export function useMeshCellsTexturesStyle() {
-  const viewerStore = useViewerStore()
-  const meshCellsCommonStyle = useMeshCellsCommonStyle()
+  const viewerStore = useViewerStore();
+  const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
   function meshCellsTextures(id) {
-    return meshCellsCommonStyle.meshCellsColoring(id).textures
+    return meshCellsCommonStyle.meshCellsColoring(id).textures;
   }
   function setMeshCellsTextures(id, textures) {
     return viewerStore.request(
@@ -27,11 +26,11 @@ export function useMeshCellsTexturesStyle() {
           })
         },
       },
-    )
+    );
   }
 
   return {
     meshCellsTextures,
     setMeshCellsTextures,
-  }
+  };
 }

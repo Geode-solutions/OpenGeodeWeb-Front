@@ -7,7 +7,7 @@ import { registerRunningExtensions } from "@ogw_front/utils/extension"
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
-    app_mode: getAppMode(),
+    app_mode: useRuntimeConfig().public.MODE,
     ID: "",
     is_captcha_validated: false,
     status: Status.NOT_CREATED,
@@ -16,18 +16,16 @@ export const useInfraStore = defineStore("infra", {
   getters: {
     domain_name() {
       if (this.app_mode === appMode.CLOUD) {
-        return useRuntimeConfig().public.API_URL
+        return useRuntimeConfig().public.API_URL;
       }
-      return "localhost"
+      return "localhost";
     },
     microservices_connected() {
-      console.log("microservices", this.microservices)
-      return this.microservices.every(
-        (store) => store.status === Status.CONNECTED,
-      )
+      console.log("microservices", this.microservices);
+      return this.microservices.every((store) => store.status === Status.CONNECTED);
     },
     microservices_busy() {
-      return this.microservices.some((store) => store.is_busy === true)
+      return this.microservices.some((store) => store.is_busy === true);
     },
   },
   actions: {
@@ -50,63 +48,59 @@ export const useInfraStore = defineStore("infra", {
       console.log(
         "[INFRA] Registered microservices:",
         this.microservices.map((store) => store.$id),
-      )
+      );
       if (this.status === Status.CREATED) {
-        return
+        return;
       }
       return navigator.locks.request("infra.create_backend", async () => {
-        this.status = Status.CREATING
+        this.status = Status.CREATING;
         if (this.status === Status.CREATED) {
-          return
+          return;
         }
-        console.log("[INFRA] Lock granted for create_backend")
+        console.log("[INFRA] Lock granted for create_backend");
         if (this.app_mode === appMode.CLOUD) {
-          console.log("[INFRA] CLOUD mode - Launching lambda...")
-          const lambdaStore = useLambdaStore()
-          this.ID = await lambdaStore.launch()
-          console.log("[INFRA] Lambda launched successfully")
+          console.log("[INFRA] CLOUD mode - Launching lambda...");
+          const lambdaStore = useLambdaStore();
+          this.ID = await lambdaStore.launch();
+          console.log("[INFRA] Lambda launched successfully");
         } else {
-          console.log(
-            `[INFRA] ${this.app_mode} mode - Launching microservices...`,
-          )
-          const appStore = useAppStore()
-          await appStore.createProjectFolder()
+          console.log(`[INFRA] ${this.app_mode} mode - Launching microservices...`);
+          const appStore = useAppStore();
+          await appStore.createProjectFolder();
           if (this.app_mode === appMode.DESKTOP) {
             globalThis.electronAPI.project_folder_path({
               projectFolderPath: appStore.projectFolderPath,
-            })
+            });
           }
-          const microservices_with_launch = this.microservices.filter(
-            (store) => store.launch,
-          )
+          const microservices_with_launch = this.microservices.filter((store) => store.launch);
           const launch_promises = microservices_with_launch.map((store) =>
             store.launch({ projectFolderPath: appStore.projectFolderPath }),
-          )
-          launch_promises.push(registerRunningExtensions())
-          await Promise.all(launch_promises)
+          );
+          launch_promises.push(registerRunningExtensions());
+          await Promise.all(launch_promises);
         }
-        this.status = Status.CREATED
-        console.log("[INFRA] Backend created successfully")
-        return this.create_connection()
-      })
+        this.status = Status.CREATED;
+        console.log("[INFRA] Backend created successfully");
+        return this.create_connection();
+      });
     },
 
     async create_connection() {
-      console.log("[INFRA] Starting create_connection")
+      console.log("[INFRA] Starting create_connection");
       console.log(
         "[INFRA] Connecting microservices:",
         this.microservices.map((store) => store.$id),
       )
       await Promise.all(
         this.microservices.map(async (store) => {
-          await store.connect()
-          console.log("[INFRA] Microservice connected:", store.$id)
+          await store.connect();
+          console.log("[INFRA] Microservice connected:", store.$id);
         }),
-      )
-      console.log("[INFRA] All microservices connected")
+      );
+      console.log("[INFRA] All microservices connected");
     },
   },
   share: {
     omit: ["microservices"],
   },
-})
+});

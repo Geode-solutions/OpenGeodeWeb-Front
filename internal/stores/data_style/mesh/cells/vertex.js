@@ -1,33 +1,33 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap"
-import { useMeshCellsCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useMeshCellsCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const meshCellsVertexAttributeSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex
+  viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
 
 export function useMeshCellsVertexAttributeStyle() {
-  const viewerStore = useViewerStore()
-  const meshCellsCommonStyle = useMeshCellsCommonStyle()
+  const viewerStore = useViewerStore();
+  const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
   function meshCellsVertexAttribute(id) {
-    return meshCellsCommonStyle.meshCellsColoring(id).vertex
+    return meshCellsCommonStyle.meshCellsColoring(id).vertex;
   }
 
   function meshCellsVertexAttributeStoredConfig(id, name) {
-    const { storedConfigs } = meshCellsVertexAttribute(id)
+    const { storedConfigs } = meshCellsVertexAttribute(id);
     if (name in storedConfigs) {
-      return storedConfigs[name]
+      return storedConfigs[name];
     }
     return setMeshCellsVertexAttributeStoredConfig(id, name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    })
+    });
   }
 
   function mutateMeshCellsVertexStyle(id, values) {
@@ -70,14 +70,14 @@ export function useMeshCellsVertexAttributeStyle() {
           return mutateMeshCellsVertexStyle(id, updates)
         },
       },
-    )
+    );
   }
 
   function meshCellsVertexAttributeRange(id) {
-    const name = meshCellsVertexAttributeName(id)
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
-    const { minimum, maximum } = storedConfig
-    return [minimum, maximum]
+    const name = meshCellsVertexAttributeName(id);
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name);
+    const { minimum, maximum } = storedConfig;
+    return [minimum, maximum];
   }
 
   function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
@@ -89,10 +89,10 @@ export function useMeshCellsVertexAttributeStyle() {
   }
 
   function meshCellsVertexAttributeColorMap(id) {
-    const name = meshCellsVertexAttributeName(id)
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name)
-    const { colorMap } = storedConfig
-    return colorMap
+    const name = meshCellsVertexAttributeName(id);
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name);
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   function setMeshCellsVertexAttributeColorMap(id, colorMap) {
@@ -108,7 +108,7 @@ export function useMeshCellsVertexAttributeStyle() {
           return setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap })
         },
       },
-    )
+    );
   }
 
   return {
@@ -119,5 +119,5 @@ export function useMeshCellsVertexAttributeStyle() {
     setMeshCellsVertexAttributeName,
     setMeshCellsVertexAttributeRange,
     setMeshCellsVertexAttributeColorMap,
-  }
+  };
 }

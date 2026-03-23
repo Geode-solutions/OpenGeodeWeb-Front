@@ -26,11 +26,11 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
     const selection = []
     for (const [id, value] of Object.entries(styles.value)) {
       if (value.visibility === true) {
-        selection.push(id)
+        selection.push(id);
       }
     }
-    return selection
-  })
+    return selection;
+  });
 
   const componentStyles = useObservable(
     liveQuery(async () => {

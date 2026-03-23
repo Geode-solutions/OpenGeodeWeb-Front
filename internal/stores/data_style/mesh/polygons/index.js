@@ -67,6 +67,29 @@ export function useMeshPolygonsStyle() {
     } else {
       throw new Error(`Unknown mesh polygons coloring type: ${type}`)
     }
+    if (type === "textures") {
+      const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id);
+      if (textures === undefined) {
+        return;
+      }
+      return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures);
+    }
+    if (type === "vertex") {
+      const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
+      return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name);
+    }
+    if (type === "polygon") {
+      const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
+      await meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name);
+      return;
+    }
+    throw new Error(`Unknown mesh polygons coloring type: ${type}`);
   }
 
   function applyMeshPolygonsStyle(id) {
@@ -90,5 +113,5 @@ export function useMeshPolygonsStyle() {
     ...meshPolygonsTexturesStyle,
     ...meshPolygonsVertexAttributeStyle,
     ...meshPolygonsPolygonAttributeStyle,
-  }
+  };
 }

@@ -4,35 +4,32 @@ import { nextTick } from "vue"
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
 
 // Local imports
-import { Status } from "@ogw_front/utils/status"
-import { cleanupBackend } from "@ogw_front/utils/local/microservices"
-import { setupIntegrationTests } from "@ogw_tests/integration/setup"
-import { useDataStore } from "@ogw_front/stores/data"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { Status } from "@ogw_front/utils/status";
+import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { setupIntegrationTests } from "@ogw_tests/integration/setup";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const INTERVAL_TIMEOUT = 20_000
-const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks
-const file_name = "test.og_brep"
-const geode_object = "BRep"
+const INTERVAL_TIMEOUT = 20_000;
+const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks;
+const file_name = "test.og_brep";
+const geode_object = "BRep";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 let id = "",
-  projectFolderPath = ""
+  projectFolderPath = "";
 
 beforeEach(async () => {
-  ;({ id, projectFolderPath } = await setupIntegrationTests(
-    file_name,
-    geode_object,
-  ))
-}, INTERVAL_TIMEOUT)
+  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+}, INTERVAL_TIMEOUT);
 
 afterEach(async () => {
-  console.log("afterEach model blocks kill", projectFolderPath)
-  await cleanupBackend(projectFolderPath)
-})
+  console.log("afterEach model blocks kill", projectFolderPath);
+  await cleanupBackend(projectFolderPath);
+});
 
 describe("Model blocks", () => {
   describe("Blocks visibility", () => {
@@ -62,15 +59,13 @@ describe("Model blocks", () => {
         {
           response_function: expect.any(Function),
         },
-      )
+      );
       for (const block_id of block_ids) {
-        expect(dataStyleStore.modelBlockVisibility(id, block_id)).toBe(
-          visibility,
-        )
+        expect(dataStyleStore.modelBlockVisibility(id, block_id)).toBe(visibility);
       }
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 
   describe("Blocks color", () => {
     test("Color red", async () => {
@@ -92,23 +87,21 @@ describe("Model blocks", () => {
         {
           response_function: expect.any(Function),
         },
-      )
+      );
       for (const block_id of block_ids) {
-        expect(dataStyleStore.modelBlockColor(id, block_id)).toStrictEqual(
-          color,
-        )
+        expect(dataStyleStore.modelBlockColor(id, block_id)).toStrictEqual(color);
       }
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
   describe("Blocks style", () => {
     test("Blocks apply style", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const result = dataStyleStore.applyModelBlocksStyle(id)
-      expect(result).toBeInstanceOf(Promise)
-      await result
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
-})
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const result = dataStyleStore.applyModelBlocksStyle(id);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+});

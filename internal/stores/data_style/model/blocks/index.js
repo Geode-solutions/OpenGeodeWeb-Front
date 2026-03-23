@@ -1,18 +1,18 @@
 // Local imports
-import { useDataStore } from "@ogw_front/stores/data"
-import { useModelBlocksColorStyle } from "./color"
-import { useModelBlocksCommonStyle } from "./common"
-import { useModelBlocksVisibilityStyle } from "./visibility"
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelBlocksColorStyle } from "./color";
+import { useModelBlocksCommonStyle } from "./common";
+import { useModelBlocksVisibilityStyle } from "./visibility";
 
 async function setModelBlocksDefaultStyle(_id) {
   // Placeholder for oxlint
 }
 
 export function useModelBlocksStyle() {
-  const dataStore = useDataStore()
-  const modelBlocksCommonStyle = useModelBlocksCommonStyle()
-  const modelBlocksVisibilityStyle = useModelBlocksVisibilityStyle()
-  const modelBlocksColorStyle = useModelBlocksColorStyle()
+  const dataStore = useDataStore();
+  const modelBlocksCommonStyle = useModelBlocksCommonStyle();
+  const modelBlocksVisibilityStyle = useModelBlocksVisibilityStyle();
+  const modelBlocksColorStyle = useModelBlocksColorStyle();
 
   async function applyModelBlocksStyle(id) {
     const block_ids = await dataStore.getBlocksGeodeIds(id)
@@ -54,7 +54,7 @@ export function useModelBlocksStyle() {
     return Promise.all(promises)
   }
 
-  async function setModelBlocksDefaultStyle(id) {}
+  async function setModelBlocksDefaultStyle(id) { }
 
   return {
     applyModelBlocksStyle,
@@ -62,5 +62,5 @@ export function useModelBlocksStyle() {
     ...modelBlocksCommonStyle,
     ...modelBlocksVisibilityStyle,
     ...modelBlocksColorStyle,
-  }
+  };
 }

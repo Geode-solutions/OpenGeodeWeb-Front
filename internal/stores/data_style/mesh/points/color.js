@@ -1,20 +1,19 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { useMeshPointsCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useMeshPointsCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshPointsColorSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.points.color
+const meshPointsColorSchemas = viewer_schemas.opengeodeweb_viewer.mesh.points.color;
 
 export function useMeshPointsColorStyle() {
-  const viewerStore = useViewerStore()
-  const meshPointsCommonStyle = useMeshPointsCommonStyle()
+  const viewerStore = useViewerStore();
+  const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
   function meshPointsColor(id) {
-    return meshPointsCommonStyle.meshPointsColoring(id).color
+    return meshPointsCommonStyle.meshPointsColoring(id).color;
   }
   function setMeshPointsColor(id, color) {
     return viewerStore.request(
@@ -27,11 +26,11 @@ export function useMeshPointsColorStyle() {
           })
         },
       },
-    )
+    );
   }
 
   return {
     meshPointsColor,
     setMeshPointsColor,
-  }
+  };
 }

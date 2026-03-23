@@ -1,20 +1,20 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { useDataStore } from "@ogw_front/stores/data"
-import { useModelSurfacesCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelSurfacesCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
+const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces;
 
 export function useModelSurfacesVisibilityStyle() {
-  const dataStore = useDataStore()
-  const viewerStore = useViewerStore()
-  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle()
+  const dataStore = useDataStore();
+  const viewerStore = useViewerStore();
+  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   function modelSurfaceVisibility(id, surface_id) {
-    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility
+    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility;
   }
   function setModelSurfacesVisibility(id, surface_ids, visibility) {
     if (!surface_ids || surface_ids.length === 0) {
@@ -50,5 +50,5 @@ export function useModelSurfacesVisibilityStyle() {
   return {
     modelSurfaceVisibility,
     setModelSurfacesVisibility,
-  }
+  };
 }

@@ -1,12 +1,12 @@
 // Third party imports
 
 // Local imports
-import { useMeshCellsCellAttributeStyle } from "./cell"
-import { useMeshCellsColorStyle } from "./color"
-import { useMeshCellsCommonStyle } from "./common"
-import { useMeshCellsTexturesStyle } from "./textures"
-import { useMeshCellsVertexAttributeStyle } from "./vertex"
-import { useMeshCellsVisibilityStyle } from "./visibility"
+import { useMeshCellsCellAttributeStyle } from "./cell";
+import { useMeshCellsColorStyle } from "./color";
+import { useMeshCellsCommonStyle } from "./common";
+import { useMeshCellsTexturesStyle } from "./textures";
+import { useMeshCellsVertexAttributeStyle } from "./vertex";
+import { useMeshCellsVisibilityStyle } from "./visibility";
 
 // Local constants
 
@@ -61,6 +61,29 @@ export function useMeshCellsStyle() {
     } else {
       throw new Error(`Unknown mesh cells coloring type: ${type}`)
     }
+    if (type === "textures") {
+      const textures = meshCellsTexturesStore.meshCellsTextures(id);
+      if (textures === undefined) {
+        return;
+      }
+      return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
+    }
+    if (type === "vertex") {
+      const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
+      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name);
+    }
+    if (type === "cell") {
+      const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
+      await meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
+      return;
+    }
+    throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }
 
   function applyMeshCellsStyle(id) {
@@ -84,5 +107,5 @@ export function useMeshCellsStyle() {
     ...meshCellsTexturesStore,
     ...meshCellsVertexAttributeStyle,
     ...meshCellsCellAttributeStyle,
-  }
+  };
 }

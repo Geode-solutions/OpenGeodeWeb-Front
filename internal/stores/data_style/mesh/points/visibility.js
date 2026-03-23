@@ -1,20 +1,19 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { useMeshPointsCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useMeshPointsCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshPointsVisibilitySchema =
-  viewer_schemas.opengeodeweb_viewer.mesh.points.visibility
+const meshPointsVisibilitySchema = viewer_schemas.opengeodeweb_viewer.mesh.points.visibility;
 
 export function useMeshPointsVisibilityStyle() {
-  const viewerStore = useViewerStore()
-  const meshPointsCommonStyle = useMeshPointsCommonStyle()
+  const viewerStore = useViewerStore();
+  const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
   function meshPointsVisibility(id) {
-    return meshPointsCommonStyle.meshPointsStyle(id).visibility
+    return meshPointsCommonStyle.meshPointsStyle(id).visibility;
   }
   function setMeshPointsVisibility(id, visibility) {
     return viewerStore.request(
@@ -25,11 +24,11 @@ export function useMeshPointsVisibilityStyle() {
           return meshPointsCommonStyle.mutateMeshPointsStyle(id, { visibility })
         },
       },
-    )
+    );
   }
 
   return {
     meshPointsVisibility,
     setMeshPointsVisibility,
-  }
+  };
 }
