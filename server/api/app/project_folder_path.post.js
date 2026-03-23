@@ -1,8 +1,7 @@
 // Node imports
 
 // Third party imports
-import { createError, defineEventHandler } from "h3";
-import { useRuntimeConfig } from "nitropack/runtime";
+import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -12,8 +11,7 @@ import {
 
 export default defineEventHandler(async (event) => {
   try {
-    const config = useRuntimeConfig(event).public;
-    const { PROJECT } = config;
+    const { PROJECT } = await readBody(event);
     const projectFolderPath = generateProjectFolderPath(PROJECT);
     await createPath(projectFolderPath);
 

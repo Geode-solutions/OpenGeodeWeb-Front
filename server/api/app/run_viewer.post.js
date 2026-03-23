@@ -12,9 +12,7 @@ import {
 
 export default defineEventHandler(async (event) => {
   try {
-    const config = useRuntimeConfig(event).public;
-    const { COMMAND_VIEWER, NUXT_ROOT_PATH } = config;
-    const { args } = await readBody(event);
+    const { COMMAND_VIEWER, NUXT_ROOT_PATH, args } = await readBody(event);
     const port = await runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, args);
     await addMicroserviceMetadatas(args.projectFolderPath, {
       type: "viewer",
