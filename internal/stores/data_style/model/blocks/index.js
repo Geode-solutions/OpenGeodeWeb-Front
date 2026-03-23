@@ -53,8 +53,6 @@ export function useModelBlocksStyle() {
     return Promise.all(promises);
   }
 
-
-
   return {
     applyModelBlocksStyle,
     setModelBlocksDefaultStyle,
