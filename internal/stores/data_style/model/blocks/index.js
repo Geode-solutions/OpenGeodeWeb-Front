@@ -4,8 +4,6 @@ import { useModelBlocksColorStyle } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelBlocksVisibilityStyle } from "./visibility";
 
-
-
 export function useModelBlocksStyle() {
   const dataStore = useDataStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
