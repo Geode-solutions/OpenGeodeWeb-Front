@@ -29,11 +29,10 @@ export function useModelSurfacesVisibilityStyle() {
         model_surfaces_schemas.visibility,
         { id, block_ids: surface_viewer_ids, visibility },
         {
-          response_function: () => {
-            return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, {
+          response_function: () =>
+            modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, {
               visibility,
-            });
-          },
+            }),
         },
       );
     });

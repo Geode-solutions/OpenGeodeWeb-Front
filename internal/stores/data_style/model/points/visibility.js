@@ -21,11 +21,10 @@ export function useModelPointsVisibilityStyle() {
       model_points_schemas.visibility,
       { id, visibility },
       {
-        response_function: () => {
-          return modelPointsCommonStyle.mutateModelPointsStyle(id, {
+        response_function: () =>
+          modelPointsCommonStyle.mutateModelPointsStyle(id, {
             visibility,
-          });
-        },
+          }),
       },
     );
   }

@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshPolygonsPolygonAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.polygons.attribute.polygon;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useMeshPolygonsPolygonAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
@@ -104,11 +105,10 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       meshPolygonsPolygonAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: () => {
-          return setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
+        response_function: () =>
+          setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
             colorMap,
-          });
-        },
+          }),
       },
     );
   }

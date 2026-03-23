@@ -30,9 +30,8 @@ export function useModelCornersVisibilityStyle() {
         model_corners_schemas.visibility,
         { id, block_ids: corner_viewer_ids, visibility },
         {
-          response_function: () => {
-            return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { visibility });
-          },
+          response_function: () =>
+            modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { visibility }),
         },
       );
     });
