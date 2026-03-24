@@ -1,4 +1,5 @@
 <script setup>
+import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -80,31 +81,23 @@ watch(
       <SearchBar v-model="search" label="Search" color="black" base-color="black" />
     </v-col>
     <v-col cols="auto" class="d-flex align-center">
-      <v-btn
-        icon
-        variant="elevated"
-        color="primary"
-        size="small"
-        v-tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
+      <ActionButton
+        :tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
+        :icon="
+          sortType === 'name' ? 'mdi-sort-alphabetical-ascending' : 'mdi-sort-numeric-ascending'
+        "
+        tooltipLocation="bottom"
         @click="toggleSort"
-      >
-        <v-icon size="24">{{
-          sortType === "name" ? "mdi-sort-alphabetical-ascending" : "mdi-sort-numeric-ascending"
-        }}</v-icon>
-      </v-btn>
+      />
       <v-menu :close-on-content-click="false">
         <template #activator="{ props }">
-          <v-btn
-            icon
-            variant="elevated"
-            color="secondary"
-            size="small"
-            v-bind="props"
-            v-tooltip="'Filter options'"
+          <ActionButton
+            tooltip="Filter options"
+            icon="mdi-filter-variant"
+            tooltipLocation="bottom"
             class="ml-1"
-          >
-            <v-icon size="24">mdi-filter-variant</v-icon>
-          </v-btn>
+            v-bind="props"
+          />
         </template>
         <v-list class="mt-1">
           <v-list-item v-for="category_id in availableFilterOptions" :key="category_id">
