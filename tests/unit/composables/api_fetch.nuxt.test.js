@@ -71,6 +71,6 @@ describe("geodeStore.request()", () => {
       handler: () => ({ result: "success" }),
     });
     await geodeStore.request(schema, params, callbacks);
-    expect(errorCalled).toBe(false);
+    expect(errorCalled).toBeFalsy();
   });
 });

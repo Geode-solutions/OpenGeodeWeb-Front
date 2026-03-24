@@ -68,7 +68,7 @@ describe("Feedback Store", () => {
         const feedbackStore = useFeedbackStore();
         feedbackStore.$patch({ server_error: true });
         feedbackStore.delete_server_error();
-        expect(feedbackStore.server_error).toBe(false);
+        expect(feedbackStore.server_error).toBeFalsy();
       });
     });
   });

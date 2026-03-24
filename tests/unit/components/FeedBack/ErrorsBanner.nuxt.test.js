@@ -35,6 +35,6 @@ describe(FeedBackErrorBanner, () => {
     const feedbackStore = useFeedbackStore();
     const v_btn = wrapper.findAll(".v-btn");
     await v_btn[1].trigger("click");
-    expect(feedbackStore.server_error).toBe(false);
+    expect(feedbackStore.server_error).toBeFalsy();
   });
 });

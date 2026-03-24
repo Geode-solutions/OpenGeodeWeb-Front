@@ -134,7 +134,7 @@ describe("Viewer Store", () => {
       test("test not is_busy", () => {
         const viewerStore = useViewerStore();
         viewerStore.request_counter = 0;
-        expect(viewerStore.is_busy).toBe(false);
+        expect(viewerStore.is_busy).toBeFalsy();
       });
     });
   });

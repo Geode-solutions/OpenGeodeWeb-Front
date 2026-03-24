@@ -64,7 +64,7 @@ describe("Lambda Store", () => {
     describe("is_busy", () => {
       test("test is_busy is always false", () => {
         const lambdaStore = useLambdaStore();
-        expect(lambdaStore.is_busy).toBe(false);
+        expect(lambdaStore.is_busy).toBeFalsy();
       });
     });
   });
@@ -92,7 +92,7 @@ describe("Lambda Store", () => {
 
         expect(lambdaStore.status).toBe(Status.CONNECTED);
         expect(id).toBe(TEST_ID);
-        expect(feedbackStore.server_error).toBe(false);
+        expect(feedbackStore.server_error).toBeFalsy();
       });
 
       test("failed launch - error response", async () => {

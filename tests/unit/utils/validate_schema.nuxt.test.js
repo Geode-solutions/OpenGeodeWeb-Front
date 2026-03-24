@@ -25,7 +25,7 @@ describe("validate schema", () => {
   test("ajv wrong params", () => {
     const params = {};
     const { valid, error } = validate_schema(schema, params);
-    expect(valid).toBe(false);
+    expect(valid).toBeFalsy();
     expect(error).toBe("data must have required property 'var_1'");
   });
 

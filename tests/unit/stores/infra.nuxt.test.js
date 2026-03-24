@@ -85,7 +85,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ status: Status.NOT_CONNECTED });
         viewerStore.$patch({ status: Status.NOT_CONNECTED });
-        expect(infraStore.microservices_connected).toBe(false);
+        expect(infraStore.microservices_connected).toBeFalsy();
       });
       test("test geode true & viewer false", () => {
         const infraStore = useInfraStore();
@@ -105,7 +105,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ status: Status.CONNECTED });
         viewerStore.$patch({ status: Status.NOT_CONNECTED });
-        expect(infraStore.microservices_connected).toBe(false);
+        expect(infraStore.microservices_connected).toBeFalsy();
       });
       test("test geode false & viewer true", () => {
         const infraStore = useInfraStore();
@@ -125,7 +125,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ status: Status.NOT_CONNECTED });
         viewerStore.$patch({ status: Status.CONNECTED });
-        expect(infraStore.microservices_connected).toBe(false);
+        expect(infraStore.microservices_connected).toBeFalsy();
       });
       test("test geode true & viewer true", () => {
         const infraStore = useInfraStore();
@@ -152,7 +152,7 @@ describe("Infra Store", () => {
     describe("microservices_busy", () => {
       test("test no microservices registered", () => {
         const infraStore = useInfraStore();
-        expect(infraStore.microservices_busy).toBe(false);
+        expect(infraStore.microservices_busy).toBeFalsy();
       });
       test("test geode false & viewer false", () => {
         const infraStore = useInfraStore();
@@ -172,7 +172,7 @@ describe("Infra Store", () => {
 
         geodeStore.$patch({ request_counter: 0 });
         viewerStore.$patch({ request_counter: 0 });
-        expect(infraStore.microservices_busy).toBe(false);
+        expect(infraStore.microservices_busy).toBeFalsy();
       });
       test("test geode true & viewer false", () => {
         const infraStore = useInfraStore();

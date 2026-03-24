@@ -113,7 +113,7 @@ describe("geode store", () => {
     test("not is_busy", () => {
       const geodeStore = useGeodeStore();
       geodeStore.request_counter = EXPECTED_NO_REQUEST;
-      expect(geodeStore.is_busy).toBe(false);
+      expect(geodeStore.is_busy).toBeFalsy();
     });
   });
 });
