@@ -135,6 +135,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     genericRenderWindow.value.getRenderWindow().render();
     syncRemoteCamera();
   }
+  
   function syncRemoteCamera() {
     console.log("syncRemoteCamera");
     const renderer = genericRenderWindow.value.getRenderer();
