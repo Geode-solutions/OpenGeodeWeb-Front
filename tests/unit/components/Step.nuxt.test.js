@@ -43,6 +43,6 @@ describe(Step, () => {
       },
       props: { step_index: 0 },
     });
-    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.exists()).toBeTruthy();
   });
 });

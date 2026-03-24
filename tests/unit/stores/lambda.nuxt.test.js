@@ -115,7 +115,7 @@ describe("Lambda Store", () => {
         await expect(lambdaStore.launch()).rejects.toThrow("Failed to launch lambda backend");
 
         expect(lambdaStore.status).toBe(Status.NOT_CONNECTED);
-        expect(feedbackStore.server_error).toBe(true);
+        expect(feedbackStore.server_error).toBeTruthy();
       });
     });
 

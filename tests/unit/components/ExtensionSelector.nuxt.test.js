@@ -52,7 +52,7 @@ describe(ExtensionSelector, () => {
       props: { geode_object_type: "BRep", filenames: ["test.toto"] },
     });
     await nextTick();
-    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.exists()).toBeTruthy();
     const v_card = await wrapper.findAllComponents(components.VCard);
     await v_card[SECOND_INDEX].trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");

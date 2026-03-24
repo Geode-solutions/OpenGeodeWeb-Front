@@ -45,6 +45,6 @@ describe(Stepper, () => {
         provide: { stepper_tree },
       },
     });
-    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.exists()).toBeTruthy();
   });
 });

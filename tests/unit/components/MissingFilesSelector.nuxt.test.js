@@ -50,7 +50,7 @@ describe(MissingFilesSelector, () => {
     });
 
     const file_uploader = wrapper.findComponent(FileUploader);
-    expect(file_uploader.exists()).toBe(true);
+    expect(file_uploader.exists()).toBeTruthy();
 
     const v_file_input = file_uploader.find('input[type="file"]');
     const files = [new File(["fake_file"], "fake_file.txt")];

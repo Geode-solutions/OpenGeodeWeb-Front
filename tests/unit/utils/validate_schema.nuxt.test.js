@@ -32,7 +32,7 @@ describe("validate schema", () => {
   test("good params", () => {
     const params = { var_1: "test", var_2: VAL_5 };
     const { valid, error } = validate_schema(schema, params);
-    expect(valid).toBe(true);
+    expect(valid).toBeTruthy();
     expect(error).toBe("No errors");
   });
 });

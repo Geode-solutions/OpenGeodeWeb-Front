@@ -129,7 +129,7 @@ describe("Viewer Store", () => {
       test("test is_busy", () => {
         const viewerStore = useViewerStore();
         viewerStore.request_counter = 1;
-        expect(viewerStore.is_busy).toBe(true);
+        expect(viewerStore.is_busy).toBeTruthy();
       });
       test("test not is_busy", () => {
         const viewerStore = useViewerStore();
@@ -143,7 +143,7 @@ describe("Viewer Store", () => {
       test("test true", async () => {
         const viewerStore = useViewerStore();
         await viewerStore.toggle_picking_mode(true);
-        expect(viewerStore.picking_mode).toBe(true);
+        expect(viewerStore.picking_mode).toBeTruthy();
       });
     });
 

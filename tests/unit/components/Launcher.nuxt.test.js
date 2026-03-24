@@ -29,7 +29,7 @@ describe(Launcher, () => {
         plugins: [vuetify, pinia],
       },
     });
-    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.exists()).toBeTruthy();
     await infraStore.$patch({ is_captcha_validated: true });
     await flushPromises();
     expect(infraStore.create_backend).toHaveBeenCalled();
