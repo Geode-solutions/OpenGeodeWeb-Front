@@ -4,8 +4,7 @@ const {
   showOverlay,
   fullscreen,
   loading,
-  loadingText,
-  dropText,
+  texts,
   multiple,
   accept,
   showExtensions,
@@ -14,8 +13,14 @@ const {
   showOverlay: { type: Boolean, required: true },
   fullscreen: { type: Boolean, required: true },
   loading: { type: Boolean, required: true },
-  loadingText: { type: String, required: true },
-  dropText: { type: String, required: true },
+  texts: {
+    type: Object,
+    default: () => ({
+      idle: "Click or drag and drop",
+      drop: "Drop files here",
+      loading: "Loading...",
+    }),
+  },
   multiple: { type: Boolean, required: true },
   accept: { type: String, default: "" },
   showExtensions: { type: Boolean, required: true },
@@ -61,7 +66,7 @@ const {
               >
                 {{
                   loading
-                    ? loadingText
+                    ? texts.loading
                     : fullscreen
                       ? "Drop your files here"
                       : "Drop your files"

@@ -3,7 +3,20 @@ import { onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDrop/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDrop/DragAndDropOverlay.vue";
 
-const props = defineProps({
+const {
+  multiple,
+  accept,
+  loading,
+  showExtensions,
+  fullscreen,
+  inline,
+  showOverlay,
+  texts = {
+    idle: "Click or drag and drop",
+    drop: "Drop files here",
+    loading: "Loading...",
+  },
+} = defineProps({
   multiple: { type: Boolean, default: false },
   accept: { type: String, default: "" },
   loading: { type: Boolean, default: false },
@@ -11,9 +24,7 @@ const props = defineProps({
   fullscreen: { type: Boolean, default: false },
   inline: { type: Boolean, default: true },
   showOverlay: { type: Boolean, default: true },
-  idleText: { type: String, default: "Click or drag and drop" },
-  dropText: { type: String, default: "Drop files here" },
-  loadingText: { type: String, default: "Loading..." },
+  texts: { type: Object, default: undefined },
 });
 
 const emit = defineEmits(["files-selected"]);
@@ -29,13 +40,13 @@ function triggerFileDialog() {
 
 function onDragEnter(event) {
   if (!isInternalDrag.value && event.dataTransfer.types.includes("Files")) {
-    dragCounter.value++;
+    dragCounter.value += 1;
     isDragging.value = true;
   }
 }
 
 function onDragLeave() {
-  dragCounter.value--;
+  dragCounter.value -= 1;
   if (dragCounter.value <= 0) {
     isDragging.value = false;
     dragCounter.value = 0;
@@ -53,7 +64,9 @@ function onDrop(event) {
   dragCounter.value = 0;
   isDragging.value = false;
   const files = [...event.dataTransfer.files];
-  if (files.length > 0) emit("files-selected", files);
+  if (files.length > 0) {
+    emit("files-selected", files);
+  }
 }
 
 function onKeyDown(event) {
@@ -67,7 +80,9 @@ function onKeyDown(event) {
 
 function handleFileSelect(event) {
   const files = [...event.target.files];
-  if (files.length > 0) emit("files-selected", files);
+  if (files.length > 0) {
+    emit("files-selected", files);
+  }
   event.target.value = "";
 }
 
@@ -80,23 +95,23 @@ function onInternalDragEnd() {
 }
 
 onMounted(() => {
-  window.addEventListener("dragstart", onInternalDragStart);
-  window.addEventListener("dragend", onInternalDragEnd);
-  window.addEventListener("dragenter", onDragEnter);
-  window.addEventListener("dragover", onDragOver);
-  window.addEventListener("dragleave", onDragLeave);
-  window.addEventListener("drop", onDrop);
-  window.addEventListener("keydown", onKeyDown);
+  globalThis.addEventListener("dragstart", onInternalDragStart);
+  globalThis.addEventListener("dragend", onInternalDragEnd);
+  globalThis.addEventListener("dragenter", onDragEnter);
+  globalThis.addEventListener("dragover", onDragOver);
+  globalThis.addEventListener("dragleave", onDragLeave);
+  globalThis.addEventListener("drop", onDrop);
+  globalThis.addEventListener("keydown", onKeyDown);
 });
 
 onUnmounted(() => {
-  window.removeEventListener("dragstart", onInternalDragStart);
-  window.removeEventListener("dragend", onInternalDragEnd);
-  window.removeEventListener("dragenter", onDragEnter);
-  window.removeEventListener("dragover", onDragOver);
-  window.removeEventListener("dragleave", onDragLeave);
-  window.removeEventListener("drop", onDrop);
-  window.removeEventListener("keydown", onKeyDown);
+  globalThis.removeEventListener("dragstart", onInternalDragStart);
+  globalThis.removeEventListener("dragend", onInternalDragEnd);
+  globalThis.removeEventListener("dragenter", onDragEnter);
+  globalThis.removeEventListener("dragover", onDragOver);
+  globalThis.removeEventListener("dragleave", onDragLeave);
+  globalThis.removeEventListener("drop", onDrop);
+  globalThis.removeEventListener("keydown", onKeyDown);
 });
 
 defineExpose({ triggerFileDialog });
@@ -105,13 +120,13 @@ defineExpose({ triggerFileDialog });
 <template>
   <DragAndDropInline
     v-if="inline"
-    v-bind="props"
+    v-bind="$props"
     :is-dragging="isDragging"
     @click="triggerFileDialog"
   />
 
   <DragAndDropOverlay
-    v-bind="props"
+    v-bind="$props"
     :is-dragging="isDragging"
   />
 

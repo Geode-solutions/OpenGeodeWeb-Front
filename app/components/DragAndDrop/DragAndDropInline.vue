@@ -4,17 +4,20 @@ import GlassCard from "@ogw_front/components/GlassCard";
 const {
   isDragging,
   loading,
-  loadingText,
-  dropText,
-  idleText,
+  texts,
   accept,
   showExtensions,
 } = defineProps({
   isDragging: { type: Boolean, required: true },
   loading: { type: Boolean, required: true },
-  loadingText: { type: String, required: true },
-  dropText: { type: String, required: true },
-  idleText: { type: String, required: true },
+  texts: {
+    type: Object,
+    default: () => ({
+      idle: "Click or drag and drop",
+      drop: "Drop files here",
+      loading: "Loading...",
+    }),
+  },
   accept: { type: String, default: "" },
   showExtensions: { type: Boolean, required: true },
 });
@@ -48,7 +51,7 @@ const emit = defineEmits(["click"]);
 
       <v-card-text class="pa-0">
         <v-sheet class="text-h6 font-weight-bold text-white d-block mb-1 bg-transparent">
-          {{ loading ? loadingText : isDragging ? dropText : idleText }}
+          {{ loading ? texts.loading : isDragging ? texts.drop : texts.idle }}
         </v-sheet>
         <v-sheet
           v-if="accept && showExtensions"
