@@ -1,13 +1,7 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
 
-const {
-  isDragging,
-  loading,
-  texts,
-  accept,
-  showExtensions,
-} = defineProps({
+const { isDragging, loading, texts, accept, showExtensions } = defineProps({
   isDragging: { type: Boolean, required: true },
   loading: { type: Boolean, required: true },
   texts: {
@@ -50,7 +44,9 @@ const emit = defineEmits(["click"]);
       </v-sheet>
 
       <v-card-text class="pa-0">
-        <v-sheet class="text-h6 font-weight-bold text-white d-block mb-1 bg-transparent">
+        <v-sheet
+          class="text-h6 font-weight-bold text-white d-block mb-1 bg-transparent"
+        >
           {{ loading ? texts.loading : isDragging ? texts.drop : texts.idle }}
         </v-sheet>
         <v-sheet
