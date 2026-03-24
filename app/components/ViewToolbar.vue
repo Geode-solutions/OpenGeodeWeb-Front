@@ -1,7 +1,6 @@
 <script setup>
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-import ActionButton from "@ogw_front/components/ActionButton.vue";
 import Screenshot from "@ogw_front/components/Screenshot";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -46,11 +45,14 @@ const camera_options = [
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
     <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
-        <ActionButton
-          :icon="camera_option.icon"
-          :tooltip="camera_option.tooltip"
+        <v-btn
+          density="comfortable"
+          icon
           @click.stop="camera_option.action"
-        />
+          v-tooltip:left="camera_option.tooltip"
+        >
+          <v-icon :icon="camera_option.icon" size="32" />
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>

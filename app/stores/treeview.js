@@ -50,7 +50,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   function toggleTreeView() {
     isTreeCollection.value = !isTreeCollection.value;
-    console.log("Switched to", isTreeCollection.value ? "TreeCollection" : "TreeComponent");
+    console.log(
+      "Switched to",
+      isTreeCollection.value ? "TreeCollection" : "TreeComponent",
+    );
   }
 
   function setPanelWidth(width) {
@@ -70,14 +73,17 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function importStores(snapshot) {
-    isAdditionnalTreeDisplayed.value = snapshot?.isAdditionnalTreeDisplayed || false;
+    isAdditionnalTreeDisplayed.value =
+      snapshot?.isAdditionnalTreeDisplayed || false;
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
     model_id.value = snapshot?.model_id || "";
     isTreeCollection.value = snapshot?.isTreeCollection || false;
     selectedTree.value = snapshot?.selectedTree || undefined;
 
     pendingSelectionIds.value =
-      snapshot?.selectionIds || (snapshot?.selection || []).map((store) => store.id) || [];
+      snapshot?.selectionIds ||
+      (snapshot?.selection || []).map((store) => store.id) ||
+      [];
   }
 
   function finalizeImportSelection() {
@@ -114,7 +120,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
           items.value.splice(i, 1);
         }
 
-        const selectionIndex = selection.value.findIndex((item) => item.id === id);
+        const selectionIndex = selection.value.findIndex(
+          (item) => item.id === id,
+        );
         if (selectionIndex !== -1) {
           selection.value.splice(selectionIndex, 1);
         }
