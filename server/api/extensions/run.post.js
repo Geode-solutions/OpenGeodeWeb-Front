@@ -10,8 +10,11 @@ import {
   addMicroserviceMetadatas,
   runBack,
 } from "@geode/opengeodeweb-front/app/utils/local/microservices.js";
+import { extensionFrontendPath } from "@geode/opengeodeweb-front/app/utils/local/path.js";
 import { extensionsConf } from "@geode/opengeodeweb-front/app/utils/config.js";
 import { unzipFile } from "@geode/opengeodeweb-front/app/utils/server.js";
+
+const __dirname = path.resolve();
 
 const CODE_200 = 200;
 
@@ -56,8 +59,16 @@ export default defineEventHandler(async (event) => {
           });
         }
 
-        const frontendFilePath = path.join(unzippedExtensionPath, frontendFile);
+        const frontendFilePath = extensionFrontendPath(
+          projectFolderPath,
+          frontendFile,
+          path.resolve(__dirname),
+          id,
+        );
+
+        console.log("frontendFilePath", { frontendFilePath });
         const frontendContent = await fs.promises.readFile(frontendFilePath, "utf8");
+
         const backendExecutablePath = path.join(unzippedExtensionPath, backendExecutable);
         fs.chmodSync(backendExecutablePath, "755");
         const port = await runBack(backendExecutable, backendExecutablePath, {
