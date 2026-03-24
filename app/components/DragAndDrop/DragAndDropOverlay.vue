@@ -1,30 +1,22 @@
 <script setup>
-const {
-  isDragging,
-  showOverlay,
-  fullscreen,
-  loading,
-  texts,
-  multiple,
-  accept,
-  showExtensions,
-} = defineProps({
-  isDragging: { type: Boolean, required: true },
-  showOverlay: { type: Boolean, required: true },
-  fullscreen: { type: Boolean, required: true },
-  loading: { type: Boolean, required: true },
-  texts: {
-    type: Object,
-    default: () => ({
-      idle: "Click or drag and drop",
-      drop: "Drop files here",
-      loading: "Loading...",
-    }),
-  },
-  multiple: { type: Boolean, required: true },
-  accept: { type: String, default: "" },
-  showExtensions: { type: Boolean, required: true },
-});
+const { isDragging, showOverlay, fullscreen, loading, texts, multiple, accept, showExtensions } =
+  defineProps({
+    isDragging: { type: Boolean, required: true },
+    showOverlay: { type: Boolean, required: true },
+    fullscreen: { type: Boolean, required: true },
+    loading: { type: Boolean, required: true },
+    texts: {
+      type: Object,
+      default: () => ({
+        idle: "Click or drag and drop",
+        drop: "Drop files here",
+        loading: "Loading...",
+      }),
+    },
+    multiple: { type: Boolean, required: true },
+    accept: { type: String, default: "" },
+    showExtensions: { type: Boolean, required: true },
+  });
 </script>
 
 <template>
@@ -53,11 +45,7 @@ const {
                 :width="fullscreen ? 140 : 120"
                 :height="fullscreen ? 140 : 120"
               >
-                <v-icon
-                  icon="mdi-cloud-upload"
-                  :size="fullscreen ? 80 : 64"
-                  color="white"
-                />
+                <v-icon icon="mdi-cloud-upload" :size="fullscreen ? 80 : 64" color="white" />
               </v-sheet>
 
               <v-sheet
@@ -65,11 +53,7 @@ const {
                 :class="fullscreen ? 'text-h2' : 'text-h3'"
               >
                 {{
-                  loading
-                    ? texts.loading
-                    : fullscreen
-                      ? "Drop your files here"
-                      : "Drop your files"
+                  loading ? texts.loading : fullscreen ? "Drop your files here" : "Drop your files"
                 }}
               </v-sheet>
 
@@ -107,11 +91,7 @@ const {
           </v-row>
         </v-container>
 
-        <v-sheet
-          v-if="fullscreen"
-          class="drag-frame-border"
-          color="transparent"
-        />
+        <v-sheet v-if="fullscreen" class="drag-frame-border" color="transparent" />
       </v-overlay>
     </v-fade-transition>
   </Teleport>
