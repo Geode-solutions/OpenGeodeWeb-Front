@@ -66,7 +66,6 @@ export default defineEventHandler(async (event) => {
           id,
         );
 
-        console.log("frontendFilePath", { frontendFilePath });
         const frontendContent = await fs.promises.readFile(frontendFilePath, "utf8");
 
         const backendExecutablePath = path.join(unzippedExtensionPath, backendExecutable);
