@@ -25,7 +25,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
             sensitivity: "base",
           }),
         );
-        selection.value.push(child);
+        selection.value.push(id);
         return;
       }
     }
@@ -36,7 +36,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         sensitivity: "base",
       }),
     );
-    selection.value.push(child);
+    selection.value.push(id);
   }
 
   function displayAdditionalTree(id) {
@@ -58,7 +58,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function exportStores() {
-    const selectionIds = selection.value.map((store) => store.id);
+    const selectionIds = selection.value;
     return {
       isAdditionnalTreeDisplayed: isAdditionnalTreeDisplayed.value,
       panelWidth: panelWidth.value,
@@ -86,14 +86,14 @@ export const useTreeviewStore = defineStore("treeview", () => {
     if (ids.length === 0) {
       for (const group of items.value) {
         for (const child of group.children) {
-          rebuilt.push(child);
+          rebuilt.push(child.id);
         }
       }
     } else {
       for (const group of items.value) {
         for (const child of group.children) {
           if (ids.includes(child.id)) {
-            rebuilt.push(child);
+            rebuilt.push(child.id);
           }
         }
       }
@@ -114,7 +114,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
           items.value.splice(i, 1);
         }
 
-        const selectionIndex = selection.value.findIndex((item) => item.id === id);
+        const selectionIndex = selection.value.indexOf(id);
         if (selectionIndex !== -1) {
           selection.value.splice(selectionIndex, 1);
         }
