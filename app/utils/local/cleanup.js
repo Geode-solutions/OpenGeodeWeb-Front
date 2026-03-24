@@ -133,6 +133,10 @@ function projectMicroservices(projectFolderPath) {
 }
 
 async function cleanupBackend(projectFolderPath) {
+  if (!fs.existsSync(projectFolderPath)) {
+    console.log(`Folder ${projectFolderPath} does not exist. Skipping cleanup.`);
+    return;
+  }
   const microservices = projectMicroservices(projectFolderPath);
   await killMicroservices(microservices);
   await deleteFolderRecursive(projectFolderPath);
@@ -142,4 +146,4 @@ function microservicesMetadatasPath(projectFolderPath) {
   return path.join(projectFolderPath, "microservices.json");
 }
 
-export { cleanupBackend, microservicesMetadatasPath };
+export { cleanupBackend, microservicesMetadatasPath, projectMicroservices };
