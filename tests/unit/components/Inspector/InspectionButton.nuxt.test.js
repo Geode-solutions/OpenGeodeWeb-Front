@@ -53,7 +53,7 @@ describe("Inspector/InspectionButton", () => {
       props: { geode_object_type, filename },
     });
 
-    expect(wrapper.exists()).toBeTruthy();
+    expect(wrapper.exists()).toBe(true);
     const v_btn = await wrapper.findComponent(components.VBtn);
     await v_btn.trigger("click");
     await flushPromises();
