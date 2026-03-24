@@ -20,7 +20,7 @@ describe(FeedBackErrorBanner, () => {
     const reload_spy = vi.spyOn(wrapper.vm, "reload");
     const feedbackStore = useFeedbackStore();
     await feedbackStore.$patch({ server_error: true });
-    expect(feedbackStore.server_error).toBeTruthy();
+    expect(feedbackStore.server_error).toBe(true);
     const v_btn = wrapper.findAll(".v-btn");
     await v_btn[0].trigger("click");
     expect(reload_spy).toHaveBeenCalledTimes(CALLED_TIMES);
@@ -35,6 +35,6 @@ describe(FeedBackErrorBanner, () => {
     const feedbackStore = useFeedbackStore();
     const v_btn = wrapper.findAll(".v-btn");
     await v_btn[1].trigger("click");
-    expect(feedbackStore.server_error).toBeFalsy();
+    expect(feedbackStore.server_error).toBe(false);
   });
 });
