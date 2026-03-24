@@ -32,7 +32,7 @@ const processedItems = computed(() =>
       const children = (category.children || []).toSorted((first, second) =>
         first[field].localeCompare(second[field]),
       );
-      return { ...category, children };
+      return { id: category.id, title: category.title, children };
     }),
 );
 
