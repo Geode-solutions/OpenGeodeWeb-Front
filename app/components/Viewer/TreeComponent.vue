@@ -43,11 +43,11 @@ function toggleSort() {
   sortType.value = sortType.value === "name" ? "id" : "name";
 }
 
-function customFilter(value, search, item) {
-  if (!search) {
+function customFilter(value, searchQuery, item) {
+  if (!searchQuery) {
     return true;
   }
-  const query = search.toLowerCase();
+  const query = searchQuery.toLowerCase();
   return (
     item.raw.title.toLowerCase().includes(query) ||
     (item.raw.id && item.raw.id.toLowerCase().includes(query))
