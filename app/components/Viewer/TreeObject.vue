@@ -32,7 +32,9 @@ const processedItems = computed(() =>
     }),
 );
 
-const availableFilterOptions = computed(() => treeviewStore.items.map((category) => category.title));
+const availableFilterOptions = computed(() =>
+  treeviewStore.items.map((category) => category.title),
+);
 
 watch(
   availableFilterOptions,
