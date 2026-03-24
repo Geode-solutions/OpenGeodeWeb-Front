@@ -15,6 +15,14 @@ const INTERVAL_TIMEOUT = 20_000;
 const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
+const SLEEP_MS = 200;
+
+function sleep(milliseconds) {
+  // oxlint-disable-next-line promise/avoid-new
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
 
 let id = "",
   projectFolderPath = "";
@@ -42,6 +50,7 @@ describe("Model lines", () => {
       const result = dataStyleStore.setModelLinesVisibility(id, line_ids, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.visibility,
         { id, block_ids: lines_viewer_ids, visibility },
@@ -69,6 +78,7 @@ describe("Model lines", () => {
       const result = dataStyleStore.setModelLinesColor(id, line_ids, color);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_lines_schemas.color,
         { id, block_ids: lines_viewer_ids, color },

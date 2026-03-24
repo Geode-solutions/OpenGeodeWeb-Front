@@ -14,6 +14,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const INTERVAL_TIMEOUT = 20_000;
 const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks;
 const file_name = "test.og_brep";
+const geode_object = "BRep";
 const SLEEP_MS = 200;
 
 function sleep(milliseconds) {
@@ -31,7 +32,6 @@ beforeEach(async () => {
 }, INTERVAL_TIMEOUT);
 
 afterEach(async () => {
-  // eslint-disable-next-line no-console
   console.log("afterEach model blocks kill", projectFolderPath);
   await cleanupBackend(projectFolderPath);
 });

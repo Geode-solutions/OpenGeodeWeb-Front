@@ -15,6 +15,14 @@ const INTERVAL_TIMEOUT = 20_000;
 const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
+const SLEEP_MS = 200;
+
+function sleep(milliseconds) {
+  // oxlint-disable-next-line promise/avoid-new
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
 
 let id = "",
   projectFolderPath = "";
@@ -42,6 +50,7 @@ describe("Model corners", () => {
       const result = dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.visibility,
         { id, block_ids: corner_viewer_ids, visibility },
@@ -69,6 +78,7 @@ describe("Model corners", () => {
       const result = dataStyleStore.setModelCornersColor(id, corner_ids, color);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.color,
         { id, block_ids: corner_viewer_ids, color },

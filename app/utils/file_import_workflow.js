@@ -27,6 +27,14 @@ async function importWorkflow(files) {
   return results;
 }
 
+function buildImportItemFromPayloadApi(value, geode_object_type) {
+  console.log("buildImportItemFromPayloadApi", { value, geode_object_type });
+  return {
+    geode_object_type,
+    ...value,
+  };
+}
+
 async function importItem(item) {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
@@ -34,6 +42,7 @@ async function importItem(item) {
   const treeviewStore = useTreeviewStore();
   const registerTask = dataStore.registerObject(item.id);
   const addDataTask = dataStore.addItem(item);
+
   const addDataComponentsTask =
     item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
   const addDataRelationsTask =
@@ -68,13 +77,15 @@ async function importFile(filename, geode_object_type) {
     geode_object_type,
     filename,
   });
-  const item = buildImportItemFromPayloadApi(response);
+
+  const item = buildImportItemFromPayloadApi(response, geode_object_type);
   return importItem(item);
 }
 
 async function importWorkflowFromSnapshot(items) {
   console.log("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
+
   const ids = await Promise.all(items.map((item) => importItem(item)));
   hybridViewerStore.remoteRender();
   console.log("[importWorkflowFromSnapshot] done", { ids });
