@@ -64,7 +64,7 @@ describe("Lambda Store", () => {
     describe("is_busy", () => {
       test("test is_busy is always false", () => {
         const lambdaStore = useLambdaStore();
-        expect(lambdaStore.is_busy).toBeFalsy();
+        expect(lambdaStore.is_busy).toBe(false);
       });
     });
   });
@@ -92,7 +92,7 @@ describe("Lambda Store", () => {
 
         expect(lambdaStore.status).toBe(Status.CONNECTED);
         expect(id).toBe(TEST_ID);
-        expect(feedbackStore.server_error).toBeFalsy();
+        expect(feedbackStore.server_error).toBe(false);
       });
 
       test("failed launch - error response", async () => {
@@ -115,7 +115,7 @@ describe("Lambda Store", () => {
         await expect(lambdaStore.launch()).rejects.toThrow("Failed to launch lambda backend");
 
         expect(lambdaStore.status).toBe(Status.NOT_CONNECTED);
-        expect(feedbackStore.server_error).toBeTruthy();
+        expect(feedbackStore.server_error).toBe(true);
       });
     });
 

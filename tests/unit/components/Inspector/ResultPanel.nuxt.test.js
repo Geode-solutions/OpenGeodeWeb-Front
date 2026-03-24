@@ -23,11 +23,11 @@ describe("Inspector/ResultPanel", () => {
       props: { inspection_result },
     });
 
-    expect(wrapper.exists()).toBeTruthy();
+    expect(wrapper.exists()).toBe(true);
     expect(wrapper.componentVM.inspection_result).toStrictEqual(inspection_result);
 
     const child_result_panel_wrapper = await wrapper.findComponent(InspectorResultPanel);
-    expect(child_result_panel_wrapper.exists()).toBeTruthy();
+    expect(child_result_panel_wrapper.exists()).toBe(true);
     expect(child_result_panel_wrapper.componentVM.inspection_result).toStrictEqual(
       inspection_result[0].children,
     );
@@ -47,7 +47,7 @@ describe("Inspector/ResultPanel", () => {
       props: { inspection_result },
     });
 
-    expect(wrapper.exists()).toBeTruthy();
+    expect(wrapper.exists()).toBe(true);
 
     console.log({ wrapper });
 

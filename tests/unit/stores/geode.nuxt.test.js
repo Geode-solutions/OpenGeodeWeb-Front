@@ -107,13 +107,13 @@ describe("geode store", () => {
     test("is_busy", () => {
       const geodeStore = useGeodeStore();
       geodeStore.request_counter = EXPECTED_ONE_REQUEST;
-      expect(geodeStore.is_busy).toBeTruthy();
+      expect(geodeStore.is_busy).toBe(true);
     });
 
     test("not is_busy", () => {
       const geodeStore = useGeodeStore();
       geodeStore.request_counter = EXPECTED_NO_REQUEST;
-      expect(geodeStore.is_busy).toBeFalsy();
+      expect(geodeStore.is_busy).toBe(false);
     });
   });
 });
