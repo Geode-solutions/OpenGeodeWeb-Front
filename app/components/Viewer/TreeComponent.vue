@@ -1,9 +1,9 @@
 <script setup>
+import SearchBar from "@ogw_front/components/SearchBar.vue";
+import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-
-import { compareSelections } from "@ogw_front/utils/treeview";
 
 const dataStyleStore = useDataStyleStore();
 const dataStore = useDataStore();
@@ -14,11 +14,44 @@ const { id } = defineProps({ id: { type: String, required: true } });
 const emit = defineEmits(["show-menu"]);
 
 const items = ref([]);
+const search = ref("");
+const sortType = ref("name");
+const filterOptions = ref({ Corner: true, Line: true, Surface: true, Block: true });
+
 const mesh_components_selection = dataStyleStore.visibleMeshComponents(id);
 
 watchEffect(async () => {
   items.value = await dataStore.formatedMeshComponents(id);
 });
+
+const processedItems = computed(() =>
+  items.value
+    .filter((category) => filterOptions.value[category.id])
+    .map((category) => {
+      const field = sortType.value === "name" ? "title" : "id";
+      const children = (category.children || []).toSorted((first, second) =>
+        first[field].localeCompare(second[field]),
+      );
+      return { ...category, children };
+    }),
+);
+
+const availableFilterOptions = computed(() => items.value.map((category) => category.id));
+
+function toggleSort() {
+  sortType.value = sortType.value === "name" ? "id" : "name";
+}
+
+function customFilter(value, search, item) {
+  if (!search) {
+    return true;
+  }
+  const query = search.toLowerCase();
+  return (
+    item.raw.title.toLowerCase().includes(query) ||
+    (item.raw.id && item.raw.id.toLowerCase().includes(query))
+  );
+}
 
 watch(
   mesh_components_selection,
@@ -42,9 +75,55 @@ watch(
 </script>
 
 <template>
+  <v-row dense align="center" class="mr-1 ml-3 mt-2 pa-1">
+    <v-col>
+      <SearchBar v-model="search" label="Search" color="black" base-color="black" />
+    </v-col>
+    <v-col cols="auto" class="d-flex align-center">
+      <v-btn
+        icon
+        variant="elevated"
+        color="primary"
+        size="small"
+        v-tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
+        @click="toggleSort"
+      >
+        <v-icon size="24">{{
+          sortType === "name" ? "mdi-sort-alphabetical-ascending" : "mdi-sort-numeric-ascending"
+        }}</v-icon>
+      </v-btn>
+      <v-menu :close-on-content-click="false">
+        <template #activator="{ props }">
+          <v-btn
+            icon
+            variant="elevated"
+            color="secondary"
+            size="small"
+            v-bind="props"
+            v-tooltip="'Filter options'"
+            class="ml-1"
+          >
+            <v-icon size="24">mdi-filter-variant</v-icon>
+          </v-btn>
+        </template>
+        <v-list class="mt-1">
+          <v-list-item v-for="category_id in availableFilterOptions" :key="category_id">
+            <v-checkbox
+              v-model="filterOptions[category_id]"
+              :label="category_id"
+              hide-details
+              density="compact"
+            />
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-col>
+  </v-row>
   <v-treeview
     v-model:selected="mesh_components_selection"
-    :items="items"
+    :items="processedItems"
+    :search="search"
+    :custom-filter="customFilter"
     class="transparent-treeview"
     item-value="id"
     select-strategy="classic"
@@ -54,8 +133,9 @@ watch(
       <span
         class="treeview-item"
         @contextmenu.prevent.stop="emit('show-menu', { event: $event, itemId: item })"
-        >{{ item.title }}</span
       >
+        {{ item.title }}
+      </span>
     </template>
   </v-treeview>
 </template>
