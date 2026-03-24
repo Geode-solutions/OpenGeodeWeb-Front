@@ -74,11 +74,7 @@ const camera_options = [
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row
-      v-for="camera_option in camera_options"
-      :key="camera_option.icon"
-      dense
-    >
+    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
         <v-btn
           density="comfortable"
@@ -92,12 +88,7 @@ const camera_options = [
     </v-row>
   </v-container>
   <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
-  <ZScaling
-    v-if="showZScaling"
-    v-model="zScale"
-    :width="400"
-    @close="handleZScalingClose"
-  />
+  <ZScaling v-if="showZScaling" v-model="zScale" :width="400" @close="handleZScalingClose" />
 </template>
 
 <style module>
