@@ -41,9 +41,7 @@ function removeFile(index) {
 
 async function upload_files() {
   toggle_loading();
-  const promise_array = internal_files.value.map((file) =>
-    geodeStore.upload(file),
-  );
+  const promise_array = internal_files.value.map((file) => geodeStore.upload(file));
   await Promise.all(promise_array);
   files_uploaded.value = true;
   emit("files_uploaded", internal_files.value);
@@ -86,10 +84,7 @@ watch(internal_files, (value) => {
     @files-selected="processSelectedFiles"
   />
 
-  <v-hover
-    v-if="!internal_files.length"
-    v-slot="{ isHovering, props: hoverProps }"
-  >
+  <v-hover v-if="!internal_files.length" v-slot="{ isHovering, props: hoverProps }">
     <GlassCard
       v-bind="hoverProps"
       class="text-center cursor-pointer glass-ui border-dashed pa-12 mb-0 transition-swing"
@@ -122,15 +117,8 @@ watch(internal_files, (value) => {
   <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
       <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
-      <span class="text-subtitle-1 font-weight-bold text-white">
-        Selected files
-      </span>
-      <v-chip
-        size="small"
-        class="ml-3 bg-white-opacity-10"
-        color="white"
-        variant="flat"
-      >
+      <span class="text-subtitle-1 font-weight-bold text-white"> Selected files </span>
+      <v-chip size="small" class="ml-3 bg-white-opacity-10" color="white" variant="flat">
         {{ internal_files.length }}
       </v-chip>
       <v-spacer />
@@ -162,18 +150,13 @@ watch(internal_files, (value) => {
         <v-icon start size="18" color="primary">mdi-file-outline</v-icon>
         <span class="text-white">{{ file.name }}</span>
         <template #close>
-          <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100"
-            >mdi-close-circle</v-icon
-          >
+          <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100">mdi-close-circle</v-icon>
         </template>
       </v-chip>
     </v-sheet>
   </v-card-text>
 
-  <v-card-actions
-    v-if="!auto_upload && internal_files.length"
-    class="mt-8 pa-0"
-  >
+  <v-card-actions v-if="!auto_upload && internal_files.length" class="mt-8 pa-0">
     <v-btn
       color="primary"
       variant="flat"
@@ -185,10 +168,7 @@ watch(internal_files, (value) => {
       @click="upload_files"
     >
       <v-icon start size="22">mdi-cloud-upload</v-icon>
-      Upload {{ internal_files.length }} file<span
-        v-if="internal_files.length > 1"
-        >s</span
-      >
+      Upload {{ internal_files.length }} file<span v-if="internal_files.length > 1">s</span>
     </v-btn>
   </v-card-actions>
 </template>

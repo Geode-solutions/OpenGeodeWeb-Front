@@ -110,10 +110,7 @@ defineExpose({ triggerFileDialog });
     @click="triggerFileDialog"
   />
 
-  <DragAndDropOverlay
-    v-bind="props"
-    :is-dragging="isDragging"
-  />
+  <DragAndDropOverlay v-bind="props" :is-dragging="isDragging" />
 
   <input
     ref="fileInput"
@@ -124,4 +121,3 @@ defineExpose({ triggerFileDialog });
     @change="handleFileSelect"
   />
 </template>
-

@@ -48,11 +48,7 @@ const {
                 :width="fullscreen ? 140 : 120"
                 :height="fullscreen ? 140 : 120"
               >
-                <v-icon
-                  icon="mdi-cloud-upload"
-                  :size="fullscreen ? 80 : 64"
-                  color="white"
-                />
+                <v-icon icon="mdi-cloud-upload" :size="fullscreen ? 80 : 64" color="white" />
               </v-sheet>
 
               <v-sheet
@@ -60,11 +56,7 @@ const {
                 :class="fullscreen ? 'text-h2' : 'text-h3'"
               >
                 {{
-                  loading
-                    ? loadingText
-                    : fullscreen
-                      ? "Drop your files here"
-                      : "Drop your files"
+                  loading ? loadingText : fullscreen ? "Drop your files here" : "Drop your files"
                 }}
               </v-sheet>
 
@@ -102,11 +94,7 @@ const {
           </v-row>
         </v-container>
 
-        <v-sheet
-          v-if="fullscreen"
-          class="drag-frame-border"
-          color="transparent"
-        />
+        <v-sheet v-if="fullscreen" class="drag-frame-border" color="transparent" />
       </v-overlay>
     </v-fade-transition>
   </Teleport>

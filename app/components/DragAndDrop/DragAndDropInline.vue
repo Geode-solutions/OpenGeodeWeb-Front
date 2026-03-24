@@ -1,23 +1,16 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
 
-const {
-  isDragging,
-  loading,
-  loadingText,
-  dropText,
-  idleText,
-  accept,
-  showExtensions,
-} = defineProps({
-  isDragging: { type: Boolean, required: true },
-  loading: { type: Boolean, required: true },
-  loadingText: { type: String, required: true },
-  dropText: { type: String, required: true },
-  idleText: { type: String, required: true },
-  accept: { type: String, default: "" },
-  showExtensions: { type: Boolean, required: true },
-});
+const { isDragging, loading, loadingText, dropText, idleText, accept, showExtensions } =
+  defineProps({
+    isDragging: { type: Boolean, required: true },
+    loading: { type: Boolean, required: true },
+    loadingText: { type: String, required: true },
+    dropText: { type: String, required: true },
+    idleText: { type: String, required: true },
+    accept: { type: String, default: "" },
+    showExtensions: { type: Boolean, required: true },
+  });
 
 const emit = defineEmits(["click"]);
 </script>
