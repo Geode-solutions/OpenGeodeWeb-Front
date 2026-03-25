@@ -11,24 +11,28 @@ function goBackToFileTree() {
   treeviewStore.displayFileTree();
 }
 
-const metaDatas = computed(() => dataStore.refItem(treeviewStore.model_id));
+const model_id = computed(() => treeviewStore.model_id);
+
+const metaDatas = dataStore.refItem(model_id.value);
 </script>
 
 <template>
   <v-breadcrumbs class="mb-n10 breadcrumb-container">
     <div class="d-flex align-center gap-2 ml-2 mt-2 mb-1">
-      <template v-if="treeviewStore.isAdditionnalTreeDisplayed">
-        <v-btn icon variant="text" size="medium" @click.stop="goBackToFileTree">
-          <v-icon size="large">mdi-file-tree</v-icon>
-        </v-btn>
-        <span class="text-h5 font-weight-bold">/</span>
-        <v-icon size="large">
-          {{ selectedTree && selectedTree.icon ? selectedTree.icon : "mdi-shape-outline" }}
-        </v-icon>
-        <span class="text-subtitle-1 font-weight-regular align-center mt-1">
-          Model Explorer ({{ metaDatas.value.name }})
-        </span>
-      </template>
+      <v-menu v-if="treeviewStore.isAdditionnalTreeDisplayed" offset-y>
+        <template v-slot:activator="{ props }">
+          <v-btn icon variant="text" size="medium" v-bind="props" @click="goBackToFileTree">
+            <v-icon size="large">mdi-file-tree</v-icon>
+          </v-btn>
+          <span class="text-h5 font-weight-bold">/</span>
+          <v-icon size="x-large">
+            {{ selectedTree && selectedTree.icon ? selectedTree.icon : "mdi-shape-outline" }}
+          </v-icon>
+          <span class="text-subtitle-1 font-weight-regular align-center mt-1">
+            Model Explorer ({{ metaDatas.name }})
+          </span>
+        </template>
+      </v-menu>
 
       <div v-else class="d-flex align-center gap-2">
         <v-icon size="large">mdi-file-tree</v-icon>
@@ -40,8 +44,6 @@ const metaDatas = computed(() => dataStore.refItem(treeviewStore.model_id));
 
 <style scoped>
 .breadcrumb-container {
-  position: relative;
-  z-index: 10;
   max-width: 100%;
   overflow: hidden;
   white-space: nowrap;

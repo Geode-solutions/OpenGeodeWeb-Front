@@ -129,12 +129,12 @@ describe("Viewer Store", () => {
       test("test is_busy", () => {
         const viewerStore = useViewerStore();
         viewerStore.request_counter = 1;
-        expect(viewerStore.is_busy).toBeTruthy();
+        expect(viewerStore.is_busy).toBe(true);
       });
       test("test not is_busy", () => {
         const viewerStore = useViewerStore();
         viewerStore.request_counter = 0;
-        expect(viewerStore.is_busy).toBeFalsy();
+        expect(viewerStore.is_busy).toBe(false);
       });
     });
   });
@@ -143,7 +143,7 @@ describe("Viewer Store", () => {
       test("test true", async () => {
         const viewerStore = useViewerStore();
         await viewerStore.toggle_picking_mode(true);
-        expect(viewerStore.picking_mode).toBeTruthy();
+        expect(viewerStore.picking_mode).toBe(true);
       });
     });
 
