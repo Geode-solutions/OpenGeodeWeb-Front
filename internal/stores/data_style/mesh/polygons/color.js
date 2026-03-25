@@ -20,10 +20,10 @@ export function useMeshPolygonsColorStyle() {
       meshPolygonsColorSchemas,
       { id, color },
       {
-        response_function: () => {
-          meshPolygonsCommonStyle.meshPolygonsColoring(id).color = color;
-          console.log(setMeshPolygonsColor.name, { id }, JSON.stringify(meshPolygonsColor(id)));
-        },
+        response_function: () =>
+          meshPolygonsCommonStyle.mutateMeshPolygonsColoring(id, {
+            color,
+          }),
       },
     );
   }

@@ -43,15 +43,16 @@ describe("Project import", () => {
       dataStyle: useDataStyleStore(),
       hybrid: useHybridViewerStore(),
     };
-    const storesArray = Object.values(stores);
-    for (const store of storesArray.slice(STORES_SLICE_START)) {
-      stores.app.registerStore(store);
-    }
 
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(async (snapshot) => {
       const items = snapshot?.items || [];
       await Promise.all(items.map((item) => database.data.put(item)));
     });
+
+    const storesArray = Object.values(stores);
+    for (const store of storesArray.slice(STORES_SLICE_START)) {
+      stores.app.registerStore(store);
+    }
 
     const snapshot = {
       data: {
@@ -77,7 +78,10 @@ describe("Project import", () => {
         isTreeCollection: false,
         selectedTree: undefined,
       },
-      dataStyle: { styles: { abc123: { some: "style" } } },
+      dataStyle: {
+        styles: { abc123: { some: "style" } },
+        componentStyles: {},
+      },
       hybridViewer: { zScale: Z_SCALE },
     };
 
@@ -86,6 +90,9 @@ describe("Project import", () => {
     const item = await database.data.get("abc123");
     expect(item).toBeDefined();
     expect(item.id).toBe("abc123");
-    expect(stores.dataStyle.styles.abc123).toBeDefined();
+
+    const style = await database.data_style.get("abc123");
+    expect(style).toBeDefined();
+    expect(style.id).toBe("abc123");
   });
 });

@@ -11,7 +11,14 @@ function goBackToFileTree() {
   treeviewStore.displayFileTree();
 }
 
-const metaDatas = computed(() => dataStore.refItem(treeviewStore.model_id));
+const model_id = computed(() => treeviewStore.model_id);
+
+const metaDatas = computed(() => {
+  if (!model_id.value) {
+    return {};
+  }
+  return dataStore.refItem(model_id.value).value || {};
+});
 </script>
 
 <template>
@@ -23,7 +30,11 @@ const metaDatas = computed(() => dataStore.refItem(treeviewStore.model_id));
         </v-btn>
         <span class="text-h5 font-weight-bold">/</span>
         <v-icon size="large">
-          {{ selectedTree && selectedTree.icon ? selectedTree.icon : "mdi-shape-outline" }}
+          {{
+            selectedTree && selectedTree.icon
+              ? selectedTree.icon
+              : "mdi-shape-outline"
+          }}
         </v-icon>
         <span class="text-subtitle-1 font-weight-regular align-center mt-1">
           Model Explorer ({{ metaDatas.name }})
@@ -32,7 +43,9 @@ const metaDatas = computed(() => dataStore.refItem(treeviewStore.model_id));
 
       <div v-else class="d-flex align-center gap-2">
         <v-icon size="large">mdi-file-tree</v-icon>
-        <span class="text-subtitle-1 font-weight-regular align-center mt-1"> Objects </span>
+        <span class="text-subtitle-1 font-weight-regular align-center mt-1">
+          Objects
+        </span>
       </div>
     </div>
   </v-breadcrumbs>

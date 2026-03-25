@@ -1,6 +1,7 @@
 // Third party imports
 
 // Local imports
+
 import { useMeshPolyhedraColorStyle } from "./color";
 import { useMeshPolyhedraCommonStyle } from "./common";
 import { useMeshPolyhedraPolyhedronAttributeStyle } from "./polyhedron";
@@ -13,17 +14,22 @@ export function useMeshPolyhedraStyle() {
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
   const meshPolyhedraVisibility = useMeshPolyhedraVisibilityStyle();
   const meshPolyhedraColorStyle = useMeshPolyhedraColorStyle();
+
+  function meshPolyhedraColoring(id) {
+    return meshPolyhedraCommonStyle.meshPolyhedraColoring(id);
+  }
   const meshPolyhedraVertexAttributeStyle = useMeshPolyhedraVertexAttributeStyle();
   const meshPolyhedraPolyhedronAttributeStyle = useMeshPolyhedraPolyhedronAttributeStyle();
 
+  function meshPolyhedraActiveColoring(id) {
+    return meshPolyhedraColoring(id).active;
+  }
+
   async function setMeshPolyhedraActiveColoring(id, type) {
-    const coloring = meshPolyhedraCommonStyle.meshPolyhedraColoring(id);
-    coloring.active = type;
-    console.log(
-      setMeshPolyhedraActiveColoring.name,
-      { id },
-      meshPolyhedraCommonStyle.meshPolyhedraActiveColoring(id),
-    );
+    await meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
+      coloring: { active: type },
+    });
+    console.log(setMeshPolyhedraActiveColoring.name, { id }, type);
     if (type === "color") {
       return meshPolyhedraColorStyle.setMeshPolyhedraColor(
         id,
@@ -42,8 +48,10 @@ export function useMeshPolyhedraStyle() {
       if (name === undefined) {
         return;
       }
-      await meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(id, name);
-      return;
+      return meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(
+        id,
+        name,
+      );
     }
     throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
   }
@@ -54,14 +62,16 @@ export function useMeshPolyhedraStyle() {
         id,
         meshPolyhedraVisibility.meshPolyhedraVisibility(id),
       ),
-      setMeshPolyhedraActiveColoring(id, meshPolyhedraCommonStyle.meshPolyhedraActiveColoring(id)),
+      setMeshPolyhedraActiveColoring(id, meshPolyhedraActiveColoring(id)),
     ]);
   }
 
   return {
+    ...meshPolyhedraCommonStyle,
+    meshPolyhedraColoring,
+    meshPolyhedraActiveColoring,
     setMeshPolyhedraActiveColoring,
     applyMeshPolyhedraStyle,
-    ...meshPolyhedraCommonStyle,
     ...meshPolyhedraVisibility,
     ...meshPolyhedraColorStyle,
     ...meshPolyhedraVertexAttributeStyle,

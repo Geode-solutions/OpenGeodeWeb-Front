@@ -20,10 +20,10 @@ export function useMeshCellsTexturesStyle() {
       meshCellsTexturesSchemas,
       { id, textures },
       {
-        response_function: () => {
-          meshCellsCommonStyle.meshCellsColoring(id).textures = textures;
-          console.log(setMeshCellsTextures.name, { id }, meshCellsTextures(id));
-        },
+        response_function: () =>
+          meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+            coloring: { textures },
+          }),
       },
     );
   }

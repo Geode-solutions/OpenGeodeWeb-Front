@@ -30,6 +30,7 @@ async function importWorkflow(files) {
 function buildImportItemFromPayloadApi(value, geode_object_type) {
   console.log("buildImportItemFromPayloadApi", { value, geode_object_type });
   return {
+    geode_object_type,
     ...value,
   };
 }

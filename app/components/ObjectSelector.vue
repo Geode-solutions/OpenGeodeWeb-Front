@@ -7,7 +7,6 @@ import { useGeodeStore } from "@ogw_front/stores/geode";
 const schema = schemas.opengeodeweb_back.allowed_objects;
 
 const emit = defineEmits(["update_values", "increment_step"]);
-console.log("ObjectSelector");
 
 const { filenames } = defineProps({
   filenames: { type: Array, required: true },
@@ -78,7 +77,6 @@ async function get_allowed_objects() {
 }
 
 function set_geode_object(geode_object_type) {
-  console.log("set_geode_object", { geode_object_type });
   if (geode_object_type) {
     emit("update_values", { geode_object_type });
     emit("increment_step");

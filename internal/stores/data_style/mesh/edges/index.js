@@ -11,42 +11,39 @@ import { useMeshEdgesWidthStyle } from "./width";
 // Local constants
 
 export function useMeshEdgesStyle() {
-  const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
   const meshEdgesVisibility = useMeshEdgesVisibilityStyle();
   const meshEdgesColorStyle = useMeshEdgesColorStyle();
+
+  function meshEdgesColoring(id) {
+    return meshEdgesCommonStyle.meshEdgesColoring(id);
+  }
   const meshEdgesWidthStyle = useMeshEdgesWidthStyle();
   const meshEdgesVertexAttributeStyle = useMeshEdgesVertexAttributeStyle();
   const meshEdgesEdgeAttributeStyle = useMeshEdgesEdgeAttributeStyle();
+  const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
-  function setMeshEdgesActiveColoring(id, type) {
-    const coloring = meshEdgesCommonStyle.meshEdgesColoring(id);
-    coloring.active = type;
-    console.log(
-      setMeshEdgesActiveColoring.name,
-      { id },
-      meshEdgesCommonStyle.meshEdgesActiveColoring(id),
-    );
+  function meshEdgesActiveColoring(id) {
+    return meshEdgesColoring(id).active;
+  }
+
+  async function setMeshEdgesActiveColoring(id, type) {
+    await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
+      coloring: { active: type },
+    });
     if (type === "color") {
       return meshEdgesColorStyle.setMeshEdgesColor(id, meshEdgesColorStyle.meshEdgesColor(id));
-    }
-    if (type === "textures") {
-      const textures = meshEdgesTexturesStore.meshEdgesTextures(id);
-      if (textures === undefined) {
-        return Promise.resolve();
-      }
-      return meshEdgesTexturesStore.setMeshEdgesTextures(id, textures);
     }
     if (type === "vertex") {
       const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
       if (name === undefined) {
-        return Promise.resolve();
+        return;
       }
       return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name);
     }
     if (type === "edge") {
       const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
       if (name === undefined) {
-        return Promise.resolve();
+        return;
       }
       return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name);
     }
@@ -57,11 +54,13 @@ export function useMeshEdgesStyle() {
     return Promise.all([
       meshEdgesVisibility.setMeshEdgesVisibility(id, meshEdgesVisibility.meshEdgesVisibility(id)),
       meshEdgesWidthStyle.setMeshEdgesWidth(id, meshEdgesWidthStyle.meshEdgesWidth(id)),
-      setMeshEdgesActiveColoring(id, meshEdgesCommonStyle.meshEdgesActiveColoring(id)),
+      setMeshEdgesActiveColoring(id, meshEdgesActiveColoring(id)),
     ]);
   }
 
   return {
+    meshEdgesColoring,
+    meshEdgesActiveColoring,
     setMeshEdgesActiveColoring,
     applyMeshEdgesStyle,
     ...meshEdgesCommonStyle,
