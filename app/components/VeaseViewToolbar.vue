@@ -31,12 +31,7 @@ const camera_options = [
     tooltip: "Reset camera",
     icon: "mdi-cube-scan",
     action: () => {
-      const { genericRenderWindow } = storeToRefs(hybridViewerStore);
-      const renderWindow = genericRenderWindow.value.value.getRenderWindow();
-      const [renderer] = renderWindow.getRenderers();
-      renderer.resetCamera();
-      renderWindow.render();
-      hybridViewerStore.syncRemoteCamera();
+      hybridViewerStore.resetCamera();
     },
   },
   {

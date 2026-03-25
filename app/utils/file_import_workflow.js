@@ -30,6 +30,7 @@ async function importWorkflow(files) {
 function buildImportItemFromPayloadApi(value, geode_object_type) {
   console.log("buildImportItemFromPayloadApi", { value, geode_object_type });
   return {
+    geode_object_type,
     ...value,
   };
 }
@@ -39,30 +40,23 @@ async function importItem(item) {
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
   const treeviewStore = useTreeviewStore();
+
   const registerTask = dataStore.registerObject(item.id);
   const addDataTask = dataStore.addItem(item);
-
   const addDataComponentsTask =
     item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
   const addDataRelationsTask =
     item.viewer_type === "model" ? dataStore.addComponentRelations(item) : Promise.resolve();
-  const addTreeviewTask = treeviewStore.addItem(
-    item.geode_object_type,
-    item.name,
-    item.id,
-    item.viewer_type,
-  );
-  const addStyleTask = dataStyleStore.addDataStyle(item.id, item.geode_object_type);
+  treeviewStore.addItem(item.geode_object_type, item.name, item.id, item.viewer_type);
+  dataStyleStore.addDataStyle(item.id, item.geode_object_type);
   const addViewerTask = addDataTask.then(() => hybridViewerStore.addItem(item.id));
-  const applyStyleTask = Promise.all([registerTask, addDataComponentsTask, addStyleTask]).then(() =>
+  const applyStyleTask = Promise.all([registerTask, addDataComponentsTask]).then(() =>
     dataStyleStore.applyDefaultStyle(item.id),
   );
   await Promise.all([
     registerTask,
     addDataTask,
     addDataComponentsTask,
-    addTreeviewTask,
-    addStyleTask,
     addDataRelationsTask,
     addViewerTask,
     applyStyleTask,
