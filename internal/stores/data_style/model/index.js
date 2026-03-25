@@ -15,15 +15,15 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 
 const MESH_CONFIG = [
-  { type: "Corner", group: "corners" },
-  { type: "Line", group: "lines" },
-  { type: "Surface", group: "surfaces" },
-  { type: "Block", group: "blocks" },
+  { type: "Corner" },
+  { type: "Line" },
+  { type: "Surface" },
+  { type: "Block" },
 ];
 
 const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
 
-function buildSelection(components, modelStyle, stylesMap) {
+function buildSelection(components, stylesMap) {
   const componentsByType = Object.fromEntries(MESH_TYPES.map((type) => [type, []]));
   for (const component of components) {
     if (componentsByType[component.type]) {
@@ -32,14 +32,15 @@ function buildSelection(components, modelStyle, stylesMap) {
   }
 
   const selection = [];
-  for (const { type, group } of MESH_CONFIG) {
+  for (const type of MESH_TYPES) {
     const groupComponents = componentsByType[type];
-    const groupVisible = modelStyle[group]?.visibility ?? true;
-    let allVisible = true;
+    if (groupComponents.length === 0) {
+      continue;
+    }
 
+    let allVisible = true;
     for (const component of groupComponents) {
-      const componentStyle = stylesMap[component.geode_id];
-      const isVisible = componentStyle?.visibility ?? groupVisible;
+      const isVisible = stylesMap[component.geode_id]?.visibility ?? true;
       if (isVisible) {
         selection.push(component.geode_id);
       } else {
@@ -111,7 +112,6 @@ export function useModelStyle() {
           if (allComponents.length === 0) {
             return [];
           }
-          const modelStyle = dataStyleStateStore.getStyle(modelId);
           const componentStyles = await database.model_component_datastyle
             .where("id_model")
             .equals(modelId)
@@ -119,7 +119,7 @@ export function useModelStyle() {
           const stylesMap = Object.fromEntries(
             componentStyles.map((style) => [style.id_component, style]),
           );
-          return buildSelection(allComponents, modelStyle, stylesMap);
+          return buildSelection(allComponents, stylesMap);
         });
 
         const subscription = observable.subscribe({
