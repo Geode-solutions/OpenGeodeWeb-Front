@@ -3,15 +3,16 @@ import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu";
 import ViewerTreeObjectTree from "@ogw_front/components/Viewer/Tree/ObjectTree";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-const { id, displayMenu, menuStore, containerWidth, containerHeight, dataStyleStore, viewerStore } = defineProps({
-  id: { type: String, required: true },
-  displayMenu: { type: Boolean, required: true },
-  menuStore: { type: Object, required: true },
-  containerWidth: { type: Number, required: true },
-  containerHeight: { type: Number, required: true },
-  dataStyleStore: { type: Object, required: true },
-  viewerStore: { type: Object, required: true },
-});
+const { id, displayMenu, menuStore, containerWidth, containerHeight, dataStyleStore, viewerStore } =
+  defineProps({
+    id: { type: String, required: true },
+    displayMenu: { type: Boolean, required: true },
+    menuStore: { type: Object, required: true },
+    containerWidth: { type: Number, required: true },
+    containerHeight: { type: Number, required: true },
+    dataStyleStore: { type: Object, required: true },
+    viewerStore: { type: Object, required: true },
+  });
 
 const emit = defineEmits(["show-menu", "set-id"]);
 
