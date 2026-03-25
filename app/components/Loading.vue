@@ -11,15 +11,21 @@ const progress = ref(0);
 
 let progressInterval = undefined;
 
+const PROGRESS_THRESHOLD = 90;
+const MAX_PROGRESS = 99;
+const PROGRESS_INCREMENT_SCALE = 5;
+const UPDATE_INTERVAL_MS = 500;
+const SLOW_INCREMENT = 0.5;
+
 onMounted(() => {
   show.value = true;
   progressInterval = setInterval(() => {
-    if (progress.value < 90) {
-      progress.value += Math.random() * 5;
-    } else if (progress.value < 99) {
-      progress.value += 0.5;
+    if (progress.value < PROGRESS_THRESHOLD) {
+      progress.value += Math.random() * PROGRESS_INCREMENT_SCALE;
+    } else if (progress.value < MAX_PROGRESS) {
+      progress.value += SLOW_INCREMENT;
     }
-  }, 500);
+  }, UPDATE_INTERVAL_MS);
 });
 
 onUnmounted(() => {
