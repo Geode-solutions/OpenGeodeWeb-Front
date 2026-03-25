@@ -41,9 +41,7 @@ const processedItems = computed(() =>
     }),
 );
 
-const availableFilterOptions = computed(() =>
-  items.value.map((category) => category.id),
-);
+const availableFilterOptions = computed(() => items.value.map((category) => category.id));
 
 function toggleSort() {
   sortType.value = sortType.value === "name" ? "id" : "name";
@@ -89,20 +87,13 @@ watch(
 <template>
   <v-row dense align="center" class="mr-1 ml-3 mt-2 pa-1">
     <v-col>
-      <SearchBar
-        v-model="search"
-        label="Search"
-        color="black"
-        base-color="black"
-      />
+      <SearchBar v-model="search" label="Search" color="black" base-color="black" />
     </v-col>
     <v-col cols="auto" class="d-flex align-center">
       <ActionButton
         :tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
         :icon="
-          sortType === 'name'
-            ? 'mdi-sort-alphabetical-ascending'
-            : 'mdi-sort-numeric-ascending'
+          sortType === 'name' ? 'mdi-sort-alphabetical-ascending' : 'mdi-sort-numeric-ascending'
         "
         tooltipLocation="bottom"
         @click="toggleSort"
@@ -118,10 +109,7 @@ watch(
           />
         </template>
         <v-list class="mt-1">
-          <v-list-item
-            v-for="category_id in availableFilterOptions"
-            :key="category_id"
-          >
+          <v-list-item v-for="category_id in availableFilterOptions" :key="category_id">
             <v-checkbox
               v-model="filterOptions[category_id]"
               :label="category_id"
@@ -146,9 +134,7 @@ watch(
     <template #title="{ item }">
       <span
         class="treeview-item"
-        @contextmenu.prevent.stop="
-          emit('show-menu', { event: $event, itemId: item })
-        "
+        @contextmenu.prevent.stop="emit('show-menu', { event: $event, itemId: item })"
       >
         {{ item.title }}
       </span>
