@@ -1,23 +1,14 @@
 <script setup>
 const DEFAULT_ICON_SIZE = 28;
-const {
-  icon,
-  tooltip,
-  color = undefined,
-  size = undefined,
-  variant = undefined,
-  density = "comfortable",
-  tooltipLocation = "left",
-  iconSize = DEFAULT_ICON_SIZE,
-} = defineProps({
+const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize } = defineProps({
   icon: { type: String, required: true },
   tooltip: { type: String, required: true },
   color: { type: String },
   size: { type: [String, Number] },
   variant: { type: String },
-  density: { type: String },
-  tooltipLocation: { type: String },
-  iconSize: { type: [String, Number] },
+  density: { type: String, default: "comfortable" },
+  tooltipLocation: { type: String, default: "left" },
+  iconSize: { type: [String, Number], default: DEFAULT_ICON_SIZE },
 });
 
 const emit = defineEmits(["click"]);
