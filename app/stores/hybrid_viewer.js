@@ -80,13 +80,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     actor.getProperty().setColor(ACTOR_COLOR);
     actor.setMapper(mapper);
     const renderer = genericRenderWindow.value.getRenderer();
-    const renderWindow = genericRenderWindow.value.getRenderWindow();
     const isFirst = renderer.getActors().length === 0;
     renderer.addActor(actor);
     if (isFirst) {
       renderer.resetCamera();
     }
-    renderWindow.render();
     hybridDb[id] = { actor, polydata, mapper };
   }
 
@@ -128,6 +126,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       z_scale,
     });
     remoteRender();
+  }
+
+  function resetCamera() {
+    const renderer = genericRenderWindow.value.getRenderer();
+    renderer.resetCamera();
+    genericRenderWindow.value.getRenderWindow().render();
+    syncRemoteCamera();
   }
 
   function syncRemoteCamera() {
@@ -305,6 +310,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     initHybridViewer,
     remoteRender,
     resize,
+    resetCamera,
     setContainer,
     zScale,
     clear,
