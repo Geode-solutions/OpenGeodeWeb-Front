@@ -14,12 +14,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 
-const MESH_CONFIG = [
-  { type: "Corner" },
-  { type: "Line" },
-  { type: "Surface" },
-  { type: "Block" },
-];
+const MESH_CONFIG = [{ type: "Corner" }, { type: "Line" }, { type: "Surface" }, { type: "Block" }];
 
 const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
 
