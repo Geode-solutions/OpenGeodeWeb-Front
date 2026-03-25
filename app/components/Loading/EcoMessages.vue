@@ -17,13 +17,14 @@ const ecoMessages = [
   },
 ];
 
+const MESSAGE_INTERVAL_MS = 3000;
 const currentMessage = ref(0);
-let interval = null;
+let interval = undefined;
 
 onMounted(() => {
   interval = setInterval(() => {
     currentMessage.value = (currentMessage.value + 1) % ecoMessages.length;
-  }, 3000);
+  }, MESSAGE_INTERVAL_MS);
 });
 
 onUnmounted(() => {

@@ -2,48 +2,74 @@
 const { logo } = defineProps({
   logo: {
     type: String,
-    required: true,
+    default: "",
   },
 });
 
 const show = ref(false);
 const progress = ref(0);
 
+let progressInterval = undefined;
+
 onMounted(() => {
   show.value = true;
+  progressInterval = setInterval(() => {
+    if (progress.value < 90) {
+      progress.value += Math.random() * 5;
+    } else if (progress.value < 99) {
+      progress.value += 0.5;
+    }
+  }, 500);
+});
+
+onUnmounted(() => {
+  if (progressInterval) {
+    clearInterval(progressInterval);
+  }
 });
 </script>
 
 <template>
-  <v-overlay
-    v-model="show"
-    persistent
-    class="align-center justify-center"
-    style="background: rgba(5, 5, 5, 0.1); backdrop-filter: blur(8px)"
-  >
-    <v-sheet
-      position="fixed"
-      location="center"
-      height="100vh"
-      width="100vw"
-      color="transparent"
-      class="bg-grid-pattern"
-      style="z-index: -1"
-    />
+  <div v-bind="$attrs">
+    <Teleport to="body">
+      <div
+        v-if="show"
+        class="d-flex align-center justify-center transition-swing"
+        style="
+          position: fixed;
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.45);
+          backdrop-filter: blur(10px);
+          z-index: 2400;
+          pointer-events: auto;
+        "
+      >
+        <div
+          style="
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(
+              rgba(255, 255, 255, 0.08) 1px,
+              transparent 0
+            );
+            background-size: 40px 40px;
+            background-position: center;
+            pointer-events: none;
+          "
+        />
 
-    <v-container class="text-center" style="max-width: 650px">
-      <LoadingHeader :logo="logo" />
-      <LoadingEcoMessages />
-      <LoadingProgress :progress="progress" />
-      <LoadingFooter />
-    </v-container>
-  </v-overlay>
+        <div
+          class="d-flex flex-column align-center text-center"
+          style="max-width: 650px; width: 100%; padding: 0 24px; gap: 1.5rem"
+        >
+          <LoadingHeader :logo="logo" />
+          <LoadingEcoMessages />
+          <LoadingProgress :progress="progress" />
+          <LoadingFooter />
+        </div>
+      </div>
+    </Teleport>
+  </div>
 </template>
-
-<style scoped>
-.bg-grid-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
-  background-size: 40px 40px;
-  background-position: center;
-}
-</style>

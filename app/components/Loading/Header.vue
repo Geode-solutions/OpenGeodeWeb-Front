@@ -2,7 +2,7 @@
 const { logo } = defineProps({
   logo: {
     type: String,
-    required: true,
+    default: "",
   },
 });
 </script>
