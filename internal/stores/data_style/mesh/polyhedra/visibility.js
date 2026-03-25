@@ -20,10 +20,10 @@ export function useMeshPolyhedraVisibilityStyle() {
       meshPolyhedraVisibilitySchema,
       { id, visibility },
       {
-        response_function: () => {
-          meshPolyhedraCommonStyle.meshPolyhedraStyle(id).visibility = visibility;
-          console.log(setMeshPolyhedraVisibility.name, { id }, meshPolyhedraVisibility(id));
-        },
+        response_function: () =>
+          meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
+            visibility,
+          }),
       },
     );
   }

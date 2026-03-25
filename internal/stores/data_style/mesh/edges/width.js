@@ -1,7 +1,6 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-// Local imports
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -20,10 +19,7 @@ export function useMeshEdgesWidthStyle() {
       meshEdgesWidthSchemas,
       { id, width },
       {
-        response_function: () => {
-          meshEdgesCommonStyle.meshEdgesStyle(id).width = width;
-          console.log(setMeshEdgesWidth.name, { id }, JSON.stringify(meshEdgesWidth(id)));
-        },
+        response_function: () => meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { width }),
       },
     );
   }

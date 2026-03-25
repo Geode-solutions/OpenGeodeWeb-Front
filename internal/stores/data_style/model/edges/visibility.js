@@ -1,7 +1,6 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-// Local imports
 import { useModelEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -21,16 +20,19 @@ export function useModelEdgesVisibilityStyle() {
       model_edges_schemas.visibility,
       { id, visibility },
       {
-        response_function: () => {
-          modelEdgesCommonStyle.modelEdgesStyle(id).visibility = visibility;
-          console.log(setModelEdgesVisibility.name, { id }, modelEdgesVisibility(id));
-        },
+        response_function: () => modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility }),
       },
     );
+  }
+
+  function applyModelEdgesStyle(id) {
+    const visibility = modelEdgesVisibility(id);
+    return Promise.resolve([setModelEdgesVisibility(id, visibility)]);
   }
 
   return {
     modelEdgesVisibility,
     setModelEdgesVisibility,
+    applyModelEdgesStyle,
   };
 }

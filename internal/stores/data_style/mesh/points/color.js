@@ -20,10 +20,10 @@ export function useMeshPointsColorStyle() {
       meshPointsColorSchemas,
       { id, color },
       {
-        response_function: () => {
-          meshPointsCommonStyle.meshPointsColoring(id).color = color;
-          console.log(setMeshPointsColor.name, { id }, JSON.stringify(meshPointsColor(id)));
-        },
+        response_function: () =>
+          meshPointsCommonStyle.mutateMeshPointsColoring(id, {
+            color,
+          }),
       },
     );
   }
