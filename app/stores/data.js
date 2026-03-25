@@ -35,7 +35,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function formatedMeshComponents(modelId) {
-    const items = await database.model_components.where({ id: modelId }).toArray();
+    const items = await database.model_components.where("id").equals(modelId).toArray();
     const componentTitles = {
       Corner: "Corners",
       Line: "Lines",
@@ -66,15 +66,21 @@ export const useDataStore = defineStore("data", () => {
       }));
   }
 
-  function refFormatedMeshComponents(id) {
+  function refFormatedMeshComponents(id_ref) {
     return useObservable(
-      liveQuery(() => formatedMeshComponents(id)),
+      liveQuery(() => {
+        const unwrapped_id = isRef(id_ref) ? id_ref.value : id_ref;
+        return formatedMeshComponents(unwrapped_id);
+      }),
       { initialValue: [] },
     );
   }
 
   async function meshComponentType(modelId, geode_id) {
-    const component = await database.model_components.where({ id: modelId, geode_id }).first();
+    const component = await database.model_components
+      .where("[id+geode_id]")
+      .equals([modelId, geode_id])
+      .first();
     return component?.type;
   }
 
@@ -155,13 +161,14 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function deleteModelComponents(modelId) {
-    await database.model_components.where({ id: modelId }).delete();
-    await database.model_components_relation.where({ id: modelId }).delete();
+    await database.model_components.where("id").equals(modelId).delete();
+    await database.model_components_relation.where("id").equals(modelId).delete();
   }
 
   async function getMeshComponentGeodeIds(modelId, component_type) {
     const components = await database.model_components
-      .where({ id: modelId, type: component_type })
+      .where("[id+type]")
+      .equals([modelId, component_type])
       .toArray();
     return components.map((component) => component.geode_id);
   }
@@ -221,6 +228,7 @@ export const useDataStore = defineStore("data", () => {
     getLinesGeodeIds,
     getSurfacesGeodeIds,
     getBlocksGeodeIds,
+    getMeshComponentGeodeIds,
     getMeshComponentsViewerIds,
 
     exportStores,

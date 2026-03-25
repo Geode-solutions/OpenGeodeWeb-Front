@@ -13,7 +13,9 @@ const hybridViewerStore = useHybridViewerStore();
 const { id } = defineProps({ id: { type: String, required: true } });
 const emit = defineEmits(["show-menu"]);
 
-const items = ref([]);
+const items = dataStore.refFormatedMeshComponents(toRef(() => id));
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => id));
+
 const search = ref("");
 const sortType = ref("name");
 const filterOptions = ref({
@@ -21,12 +23,6 @@ const filterOptions = ref({
   Line: true,
   Surface: true,
   Block: true,
-});
-
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => id));
-
-watchEffect(async () => {
-  items.value = await dataStore.formatedMeshComponents(id);
 });
 
 const processedItems = computed(() =>
@@ -58,30 +54,41 @@ function customFilter(value, searchQuery, item) {
   );
 }
 
-watch(
-  mesh_components_selection,
-  async (current, previous) => {
-    if (!previous) {
-      return;
+function expandCategorySelections(categoryIds, currentSelection, shouldBePresent) {
+  const extraIds = [];
+  for (const categoryId of categoryIds) {
+    const category = items.value.find((cat) => cat.id === categoryId);
+    if (category?.children) {
+      for (const child of category.children) {
+        if (currentSelection.includes(child.id) === shouldBePresent) {
+          extraIds.push(child.id);
+        }
+      }
     }
+  }
+  return extraIds;
+}
 
-    const { added, removed } = compareSelections(current, previous);
-    console.log("TreeComponent selection change:", {
-      id,
-      added,
-      removed,
-    });
+async function onSelectionChange(current) {
+  const previous = mesh_components_selection.value;
+  const { added, removed } = compareSelections(current, previous);
 
-    if (added.length > 0) {
-      await dataStyleStore.setModelMeshComponentsVisibility(id, added, true);
-    }
-    if (removed.length > 0) {
-      await dataStyleStore.setModelMeshComponentsVisibility(id, removed, false);
-    }
-    hybridViewerStore.remoteRender();
-  },
-  { deep: true },
-);
+  if (added.length === 0 && removed.length === 0) {
+    return;
+  }
+
+  // Manual hierarchy: if a category is toggled, toggle all its children too
+  const allAdded = [...added, ...expandCategorySelections(added, current, false)];
+  const allRemoved = [...removed, ...expandCategorySelections(removed, current, true)];
+
+  if (allAdded.length > 0) {
+    await dataStyleStore.setModelMeshComponentsVisibility(id, allAdded, true);
+  }
+  if (allRemoved.length > 0) {
+    await dataStyleStore.setModelMeshComponentsVisibility(id, allRemoved, false);
+  }
+  hybridViewerStore.remoteRender();
+}
 </script>
 
 <template>
@@ -122,14 +129,15 @@ watch(
     </v-col>
   </v-row>
   <v-treeview
-    v-model:selected="mesh_components_selection"
+    :selected="mesh_components_selection"
     :items="processedItems"
     :search="search"
     :custom-filter="customFilter"
     class="transparent-treeview"
     item-value="id"
-    select-strategy="classic"
+    select-strategy="independent"
     selectable
+    @update:selected="onSelectionChange"
   >
     <template #title="{ item }">
       <span
