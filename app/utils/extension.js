@@ -19,7 +19,7 @@ async function registerRunningExtensions() {
 
   return Promise.all(
     extensionsArray.map(async (extension) => {
-      const { name, version, frontendContent, port } = extension;
+      const { id, name, version, frontendContent, port } = extension;
       const blob = new Blob([frontendContent], {
         type: "application/javascript",
       });

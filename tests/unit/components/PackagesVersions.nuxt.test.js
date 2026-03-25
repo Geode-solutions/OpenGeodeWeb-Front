@@ -37,6 +37,6 @@ describe(PackagesVersions, () => {
       },
       props: { schema },
     });
-    expect(wrapper.exists()).toBeTruthy();
+    expect(wrapper.exists()).toBe(true);
   });
 });
