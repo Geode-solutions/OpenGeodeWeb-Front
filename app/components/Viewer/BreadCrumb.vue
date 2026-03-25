@@ -11,14 +11,7 @@ function goBackToFileTree() {
   treeviewStore.displayFileTree();
 }
 
-const model_id = computed(() => treeviewStore.model_id);
-
-const metaDatas = computed(() => {
-  if (!model_id.value) {
-    return {};
-  }
-  return dataStore.refItem(model_id.value).value || {};
-});
+const metaDatas = computed(() => dataStore.refItem(treeviewStore.model_id));
 </script>
 
 <template>
