@@ -66,10 +66,10 @@ export const useDataStore = defineStore("data", () => {
       }));
   }
 
-  function refFormatedMeshComponents(id_ref) {
+  function refFormatedMeshComponents(id) {
     return useObservable(
       liveQuery(() => {
-        const unwrapped_id = isRef(id_ref) ? id_ref.value : id_ref;
+        const unwrapped_id = isRef(id) ? id.value : id;
         return formatedMeshComponents(unwrapped_id);
       }),
       { initialValue: [] },

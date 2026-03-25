@@ -77,7 +77,6 @@ async function onSelectionChange(current) {
     return;
   }
 
-  // Manual hierarchy: if a category is toggled, toggle all its children too
   const allAdded = [...added, ...expandCategorySelections(added, current, false)];
   const allRemoved = [...removed, ...expandCategorySelections(removed, current, true)];
 

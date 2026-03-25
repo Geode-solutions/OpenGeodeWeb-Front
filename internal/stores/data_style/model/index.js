@@ -94,10 +94,10 @@ export function useModelStyle() {
     );
   }
 
-  function visibleMeshComponents(idRef) {
+  function visibleMeshComponents(id_ref) {
     const selection = ref([]);
     watch(
-      () => (isRef(idRef) ? idRef.value : idRef),
+      () => (isRef(id_ref) ? id_ref.value : id_ref),
       (modelId, _prev, onCleanup) => {
         if (!modelId) {
           selection.value = [];
