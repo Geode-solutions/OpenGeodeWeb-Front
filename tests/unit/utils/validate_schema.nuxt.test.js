@@ -25,14 +25,14 @@ describe("validate schema", () => {
   test("ajv wrong params", () => {
     const params = {};
     const { valid, error } = validate_schema(schema, params);
-    expect(valid).toBeFalsy();
+    expect(valid).toBe(false);
     expect(error).toBe("data must have required property 'var_1'");
   });
 
   test("good params", () => {
     const params = { var_1: "test", var_2: VAL_5 };
     const { valid, error } = validate_schema(schema, params);
-    expect(valid).toBeTruthy();
+    expect(valid).toBe(true);
     expect(error).toBe("No errors");
   });
 });
