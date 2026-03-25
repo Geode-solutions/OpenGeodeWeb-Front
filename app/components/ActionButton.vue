@@ -3,8 +3,8 @@ const DEFAULT_ICON_SIZE = 28;
 const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize } = defineProps({
   icon: { type: String, required: true },
   tooltip: { type: String, required: true },
-  color: { type: String },
-  size: { type: [String, Number] },
+  color: { type: String, default: undefined },
+  size: { type: [String, Number], default: undefined },
   variant: { type: String },
   density: { type: String, default: "comfortable" },
   tooltipLocation: { type: String, default: "left" },
