@@ -14,6 +14,14 @@ const INTERVAL_TIMEOUT = 25_000;
 const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
+const SLEEP_MS = 200;
+
+function sleep(milliseconds) {
+  // oxlint-disable-next-line promise/avoid-new
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
 
 let id = "",
   projectFolderPath = "";
@@ -38,6 +46,7 @@ describe("Model edges", () => {
       const result = dataStyleStore.setModelEdgesVisibility(id, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_edges_schemas.visibility,
         { id, visibility },

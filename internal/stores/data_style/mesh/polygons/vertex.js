@@ -30,31 +30,44 @@ export function useMeshPolygonsVertexAttributeStyle() {
     });
   }
 
-  function setMeshPolygonsVertexAttributeStoredConfig(id, name, { minimum, maximum, colorMap }) {
-    const { storedConfigs } = meshPolygonsVertexAttribute(id);
-    storedConfigs[name] = { minimum, maximum, colorMap };
-    return storedConfigs[name];
+  function mutateMeshPolygonsVertexStyle(id, values) {
+    return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+      coloring: {
+        vertex: values,
+      },
+    });
+  }
+
+  function setMeshPolygonsVertexAttributeStoredConfig(id, name, config) {
+    return mutateMeshPolygonsVertexStyle(id, {
+      storedConfigs: {
+        [name]: config,
+      },
+    });
   }
 
   function meshPolygonsVertexAttributeName(id) {
-    console.log(meshPolygonsVertexAttributeName.name, { id }, meshPolygonsVertexAttribute(id));
     return meshPolygonsVertexAttribute(id).name;
   }
+
   function setMeshPolygonsVertexAttributeName(id, name) {
-    console.log(setMeshPolygonsVertexAttributeName.name, { id, name });
     return viewerStore.request(
       meshPolygonsVertexAttributeSchemas.name,
       { id, name },
       {
-        response_function: async () => {
-          meshPolygonsVertexAttribute(id).name = name;
-          const { minimum, maximum } = meshPolygonsVertexAttributeStoredConfig(id, name);
-          await setMeshPolygonsVertexAttributeRange(id, minimum, maximum);
-          console.log(
-            setMeshPolygonsVertexAttributeName.name,
-            { id },
-            meshPolygonsVertexAttributeName(id),
-          );
+        response_function: () => {
+          const updates = { name };
+          const vertex = meshPolygonsVertexAttribute(id);
+          if (!(name in vertex.storedConfigs)) {
+            updates.storedConfigs = {
+              [name]: {
+                minimum: undefined,
+                maximum: undefined,
+                colorMap: undefined,
+              },
+            };
+          }
+          return mutateMeshPolygonsVertexStyle(id, updates);
         },
       },
     );
@@ -66,12 +79,13 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
+
   function setMeshPolygonsVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsVertexAttributeName(id);
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name);
-    storedConfig.minimum = minimum;
-    storedConfig.maximum = maximum;
-    return setMeshPolygonsVertexAttributeColorMap(id, storedConfig.colorMap);
+    return setMeshPolygonsVertexAttributeStoredConfig(id, name, {
+      minimum,
+      maximum,
+    });
   }
 
   function meshPolygonsVertexAttributeColorMap(id) {
@@ -80,38 +94,17 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const { colorMap } = storedConfig;
     return colorMap;
   }
+
   function setMeshPolygonsVertexAttributeColorMap(id, colorMap) {
     const name = meshPolygonsVertexAttributeName(id);
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name);
-    if (
-      storedConfig.minimum === undefined ||
-      storedConfig.maximum === undefined ||
-      colorMap === undefined
-    ) {
-      storedConfig.colorMap = colorMap;
-      return;
-    }
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
-
-    console.log(setMeshPolygonsVertexAttributeColorMap.name, {
-      id,
-      minimum,
-      maximum,
-      colorMap,
-    });
     return viewerStore.request(
       meshPolygonsVertexAttributeSchemas.color_map,
       { id, points, minimum, maximum },
       {
-        response_function: () => {
-          storedConfig.colorMap = colorMap;
-          console.log(
-            setMeshPolygonsVertexAttributeColorMap.name,
-            { id },
-            meshPolygonsVertexAttributeColorMap(id),
-          );
-        },
+        response_function: () => setMeshPolygonsVertexAttributeStoredConfig(id, name, { colorMap }),
       },
     );
   }

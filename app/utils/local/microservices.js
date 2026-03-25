@@ -11,7 +11,7 @@ import pTimeout from "p-timeout";
 // Local imports
 import { commandExistsSync, waitForReady } from "./scripts.js";
 import { executableName, executablePath } from "./path.js";
-import { microservicesMetadatasPath } from "./cleanup.js";
+import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 
 const DEFAULT_TIMEOUT_SECONDS = 30;
 const MILLISECONDS_PER_SECOND = 1000;
@@ -110,18 +110,6 @@ async function runViewer(execName, execPath, args = {}) {
   console.log("runViewer", execName, execPath, viewerArgs);
   await runScript(execName, execPath, viewerArgs, "Starting factory");
   return port;
-}
-
-function projectMicroservices(projectFolderPath) {
-  console.log("projectMicroservices", { projectFolderPath });
-  const filePath = microservicesMetadatasPath(projectFolderPath);
-
-  if (!fs.existsSync(filePath)) {
-    const microservicesMetadatas = { microservices: [] };
-    fs.writeFileSync(filePath, JSON.stringify(microservicesMetadatas, undefined, 2), "utf8");
-  }
-  const content = JSON.parse(fs.readFileSync(filePath, "utf8"));
-  return content.microservices;
 }
 
 function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
