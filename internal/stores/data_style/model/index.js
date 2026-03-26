@@ -18,36 +18,6 @@ const MESH_CONFIG = [{ type: "Corner" }, { type: "Line" }, { type: "Surface" }, 
 
 const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
 
-function buildSelection(components, stylesMap) {
-  const componentsByType = Object.fromEntries(MESH_TYPES.map((type) => [type, []]));
-  for (const component of components) {
-    if (componentsByType[component.type]) {
-      componentsByType[component.type].push(component);
-    }
-  }
-
-  const selection = [];
-  for (const type of MESH_TYPES) {
-    const groupComponents = componentsByType[type];
-    if (groupComponents.length === 0) {
-      continue;
-    }
-
-    let allVisible = true;
-    for (const component of groupComponents) {
-      const isVisible = stylesMap[component.geode_id]?.visibility ?? true;
-      if (isVisible) {
-        selection.push(component.geode_id);
-      } else {
-        allVisible = false;
-      }
-    }
-    if (allVisible) {
-      selection.push(type);
-    }
-  }
-  return selection;
-}
 
 export function useModelStyle() {
   const dataStore = useDataStore();
@@ -71,6 +41,41 @@ export function useModelStyle() {
     Block: (modelId, ids, visibility) =>
       modelBlocksStyleStore.setModelBlocksVisibility(modelId, ids, visibility),
   };
+
+  function buildSelection(modelId, components, stylesMap) {
+    const componentsByType = Object.fromEntries(MESH_TYPES.map((type) => [type, []]));
+    for (const component of components) {
+      if (componentsByType[component.type]) {
+        componentsByType[component.type].push(component);
+      }
+    }
+
+    const groupStyles = dataStyleStateStore.getStyle(modelId);
+    const selection = [];
+    for (const type of MESH_TYPES) {
+      const groupComponents = componentsByType[type];
+      if (groupComponents.length === 0) {
+        continue;
+      }
+
+      const typeKey = `${type.toLowerCase()}s`;
+      const defaultVisibility = groupStyles[typeKey]?.visibility ?? true;
+
+      let allVisible = true;
+      for (const component of groupComponents) {
+        const isVisible = stylesMap[component.geode_id]?.visibility ?? defaultVisibility;
+        if (isVisible) {
+          selection.push(component.geode_id);
+        } else {
+          allVisible = false;
+        }
+      }
+      if (allVisible) {
+        selection.push(type);
+      }
+    }
+    return selection;
+  }
 
   function modelVisibility(modelId) {
     return dataStyleStateStore.getStyle(modelId).visibility;
@@ -114,7 +119,7 @@ export function useModelStyle() {
           const stylesMap = Object.fromEntries(
             componentStyles.map((style) => [style.id_component, style]),
           );
-          return buildSelection(allComponents, stylesMap);
+          return buildSelection(modelId, allComponents, stylesMap);
         });
 
         const subscription = observable.subscribe({
@@ -130,10 +135,11 @@ export function useModelStyle() {
   }
 
   async function setModelMeshComponentsVisibility(modelId, componentIds, visibility) {
+    const uniqueIds = [...new Set(componentIds)];
     const idsByType = Object.fromEntries(MESH_TYPES.map((type) => [type, []]));
 
     await Promise.all(
-      componentIds.map(async (componentId) => {
+      uniqueIds.map(async (componentId) => {
         if (MESH_TYPES.includes(componentId)) {
           const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, componentId);
           idsByType[componentId].push(...geodeIds);
@@ -148,7 +154,7 @@ export function useModelStyle() {
 
     return Promise.all(
       MESH_TYPES.filter((type) => idsByType[type].length > 0).map((type) =>
-        visibilitySetters[type](modelId, idsByType[type], visibility),
+        visibilitySetters[type](modelId, [...new Set(idsByType[type])], visibility),
       ),
     );
   }

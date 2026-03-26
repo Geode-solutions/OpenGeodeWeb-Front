@@ -54,21 +54,6 @@ function customFilter(value, searchQuery, item) {
   );
 }
 
-function expandCategorySelections(categoryIds, currentSelection, shouldBePresent) {
-  const extraIds = [];
-  for (const categoryId of categoryIds) {
-    const category = items.value.find((cat) => cat.id === categoryId);
-    if (category?.children) {
-      for (const child of category.children) {
-        if (currentSelection.includes(child.id) === shouldBePresent) {
-          extraIds.push(child.id);
-        }
-      }
-    }
-  }
-  return extraIds;
-}
-
 async function onSelectionChange(current) {
   const previous = mesh_components_selection.value;
   const { added, removed } = compareSelections(current, previous);
@@ -77,14 +62,11 @@ async function onSelectionChange(current) {
     return;
   }
 
-  const allAdded = [...added, ...expandCategorySelections(added, current, false)];
-  const allRemoved = [...removed, ...expandCategorySelections(removed, current, true)];
-
-  if (allAdded.length > 0) {
-    await dataStyleStore.setModelMeshComponentsVisibility(id, allAdded, true);
+  if (added.length > 0) {
+    await dataStyleStore.setModelMeshComponentsVisibility(id, added, true);
   }
-  if (allRemoved.length > 0) {
-    await dataStyleStore.setModelMeshComponentsVisibility(id, allRemoved, false);
+  if (removed.length > 0) {
+    await dataStyleStore.setModelMeshComponentsVisibility(id, removed, false);
   }
   hybridViewerStore.remoteRender();
 }
