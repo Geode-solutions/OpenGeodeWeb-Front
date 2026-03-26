@@ -20,10 +20,10 @@ export function useMeshPolygonsVisibilityStyle() {
       meshPolygonsVisibilitySchema,
       { id, visibility },
       {
-        response_function: () => {
-          meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility = visibility;
-          console.log(setMeshPolygonsVisibility.name, { id }, meshPolygonsVisibility(id));
-        },
+        response_function: () =>
+          meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+            visibility,
+          }),
       },
     );
   }

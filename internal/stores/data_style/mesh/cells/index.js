@@ -15,17 +15,22 @@ export function useMeshCellsStyle() {
   const meshCellsVisibility = useMeshCellsVisibilityStyle();
   const meshCellsColorStyle = useMeshCellsColorStyle();
   const meshCellsTexturesStore = useMeshCellsTexturesStyle();
+
+  function meshCellsColoring(id) {
+    return meshCellsCommonStyle.meshCellsColoring(id);
+  }
   const meshCellsVertexAttributeStyle = useMeshCellsVertexAttributeStyle();
   const meshCellsCellAttributeStyle = useMeshCellsCellAttributeStyle();
 
+  function meshCellsActiveColoring(id) {
+    return meshCellsColoring(id).active;
+  }
+
   async function setMeshCellsActiveColoring(id, type) {
-    const coloring = meshCellsCommonStyle.meshCellsColoring(id);
-    coloring.active = type;
-    console.log(
-      setMeshCellsActiveColoring.name,
-      { id },
-      meshCellsCommonStyle.meshCellsActiveColoring(id),
-    );
+    await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+      coloring: { active: type },
+    });
+    console.log(setMeshCellsActiveColoring.name, { id }, type);
     if (type === "color") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
     }
@@ -48,8 +53,7 @@ export function useMeshCellsStyle() {
       if (name === undefined) {
         return;
       }
-      await meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
-      return;
+      return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }
@@ -57,12 +61,14 @@ export function useMeshCellsStyle() {
   function applyMeshCellsStyle(id) {
     return Promise.all([
       meshCellsVisibility.setMeshCellsVisibility(id, meshCellsVisibility.meshCellsVisibility(id)),
-      setMeshCellsActiveColoring(id, meshCellsCommonStyle.meshCellsActiveColoring(id)),
+      setMeshCellsActiveColoring(id, meshCellsActiveColoring(id)),
     ]);
   }
 
   return {
     ...meshCellsCommonStyle,
+    meshCellsColoring,
+    meshCellsActiveColoring,
     setMeshCellsActiveColoring,
     applyMeshCellsStyle,
     ...meshCellsVisibility,

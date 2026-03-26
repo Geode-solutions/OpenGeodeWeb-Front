@@ -14,6 +14,14 @@ const INTERVAL_TIMEOUT = 20_000;
 const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
+const SLEEP_MS = 200;
+
+function sleep(milliseconds) {
+  // oxlint-disable-next-line promise/avoid-new
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
 
 let id = "",
   projectFolderPath = "";
@@ -38,6 +46,7 @@ describe("Model points", () => {
       const result = dataStyleStore.setModelPointsVisibility(id, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_points_schemas.visibility,
         { id, visibility },
@@ -60,6 +69,7 @@ describe("Model points", () => {
       const result = dataStyleStore.setModelPointsSize(id, size);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_points_schemas.size,
         { id, size },

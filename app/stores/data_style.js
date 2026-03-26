@@ -1,3 +1,4 @@
+import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
@@ -10,16 +11,13 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const modelStyleStore = useModelStyle();
   const dataStore = useDataStore();
 
-  function addDataStyle(id, geode_object) {
-    dataStyleState.styles[id] = getDefaultStyle(geode_object);
+  async function addDataStyle(id, geode_object) {
+    await database.data_style.put(structuredClone({ id, ...getDefaultStyle(geode_object) }));
   }
 
   async function setVisibility(id, visibility) {
     const item = await dataStore.item(id);
-    const viewer_type = item?.viewer_type;
-    if (!viewer_type) {
-      throw new Error(`Item not found or not loaded: ${id}`);
-    }
+    const { viewer_type } = item;
 
     if (viewer_type === "mesh") {
       return meshStyleStore.setMeshVisibility(id, visibility);
@@ -32,10 +30,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyDefaultStyle(id) {
     const item = await dataStore.item(id);
-    const viewer_type = item?.viewer_type;
-    if (!viewer_type) {
-      throw new Error(`Item not found or not loaded: ${id}`);
-    }
+    const { viewer_type } = item;
+
     if (viewer_type === "mesh") {
       return meshStyleStore.applyMeshStyle(id);
     }
@@ -46,29 +42,36 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   function exportStores() {
-    return { styles: dataStyleState.styles };
+    return {
+      styles: dataStyleState.styles,
+      componentStyles: dataStyleState.componentStyles,
+    };
   }
 
-  function importStores(snapshot) {
-    const stylesSnapshot = snapshot.styles || {};
-    for (const id of Object.keys(dataStyleState.styles)) {
-      delete dataStyleState.styles[id];
-    }
-    for (const [id, style] of Object.entries(stylesSnapshot)) {
-      dataStyleState.styles[id] = style;
-    }
+  async function importStores(snapshot) {
+    const stylesSnapshot = snapshot.styles;
+    const componentStylesSnapshot = snapshot.componentStyles;
+
+    await dataStyleState.clear();
+
+    const style_promises = Object.entries(stylesSnapshot).map(([id, style]) =>
+      database.data_style.put(structuredClone({ id, ...style })),
+    );
+    const component_style_promises = Object.values(componentStylesSnapshot).map((style) =>
+      database.model_component_datastyle.put(structuredClone(style)),
+    );
+
+    await Promise.all([...style_promises, ...component_style_promises]);
   }
 
   function applyAllStylesFromState() {
-    const ids = Object.keys(dataStyleState.styles || {});
+    const ids = Object.keys(dataStyleState.styles);
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id);
-      const viewerType = meta?.viewer_type;
-      const style = dataStyleState.styles[id];
-      if (style && viewerType === "mesh") {
+      const viewerType = meta.viewer_type;
+      if (viewerType === "mesh") {
         return meshStyleStore.applyMeshStyle(id);
-      }
-      if (style && viewerType === "model") {
+      } else if (viewerType === "model") {
         return modelStyleStore.applyModelStyle(id);
       }
     });

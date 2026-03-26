@@ -12,8 +12,12 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
 
-  function item(id) {
-    return database.data.get(id);
+  async function item(id) {
+    const data_item = await database.data.get(id);
+    if (!data_item) {
+      throw new Error(`Item not found: ${id}`);
+    }
+    return data_item;
   }
 
   function refItem(id) {
@@ -61,6 +65,13 @@ export const useDataStore = defineStore("data", () => {
           is_active: meshComponent.is_active,
         })),
       }));
+  }
+
+  function refFormatedMeshComponents(id) {
+    return useObservable(
+      liveQuery(() => formatedMeshComponents(id)),
+      { initialValue: [] },
+    );
   }
 
   async function meshComponentType(modelId, geode_id) {
@@ -178,7 +189,7 @@ export const useDataStore = defineStore("data", () => {
       .where("[id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray();
-    return components.map((component) => component.viewer_id);
+    return components.map((component) => Number.parseInt(component.viewer_id, 10));
   }
 
   async function exportStores() {
@@ -200,6 +211,7 @@ export const useDataStore = defineStore("data", () => {
     refItem,
     meshComponentType,
     formatedMeshComponents,
+    refFormatedMeshComponents,
     registerObject,
     deregisterObject,
     addItem,
@@ -212,6 +224,7 @@ export const useDataStore = defineStore("data", () => {
     getSurfacesGeodeIds,
     getBlocksGeodeIds,
     getMeshComponentsViewerIds,
+
     exportStores,
     importStores,
     clear,

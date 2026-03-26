@@ -36,4 +36,23 @@ function generateProjectFolderPath(projectName) {
   return path.join(os.tmpdir(), projectName.replaceAll("/", "_"), uuidv4());
 }
 
-export { createPath, executablePath, executableName, generateProjectFolderPath };
+function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPath, extensionId) {
+  if (process.env.NODE_ENV === "production") {
+    return path.join(unzippedExtensionPath, frontendFile);
+  }
+  const extentionRepoName = extensionId
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("-");
+  const localExtensionPath = path.join(rootPath, "..", extentionRepoName, "dist", frontendFile);
+  console.log("runExtensions", { localExtensionPath });
+  return localExtensionPath;
+}
+
+export {
+  createPath,
+  extensionFrontendPath,
+  executablePath,
+  executableName,
+  generateProjectFolderPath,
+};
