@@ -25,7 +25,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
             sensitivity: "base",
           }),
         );
-        selection.value.push(child);
+        selection.value.push(id);
         return;
       }
     }
@@ -36,7 +36,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         sensitivity: "base",
       }),
     );
-    selection.value.push(child);
+    selection.value.push(id);
   }
 
   function displayAdditionalTree(id) {
