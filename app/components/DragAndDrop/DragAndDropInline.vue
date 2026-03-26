@@ -70,5 +70,4 @@ const emit = defineEmits(["click"]);
   border-color: rgba(var(--v-theme-primary), 0.4) !important;
   background: rgba(var(--v-theme-primary), 0.05) !important;
 }
-
 </style>
