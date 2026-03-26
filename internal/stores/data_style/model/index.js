@@ -18,7 +18,6 @@ const MESH_CONFIG = [{ type: "Corner" }, { type: "Line" }, { type: "Surface" }, 
 
 const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
 
-
 export function useModelStyle() {
   const dataStore = useDataStore();
   const dataStyleStateStore = useDataStyleStateStore();
