@@ -86,7 +86,7 @@ export function useModelStyle() {
   function visibleMeshComponents(id_ref) {
     const selection = ref([]);
     watch(
-      () => (isRef(id_ref) ? id_ref.value : id_ref),
+      () => unref(id_ref),
       (modelId, _prev, onCleanup) => {
         if (!modelId) {
           selection.value = [];

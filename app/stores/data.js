@@ -69,7 +69,7 @@ export const useDataStore = defineStore("data", () => {
   function refFormatedMeshComponents(id) {
     return useObservable(
       liveQuery(() => {
-        const unwrapped_id = isRef(id) ? id.value : id;
+        const unwrapped_id = unref(id);
         return formatedMeshComponents(unwrapped_id);
       }),
       { initialValue: [] },
