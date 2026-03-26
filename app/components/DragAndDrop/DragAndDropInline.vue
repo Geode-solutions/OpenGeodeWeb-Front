@@ -71,16 +71,4 @@ const emit = defineEmits(["click"]);
   background: rgba(var(--v-theme-primary), 0.05) !important;
 }
 
-.rotating {
-  animation: rotate 1s linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 </style>

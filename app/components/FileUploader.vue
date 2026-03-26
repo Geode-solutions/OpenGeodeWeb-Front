@@ -74,6 +74,24 @@ watch(internal_files, (value) => {
 
 <template>
   <DragAndDrop
+    v-if="!internal_files.length"
+    ref="dragAndDropRef"
+    :multiple="multiple"
+    :accept="accept"
+    :loading="loading"
+    :show-extensions="false"
+    :inline="true"
+    :show-overlay="show_overlay"
+    :texts="{
+      idle: 'Select files',
+      drop: 'Drop files here',
+      loading: 'Loading...',
+    }"
+    @files-selected="processSelectedFiles"
+  />
+
+  <DragAndDrop
+    v-else
     ref="dragAndDropRef"
     :multiple="multiple"
     :accept="accept"
@@ -83,36 +101,6 @@ watch(internal_files, (value) => {
     :show-overlay="show_overlay"
     @files-selected="processSelectedFiles"
   />
-
-  <v-hover v-if="!internal_files.length" v-slot="{ isHovering, props: hoverProps }">
-    <GlassCard
-      v-bind="hoverProps"
-      class="text-center cursor-pointer glass-ui border-dashed pa-12 mb-0 transition-swing"
-      :class="{ 'elevation-12 border-opacity-40': isHovering }"
-      variant="ui"
-      @click="dragAndDropRef?.triggerFileDialog"
-    >
-      <v-sheet
-        class="mx-auto mb-6 d-flex align-center justify-center transition-swing"
-        :color="isHovering ? 'primary' : 'rgba(255, 255, 255, 0.05)'"
-        rounded="circle"
-        width="80"
-        height="80"
-      >
-        <v-icon
-          :icon="loading ? 'mdi-loading' : 'mdi-plus'"
-          size="40"
-          :color="isHovering ? 'white' : 'primary'"
-          :class="{ rotating: loading }"
-        />
-      </v-sheet>
-
-      <div class="text-h6 font-weight-bold text-white mb-1">Select files</div>
-      <div class="text-body-2 text-white opacity-60">
-        Or drag and drop them anywhere to import them
-      </div>
-    </GlassCard>
-  </v-hover>
 
   <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
@@ -182,19 +170,6 @@ watch(internal_files, (value) => {
 .border-dashed:hover {
   border-color: rgba(var(--v-theme-primary), 0.4) !important;
   background: rgba(var(--v-theme-primary), 0.02) !important;
-}
-
-.rotating {
-  animation: rotate 1s linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .custom-upload-btn {

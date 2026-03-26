@@ -120,12 +120,25 @@ defineExpose({ triggerFileDialog });
 <template>
   <DragAndDropInline
     v-if="inline"
-    v-bind="$props"
     :is-dragging="isDragging"
+    :loading="loading"
+    :texts="texts"
+    :accept="accept"
+    :show-extensions="showExtensions"
     @click="triggerFileDialog"
   />
 
-  <DragAndDropOverlay v-bind="$props" :is-dragging="isDragging" />
+  <DragAndDropOverlay
+    v-if="isDragging && showOverlay"
+    :is-dragging="isDragging"
+    :show-overlay="showOverlay"
+    :fullscreen="fullscreen"
+    :loading="loading"
+    :texts="texts"
+    :multiple="multiple"
+    :accept="accept"
+    :show-extensions="showExtensions"
+  />
 
   <input
     ref="fileInput"
@@ -136,3 +149,18 @@ defineExpose({ triggerFileDialog });
     @change="handleFileSelect"
   />
 </template>
+
+<style>
+.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
