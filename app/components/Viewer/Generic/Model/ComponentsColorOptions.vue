@@ -27,11 +27,7 @@ watch(color, async (newValue) => {
 </script>
 
 <template>
-  <ViewerContextMenuItem
-    :itemProps="itemProps"
-    tooltip="Components color"
-    :btn_image="ModelColor"
-  >
+  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Components color" :btn_image="ModelColor">
     <template #options>
       <v-row class="pa-0" align="center">
         <v-col>
