@@ -150,6 +150,18 @@ export function useModelStyle() {
     );
   }
 
+  async function setModelComponentsColor(modelId, componentIds, color) {
+    const viewerIds = await dataStore.getMeshComponentsViewerIds(modelId, componentIds);
+    if (viewerIds.length > 0) {
+      await viewerStore.request(model_schemas.components_color, {
+        id: modelId,
+        block_ids: viewerIds,
+        color,
+      });
+    }
+    return dataStyleStateStore.mutateComponentStyles(modelId, componentIds, { color });
+  }
+
   function applyModelStyle(modelId) {
     const style = dataStyleStateStore.getStyle(modelId);
     const handlers = {
@@ -194,6 +206,7 @@ export function useModelStyle() {
     visibleMeshComponents,
     setModelVisibility,
     setModelComponentsVisibility,
+    setModelComponentsColor,
     applyModelStyle,
     setModelMeshComponentsDefaultStyle,
     ...useModelBlocksStyle(),
