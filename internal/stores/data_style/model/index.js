@@ -162,20 +162,21 @@ export function useModelStyle() {
     const componentsMap = Object.fromEntries(
       allComponents.map((component) => [component.geode_id, component]),
     );
-
-    await Promise.all(
-      MESH_TYPES.map(async (type) => {
+    const handlers = {
+      Corner: (ids) => modelCornersStyleStore.setModelCornersColor(modelId, ids, color),
+      Line: (ids) => modelLinesStyleStore.setModelLinesColor(modelId, ids, color),
+      Surface: (ids) => modelSurfacesStyleStore.setModelSurfacesColor(modelId, ids, color),
+      Block: (ids) => modelBlocksStyleStore.setModelBlocksColor(modelId, ids, color),
+    };
+    return Promise.all(
+      MESH_TYPES.map((type) => {
         const idsForType = componentIds.filter((id) => componentsMap[id]?.type === type);
         if (idsForType.length === 0) {
-          return;
+          return undefined;
         }
-        const viewerIds = await dataStore.getMeshComponentsViewerIds(modelId, idsForType);
-        const schema = model_schemas[`${type.toLowerCase()}s`].color;
-        await viewerStore.request(schema, { id: modelId, block_ids: viewerIds, color });
+        return handlers[type](idsForType);
       }),
     );
-
-    return dataStyleStateStore.mutateComponentStyles(modelId, componentIds, { color });
   }
 
   function applyModelStyle(modelId) {
