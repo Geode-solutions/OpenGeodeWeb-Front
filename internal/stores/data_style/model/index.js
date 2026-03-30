@@ -171,9 +171,6 @@ export function useModelStyle() {
     return Promise.all(
       MESH_TYPES.map((type) => {
         const idsForType = componentIds.filter((id) => componentsMap[id]?.type === type);
-        if (idsForType.length === 0) {
-          return undefined;
-        }
         return handlers[type](idsForType);
       }),
     );
