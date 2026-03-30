@@ -1,5 +1,5 @@
 <script setup>
-import ModelColor from "@ogw_front/assets/viewer_svgs/surface_polygons.svg";
+import ModelColor from "@ogw_front/assets/viewer_svgs/model_component_color.svg";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 
