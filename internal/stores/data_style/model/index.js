@@ -151,14 +151,23 @@ export function useModelStyle() {
   }
 
   async function setModelComponentsColor(modelId, componentIds, color) {
-    const viewerIds = await dataStore.getMeshComponentsViewerIds(modelId, componentIds);
-    if (viewerIds.length > 0) {
-      await viewerStore.request(model_schemas.components_color, {
-        id: modelId,
-        block_ids: viewerIds,
-        color,
-      });
-    }
+    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+    const componentsMap = Object.fromEntries(
+      allComponents.map((component) => [component.geode_id, component]),
+    );
+
+    await Promise.all(
+      MESH_TYPES.map(async (type) => {
+        const idsForType = componentIds.filter((id) => componentsMap[id]?.type === type);
+        if (idsForType.length === 0) {
+          return;
+        }
+        const viewerIds = await dataStore.getMeshComponentsViewerIds(modelId, idsForType);
+        const schema = model_schemas[`${type.toLowerCase()}s`].color;
+        await viewerStore.request(schema, { id: modelId, block_ids: viewerIds, color });
+      }),
+    );
+
     return dataStyleStateStore.mutateComponentStyles(modelId, componentIds, { color });
   }
 
