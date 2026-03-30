@@ -17,12 +17,7 @@ const modelId = computed(() => itemProps.meta_data.modelId);
 const componentId = computed(() => itemProps.id);
 
 const color = computed({
-  get: () =>
-    dataStyleStore.getComponentStyle(modelId.value, componentId.value)?.color ?? {
-      r: 255,
-      g: 255,
-      b: 255,
-    },
+  get: () => dataStyleStore.getModelComponentColor(modelId.value, componentId.value),
   set: async (newValue) => {
     await dataStyleStore.setComponentsColor(modelId.value, [componentId.value], newValue);
     hybridViewerStore.remoteRender();

@@ -122,6 +122,13 @@ export function useModelStyle() {
     return selection;
   }
 
+  function getModelComponentColor(modelId, componentId) {
+    return (
+      dataStyleStateStore.getComponentStyle(modelId, componentId)?.color ??
+      dataStyleStateStore.getStyle(modelId).color
+    );
+  }
+
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
     const allComponents = await database.model_components.where("id").equals(modelId).toArray();
     const componentsMap = Object.fromEntries(
@@ -215,6 +222,7 @@ export function useModelStyle() {
     visibleMeshComponents,
     setModelVisibility,
     setModelComponentsVisibility,
+    getModelComponentColor,
     setModelComponentsColor,
     applyModelStyle,
     setModelMeshComponentsDefaultStyle,
