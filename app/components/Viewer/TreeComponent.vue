@@ -124,7 +124,14 @@ async function onSelectionChange(current) {
       <span
         class="treeview-item"
         :class="{ 'inactive-item': item.is_active === false }"
-        @contextmenu.prevent.stop="emit('show-menu', { event: $event, itemId: item })"
+        @contextmenu.prevent.stop="
+          emit('show-menu', {
+            event: $event,
+            itemId: item.id,
+            context_type: 'model_component',
+            modelId: id,
+          })
+        "
       >
         {{ item.title }}
         <v-tooltip v-if="item.category" activator="parent" location="right">

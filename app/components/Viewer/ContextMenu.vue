@@ -174,6 +174,7 @@ function getItemStyle(index) {
           :index="index"
           :itemProps="{
             id: id,
+            meta_data: meta_data,
             tooltip_location: getTooltipLocation(index),
             tooltip_origin: getTooltipOrigin(index),
             totalItems: menuItemCount,

@@ -13,16 +13,14 @@ const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
 });
 
-const id = computed(() => itemProps.id);
-const components_selection = dataStyleStore.visibleMeshComponents(id);
+const modelId = computed(() => itemProps.meta_data.modelId);
+const componentId = computed(() => itemProps.id);
 
 const color = ref({ r: 255, g: 255, b: 255 });
 
 watch(color, async (newValue) => {
-  if (components_selection.value.length > 0) {
-    await dataStyleStore.setComponentsColor(id.value, components_selection.value, newValue);
-    hybridViewerStore.remoteRender();
-  }
+  await dataStyleStore.setComponentsColor(modelId.value, [componentId.value], newValue);
+  hybridViewerStore.remoteRender();
 });
 </script>
 
