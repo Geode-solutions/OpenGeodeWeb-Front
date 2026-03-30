@@ -63,10 +63,10 @@ async function onSelectionChange(current) {
   }
 
   if (added.length > 0) {
-    await dataStyleStore.setComponentsVisibility(id, added, true);
+    await dataStyleStore.setModelComponentsVisibility(id, added, true);
   }
   if (removed.length > 0) {
-    await dataStyleStore.setComponentsVisibility(id, removed, false);
+    await dataStyleStore.setModelComponentsVisibility(id, removed, false);
   }
   hybridViewerStore.remoteRender();
 }

@@ -123,10 +123,7 @@ export function useModelStyle() {
   }
 
   function getModelComponentColor(modelId, componentId) {
-    return (
-      dataStyleStateStore.getComponentStyle(modelId, componentId)?.color ??
-      dataStyleStateStore.getStyle(modelId).color
-    );
+    return dataStyleStateStore.getComponentStyle(modelId, componentId).color;
   }
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
@@ -224,11 +221,11 @@ export function useModelStyle() {
     setModelComponentsColor,
     applyModelStyle,
     setModelMeshComponentsDefaultStyle,
-    ...useModelBlocksStyle(),
-    ...useModelCornersStyle(),
-    ...useModelEdgesStyle(),
-    ...useModelLinesStyle(),
-    ...useModelPointsStyle(),
-    ...useModelSurfacesStyle(),
+    ...modelBlocksStyleStore,
+    ...modelCornersStyleStore,
+    ...modelEdgesStyleStore,
+    ...modelLinesStyleStore,
+    ...modelPointsStyleStore,
+    ...modelSurfacesStyleStore,
   };
 }
