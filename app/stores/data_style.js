@@ -81,6 +81,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   return {
     styles: dataStyleState.styles,
     getStyle: dataStyleState.getStyle,
+    getComponentStyle: dataStyleState.getComponentStyle,
     objectVisibility: dataStyleState.objectVisibility,
     selectedObjects: dataStyleState.selectedObjects,
     ...meshStyleStore,

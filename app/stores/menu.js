@@ -36,9 +36,9 @@ import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/Tetr
 import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions";
 
 // Model components
+import ModelComponentsOptions from "@ogw_front/components/Viewer/Generic/Model/ModelComponentsOptions";
 import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions";
 import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions";
-import TreeComponentsColorOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentsColorOptions";
 
 const PointSet_menu = [PointSetPointsOptions];
 
@@ -89,7 +89,7 @@ const Section_menu = [ModelEdgesOptions, ModelPointsOptions];
 
 const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
 
-const ModelComponent_menu = [TreeComponentsColorOptions];
+const ModelComponent_menu = [ModelComponentsOptions];
 
 const menusData = {
   mesh: {
