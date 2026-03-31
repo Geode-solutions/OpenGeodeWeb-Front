@@ -20,7 +20,7 @@ const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
 
 export function useModelStyle() {
   const dataStore = useDataStore();
-  const dataStyleStateStore = useDataStyleState();
+  const dataStyleState = useDataStyleState();
   const modelCornersStyleStore = useModelCornersStyle();
   const modelBlocksStyleStore = useModelBlocksStyle();
   const modelEdgesStyleStore = useModelEdgesStyle();
@@ -38,7 +38,7 @@ export function useModelStyle() {
       }
     }
 
-    const groupStyles = dataStyleStateStore.getStyle(modelId);
+    const groupStyles = dataStyleState.getStyle(modelId);
     const selection = [];
     for (const type of MESH_TYPES) {
       const typeComponents = componentsByType[type];
@@ -66,7 +66,7 @@ export function useModelStyle() {
   }
 
   function modelVisibility(modelId) {
-    return dataStyleStateStore.getStyle(modelId).visibility;
+    return dataStyleState.getStyle(modelId).visibility;
   }
 
   function setModelVisibility(modelId, visibility) {
@@ -76,7 +76,7 @@ export function useModelStyle() {
       {
         response_function: async () => {
           await hybridViewerStore.setVisibility(modelId, visibility);
-          await dataStyleStateStore.mutateStyle(modelId, { visibility });
+          await dataStyleState.mutateStyle(modelId, { visibility });
           return { id: modelId, visibility };
         },
       },
@@ -123,7 +123,7 @@ export function useModelStyle() {
   }
 
   function getModelComponentColor(modelId, componentId) {
-    return dataStyleStateStore.getComponentStyle(modelId, componentId).color;
+    return dataStyleState.getComponentStyle(modelId, componentId).color;
   }
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
@@ -149,7 +149,7 @@ export function useModelStyle() {
           const schema = model_schemas[`${type.toLowerCase()}s`].visibility;
           await viewerStore.request(schema, { id: modelId, block_ids: viewerIds, visibility });
         }
-        return dataStyleStateStore.mutateComponentStyles(modelId, idsToUpdate, { visibility });
+        return dataStyleState.mutateComponentStyles(modelId, idsToUpdate, { visibility });
       }),
     );
   }
@@ -174,7 +174,7 @@ export function useModelStyle() {
   }
 
   function applyModelStyle(modelId) {
-    const style = dataStyleStateStore.getStyle(modelId);
+    const style = dataStyleState.getStyle(modelId);
     const handlers = {
       visibility: () => setModelVisibility(modelId, style.visibility),
       corners: () => modelCornersStyleStore.applyModelCornersStyle(modelId),
