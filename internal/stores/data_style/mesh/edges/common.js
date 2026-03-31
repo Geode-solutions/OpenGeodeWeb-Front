@@ -1,16 +1,16 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshEdgesCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore();
+  const dataStyleState = useDataStyleState();
 
   function mutateMeshEdgesStyle(id, values) {
-    return dataStyleStateStore.mutateStyle(id, {
+    return dataStyleState.mutateStyle(id, {
       edges: values,
     });
   }
 
   function meshEdgesStyle(id) {
-    return dataStyleStateStore.getStyle(id).edges;
+    return dataStyleState.getStyle(id).edges;
   }
 
   function meshEdgesColoring(id) {

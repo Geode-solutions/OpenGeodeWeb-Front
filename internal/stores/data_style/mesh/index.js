@@ -5,7 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useMeshCellsStyle } from "./cells";
 import { useMeshEdgesStyle } from "./edges";
 import { useMeshPointsStyle } from "./points";
@@ -18,7 +18,7 @@ const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
 export function useMeshStyle() {
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
-  const dataStyleState = useDataStyleStateStore();
+  const dataStyleState = useDataStyleState();
   const meshPointsStyle = useMeshPointsStyle();
   const meshEdgesStyle = useMeshEdgesStyle();
   const meshCellsStyle = useMeshCellsStyle();
