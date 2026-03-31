@@ -85,6 +85,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     exportStores,
     importStores,
     applyAllStylesFromState,
+    ...dataStyleState,
     ...meshStyleStore,
     ...modelStyleStore,
   };
