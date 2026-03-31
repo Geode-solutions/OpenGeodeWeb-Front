@@ -1,16 +1,16 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshPolygonsCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore();
+  const dataStyleState = useDataStyleState();
 
   function mutateMeshPolygonsStyle(id, values) {
-    return dataStyleStateStore.mutateStyle(id, {
+    return dataStyleState.mutateStyle(id, {
       polygons: values,
     });
   }
 
   function meshPolygonsStyle(id) {
-    return dataStyleStateStore.getStyle(id).polygons;
+    return dataStyleState.getStyle(id).polygons;
   }
 
   function meshPolygonsColoring(id) {

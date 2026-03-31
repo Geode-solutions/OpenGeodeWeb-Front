@@ -36,6 +36,7 @@ import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/Tetr
 import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions";
 
 // Model components
+import ModelComponentsOptions from "@ogw_front/components/Viewer/Generic/Model/ModelComponentsOptions";
 import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions";
 import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions";
 
@@ -88,6 +89,8 @@ const Section_menu = [ModelEdgesOptions, ModelPointsOptions];
 
 const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
 
+const ModelComponent_menu = [ModelComponentsOptions];
+
 const menusData = {
   mesh: {
     EdgedCurve2D: EdgedCurve_menu,
@@ -113,6 +116,9 @@ const menusData = {
     ImplicitStructuralModel: ImplicitStructuralModel_menu,
     Section: Section_menu,
     StructuralModel: StructuralModel_menu,
+  },
+  model_component: {
+    component: ModelComponent_menu,
   },
 };
 

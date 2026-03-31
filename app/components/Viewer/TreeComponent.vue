@@ -63,10 +63,10 @@ async function onSelectionChange(current) {
   }
 
   if (added.length > 0) {
-    await dataStyleStore.setComponentsVisibility(id, added, true);
+    await dataStyleStore.setModelComponentsVisibility(id, added, true);
   }
   if (removed.length > 0) {
-    await dataStyleStore.setComponentsVisibility(id, removed, false);
+    await dataStyleStore.setModelComponentsVisibility(id, removed, false);
   }
   hybridViewerStore.remoteRender();
 }
@@ -124,7 +124,14 @@ async function onSelectionChange(current) {
       <span
         class="treeview-item"
         :class="{ 'inactive-item': item.is_active === false }"
-        @contextmenu.prevent.stop="emit('show-menu', { event: $event, itemId: item })"
+        @contextmenu.prevent.stop="
+          emit('show-menu', {
+            event: $event,
+            itemId: item.id,
+            context_type: 'model_component',
+            modelId: id,
+          })
+        "
       >
         {{ item.title }}
         <v-tooltip v-if="item.category" activator="parent" location="right">
