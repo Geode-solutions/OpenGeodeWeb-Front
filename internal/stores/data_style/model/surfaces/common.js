@@ -1,8 +1,8 @@
 import merge from "lodash/merge";
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useModelSurfacesCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore();
+  const dataStyleStateStore = useDataStyleState();
 
   function modelSurfacesStyle(id) {
     return dataStyleStateStore.getStyle(id).surfaces;

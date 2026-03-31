@@ -3,7 +3,7 @@ import { liveQuery } from "dexie";
 import merge from "lodash/merge";
 import { useObservable } from "@vueuse/rxjs";
 
-export const useDataStyleStateStore = defineStore("dataStyleState", () => {
+export function useDataStyleState() {
   const styles = useObservable(
     liveQuery(async () => {
       const allStyles = await database.data_style.toArray();
@@ -137,15 +137,15 @@ export const useDataStyleStateStore = defineStore("dataStyleState", () => {
   }
 
   return {
+    styles,
+    componentStyles,
+    objectVisibility,
+    selectedObjects,
     getStyle,
     mutateStyle,
     getComponentStyle,
     mutateComponentStyle,
     mutateComponentStyles,
-    styles,
-    componentStyles,
-    objectVisibility,
-    selectedObjects,
     clear,
   };
-});
+}

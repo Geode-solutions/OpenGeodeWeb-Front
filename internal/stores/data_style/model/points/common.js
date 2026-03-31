@@ -1,7 +1,7 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useModelPointsCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore();
+  const dataStyleStateStore = useDataStyleState();
 
   function mutateModelPointsStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {

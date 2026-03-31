@@ -1,8 +1,8 @@
 import merge from "lodash/merge";
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useModelCornersCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore();
+  const dataStyleStateStore = useDataStyleState();
 
   function modelCornersStyle(id) {
     return dataStyleStateStore.getStyle(id).corners;

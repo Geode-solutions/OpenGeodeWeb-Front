@@ -1,7 +1,7 @@
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 import { useDataStore } from "@ogw_front/stores/data";
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelBlocksStyle } from "./blocks";
 import { useModelCornersStyle } from "./corners";
@@ -20,7 +20,7 @@ const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
 
 export function useModelStyle() {
   const dataStore = useDataStore();
-  const dataStyleStateStore = useDataStyleStateStore();
+  const dataStyleStateStore = useDataStyleState();
   const modelCornersStyleStore = useModelCornersStyle();
   const modelBlocksStyleStore = useModelBlocksStyle();
   const modelEdgesStyleStore = useModelEdgesStyle();

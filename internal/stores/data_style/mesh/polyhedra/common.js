@@ -1,7 +1,7 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshPolyhedraCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore();
+  const dataStyleStateStore = useDataStyleState();
 
   function mutateMeshPolyhedraStyle(id, values) {
     return dataStyleStateStore.mutateStyle(id, {
