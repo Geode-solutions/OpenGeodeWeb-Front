@@ -36,9 +36,9 @@ import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/Tetr
 import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions";
 
 // Model components
-import ModelComponentsOptions from "@ogw_front/components/Viewer/Generic/Model/ModelComponentsOptions";
 import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions";
 import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions";
+import ModelStyleOptions from "@ogw_front/components/Viewer/Generic/Model/ModelStyleOptions";
 
 const PointSet_menu = [PointSetPointsOptions];
 
@@ -89,7 +89,7 @@ const Section_menu = [ModelEdgesOptions, ModelPointsOptions];
 
 const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
 
-const ModelComponent_menu = [ModelComponentsOptions];
+const ModelComponent_menu = [ModelStyleOptions];
 
 const menusData = {
   mesh: {
@@ -133,6 +133,7 @@ export const useMenuStore = defineStore("menu", () => {
   const containerTop = ref(0);
   const containerLeft = ref(0);
   const active_item_index = ref(undefined);
+  const active_sub_item_index = ref(undefined);
   const current_meta_data = ref({});
 
   function getMenuItems(objectType, geodeObject) {
@@ -144,6 +145,7 @@ export const useMenuStore = defineStore("menu", () => {
 
   function closeMenu() {
     active_item_index.value = undefined;
+    active_sub_item_index.value = undefined;
     current_id.value = undefined;
     current_meta_data.value = {};
     menuX.value = 0;
@@ -188,6 +190,15 @@ export const useMenuStore = defineStore("menu", () => {
     } else {
       active_item_index.value = index;
     }
+    active_sub_item_index.value = undefined;
+  }
+
+  function toggleSubItemOptions(index) {
+    if (active_sub_item_index.value === index) {
+      active_sub_item_index.value = undefined;
+    } else {
+      active_sub_item_index.value = index;
+    }
   }
 
   const router = useRouter();
@@ -211,10 +222,12 @@ export const useMenuStore = defineStore("menu", () => {
     containerTop,
     containerLeft,
     active_item_index,
+    active_sub_item_index,
     getMenuItems,
     closeMenu,
     openMenu,
     setMenuPosition,
     toggleItemOptions,
+    toggleSubItemOptions,
   };
 });

@@ -9,8 +9,10 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const { itemProps } = defineProps({
+const { index, itemProps, isSubItem } = defineProps({
+  index: { type: Number, required: true },
   itemProps: { type: Object, required: true },
+  isSubItem: { type: Boolean, default: false },
 });
 
 const modelId = computed(() => itemProps.meta_data.modelId);
@@ -26,7 +28,13 @@ const color = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Components color" :btn_image="ModelColor">
+  <ViewerContextMenuItem
+    :index="index"
+    :itemProps="itemProps"
+    tooltip="Components color"
+    :btn_image="ModelColor"
+    :is-sub-item="isSubItem"
+  >
     <template #options>
       <v-row class="pa-0" align="center">
         <v-col>
