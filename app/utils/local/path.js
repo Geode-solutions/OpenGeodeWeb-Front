@@ -11,7 +11,7 @@ import { appMode } from "./app_mode.js";
 
 function executablePath(microservicePath) {
   console.log("[executablePath]", { microservicePath }, process.env.NODE_ENV);
-  if (useRuntimeConfig().public.MODE === appMode.DESKTOP && process.env.NODE_ENV === "production") {
+  if (process.env.MODE === appMode.DESKTOP && process.env.NODE_ENV === "production") {
     return process.env.RESOURCES_PATH;
   }
   return microservicePath;

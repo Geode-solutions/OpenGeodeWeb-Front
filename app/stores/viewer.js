@@ -101,6 +101,7 @@ export const useViewerStore = defineStore(
           });
           client.value.onConnectionClose((httpReq) => {
             const message = httpReq?.response?.error || `Connection close`;
+            status.value = Status.NOT_CONNECTED;
             console.error(message);
           });
 
