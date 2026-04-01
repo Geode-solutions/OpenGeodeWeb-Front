@@ -39,6 +39,16 @@ export default defineNuxtConfig({
     transpile: ["vuetify"],
   },
 
+  vuetify: {
+    vuetifyOptions: {
+      defaults: {
+        VTooltip: {
+          openDelay: 500,
+        },
+      },
+    },
+  },
+
   vue: {
     compilerOptions: {
       isCustomElement: (tag) => ["md-linedivider"].includes(tag),
