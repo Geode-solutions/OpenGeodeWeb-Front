@@ -153,6 +153,15 @@ export const useDataStore = defineStore("data", () => {
     return database.model_components_relation.bulkPut(relations);
   }
 
+  async function getComponentByViewerId(modelId, viewer_id) {
+    const component = await database.model_components
+      .where("viewer_id")
+      .equals(Number(viewer_id))
+      .and((comp) => comp.id === modelId)
+      .first();
+    return component;
+  }
+
   async function deleteItem(id) {
     await database.data.delete(id);
     await deleteModelComponents(id);
@@ -232,6 +241,7 @@ export const useDataStore = defineStore("data", () => {
     getBlocksGeodeIds,
     getMeshComponentGeodeIds,
     getMeshComponentsViewerIds,
+    getComponentByViewerId,
 
     exportStores,
     importStores,

@@ -36,6 +36,7 @@ import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/Tetr
 import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions";
 
 // Model components
+import ModelComponentsOptions from "@ogw_front/components/Viewer/Generic/Model/ModelComponentsOptions";
 import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions";
 import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions";
 import ModelStyleOptions from "@ogw_front/components/Viewer/Generic/Model/ModelStyleOptions";
@@ -78,18 +79,18 @@ const TetrahedralSolid_menu = [
   TetrahedralSolidTetrahedraOptions,
 ];
 
-const BRep_menu = [ModelEdgesOptions, ModelPointsOptions];
+const BRep_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
-const CrossSection_menu = [ModelEdgesOptions, ModelPointsOptions];
+const CrossSection_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
-const ImplicitCrossSection_menu = [ModelEdgesOptions, ModelPointsOptions];
-const ImplicitStructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
+const ImplicitCrossSection_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
+const ImplicitStructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
-const Section_menu = [ModelEdgesOptions, ModelPointsOptions];
+const Section_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
-const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
+const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
-const ModelComponent_menu = [ModelStyleOptions];
+const ModelComponent_menu = [ModelComponentsOptions];
 
 const menusData = {
   mesh: {

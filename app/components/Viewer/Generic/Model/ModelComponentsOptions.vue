@@ -15,8 +15,8 @@ const { index, itemProps, isSubItem } = defineProps({
   isSubItem: { type: Boolean, default: false },
 });
 
-const modelId = computed(() => itemProps.meta_data.modelId);
-const componentId = computed(() => itemProps.id);
+const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
+const componentId = computed(() => itemProps.meta_data.pickedComponentId || itemProps.id);
 
 const color = computed({
   get: () => dataStyleStore.getModelComponentColor(modelId.value, componentId.value),

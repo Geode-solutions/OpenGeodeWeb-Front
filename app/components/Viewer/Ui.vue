@@ -23,17 +23,14 @@ const dataItems = dataStore.refAllItems();
 async function get_viewer_id(x, y) {
   const activeIds = new Set(dataItems.value.map((item) => item.id));
   const ids = Object.keys(dataStyleStore.styles).filter((styleId) => activeIds.has(styleId));
-  await viewerStore.request(
+  const response = await viewerStore.request(
     viewer_schemas.opengeodeweb_viewer.viewer.picked_ids,
     { x, y, ids },
-    {
-      response_function: (response) => {
-        const { array_ids } = response;
-        const [first_id] = array_ids;
-        emit("set-id", first_id);
-      },
-    },
   );
+  const { array_ids, viewer_id } = response;
+  const [first_id] = array_ids;
+  emit("set-id", first_id);
+  return { id: first_id, viewer_id };
 }
 
 defineExpose({ get_viewer_id });
