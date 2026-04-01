@@ -17,7 +17,7 @@ const subItemProps = computed(() => ({
   <ViewerContextMenuItem
     :index="itemProps.index"
     :itemProps="itemProps"
-    tooltip="Style options"
+    tooltip="Components options"
     :btn_image="SurfaceTriangles"
     no-card
   >
