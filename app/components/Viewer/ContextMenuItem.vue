@@ -22,9 +22,7 @@ const { index, itemProps, tooltip, btn_image, noCard, isSubItem } = defineProps(
 });
 
 const is_active = computed(() =>
-  isSubItem
-    ? menuStore.active_sub_item_index === index
-    : menuStore.active_item_index === index,
+  isSubItem ? menuStore.active_sub_item_index === index : menuStore.active_item_index === index,
 );
 const optionsRef = ref(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
