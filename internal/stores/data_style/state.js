@@ -47,49 +47,7 @@ export function useDataStyleState() {
   );
 
   function getStyle(id) {
-    const default_style = {
-      visibility: true,
-      color: { r: 255, g: 255, b: 255 },
-      corners: { visibility: true, color: { r: 20, g: 20, b: 20 } },
-      lines: { visibility: true, color: { r: 20, g: 20, b: 20 } },
-      surfaces: { visibility: true, color: { r: 255, g: 255, b: 255 } },
-      blocks: { visibility: true, color: { r: 255, g: 255, b: 255 } },
-      points: { visibility: true, size: 10 },
-      edges: { visibility: true },
-      cells: {
-        visibility: true,
-        coloring: {
-          active: "color",
-          color: { r: 255, g: 255, b: 255 },
-          cell: { name: "", storedConfigs: {} },
-          vertex: { name: "", storedConfigs: {} },
-          textures: [],
-        },
-      },
-      polygons: {
-        visibility: true,
-        coloring: {
-          active: "color",
-          color: { r: 255, g: 255, b: 255 },
-          polygon: { name: "", storedConfigs: {} },
-          vertex: { name: "", storedConfigs: {} },
-          textures: [],
-        },
-      },
-      polyhedra: {
-        visibility: true,
-        coloring: {
-          active: "color",
-          color: { r: 255, g: 255, b: 255 },
-          polyhedron: { name: "", storedConfigs: {} },
-          vertex: { name: "", storedConfigs: {} },
-        },
-      },
-    };
-    if (styles.value[id]) {
-      return { ...default_style, ...toRaw(styles.value[id]) };
-    }
-    return default_style;
+    return { ...toRaw(styles.value[id]) };
   }
 
   function mutateStyle(id, values) {
@@ -137,15 +95,15 @@ export function useDataStyleState() {
   }
 
   return {
-    styles,
-    componentStyles,
-    objectVisibility,
-    selectedObjects,
     getStyle,
     mutateStyle,
     getComponentStyle,
     mutateComponentStyle,
     mutateComponentStyles,
+    styles,
+    componentStyles,
+    objectVisibility,
+    selectedObjects,
     clear,
   };
 }
