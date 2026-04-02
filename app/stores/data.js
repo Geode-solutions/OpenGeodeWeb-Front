@@ -144,29 +144,17 @@ export const useDataStore = defineStore("data", () => {
     if (new_item.mesh_components) {
       for (const component of new_item.mesh_components) {
         if (component.boundaries) {
-          addModelComponentRelations(
-            component.boundaries,
-            component.geode_id,
-            "boundary",
-          );
+          addModelComponentRelations(component.boundaries, component.geode_id, "boundary");
         }
         if (component.internals) {
-          addModelComponentRelations(
-            component.internals,
-            component.geode_id,
-            "internal",
-          );
+          addModelComponentRelations(component.internals, component.geode_id, "internal");
         }
       }
     }
     if (new_item.collection_components) {
       for (const component of new_item.collection_components) {
         if (component.items) {
-          addModelComponentRelations(
-            component.items,
-            component.geode_id,
-            "collection",
-          );
+          addModelComponentRelations(component.items, component.geode_id, "collection");
         }
       }
     }
