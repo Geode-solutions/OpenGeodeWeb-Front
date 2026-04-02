@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from "vue";
-import DragAndDropInline from "./DragAndDrop/DragAndDropInline.vue";
-import DragAndDropOverlay from "./DragAndDrop/DragAndDropOverlay.vue";
+import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
+import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 
 const {
   multiple,
@@ -11,11 +11,7 @@ const {
   fullscreen,
   inline,
   showOverlay,
-  texts = {
-    idle: "Click or drag and drop",
-    drop: "Drop files here",
-    loading: "Loading...",
-  },
+  texts,
 } = defineProps({
   multiple: { type: Boolean, default: false },
   accept: { type: String, default: "" },
@@ -24,7 +20,14 @@ const {
   fullscreen: { type: Boolean, default: false },
   inline: { type: Boolean, default: true },
   showOverlay: { type: Boolean, default: true },
-  texts: { type: Object, default: undefined },
+  texts: {
+    type: Object,
+    default: () => ({
+      idle: "Click or drag and drop",
+      drop: "Drop files here",
+      loading: "Loading...",
+    }),
+  },
 });
 
 const emit = defineEmits(["files-selected"]);
@@ -120,32 +123,32 @@ defineExpose({ triggerFileDialog });
 <template>
   <DragAndDropInline
     v-if="inline"
-    :is-dragging="isDragging"
-    :loading="loading"
-    :texts="texts"
-    :accept="accept"
-    :show-extensions="showExtensions"
+    :is-dragging
+    :loading
+    :texts
+    :accept
+    :show-extensions
     @click="triggerFileDialog"
   />
 
   <DragAndDropOverlay
     v-if="isDragging && showOverlay"
-    :is-dragging="isDragging"
-    :show-overlay="showOverlay"
-    :fullscreen="fullscreen"
-    :loading="loading"
-    :texts="texts"
-    :multiple="multiple"
-    :accept="accept"
-    :show-extensions="showExtensions"
+    :is-dragging
+    :show-overlay
+    :fullscreen
+    :loading
+    :texts
+    :multiple
+    :accept
+    :show-extensions
   />
 
   <input
     ref="fileInput"
     type="file"
     class="d-none"
-    :multiple="multiple"
-    :accept="accept"
+    :multiple
+    :accept
     @change="handleFileSelect"
   />
 </template>

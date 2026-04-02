@@ -1,11 +1,19 @@
 <script setup>
+import { useTemplateRef } from "vue";
 import DragAndDrop from "@ogw_front/components/DragAndDrop";
 import GlassCard from "@ogw_front/components/GlassCard";
 import { useGeodeStore } from "@ogw_front/stores/geode";
 
 const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"]);
 
-const { multiple, accept, files, auto_upload, mini, show_overlay } = defineProps({
+const {
+  multiple,
+  accept,
+  files,
+  auto_upload,
+  mini,
+  show_overlay: showOverlay,
+} = defineProps({
   multiple: { type: Boolean, required: true },
   accept: { type: String, required: true },
   files: { type: Array, required: false, default: [] },
@@ -19,7 +27,7 @@ const geodeStore = useGeodeStore();
 const internal_files = ref(files);
 const loading = ref(false);
 const files_uploaded = ref(false);
-const dragAndDropRef = ref(undefined);
+const dragAndDropRef = useTemplateRef("dragAndDropRef");
 
 const toggle_loading = useToggle(loading);
 
@@ -76,12 +84,12 @@ watch(internal_files, (value) => {
   <DragAndDrop
     v-if="!internal_files.length"
     ref="dragAndDropRef"
-    :multiple="multiple"
-    :accept="accept"
-    :loading="loading"
+    :multiple
+    :accept
+    :loading
     :show-extensions="false"
     :inline="true"
-    :show-overlay="show_overlay"
+    :show-overlay="showOverlay"
     :texts="{
       idle: 'Select files',
       drop: 'Drop files here',
@@ -93,12 +101,12 @@ watch(internal_files, (value) => {
   <DragAndDrop
     v-else
     ref="dragAndDropRef"
-    :multiple="multiple"
-    :accept="accept"
-    :loading="loading"
+    :multiple
+    :accept
+    :loading
     :show-extensions="false"
     :inline="false"
-    :show-overlay="show_overlay"
+    :show-overlay="showOverlay"
     @files-selected="processSelectedFiles"
   />
 
