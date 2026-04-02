@@ -3,32 +3,24 @@ import { onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 
-const {
-  multiple,
-  accept,
-  loading,
-  showExtensions,
-  fullscreen,
-  inline,
-  showOverlay,
-  texts,
-} = defineProps({
-  multiple: { type: Boolean, default: false },
-  accept: { type: String, default: "" },
-  loading: { type: Boolean, default: false },
-  showExtensions: { type: Boolean, default: true },
-  fullscreen: { type: Boolean, default: false },
-  inline: { type: Boolean, default: true },
-  showOverlay: { type: Boolean, default: true },
-  texts: {
-    type: Object,
-    default: () => ({
-      idle: "Click or drag and drop",
-      drop: "Drop files here",
-      loading: "Loading...",
-    }),
-  },
-});
+const { multiple, accept, loading, showExtensions, fullscreen, inline, showOverlay, texts } =
+  defineProps({
+    multiple: { type: Boolean, default: false },
+    accept: { type: String, default: "" },
+    loading: { type: Boolean, default: false },
+    showExtensions: { type: Boolean, default: true },
+    fullscreen: { type: Boolean, default: false },
+    inline: { type: Boolean, default: true },
+    showOverlay: { type: Boolean, default: true },
+    texts: {
+      type: Object,
+      default: () => ({
+        idle: "Click or drag and drop",
+        drop: "Drop files here",
+        loading: "Loading...",
+      }),
+    },
+  });
 
 const emit = defineEmits(["files-selected"]);
 
@@ -143,14 +135,7 @@ defineExpose({ triggerFileDialog });
     :show-extensions
   />
 
-  <input
-    ref="fileInput"
-    type="file"
-    class="d-none"
-    :multiple
-    :accept
-    @change="handleFileSelect"
-  />
+  <input ref="fileInput" type="file" class="d-none" :multiple :accept @change="handleFileSelect" />
 </template>
 
 <style>
