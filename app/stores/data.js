@@ -109,6 +109,9 @@ export const useDataStore = defineStore("data", () => {
   function addComponents(new_item) {
     const allComponents = [];
     function addModelComponents(components) {
+      if (!components) {
+        return;
+      }
       for (const component of components) {
         allComponents.push({
           id: new_item.id,
