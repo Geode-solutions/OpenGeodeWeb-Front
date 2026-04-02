@@ -1,6 +1,6 @@
 <script setup>
-import { useTemplateRef } from "vue";
 import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useTemplateRef } from "vue";
 
 import DragAndDrop from "@ogw_front/components/DragAndDrop";
 
