@@ -10,9 +10,12 @@ import { v4 as uuidv4 } from "uuid";
 import { appMode } from "./app_mode.js";
 
 function executablePath(microservicePath) {
-  console.log("[executablePath]", { microservicePath }, process.env.NODE_ENV);
-  if (process.env.MODE === appMode.DESKTOP && process.env.NODE_ENV === "production") {
-    return process.env.RESOURCES_PATH;
+  const resourcesPath = process.env.RESOURCES_PATH;
+  const mode = process.env.MODE;
+  const nodeEnv = process.env.NODE_ENV;
+  console.log("[executablePath]", { microservicePath, mode, nodeEnv, resourcesPath });
+  if (mode === appMode.DESKTOP && nodeEnv === "production") {
+    return resourcesPath;
   }
   return microservicePath;
 }
