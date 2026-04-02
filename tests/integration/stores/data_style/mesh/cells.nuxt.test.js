@@ -1,5 +1,5 @@
 // Third party imports
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
@@ -20,14 +20,14 @@ const cell_attribute = { name: "RGB_data" };
 let id = "",
   projectFolderPath = "";
 
-beforeEach(async () => {
+beforeAll(async () => {
   id = "";
   projectFolderPath = "";
   ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
 }, INTERVAL_TIMEOUT);
 
-afterEach(async () => {
-  console.log("afterEach mesh cells kill", projectFolderPath);
+afterAll(async () => {
+  console.log("afterAll mesh cells kill", projectFolderPath);
   await cleanupBackend(projectFolderPath);
 });
 
