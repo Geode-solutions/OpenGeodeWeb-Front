@@ -24,6 +24,8 @@ const ACTOR_COLOR = [
   ACTOR_DARK_VALUE / RGB_MAX,
 ];
 const WHEEL_TIME_OUT_MS = 600;
+const CLIPPING_RANGE_EXPANSION = 0.15;
+const NEAR_CLIPPING_PLANE_TOLERANCE = 0;
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
@@ -62,6 +64,10 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       imageStyle.opacity = 1;
     });
 
+    const renderer = genericRenderWindow.value.getRenderer();
+    renderer.setClippingRangeExpansion(CLIPPING_RANGE_EXPANSION);
+    renderer.setNearClippingPlaneTolerance(NEAR_CLIPPING_PLANE_TOLERANCE);
+
     status.value = Status.CREATED;
   }
 
@@ -98,13 +104,20 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     delete hybridDb[id];
   }
 
-  function setVisibility(id, visibility) {
+  async function setVisibility(id, visibility) {
     if (!hybridDb[id]) {
       return;
     }
     hybridDb[id].actor.setVisibility(visibility);
-    const renderWindow = genericRenderWindow.value.getRenderWindow();
-    renderWindow.render();
+    const renderer = genericRenderWindow.value.getRenderer();
+    renderer.resetCameraClippingRange();
+    genericRenderWindow.value.getRenderWindow().render();
+    const item = await dataStore.item(id);
+    const schema = viewer_schemas?.opengeodeweb_viewer?.[item.viewer_type]?.visibility;
+    if (schema) {
+      await viewerStore.request(schema, { id, visibility });
+    }
+    syncRemoteCamera();
   }
   async function setZScaling(z_scale) {
     zScale.value = z_scale;
