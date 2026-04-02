@@ -12,18 +12,14 @@ const OFFSET = 40;
 const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
-const { index, itemProps, tooltip, btn_image, noCard, isSubItem } = defineProps({
+const { index, itemProps, tooltip, btn_image } = defineProps({
   index: { type: Number, required: true },
   itemProps: { type: Object, required: true },
   tooltip: { type: String, required: true },
   btn_image: { type: String, required: true },
-  noCard: { type: Boolean, default: false },
-  isSubItem: { type: Boolean, default: false },
 });
 
-const is_active = computed(() =>
-  isSubItem ? menuStore.active_sub_item_index === index : menuStore.active_item_index === index,
-);
+const is_active = computed(() => menuStore.active_item_index === index);
 const optionsRef = ref(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
 
@@ -61,11 +57,7 @@ const optionsClass = computed(() => {
 });
 
 function toggleOptions() {
-  if (isSubItem) {
-    menuStore.toggleSubItemOptions(index);
-  } else {
-    menuStore.toggleItemOptions(index);
-  }
+  menuStore.toggleItemOptions(index);
 }
 </script>
 <template>
@@ -95,11 +87,7 @@ function toggleOptions() {
       color="transparent"
       @click.stop
     >
-      <template v-if="noCard">
-        <slot name="options" />
-      </template>
       <GlassCard
-        v-else
         @click.stop
         :title="tooltip"
         width="320"

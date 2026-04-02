@@ -4,9 +4,8 @@ import ViewerTreeObjectTree from "@ogw_front/components/Viewer/Tree/ObjectTree";
 import { useDataStore } from "@ogw_front/stores/data";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-const { id, displayMenu, menuStore, containerWidth, containerHeight, dataStyleStore, viewerStore } =
+const { displayMenu, menuStore, containerWidth, containerHeight, dataStyleStore, viewerStore } =
   defineProps({
-    id: { type: String, required: true },
     displayMenu: { type: Boolean, required: true },
     menuStore: { type: Object, required: true },
     containerWidth: { type: Number, required: true },
@@ -15,7 +14,7 @@ const { id, displayMenu, menuStore, containerWidth, containerHeight, dataStyleSt
     viewerStore: { type: Object, required: true },
   });
 
-const emit = defineEmits(["show-menu", "set-id"]);
+const emit = defineEmits(["show-menu"]);
 
 const dataStore = useDataStore();
 const dataItems = dataStore.refAllItems();
@@ -30,7 +29,6 @@ async function get_viewer_id(x, y) {
   });
   const { array_ids, viewer_id } = response;
   const [first_id] = array_ids;
-  emit("set-id", first_id);
   return { id: first_id, viewer_id };
 }
 
@@ -41,7 +39,7 @@ defineExpose({ get_viewer_id });
   <ViewerTreeObjectTree @show-menu="(args) => emit('show-menu', args)" />
   <ViewerContextMenu
     v-if="displayMenu"
-    :id="menuStore.current_id || id"
+    :id="menuStore.current_id"
     :x="menuStore.menuX"
     :y="menuStore.menuY"
     :container-width="containerWidth"
