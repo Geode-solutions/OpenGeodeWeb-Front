@@ -1,5 +1,5 @@
 // Third party imports
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
@@ -27,11 +27,11 @@ function sleep(milliseconds) {
 let id = "",
   projectFolderPath = "";
 
-beforeEach(async () => {
+beforeAll(async () => {
   ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
 }, INTERVAL_TIMEOUT);
-afterEach(async () => {
-  console.log("afterEach model lines kill", projectFolderPath);
+afterAll(async () => {
+  console.log("afterAll model lines kill", projectFolderPath);
   await cleanupBackend(projectFolderPath);
 });
 

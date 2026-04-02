@@ -1,7 +1,7 @@
 // Global imports
 
 // Third party imports
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
@@ -15,12 +15,12 @@ const CONNECT_TIMEOUT = 25_000;
 
 let projectFolderPath = "";
 
-beforeEach(async () => {
+beforeAll(async () => {
   setupActivePinia();
   ({ projectFolderPath } = await runMicroservices());
 });
 
-afterEach(async () => {
+afterAll(async () => {
   await cleanupBackend(projectFolderPath);
 });
 
