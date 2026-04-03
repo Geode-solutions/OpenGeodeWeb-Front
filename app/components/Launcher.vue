@@ -1,19 +1,26 @@
 <script setup>
-  import Loading from "@ogw_front/components/Loading"
-  import Recaptcha from "@ogw_front/components/Recaptcha"
-  import { Status } from "@ogw_front/utils/status"
-  import { useInfraStore } from "@ogw_front/stores/infra"
+import Loading from "@ogw_front/components/Loading";
+import Recaptcha from "@ogw_front/components/Recaptcha";
+import { Status } from "@ogw_front/utils/status";
+import { useInfraStore } from "@ogw_front/stores/infra";
 
-  const infraStore = useInfraStore()
+const { logo } = defineProps({
+  logo: {
+    type: String,
+    required: true,
+  },
+});
 
-  watch(
-    () => infraStore.is_captcha_validated,
-    (value, oldValue) => {
-      if (value && !oldValue && import.meta.client) {
-        infraStore.create_backend()
-      }
-    },
-  )
+const infraStore = useInfraStore();
+
+watch(
+  () => infraStore.is_captcha_validated,
+  (value, oldValue) => {
+    if (value && !oldValue && import.meta.client) {
+      infraStore.create_backend();
+    }
+  },
+);
 </script>
 
 <template>
@@ -29,7 +36,7 @@
         <Recaptcha :button_color="'secondary'" />
       </v-col>
       <v-col v-else-if="infraStore.status == Status.CREATING">
-        <Loading />
+        <Loading :logo="logo" />
       </v-col>
     </v-row>
   </v-container>

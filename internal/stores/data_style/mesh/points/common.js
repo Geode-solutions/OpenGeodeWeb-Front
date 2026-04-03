@@ -1,23 +1,32 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshPointsCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStyleState = useDataStyleState();
+
+  function mutateMeshPointsStyle(id, values) {
+    return dataStyleState.mutateStyle(id, {
+      points: values,
+    });
+  }
 
   function meshPointsStyle(id) {
-    return dataStyleStateStore.getStyle(id).points
+    return dataStyleState.getStyle(id).points;
   }
 
   function meshPointsColoring(id) {
-    return meshPointsStyle(id).coloring
+    return meshPointsStyle(id).coloring;
   }
 
-  function meshPointsActiveColoring(id) {
-    return meshPointsColoring(id).active
+  function mutateMeshPointsColoring(id, values) {
+    return mutateMeshPointsStyle(id, {
+      coloring: values,
+    });
   }
 
   return {
     meshPointsStyle,
     meshPointsColoring,
-    meshPointsActiveColoring,
-  }
+    mutateMeshPointsStyle,
+    mutateMeshPointsColoring,
+  };
 }

@@ -1,75 +1,71 @@
 // Third party imports
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" }
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
-import {
-  delete_folder_recursive,
-  kill_back,
-  kill_viewer,
-} from "@ogw_front/utils/local"
-import { Status } from "@ogw_front/utils/status"
-import { setupIntegrationTests } from "@ogw_tests/integration/setup"
-import { useDataStyleStore } from "@ogw_front/stores/data_style"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { Status } from "@ogw_front/utils/status";
+import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { setupIntegrationTests } from "@ogw_tests/integration/setup";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const INTERVAL_TIMEOUT = 25_000
-const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges
-const file_name = "test.og_brep"
-const geode_object = "BRep"
+const INTERVAL_TIMEOUT = 25_000;
+const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges;
+const file_name = "test.og_brep";
+const geode_object = "BRep";
+const SLEEP_MS = 200;
 
-let back_port = 0,
-  id = "",
-  project_folder_path = "",
-  viewer_port = 0
+function sleep(milliseconds) {
+  // oxlint-disable-next-line promise/avoid-new
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
 
-beforeEach(async () => {
-  ;({ id, back_port, viewer_port, project_folder_path } =
-    await setupIntegrationTests(file_name, geode_object))
-}, INTERVAL_TIMEOUT)
+let id = "",
+  projectFolderPath = "";
 
-afterEach(async () => {
-  console.log(
-    "afterEach model edges kill",
-    back_port,
-    viewer_port,
-    project_folder_path,
-  )
-  await Promise.all([kill_back(back_port), kill_viewer(viewer_port)])
-  delete_folder_recursive(project_folder_path)
-})
+beforeAll(async () => {
+  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+}, INTERVAL_TIMEOUT);
+
+afterAll(async () => {
+  console.log("afterAll model edges kill", projectFolderPath);
+  await cleanupBackend(projectFolderPath);
+});
 
 describe("Model edges", () => {
   describe("Edges visibility", () => {
     test("Visibility true", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const visibility = true
-      const spy = vi.spyOn(viewerStore, "request")
-      spy.mockClear()
-      const result = dataStyleStore.setModelEdgesVisibility(id, visibility)
-      expect(result).toBeInstanceOf(Promise)
-      await result
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const visibility = true;
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelEdgesVisibility(id, visibility);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_edges_schemas.visibility,
         { id, visibility },
         {
           response_function: expect.any(Function),
         },
-      )
-      expect(dataStyleStore.modelEdgesVisibility(id)).toBe(visibility)
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
+      );
+      expect(dataStyleStore.modelEdgesVisibility(id)).toBe(visibility);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
   describe("Edges style", () => {
     test("Edges apply style", async () => {
-      const dataStyleStore = useDataStyleStore()
-      const viewerStore = useViewerStore()
-      const result = dataStyleStore.applyModelEdgesStyle(id)
-      expect(result).toBeInstanceOf(Promise)
-      await result
-      expect(viewerStore.status).toBe(Status.CONNECTED)
-    })
-  })
-})
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const result = dataStyleStore.applyModelEdgesStyle(id);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+});

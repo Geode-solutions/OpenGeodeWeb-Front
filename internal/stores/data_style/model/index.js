@@ -1,211 +1,231 @@
-// Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import { database } from "@ogw_internal/database/database";
+import { liveQuery } from "dexie";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelBlocksStyle } from "./blocks";
+import { useModelCornersStyle } from "./corners";
+import { useModelEdgesStyle } from "./edges";
+import { useModelLinesStyle } from "./lines";
+import { useModelPointsStyle } from "./points";
+import { useModelSurfacesStyle } from "./surfaces";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-// Local imports
-import { useDataStore } from "@ogw_front/stores/data"
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer"
-import { useModelBlocksStyle } from "./blocks"
-import { useModelCornersStyle } from "./corners"
-import { useModelEdgesStyle } from "./edges"
-import { useModelLinesStyle } from "./lines"
-import { useModelPointsStyle } from "./points"
-import { useModelSurfacesStyle } from "./surfaces"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 
-// Local constants
-const model_schemas = viewer_schemas.opengeodeweb_viewer.model
+const MESH_CONFIG = [{ type: "Corner" }, { type: "Line" }, { type: "Surface" }, { type: "Block" }];
+
+const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
 
 export function useModelStyle() {
-  const dataStore = useDataStore()
-  const dataStyleStateStore = useDataStyleStateStore()
-  const modelCornersStyleStore = useModelCornersStyle()
-  const modelBlocksStyleStore = useModelBlocksStyle()
-  const modelEdgesStyleStore = useModelEdgesStyle()
-  const modelLinesStyleStore = useModelLinesStyle()
-  const modelPointsStyleStore = useModelPointsStyle()
-  const modelSurfacesStyleStore = useModelSurfacesStyle()
-  const hybridViewerStore = useHybridViewerStore()
-  const viewerStore = useViewerStore()
+  const dataStore = useDataStore();
+  const dataStyleState = useDataStyleState();
+  const modelCornersStyleStore = useModelCornersStyle();
+  const modelBlocksStyleStore = useModelBlocksStyle();
+  const modelEdgesStyleStore = useModelEdgesStyle();
+  const modelLinesStyleStore = useModelLinesStyle();
+  const modelPointsStyleStore = useModelPointsStyle();
+  const modelSurfacesStyleStore = useModelSurfacesStyle();
+  const hybridViewerStore = useHybridViewerStore();
+  const viewerStore = useViewerStore();
 
-  function modelVisibility(id) {
-    return dataStyleStateStore.getStyle(id).visibility
+  function buildSelection(modelId, components, stylesMap) {
+    const componentsByType = Object.fromEntries(MESH_TYPES.map((type) => [type, []]));
+    for (const component of components) {
+      if (componentsByType[component.type]) {
+        componentsByType[component.type].push(component);
+      }
+    }
+
+    const groupStyles = dataStyleState.getStyle(modelId);
+    const selection = [];
+    for (const type of MESH_TYPES) {
+      const typeComponents = componentsByType[type];
+      if (typeComponents.length === 0) {
+        continue;
+      }
+
+      const typeKey = `${type.toLowerCase()}s`;
+      const defaultVisibility = groupStyles[typeKey].visibility;
+
+      let allVisible = true;
+      for (const component of typeComponents) {
+        const isVisible = stylesMap[component.geode_id]?.visibility ?? defaultVisibility;
+        if (isVisible) {
+          selection.push(component.geode_id);
+        } else {
+          allVisible = false;
+        }
+      }
+      if (allVisible) {
+        selection.push(type);
+      }
+    }
+    return selection;
   }
-  function setModelVisibility(id, visibility) {
+
+  function modelVisibility(modelId) {
+    return dataStyleState.getStyle(modelId).visibility;
+  }
+
+  function setModelVisibility(modelId, visibility) {
     return viewerStore.request(
       model_schemas.visibility,
-      { id, visibility },
+      { id: modelId, visibility },
       {
-        response_function: () => {
-          dataStyleStateStore.getStyle(id).visibility = visibility
-          hybridViewerStore.setVisibility(id, visibility)
-          console.log(setModelVisibility.name, { id }, modelVisibility(id))
+        response_function: async () => {
+          await hybridViewerStore.setVisibility(modelId, visibility);
+          await dataStyleState.mutateStyle(modelId, { visibility });
+          return { id: modelId, visibility };
         },
       },
-    )
+    );
   }
 
-  function visibleMeshComponents(id) {
-    const visible_mesh_components = ref([])
-    const styles = dataStyleStateStore.styles[id]
-    if (!styles) {
-      return visible_mesh_components
-    }
+  function visibleMeshComponents(id_ref) {
+    const selection = ref([]);
+    watch(
+      () => unref(id_ref),
+      (modelId, _prev, onCleanup) => {
+        if (!modelId) {
+          selection.value = [];
+          return;
+        }
+        const observable = liveQuery(async () => {
+          const allComponents = await database.model_components
+            .where("id")
+            .equals(modelId)
+            .toArray();
+          if (allComponents.length === 0) {
+            return [];
+          }
+          const componentStyles = await database.model_component_datastyle
+            .where("id_model")
+            .equals(modelId)
+            .toArray();
+          const stylesMap = Object.fromEntries(
+            componentStyles.map((style) => [style.id_component, style]),
+          );
+          return buildSelection(modelId, allComponents, stylesMap);
+        });
 
-    for (const [corner_id, style] of Object.entries(styles.corners || {})) {
-      if (style.visibility) {
-        visible_mesh_components.value.push(corner_id)
-      }
-    }
-
-    for (const [line_id, style] of Object.entries(styles.lines || {})) {
-      if (style.visibility) {
-        visible_mesh_components.value.push(line_id)
-      }
-    }
-
-    for (const [surface_id, style] of Object.entries(styles.surfaces || {})) {
-      if (style.visibility) {
-        visible_mesh_components.value.push(surface_id)
-      }
-    }
-
-    for (const [block_id, style] of Object.entries(styles.blocks || {})) {
-      if (style.visibility) {
-        visible_mesh_components.value.push(block_id)
-      }
-    }
-
-    return visible_mesh_components
-  }
-
-  function modelMeshComponentVisibility(id, component_type, component_id) {
-    if (component_type === "Corner") {
-      return modelCornersStyleStore.modelCornerVisibility(id, component_id)
-    } else if (component_type === "Line") {
-      return modelLinesStyleStore.modelLineVisibility(id, component_id)
-    } else if (component_type === "Surface") {
-      return modelSurfacesStyleStore.modelSurfaceVisibility(id, component_id)
-    } else if (component_type === "Block") {
-      return modelBlocksStyleStore.modelBlockVisibility(id, component_id)
-    }
-    throw new Error(`Unknown model component_type: ${component_type}`)
-  }
-
-  function modelColor(id) {
-    return dataStyleStateStore.getStyle(id).color
-  }
-  function setModelColor(id, color) {
-    return viewerStore.request(
-      model_schemas.color,
-      { id, color },
-      {
-        response_function: () => {
-          dataStyleStateStore.styles[id].color = color
-          console.log(setModelColor.name, { id }, modelColor(id))
-        },
+        const subscription = observable.subscribe({
+          next: (val) => {
+            selection.value = val;
+          },
+        });
+        onCleanup(() => subscription.unsubscribe());
       },
-    )
+      { immediate: true },
+    );
+    return selection;
   }
 
-  async function setModelMeshComponentsVisibility(
-    id,
-    component_geode_ids,
-    visibility,
-  ) {
-    const component_type = await dataStore.meshComponentType(
-      id,
-      component_geode_ids[0],
-    )
-    if (component_type === "Corner") {
-      return modelCornersStyleStore.setModelCornersVisibility(
-        id,
-        component_geode_ids,
-        visibility,
-      )
-    } else if (component_type === "Line") {
-      return modelLinesStyleStore.setModelLinesVisibility(
-        id,
-        component_geode_ids,
-        visibility,
-      )
-    } else if (component_type === "Surface") {
-      return modelSurfacesStyleStore.setModelSurfacesVisibility(
-        id,
-        component_geode_ids,
-        visibility,
-      )
-    } else if (component_type === "Block") {
-      return modelBlocksStyleStore.setModelBlocksVisibility(
-        id,
-        component_geode_ids,
-        visibility,
-      )
-    } else {
-      throw new Error(`Unknown model component_type: ${component_type}`)
-    }
+  function getModelComponentColor(modelId, componentId) {
+    return dataStyleState.getComponentStyle(modelId, componentId).color;
   }
 
-  function applyModelStyle(id) {
-    const style = dataStyleStateStore.getStyle(id)
-    const promise_array = []
-    for (const [key, value] of Object.entries(style)) {
-      if (key === "visibility") {
-        promise_array.push(setModelVisibility(id, value))
-      } else if (key === "corners") {
-        promise_array.push(modelCornersStyleStore.applyModelCornersStyle(id))
-      } else if (key === "lines") {
-        promise_array.push(modelLinesStyleStore.applyModelLinesStyle(id))
-      } else if (key === "surfaces") {
-        promise_array.push(modelSurfacesStyleStore.applyModelSurfacesStyle(id))
-      } else if (key === "blocks") {
-        promise_array.push(modelBlocksStyleStore.applyModelBlocksStyle(id))
-      } else if (key === "points") {
-        promise_array.push(modelPointsStyleStore.applyModelPointsStyle(id))
-      } else if (key === "edges") {
-        promise_array.push(modelEdgesStyleStore.applyModelEdgesStyle(id))
-      } else {
-        throw new Error(`Unknown model key: ${key}`)
+  async function setModelComponentsVisibility(modelId, componentIds, visibility) {
+    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+    const componentsMap = Object.fromEntries(
+      allComponents.map((component) => [component.geode_id, component]),
+    );
+
+    return Promise.all(
+      MESH_TYPES.map(async (type) => {
+        const typeComponents = allComponents.filter((component) => component.type === type);
+        const isSelectedType = componentIds.includes(type);
+        const idsToUpdate = isSelectedType
+          ? typeComponents.map((component) => component.geode_id)
+          : componentIds.filter((id) => componentsMap[id]?.type === type);
+
+        if (idsToUpdate.length === 0) {
+          return;
+        }
+
+        const viewerIds = await dataStore.getMeshComponentsViewerIds(modelId, idsToUpdate);
+        if (viewerIds.length > 0) {
+          const schema = model_schemas[`${type.toLowerCase()}s`].visibility;
+          await viewerStore.request(schema, { id: modelId, block_ids: viewerIds, visibility });
+        }
+        return dataStyleState.mutateComponentStyles(modelId, idsToUpdate, { visibility });
+      }),
+    );
+  }
+
+  async function setModelComponentsColor(modelId, componentIds, color) {
+    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+    const componentsMap = Object.fromEntries(
+      allComponents.map((component) => [component.geode_id, component]),
+    );
+    const handlers = {
+      Corner: (ids) => modelCornersStyleStore.setModelCornersColor(modelId, ids, color),
+      Line: (ids) => modelLinesStyleStore.setModelLinesColor(modelId, ids, color),
+      Surface: (ids) => modelSurfacesStyleStore.setModelSurfacesColor(modelId, ids, color),
+      Block: (ids) => modelBlocksStyleStore.setModelBlocksColor(modelId, ids, color),
+    };
+    return Promise.all(
+      MESH_TYPES.map((type) => {
+        const idsForType = componentIds.filter((id) => componentsMap[id]?.type === type);
+        return handlers[type](idsForType);
+      }),
+    );
+  }
+
+  function applyModelStyle(modelId) {
+    const style = dataStyleState.getStyle(modelId);
+    const handlers = {
+      visibility: () => setModelVisibility(modelId, style.visibility),
+      corners: () => modelCornersStyleStore.applyModelCornersStyle(modelId),
+      lines: () => modelLinesStyleStore.applyModelLinesStyle(modelId),
+      surfaces: () => modelSurfacesStyleStore.applyModelSurfacesStyle(modelId),
+      blocks: () => modelBlocksStyleStore.applyModelBlocksStyle(modelId),
+      points: () => modelPointsStyleStore.applyModelPointsStyle(modelId),
+      edges: () => modelEdgesStyleStore.applyModelEdgesStyle(modelId),
+    };
+
+    return Promise.all(
+      Object.keys(style)
+        .filter((key) => handlers[key])
+        .map((key) => handlers[key]()),
+    );
+  }
+
+  function setModelMeshComponentsDefaultStyle(modelId) {
+    return dataStore.item(modelId).then((item) => {
+      if (!item) {
+        return [];
       }
-    }
-    return Promise.all(promise_array)
-  }
-
-  async function setModelMeshComponentsDefaultStyle(id) {
-    const item = await dataStore.item(id)
-    const { mesh_components } = item
-    const promise_array = []
-    if ("Corner" in mesh_components) {
-      promise_array.push(modelCornersStyleStore.setModelCornersDefaultStyle(id))
-    }
-    if ("Line" in mesh_components) {
-      promise_array.push(modelLinesStyleStore.setModelLinesDefaultStyle(id))
-    }
-    if ("Surface" in mesh_components) {
-      promise_array.push(
-        modelSurfacesStyleStore.setModelSurfacesDefaultStyle(id),
-      )
-    }
-    if ("Block" in mesh_components) {
-      promise_array.push(modelBlocksStyleStore.setModelBlocksDefaultStyle(id))
-    }
-    return promise_array
+      const { mesh_components } = item;
+      const handlers = {
+        Corner: () => modelCornersStyleStore.setModelCornersDefaultStyle(modelId),
+        Line: () => modelLinesStyleStore.setModelLinesDefaultStyle(modelId),
+        Surface: () => modelSurfacesStyleStore.setModelSurfacesDefaultStyle(modelId),
+        Block: () => modelBlocksStyleStore.setModelBlocksDefaultStyle(modelId),
+      };
+      return Promise.all(
+        Object.keys(mesh_components)
+          .filter((key) => handlers[key])
+          .map((key) => handlers[key]()),
+      );
+    });
   }
 
   return {
     modelVisibility,
     visibleMeshComponents,
-    modelMeshComponentVisibility,
     setModelVisibility,
-    setModelColor,
-    setModelMeshComponentsVisibility,
+    setModelComponentsVisibility,
+    getModelComponentColor,
+    setModelComponentsColor,
     applyModelStyle,
     setModelMeshComponentsDefaultStyle,
-    ...useModelBlocksStyle(),
-    ...useModelCornersStyle(),
-    ...useModelEdgesStyle(),
-    ...useModelLinesStyle(),
-    ...useModelPointsStyle(),
-    ...useModelSurfacesStyle(),
-  }
+    ...modelBlocksStyleStore,
+    ...modelCornersStyleStore,
+    ...modelEdgesStyleStore,
+    ...modelLinesStyleStore,
+    ...modelPointsStyleStore,
+    ...modelSurfacesStyleStore,
+  };
 }

@@ -1,17 +1,17 @@
-import { fileURLToPath } from "node:url"
-import path from "node:path"
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 
-import { defineConfig } from "vitest/config"
-import { defineVitestProject } from "@nuxt/test-utils/config"
-import { playwright } from "@vitest/browser-playwright"
-// import vue from "@vitejs/plugin-vue"
+import { defineConfig } from "vitest/config";
+import { defineVitestProject } from "@nuxt/test-utils/config";
+import { playwright } from "@vitest/browser-playwright";
+// import vue from "@vitejs/plugin-vue";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const RETRIES = 3
-const DEFAULT_RETRY = 0
+const RETRIES = 3;
+const DEFAULT_RETRY = 0;
 
-const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY
+const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY;
 
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
@@ -72,4 +72,4 @@ export default defineConfig({
       }),
     ],
   },
-})
+});

@@ -1,25 +1,26 @@
-import path, { dirname } from "node:path"
-import { fileURLToPath } from "node:url"
+// Node imports
+import path, { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+// Local imports
+import package_json from "./package.json";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       API_URL: "api.geode-solutions.com",
-      SITE_BRANCH:
-        process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
-      PROJECT: process.env.NODE_ENV === "production" ? process.env.PROJECT : "",
-      BROWSER: process.env.BROWSER ?? false,
-      GEODE_PORT: process.env.GEODE_PORT ?? undefined,
-      VIEWER_PORT: process.env.VIEWER_PORT ?? undefined,
+      COMMAND_BACK: "opengeodeweb-back",
+      COMMAND_VIEWER: "opengeodeweb-viewer",
+      NUXT_ROOT_PATH: __dirname,
+      MODE: process.env.MODE || "CLOUD",
+      PROJECT: package_json.name,
+      SITE_BRANCH: process.env.NODE_ENV === "production" ? process.env.SITE_BRANCH : "",
     },
   },
 
-  modules: [
-    ["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }],
-    "@vueuse/nuxt",
-  ],
+  modules: [["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }], "@vueuse/nuxt"],
   imports: {
     scan: false,
   },
@@ -38,6 +39,16 @@ export default defineNuxtConfig({
     transpile: ["vuetify"],
   },
 
+  vuetify: {
+    vuetifyOptions: {
+      defaults: {
+        VTooltip: {
+          openDelay: 500,
+        },
+      },
+    },
+  },
+
   vue: {
     compilerOptions: {
       isCustomElement: (tag) => ["md-linedivider"].includes(tag),
@@ -51,11 +62,10 @@ export default defineNuxtConfig({
         "fast-deep-equal",
         "globalthis",
         "h3",
-        "is-electron",
         "js-file-download",
         "lodash",
         "seedrandom",
       ],
     },
   },
-})
+});

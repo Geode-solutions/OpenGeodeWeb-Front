@@ -1,92 +1,69 @@
-import { Dexie } from "dexie"
-import { ExtendedDatabase } from "./extended_database"
-import { dataTable } from "./tables/data"
-import { modelComponentsRelationTable } from "./tables/model_components_relation"
-import { modelComponentsTable } from "./tables/model_components"
+import { BaseDatabase } from "./base_database";
+import { ExtendedDatabase } from "./extended_database";
 
-class Database extends Dexie {
+class Database extends BaseDatabase {
   constructor() {
-    super("Database")
+    super("Database");
 
-    this.version(1).stores({
-      [dataTable.name]: dataTable.schema,
-      [modelComponentsTable.name]: modelComponentsTable.schema,
-      [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
-    })
+    this.version(1).stores(BaseDatabase.initialStores);
   }
 
   static async addTable(tableName, schemaDefinition) {
-    await this.addTables({ [tableName]: schemaDefinition })
+    await this.addTables({ [tableName]: schemaDefinition });
   }
 
   static async addTables(newTables) {
-    const tempDb = new Dexie("Database")
-    await tempDb.open()
+    const tempDb = new Dexie("Database");
+    await tempDb.open();
 
-    const currentVersion = tempDb.verno
-    const currentStores = {}
-
-    currentStores[dataTable.name] = dataTable.schema
-    currentStores[modelComponentsTable.name] = modelComponentsTable.schema
-    currentStores[modelComponentsRelationTable.name] =
-      modelComponentsRelationTable.schema
+    const currentVersion = tempDb.verno;
+    const currentStores = { ...BaseDatabase.initialStores };
 
     for (const table of tempDb.tables) {
-      const keyPath = table.schema.primKey.src
-      const indexes = table.schema.indexes.map((index) => index.src)
-      const parts = keyPath ? [keyPath, ...indexes] : indexes
-      currentStores[table.name] = parts.join(",")
+      const keyPath = table.schema.primKey.src;
+      const indexes = table.schema.indexes.map((index) => index.src);
+      const parts = keyPath ? [keyPath, ...indexes] : indexes;
+      currentStores[table.name] = parts.join(",");
     }
 
-    tempDb.close()
+    tempDb.close();
 
-    const allExisting = Object.keys(newTables).every(
-      (tableName) => currentStores[tableName],
-    )
+    const allExisting = Object.keys(newTables).every((tableName) => currentStores[tableName]);
 
-    databaseContainer.instance.close()
+    databaseContainer.instance.close();
 
     if (allExisting) {
-      const existingDb = new Dexie("Database")
+      const existingDb = new Dexie("Database");
       for (let version = 1; version <= currentVersion; version += 1) {
         if (version === 1) {
-          existingDb.version(1).stores({
-            [dataTable.name]: dataTable.schema,
-            [modelComponentsTable.name]: modelComponentsTable.schema,
-            [modelComponentsRelationTable.name]:
-              modelComponentsRelationTable.schema,
-          })
+          existingDb.version(1).stores(BaseDatabase.initialStores);
         } else {
-          existingDb.version(version).stores(currentStores)
+          existingDb.version(version).stores(currentStores);
         }
       }
-      await existingDb.open()
-      databaseContainer.instance = existingDb
+      await existingDb.open();
+      databaseContainer.instance = existingDb;
     } else {
-      const newDb = new ExtendedDatabase(
-        currentVersion,
-        currentStores,
-        newTables,
-      )
-      await newDb.open()
-      databaseContainer.instance = newDb
+      const newDb = new ExtendedDatabase(currentVersion, currentStores, newTables);
+      await newDb.open();
+      databaseContainer.instance = newDb;
     }
   }
 }
 
-const databaseContainer = { instance: new Database() }
+const databaseContainer = { instance: new Database() };
 
 const database = new Proxy(
   {},
   {
     get(target, prop) {
-      const value = databaseContainer.instance[prop]
+      const value = databaseContainer.instance[prop];
       if (typeof value === "function") {
-        return value.bind(databaseContainer.instance)
+        return value.bind(databaseContainer.instance);
       }
-      return value
+      return value;
     },
   },
-)
+);
 
-export { Database, database }
+export { Database, database };
