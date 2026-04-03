@@ -276,7 +276,7 @@ describe("Infra Store", () => {
 
   describe("create_backend", () => {
     // Test without microservices
-    test("test with end-point", () => {
+    test("test with end-point", async () => {
       const infraStore = useInfraStore();
       const geodeStore = useGeodeStore();
       const viewerStore = useViewerStore();
@@ -287,7 +287,7 @@ describe("Infra Store", () => {
         method: "POST",
         handler: () => ({ url }),
       });
-      infraStore.create_backend("", "", false);
+      await infraStore.create_backend("", "", false);
       expect(infraStore.status).toBe(Status.CREATED);
       expect(infraStore.domain_name).toBe(url);
 
