@@ -29,7 +29,7 @@ const optionsStyle = computed(() => {
   if (!is_active.value || !optionsHeight.value) {
     return {};
   }
-  const angle = (index / itemProps.totalItems) * 2 * Math.PI;
+  const angle = (itemProps.index / itemProps.totalItems) * 2 * Math.PI;
   const radius = RADIUS;
   const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius;
   const height = optionsHeight.value;
