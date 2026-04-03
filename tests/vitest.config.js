@@ -4,7 +4,6 @@ import path from "node:path";
 import { defineConfig } from "vitest/config";
 import { defineVitestProject } from "@nuxt/test-utils/config";
 import { playwright } from "@vitest/browser-playwright";
-// import vue from "@vitejs/plugin-vue";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,14 +24,12 @@ export default defineConfig({
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
       await defineVitestProject({
-        // plugins: [vue()],
         test: {
           name: "browser",
-          include: ["tests/browser/**/*.test.js"],
+          include: ["tests/browser/cells.test.js"],
           setupFiles: ["vitest-browser-vue"],
           browser: {
             enabled: true,
-            // headless: true,
             provider: playwright(),
             instances: [{ browser: "chromium" }],
           },
