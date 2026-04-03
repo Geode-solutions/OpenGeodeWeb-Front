@@ -8,6 +8,8 @@ import ZScaling from "@ogw_front/components/ZScaling";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+import vtkCubeAxesActor from "@kitware/vtk.js/Rendering/Core/CubeAxesActor";
+
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
 const take_screenshot = ref(false);
@@ -52,6 +54,12 @@ const camera_options = [
         {
           response_function: () => {
             grid_scale.value = !grid_scale.value;
+            const renderer = hybridViewerStore.genericRenderWindow.value.getRenderer();
+            const cubeAxes = vtkCubeAxesActor.newInstance();
+            const bounds = renderer.computeVisiblePropBounds();
+            cubeAxes.setDataBounds(bounds);
+            cubeAxes.setCamera(renderer.getActiveCamera());
+            renderer.addActor(cubeAxes);
             hybridViewerStore.remoteRender();
           },
         },

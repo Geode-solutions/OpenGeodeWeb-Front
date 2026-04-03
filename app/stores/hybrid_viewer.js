@@ -24,8 +24,8 @@ const ACTOR_COLOR = [
   ACTOR_DARK_VALUE / RGB_MAX,
 ];
 const WHEEL_TIME_OUT_MS = 600;
-const CLIPPING_RANGE_EXPANSION = 0.15;
-const NEAR_CLIPPING_PLANE_TOLERANCE = 0;
+const CLIPPING_RANGE_EXPANSION = 0.05;
+const NEAR_CLIPPING_PLANE_TOLERANCE = 0.01;
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
@@ -162,6 +162,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         distance: camera.getDistance(),
       },
     };
+    console.log({ params });
     viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, params, {
       response_function: () => {
         remoteRender();
