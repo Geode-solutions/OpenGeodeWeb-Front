@@ -1,41 +1,40 @@
 // Node imports
 
 // Third party imports
-import { google } from "googleapis"
+import { google } from "googleapis";
 
 // Local imports
 
 function checkRecaptchaParams(name, email, launch) {
-  console.log("check_recaptcha_params", { name, email, launch })
-  return name === "" && email === "" && launch === false
+  console.log("check_recaptcha_params", { name, email, launch });
+  return name === "" && email === "" && launch === false;
 }
 
 async function artifactImage(registry, parent, repo) {
-  const branch = process.env.BRANCH
-  const [_, projectId] = parent.split("/")
-  const repository = `${parent}/repositories/ghcr/packages/geode-solutions%2F`
-  const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/ghcr/geode-solutions`
-  const response =
-    await registry.projects.locations.repositories.packages.tags.get({
-      name: `${repository}${repo}/tags/${branch}`,
-    })
-  const digest = response.data.version.split("/").pop()
-  const image = `${artifactRegistry}/${repo}@${digest}`
-  console.log("Found image for", repo, image)
-  return image
+  const branch = process.env.BRANCH;
+  const [_, projectId] = parent.split("/");
+  const repository = `${parent}/repositories/ghcr/packages/geode-solutions%2F`;
+  const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/ghcr/geode-solutions`;
+  const response = await registry.projects.locations.repositories.packages.tags.get({
+    name: `${repository}${repo}/tags/${branch}`,
+  });
+  const digest = response.data.version.split("/").pop();
+  const image = `${artifactRegistry}/${repo}@${digest}`;
+  console.log("Found image for", repo, image);
+  return image;
 }
 
 function artifactImages(parent, authClient) {
-  const projectName = process.env.PROJECT
+  const projectName = process.env.PROJECT;
   const registry = google.artifactregistry({
     version: "v1",
     auth: authClient,
-  })
+  });
   return Promise.all([
     artifactImage(registry, parent, "opengeodeweb-router"),
     artifactImage(registry, parent, `${projectName}-back`),
     artifactImage(registry, parent, `${projectName}-viewer`),
-  ])
+  ]);
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -45,11 +44,11 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
       cpu: "1000m",
       memory: "512Mi",
     },
-  }
+  };
   const volumeMounts = {
     name: "data",
     mountPath: "/data",
-  }
+  };
   return {
     parent,
     service: {
@@ -91,7 +90,7 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
         ],
       },
     },
-  }
+  };
 }
 
-export { checkRecaptchaParams, artifactImages, requestConfig }
+export { checkRecaptchaParams, artifactImages, requestConfig };
