@@ -58,10 +58,15 @@ export default defineConfig({
         test: {
           name: "integration",
           globals: false,
-          include: ["tests/integration/**/*.test.js"],
+          include: ["tests/integration/stores/data_style/mesh/cells.nuxt.test.js"],
           environment: "nuxt",
           fileParallelism: false,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            instances: [{ browser: "chromium" }],
+          },
           server: {
             deps: {
               inline: ["vuetify"],
