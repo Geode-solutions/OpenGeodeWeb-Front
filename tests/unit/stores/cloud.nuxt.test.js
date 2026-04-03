@@ -12,7 +12,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 const PROJECT = "project";
 const STATUS_500 = 500;
 
-beforeEach(async () => {
+beforeEach(() => {
   setupActivePinia();
 });
 
@@ -51,7 +51,7 @@ describe("Cloud Store", () => {
         await cloudStore.launch("", "", false);
 
         expect(cloudStore.status).toBe(Status.CONNECTED);
-        expect(feedbackStore.server_error).toBeFalsy();
+        expect(feedbackStore.server_error).toBe(false);
       });
 
       test("failed launch - error response", async () => {
@@ -74,7 +74,7 @@ describe("Cloud Store", () => {
         await expect(cloudStore.launch("", "", false)).rejects.toThrow("500 Internal Server Error");
 
         expect(cloudStore.status).toBe(Status.NOT_CONNECTED);
-        expect(feedbackStore.server_error).toBeTruthy();
+        expect(feedbackStore.server_error).toBe(true);
       });
     });
 

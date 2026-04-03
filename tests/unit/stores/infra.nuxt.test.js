@@ -4,7 +4,7 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/app_mode";
+import { appMode } from "@ogw_front/utils/local/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 import { useGeodeStore } from "@ogw_front/stores/geode";
@@ -276,7 +276,7 @@ describe("Infra Store", () => {
 
   describe("create_backend", () => {
     // Test without microservices
-    test("test with end-point", async () => {
+    test("test with end-point", () => {
       const infraStore = useInfraStore();
       const geodeStore = useGeodeStore();
       const viewerStore = useViewerStore();
@@ -287,7 +287,7 @@ describe("Infra Store", () => {
         method: "POST",
         handler: () => ({ url }),
       });
-      await infraStore.create_backend("", "", false);
+      infraStore.create_backend("", "", false);
       expect(infraStore.status).toBe(Status.CREATED);
       expect(infraStore.domain_name).toBe(url);
 

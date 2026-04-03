@@ -51,7 +51,7 @@ export const useCloudStore = defineStore("cloud", {
         },
       });
     },
-    async connect() {
+    connect() {
       console.log("[CLOUD] Cloud connected");
       this.status = Status.CONNECTED;
       return Promise.resolve();

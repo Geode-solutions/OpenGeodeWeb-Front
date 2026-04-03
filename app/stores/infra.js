@@ -1,5 +1,5 @@
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/app_mode";
+import { appMode } from "@ogw_front/utils/local/app_mode";
 import { registerRunningExtensions } from "@ogw_front/utils/extension";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useCloudStore } from "@ogw_front/stores/cloud";
@@ -30,7 +30,7 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Microservice registered:", store_name);
       }
     },
-    async create_backend(name, email, launch) {
+    create_backend(name, email, launch) {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
       console.log(
         "[INFRA] Registered microservices:",
