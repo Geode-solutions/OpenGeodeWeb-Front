@@ -157,7 +157,7 @@ export const useDataStore = defineStore("data", () => {
     const component = await database.model_components
       .where("viewer_id")
       .equals(Number(viewer_id))
-      .and((comp) => comp.id === modelId)
+      .and((component) => component.id === modelId)
       .first();
     return component;
   }
