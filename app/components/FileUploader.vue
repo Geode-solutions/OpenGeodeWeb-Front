@@ -1,15 +1,25 @@
 <script setup>
-import DragAndDrop from "@ogw_front/components/DragAndDrop";
 import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useTemplateRef } from "vue";
+
+import DragAndDrop from "@ogw_front/components/DragAndDrop";
 
 const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"]);
 
-const { multiple, accept, files, auto_upload, mini } = defineProps({
+const {
+  multiple,
+  accept,
+  files,
+  auto_upload,
+  mini,
+  show_overlay: showOverlay,
+} = defineProps({
   multiple: { type: Boolean, required: true },
   accept: { type: String, required: true },
   files: { type: Array, required: false, default: [] },
   auto_upload: { type: Boolean, required: false, default: false },
   mini: { type: Boolean, required: false, default: false },
+  show_overlay: { type: Boolean, required: false, default: true },
 });
 
 const geodeStore = useGeodeStore();
@@ -17,6 +27,7 @@ const geodeStore = useGeodeStore();
 const internal_files = ref(files);
 const loading = ref(false);
 const files_uploaded = ref(false);
+const dragAndDropRef = useTemplateRef("dragAndDropRef");
 
 const toggle_loading = useToggle(loading);
 
@@ -71,20 +82,53 @@ watch(internal_files, (value) => {
 
 <template>
   <DragAndDrop
-    :multiple="multiple"
-    :accept="accept"
-    :loading="loading"
+    v-if="!internal_files.length"
+    ref="dragAndDropRef"
+    :multiple
+    :accept
+    :loading
     :show-extensions="false"
+    :inline="true"
+    :show-overlay="showOverlay"
+    :texts="{
+      idle: 'Select files',
+      drop: 'Drop files here',
+      loading: 'Loading...',
+    }"
     @files-selected="processSelectedFiles"
   />
 
-  <v-card-text v-if="internal_files.length" class="mt-6">
+  <DragAndDrop
+    v-else
+    ref="dragAndDropRef"
+    :multiple
+    :accept
+    :loading
+    :show-extensions="false"
+    :inline="false"
+    :show-overlay="showOverlay"
+    @files-selected="processSelectedFiles"
+  />
+
+  <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
       <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
-      <span class="text-subtitle-1 font-weight-bold text-white"> Selected Files </span>
+      <span class="text-subtitle-1 font-weight-bold text-white"> Selected files </span>
       <v-chip size="small" class="ml-3 bg-white-opacity-10" color="white" variant="flat">
         {{ internal_files.length }}
       </v-chip>
+      <v-spacer />
+      <v-btn
+        v-if="multiple"
+        variant="text"
+        color="white"
+        size="small"
+        class="text-none opacity-60"
+        prepend-icon="mdi-plus"
+        @click="dragAndDropRef?.triggerFileDialog"
+      >
+        Add
+      </v-btn>
     </v-sheet>
 
     <v-sheet class="d-flex flex-wrap ga-2" color="transparent">
@@ -108,7 +152,7 @@ watch(internal_files, (value) => {
     </v-sheet>
   </v-card-text>
 
-  <v-card-actions v-if="!auto_upload && internal_files.length" class="mt-6 pa-0">
+  <v-card-actions v-if="!auto_upload && internal_files.length" class="mt-8 pa-0">
     <v-btn
       color="primary"
       variant="flat"
@@ -124,3 +168,20 @@ watch(internal_files, (value) => {
     </v-btn>
   </v-card-actions>
 </template>
+
+<style scoped>
+.border-dashed {
+  border: 2px dashed rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.3s ease;
+}
+
+.border-dashed:hover {
+  border-color: rgba(var(--v-theme-primary), 0.4) !important;
+  background: rgba(var(--v-theme-primary), 0.02) !important;
+}
+
+.custom-upload-btn {
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(var(--v-theme-primary), 0.3);
+}
+</style>
