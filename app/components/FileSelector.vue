@@ -9,10 +9,11 @@ const schema = schemas.opengeodeweb_back.allowed_files;
 
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
-const { multiple, files, auto_upload } = defineProps({
+const { multiple, files, auto_upload, show_overlay } = defineProps({
   multiple: { type: Boolean, required: true },
   files: { type: Array, default: () => [] },
   auto_upload: { type: Boolean, default: true },
+  show_overlay: { type: Boolean, default: true },
 });
 
 const internal_files = ref(files);
@@ -63,6 +64,7 @@ await get_allowed_files();
       accept,
       files: internal_files,
       auto_upload: internal_auto_upload,
+      show_overlay,
     }"
     @files_uploaded="files_uploaded_event"
   />
