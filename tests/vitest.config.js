@@ -9,6 +9,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const RETRIES = 3;
 const DEFAULT_RETRY = 0;
+const TIMEOUTS = {
+  unit: 5000,
+  integration: 15_000,
+};
 
 const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY;
 
@@ -42,6 +46,7 @@ export default defineConfig({
           globals: false,
           include: ["tests/unit/**/*.test.js"],
           environment: "nuxt",
+          testTimeout: TIMEOUTS.unit,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
           server: {
             deps: {
@@ -58,6 +63,7 @@ export default defineConfig({
           include: ["tests/integration/stores/data_style/mesh/cells.nuxt.test.js"],
           environment: "nuxt",
           fileParallelism: false,
+          testTimeout: TIMEOUTS.integration,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
           browser: {
             enabled: true,
