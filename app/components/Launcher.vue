@@ -1,13 +1,20 @@
 <script setup>
-  import Loading from "@ogw_front/components/Loading"
-  import Recaptcha from "@ogw_front/components/Recaptcha"
-  import { Status } from "@ogw_front/utils/status"
-  import { useInfraStore } from "@ogw_front/stores/infra"
+import Loading from "@ogw_front/components/Loading";
+import Recaptcha from "@ogw_front/components/Recaptcha";
+import { Status } from "@ogw_front/utils/status";
+import { useInfraStore } from "@ogw_front/stores/infra";
 
-  const infraStore = useInfraStore()
-  if (infraStore.app_mode !== appMode.CLOUD) {
-    infraStore.create_backend()
-  }
+const { logo } = defineProps({
+  logo: {
+    type: String,
+    required: true,
+  },
+});
+
+const infraStore = useInfraStore();
+if (infraStore.app_mode !== appMode.CLOUD) {
+  infraStore.create_backend();
+}
 </script>
 
 <template>
@@ -23,7 +30,7 @@
         <Recaptcha :button_color="'secondary'" />
       </v-col>
       <v-col v-else-if="infraStore.status == Status.CREATING">
-        <Loading />
+        <Loading :logo="logo" />
       </v-col>
     </v-row>
   </v-container>

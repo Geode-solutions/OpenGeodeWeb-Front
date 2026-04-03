@@ -1,46 +1,46 @@
 <script setup>
-  import { useInfraStore } from "@ogw_front/stores/infra"
+import { useInfraStore } from "@ogw_front/stores/infra";
 
-  const { button_label, button_color, color } = defineProps({
-    button_label: {
-      type: String,
-      required: false,
-      default: "Launch the app",
-    },
-    button_color: {
-      type: String,
-      required: false,
-      default: "white",
-    },
-    color: {
-      type: String,
-      required: false,
-    },
-  })
+const { button_label, button_color, color } = defineProps({
+  button_label: {
+    type: String,
+    required: false,
+    default: "Launch the app",
+  },
+  button_color: {
+    type: String,
+    required: false,
+    default: "white",
+  },
+  color: {
+    type: String,
+    required: false,
+  },
+});
 
-  const name = ref("")
-  const email = ref("")
-  const launch = ref(false)
-  const valid = ref(false)
-  const emailRules = [
-    (value) => {
-      if (value) {
-        return true
-      }
-      return "E-mail is required."
-    },
-    (value) => {
-      if (/.+@.+\..+/.test(value)) {
-        return true
-      }
-      return "E-mail must be valid."
-    },
-  ]
+const name = ref("");
+const email = ref("");
+const launch = ref(false);
+const valid = ref(false);
+const emailRules = [
+  (value) => {
+    if (value) {
+      return true;
+    }
+    return "E-mail is required.";
+  },
+  (value) => {
+    if (/.+@.+\..+/.test(value)) {
+      return true;
+    }
+    return "E-mail must be valid.";
+  },
+];
 
-  function submit() {
-    const infraStore = useInfraStore()
-    return infraStore.create_backend(name.value, email.value, launch.value)
-  }
+function submit() {
+  const infraStore = useInfraStore();
+  return infraStore.create_backend(name.value, email.value, launch.value);
+}
 </script>
 
 <template>

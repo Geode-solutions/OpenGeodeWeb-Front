@@ -1,23 +1,39 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshCellsCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStyleState = useDataStyleState();
+
+  function mutateMeshCellsStyle(id, values) {
+    return dataStyleState.mutateStyle(id, {
+      cells: values,
+    });
+  }
 
   function meshCellsStyle(id) {
-    return dataStyleStateStore.getStyle(id).cells
+    return dataStyleState.getStyle(id).cells;
   }
 
   function meshCellsColoring(id) {
-    return meshCellsStyle(id).coloring
+    return meshCellsStyle(id).coloring;
   }
 
-  function meshCellsActiveColoring(id) {
-    return meshCellsColoring(id).active
+  function mutateMeshCellsColoring(id, values) {
+    return mutateMeshCellsStyle(id, {
+      coloring: values,
+    });
+  }
+
+  function mutateMeshCellsCellStyle(id, values) {
+    return mutateMeshCellsColoring(id, {
+      cell: values,
+    });
   }
 
   return {
     meshCellsStyle,
     meshCellsColoring,
-    meshCellsActiveColoring,
-  }
+    mutateMeshCellsStyle,
+    mutateMeshCellsColoring,
+    mutateMeshCellsCellStyle,
+  };
 }

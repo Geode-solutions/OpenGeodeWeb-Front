@@ -1,86 +1,61 @@
 // Node imports
-import fs from "node:fs"
-import os from "node:os"
-import path from "node:path"
-import { setTimeout } from "node:timers/promises"
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 // Third party imports
-import isElectron from "is-electron"
-import { rimraf } from "rimraf"
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
 
-const MAX_DELETE_FOLDER_RETRIES = 5
+// Local imports
+import { appMode } from "./app_mode.js";
 
-function venvScriptPath(microservicePath) {
-  const venvPath = path.join(microservicePath, "venv")
-  let scriptPath = ""
-  if (process.platform === "win32") {
-    scriptPath = path.join(venvPath, "Scripts")
-  } else {
-    scriptPath = path.join(venvPath, "bin")
+function executablePath(microservicePath) {
+  const resourcesPath = process.env.RESOURCES_PATH;
+  const mode = process.env.MODE;
+  const nodeEnv = process.env.NODE_ENV;
+  console.log("[executablePath]", { microservicePath, mode, nodeEnv, resourcesPath });
+  if (mode === appMode.DESKTOP && nodeEnv === "production") {
+    return resourcesPath;
   }
-  return scriptPath
-}
-
-async function executablePath(microservicePath) {
-  if (isElectron()) {
-    const electron = await import("electron")
-    if (electron.app.isPackaged) {
-      return process.resourcesPath
-    } else {
-      return venvScriptPath(microservicePath)
-    }
-  } else {
-    return venvScriptPath(microservicePath)
-  }
+  return microservicePath;
 }
 
 function executableName(name) {
   if (process.platform === "win32") {
-    return `${name}.exe`
+    return `${name}.exe`;
   }
-  return name
+  return name;
 }
 
 function createPath(dirPath) {
   if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true })
-    console.log(`${dirPath} directory created successfully!`)
+    fs.mkdirSync(dirPath, { recursive: true });
+    console.log(`${dirPath} directory created successfully!`);
   }
-  return dirPath
+  return dirPath;
 }
 
 function generateProjectFolderPath(projectName) {
-  return path.join(os.tmpdir(), projectName.replace(/\//g, "_"), uuidv4())
+  return path.join(os.tmpdir(), projectName.replaceAll("/", "_"), uuidv4());
 }
 
-async function deleteFolderRecursive(folderPath) {
-  if (!fs.existsSync(folderPath)) {
-    console.log(`Folder ${folderPath} does not exist.`)
-    return
+function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPath, extensionId) {
+  if (process.env.NODE_ENV === "production") {
+    return path.join(unzippedExtensionPath, frontendFile);
   }
-  for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
-    try {
-      console.log(`Deleting folder: ${folderPath}`)
-      // oxlint-disable-next-line no-await-in-loop
-      await rimraf(folderPath)
-      console.log(`Deleted folder: ${folderPath}`)
-      return
-    } catch (error) {
-      console.error(`Error deleting folder ${folderPath}:`, error)
-      // Wait before retrying
-      const MILLISECONDS_PER_RETRY = 1000
-      const DELAY = MILLISECONDS_PER_RETRY * (i + 1)
-      // oxlint-disable-next-line no-await-in-loop
-      await setTimeout(DELAY)
-      console.log("Retrying delete folder")
-    }
-  }
+  const extentionRepoName = extensionId
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("-");
+  const localExtensionPath = path.join(rootPath, "..", extentionRepoName, "dist", frontendFile);
+  console.log("runExtensions", { localExtensionPath });
+  return localExtensionPath;
 }
+
 export {
   createPath,
+  extensionFrontendPath,
   executablePath,
   executableName,
-  deleteFolderRecursive,
   generateProjectFolderPath,
-}
+};

@@ -1,40 +1,35 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { useMeshPolygonsCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useMeshPolygonsCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshPolygonsColorSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.polygons.color
+const meshPolygonsColorSchemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons.color;
 
 export function useMeshPolygonsColorStyle() {
-  const viewerStore = useViewerStore()
-  const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle()
+  const viewerStore = useViewerStore();
+  const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
   function meshPolygonsColor(id) {
-    return meshPolygonsCommonStyle.meshPolygonsColoring(id).color
+    return meshPolygonsCommonStyle.meshPolygonsColoring(id).color;
   }
   function setMeshPolygonsColor(id, color) {
     return viewerStore.request(
       meshPolygonsColorSchemas,
       { id, color },
       {
-        response_function: () => {
-          meshPolygonsCommonStyle.meshPolygonsColoring(id).color = color
-          console.log(
-            setMeshPolygonsColor.name,
-            { id },
-            JSON.stringify(meshPolygonsColor(id)),
-          )
-        },
+        response_function: () =>
+          meshPolygonsCommonStyle.mutateMeshPolygonsColoring(id, {
+            color,
+          }),
       },
-    )
+    );
   }
 
   return {
     meshPolygonsColor,
     setMeshPolygonsColor,
-  }
+  };
 }

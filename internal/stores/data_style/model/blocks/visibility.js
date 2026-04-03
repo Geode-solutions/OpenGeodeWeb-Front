@@ -1,61 +1,47 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json"
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import { useDataStore } from "@ogw_front/stores/data"
-import { useModelBlocksCommonStyle } from "./common"
-import { useViewerStore } from "@ogw_front/stores/viewer"
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelBlocksCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks
+const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks;
 
 export function useModelBlocksVisibilityStyle() {
-  const dataStore = useDataStore()
-  const viewerStore = useViewerStore()
-  const modelBlocksCommonStyle = useModelBlocksCommonStyle()
+  const dataStore = useDataStore();
+  const viewerStore = useViewerStore();
+  const modelBlocksCommonStyle = useModelBlocksCommonStyle();
+
   function modelBlockVisibility(id, block_id) {
-    return modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility
-  }
-  function saveModelBlockVisibility(id, block_id, visibility) {
-    modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility = visibility
+    const style = modelBlocksCommonStyle.modelBlockStyle(id, block_id);
+    return style.visibility ?? true;
   }
 
-  async function setModelBlocksVisibility(id, block_ids, visibility) {
+  function setModelBlocksVisibility(id, block_ids, visibility) {
     if (!block_ids || block_ids.length === 0) {
-      return
+      return Promise.resolve();
     }
-    const blocks_viewer_ids = await dataStore.getMeshComponentsViewerIds(
-      id,
-      block_ids,
-    )
-    if (!blocks_viewer_ids || blocks_viewer_ids.length === 0) {
-      console.warn(
-        "[setModelBlocksVisibility] No viewer IDs found, skipping visibility request",
-        { id, block_ids },
-      )
-      return
-    }
-    return viewerStore.request(
-      model_blocks_schemas.visibility,
-      { id, block_ids: blocks_viewer_ids, visibility },
-      {
-        response_function: () => {
-          for (const block_id of block_ids) {
-            saveModelBlockVisibility(id, block_id, visibility)
-          }
-          console.log(
-            setModelBlocksVisibility.name,
-            { id },
-            { block_ids },
-            modelBlockVisibility(id, block_ids[0]),
-          )
+    return dataStore.getMeshComponentsViewerIds(id, block_ids).then((block_viewer_ids) => {
+      if (!block_viewer_ids || block_viewer_ids.length === 0) {
+        return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
+          visibility,
+        });
+      }
+      return viewerStore.request(
+        model_blocks_schemas.visibility,
+        { id, block_ids: block_viewer_ids, visibility },
+        {
+          response_function: () =>
+            modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { visibility }),
         },
-      },
-    )
+      );
+    });
   }
 
   return {
     modelBlockVisibility,
     setModelBlocksVisibility,
-  }
+  };
 }

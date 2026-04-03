@@ -1,41 +1,41 @@
 // Third party imports
-import * as components from "vuetify/components"
-import { beforeEach, describe, expect, test, vi } from "vitest"
-import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
-import { nextTick } from "vue"
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json"
+import * as components from "vuetify/components";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
+import { nextTick } from "vue";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 // Local imports
-import { setupActivePinia, vuetify } from "@ogw_tests/utils"
-import ExtensionSelector from "@ogw_front/components/ExtensionSelector"
-import { useGeodeStore } from "@ogw_front/stores/geode"
+import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import ExtensionSelector from "@ogw_front/components/ExtensionSelector";
+import { useGeodeStore } from "@ogw_front/stores/geode";
 
-const EXPECTED_LENGTH = 1
-const FIRST_INDEX = 0
-const SECOND_INDEX = 1
+const EXPECTED_LENGTH = 1;
+const FIRST_INDEX = 0;
+const SECOND_INDEX = 1;
 
-const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions
+const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
 
-const pinia = setupActivePinia()
-const geodeStore = useGeodeStore()
+const pinia = setupActivePinia();
+const geodeStore = useGeodeStore();
 
 beforeEach(() => {
-  geodeStore.base_url = ""
+  geodeStore.base_url = "";
 
   geodeStore.request = vi.fn(() => {
     const response = {
       geode_objects_and_output_extensions: {
         BRep: { msh: { is_saveable: true } },
       },
-    }
-    return Promise.resolve(response)
-  })
-})
+    };
+    return Promise.resolve(response);
+  });
+});
 
 describe(ExtensionSelector, () => {
   test(`Select geode_object & extension`, async () => {
-    const output_geode_object = "BRep"
-    const output_extension = "msh"
+    const output_geode_object = "BRep";
+    const output_extension = "msh";
 
     registerEndpoint(schema.$id, {
       method: schema.methods[FIRST_INDEX],
@@ -44,24 +44,22 @@ describe(ExtensionSelector, () => {
           BRep: { msh: { is_saveable: true } },
         },
       }),
-    })
+    });
     const wrapper = await mountSuspended(ExtensionSelector, {
       global: {
         plugins: [vuetify, pinia],
       },
       props: { geode_object_type: "BRep", filenames: ["test.toto"] },
-    })
-    await nextTick()
-    expect(wrapper.exists()).toBeTruthy()
-    const v_card = await wrapper.findAllComponents(components.VCard)
-    await v_card[SECOND_INDEX].trigger("click")
-    expect(wrapper.emitted()).toHaveProperty("update_values")
-    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH)
-    expect(
-      wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX],
-    ).toStrictEqual({
+    });
+    await nextTick();
+    expect(wrapper.exists()).toBe(true);
+    const v_card = await wrapper.findAllComponents(components.VCard);
+    await v_card[SECOND_INDEX].trigger("click");
+    expect(wrapper.emitted()).toHaveProperty("update_values");
+    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
       output_geode_object,
       output_extension,
-    })
-  })
-})
+    });
+  });
+});

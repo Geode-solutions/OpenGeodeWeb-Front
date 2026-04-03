@@ -1,21 +1,31 @@
-import { useDataStyleStateStore } from "@ogw_internal/stores/data_style/state"
+import merge from "lodash/merge";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useModelLinesCommonStyle() {
-  const dataStyleStateStore = useDataStyleStateStore()
+  const dataStyleState = useDataStyleState();
 
   function modelLinesStyle(id) {
-    return dataStyleStateStore.getStyle(id).lines
+    return dataStyleState.getStyle(id).lines;
   }
 
   function modelLineStyle(id, line_id) {
-    if (!modelLinesStyle(id)[line_id]) {
-      modelLinesStyle(id)[line_id] = {}
-    }
-    return modelLinesStyle(id)[line_id]
+    const groupStyle = modelLinesStyle(id);
+    const individualStyle = dataStyleState.getComponentStyle(id, line_id);
+    return merge({}, groupStyle, individualStyle);
+  }
+
+  function mutateModelLinesStyle(id, line_ids, values) {
+    return dataStyleState.mutateComponentStyles(id, line_ids, values);
+  }
+
+  function mutateModelLineStyle(id, line_id, values) {
+    return dataStyleState.mutateComponentStyle(id, line_id, values);
   }
 
   return {
     modelLinesStyle,
     modelLineStyle,
-  }
+    mutateModelLinesStyle,
+    mutateModelLineStyle,
+  };
 }

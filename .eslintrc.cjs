@@ -12,4 +12,4 @@ module.exports = {
     "plugin:vuetify/recommended",
     "plugin:nuxt/recommended",
   ],
-}
+};

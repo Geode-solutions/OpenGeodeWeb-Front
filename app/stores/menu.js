@@ -1,96 +1,95 @@
 // PointSet components
-import PointSetPointsOptions from "@ogw_front/components/Viewer/PointSet/SpecificPointsOptions"
+import PointSetPointsOptions from "@ogw_front/components/Viewer/PointSet/SpecificPointsOptions";
 
 // EdgedCurve components
-import EdgedCurveEdgesOptions from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesOptions"
-import EdgedCurvePointsOptions from "@ogw_front/components/Viewer/EdgedCurve/PointsOptions"
+import EdgedCurveEdgesOptions from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesOptions";
+import EdgedCurvePointsOptions from "@ogw_front/components/Viewer/EdgedCurve/PointsOptions";
 
 // PolygonalSurface components
-import PolygonalSurfaceEdgesOptions from "@ogw_front/components/Viewer/PolygonalSurface/EdgesOptions"
-import PolygonalSurfacePointsOptions from "@ogw_front/components/Viewer/PolygonalSurface/PointsOptions"
-import PolygonalSurfacePolygonsOptions from "@ogw_front/components/Viewer/PolygonalSurface/SpecificPolygonsOptions"
+import PolygonalSurfaceEdgesOptions from "@ogw_front/components/Viewer/PolygonalSurface/EdgesOptions";
+import PolygonalSurfacePointsOptions from "@ogw_front/components/Viewer/PolygonalSurface/PointsOptions";
+import PolygonalSurfacePolygonsOptions from "@ogw_front/components/Viewer/PolygonalSurface/SpecificPolygonsOptions";
 
 // TriangulatedSurface components
-import TriangulatedSurfaceEdgesOptions from "@ogw_front/components/Viewer/TriangulatedSurface/EdgesOptions"
-import TriangulatedSurfacePointsOptions from "@ogw_front/components/Viewer/TriangulatedSurface/PointsOptions"
-import TriangulatedSurfaceTrianglesOptions from "@ogw_front/components/Viewer/TriangulatedSurface/TrianglesOptions"
+import TriangulatedSurfaceEdgesOptions from "@ogw_front/components/Viewer/TriangulatedSurface/EdgesOptions";
+import TriangulatedSurfacePointsOptions from "@ogw_front/components/Viewer/TriangulatedSurface/PointsOptions";
+import TriangulatedSurfaceTrianglesOptions from "@ogw_front/components/Viewer/TriangulatedSurface/TrianglesOptions";
 
 // Grid 2D components
-import Grid2DCellsOptions from "@ogw_front/components/Viewer/Grid/2D/CellsOptions"
-import Grid2DEdgesOptions from "@ogw_front/components/Viewer/Grid/2D/EdgesOptions"
-import Grid2DPointsOptions from "@ogw_front/components/Viewer/Grid/2D/PointsOptions"
+import Grid2DCellsOptions from "@ogw_front/components/Viewer/Grid/2D/CellsOptions";
+import Grid2DEdgesOptions from "@ogw_front/components/Viewer/Grid/2D/EdgesOptions";
+import Grid2DPointsOptions from "@ogw_front/components/Viewer/Grid/2D/PointsOptions";
 
 // Grid 3D components
-import Grid3DCellsOptions from "@ogw_front/components/Viewer/Grid/3D/CellsOptions"
-import Grid3DEdgesOptions from "@ogw_front/components/Viewer/Grid/3D/EdgesOptions"
-import Grid3DPointsOptions from "@ogw_front/components/Viewer/Grid/3D/PointsOptions"
+import Grid3DCellsOptions from "@ogw_front/components/Viewer/Grid/3D/CellsOptions";
+import Grid3DEdgesOptions from "@ogw_front/components/Viewer/Grid/3D/EdgesOptions";
+import Grid3DPointsOptions from "@ogw_front/components/Viewer/Grid/3D/PointsOptions";
 
 // Solid components
-import SolidEdgesOptions from "@ogw_front/components/Viewer/Solid/EdgesOptions"
-import SolidPointsOptions from "@ogw_front/components/Viewer/Solid/PointsOptions"
-import SolidPolygonsOptions from "@ogw_front/components/Viewer/Solid/PolygonsOptions"
-import SolidPolyhedraOptions from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraOptions"
+import SolidEdgesOptions from "@ogw_front/components/Viewer/Solid/EdgesOptions";
+import SolidPointsOptions from "@ogw_front/components/Viewer/Solid/PointsOptions";
+import SolidPolygonsOptions from "@ogw_front/components/Viewer/Solid/PolygonsOptions";
+import SolidPolyhedraOptions from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraOptions";
 
 // TetrahedralSolid components
-import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TetrahedraOptions"
-import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions"
+import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TetrahedraOptions";
+import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions";
 
 // Model components
-import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions"
-import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions"
+import ModelComponentsOptions from "@ogw_front/components/Viewer/Generic/Model/ModelComponentsOptions";
+import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions";
+import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions";
 
-const PointSet_menu = [PointSetPointsOptions]
+const PointSet_menu = [PointSetPointsOptions];
 
-const EdgedCurve_menu = [EdgedCurvePointsOptions, EdgedCurveEdgesOptions]
+const EdgedCurve_menu = [EdgedCurvePointsOptions, EdgedCurveEdgesOptions];
 
 const PolygonalSurface_menu = [
   PolygonalSurfacePointsOptions,
   PolygonalSurfaceEdgesOptions,
   PolygonalSurfacePolygonsOptions,
-]
+];
 
 const TriangulatedSurface_menu = [
   TriangulatedSurfacePointsOptions,
   TriangulatedSurfaceEdgesOptions,
   TriangulatedSurfaceTrianglesOptions,
-]
+];
 
-const Grid2D_menu = [
-  Grid2DPointsOptions,
-  Grid2DEdgesOptions,
-  Grid2DCellsOptions,
-]
+const Grid2D_menu = [Grid2DPointsOptions, Grid2DEdgesOptions, Grid2DCellsOptions];
 const Grid3D_menu = [
   Grid3DPointsOptions,
   Grid3DEdgesOptions,
   // Grid3DFacetsOptions,
   Grid3DCellsOptions,
-]
+];
 
 const Solid_menu = [
   SolidPointsOptions,
   SolidEdgesOptions,
   SolidPolygonsOptions,
   SolidPolyhedraOptions,
-]
+];
 
 const TetrahedralSolid_menu = [
   SolidPointsOptions,
   SolidEdgesOptions,
   TetrahedralSolidTrianglesOptions,
   TetrahedralSolidTetrahedraOptions,
-]
+];
 
-const BRep_menu = [ModelEdgesOptions, ModelPointsOptions]
+const BRep_menu = [ModelEdgesOptions, ModelPointsOptions];
 
-const CrossSection_menu = [ModelEdgesOptions, ModelPointsOptions]
+const CrossSection_menu = [ModelEdgesOptions, ModelPointsOptions];
 
-const ImplicitCrossSection_menu = [ModelEdgesOptions, ModelPointsOptions]
-const ImplicitStructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions]
+const ImplicitCrossSection_menu = [ModelEdgesOptions, ModelPointsOptions];
+const ImplicitStructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
 
-const Section_menu = [ModelEdgesOptions, ModelPointsOptions]
+const Section_menu = [ModelEdgesOptions, ModelPointsOptions];
 
-const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions]
+const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions];
+
+const ModelComponent_menu = [ModelComponentsOptions];
 
 const menusData = {
   mesh: {
@@ -118,88 +117,88 @@ const menusData = {
     Section: Section_menu,
     StructuralModel: StructuralModel_menu,
   },
-}
+  model_component: {
+    component: ModelComponent_menu,
+  },
+};
 
 export const useMenuStore = defineStore("menu", () => {
-  const menus = shallowRef(menusData)
-  const display_menu = ref(false)
-  const current_id = ref(undefined)
-  const menuX = ref(0)
-  const menuY = ref(0)
-  const containerWidth = ref(window.innerWidth)
-  const containerHeight = ref(window.innerHeight)
-  const containerTop = ref(0)
-  const containerLeft = ref(0)
-  const active_item_index = ref(undefined)
-  const current_meta_data = ref({})
+  const menus = shallowRef(menusData);
+  const display_menu = ref(false);
+  const current_id = ref(undefined);
+  const menuX = ref(0);
+  const menuY = ref(0);
+  const containerWidth = ref(window.innerWidth);
+  const containerHeight = ref(window.innerHeight);
+  const containerTop = ref(0);
+  const containerLeft = ref(0);
+  const active_item_index = ref(undefined);
+  const current_meta_data = ref({});
 
   function getMenuItems(objectType, geodeObject) {
     if (!objectType || !geodeObject || !menus.value[objectType]) {
-      return []
+      return [];
     }
-    return menus.value[objectType][geodeObject] || []
+    return menus.value[objectType][geodeObject] || [];
   }
 
   function closeMenu() {
-    active_item_index.value = undefined
-    current_id.value = undefined
-    current_meta_data.value = {}
-    menuX.value = 0
-    menuY.value = 0
-    display_menu.value = false
+    active_item_index.value = undefined;
+    current_id.value = undefined;
+    current_meta_data.value = {};
+    menuX.value = 0;
+    menuY.value = 0;
+    display_menu.value = false;
   }
 
   async function openMenu(id, x, y, width, height, top, left, meta_data) {
-    await closeMenu()
+    await closeMenu();
 
     if (meta_data) {
-      const items = getMenuItems(
-        meta_data.viewer_type,
-        meta_data.geode_object_type,
-      )
+      const items = getMenuItems(meta_data.viewer_type, meta_data.geode_object_type);
       if (items.length === 0) {
-        return
+        return;
       }
     }
 
-    current_id.value = id
-    current_meta_data.value = meta_data || {}
+    current_id.value = id;
+    current_meta_data.value = meta_data || {};
 
     if (x !== undefined && y !== undefined) {
-      menuX.value = x
-      menuY.value = y
+      menuX.value = x;
+      menuY.value = y;
     }
 
-    containerWidth.value = width
-    containerHeight.value = height
-    containerTop.value = top
-    containerLeft.value = left
+    containerWidth.value = width;
+    containerHeight.value = height;
+    containerTop.value = top;
+    containerLeft.value = left;
 
-    display_menu.value = true
+    display_menu.value = true;
   }
 
   function setMenuPosition(x, y) {
-    menuX.value = x
-    menuY.value = y
+    menuX.value = x;
+    menuY.value = y;
   }
 
   function toggleItemOptions(index) {
     if (active_item_index.value === index) {
-      active_item_index.value = undefined
+      active_item_index.value = undefined;
     } else {
-      active_item_index.value = index
+      active_item_index.value = index;
     }
   }
 
-  const router = useRouter()
+  const router = useRouter();
   watch(
     () => router.currentRoute.value.path,
     () => {
       if (display_menu.value || active_item_index.value !== null) {
-        closeMenu()
+        closeMenu();
       }
     },
-  )
+  );
 
   return {
     display_menu,
@@ -217,5 +216,5 @@ export const useMenuStore = defineStore("menu", () => {
     openMenu,
     setMenuPosition,
     toggleItemOptions,
-  }
-})
+  };
+});

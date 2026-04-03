@@ -1,17 +1,17 @@
-import { describe, expect, test } from "vitest"
-import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime"
+import { describe, expect, test } from "vitest";
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 
-import { setupActivePinia, vuetify } from "@ogw_tests/utils"
-import PackagesVersions from "@ogw_front/components/PackagesVersions"
-import { useGeodeStore } from "@ogw_front/stores/geode"
+import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import PackagesVersions from "@ogw_front/components/PackagesVersions";
+import { useGeodeStore } from "@ogw_front/stores/geode";
 
-const FIRST_INDEX = 0
+const FIRST_INDEX = 0;
 
-describe(PackagesVersions, async () => {
+describe(PackagesVersions, () => {
   test(`Mount`, async () => {
-    const pinia = setupActivePinia()
-    const geodeStore = useGeodeStore()
-    geodeStore.base_url = ""
+    const pinia = setupActivePinia();
+    const geodeStore = useGeodeStore();
+    geodeStore.base_url = "";
 
     const schema = {
       $id: "/versions",
@@ -19,7 +19,7 @@ describe(PackagesVersions, async () => {
       type: "object",
       properties: {},
       additionalProperties: false,
-    }
+    };
     registerEndpoint(schema.$id, {
       method: schema.methods[FIRST_INDEX],
       handler: () => ({
@@ -30,13 +30,13 @@ describe(PackagesVersions, async () => {
           },
         ],
       }),
-    })
+    });
     const wrapper = await mountSuspended(PackagesVersions, {
       global: {
         plugins: [vuetify, pinia],
       },
       props: { schema },
-    })
-    expect(wrapper.exists()).toBeTruthy()
-  })
-})
+    });
+    expect(wrapper.exists()).toBe(true);
+  });
+});
