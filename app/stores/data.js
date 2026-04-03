@@ -120,8 +120,12 @@ export const useDataStore = defineStore("data", () => {
         });
       }
     }
-    addModelComponents(new_item.mesh_components);
-    addModelComponents(new_item.collection_components);
+    if (new_item.mesh_components) {
+      addModelComponents(new_item.mesh_components);
+    }
+    if (new_item.collection_components) {
+      addModelComponents(new_item.collection_components);
+    }
     return database.model_components.bulkPut(allComponents);
   }
 
@@ -137,17 +141,21 @@ export const useDataStore = defineStore("data", () => {
         });
       }
     }
-    for (const component of new_item.mesh_components) {
-      if (component.boundaries) {
-        addModelComponentRelations(component.boundaries, component.geode_id, "boundary");
-      }
-      if (component.internals) {
-        addModelComponentRelations(component.internals, component.geode_id, "internal");
+    if (new_item.mesh_components) {
+      for (const component of new_item.mesh_components) {
+        if (component.boundaries) {
+          addModelComponentRelations(component.boundaries, component.geode_id, "boundary");
+        }
+        if (component.internals) {
+          addModelComponentRelations(component.internals, component.geode_id, "internal");
+        }
       }
     }
-    for (const component of new_item.collection_components) {
-      if (component.items) {
-        addModelComponentRelations(component.items, component.geode_id, "collection");
+    if (new_item.collection_components) {
+      for (const component of new_item.collection_components) {
+        if (component.items) {
+          addModelComponentRelations(component.items, component.geode_id, "collection");
+        }
       }
     }
     return database.model_components_relation.bulkPut(relations);
