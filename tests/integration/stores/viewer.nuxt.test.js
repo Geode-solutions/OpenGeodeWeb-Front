@@ -1,7 +1,6 @@
 // Global imports
 
 // Third party imports
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports

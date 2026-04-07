@@ -1,5 +1,4 @@
 // Third party imports
-import { describe, expect, test, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
 // Local imports

@@ -1,5 +1,4 @@
 // Third party imports
-import { describe, expect, test } from "vitest";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports

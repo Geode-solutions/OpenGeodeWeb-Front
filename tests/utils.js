@@ -4,7 +4,6 @@ import * as directives from "vuetify/directives";
 import { createTestingPinia } from "@pinia/testing";
 import { createVuetify } from "vuetify";
 import { setActivePinia } from "pinia";
-import { vi } from "vitest";
 
 const vuetify = createVuetify({ components, directives });
 

@@ -1,5 +1,4 @@
 // Third party imports
-import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 
 import { WebSocket } from "ws";
 // Local imports

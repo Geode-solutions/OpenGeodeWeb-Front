@@ -1,5 +1,4 @@
 import * as components from "vuetify/components";
-import { describe, expect, test } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 
