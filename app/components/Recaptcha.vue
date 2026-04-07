@@ -1,8 +1,5 @@
 <script setup>
-import { appMode } from "@ogw_front/utils/local/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
-
-const RESPONSE_STATUS_OK = 200;
 
 const { button_label, button_color, color } = defineProps({
   button_label: {
@@ -20,7 +17,7 @@ const { button_label, button_color, color } = defineProps({
     required: false,
   },
 });
-const infraStore = useInfraStore();
+
 const name = ref("");
 const email = ref("");
 const launch = ref(false);
@@ -40,26 +37,9 @@ const emailRules = [
   },
 ];
 
-onMounted(() => {
-  if (
-    import.meta.client &&
-    (process.env.NODE_ENV !== "production" || infraStore.app_mode !== appMode.CLOUD)
-  ) {
-    infraStore.$patch({ is_captcha_validated: true });
-  }
-});
-async function submit_recaptcha() {
-  const response = await $fetch.raw(`/.netlify/functions/recaptcha`, {
-    method: "POST",
-    body: {
-      name: name.value,
-      email: email.value,
-      launch: launch.value,
-    },
-  });
-  infraStore.$patch({
-    is_captcha_validated: response.status === RESPONSE_STATUS_OK,
-  });
+function submit() {
+  const infraStore = useInfraStore();
+  return infraStore.create_backend(name.value, email.value, launch.value);
 }
 </script>
 
@@ -89,7 +69,7 @@ async function submit_recaptcha() {
   </VRow>
   <VRow align="center" justify="center">
     <VCol cols="4" class="d-flex justify-center align-center">
-      <VBtn :text="button_label" :color="color || button_color" @click="submit_recaptcha" />
+      <VBtn :text="button_label" :color="color || button_color" @click="submit" />
     </VCol>
   </VRow>
 </template>

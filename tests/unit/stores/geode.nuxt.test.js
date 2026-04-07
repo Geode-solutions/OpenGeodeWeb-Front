@@ -14,7 +14,6 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 const PORT_443 = "443";
 const PORT_12 = "12";
 const PORT_5000 = "5000";
-const CLOUD_ID = "123456";
 const STATUS_500 = 500;
 const EXPECTED_ONE_REQUEST = 1;
 const EXPECTED_NO_REQUEST = 0;
@@ -88,18 +87,8 @@ describe("geode store", () => {
       const infraStore = useInfraStore();
       const geodeStore = useGeodeStore();
       infraStore.app_mode = appMode.CLOUD;
-      infraStore.ID = CLOUD_ID;
       infraStore.domain_name = "example.com";
-      expect(geodeStore.base_url).toBe(`https://example.com:${PORT_443}/${CLOUD_ID}/geode`);
-    });
-
-    test("app_mode CLOUD, ID empty", () => {
-      const infraStore = useInfraStore();
-      const geodeStore = useGeodeStore();
-      infraStore.app_mode = appMode.CLOUD;
-      infraStore.ID = "";
-      infraStore.domain_name = "example.com";
-      expect(() => geodeStore.base_url).toThrow("ID must not be empty in cloud mode");
+      expect(geodeStore.base_url).toBe(`https://example.com:${PORT_443}/geode`);
     });
   });
 
