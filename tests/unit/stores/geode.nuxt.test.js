@@ -14,7 +14,6 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 const PORT_443 = "443";
 const PORT_12 = "12";
 const PORT_5000 = "5000";
-const CLOUD_ID = "123456";
 const STATUS_500 = 500;
 const EXPECTED_ONE_REQUEST = 1;
 const EXPECTED_NO_REQUEST = 0;

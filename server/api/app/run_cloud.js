@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     const projectId = process.env.GOOGLE_CLOUD_PROJECT;
     const parent = `projects/${projectId}/locations/${location}`;
     const auth = new GoogleAuth({
-      credentials: credentials,
+      credentials,
       scopes: ["https://www.googleapis.com/auth/cloud-platform"],
     });
     const authClient = await auth.getClient();
