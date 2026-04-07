@@ -84,9 +84,6 @@
     "vitest-environment-nuxt": "1.0.1",
     "vitest-indexeddb": "0.0.1"
   },
-  "peerDependencies": {
-    "electron": "36.4.0"
-  },
   "overrides": {
     "vue": "latest"
   }
