@@ -1,6 +1,9 @@
 import { defineConfig } from "vitest/config";
 import { defineVitestProject } from "@nuxt/test-utils/config";
 import path from "node:path";
+import { playwright } from "@vitest/browser-playwright";
+
+import { serverSetup, serverCleanup } from "./browser/commands";
 
 const __dirname = import.meta.dirname;
 
@@ -29,6 +32,10 @@ export default defineConfig({
           include: ["tests/browser/cells.test.js"],
           setupFiles: ["vitest-browser-vue"],
           browser: {
+            commands: {
+              serverSetup,
+              serverCleanup,
+            },
             enabled: true,
             provider: playwright(),
             instances: [{ browser: "chromium" }],

@@ -55,6 +55,12 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    resolve: {
+      alias: {
+        // Only alias ws in browser context
+        ws: path.resolve(__dirname, "tests/browser/shims/ws.js"),
+      },
+    },
     optimizeDeps: {
       include: [
         "ajv",
@@ -63,7 +69,12 @@ export default defineNuxtConfig({
         "h3",
         "js-file-download",
         "lodash",
+        "lodash/merge",
         "seedrandom",
+        "spark-md5",
+        "dexie",
+        "ws",
+        "xmlbuilder2",
       ],
     },
   },
