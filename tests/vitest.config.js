@@ -21,13 +21,11 @@ export default defineConfig({
     },
   },
   test: {
-    globals: false,
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
       await defineVitestProject({
         test: {
           name: "unit",
-          globals: false,
           include: ["tests/unit/**/*.test.js"],
           environment: "nuxt",
           testTimeout: TIMEOUTS.unit,
@@ -43,7 +41,6 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "integration",
-          globals: false,
           include: ["tests/integration/**/*.test.js"],
           environment: "nuxt",
           fileParallelism: false,
