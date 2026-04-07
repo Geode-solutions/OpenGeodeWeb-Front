@@ -126,6 +126,12 @@
       }
     },
     {
+      "files": ["tests/e2e/**"],
+      "rules": {
+        "vitest/prefer-importing-vitest-globals": "off"
+      }
+    },
+    {
       "files": ["**/preload.js"],
       "rules": {
         "import/no-commonjs": "off"
