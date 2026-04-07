@@ -111,18 +111,8 @@ describe("Viewer Store", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.CLOUD;
-        infraStore.ID = "123456";
         infraStore.domain_name = "example.com";
-        expect(viewerStore.base_url).toBe("wss://example.com:443/123456/viewer/ws");
-      });
-
-      test("test app_mode CLOUD, ID empty", () => {
-        const infraStore = useInfraStore();
-        const viewerStore = useViewerStore();
-        infraStore.app_mode = appMode.CLOUD;
-        infraStore.ID = "";
-        infraStore.domain_name = "example.com";
-        expect(() => viewerStore.base_url).toThrowError("ID must not be empty in cloud mode");
+        expect(viewerStore.base_url).toBe("wss://example.com:443/viewer/ws");
       });
     });
     describe("is_busy", () => {

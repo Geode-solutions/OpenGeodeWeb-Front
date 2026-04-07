@@ -2,23 +2,16 @@ import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { registerRunningExtensions } from "@ogw_front/utils/extension";
 import { useAppStore } from "@ogw_front/stores/app";
-import { useLambdaStore } from "@ogw_front/stores/lambda";
+import { useCloudStore } from "@ogw_front/stores/cloud";
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: useRuntimeConfig().public.MODE,
-    ID: "",
-    is_captcha_validated: false,
     status: Status.NOT_CREATED,
     microservices: [],
+    domain_name: "localhost",
   }),
   getters: {
-    domain_name() {
-      if (this.app_mode === appMode.CLOUD) {
-        return useRuntimeConfig().public.API_URL;
-      }
-      return "localhost";
-    },
     microservices_connected() {
       console.log("microservices", this.microservices);
       return this.microservices.every((store) => store.status === Status.CONNECTED);
@@ -37,7 +30,7 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Microservice registered:", store_name);
       }
     },
-    create_backend() {
+    create_backend(name, email, launch) {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
       console.log(
         "[INFRA] Registered microservices:",
@@ -47,18 +40,15 @@ export const useInfraStore = defineStore("infra", {
         return;
       }
       return navigator.locks.request("infra.create_backend", async () => {
-        this.status = Status.CREATING;
         if (this.status === Status.CREATED) {
           return;
         }
+        this.status = Status.CREATING;
         console.log("[INFRA] Lock granted for create_backend");
         if (this.app_mode === appMode.CLOUD) {
-          console.log("[INFRA] CLOUD mode - Launching lambda...");
-          const lambdaStore = useLambdaStore();
-          this.ID = await lambdaStore.launch();
-          console.log("[INFRA] Lambda launched successfully");
+          const cloudStore = useCloudStore();
+          await cloudStore.launch(name, email, launch);
         } else {
-          console.log(`[INFRA] ${this.app_mode} mode - Launching microservices...`);
           const appStore = useAppStore();
           await appStore.createProjectFolder();
           if (this.app_mode === appMode.DESKTOP) {
