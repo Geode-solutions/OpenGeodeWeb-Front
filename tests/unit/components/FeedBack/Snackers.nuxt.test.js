@@ -1,5 +1,6 @@
 // Third party imports
 import * as components from "vuetify/components";
+import { describe, expect, test, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
 // Local imports

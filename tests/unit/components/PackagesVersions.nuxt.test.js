@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";

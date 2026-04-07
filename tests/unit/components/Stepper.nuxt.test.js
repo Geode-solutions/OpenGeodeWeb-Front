@@ -1,5 +1,6 @@
 // Third party imports
 import { computed, reactive, ref, shallowRef } from "vue";
+import { describe, expect, test } from "vitest";
 import ResizeObserver from "resize-observer-polyfill";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 

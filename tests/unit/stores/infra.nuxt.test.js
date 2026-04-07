@@ -1,4 +1,5 @@
 // Third party imports
+import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 import { registerEndpoint } from "@nuxt/test-utils/runtime";
 
 // Local imports

@@ -27,7 +27,7 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "unit",
-          globals: true,
+          globals: false,
           include: ["tests/unit/**/*.test.js"],
           environment: "nuxt",
           testTimeout: TIMEOUTS.unit,
@@ -43,7 +43,7 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "integration",
-          globals: true,
+          globals: false,
           include: ["tests/integration/**/*.test.js"],
           environment: "nuxt",
           fileParallelism: false,

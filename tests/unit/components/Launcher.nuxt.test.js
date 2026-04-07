@@ -1,3 +1,5 @@
+import { describe, expect, test, vi } from "vitest";
+
 import Launcher from "@ogw_front/components/Launcher";
 import ResizeObserver from "resize-observer-polyfill";
 import { flushPromises } from "@vue/test-utils";

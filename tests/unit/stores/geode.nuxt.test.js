@@ -1,4 +1,5 @@
 // Third party imports
+import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { registerEndpoint } from "@nuxt/test-utils/runtime";
 
