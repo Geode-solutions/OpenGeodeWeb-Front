@@ -14,8 +14,8 @@ const toggle_loading = useToggle(loading);
 async function get_inspection_results() {
   toggle_loading();
   const params = {
-    geode_object_type: geode_object_type,
-    filename: filename,
+    geode_object_type,
+    filename,
   };
   const geodeStore = useGeodeStore();
 

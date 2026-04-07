@@ -1,9 +1,8 @@
 import { defineConfig } from "vitest/config";
 import { defineVitestProject } from "@nuxt/test-utils/config";
-import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 const RETRIES = 3;
 const DEFAULT_RETRY = 0;
@@ -22,14 +21,13 @@ export default defineConfig({
     },
   },
   test: {
-    globals: false,
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
       await defineVitestProject({
         test: {
           name: "unit",
-          globals: false,
           include: ["tests/unit/**/*.test.js"],
+          globals: true,
           environment: "nuxt",
           testTimeout: TIMEOUTS.unit,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
@@ -44,8 +42,8 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "integration",
-          globals: false,
           include: ["tests/integration/**/*.test.js"],
+          globals: true,
           environment: "nuxt",
           fileParallelism: false,
           testTimeout: TIMEOUTS.integration,
