@@ -27,7 +27,7 @@ onMounted(() => {
 function getTextureCoordinates() {
   geodeStore.request(
     back_schemas.opengeodeweb_back.texture_coordinates,
-    { id: id },
+    { id },
     {
       response_function: (response) => {
         texture_coordinates.value = response.texture_coordinates;

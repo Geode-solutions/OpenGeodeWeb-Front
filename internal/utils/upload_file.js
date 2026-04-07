@@ -16,7 +16,7 @@ async function upload_file(
 
   const request_options = {
     method: "PUT",
-    body: body,
+    body,
   };
   microservice.start_request();
   return await $fetch(route, {

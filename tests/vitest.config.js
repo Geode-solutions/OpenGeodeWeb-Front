@@ -1,11 +1,8 @@
-import { fileURLToPath } from "node:url";
-import path from "node:path";
-
 import { defineConfig } from "vitest/config";
 import { defineVitestProject } from "@nuxt/test-utils/config";
-import { playwright } from "@vitest/browser-playwright";
+import path from "node:path";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 const RETRIES = 3;
 const DEFAULT_RETRY = 0;
@@ -24,7 +21,6 @@ export default defineConfig({
     },
   },
   test: {
-    globals: false,
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
       await defineVitestProject({
@@ -43,7 +39,6 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "unit",
-          globals: false,
           include: ["tests/unit/**/*.test.js"],
           environment: "nuxt",
           testTimeout: TIMEOUTS.unit,
@@ -59,8 +54,7 @@ export default defineConfig({
       await defineVitestProject({
         test: {
           name: "integration",
-          globals: false,
-          include: ["tests/integration/stores/data_style/mesh/cells.nuxt.test.js"],
+          include: ["tests/integration/**/*.test.js"],
           environment: "nuxt",
           fileParallelism: false,
           testTimeout: TIMEOUTS.integration,
