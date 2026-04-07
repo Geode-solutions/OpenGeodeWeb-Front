@@ -107,7 +107,7 @@ describe(FileSelector, () => {
         },
         props: {
           multiple: false,
-          files: files,
+          files,
           auto_upload: false,
         },
       });
