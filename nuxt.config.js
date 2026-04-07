@@ -1,11 +1,10 @@
 // Node imports
-import path, { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 // Local imports
 import package_json from "./package.json";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 export default defineNuxtConfig({
   runtimeConfig: {
