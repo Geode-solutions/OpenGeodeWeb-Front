@@ -21,7 +21,7 @@ export default defineConfig({
     },
   },
   test: {
-    globals: false,
+    globals: true,
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
       await defineVitestProject({
