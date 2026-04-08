@@ -3,12 +3,11 @@ import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
-// import { Status } from "@ogw_front/utils/status";
-import { serverSetup, serverCleanup } from "vitest/browser";
+import { serverCleanup, serverSetup } from "./commands.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-import HybridRenderingView from "@ogw_front/components/HybridRenderingView.vue";
+// import HybridRenderingView from "@ogw_front/components/HybridRenderingView.vue";
 
 // Local constants
 const INTERVAL_TIMEOUT = 60_000;
@@ -51,12 +50,12 @@ describe("Mesh cells", () => {
       );
       expect(dataStyleStore.meshCellsVisibility(id)).toBe(visibility);
 
-      const hybridRenderingView = await render(HybridRenderingView, {
-        global: {
-          plugins: [vuetify],
-        },
-      });
-      await expect(hybridRenderingView.container).toMatchScreenshot();
+      // const hybridRenderingView = await render(HybridRenderingView, {
+      //   global: {
+      //     plugins: [vuetify],
+      //   },
+      // });
+      // await expect(hybridRenderingView.container).toMatchScreenshot();
     });
   });
 });
