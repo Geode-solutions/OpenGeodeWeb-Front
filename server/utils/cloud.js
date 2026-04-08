@@ -14,10 +14,12 @@ async function artifactImage(registry, parent, repo) {
   const branch = process.env.BRANCH;
   const [_, projectId] = parent.split("/");
   const repository = `${parent}/repositories/ghcr/packages/geode-solutions%2F`;
-  const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/ghcr/geode-solutions`;
+  const name = `${repository}${repo}/tags/${branch}`;
+  console.log({ name });
   const response = await registry.projects.locations.repositories.packages.tags.get({
-    name: `${repository}${repo}/tags/${branch}`,
+    name,
   });
+  const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/ghcr/geode-solutions`;
   const digest = response.data.version.split("/").pop();
   const image = `${artifactRegistry}/${repo}@${digest}`;
   console.log("Found image for", repo, image);
