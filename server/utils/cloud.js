@@ -56,11 +56,15 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
     service: {
       ingress: "INGRESS_TRAFFIC_ALL",
       invokerIamDisabled: true,
-      scaling: {
-        scalingMode: "MANUAL",
-        manualInstanceCount: 1,
-      },
+      // scaling: {
+      //   scalingMode: "MANUAL",
+      //   manualInstanceCount: 1,
+      // },
       template: {
+        scaling: {
+          minInstanceCount: 0,
+          maxInstanceCount: 1,
+        },
         volumes: [
           {
             name: "data",
