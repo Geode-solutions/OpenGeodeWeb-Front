@@ -22,7 +22,7 @@ if (infraStore.app_mode !== appMode.CLOUD) {
   <v-container class="justify">
     <v-row align-content="center" align="center">
       <v-col
-        v-if="!infraStore.status == Status.NOT_CREATED"
+        v-if="infraStore.status === Status.NOT_CREATED"
         class="align"
         cols="12"
         align-self="center"
@@ -30,7 +30,7 @@ if (infraStore.app_mode !== appMode.CLOUD) {
       >
         <Recaptcha :button_color="'secondary'" />
       </v-col>
-      <v-col v-else-if="infraStore.status == Status.CREATING">
+      <v-col v-else-if="infraStore.status === Status.CREATING">
         <Loading :logo="logo" />
       </v-col>
     </v-row>

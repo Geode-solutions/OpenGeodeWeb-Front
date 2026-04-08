@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
     const location = "europe-west9";
     const projectId = process.env.GOOGLE_CLOUD_PROJECT;
     const parent = `projects/${projectId}/locations/${location}`;
+    console.log({ parent });
     const auth = new GoogleAuth({
       credentials,
       scopes: ["https://www.googleapis.com/auth/cloud-platform"],
@@ -28,6 +29,7 @@ export default defineEventHandler(async (event) => {
     const authClient = await auth.getClient();
     const [routerImage, backImage, viewerImage] = await artifactImages(parent, authClient);
     const request = requestConfig(parent, routerImage, backImage, viewerImage);
+    console.log({ request });
     const runClient = new ServicesClient({ authClient });
     const [operation] = await runClient.createService(request);
     const [response] = await operation.promise();
