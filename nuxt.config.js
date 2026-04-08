@@ -54,12 +54,6 @@ export default defineNuxtConfig({
   },
 
   vite: {
-    resolve: {
-      alias: {
-        // Only alias ws in browser context
-        ws: path.resolve(__dirname, "tests/browser/shims/ws.js"),
-      },
-    },
     optimizeDeps: {
       include: [
         "ajv",

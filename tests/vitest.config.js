@@ -1,9 +1,10 @@
+import path from "node:path";
+
 import { defineConfig } from "vitest/config";
 import { defineVitestProject } from "@nuxt/test-utils/config";
-import path from "node:path";
 import { playwright } from "@vitest/browser-playwright";
 
-import { serverSetup, serverCleanup } from "./browser/commands";
+import { serverCleanup, serverSetup } from "./browser/commands.js";
 
 const __dirname = import.meta.dirname;
 
@@ -30,6 +31,7 @@ export default defineConfig({
         test: {
           name: "browser",
           include: ["tests/browser/cells.test.js"],
+          environment: "nuxt",
           setupFiles: ["vitest-browser-vue"],
           browser: {
             commands: {
@@ -66,11 +68,6 @@ export default defineConfig({
           fileParallelism: false,
           testTimeout: TIMEOUTS.integration,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
-          browser: {
-            enabled: true,
-            provider: playwright(),
-            instances: [{ browser: "chromium" }],
-          },
           server: {
             deps: {
               inline: ["vuetify"],
