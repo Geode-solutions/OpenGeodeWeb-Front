@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
         body: JSON.stringify({ message: "INTERNAL_ERROR" }),
       };
     }
-    console.log("ENV", process.env);
     const credentials = JSON.parse(process.env.GOOGLE_CLOUD_KEY);
     const location = "europe-west9";
     const projectId = process.env.GOOGLE_CLOUD_PROJECT;

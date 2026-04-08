@@ -11,7 +11,7 @@ function checkRecaptchaParams(name, email, launch) {
 }
 
 async function artifactImage(registry, parent, repo) {
-  const branch = process.env.BRANCH;
+  const branch = process.env.NETLIFY_BRANCH;
   const [_, projectId] = parent.split("/");
   const repository = `${parent}/repositories/ghcr/packages/geode-solutions%2F`;
   const name = `${repository}${repo}/tags/${branch}`;
