@@ -1,5 +1,5 @@
-import { cleanupBackend } from "@geode/opengeodeweb-front/app/utils/local/cleanup";
-import { setupIntegrationTests } from "./setup";
+import { cleanupBackend } from "@ogw_front/utils/local/cleanup.js";
+import { setupIntegrationTests } from "./setup.js";
 
 async function serverSetup(file_name, geode_object) {
   console.log(`[Server] Setting up integration test for ${file_name}`);
