@@ -78,6 +78,12 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
               },
             ],
             resources,
+            env: [
+              {
+                name: "PARENT",
+                value: parent,
+              },
+            ],
             startupProbe: {
               httpGet: {
                 port: 80,
