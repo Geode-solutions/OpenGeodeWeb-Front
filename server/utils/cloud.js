@@ -78,6 +78,14 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
               },
             ],
             resources,
+            startupProbe: {
+              httpGet: {
+                port: 80,
+                path: "/viewer/healthcheck",
+              },
+              periodSeconds: 1,
+              failureThreshold: 30,
+            },
           },
           {
             image: backImage,
