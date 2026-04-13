@@ -5,7 +5,7 @@ import ModelComponentsView from "@ogw_front/components/Viewer/ObjectTree/Views/M
 import TreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const WIDTH_MIN = 300;
+const WIDTH_MIN = 200;
 const HEIGHT_MIN = 150;
 
 const treeviewStore = useTreeviewStore();
