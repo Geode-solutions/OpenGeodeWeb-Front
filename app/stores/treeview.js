@@ -41,7 +41,8 @@ function processImport(snapshot) {
   const views = snapshot?.opened_views || [{ type: "object", id: "main", title: "Objects" }];
   const pWidth = snapshot?.panelWidth || PANEL_WIDTH;
   const apWidth = snapshot?.additionalPanelWidth || PANEL_WIDTH;
-  const ids = snapshot?.selectionIds || (snapshot?.selection || []).map((sel) => sel.id || sel) || [];
+  const ids =
+    snapshot?.selectionIds || (snapshot?.selection || []).map((sel) => sel.id || sel) || [];
   return { opened_views: views, panelWidth: pWidth, additionalPanelWidth: apWidth, ids };
 }
 
@@ -75,7 +76,12 @@ function createActions(state) {
         return closeView(idx);
       }
       additionalPanelWidth.value = panelWidth.value;
-      peek.value.push({ type: "component", id, title: title || id, geode_object_type: geodeObjectType });
+      peek.value.push({
+        type: "component",
+        id,
+        title: title || id,
+        geode_object_type: geodeObjectType,
+      });
     },
     closeView,
     moveView: (fromIdx, toIdx) => {
@@ -86,8 +92,10 @@ function createActions(state) {
     },
     importStores: (snapshot) => {
       const data = processImport(snapshot);
-      peek.value = data.opened_views; panelWidth.value = data.panelWidth;
-      additionalPanelWidth.value = data.additionalPanelWidth; pendingIds.value = data.ids;
+      peek.value = data.opened_views;
+      panelWidth.value = data.panelWidth;
+      additionalPanelWidth.value = data.additionalPanelWidth;
+      pendingIds.value = data.ids;
     },
   };
 }
@@ -101,22 +109,42 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const isImporting = ref(false);
   const pendingSelectionIds = ref([]);
 
-  const acts = createActions({ items, selection, peek: opened_views, panelWidth, additionalPanelWidth, pendingIds: pendingSelectionIds });
+  const acts = createActions({
+    items,
+    selection,
+    peek: opened_views,
+    panelWidth,
+    additionalPanelWidth,
+    pendingIds: pendingSelectionIds,
+  });
 
   return {
     ...acts,
-    items, selection, opened_views, panelWidth, additionalPanelWidth, isImporting,
+    items,
+    selection,
+    opened_views,
+    panelWidth,
+    additionalPanelWidth,
+    isImporting,
     removeItem: (id) => removeItemFromItems(items, selection, id),
-    displayFileTree: () => (opened_views.value = [{ type: "object", id: "main", title: "Objects" }]),
+    displayFileTree: () =>
+      (opened_views.value = [{ type: "object", id: "main", title: "Objects" }]),
     setPanelWidth: (width) => (panelWidth.value = width),
     setAdditionalPanelWidth: (width) => (additionalPanelWidth.value = width),
-    exportStores: () => ({ opened_views: opened_views.value, panelWidth: panelWidth.value, additionalPanelWidth: additionalPanelWidth.value, selectionIds: selection.value }),
+    exportStores: () => ({
+      opened_views: opened_views.value,
+      panelWidth: panelWidth.value,
+      additionalPanelWidth: additionalPanelWidth.value,
+      selectionIds: selection.value,
+    }),
     finalizeImportSelection: () => {
       selection.value = finalizeRebuild(items, pendingSelectionIds.value);
       pendingSelectionIds.value = [];
     },
     clear: () => {
-      items.value = []; selection.value = []; pendingSelectionIds.value = [];
+      items.value = [];
+      selection.value = [];
+      pendingSelectionIds.value = [];
       opened_views.value = [{ type: "object", id: "main", title: "Objects" }];
     },
   };

@@ -34,9 +34,7 @@ watch(
     const { added, removed } = compareSelections(current, previous);
 
     const allObjectIds = new Set(
-      treeviewStore.items.flatMap((group) =>
-        group.children.map((child) => child.id),
-      ),
+      treeviewStore.items.flatMap((group) => group.children.map((child) => child.id)),
     );
 
     const updates = [
@@ -93,11 +91,7 @@ function isModel(item) {
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
-            treeviewStore.displayAdditionalTree(
-              item.id,
-              item.title,
-              item.geode_object_type,
-            )
+            treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type)
           "
         />
       </template>
