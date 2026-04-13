@@ -1,11 +1,10 @@
 <script setup>
-import { toRef, watch } from "vue";
 import TreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import TreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useTreeFilter } from "@ogw_front/composables/useTreeFilter";
+import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();
@@ -35,7 +34,9 @@ watch(
     const { added, removed } = compareSelections(current, previous);
 
     const allObjectIds = new Set(
-      treeviewStore.items.flatMap((group) => group.children.map((child) => child.id)),
+      treeviewStore.items.flatMap((group) =>
+        group.children.map((child) => child.id),
+      ),
     );
 
     const updates = [
@@ -92,7 +93,11 @@ function isModel(item) {
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
-            treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type)
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+            )
           "
         />
       </template>

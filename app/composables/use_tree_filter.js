@@ -1,0 +1,79 @@
+import { computed, ref, watch } from "vue";
+
+function customFilter(_value, searchQuery, item) {
+  if (!searchQuery) {
+    return true;
+  }
+  const query = searchQuery.toLowerCase();
+  const title = (item.raw.title || "").toLowerCase();
+  const id = (item.raw.id || "").toLowerCase();
+  return title.includes(query) || id.includes(query);
+}
+
+function sortAndFormatItems(items, sortType) {
+  const field = sortType === "name" ? "title" : "id";
+  return items.map((category) => {
+    const children = (category.children || []).toSorted((first, second) => {
+      const val1 = first[field] || "";
+      const val2 = second[field] || "";
+      return val1.localeCompare(val2, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
+    });
+    return {
+      id: category.id,
+      title: category.title || category.id,
+      geode_object_type: category.geode_object_type,
+      children,
+    };
+  });
+}
+
+function useTreeFilter(rawItems, options = {}) {
+  const search = ref("");
+  const sortType = ref(options.defaultSort || "name");
+  const filterOptions = ref(options.defaultFilters || {});
+
+  const availableFilterOptions = computed(() =>
+    rawItems.value.map((category) => category.title || category.id),
+  );
+
+  watch(
+    availableFilterOptions,
+    (newOptions) => {
+      for (const option of newOptions) {
+        if (filterOptions.value[option] === undefined) {
+          filterOptions.value[option] = true;
+        }
+      }
+    },
+    { immediate: true },
+  );
+
+  const processedItems = computed(() =>
+    sortAndFormatItems(
+      rawItems.value.filter((category) => {
+        const key = category.title || category.id;
+        return filterOptions.value[key] !== false;
+      }),
+      sortType.value,
+    ),
+  );
+
+  function toggleSort() {
+    sortType.value = sortType.value === "name" ? "id" : "name";
+  }
+
+  return {
+    search,
+    sortType,
+    filterOptions,
+    processedItems,
+    availableFilterOptions,
+    toggleSort,
+    customFilter,
+  };
+}
+
+export { customFilter, useTreeFilter };

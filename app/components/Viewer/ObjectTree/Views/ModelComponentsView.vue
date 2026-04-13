@@ -2,11 +2,10 @@
 import TreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import TreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
-import { toRef } from "vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useTreeFilter } from "@ogw_front/composables/useTreeFilter";
+import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 
 const { id } = defineProps({ id: { type: String, required: true } });
 const emit = defineEmits(["show-menu"]);
