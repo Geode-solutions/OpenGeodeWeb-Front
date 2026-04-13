@@ -1,4 +1,5 @@
 <script setup>
+import { toRef } from "vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -87,5 +88,17 @@ async function onSelectionChange(current) {
 .transparent-treeview {
   background-color: transparent;
   margin: 4px 0;
+}
+
+:deep(.v-list-item) {
+  transition: background-color 0.2s ease;
+}
+
+:deep(.v-list-item--active > .v-list-item__overlay) {
+  opacity: 0 !important;
+}
+
+:deep(.v-list-item:hover > .v-list-item__overlay) {
+  opacity: 0.1 !important;
 }
 </style>

@@ -25,7 +25,11 @@ export const useTreeviewStore = defineStore("treeview", () => {
         return;
       }
     }
-    items.value.push({ title: geode_object_type, children: [child] });
+    items.value.push({
+      id: geode_object_type,
+      title: geode_object_type,
+      children: [child],
+    });
     items.value.sort((element1, element2) =>
       element1.title.localeCompare(element2.title, undefined, {
         numeric: true,
@@ -70,11 +74,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function exportStores() {
-    const selectionIds = selection.value.map((store) => store.id);
     return {
       opened_views: opened_views.value,
       panelWidth: panelWidth.value,
-      selectionIds,
+      selectionIds: selection.value,
     };
   }
 
@@ -83,7 +86,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
 
     pendingSelectionIds.value =
-      snapshot?.selectionIds || (snapshot?.selection || []).map((store) => store.id) || [];
+      snapshot?.selectionIds || (snapshot?.selection || []).map((sel) => sel.id || sel) || [];
   }
 
   function finalizeImportSelection() {
@@ -99,7 +102,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       for (const group of items.value) {
         for (const child of group.children) {
           if (ids.includes(child.id)) {
-            rebuilt.push(child);
+            rebuilt.push(child.id);
           }
         }
       }
@@ -120,7 +123,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
           items.value.splice(i, 1);
         }
 
-        const selectionIndex = selection.value.findIndex((item) => item.id === id);
+        const selectionIndex = selection.value.indexOf(id);
         if (selectionIndex !== -1) {
           selection.value.splice(selectionIndex, 1);
         }

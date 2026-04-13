@@ -1,4 +1,4 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 export function useTreeFilter(rawItems, options = {}) {
   const search = ref("");

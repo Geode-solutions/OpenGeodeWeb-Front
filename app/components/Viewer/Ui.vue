@@ -2,6 +2,10 @@
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu";
 import ViewerTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+import { useMenuStore } from "@ogw_front/stores/menu";
 
 const { displayMenu, containerWidth, containerHeight } = defineProps({
   displayMenu: { type: Boolean, required: true },

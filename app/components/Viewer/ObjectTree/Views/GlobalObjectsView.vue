@@ -1,4 +1,5 @@
 <script setup>
+import { watch, toRef } from "vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -31,9 +32,13 @@ watch(
     if (current === oldSelection) return;
 
     const { added, removed } = compareSelections(current, previous);
+    
+    // Get all valid object IDs from the tree to filter out category IDs
+    const allObjectIds = new Set(treeviewStore.items.flatMap(group => group.children.map(child => child.id)));
+
     const updates = [
-      ...added.map((id) => dataStyleStore.setVisibility(id, true)),
-      ...removed.map((id) => dataStyleStore.setVisibility(id, false)),
+      ...added.filter(id => allObjectIds.has(id)).map((id) => dataStyleStore.setVisibility(id, true)),
+      ...removed.filter(id => allObjectIds.has(id)).map((id) => dataStyleStore.setVisibility(id, false)),
     ];
     await Promise.all(updates);
     hybridViewerStore.remoteRender();
@@ -91,5 +96,17 @@ function isModel(item) {
 .transparent-treeview {
   background-color: transparent;
   margin: 4px 0;
+}
+
+:deep(.v-list-item) {
+  transition: background-color 0.2s ease;
+}
+
+:deep(.v-list-item--active > .v-list-item__overlay) {
+  opacity: 0 !important;
+}
+
+:deep(.v-list-item:hover > .v-list-item__overlay) {
+  opacity: 0.1 !important;
 }
 </style>

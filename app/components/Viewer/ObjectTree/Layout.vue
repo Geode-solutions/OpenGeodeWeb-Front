@@ -1,4 +1,5 @@
 <script setup>
+import { ref, computed, watch } from "vue";
 import GlobalObjectsView from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjectsView.vue";
 import ModelComponentsView from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponentsView.vue";
 import TreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
