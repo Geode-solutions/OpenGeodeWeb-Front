@@ -1,5 +1,4 @@
 <script setup>
-import { ref, computed, watch } from "vue";
 import GlobalObjectsView from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjectsView.vue";
 import ModelComponentsView from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponentsView.vue";
 import TreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
@@ -7,6 +6,10 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 200;
 const HEIGHT_MIN = 150;
+const GAP_WIDTH = 10;
+const PERCENT_100 = 100;
+
+const TOTAL_PERCENT = 100;
 
 const treeviewStore = useTreeviewStore();
 const emit = defineEmits(["show-menu"]);
@@ -16,19 +19,21 @@ const additionalViews = computed(() => treeviewStore.opened_views.slice(1));
 
 const totalWidth = computed(() => {
   const hasAdditional = additionalViews.value.length > 0;
-  const gap = hasAdditional ? 10 : 0;
+  const gap = hasAdditional ? GAP_WIDTH : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
   return `${treeviewStore.panelWidth + secondColWidth + gap}px`;
 });
 
 const rowHeights = ref([]);
-const draggedIndex = ref(null);
+const draggedIndex = ref(undefined);
 
 watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      rowHeights.value = new Array(newLength).fill(100 / newLength);
+      rowHeights.value = Array.from({ length: newLength }).fill(
+        PERCENT_100 / newLength,
+      );
     }
   },
   { immediate: true },
@@ -43,10 +48,10 @@ function onDragOver(event) {
 }
 
 function onDrop(targetIndex) {
-  if (draggedIndex.value !== null && draggedIndex.value !== targetIndex) {
+  if (draggedIndex.value !== undefined && draggedIndex.value !== targetIndex) {
     treeviewStore.moveView(draggedIndex.value, targetIndex);
   }
-  draggedIndex.value = null;
+  draggedIndex.value = undefined;
 }
 
 function onResizeStart(event) {
@@ -93,8 +98,8 @@ function onVerticalResizeStart(event, index) {
 
   function resize(move_event) {
     const deltaY = move_event.clientY - startY;
-    const deltaPercent = (deltaY / containerHeight) * 100;
-    const minHeightPercent = (HEIGHT_MIN / containerHeight) * 100;
+    const deltaPercent = (deltaY / containerHeight) * PERCENT_100;
+    const minHeightPercent = (HEIGHT_MIN / containerHeight) * PERCENT_100;
 
     let newH1 = startHeight1 + deltaPercent;
     let newH2 = startHeight2 - deltaPercent;
@@ -144,7 +149,11 @@ function onVerticalResizeStart(event, index) {
       </TreeBox>
     </div>
 
-    <div v-if="additionalViews.length > 0" class="column-separator" @mousedown="onResizeStart" />
+    <div
+      v-if="additionalViews.length > 0"
+      class="column-separator"
+      @mousedown="onResizeStart"
+    />
 
     <div
       v-if="additionalViews.length > 0"
@@ -157,7 +166,8 @@ function onVerticalResizeStart(event, index) {
         <div
           class="view-wrapper"
           :class="{
-            'drag-over': draggedIndex !== null && draggedIndex !== index + 1,
+            'drag-over':
+              draggedIndex !== undefined && draggedIndex !== index + 1,
           }"
           :style="{ flex: `0 0 ${rowHeights[index]}%` }"
           @dragover="onDragOver"
@@ -170,7 +180,10 @@ function onVerticalResizeStart(event, index) {
             @close="treeviewStore.closeView(index + 1)"
             @dragstart="onDragStart(index + 1)"
           >
-            <ModelComponentsView :id="view.id" @show-menu="emit('show-menu', $event)" />
+            <ModelComponentsView
+              :id="view.id"
+              @show-menu="emit('show-menu', $event)"
+            />
           </TreeBox>
         </div>
         <div
@@ -183,7 +196,9 @@ function onVerticalResizeStart(event, index) {
     <div
       class="total-resizer"
       @mousedown="
-        additionalViews.length > 0 ? onAdditionalResizeStart($event) : onResizeStart($event)
+        additionalViews.length > 0
+          ? onAdditionalResizeStart($event)
+          : onResizeStart($event)
       "
     />
   </div>
@@ -195,7 +210,7 @@ function onVerticalResizeStart(event, index) {
   z-index: 2;
   left: 0;
   top: 0;
-  height: calc(100vh - 100px); /* Adjust based on your header height */
+  height: calc(100vh - 100px);
   margin-top: 10px;
   margin-left: 10px;
   pointer-events: auto;

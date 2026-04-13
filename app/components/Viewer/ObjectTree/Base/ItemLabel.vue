@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+const { item, showTooltip } = defineProps({
   item: { type: Object, required: true },
   showTooltip: { type: Boolean, default: false },
 });

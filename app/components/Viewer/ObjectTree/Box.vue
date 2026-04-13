@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 
-const props = defineProps({
+const { title, closable, geode_object_type, mdiIcon } = defineProps({
   title: { type: String, required: true },
   closable: { type: Boolean, default: false },
   geode_object_type: { type: String, default: "" },
@@ -12,8 +12,8 @@ const props = defineProps({
 const emit = defineEmits(["close", "dragstart"]);
 
 const icon = computed(() => {
-  if (props.geode_object_type && geode_objects[props.geode_object_type]) {
-    return geode_objects[props.geode_object_type].image;
+  if (geode_object_type && geode_objects[geode_object_type]) {
+    return geode_objects[geode_object_type].image;
   }
   return undefined;
 });

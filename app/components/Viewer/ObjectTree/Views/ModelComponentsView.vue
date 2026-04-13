@@ -1,13 +1,12 @@
 <script setup>
+import TreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
+import TreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import { compareSelections } from "@ogw_front/utils/treeview";
 import { toRef } from "vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/useTreeFilter";
-import { compareSelections } from "@ogw_front/utils/treeview";
-
-import TreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
-import TreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 
 const { id } = defineProps({ id: { type: String, required: true } });
 const emit = defineEmits(["show-menu"]);
@@ -17,7 +16,9 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const items = dataStore.refFormatedMeshComponents(toRef(() => id));
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => id));
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(
+  toRef(() => id),
+);
 
 const {
   search,
@@ -33,7 +34,9 @@ async function onSelectionChange(current) {
   const previous = mesh_components_selection.value;
   const { added, removed } = compareSelections(current, previous);
 
-  if (added.length === 0 && removed.length === 0) return;
+  if (added.length === 0 && removed.length === 0) {
+    return;
+  }
 
   if (added.length > 0) {
     await dataStyleStore.setModelComponentsVisibility(id, added, true);

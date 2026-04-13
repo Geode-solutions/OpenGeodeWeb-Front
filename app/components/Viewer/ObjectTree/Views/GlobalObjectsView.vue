@@ -1,13 +1,12 @@
 <script setup>
-import { watch, toRef } from "vue";
-import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useTreeviewStore } from "@ogw_front/stores/treeview";
-import { useTreeFilter } from "@ogw_front/composables/useTreeFilter";
-import { compareSelections } from "@ogw_front/utils/treeview";
-
+import { toRef, watch } from "vue";
 import TreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import TreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import { compareSelections } from "@ogw_front/utils/treeview";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTreeFilter } from "@ogw_front/composables/useTreeFilter";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();
 const dataStyleStore = useDataStyleStore();
@@ -29,7 +28,9 @@ watch(
   () => treeviewStore.selection,
   async (current, previous) => {
     const oldSelection = previous || [];
-    if (current === oldSelection) return;
+    if (current === oldSelection) {
+      return;
+    }
 
     const { added, removed } = compareSelections(current, previous);
 

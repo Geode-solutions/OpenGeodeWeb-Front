@@ -1,8 +1,8 @@
 <script setup>
-import SearchBar from "@ogw_front/components/SearchBar.vue";
 import ActionButton from "@ogw_front/components/ActionButton.vue";
+import SearchBar from "@ogw_front/components/SearchBar.vue";
 
-const props = defineProps({
+const { search, sortType, filterOptions, availableFilterOptions } = defineProps({
   search: { type: String, required: true },
   sortType: { type: String, required: true },
   filterOptions: { type: Object, required: true },
