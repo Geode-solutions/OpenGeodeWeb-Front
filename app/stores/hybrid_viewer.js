@@ -37,7 +37,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const is_moving = ref(false);
   const zScale = ref(1);
   let viewStream = undefined;
-  const gridActor = undefined;
 
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
