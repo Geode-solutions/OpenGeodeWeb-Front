@@ -49,10 +49,7 @@ function onResizeStart(event) {
   function resize(move_event) {
     const deltaX = move_event.clientX - startX;
     const maxWidth = window.innerWidth * 0.8;
-    const newWidth = Math.max(
-      WIDTH_MIN,
-      Math.min(startWidth + deltaX, maxWidth),
-    );
+    const newWidth = Math.max(WIDTH_MIN, Math.min(startWidth + deltaX, maxWidth));
     treeviewStore.setPanelWidth(newWidth);
     document.body.style.userSelect = "none";
   }
