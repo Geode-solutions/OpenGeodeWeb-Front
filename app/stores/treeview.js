@@ -3,12 +3,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   const items = ref([]);
   const selection = ref([]);
-  const components_selection = ref([]);
-  const isAdditionnalTreeDisplayed = ref(false);
+  const opened_views = ref([{ type: "object", id: "main", title: "Objects" }]);
   const panelWidth = ref(PANEL_WIDTH);
-  const model_id = ref("");
-  const isTreeCollection = ref(false);
-  const selectedTree = ref(undefined);
   const isImporting = ref(false);
   const pendingSelectionIds = ref([]);
 
@@ -39,19 +35,35 @@ export const useTreeviewStore = defineStore("treeview", () => {
     selection.value.push(id);
   }
 
-  function displayAdditionalTree(id) {
-    isAdditionnalTreeDisplayed.value = true;
-    model_id.value = id;
+  function displayAdditionalTree(id, title) {
+    if (opened_views.value.some((view) => view.id === id)) {
+      return;
+    }
+    opened_views.value.push({
+      type: "component",
+      id,
+      title: title || id,
+    });
+  }
+
+  function closeView(index) {
+    if (index > 0) {
+      opened_views.value.splice(index, 1);
+    }
+  }
+
+  function moveView(fromIndex, toIndex) {
+    if (fromIndex === 0 || toIndex === 0) {
+      return;
+    }
+    const element = opened_views.value.splice(fromIndex, 1)[0];
+    opened_views.value.splice(toIndex, 0, element);
   }
 
   function displayFileTree() {
-    isAdditionnalTreeDisplayed.value = false;
+    opened_views.value = [{ type: "object", id: "main", title: "Objects" }];
   }
 
-  function toggleTreeView() {
-    isTreeCollection.value = !isTreeCollection.value;
-    console.log("Switched to", isTreeCollection.value ? "TreeCollection" : "TreeComponent");
-  }
 
   function setPanelWidth(width) {
     panelWidth.value = width;
@@ -60,21 +72,15 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function exportStores() {
     const selectionIds = selection.value.map((store) => store.id);
     return {
-      isAdditionnalTreeDisplayed: isAdditionnalTreeDisplayed.value,
+      opened_views: opened_views.value,
       panelWidth: panelWidth.value,
-      model_id: model_id.value,
-      isTreeCollection: isTreeCollection.value,
-      selectedTree: selectedTree.value,
       selectionIds,
     };
   }
 
   function importStores(snapshot) {
-    isAdditionnalTreeDisplayed.value = snapshot?.isAdditionnalTreeDisplayed || false;
+    opened_views.value = snapshot?.opened_views || [{ type: "object", id: "main", title: "Objects" }];
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
-    model_id.value = snapshot?.model_id || "";
-    isTreeCollection.value = snapshot?.isTreeCollection || false;
-    selectedTree.value = snapshot?.selectedTree || undefined;
 
     pendingSelectionIds.value =
       snapshot?.selectionIds || (snapshot?.selection || []).map((store) => store.id) || [];
@@ -127,26 +133,22 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function clear() {
     items.value = [];
     selection.value = [];
-    components_selection.value = [];
     pendingSelectionIds.value = [];
-    model_id.value = "";
-    selectedTree.value = undefined;
+    opened_views.value = [{ type: "object", id: "main", title: "Objects" }];
   }
 
   return {
     items,
     selection,
-    components_selection,
-    isAdditionnalTreeDisplayed,
+    opened_views,
     panelWidth,
-    model_id,
-    selectedTree,
     isImporting,
     addItem,
     removeItem,
     displayAdditionalTree,
+    closeView,
+    moveView,
     displayFileTree,
-    toggleTreeView,
     setPanelWidth,
     exportStores,
     importStores,

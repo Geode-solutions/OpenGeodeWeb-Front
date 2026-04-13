@@ -1,0 +1,95 @@
+<script setup>
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
+import { useTreeFilter } from "@ogw_front/composables/useTreeFilter";
+import { compareSelections } from "@ogw_front/utils/treeview";
+
+import TreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
+import TreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+
+const treeviewStore = useTreeviewStore();
+const dataStyleStore = useDataStyleStore();
+const hybridViewerStore = useHybridViewerStore();
+
+const emit = defineEmits(["show-menu"]);
+
+const {
+  search,
+  sortType,
+  filterOptions,
+  processedItems,
+  availableFilterOptions,
+  toggleSort,
+  customFilter,
+} = useTreeFilter(toRef(() => treeviewStore.items));
+
+watch(
+  () => treeviewStore.selection,
+  async (current, previous) => {
+    const oldSelection = previous || [];
+    if (current === oldSelection) return;
+
+    const { added, removed } = compareSelections(current, previous);
+    const updates = [
+      ...added.map((id) => dataStyleStore.setVisibility(id, true)),
+      ...removed.map((id) => dataStyleStore.setVisibility(id, false)),
+    ];
+    await Promise.all(updates);
+    hybridViewerStore.remoteRender();
+  },
+);
+
+function isModel(item) {
+  return item.viewer_type === "model";
+}
+</script>
+
+<template>
+  <div class="tree-view-container">
+    <TreeControls
+      v-model:search="search"
+      :sort-type="sortType"
+      :filter-options="filterOptions"
+      :available-filter-options="availableFilterOptions"
+      @toggle-sort="toggleSort"
+    />
+
+    <v-treeview
+      v-model:selected="treeviewStore.selection"
+      :items="processedItems"
+      :search="search"
+      :custom-filter="customFilter"
+      class="transparent-treeview"
+      item-value="id"
+      select-strategy="classic"
+      selectable
+    >
+      <template #title="{ item }">
+        <TreeItemLabel
+          :item="item"
+          @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
+        />
+      </template>
+
+      <template #append="{ item }">
+        <v-btn
+          v-if="isModel(item)"
+          icon="mdi-magnify-expand"
+          size="medium"
+          class="ml-8"
+          variant="text"
+          v-tooltip="'Model\'s mesh components'"
+          @click.stop="treeviewStore.displayAdditionalTree(item.id, item.title)"
+        />
+      </template>
+    </v-treeview>
+  </div>
+</template>
+
+<style scoped>
+.transparent-treeview {
+  background-color: transparent;
+  margin: 4px 0;
+}
+</style>
