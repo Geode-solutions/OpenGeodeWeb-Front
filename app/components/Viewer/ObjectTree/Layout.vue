@@ -138,7 +138,7 @@ function onVerticalResizeStart(event, index) {
           width: additionalViews.length > 0 ? `${mainColWidth}%` : '100%',
         }"
       >
-        <TreeBox :title="mainView.title">
+        <TreeBox :title="mainView.title" mdi-icon="mdi-file-tree-outline">
           <GlobalObjectsView @show-menu="emit('show-menu', $event)" />
         </TreeBox>
       </div>

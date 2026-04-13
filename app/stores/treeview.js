@@ -40,7 +40,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function displayAdditionalTree(id, title, geode_object_type) {
-    if (opened_views.value.some((view) => view.id === id)) {
+    const existingIndex = opened_views.value.findIndex((view) => view.id === id);
+    if (existingIndex !== -1) {
+      closeView(existingIndex);
       return;
     }
     opened_views.value.push({

@@ -33,7 +33,8 @@ const emit = defineEmits(["contextmenu"]);
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   cursor: pointer;
 }
 

@@ -6,6 +6,7 @@ const props = defineProps({
   title: { type: String, required: true },
   closable: { type: Boolean, default: false },
   geode_object_type: { type: String, default: "" },
+  mdiIcon: { type: String, default: "" },
 });
 
 const emit = defineEmits(["close", "dragstart"]);
@@ -21,7 +22,7 @@ const icon = computed(() => {
 <template>
   <v-card variant="outlined" class="tree-box d-flex flex-column">
     <v-card-title
-      class="tree-box-header pa-2 d-flex align-center"
+      class="tree-box-header d-flex align-center"
       :class="{ 'cursor-grab': closable }"
       :draggable="closable"
       @dragstart="emit('dragstart', $event)"
@@ -30,12 +31,19 @@ const icon = computed(() => {
         v-if="icon"
         :src="icon"
         width="24"
+        height="24"
         max-width="24"
         class="mr-2"
-        style="filter: brightness(0)"
+        style="filter: brightness(0); display: flex; align-items: center"
       />
-      <v-icon v-else-if="closable" size="small" class="mr-2">mdi-drag-variant</v-icon>
-      <span class="text-subtitle-2 font-weight-bold">{{ title }}</span>
+      <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <span
+        class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
+        style="height: 24px; line-height: 1"
+      >
+        {{ title }}
+      </span>
       <v-spacer />
       <v-btn
         v-if="closable"
@@ -62,7 +70,8 @@ const icon = computed(() => {
 }
 
 .tree-box-header {
-  min-height: 40px;
+  height: 40px !important;
+  padding: 0 8px !important;
   background-color: rgba(255, 255, 255, 0.1);
 }
 </style>
