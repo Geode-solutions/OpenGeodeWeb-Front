@@ -31,9 +31,7 @@ watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      rowHeights.value = Array.from({ length: newLength }).fill(
-        PERCENT_100 / newLength,
-      );
+      rowHeights.value = Array.from({ length: newLength }).fill(PERCENT_100 / newLength);
     }
   },
   { immediate: true },
@@ -149,11 +147,7 @@ function onVerticalResizeStart(event, index) {
       </TreeBox>
     </div>
 
-    <div
-      v-if="additionalViews.length > 0"
-      class="column-separator"
-      @mousedown="onResizeStart"
-    />
+    <div v-if="additionalViews.length > 0" class="column-separator" @mousedown="onResizeStart" />
 
     <div
       v-if="additionalViews.length > 0"
@@ -166,8 +160,7 @@ function onVerticalResizeStart(event, index) {
         <div
           class="view-wrapper"
           :class="{
-            'drag-over':
-              draggedIndex !== undefined && draggedIndex !== index + 1,
+            'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
           }"
           :style="{ flex: `0 0 ${rowHeights[index]}%` }"
           @dragover="onDragOver"
@@ -180,10 +173,7 @@ function onVerticalResizeStart(event, index) {
             @close="treeviewStore.closeView(index + 1)"
             @dragstart="onDragStart(index + 1)"
           >
-            <ModelComponentsView
-              :id="view.id"
-              @show-menu="emit('show-menu', $event)"
-            />
+            <ModelComponentsView :id="view.id" @show-menu="emit('show-menu', $event)" />
           </TreeBox>
         </div>
         <div
@@ -196,9 +186,7 @@ function onVerticalResizeStart(event, index) {
     <div
       class="total-resizer"
       @mousedown="
-        additionalViews.length > 0
-          ? onAdditionalResizeStart($event)
-          : onResizeStart($event)
+        additionalViews.length > 0 ? onAdditionalResizeStart($event) : onResizeStart($event)
       "
     />
   </div>
