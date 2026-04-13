@@ -32,13 +32,20 @@ watch(
     if (current === oldSelection) return;
 
     const { added, removed } = compareSelections(current, previous);
-    
-    // Get all valid object IDs from the tree to filter out category IDs
-    const allObjectIds = new Set(treeviewStore.items.flatMap(group => group.children.map(child => child.id)));
+
+    const allObjectIds = new Set(
+      treeviewStore.items.flatMap((group) =>
+        group.children.map((child) => child.id),
+      ),
+    );
 
     const updates = [
-      ...added.filter(id => allObjectIds.has(id)).map((id) => dataStyleStore.setVisibility(id, true)),
-      ...removed.filter(id => allObjectIds.has(id)).map((id) => dataStyleStore.setVisibility(id, false)),
+      ...added
+        .filter((id) => allObjectIds.has(id))
+        .map((id) => dataStyleStore.setVisibility(id, true)),
+      ...removed
+        .filter((id) => allObjectIds.has(id))
+        .map((id) => dataStyleStore.setVisibility(id, false)),
     ];
     await Promise.all(updates);
     hybridViewerStore.remoteRender();
@@ -85,7 +92,13 @@ function isModel(item) {
           class="ml-8"
           variant="text"
           v-tooltip="'Model\'s mesh components'"
-          @click.stop="treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type)"
+          @click.stop="
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+            )
+          "
         />
       </template>
     </v-treeview>
