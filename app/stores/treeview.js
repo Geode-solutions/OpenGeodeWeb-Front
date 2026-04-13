@@ -69,7 +69,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
     opened_views.value = [{ type: "object", id: "main", title: "Objects" }];
   }
 
-
   function setPanelWidth(width) {
     panelWidth.value = width;
   }
@@ -83,7 +82,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function importStores(snapshot) {
-    opened_views.value = snapshot?.opened_views || [{ type: "object", id: "main", title: "Objects" }];
+    opened_views.value = snapshot?.opened_views || [
+      { type: "object", id: "main", title: "Objects" },
+    ];
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
 
     pendingSelectionIds.value =
