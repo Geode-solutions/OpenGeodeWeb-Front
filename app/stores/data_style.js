@@ -62,9 +62,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const component_style_promises = Object.values(componentStylesSnapshot).map((style) =>
       database.model_component_datastyle.put(structuredClone(style)),
     );
-    const model_component_type_style_promises = Object.values(
-      modelComponentTypeStylesSnapshot,
-    ).map((style) => database.model_component_type_datastyle.put(structuredClone(style)));
+    const model_component_type_style_promises = Object.values(modelComponentTypeStylesSnapshot).map(
+      (style) => database.model_component_type_datastyle.put(structuredClone(style)),
+    );
 
     await Promise.all([
       ...style_promises,
