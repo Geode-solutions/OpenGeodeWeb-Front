@@ -160,10 +160,7 @@ function onVerticalResizeStart(event, index) {
               @close="treeviewStore.closeView(index + 1)"
               @dragstart="onDragStart(index + 1)"
             >
-              <ModelComponentsView
-                :id="view.id"
-                @show-menu="emit('show-menu', $event)"
-              />
+              <ModelComponentsView :id="view.id" @show-menu="emit('show-menu', $event)" />
             </TreeBox>
           </div>
           <div
