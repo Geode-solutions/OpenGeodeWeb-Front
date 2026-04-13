@@ -33,6 +33,19 @@ export function useDataStyleState() {
     return selection;
   });
 
+  const modelComponentTypeStyles = useObservable(
+    liveQuery(async () => {
+      const all = await database.model_component_type_datastyle.toArray();
+      const accumulator = {};
+      for (const style of all) {
+        const key = `${style.id_model}_${style.type}`;
+        accumulator[key] = style;
+      }
+      return accumulator;
+    }),
+    { initialValue: {} },
+  );
+
   const componentStyles = useObservable(
     liveQuery(async () => {
       const all = await database.model_component_datastyle.toArray();
@@ -69,6 +82,21 @@ export function useDataStyleState() {
     });
   }
 
+  function getModelComponentTypeStyle(id_model, type) {
+    const key = `${id_model}_${type}`;
+    return modelComponentTypeStyles.value[key] || {};
+  }
+
+  function mutateModelComponentTypeStyle(id_model, type, values) {
+    return database.model_component_type_datastyle.get([id_model, type]).then((style) => {
+      const model_component_type_style = style || { id_model, type };
+      merge(model_component_type_style, values);
+      return database.model_component_type_datastyle.put(
+        structuredClone(toRaw(model_component_type_style)),
+      );
+    });
+  }
+
   function mutateComponentStyles(id_model, id_components, values) {
     return database.model_component_datastyle
       .where("id_model")
@@ -91,17 +119,24 @@ export function useDataStyleState() {
   }
 
   function clear() {
-    return Promise.all([database.data_style.clear(), database.model_component_datastyle.clear()]);
+    return Promise.all([
+      database.data_style.clear(),
+      database.model_component_datastyle.clear(),
+      database.model_component_type_datastyle.clear(),
+    ]);
   }
 
   return {
     getStyle,
-    mutateStyle,
     getComponentStyle,
+    getModelComponentTypeStyle,
+    mutateStyle,
     mutateComponentStyle,
+    mutateModelComponentTypeStyle,
     mutateComponentStyles,
     styles,
     componentStyles,
+    modelComponentTypeStyles,
     objectVisibility,
     selectedObjects,
     clear,

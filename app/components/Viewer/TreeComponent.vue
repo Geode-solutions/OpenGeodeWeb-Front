@@ -127,9 +127,10 @@ async function onSelectionChange(current) {
         @contextmenu.prevent.stop="
           emit('show-menu', {
             event: $event,
-            itemId: item.id,
-            context_type: 'model_component',
+            itemId: item.category ? item.id : id,
+            context_type: item.category ? 'model_component' : 'model_component_type',
             modelId: id,
+            modelComponentType: item.category ? undefined : item.id,
           })
         "
       >

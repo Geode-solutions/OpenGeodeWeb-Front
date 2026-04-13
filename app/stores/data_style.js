@@ -45,12 +45,14 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     return {
       styles: dataStyleState.styles,
       componentStyles: dataStyleState.componentStyles,
+      modelComponentTypeStyles: dataStyleState.modelComponentTypeStyles,
     };
   }
 
   async function importStores(snapshot) {
     const stylesSnapshot = snapshot.styles;
     const componentStylesSnapshot = snapshot.componentStyles;
+    const modelComponentTypeStylesSnapshot = snapshot.modelComponentTypeStyles;
 
     await dataStyleState.clear();
 
@@ -60,8 +62,15 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const component_style_promises = Object.values(componentStylesSnapshot).map((style) =>
       database.model_component_datastyle.put(structuredClone(style)),
     );
+    const model_component_type_style_promises = Object.values(
+      modelComponentTypeStylesSnapshot,
+    ).map((style) => database.model_component_type_datastyle.put(structuredClone(style)));
 
-    await Promise.all([...style_promises, ...component_style_promises]);
+    await Promise.all([
+      ...style_promises,
+      ...component_style_promises,
+      ...model_component_type_style_promises,
+    ]);
   }
 
   function applyAllStylesFromState() {

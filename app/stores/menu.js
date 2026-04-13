@@ -117,6 +117,9 @@ const menusData = {
     Section: Section_menu,
     StructuralModel: StructuralModel_menu,
   },
+  model_component_type: {
+    type: ModelComponent_menu,
+  },
   model_component: {
     component: ModelComponent_menu,
   },

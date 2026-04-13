@@ -11,12 +11,21 @@ import { useModelPointsStyle } from "./points";
 import { useModelSurfacesStyle } from "./surfaces";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 
 const MESH_CONFIG = [{ type: "Corner" }, { type: "Line" }, { type: "Surface" }, { type: "Block" }];
 
 const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
+
+const brepDefaults = getDefaultStyle("BRep");
+const DEFAULT_MODEL_COMPONENT_TYPE_COLORS = {
+  Corner: brepDefaults.corners.color,
+  Line: brepDefaults.lines.color,
+  Surface: brepDefaults.surfaces.color,
+  Block: brepDefaults.blocks.color,
+};
 
 export function useModelStyle() {
   const dataStore = useDataStore();
@@ -47,7 +56,7 @@ export function useModelStyle() {
       }
 
       const typeKey = `${type.toLowerCase()}s`;
-      const defaultVisibility = groupStyles[typeKey].visibility;
+      const defaultVisibility = groupStyles[typeKey]?.visibility ?? true;
 
       let allVisible = true;
       for (const component of typeComponents) {
@@ -124,6 +133,23 @@ export function useModelStyle() {
 
   function getModelComponentColor(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).color;
+  }
+
+  function getModelComponentTypeColor(modelId, type) {
+    const style = dataStyleState.getModelComponentTypeStyle(modelId, type);
+    return style.color || DEFAULT_MODEL_COMPONENT_TYPE_COLORS[type] || { r: 255, g: 255, b: 255 };
+  }
+
+  async function setModelComponentTypeColor(modelId, type, color) {
+    await dataStyleState.mutateModelComponentTypeStyle(modelId, type, { color });
+    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+    const idsForType = allComponents
+      .filter((component) => component.type === type)
+      .map((component) => component.geode_id);
+    if (idsForType.length === 0) {
+      return;
+    }
+    return setModelComponentsColor(modelId, idsForType, color);
   }
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
@@ -218,6 +244,8 @@ export function useModelStyle() {
     setModelVisibility,
     setModelComponentsVisibility,
     getModelComponentColor,
+    getModelComponentTypeColor,
+    setModelComponentTypeColor,
     setModelComponentsColor,
     applyModelStyle,
     setModelMeshComponentsDefaultStyle,
