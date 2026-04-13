@@ -10,7 +10,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   // /** Functions **/
   function addItem(geode_object_type, name, id, viewer_type) {
-    const child = { title: name, id, viewer_type };
+    const child = { title: name, id, viewer_type, geode_object_type };
 
     for (let i = 0; i < items.value.length; i += 1) {
       if (items.value[i].title === geode_object_type) {
@@ -39,7 +39,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     selection.value.push(id);
   }
 
-  function displayAdditionalTree(id, title) {
+  function displayAdditionalTree(id, title, geode_object_type) {
     if (opened_views.value.some((view) => view.id === id)) {
       return;
     }
@@ -47,6 +47,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       type: "component",
       id,
       title: title || id,
+      geode_object_type,
     });
   }
 

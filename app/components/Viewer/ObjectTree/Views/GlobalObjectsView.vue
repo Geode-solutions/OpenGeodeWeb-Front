@@ -85,7 +85,7 @@ function isModel(item) {
           class="ml-8"
           variant="text"
           v-tooltip="'Model\'s mesh components'"
-          @click.stop="treeviewStore.displayAdditionalTree(item.id, item.title)"
+          @click.stop="treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type)"
         />
       </template>
     </v-treeview>

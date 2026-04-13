@@ -155,6 +155,7 @@ function onVerticalResizeStart(event, index) {
           >
             <TreeBox
               :title="view.title"
+              :geode_object_type="view.geode_object_type"
               closable
               @close="treeviewStore.closeView(index + 1)"
               @dragstart="onDragStart(index + 1)"
@@ -218,7 +219,7 @@ function onVerticalResizeStart(event, index) {
 
 .view-wrapper.drag-over {
   border: 2px dashed rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
+  border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.02);
 }
 
