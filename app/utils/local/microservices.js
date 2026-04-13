@@ -45,15 +45,6 @@ async function runScript(
   child.stdout.on("data", (data) => console.log(`[${execName}] ${data.toString()}`));
   child.stderr.on("data", (data) => console.log(`[${execName}] ${data.toString()}`));
 
-  child.on("error", async (error) => {
-    const electron = await import("electron");
-    electron.dialog.showMessageBox({
-      title: "Title",
-      type: "warning",
-      message: `Error occured.\r\n${error}`,
-    });
-  });
-
   child.on("close", (code) => console.log(`[${execName}] exited with code ${code}`));
   child.on("kill", () => {
     console.log(`[${execName}] process killed`);
