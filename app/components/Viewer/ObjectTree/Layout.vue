@@ -14,7 +14,13 @@ const emit = defineEmits(["show-menu"]);
 const mainView = computed(() => treeviewStore.opened_views[0]);
 const additionalViews = computed(() => treeviewStore.opened_views.slice(1));
 
-const mainColWidth = ref(50);
+const totalWidth = computed(() => {
+  const hasAdditional = additionalViews.value.length > 0;
+  const gap = hasAdditional ? 10 : 0;
+  const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
+  return `${treeviewStore.panelWidth + secondColWidth + gap}px`;
+});
+
 const rowHeights = ref([]);
 const draggedIndex = ref(null);
 
@@ -48,8 +54,7 @@ function onResizeStart(event) {
   const startX = event.clientX;
   function resize(move_event) {
     const deltaX = move_event.clientX - startX;
-    const maxWidth = window.innerWidth * 0.8;
-    const newWidth = Math.max(WIDTH_MIN, Math.min(startWidth + deltaX, maxWidth));
+    const newWidth = Math.max(WIDTH_MIN, startWidth + deltaX);
     treeviewStore.setPanelWidth(newWidth);
     document.body.style.userSelect = "none";
   }
@@ -62,13 +67,13 @@ function onResizeStart(event) {
   document.addEventListener("mouseup", stopResize);
 }
 
-function onSplitResizeStart(event) {
+function onAdditionalResizeStart(event) {
+  const startWidth = treeviewStore.additionalPanelWidth;
   const startX = event.clientX;
-  const startWidth = mainColWidth.value;
   function resize(move_event) {
     const deltaX = move_event.clientX - startX;
-    const deltaPercent = (deltaX / treeviewStore.panelWidth) * 100;
-    mainColWidth.value = Math.max(20, Math.min(startWidth + deltaPercent, 80));
+    const newWidth = Math.max(WIDTH_MIN, startWidth + deltaX);
+    treeviewStore.setAdditionalPanelWidth(newWidth);
     document.body.style.userSelect = "none";
   }
   function stopResize() {
@@ -80,6 +85,7 @@ function onSplitResizeStart(event) {
   document.addEventListener("mouseup", stopResize);
 }
 
+
 function onVerticalResizeStart(event, index) {
   const startY = event.clientY;
   const startHeight1 = rowHeights.value[index];
@@ -89,17 +95,17 @@ function onVerticalResizeStart(event, index) {
   function resize(move_event) {
     const deltaY = move_event.clientY - startY;
     const deltaPercent = (deltaY / containerHeight) * 100;
+    const minHeightPercent = (HEIGHT_MIN / containerHeight) * 100;
 
     let newH1 = startHeight1 + deltaPercent;
     let newH2 = startHeight2 - deltaPercent;
 
-    const MIN_HEIGHT = 10;
-    if (newH1 < MIN_HEIGHT) {
-      newH1 = MIN_HEIGHT;
-      newH2 = startHeight1 + startHeight2 - MIN_HEIGHT;
-    } else if (newH2 < MIN_HEIGHT) {
-      newH2 = MIN_HEIGHT;
-      newH1 = startHeight1 + startHeight2 - MIN_HEIGHT;
+    if (newH1 < minHeightPercent) {
+      newH1 = minHeightPercent;
+      newH2 = startHeight1 + startHeight2 - minHeightPercent;
+    } else if (newH2 < minHeightPercent) {
+      newH2 = minHeightPercent;
+      newH1 = startHeight1 + startHeight2 - minHeightPercent;
     }
 
     rowHeights.value[index] = newH1;
@@ -123,59 +129,62 @@ function onVerticalResizeStart(event, index) {
 <template>
   <div
     v-if="treeviewStore.items.length > 0"
-    class="treeview-container"
-    :style="{ width: `${treeviewStore.panelWidth}px` }"
+    class="treeview-container d-flex"
+    :style="{ width: totalWidth }"
     @contextmenu.prevent
     @mousedown.stop
   >
-    <div class="layout-root">
-      <div
-        class="column main-column"
-        :style="{
-          width: additionalViews.length > 0 ? `${mainColWidth}%` : '100%',
-        }"
-      >
-        <TreeBox :title="mainView.title" mdi-icon="mdi-file-tree-outline">
-          <GlobalObjectsView @show-menu="emit('show-menu', $event)" />
-        </TreeBox>
-      </div>
-
-      <div
-        v-if="additionalViews.length > 0"
-        class="h-split-resizer"
-        @mousedown="onSplitResizeStart"
-      />
-
-      <div v-if="additionalViews.length > 0" class="column additional-column">
-        <template v-for="(view, index) in additionalViews" :key="view.id">
-          <div
-            class="view-wrapper"
-            :class="{
-              'drag-over': draggedIndex !== null && draggedIndex !== index + 1,
-            }"
-            :style="{ flex: `0 0 ${rowHeights[index]}%` }"
-            @dragover="onDragOver"
-            @drop="onDrop(index + 1)"
-          >
-            <TreeBox
-              :title="view.title"
-              :geode_object_type="view.geode_object_type"
-              closable
-              @close="treeviewStore.closeView(index + 1)"
-              @dragstart="onDragStart(index + 1)"
-            >
-              <ModelComponentsView :id="view.id" @show-menu="emit('show-menu', $event)" />
-            </TreeBox>
-          </div>
-          <div
-            v-if="index < additionalViews.length - 1"
-            class="v-split-resizer"
-            @mousedown="onVerticalResizeStart($event, index)"
-          />
-        </template>
-      </div>
+    <div
+      class="column main-column"
+      :style="{
+        width: `${treeviewStore.panelWidth}px`,
+      }"
+    >
+      <TreeBox :title="mainView.title" mdi-icon="mdi-file-tree-outline">
+        <GlobalObjectsView @show-menu="emit('show-menu', $event)" />
+      </TreeBox>
     </div>
-    <div class="total-resizer" @mousedown="onResizeStart" />
+
+    <div v-if="additionalViews.length > 0" class="column-separator" @mousedown="onResizeStart" />
+
+    <div
+      v-if="additionalViews.length > 0"
+      class="column additional-column"
+      :style="{
+        width: `${treeviewStore.additionalPanelWidth}px`,
+      }"
+    >
+      <template v-for="(view, index) in additionalViews" :key="view.id">
+        <div
+          class="view-wrapper"
+          :class="{
+            'drag-over': draggedIndex !== null && draggedIndex !== index + 1,
+          }"
+          :style="{ flex: `0 0 ${rowHeights[index]}%` }"
+          @dragover="onDragOver"
+          @drop="onDrop(index + 1)"
+        >
+          <TreeBox
+            :title="view.title"
+            :geode_object_type="view.geode_object_type"
+            closable
+            @close="treeviewStore.closeView(index + 1)"
+            @dragstart="onDragStart(index + 1)"
+          >
+            <ModelComponentsView :id="view.id" @show-menu="emit('show-menu', $event)" />
+          </TreeBox>
+        </div>
+        <div
+          v-if="index < additionalViews.length - 1"
+          class="v-split-resizer"
+          @mousedown="onVerticalResizeStart($event, index)"
+        />
+      </template>
+    </div>
+    <div
+      class="total-resizer"
+      @mousedown="additionalViews.length > 0 ? onAdditionalResizeStart($event) : onResizeStart($event)"
+    />
   </div>
 </template>
 
@@ -189,19 +198,22 @@ function onVerticalResizeStart(event, index) {
   margin-top: 10px;
   margin-left: 10px;
   pointer-events: auto;
+  width: max-content;
+  min-width: min-content;
 }
 
 .layout-root {
   display: flex;
   height: 100%;
-  width: 100%;
 }
 
 .column {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
 }
 
 .main-column {
@@ -209,13 +221,14 @@ function onVerticalResizeStart(event, index) {
 }
 
 .additional-column {
-  flex: 1;
+  flex-shrink: 0;
 }
 
 .view-wrapper {
   overflow: hidden;
   padding: 2px;
   transition: transform 0.2s;
+  min-height: 150px;
 }
 
 .view-wrapper.drag-over {
@@ -224,15 +237,20 @@ function onVerticalResizeStart(event, index) {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
-.h-split-resizer {
+.column-separator {
   width: 6px;
-  position: relative;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  margin: 0 2px;
   cursor: ew-resize;
-  background-color: transparent;
-  z-index: 5;
+  position: relative;
 }
 
-.h-split-resizer::after {
+.column-separator:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.column-separator::after {
   content: "";
   position: absolute;
   top: 10%;
@@ -241,13 +259,6 @@ function onVerticalResizeStart(event, index) {
   width: 2px;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 1px;
-  transition: background-color 0.2s;
-}
-
-.h-split-resizer:hover::after {
-  background-color: rgba(0, 0, 0, 0.4);
-  width: 3px;
-  left: 1.5px;
 }
 
 .v-split-resizer {

@@ -5,6 +5,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const selection = ref([]);
   const opened_views = ref([{ type: "object", id: "main", title: "Objects" }]);
   const panelWidth = ref(PANEL_WIDTH);
+  const additionalPanelWidth = ref(PANEL_WIDTH);
   const isImporting = ref(false);
   const pendingSelectionIds = ref([]);
 
@@ -45,6 +46,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       closeView(existingIndex);
       return;
     }
+    additionalPanelWidth.value = panelWidth.value;
     opened_views.value.push({
       type: "component",
       id,
@@ -74,11 +76,15 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function setPanelWidth(width) {
     panelWidth.value = width;
   }
+  function setAdditionalPanelWidth(width) {
+    additionalPanelWidth.value = width;
+  }
 
   function exportStores() {
     return {
       opened_views: opened_views.value,
       panelWidth: panelWidth.value,
+      additionalPanelWidth: additionalPanelWidth.value,
       selectionIds: selection.value,
     };
   }
@@ -88,6 +94,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       { type: "object", id: "main", title: "Objects" },
     ];
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
+    additionalPanelWidth.value = snapshot?.additionalPanelWidth || PANEL_WIDTH;
 
     pendingSelectionIds.value =
       snapshot?.selectionIds || (snapshot?.selection || []).map((sel) => sel.id || sel) || [];
@@ -149,6 +156,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     selection,
     opened_views,
     panelWidth,
+    additionalPanelWidth,
     isImporting,
     addItem,
     removeItem,
@@ -157,6 +165,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     moveView,
     displayFileTree,
     setPanelWidth,
+    setAdditionalPanelWidth,
     exportStores,
     importStores,
     finalizeImportSelection,
