@@ -1,4 +1,5 @@
 import { database } from "@ogw_internal/database/database";
+import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { liveQuery } from "dexie";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -11,7 +12,6 @@ import { useModelPointsStyle } from "./points";
 import { useModelSurfacesStyle } from "./surfaces";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 

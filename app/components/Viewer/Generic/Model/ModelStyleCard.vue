@@ -1,9 +1,9 @@
 <script setup>
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useDataStore } from "@ogw_front/stores/data";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -16,16 +16,16 @@ const { itemProps } = defineProps({
 const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
 const componentId = computed(() => itemProps.meta_data.pickedComponentId);
 
-const component_type = ref(null);
+const component_type = ref(undefined);
 
 watchEffect(async () => {
   if (itemProps.meta_data.viewer_type === "model_component_type") {
     component_type.value = itemProps.meta_data.modelComponentType;
   } else if (componentId.value && modelId.value) {
     const type = await dataStore.meshComponentType(modelId.value, componentId.value);
-    component_type.value = type || null;
+    component_type.value = type;
   } else {
-    component_type.value = null;
+    component_type.value = undefined;
   }
 });
 
@@ -64,7 +64,9 @@ const modelComponentTypeColor = computed({
 });
 
 const modelComponentTypeLabel = computed(() => {
-  if (!component_type.value) return "";
+  if (!component_type.value) {
+    return "";
+  }
   return `${component_type.value}s Options`;
 });
 </script>
