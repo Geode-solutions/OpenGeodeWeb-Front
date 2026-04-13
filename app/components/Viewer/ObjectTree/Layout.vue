@@ -14,8 +14,8 @@ const emit = defineEmits(["show-menu"]);
 const mainView = computed(() => treeviewStore.opened_views[0]);
 const additionalViews = computed(() => treeviewStore.opened_views.slice(1));
 
-const mainColWidth = ref(50); // percentage
-const rowHeights = ref([]); // percentages of the second column height
+const mainColWidth = ref(50);
+const rowHeights = ref([]);
 const draggedIndex = ref(null);
 
 watch(
@@ -49,7 +49,10 @@ function onResizeStart(event) {
   function resize(move_event) {
     const deltaX = move_event.clientX - startX;
     const maxWidth = window.innerWidth * 0.8;
-    const newWidth = Math.max(WIDTH_MIN, Math.min(startWidth + deltaX, maxWidth));
+    const newWidth = Math.max(
+      WIDTH_MIN,
+      Math.min(startWidth + deltaX, maxWidth),
+    );
     treeviewStore.setPanelWidth(newWidth);
     document.body.style.userSelect = "none";
   }
@@ -93,7 +96,7 @@ function onVerticalResizeStart(event, index) {
     let newH1 = startHeight1 + deltaPercent;
     let newH2 = startHeight2 - deltaPercent;
 
-    const MIN_HEIGHT = 10; // percent
+    const MIN_HEIGHT = 10;
     if (newH1 < MIN_HEIGHT) {
       newH1 = MIN_HEIGHT;
       newH2 = startHeight1 + startHeight2 - MIN_HEIGHT;
@@ -131,7 +134,9 @@ function onVerticalResizeStart(event, index) {
     <div class="layout-root">
       <div
         class="column main-column"
-        :style="{ width: additionalViews.length > 0 ? `${mainColWidth}%` : '100%' }"
+        :style="{
+          width: additionalViews.length > 0 ? `${mainColWidth}%` : '100%',
+        }"
       >
         <TreeBox :title="mainView.title">
           <GlobalObjectsView @show-menu="emit('show-menu', $event)" />
@@ -148,7 +153,9 @@ function onVerticalResizeStart(event, index) {
         <template v-for="(view, index) in additionalViews" :key="view.id">
           <div
             class="view-wrapper"
-            :class="{ 'drag-over': draggedIndex !== null && draggedIndex !== index + 1 }"
+            :class="{
+              'drag-over': draggedIndex !== null && draggedIndex !== index + 1,
+            }"
             :style="{ flex: `0 0 ${rowHeights[index]}%` }"
             @dragover="onDragOver"
             @drop="onDrop(index + 1)"
