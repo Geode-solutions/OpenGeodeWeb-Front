@@ -85,7 +85,6 @@ function onAdditionalResizeStart(event) {
   document.addEventListener("mouseup", stopResize);
 }
 
-
 function onVerticalResizeStart(event, index) {
   const startY = event.clientY;
   const startHeight1 = rowHeights.value[index];
@@ -183,7 +182,9 @@ function onVerticalResizeStart(event, index) {
     </div>
     <div
       class="total-resizer"
-      @mousedown="additionalViews.length > 0 ? onAdditionalResizeStart($event) : onResizeStart($event)"
+      @mousedown="
+        additionalViews.length > 0 ? onAdditionalResizeStart($event) : onResizeStart($event)
+      "
     />
   </div>
 </template>
