@@ -98,24 +98,25 @@ export function useDataStyleState() {
   }
 
   function mutateComponentStyles(id_model, id_components, values) {
-    return database.model_component_datastyle
-      .where("id_model")
-      .equals(id_model)
-      .toArray()
-      .then((all_styles) => {
-        const style_map = {};
-        for (const style of all_styles) {
-          style_map[style.id_component] = style;
-        }
+    return database.transaction("rw", database.model_component_datastyle, async () => {
+      const all_styles = await database.model_component_datastyle
+        .where("id_model")
+        .equals(id_model)
+        .toArray();
 
-        const updates = id_components.map((id_component) => {
-          const style = style_map[id_component] || { id_model, id_component };
-          merge(style, values);
-          return toRaw(style);
-        });
+      const style_map = {};
+      for (const style of all_styles) {
+        style_map[style.id_component] = style;
+      }
 
-        return database.model_component_datastyle.bulkPut(structuredClone(updates));
+      const updates = id_components.map((id_component) => {
+        const style = style_map[id_component] || { id_model, id_component };
+        merge(style, values);
+        return toRaw(style);
       });
+
+      return database.model_component_datastyle.bulkPut(structuredClone(updates));
+    });
   }
 
   function clear() {

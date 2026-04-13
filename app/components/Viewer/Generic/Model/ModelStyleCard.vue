@@ -18,6 +18,10 @@ const componentId = computed(() => itemProps.meta_data.pickedComponentId);
 
 const component_type = ref(undefined);
 
+const modelCollapsed = ref(false);
+const typeCollapsed = ref(false);
+const componentCollapsed = ref(false);
+
 watchEffect(async () => {
   if (itemProps.meta_data.viewer_type === "model_component_type") {
     component_type.value = itemProps.meta_data.modelComponentType;
@@ -42,9 +46,9 @@ const componentColor = computed({
     componentId.value
       ? dataStyleStore.getModelComponentColor(modelId.value, componentId.value)
       : undefined,
-  set: (newValue) => {
+  set: async (newValue) => {
     if (componentId.value) {
-      dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], newValue);
+      await dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], newValue);
       hybridViewerStore.remoteRender();
     }
   },
@@ -55,9 +59,13 @@ const modelComponentTypeColor = computed({
     component_type.value
       ? dataStyleStore.getModelComponentTypeColor(modelId.value, component_type.value)
       : undefined,
-  set: (newValue) => {
+  set: async (newValue) => {
     if (component_type.value) {
-      dataStyleStore.setModelComponentTypeColor(modelId.value, component_type.value, newValue);
+      await dataStyleStore.setModelComponentTypeColor(
+        modelId.value,
+        component_type.value,
+        newValue,
+      );
       hybridViewerStore.remoteRender();
     }
   },
@@ -74,23 +82,38 @@ const modelComponentTypeLabel = computed(() => {
 <template>
   <div class="model-style-card">
     <div class="options-section">
-      <div class="section-badge">Model Options</div>
-      <v-container class="pa-2">
+      <div class="section-badge" @click="modelCollapsed = !modelCollapsed">
+        Model Options
+        <v-icon class="collapse-icon" :class="{ rotated: modelCollapsed }" size="12">
+          mdi-chevron-down
+        </v-icon>
+      </div>
+      <v-container v-show="!modelCollapsed" class="pa-2">
         <VisibilitySwitch v-model="modelVisibility" />
       </v-container>
     </div>
 
     <div v-if="component_type" class="options-section mt-6">
-      <div class="section-badge">{{ modelComponentTypeLabel }}</div>
-      <v-container class="pa-2">
+      <div class="section-badge" @click="typeCollapsed = !typeCollapsed">
+        {{ modelComponentTypeLabel }}
+        <v-icon class="collapse-icon" :class="{ rotated: typeCollapsed }" size="12">
+          mdi-chevron-down
+        </v-icon>
+      </div>
+      <v-container v-show="!typeCollapsed" class="pa-2">
         <div class="text-caption mb-1">Color</div>
         <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
       </v-container>
     </div>
 
     <div v-if="componentId" class="options-section mt-6">
-      <div class="section-badge">Component Options</div>
-      <v-container class="pa-2">
+      <div class="section-badge" @click="componentCollapsed = !componentCollapsed">
+        Component Options
+        <v-icon class="collapse-icon" :class="{ rotated: componentCollapsed }" size="12">
+          mdi-chevron-down
+        </v-icon>
+      </div>
+      <v-container v-show="!componentCollapsed" class="pa-2">
         <div class="text-caption mb-1">Color</div>
         <ViewerOptionsColorPicker v-model="componentColor" />
       </v-container>
@@ -126,6 +149,23 @@ const modelComponentTypeLabel = computed(() => {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.section-badge:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.collapse-icon {
+  transition: transform 0.2s ease;
+}
+
+.collapse-icon.rotated {
+  transform: rotate(-90deg);
 }
 
 .v-theme--light .options-section {
