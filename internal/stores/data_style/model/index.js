@@ -1,5 +1,6 @@
 import { database } from "@ogw_internal/database/database";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
+import { getDeterministicColor } from "@ogw_front/utils/color";
 import { liveQuery } from "dexie";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -132,16 +133,34 @@ export function useModelStyle() {
   }
 
   function getModelComponentColor(modelId, componentId) {
-    return dataStyleState.getComponentStyle(modelId, componentId).color;
+    const style = dataStyleState.getComponentStyle(modelId, componentId);
+    if (style.color_mode === "random") {
+      return getDeterministicColor(componentId);
+    }
+    return style.color;
+  }
+
+  function getModelComponentColorMode(modelId, componentId) {
+    return dataStyleState.getComponentStyle(modelId, componentId).color_mode || "default";
   }
 
   function getModelComponentTypeColor(modelId, type) {
     const style = dataStyleState.getModelComponentTypeStyle(modelId, type);
-    return style.color || DEFAULT_MODEL_COMPONENT_TYPE_COLORS[type] || { r: 255, g: 255, b: 255 };
+    if (style.color_mode === "random") {
+      return { r: 128, g: 128, b: 128 };
+    }
+    return style.color || DEFAULT_MODEL_COMPONENT_TYPE_COLORS[type];
+  }
+
+  function getModelComponentTypeColorMode(modelId, type) {
+    return dataStyleState.getModelComponentTypeStyle(modelId, type).color_mode || "default";
   }
 
   async function setModelComponentTypeColor(modelId, type, color) {
-    await dataStyleState.mutateModelComponentTypeStyle(modelId, type, { color });
+    await dataStyleState.mutateModelComponentTypeStyle(modelId, type, {
+      color,
+      color_mode: "default",
+    });
     const allComponents = await database.model_components.where("id").equals(modelId).toArray();
     const idsForType = allComponents
       .filter((component) => component.type === type)
@@ -150,6 +169,24 @@ export function useModelStyle() {
       return;
     }
     return setModelComponentsColor(modelId, idsForType, color);
+  }
+
+  async function setModelComponentTypeColorMode(modelId, type, color_mode) {
+    await dataStyleState.mutateModelComponentTypeStyle(modelId, type, { color_mode });
+    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+    const idsForType = allComponents
+      .filter((component) => component.type === type)
+      .map((component) => component.geode_id);
+    if (idsForType.length === 0) {
+      return;
+    }
+    await dataStyleState.mutateComponentStyles(modelId, idsForType, { color_mode });
+    return applyModelStyle(modelId);
+  }
+
+  async function setModelComponentColorMode(modelId, componentId, color_mode) {
+    await dataStyleState.mutateComponentStyle(modelId, componentId, { color_mode });
+    return applyModelStyle(modelId);
   }
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
@@ -185,6 +222,15 @@ export function useModelStyle() {
     const componentsMap = Object.fromEntries(
       allComponents.map((component) => [component.geode_id, component]),
     );
+
+    // If a color is explicitly provided, we ensure the mode is 'default' for these components
+    if (color) {
+      await dataStyleState.mutateComponentStyles(modelId, componentIds, {
+        color,
+        color_mode: "default",
+      });
+    }
+
     const handlers = {
       Corner: (ids) => modelCornersStyleStore.setModelCornersColor(modelId, ids, color),
       Line: (ids) => modelLinesStyleStore.setModelLinesColor(modelId, ids, color),
@@ -246,7 +292,11 @@ export function useModelStyle() {
     getModelComponentColor,
     getModelComponentTypeColor,
     setModelComponentTypeColor,
+    setModelComponentTypeColorMode,
+    setModelComponentColorMode,
     setModelComponentsColor,
+    getModelComponentColorMode,
+    getModelComponentTypeColorMode,
     applyModelStyle,
     setModelMeshComponentsDefaultStyle,
     ...modelBlocksStyleStore,

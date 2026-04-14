@@ -1,4 +1,5 @@
 // Local imports
+import { getDeterministicColor } from "@ogw_front/utils/color";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesColorStyle } from "./color";
 import { useModelLinesCommonStyle } from "./common";
@@ -32,7 +33,11 @@ export function useModelLinesStyle() {
       }
       visibilityGroups[vKey].push(line_id);
 
-      const cKey = JSON.stringify(style.color);
+      let { color } = style;
+      if (style.color_mode === "random") {
+        color = getDeterministicColor(line_id);
+      }
+      const cKey = JSON.stringify(color);
       if (!colorGroups[cKey]) {
         colorGroups[cKey] = [];
       }

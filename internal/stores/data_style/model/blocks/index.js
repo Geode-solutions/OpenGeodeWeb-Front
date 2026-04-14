@@ -1,4 +1,5 @@
 // Local imports
+import { getDeterministicColor } from "@ogw_front/utils/color";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColorStyle } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
@@ -31,7 +32,11 @@ export function useModelBlocksStyle() {
       }
       visibilityGroups[vKey].push(block_id);
 
-      const cKey = JSON.stringify(style.color);
+      let { color } = style;
+      if (style.color_mode === "random") {
+        color = getDeterministicColor(block_id);
+      }
+      const cKey = JSON.stringify(color);
       if (!colorGroups[cKey]) {
         colorGroups[cKey] = [];
       }

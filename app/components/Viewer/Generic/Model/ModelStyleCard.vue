@@ -89,6 +89,41 @@ const modelComponentTypeColor = computed({
   },
 });
 
+const colorModes = [
+  { title: "Default", value: "default" },
+  { title: "Random", value: "random" },
+];
+
+const modelComponentTypeColorMode = computed({
+  get: () =>
+    component_type.value
+      ? dataStyleStore.getModelComponentTypeColorMode(modelId.value, component_type.value)
+      : "default",
+  set: async (value) => {
+    if (component_type.value) {
+      await dataStyleStore.setModelComponentTypeColorMode(
+        modelId.value,
+        component_type.value,
+        value,
+      );
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
+const componentColorMode = computed({
+  get: () =>
+    componentId.value
+      ? dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value)
+      : "default",
+  set: async (value) => {
+    if (componentId.value) {
+      await dataStyleStore.setModelComponentColorMode(modelId.value, componentId.value, value);
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
 const modelComponentTypeLabel = computed(() => {
   if (!component_type.value) {
     return "";
@@ -120,8 +155,20 @@ const modelComponentTypeLabel = computed(() => {
       </div>
       <v-container v-show="!typeCollapsed" class="pa-2">
         <VisibilitySwitch v-model="modelComponentTypeVisibility" />
-        <div class="text-caption mb-1 mt-2">Color</div>
-        <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
+        <div class="text-caption mb-1 mt-2">Color Mode</div>
+        <v-select
+          v-model="modelComponentTypeColorMode"
+          :items="colorModes"
+          density="compact"
+          hide-details
+          class="mb-3"
+          variant="outlined"
+        />
+
+        <template v-if="modelComponentTypeColorMode === 'default' && modelComponentTypeColor">
+          <div class="text-caption mb-1">Color</div>
+          <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
+        </template>
       </v-container>
     </div>
 
@@ -134,8 +181,20 @@ const modelComponentTypeLabel = computed(() => {
       </div>
       <v-container v-show="!componentCollapsed" class="pa-2">
         <VisibilitySwitch v-model="componentVisibility" />
-        <div class="text-caption mb-1 mt-2">Color</div>
-        <ViewerOptionsColorPicker v-model="componentColor" />
+        <div class="text-caption mb-1 mt-2">Color Mode</div>
+        <v-select
+          v-model="componentColorMode"
+          :items="colorModes"
+          density="compact"
+          hide-details
+          class="mb-3"
+          variant="outlined"
+        />
+
+        <template v-if="componentColorMode === 'default' && componentColor">
+          <div class="text-caption mb-1">Color</div>
+          <ViewerOptionsColorPicker v-model="componentColor" />
+        </template>
       </v-container>
     </div>
   </div>

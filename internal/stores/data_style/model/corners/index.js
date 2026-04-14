@@ -1,8 +1,10 @@
 // Local imports
+import { getDeterministicColor } from "@ogw_front/utils/color";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersColorStyle } from "./color";
 import { useModelCornersCommonStyle } from "./common";
 import { useModelCornersVisibilityStyle } from "./visibility";
+
 async function setModelCornersDefaultStyle(_id) {
   // Placeholder
 }
@@ -34,7 +36,11 @@ export function useModelCornersStyle() {
       visibilityGroups[vKey].push(corner_id);
 
       // Group by color
-      const cKey = JSON.stringify(style.color);
+      let { color } = style;
+      if (style.color_mode === "random") {
+        color = getDeterministicColor(corner_id);
+      }
+      const cKey = JSON.stringify(color);
       if (!colorGroups[cKey]) {
         colorGroups[cKey] = [];
       }
