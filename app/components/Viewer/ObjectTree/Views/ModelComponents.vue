@@ -1,6 +1,6 @@
 <script setup>
-import TreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
-import TreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
+import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -15,7 +15,9 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const items = dataStore.refFormatedMeshComponents(toRef(() => id));
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => id));
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(
+  toRef(() => id),
+);
 
 const {
   search,
@@ -47,7 +49,7 @@ async function onSelectionChange(current) {
 
 <template>
   <div class="tree-view-container">
-    <TreeControls
+    <ObjectTreeControls
       v-model:search="search"
       :sort-type="sortType"
       :filter-options="filterOptions"
@@ -67,7 +69,7 @@ async function onSelectionChange(current) {
       @update:selected="onSelectionChange"
     >
       <template #title="{ item }">
-        <TreeItemLabel
+        <ObjectTreeItemLabel
           :item="item"
           show-tooltip
           @contextmenu="

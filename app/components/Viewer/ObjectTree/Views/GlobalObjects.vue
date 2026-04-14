@@ -1,6 +1,6 @@
 <script setup>
-import TreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
-import TreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
+import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -34,7 +34,9 @@ watch(
     const { added, removed } = compareSelections(current, previous);
 
     const allObjectIds = new Set(
-      treeviewStore.items.flatMap((group) => group.children.map((child) => child.id)),
+      treeviewStore.items.flatMap((group) =>
+        group.children.map((child) => child.id),
+      ),
     );
 
     const updates = [
@@ -57,7 +59,7 @@ function isModel(item) {
 
 <template>
   <div class="tree-view-container">
-    <TreeControls
+    <ObjectTreeControls
       v-model:search="search"
       :sort-type="sortType"
       :filter-options="filterOptions"
@@ -76,7 +78,7 @@ function isModel(item) {
       selectable
     >
       <template #title="{ item }">
-        <TreeItemLabel
+        <ObjectTreeItemLabel
           :item="item"
           @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
         />
@@ -91,7 +93,11 @@ function isModel(item) {
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
-            treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type)
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+            )
           "
         />
       </template>

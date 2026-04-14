@@ -22,7 +22,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       if (item.title === geodeObjectType) {
         item.children.push(child);
         const opt = { numeric: true, sensitivity: "base" };
-        item.children.sort((el1, el2) => el1.title.localeCompare(el2.title, undefined, opt));
+        item.children.sort((childA, childB) => childA.title.localeCompare(childB.title, undefined, opt));
         found = true;
         break;
       }
@@ -30,7 +30,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     if (!found) {
       items.value.push({ id: geodeObjectType, title: geodeObjectType, children: [child] });
       const sortOpt = { numeric: true, sensitivity: "base" };
-      items.value.sort((el1, el2) => el1.title.localeCompare(el2.title, undefined, sortOpt));
+      items.value.sort((groupA, groupB) => groupA.title.localeCompare(groupB.title, undefined, sortOpt));
     }
     selection.value.push(id);
   }
@@ -107,6 +107,27 @@ export const useTreeviewStore = defineStore("treeview", () => {
     opened_views.value = [{ type: "object", id: "main", title: "Objects" }];
   }
 
+  function displayFileTree() {
+    opened_views.value = [{ type: "object", id: "main", title: "Objects" }];
+  }
+
+  function setPanelWidth(width) {
+    panelWidth.value = width;
+  }
+
+  function setAdditionalPanelWidth(width) {
+    additionalPanelWidth.value = width;
+  }
+
+  function exportStores() {
+    return {
+      opened_views: opened_views.value,
+      panelWidth: panelWidth.value,
+      additionalPanelWidth: additionalPanelWidth.value,
+      selectionIds: selection.value,
+    };
+  }
+
   return {
     items,
     selection,
@@ -120,16 +141,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
     closeView,
     moveView,
     importStores,
-    displayFileTree: () =>
-      (opened_views.value = [{ type: "object", id: "main", title: "Objects" }]),
-    setPanelWidth: (width) => (panelWidth.value = width),
-    setAdditionalPanelWidth: (width) => (additionalPanelWidth.value = width),
-    exportStores: () => ({
-      opened_views: opened_views.value,
-      panelWidth: panelWidth.value,
-      additionalPanelWidth: additionalPanelWidth.value,
-      selectionIds: selection.value,
-    }),
+    displayFileTree,
+    setPanelWidth,
+    setAdditionalPanelWidth,
+    exportStores,
     finalizeImportSelection,
     clear,
   };
