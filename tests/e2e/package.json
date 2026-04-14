@@ -1,0 +1,8 @@
+{
+  "name": "@geode/opengeodeweb-front/tests/e2e",
+  "version": "0.0.0",
+  "scripts": {
+    "build:browser": "cross-env MODE=BROWSER nuxi build",
+    "dev": "cross-env MODE=BROWSER nuxt dev"
+  }
+}

@@ -7,7 +7,7 @@ import { serverCleanup, serverSetup } from "./commands.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-// import HybridRenderingView from "@ogw_front/components/HybridRenderingView.vue";
+import HybridRenderingView from "@ogw_front/components/HybridRenderingView.vue";
 
 // Local constants
 const INTERVAL_TIMEOUT = 60_000;
@@ -21,8 +21,6 @@ let id = "",
   projectFolderPath = "";
 
 beforeAll(async () => {
-  id = "";
-  projectFolderPath = "";
   ({ id, projectFolderPath } = await serverSetup(file_name, geode_object));
 }, INTERVAL_TIMEOUT);
 
@@ -50,12 +48,12 @@ describe("Mesh cells", () => {
       );
       expect(dataStyleStore.meshCellsVisibility(id)).toBe(visibility);
 
-      // const hybridRenderingView = await render(HybridRenderingView, {
-      //   global: {
-      //     plugins: [vuetify],
-      //   },
-      // });
-      // await expect(hybridRenderingView.container).toMatchScreenshot();
+      const hybridRenderingView = await render(HybridRenderingView, {
+        global: {
+          plugins: [vuetify],
+        },
+      });
+      await expect(hybridRenderingView.container).toMatchScreenshot();
     });
   });
 });

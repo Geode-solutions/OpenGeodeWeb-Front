@@ -3,31 +3,41 @@ import path from "node:path";
 
 // Local imports
 import package_json from "./package.json";
+import { SourceMap } from "node:module";
 
 const __dirname = import.meta.dirname;
+
+const sharedAlias = {
+  "@ogw_front": path.resolve(__dirname, "app"),
+  "@ogw_internal": path.resolve(__dirname, "internal"),
+  "@ogw_server": path.resolve(__dirname, "server"),
+  "@ogw_tests": path.resolve(__dirname, "tests"),
+};
 
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       COMMAND_BACK: "opengeodeweb-back",
       COMMAND_VIEWER: "opengeodeweb-viewer",
+      DATA_FOLDER_PATH: path.join("tests", "integration", "data", "uploads"),
       NUXT_ROOT_PATH: __dirname,
       MODE: process.env.MODE || "CLOUD",
       PROJECT: package_json.name,
     },
   },
 
-  modules: [["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }], "@vueuse/nuxt"],
+  modules: [
+    ["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }],
+    "@vueuse/nuxt",
+    "vuetify-nuxt-module",
+  ],
   imports: {
     scan: false,
   },
 
-  alias: {
-    "@ogw_front": path.resolve(__dirname, "app"),
-    "@ogw_internal": path.resolve(__dirname, "internal"),
-    "@ogw_server": path.resolve(__dirname, "server"),
-    "@ogw_tests": path.resolve(__dirname, "tests"),
-  },
+  ssr: false,
+
+  alias: sharedAlias,
 
   // ** Global CSS
   css: ["vuetify/lib/styles/main.sass"],
@@ -36,6 +46,12 @@ export default defineNuxtConfig({
   build: {
     transpile: ["vuetify"],
   },
+
+  nitro: {
+    scanDirs: [path.resolve(__dirname, "server")], // ← explicitly point to /repo/server
+  },
+
+  serverDir: path.resolve(__dirname, "server"),
 
   vuetify: {
     vuetifyOptions: {
@@ -54,6 +70,10 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    alias: sharedAlias,
+    build: {
+      sourcemap: process.env.NODE_ENV === "test", // Faster builds in test/CI
+    },
     optimizeDeps: {
       include: [
         "ajv",
@@ -72,6 +92,14 @@ export default defineNuxtConfig({
         "ws",
         "xmlbuilder2",
       ],
+    },
+    server: {
+      fs: {
+        allow: [
+          path.resolve(__dirname, "../../node_modules/@fontsource"),
+          path.resolve(__dirname, "../../node_modules/@mdi/font"),
+        ],
+      },
     },
   },
 });
