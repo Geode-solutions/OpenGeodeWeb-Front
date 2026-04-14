@@ -1,13 +1,11 @@
-import { computed, ref, watch } from "vue";
-
-function customFilter(_value, searchQuery, item) {
+function customFilter(value, searchQuery, item) {
   if (!searchQuery) {
     return true;
   }
   const query = searchQuery.toLowerCase();
   const title = (item.raw.title || "").toLowerCase();
-  const id = (item.raw.id || "").toLowerCase();
-  return title.includes(query) || id.includes(query);
+  const idValue = String(value || "").toLowerCase();
+  return title.includes(query) || idValue.includes(query);
 }
 
 function sortAndFormatItems(items, sortType) {

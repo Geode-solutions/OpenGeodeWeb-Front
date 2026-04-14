@@ -1,7 +1,7 @@
 <script setup>
-import GlobalObjectsView from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjectsView.vue";
-import ModelComponentsView from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponentsView.vue";
-import TreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
+import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
+import ModelComponents from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponents.vue";
+import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 200;
@@ -142,9 +142,9 @@ function onVerticalResizeStart(event, index) {
         width: `${treeviewStore.panelWidth}px`,
       }"
     >
-      <TreeBox :title="mainView.title" mdi-icon="mdi-file-tree-outline">
-        <GlobalObjectsView @show-menu="emit('show-menu', $event)" />
-      </TreeBox>
+      <ViewerObjectTreeBox :title="mainView.title" mdi-icon="mdi-file-tree-outline">
+        <GlobalObjects @show-menu="emit('show-menu', $event)" />
+      </ViewerObjectTreeBox>
     </div>
 
     <div v-if="additionalViews.length > 0" class="column-separator" @mousedown="onResizeStart" />
@@ -166,15 +166,15 @@ function onVerticalResizeStart(event, index) {
           @dragover="onDragOver"
           @drop="onDrop(index + 1)"
         >
-          <TreeBox
+          <ViewerObjectTreeBox
             :title="view.title"
             :geode_object_type="view.geode_object_type"
             closable
             @close="treeviewStore.closeView(index + 1)"
             @dragstart="onDragStart(index + 1)"
           >
-            <ModelComponentsView :id="view.id" @show-menu="emit('show-menu', $event)" />
-          </TreeBox>
+            <ModelComponents :id="view.id" @show-menu="emit('show-menu', $event)" />
+          </ViewerObjectTreeBox>
         </div>
         <div
           v-if="index < additionalViews.length - 1"

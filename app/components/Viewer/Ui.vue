@@ -1,6 +1,6 @@
 <script setup>
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu";
-import ViewerTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
+import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useMenuStore } from "@ogw_front/stores/menu";
@@ -23,7 +23,9 @@ const dataItems = dataStore.refAllItems();
 
 async function get_viewer_id(x, y) {
   const activeIds = new Set(dataItems.value.map((item) => item.id));
-  const ids = Object.keys(dataStyleStore.styles).filter((styleId) => activeIds.has(styleId));
+  const ids = Object.keys(dataStyleStore.styles).filter((styleId) =>
+    activeIds.has(styleId),
+  );
 
   let result = { id: undefined, viewer_id: undefined };
   await viewerStore.request(
@@ -44,7 +46,7 @@ defineExpose({ get_viewer_id });
 </script>
 
 <template>
-  <ViewerTreeLayout @show-menu="(args) => emit('show-menu', args)" />
+  <ViewerObjectTreeLayout @show-menu="(args) => emit('show-menu', args)" />
   <ViewerContextMenu
     v-if="displayMenu"
     :id="menuStore.current_id"

@@ -14,13 +14,19 @@ const emit = defineEmits(["contextmenu"]);
     @contextmenu.prevent.stop="emit('contextmenu', $event)"
   >
     {{ item.title }}
-
-    <v-tooltip v-if="showTooltip && item.category" activator="parent" location="right">
+    <v-tooltip
+      v-if="showTooltip && item.category"
+      activator="parent"
+      location="right"
+    >
       <div class="d-flex flex-column pa-1">
         <span class="text-caption"><strong>ID:</strong> {{ item.id }}</span>
-        <span v-if="item.title" class="text-caption"><strong>Name:</strong> {{ item.title }}</span>
+        <span v-if="item.title" class="text-caption"
+          ><strong>Name:</strong> {{ item.title }}</span
+        >
         <span class="text-caption font-italic border-t-sm d-flex align-center">
-          <strong class="mr-1">Status:</strong> {{ item.is_active ? "Active" : "Inactive" }}
+          <strong class="mr-1">Status:</strong>
+          {{ item.is_active ? "Active" : "Inactive" }}
         </span>
       </div>
     </v-tooltip>
