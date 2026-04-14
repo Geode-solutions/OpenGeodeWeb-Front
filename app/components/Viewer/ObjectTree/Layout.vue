@@ -2,6 +2,7 @@
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import ModelComponents from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponents.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
+import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 200;
@@ -168,7 +169,7 @@ function onVerticalResizeStart(event, index) {
         >
           <ViewerObjectTreeBox
             :title="view.title"
-            :geode_object_type="view.geode_object_type"
+            :icon="geode_objects[view.geode_object_type]?.image"
             closable
             @close="treeviewStore.closeView(index + 1)"
             @dragstart="onDragStart(index + 1)"

@@ -1,22 +1,12 @@
 <script setup>
-import { computed } from "vue";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
-
-const { title, closable, geode_object_type, mdiIcon } = defineProps({
+const { title, closable, icon, mdiIcon } = defineProps({
   title: { type: String, required: true },
   closable: { type: Boolean, default: false },
-  geode_object_type: { type: String, default: "" },
+  icon: { type: String, default: "" },
   mdiIcon: { type: String, default: "" },
 });
 
 const emit = defineEmits(["close", "dragstart"]);
-
-const icon = computed(() => {
-  if (geode_object_type && geode_objects[geode_object_type]) {
-    return geode_objects[geode_object_type].image;
-  }
-  return undefined;
-});
 </script>
 
 <template>
@@ -37,7 +27,9 @@ const icon = computed(() => {
         style="filter: brightness(0); display: flex; align-items: center"
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2"
+        >mdi-drag-variant</v-icon
+      >
       <span
         class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
         style="height: 24px; line-height: 1"
