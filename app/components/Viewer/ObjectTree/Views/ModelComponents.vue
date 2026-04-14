@@ -15,9 +15,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const items = dataStore.refFormatedMeshComponents(toRef(() => id));
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(
-  toRef(() => id),
-);
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => id));
 
 const {
   search,
