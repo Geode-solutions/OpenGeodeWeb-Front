@@ -75,7 +75,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function importStores(snapshot) {
-    opened_views.value = snapshot?.opened_views || [{ type: "object", id: "main", title: "Objects" }];
+    opened_views.value = snapshot?.opened_views || [
+      { type: "object", id: "main", title: "Objects" },
+    ];
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
     additionalPanelWidth.value = snapshot?.additionalPanelWidth || PANEL_WIDTH;
     pendingSelectionIds.value =
@@ -86,7 +88,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
     const rebuilt = [];
     for (const group of items.value) {
       for (const child of group.children) {
-        if (pendingSelectionIds.value.length === 0 || pendingSelectionIds.value.includes(child.id)) {
+        if (
+          pendingSelectionIds.value.length === 0 ||
+          pendingSelectionIds.value.includes(child.id)
+        ) {
           rebuilt.push(child.id || child);
         }
       }
@@ -129,4 +134,3 @@ export const useTreeviewStore = defineStore("treeview", () => {
     clear,
   };
 });
-
