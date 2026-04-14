@@ -16,6 +16,8 @@ const { itemProps } = defineProps({
 const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
 const componentId = computed(() => itemProps.meta_data.pickedComponentId);
 
+const selection = dataStyleStore.visibleMeshComponents(modelId);
+
 const component_type = ref(undefined);
 
 const modelCollapsed = ref(false);
@@ -35,8 +37,24 @@ watchEffect(async () => {
 
 const modelVisibility = computed({
   get: () => dataStyleStore.modelVisibility(modelId.value),
-  set: (value) => {
-    dataStyleStore.setModelVisibility(modelId.value, value);
+  set: async (value) => {
+    await dataStyleStore.setModelVisibility(modelId.value, value);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const modelComponentTypeVisibility = computed({
+  get: () => selection.value.includes(component_type.value),
+  set: async (value) => {
+    await dataStyleStore.setModelComponentsVisibility(modelId.value, [component_type.value], value);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const componentVisibility = computed({
+  get: () => selection.value.includes(componentId.value),
+  set: async (value) => {
+    await dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], value);
     hybridViewerStore.remoteRender();
   },
 });
@@ -101,7 +119,8 @@ const modelComponentTypeLabel = computed(() => {
         </v-icon>
       </div>
       <v-container v-show="!typeCollapsed" class="pa-2">
-        <div class="text-caption mb-1">Color</div>
+        <VisibilitySwitch v-model="modelComponentTypeVisibility" />
+        <div class="text-caption mb-1 mt-2">Color</div>
         <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
       </v-container>
     </div>
@@ -114,7 +133,8 @@ const modelComponentTypeLabel = computed(() => {
         </v-icon>
       </div>
       <v-container v-show="!componentCollapsed" class="pa-2">
-        <div class="text-caption mb-1">Color</div>
+        <VisibilitySwitch v-model="componentVisibility" />
+        <div class="text-caption mb-1 mt-2">Color</div>
         <ViewerOptionsColorPicker v-model="componentColor" />
       </v-container>
     </div>
