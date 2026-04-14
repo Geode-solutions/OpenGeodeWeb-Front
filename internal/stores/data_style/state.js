@@ -88,7 +88,8 @@ export function useDataStyleState() {
   }
 
   function mutateModelComponentTypeStyle(id_model, type, values) {
-    return database.model_component_type_datastyle.get([id_model, type]).then((style) => {
+    return database.transaction("rw", database.model_component_type_datastyle, async () => {
+      const style = await database.model_component_type_datastyle.get([id_model, type]);
       const model_component_type_style = style || { id_model, type };
       merge(model_component_type_style, values);
       return database.model_component_type_datastyle.put(
