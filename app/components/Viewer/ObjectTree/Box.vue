@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from "vue";
 const SCROLL_SYNC_DELAY = 50;
 const SCROLL_THRESHOLD = 1;
 const { title, closable, icon, mdiIcon, scrollTop } = defineProps({
@@ -87,7 +86,9 @@ watch(
         style="filter: brightness(0); display: flex; align-items: center"
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2"
+        >mdi-drag-variant</v-icon
+      >
       <span
         class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
         style="height: 24px; line-height: 1"
