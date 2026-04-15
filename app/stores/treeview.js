@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, watch, toRaw } from "vue";
+import { ref, toRaw, watch } from "vue";
 import { database } from "@ogw_internal/database/database";
 const PANEL_WIDTH = 300;
 
@@ -15,23 +15,29 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const pendingSelectionIds = ref([]);
   const rowHeights = ref([]);
 
-  database.treeview_config.get("main").then((config) => {
-    if (config?.opened_views) {
-      opened_views.value = config.opened_views;
+  async function loadConfig() {
+    try {
+      const config = await database.treeview_config.get("main");
+      if (config?.opened_views) {
+        opened_views.value = config.opened_views;
+      }
+      if (config?.panelWidth) {
+        panelWidth.value = config.panelWidth;
+      }
+      if (config?.additionalPanelWidth) {
+        additionalPanelWidth.value = config.additionalPanelWidth;
+      }
+      if (config?.selectionIds) {
+        selection.value = config.selectionIds;
+      }
+      if (config?.rowHeights) {
+        rowHeights.value = config.rowHeights;
+      }
+    } catch (error) {
+      console.error("Failed to load treeview config:", error);
     }
-    if (config?.panelWidth) {
-      panelWidth.value = config.panelWidth;
-    }
-    if (config?.additionalPanelWidth) {
-      additionalPanelWidth.value = config.additionalPanelWidth;
-    }
-    if (config?.selectionIds) {
-      selection.value = config.selectionIds;
-    }
-    if (config?.rowHeights) {
-      rowHeights.value = config.rowHeights;
-    }
-  });
+  }
+  loadConfig();
 
   watch(
     [opened_views, panelWidth, additionalPanelWidth, selection, rowHeights],
@@ -171,15 +177,15 @@ export const useTreeviewStore = defineStore("treeview", () => {
     additionalPanelWidth.value = width;
   }
 
-  function setScrollTop(id, scrollTop) {
-    const view = opened_views.value.find((v) => v.id === id);
+  function setScrollTop(viewId, scrollTop) {
+    const view = opened_views.value.find((view) => view.id === viewId);
     if (view) {
       view.scrollTop = scrollTop;
     }
   }
 
-  function setOpened(id, opened) {
-    const view = opened_views.value.find((v) => v.id === id);
+  function setOpened(viewId, opened) {
+    const view = opened_views.value.find((view) => view.id === viewId);
     if (view) {
       view.opened = opened;
     }

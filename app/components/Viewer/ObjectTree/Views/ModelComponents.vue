@@ -1,5 +1,5 @@
 <script setup>
-import { toRef, computed } from "vue";
+import { computed, toRef } from "vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
@@ -9,7 +9,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const { id } = defineProps({ id: { type: String, required: true } });
+const { id: viewId } = defineProps({ id: { type: String, required: true } });
 const emit = defineEmits(["show-menu"]);
 
 const dataStore = useDataStore();
@@ -17,14 +17,14 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const treeviewStore = useTreeviewStore();
 
-const currentView = computed(() => treeviewStore.opened_views.find((v) => v.id === id));
+const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
 const opened = computed({
   get: () => currentView.value?.opened || [],
-  set: (val) => treeviewStore.setOpened(id, val),
+  set: (val) => treeviewStore.setOpened(viewId, val),
 });
 
-const items = dataStore.refFormatedMeshComponents(toRef(() => id));
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => id));
+const items = dataStore.refFormatedMeshComponents(toRef(() => viewId));
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => viewId));
 
 const {
   search,
@@ -45,10 +45,10 @@ async function onSelectionChange(current) {
   }
 
   if (added.length > 0) {
-    await dataStyleStore.setModelComponentsVisibility(id, added, true);
+    await dataStyleStore.setModelComponentsVisibility(viewId, added, true);
   }
   if (removed.length > 0) {
-    await dataStyleStore.setModelComponentsVisibility(id, removed, false);
+    await dataStyleStore.setModelComponentsVisibility(viewId, removed, false);
   }
   hybridViewerStore.remoteRender();
 }
@@ -85,7 +85,7 @@ async function onSelectionChange(current) {
               event: $event,
               itemId: item.id,
               context_type: 'model_component',
-              modelId: id,
+              modelId: viewId,
             })
           "
         />

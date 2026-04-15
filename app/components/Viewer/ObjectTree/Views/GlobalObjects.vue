@@ -1,5 +1,5 @@
 <script setup>
-import { toRef, watch, computed } from "vue";
+import { computed, toRef, watch } from "vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
