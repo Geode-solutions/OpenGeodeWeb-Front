@@ -1,6 +1,6 @@
 <script setup>
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu";
-import ViewerTreeObjectTree from "@ogw_front/components/Viewer/Tree/ObjectTree";
+import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useMenuStore } from "@ogw_front/stores/menu";
@@ -44,7 +44,7 @@ defineExpose({ get_viewer_id });
 </script>
 
 <template>
-  <ViewerTreeObjectTree @show-menu="(args) => emit('show-menu', args)" />
+  <ViewerObjectTreeLayout @show-menu="(args) => emit('show-menu', args)" />
   <ViewerContextMenu
     v-if="displayMenu"
     :id="menuStore.current_id"

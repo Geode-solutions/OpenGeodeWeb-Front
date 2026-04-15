@@ -15,6 +15,7 @@ export class BaseDatabase extends Dexie {
       [modelComponentDataStyleTable.name]: modelComponentDataStyleTable.schema,
       [modelComponentTypeDataStyleTable.name]: modelComponentTypeDataStyleTable.schema,
       [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
+      treeview_config: "id",
     };
   }
 
