@@ -13,6 +13,7 @@ const sharedAlias = {
   "@ogw_server": path.resolve(__dirname, "server"),
   "@ogw_tests": path.resolve(__dirname, "tests"),
 };
+const oneMinute = 60_000;
 
 export default defineNuxtConfig({
   runtimeConfig: {
@@ -48,10 +49,10 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    scanDirs: [path.resolve(__dirname, "server")], // ← explicitly point to /repo/server
+    routeRules: {
+      "/api/**": { timeout: oneMinute },
+    },
   },
-
-  serverDir: path.resolve(__dirname, "server"),
 
   vuetify: {
     vuetifyOptions: {
@@ -72,7 +73,7 @@ export default defineNuxtConfig({
   vite: {
     alias: sharedAlias,
     build: {
-      sourcemap: process.env.NODE_ENV === "test", // Faster builds in test/CI
+      sourcemap: process.env.NODE_ENV === "test",
     },
     optimizeDeps: {
       include: [

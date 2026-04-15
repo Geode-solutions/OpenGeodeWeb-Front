@@ -13,13 +13,13 @@ function checkRecaptchaParams(name, email, launch) {
 async function artifactImage(registry, parent, repo) {
   const branch = process.env.NETLIFY_BRANCH;
   const [_, projectId] = parent.split("/");
-  const repository = `${parent}/repositories/ghcr/packages/geode-solutions%2F`;
+  const repository = `${parent}/repositories/github/packages/`;
   const name = `${repository}${repo}/tags/${branch}`;
   console.log({ name });
   const response = await registry.projects.locations.repositories.packages.tags.get({
     name,
   });
-  const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/ghcr/geode-solutions`;
+  const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/github`;
   const digest = response.data.version.split("/").pop();
   const image = `${artifactRegistry}/${repo}@${digest}`;
   console.log("Found image for", repo, image);
@@ -78,6 +78,20 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
               },
             ],
             resources,
+            env: [
+              {
+                name: "PARENT",
+                value: parent,
+              },
+            ],
+            startupProbe: {
+              httpGet: {
+                port: 80,
+                path: "/viewer/healthcheck",
+              },
+              periodSeconds: 1,
+              failureThreshold: 30,
+            },
           },
           {
             image: backImage,
