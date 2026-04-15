@@ -1,5 +1,3 @@
-import { ref, computed, watch, toRef } from "vue";
-
 function customFilter(value, searchQuery, item) {
   if (!searchQuery) {
     return true;

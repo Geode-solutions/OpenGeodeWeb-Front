@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, toRaw, watch } from "vue";
+
 import { database } from "@ogw_internal/database/database";
 const PANEL_WIDTH = 300;
 

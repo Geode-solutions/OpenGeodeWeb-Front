@@ -1,5 +1,4 @@
 <script setup>
-import { computed, ref, watch } from "vue";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import ModelComponents from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponents.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
@@ -36,7 +35,9 @@ watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      treeviewStore.setRowHeights(Array.from({ length: newLength }).fill(PERCENT_100 / newLength));
+      treeviewStore.setRowHeights(
+        Array.from({ length: newLength }).fill(PERCENT_100 / newLength),
+      );
     }
   },
   { immediate: true },
@@ -159,7 +160,11 @@ function onVerticalResizeStart(event, index) {
       </ViewerObjectTreeBox>
     </div>
 
-    <div v-if="additionalViews.length > 0" class="column-separator" @mousedown="onResizeStart" />
+    <div
+      v-if="additionalViews.length > 0"
+      class="column-separator"
+      @mousedown="onResizeStart"
+    />
 
     <div
       v-if="additionalViews.length > 0"
@@ -172,7 +177,8 @@ function onVerticalResizeStart(event, index) {
         <div
           class="view-wrapper"
           :class="{
-            'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
+            'drag-over':
+              draggedIndex !== undefined && draggedIndex !== index + 1,
           }"
           :style="{ flex: `0 0 ${rowHeights[index]}%` }"
           @dragover="onDragOver"
@@ -187,7 +193,10 @@ function onVerticalResizeStart(event, index) {
             @dragstart="onDragStart(index + 1)"
             @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
           >
-            <ModelComponents :id="view.id" @show-menu="emit('show-menu', $event)" />
+            <ModelComponents
+              :id="view.id"
+              @show-menu="emit('show-menu', $event)"
+            />
           </ViewerObjectTreeBox>
         </div>
         <div
@@ -200,7 +209,9 @@ function onVerticalResizeStart(event, index) {
     <div
       class="total-resizer"
       @mousedown="
-        additionalViews.length > 0 ? onAdditionalResizeStart($event) : onResizeStart($event)
+        additionalViews.length > 0
+          ? onAdditionalResizeStart($event)
+          : onResizeStart($event)
       "
     />
   </div>
