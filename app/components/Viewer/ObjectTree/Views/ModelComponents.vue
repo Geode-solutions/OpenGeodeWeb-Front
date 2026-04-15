@@ -16,18 +16,14 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const treeviewStore = useTreeviewStore();
 
-const currentView = computed(() =>
-  treeviewStore.opened_views.find((view) => view.id === viewId),
-);
+const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
 const opened = computed({
   get: () => currentView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(viewId, val),
 });
 
 const items = dataStore.refFormatedMeshComponents(toRef(() => viewId));
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(
-  toRef(() => viewId),
-);
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => viewId));
 
 const {
   search,
