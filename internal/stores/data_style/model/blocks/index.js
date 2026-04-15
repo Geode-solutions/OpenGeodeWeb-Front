@@ -1,9 +1,9 @@
 // Local imports
-import { getDeterministicColor } from "@ogw_front/utils/color";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColorStyle } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelBlocksVisibilityStyle } from "./visibility";
+
 async function setModelBlocksDefaultStyle(_id) {
   // Placeholder
 }
@@ -32,15 +32,12 @@ export function useModelBlocksStyle() {
       }
       visibilityGroups[vKey].push(block_id);
 
-      let { color } = style;
-      if (style.color_mode === "random") {
-        color = getDeterministicColor(block_id);
-      }
-      const cKey = JSON.stringify(color);
+      const color_mode = style.color_mode || "constant";
+      const cKey = color_mode === "random" ? "random" : JSON.stringify(style.color);
       if (!colorGroups[cKey]) {
-        colorGroups[cKey] = [];
+        colorGroups[cKey] = { color_mode, color: style.color, ids: [] };
       }
-      colorGroups[cKey].push(block_id);
+      colorGroups[cKey].ids.push(block_id);
     }
 
     const promises = [];
@@ -51,8 +48,8 @@ export function useModelBlocksStyle() {
       );
     }
 
-    for (const [cValue, ids] of Object.entries(colorGroups)) {
-      promises.push(modelBlocksColorStyle.setModelBlocksColor(id, ids, JSON.parse(cValue)));
+    for (const { color_mode, color, ids } of Object.values(colorGroups)) {
+      promises.push(modelBlocksColorStyle.setModelBlocksColor(id, ids, color, color_mode));
     }
 
     return Promise.all(promises);

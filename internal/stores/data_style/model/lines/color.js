@@ -18,31 +18,24 @@ export function useModelLinesColorStyle() {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).color;
   }
 
-  function setModelLinesColor(id, line_ids, color) {
+  function setModelLinesColor(id, line_ids, color, color_mode = "constant") {
     if (!line_ids || line_ids.length === 0) {
       return Promise.resolve();
     }
     return dataStore.getMeshComponentsViewerIds(id, line_ids).then((line_viewer_ids) => {
       if (!line_viewer_ids || line_viewer_ids.length === 0) {
-        return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
-          color,
-        });
+        return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, { color, color_mode });
       }
-      return viewerStore.request(
-        model_lines_schemas.color,
-        { id, block_ids: line_viewer_ids, color },
-        {
-          response_function: () =>
-            modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
-              color,
-            }),
-        },
-      );
+      const params = { id, block_ids: line_viewer_ids, color_mode };
+      if (color_mode === "constant") {
+        params.color = color;
+      }
+      return viewerStore.request(model_lines_schemas.color, params, {
+        response_function: () =>
+          modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, { color, color_mode }),
+      });
     });
   }
 
-  return {
-    modelLineColor,
-    setModelLinesColor,
-  };
+  return { modelLineColor, setModelLinesColor };
 }

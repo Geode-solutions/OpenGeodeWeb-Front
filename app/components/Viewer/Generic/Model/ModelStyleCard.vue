@@ -90,7 +90,7 @@ const modelComponentTypeColor = computed({
 });
 
 const colorModes = [
-  { title: "Default", value: "default" },
+  { title: "Constant", value: "constant" },
   { title: "Random", value: "random" },
 ];
 
@@ -98,7 +98,7 @@ const modelComponentTypeColorMode = computed({
   get: () =>
     component_type.value
       ? dataStyleStore.getModelComponentTypeColorMode(modelId.value, component_type.value)
-      : "default",
+      : "constant",
   set: async (value) => {
     if (component_type.value) {
       await dataStyleStore.setModelComponentTypeColorMode(
@@ -115,7 +115,7 @@ const componentColorMode = computed({
   get: () =>
     componentId.value
       ? dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value)
-      : "default",
+      : "constant",
   set: async (value) => {
     if (componentId.value) {
       await dataStyleStore.setModelComponentColorMode(modelId.value, componentId.value, value);
@@ -165,7 +165,7 @@ const modelComponentTypeLabel = computed(() => {
           variant="outlined"
         />
 
-        <template v-if="modelComponentTypeColorMode === 'default' && modelComponentTypeColor">
+        <template v-if="modelComponentTypeColorMode === 'constant' && modelComponentTypeColor">
           <div class="text-caption mb-1">Color</div>
           <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
         </template>
@@ -191,7 +191,7 @@ const modelComponentTypeLabel = computed(() => {
           variant="outlined"
         />
 
-        <template v-if="componentColorMode === 'default' && componentColor">
+        <template v-if="componentColorMode === 'constant' && componentColor">
           <div class="text-caption mb-1">Color</div>
           <ViewerOptionsColorPicker v-model="componentColor" />
         </template>

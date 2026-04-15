@@ -18,27 +18,27 @@ export function useModelSurfacesColorStyle() {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color;
   }
 
-  function setModelSurfacesColor(id, surface_ids, color) {
+  function setModelSurfacesColor(id, surface_ids, color, color_mode = "constant") {
     if (!surface_ids || surface_ids.length === 0) {
       return Promise.resolve();
     }
     return dataStore.getMeshComponentsViewerIds(id, surface_ids).then((surface_viewer_ids) => {
       if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-        return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color });
+        return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, {
+          color,
+          color_mode,
+        });
       }
-      return viewerStore.request(
-        model_surfaces_schemas.color,
-        { id, block_ids: surface_viewer_ids, color },
-        {
-          response_function: () =>
-            modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color }),
-        },
-      );
+      const params = { id, block_ids: surface_viewer_ids, color_mode };
+      if (color_mode === "constant") {
+        params.color = color;
+      }
+      return viewerStore.request(model_surfaces_schemas.color, params, {
+        response_function: () =>
+          modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color, color_mode }),
+      });
     });
   }
 
-  return {
-    modelSurfaceColor,
-    setModelSurfacesColor,
-  };
+  return { modelSurfaceColor, setModelSurfacesColor };
 }

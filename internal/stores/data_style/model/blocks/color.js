@@ -18,29 +18,24 @@ export function useModelBlocksColorStyle() {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).color;
   }
 
-  function setModelBlocksColor(id, block_ids, color) {
+  function setModelBlocksColor(id, block_ids, color, color_mode = "constant") {
     if (!block_ids || block_ids.length === 0) {
       return Promise.resolve();
     }
     return dataStore.getMeshComponentsViewerIds(id, block_ids).then((block_viewer_ids) => {
       if (!block_viewer_ids || block_viewer_ids.length === 0) {
-        return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
-          color,
-        });
+        return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color, color_mode });
       }
-      return viewerStore.request(
-        model_blocks_schemas.color,
-        { id, block_ids: block_viewer_ids, color },
-        {
-          response_function: () =>
-            modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color }),
-        },
-      );
+      const params = { id, block_ids: block_viewer_ids, color_mode };
+      if (color_mode === "constant") {
+        params.color = color;
+      }
+      return viewerStore.request(model_blocks_schemas.color, params, {
+        response_function: () =>
+          modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color, color_mode }),
+      });
     });
   }
 
-  return {
-    modelBlockColor,
-    setModelBlocksColor,
-  };
+  return { modelBlockColor, setModelBlocksColor };
 }

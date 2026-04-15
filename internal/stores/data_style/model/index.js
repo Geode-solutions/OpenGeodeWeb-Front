@@ -141,7 +141,7 @@ export function useModelStyle() {
   }
 
   function getModelComponentColorMode(modelId, componentId) {
-    return dataStyleState.getComponentStyle(modelId, componentId).color_mode || "default";
+    return dataStyleState.getComponentStyle(modelId, componentId).color_mode || "constant";
   }
 
   function getModelComponentTypeColor(modelId, type) {
@@ -153,13 +153,13 @@ export function useModelStyle() {
   }
 
   function getModelComponentTypeColorMode(modelId, type) {
-    return dataStyleState.getModelComponentTypeStyle(modelId, type).color_mode || "default";
+    return dataStyleState.getModelComponentTypeStyle(modelId, type).color_mode || "constant";
   }
 
   async function setModelComponentTypeColor(modelId, type, color) {
     await dataStyleState.mutateModelComponentTypeStyle(modelId, type, {
       color,
-      color_mode: "default",
+      color_mode: "constant",
     });
     const allComponents = await database.model_components.where("id").equals(modelId).toArray();
     const idsForType = allComponents
@@ -181,11 +181,22 @@ export function useModelStyle() {
       return;
     }
     await dataStyleState.mutateComponentStyles(modelId, idsForType, { color_mode });
-    return applyModelStyle(modelId);
+    const color =
+      color_mode === "constant"
+        ? dataStyleState.getModelComponentTypeStyle(modelId, type).color
+        : undefined;
+    return setModelComponentsColor(modelId, idsForType, color, color_mode);
   }
 
   async function setModelComponentColorMode(modelId, componentId, color_mode) {
-    await dataStyleState.mutateComponentStyle(modelId, componentId, { color_mode });
+    const values = { color_mode };
+    if (color_mode === "constant") {
+      const style = dataStyleState.getComponentStyle(modelId, componentId);
+      if (!style.color) {
+        values.color = getDeterministicColor(componentId);
+      }
+    }
+    await dataStyleState.mutateComponentStyle(modelId, componentId, values);
     return applyModelStyle(modelId);
   }
 
@@ -217,25 +228,23 @@ export function useModelStyle() {
     );
   }
 
-  async function setModelComponentsColor(modelId, componentIds, color) {
+  async function setModelComponentsColor(modelId, componentIds, color, color_mode = "constant") {
     const allComponents = await database.model_components.where("id").equals(modelId).toArray();
     const componentsMap = Object.fromEntries(
       allComponents.map((component) => [component.geode_id, component]),
     );
 
-    // If a color is explicitly provided, we ensure the mode is 'default' for these components
-    if (color) {
-      await dataStyleState.mutateComponentStyles(modelId, componentIds, {
-        color,
-        color_mode: "default",
-      });
-    }
+    await dataStyleState.mutateComponentStyles(modelId, componentIds, {
+      ...(color ? { color } : {}),
+      color_mode,
+    });
 
     const handlers = {
-      Corner: (ids) => modelCornersStyleStore.setModelCornersColor(modelId, ids, color),
-      Line: (ids) => modelLinesStyleStore.setModelLinesColor(modelId, ids, color),
-      Surface: (ids) => modelSurfacesStyleStore.setModelSurfacesColor(modelId, ids, color),
-      Block: (ids) => modelBlocksStyleStore.setModelBlocksColor(modelId, ids, color),
+      Corner: (ids) => modelCornersStyleStore.setModelCornersColor(modelId, ids, color, color_mode),
+      Line: (ids) => modelLinesStyleStore.setModelLinesColor(modelId, ids, color, color_mode),
+      Surface: (ids) =>
+        modelSurfacesStyleStore.setModelSurfacesColor(modelId, ids, color, color_mode),
+      Block: (ids) => modelBlocksStyleStore.setModelBlocksColor(modelId, ids, color, color_mode),
     };
     return Promise.all(
       MESH_TYPES.map((type) => {

@@ -1,5 +1,4 @@
 // Local imports
-import { getDeterministicColor } from "@ogw_front/utils/color";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesColorStyle } from "./color";
 import { useModelLinesCommonStyle } from "./common";
@@ -33,15 +32,12 @@ export function useModelLinesStyle() {
       }
       visibilityGroups[vKey].push(line_id);
 
-      let { color } = style;
-      if (style.color_mode === "random") {
-        color = getDeterministicColor(line_id);
-      }
-      const cKey = JSON.stringify(color);
+      const color_mode = style.color_mode || "constant";
+      const cKey = color_mode === "random" ? "random" : JSON.stringify(style.color);
       if (!colorGroups[cKey]) {
-        colorGroups[cKey] = [];
+        colorGroups[cKey] = { color_mode, color: style.color, ids: [] };
       }
-      colorGroups[cKey].push(line_id);
+      colorGroups[cKey].ids.push(line_id);
     }
 
     const promises = [];
@@ -50,8 +46,8 @@ export function useModelLinesStyle() {
       promises.push(modelLinesVisibilityStyle.setModelLinesVisibility(id, ids, vValue === "true"));
     }
 
-    for (const [cValue, ids] of Object.entries(colorGroups)) {
-      promises.push(modelLinesColorStyle.setModelLinesColor(id, ids, JSON.parse(cValue)));
+    for (const { color_mode, color, ids } of Object.values(colorGroups)) {
+      promises.push(modelLinesColorStyle.setModelLinesColor(id, ids, color, color_mode));
     }
 
     return Promise.all(promises);

@@ -18,22 +18,25 @@ export function useModelCornersColorStyle() {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).color;
   }
 
-  function setModelCornersColor(id, corner_ids, color) {
+  function setModelCornersColor(id, corner_ids, color, color_mode = "constant") {
     if (!corner_ids || corner_ids.length === 0) {
       return Promise.resolve();
     }
     return dataStore.getMeshComponentsViewerIds(id, corner_ids).then((corner_viewer_ids) => {
       if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
-        return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color });
+        return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, {
+          color,
+          color_mode,
+        });
       }
-      return viewerStore.request(
-        model_corners_schemas.color,
-        { id, block_ids: corner_viewer_ids, color },
-        {
-          response_function: () =>
-            modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color }),
-        },
-      );
+      const params = { id, block_ids: corner_viewer_ids, color_mode };
+      if (color_mode === "constant") {
+        params.color = color;
+      }
+      return viewerStore.request(model_corners_schemas.color, params, {
+        response_function: () =>
+          modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color, color_mode }),
+      });
     });
   }
 

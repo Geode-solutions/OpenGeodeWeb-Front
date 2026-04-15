@@ -1,5 +1,4 @@
 // Local imports
-import { getDeterministicColor } from "@ogw_front/utils/color";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelSurfacesColorStyle } from "./color";
 import { useModelSurfacesCommonStyle } from "./common";
@@ -33,15 +32,12 @@ export function useModelSurfacesStyle() {
       }
       visibilityGroups[vKey].push(surface_id);
 
-      let { color } = style;
-      if (style.color_mode === "random") {
-        color = getDeterministicColor(surface_id);
-      }
-      const cKey = JSON.stringify(color);
+      const color_mode = style.color_mode || "constant";
+      const cKey = color_mode === "random" ? "random" : JSON.stringify(style.color);
       if (!colorGroups[cKey]) {
-        colorGroups[cKey] = [];
+        colorGroups[cKey] = { color_mode, color: style.color, ids: [] };
       }
-      colorGroups[cKey].push(surface_id);
+      colorGroups[cKey].ids.push(surface_id);
     }
 
     const promises = [];
@@ -52,8 +48,8 @@ export function useModelSurfacesStyle() {
       );
     }
 
-    for (const [cValue, ids] of Object.entries(colorGroups)) {
-      promises.push(modelSurfacesColorStyle.setModelSurfacesColor(id, ids, JSON.parse(cValue)));
+    for (const { color_mode, color, ids } of Object.values(colorGroups)) {
+      promises.push(modelSurfacesColorStyle.setModelSurfacesColor(id, ids, color, color_mode));
     }
 
     return Promise.all(promises);
