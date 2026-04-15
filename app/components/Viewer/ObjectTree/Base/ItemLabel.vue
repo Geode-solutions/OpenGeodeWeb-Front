@@ -16,15 +16,9 @@ const actualItem = computed(() => item.raw || item);
     @contextmenu.prevent.stop="emit('contextmenu', $event)"
   >
     {{ actualItem.title }}
-    <v-tooltip
-      v-if="showTooltip && actualItem.category"
-      activator="parent"
-      location="right"
-    >
+    <v-tooltip v-if="showTooltip && actualItem.category" activator="parent" location="right">
       <div class="d-flex flex-column pa-1">
-        <span class="text-caption"
-          ><strong>ID:</strong> {{ actualItem.id }}</span
-        >
+        <span class="text-caption"><strong>ID:</strong> {{ actualItem.id }}</span>
         <span v-if="actualItem.title" class="text-caption"
           ><strong>Name:</strong> {{ actualItem.title }}</span
         >
