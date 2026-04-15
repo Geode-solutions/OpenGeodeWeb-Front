@@ -178,14 +178,14 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function setScrollTop(viewId, scrollTop) {
-    const view = opened_views.value.find((view) => view.id === viewId);
+    const view = opened_views.value.find((openedView) => openedView.id === viewId);
     if (view) {
       view.scrollTop = scrollTop;
     }
   }
 
   function setOpened(viewId, opened) {
-    const view = opened_views.value.find((view) => view.id === viewId);
+    const view = opened_views.value.find((openedView) => openedView.id === viewId);
     if (view) {
       view.opened = opened;
     }
