@@ -60,8 +60,7 @@ watch(
 function isModel(item) {
   const actualItem = item.raw || item;
   return (
-    actualItem.viewer_type === "model" ||
-    ["BRep", "Section"].includes(actualItem.geode_object_type)
+    actualItem.viewer_type === "model" || ["BRep", "Section"].includes(actualItem.geode_object_type)
   );
 }
 </script>
