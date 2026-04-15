@@ -1,38 +1,44 @@
+// Node imports
+import path from "node:path";
+
+// Third party imports
 import { beforeAll, describe, expect, test } from "vitest";
+import { createPage, setup, url } from '@nuxt/test-utils/e2e';
 
-// import { page } from "@vitest/browser/context";
+import { setupIntegrationTests } from "@ogw_tests/integration/setup";
 
-import { importFile } from "@ogw_front/utils/file_import_workflow";
+// Local imports
 
-import { setup } from '@nuxt/test-utils/e2e'
 
-const timeout = 5000;
+const timeout = 180_000;           // increased
+const INTERVAL_TIMEOUT = 180_000;  // for beforeAll
+
+await setup({
+  rootDir: path.resolve(import.meta.dirname),
+  server: true,
+  browser: true,
+  setupTimeout: 80_000
+});
 
 const file_name = "test.og_rgd2d";
 const geode_object = "RegularGrid2D";
-beforeAll(async () => {
+let id = "",
+  projectFolderPath = "";
 
-  await setup({
-    rootDir: import.meta.dirname,
-    server: true,
-    dev: true,
-    dotenv: { env: { MODE: "BROWSER" } },
-    setupTimeout: 10_000,
-  
-});
-//   console.log("Navigating to", process.env.NUXT_TEST_URL);
-//   await page.goto(process.env.NUXT_TEST_URL);
-//   await importFile(file_name, geode_object);
-});
+
+beforeAll(async () => {
+  id = "";
+  projectFolderPath = "";
+  await setupIntegrationTests(file_name, geode_object);
+}, INTERVAL_TIMEOUT);
 
 describe("Dashboard E2E – Real Nitro Backend + Playwright Browser", () => {
-  test(
-    "should display the dashboard and interact with it",
-    () => {
-      console.log("Running E2E test: should display the dashboard and interact with it");
-      const one = 1;
-      expect(one).toBe(one);
-    },
-    timeout,
-  );
+  test("HybridRenderingView component renders", async () => {
+    const page = await createPage(url("/"));
+    console.log("→ Page opened. Waiting for full load and rendering...");
+    await page.waitForLoadState("networkidle", { timeout: 90_000 });
+    page.waitForTimeout(5000);
+    console.log("→ Taking screenshot...");
+    await expect(page).toMatchScreenshot("hybrid-rendering-view");
+  }, timeout);
 });

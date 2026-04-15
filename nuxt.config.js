@@ -3,9 +3,9 @@ import path from "node:path";
 
 // Local imports
 import package_json from "./package.json";
-import { SourceMap } from "node:module";
 
 const __dirname = import.meta.dirname;
+console.log(`Loading Nuxt config: ${import.meta.url}`);
 
 const sharedAlias = {
   "@ogw_front": path.resolve(__dirname, "app"),
