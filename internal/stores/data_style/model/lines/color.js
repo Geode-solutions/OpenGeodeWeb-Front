@@ -30,10 +30,7 @@ export function useModelLinesColorStyle() {
       if (color_mode === "constant") {
         params.color = color;
       }
-      return viewerStore.request(model_lines_schemas.color, params, {
-        response_function: () =>
-          modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, { color, color_mode }),
-      });
+      return viewerStore.request(model_lines_schemas.color, params);
     });
   }
 

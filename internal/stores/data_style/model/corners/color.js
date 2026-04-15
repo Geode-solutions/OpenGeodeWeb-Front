@@ -33,10 +33,7 @@ export function useModelCornersColorStyle() {
       if (color_mode === "constant") {
         params.color = color;
       }
-      return viewerStore.request(model_corners_schemas.color, params, {
-        response_function: () =>
-          modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, { color, color_mode }),
-      });
+      return viewerStore.request(model_corners_schemas.color, params);
     });
   }
 

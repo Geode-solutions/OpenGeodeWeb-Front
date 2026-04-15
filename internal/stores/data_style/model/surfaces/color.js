@@ -33,10 +33,7 @@ export function useModelSurfacesColorStyle() {
       if (color_mode === "constant") {
         params.color = color;
       }
-      return viewerStore.request(model_surfaces_schemas.color, params, {
-        response_function: () =>
-          modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { color, color_mode }),
-      });
+      return viewerStore.request(model_surfaces_schemas.color, params);
     });
   }
 

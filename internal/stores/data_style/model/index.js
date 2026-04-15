@@ -1,6 +1,6 @@
 import { database } from "@ogw_internal/database/database";
-import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { getDeterministicColor } from "@ogw_front/utils/color";
+import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { liveQuery } from "dexie";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -16,9 +16,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 
-const MESH_CONFIG = [{ type: "Corner" }, { type: "Line" }, { type: "Surface" }, { type: "Block" }];
-
-const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
+const MESH_TYPES = ["Corner", "Line", "Surface", "Block"];
 
 const brepDefaults = getDefaultStyle("BRep");
 const DEFAULT_MODEL_COMPONENT_TYPE_COLORS = {
@@ -157,101 +155,143 @@ export function useModelStyle() {
   }
 
   async function setModelComponentTypeColor(modelId, type, color) {
-    await dataStyleState.mutateModelComponentTypeStyle(modelId, type, {
-      color,
-      color_mode: "constant",
-    });
-    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
-    const idsForType = allComponents
-      .filter((component) => component.type === type)
-      .map((component) => component.geode_id);
-    if (idsForType.length === 0) {
-      return;
+    viewerStore.start_request();
+    try {
+      await dataStyleState.mutateModelComponentTypeStyle(modelId, type, {
+        color,
+        color_mode: "constant",
+      });
+      const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+      const idsForType = allComponents
+        .filter((component) => component.type === type)
+        .map((component) => component.geode_id);
+      if (idsForType.length === 0) {
+        return;
+      }
+      await setModelComponentsColor(modelId, idsForType, color);
+    } finally {
+      viewerStore.stop_request();
     }
-    return setModelComponentsColor(modelId, idsForType, color);
   }
 
   async function setModelComponentTypeColorMode(modelId, type, color_mode) {
-    await dataStyleState.mutateModelComponentTypeStyle(modelId, type, { color_mode });
-    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
-    const idsForType = allComponents
-      .filter((component) => component.type === type)
-      .map((component) => component.geode_id);
-    if (idsForType.length === 0) {
-      return;
+    viewerStore.start_request();
+    try {
+      await dataStyleState.mutateModelComponentTypeStyle(modelId, type, { color_mode });
+      const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+      const idsForType = allComponents
+        .filter((component) => component.type === type)
+        .map((component) => component.geode_id);
+      if (idsForType.length === 0) {
+        return;
+      }
+
+      if (color_mode === "random") {
+        await setModelComponentsColor(modelId, idsForType, undefined, color_mode);
+        return;
+      }
+
+      const storedTypeColor = dataStyleState.getModelComponentTypeStyle(modelId, type).color;
+      if (storedTypeColor) {
+        await setModelComponentsColor(modelId, idsForType, storedTypeColor, color_mode);
+        return;
+      }
+
+      await database.transaction("rw", database.model_component_datastyle, async () => {
+        const all_styles = await database.model_component_datastyle
+          .where("id_model")
+          .equals(modelId)
+          .toArray();
+        const style_map = Object.fromEntries(all_styles.map((s) => [s.id_component, s]));
+        const updates = idsForType.map((id_component) => {
+          const style = style_map[id_component] || { id_model: modelId, id_component };
+          style.color_mode = color_mode;
+          style.color = style.color ?? getDeterministicColor(id_component);
+          return structuredClone(style);
+        });
+        return database.model_component_datastyle.bulkPut(updates);
+      });
+    } finally {
+      viewerStore.stop_request();
     }
-    await dataStyleState.mutateComponentStyles(modelId, idsForType, { color_mode });
-    const color =
-      color_mode === "constant"
-        ? dataStyleState.getModelComponentTypeStyle(modelId, type).color
-        : undefined;
-    return setModelComponentsColor(modelId, idsForType, color, color_mode);
   }
 
   async function setModelComponentColorMode(modelId, componentId, color_mode) {
-    const values = { color_mode };
-    if (color_mode === "constant") {
-      const style = dataStyleState.getComponentStyle(modelId, componentId);
-      if (!style.color) {
-        values.color = getDeterministicColor(componentId);
+    viewerStore.start_request();
+    try {
+      if (color_mode === "random") {
+        await dataStyleState.mutateComponentStyle(modelId, componentId, { color_mode });
+        await setModelComponentsColor(modelId, [componentId], undefined, color_mode);
+        return;
       }
+      const style = dataStyleState.getComponentStyle(modelId, componentId);
+      const color = style.color ?? getDeterministicColor(componentId);
+      await dataStyleState.mutateComponentStyle(modelId, componentId, { color_mode, color });
+    } finally {
+      viewerStore.stop_request();
     }
-    await dataStyleState.mutateComponentStyle(modelId, componentId, values);
-    return applyModelStyle(modelId);
   }
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
-    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
-    const componentsMap = Object.fromEntries(
-      allComponents.map((component) => [component.geode_id, component]),
-    );
+    viewerStore.start_request();
+    try {
+      const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+      const componentsMap = Object.fromEntries(
+        allComponents.map((component) => [component.geode_id, component]),
+      );
 
-    return Promise.all(
-      MESH_TYPES.map(async (type) => {
-        const typeComponents = allComponents.filter((component) => component.type === type);
-        const isSelectedType = componentIds.includes(type);
-        const idsToUpdate = isSelectedType
-          ? typeComponents.map((component) => component.geode_id)
-          : componentIds.filter((id) => componentsMap[id]?.type === type);
+      return Promise.all(
+        MESH_TYPES.map(async (type) => {
+          const typeComponents = allComponents.filter((component) => component.type === type);
+          const isSelectedType = componentIds.includes(type);
+          const idsToUpdate = isSelectedType
+            ? typeComponents.map((component) => component.geode_id)
+            : componentIds.filter((id) => componentsMap[id]?.type === type);
 
-        if (idsToUpdate.length === 0) {
-          return;
-        }
+          if (idsToUpdate.length === 0) {
+            return;
+          }
 
-        const viewerIds = await dataStore.getMeshComponentsViewerIds(modelId, idsToUpdate);
-        if (viewerIds.length > 0) {
-          const schema = model_schemas[`${type.toLowerCase()}s`].visibility;
-          await viewerStore.request(schema, { id: modelId, block_ids: viewerIds, visibility });
-        }
-        return dataStyleState.mutateComponentStyles(modelId, idsToUpdate, { visibility });
-      }),
-    );
+          const viewerIds = await dataStore.getMeshComponentsViewerIds(modelId, idsToUpdate);
+          if (viewerIds.length > 0) {
+            const schema = model_schemas[`${type.toLowerCase()}s`].visibility;
+            await viewerStore.request(schema, { id: modelId, block_ids: viewerIds, visibility });
+          }
+          await dataStyleState.mutateComponentStyles(modelId, idsToUpdate, { visibility });
+        }),
+      );
+    } finally {
+      viewerStore.stop_request();
+    }
   }
 
   async function setModelComponentsColor(modelId, componentIds, color, color_mode = "constant") {
-    const allComponents = await database.model_components.where("id").equals(modelId).toArray();
-    const componentsMap = Object.fromEntries(
-      allComponents.map((component) => [component.geode_id, component]),
-    );
+    viewerStore.start_request();
+    try {
+      const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+      const componentsMap = Object.fromEntries(
+        allComponents.map((component) => [component.geode_id, component]),
+      );
 
-    await dataStyleState.mutateComponentStyles(modelId, componentIds, {
-      ...(color ? { color } : {}),
-      color_mode,
-    });
+      await dataStyleState.mutateComponentStyles(modelId, componentIds, { color, color_mode });
 
-    const handlers = {
-      Corner: (ids) => modelCornersStyleStore.setModelCornersColor(modelId, ids, color, color_mode),
-      Line: (ids) => modelLinesStyleStore.setModelLinesColor(modelId, ids, color, color_mode),
-      Surface: (ids) =>
-        modelSurfacesStyleStore.setModelSurfacesColor(modelId, ids, color, color_mode),
-      Block: (ids) => modelBlocksStyleStore.setModelBlocksColor(modelId, ids, color, color_mode),
-    };
-    return Promise.all(
-      MESH_TYPES.map((type) => {
-        const idsForType = componentIds.filter((id) => componentsMap[id]?.type === type);
-        return handlers[type](idsForType);
-      }),
-    );
+      const handlers = {
+        Corner: (ids) =>
+          modelCornersStyleStore.setModelCornersColor(modelId, ids, color, color_mode),
+        Line: (ids) => modelLinesStyleStore.setModelLinesColor(modelId, ids, color, color_mode),
+        Surface: (ids) =>
+          modelSurfacesStyleStore.setModelSurfacesColor(modelId, ids, color, color_mode),
+        Block: (ids) => modelBlocksStyleStore.setModelBlocksColor(modelId, ids, color, color_mode),
+      };
+      await Promise.all(
+        MESH_TYPES.map((type) => {
+          const idsForType = componentIds.filter((id) => componentsMap[id]?.type === type);
+          return handlers[type](idsForType);
+        }),
+      );
+    } finally {
+      viewerStore.stop_request();
+    }
   }
 
   function applyModelStyle(modelId) {
@@ -274,23 +314,29 @@ export function useModelStyle() {
   }
 
   function setModelMeshComponentsDefaultStyle(modelId) {
-    return dataStore.item(modelId).then((item) => {
-      if (!item) {
-        return [];
-      }
-      const { mesh_components } = item;
-      const handlers = {
-        Corner: () => modelCornersStyleStore.setModelCornersDefaultStyle(modelId),
-        Line: () => modelLinesStyleStore.setModelLinesDefaultStyle(modelId),
-        Surface: () => modelSurfacesStyleStore.setModelSurfacesDefaultStyle(modelId),
-        Block: () => modelBlocksStyleStore.setModelBlocksDefaultStyle(modelId),
-      };
-      return Promise.all(
-        Object.keys(mesh_components)
-          .filter((key) => handlers[key])
-          .map((key) => handlers[key]()),
-      );
-    });
+    viewerStore.start_request();
+    return dataStore
+      .item(modelId)
+      .then((item) => {
+        if (!item) {
+          return [];
+        }
+        const { mesh_components } = item;
+        const handlers = {
+          Corner: () => modelCornersStyleStore.setModelCornersDefaultStyle(modelId),
+          Line: () => modelLinesStyleStore.setModelLinesDefaultStyle(modelId),
+          Surface: () => modelSurfacesStyleStore.setModelSurfacesDefaultStyle(modelId),
+          Block: () => modelBlocksStyleStore.setModelBlocksDefaultStyle(modelId),
+        };
+        return Promise.all(
+          Object.keys(mesh_components)
+            .filter((key) => handlers[key])
+            .map((key) => handlers[key]()),
+        );
+      })
+      .finally(() => {
+        viewerStore.stop_request();
+      });
   }
 
   return {

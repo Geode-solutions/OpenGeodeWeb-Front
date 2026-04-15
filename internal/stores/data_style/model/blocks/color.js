@@ -30,10 +30,7 @@ export function useModelBlocksColorStyle() {
       if (color_mode === "constant") {
         params.color = color;
       }
-      return viewerStore.request(model_blocks_schemas.color, params, {
-        response_function: () =>
-          modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color, color_mode }),
-      });
+      return viewerStore.request(model_blocks_schemas.color, params);
     });
   }
 
