@@ -5,8 +5,13 @@ import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-const { logo } = defineProps({
+const { logo, appName } = defineProps({
   logo: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  appName: {
     type: String,
     required: true,
   },
@@ -31,7 +36,7 @@ if (infraStore.app_mode !== appMode.CLOUD) {
         <Recaptcha :button_color="'secondary'" />
       </v-col>
       <v-col v-else-if="infraStore.status === Status.CREATING">
-        <Loading :logo="logo" />
+        <Loading :logo="logo" :app-name="appName" />
       </v-col>
     </v-row>
   </v-container>
