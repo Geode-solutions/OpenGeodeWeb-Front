@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2026-04-15",
   vite: {
     define: {
-      name: 'true',
+      name: "true",
     },
     server: {
       fs: {
