@@ -80,12 +80,14 @@ async function onSelectionChange(current) {
           :item="item"
           show-tooltip
           @contextmenu="
+            const actualItem = item.raw || item;
             emit('show-menu', {
               event: $event,
-              itemId: item.id,
-              context_type: 'model_component',
+              itemId: actualItem.category ? actualItem.id : viewId,
+              context_type: actualItem.category ? 'model_component' : 'model_component_type',
               modelId: viewId,
-            })
+              modelComponentType: actualItem.category ? undefined : actualItem.id,
+            });
           "
         />
       </template>
