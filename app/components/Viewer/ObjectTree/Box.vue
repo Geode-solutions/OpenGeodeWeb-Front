@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted, onUnmounted, ref, watch } from "vue";
 const SCROLL_SYNC_DELAY = 50;
 const SCROLL_THRESHOLD = 1;
 const { title, closable, icon, mdiIcon, scrollTop } = defineProps({
