@@ -1,4 +1,5 @@
 <script setup>
+import { toRef, watch, computed } from "vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
@@ -12,6 +13,12 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const emit = defineEmits(["show-menu"]);
+
+const mainView = computed(() => treeviewStore.opened_views[0]);
+const opened = computed({
+  get: () => mainView.value?.opened || [],
+  set: (val) => treeviewStore.setOpened(mainView.value.id, val),
+});
 
 const {
   search,
@@ -51,7 +58,11 @@ watch(
 );
 
 function isModel(item) {
-  return item.viewer_type === "model";
+  const actualItem = item.raw || item;
+  return (
+    actualItem.viewer_type === "model" ||
+    ["BRep", "Section"].includes(actualItem.geode_object_type)
+  );
 }
 </script>
 
@@ -67,6 +78,7 @@ function isModel(item) {
 
     <v-treeview
       v-model:selected="treeviewStore.selection"
+      v-model:opened="opened"
       :items="processedItems"
       :search="search"
       :custom-filter="customFilter"

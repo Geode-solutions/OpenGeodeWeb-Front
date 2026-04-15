@@ -1,13 +1,52 @@
+import { defineStore } from "pinia";
+import { ref, watch, toRaw } from "vue";
+import { database } from "@ogw_internal/database/database";
 const PANEL_WIDTH = 300;
 
 export const useTreeviewStore = defineStore("treeview", () => {
   const items = ref([]);
   const selection = ref([]);
-  const opened_views = ref([{ type: "object", id: "main", title: "Objects" }]);
+  const opened_views = ref([
+    { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
+  ]);
   const panelWidth = ref(PANEL_WIDTH);
   const additionalPanelWidth = ref(PANEL_WIDTH);
   const isImporting = ref(false);
   const pendingSelectionIds = ref([]);
+  const rowHeights = ref([]);
+
+  database.treeview_config.get("main").then((config) => {
+    if (config?.opened_views) {
+      opened_views.value = config.opened_views;
+    }
+    if (config?.panelWidth) {
+      panelWidth.value = config.panelWidth;
+    }
+    if (config?.additionalPanelWidth) {
+      additionalPanelWidth.value = config.additionalPanelWidth;
+    }
+    if (config?.selectionIds) {
+      selection.value = config.selectionIds;
+    }
+    if (config?.rowHeights) {
+      rowHeights.value = config.rowHeights;
+    }
+  });
+
+  watch(
+    [opened_views, panelWidth, additionalPanelWidth, selection, rowHeights],
+    () => {
+      database.treeview_config.put({
+        id: "main",
+        opened_views: toRaw(opened_views.value),
+        panelWidth: panelWidth.value,
+        additionalPanelWidth: additionalPanelWidth.value,
+        selectionIds: toRaw(selection.value),
+        rowHeights: toRaw(rowHeights.value),
+      });
+    },
+    { deep: true },
+  );
 
   function closeView(index) {
     if (index > 0) {
@@ -15,8 +54,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function addItem(geodeObjectType, name, id, viewerType) {
-    const child = { title: name, id, viewerType, geode_object_type: geodeObjectType };
+  function addItem(geodeObjectType, name, id, viewer_type) {
+    const child = { title: name, id, viewer_type, geode_object_type: geodeObjectType };
     let found = false;
     for (const item of items.value) {
       if (item.title === geodeObjectType) {
@@ -40,17 +79,17 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function removeItem(id) {
-    for (let i = 0; i < items.value.length; i += 1) {
-      const group = items.value[i];
+    for (let index = 0; index < items.value.length; index += 1) {
+      const group = items.value[index];
       const childIndex = group.children.findIndex((child) => child.id === id);
       if (childIndex !== -1) {
         group.children.splice(childIndex, 1);
         if (group.children.length === 0) {
-          items.value.splice(i, 1);
+          items.value.splice(index, 1);
         }
-        const sIdx = selection.value.indexOf(id);
-        if (sIdx !== -1) {
-          selection.value.splice(sIdx, 1);
+        const selectionIndex = selection.value.indexOf(id);
+        if (selectionIndex !== -1) {
+          selection.value.splice(selectionIndex, 1);
         }
         return;
       }
@@ -58,9 +97,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function displayAdditionalTree(id, title, geodeObjectType) {
-    const idx = opened_views.value.findIndex((view) => view.id === id);
-    if (idx !== -1) {
-      return closeView(idx);
+    const index = opened_views.value.findIndex((view) => view.id === id);
+    if (index !== -1) {
+      return closeView(index);
     }
     additionalPanelWidth.value = panelWidth.value;
     opened_views.value.push({
@@ -68,6 +107,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
       id,
       title: title || id,
       geode_object_type: geodeObjectType,
+      scrollTop: 0,
+      opened: [],
     });
   }
 
@@ -80,12 +121,15 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   function importStores(snapshot) {
     opened_views.value = snapshot?.opened_views || [
-      { type: "object", id: "main", title: "Objects" },
+      { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
     ];
     panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
     additionalPanelWidth.value = snapshot?.additionalPanelWidth || PANEL_WIDTH;
+    rowHeights.value = snapshot?.rowHeights || [];
     pendingSelectionIds.value =
-      snapshot?.selectionIds || (snapshot?.selection || []).map((sel) => sel.id || sel) || [];
+      snapshot?.selectionIds ||
+      (snapshot?.selection || []).map((selectionItem) => selectionItem.id || selectionItem) ||
+      [];
   }
 
   function finalizeImportSelection() {
@@ -108,11 +152,15 @@ export const useTreeviewStore = defineStore("treeview", () => {
     items.value = [];
     selection.value = [];
     pendingSelectionIds.value = [];
-    opened_views.value = [{ type: "object", id: "main", title: "Objects" }];
+    opened_views.value = [
+      { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
+    ];
   }
 
   function displayFileTree() {
-    opened_views.value = [{ type: "object", id: "main", title: "Objects" }];
+    opened_views.value = [
+      { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
+    ];
   }
 
   function setPanelWidth(width) {
@@ -123,12 +171,31 @@ export const useTreeviewStore = defineStore("treeview", () => {
     additionalPanelWidth.value = width;
   }
 
+  function setScrollTop(id, scrollTop) {
+    const view = opened_views.value.find((v) => v.id === id);
+    if (view) {
+      view.scrollTop = scrollTop;
+    }
+  }
+
+  function setOpened(id, opened) {
+    const view = opened_views.value.find((v) => v.id === id);
+    if (view) {
+      view.opened = opened;
+    }
+  }
+
+  function setRowHeights(heights) {
+    rowHeights.value = heights;
+  }
+
   function exportStores() {
     return {
       opened_views: opened_views.value,
       panelWidth: panelWidth.value,
       additionalPanelWidth: additionalPanelWidth.value,
       selectionIds: selection.value,
+      rowHeights: rowHeights.value,
     };
   }
 
@@ -139,6 +206,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     panelWidth,
     additionalPanelWidth,
     isImporting,
+    rowHeights,
     addItem,
     removeItem,
     displayAdditionalTree,
@@ -148,6 +216,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayFileTree,
     setPanelWidth,
     setAdditionalPanelWidth,
+    setScrollTop,
+    setOpened,
+    setRowHeights,
     exportStores,
     finalizeImportSelection,
     clear,

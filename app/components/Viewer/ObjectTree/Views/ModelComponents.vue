@@ -1,4 +1,5 @@
 <script setup>
+import { toRef, computed } from "vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
@@ -6,6 +7,7 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id } = defineProps({ id: { type: String, required: true } });
 const emit = defineEmits(["show-menu"]);
@@ -13,6 +15,13 @@ const emit = defineEmits(["show-menu"]);
 const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
+const treeviewStore = useTreeviewStore();
+
+const currentView = computed(() => treeviewStore.opened_views.find((v) => v.id === id));
+const opened = computed({
+  get: () => currentView.value?.opened || [],
+  set: (val) => treeviewStore.setOpened(id, val),
+});
 
 const items = dataStore.refFormatedMeshComponents(toRef(() => id));
 const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => id));
@@ -57,6 +66,7 @@ async function onSelectionChange(current) {
 
     <v-treeview
       :selected="mesh_components_selection"
+      v-model:opened="opened"
       :items="processedItems"
       :search="search"
       :custom-filter="customFilter"

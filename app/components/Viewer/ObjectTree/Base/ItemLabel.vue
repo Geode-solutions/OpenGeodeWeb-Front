@@ -5,22 +5,32 @@ const { item, showTooltip } = defineProps({
 });
 
 const emit = defineEmits(["contextmenu"]);
+
+const actualItem = computed(() => item.raw || item);
 </script>
 
 <template>
   <span
     class="tree-item-label"
-    :class="{ 'inactive-item': item.is_active === false }"
+    :class="{ 'inactive-item': actualItem.is_active === false }"
     @contextmenu.prevent.stop="emit('contextmenu', $event)"
   >
-    {{ item.title }}
-    <v-tooltip v-if="showTooltip && item.category" activator="parent" location="right">
+    {{ actualItem.title }}
+    <v-tooltip
+      v-if="showTooltip && actualItem.category"
+      activator="parent"
+      location="right"
+    >
       <div class="d-flex flex-column pa-1">
-        <span class="text-caption"><strong>ID:</strong> {{ item.id }}</span>
-        <span v-if="item.title" class="text-caption"><strong>Name:</strong> {{ item.title }}</span>
+        <span class="text-caption"
+          ><strong>ID:</strong> {{ actualItem.id }}</span
+        >
+        <span v-if="actualItem.title" class="text-caption"
+          ><strong>Name:</strong> {{ actualItem.title }}</span
+        >
         <span class="text-caption font-italic border-t-sm d-flex align-center">
           <strong class="mr-1">Status:</strong>
-          {{ item.is_active ? "Active" : "Inactive" }}
+          {{ actualItem.is_active ? "Active" : "Inactive" }}
         </span>
       </div>
     </v-tooltip>

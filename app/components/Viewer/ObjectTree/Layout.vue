@@ -1,4 +1,5 @@
 <script setup>
+import { computed, ref, watch } from "vue";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import ModelComponents from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponents.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
@@ -25,14 +26,17 @@ const totalWidth = computed(() => {
   return `${treeviewStore.panelWidth + secondColWidth + gap}px`;
 });
 
-const rowHeights = ref([]);
+const rowHeights = computed({
+  get: () => treeviewStore.rowHeights,
+  set: (val) => treeviewStore.setRowHeights(val),
+});
 const draggedIndex = ref(undefined);
 
 watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      rowHeights.value = Array.from({ length: newLength }).fill(PERCENT_100 / newLength);
+      treeviewStore.setRowHeights(Array.from({ length: newLength }).fill(PERCENT_100 / newLength));
     }
   },
   { immediate: true },
@@ -111,8 +115,10 @@ function onVerticalResizeStart(event, index) {
       newH1 = startHeight1 + startHeight2 - minHeightPercent;
     }
 
-    rowHeights.value[index] = newH1;
-    rowHeights.value[index + 1] = newH2;
+    const newHeights = [...rowHeights.value];
+    newHeights[index] = newH1;
+    newHeights[index + 1] = newH2;
+    treeviewStore.setRowHeights(newHeights);
 
     document.body.style.userSelect = "none";
     document.body.style.cursor = "ns-resize";
@@ -143,7 +149,12 @@ function onVerticalResizeStart(event, index) {
         width: `${treeviewStore.panelWidth}px`,
       }"
     >
-      <ViewerObjectTreeBox :title="mainView.title" mdi-icon="mdi-file-tree-outline">
+      <ViewerObjectTreeBox
+        :title="mainView.title"
+        mdi-icon="mdi-file-tree-outline"
+        :scroll-top="mainView.scrollTop"
+        @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
+      >
         <GlobalObjects @show-menu="emit('show-menu', $event)" />
       </ViewerObjectTreeBox>
     </div>
@@ -170,9 +181,11 @@ function onVerticalResizeStart(event, index) {
           <ViewerObjectTreeBox
             :title="view.title"
             :icon="geode_objects[view.geode_object_type]?.image"
+            :scroll-top="view.scrollTop"
             closable
             @close="treeviewStore.closeView(index + 1)"
             @dragstart="onDragStart(index + 1)"
+            @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
           >
             <ModelComponents :id="view.id" @show-menu="emit('show-menu', $event)" />
           </ViewerObjectTreeBox>

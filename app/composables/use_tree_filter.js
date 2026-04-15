@@ -1,3 +1,5 @@
+import { ref, computed, watch, toRef } from "vue";
+
 function customFilter(value, searchQuery, item) {
   if (!searchQuery) {
     return true;
@@ -11,18 +13,18 @@ function customFilter(value, searchQuery, item) {
 function sortAndFormatItems(items, sortType) {
   const field = sortType === "name" ? "title" : "id";
   return items.map((category) => {
-    const children = (category.children || []).toSorted((first, second) => {
-      const val1 = first[field] || "";
-      const val2 = second[field] || "";
-      return val1.localeCompare(val2, undefined, {
+    const children = (category.children || []).toSorted((itemA, itemB) => {
+      const valueA = itemA[field] || "";
+      const valueB = itemB[field] || "";
+      return valueA.localeCompare(valueB, undefined, {
         numeric: true,
         sensitivity: "base",
       });
     });
     return {
+      ...category,
       id: category.id,
       title: category.title || category.id,
-      geode_object_type: category.geode_object_type,
       children,
     };
   });
