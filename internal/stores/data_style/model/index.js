@@ -28,7 +28,6 @@ export function useModelStyle() {
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
 
-
   function modelVisibility(modelId) {
     return dataStyleState.getStyle(modelId).visibility;
   }
