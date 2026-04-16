@@ -10,10 +10,7 @@ export default defineNuxtConfig({
   extends: [rootNuxtConfigPath],
   compatibilityDate: "2026-04-15",
 
-  modules: [
-    ["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }],
-    "@vueuse/nuxt",
-  ],
+  modules: [["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }], "@vueuse/nuxt"],
   vite: {
     define: {
       name: "true",
