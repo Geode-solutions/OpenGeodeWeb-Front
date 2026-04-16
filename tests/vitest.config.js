@@ -71,26 +71,15 @@ export default defineConfig({
         test: {
           name: "e2e",
           extends: true,
-          include: ["tests/e2e/cells.nuxt.test.js"],
+          include: ["tests/e2e/test.test.js"],
           testTimeout: TIMEOUTS.e2e,
-          environment: "node",
+          environment: "nuxt",
           server: {
             deps: {
               external: ['bun:test', '@nuxt/test-utils'],
             },
           },
           setupFiles: [setupIndexedDB],
-          // browser: {
-          //   enabled: true,
-          //   provider: playwright(),
-          //   instances: [{ browser: "chromium" }],
-          //   expect: {
-          //     toMatchScreenshot: {
-          //       threshold: 0.02,
-          //     },
-          //   },
-          //   connectTimeout: 120_000,
-          // },
         },
       }),
       await defineVitestProject({
