@@ -55,7 +55,8 @@ const modelComponentTypeVisibility = styleComputed(
 
 const componentVisibility = styleComputed(
   () => selection.value.includes(componentId.value),
-  (isVisible) => dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], isVisible),
+  (isVisible) =>
+    dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], isVisible),
 );
 
 const componentColor = styleComputed(
