@@ -76,7 +76,9 @@ export function useDataStyleState() {
   }
 
   function mutateStyle(id, values) {
-    return genericMutate("data_style", id, values);
+    const style = getStyle(id);
+    merge(style, values);
+    return database.data_style.put(structuredClone({ id, ...toRaw(style) }));
   }
 
   function getComponentStyle(id_model, id_component) {
