@@ -1,4 +1,5 @@
 import { BaseDatabase } from "./base_database";
+import { Dexie } from "dexie";
 import { ExtendedDatabase } from "./extended_database";
 
 class Database extends BaseDatabase {
@@ -51,6 +52,7 @@ class Database extends BaseDatabase {
   }
 }
 
+await Dexie.delete("Database");
 const databaseContainer = { instance: new Database() };
 
 const database = new Proxy(
