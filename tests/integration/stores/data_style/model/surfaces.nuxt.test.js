@@ -50,10 +50,11 @@ describe("model surfaces", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        model_surfaces_schemas.visibility,
-        { id, block_ids: surface_viewer_ids, visibility },
-      );
+      expect(spy).toHaveBeenCalledWith(model_surfaces_schemas.visibility, {
+        id,
+        block_ids: surface_viewer_ids,
+        visibility,
+      });
       for (const surface_id of surface_ids) {
         expect(dataStyleStore.modelSurfaceVisibility(id, surface_id)).toBe(visibility);
       }
@@ -75,10 +76,12 @@ describe("model surfaces", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        model_surfaces_schemas.color,
-        { id, block_ids: surface_viewer_ids, color, color_mode: "constant" },
-      );
+      expect(spy).toHaveBeenCalledWith(model_surfaces_schemas.color, {
+        id,
+        block_ids: surface_viewer_ids,
+        color,
+        color_mode: "constant",
+      });
       for (const surface_id of surface_ids) {
         expect(dataStyleStore.modelSurfaceColor(id, surface_id)).toStrictEqual(color);
       }
