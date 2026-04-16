@@ -143,9 +143,9 @@ export function useDataStyleState() {
     id,
     component_ids,
     color,
-    color_mode,
     schema,
     { dataStore, viewerStore },
+    color_mode = "constant",
   ) {
     if (!component_ids?.length) {
       return;

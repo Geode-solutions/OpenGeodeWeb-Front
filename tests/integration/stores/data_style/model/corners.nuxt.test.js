@@ -54,9 +54,6 @@ describe("Model corners", () => {
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.visibility,
         { id, block_ids: corner_viewer_ids, visibility },
-        {
-          response_function: expect.any(Function),
-        },
       );
       for (const corner_id of corner_ids) {
         expect(dataStyleStore.modelCornerVisibility(id, corner_id)).toBe(visibility);
@@ -81,10 +78,7 @@ describe("Model corners", () => {
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.color,
-        { id, block_ids: corner_viewer_ids, color },
-        {
-          response_function: expect.any(Function),
-        },
+        { id, block_ids: corner_viewer_ids, color, color_mode: "constant" },
       );
       for (const corner_id of corner_ids) {
         expect(dataStyleStore.modelCornerColor(id, corner_id)).toStrictEqual(color);

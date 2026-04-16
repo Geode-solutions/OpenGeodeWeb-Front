@@ -22,9 +22,19 @@ export function useModelSurfacesCommonStyle() {
     return dataStyleState.mutateComponentStyle(id, surface_id, values);
   }
 
+  function modelSurfaceVisibility(id, surface_id) {
+    return modelSurfaceStyle(id, surface_id).visibility;
+  }
+
+  function modelSurfaceColor(id, surface_id) {
+    return modelSurfaceStyle(id, surface_id).color;
+  }
+
   return {
     modelSurfacesStyle,
     modelSurfaceStyle,
+    modelSurfaceVisibility,
+    modelSurfaceColor,
     mutateModelSurfacesStyle,
     mutateModelSurfaceStyle,
   };

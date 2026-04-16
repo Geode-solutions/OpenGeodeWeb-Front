@@ -22,9 +22,19 @@ export function useModelCornersCommonStyle() {
     return dataStyleState.mutateComponentStyle(id, corner_id, values);
   }
 
+  function modelCornerVisibility(id, corner_id) {
+    return modelCornerStyle(id, corner_id).visibility;
+  }
+
+  function modelCornerColor(id, corner_id) {
+    return modelCornerStyle(id, corner_id).color;
+  }
+
   return {
     modelCornersStyle,
     modelCornerStyle,
+    modelCornerVisibility,
+    modelCornerColor,
     mutateModelCornersStyle,
     mutateModelCornerStyle,
   };

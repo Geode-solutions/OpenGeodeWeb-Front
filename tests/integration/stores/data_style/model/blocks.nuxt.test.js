@@ -54,9 +54,6 @@ describe("Model blocks", () => {
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.visibility,
         { id, block_ids: block_viewer_ids, visibility },
-        {
-          response_function: expect.any(Function),
-        },
       );
       for (const block_id of block_ids) {
         expect(dataStyleStore.modelBlockVisibility(id, block_id)).toBe(visibility);
@@ -78,10 +75,7 @@ describe("Model blocks", () => {
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.color,
-        { id, block_ids: block_viewer_ids, color },
-        {
-          response_function: expect.any(Function),
-        },
+        { id, block_ids: block_viewer_ids, color, color_mode: "constant" },
       );
       for (const block_id of block_ids) {
         expect(dataStyleStore.modelBlockColor(id, block_id)).toStrictEqual(color);

@@ -115,7 +115,7 @@ function useModelComponentColor(type) {
   const schema = model_schemas[`${type.toLowerCase()}s`].color;
 
   return {
-    [`setModel${type}sColor`]: (modelId, componentIds, color, color_mode) =>
+    [`setModel${type}sColor`]: (modelId, componentIds, color, color_mode = "constant") =>
       dataStyleState.setModelTypeColor(modelId, componentIds, color, color_mode, schema, {
         dataStore,
         viewerStore,

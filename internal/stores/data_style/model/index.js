@@ -111,9 +111,49 @@ export function useModelStyle() {
     }
   }
 
+  function applyModelCornersStyle(modelId) {
+    return applyComponentTypeStyle(modelId, {
+      getIds: dataStore.getCornersGeodeIds,
+      getStyle: modelCornersStyleStore.modelCornerStyle,
+      setVisibility: modelCornersStyleStore.setModelCornersVisibility,
+      setColor: modelCornersStyleStore.setModelCornersColor,
+    });
+  }
+
+  function applyModelLinesStyle(modelId) {
+    return applyComponentTypeStyle(modelId, {
+      getIds: dataStore.getLinesGeodeIds,
+      getStyle: modelLinesStyleStore.modelLineStyle,
+      setVisibility: modelLinesStyleStore.setModelLinesVisibility,
+      setColor: modelLinesStyleStore.setModelLinesColor,
+    });
+  }
+
+  function applyModelSurfacesStyle(modelId) {
+    return applyComponentTypeStyle(modelId, {
+      getIds: dataStore.getSurfacesGeodeIds,
+      getStyle: modelSurfacesStyleStore.modelSurfaceStyle,
+      setVisibility: modelSurfacesStyleStore.setModelSurfacesVisibility,
+      setColor: modelSurfacesStyleStore.setModelSurfacesColor,
+    });
+  }
+
+  function applyModelBlocksStyle(modelId) {
+    return applyComponentTypeStyle(modelId, {
+      getIds: dataStore.getBlocksGeodeIds,
+      getStyle: modelBlocksStyleStore.modelBlockStyle,
+      setVisibility: modelBlocksStyleStore.setModelBlocksVisibility,
+      setColor: modelBlocksStyleStore.setModelBlocksColor,
+    });
+  }
+
   return {
     visibleMeshComponents,
     applyModelStyle,
+    applyModelCornersStyle,
+    applyModelLinesStyle,
+    applyModelSurfacesStyle,
+    applyModelBlocksStyle,
     setModelMeshComponentsDefaultStyle,
     ...modelColorStyle,
     ...modelVisibilityStyle,

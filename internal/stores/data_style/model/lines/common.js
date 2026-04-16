@@ -22,9 +22,19 @@ export function useModelLinesCommonStyle() {
     return dataStyleState.mutateComponentStyle(id, line_id, values);
   }
 
+  function modelLineVisibility(id, line_id) {
+    return modelLineStyle(id, line_id).visibility;
+  }
+
+  function modelLineColor(id, line_id) {
+    return modelLineStyle(id, line_id).color;
+  }
+
   return {
     modelLinesStyle,
     modelLineStyle,
+    modelLineVisibility,
+    modelLineColor,
     mutateModelLinesStyle,
     mutateModelLineStyle,
   };
