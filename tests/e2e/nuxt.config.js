@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   ],
   vite: {
     define: {
-      name: 'true',
+      name: "true",
     },
     server: {
       fs: {

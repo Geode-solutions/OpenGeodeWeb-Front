@@ -2,7 +2,7 @@ import path from "node:path";
 
 import { defineConfig } from "vitest/config";
 import { defineVitestProject } from "@nuxt/test-utils/config";
-import { playwright } from '@vitest/browser-playwright'
+import { playwright } from "@vitest/browser-playwright";
 
 const __dirname = import.meta.dirname;
 
@@ -50,14 +50,14 @@ export default defineConfig({
       await defineVitestProject({
         plugins: [
           {
-            name: 'ignore-bun-test',
-            enforce: 'pre',
+            name: "ignore-bun-test",
+            enforce: "pre",
             resolveId(id) {
-              if (id === 'bun:test') {
-                return { id: 'bun:test', external: true }
+              if (id === "bun:test") {
+                return { id: "bun:test", external: true };
               }
-            }
-          }
+            },
+          },
         ],
         environments: {
           client: {
@@ -76,7 +76,7 @@ export default defineConfig({
           environment: "nuxt",
           server: {
             deps: {
-              external: ['bun:test', '@nuxt/test-utils'],
+              external: ["bun:test", "@nuxt/test-utils"],
             },
           },
           setupFiles: [setupIndexedDB],
