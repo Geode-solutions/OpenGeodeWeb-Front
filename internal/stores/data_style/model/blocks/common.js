@@ -18,6 +18,10 @@ export function useModelBlocksCommonStyle() {
     return dataStyleState.mutateComponentStyles(id, block_ids, values);
   }
 
+  function mutateModelBlockStyle(id, block_id, values) {
+    return dataStyleState.mutateComponentStyle(id, block_id, values);
+  }
+
   function modelBlockVisibility(id, block_id) {
     return modelBlockStyle(id, block_id).visibility;
   }
