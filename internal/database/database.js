@@ -52,6 +52,7 @@ class Database extends BaseDatabase {
 }
 
 const databaseContainer = { instance: new Database() };
+databaseContainer.instance.clear();
 
 const database = new Proxy(
   {},
