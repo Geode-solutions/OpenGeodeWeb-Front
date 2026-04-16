@@ -2,7 +2,7 @@ import { MESH_TYPES } from "./constants";
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 
-function buildSelection(modelId, components, stylesMap, dataStyleState) {
+function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyleState) {
   const componentsByType = Object.fromEntries(MESH_TYPES.map((type) => [type, []]));
   for (const component of components) {
     if (componentsByType[component.type]) {
@@ -19,7 +19,8 @@ function buildSelection(modelId, components, stylesMap, dataStyleState) {
     }
 
     const typeKey = `${type.toLowerCase()}s`;
-    const defaultVisibility = groupStyles[typeKey]?.visibility ?? true;
+    const typeStyle = typeStylesMap[type];
+    const defaultVisibility = typeStyle?.visibility ?? groupStyles[typeKey]?.visibility ?? true;
 
     let allVisible = true;
     for (const component of typeComponents) {
@@ -47,18 +48,22 @@ function useModelSelection(id_ref, dataStyleState) {
         return;
       }
       const observable = liveQuery(async () => {
-        const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+        const [allComponents, componentStyles, typeStyles] = await Promise.all([
+          database.model_components.where("id").equals(modelId).toArray(),
+          database.model_component_datastyle.where("id_model").equals(modelId).toArray(),
+          database.model_component_type_datastyle.where("id_model").equals(modelId).toArray(),
+        ]);
+
         if (allComponents.length === 0) {
           return [];
         }
-        const componentStyles = await database.model_component_datastyle
-          .where("id_model")
-          .equals(modelId)
-          .toArray();
+
         const stylesMap = Object.fromEntries(
           componentStyles.map((style) => [style.id_component, style]),
         );
-        return buildSelection(modelId, allComponents, stylesMap, dataStyleState);
+        const typeStylesMap = Object.fromEntries(typeStyles.map((style) => [style.type, style]));
+
+        return buildSelection(modelId, allComponents, stylesMap, typeStylesMap, dataStyleState);
       });
 
       const subscription = observable.subscribe({

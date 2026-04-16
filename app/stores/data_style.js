@@ -74,7 +74,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   function applyAllStylesFromState() {
-    const ids = Object.keys(dataStyleState.styles);
+    const ids = Object.keys(dataStyleState.styles.value);
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id);
       const viewerType = meta.viewer_type;

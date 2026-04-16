@@ -1,4 +1,4 @@
-import { MESH_TYPES } from "./constants";
+import { DEFAULT_MODEL_COMPONENT_TYPE_COLORS, MESH_TYPES } from "./constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelBlocksStyle } from "./blocks";
@@ -50,7 +50,7 @@ async function applyComponentTypeStyle(modelId, { getIds, getStyle, setVisibilit
   return Promise.all(promises);
 }
 
-export function useModelStyle() {
+function useModelStyle() {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const modelCornersStyleStore = useModelCornersStyle();
@@ -128,7 +128,6 @@ export function useModelStyle() {
       setColor: modelLinesStyleStore.setModelLinesColor,
     });
   }
-
   function applyModelSurfacesStyle(modelId) {
     return applyComponentTypeStyle(modelId, {
       getIds: dataStore.getSurfacesGeodeIds,
@@ -137,7 +136,6 @@ export function useModelStyle() {
       setColor: modelSurfacesStyleStore.setModelSurfacesColor,
     });
   }
-
   function applyModelBlocksStyle(modelId) {
     return applyComponentTypeStyle(modelId, {
       getIds: dataStore.getBlocksGeodeIds,
@@ -146,7 +144,6 @@ export function useModelStyle() {
       setColor: modelBlocksStyleStore.setModelBlocksColor,
     });
   }
-
   return {
     visibleMeshComponents,
     applyModelStyle,
@@ -165,3 +162,5 @@ export function useModelStyle() {
     ...modelSurfacesStyleStore,
   };
 }
+
+export { MESH_TYPES, DEFAULT_MODEL_COMPONENT_TYPE_COLORS, useModelStyle };

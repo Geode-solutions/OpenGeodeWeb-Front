@@ -1,4 +1,4 @@
-import { MESH_TYPES } from "./constants";
+import { MESH_TYPES } from "@ogw_internal/stores/data_style/model";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -69,13 +69,26 @@ function useModelVisibilityStyle(stores) {
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
     viewerStore.start_request();
     try {
-      return await dispatchToComponentTypes(
-        modelId,
-        componentIds,
-        "Visibility",
-        { dataStore, stores, viewerStore },
-        visibility,
-      );
+      const typeIds = componentIds.filter((id) => MESH_TYPES.includes(id));
+      const individualIds = componentIds.filter((id) => !MESH_TYPES.includes(id));
+
+      const promises = [];
+      for (const typeId of typeIds) {
+        promises.push(setModelComponentTypeVisibility(modelId, typeId, visibility));
+      }
+
+      if (individualIds.length > 0) {
+        promises.push(
+          dispatchToComponentTypes(
+            modelId,
+            individualIds,
+            "Visibility",
+            { dataStore, stores, viewerStore },
+            visibility,
+          ),
+        );
+      }
+      return await Promise.all(promises);
     } finally {
       viewerStore.stop_request();
     }
