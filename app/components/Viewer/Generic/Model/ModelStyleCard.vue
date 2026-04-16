@@ -15,9 +15,7 @@ const { itemProps } = defineProps({
 
 const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
 const componentId = computed(() => itemProps.meta_data.pickedComponentId);
-
 const selection = dataStyleStore.visibleMeshComponents(modelId);
-
 const component_type = ref(undefined);
 
 const modelCollapsed = ref(false);
@@ -28,108 +26,86 @@ watchEffect(async () => {
   if (itemProps.meta_data.viewer_type === "model_component_type") {
     component_type.value = itemProps.meta_data.modelComponentType;
   } else if (componentId.value && modelId.value) {
-    const type = await dataStore.meshComponentType(modelId.value, componentId.value);
-    component_type.value = type;
+    component_type.value = await dataStore.meshComponentType(modelId.value, componentId.value);
   } else {
     component_type.value = undefined;
   }
 });
 
-const modelVisibility = computed({
-  get: () => dataStyleStore.modelVisibility(modelId.value),
-  set: async (value) => {
-    await dataStyleStore.setModelVisibility(modelId.value, value);
-    hybridViewerStore.remoteRender();
-  },
-});
+function styleComputed(getter, setter) {
+  return computed({
+    get: getter,
+    set: async (newValue) => {
+      await setter(newValue);
+      hybridViewerStore.remoteRender();
+    },
+  });
+}
 
-const modelComponentTypeVisibility = computed({
-  get: () => selection.value.includes(component_type.value),
-  set: async (value) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId.value, [component_type.value], value);
-    hybridViewerStore.remoteRender();
-  },
-});
+const modelVisibility = styleComputed(
+  () => dataStyleStore.modelVisibility(modelId.value),
+  (isVisible) => dataStyleStore.setModelVisibility(modelId.value, isVisible),
+);
 
-const componentVisibility = computed({
-  get: () => selection.value.includes(componentId.value),
-  set: async (value) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], value);
-    hybridViewerStore.remoteRender();
-  },
-});
+const modelComponentTypeVisibility = styleComputed(
+  () => selection.value.includes(component_type.value),
+  (isVisible) =>
+    dataStyleStore.setModelComponentTypeVisibility(modelId.value, component_type.value, isVisible),
+);
 
-const componentColor = computed({
-  get: () =>
+const componentVisibility = styleComputed(
+  () => selection.value.includes(componentId.value),
+  (isVisible) => dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], isVisible),
+);
+
+const componentColor = styleComputed(
+  () =>
     componentId.value
       ? dataStyleStore.getModelComponentColor(modelId.value, componentId.value)
       : undefined,
-  set: async (newValue) => {
-    if (componentId.value) {
-      await dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], newValue);
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
+  (color) =>
+    componentId.value &&
+    dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], color),
+);
 
-const modelComponentTypeColor = computed({
-  get: () =>
+const modelComponentTypeColor = styleComputed(
+  () =>
     component_type.value
       ? dataStyleStore.getModelComponentTypeColor(modelId.value, component_type.value)
       : undefined,
-  set: async (newValue) => {
-    if (component_type.value) {
-      await dataStyleStore.setModelComponentTypeColor(
-        modelId.value,
-        component_type.value,
-        newValue,
-      );
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
+  (color) =>
+    component_type.value &&
+    dataStyleStore.setModelComponentTypeColor(modelId.value, component_type.value, color),
+);
+
+const modelComponentTypeColorMode = styleComputed(
+  () =>
+    component_type.value
+      ? dataStyleStore.getModelComponentTypeColorMode(modelId.value, component_type.value)
+      : "constant",
+  (colorMode) =>
+    component_type.value &&
+    dataStyleStore.setModelComponentTypeColorMode(modelId.value, component_type.value, colorMode),
+);
+
+const componentColorMode = styleComputed(
+  () =>
+    componentId.value
+      ? dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value)
+      : "constant",
+  (colorMode) =>
+    componentId.value &&
+    dataStyleStore.setModelComponentColorMode(modelId.value, componentId.value, colorMode),
+);
 
 const colorModes = [
   { title: "Constant", value: "constant" },
   { title: "Random", value: "random" },
 ];
 
-const modelComponentTypeColorMode = computed({
-  get: () =>
-    component_type.value
-      ? dataStyleStore.getModelComponentTypeColorMode(modelId.value, component_type.value)
-      : "constant",
-  set: async (value) => {
-    if (component_type.value) {
-      await dataStyleStore.setModelComponentTypeColorMode(
-        modelId.value,
-        component_type.value,
-        value,
-      );
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-const componentColorMode = computed({
-  get: () =>
-    componentId.value
-      ? dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value)
-      : "constant",
-  set: async (value) => {
-    if (componentId.value) {
-      await dataStyleStore.setModelComponentColorMode(modelId.value, componentId.value, value);
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-const modelComponentTypeLabel = computed(() => {
-  if (!component_type.value) {
-    return "";
-  }
-  return `${component_type.value}s Options`;
-});
+const modelComponentTypeLabel = computed(() =>
+  component_type.value ? `${component_type.value}s Options` : "",
+);
 </script>
 
 <template>

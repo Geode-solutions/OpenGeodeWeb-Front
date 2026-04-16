@@ -1,21 +1,16 @@
-// Local imports
-import { useModelSurfacesColorStyle } from "./color";
+import { useModelComponentColor } from "@ogw_internal/stores/data_style/model/color";
+import { useModelComponentVisibility } from "@ogw_internal/stores/data_style/model/visibility";
 import { useModelSurfacesCommonStyle } from "./common";
-import { useModelSurfacesVisibilityStyle } from "./visibility";
 
 async function setModelSurfacesDefaultStyle(_id) {
   // Placeholder
 }
 
 export function useModelSurfacesStyle() {
-  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
-  const modelSurfacesVisibilityStyle = useModelSurfacesVisibilityStyle();
-  const modelSurfacesColorStyle = useModelSurfacesColorStyle();
-
   return {
     setModelSurfacesDefaultStyle,
-    ...modelSurfacesCommonStyle,
-    ...modelSurfacesVisibilityStyle,
-    ...modelSurfacesColorStyle,
+    ...useModelSurfacesCommonStyle(),
+    ...useModelComponentVisibility("Surface"),
+    ...useModelComponentColor("Surface"),
   };
 }

@@ -2,23 +2,15 @@ import { DEFAULT_MODEL_COMPONENT_TYPE_COLORS } from "./constants";
 import { dispatchToComponentTypes } from "./visibility";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
-import { useModelBlocksStyle } from "./blocks";
-import { useModelCornersStyle } from "./corners";
-import { useModelLinesStyle } from "./lines";
-import { useModelSurfacesStyle } from "./surfaces";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-export function useModelColorStyle() {
+const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
+
+function useModelColorStyle(stores) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const viewerStore = useViewerStore();
-
-  const stores = {
-    Corner: useModelCornersStyle(),
-    Line: useModelLinesStyle(),
-    Surface: useModelSurfacesStyle(),
-    Block: useModelBlocksStyle(),
-  };
 
   function getModelComponentColor(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).color;
@@ -29,8 +21,10 @@ export function useModelColorStyle() {
   }
 
   function getModelComponentTypeColor(modelId, type) {
-    const style = dataStyleState.getModelComponentTypeStyle(modelId, type);
-    return style.color || DEFAULT_MODEL_COMPONENT_TYPE_COLORS[type];
+    return (
+      dataStyleState.getModelComponentTypeStyle(modelId, type).color ||
+      DEFAULT_MODEL_COMPONENT_TYPE_COLORS[type]
+    );
   }
 
   function getModelComponentTypeColorMode(modelId, type) {
@@ -67,7 +61,6 @@ export function useModelColorStyle() {
         await setModelComponentsColor(modelId, idsForType, undefined, color_mode);
         return;
       }
-
       await dataStyleState.mutateComponentStyles(modelId, idsForType, { color_mode });
     } finally {
       viewerStore.stop_request();
@@ -77,12 +70,10 @@ export function useModelColorStyle() {
   async function setModelComponentColorMode(modelId, componentId, color_mode) {
     viewerStore.start_request();
     try {
-      if (color_mode === "random") {
-        await dataStyleState.mutateComponentStyle(modelId, componentId, { color_mode });
-        await setModelComponentsColor(modelId, [componentId], undefined, color_mode);
-        return;
-      }
       await dataStyleState.mutateComponentStyle(modelId, componentId, { color_mode });
+      if (color_mode === "random") {
+        await setModelComponentsColor(modelId, [componentId], undefined, color_mode);
+      }
     } finally {
       viewerStore.stop_request();
     }
@@ -116,3 +107,20 @@ export function useModelColorStyle() {
     setModelComponentsColor,
   };
 }
+
+function useModelComponentColor(type) {
+  const dataStore = useDataStore();
+  const dataStyleState = useDataStyleState();
+  const viewerStore = useViewerStore();
+  const schema = model_schemas[`${type.toLowerCase()}s`].color;
+
+  return {
+    [`setModel${type}sColor`]: (modelId, componentIds, color, color_mode) =>
+      dataStyleState.setModelTypeColor(modelId, componentIds, color, color_mode, schema, {
+        dataStore,
+        viewerStore,
+      }),
+  };
+}
+
+export { useModelColorStyle, useModelComponentColor };

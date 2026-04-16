@@ -1,21 +1,16 @@
-// Local imports
-import { useModelCornersColorStyle } from "./color";
+import { useModelComponentColor } from "@ogw_internal/stores/data_style/model/color";
+import { useModelComponentVisibility } from "@ogw_internal/stores/data_style/model/visibility";
 import { useModelCornersCommonStyle } from "./common";
-import { useModelCornersVisibilityStyle } from "./visibility";
 
 async function setModelCornersDefaultStyle(_id) {
   // Placeholder
 }
 
 export function useModelCornersStyle() {
-  const modelCornersCommonStyle = useModelCornersCommonStyle();
-  const modelCornersVisibilityStyle = useModelCornersVisibilityStyle();
-  const modelCornersColorStyle = useModelCornersColorStyle();
-
   return {
     setModelCornersDefaultStyle,
-    ...modelCornersCommonStyle,
-    ...modelCornersVisibilityStyle,
-    ...modelCornersColorStyle,
+    ...useModelCornersCommonStyle(),
+    ...useModelComponentVisibility("Corner"),
+    ...useModelComponentColor("Corner"),
   };
 }

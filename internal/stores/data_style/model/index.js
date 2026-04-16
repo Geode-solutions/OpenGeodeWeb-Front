@@ -61,15 +61,15 @@ export function useModelStyle() {
   const modelSurfacesStyleStore = useModelSurfacesStyle();
   const viewerStore = useViewerStore();
 
-  const modelColorStyle = useModelColorStyle();
-  const modelVisibilityStyle = useModelVisibilityStyle();
-
   const stores = {
     Corner: modelCornersStyleStore,
     Line: modelLinesStyleStore,
     Surface: modelSurfacesStyleStore,
     Block: modelBlocksStyleStore,
   };
+
+  const modelColorStyle = useModelColorStyle(stores);
+  const modelVisibilityStyle = useModelVisibilityStyle(stores);
 
   function visibleMeshComponents(id_ref) {
     return useModelSelection(id_ref, dataStyleState);

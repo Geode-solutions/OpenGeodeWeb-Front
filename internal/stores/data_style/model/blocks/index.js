@@ -1,21 +1,16 @@
-// Local imports
-import { useModelBlocksColorStyle } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
-import { useModelBlocksVisibilityStyle } from "./visibility";
+import { useModelComponentColor } from "@ogw_internal/stores/data_style/model/color";
+import { useModelComponentVisibility } from "@ogw_internal/stores/data_style/model/visibility";
 
 async function setModelBlocksDefaultStyle(_id) {
   // Placeholder
 }
 
 export function useModelBlocksStyle() {
-  const modelBlocksCommonStyle = useModelBlocksCommonStyle();
-  const modelBlocksVisibilityStyle = useModelBlocksVisibilityStyle();
-  const modelBlocksColorStyle = useModelBlocksColorStyle();
-
   return {
     setModelBlocksDefaultStyle,
-    ...modelBlocksCommonStyle,
-    ...modelBlocksVisibilityStyle,
-    ...modelBlocksColorStyle,
+    ...useModelBlocksCommonStyle(),
+    ...useModelComponentVisibility("Block"),
+    ...useModelComponentColor("Block"),
   };
 }
