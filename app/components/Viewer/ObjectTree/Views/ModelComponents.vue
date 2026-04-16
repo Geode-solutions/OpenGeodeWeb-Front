@@ -1,4 +1,5 @@
 <script setup>
+import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
@@ -16,14 +17,18 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const treeviewStore = useTreeviewStore();
 
-const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
+const currentView = computed(() =>
+  treeviewStore.opened_views.find((view) => view.id === viewId),
+);
 const opened = computed({
   get: () => currentView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(viewId, val),
 });
 
 const items = dataStore.refFormatedMeshComponents(toRef(() => viewId));
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => viewId));
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(
+  toRef(() => viewId),
+);
 
 const {
   search,
@@ -63,7 +68,10 @@ async function onSelectionChange(current) {
       @toggle-sort="toggleSort"
     />
 
+    <FetchingData v-if="items === undefined" :size="48" :width="4" text="" />
+
     <v-treeview
+      v-else
       :selected="mesh_components_selection"
       v-model:opened="opened"
       :items="processedItems"

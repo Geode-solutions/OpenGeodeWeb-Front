@@ -73,7 +73,7 @@ export const useDataStore = defineStore("data", () => {
         const unwrapped_id = unref(id);
         return formatedMeshComponents(unwrapped_id);
       }),
-      { initialValue: [] },
+      { initialValue: undefined },
     );
   }
 
