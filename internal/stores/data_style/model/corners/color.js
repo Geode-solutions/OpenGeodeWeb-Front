@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCornersCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -13,28 +14,27 @@ export function useModelCornersColorStyle() {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
+  const dataStyleState = useDataStyleState();
 
   function modelCornerColor(id, corner_id) {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).color;
   }
 
   function setModelCornersColor(id, corner_ids, color, color_mode = "constant") {
-    if (!corner_ids || corner_ids.length === 0) {
-      return Promise.resolve();
-    }
-    return dataStore.getMeshComponentsViewerIds(id, corner_ids).then((corner_viewer_ids) => {
-      if (!corner_viewer_ids || corner_viewer_ids.length === 0) {
-        return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, {
-          color,
-          color_mode,
-        });
-      }
-      const params = { id, block_ids: corner_viewer_ids, color_mode };
-      if (color_mode === "constant") {
-        params.color = color;
-      }
-      return viewerStore.request(model_corners_schemas.color, params);
-    });
+    return dataStyleState
+      .setModelTypeColor(id, corner_ids, color, color_mode, model_corners_schemas.color, {
+        dataStore,
+        viewerStore,
+      })
+      .then((res) => {
+        if (!res) {
+          return modelCornersCommonStyle.mutateModelCornersStyle(id, corner_ids, {
+            color,
+            color_mode,
+          });
+        }
+        return res;
+      });
   }
 
   return {

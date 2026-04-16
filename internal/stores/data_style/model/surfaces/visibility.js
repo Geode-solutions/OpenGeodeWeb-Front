@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelSurfacesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -13,29 +14,26 @@ export function useModelSurfacesVisibilityStyle() {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
+  const dataStyleState = useDataStyleState();
+
   function modelSurfaceVisibility(id, surface_id) {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility;
   }
-  function setModelSurfacesVisibility(id, surface_ids, visibility) {
-    if (!surface_ids || surface_ids.length === 0) {
-      return Promise.resolve();
-    }
 
-    return dataStore.getMeshComponentsViewerIds(id, surface_ids).then((surface_viewer_ids) => {
-      if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-        return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, { visibility });
-      }
-      return viewerStore.request(
-        model_surfaces_schemas.visibility,
-        { id, block_ids: surface_viewer_ids, visibility },
-        {
-          response_function: () =>
-            modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, {
-              visibility,
-            }),
-        },
-      );
-    });
+  function setModelSurfacesVisibility(id, surface_ids, visibility) {
+    return dataStyleState
+      .setModelTypeVisibility(id, surface_ids, visibility, model_surfaces_schemas.visibility, {
+        dataStore,
+        viewerStore,
+      })
+      .then((res) => {
+        if (!res) {
+          return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, {
+            visibility,
+          });
+        }
+        return res;
+      });
   }
 
   return {

@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelSurfacesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -13,28 +14,27 @@ export function useModelSurfacesColorStyle() {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
+  const dataStyleState = useDataStyleState();
 
   function modelSurfaceColor(id, surface_id) {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color;
   }
 
   function setModelSurfacesColor(id, surface_ids, color, color_mode = "constant") {
-    if (!surface_ids || surface_ids.length === 0) {
-      return Promise.resolve();
-    }
-    return dataStore.getMeshComponentsViewerIds(id, surface_ids).then((surface_viewer_ids) => {
-      if (!surface_viewer_ids || surface_viewer_ids.length === 0) {
-        return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, {
-          color,
-          color_mode,
-        });
-      }
-      const params = { id, block_ids: surface_viewer_ids, color_mode };
-      if (color_mode === "constant") {
-        params.color = color;
-      }
-      return viewerStore.request(model_surfaces_schemas.color, params);
-    });
+    return dataStyleState
+      .setModelTypeColor(id, surface_ids, color, color_mode, model_surfaces_schemas.color, {
+        dataStore,
+        viewerStore,
+      })
+      .then((res) => {
+        if (!res) {
+          return modelSurfacesCommonStyle.mutateModelSurfacesStyle(id, surface_ids, {
+            color,
+            color_mode,
+          });
+        }
+        return res;
+      });
   }
 
   return { modelSurfaceColor, setModelSurfacesColor };

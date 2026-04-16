@@ -63,10 +63,20 @@ export function useDataStyleState() {
     return { ...toRaw(styles.value[id]) };
   }
 
+  async function genericMutate(tableName, key, values) {
+    const table = database[tableName];
+    const entry = (await table.get(key)) || (Array.isArray(key) ? {} : { id: key });
+    if (tableName === "model_component_datastyle" && !entry.id_model) {
+      [entry.id_model, entry.id_component] = key;
+    } else if (tableName === "model_component_type_datastyle" && !entry.id_model) {
+      [entry.id_model, entry.type] = key;
+    }
+    merge(entry, values);
+    return table.put(structuredClone(toRaw(entry)));
+  }
+
   function mutateStyle(id, values) {
-    const style = getStyle(id);
-    merge(style, values);
-    return database.data_style.put(structuredClone({ id, ...toRaw(style) }));
+    return genericMutate("data_style", id, values);
   }
 
   function getComponentStyle(id_model, id_component) {
@@ -75,11 +85,7 @@ export function useDataStyleState() {
   }
 
   function mutateComponentStyle(id_model, id_component, values) {
-    return database.model_component_datastyle.get([id_model, id_component]).then((style) => {
-      const component_style = style || { id_model, id_component };
-      merge(component_style, values);
-      return database.model_component_datastyle.put(structuredClone(toRaw(component_style)));
-    });
+    return genericMutate("model_component_datastyle", [id_model, id_component], values);
   }
 
   function getModelComponentTypeStyle(id_model, type) {
@@ -88,14 +94,9 @@ export function useDataStyleState() {
   }
 
   function mutateModelComponentTypeStyle(id_model, type, values) {
-    return database.transaction("rw", database.model_component_type_datastyle, async () => {
-      const style = await database.model_component_type_datastyle.get([id_model, type]);
-      const model_component_type_style = style || { id_model, type };
-      merge(model_component_type_style, values);
-      return database.model_component_type_datastyle.put(
-        structuredClone(toRaw(model_component_type_style)),
-      );
-    });
+    return database.transaction("rw", database.model_component_type_datastyle, () =>
+      genericMutate("model_component_type_datastyle", [id_model, type], values),
+    );
   }
 
   function mutateComponentStyles(id_model, id_components, values) {
@@ -120,6 +121,80 @@ export function useDataStyleState() {
     });
   }
 
+  function bulkMutateComponentStylesPerComponent(id_model, component_updates) {
+    return database.transaction("rw", database.model_component_datastyle, async () => {
+      const component_ids = new Set(component_updates.map((update) => update.id_component));
+      const all_styles = await database.model_component_datastyle
+        .where("id_model")
+        .equals(id_model)
+        .and((style) => component_ids.has(style.id_component))
+        .toArray();
+      const style_map = Object.fromEntries(all_styles.map((style) => [style.id_component, style]));
+      const updates = component_updates.map(({ id_component, values }) => {
+        const style = style_map[id_component] || { id_model, id_component };
+        merge(style, values);
+        return toRaw(style);
+      });
+      return database.model_component_datastyle.bulkPut(structuredClone(updates));
+    });
+  }
+
+  async function setModelTypeColor(
+    id,
+    component_ids,
+    color,
+    color_mode,
+    schema,
+    { dataStore, viewerStore },
+  ) {
+    if (!component_ids?.length) {
+      return;
+    }
+
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(id, component_ids);
+    if (!viewer_ids?.length) {
+      return;
+    }
+
+    const params = { id, block_ids: viewer_ids, color_mode };
+    if (color_mode === "constant") {
+      params.color = color;
+    }
+
+    const colors = await viewerStore.request(schema, params);
+    if (!colors?.length) {
+      return;
+    }
+
+    return bulkMutateComponentStylesPerComponent(
+      id,
+      colors.map(({ geode_id, color: color_value }) => ({
+        id_component: geode_id,
+        values: { color: color_value },
+      })),
+    );
+  }
+
+  async function setModelTypeVisibility(
+    id,
+    component_ids,
+    visibility,
+    schema,
+    { dataStore, viewerStore },
+  ) {
+    if (!component_ids?.length) {
+      return;
+    }
+
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(id, component_ids);
+    if (!viewer_ids?.length) {
+      return;
+    }
+
+    await viewerStore.request(schema, { id, block_ids: viewer_ids, visibility });
+    return mutateComponentStyles(id, component_ids, { visibility });
+  }
+
   function clear() {
     return Promise.all([
       database.data_style.clear(),
@@ -136,11 +211,14 @@ export function useDataStyleState() {
     mutateComponentStyle,
     mutateModelComponentTypeStyle,
     mutateComponentStyles,
+    bulkMutateComponentStylesPerComponent,
     styles,
     componentStyles,
     modelComponentTypeStyles,
     objectVisibility,
     selectedObjects,
+    setModelTypeColor,
+    setModelTypeVisibility,
     clear,
   };
 }

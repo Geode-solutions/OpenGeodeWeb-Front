@@ -3,6 +3,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelBlocksCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -13,25 +14,27 @@ export function useModelBlocksColorStyle() {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
+  const dataStyleState = useDataStyleState();
 
   function modelBlockColor(id, block_id) {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).color;
   }
 
   function setModelBlocksColor(id, block_ids, color, color_mode = "constant") {
-    if (!block_ids || block_ids.length === 0) {
-      return Promise.resolve();
-    }
-    return dataStore.getMeshComponentsViewerIds(id, block_ids).then((block_viewer_ids) => {
-      if (!block_viewer_ids || block_viewer_ids.length === 0) {
-        return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color, color_mode });
-      }
-      const params = { id, block_ids: block_viewer_ids, color_mode };
-      if (color_mode === "constant") {
-        params.color = color;
-      }
-      return viewerStore.request(model_blocks_schemas.color, params);
-    });
+    return dataStyleState
+      .setModelTypeColor(id, block_ids, color, color_mode, model_blocks_schemas.color, {
+        dataStore,
+        viewerStore,
+      })
+      .then((res) => {
+        if (!res) {
+          return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
+            color,
+            color_mode,
+          });
+        }
+        return res;
+      });
   }
 
   return { modelBlockColor, setModelBlocksColor };
