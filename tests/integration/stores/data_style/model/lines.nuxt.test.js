@@ -51,10 +51,11 @@ describe("Model lines", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        model_lines_schemas.visibility,
-        { id, block_ids: lines_viewer_ids, visibility },
-      );
+      expect(spy).toHaveBeenCalledWith(model_lines_schemas.visibility, {
+        id,
+        block_ids: lines_viewer_ids,
+        visibility,
+      });
       for (const line_id of line_ids) {
         expect(dataStyleStore.modelLineVisibility(id, line_id)).toBe(visibility);
       }
@@ -76,10 +77,12 @@ describe("Model lines", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        model_lines_schemas.color,
-        { id, block_ids: lines_viewer_ids, color, color_mode: "constant" },
-      );
+      expect(spy).toHaveBeenCalledWith(model_lines_schemas.color, {
+        id,
+        block_ids: lines_viewer_ids,
+        color,
+        color_mode: "constant",
+      });
       for (const line_id of line_ids) {
         expect(dataStyleStore.modelLineColor(id, line_id)).toStrictEqual(color);
       }
