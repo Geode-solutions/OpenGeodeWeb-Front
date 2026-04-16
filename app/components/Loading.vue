@@ -1,8 +1,12 @@
 <script setup>
-const { logo } = defineProps({
+const { logo, appName } = defineProps({
   logo: {
     type: String,
     default: "",
+  },
+  appName: {
+    type: String,
+    required: true,
   },
 });
 
@@ -68,7 +72,7 @@ onUnmounted(() => {
           style="max-width: 650px; width: 100%; padding: 0 24px; gap: 1.5rem"
         >
           <LoadingHeader :logo="logo" />
-          <LoadingEcoMessages />
+          <LoadingEcoMessages :app-name="appName" />
           <LoadingProgress :progress="progress" />
           <LoadingFooter />
         </div>
