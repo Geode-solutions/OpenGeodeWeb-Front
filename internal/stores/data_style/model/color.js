@@ -116,10 +116,17 @@ function useModelComponentColor(type) {
 
   return {
     [`setModel${type}sColor`]: (modelId, componentIds, color, color_mode = "constant") =>
-      dataStyleState.setModelTypeColor(modelId, componentIds, color, color_mode, schema, {
-        dataStore,
-        viewerStore,
-      }),
+      dataStyleState.setModelTypeColor(
+        modelId,
+        componentIds,
+        color,
+        schema,
+        {
+          dataStore,
+          viewerStore,
+        },
+        color_mode,
+      ),
   };
 }
 
