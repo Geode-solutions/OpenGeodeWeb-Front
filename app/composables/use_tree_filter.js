@@ -33,9 +33,12 @@ function useTreeFilter(rawItems, options = {}) {
   const sortType = ref(options.defaultSort || "name");
   const filterOptions = ref(options.defaultFilters || {});
 
-  const availableFilterOptions = computed(() =>
-    rawItems.value.map((category) => category.title || category.id),
-  );
+  const availableFilterOptions = computed(() => {
+    if (!rawItems.value) {
+      return [];
+    }
+    return rawItems.value.map((category) => category.title || category.id);
+  });
 
   watch(
     availableFilterOptions,
@@ -49,15 +52,18 @@ function useTreeFilter(rawItems, options = {}) {
     { immediate: true },
   );
 
-  const processedItems = computed(() =>
-    sortAndFormatItems(
+  const processedItems = computed(() => {
+    if (!rawItems.value) {
+      return [];
+    }
+    return sortAndFormatItems(
       rawItems.value.filter((category) => {
         const key = category.title || category.id;
         return filterOptions.value[key] !== false;
       }),
       sortType.value,
-    ),
-  );
+    );
+  });
 
   function toggleSort() {
     sortType.value = sortType.value === "name" ? "id" : "name";

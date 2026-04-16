@@ -7,8 +7,9 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 
 const infraStore = useInfraStore();
 
-const { versions_schema } = defineProps({
+const { versions_schema, appName } = defineProps({
   versions_schema: { type: Object, required: true },
+  appName: { type: String, required: true },
 });
 </script>
 
@@ -17,7 +18,7 @@ const { versions_schema } = defineProps({
     <v-row class="flex-column">
       <template v-if="!infraStore.microservices_connected">
         <v-col>
-          <Launcher />
+          <Launcher :app-name="appName" />
         </v-col>
       </template>
       <template v-else>
