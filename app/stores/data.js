@@ -45,23 +45,23 @@ export const useDataStore = defineStore("data", () => {
 
     const componentsByType = {};
     for (const component_item of items) {
-      if (componentTitles[component_item.type]) {
-        if (!componentsByType[component_item.type]) {
-          componentsByType[component_item.type] = [];
+      if (componentTitles[component_item.componentType]) {
+        if (!componentsByType[component_item.componentType]) {
+          componentsByType[component_item.componentType] = [];
         }
-        componentsByType[component_item.type].push(component_item);
+        componentsByType[component_item.componentType].push(component_item);
       }
     }
 
     return Object.keys(componentTitles)
-      .filter((type) => componentsByType[type])
-      .map((type) => ({
-        id: type,
-        title: componentTitles[type],
-        children: componentsByType[type].map((meshComponent) => ({
+      .filter((componentType) => componentsByType[componentType])
+      .map((componentType) => ({
+        id: componentType,
+        title: componentTitles[componentType],
+        children: componentsByType[componentType].map((meshComponent) => ({
           id: meshComponent.geode_id,
           title: meshComponent.name,
-          category: meshComponent.type,
+          category: meshComponent.componentType,
           is_active: meshComponent.is_active,
         })),
       }));
@@ -82,7 +82,7 @@ export const useDataStore = defineStore("data", () => {
       .where("[id+geode_id]")
       .equals([modelId, geode_id])
       .first();
-    return component?.type;
+    return component?.componentType;
   }
 
   async function registerObject(id) {
@@ -113,7 +113,7 @@ export const useDataStore = defineStore("data", () => {
         allComponents.push({
           id: new_item.id,
           geode_id: component.geode_id,
-          type: component.type,
+          componentType: component.type,
           viewer_id: component.viewer_id,
           name: component.name,
           is_active: component.is_active,
@@ -184,10 +184,10 @@ export const useDataStore = defineStore("data", () => {
     await database.model_components_relation.where("id").equals(modelId).delete();
   }
 
-  async function getMeshComponentGeodeIds(modelId, component_type) {
+  async function getMeshComponentGeodeIds(modelId, componentType) {
     const components = await database.model_components
-      .where("[id+type]")
-      .equals([modelId, component_type])
+      .where("[id+componentType]")
+      .equals([modelId, componentType])
       .toArray();
     return components.map((component) => component.geode_id);
   }

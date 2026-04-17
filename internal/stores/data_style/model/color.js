@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL_COMPONENT_TYPE_COLORS } from "./constants";
+import { DEFAULT_MODEL_COMPONENT_TYPE_COLORS } from "@ogw_front/utils/default_styles";
 import { dispatchToComponentTypes } from "./visibility";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -15,37 +15,39 @@ function useModelColorStyle(componentStyleFunctions) {
     return dataStyleState.getComponentStyle(modelId, componentId).color;
   }
 
-  function getModelComponentEffectiveColor(modelId, componentId, type) {
+  function getModelComponentEffectiveColor(modelId, componentId, componentType) {
     const individualColor = getModelComponentColor(modelId, componentId);
     if (individualColor !== undefined) {
       return individualColor;
     }
-    return getModelComponentTypeColor(modelId, type);
+    return getModelComponentTypeColor(modelId, componentType);
   }
 
   function getModelComponentColorMode(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).color_mode || "constant";
   }
 
-  function getModelComponentTypeColor(modelId, type) {
+  function getModelComponentTypeColor(modelId, componentType) {
     return (
-      dataStyleState.getModelComponentTypeStyle(modelId, type).color ||
-      DEFAULT_MODEL_COMPONENT_TYPE_COLORS[type]
+      dataStyleState.getModelComponentTypeStyle(modelId, componentType).color ||
+      DEFAULT_MODEL_COMPONENT_TYPE_COLORS[componentType]
     );
   }
 
-  function getModelComponentTypeColorMode(modelId, type) {
-    return dataStyleState.getModelComponentTypeStyle(modelId, type).color_mode || "constant";
+  function getModelComponentTypeColorMode(modelId, componentType) {
+    return (
+      dataStyleState.getModelComponentTypeStyle(modelId, componentType).color_mode || "constant"
+    );
   }
 
-  async function setModelComponentTypeColor(modelId, type, color) {
+  async function setModelComponentTypeColor(modelId, componentType, color) {
     viewerStore.start_request();
     try {
-      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
+      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
         color,
         color_mode: "constant",
       });
-      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
+      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
       if (idsForType.length === 0) {
         return;
       }
@@ -55,11 +57,11 @@ function useModelColorStyle(componentStyleFunctions) {
     }
   }
 
-  async function setModelComponentTypeColorMode(modelId, type, color_mode) {
+  async function setModelComponentTypeColorMode(modelId, componentType, color_mode) {
     viewerStore.start_request();
     try {
-      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, { color_mode });
-      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
+      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, { color_mode });
+      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
       if (idsForType.length === 0) {
         return;
       }
@@ -94,7 +96,7 @@ function useModelColorStyle(componentStyleFunctions) {
         modelId,
         componentIds,
         "Color",
-        { dataStore, componentStyleFunctions, viewerStore },
+        { componentStyleFunctions },
         color,
         color_mode,
       );

@@ -1,25 +1,27 @@
-import { MESH_TYPES } from "./constants";
+import { MESH_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 
 function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyleState) {
-  const componentsByType = Object.fromEntries(MESH_TYPES.map((type) => [type, []]));
+  const componentsByType = Object.fromEntries(
+    MESH_TYPES.map((componentType) => [componentType, []]),
+  );
   for (const component of components) {
-    if (componentsByType[component.type]) {
-      componentsByType[component.type].push(component);
+    if (componentsByType[component.componentType]) {
+      componentsByType[component.componentType].push(component);
     }
   }
 
   const groupStyles = dataStyleState.getStyle(modelId);
   const selection = [];
-  for (const type of MESH_TYPES) {
-    const typeComponents = componentsByType[type];
+  for (const componentType of MESH_TYPES) {
+    const typeComponents = componentsByType[componentType];
     if (typeComponents.length === 0) {
       continue;
     }
 
-    const typeKey = `${type.toLowerCase()}s`;
-    const typeStyle = typeStylesMap[type];
+    const typeKey = `${componentType.toLowerCase()}s`;
+    const typeStyle = typeStylesMap[componentType];
     const defaultVisibility = typeStyle?.visibility ?? groupStyles[typeKey]?.visibility ?? true;
 
     let allVisible = true;
@@ -32,7 +34,7 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
       }
     }
     if (allVisible) {
-      selection.push(type);
+      selection.push(componentType);
     }
   }
   return selection;
@@ -61,7 +63,9 @@ function useModelSelection(id_ref, dataStyleState) {
         const stylesMap = Object.fromEntries(
           componentStyles.map((style) => [style.id_component, style]),
         );
-        const typeStylesMap = Object.fromEntries(typeStyles.map((style) => [style.type, style]));
+        const typeStylesMap = Object.fromEntries(
+          typeStyles.map((style) => [style.componentType, style]),
+        );
 
         return buildSelection(modelId, allComponents, stylesMap, typeStylesMap, dataStyleState);
       });

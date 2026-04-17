@@ -1,4 +1,4 @@
-import { MESH_TYPES } from "./constants";
+import { MESH_TYPES } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -8,11 +8,12 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 
-async function getModelComponentsMap(modelId, dataStore) {
+async function getModelComponentsMap(modelId) {
+  const dataStore = useDataStore();
   const results = await Promise.all(
-    MESH_TYPES.map(async (type) => {
-      const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, type);
-      return geodeIds.map((geode_id) => ({ geode_id, type }));
+    MESH_TYPES.map(async (componentType) => {
+      const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
+      return geodeIds.map((geode_id) => ({ geode_id, componentType }));
     }),
   );
   const allComponents = results.flat();
@@ -28,10 +29,10 @@ async function dispatchToComponentTypes(
   modelId,
   componentIds,
   action,
-  { dataStore, componentStyleFunctions },
+  { componentStyleFunctions },
   ...args
 ) {
-  const { componentsMap } = await getModelComponentsMap(modelId, dataStore);
+  const { componentsMap } = await getModelComponentsMap(modelId);
 
   const idsByComponent = {
     Block: [],
@@ -41,9 +42,9 @@ async function dispatchToComponentTypes(
   };
 
   for (const id of componentIds) {
-    const type = componentsMap[id]?.type;
-    if (type && idsByComponent[type]) {
-      idsByComponent[type].push(id);
+    const componentType = componentsMap[id]?.componentType;
+    if (componentType && idsByComponent[componentType]) {
+      idsByComponent[componentType].push(id);
     }
   }
 
@@ -157,7 +158,7 @@ function useModelVisibilityStyle(componentStyleFunctions) {
             modelId,
             individualIds,
             "Visibility",
-            { dataStore, componentStyleFunctions, viewerStore },
+            { componentStyleFunctions },
             visibility,
           ),
         );
@@ -168,13 +169,13 @@ function useModelVisibilityStyle(componentStyleFunctions) {
     }
   }
 
-  async function setModelComponentTypeVisibility(modelId, type, visibility) {
+  async function setModelComponentTypeVisibility(modelId, componentType, visibility) {
     viewerStore.start_request();
     try {
-      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
+      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
         visibility,
       });
-      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
+      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
       if (idsForType.length === 0) {
         return;
       }

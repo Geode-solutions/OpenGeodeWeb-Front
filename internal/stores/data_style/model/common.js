@@ -1,7 +1,12 @@
 import { database } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 export function useModelCommonStyle() {
+  const dataStore = useDataStore();
+  const viewerStore = useViewerStore();
+
   async function mutateComponentStyle(id_model, id_component, values) {
     const table = database.model_component_datastyle;
     const key = [id_model, id_component];
@@ -10,11 +15,11 @@ export function useModelCommonStyle() {
     return table.put(structuredClone(toRaw(entry)));
   }
 
-  function mutateModelComponentTypeStyle(id_model, type, values) {
+  function mutateModelComponentTypeStyle(id_model, componentType, values) {
     return database.transaction("rw", database.model_component_type_datastyle, async () => {
       const table = database.model_component_type_datastyle;
-      const key = [id_model, type];
-      const entry = (await table.get(key)) || { id_model, type };
+      const key = [id_model, componentType];
+      const entry = (await table.get(key)) || { id_model, componentType };
       merge(entry, values);
       return table.put(structuredClone(toRaw(entry)));
     });
@@ -60,14 +65,7 @@ export function useModelCommonStyle() {
     });
   }
 
-  async function setModelTypeColor(
-    id,
-    component_ids,
-    color,
-    schema,
-    { dataStore, viewerStore },
-    color_mode = "constant",
-  ) {
+  async function setModelTypeColor(id, component_ids, color, schema, color_mode = "constant") {
     if (!component_ids?.length) {
       return;
     }
@@ -96,13 +94,7 @@ export function useModelCommonStyle() {
     );
   }
 
-  async function setModelTypeVisibility(
-    id,
-    component_ids,
-    visibility,
-    schema,
-    { dataStore, viewerStore },
-  ) {
+  async function setModelTypeVisibility(id, component_ids, visibility, schema) {
     if (!component_ids?.length) {
       return;
     }

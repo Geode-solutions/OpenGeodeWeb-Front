@@ -1,4 +1,3 @@
-import { DEFAULT_MODEL_COMPONENT_TYPE_COLORS, MESH_TYPES } from "./constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelBlocksStyle } from "./blocks";
@@ -84,4 +83,4 @@ function useModelStyle() {
   };
 }
 
-export { MESH_TYPES, DEFAULT_MODEL_COMPONENT_TYPE_COLORS, useModelStyle };
+export { useModelStyle };

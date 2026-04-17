@@ -38,7 +38,7 @@ export function useDataStyleState() {
       const all = await database.model_component_type_datastyle.toArray();
       const accumulator = {};
       for (const style of all) {
-        const key = `${style.id_model}_${style.type}`;
+        const key = `${style.id_model}_${style.componentType}`;
         accumulator[key] = style;
       }
       return accumulator;
@@ -74,8 +74,8 @@ export function useDataStyleState() {
     return componentStyles.value[key] || {};
   }
 
-  function getModelComponentTypeStyle(id_model, type) {
-    const key = `${id_model}_${type}`;
+  function getModelComponentTypeStyle(id_model, componentType) {
+    const key = `${id_model}_${componentType}`;
     return modelComponentTypeStyles.value[key] || {};
   }
 
