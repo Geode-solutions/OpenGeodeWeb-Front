@@ -13,13 +13,7 @@ export function useModelBlocksColor() {
   }
 
   function setModelBlocksColor(modelId, componentIds, color, color_mode = "constant") {
-    return modelCommonStyle.setModelTypeColor(
-      modelId,
-      componentIds,
-      color,
-      schema,
-      color_mode,
-    );
+    return modelCommonStyle.setModelTypeColor(modelId, componentIds, color, schema, color_mode);
   }
 
   return { setModelBlocksColor, modelBlockColor };
