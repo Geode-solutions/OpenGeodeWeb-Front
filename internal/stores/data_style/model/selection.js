@@ -63,9 +63,7 @@ function useModelSelection(id_ref, dataStyleState) {
         const stylesMap = Object.fromEntries(
           componentStyles.map((style) => [style.id_component, style]),
         );
-        const typeStylesMap = Object.fromEntries(
-          typeStyles.map((style) => [style.type, style]),
-        );
+        const typeStylesMap = Object.fromEntries(typeStyles.map((style) => [style.type, style]));
 
         return buildSelection(modelId, allComponents, stylesMap, typeStylesMap, dataStyleState);
       });

@@ -24,7 +24,6 @@ export function useModelCornersCommonStyle() {
     return modelCommonStyle.mutateComponentStyle(id, corner_id, values);
   }
 
-
   return {
     modelCornersStyle,
     modelCornerStyle,

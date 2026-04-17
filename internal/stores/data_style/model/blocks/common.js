@@ -24,7 +24,6 @@ export function useModelBlocksCommonStyle() {
     return modelCommonStyle.mutateComponentStyle(id, block_id, values);
   }
 
-
   return {
     modelBlocksStyle,
     modelBlockStyle,

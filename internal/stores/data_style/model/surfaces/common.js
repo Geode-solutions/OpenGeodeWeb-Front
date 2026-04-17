@@ -24,7 +24,6 @@ export function useModelSurfacesCommonStyle() {
     return modelCommonStyle.mutateComponentStyle(id, surface_id, values);
   }
 
-
   return {
     modelSurfacesStyle,
     modelSurfaceStyle,
