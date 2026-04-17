@@ -53,7 +53,11 @@ describe("Model corners", () => {
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.visibility,
-        { id, block_ids: corner_viewer_ids, visibility },
+        {
+          id,
+          block_ids: corner_viewer_ids,
+          visibility,
+        },
         {
           response_function: expect.any(Function),
         },
@@ -81,7 +85,12 @@ describe("Model corners", () => {
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_corners_schemas.color,
-        { id, block_ids: corner_viewer_ids, color },
+        {
+          id,
+          block_ids: corner_viewer_ids,
+          color,
+          color_mode: "constant",
+        },
         {
           response_function: expect.any(Function),
         },

@@ -53,7 +53,11 @@ describe("Model blocks", () => {
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.visibility,
-        { id, block_ids: block_viewer_ids, visibility },
+        {
+          id,
+          block_ids: block_viewer_ids,
+          visibility,
+        },
         {
           response_function: expect.any(Function),
         },
@@ -78,7 +82,12 @@ describe("Model blocks", () => {
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_blocks_schemas.color,
-        { id, block_ids: block_viewer_ids, color },
+        {
+          id,
+          block_ids: block_viewer_ids,
+          color,
+          color_mode: "constant",
+        },
         {
           response_function: expect.any(Function),
         },

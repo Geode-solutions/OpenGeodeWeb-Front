@@ -1,8 +1,7 @@
-// Local imports
 import { useDataStore } from "@ogw_front/stores/data";
-import { useModelSurfacesColorStyle } from "./color";
+import { useModelSurfacesColor } from "./color";
 import { useModelSurfacesCommonStyle } from "./common";
-import { useModelSurfacesVisibilityStyle } from "./visibility";
+import { useModelSurfacesVisibility } from "./visibility";
 
 async function setModelSurfacesDefaultStyle(_id) {
   // Placeholder
@@ -10,46 +9,44 @@ async function setModelSurfacesDefaultStyle(_id) {
 
 export function useModelSurfacesStyle() {
   const dataStore = useDataStore();
-  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
-  const modelSurfacesVisibilityStyle = useModelSurfacesVisibilityStyle();
-  const modelSurfacesColorStyle = useModelSurfacesColorStyle();
+  const commonStyle = useModelSurfacesCommonStyle();
+  const visibilityStyle = useModelSurfacesVisibility();
+  const colorStyle = useModelSurfacesColor();
 
-  async function applyModelSurfacesStyle(id) {
-    const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-    if (surface_ids.length === 0) {
+  async function applyModelSurfacesStyle(modelId) {
+    const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
+    if (!surfaces_ids?.length) {
       return;
     }
 
     const visibilityGroups = {};
     const colorGroups = {};
 
-    for (const surface_id of surface_ids) {
-      const style = modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id);
+    for (const surfaces_id of surfaces_ids) {
+      const style = commonStyle.modelSurfaceStyle(modelId, surfaces_id);
 
-      const vKey = String(style.visibility);
-      if (!visibilityGroups[vKey]) {
-        visibilityGroups[vKey] = [];
+      const visibility = String(style.visibility);
+      if (!visibilityGroups[visibility]) {
+        visibilityGroups[visibility] = [];
       }
-      visibilityGroups[vKey].push(surface_id);
+      visibilityGroups[visibility].push(surfaces_id);
 
-      const cKey = JSON.stringify(style.color);
-      if (!colorGroups[cKey]) {
-        colorGroups[cKey] = [];
+      const color_mode = style.color_mode || "constant";
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, surfaces_ids: [] };
       }
-      colorGroups[cKey].push(surface_id);
+      colorGroups[color_key].surfaces_ids.push(surfaces_id);
     }
 
-    const promises = [];
-
-    for (const [vValue, ids] of Object.entries(visibilityGroups)) {
-      promises.push(
-        modelSurfacesVisibilityStyle.setModelSurfacesVisibility(id, ids, vValue === "true"),
-      );
-    }
-
-    for (const [cValue, ids] of Object.entries(colorGroups)) {
-      promises.push(modelSurfacesColorStyle.setModelSurfacesColor(id, ids, JSON.parse(cValue)));
-    }
+    const promises = [
+      ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
+        visibilityStyle.setModelSurfacesVisibility(modelId, ids, visibility === "true"),
+      ),
+      ...Object.values(colorGroups).map(({ color_mode, color, surfaces_ids: ids }) =>
+        colorStyle.setModelSurfacesColor(modelId, ids, color, color_mode),
+      ),
+    ];
 
     return Promise.all(promises);
   }
@@ -57,8 +54,8 @@ export function useModelSurfacesStyle() {
   return {
     applyModelSurfacesStyle,
     setModelSurfacesDefaultStyle,
-    ...modelSurfacesCommonStyle,
-    ...modelSurfacesVisibilityStyle,
-    ...modelSurfacesColorStyle,
+    ...commonStyle,
+    ...visibilityStyle,
+    ...colorStyle,
   };
 }

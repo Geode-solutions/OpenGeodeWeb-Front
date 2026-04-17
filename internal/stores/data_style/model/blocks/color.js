@@ -1,46 +1,20 @@
-// Third party imports
+import { useModelBlocksCommonStyle } from "./common";
+import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-// Local imports
-import { useDataStore } from "@ogw_front/stores/data";
-import { useModelBlocksCommonStyle } from "./common";
-import { useViewerStore } from "@ogw_front/stores/viewer";
+const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.color;
 
-// Local constants
-const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks;
-
-export function useModelBlocksColorStyle() {
-  const dataStore = useDataStore();
-  const viewerStore = useViewerStore();
+export function useModelBlocksColor() {
+  const modelCommonStyle = useModelCommonStyle();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
 
   function modelBlockColor(id, block_id) {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).color;
   }
 
-  function setModelBlocksColor(id, block_ids, color) {
-    if (!block_ids || block_ids.length === 0) {
-      return Promise.resolve();
-    }
-    return dataStore.getMeshComponentsViewerIds(id, block_ids).then((block_viewer_ids) => {
-      if (!block_viewer_ids || block_viewer_ids.length === 0) {
-        return modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, {
-          color,
-        });
-      }
-      return viewerStore.request(
-        model_blocks_schemas.color,
-        { id, block_ids: block_viewer_ids, color },
-        {
-          response_function: () =>
-            modelBlocksCommonStyle.mutateModelBlocksStyle(id, block_ids, { color }),
-        },
-      );
-    });
+  function setModelBlocksColor(modelId, blocks_ids, color, color_mode = "constant") {
+    return modelCommonStyle.setModelTypeColor(modelId, blocks_ids, color, schema, color_mode);
   }
 
-  return {
-    modelBlockColor,
-    setModelBlocksColor,
-  };
+  return { setModelBlocksColor, modelBlockColor };
 }

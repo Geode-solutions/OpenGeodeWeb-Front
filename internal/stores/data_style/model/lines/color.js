@@ -1,48 +1,20 @@
-// Third party imports
+import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
+import { useModelLinesCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-// Local imports
-import { useDataStore } from "@ogw_front/stores/data";
-import { useModelLinesCommonStyle } from "./common";
-import { useViewerStore } from "@ogw_front/stores/viewer";
+const schema = viewer_schemas.opengeodeweb_viewer.model.lines.color;
 
-// Local constants
-const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines;
-
-export function useModelLinesColorStyle() {
-  const dataStore = useDataStore();
-  const viewerStore = useViewerStore();
+export function useModelLinesColor() {
+  const modelCommonStyle = useModelCommonStyle();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
 
   function modelLineColor(id, line_id) {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).color;
   }
 
-  function setModelLinesColor(id, line_ids, color) {
-    if (!line_ids || line_ids.length === 0) {
-      return Promise.resolve();
-    }
-    return dataStore.getMeshComponentsViewerIds(id, line_ids).then((line_viewer_ids) => {
-      if (!line_viewer_ids || line_viewer_ids.length === 0) {
-        return modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
-          color,
-        });
-      }
-      return viewerStore.request(
-        model_lines_schemas.color,
-        { id, block_ids: line_viewer_ids, color },
-        {
-          response_function: () =>
-            modelLinesCommonStyle.mutateModelLinesStyle(id, line_ids, {
-              color,
-            }),
-        },
-      );
-    });
+  function setModelLinesColor(modelId, lines_ids, color, color_mode = "constant") {
+    return modelCommonStyle.setModelTypeColor(modelId, lines_ids, color, schema, color_mode);
   }
 
-  return {
-    modelLineColor,
-    setModelLinesColor,
-  };
+  return { setModelLinesColor, modelLineColor };
 }
