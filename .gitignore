@@ -27,6 +27,7 @@ venv
 .pytest_cache
 __snapshots__
 coverage
+.nuxtrc
 *.db
 package-lock.json
 /build
