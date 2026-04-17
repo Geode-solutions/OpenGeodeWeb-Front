@@ -14,20 +14,25 @@ class Database extends BaseDatabase {
   }
 
   static async addTables(newTables) {
-    const tempDb = new Dexie("Database");
-    await tempDb.open();
+    let currentVersion = 1;
+    let currentStores = { ...BaseDatabase.initialStores };
 
-    const currentVersion = tempDb.verno;
-    const currentStores = { ...BaseDatabase.initialStores };
+    if (await Dexie.exists("Database")) {
+      const tempDb = new Dexie("Database");
+      await tempDb.open();
 
-    for (const table of tempDb.tables) {
-      const keyPath = table.schema.primKey.src;
-      const indexes = table.schema.indexes.map((index) => index.src);
-      const parts = keyPath ? [keyPath, ...indexes] : indexes;
-      currentStores[table.name] = parts.join(",");
+      currentVersion = tempDb.verno;
+      currentStores = { ...BaseDatabase.initialStores };
+
+      for (const table of tempDb.tables) {
+        const keyPath = table.schema.primKey.src;
+        const indexes = table.schema.indexes.map((index) => index.src);
+        const parts = keyPath ? [keyPath, ...indexes] : indexes;
+        currentStores[table.name] = parts.join(",");
+      }
+
+      tempDb.close();
     }
-
-    tempDb.close();
 
     const allExisting = Object.keys(newTables).every((tableName) => currentStores[tableName]);
 
