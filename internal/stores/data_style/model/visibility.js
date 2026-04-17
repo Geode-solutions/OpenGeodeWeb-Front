@@ -69,7 +69,7 @@ async function dispatchToComponentTypes(
     }
     if (idsByComponent.Line.length > 0) {
       promises.push(
-        componentStyleFunctions.Line.setModelLinesVisibility( modelId, idsByComponent.Line, ...args),
+        componentStyleFunctions.Line.setModelLinesVisibility(modelId, idsByComponent.Line, ...args),
       );
     }
     if (idsByComponent.Corner.length > 0) {
@@ -103,7 +103,11 @@ async function dispatchToComponentTypes(
     }
     if (idsByComponent.Corner.length > 0) {
       promises.push(
-        componentStyleFunctions.Corner.setModelCornersColor(modelId, idsByComponent.Corner, ...args),
+        componentStyleFunctions.Corner.setModelCornersColor(
+          modelId,
+          idsByComponent.Corner,
+          ...args,
+        ),
       );
     }
   }
