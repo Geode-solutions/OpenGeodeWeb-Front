@@ -1,4 +1,5 @@
 <script setup>
+import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
@@ -63,7 +64,10 @@ async function onSelectionChange(current) {
       @toggle-sort="toggleSort"
     />
 
+    <FetchingData v-if="items === undefined" :size="48" :width="4" text="" />
+
     <v-treeview
+      v-else
       :selected="mesh_components_selection"
       v-model:opened="opened"
       :items="processedItems"

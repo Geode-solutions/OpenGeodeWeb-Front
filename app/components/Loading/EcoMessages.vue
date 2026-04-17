@@ -1,5 +1,12 @@
 <script setup>
-const ecoMessages = [
+const { appName } = defineProps({
+  appName: {
+    type: String,
+    required: true,
+  },
+});
+
+const ecoMessages = computed(() => [
   {
     icon: "mdi-leaf",
     title: "Why the wait?",
@@ -13,17 +20,17 @@ const ecoMessages = [
   {
     icon: "mdi-earth",
     title: "Your choice matters",
-    message: "By using Vease, you're part of a more sustainable way to work with data.",
+    message: `By using ${appName}, you're part of a more sustainable way to work with data.`,
   },
-];
+]);
 
-const MESSAGE_INTERVAL_MS = 3000;
+const MESSAGE_INTERVAL_MS = 5000;
 const currentMessage = ref(0);
 let interval = undefined;
 
 onMounted(() => {
   interval = setInterval(() => {
-    currentMessage.value = (currentMessage.value + 1) % ecoMessages.length;
+    currentMessage.value = (currentMessage.value + 1) % ecoMessages.value.length;
   }, MESSAGE_INTERVAL_MS);
 });
 
