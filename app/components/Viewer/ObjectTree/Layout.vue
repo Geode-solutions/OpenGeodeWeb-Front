@@ -154,7 +154,7 @@ function onVerticalResizeStart(event, index) {
         :scroll-top="mainView.scrollTop"
         @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
       >
-        <GlobalObjects @show-menu="emit('show-menu', $event)" />
+        <GlobalObjects data-testid="mainObjectTree" @show-menu="emit('show-menu', $event)" />
       </ViewerObjectTreeBox>
     </div>
 
@@ -186,7 +186,11 @@ function onVerticalResizeStart(event, index) {
             @dragstart="onDragStart(index + 1)"
             @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
           >
-            <ModelComponents :id="view.id" @show-menu="emit('show-menu', $event)" />
+            <ModelComponents
+              data-testid="modelComponentsObjectTree"
+              :id="view.id"
+              @show-menu="emit('show-menu', $event)"
+            />
           </ViewerObjectTreeBox>
         </div>
         <div
