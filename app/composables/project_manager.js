@@ -2,7 +2,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-import { importWorkflowFromSnapshot } from "@ogw_front/utils/file_import_workflow";
+import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
 
 import { useAppStore } from "@ogw_front/stores/app";
 import { useDataStore } from "@ogw_front/stores/data";
