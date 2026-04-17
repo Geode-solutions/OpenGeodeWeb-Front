@@ -13,13 +13,7 @@ export function useModelLinesColor() {
   }
 
   function setModelLinesColor(modelId, componentIds, color, color_mode = "constant") {
-    return modelCommonStyle.setModelTypeColor(
-      modelId,
-      componentIds,
-      color,
-      schema,
-      color_mode,
-    );
+    return modelCommonStyle.setModelTypeColor(modelId, componentIds, color, schema, color_mode);
   }
 
   return { setModelLinesColor, modelLineColor };
