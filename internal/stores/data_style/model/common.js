@@ -81,6 +81,11 @@ export function useModelCommonStyle() {
     }
 
     const colors = await viewerStore.request(schema, params);
+
+    if (color_mode === "constant" && color !== undefined) {
+      return mutateComponentStyles(id, component_ids, { color });
+    }
+
     if (!colors?.length) {
       return;
     }
