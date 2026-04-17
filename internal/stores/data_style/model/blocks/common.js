@@ -1,8 +1,10 @@
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
+import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
 export function useModelBlocksCommonStyle() {
   const dataStyleState = useDataStyleState();
+  const modelCommonStyle = useModelCommonStyle();
 
   function modelBlocksStyle(id) {
     return dataStyleState.getStyle(id).blocks;
@@ -15,11 +17,11 @@ export function useModelBlocksCommonStyle() {
   }
 
   function mutateModelBlocksStyle(id, block_ids, values) {
-    return dataStyleState.mutateComponentStyles(id, block_ids, values);
+    return modelCommonStyle.mutateComponentStyles(id, block_ids, values);
   }
 
   function mutateModelBlockStyle(id, block_id, values) {
-    return dataStyleState.mutateComponentStyle(id, block_id, values);
+    return modelCommonStyle.mutateComponentStyle(id, block_id, values);
   }
 
   function modelBlockVisibility(id, block_id) {

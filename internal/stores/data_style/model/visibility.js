@@ -1,7 +1,8 @@
-import { MESH_TYPES } from "@ogw_internal/stores/data_style/model";
+import { MESH_TYPES } from "./constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -31,15 +32,55 @@ async function dispatchToComponentTypes(
   ...args
 ) {
   const { componentsMap } = await getModelComponentsMap(modelId, dataStore);
-  return Promise.all(
-    MESH_TYPES.map((type) => {
-      const idsForType = componentIds.filter((id) => componentsMap[id]?.type === type);
-      if (idsForType.length === 0) {
-        return undefined;
-      }
-      return stores[type][`setModel${type}s${action}`](modelId, idsForType, ...args);
-    }),
-  );
+
+  const idsByComponent = {
+    Block: [],
+    Surface: [],
+    Line: [],
+    Corner: [],
+  };
+
+  for (const id of componentIds) {
+    const type = componentsMap[id]?.type;
+    if (type && idsByComponent[type]) {
+      idsByComponent[type].push(id);
+    }
+  }
+
+  const promises = [];
+  if (action === "Visibility") {
+    if (idsByComponent.Block.length > 0) {
+      promises.push(stores.Block.setModelBlocksVisibility(modelId, idsByComponent.Block, ...args));
+    }
+    if (idsByComponent.Surface.length > 0) {
+      promises.push(
+        stores.Surface.setModelSurfacesVisibility(modelId, idsByComponent.Surface, ...args),
+      );
+    }
+    if (idsByComponent.Line.length > 0) {
+      promises.push(stores.Line.setModelLinesVisibility(modelId, idsByComponent.Line, ...args));
+    }
+    if (idsByComponent.Corner.length > 0) {
+      promises.push(
+        stores.Corner.setModelCornersVisibility(modelId, idsByComponent.Corner, ...args),
+      );
+    }
+  } else if (action === "Color") {
+    if (idsByComponent.Block.length > 0) {
+      promises.push(stores.Block.setModelBlocksColor(modelId, idsByComponent.Block, ...args));
+    }
+    if (idsByComponent.Surface.length > 0) {
+      promises.push(stores.Surface.setModelSurfacesColor(modelId, idsByComponent.Surface, ...args));
+    }
+    if (idsByComponent.Line.length > 0) {
+      promises.push(stores.Line.setModelLinesColor(modelId, idsByComponent.Line, ...args));
+    }
+    if (idsByComponent.Corner.length > 0) {
+      promises.push(stores.Corner.setModelCornersColor(modelId, idsByComponent.Corner, ...args));
+    }
+  }
+
+  return Promise.all(promises);
 }
 
 function useModelVisibilityStyle(stores) {
@@ -47,6 +88,7 @@ function useModelVisibilityStyle(stores) {
   const dataStyleState = useDataStyleState();
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
+  const modelCommonStyle = useModelCommonStyle();
 
   function modelVisibility(modelId) {
     return dataStyleState.getStyle(modelId).visibility;
@@ -97,7 +139,7 @@ function useModelVisibilityStyle(stores) {
   async function setModelComponentTypeVisibility(modelId, type, visibility) {
     viewerStore.start_request();
     try {
-      await dataStyleState.mutateModelComponentTypeStyle(modelId, type, {
+      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
         visibility,
       });
       const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
@@ -118,24 +160,4 @@ function useModelVisibilityStyle(stores) {
   };
 }
 
-function useModelComponentVisibility(type) {
-  const dataStore = useDataStore();
-  const dataStyleState = useDataStyleState();
-  const viewerStore = useViewerStore();
-  const schema = model_schemas[`${type.toLowerCase()}s`].visibility;
-
-  return {
-    [`setModel${type}sVisibility`]: (modelId, componentIds, visibility) =>
-      dataStyleState.setModelTypeVisibility(modelId, componentIds, visibility, schema, {
-        dataStore,
-        viewerStore,
-      }),
-  };
-}
-
-export {
-  getModelComponentsMap,
-  dispatchToComponentTypes,
-  useModelVisibilityStyle,
-  useModelComponentVisibility,
-};
+export { getModelComponentsMap, dispatchToComponentTypes, useModelVisibilityStyle };

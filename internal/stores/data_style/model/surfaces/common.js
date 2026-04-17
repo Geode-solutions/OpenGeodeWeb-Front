@@ -1,8 +1,10 @@
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
+import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
 export function useModelSurfacesCommonStyle() {
   const dataStyleState = useDataStyleState();
+  const modelCommonStyle = useModelCommonStyle();
 
   function modelSurfacesStyle(id) {
     return dataStyleState.getStyle(id).surfaces;
@@ -15,11 +17,11 @@ export function useModelSurfacesCommonStyle() {
   }
 
   function mutateModelSurfacesStyle(id, surface_ids, values) {
-    return dataStyleState.mutateComponentStyles(id, surface_ids, values);
+    return modelCommonStyle.mutateComponentStyles(id, surface_ids, values);
   }
 
   function mutateModelSurfaceStyle(id, surface_id, values) {
-    return dataStyleState.mutateComponentStyle(id, surface_id, values);
+    return modelCommonStyle.mutateComponentStyle(id, surface_id, values);
   }
 
   function modelSurfaceVisibility(id, surface_id) {

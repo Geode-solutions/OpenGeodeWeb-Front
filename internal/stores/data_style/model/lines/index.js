@@ -1,16 +1,61 @@
-import { useModelComponentColor } from "@ogw_internal/stores/data_style/model/color";
-import { useModelComponentVisibility } from "@ogw_internal/stores/data_style/model/visibility";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
+import { useModelLinesVisibility } from "./visibility";
 
 async function setModelLinesDefaultStyle(_id) {
   // Placeholder
 }
 
 export function useModelLinesStyle() {
+  const dataStore = useDataStore();
+  const commonStyle = useModelLinesCommonStyle();
+  const visibilityStyle = useModelLinesVisibility();
+  const colorStyle = useModelLinesColor();
+
+  async function applyModelLinesStyle(modelId) {
+    const compIds = await dataStore.getLinesGeodeIds(modelId);
+    if (!compIds?.length) {
+      return;
+    }
+
+    const visibilityGroups = {};
+    const colorGroups = {};
+
+    for (const compId of compIds) {
+      const style = commonStyle.modelLineStyle(modelId, compId);
+
+      const visibility = String(style.visibility);
+      if (!visibilityGroups[visibility]) {
+        visibilityGroups[visibility] = [];
+      }
+      visibilityGroups[visibility].push(compId);
+
+      const color_mode = style.color_mode || "constant";
+      const cKey = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[cKey]) {
+        colorGroups[cKey] = { color_mode, color: style.color, compIds: [] };
+      }
+      colorGroups[cKey].compIds.push(compId);
+    }
+
+    const promises = [
+      ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
+        visibilityStyle.setModelLinesVisibility(modelId, ids, visibility === "true"),
+      ),
+      ...Object.values(colorGroups).map(({ color_mode, color, compIds: ids }) =>
+        colorStyle.setModelLinesColor(modelId, ids, color, color_mode),
+      ),
+    ];
+
+    return Promise.all(promises);
+  }
+
   return {
+    applyModelLinesStyle,
     setModelLinesDefaultStyle,
-    ...useModelLinesCommonStyle(),
-    ...useModelComponentVisibility("Line"),
-    ...useModelComponentColor("Line"),
+    ...commonStyle,
+    ...visibilityStyle,
+    ...colorStyle,
   };
 }

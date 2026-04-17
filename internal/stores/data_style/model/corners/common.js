@@ -1,8 +1,10 @@
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
+import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
 export function useModelCornersCommonStyle() {
   const dataStyleState = useDataStyleState();
+  const modelCommonStyle = useModelCommonStyle();
 
   function modelCornersStyle(id) {
     return dataStyleState.getStyle(id).corners;
@@ -15,11 +17,11 @@ export function useModelCornersCommonStyle() {
   }
 
   function mutateModelCornersStyle(id, corner_ids, values) {
-    return dataStyleState.mutateComponentStyles(id, corner_ids, values);
+    return modelCommonStyle.mutateComponentStyles(id, corner_ids, values);
   }
 
   function mutateModelCornerStyle(id, corner_id, values) {
-    return dataStyleState.mutateComponentStyle(id, corner_id, values);
+    return modelCommonStyle.mutateComponentStyle(id, corner_id, values);
   }
 
   function modelCornerVisibility(id, corner_id) {
