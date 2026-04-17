@@ -78,7 +78,7 @@ export function useModelCommonStyle() {
     }
 
     const params = { id, block_ids: viewer_ids, color_mode };
-    if (color_mode === "constant") {
+    if (color_mode === "constant" && color !== undefined) {
       params.color = color;
     }
 

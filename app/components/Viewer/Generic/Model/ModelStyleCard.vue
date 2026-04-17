@@ -62,7 +62,11 @@ const componentVisibility = styleComputed(
 const componentColor = styleComputed(
   () =>
     componentId.value
-      ? dataStyleStore.getModelComponentColor(modelId.value, componentId.value)
+      ? dataStyleStore.getModelComponentEffectiveColor(
+          modelId.value,
+          componentId.value,
+          component_type.value,
+        )
       : undefined,
   (color) =>
     componentId.value &&
@@ -142,7 +146,7 @@ const modelComponentTypeLabel = computed(() =>
           variant="outlined"
         />
 
-        <template v-if="modelComponentTypeColorMode === 'constant' && modelComponentTypeColor">
+        <template v-if="modelComponentTypeColorMode === 'constant'">
           <div class="text-caption mb-1">Color</div>
           <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
         </template>
@@ -168,7 +172,7 @@ const modelComponentTypeLabel = computed(() =>
           variant="outlined"
         />
 
-        <template v-if="componentColorMode === 'constant' && componentColor">
+        <template v-if="componentColorMode === 'constant'">
           <div class="text-caption mb-1">Color</div>
           <ViewerOptionsColorPicker v-model="componentColor" />
         </template>
