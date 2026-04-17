@@ -55,12 +55,7 @@ function submit() {
           </VRow>
           <VRow>
             <VCol>
-              <VTextField
-                v-model="email"
-                :rules="emailRules"
-                label="E-mail"
-                required
-              />
+              <VTextField v-model="email" :rules="emailRules" label="E-mail" required />
             </VCol>
           </VRow>
           <VRow>
@@ -74,12 +69,7 @@ function submit() {
   </VRow>
   <VRow align="center" justify="center">
     <VCol cols="auto" class="d-flex justify-center align-center">
-      <VBtn
-        class="load-btn"
-        :text="button_label"
-        :color="color || button_color"
-        @click="submit"
-      />
+      <VBtn class="load-btn" :text="button_label" :color="color || button_color" @click="submit" />
     </VCol>
   </VRow>
 </template>
