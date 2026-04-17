@@ -12,8 +12,8 @@ export function useModelBlocksVisibility() {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility;
   }
 
-  function setModelBlocksVisibility(modelId, componentIds, visibility) {
-    return modelCommonStyle.setModelTypeVisibility(modelId, componentIds, visibility, schema);
+  function setModelBlocksVisibility(modelId, blocks_ids, visibility) {
+    return modelCommonStyle.setModelTypeVisibility(modelId, blocks_ids, visibility, schema);
   }
 
   return { setModelBlocksVisibility, modelBlockVisibility };

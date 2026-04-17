@@ -14,36 +14,36 @@ export function useModelLinesStyle() {
   const colorStyle = useModelLinesColor();
 
   async function applyModelLinesStyle(modelId) {
-    const compIds = await dataStore.getLinesGeodeIds(modelId);
-    if (!compIds?.length) {
+    const lines_ids = await dataStore.getLinesGeodeIds(modelId);
+    if (!lines_ids?.length) {
       return;
     }
 
     const visibilityGroups = {};
     const colorGroups = {};
 
-    for (const compId of compIds) {
-      const style = commonStyle.modelLineStyle(modelId, compId);
+    for (const line_id of lines_ids) {
+      const style = commonStyle.modelLineStyle(modelId, line_id);
 
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
         visibilityGroups[visibility] = [];
       }
-      visibilityGroups[visibility].push(compId);
+      visibilityGroups[visibility].push(line_id);
 
       const color_mode = style.color_mode || "constant";
-      const cKey = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[cKey]) {
-        colorGroups[cKey] = { color_mode, color: style.color, compIds: [] };
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, lines_ids: [] };
       }
-      colorGroups[cKey].compIds.push(compId);
+      colorGroups[color_key].lines_ids.push(line_id);
     }
 
     const promises = [
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
         visibilityStyle.setModelLinesVisibility(modelId, ids, visibility === "true"),
       ),
-      ...Object.values(colorGroups).map(({ color_mode, color, compIds: ids }) =>
+      ...Object.values(colorGroups).map(({ color_mode, color, lines_ids: ids }) =>
         colorStyle.setModelLinesColor(modelId, ids, color, color_mode),
       ),
     ];

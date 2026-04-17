@@ -16,27 +16,17 @@ export function useModelLinesCommonStyle() {
     return merge({}, groupStyle, individualStyle);
   }
 
-  function mutateModelLinesStyle(id, line_ids, values) {
-    return modelCommonStyle.mutateComponentStyles(id, line_ids, values);
+  function mutateModelLinesStyle(id, lines_ids, values) {
+    return modelCommonStyle.mutateComponentStyles(id, lines_ids, values);
   }
 
   function mutateModelLineStyle(id, line_id, values) {
     return modelCommonStyle.mutateComponentStyle(id, line_id, values);
   }
 
-  function modelLineVisibility(id, line_id) {
-    return modelLineStyle(id, line_id).visibility;
-  }
-
-  function modelLineColor(id, line_id) {
-    return modelLineStyle(id, line_id).color;
-  }
-
   return {
     modelLinesStyle,
     modelLineStyle,
-    modelLineVisibility,
-    modelLineColor,
     mutateModelLinesStyle,
     mutateModelLineStyle,
   };

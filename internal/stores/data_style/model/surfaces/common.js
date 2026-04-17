@@ -16,27 +16,18 @@ export function useModelSurfacesCommonStyle() {
     return merge({}, groupStyle, individualStyle);
   }
 
-  function mutateModelSurfacesStyle(id, surface_ids, values) {
-    return modelCommonStyle.mutateComponentStyles(id, surface_ids, values);
+  function mutateModelSurfacesStyle(id, surfaces_ids, values) {
+    return modelCommonStyle.mutateComponentStyles(id, surfaces_ids, values);
   }
 
   function mutateModelSurfaceStyle(id, surface_id, values) {
     return modelCommonStyle.mutateComponentStyle(id, surface_id, values);
   }
 
-  function modelSurfaceVisibility(id, surface_id) {
-    return modelSurfaceStyle(id, surface_id).visibility;
-  }
-
-  function modelSurfaceColor(id, surface_id) {
-    return modelSurfaceStyle(id, surface_id).color;
-  }
 
   return {
     modelSurfacesStyle,
     modelSurfaceStyle,
-    modelSurfaceVisibility,
-    modelSurfaceColor,
     mutateModelSurfacesStyle,
     mutateModelSurfaceStyle,
   };

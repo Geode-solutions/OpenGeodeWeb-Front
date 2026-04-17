@@ -7,8 +7,8 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
     MESH_TYPES.map((componentType) => [componentType, []]),
   );
   for (const component of components) {
-    if (componentsByType[component.componentType]) {
-      componentsByType[component.componentType].push(component);
+    if (componentsByType[component.type]) {
+      componentsByType[component.type].push(component);
     }
   }
 
@@ -64,7 +64,7 @@ function useModelSelection(id_ref, dataStyleState) {
           componentStyles.map((style) => [style.id_component, style]),
         );
         const typeStylesMap = Object.fromEntries(
-          typeStyles.map((style) => [style.componentType, style]),
+          typeStyles.map((style) => [style.type, style]),
         );
 
         return buildSelection(modelId, allComponents, stylesMap, typeStylesMap, dataStyleState);

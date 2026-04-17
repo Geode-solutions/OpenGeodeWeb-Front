@@ -12,8 +12,8 @@ export function useModelSurfacesVisibility() {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility;
   }
 
-  function setModelSurfacesVisibility(modelId, componentIds, visibility) {
-    return modelCommonStyle.setModelTypeVisibility(modelId, componentIds, visibility, schema);
+  function setModelSurfacesVisibility(modelId, surfaces_ids, visibility) {
+    return modelCommonStyle.setModelTypeVisibility(modelId, surfaces_ids, visibility, schema);
   }
 
   return { setModelSurfacesVisibility, modelSurfaceVisibility };

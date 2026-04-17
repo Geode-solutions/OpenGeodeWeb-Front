@@ -14,36 +14,36 @@ export function useModelCornersStyle() {
   const colorStyle = useModelCornersColor();
 
   async function applyModelCornersStyle(modelId) {
-    const compIds = await dataStore.getCornersGeodeIds(modelId);
-    if (!compIds?.length) {
+    const corners_ids = await dataStore.getCornersGeodeIds(modelId);
+    if (!corners_ids?.length) {
       return;
     }
 
     const visibilityGroups = {};
     const colorGroups = {};
 
-    for (const compId of compIds) {
-      const style = commonStyle.modelCornerStyle(modelId, compId);
+    for (const corner_id of corners_ids) {
+      const style = commonStyle.modelCornerStyle(modelId, corner_id);
 
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
         visibilityGroups[visibility] = [];
       }
-      visibilityGroups[visibility].push(compId);
+      visibilityGroups[visibility].push(corner_id);
 
       const color_mode = style.color_mode || "constant";
-      const cKey = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[cKey]) {
-        colorGroups[cKey] = { color_mode, color: style.color, compIds: [] };
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, corners_ids: [] };
       }
-      colorGroups[cKey].compIds.push(compId);
+      colorGroups[color_key].corners_ids.push(corner_id);
     }
 
     const promises = [
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
         visibilityStyle.setModelCornersVisibility(modelId, ids, visibility === "true"),
       ),
-      ...Object.values(colorGroups).map(({ color_mode, color, compIds: ids }) =>
+      ...Object.values(colorGroups).map(({ color_mode, color, corners_ids: ids }) =>
         colorStyle.setModelCornersColor(modelId, ids, color, color_mode),
       ),
     ];

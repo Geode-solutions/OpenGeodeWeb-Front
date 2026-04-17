@@ -12,8 +12,8 @@ export function useModelCornersVisibility() {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility;
   }
 
-  function setModelCornersVisibility(modelId, componentIds, visibility) {
-    return modelCommonStyle.setModelTypeVisibility(modelId, componentIds, visibility, schema);
+  function setModelCornersVisibility(modelId, corners_ids, visibility) {
+    return modelCommonStyle.setModelTypeVisibility(modelId, corners_ids, visibility, schema);
   }
 
   return { setModelCornersVisibility, modelCornerVisibility };

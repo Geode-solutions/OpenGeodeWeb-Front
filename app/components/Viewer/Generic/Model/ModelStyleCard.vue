@@ -31,19 +31,19 @@ watchEffect(async () => {
 
 const modelVisibility = computed({
   get: () => dataStyleStore.modelVisibility(modelId.value),
-  set: async (isVisible) => {
-    await dataStyleStore.setModelVisibility(modelId.value, isVisible);
+  set: async (newValue) => {
+    await dataStyleStore.setModelVisibility(modelId.value, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const modelComponentTypeVisibility = computed({
   get: () => selection.value.includes(componentType.value),
-  set: async (isVisible) => {
+  set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(
       modelId.value,
       componentType.value,
-      isVisible,
+      newValue,
     );
     hybridViewerStore.remoteRender();
   },
@@ -51,12 +51,8 @@ const modelComponentTypeVisibility = computed({
 
 const componentVisibility = computed({
   get: () => selection.value.includes(componentId.value),
-  set: async (isVisible) => {
-    await dataStyleStore.setModelComponentsVisibility(
-      modelId.value,
-      [componentId.value],
-      isVisible,
-    );
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], newValue);
     hybridViewerStore.remoteRender();
   },
 });

@@ -12,8 +12,8 @@ export function useModelCornersColor() {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).color;
   }
 
-  function setModelCornersColor(modelId, componentIds, color, color_mode = "constant") {
-    return modelCommonStyle.setModelTypeColor(modelId, componentIds, color, schema, color_mode);
+  function setModelCornersColor(modelId, corners_ids, color, color_mode = "constant") {
+    return modelCommonStyle.setModelTypeColor(modelId, corners_ids, color, schema, color_mode);
   }
 
   return { setModelCornersColor, modelCornerColor };

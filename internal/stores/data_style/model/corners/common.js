@@ -16,27 +16,18 @@ export function useModelCornersCommonStyle() {
     return merge({}, groupStyle, individualStyle);
   }
 
-  function mutateModelCornersStyle(id, corner_ids, values) {
-    return modelCommonStyle.mutateComponentStyles(id, corner_ids, values);
+  function mutateModelCornersStyle(id, corners_ids, values) {
+    return modelCommonStyle.mutateComponentStyles(id, corners_ids, values);
   }
 
   function mutateModelCornerStyle(id, corner_id, values) {
     return modelCommonStyle.mutateComponentStyle(id, corner_id, values);
   }
 
-  function modelCornerVisibility(id, corner_id) {
-    return modelCornerStyle(id, corner_id).visibility;
-  }
-
-  function modelCornerColor(id, corner_id) {
-    return modelCornerStyle(id, corner_id).color;
-  }
 
   return {
     modelCornersStyle,
     modelCornerStyle,
-    modelCornerVisibility,
-    modelCornerColor,
     mutateModelCornersStyle,
     mutateModelCornerStyle,
   };

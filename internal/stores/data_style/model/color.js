@@ -15,39 +15,37 @@ function useModelColorStyle(componentStyleFunctions) {
     return dataStyleState.getComponentStyle(modelId, componentId).color;
   }
 
-  function getModelComponentEffectiveColor(modelId, componentId, componentType) {
+  function getModelComponentEffectiveColor(modelId, componentId, type) {
     const individualColor = getModelComponentColor(modelId, componentId);
     if (individualColor !== undefined) {
       return individualColor;
     }
-    return getModelComponentTypeColor(modelId, componentType);
+    return getModelComponentTypeColor(modelId, type);
   }
 
   function getModelComponentColorMode(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).color_mode || "constant";
   }
 
-  function getModelComponentTypeColor(modelId, componentType) {
+  function getModelComponentTypeColor(modelId, type) {
     return (
-      dataStyleState.getModelComponentTypeStyle(modelId, componentType).color ||
-      DEFAULT_MODEL_COMPONENT_TYPE_COLORS[componentType]
+      dataStyleState.getModelComponentTypeStyle(modelId, type).color ||
+      DEFAULT_MODEL_COMPONENT_TYPE_COLORS[type]
     );
   }
 
-  function getModelComponentTypeColorMode(modelId, componentType) {
-    return (
-      dataStyleState.getModelComponentTypeStyle(modelId, componentType).color_mode || "constant"
-    );
+  function getModelComponentTypeColorMode(modelId, type) {
+    return dataStyleState.getModelComponentTypeStyle(modelId, type).color_mode || "constant";
   }
 
-  async function setModelComponentTypeColor(modelId, componentType, color) {
+  async function setModelComponentTypeColor(modelId, type, color) {
     viewerStore.start_request();
     try {
-      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
+      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
         color,
         color_mode: "constant",
       });
-      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
+      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
       if (idsForType.length === 0) {
         return;
       }
@@ -57,11 +55,11 @@ function useModelColorStyle(componentStyleFunctions) {
     }
   }
 
-  async function setModelComponentTypeColorMode(modelId, componentType, color_mode) {
+  async function setModelComponentTypeColorMode(modelId, type, color_mode) {
     viewerStore.start_request();
     try {
-      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, { color_mode });
-      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
+      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, { color_mode });
+      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
       if (idsForType.length === 0) {
         return;
       }

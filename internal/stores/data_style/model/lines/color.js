@@ -12,8 +12,8 @@ export function useModelLinesColor() {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).color;
   }
 
-  function setModelLinesColor(modelId, componentIds, color, color_mode = "constant") {
-    return modelCommonStyle.setModelTypeColor(modelId, componentIds, color, schema, color_mode);
+  function setModelLinesColor(modelId, lines_ids, color, color_mode = "constant") {
+    return modelCommonStyle.setModelTypeColor(modelId, lines_ids, color, schema, color_mode);
   }
 
   return { setModelLinesColor, modelLineColor };

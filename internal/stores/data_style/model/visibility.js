@@ -11,9 +11,9 @@ const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 async function getModelComponentsMap(modelId) {
   const dataStore = useDataStore();
   const results = await Promise.all(
-    MESH_TYPES.map(async (componentType) => {
-      const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
-      return geodeIds.map((geode_id) => ({ geode_id, componentType }));
+    MESH_TYPES.map(async (type) => {
+      const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, type);
+      return geodeIds.map((geode_id) => ({ geode_id, type }));
     }),
   );
   const allComponents = results.flat();
@@ -42,9 +42,9 @@ async function dispatchToComponentTypes(
   };
 
   for (const id of componentIds) {
-    const componentType = componentsMap[id]?.componentType;
-    if (componentType && idsByComponent[componentType]) {
-      idsByComponent[componentType].push(id);
+    const type = componentsMap[id]?.type;
+    if (type && idsByComponent[type]) {
+      idsByComponent[type].push(id);
     }
   }
 

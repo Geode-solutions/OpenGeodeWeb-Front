@@ -12,8 +12,8 @@ export function useModelLinesVisibility() {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).visibility;
   }
 
-  function setModelLinesVisibility(modelId, componentIds, visibility) {
-    return modelCommonStyle.setModelTypeVisibility(modelId, componentIds, visibility, schema);
+  function setModelLinesVisibility(modelId, lines_ids, visibility) {
+    return modelCommonStyle.setModelTypeVisibility(modelId, lines_ids, visibility, schema);
   }
 
   return { setModelLinesVisibility, modelLineVisibility };

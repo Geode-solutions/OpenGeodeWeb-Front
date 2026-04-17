@@ -14,36 +14,36 @@ export function useModelSurfacesStyle() {
   const colorStyle = useModelSurfacesColor();
 
   async function applyModelSurfacesStyle(modelId) {
-    const compIds = await dataStore.getSurfacesGeodeIds(modelId);
-    if (!compIds?.length) {
+    const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
+    if (!surfaces_ids?.length) {
       return;
     }
 
     const visibilityGroups = {};
     const colorGroups = {};
 
-    for (const compId of compIds) {
-      const style = commonStyle.modelSurfaceStyle(modelId, compId);
+    for (const surfaces_id of surfaces_ids) {
+      const style = commonStyle.modelSurfaceStyle(modelId, surfaces_id);
 
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
         visibilityGroups[visibility] = [];
       }
-      visibilityGroups[visibility].push(compId);
+      visibilityGroups[visibility].push(surfaces_id);
 
       const color_mode = style.color_mode || "constant";
-      const cKey = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[cKey]) {
-        colorGroups[cKey] = { color_mode, color: style.color, compIds: [] };
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, surfaces_ids: [] };
       }
-      colorGroups[cKey].compIds.push(compId);
+      colorGroups[color_key].surfaces_ids.push(surfaces_id);
     }
 
     const promises = [
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
         visibilityStyle.setModelSurfacesVisibility(modelId, ids, visibility === "true"),
       ),
-      ...Object.values(colorGroups).map(({ color_mode, color, compIds: ids }) =>
+      ...Object.values(colorGroups).map(({ color_mode, color, surfaces_ids: ids }) =>
         colorStyle.setModelSurfacesColor(modelId, ids, color, color_mode),
       ),
     ];

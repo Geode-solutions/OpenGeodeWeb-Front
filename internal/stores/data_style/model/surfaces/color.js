@@ -12,8 +12,8 @@ export function useModelSurfacesColor() {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color;
   }
 
-  function setModelSurfacesColor(modelId, componentIds, color, color_mode = "constant") {
-    return modelCommonStyle.setModelTypeColor(modelId, componentIds, color, schema, color_mode);
+  function setModelSurfacesColor(modelId, surfaces_ids, color, color_mode = "constant") {
+    return modelCommonStyle.setModelTypeColor(modelId, surfaces_ids, color, schema, color_mode);
   }
 
   return { setModelSurfacesColor, modelSurfaceColor };

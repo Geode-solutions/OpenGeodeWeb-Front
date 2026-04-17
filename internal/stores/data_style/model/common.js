@@ -15,11 +15,11 @@ export function useModelCommonStyle() {
     return table.put(structuredClone(toRaw(entry)));
   }
 
-  function mutateModelComponentTypeStyle(id_model, componentType, values) {
+  function mutateModelComponentTypeStyle(id_model, type, values) {
     return database.transaction("rw", database.model_component_type_datastyle, async () => {
       const table = database.model_component_type_datastyle;
-      const key = [id_model, componentType];
-      const entry = (await table.get(key)) || { id_model, componentType };
+      const key = [id_model, type];
+      const entry = (await table.get(key)) || { id_model, type };
       merge(entry, values);
       return table.put(structuredClone(toRaw(entry)));
     });
@@ -80,23 +80,26 @@ export function useModelCommonStyle() {
       params.color = color;
     }
 
-    const colors = await viewerStore.request(schema, params);
+    return viewerStore.request(schema, params, {
+      response_function: async (colors) => {
+        if (color_mode === "constant" && color !== undefined) {
+          await mutateComponentStyles(id, component_ids, { color });
+          return;
+        }
 
-    if (color_mode === "constant" && color !== undefined) {
-      return mutateComponentStyles(id, component_ids, { color });
-    }
+        if (!colors?.length) {
+          return;
+        }
 
-    if (!colors?.length) {
-      return;
-    }
-
-    return bulkMutateComponentStylesPerComponent(
-      id,
-      colors.map(({ geode_id, color: color_value }) => ({
-        id_component: geode_id,
-        values: { color: color_value },
-      })),
-    );
+        await bulkMutateComponentStylesPerComponent(
+          id,
+          colors.map(({ geode_id, color: color_value }) => ({
+            id_component: geode_id,
+            values: { color: color_value },
+          })),
+        );
+      },
+    });
   }
 
   async function setModelTypeVisibility(id, component_ids, visibility, schema) {
@@ -109,8 +112,13 @@ export function useModelCommonStyle() {
       return;
     }
 
-    await viewerStore.request(schema, { id, block_ids: viewer_ids, visibility });
-    return mutateComponentStyles(id, component_ids, { visibility });
+    return viewerStore.request(
+      schema,
+      { id, block_ids: viewer_ids, visibility },
+      {
+        response_function: () => mutateComponentStyles(id, component_ids, { visibility }),
+      },
+    );
   }
 
   return {

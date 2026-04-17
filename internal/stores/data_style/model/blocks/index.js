@@ -14,36 +14,36 @@ export function useModelBlocksStyle() {
   const colorStyle = useModelBlocksColor();
 
   async function applyModelBlocksStyle(modelId) {
-    const compIds = await dataStore.getBlocksGeodeIds(modelId);
-    if (!compIds?.length) {
+    const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
+    if (!blocks_ids?.length) {
       return;
     }
 
     const visibilityGroups = {};
     const colorGroups = {};
 
-    for (const compId of compIds) {
-      const style = commonStyle.modelBlockStyle(modelId, compId);
+    for (const block_id of blocks_ids) {
+      const style = commonStyle.modelBlockStyle(modelId, block_id);
 
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
         visibilityGroups[visibility] = [];
       }
-      visibilityGroups[visibility].push(compId);
+      visibilityGroups[visibility].push(block_id);
 
       const color_mode = style.color_mode || "constant";
-      const cKey = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[cKey]) {
-        colorGroups[cKey] = { color_mode, color: style.color, compIds: [] };
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, blocks_ids: [] };
       }
-      colorGroups[cKey].compIds.push(compId);
+      colorGroups[color_key].blocks_ids.push(block_id);
     }
 
     const promises = [
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
         visibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
       ),
-      ...Object.values(colorGroups).map(({ color_mode, color, compIds: ids }) =>
+      ...Object.values(colorGroups).map(({ color_mode, color, blocks_ids: ids }) =>
         colorStyle.setModelBlocksColor(modelId, ids, color, color_mode),
       ),
     ];
