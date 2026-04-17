@@ -96,8 +96,7 @@ function onResizeStart(event) {
     const currentTotalWidth =
       newWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
     if (currentTotalWidth > maxWidth.value) {
-      newWidth =
-        maxWidth.value - (hasAdditional ? treeviewStore.additionalPanelWidth : 0) - gap;
+      newWidth = maxWidth.value - (hasAdditional ? treeviewStore.additionalPanelWidth : 0) - gap;
     }
     treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
