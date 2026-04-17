@@ -44,7 +44,10 @@ defineExpose({ get_viewer_id });
 </script>
 
 <template>
-  <ViewerObjectTreeLayout @show-menu="(args) => emit('show-menu', args)" />
+  <ViewerObjectTreeLayout
+    :container-width="containerWidth"
+    @show-menu="(args) => emit('show-menu', args)"
+  />
   <ViewerContextMenu
     v-if="displayMenu"
     :id="menuStore.current_id"

@@ -11,9 +11,16 @@ const GAP_WIDTH = 10;
 const PERCENT_100 = 100;
 
 const TOTAL_PERCENT = 100;
+const MAX_PANEL_WIDTH_RATIO = 0.8;
+
+const { containerWidth } = defineProps({
+  containerWidth: { type: Number, required: true },
+});
 
 const treeviewStore = useTreeviewStore();
 const emit = defineEmits(["show-menu"]);
+
+const maxWidth = computed(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
 const mainView = computed(() => treeviewStore.opened_views[0]);
 const additionalViews = computed(() => treeviewStore.opened_views.slice(1));
@@ -41,6 +48,28 @@ watch(
   { immediate: true },
 );
 
+watch(maxWidth, (newMax) => {
+  const hasAdditional = additionalViews.value.length > 0;
+  const gap = hasAdditional ? GAP_WIDTH : 0;
+  const total =
+    treeviewStore.panelWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
+
+  if (total > newMax) {
+    if (hasAdditional) {
+      const newAdditionalWidth = newMax - treeviewStore.panelWidth - gap;
+      if (newAdditionalWidth < WIDTH_MIN) {
+        treeviewStore.setAdditionalPanelWidth(WIDTH_MIN);
+        const newMainWidth = newMax - WIDTH_MIN - gap;
+        treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newMainWidth));
+      } else {
+        treeviewStore.setAdditionalPanelWidth(newAdditionalWidth);
+      }
+    } else {
+      treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newMax));
+    }
+  }
+});
+
 function onDragStart(index) {
   draggedIndex.value = index;
 }
@@ -61,8 +90,16 @@ function onResizeStart(event) {
   const startX = event.clientX;
   function resize(move_event) {
     const deltaX = move_event.clientX - startX;
-    const newWidth = Math.max(WIDTH_MIN, startWidth + deltaX);
-    treeviewStore.setPanelWidth(newWidth);
+    let newWidth = Math.max(WIDTH_MIN, startWidth + deltaX);
+    const hasAdditional = additionalViews.value.length > 0;
+    const gap = hasAdditional ? GAP_WIDTH : 0;
+    const currentTotalWidth =
+      newWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
+    if (currentTotalWidth > maxWidth.value) {
+      newWidth =
+        maxWidth.value - (hasAdditional ? treeviewStore.additionalPanelWidth : 0) - gap;
+    }
+    treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
   function stopResize() {
@@ -79,8 +116,12 @@ function onAdditionalResizeStart(event) {
   const startX = event.clientX;
   function resize(move_event) {
     const deltaX = move_event.clientX - startX;
-    const newWidth = Math.max(WIDTH_MIN, startWidth + deltaX);
-    treeviewStore.setAdditionalPanelWidth(newWidth);
+    let newWidth = Math.max(WIDTH_MIN, startWidth + deltaX);
+    const currentTotalWidth = treeviewStore.panelWidth + newWidth + GAP_WIDTH;
+    if (currentTotalWidth > maxWidth.value) {
+      newWidth = maxWidth.value - treeviewStore.panelWidth - GAP_WIDTH;
+    }
+    treeviewStore.setAdditionalPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
   function stopResize() {
