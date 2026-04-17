@@ -28,7 +28,7 @@ async function dispatchToComponentTypes(
   modelId,
   componentIds,
   action,
-  { dataStore, stores },
+  { dataStore, componentStyleFunctions },
   ...args
 ) {
   const { componentsMap } = await getModelComponentsMap(modelId, dataStore);
@@ -50,40 +50,68 @@ async function dispatchToComponentTypes(
   const promises = [];
   if (action === "Visibility") {
     if (idsByComponent.Block.length > 0) {
-      promises.push(stores.Block.setModelBlocksVisibility(modelId, idsByComponent.Block, ...args));
+      promises.push(
+        componentStyleFunctions.Block.setModelBlocksVisibility(
+          modelId,
+          idsByComponent.Block,
+          ...args,
+        ),
+      );
     }
     if (idsByComponent.Surface.length > 0) {
       promises.push(
-        stores.Surface.setModelSurfacesVisibility(modelId, idsByComponent.Surface, ...args),
+        componentStyleFunctions.Surface.setModelSurfacesVisibility(
+          modelId,
+          idsByComponent.Surface,
+          ...args,
+        ),
       );
     }
     if (idsByComponent.Line.length > 0) {
-      promises.push(stores.Line.setModelLinesVisibility(modelId, idsByComponent.Line, ...args));
+      promises.push(
+        componentStyleFunctions.Line.setModelLinesVisibility( modelId, idsByComponent.Line, ...args),
+      );
     }
     if (idsByComponent.Corner.length > 0) {
       promises.push(
-        stores.Corner.setModelCornersVisibility(modelId, idsByComponent.Corner, ...args),
+        componentStyleFunctions.Corner.setModelCornersVisibility(
+          modelId,
+          idsByComponent.Corner,
+          ...args,
+        ),
       );
     }
   } else if (action === "Color") {
     if (idsByComponent.Block.length > 0) {
-      promises.push(stores.Block.setModelBlocksColor(modelId, idsByComponent.Block, ...args));
+      promises.push(
+        componentStyleFunctions.Block.setModelBlocksColor(modelId, idsByComponent.Block, ...args),
+      );
     }
     if (idsByComponent.Surface.length > 0) {
-      promises.push(stores.Surface.setModelSurfacesColor(modelId, idsByComponent.Surface, ...args));
+      promises.push(
+        componentStyleFunctions.Surface.setModelSurfacesColor(
+          modelId,
+          idsByComponent.Surface,
+          ...args,
+        ),
+      );
     }
     if (idsByComponent.Line.length > 0) {
-      promises.push(stores.Line.setModelLinesColor(modelId, idsByComponent.Line, ...args));
+      promises.push(
+        componentStyleFunctions.Line.setModelLinesColor(modelId, idsByComponent.Line, ...args),
+      );
     }
     if (idsByComponent.Corner.length > 0) {
-      promises.push(stores.Corner.setModelCornersColor(modelId, idsByComponent.Corner, ...args));
+      promises.push(
+        componentStyleFunctions.Corner.setModelCornersColor(modelId, idsByComponent.Corner, ...args),
+      );
     }
   }
 
   return Promise.all(promises);
 }
 
-function useModelVisibilityStyle(stores) {
+function useModelVisibilityStyle(componentStyleFunctions) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const hybridViewerStore = useHybridViewerStore();
@@ -125,7 +153,7 @@ function useModelVisibilityStyle(stores) {
             modelId,
             individualIds,
             "Visibility",
-            { dataStore, stores, viewerStore },
+            { dataStore, componentStyleFunctions, viewerStore },
             visibility,
           ),
         );

@@ -5,7 +5,7 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-function useModelColorStyle(stores) {
+function useModelColorStyle(componentStyleFunctions) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const viewerStore = useViewerStore();
@@ -86,7 +86,7 @@ function useModelColorStyle(stores) {
         modelId,
         componentIds,
         "Color",
-        { dataStore, stores, viewerStore },
+        { dataStore, componentStyleFunctions, viewerStore },
         color,
         color_mode,
       );

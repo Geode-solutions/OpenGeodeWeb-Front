@@ -15,23 +15,23 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 function useModelStyle() {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
-  const modelCornersStyleStore = useModelCornersStyle();
-  const modelBlocksStyleStore = useModelBlocksStyle();
-  const modelEdgesStyleStore = useModelEdgesStyle();
-  const modelLinesStyleStore = useModelLinesStyle();
-  const modelPointsStyleStore = useModelPointsStyle();
-  const modelSurfacesStyleStore = useModelSurfacesStyle();
+  const modelCornersStyle = useModelCornersStyle();
+  const modelBlocksStyle = useModelBlocksStyle();
+  const modelEdgesStyle = useModelEdgesStyle();
+  const modelLinesStyle = useModelLinesStyle();
+  const modelPointsStyle = useModelPointsStyle();
+  const modelSurfacesStyle = useModelSurfacesStyle();
   const viewerStore = useViewerStore();
 
-  const stores = {
-    Corner: modelCornersStyleStore,
-    Line: modelLinesStyleStore,
-    Surface: modelSurfacesStyleStore,
-    Block: modelBlocksStyleStore,
+  const componentStyleFunctions = {
+    Corner: modelCornersStyle,
+    Line: modelLinesStyle,
+    Surface: modelSurfacesStyle,
+    Block: modelBlocksStyle,
   };
 
-  const modelColorStyle = useModelColorStyle(stores);
-  const modelVisibilityStyle = useModelVisibilityStyle(stores);
+  const modelColorStyle = useModelColorStyle(componentStyleFunctions);
+  const modelVisibilityStyle = useModelVisibilityStyle(componentStyleFunctions);
 
   function visibleMeshComponents(id_ref) {
     return useModelSelection(id_ref, dataStyleState);
@@ -42,12 +42,12 @@ function useModelStyle() {
 
     return Promise.all([
       modelVisibilityStyle.setModelVisibility(modelId, style.visibility),
-      modelBlocksStyleStore.applyModelBlocksStyle(modelId),
-      modelSurfacesStyleStore.applyModelSurfacesStyle(modelId),
-      modelLinesStyleStore.applyModelLinesStyle(modelId),
-      modelCornersStyleStore.applyModelCornersStyle(modelId),
-      modelPointsStyleStore.applyModelPointsStyle(modelId),
-      modelEdgesStyleStore.applyModelEdgesStyle(modelId),
+      modelBlocksStyle.applyModelBlocksStyle(modelId),
+      modelSurfacesStyle.applyModelSurfacesStyle(modelId),
+      modelLinesStyle.applyModelLinesStyle(modelId),
+      modelCornersStyle.applyModelCornersStyle(modelId),
+      modelPointsStyle.applyModelPointsStyle(modelId),
+      modelEdgesStyle.applyModelEdgesStyle(modelId),
     ]);
   }
 
@@ -59,10 +59,10 @@ function useModelStyle() {
         return;
       }
       return await Promise.all([
-        modelBlocksStyleStore.setModelBlocksDefaultStyle(modelId),
-        modelSurfacesStyleStore.setModelSurfacesDefaultStyle(modelId),
-        modelLinesStyleStore.setModelLinesDefaultStyle(modelId),
-        modelCornersStyleStore.setModelCornersDefaultStyle(modelId),
+        modelBlocksStyle.setModelBlocksDefaultStyle(modelId),
+        modelSurfacesStyle.setModelSurfacesDefaultStyle(modelId),
+        modelLinesStyle.setModelLinesDefaultStyle(modelId),
+        modelCornersStyle.setModelCornersDefaultStyle(modelId),
       ]);
     } finally {
       viewerStore.stop_request();
@@ -75,12 +75,12 @@ function useModelStyle() {
     setModelMeshComponentsDefaultStyle,
     ...modelColorStyle,
     ...modelVisibilityStyle,
-    ...modelBlocksStyleStore,
-    ...modelCornersStyleStore,
-    ...modelEdgesStyleStore,
-    ...modelLinesStyleStore,
-    ...modelPointsStyleStore,
-    ...modelSurfacesStyleStore,
+    ...modelBlocksStyle,
+    ...modelCornersStyle,
+    ...modelEdgesStyle,
+    ...modelLinesStyle,
+    ...modelPointsStyle,
+    ...modelSurfacesStyle,
   };
 }
 
