@@ -22,7 +22,7 @@ const { steps, current_step_index } = toRefs(stepper_tree);
     @update:model-value="current_step_index = $event - 1"
     flat
     non-linear
-    class="pa-0 ma-0 bg-transparent rounded-xl overflow-hidden custom-stepper flex-grow-1"
+    class="pa-0 ma-0 bg-transparent rounded-xl overflow-y-auto custom-stepper flex-grow-1"
   >
     <Step
       v-for="(step, index) in steps"
