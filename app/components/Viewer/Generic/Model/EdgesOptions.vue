@@ -25,9 +25,17 @@ const visibility = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Edges options" :btn_image="SurfaceEdges">
+  <ViewerContextMenuItem
+    data-testid="modelEdgesMenu"
+    :itemProps="itemProps"
+    tooltip="Edges options"
+    :btn_image="SurfaceEdges"
+  >
     <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch
+        data-testid="modelEdgesVisibilitySwitch"
+        v-model="visibility"
+      />
     </template>
   </ViewerContextMenuItem>
 </template>

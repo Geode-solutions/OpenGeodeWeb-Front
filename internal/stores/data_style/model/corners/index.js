@@ -1,59 +1,52 @@
-// Local imports
 import { useDataStore } from "@ogw_front/stores/data";
-import { useModelCornersColorStyle } from "./color";
+import { useModelCornersColor } from "./color";
 import { useModelCornersCommonStyle } from "./common";
-import { useModelCornersVisibilityStyle } from "./visibility";
+import { useModelCornersVisibility } from "./visibility";
+
 async function setModelCornersDefaultStyle(_id) {
   // Placeholder
 }
 
 export function useModelCornersStyle() {
   const dataStore = useDataStore();
-  const modelCornersCommonStyle = useModelCornersCommonStyle();
-  const modelCornersVisibilityStyle = useModelCornersVisibilityStyle();
-  const modelCornersColorStyle = useModelCornersColorStyle();
+  const modelCommonStyle = useModelCornersCommonStyle();
+  const modelVisibilityStyle = useModelCornersVisibility();
+  const modelColorStyle = useModelCornersColor();
 
-  async function applyModelCornersStyle(id) {
-    const corner_ids = await dataStore.getCornersGeodeIds(id);
-    if (corner_ids.length === 0) {
+  async function applyModelCornersStyle(modelId) {
+    const corners_ids = await dataStore.getCornersGeodeIds(modelId);
+    if (!corners_ids?.length) {
       return;
     }
 
-    // Group corners by their effective style to minimize RPC calls
     const visibilityGroups = {};
     const colorGroups = {};
 
-    for (const corner_id of corner_ids) {
-      const style = modelCornersCommonStyle.modelCornerStyle(id, corner_id);
+    for (const corner_id of corners_ids) {
+      const style = modelCommonStyle.modelCornerStyle(modelId, corner_id);
 
-      // Group by visibility
-      const vKey = String(style.visibility);
-      if (!visibilityGroups[vKey]) {
-        visibilityGroups[vKey] = [];
+      const visibility = String(style.visibility);
+      if (!visibilityGroups[visibility]) {
+        visibilityGroups[visibility] = [];
       }
-      visibilityGroups[vKey].push(corner_id);
+      visibilityGroups[visibility].push(corner_id);
 
-      // Group by color
-      const cKey = JSON.stringify(style.color);
-      if (!colorGroups[cKey]) {
-        colorGroups[cKey] = [];
+      const color_mode = style.color_mode || "constant";
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, corners_ids: [] };
       }
-      colorGroups[cKey].push(corner_id);
+      colorGroups[color_key].corners_ids.push(corner_id);
     }
 
-    const promises = [];
-
-    // Apply visibility groups
-    for (const [vValue, ids] of Object.entries(visibilityGroups)) {
-      promises.push(
-        modelCornersVisibilityStyle.setModelCornersVisibility(id, ids, vValue === "true"),
-      );
-    }
-
-    // Apply color groups
-    for (const [cValue, ids] of Object.entries(colorGroups)) {
-      promises.push(modelCornersColorStyle.setModelCornersColor(id, ids, JSON.parse(cValue)));
-    }
+    const promises = [
+      ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
+        modelVisibilityStyle.setModelCornersVisibility(modelId, ids, visibility === "true"),
+      ),
+      ...Object.values(colorGroups).map(({ color_mode, color, corners_ids: ids }) =>
+        modelColorStyle.setModelCornersColor(modelId, ids, color, color_mode),
+      ),
+    ];
 
     return Promise.all(promises);
   }
@@ -61,8 +54,8 @@ export function useModelCornersStyle() {
   return {
     applyModelCornersStyle,
     setModelCornersDefaultStyle,
-    ...modelCornersCommonStyle,
-    ...modelCornersVisibilityStyle,
-    ...modelCornersColorStyle,
+    ...modelCommonStyle,
+    ...modelVisibilityStyle,
+    ...modelColorStyle,
   };
 }

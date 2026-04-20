@@ -33,6 +33,19 @@ export function useDataStyleState() {
     return selection;
   });
 
+  const modelComponentTypeStyles = useObservable(
+    liveQuery(async () => {
+      const all = await database.model_component_type_datastyle.toArray();
+      const accumulator = {};
+      for (const style of all) {
+        const key = `${style.id_model}_${style.type}`;
+        accumulator[key] = style;
+      }
+      return accumulator;
+    }),
+    { initialValue: {} },
+  );
+
   const componentStyles = useObservable(
     liveQuery(async () => {
       const all = await database.model_component_datastyle.toArray();
@@ -61,47 +74,27 @@ export function useDataStyleState() {
     return componentStyles.value[key] || {};
   }
 
-  function mutateComponentStyle(id_model, id_component, values) {
-    return database.model_component_datastyle.get([id_model, id_component]).then((style) => {
-      const component_style = style || { id_model, id_component };
-      merge(component_style, values);
-      return database.model_component_datastyle.put(structuredClone(toRaw(component_style)));
-    });
-  }
-
-  function mutateComponentStyles(id_model, id_components, values) {
-    return database.model_component_datastyle
-      .where("id_model")
-      .equals(id_model)
-      .toArray()
-      .then((all_styles) => {
-        const style_map = {};
-        for (const style of all_styles) {
-          style_map[style.id_component] = style;
-        }
-
-        const updates = id_components.map((id_component) => {
-          const style = style_map[id_component] || { id_model, id_component };
-          merge(style, values);
-          return toRaw(style);
-        });
-
-        return database.model_component_datastyle.bulkPut(structuredClone(updates));
-      });
+  function getModelComponentTypeStyle(id_model, type) {
+    const key = `${id_model}_${type}`;
+    return modelComponentTypeStyles.value[key] || {};
   }
 
   function clear() {
-    return Promise.all([database.data_style.clear(), database.model_component_datastyle.clear()]);
+    return Promise.all([
+      database.data_style.clear(),
+      database.model_component_datastyle.clear(),
+      database.model_component_type_datastyle.clear(),
+    ]);
   }
 
   return {
     getStyle,
-    mutateStyle,
     getComponentStyle,
-    mutateComponentStyle,
-    mutateComponentStyles,
+    getModelComponentTypeStyle,
+    mutateStyle,
     styles,
     componentStyles,
+    modelComponentTypeStyles,
     objectVisibility,
     selectedObjects,
     clear,

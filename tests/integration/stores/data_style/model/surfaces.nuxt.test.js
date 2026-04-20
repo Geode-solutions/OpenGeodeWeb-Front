@@ -52,7 +52,11 @@ describe("model surfaces", () => {
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.visibility,
-        { id, block_ids: surface_viewer_ids, visibility },
+        {
+          id,
+          block_ids: surface_viewer_ids,
+          visibility,
+        },
         {
           response_function: expect.any(Function),
         },
@@ -80,7 +84,12 @@ describe("model surfaces", () => {
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
         model_surfaces_schemas.color,
-        { id, block_ids: surface_viewer_ids, color },
+        {
+          id,
+          block_ids: surface_viewer_ids,
+          color,
+          color_mode: "constant",
+        },
         {
           response_function: expect.any(Function),
         },

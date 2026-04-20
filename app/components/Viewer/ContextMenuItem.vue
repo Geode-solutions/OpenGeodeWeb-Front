@@ -96,8 +96,9 @@ function toggleOptions() {
         variant="panel"
         padding="pa-0"
         class="elevation-24"
+        style="overflow: hidden; display: flex; flex-direction: column"
       >
-        <v-card-text class="pa-5">
+        <v-card-text class="pa-5" style="overflow-y: auto; flex: 1; min-height: 0">
           <slot name="options" />
         </v-card-text>
       </GlassCard>

@@ -59,6 +59,7 @@ class Database extends BaseDatabase {
 
 await Dexie.delete("Database");
 const databaseContainer = { instance: new Database() };
+databaseContainer.instance.clear();
 
 const database = new Proxy(
   {},
