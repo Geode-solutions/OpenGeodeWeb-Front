@@ -20,6 +20,6 @@ watch(pressed, (value) => {
     canvas-height="100"
     hide-inputs
     width="100%"
-    mode="rgb"
+    mode="rgba"
   />
 </template>
