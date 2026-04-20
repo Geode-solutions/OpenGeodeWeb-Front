@@ -32,9 +32,17 @@ const size = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Points options" :btn_image="SurfacePoints">
+  <ViewerContextMenuItem
+    data-testid="modelPointsMenu"
+    :itemProps="itemProps"
+    tooltip="Points options"
+    :btn_image="SurfacePoints"
+  >
     <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch
+        data-testid="modelPointsVisibilitySwitch"
+        v-model="visibility"
+      />
       <template v-if="visibility">
         <v-row class="pa-0" align="center">
           <v-divider />

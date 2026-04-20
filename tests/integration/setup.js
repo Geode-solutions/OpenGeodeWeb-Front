@@ -10,7 +10,7 @@ import { addMicroserviceMetadatas, runBack, runViewer } from "@ogw_front/utils/l
 import { createPath, generateProjectFolderPath } from "@ogw_front/utils/local/path";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
-import { importFile } from "@ogw_front/utils/file_import_workflow";
+import { importFile } from "@ogw_front/utils/import_workflow";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useGeodeStore } from "@ogw_front/stores/geode";
 import { useInfraStore } from "@ogw_front/stores/infra";
