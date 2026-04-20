@@ -18,6 +18,7 @@ const MESH_CONFIG = [{ type: "Corner" }, { type: "Line" }, { type: "Surface" }, 
 
 const MESH_TYPES = MESH_CONFIG.map((config) => config.type);
 
+// oxlint-disable-next-line max-lines-per-function, max-statements
 export function useModelStyle() {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
@@ -83,43 +84,23 @@ export function useModelStyle() {
     );
   }
 
-  function visibleMeshComponents(id_ref) {
-    const selection = ref([]);
-    watch(
-      () => unref(id_ref),
-      (modelId, _prev, onCleanup) => {
-        if (!modelId) {
-          selection.value = [];
-          return;
+  function visibleMeshComponents(modelId) {
+    return useObservable(
+      liveQuery(async () => {
+        const allComponents = await database.model_components.where("id").equals(modelId).toArray();
+        if (allComponents.length === 0) {
+          return [];
         }
-        const observable = liveQuery(async () => {
-          const allComponents = await database.model_components
-            .where("id")
-            .equals(modelId)
-            .toArray();
-          if (allComponents.length === 0) {
-            return [];
-          }
-          const componentStyles = await database.model_component_datastyle
-            .where("id_model")
-            .equals(modelId)
-            .toArray();
-          const stylesMap = Object.fromEntries(
-            componentStyles.map((style) => [style.id_component, style]),
-          );
-          return buildSelection(modelId, allComponents, stylesMap);
-        });
-
-        const subscription = observable.subscribe({
-          next: (val) => {
-            selection.value = val;
-          },
-        });
-        onCleanup(() => subscription.unsubscribe());
-      },
-      { immediate: true },
+        const componentStyles = await database.model_component_datastyle
+          .where("id_model")
+          .equals(modelId)
+          .toArray();
+        const stylesMap = Object.fromEntries(
+          componentStyles.map((style) => [style.id_component, style]),
+        );
+        return buildSelection(modelId, allComponents, stylesMap);
+      }),
     );
-    return selection;
   }
 
   function getModelComponentColor(modelId, componentId) {

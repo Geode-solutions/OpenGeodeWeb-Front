@@ -40,7 +40,9 @@ watch(
     const { added, removed } = compareSelections(current, previous);
 
     const allObjectIds = new Set(
-      treeviewStore.items.flatMap((group) => group.children.map((child) => child.id)),
+      treeviewStore.items.flatMap((group) =>
+        group.children.map((child) => child.id),
+      ),
     );
 
     const updates = [
@@ -59,7 +61,8 @@ watch(
 function isModel(item) {
   const actualItem = item.raw || item;
   return (
-    actualItem.viewer_type === "model" || ["BRep", "Section"].includes(actualItem.geode_object_type)
+    actualItem.viewer_type === "model" ||
+    ["BRep", "Section"].includes(actualItem.geode_object_type)
   );
 }
 </script>
@@ -84,6 +87,7 @@ function isModel(item) {
       item-value="id"
       select-strategy="classic"
       selectable
+      items-registration="props"
     >
       <template #title="{ item }">
         <ObjectTreeItemLabel
@@ -101,7 +105,11 @@ function isModel(item) {
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
-            treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type)
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+            )
           "
         />
       </template>

@@ -63,7 +63,7 @@
     "sass": "1.87.0",
     "semver": "7.7.1",
     "uuid": "11.1.0",
-    "vuetify": "3.10.11",
+    "vuetify": "3.12.5",
     "vuetify-nuxt-module": "0.18.7",
     "ws": "8.18.3",
     "wslink": "1.12.4"
