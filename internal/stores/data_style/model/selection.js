@@ -1,6 +1,7 @@
 import { MESH_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
+import { useObservable } from "@vueuse/rxjs";
 
 function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyleState) {
   const componentsByType = Object.fromEntries(
@@ -41,7 +42,7 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
 }
 
 function useModelSelection(modelId, dataStyleState) {
-  return useObservable(() =>
+  return useObservable(
     liveQuery(async () => {
       const [allComponents, componentStyles, typeStyles] = await Promise.all([
         database.model_components.where("id").equals(modelId).toArray(),
