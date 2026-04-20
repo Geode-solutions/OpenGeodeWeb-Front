@@ -58,7 +58,7 @@ const snapshotMock = {
           visibility: true,
           coloring: {
             active: "color",
-            color: { r: 255, g: 255, b: 255 },
+            color: { red: 255, green: 255, blue: 255, alpha: 1 },
             vertex: undefined,
           },
           size: POINT_SIZE,
