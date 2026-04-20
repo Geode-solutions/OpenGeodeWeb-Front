@@ -1,4 +1,5 @@
 <script setup>
+// oxlint-disable id-length
 const colorPickerRef = useTemplateRef("colorPickerRef");
 const model = defineModel();
 const { pressed } = useMousePressed({ target: colorPickerRef });
