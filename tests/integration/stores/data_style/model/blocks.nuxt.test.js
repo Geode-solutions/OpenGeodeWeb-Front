@@ -76,7 +76,7 @@ describe("Model blocks", () => {
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
       const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
-      const color = { r: 255, g: 0, b: 0 };
+      const color = { r: 255, g: 0, b: 0, a: 1 };
       const spy = vi.spyOn(viewerStore, "request");
       await dataStyleStore.setModelBlocksColor(id, block_ids, color);
       await sleep(SLEEP_MS);

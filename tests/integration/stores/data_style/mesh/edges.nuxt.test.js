@@ -53,7 +53,7 @@ describe("Mesh edges", () => {
     test("Edges color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const color = { r: 255, g: 0, b: 0 };
+      const color = { r: 255, g: 0, b: 0, a: 1 };
       const spy = vi.spyOn(viewerStore, "request");
       const result = dataStyleStore.setMeshEdgesColor(id, color);
       expect(result).toBeInstanceOf(Promise);

@@ -76,7 +76,7 @@ describe("Model corners", () => {
       const dataStore = useDataStore();
       const corner_ids = await dataStore.getCornersGeodeIds(id);
       const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, corner_ids);
-      const color = { r: 255, g: 0, b: 0 };
+      const color = { r: 255, g: 0, b: 0, a: 1 };
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       const result = dataStyleStore.setModelCornersColor(id, corner_ids, color);
