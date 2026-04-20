@@ -40,44 +40,24 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
   return selection;
 }
 
-function useModelSelection(id_ref, dataStyleState) {
-  const selection = ref([]);
-  watch(
-    () => unref(id_ref),
-    (modelId, _prev, onCleanup) => {
-      if (!modelId) {
-        selection.value = [];
-        return;
+function useModelSelection(modelId, dataStyleState) {
+  return useObservable(() =>
+    liveQuery(async () => {
+      const [allComponents, componentStyles, typeStyles] = await Promise.all([
+        database.model_components.where("id").equals(modelId).toArray(),
+        database.model_component_datastyle.where("id_model").equals(modelId).toArray(),
+        database.model_component_type_datastyle.where("id_model").equals(modelId).toArray(),
+      ]);
+      if (allComponents.length === 0) {
+        return [];
       }
-      const observable = liveQuery(async () => {
-        const [allComponents, componentStyles, typeStyles] = await Promise.all([
-          database.model_components.where("id").equals(modelId).toArray(),
-          database.model_component_datastyle.where("id_model").equals(modelId).toArray(),
-          database.model_component_type_datastyle.where("id_model").equals(modelId).toArray(),
-        ]);
-
-        if (allComponents.length === 0) {
-          return [];
-        }
-
-        const stylesMap = Object.fromEntries(
-          componentStyles.map((style) => [style.id_component, style]),
-        );
-        const typeStylesMap = Object.fromEntries(typeStyles.map((style) => [style.type, style]));
-
-        return buildSelection(modelId, allComponents, stylesMap, typeStylesMap, dataStyleState);
-      });
-
-      const subscription = observable.subscribe({
-        next: (val) => {
-          selection.value = val;
-        },
-      });
-      onCleanup(() => subscription.unsubscribe());
-    },
-    { immediate: true },
+      const stylesMap = Object.fromEntries(
+        componentStyles.map((style) => [style.id_component, style]),
+      );
+      const typeStylesMap = Object.fromEntries(typeStyles.map((style) => [style.type, style]));
+      return buildSelection(modelId, allComponents, stylesMap, typeStylesMap, dataStyleState);
+    }),
   );
-  return selection;
 }
 
 export { buildSelection, useModelSelection };
