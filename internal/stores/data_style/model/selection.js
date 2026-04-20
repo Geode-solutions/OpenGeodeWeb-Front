@@ -1,9 +1,11 @@
-import { MESH_TYPES } from "./constants";
+import { MESH_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 
 function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyleState) {
-  const componentsByType = Object.fromEntries(MESH_TYPES.map((type) => [type, []]));
+  const componentsByType = Object.fromEntries(
+    MESH_TYPES.map((componentType) => [componentType, []]),
+  );
   for (const component of components) {
     if (componentsByType[component.type]) {
       componentsByType[component.type].push(component);
@@ -12,14 +14,14 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
 
   const groupStyles = dataStyleState.getStyle(modelId);
   const selection = [];
-  for (const type of MESH_TYPES) {
-    const typeComponents = componentsByType[type];
+  for (const componentType of MESH_TYPES) {
+    const typeComponents = componentsByType[componentType];
     if (typeComponents.length === 0) {
       continue;
     }
 
-    const typeKey = `${type.toLowerCase()}s`;
-    const typeStyle = typeStylesMap[type];
+    const typeKey = `${componentType.toLowerCase()}s`;
+    const typeStyle = typeStylesMap[componentType];
     const defaultVisibility = typeStyle?.visibility ?? groupStyles[typeKey]?.visibility ?? true;
 
     let allVisible = true;
@@ -32,7 +34,7 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
       }
     }
     if (allVisible) {
-      selection.push(type);
+      selection.push(componentType);
     }
   }
   return selection;

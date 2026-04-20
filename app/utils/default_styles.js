@@ -21,6 +21,15 @@ const surfaces_defaultColor = { r: 255, g: 255, b: 255 };
 const blocks_defaultVisibility = true;
 const blocks_defaultColor = { r: 255, g: 255, b: 255 };
 
+const DEFAULT_MODEL_COMPONENT_TYPE_COLORS = {
+  Corner: corners_defaultColor,
+  Line: lines_defaultColor,
+  Surface: surfaces_defaultColor,
+  Block: blocks_defaultColor,
+};
+
+const MESH_TYPES = ["Corner", "Line", "Surface", "Block"];
+
 // Mesh functions
 function meshPointsDefaultStyle(
   visibility = points_defaultVisibility,
@@ -315,4 +324,4 @@ function getDefaultStyle(type) {
   return default_styles()[type];
 }
 
-export { getDefaultStyle };
+export { getDefaultStyle, DEFAULT_MODEL_COMPONENT_TYPE_COLORS, MESH_TYPES };

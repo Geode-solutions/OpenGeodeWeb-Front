@@ -1,16 +1,61 @@
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
-import { useModelComponentColor } from "@ogw_internal/stores/data_style/model/color";
-import { useModelComponentVisibility } from "@ogw_internal/stores/data_style/model/visibility";
+import { useModelBlocksVisibility } from "./visibility";
 
 async function setModelBlocksDefaultStyle(_id) {
   // Placeholder
 }
 
 export function useModelBlocksStyle() {
+  const dataStore = useDataStore();
+  const commonStyle = useModelBlocksCommonStyle();
+  const visibilityStyle = useModelBlocksVisibility();
+  const colorStyle = useModelBlocksColor();
+
+  async function applyModelBlocksStyle(modelId) {
+    const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
+    if (!blocks_ids?.length) {
+      return;
+    }
+
+    const visibilityGroups = {};
+    const colorGroups = {};
+
+    for (const block_id of blocks_ids) {
+      const style = commonStyle.modelBlockStyle(modelId, block_id);
+
+      const visibility = String(style.visibility);
+      if (!visibilityGroups[visibility]) {
+        visibilityGroups[visibility] = [];
+      }
+      visibilityGroups[visibility].push(block_id);
+
+      const color_mode = style.color_mode || "constant";
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, blocks_ids: [] };
+      }
+      colorGroups[color_key].blocks_ids.push(block_id);
+    }
+
+    const promises = [
+      ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
+        visibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
+      ),
+      ...Object.values(colorGroups).map(({ color_mode, color, blocks_ids: ids }) =>
+        colorStyle.setModelBlocksColor(modelId, ids, color, color_mode),
+      ),
+    ];
+
+    return Promise.all(promises);
+  }
+
   return {
+    applyModelBlocksStyle,
     setModelBlocksDefaultStyle,
-    ...useModelBlocksCommonStyle(),
-    ...useModelComponentVisibility("Block"),
-    ...useModelComponentColor("Block"),
+    ...commonStyle,
+    ...visibilityStyle,
+    ...colorStyle,
   };
 }

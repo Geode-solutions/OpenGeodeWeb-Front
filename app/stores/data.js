@@ -184,10 +184,10 @@ export const useDataStore = defineStore("data", () => {
     await database.model_components_relation.where("id").equals(modelId).delete();
   }
 
-  async function getMeshComponentGeodeIds(modelId, component_type) {
+  async function getMeshComponentGeodeIds(modelId, type) {
     const components = await database.model_components
       .where("[id+type]")
-      .equals([modelId, component_type])
+      .equals([modelId, type])
       .toArray();
     return components.map((component) => component.geode_id);
   }
