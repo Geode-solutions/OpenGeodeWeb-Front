@@ -9,7 +9,6 @@ import { useModelPointsStyle } from "./points";
 import { useModelSelection } from "./selection";
 import { useModelSurfacesStyle } from "./surfaces";
 import { useModelVisibilityStyle } from "./visibility";
-import { useViewerStore } from "@ogw_front/stores/viewer";
 
 function useModelStyle() {
   const dataStore = useDataStore();
@@ -20,7 +19,6 @@ function useModelStyle() {
   const modelLinesStyle = useModelLinesStyle();
   const modelPointsStyle = useModelPointsStyle();
   const modelSurfacesStyle = useModelSurfacesStyle();
-  const viewerStore = useViewerStore();
 
   const componentStyleFunctions = {
     Corner: modelCornersStyle,
@@ -51,21 +49,16 @@ function useModelStyle() {
   }
 
   async function setModelMeshComponentsDefaultStyle(modelId) {
-    viewerStore.start_request();
-    try {
-      const item = await dataStore.item(modelId);
-      if (!item) {
-        return;
-      }
-      return await Promise.all([
-        modelBlocksStyle.setModelBlocksDefaultStyle(modelId),
-        modelSurfacesStyle.setModelSurfacesDefaultStyle(modelId),
-        modelLinesStyle.setModelLinesDefaultStyle(modelId),
-        modelCornersStyle.setModelCornersDefaultStyle(modelId),
-      ]);
-    } finally {
-      viewerStore.stop_request();
+    const item = await dataStore.item(modelId);
+    if (!item) {
+      return;
     }
+    return await Promise.all([
+      modelBlocksStyle.setModelBlocksDefaultStyle(modelId),
+      modelSurfacesStyle.setModelSurfacesDefaultStyle(modelId),
+      modelLinesStyle.setModelLinesDefaultStyle(modelId),
+      modelCornersStyle.setModelCornersDefaultStyle(modelId),
+    ]);
   }
 
   return {

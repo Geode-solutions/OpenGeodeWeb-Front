@@ -142,47 +142,37 @@ function useModelVisibilityStyle(componentStyleFunctions) {
   }
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
-    viewerStore.start_request();
-    try {
-      const typeIds = componentIds.filter((id) => MESH_TYPES.includes(id));
-      const individualIds = componentIds.filter((id) => !MESH_TYPES.includes(id));
+    const typeIds = componentIds.filter((id) => MESH_TYPES.includes(id));
+    const individualIds = componentIds.filter((id) => !MESH_TYPES.includes(id));
 
-      const promises = [];
-      for (const typeId of typeIds) {
-        promises.push(setModelComponentTypeVisibility(modelId, typeId, visibility));
-      }
-
-      if (individualIds.length > 0) {
-        promises.push(
-          dispatchToComponentTypes(
-            modelId,
-            individualIds,
-            "Visibility",
-            { componentStyleFunctions },
-            visibility,
-          ),
-        );
-      }
-      return await Promise.all(promises);
-    } finally {
-      viewerStore.stop_request();
+    const promises = [];
+    for (const typeId of typeIds) {
+      promises.push(setModelComponentTypeVisibility(modelId, typeId, visibility));
     }
+
+    if (individualIds.length > 0) {
+      promises.push(
+        dispatchToComponentTypes(
+          modelId,
+          individualIds,
+          "Visibility",
+          { componentStyleFunctions },
+          visibility,
+        ),
+      );
+    }
+    return await Promise.all(promises);
   }
 
   async function setModelComponentTypeVisibility(modelId, componentType, visibility) {
-    viewerStore.start_request();
-    try {
-      await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
-        visibility,
-      });
-      const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
-      if (idsForType.length === 0) {
-        return;
-      }
-      await setModelComponentsVisibility(modelId, idsForType, visibility);
-    } finally {
-      viewerStore.stop_request();
+    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
+      visibility,
+    });
+    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
+    if (idsForType.length === 0) {
+      return;
     }
+    await setModelComponentsVisibility(modelId, idsForType, visibility);
   }
 
   return {

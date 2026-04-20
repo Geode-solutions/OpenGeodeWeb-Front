@@ -9,9 +9,9 @@ async function setModelBlocksDefaultStyle(_id) {
 
 export function useModelBlocksStyle() {
   const dataStore = useDataStore();
-  const commonStyle = useModelBlocksCommonStyle();
-  const visibilityStyle = useModelBlocksVisibility();
-  const colorStyle = useModelBlocksColor();
+  const modelCommonStyle = useModelBlocksCommonStyle();
+  const modelVisibilityStyle = useModelBlocksVisibility();
+  const modelColorStyle = useModelBlocksColor();
 
   async function applyModelBlocksStyle(modelId) {
     const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
@@ -23,7 +23,7 @@ export function useModelBlocksStyle() {
     const colorGroups = {};
 
     for (const block_id of blocks_ids) {
-      const style = commonStyle.modelBlockStyle(modelId, block_id);
+      const style = modelCommonStyle.modelBlockStyle(modelId, block_id);
 
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
@@ -41,10 +41,10 @@ export function useModelBlocksStyle() {
 
     const promises = [
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
-        visibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
+        modelVisibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
       ),
       ...Object.values(colorGroups).map(({ color_mode, color, blocks_ids: ids }) =>
-        colorStyle.setModelBlocksColor(modelId, ids, color, color_mode),
+        modelColorStyle.setModelBlocksColor(modelId, ids, color, color_mode),
       ),
     ];
 
@@ -54,8 +54,8 @@ export function useModelBlocksStyle() {
   return {
     applyModelBlocksStyle,
     setModelBlocksDefaultStyle,
-    ...commonStyle,
-    ...visibilityStyle,
-    ...colorStyle,
+    ...modelCommonStyle,
+    ...modelVisibilityStyle,
+    ...modelColorStyle,
   };
 }

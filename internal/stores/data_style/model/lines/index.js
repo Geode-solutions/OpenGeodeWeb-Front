@@ -9,9 +9,9 @@ async function setModelLinesDefaultStyle(_id) {
 
 export function useModelLinesStyle() {
   const dataStore = useDataStore();
-  const commonStyle = useModelLinesCommonStyle();
-  const visibilityStyle = useModelLinesVisibility();
-  const colorStyle = useModelLinesColor();
+  const modelCommonStyle = useModelLinesCommonStyle();
+  const modelVisibilityStyle = useModelLinesVisibility();
+  const modelColorStyle = useModelLinesColor();
 
   async function applyModelLinesStyle(modelId) {
     const lines_ids = await dataStore.getLinesGeodeIds(modelId);
@@ -23,7 +23,7 @@ export function useModelLinesStyle() {
     const colorGroups = {};
 
     for (const line_id of lines_ids) {
-      const style = commonStyle.modelLineStyle(modelId, line_id);
+      const style = modelCommonStyle.modelLineStyle(modelId, line_id);
 
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
@@ -41,10 +41,10 @@ export function useModelLinesStyle() {
 
     const promises = [
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
-        visibilityStyle.setModelLinesVisibility(modelId, ids, visibility === "true"),
+        modelVisibilityStyle.setModelLinesVisibility(modelId, ids, visibility === "true"),
       ),
       ...Object.values(colorGroups).map(({ color_mode, color, lines_ids: ids }) =>
-        colorStyle.setModelLinesColor(modelId, ids, color, color_mode),
+        modelColorStyle.setModelLinesColor(modelId, ids, color, color_mode),
       ),
     ];
 
@@ -54,8 +54,8 @@ export function useModelLinesStyle() {
   return {
     applyModelLinesStyle,
     setModelLinesDefaultStyle,
-    ...commonStyle,
-    ...visibilityStyle,
-    ...colorStyle,
+    ...modelCommonStyle,
+    ...modelVisibilityStyle,
+    ...modelColorStyle,
   };
 }

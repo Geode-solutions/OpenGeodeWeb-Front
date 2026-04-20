@@ -9,9 +9,9 @@ async function setModelCornersDefaultStyle(_id) {
 
 export function useModelCornersStyle() {
   const dataStore = useDataStore();
-  const commonStyle = useModelCornersCommonStyle();
-  const visibilityStyle = useModelCornersVisibility();
-  const colorStyle = useModelCornersColor();
+  const modelCommonStyle = useModelCornersCommonStyle();
+  const modelVisibilityStyle = useModelCornersVisibility();
+  const modelColorStyle = useModelCornersColor();
 
   async function applyModelCornersStyle(modelId) {
     const corners_ids = await dataStore.getCornersGeodeIds(modelId);
@@ -23,7 +23,7 @@ export function useModelCornersStyle() {
     const colorGroups = {};
 
     for (const corner_id of corners_ids) {
-      const style = commonStyle.modelCornerStyle(modelId, corner_id);
+      const style = modelCommonStyle.modelCornerStyle(modelId, corner_id);
 
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
@@ -41,10 +41,10 @@ export function useModelCornersStyle() {
 
     const promises = [
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
-        visibilityStyle.setModelCornersVisibility(modelId, ids, visibility === "true"),
+        modelVisibilityStyle.setModelCornersVisibility(modelId, ids, visibility === "true"),
       ),
       ...Object.values(colorGroups).map(({ color_mode, color, corners_ids: ids }) =>
-        colorStyle.setModelCornersColor(modelId, ids, color, color_mode),
+        modelColorStyle.setModelCornersColor(modelId, ids, color, color_mode),
       ),
     ];
 
@@ -54,8 +54,8 @@ export function useModelCornersStyle() {
   return {
     applyModelCornersStyle,
     setModelCornersDefaultStyle,
-    ...commonStyle,
-    ...visibilityStyle,
-    ...colorStyle,
+    ...modelCommonStyle,
+    ...modelVisibilityStyle,
+    ...modelColorStyle,
   };
 }

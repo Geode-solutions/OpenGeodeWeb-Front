@@ -9,9 +9,9 @@ async function setModelSurfacesDefaultStyle(_id) {
 
 export function useModelSurfacesStyle() {
   const dataStore = useDataStore();
-  const commonStyle = useModelSurfacesCommonStyle();
-  const visibilityStyle = useModelSurfacesVisibility();
-  const colorStyle = useModelSurfacesColor();
+  const modelCommonStyle = useModelSurfacesCommonStyle();
+  const modelVisibilityStyle = useModelSurfacesVisibility();
+  const modelColorStyle = useModelSurfacesColor();
 
   async function applyModelSurfacesStyle(modelId) {
     const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
@@ -23,7 +23,7 @@ export function useModelSurfacesStyle() {
     const colorGroups = {};
 
     for (const surfaces_id of surfaces_ids) {
-      const style = commonStyle.modelSurfaceStyle(modelId, surfaces_id);
+      const style = modelCommonStyle.modelSurfaceStyle(modelId, surfaces_id);
 
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
@@ -41,10 +41,10 @@ export function useModelSurfacesStyle() {
 
     const promises = [
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
-        visibilityStyle.setModelSurfacesVisibility(modelId, ids, visibility === "true"),
+        modelVisibilityStyle.setModelSurfacesVisibility(modelId, ids, visibility === "true"),
       ),
       ...Object.values(colorGroups).map(({ color_mode, color, surfaces_ids: ids }) =>
-        colorStyle.setModelSurfacesColor(modelId, ids, color, color_mode),
+        modelColorStyle.setModelSurfacesColor(modelId, ids, color, color_mode),
       ),
     ];
 
@@ -54,8 +54,8 @@ export function useModelSurfacesStyle() {
   return {
     applyModelSurfacesStyle,
     setModelSurfacesDefaultStyle,
-    ...commonStyle,
-    ...visibilityStyle,
-    ...colorStyle,
+    ...modelCommonStyle,
+    ...modelVisibilityStyle,
+    ...modelColorStyle,
   };
 }
