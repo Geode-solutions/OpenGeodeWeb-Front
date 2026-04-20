@@ -1,8 +1,7 @@
-// Local imports
 import { useDataStore } from "@ogw_front/stores/data";
-import { useModelLinesColorStyle } from "./color";
+import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
-import { useModelLinesVisibilityStyle } from "./visibility";
+import { useModelLinesVisibility } from "./visibility";
 
 async function setModelLinesDefaultStyle(_id) {
   // Placeholder
@@ -10,44 +9,44 @@ async function setModelLinesDefaultStyle(_id) {
 
 export function useModelLinesStyle() {
   const dataStore = useDataStore();
-  const modelLinesCommonStyle = useModelLinesCommonStyle();
-  const modelLinesVisibilityStyle = useModelLinesVisibilityStyle();
-  const modelLinesColorStyle = useModelLinesColorStyle();
+  const modelCommonStyle = useModelLinesCommonStyle();
+  const modelVisibilityStyle = useModelLinesVisibility();
+  const modelColorStyle = useModelLinesColor();
 
-  async function applyModelLinesStyle(id) {
-    const line_ids = await dataStore.getLinesGeodeIds(id);
-    if (line_ids.length === 0) {
+  async function applyModelLinesStyle(modelId) {
+    const lines_ids = await dataStore.getLinesGeodeIds(modelId);
+    if (!lines_ids?.length) {
       return;
     }
 
     const visibilityGroups = {};
     const colorGroups = {};
 
-    for (const line_id of line_ids) {
-      const style = modelLinesCommonStyle.modelLineStyle(id, line_id);
+    for (const line_id of lines_ids) {
+      const style = modelCommonStyle.modelLineStyle(modelId, line_id);
 
-      const vKey = String(style.visibility);
-      if (!visibilityGroups[vKey]) {
-        visibilityGroups[vKey] = [];
+      const visibility = String(style.visibility);
+      if (!visibilityGroups[visibility]) {
+        visibilityGroups[visibility] = [];
       }
-      visibilityGroups[vKey].push(line_id);
+      visibilityGroups[visibility].push(line_id);
 
-      const cKey = JSON.stringify(style.color);
-      if (!colorGroups[cKey]) {
-        colorGroups[cKey] = [];
+      const color_mode = style.color_mode || "constant";
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, lines_ids: [] };
       }
-      colorGroups[cKey].push(line_id);
+      colorGroups[color_key].lines_ids.push(line_id);
     }
 
-    const promises = [];
-
-    for (const [vValue, ids] of Object.entries(visibilityGroups)) {
-      promises.push(modelLinesVisibilityStyle.setModelLinesVisibility(id, ids, vValue === "true"));
-    }
-
-    for (const [cValue, ids] of Object.entries(colorGroups)) {
-      promises.push(modelLinesColorStyle.setModelLinesColor(id, ids, JSON.parse(cValue)));
-    }
+    const promises = [
+      ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
+        modelVisibilityStyle.setModelLinesVisibility(modelId, ids, visibility === "true"),
+      ),
+      ...Object.values(colorGroups).map(({ color_mode, color, lines_ids: ids }) =>
+        modelColorStyle.setModelLinesColor(modelId, ids, color, color_mode),
+      ),
+    ];
 
     return Promise.all(promises);
   }
@@ -55,8 +54,8 @@ export function useModelLinesStyle() {
   return {
     applyModelLinesStyle,
     setModelLinesDefaultStyle,
-    ...modelLinesCommonStyle,
-    ...modelLinesVisibilityStyle,
-    ...modelLinesColorStyle,
+    ...modelCommonStyle,
+    ...modelVisibilityStyle,
+    ...modelColorStyle,
   };
 }

@@ -1,11 +1,14 @@
 <script setup>
+import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
+const dataStore = useDataStore();
 
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
@@ -13,11 +16,43 @@ const { itemProps } = defineProps({
 
 const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
 const componentId = computed(() => itemProps.meta_data.pickedComponentId);
+const selection = dataStyleStore.visibleMeshComponents(modelId);
+const componentType = ref(undefined);
+
+watchEffect(async () => {
+  if (itemProps.meta_data.viewer_type === "model_component_type") {
+    componentType.value = itemProps.meta_data.modelComponentType;
+  } else if (componentId.value && modelId.value) {
+    componentType.value = await dataStore.meshComponentType(modelId.value, componentId.value);
+  } else {
+    componentType.value = undefined;
+  }
+});
 
 const modelVisibility = computed({
   get: () => dataStyleStore.modelVisibility(modelId.value),
-  set: (value) => {
-    dataStyleStore.setModelVisibility(modelId.value, value);
+  set: async (newValue) => {
+    await dataStyleStore.setModelVisibility(modelId.value, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const modelComponentTypeVisibility = computed({
+  get: () => selection.value.includes(componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentTypeVisibility(
+      modelId.value,
+      componentType.value,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const componentVisibility = computed({
+  get: () => selection.value.includes(componentId.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -25,72 +60,114 @@ const modelVisibility = computed({
 const componentColor = computed({
   get: () =>
     componentId.value
-      ? dataStyleStore.getModelComponentColor(modelId.value, componentId.value)
+      ? dataStyleStore.getModelComponentEffectiveColor(
+          modelId.value,
+          componentId.value,
+          componentType.value,
+        )
       : undefined,
-  set: async (newValue) => {
+  set: async (color) => {
     if (componentId.value) {
-      await dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], newValue);
+      await dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], color);
       hybridViewerStore.remoteRender();
     }
   },
 });
+
+const modelComponentTypeColor = computed({
+  get: () =>
+    componentType.value
+      ? dataStyleStore.getModelComponentTypeColor(modelId.value, componentType.value)
+      : undefined,
+  set: async (color) => {
+    if (componentType.value) {
+      await dataStyleStore.setModelComponentTypeColor(modelId.value, componentType.value, color);
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
+const modelComponentTypeColorMode = computed({
+  get: () => dataStyleStore.getModelComponentTypeColorMode(modelId.value, componentType.value),
+  set: async (colorMode) => {
+    if (componentType.value) {
+      await dataStyleStore.setModelComponentTypeColorMode(
+        modelId.value,
+        componentType.value,
+        colorMode,
+      );
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
+const componentColorMode = computed({
+  get: () => dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value),
+  set: async (colorMode) => {
+    if (componentId.value) {
+      await dataStyleStore.setModelComponentColorMode(modelId.value, componentId.value, colorMode);
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
+const colorModes = [
+  { title: "Constant", value: "constant" },
+  { title: "Random", value: "random" },
+];
+
+const modelComponentTypeLabel = computed(() =>
+  componentType.value ? `${componentType.value}s Options` : "",
+);
 </script>
 
 <template>
   <div class="model-style-card">
-    <div class="options-section">
-      <div class="section-badge">Model Options</div>
-      <v-container class="pa-2">
-        <VisibilitySwitch v-model="modelVisibility" />
-      </v-container>
-    </div>
+    <OptionsSection title="Model Options">
+      <VisibilitySwitch v-model="modelVisibility" />
+    </OptionsSection>
 
-    <div v-if="componentId" class="options-section mt-6">
-      <div class="section-badge">Component Options</div>
-      <v-container class="pa-2">
+    <OptionsSection v-if="componentType" :title="modelComponentTypeLabel" class="mt-6">
+      <VisibilitySwitch v-model="modelComponentTypeVisibility" />
+      <div class="text-caption mb-1 mt-2">Color Mode</div>
+      <v-select
+        v-model="modelComponentTypeColorMode"
+        :items="colorModes"
+        density="compact"
+        hide-details
+        class="mb-3"
+        variant="outlined"
+      />
+
+      <template v-if="modelComponentTypeColorMode === 'constant'">
+        <div class="text-caption mb-1">Color</div>
+        <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
+      </template>
+    </OptionsSection>
+
+    <OptionsSection v-if="componentId" title="Component Options" class="mt-6">
+      <VisibilitySwitch v-model="componentVisibility" />
+      <div class="text-caption mb-1 mt-2">Color Mode</div>
+      <v-select
+        v-model="componentColorMode"
+        :items="colorModes"
+        density="compact"
+        hide-details
+        class="mb-3"
+        variant="outlined"
+      />
+
+      <template v-if="componentColorMode === 'constant'">
         <div class="text-caption mb-1">Color</div>
         <ViewerOptionsColorPicker v-model="componentColor" />
-      </v-container>
-    </div>
+      </template>
+    </OptionsSection>
   </div>
 </template>
 
 <style scoped>
 .model-style-card {
-  min-width: 280px;
-}
-
-.options-section {
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 12px 8px 8px 8px;
-}
-
-.section-badge {
-  position: absolute;
-  top: -12px;
-  left: 16px;
-  background-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  padding: 2px 12px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.v-theme--light .options-section {
-  border-color: rgba(0, 0, 0, 0.12);
-}
-
-.v-theme--light .section-badge {
-  background-color: white;
-  color: #444;
-  border-color: rgba(0, 0, 0, 0.12);
+  padding-top: 20px;
+  overflow-x: hidden;
 }
 </style>

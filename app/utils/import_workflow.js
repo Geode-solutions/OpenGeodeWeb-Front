@@ -48,10 +48,10 @@ async function importItem(item) {
   const addDataRelationsTask =
     item.viewer_type === "model" ? dataStore.addComponentRelations(item) : Promise.resolve();
   treeviewStore.addItem(item.geode_object_type, item.name, item.id, item.viewer_type);
-  dataStyleStore.addDataStyle(item.id, item.geode_object_type);
+  const addDataStyleTask = dataStyleStore.addDataStyle(item.id, item.geode_object_type);
   const addViewerTask = addDataTask.then(() => hybridViewerStore.addItem(item.id));
-  const applyStyleTask = Promise.all([registerTask, addDataComponentsTask]).then(() =>
-    dataStyleStore.applyDefaultStyle(item.id),
+  const applyStyleTask = Promise.all([registerTask, addDataComponentsTask, addDataStyleTask]).then(
+    () => dataStyleStore.applyDefaultStyle(item.id),
   );
   await Promise.all([
     registerTask,

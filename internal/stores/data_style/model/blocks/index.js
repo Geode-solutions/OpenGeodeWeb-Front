@@ -1,54 +1,52 @@
-// Local imports
 import { useDataStore } from "@ogw_front/stores/data";
-import { useModelBlocksColorStyle } from "./color";
+import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
-import { useModelBlocksVisibilityStyle } from "./visibility";
+import { useModelBlocksVisibility } from "./visibility";
+
 async function setModelBlocksDefaultStyle(_id) {
   // Placeholder
 }
 
 export function useModelBlocksStyle() {
   const dataStore = useDataStore();
-  const modelBlocksCommonStyle = useModelBlocksCommonStyle();
-  const modelBlocksVisibilityStyle = useModelBlocksVisibilityStyle();
-  const modelBlocksColorStyle = useModelBlocksColorStyle();
+  const modelCommonStyle = useModelBlocksCommonStyle();
+  const modelVisibilityStyle = useModelBlocksVisibility();
+  const modelColorStyle = useModelBlocksColor();
 
-  async function applyModelBlocksStyle(id) {
-    const block_ids = await dataStore.getBlocksGeodeIds(id);
-    if (block_ids.length === 0) {
+  async function applyModelBlocksStyle(modelId) {
+    const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
+    if (!blocks_ids?.length) {
       return;
     }
 
     const visibilityGroups = {};
     const colorGroups = {};
 
-    for (const block_id of block_ids) {
-      const style = modelBlocksCommonStyle.modelBlockStyle(id, block_id);
+    for (const block_id of blocks_ids) {
+      const style = modelCommonStyle.modelBlockStyle(modelId, block_id);
 
-      const vKey = String(style.visibility);
-      if (!visibilityGroups[vKey]) {
-        visibilityGroups[vKey] = [];
+      const visibility = String(style.visibility);
+      if (!visibilityGroups[visibility]) {
+        visibilityGroups[visibility] = [];
       }
-      visibilityGroups[vKey].push(block_id);
+      visibilityGroups[visibility].push(block_id);
 
-      const cKey = JSON.stringify(style.color);
-      if (!colorGroups[cKey]) {
-        colorGroups[cKey] = [];
+      const color_mode = style.color_mode || "constant";
+      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      if (!colorGroups[color_key]) {
+        colorGroups[color_key] = { color_mode, color: style.color, blocks_ids: [] };
       }
-      colorGroups[cKey].push(block_id);
+      colorGroups[color_key].blocks_ids.push(block_id);
     }
 
-    const promises = [];
-
-    for (const [vValue, ids] of Object.entries(visibilityGroups)) {
-      promises.push(
-        modelBlocksVisibilityStyle.setModelBlocksVisibility(id, ids, vValue === "true"),
-      );
-    }
-
-    for (const [cValue, ids] of Object.entries(colorGroups)) {
-      promises.push(modelBlocksColorStyle.setModelBlocksColor(id, ids, JSON.parse(cValue)));
-    }
+    const promises = [
+      ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
+        modelVisibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
+      ),
+      ...Object.values(colorGroups).map(({ color_mode, color, blocks_ids: ids }) =>
+        modelColorStyle.setModelBlocksColor(modelId, ids, color, color_mode),
+      ),
+    ];
 
     return Promise.all(promises);
   }
@@ -56,8 +54,8 @@ export function useModelBlocksStyle() {
   return {
     applyModelBlocksStyle,
     setModelBlocksDefaultStyle,
-    ...modelBlocksCommonStyle,
-    ...modelBlocksVisibilityStyle,
-    ...modelBlocksColorStyle,
+    ...modelCommonStyle,
+    ...modelVisibilityStyle,
+    ...modelColorStyle,
   };
 }
