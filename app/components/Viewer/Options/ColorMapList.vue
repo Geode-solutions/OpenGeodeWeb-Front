@@ -6,8 +6,9 @@ const LAST_POINT_OFFSET = 4;
 const THREE = 3;
 const CHUNK_SIZE = 5;
 
-const { presets } = defineProps({
+const { presets, modelValue } = defineProps({
   presets: { type: Array, required: true },
+  modelValue: { type: String, default: "" },
 });
 
 const emit = defineEmits(["select"]);
@@ -162,6 +163,8 @@ watch(filteredPresets, drawAllCanvases);
           <v-list-item
             v-for="(child, cIdx) in item.Children"
             :key="cIdx"
+            :active="child.Name === modelValue"
+            color="primary"
             @click="emit('select', child)"
             class="px-2 mb-1"
             rounded="md"
@@ -178,7 +181,14 @@ watch(filteredPresets, drawAllCanvases);
           </v-list-item>
         </v-list-group>
 
-        <v-list-item v-else @click="emit('select', item)" class="px-2 mb-1" rounded="md">
+        <v-list-item
+          v-else
+          :active="item.Name === modelValue"
+          color="primary"
+          @click="emit('select', item)"
+          class="px-2 mb-1"
+          rounded="md"
+        >
           <div class="d-flex flex-column py-1">
             <span class="text-caption text-grey-lighten-1 mb-1">{{ item.Name }}</span>
             <canvas

@@ -83,6 +83,21 @@ export function useMeshPolygonsPolygonAttributeStyle() {
 
   function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsPolygonAttributeName(id);
+    const colorMap = meshPolygonsPolygonAttributeColorMap(id);
+    const points = getRGBPointsFromPreset(colorMap);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      return viewerStore.request(
+        meshPolygonsPolygonAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: () =>
+            setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
+              minimum,
+              maximum,
+            }),
+        },
+      );
+    }
     return setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
       minimum,
       maximum,
@@ -101,16 +116,19 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
-    return viewerStore.request(
-      meshPolygonsPolygonAttributeSchemas.color_map,
-      { id, points, minimum, maximum },
-      {
-        response_function: () =>
-          setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
-            colorMap,
-          }),
-      },
-    );
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      return viewerStore.request(
+        meshPolygonsPolygonAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: () =>
+            setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
+              colorMap,
+            }),
+        },
+      );
+    }
+    return setMeshPolygonsPolygonAttributeStoredConfig(id, name, { colorMap });
   }
 
   return {

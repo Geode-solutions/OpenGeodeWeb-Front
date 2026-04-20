@@ -49,8 +49,16 @@ const presets = computed(() => {
     (preset) => !paraviewNames.includes(preset.Name) && !matplotlibNames.includes(preset.Name),
   );
 
+  const topPresets = [defaultPreset];
+  if (selectedPresetName.value !== defaultPreset.Name) {
+    const currentPreset = vtkColorMaps.getPresetByName(selectedPresetName.value);
+    if (currentPreset) {
+      topPresets.push(currentPreset);
+    }
+  }
+
   return [
-    defaultPreset,
+    ...topPresets,
     { Name: "ParaView", Children: paraviewPresets },
     { Name: "Matplotlib", Children: matplotlibPresets },
     { Name: "Others", Children: otherPresets },
@@ -137,7 +145,11 @@ watch(
       </v-card>
     </template>
 
-    <ColorMapList :presets="presets" @select="onSelectPreset" />
+    <ColorMapList
+      :presets="presets"
+      :model-value="selectedPresetName"
+      @select="onSelectPreset"
+    />
   </v-menu>
 </template>
 
