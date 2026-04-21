@@ -26,18 +26,18 @@ function sleep(milliseconds) {
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("model edges", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll model edges kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll model edges kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Model edges", () => {
-  describe("Edges visibility", () => {
-    test("Visibility true", async () => {
+  describe("edges visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const visibility = true;
@@ -58,8 +58,8 @@ describe("Model edges", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
-  describe("Edges style", () => {
-    test("Edges apply style", async () => {
+  describe("edges style", () => {
+    test("edges apply style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyModelEdgesStyle(id);
