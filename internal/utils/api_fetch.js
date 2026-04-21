@@ -73,5 +73,5 @@ export async function api_fetch(
     });
   }
 
-  return await performFetch();
+  return performFetch();
 }
