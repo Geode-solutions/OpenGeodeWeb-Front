@@ -5,11 +5,13 @@ import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/It
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHoverHighlight } from "@ogw_front/composables/use_hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id: viewId } = defineProps({ id: { type: String, required: true } });
+const { onHoverEnter, onHoverLeave } = useHoverHighlight();
 const emit = defineEmits(["show-menu"]);
 
 const dataStore = useDataStore();
@@ -63,6 +65,21 @@ function showContextMenu(event, item) {
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });
 }
+
+function handleHoverEnter(item) {
+  const actualItem = item.raw || item;
+  let block_ids = [];
+  if (actualItem.category) {
+    block_ids = [actualItem.viewer_id];
+  } else if (actualItem.children) {
+    block_ids = actualItem.children.map((child) => child.viewer_id);
+  }
+  onHoverEnter(viewId, block_ids);
+}
+
+function handleHoverLeave() {
+  onHoverLeave(viewId);
+}
 </script>
 
 <template>
@@ -91,11 +108,13 @@ function showContextMenu(event, item) {
       @update:selected="onSelectionChange"
     >
       <template #title="{ item }">
-        <ObjectTreeItemLabel
-          :item="item"
-          show-tooltip
-          @contextmenu="showContextMenu($event, item)"
-        />
+        <div @mouseenter="handleHoverEnter(item)" @mouseleave="handleHoverLeave(item)">
+          <ObjectTreeItemLabel
+            :item="item"
+            show-tooltip
+            @contextmenu="showContextMenu($event, item)"
+          />
+        </div>
       </template>
     </v-treeview>
   </div>

@@ -2,14 +2,18 @@
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHoverHighlight } from "@ogw_front/composables/use_hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();
+const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
+const { onHoverEnter, onHoverLeave } = useHoverHighlight();
 
 const emit = defineEmits(["show-menu"]);
 
@@ -62,6 +66,27 @@ function isModel(item) {
     actualItem.viewer_type === "model" || ["BRep", "Section"].includes(actualItem.geode_object_type)
   );
 }
+
+async function handleHoverEnter(item) {
+  const actualItem = item.raw || item;
+  let block_ids = [];
+  if (isModel(item)) {
+    const cornerIds = await dataStore.getCornersGeodeIds(actualItem.id);
+    const lineIds = await dataStore.getLinesGeodeIds(actualItem.id);
+    const surfaceIds = await dataStore.getSurfacesGeodeIds(actualItem.id);
+    const blockIds = await dataStore.getBlocksGeodeIds(actualItem.id);
+    const allGeodeIds = [...cornerIds, ...lineIds, ...surfaceIds, ...blockIds];
+    block_ids = await dataStore.getMeshComponentsViewerIds(actualItem.id, allGeodeIds);
+  } else {
+    block_ids = [1];
+  }
+  onHoverEnter(actualItem.id, block_ids);
+}
+
+function handleHoverLeave(item) {
+  const actualItem = item.raw || item;
+  onHoverLeave(actualItem.id);
+}
 </script>
 
 <template>
@@ -86,10 +111,12 @@ function isModel(item) {
       selectable
     >
       <template #title="{ item }">
-        <ObjectTreeItemLabel
-          :item="item"
-          @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
-        />
+        <div @mouseenter="handleHoverEnter(item)" @mouseleave="handleHoverLeave(item)">
+          <ObjectTreeItemLabel
+            :item="item"
+            @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
+          />
+        </div>
       </template>
 
       <template #append="{ item }">

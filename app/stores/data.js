@@ -62,6 +62,7 @@ export const useDataStore = defineStore("data", () => {
           id: meshComponent.geode_id,
           title: meshComponent.name,
           category: meshComponent.type,
+          viewer_id: meshComponent.viewer_id,
           is_active: meshComponent.is_active,
         })),
       }));
