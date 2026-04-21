@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import { ref, toRaw, watch } from "vue";
+import { compareSelections } from "@ogw_front/utils/treeview";
 import { database } from "@ogw_internal/database/database";
 const PANEL_WIDTH = 300;
 
@@ -55,9 +56,21 @@ export const useTreeviewStore = defineStore("treeview", () => {
     { deep: true },
   );
 
+  watch(selection, (current, previous) => {
+    const { removed } = compareSelections(current, previous);
+    for (const id of removed) {
+      const index = opened_views.value.findIndex(
+        (view) => view.type === "component" && view.id === id,
+      );
+      if (index !== -1) {
+        closeView(index);
+      }
+    }
+  });
+
   function closeView(index) {
     if (index > 0) {
-      opened_views.value.splice(index, 1);
+      opened_views.value = opened_views.value.filter((_, i) => i !== index);
     }
   }
 
@@ -82,7 +95,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         groupA.title.localeCompare(groupB.title, undefined, sortOpt),
       );
     }
-    selection.value.push(id);
+    selection.value = [...selection.value, id];
   }
 
   function removeItem(id) {
@@ -94,10 +107,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         if (group.children.length === 0) {
           items.value.splice(index, 1);
         }
-        const selectionIndex = selection.value.indexOf(id);
-        if (selectionIndex !== -1) {
-          selection.value.splice(selectionIndex, 1);
-        }
+        selection.value = selection.value.filter((s_id) => s_id !== id);
         return;
       }
     }
