@@ -19,21 +19,21 @@ const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
 const pinia = setupActivePinia();
 const geodeStore = useGeodeStore();
 
-beforeEach(() => {
-  geodeStore.base_url = "";
+describe("extension selector", () => {
+  beforeEach(() => {
+    geodeStore.base_url = "";
 
-  geodeStore.request = vi.fn(() => {
-    const response = {
-      geode_objects_and_output_extensions: {
-        BRep: { msh: { is_saveable: true } },
-      },
-    };
-    return Promise.resolve(response);
+    geodeStore.request = vi.fn(() => {
+      const response = {
+        geode_objects_and_output_extensions: {
+          BRep: { msh: { is_saveable: true } },
+        },
+      };
+      return Promise.resolve(response);
+    });
   });
-});
 
-describe(ExtensionSelector, () => {
-  test(`Select geode_object & extension`, async () => {
+  test("select geode_object & extension", async () => {
     const output_geode_object = "BRep";
     const output_extension = "msh";
 

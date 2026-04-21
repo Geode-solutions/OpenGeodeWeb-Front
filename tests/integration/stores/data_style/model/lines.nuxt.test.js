@@ -27,17 +27,18 @@ function sleep(milliseconds) {
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
-afterAll(async () => {
-  console.log("afterAll model lines kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+describe("model lines", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-describe("Model lines", () => {
-  describe("Lines visibility", () => {
-    test("Visibility false", async () => {
+  afterAll(async () => {
+    console.log("afterAll model lines kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
+
+  describe("lines visibility", () => {
+    test("visibility false", async () => {
       console.log("FROM TEST MODEL LINES");
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
@@ -69,14 +70,14 @@ describe("Model lines", () => {
     });
   });
 
-  describe("Lines color", () => {
-    test("Color red", async () => {
+  describe("lines color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
-      const color = { r: 255, g: 0, b: 0 };
+      const color = { red: 255, green: 0, blue: 0, alpha: 1 };
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       const result = dataStyleStore.setModelLinesColor(id, line_ids, color);
@@ -101,8 +102,8 @@ describe("Model lines", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
-  describe("Lines style", () => {
-    test("Lines apply style", async () => {
+  describe("lines style", () => {
+    test("lines apply style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyModelLinesStyle(id);

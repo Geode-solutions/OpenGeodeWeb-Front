@@ -15,16 +15,16 @@ const CONNECT_TIMEOUT = 25_000;
 
 let projectFolderPath = "";
 
-beforeAll(async () => {
-  setupActivePinia();
-  ({ projectFolderPath } = await runMicroservices());
-});
+describe("viewer Store", () => {
+  beforeAll(async () => {
+    setupActivePinia();
+    ({ projectFolderPath } = await runMicroservices());
+  });
 
-afterAll(async () => {
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Viewer Store", () => {
   describe("actions", () => {
     describe("ws_connect", () => {
       test(
@@ -61,7 +61,7 @@ describe("Viewer Store", () => {
             viewerStore
               .request(schema, params, {}, timeout)
               .rejects.toThrow(`${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`),
-          );
+          ).toBeDefined();
         },
         CONNECT_TIMEOUT,
       );

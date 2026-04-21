@@ -20,18 +20,18 @@ const polygon_attribute = { name: "test_attribute" };
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("mesh polygons", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll mesh polygons kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll mesh polygons kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Mesh polygons", () => {
-  describe("Polygons visibility", () => {
-    test("Visibility true", async () => {
+  describe("polygons visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const visibility = true;
@@ -51,11 +51,11 @@ describe("Mesh polygons", () => {
     });
   });
 
-  describe("Polygons color", () => {
-    test("Color red", async () => {
+  describe("polygons color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const color = { r: 255, g: 0, b: 0 };
+      const color = { red: 255, green: 0, blue: 0, alpha: 1 };
       const spy = vi.spyOn(viewerStore, "request");
       const result = dataStyleStore.setMeshPolygonsColor(id, color);
       expect(result).toBeInstanceOf(Promise);
@@ -72,8 +72,8 @@ describe("Mesh polygons", () => {
     });
   });
 
-  describe("Polygons vertex attribute", () => {
-    test("Coloring vertex attribute", async () => {
+  describe("polygons vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const spy = vi.spyOn(viewerStore, "request");
@@ -92,8 +92,8 @@ describe("Mesh polygons", () => {
     });
   });
 
-  describe("Polygons polygon attribute", () => {
-    test("Coloring polygon attribute", async () => {
+  describe("polygons polygon attribute", () => {
+    test("coloring polygon attribute", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const spy = vi.spyOn(viewerStore, "request");
@@ -112,42 +112,44 @@ describe("Mesh polygons", () => {
     });
   });
 
-  describe("Polygons active coloring", () => {
-    test("test coloring", async () => {
+  describe("polygons active coloring", () => {
+    test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringTypes = [
-        { name: "color" },
-        {
-          name: "vertex",
-          function: () =>
-            dataStyleStore.setMeshPolygonsVertexAttributeName(id, vertex_attribute.name),
-        },
-        {
-          name: "polygon",
-          function: () =>
-            dataStyleStore.setMeshPolygonsPolygonAttributeName(id, polygon_attribute.name),
-        },
-      ];
+      const coloringName = "color";
+      const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
 
-      async function testColoring(coloringType, expectedColoringType) {
-        if (coloringType.function) {
-          await coloringType.function();
-        }
-        const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringType.name);
-        expect(result).toBeInstanceOf(Promise);
-        await result;
-        expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(expectedColoringType);
-        expect(viewerStore.status).toBe(Status.CONNECTED);
-      }
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, vertex_attribute.name);
+      const coloringName = "vertex";
+      const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
 
-      await testColoring(coloringTypes[0], "color");
-      await testColoring(coloringTypes[1], "vertex");
-      await testColoring(coloringTypes[2], "polygon");
+    test("coloring polygon", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, polygon_attribute.name);
+      const coloringName = "polygon";
+      const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
 
-  test("Polygons apply default style", async () => {
+  test("polygons apply default style", async () => {
     const dataStyleStore = useDataStyleStore();
     const viewerStore = useViewerStore();
     const result = dataStyleStore.applyMeshPolygonsStyle(id);
