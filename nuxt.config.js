@@ -5,7 +5,6 @@ import path from "node:path";
 import package_json from "./package.json";
 
 const __dirname = import.meta.dirname;
-const oneMinute = 60_000;
 
 export default defineNuxtConfig({
   runtimeConfig: {
@@ -36,12 +35,6 @@ export default defineNuxtConfig({
   // ** Build configuration
   build: {
     transpile: ["vuetify"],
-  },
-
-  nitro: {
-    routeRules: {
-      "/api/**": { timeout: oneMinute },
-    },
   },
 
   vuetify: {
