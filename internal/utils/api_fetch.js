@@ -37,7 +37,7 @@ export function api_fetch(
     request_options.max_retry = schema.max_retry;
   }
 
-  function performFetch() {
+  async function performFetch() {
     return $fetch(schema.$id, {
       baseURL: microservice.base_url,
       ...request_options,
