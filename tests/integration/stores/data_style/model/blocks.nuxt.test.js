@@ -27,18 +27,18 @@ function sleep(milliseconds) {
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("model blocks", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll model blocks kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll model blocks kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Model blocks", () => {
-  describe("Blocks visibility", () => {
-    test("Visibility false", async () => {
+  describe("blocks visibility", () => {
+    test("visibility false", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
@@ -69,8 +69,8 @@ describe("Model blocks", () => {
     });
   });
 
-  describe("Blocks color", () => {
-    test("Color red", async () => {
+  describe("blocks color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
@@ -98,8 +98,8 @@ describe("Model blocks", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
-  describe("Blocks style", () => {
-    test("Blocks apply style", async () => {
+  describe("blocks style", () => {
+    test("blocks apply style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyModelBlocksStyle(id);

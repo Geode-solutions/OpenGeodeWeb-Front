@@ -27,18 +27,18 @@ function sleep(milliseconds) {
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("model corners", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll model corners kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll model corners kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Model corners", () => {
-  describe("Corners visibility", () => {
-    test("Visibility false", async () => {
+  describe("corners visibility", () => {
+    test("visibility false", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
@@ -69,8 +69,8 @@ describe("Model corners", () => {
     });
   });
 
-  describe("Corner color", () => {
-    test("Color red", async () => {
+  describe("corner color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
@@ -102,8 +102,8 @@ describe("Model corners", () => {
     });
   });
 
-  describe("Corner style", () => {
-    test("Corners apply style", async () => {
+  describe("corner style", () => {
+    test("corners apply style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyModelCornersStyle(id);

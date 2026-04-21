@@ -27,15 +27,15 @@ function sleep(milliseconds) {
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
-
-afterAll(async () => {
-  console.log("afterAll model surfaces kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
 describe("model surfaces", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
+
+  afterAll(async () => {
+    console.log("afterAll model surfaces kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
   describe("surfaces visibility", () => {
     test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -100,8 +100,8 @@ describe("model surfaces", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
-  describe("Surfaces style", () => {
-    test("Surfaces apply style", async () => {
+  describe("surfaces style", () => {
+    test("surfaces apply style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyModelSurfacesStyle(id);
