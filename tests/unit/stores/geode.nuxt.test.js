@@ -18,11 +18,11 @@ const STATUS_500 = 500;
 const EXPECTED_ONE_REQUEST = 1;
 const EXPECTED_NO_REQUEST = 0;
 
-beforeEach(() => {
-  setupActivePinia();
-});
-
 describe("geode store", () => {
+  beforeEach(() => {
+    setupActivePinia();
+  });
+
   test("state", () => {
     const geodeStore = useGeodeStore();
     expectTypeOf(geodeStore.default_local_port).toBeString();
@@ -118,7 +118,7 @@ describe("geode store actions", () => {
     test("response", async () => {
       const geodeStore = useGeodeStore();
       geodeStore.base_url = "";
-      getFakeCall.mockImplementation(() => ({}));
+      getFakeCall.mockReturnValue({});
       await geodeStore.ping();
       expect(geodeStore.status).toBe(Status.CONNECTED);
     });

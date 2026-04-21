@@ -13,8 +13,8 @@ const FIRST_INDEX = 0;
 
 globalThis.ResizeObserver = ResizeObserver;
 
-describe(Stepper, () => {
-  test(`Mount`, async () => {
+describe("stepper", () => {
+  test("mount", async () => {
     const geode_object_type = ref("BRep");
     const files = ref([]);
     const stepper_tree = reactive({
@@ -30,12 +30,7 @@ describe(Stepper, () => {
               key: "",
             },
           },
-          chips: computed(() => {
-            if (geode_object_type.value === "") {
-              return [];
-            }
-            return [geode_object_type.value];
-          }),
+          chips: computed(() => [geode_object_type.value].filter((chip) => chip !== "")),
         },
       ],
     });

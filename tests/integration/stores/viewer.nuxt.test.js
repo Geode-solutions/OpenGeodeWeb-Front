@@ -15,16 +15,16 @@ const CONNECT_TIMEOUT = 25_000;
 
 let projectFolderPath = "";
 
-beforeAll(async () => {
-  setupActivePinia();
-  ({ projectFolderPath } = await runMicroservices());
-});
+describe("viewer Store", () => {
+  beforeAll(async () => {
+    setupActivePinia();
+    ({ projectFolderPath } = await runMicroservices());
+  });
 
-afterAll(async () => {
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Viewer Store", () => {
   describe("actions", () => {
     describe("ws_connect", () => {
       test(
@@ -52,15 +52,13 @@ describe("Viewer Store", () => {
     describe("request", () => {
       test(
         "request",
-        () => {
+        async () => {
           const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.render;
           const viewerStore = useViewerStore();
           const timeout = 1;
           const params = {};
-          expect(() =>
-            viewerStore
-              .request(schema, params, {}, timeout)
-              .rejects.toThrow(`${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`),
+          await expect(viewerStore.request(schema, params, {}, timeout)).rejects.toThrow(
+            `${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`,
           );
         },
         CONNECT_TIMEOUT,

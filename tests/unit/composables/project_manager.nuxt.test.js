@@ -1,3 +1,6 @@
+// oxlint-disable vitest/expect-expect
+// oxlint-disable jest/prefer-ending-with-an-expect
+
 // Third party imports
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -220,27 +223,27 @@ function verifyRemaining() {
   expect(hybridViewerStoreMock.remoteRender).toHaveBeenCalledWith();
 }
 
-beforeEach(() => {
-  setupActivePinia();
-  const storesList = [
-    viewerStoreMock,
-    treeviewStoreMock,
-    dataStoreMock,
-    dataStyleStoreMock,
-    hybridViewerStoreMock,
-  ];
-  for (const store of storesList) {
-    const values = Object.values(store);
-    for (const value of values) {
-      if (typeof value === "function" && value.mockClear) {
-        value.mockClear();
+describe("projectManager composable (compact)", () => {
+  beforeEach(() => {
+    setupActivePinia();
+    const storesList = [
+      viewerStoreMock,
+      treeviewStoreMock,
+      dataStoreMock,
+      dataStyleStoreMock,
+      hybridViewerStoreMock,
+    ];
+    for (const store of storesList) {
+      const values = Object.values(store);
+      for (const value of values) {
+        if (typeof value === "function" && value.mockClear) {
+          value.mockClear();
+        }
       }
     }
-  }
-  viewer_call_mock_fn.mockClear();
-});
+    viewer_call_mock_fn.mockClear();
+  });
 
-describe("projectManager composable (compact)", () => {
   test("exportProject", async () => {
     const { exportProject } = useProjectManager();
     const { default: fileDownload } = await import("js-file-download");

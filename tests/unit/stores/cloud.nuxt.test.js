@@ -12,16 +12,15 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 const PROJECT = "project";
 const STATUS_500 = 500;
 
-beforeEach(() => {
-  setupActivePinia();
-});
-
 function setupConfig() {
   const config = useRuntimeConfig();
   config.public.PROJECT = PROJECT;
 }
 
-describe("Cloud Store", () => {
+describe("cloud store", () => {
+  beforeEach(() => {
+    setupActivePinia();
+  });
   describe("state", () => {
     test("initial state", () => {
       const cloudStore = useCloudStore();
@@ -44,9 +43,9 @@ describe("Cloud Store", () => {
           handler: postFakeCall,
         });
 
-        postFakeCall.mockImplementation(() => ({
+        postFakeCall.mockReturnValue({
           url: "http://test.com",
-        }));
+        });
 
         await cloudStore.launch("", "", false);
 

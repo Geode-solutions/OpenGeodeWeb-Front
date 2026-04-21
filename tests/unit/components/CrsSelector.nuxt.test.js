@@ -13,14 +13,14 @@ const FIRST_INDEX = 0;
 let pinia = undefined;
 let geodeStore = undefined;
 
-beforeEach(() => {
-  pinia = setupActivePinia();
-  geodeStore = useGeodeStore();
-  geodeStore.base_url = "";
-});
+describe("crs selector", () => {
+  beforeEach(() => {
+    pinia = setupActivePinia();
+    geodeStore = useGeodeStore();
+    geodeStore.base_url = "";
+  });
 
-describe(CrsSelector, () => {
-  test(`Default behavior`, async () => {
+  test("default behavior", async () => {
     const crs_list = [
       {
         authority: "EPSG",
@@ -31,9 +31,7 @@ describe(CrsSelector, () => {
 
     // Mock geodeStore.request instead of registerEndpoint
     geodeStore.request = vi.fn((schema, params, callbacks) => {
-      if (callbacks?.response_function) {
-        callbacks.response_function({ crs_list });
-      }
+      callbacks.response_function({ crs_list });
       return Promise.resolve({ crs_list });
     });
 
@@ -50,7 +48,7 @@ describe(CrsSelector, () => {
     await input.trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
       [key_to_update]: crs_list[FIRST_INDEX],
     });
   });
