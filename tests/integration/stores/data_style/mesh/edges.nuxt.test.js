@@ -20,18 +20,18 @@ const edge_attribute = { name: "edge_attribute" };
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("mesh edges", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll mesh edges kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll mesh edges kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Mesh edges", () => {
-  describe("Edges", () => {
-    test("Edges visibility", async () => {
+  describe("edges", () => {
+    test("edges visibility", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const visibility = true;
@@ -50,7 +50,7 @@ describe("Mesh edges", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
-    test("Edges color red", async () => {
+    test("edges color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const color = { red: 255, green: 0, blue: 0, alpha: 1 };
@@ -69,7 +69,7 @@ describe("Mesh edges", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
-    test("Edges vertex attribute", async () => {
+    test("edges vertex attribute", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
 
@@ -86,7 +86,7 @@ describe("Mesh edges", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
-    test("Edges edge attribute", async () => {
+    test("edges edge attribute", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
 
@@ -103,36 +103,42 @@ describe("Mesh edges", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
-    test("Edges active coloring", async () => {
+    test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringTypes = [
-        { name: "color" },
-        {
-          name: "vertex",
-          function: () => dataStyleStore.setMeshEdgesVertexAttributeName(id, vertex_attribute.name),
-        },
-        {
-          name: "edge",
-          function: () => dataStyleStore.setMeshEdgesEdgeAttributeName(id, edge_attribute.name),
-        },
-      ];
-      async function testColoring(coloringType) {
-        if (coloringType.function) {
-          await coloringType.function();
-        }
-        const result = dataStyleStore.setMeshEdgesActiveColoring(id, coloringType.name);
-        expect(result).toBeInstanceOf(Promise);
-        await result;
-        expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(coloringType.name);
-        expect(viewerStore.status).toBe(Status.CONNECTED);
-      }
-
-      await testColoring(coloringTypes[0]);
-      await testColoring(coloringTypes[1]);
-      await testColoring(coloringTypes[2]);
+      const coloringName = "color";
+      const result = dataStyleStore.setMeshEdgesActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
     });
-    test("Edges apply style", async () => {
+
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshEdgesVertexAttributeName(id, vertex_attribute.name);
+      const coloringName = "vertex";
+      const result = dataStyleStore.setMeshEdgesActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring edge", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshEdgesEdgeAttributeName(id, edge_attribute.name);
+      const coloringName = "edge";
+      const result = dataStyleStore.setMeshEdgesActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshEdgesActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("edges apply style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyMeshEdgesStyle(id);

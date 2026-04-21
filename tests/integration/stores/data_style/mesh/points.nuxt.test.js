@@ -19,18 +19,18 @@ const vertex_attribute = { name: "points" };
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("mesh points", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll mesh points kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll mesh points kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Mesh points", () => {
-  describe("Points visibility", () => {
-    test("Visibility true", async () => {
+  describe("points visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const visibility = true;
@@ -50,8 +50,8 @@ describe("Mesh points", () => {
     });
   });
 
-  describe("Points color", () => {
-    test("Color red", async () => {
+  describe("points color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const color = { red: 255, green: 0, blue: 0, alpha: 1 };
@@ -71,36 +71,33 @@ describe("Mesh points", () => {
     });
   });
 
-  describe("Points active coloring", () => {
-    test("test coloring", async () => {
+  describe("points active coloring", () => {
+    test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringTypes = [
-        { name: "color" },
-        {
-          name: "vertex",
-          function: () =>
-            dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name),
-        },
-      ];
-      async function testColoring(coloringType, expectedColoringType) {
-        if (coloringType.function) {
-          await coloringType.function();
-        }
-        const result = dataStyleStore.setMeshPointsActiveColoring(id, coloringType.name);
-        expect(result).toBeInstanceOf(Promise);
-        await result;
-        expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(expectedColoringType);
-        expect(viewerStore.status).toBe(Status.CONNECTED);
-      }
+      const coloringName = "color";
+      const result = dataStyleStore.setMeshPointsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
 
-      await testColoring(coloringTypes[0], "color");
-      await testColoring(coloringTypes[1], "vertex");
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name);
+      const coloringName = "vertex";
+      const result = dataStyleStore.setMeshPointsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshPointsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
 
-  describe("Points size", () => {
-    test("Size 20", async () => {
+  describe("points size", () => {
+    test("size 20", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const size = 20;
@@ -120,8 +117,8 @@ describe("Mesh points", () => {
     });
   });
 
-  describe("Points vertex attribute", () => {
-    test("test coloring", async () => {
+  describe("points vertex attribute", () => {
+    test("vertex attribute", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
 
@@ -139,7 +136,7 @@ describe("Mesh points", () => {
     });
   });
 
-  test("Points apply default style", async () => {
+  test("points apply default style", async () => {
     const dataStyleStore = useDataStyleStore();
     const viewerStore = useViewerStore();
     const result = dataStyleStore.applyMeshPointsStyle(id);

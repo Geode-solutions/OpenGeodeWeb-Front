@@ -18,18 +18,18 @@ const geode_object = "RegularGrid3D";
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("mesh", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll mesh index kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll mesh index kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Mesh", () => {
-  describe("Mesh visibility", () => {
-    test("Visibility true", async () => {
+  describe("mesh visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const visibility = true;
@@ -49,8 +49,8 @@ describe("Mesh", () => {
     });
   });
 
-  describe("Apply mesh default style", () => {
-    test("Apply mesh default style", async () => {
+  describe("apply mesh default style", () => {
+    test("apply mesh default style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyMeshStyle(id);

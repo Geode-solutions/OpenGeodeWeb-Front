@@ -20,18 +20,18 @@ const polyhedron_attribute = { name: "toto_on_polyhedra" };
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("mesh polyhedra", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll mesh cells kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll mesh cells kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Mesh polyhedra", () => {
-  describe("Polyhedra", () => {
-    test("Polyhedra visibility", async () => {
+  describe("polyhedra", () => {
+    test("polyhedra visibility", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const visibility = true;
@@ -50,7 +50,7 @@ describe("Mesh polyhedra", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
-    test("Polyhedra color red", async () => {
+    test("polyhedra color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const color = { red: 255, green: 0, blue: 0, alpha: 1 };
@@ -69,40 +69,43 @@ describe("Mesh polyhedra", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
-    test("Polyhedra active coloring", async () => {
+    test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringTypes = [
-        { name: "color" },
-        {
-          name: "vertex",
-          function: () =>
-            dataStyleStore.setMeshPolyhedraVertexAttributeName(id, vertex_attribute.name),
-        },
-        {
-          name: "polyhedron",
-          function: () =>
-            dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, polyhedron_attribute.name),
-        },
-      ];
-      async function testColoring(coloringType, expectedColoringType) {
-        if (coloringType.function) {
-          await coloringType.function();
-        }
-        const result = dataStyleStore.setMeshPolyhedraActiveColoring(id, coloringType.name);
-        expect(result).toBeInstanceOf(Promise);
-        await result;
-        expect(dataStyleStore.meshPolyhedraActiveColoring(id)).toBe(expectedColoringType);
-        expect(viewerStore.status).toBe(Status.CONNECTED);
-      }
+      const coloringName = "color";
+      const result = dataStyleStore.setMeshPolyhedraActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshPolyhedraActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
 
-      await testColoring(coloringTypes[0], "color");
-      await testColoring(coloringTypes[1], "vertex");
-      await testColoring(coloringTypes[2], "polyhedron");
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, vertex_attribute.name);
+      const coloringName = "vertex";
+      const result = dataStyleStore.setMeshPolyhedraActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshPolyhedraActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring polyhedron", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, polyhedron_attribute.name);
+      const coloringName = "polyhedron";
+      const result = dataStyleStore.setMeshPolyhedraActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshPolyhedraActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
 
-  test("Polyhedra vertex attribute", async () => {
+  test("polyhedra vertex attribute", async () => {
     const dataStyleStore = useDataStyleStore();
     const viewerStore = useViewerStore();
 
@@ -119,7 +122,7 @@ describe("Mesh polyhedra", () => {
     expect(viewerStore.status).toBe(Status.CONNECTED);
   });
 
-  test("Polyhedra polyhedron attribute", async () => {
+  test("polyhedra polyhedron attribute", async () => {
     const dataStyleStore = useDataStyleStore();
     const viewerStore = useViewerStore();
 
@@ -136,7 +139,7 @@ describe("Mesh polyhedra", () => {
     expect(viewerStore.status).toBe(Status.CONNECTED);
   });
 
-  test("Polyhedra apply default style", async () => {
+  test("polyhedra apply default style", async () => {
     const dataStyleStore = useDataStyleStore();
     const viewerStore = useViewerStore();
     const result = dataStyleStore.applyMeshPolyhedraStyle(id);
