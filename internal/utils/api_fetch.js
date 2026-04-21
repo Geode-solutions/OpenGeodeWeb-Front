@@ -4,7 +4,7 @@ import { validate_schema } from "@ogw_front/utils/validate_schema";
 
 const ERROR_400 = 400;
 
-export function api_fetch(
+export async function api_fetch(
   microservice,
   { schema, params },
   { request_error_function, response_function, response_error_function, timeout } = {},
