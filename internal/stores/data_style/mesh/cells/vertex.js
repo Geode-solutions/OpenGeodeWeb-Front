@@ -120,8 +120,7 @@ export function useMeshCellsVertexAttributeStyle() {
         meshCellsVertexAttributeSchemas.color_map,
         { id, points, minimum, maximum },
         {
-          response_function: () =>
-            setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap }),
+          response_function: () => setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap }),
         },
       );
     }

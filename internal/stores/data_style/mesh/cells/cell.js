@@ -98,8 +98,7 @@ export function useMeshCellsCellAttributeStyle() {
         meshCellsCellAttributeSchemas.color_map,
         { id, points, minimum, maximum },
         {
-          response_function: () =>
-            setMeshCellsCellAttributeStoredConfig(id, name, { colorMap }),
+          response_function: () => setMeshCellsCellAttributeStoredConfig(id, name, { colorMap }),
         },
       );
     }

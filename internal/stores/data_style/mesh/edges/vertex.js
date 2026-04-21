@@ -121,8 +121,7 @@ export function useMeshEdgesVertexAttributeStyle() {
         meshEdgesVertexAttributeSchemas.color_map,
         { id, points, minimum, maximum },
         {
-          response_function: () =>
-            setMeshEdgesVertexAttributeStoredConfig(id, name, { colorMap }),
+          response_function: () => setMeshEdgesVertexAttributeStoredConfig(id, name, { colorMap }),
         },
       );
     }

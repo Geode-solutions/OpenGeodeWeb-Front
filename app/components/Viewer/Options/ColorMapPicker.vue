@@ -145,11 +145,7 @@ watch(
       </v-card>
     </template>
 
-    <ColorMapList
-      :presets="presets"
-      :model-value="selectedPresetName"
-      @select="onSelectPreset"
-    />
+    <ColorMapList :presets="presets" :model-value="selectedPresetName" @select="onSelectPreset" />
   </v-menu>
 </template>
 
