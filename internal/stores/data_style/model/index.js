@@ -10,6 +10,7 @@ import { useModelSelection } from "./selection";
 import { useModelSurfacesStyle } from "./surfaces";
 import { useModelVisibilityStyle } from "./visibility";
 
+// oxlint-disable-next-line max-lines-per-function, max-statements
 function useModelStyle() {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();

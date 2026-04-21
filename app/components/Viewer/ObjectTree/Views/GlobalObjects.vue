@@ -84,6 +84,7 @@ function isModel(item) {
       item-value="id"
       select-strategy="classic"
       selectable
+      items-registration="props"
     >
       <template #title="{ item }">
         <ObjectTreeItemLabel
