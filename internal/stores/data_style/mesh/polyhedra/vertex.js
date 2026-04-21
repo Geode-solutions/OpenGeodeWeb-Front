@@ -87,20 +87,11 @@ function useMeshPolyhedraVertexAttributeActions() {
 
   function setMeshPolyhedraVertexAttributeRange(id, minimum, maximum) {
     const name = config.meshPolyhedraVertexAttributeName(id);
-    const colorMap = meshPolyhedraVertexAttributeColorMap(id);
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(config.meshPolyhedraVertexAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshPolyhedraVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () =>
-            config.setMeshPolyhedraVertexAttributeStoredConfig(id, name, {
-              minimum,
-              maximum,
-            }),
-        },
-      );
+      return viewerStore.request(meshPolyhedraVertexAttributeSchemas.color_map, { id, points, minimum, maximum }, {
+        response_function: () => config.setMeshPolyhedraVertexAttributeStoredConfig(id, name, { minimum, maximum }),
+      });
     }
     return config.setMeshPolyhedraVertexAttributeStoredConfig(id, name, {
       minimum,
@@ -114,14 +105,9 @@ function useMeshPolyhedraVertexAttributeActions() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshPolyhedraVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () =>
-            config.setMeshPolyhedraVertexAttributeStoredConfig(id, name, { colorMap }),
-        },
-      );
+      return viewerStore.request(meshPolyhedraVertexAttributeSchemas.color_map, { id, points, minimum, maximum }, {
+        response_function: () => config.setMeshPolyhedraVertexAttributeStoredConfig(id, name, { colorMap }),
+      });
     }
     return config.setMeshPolyhedraVertexAttributeStoredConfig(id, name, { colorMap });
   }

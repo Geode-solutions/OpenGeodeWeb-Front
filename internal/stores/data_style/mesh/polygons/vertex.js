@@ -82,20 +82,11 @@ export function useMeshPolygonsVertexAttributeStyle() {
 
   function setMeshPolygonsVertexAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsVertexAttributeName(id);
-    const colorMap = meshPolygonsVertexAttributeColorMap(id);
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(meshPolygonsVertexAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshPolygonsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () =>
-            setMeshPolygonsVertexAttributeStoredConfig(id, name, {
-              minimum,
-              maximum,
-            }),
-        },
-      );
+      return viewerStore.request(meshPolygonsVertexAttributeSchemas.color_map, { id, points, minimum, maximum }, {
+        response_function: () => setMeshPolygonsVertexAttributeStoredConfig(id, name, { minimum, maximum }),
+      });
     }
     return setMeshPolygonsVertexAttributeStoredConfig(id, name, {
       minimum,
@@ -116,14 +107,9 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshPolygonsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () =>
-            setMeshPolygonsVertexAttributeStoredConfig(id, name, { colorMap }),
-        },
-      );
+      return viewerStore.request(meshPolygonsVertexAttributeSchemas.color_map, { id, points, minimum, maximum }, {
+        response_function: () => setMeshPolygonsVertexAttributeStoredConfig(id, name, { colorMap }),
+      });
     }
     return setMeshPolygonsVertexAttributeStoredConfig(id, name, { colorMap });
   }

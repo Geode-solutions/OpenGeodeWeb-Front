@@ -82,20 +82,11 @@ export function useMeshCellsVertexAttributeStyle() {
 
   function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
     const name = meshCellsVertexAttributeName(id);
-    const colorMap = meshCellsVertexAttributeColorMap(id);
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(meshCellsVertexAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshCellsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () =>
-            setMeshCellsVertexAttributeStoredConfig(id, name, {
-              minimum,
-              maximum,
-            }),
-        },
-      );
+      return viewerStore.request(meshCellsVertexAttributeSchemas.color_map, { id, points, minimum, maximum }, {
+        response_function: () => setMeshCellsVertexAttributeStoredConfig(id, name, { minimum, maximum }),
+      });
     }
     return setMeshCellsVertexAttributeStoredConfig(id, name, {
       minimum,
@@ -116,14 +107,9 @@ export function useMeshCellsVertexAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshCellsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () =>
-            setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap }),
-        },
-      );
+      return viewerStore.request(meshCellsVertexAttributeSchemas.color_map, { id, points, minimum, maximum }, {
+        response_function: () => setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap }),
+      });
     }
     return setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap });
   }

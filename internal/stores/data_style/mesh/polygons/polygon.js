@@ -83,20 +83,11 @@ export function useMeshPolygonsPolygonAttributeStyle() {
 
   function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsPolygonAttributeName(id);
-    const colorMap = meshPolygonsPolygonAttributeColorMap(id);
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(meshPolygonsPolygonAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshPolygonsPolygonAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () =>
-            setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
-              minimum,
-              maximum,
-            }),
-        },
-      );
+      return viewerStore.request(meshPolygonsPolygonAttributeSchemas.color_map, { id, points, minimum, maximum }, {
+        response_function: () => setMeshPolygonsPolygonAttributeStoredConfig(id, name, { minimum, maximum }),
+      });
     }
     return setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
       minimum,
@@ -117,16 +108,9 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshPolygonsPolygonAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () =>
-            setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
-              colorMap,
-            }),
-        },
-      );
+      return viewerStore.request(meshPolygonsPolygonAttributeSchemas.color_map, { id, points, minimum, maximum }, {
+        response_function: () => setMeshPolygonsPolygonAttributeStoredConfig(id, name, { colorMap }),
+      });
     }
     return setMeshPolygonsPolygonAttributeStoredConfig(id, name, { colorMap });
   }
