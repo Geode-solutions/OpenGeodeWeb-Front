@@ -89,9 +89,14 @@ function useMeshPolyhedraPolyhedronAttributeActions() {
     const name = config.meshPolyhedraPolyhedronAttributeName(id);
     const points = getRGBPointsFromPreset(config.meshPolyhedraPolyhedronAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(meshPolyhedraPolyhedronAttributeSchemas.color_map, { id, points, minimum, maximum }, {
-        response_function: () => config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { minimum, maximum }),
-      });
+      return viewerStore.request(
+        meshPolyhedraPolyhedronAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: () =>
+            config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { minimum, maximum }),
+        },
+      );
     }
     return config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, {
       minimum,
@@ -105,9 +110,14 @@ function useMeshPolyhedraPolyhedronAttributeActions() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(meshPolyhedraPolyhedronAttributeSchemas.color_map, { id, points, minimum, maximum }, {
-        response_function: () => config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { colorMap }),
-      });
+      return viewerStore.request(
+        meshPolyhedraPolyhedronAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: () =>
+            config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { colorMap }),
+        },
+      );
     }
     return config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { colorMap });
   }
