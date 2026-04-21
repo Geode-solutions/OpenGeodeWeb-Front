@@ -164,7 +164,6 @@ watch(filteredPresets, drawAllCanvases);
             v-for="(child, cIdx) in item.Children"
             :key="cIdx"
             :active="child.Name === selectedPresetName"
-            color="primary"
             @click="emit('select', child)"
             class="px-2 mb-1"
             rounded="md"
