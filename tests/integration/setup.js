@@ -1,3 +1,5 @@
+// oxlint-disable vitest/require-top-level-describe
+
 // Node.js imports
 import { WebSocket } from "ws";
 import path from "node:path";

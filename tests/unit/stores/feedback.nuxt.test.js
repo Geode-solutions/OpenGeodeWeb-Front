@@ -1,18 +1,21 @@
-// Third party imports
-import { beforeEach, describe, expect, expectTypeOf, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 
 // Local imports
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const ERROR_500 = 500;
-const MILISECONDS_TIMEOUT = 1000;
 
-beforeEach(() => {
-  setupActivePinia();
-});
+describe("feedback store", () => {
+  beforeEach(() => {
+    setupActivePinia();
+    vi.useFakeTimers();
+  });
 
-describe("Feedback Store", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   describe("state", () => {
     test("initial state", () => {
       const feedbackStore = useFeedbackStore();
@@ -23,48 +26,48 @@ describe("Feedback Store", () => {
 
   describe("actions", () => {
     describe("add_error", () => {
-      test("test add_error", () => {
+      test("add_error", async () => {
         const feedbackStore = useFeedbackStore();
-        feedbackStore.add_error(ERROR_500, "/test", "test message", "test description");
+        await feedbackStore.add_error(ERROR_500, "/test", "test message", "test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
         expect(feedbackStore.feedbacks[0].type).toBe("error");
       });
 
-      test("test feedbacks_timeout", () => {
+      test("feedbacks_timeout", async () => {
         const feedbackStore = useFeedbackStore();
         feedbackStore.feedbacks_timeout_miliseconds = 500;
-        feedbackStore.add_error(ERROR_500, "/test", "test message", "test description");
+        await feedbackStore.add_error(ERROR_500, "/test", "test message", "test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        setTimeout(() => {
-          expect(feedbackStore.feedbacks).toHaveLength(0);
-        }, MILISECONDS_TIMEOUT);
+        vi.runAllTimers();
+        expect(feedbackStore.feedbacks).toHaveLength(0);
       });
     });
 
     describe("add_success", () => {
-      test("test add_success", () => {
+      test("add_success", async () => {
         const feedbackStore = useFeedbackStore();
         feedbackStore.feedbacks_timeout_miliseconds = 500;
-        feedbackStore.add_success("test description");
+        await feedbackStore.add_success("test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
         expect(feedbackStore.feedbacks[0].type).toBe("success");
-
-        setTimeout(() => {
-          expect(feedbackStore.feedbacks).toHaveLength(0);
-        }, MILISECONDS_TIMEOUT);
+        vi.runAllTimers();
+        expect(feedbackStore.feedbacks).toHaveLength(0);
       });
     });
 
     describe("delete_feedback", () => {
-      test("test", () => {
+      test("delete_feedback", async () => {
         const feedbackStore = useFeedbackStore();
-        feedbackStore.delete_feedback(0);
+        await feedbackStore.add_success("test description");
+        expect(feedbackStore.feedbacks).toHaveLength(1);
+        const feedbackId = feedbackStore.feedbacks[0].id;
+        feedbackStore.delete_feedback(feedbackId);
         expect(feedbackStore.feedbacks).toHaveLength(0);
       });
     });
 
     describe("delete_server_error", () => {
-      test("test", () => {
+      test("delete_server_error", () => {
         const feedbackStore = useFeedbackStore();
         feedbackStore.$patch({ server_error: true });
         feedbackStore.delete_server_error();

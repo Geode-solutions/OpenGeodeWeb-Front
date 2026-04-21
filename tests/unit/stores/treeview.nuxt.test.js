@@ -8,11 +8,11 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview";
 // CONSTANTS
 const STEP_1 = 1;
 
-beforeEach(() => {
-  setupActivePinia();
-});
-
 describe("treeview store state", () => {
+  beforeEach(() => {
+    setupActivePinia();
+  });
+
   test("initial state", () => {
     const treeviewStore = useTreeviewStore();
     expectTypeOf(treeviewStore.items).toBeArray();
@@ -58,5 +58,6 @@ describe("treeview store actions", () => {
         expect(treeviewStore.items[j].children).toStrictEqual(childrenCopy.toSorted());
       }
     }
+    expect(treeviewStore.selection).toHaveLength(testItems.length);
   });
 });

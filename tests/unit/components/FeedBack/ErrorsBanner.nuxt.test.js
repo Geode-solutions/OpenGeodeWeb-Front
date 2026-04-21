@@ -9,9 +9,10 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const CALLED_TIMES = 1;
 
-describe(FeedBackErrorBanner, () => {
+describe("feedback error banner", () => {
   const pinia = setupActivePinia();
-  test(`Test reload`, async () => {
+
+  test("reload", async () => {
     const wrapper = mount(FeedBackErrorBanner, {
       global: {
         plugins: [vuetify, pinia],
@@ -26,7 +27,7 @@ describe(FeedBackErrorBanner, () => {
     expect(reload_spy).toHaveBeenCalledTimes(CALLED_TIMES);
   });
 
-  test(`Test delete error`, async () => {
+  test("delete error", async () => {
     const wrapper = mount(FeedBackErrorBanner, {
       global: {
         plugins: [vuetify, pinia],

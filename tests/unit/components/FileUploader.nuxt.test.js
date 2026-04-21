@@ -15,7 +15,7 @@ const SECOND_INDEX = 1;
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 
-describe(FileUploader, () => {
+describe("file uploader", () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
   geodeStore.base_url = "";
@@ -31,8 +31,8 @@ describe(FileUploader, () => {
 
   const files = [new File(["fake_file"], "fake_file.txt")];
 
-  describe(`Upload file`, () => {
-    test(`prop auto_upload false`, async () => {
+  describe("upload file", () => {
+    test("prop auto_upload false", async () => {
       const wrapper = await mountSuspended(FileUploader, {
         global: {
           plugins: [vuetify, pinia],
@@ -51,7 +51,7 @@ describe(FileUploader, () => {
       await v_btn.trigger("click");
       await flushPromises();
       await flushPromises();
-      expect(wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX]).toEqual(files);
+      expect(wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX]).toStrictEqual(files);
     });
 
     test(`prop auto_upload true`, async () => {
@@ -62,7 +62,7 @@ describe(FileUploader, () => {
         props: { multiple: false, accept: "*.txt", files, auto_upload: true },
       });
       await flushPromises();
-      expect(wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX]).toEqual(files);
+      expect(wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX]).toStrictEqual(files);
     });
   });
 });

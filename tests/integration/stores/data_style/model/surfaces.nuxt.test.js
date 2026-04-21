@@ -27,15 +27,15 @@ function sleep(milliseconds) {
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
-
-afterAll(async () => {
-  console.log("afterAll model surfaces kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
 describe("model surfaces", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
+
+  afterAll(async () => {
+    console.log("afterAll model surfaces kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
   describe("surfaces visibility", () => {
     test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -75,7 +75,7 @@ describe("model surfaces", () => {
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
       const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, surface_ids);
-      const color = { r: 255, g: 0, b: 0 };
+      const color = { red: 255, green: 0, blue: 0, alpha: 1 };
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       const result = dataStyleStore.setModelSurfacesColor(id, surface_ids, color);
@@ -100,8 +100,8 @@ describe("model surfaces", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
-  describe("Surfaces style", () => {
-    test("Surfaces apply style", async () => {
+  describe("surfaces style", () => {
+    test("surfaces apply style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyModelSurfacesStyle(id);

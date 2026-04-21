@@ -15,29 +15,29 @@ let infraStore = undefined;
 let geodeStore = undefined;
 let viewerStore = undefined;
 
-beforeEach(() => {
-  setupActivePinia();
-  infraStore = useInfraStore();
-  geodeStore = useGeodeStore();
-  viewerStore = useViewerStore();
-
-  // Register microservices in infra store
-  infraStore.register_microservice(geodeStore, {
-    request: vi.fn(),
-    connect: vi.fn(),
-    launch: vi.fn(),
-  });
-  infraStore.register_microservice(viewerStore, {
-    request: vi.fn(),
-    connect: vi.fn(),
-    launch: vi.fn(),
-  });
-
-  geodeStore.$patch({ status: Status.NOT_CONNECTED });
-  viewerStore.$patch({ status: Status.NOT_CONNECTED });
-});
-
 describe("when_microservices_connected_run_function", () => {
+  beforeEach(() => {
+    setupActivePinia();
+    infraStore = useInfraStore();
+    geodeStore = useGeodeStore();
+    viewerStore = useViewerStore();
+
+    // Register microservices in infra store
+    infraStore.register_microservice(geodeStore, {
+      request: vi.fn(),
+      connect: vi.fn(),
+      launch: vi.fn(),
+    });
+    infraStore.register_microservice(viewerStore, {
+      request: vi.fn(),
+      connect: vi.fn(),
+      launch: vi.fn(),
+    });
+
+    geodeStore.$patch({ status: Status.NOT_CONNECTED });
+    viewerStore.$patch({ status: Status.NOT_CONNECTED });
+  });
+
   test("microservices not connected", () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method");
     run_function_when_microservices_connected(dumb_obj.dumb_method);
