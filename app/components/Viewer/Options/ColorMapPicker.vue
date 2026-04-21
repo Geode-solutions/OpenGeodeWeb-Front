@@ -6,22 +6,20 @@ import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/C
 const LAST_POINT_OFFSET = 4;
 const THREE = 3;
 
-const { max, min, modelValue } = defineProps({
-  modelValue: { type: String, default: "Cool to Warm" },
+const { max, min } = defineProps({
   min: { type: Number, required: true },
   max: { type: Number, required: true },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const selectedPresetName = defineModel("selectedPresetName", { default: "Cool to Warm" });
+
+const emit = defineEmits([]);
 
 const menuOpen = ref(false);
 const lutCanvas = ref();
-const selectedPresetName = ref(modelValue);
 
 const presets = computed(() => {
   const allPresets = vtkColorMaps.rgbPresetNames.map((name) => vtkColorMaps.getPresetByName(name));
-
-  const defaultPreset = vtkColorMaps.getPresetByName("Cool to Warm");
 
   const paraviewNames = [
     "Cool to Warm",
@@ -49,20 +47,14 @@ const presets = computed(() => {
     (preset) => !paraviewNames.includes(preset.Name) && !matplotlibNames.includes(preset.Name),
   );
 
-  const topPresets = [defaultPreset];
-  if (selectedPresetName.value !== defaultPreset.Name) {
-    const currentPreset = vtkColorMaps.getPresetByName(selectedPresetName.value);
-    if (currentPreset) {
-      topPresets.push(currentPreset);
-    }
-  }
+  const currentPreset = vtkColorMaps.getPresetByName(selectedPresetName.value);
 
   return [
-    ...topPresets,
+    currentPreset,
     { Name: "ParaView", Children: paraviewPresets },
     { Name: "Matplotlib", Children: matplotlibPresets },
     { Name: "Others", Children: otherPresets },
-  ];
+  ].filter(Boolean);
 });
 
 function drawLutCanvas() {
@@ -111,20 +103,11 @@ function drawLutCanvas() {
 
 function onSelectPreset(preset) {
   selectedPresetName.value = preset.Name;
-  emit("update:modelValue", preset.Name);
   menuOpen.value = false;
 }
 
 onMounted(() => nextTick(drawLutCanvas));
 watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas);
-watch(
-  () => modelValue,
-  (newValue) => {
-    if (newValue !== selectedPresetName.value) {
-      selectedPresetName.value = newValue;
-    }
-  },
-);
 </script>
 
 <template>
@@ -145,7 +128,11 @@ watch(
       </v-card>
     </template>
 
-    <ColorMapList :presets="presets" :model-value="selectedPresetName" @select="onSelectPreset" />
+    <ColorMapList
+      :presets="presets"
+      :selected-preset-name="selectedPresetName"
+      @select="onSelectPreset"
+    />
   </v-menu>
 </template>
 
