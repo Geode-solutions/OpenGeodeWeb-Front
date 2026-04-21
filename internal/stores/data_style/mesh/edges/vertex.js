@@ -85,9 +85,14 @@ export function useMeshEdgesVertexAttributeStyle() {
     const name = meshEdgesVertexAttributeName(id);
     const points = getRGBPointsFromPreset(meshEdgesVertexAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(meshEdgesVertexAttributeSchemas.color_map, { id, points, minimum, maximum }, {
-        response_function: () => setMeshEdgesVertexAttributeStoredConfig(id, name, { minimum, maximum }),
-      });
+      return viewerStore.request(
+        meshEdgesVertexAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: () =>
+            setMeshEdgesVertexAttributeStoredConfig(id, name, { minimum, maximum }),
+        },
+      );
     }
     return setMeshEdgesVertexAttributeStoredConfig(id, name, {
       minimum,
@@ -107,9 +112,13 @@ export function useMeshEdgesVertexAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(meshEdgesVertexAttributeSchemas.color_map, { id, points, minimum, maximum }, {
-        response_function: () => setMeshEdgesVertexAttributeStoredConfig(id, name, { colorMap }),
-      });
+      return viewerStore.request(
+        meshEdgesVertexAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: () => setMeshEdgesVertexAttributeStoredConfig(id, name, { colorMap }),
+        },
+      );
     }
     return setMeshEdgesVertexAttributeStoredConfig(id, name, { colorMap });
   }
