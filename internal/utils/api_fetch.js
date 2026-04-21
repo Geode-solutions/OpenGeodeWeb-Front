@@ -7,7 +7,7 @@ const ERROR_400 = 400;
 export function api_fetch(
   microservice,
   { schema, params },
-  { request_error_function, response_function, response_error_function } = {},
+  { request_error_function, response_function, response_error_function, timeout } = {},
 ) {
   const feedbackStore = useFeedbackStore();
 
@@ -36,30 +36,42 @@ export function api_fetch(
   if (schema.max_retry) {
     request_options.max_retry = schema.max_retry;
   }
-  return $fetch(schema.$id, {
-    baseURL: microservice.base_url,
-    ...request_options,
-    onRequestError({ error }) {
-      microservice.stop_request();
-      feedbackStore.add_error(error.code, schema.$id, error.message, error.stack);
-      if (request_error_function) {
-        request_error_function(error);
-      }
-    },
-    onResponse({ response }) {
-      if (response.ok) {
+
+  function performFetch() {
+    return $fetch(schema.$id, {
+      baseURL: microservice.base_url,
+      ...request_options,
+      onRequestError({ error }) {
         microservice.stop_request();
-        if (response_function) {
-          response_function(response._data);
+        feedbackStore.add_error(error.code, schema.$id, error.message, error.stack);
+        if (request_error_function) {
+          request_error_function(error);
         }
-      }
-    },
-    onResponseError({ response }) {
-      microservice.stop_request();
-      feedbackStore.add_error(response.status, schema.$id, response.name, response.description);
-      if (response_error_function) {
-        response_error_function(response);
-      }
-    },
-  });
+      },
+      onResponse({ response }) {
+        if (response.ok) {
+          microservice.stop_request();
+          if (response_function) {
+            response_function(response._data);
+          }
+        }
+      },
+      onResponseError({ response }) {
+        microservice.stop_request();
+        feedbackStore.add_error(response.status, schema.$id, response.name, response.description);
+        if (response_error_function) {
+          response_error_function(response);
+        }
+      },
+    });
+  }
+
+  if (timeout !== undefined && timeout > 0) {
+    return pTimeout(performCall(), {
+      milliseconds: timeout,
+      message: `${schema.$id}: Timed out after ${timeout}ms`,
+    });
+  }
+
+  return performFetch();
 }
