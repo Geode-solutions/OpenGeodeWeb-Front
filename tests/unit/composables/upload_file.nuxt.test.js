@@ -11,13 +11,13 @@ import { useGeodeStore } from "@ogw_front/stores/geode";
 const ZERO = 0;
 const schema = schemas.opengeodeweb_back.upload_file;
 
-beforeEach(() => {
-  setupActivePinia();
-  const geodeStore = useGeodeStore();
-  geodeStore.base_url = "";
-});
+describe("upload_file", () => {
+  beforeEach(() => {
+    setupActivePinia();
+    const geodeStore = useGeodeStore();
+    geodeStore.base_url = "";
+  });
 
-describe("upload_file test", () => {
   test("throw error", async () => {
     const geodeStore = useGeodeStore();
     const file = "toto";

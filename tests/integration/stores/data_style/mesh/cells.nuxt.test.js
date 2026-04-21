@@ -20,20 +20,20 @@ const cell_attribute = { name: "RGB_data" };
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  id = "";
-  projectFolderPath = "";
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("mesh cells", () => {
+  beforeAll(async () => {
+    id = "";
+    projectFolderPath = "";
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll mesh cells kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll mesh cells kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Mesh cells", () => {
-  describe("Cells visibility", () => {
-    test("Visibility true", async () => {
+  describe("cells visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const visibility = true;
@@ -53,11 +53,11 @@ describe("Mesh cells", () => {
     });
   });
 
-  describe("Cells color", () => {
-    test("Color red", async () => {
+  describe("cells color", () => {
+    test("color red", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const color = { r: 255, g: 0, b: 0 };
+      const color = { red: 255, green: 0, blue: 0, alpha: 1 };
       const spy = vi.spyOn(viewerStore, "request");
       const result = dataStyleStore.setMeshCellsColor(id, color);
       expect(result).toBeInstanceOf(Promise);
@@ -74,8 +74,8 @@ describe("Mesh cells", () => {
     });
   });
 
-  describe("Cells vertex attribute", () => {
-    test("Coloring vertex attribute", async () => {
+  describe("cells vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const spy = vi.spyOn(viewerStore, "request");
@@ -94,8 +94,8 @@ describe("Mesh cells", () => {
     });
   });
 
-  describe("Cells cell attribute", () => {
-    test("Coloring cell attribute", async () => {
+  describe("cells cell attribute", () => {
+    test("coloring cell attribute", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const spy = vi.spyOn(viewerStore, "request");
@@ -114,39 +114,44 @@ describe("Mesh cells", () => {
     });
   });
 
-  describe("Cells active coloring", () => {
-    test("test coloring", async () => {
+  describe("cells active coloring", () => {
+    test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringTypes = [
-        { name: "color" },
-        {
-          name: "vertex",
-          function: () => dataStyleStore.setMeshCellsVertexAttributeName(id, vertex_attribute.name),
-        },
-        {
-          name: "cell",
-          function: () => dataStyleStore.setMeshCellsCellAttributeName(id, cell_attribute.name),
-        },
-      ];
-      async function testColoring(coloringType, expectedColoringType) {
-        if (coloringType.function) {
-          await coloringType.function();
-        }
-        const result = dataStyleStore.setMeshCellsActiveColoring(id, coloringType.name);
-        expect(result).toBeInstanceOf(Promise);
-        await result;
-        expect(dataStyleStore.meshCellsActiveColoring(id)).toBe(expectedColoringType);
-        expect(viewerStore.status).toBe(Status.CONNECTED);
-      }
+      const coloringName = "color";
+      const result = dataStyleStore.setMeshCellsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshCellsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
 
-      await testColoring(coloringTypes[0], "color");
-      await testColoring(coloringTypes[1], "vertex");
-      await testColoring(coloringTypes[2], "cell");
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshCellsVertexAttributeName(id, vertex_attribute.name);
+      const coloringName = "vertex";
+      const result = dataStyleStore.setMeshCellsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshCellsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring cell", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      await dataStyleStore.setMeshCellsCellAttributeName(id, cell_attribute.name);
+      const coloringName = "cell";
+      const result = dataStyleStore.setMeshCellsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.meshCellsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
 
-  test("Cells apply default style", async () => {
+  test("cells apply default style", async () => {
     const dataStyleStore = useDataStyleStore();
     const viewerStore = useViewerStore();
     const result = dataStyleStore.applyMeshCellsStyle(id);
