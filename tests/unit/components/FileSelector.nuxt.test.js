@@ -18,12 +18,12 @@ const SECOND_INDEX = 1;
 const allowed_files_schema = schemas.opengeodeweb_back.allowed_files;
 const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 
-describe(FileSelector, () => {
+describe("file selector", () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
   geodeStore.base_url = "";
 
-  test(`Select file`, async () => {
+  test("select file", async () => {
     registerEndpoint(allowed_files_schema.$id, {
       method: allowed_files_schema.methods[FIRST_INDEX],
       handler: () => ({
@@ -58,13 +58,13 @@ describe(FileSelector, () => {
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
       files,
       auto_upload,
     });
   });
 
-  describe(FileSelector, () => {
+  describe("file selector", () => {
     registerEndpoint(allowed_files_schema.$id, {
       method: allowed_files_schema.methods[FIRST_INDEX],
       handler: () => ({
@@ -76,8 +76,8 @@ describe(FileSelector, () => {
       method: upload_file_schema.methods[SECOND_INDEX],
       handler: () => ({}),
     });
-
     const files = [new File(["fake_file"], "fake_file.txt")];
+
     test("auto_upload true", async () => {
       const wrapper = await mountSuspended(FileSelector, {
         global: {
@@ -91,10 +91,10 @@ describe(FileSelector, () => {
       });
 
       await flushPromises();
-      expect(wrapper.componentVM.files).toEqual(files);
+      expect(wrapper.componentVM.files).toStrictEqual(files);
       expect(wrapper.emitted()).toHaveProperty("update_values");
       expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-      expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
+      expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
         files,
         auto_upload: false,
       });
@@ -115,7 +115,7 @@ describe(FileSelector, () => {
       await flushPromises();
 
       const file_uploader = wrapper.findComponent(FileUploader);
-      expect(wrapper.vm.files).toEqual(files);
+      expect(wrapper.vm.files).toStrictEqual(files);
       const upload_files = vi.spyOn(file_uploader.vm, "upload_files");
       expect(upload_files).not.toHaveBeenCalled();
     });

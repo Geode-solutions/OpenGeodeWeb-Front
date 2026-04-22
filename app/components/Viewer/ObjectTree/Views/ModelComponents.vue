@@ -25,8 +25,8 @@ const opened = computed({
   set: (val) => treeviewStore.setOpened(viewId, val),
 });
 
-const items = dataStore.refFormatedMeshComponents(toRef(() => viewId));
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(toRef(() => viewId));
+const items = dataStore.refFormatedMeshComponents(viewId);
+const mesh_components_selection = dataStyleStore.visibleMeshComponents(viewId);
 
 const {
   search,
@@ -105,6 +105,7 @@ function handleHoverLeave() {
       item-value="id"
       select-strategy="independent"
       selectable
+      items-registration="props"
       @update:selected="onSelectionChange"
     >
       <template #title="{ item }">

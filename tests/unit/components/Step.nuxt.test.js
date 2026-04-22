@@ -10,8 +10,8 @@ import { vuetify } from "@ogw_tests/utils";
 
 globalThis.ResizeObserver = ResizeObserver;
 
-describe(Step, () => {
-  test(`BRep`, () => {
+describe("step", () => {
+  test("brep", () => {
     const geode_object_type = ref("BRep");
     const files = ref([]);
     const stepper_tree = reactive({
@@ -27,12 +27,7 @@ describe(Step, () => {
               key: "",
             },
           },
-          chips: computed(() => {
-            if (geode_object_type.value === "") {
-              return [];
-            }
-            return [geode_object_type.value];
-          }),
+          chips: computed(() => [geode_object_type.value].filter((chip) => chip !== "")),
         },
       ],
     });

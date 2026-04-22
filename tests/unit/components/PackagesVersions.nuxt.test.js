@@ -7,8 +7,8 @@ import { useGeodeStore } from "@ogw_front/stores/geode";
 
 const FIRST_INDEX = 0;
 
-describe(PackagesVersions, () => {
-  test(`Mount`, async () => {
+describe("packages versions", () => {
+  test("mount", async () => {
     const pinia = setupActivePinia();
     const geodeStore = useGeodeStore();
     geodeStore.base_url = "";

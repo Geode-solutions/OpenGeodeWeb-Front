@@ -9,6 +9,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
 
+// oxlint-disable-next-line max-lines-per-function, max-statements
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
 
@@ -68,12 +69,9 @@ export const useDataStore = defineStore("data", () => {
       }));
   }
 
-  function refFormatedMeshComponents(id) {
+  function refFormatedMeshComponents(modelId) {
     return useObservable(
-      liveQuery(() => {
-        const unwrapped_id = unref(id);
-        return formatedMeshComponents(unwrapped_id);
-      }),
+      liveQuery(() => formatedMeshComponents(modelId)),
       { initialValue: undefined },
     );
   }

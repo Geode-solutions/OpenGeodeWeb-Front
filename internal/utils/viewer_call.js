@@ -4,7 +4,7 @@ import { validate_schema } from "@ogw_front/utils/validate_schema";
 
 const ERROR_400 = 400;
 
-export async function viewer_call(
+export function viewer_call(
   microservice,
   { schema, params = {} },
   { request_error_function, response_function, response_error_function, timeout } = {},
@@ -50,11 +50,11 @@ export async function viewer_call(
   }
 
   if (timeout !== undefined && timeout > 0) {
-    return await pTimeout(performCall(), {
+    return pTimeout(performCall(), {
       milliseconds: timeout,
       message: `${schema.$id}: Timed out after ${timeout}ms`,
     });
   }
 
-  return await performCall();
+  return performCall();
 }

@@ -10,8 +10,8 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 vi.stubGlobal("visualViewport", new EventTarget());
 
-describe(FeedBackSnackers, () => {
-  test(`Test delete error`, async () => {
+describe("feedback snackers", () => {
+  test("delete feedback", async () => {
     const pinia = setupActivePinia();
     const feedbackStore = useFeedbackStore();
     feedbackStore.$patch({
@@ -41,9 +41,9 @@ describe(FeedBackSnackers, () => {
       },
     );
 
-    expect(feedbackStore.feedbacks.length).toBe(1);
+    expect(feedbackStore.feedbacks).toHaveLength(1);
     const v_btn = await wrapper.findComponent(components.VBtn);
     await v_btn.trigger("click");
-    expect(feedbackStore.feedbacks.length).toBe(0);
+    expect(feedbackStore.feedbacks).toHaveLength(0);
   });
 });

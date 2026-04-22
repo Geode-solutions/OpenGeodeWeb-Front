@@ -111,6 +111,7 @@ function handleHoverLeave(item) {
       item-value="id"
       select-strategy="classic"
       selectable
+      items-registration="props"
     >
       <template #title="{ item }">
         <div @mouseenter="handleHoverEnter(item)" @mouseleave="handleHoverLeave(item)">

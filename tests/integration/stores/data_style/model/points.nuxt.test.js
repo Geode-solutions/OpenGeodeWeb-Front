@@ -26,18 +26,18 @@ function sleep(milliseconds) {
 let id = "",
   projectFolderPath = "";
 
-beforeAll(async () => {
-  ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-}, INTERVAL_TIMEOUT);
+describe("model points", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, INTERVAL_TIMEOUT);
 
-afterAll(async () => {
-  console.log("afterAll model points kill", projectFolderPath);
-  await cleanupBackend(projectFolderPath);
-});
+  afterAll(async () => {
+    console.log("afterAll model points kill", projectFolderPath);
+    await cleanupBackend(projectFolderPath);
+  });
 
-describe("Model points", () => {
-  describe("Points visibility", () => {
-    test("Visibility true", async () => {
+  describe("points visibility", () => {
+    test("visibility true", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const visibility = true;
@@ -59,8 +59,8 @@ describe("Model points", () => {
     });
   });
 
-  describe("Points size", () => {
-    test("Size 20", async () => {
+  describe("points size", () => {
+    test("size 20", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const size = 20;
@@ -81,8 +81,8 @@ describe("Model points", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
-  describe("Points style", () => {
-    test("Points apply style", async () => {
+  describe("points style", () => {
+    test("points apply style", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const result = dataStyleStore.applyModelPointsStyle(id);

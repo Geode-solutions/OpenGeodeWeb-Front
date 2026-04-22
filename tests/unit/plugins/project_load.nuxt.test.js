@@ -30,11 +30,11 @@ vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
   }),
 }));
 
-beforeEach(() => {
-  setupActivePinia();
-});
+describe("project import", () => {
+  beforeEach(() => {
+    setupActivePinia();
+  });
 
-describe("Project import", () => {
   test("app.importStores restores stores", async () => {
     const stores = {
       app: useAppStore(),
@@ -45,7 +45,7 @@ describe("Project import", () => {
     };
 
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(async (snapshot) => {
-      const items = snapshot?.items || [];
+      const { items } = snapshot;
       await Promise.all(items.map((item) => database.data.put(item)));
     });
 

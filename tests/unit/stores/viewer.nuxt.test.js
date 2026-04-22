@@ -20,19 +20,19 @@ vi.stubGlobal("navigator", {
   },
 });
 
-beforeAll(() => {
-  globalThis.WebSocket = WebSocket;
-});
+describe("viewer store", () => {
+  beforeAll(() => {
+    globalThis.WebSocket = WebSocket;
+  });
 
-afterAll(() => {
-  delete globalThis.WebSocket;
-});
+  beforeEach(() => {
+    setupActivePinia();
+  });
 
-beforeEach(() => {
-  setupActivePinia();
-});
+  afterAll(() => {
+    delete globalThis.WebSocket;
+  });
 
-describe("Viewer Store", () => {
   describe("state", () => {
     test("initial state", () => {
       const viewerStore = useViewerStore();
@@ -50,19 +50,21 @@ describe("Viewer Store", () => {
 
   describe("getters", () => {
     describe("protocol", () => {
-      test("test app_mode CLOUD", () => {
+      test("app_mode CLOUD", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.CLOUD;
         expect(viewerStore.protocol).toBe("wss");
       });
-      test("test app_mode BROWSER", () => {
+
+      test("app_mode BROWSER", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.BROWSER;
         expect(viewerStore.protocol).toBe("ws");
       });
-      test("test app_mode DESKTOP", () => {
+
+      test("app_mode DESKTOP", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.DESKTOP;
@@ -71,26 +73,28 @@ describe("Viewer Store", () => {
     });
 
     describe("port", () => {
-      test("test app_mode CLOUD", () => {
+      test("app_mode CLOUD", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.CLOUD;
         expect(viewerStore.port).toBe("443");
       });
-      test("test app_mode BROWSER", () => {
+
+      test("app_mode BROWSER", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.BROWSER;
         expect(viewerStore.port).toBe(viewerStore.default_local_port);
       });
-      test("test app_mode DESKTOP", () => {
+
+      test("app_mode DESKTOP", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.DESKTOP;
         expect(viewerStore.port).toBe(viewerStore.default_local_port);
       });
 
-      test("test override default_local_port", () => {
+      test("override default_local_port", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.DESKTOP;
@@ -99,7 +103,7 @@ describe("Viewer Store", () => {
       });
     });
     describe("base_url", () => {
-      test("test app_mode DESKTOP", () => {
+      test("app_mode DESKTOP", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.DESKTOP;
@@ -107,7 +111,7 @@ describe("Viewer Store", () => {
         expect(viewerStore.base_url).toBe("ws://localhost:1234/ws");
       });
 
-      test("test app_mode CLOUD", () => {
+      test("app_mode CLOUD", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.CLOUD;
@@ -116,12 +120,13 @@ describe("Viewer Store", () => {
       });
     });
     describe("is_busy", () => {
-      test("test is_busy", () => {
+      test("is_busy", () => {
         const viewerStore = useViewerStore();
         viewerStore.request_counter = 1;
         expect(viewerStore.is_busy).toBe(true);
       });
-      test("test not is_busy", () => {
+
+      test("not is_busy", () => {
         const viewerStore = useViewerStore();
         viewerStore.request_counter = 0;
         expect(viewerStore.is_busy).toBe(false);
@@ -130,7 +135,7 @@ describe("Viewer Store", () => {
   });
   describe("actions", () => {
     describe("toggle_picking_mode", () => {
-      test("test true", async () => {
+      test("true", async () => {
         const viewerStore = useViewerStore();
         await viewerStore.toggle_picking_mode(true);
         expect(viewerStore.picking_mode).toBe(true);
@@ -138,7 +143,7 @@ describe("Viewer Store", () => {
     });
 
     describe("start_request", () => {
-      test("test increment", async () => {
+      test("increment", async () => {
         const viewerStore = useViewerStore();
         await viewerStore.start_request();
         expect(viewerStore.request_counter).toBe(1);
@@ -146,7 +151,7 @@ describe("Viewer Store", () => {
     });
 
     describe("stop_request", () => {
-      test("test decrement", async () => {
+      test("decrement", async () => {
         const viewerStore = useViewerStore();
         await viewerStore.stop_request();
         expect(viewerStore.request_counter).toBe(-1);

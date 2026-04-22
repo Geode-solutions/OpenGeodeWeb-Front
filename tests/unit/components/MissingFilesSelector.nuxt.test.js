@@ -17,20 +17,18 @@ const SECOND_INDEX = 1;
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 
-describe(MissingFilesSelector, () => {
+describe("missing files selector", () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
   geodeStore.base_url = "";
 
-  test(`Select file`, async () => {
+  test("select file", async () => {
     geodeStore.request = vi.fn((schema, params, callbacks) => {
-      if (callbacks?.response_function) {
-        callbacks.response_function({
-          has_missing_files: true,
-          mandatory_files: ["fake_file.txt"],
-          additional_files: ["fake_file_2.txt"],
-        });
-      }
+      callbacks?.response_function?.({
+        has_missing_files: true,
+        mandatory_files: ["fake_file.txt"],
+        additional_files: ["fake_file_2.txt"],
+      });
       return Promise.resolve({
         has_missing_files: true,
         mandatory_files: ["fake_file.txt"],
@@ -70,7 +68,7 @@ describe(MissingFilesSelector, () => {
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toEqual({
+    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
       additional_files: files,
     });
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);

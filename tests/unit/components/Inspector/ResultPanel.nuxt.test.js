@@ -6,8 +6,8 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import InspectorResultPanel from "@ogw_front/components/Inspector/ResultPanel";
 import { vuetify } from "@ogw_tests/utils";
 
-describe("Inspector/ResultPanel", () => {
-  test(`Test with issues`, async () => {
+describe("inspector result panel", () => {
+  test("with issues", async () => {
     const inspection_result = [
       {
         title: "Brep inspection",
@@ -33,7 +33,7 @@ describe("Inspector/ResultPanel", () => {
     );
   });
 
-  test(`Test without issues`, async () => {
+  test("without issues", async () => {
     const inspection_result = [
       {
         title: "Brep inspection",
