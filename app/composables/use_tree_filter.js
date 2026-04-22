@@ -2,30 +2,29 @@ function customFilter(value, searchQuery, item) {
   if (!searchQuery) {
     return true;
   }
+  if (!item || !item.raw) {
+    return false;
+  }
   const query = searchQuery.toLowerCase();
   const title = (item.raw.title || "").toLowerCase();
   const idValue = String(value || "").toLowerCase();
   return title.includes(query) || idValue.includes(query);
 }
 
-function sortAndFormatItems(items, sortType) {
+function sortAndFormatItems(itemList, sortType) {
+  if (!itemList || !Array.isArray(itemList)) {
+    return [];
+  }
   const field = sortType === "name" ? "title" : "id";
-  return items.map((category) => {
-    const children = (category.children || []).toSorted((itemA, itemB) => {
-      const valueA = itemA[field] || "";
-      const valueB = itemB[field] || "";
-      return valueA.localeCompare(valueB, undefined, {
-        numeric: true,
-        sensitivity: "base",
-      });
+  const options = { numeric: true, sensitivity: "base" };
+
+  return itemList
+    .filter((item) => item !== null && item !== undefined)
+    .toSorted((itemA, itemB) => {
+      const fieldA = String(itemA[field] || itemA.id || "");
+      const fieldB = String(itemB[field] || itemB.id || "");
+      return fieldA.localeCompare(fieldB, undefined, options);
     });
-    return {
-      ...category,
-      id: category.id,
-      title: category.title || category.id,
-      children,
-    };
-  });
 }
 
 function useTreeFilter(rawItems, options = {}) {

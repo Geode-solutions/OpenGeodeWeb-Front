@@ -8,6 +8,7 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
+const LOADER_DELAY_MS = 50;
 
 const { id: viewId } = defineProps({ id: { type: String, required: true } });
 const emit = defineEmits(["show-menu"]);
@@ -17,13 +18,56 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const treeviewStore = useTreeviewStore();
 
-const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
+const currentView = computed(() =>
+  treeviewStore.opened_views.find((view) => view.id === viewId),
+);
 const opened = computed({
   get: () => currentView.value?.opened || [],
-  set: (val) => treeviewStore.setOpened(viewId, val),
+  set: (value) => treeviewStore.setOpened(viewId, value),
 });
 
 const items = dataStore.refFormatedMeshComponents(viewId);
+
+const localItems = ref([]);
+
+function sortItems(itemList) {
+  const field = sortType.value === "name" ? "title" : "id";
+  const options = { numeric: true, sensitivity: "base" };
+  return itemList.toSorted((itemA, itemB) => {
+    const titleA = String(itemA[field] || itemA.id || "");
+    const titleB = String(itemB[field] || itemB.id || "");
+    return titleA.localeCompare(titleB, undefined, options);
+  });
+}
+
+watch(
+  items,
+  (newItems) => {
+    if (!newItems) {
+      localItems.value = [];
+      return;
+    }
+    localItems.value = newItems.map((newCategory) => {
+      const existing = localItems.value.find(
+        (category) => category.id === newCategory.id,
+      );
+      if (existing) {
+        existing.title = newCategory.title || newCategory.id;
+        return existing;
+      }
+      return reactive({
+        ...newCategory,
+        title: newCategory.title || newCategory.id,
+        children: [],
+        manualChildren: [],
+      });
+    });
+  },
+  { immediate: true },
+);
+
+const displayItems = localItems;
+
 const mesh_components_selection = dataStyleStore.visibleMeshComponents(viewId);
 
 const {
@@ -34,7 +78,99 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
-} = useTreeFilter(items);
+} = useTreeFilter(displayItems);
+
+function restoreManualState() {
+  for (const category of localItems.value) {
+    category.children = category.manualChildren || [];
+  }
+}
+
+function saveManualState() {
+  for (const category of localItems.value) {
+    category.manualChildren = [...category.children];
+  }
+}
+
+async function performGlobalSearch(query) {
+  const allComponents = await dataStore.getAllMeshComponents(viewId);
+  const searchMatch = query.toLowerCase();
+  const matches = allComponents.filter(
+    (component) =>
+      component.title.toLowerCase().includes(searchMatch) ||
+      component.id.toLowerCase().includes(searchMatch),
+  );
+
+  const byType = {};
+  for (const match of matches) {
+    if (!byType[match.category]) {
+      byType[match.category] = [];
+    }
+    byType[match.category].push(match);
+  }
+
+  for (const type of Object.keys(byType)) {
+    byType[type] = sortItems(byType[type]);
+  }
+
+  for (const category of localItems.value) {
+    category.children = byType[category.id] || [];
+  }
+
+  const idsToOpen = Object.keys(byType).filter(
+    (type) => byType[type].length > 0,
+  );
+  if (idsToOpen.length > 0) {
+    opened.value = [...new Set([...opened.value, ...idsToOpen])];
+  }
+}
+
+watch(search, async (newSearch, oldSearch) => {
+  if (!newSearch) {
+    restoreManualState();
+    return;
+  }
+
+  if (!oldSearch) {
+    saveManualState();
+  }
+
+  await performGlobalSearch(newSearch);
+});
+
+watch(opened, (newOpened, oldOpened) => {
+  if (search.value) {
+    return;
+  }
+  const closed = oldOpened.filter((itemId) => !newOpened.includes(itemId));
+  for (const itemId of closed) {
+    const category = localItems.value.find(
+      (existingCategory) => existingCategory.id === itemId,
+    );
+    if (category) {
+      category.children = [];
+      category.manualChildren = [];
+    }
+  }
+});
+
+async function loadChildren(item) {
+  if (search.value) {
+    return;
+  }
+  const target = localItems.value.find((category) => category.id === item.id);
+  if (!target) {
+    return;
+  }
+
+  // oxlint-disable-next-line promise/avoid-new
+  await new Promise((resolve) => {
+    setTimeout(resolve, LOADER_DELAY_MS);
+  });
+  const children = await dataStore.getMeshComponentsByType(viewId, target.id);
+  target.children = sortItems(children);
+  target.manualChildren = [...target.children];
+}
 
 async function onSelectionChange(current) {
   const previous = mesh_components_selection.value;
@@ -58,7 +194,9 @@ function showContextMenu(event, item) {
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : viewId,
-    context_type: actualItem.category ? "model_component" : "model_component_type",
+    context_type: actualItem.category
+      ? "model_component"
+      : "model_component_type",
     modelId: viewId,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });
@@ -84,6 +222,7 @@ function showContextMenu(event, item) {
       :items="processedItems"
       :search="search"
       :custom-filter="customFilter"
+      :load-children="loadChildren"
       class="transparent-treeview"
       item-value="id"
       select-strategy="independent"
