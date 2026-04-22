@@ -89,7 +89,12 @@ const edge_attribute_color_map = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Edges options" :btn_image="btn_image">
+  <ViewerContextMenuItem
+    data-testid="meshEdgesMenu"
+    :itemProps="itemProps"
+    tooltip="Edges options"
+    :btn_image="btn_image"
+  >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
       <template v-if="visibility">

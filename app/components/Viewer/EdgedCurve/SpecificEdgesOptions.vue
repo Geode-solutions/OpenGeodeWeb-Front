@@ -88,11 +88,7 @@ const edge_attribute_color_map = computed({
 });
 </script>
 <template>
-  <ViewerContextMenuItem
-    :itemProps="itemProps"
-    tooltip="Edges options"
-    :btn_image="EdgedCurveEdges"
-  >
+  <ViewerContextMenuItem :itemProps="itemProps" :btn_image="EdgedCurveEdges">
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
       <template v-if="visibility">
