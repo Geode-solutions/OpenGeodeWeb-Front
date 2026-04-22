@@ -4,7 +4,7 @@ import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/It
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useHoverHighlight } from "@ogw_front/composables/use_hover_highlight";
+import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -13,7 +13,7 @@ const treeviewStore = useTreeviewStore();
 const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
-const { onHoverEnter, onHoverLeave } = useHoverHighlight();
+const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
 const emit = defineEmits(["show-menu"]);
 
@@ -70,6 +70,7 @@ function isModel(item) {
 async function handleHoverEnter(item) {
   const actualItem = item.raw || item;
   let block_ids = [];
+  const type = isModel(item) ? "model" : "mesh";
   if (isModel(item)) {
     const [cornerIds, lineIds, surfaceIds, blockIds] = await Promise.all([
       dataStore.getCornersGeodeIds(actualItem.id),
@@ -82,7 +83,7 @@ async function handleHoverEnter(item) {
   } else {
     block_ids = [0];
   }
-  onHoverEnter(actualItem.id, block_ids);
+  onHoverEnter(actualItem.id, block_ids, type);
 }
 
 function handleHoverLeave(item) {
