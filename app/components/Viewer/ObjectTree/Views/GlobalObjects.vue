@@ -71,14 +71,16 @@ async function handleHoverEnter(item) {
   const actualItem = item.raw || item;
   let block_ids = [];
   if (isModel(item)) {
-    const cornerIds = await dataStore.getCornersGeodeIds(actualItem.id);
-    const lineIds = await dataStore.getLinesGeodeIds(actualItem.id);
-    const surfaceIds = await dataStore.getSurfacesGeodeIds(actualItem.id);
-    const blockIds = await dataStore.getBlocksGeodeIds(actualItem.id);
+    const [cornerIds, lineIds, surfaceIds, blockIds] = await Promise.all([
+      dataStore.getCornersGeodeIds(actualItem.id),
+      dataStore.getLinesGeodeIds(actualItem.id),
+      dataStore.getSurfacesGeodeIds(actualItem.id),
+      dataStore.getBlocksGeodeIds(actualItem.id),
+    ]);
     const allGeodeIds = [...cornerIds, ...lineIds, ...surfaceIds, ...blockIds];
     block_ids = await dataStore.getMeshComponentsViewerIds(actualItem.id, allGeodeIds);
   } else {
-    block_ids = [1];
+    block_ids = [0];
   }
   onHoverEnter(actualItem.id, block_ids);
 }
