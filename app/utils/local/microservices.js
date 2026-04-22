@@ -13,7 +13,7 @@ import { commandExistsSync, waitForReady } from "./scripts.js";
 import { executableName, executablePath } from "./path.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 
-const DEFAULT_TIMEOUT_SECONDS = 30;
+const DEFAULT_TIMEOUT_SECONDS = 60;
 const MILLISECONDS_PER_SECOND = 1000;
 
 function getAvailablePort() {
