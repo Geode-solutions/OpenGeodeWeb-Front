@@ -161,6 +161,24 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     });
   }
 
+  function updateLocalCamera(snapshot_camera_options) {
+    if (!snapshot_camera_options) {
+      return;
+    }
+
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
+
+    camera.setFocalPoint(...snapshot_camera_options.focal_point);
+    camera.setViewUp(...snapshot_camera_options.view_up);
+    camera.setPosition(...snapshot_camera_options.position);
+    camera.setViewAngle(snapshot_camera_options.view_angle);
+    camera.setClippingRange(...snapshot_camera_options.clipping_range);
+
+    genericRenderWindow.value.getRenderWindow().render();
+    Object.assign(camera_options, snapshot_camera_options);
+  }
+
   function remoteRender() {
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
   }
@@ -307,6 +325,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setVisibility,
     setZScaling,
     syncRemoteCamera,
+    updateLocalCamera,
     initHybridViewer,
     remoteRender,
     resize,
