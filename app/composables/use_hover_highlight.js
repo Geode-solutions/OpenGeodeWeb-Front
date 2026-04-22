@@ -1,7 +1,7 @@
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-const HOVER_DELAY = 600;
+const HOVER_DELAY = 1000;
 
 export function useHoverhighlight() {
   const viewerStore = useViewerStore();
