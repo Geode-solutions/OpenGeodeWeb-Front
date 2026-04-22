@@ -1,7 +1,7 @@
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-const HOVER_DELAY = 1000;
+const HOVER_DELAY = 800;
 
 export function useHoverhighlight() {
   const viewerStore = useViewerStore();
@@ -17,10 +17,9 @@ export function useHoverhighlight() {
     timer = setTimeout(async () => {
       currentId = id;
       currentType = type;
-      await viewerStore.request(schema, {
-        id,
-        block_ids,
-      });
+      const params =
+        type === "model" ? { id, block_ids, visibility: true } : { id, visibility: true };
+      await viewerStore.request(schema, params);
     }, HOVER_DELAY);
   }
 
@@ -31,10 +30,11 @@ export function useHoverhighlight() {
     }
     if (currentId === id) {
       const schema = vtk_schemas.opengeodeweb_viewer[currentType].highlight;
-      viewerStore.request(schema, {
-        id,
-        block_ids: [],
-      });
+      const params =
+        currentType === "model"
+          ? { id, block_ids: [], visibility: false }
+          : { id, visibility: false };
+      viewerStore.request(schema, params);
       currentId = undefined;
       currentType = undefined;
     }
