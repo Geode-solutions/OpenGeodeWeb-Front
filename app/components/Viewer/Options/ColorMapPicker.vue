@@ -13,8 +13,6 @@ const { max, min } = defineProps({
 
 const selectedPresetName = defineModel("selectedPresetName", { default: "Cool to Warm" });
 
-const emit = defineEmits([]);
-
 const menuOpen = ref(false);
 const lutCanvas = ref();
 
