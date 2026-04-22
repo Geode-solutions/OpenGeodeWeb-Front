@@ -18,9 +18,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const treeviewStore = useTreeviewStore();
 
-const currentView = computed(() =>
-  treeviewStore.opened_views.find((view) => view.id === viewId),
-);
+const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
 const opened = computed({
   get: () => currentView.value?.opened || [],
   set: (value) => treeviewStore.setOpened(viewId, value),
@@ -48,9 +46,7 @@ watch(
       return;
     }
     localItems.value = newItems.map((newCategory) => {
-      const existing = localItems.value.find(
-        (category) => category.id === newCategory.id,
-      );
+      const existing = localItems.value.find((category) => category.id === newCategory.id);
       if (existing) {
         existing.title = newCategory.title || newCategory.id;
         return existing;
@@ -117,9 +113,7 @@ async function performGlobalSearch(query) {
     category.children = byType[category.id] || [];
   }
 
-  const idsToOpen = Object.keys(byType).filter(
-    (type) => byType[type].length > 0,
-  );
+  const idsToOpen = Object.keys(byType).filter((type) => byType[type].length > 0);
   if (idsToOpen.length > 0) {
     opened.value = [...new Set([...opened.value, ...idsToOpen])];
   }
@@ -144,9 +138,7 @@ watch(opened, (newOpened, oldOpened) => {
   }
   const closed = oldOpened.filter((itemId) => !newOpened.includes(itemId));
   for (const itemId of closed) {
-    const category = localItems.value.find(
-      (existingCategory) => existingCategory.id === itemId,
-    );
+    const category = localItems.value.find((existingCategory) => existingCategory.id === itemId);
     if (category) {
       category.children = [];
       category.manualChildren = [];
@@ -194,9 +186,7 @@ function showContextMenu(event, item) {
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : viewId,
-    context_type: actualItem.category
-      ? "model_component"
-      : "model_component_type",
+    context_type: actualItem.category ? "model_component" : "model_component_type",
     modelId: viewId,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });
