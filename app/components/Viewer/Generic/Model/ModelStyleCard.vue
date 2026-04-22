@@ -38,7 +38,7 @@ const modelVisibility = computed({
 });
 
 const modelComponentTypeVisibility = computed({
-  get: () => selection.value.includes(componentType.value),
+  get: () => selection.value?.includes(componentType.value),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(
       modelId.value,
@@ -50,7 +50,7 @@ const modelComponentTypeVisibility = computed({
 });
 
 const componentVisibility = computed({
-  get: () => selection.value.includes(componentId.value),
+  get: () => selection.value?.includes(componentId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], newValue);
     hybridViewerStore.remoteRender();

@@ -44,10 +44,14 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
 function useModelSelection(modelId, dataStyleState) {
   return useObservable(
     liveQuery(async () => {
+      const id = unref(modelId);
+      if (!id) {
+        return [];
+      }
       const [allComponents, componentStyles, typeStyles] = await Promise.all([
-        database.model_components.where("id").equals(modelId).toArray(),
-        database.model_component_datastyle.where("id_model").equals(modelId).toArray(),
-        database.model_component_type_datastyle.where("id_model").equals(modelId).toArray(),
+        database.model_components.where("id").equals(id).toArray(),
+        database.model_component_datastyle.where("id_model").equals(id).toArray(),
+        database.model_component_type_datastyle.where("id_model").equals(id).toArray(),
       ]);
       if (allComponents.length === 0) {
         return [];
@@ -56,7 +60,7 @@ function useModelSelection(modelId, dataStyleState) {
         componentStyles.map((style) => [style.id_component, style]),
       );
       const typeStylesMap = Object.fromEntries(typeStyles.map((style) => [style.type, style]));
-      return buildSelection(modelId, allComponents, stylesMap, typeStylesMap, dataStyleState);
+      return buildSelection(id, allComponents, stylesMap, typeStylesMap, dataStyleState);
     }),
   );
 }
