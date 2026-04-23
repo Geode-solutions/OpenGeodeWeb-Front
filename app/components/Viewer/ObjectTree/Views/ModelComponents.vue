@@ -106,13 +106,13 @@ function handleHoverLeave() {
       @update:selected="onSelectionChange"
     >
       <template #title="{ item }">
-        <div @mouseenter="handleHoverEnter(item)" @mouseleave="handleHoverLeave(item)">
-          <ObjectTreeItemLabel
-            :item="item"
-            show-tooltip
-            @contextmenu="showContextMenu($event, item)"
-          />
-        </div>
+        <ObjectTreeItemLabel
+          :item="item"
+          show-tooltip
+          @mouseenter="handleHoverEnter(item)"
+          @mouseleave="handleHoverLeave(item)"
+          @contextmenu="showContextMenu($event, item)"
+        />
       </template>
     </v-treeview>
   </div>

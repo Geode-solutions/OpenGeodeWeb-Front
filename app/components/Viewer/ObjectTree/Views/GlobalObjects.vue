@@ -103,12 +103,12 @@ function handleHoverLeave(item) {
       items-registration="props"
     >
       <template #title="{ item }">
-        <div @mouseenter="handleHoverEnter(item)" @mouseleave="handleHoverLeave(item)">
-          <ObjectTreeItemLabel
-            :item="item"
-            @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
-          />
-        </div>
+        <ObjectTreeItemLabel
+          :item="item"
+          @mouseenter="handleHoverEnter(item)"
+          @mouseleave="handleHoverLeave(item)"
+          @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
+        />
       </template>
 
       <template #append="{ item }">
