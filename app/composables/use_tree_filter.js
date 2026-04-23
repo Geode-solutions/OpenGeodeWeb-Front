@@ -65,28 +65,6 @@ function useTreeFilter(rawItems, options = {}) {
     );
   });
 
-  const processedItemIds = computed(() => {
-    const ids = new Set();
-    for (const category of processedItems.value) {
-      for (const child of category.children || []) {
-        ids.add(child.id);
-      }
-    }
-    return ids;
-  });
-
-  const filteredItemIds = computed(() => {
-    const ids = new Set();
-    for (const category of processedItems.value) {
-      for (const child of category.children || []) {
-        if (!search.value || customFilter(child.id, search.value, { raw: child })) {
-          ids.add(child.id);
-        }
-      }
-    }
-    return ids;
-  });
-
   function toggleSort() {
     sortType.value = sortType.value === "name" ? "id" : "name";
   }
@@ -96,8 +74,6 @@ function useTreeFilter(rawItems, options = {}) {
     sortType,
     filterOptions,
     processedItems,
-    processedItemIds,
-    filteredItemIds,
     availableFilterOptions,
     toggleSort,
     customFilter,

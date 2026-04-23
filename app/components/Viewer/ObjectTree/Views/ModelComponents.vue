@@ -33,14 +33,20 @@ const {
   sortType,
   filterOptions,
   processedItems,
+  processedItemIds,
+  filteredItemIds,
   availableFilterOptions,
   toggleSort,
   customFilter,
 } = useTreeFilter(items);
 
-async function onSelectionChange(current) {
+async function onSelectionChange(newVal) {
   const previous = mesh_components_selection.value;
-  const { added, removed } = compareSelections(current, previous);
+  const prevVisibleSet = new Set(previous.filter((id) => filteredItemIds.value.has(id)));
+  const newValSet = new Set(newVal.filter((id) => filteredItemIds.value.has(id)));
+
+  const added = [...newValSet].filter((id) => !prevVisibleSet.has(id));
+  const removed = [...prevVisibleSet].filter((id) => !newValSet.has(id));
 
   if (added.length === 0 && removed.length === 0) {
     return;
@@ -54,6 +60,53 @@ async function onSelectionChange(current) {
   }
   hybridViewerStore.remoteRender();
 }
+
+const filterHiddenCache = new Map();
+
+watch(filteredItemIds, async (newFiltered, oldFiltered) => {
+  const prev = oldFiltered ?? new Set();
+  const selectionSet = new Set(mesh_components_selection.value);
+
+  const nowHidden = [...prev].filter((id) => !newFiltered.has(id));
+  const nowShown = [...newFiltered].filter((id) => !prev.has(id));
+
+  if (nowHidden.length === 0 && nowShown.length === 0) {
+    return;
+  }
+
+  for (const id of nowHidden) {
+    filterHiddenCache.set(id, selectionSet.has(id));
+  }
+
+  const toShow = [];
+  const toHide = [];
+  for (const id of nowShown) {
+    const wasVisible = filterHiddenCache.has(id) ? filterHiddenCache.get(id) : selectionSet.has(id);
+    filterHiddenCache.delete(id);
+    if (wasVisible) {
+      toShow.push(id);
+    } else {
+      toHide.push(id);
+    }
+  }
+
+  const actualToHide = nowHidden.filter((id) => selectionSet.has(id));
+
+  const promises = [];
+  if (actualToHide.length > 0) {
+    promises.push(dataStyleStore.setModelComponentsVisibility(viewId, actualToHide, false));
+  }
+  if (toShow.length > 0) {
+    promises.push(dataStyleStore.setModelComponentsVisibility(viewId, toShow, true));
+  }
+  if (toHide.length > 0) {
+    promises.push(dataStyleStore.setModelComponentsVisibility(viewId, toHide, false));
+  }
+  if (promises.length > 0) {
+    await Promise.all(promises);
+    hybridViewerStore.remoteRender();
+  }
+});
 
 function showContextMenu(event, item) {
   const actualItem = item.raw || item;
@@ -100,9 +153,8 @@ function handleHoverLeave() {
       :custom-filter="customFilter"
       class="transparent-treeview"
       item-value="id"
-      select-strategy="independent"
+      select-strategy="classic"
       selectable
-      items-registration="props"
       @update:selected="onSelectionChange"
     >
       <template #title="{ item }">
