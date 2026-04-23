@@ -2,6 +2,7 @@
 import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
+import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/SizeSlider";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -100,6 +101,7 @@ const edge_attribute_color_map = computed({
           <v-col justify="center">
             <v-slider v-model="size" hide-details min="0" max="20" step="2" />
           </v-col>
+          <ViewerOptionsSizeSlider v-model="size" />
         </v-row>
         <v-row>
           <v-col>
