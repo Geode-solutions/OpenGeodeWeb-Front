@@ -48,7 +48,7 @@ watch(
   { immediate: true },
 );
 
-watch(maxWidth, (newMax) => {
+watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
   const hasAdditional = additionalViews.value.length > 0;
   const gap = hasAdditional ? GAP_WIDTH : 0;
   const total =

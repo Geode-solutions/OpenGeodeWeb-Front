@@ -1,34 +1,48 @@
 <script setup>
-const { item, showTooltip } = defineProps({
+const { item, isLeaf = undefined } = defineProps({
   item: { type: Object, required: true },
-  showTooltip: { type: Boolean, default: false },
+  isLeaf: { type: Boolean },
 });
 
 const emit = defineEmits(["contextmenu"]);
 
 const actualItem = computed(() => item.raw || item);
+
+const tooltipDisabled = computed(() => {
+  if (isLeaf !== undefined) {
+    return !isLeaf;
+  }
+  return actualItem.value.children && actualItem.value.children.length > 0;
+});
 </script>
 
 <template>
-  <span
-    class="tree-item-label"
-    :class="{ 'inactive-item': actualItem.is_active === false }"
-    @contextmenu.prevent.stop="emit('contextmenu', $event)"
-  >
-    {{ actualItem.title }}
-    <v-tooltip v-if="showTooltip && actualItem.category" activator="parent" location="right">
-      <div class="d-flex flex-column pa-1">
-        <span class="text-caption"><strong>ID:</strong> {{ actualItem.id }}</span>
-        <span v-if="actualItem.title" class="text-caption"
-          ><strong>Name:</strong> {{ actualItem.title }}</span
-        >
-        <span class="text-caption font-italic border-t-sm d-flex align-center">
-          <strong class="mr-1">Status:</strong>
-          {{ actualItem.is_active ? "Active" : "Inactive" }}
-        </span>
-      </div>
-    </v-tooltip>
-  </span>
+  <v-tooltip :disabled="tooltipDisabled" location="right" open-delay="400">
+    <template #activator="{ props }">
+      <span
+        v-bind="props"
+        class="tree-item-label"
+        :class="{ 'inactive-item': actualItem.is_active === false }"
+        title=""
+        @contextmenu.prevent.stop="emit('contextmenu', $event)"
+      >
+        {{ actualItem.title }}
+      </span>
+    </template>
+
+    <div class="d-flex flex-column ga-1">
+      <span class="text-caption">
+        <strong class="text-white">ID:</strong> {{ actualItem.id }}
+      </span>
+      <span v-if="actualItem.title" class="text-caption">
+        <strong class="text-white">Name:</strong> {{ actualItem.title }}
+      </span>
+      <span class="text-caption">
+        <strong class="text-white">Status:</strong>
+        <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
+      </span>
+    </div>
+  </v-tooltip>
 </template>
 
 <style scoped>

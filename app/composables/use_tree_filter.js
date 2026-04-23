@@ -79,4 +79,4 @@ function useTreeFilter(rawItems, options = {}) {
   };
 }
 
-export { customFilter, useTreeFilter };
+export { customFilter, useTreeFilter, sortAndFormatItems };

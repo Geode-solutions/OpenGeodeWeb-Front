@@ -1,4 +1,5 @@
 <script setup>
+import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
@@ -27,7 +28,10 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
-} = useTreeFilter(toRef(() => treeviewStore.items));
+} = useTreeFilter(
+  toRef(() => treeviewStore.items),
+  { recursiveSort: true },
+);
 
 watch(
   () => treeviewStore.selection,
@@ -40,7 +44,9 @@ watch(
     const { added, removed } = compareSelections(current, previous);
 
     const allObjectIds = new Set(
-      treeviewStore.items.flatMap((group) => group.children.map((child) => child.id)),
+      treeviewStore.items.flatMap((group) =>
+        group.children.map((child) => child.id),
+      ),
     );
 
     const updates = [
@@ -59,7 +65,8 @@ watch(
 function isModel(item) {
   const actualItem = item.raw || item;
   return (
-    actualItem.viewer_type === "model" || ["BRep", "Section"].includes(actualItem.geode_object_type)
+    actualItem.viewer_type === "model" ||
+    ["BRep", "Section"].includes(actualItem.geode_object_type)
   );
 }
 </script>
@@ -74,21 +81,19 @@ function isModel(item) {
       @toggle-sort="toggleSort"
     />
 
-    <v-treeview
+    <CommonTreeView
       v-model:selected="treeviewStore.selection"
       v-model:opened="opened"
       :items="processedItems"
       :search="search"
       :custom-filter="customFilter"
-      class="transparent-treeview"
-      item-value="id"
-      select-strategy="classic"
-      selectable
-      items-registration="props"
+      :selection="{ selectable: true }"
+      class="transparent-treeview virtual-tree-height"
     >
-      <template #title="{ item }">
+      <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item"
+          :is-leaf="isLeaf"
           @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
         />
       </template>
@@ -102,11 +107,15 @@ function isModel(item) {
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
-            treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type)
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+            )
           "
         />
       </template>
-    </v-treeview>
+    </CommonTreeView>
   </div>
 </template>
 

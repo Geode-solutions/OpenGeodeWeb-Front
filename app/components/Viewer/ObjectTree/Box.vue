@@ -8,7 +8,6 @@ const { title, closable, icon, mdiIcon, scrollTop } = defineProps({
   mdiIcon: { type: String, default: "" },
   scrollTop: { type: Number, default: 0 },
 });
-
 const emit = defineEmits(["close", "dragstart", "update:scrollTop"]);
 
 const scrollContainer = ref(undefined);
@@ -86,10 +85,20 @@ watch(
         style="filter: brightness(0); display: flex; align-items: center"
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2"
+        >mdi-drag-variant</v-icon
+      >
       <span
         class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
-        style="height: 24px; line-height: 1"
+        style="
+          height: 24px;
+          line-height: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          flex-shrink: 1;
+          min-width: 0;
+        "
       >
         {{ title }}
       </span>
@@ -106,7 +115,7 @@ watch(
     <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column">
       <div
         ref="scrollContainer"
-        class="flex-grow-1 overflow-y-auto overflow-x-hidden"
+        class="flex-grow-1 overflow-y-hidden overflow-x-hidden"
         @scroll="handleScroll"
       >
         <slot />

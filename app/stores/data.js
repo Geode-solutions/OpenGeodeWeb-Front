@@ -86,6 +86,18 @@ export const useDataStore = defineStore("data", () => {
     }));
   }
 
+  async function fetchAllMeshComponents(modelId) {
+    const components = await getAllMeshComponents(modelId);
+    const byType = {};
+    for (const component of components) {
+      if (!byType[component.category]) {
+        byType[component.category] = [];
+      }
+      byType[component.category].push(component);
+    }
+    return byType;
+  }
+
   function refFormatedMeshComponents(modelId) {
     return useObservable(
       liveQuery(() => formatedMeshComponents(modelId)),
@@ -224,6 +236,14 @@ export const useDataStore = defineStore("data", () => {
     return await getMeshComponentGeodeIds(modelId, "Block");
   }
 
+  async function getMeshComponentGeodeIds(modelId, type) {
+    const components = await database.model_components
+      .where("[id+type]")
+      .equals([modelId, type])
+      .toArray();
+    return components.map((component) => component.geode_id);
+  }
+
   async function getMeshComponentsViewerIds(modelId, meshComponentGeodeIds) {
     const components = await database.model_components
       .where("[id+geode_id]")
@@ -272,5 +292,6 @@ export const useDataStore = defineStore("data", () => {
     exportStores,
     importStores,
     clear,
+    fetchAllMeshComponents,
   };
 });
