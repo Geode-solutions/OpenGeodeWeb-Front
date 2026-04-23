@@ -83,13 +83,11 @@ function handleHoverEnter(item) {
   
   onHoverEnter(
     actualItem.id,
-    async () => {
-      if (is_model) {
-        return await dataStore.getAllModelComponentsViewerIds(actualItem.id);
-      }
-      return [];
-    },
-    is_model ? "model" : "mesh"
+    async () =>
+      is_model
+        ? await dataStore.getAllModelComponentsViewerIds(actualItem.id)
+        : [],
+    is_model ? "model" : "mesh",
   );
 }
 
