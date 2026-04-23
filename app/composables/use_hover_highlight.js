@@ -9,7 +9,7 @@ export function useHoverhighlight() {
   let currentId = undefined;
   let currentType = undefined;
 
-  function onHoverEnter(id, block_ids, type = "model") {
+  function onHoverEnter(id, block_ids = [], type = "model") {
     if (timer) {
       clearTimeout(timer);
     }
@@ -20,7 +20,7 @@ export function useHoverhighlight() {
       const params = {
         id,
         visibility: true,
-        ...(type === "model" ? { block_ids } : {}),
+        ...(type === "model" && { block_ids }),
       };
       await viewerStore.request(schema, params);
     }, HOVER_DELAY);
@@ -36,7 +36,7 @@ export function useHoverhighlight() {
       const params = {
         id,
         visibility: false,
-        ...(currentType === "model" ? { block_ids: [] } : {}),
+        ...(currentType === "model" && { block_ids: [] }),
       };
       viewerStore.request(schema, params);
       currentId = undefined;

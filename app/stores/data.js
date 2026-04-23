@@ -207,6 +207,11 @@ export const useDataStore = defineStore("data", () => {
     return await getMeshComponentGeodeIds(modelId, "Block");
   }
 
+  async function getAllModelComponentsViewerIds(modelId) {
+    const components = await database.model_components.where("id").equals(modelId).toArray();
+    return components.map((component) => Number.parseInt(component.viewer_id, 10));
+  }
+
   async function getMeshComponentsViewerIds(modelId, meshComponentGeodeIds) {
     const components = await database.model_components
       .where("[id+geode_id]")
@@ -246,6 +251,7 @@ export const useDataStore = defineStore("data", () => {
     getLinesGeodeIds,
     getSurfacesGeodeIds,
     getBlocksGeodeIds,
+    getAllModelComponentsViewerIds,
     getMeshComponentGeodeIds,
     getMeshComponentsViewerIds,
     getComponentByViewerId,
