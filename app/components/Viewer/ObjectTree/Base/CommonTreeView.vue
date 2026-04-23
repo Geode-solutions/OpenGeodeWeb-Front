@@ -24,12 +24,7 @@ const {
   scrollTop: { type: Number },
 });
 
-const emit = defineEmits([
-  "update:opened",
-  "update:selected",
-  "click:item",
-  "update:scrollTop",
-]);
+const emit = defineEmits(["update:opened", "update:selected", "click:item", "update:scrollTop"]);
 
 const {
   actualItemProps,
