@@ -175,7 +175,6 @@ const { virtualScrollRef, stickyHeader, handleScroll } = useTreeScroll(
       </v-list-item>
     </template>
   </v-virtual-scroll>
-  >>>>>>> 647292f4e76a9b31369fd306ad3c5d2ee54c21aa
 </template>
 
 <style scoped>
