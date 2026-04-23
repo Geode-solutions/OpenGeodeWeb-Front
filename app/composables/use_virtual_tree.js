@@ -47,8 +47,7 @@ export function useVirtualTree(props, emit) {
     if (actualSelection.value.strategy === "classic") {
       const childrenIds = getAllChildrenIds(item);
       return (
-        childrenIds.length > 0 &&
-        childrenIds.every((childId) => selectedSet.value.has(childId))
+        childrenIds.length > 0 && childrenIds.every((childId) => selectedSet.value.has(childId))
       );
     }
     return false;
@@ -63,13 +62,8 @@ export function useVirtualTree(props, emit) {
       return false;
     }
 
-    const selectedChildren = childrenIds.filter((childId) =>
-      selectedSet.value.has(childId),
-    );
-    return (
-      selectedChildren.length > 0 &&
-      selectedChildren.length < childrenIds.length
-    );
+    const selectedChildren = childrenIds.filter((childId) => selectedSet.value.has(childId));
+    return selectedChildren.length > 0 && selectedChildren.length < childrenIds.length;
   }
 
   function toggleSelect(item) {

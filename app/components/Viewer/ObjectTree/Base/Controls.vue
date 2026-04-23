@@ -2,14 +2,12 @@
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 
-const { search, sortType, filterOptions, availableFilterOptions } = defineProps(
-  {
-    search: { type: String, required: true },
-    sortType: { type: String, required: true },
-    filterOptions: { type: Object, required: true },
-    availableFilterOptions: { type: Array, required: true },
-  },
-);
+const { search, sortType, filterOptions, availableFilterOptions } = defineProps({
+  search: { type: String, required: true },
+  sortType: { type: String, required: true },
+  filterOptions: { type: Object, required: true },
+  availableFilterOptions: { type: Array, required: true },
+});
 
 const emit = defineEmits(["update:search", "toggle-sort", "collapse-all"]);
 </script>
@@ -29,9 +27,7 @@ const emit = defineEmits(["update:search", "toggle-sort", "collapse-all"]);
       <ActionButton
         :tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
         :icon="
-          sortType === 'name'
-            ? 'mdi-sort-alphabetical-ascending'
-            : 'mdi-sort-numeric-ascending'
+          sortType === 'name' ? 'mdi-sort-alphabetical-ascending' : 'mdi-sort-numeric-ascending'
         "
         tooltipLocation="bottom"
         @click="emit('toggle-sort')"
@@ -47,10 +43,7 @@ const emit = defineEmits(["update:search", "toggle-sort", "collapse-all"]);
           />
         </template>
         <v-list class="mt-1">
-          <v-list-item
-            v-for="category_id in availableFilterOptions"
-            :key="category_id"
-          >
+          <v-list-item v-for="category_id in availableFilterOptions" :key="category_id">
             <v-checkbox
               v-model="filterOptions[category_id]"
               :label="category_id"

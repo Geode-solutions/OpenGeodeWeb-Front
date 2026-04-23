@@ -30,10 +30,7 @@ export function useTreeScroll(scrollTopGetter, emit, displayItems, actualItemPro
     const itemHeight = actualItemProps.value.height || DEFAULT_ITEM_HEIGHT;
     const firstVisibleIndex = Math.floor(internalScrollTop.value / itemHeight);
 
-    if (
-      firstVisibleIndex < 0 ||
-      firstVisibleIndex >= displayItems.value.length
-    ) {
+    if (firstVisibleIndex < 0 || firstVisibleIndex >= displayItems.value.length) {
       return undefined;
     }
 
@@ -50,12 +47,7 @@ export function useTreeScroll(scrollTopGetter, emit, displayItems, actualItemPro
       if (item && !item.isLeaf && item.depth < firstVisibleDepth) {
         return item;
       }
-      if (
-        item &&
-        item.depth === 0 &&
-        !item.isLeaf &&
-        current < firstVisibleIndex
-      ) {
+      if (item && item.depth === 0 && !item.isLeaf && current < firstVisibleIndex) {
         return item;
       }
       current -= 1;

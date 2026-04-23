@@ -17,7 +17,7 @@ export function useHoverhighlight() {
     timer = setTimeout(async () => {
       currentId = id;
       currentType = type;
-      
+
       let block_ids = [];
       if (typeof block_ids_provider === "function") {
         block_ids = await block_ids_provider();
