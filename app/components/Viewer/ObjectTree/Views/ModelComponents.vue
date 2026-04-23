@@ -1,11 +1,14 @@
 <script setup>
-import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/use_tree_filter";
+import {
+  sortAndFormatItems,
+  useTreeFilter,
+} from "@ogw_front/composables/use_tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import { useModelComponents } from "@ogw_front/composables/use_model_components";
 import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
+import { useModelComponents } from "@ogw_front/composables/use_model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id: viewId } = defineProps({ id: { type: String, required: true } });
@@ -21,7 +24,9 @@ const {
   updateVisibility,
 } = useModelComponents(viewId);
 
-const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
+const currentView = computed(() =>
+  treeviewStore.opened_views.find((view) => view.id === viewId),
+);
 
 const opened = computed({
   get: () => currentView.value?.opened || [],
@@ -66,7 +71,10 @@ const itemsForTreeView = computed(() => {
         item[key] = category[key];
       }
     }
-    item.children = sortAndFormatItems(componentsCache.value?.[category.id], sortType.value);
+    item.children = sortAndFormatItems(
+      componentsCache.value?.[category.id],
+      sortType.value,
+    );
     return item;
   });
 });
@@ -76,7 +84,9 @@ function showContextMenu(event, item) {
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : viewId,
-    context_type: actualItem.category ? "model_component" : "model_component_type",
+    context_type: actualItem.category
+      ? "model_component"
+      : "model_component_type",
     modelId: viewId,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });
@@ -84,24 +94,27 @@ function showContextMenu(event, item) {
 
 function handleHoverEnter(item) {
   const actualItem = item.raw || item;
-  
-  // Sécurité : on ne highlight que si c'est un composant (qui a une category) ou si on veut highlight tout le type
-  // Mais ici, pour éviter les exceptions, on ne highlight que les composants individuels 
-  // ou on s'assure que viewer_id existe.
-  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
+
+  if (
+    !actualItem.category &&
+    (!actualItem.children || actualItem.children.length === 0)
+  ) {
     return;
   }
 
-  onHoverEnter(viewId, () => {
-    return actualItem.category
+  onHoverEnter(viewId, () =>
+    actualItem.category
       ? [actualItem.viewer_id]
-      : actualItem.children?.map((child) => child.viewer_id) || [];
-  });
+      : actualItem.children?.map((child) => child.viewer_id) || [],
+  );
 }
 
 function handleHoverLeave(item) {
   const actualItem = item.raw || item;
-  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
+  if (
+    !actualItem.category &&
+    (!actualItem.children || actualItem.children.length === 0)
+  ) {
     return;
   }
   onHoverLeave(viewId);

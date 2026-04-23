@@ -16,13 +16,24 @@ const scrollContainer = ref(undefined);
 const treeviewBox = useTemplateRef("treeview-box");
 const hybridViewerStore = useHybridViewerStore();
 
+const LUMINANCE_THRESHOLD = 0.7;
+const ADAPTIVE_EXPONENT = 1.4;
+
+const MIN_BLUR = 1;
+const MAX_BLUR = 20;
+
+const MIN_OPACITY = 0.05;
+const MAX_OPACITY = 0.5;
+
+const MIN_BOOST = 1;
+const MAX_BOOST = 1.7;
+
 const { x, y, width, height } = useElementBounding(treeviewBox);
-const brightness = ref(0.7);
+const brightness = ref(LUMINANCE_THRESHOLD);
 
 let isApplyingScroll = false;
 let resizeObserver = undefined;
 
-// Capteur de luminosité "Smart"
 watch(
   [x, y, width, height, () => hybridViewerStore.latestImage],
   () => {
@@ -36,18 +47,13 @@ watch(
   { immediate: true },
 );
 
-// Calcul des paramètres visuels adaptatifs
 const adaptiveStyles = computed(() => {
-  // Mapping : si le fond est le gris clair par défaut (0.7), darkFactor = 0.
-  //           si le fond est noir (0.0), darkFactor = 1.
-  const normalized = Math.min(1, brightness.value / 0.7);
-  const darkFactor = Math.pow(1 - normalized, 2);
+  const normalized = Math.min(1, brightness.value / LUMINANCE_THRESHOLD);
+  const darkFactor = (1 - normalized) ** ADAPTIVE_EXPONENT;
 
-  // Focus Crystal : flou et opacité quasi-nuls sur fond clair (transparent),
-  // mais remontent fort sur le noir pour garantir la lisibilité du texte.
-  const blur = 1 + darkFactor * 19; // de 1px à 20px
-  const opacity = 0.02 + darkFactor * 0.6; // de 2% à 62%
-  const brightnessBoost = 1 + darkFactor * 0.5; // boost la lumière derrière de 1.0 à 1.5
+  const blur = MIN_BLUR + darkFactor * (MAX_BLUR - MIN_BLUR);
+  const opacity = MIN_OPACITY + darkFactor * (MAX_OPACITY - MIN_OPACITY);
+  const brightnessBoost = MIN_BOOST + darkFactor * (MAX_BOOST - MIN_BOOST);
 
   return {
     "--adaptive-blur": `${blur}px`,
@@ -194,7 +200,6 @@ watch(
   content: "";
   position: absolute;
   inset: 0;
-  /* L'opacité et le flou sont pilotés dynamiquement par le JS */
   background: rgba(255, 255, 255, var(--adaptive-opacity));
   backdrop-filter: blur(var(--adaptive-blur))
     brightness(var(--adaptive-brightness));
@@ -202,6 +207,7 @@ watch(
     brightness(var(--adaptive-brightness));
   z-index: 0;
   pointer-events: none;
+  border-radius: inherit;
   transition:
     background-color 0.3s ease,
     backdrop-filter 0.3s ease;

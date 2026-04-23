@@ -253,9 +253,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const relW = width * scaleX;
     const relH = height * scaleY;
 
-    // On dessine la zone d'intérêt en 1x1 pixel pour obtenir la moyenne direct
-    offscreenCanvas.width = 1;
-    offscreenCanvas.height = 1;
+    // On échantillonne une grille de 10x10 (100 points) pour ne rien rater
+    offscreenCanvas.width = 10;
+    offscreenCanvas.height = 10;
     try {
       offscreenCtx.drawImage(
         latestImage.value,
@@ -265,11 +265,19 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         Math.min(latestImage.value.height, relH),
         0,
         0,
-        1,
-        1,
+        10,
+        10,
       );
-      const data = offscreenCtx.getImageData(0, 0, 1, 1).data;
-      return (data[0] + data[1] + data[2]) / (3 * RGB_MAX);
+      // data contient 100 pixels * 4 (RGBA) = 400 bytes
+      const data = offscreenCtx.getImageData(0, 0, 10, 10).data;
+      
+      let minBrightness = 1.0;
+      for (let i = 0; i < 400; i += 4) {
+        const b = (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
+        if (b < minBrightness) minBrightness = b;
+      }
+      
+      return minBrightness;
     } catch (e) {
       return BACKGROUND_GREY_VALUE / RGB_MAX;
     }
