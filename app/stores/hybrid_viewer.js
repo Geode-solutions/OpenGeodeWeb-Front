@@ -270,13 +270,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       );
       // data contient 100 pixels * 4 (RGBA) = 400 bytes
       const data = offscreenCtx.getImageData(0, 0, 10, 10).data;
-      
+
       let minBrightness = 1.0;
       for (let i = 0; i < 400; i += 4) {
         const b = (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
         if (b < minBrightness) minBrightness = b;
       }
-      
+
       return minBrightness;
     } catch (e) {
       return BACKGROUND_GREY_VALUE / RGB_MAX;
