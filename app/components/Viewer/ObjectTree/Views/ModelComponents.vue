@@ -84,9 +84,9 @@ function showContextMenu(event, item) {
 
 function handleHoverEnter(item) {
   const actualItem = item.raw || item;
-  
+
   // Sécurité : on ne highlight que si c'est un composant (qui a une category) ou si on veut highlight tout le type
-  // Mais ici, pour éviter les exceptions, on ne highlight que les composants individuels 
+  // Mais ici, pour éviter les exceptions, on ne highlight que les composants individuels
   // ou on s'assure que viewer_id existe.
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
     return;
