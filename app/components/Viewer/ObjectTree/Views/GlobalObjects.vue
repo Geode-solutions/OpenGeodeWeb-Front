@@ -24,18 +24,23 @@ const {
   sortType,
   filterOptions,
   processedItems,
-  filteredIds,
+  processedItemIds,
+  filteredItemIds,
   availableFilterOptions,
   toggleSort,
   customFilter,
 } = useTreeFilter(toRef(() => treeviewStore.items));
 
-const actuallyVisibleIds = computed(() => {
-  return treeviewStore.selection.filter((id) => filteredIds.value.has(id));
+const treeviewSelection = computed({
+  get: () => treeviewStore.selection.filter((id) => processedItemIds.value.has(id)),
+  set: (newVal) => {
+    const hiddenSelected = treeviewStore.selection.filter((id) => !processedItemIds.value.has(id));
+    treeviewStore.selection = [...newVal, ...hiddenSelected];
+  },
 });
 
 watch(
-  actuallyVisibleIds,
+  () => treeviewStore.selection,
   async (current, previous) => {
     const oldSelection = previous || [];
     if (current === oldSelection) {
@@ -50,7 +55,7 @@ watch(
 
     const updates = [
       ...added
-        .filter((id) => allObjectIds.has(id))
+        .filter((id) => allObjectIds.has(id) && filteredItemIds.value.has(id))
         .map((id) => dataStyleStore.setVisibility(id, true)),
       ...removed
         .filter((id) => allObjectIds.has(id))
@@ -60,6 +65,23 @@ watch(
     hybridViewerStore.remoteRender();
   },
 );
+
+watch(filteredItemIds, async (newFiltered, oldFiltered) => {
+  const prev = oldFiltered ?? new Set();
+  const selectionSet = new Set(treeviewStore.selection);
+
+  const toHide = [...prev].filter((id) => !newFiltered.has(id) && selectionSet.has(id));
+  const toShow = [...newFiltered].filter((id) => !prev.has(id) && selectionSet.has(id));
+
+  if (toHide.length === 0 && toShow.length === 0) {
+    return;
+  }
+  await Promise.all([
+    ...toHide.map((id) => dataStyleStore.setVisibility(id, false)),
+    ...toShow.map((id) => dataStyleStore.setVisibility(id, true)),
+  ]);
+  hybridViewerStore.remoteRender();
+});
 
 function isModel(item) {
   const actualItem = item.raw || item;
@@ -80,7 +102,7 @@ function isModel(item) {
     />
 
     <v-treeview
-      v-model:selected="treeviewStore.selection"
+      v-model:selected="treeviewSelection"
       v-model:opened="opened"
       :items="processedItems"
       :search="search"
