@@ -69,9 +69,10 @@ function isModel(item) {
 
 async function handleHoverEnter(item) {
   const actualItem = item.raw || item;
+  const is_model = isModel(item);
+  const type = is_model ? "model" : "mesh";
   let block_ids = [];
-  const type = isModel(item) ? "model" : "mesh";
-  if (isModel(item)) {
+  if (is_model) {
     const [cornerIds, lineIds, surfaceIds, blockIds] = await Promise.all([
       dataStore.getCornersGeodeIds(actualItem.id),
       dataStore.getLinesGeodeIds(actualItem.id),
@@ -80,10 +81,8 @@ async function handleHoverEnter(item) {
     ]);
     const allGeodeIds = [...cornerIds, ...lineIds, ...surfaceIds, ...blockIds];
     block_ids = await dataStore.getMeshComponentsViewerIds(actualItem.id, allGeodeIds);
-  } else {
-    block_ids = [0];
   }
-  onHoverEnter(actualItem.id, block_ids, type);
+  onHoverEnter(actualItem.id, is_model ? block_ids : undefined, type);
 }
 
 function handleHoverLeave(item) {

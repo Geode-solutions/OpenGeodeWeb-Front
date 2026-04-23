@@ -68,12 +68,9 @@ function showContextMenu(event, item) {
 
 function handleHoverEnter(item) {
   const actualItem = item.raw || item;
-  let block_ids = [];
-  if (actualItem.category) {
-    block_ids = [actualItem.viewer_id];
-  } else if (actualItem.children) {
-    block_ids = actualItem.children.map((child) => child.viewer_id);
-  }
+  const block_ids = actualItem.category
+    ? [actualItem.viewer_id]
+    : actualItem.children?.map((child) => child.viewer_id) || [];
   onHoverEnter(viewId, block_ids);
 }
 
