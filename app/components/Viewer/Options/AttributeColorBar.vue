@@ -10,7 +10,7 @@ const colorMap = defineModel("colorMap", { type: String });
 
 <template>
   <div class="attribute-colorbar mt-3">
-    <ColorMapPicker v-model="colorMap" :min="minimum" :max="maximum" />
+    <ColorMapPicker v-model:selected-preset-name="colorMap" :min="minimum" :max="maximum" />
     <v-row dense align="center" class="mt-2">
       <v-col cols="5">
         <v-text-field
