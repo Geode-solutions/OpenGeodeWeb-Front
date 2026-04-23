@@ -37,6 +37,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   let viewStream = undefined;
   const gridActor = undefined;
 
+  const latestImage = ref(null);
+  const offscreenCanvas = typeof document !== "undefined" ? document.createElement("canvas") : null;
+  const offscreenCtx = offscreenCanvas
+    ? offscreenCanvas.getContext("2d", { willReadFrequently: true })
+    : null;
+
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
       return;
@@ -58,6 +64,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       if (is_moving.value) {
         return;
       }
+      latestImage.value = event.image;
       webGLRenderWindow.setBackgroundImage(event.image);
       imageStyle.opacity = 1;
     });
@@ -223,6 +230,51 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender();
   }
 
+  function getAverageBrightness(rect) {
+    if (!latestImage.value || !offscreenCtx) {
+      return BACKGROUND_GREY_VALUE / RGB_MAX;
+    }
+
+    const { x, y, width, height } = rect;
+    const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
+    const canvas = webGLRenderWindow.getCanvas();
+    if (!canvas) {
+      return BACKGROUND_GREY_VALUE / RGB_MAX;
+    }
+
+    const canvasRect = canvas.getBoundingClientRect();
+
+    // Mapping des coordonnées fenêtre vers les coordonnées de l'image VTK
+    const scaleX = latestImage.value.width / canvasRect.width;
+    const scaleY = latestImage.value.height / canvasRect.height;
+
+    const relX = (x - canvasRect.left) * scaleX;
+    const relY = (y - canvasRect.top) * scaleY;
+    const relW = width * scaleX;
+    const relH = height * scaleY;
+
+    // On dessine la zone d'intérêt en 1x1 pixel pour obtenir la moyenne direct
+    offscreenCanvas.width = 1;
+    offscreenCanvas.height = 1;
+    try {
+      offscreenCtx.drawImage(
+        latestImage.value,
+        Math.max(0, relX),
+        Math.max(0, relY),
+        Math.min(latestImage.value.width, relW),
+        Math.min(latestImage.value.height, relH),
+        0,
+        0,
+        1,
+        1,
+      );
+      const data = offscreenCtx.getImageData(0, 0, 1, 1).data;
+      return (data[0] + data[1] + data[2]) / (3 * RGB_MAX);
+    } catch (e) {
+      return BACKGROUND_GREY_VALUE / RGB_MAX;
+    }
+  }
+
   function exportStores() {
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
@@ -316,5 +368,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     clear,
     exportStores,
     importStores,
+    latestImage,
+    getAverageBrightness,
   };
 });
