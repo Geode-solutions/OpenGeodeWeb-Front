@@ -144,8 +144,6 @@ function handleHoverLeave(item) {
       @update:selected="updateVisibility"
       @click:item="updateVisibility([$event.id, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(viewId, $event)"
-      @item:mouseenter="handleHoverEnter"
-      @item:mouseleave="handleHoverLeave"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -154,6 +152,8 @@ function handleHoverLeave(item) {
           show-tooltip
           class="text-body-1"
           @contextmenu.prevent.stop="showContextMenu($event, item)"
+          @mouseenter="handleHoverEnter(item)"
+          @mouseleave="handleHoverLeave(item)"
         />
       </template>
     </CommonTreeView>

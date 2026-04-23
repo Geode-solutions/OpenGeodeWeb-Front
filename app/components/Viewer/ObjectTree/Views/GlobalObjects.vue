@@ -121,14 +121,14 @@ function handleHoverLeave(item) {
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
-      @item:mouseenter="handleHoverEnter"
-      @item:mouseleave="handleHoverLeave"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item"
           :is-leaf="isLeaf"
           @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
+          @mouseenter="handleHoverEnter(item)"
+          @mouseleave="handleHoverLeave(item)"
         />
       </template>
 

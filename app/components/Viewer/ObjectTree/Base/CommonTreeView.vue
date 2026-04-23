@@ -29,8 +29,6 @@ const emit = defineEmits([
   "update:selected",
   "click:item",
   "update:scrollTop",
-  "item:mouseenter",
-  "item:mouseleave",
 ]);
 
 const {
@@ -73,8 +71,6 @@ const { virtualScrollRef, stickyHeader, handleScroll } = useTreeScroll(
       :get-indeterminate="getIndeterminate"
       @toggle-open="toggleOpen"
       @toggle-select="toggleSelect"
-      @mouseenter="emit('item:mouseenter', stickyHeader)"
-      @mouseleave="emit('item:mouseleave', stickyHeader)"
     >
       <template #title="slotProps">
         <slot name="title" v-bind="slotProps" />
@@ -92,8 +88,6 @@ const { virtualScrollRef, stickyHeader, handleScroll } = useTreeScroll(
         <v-list-item
           :class="['tree-row-wrapper', { 'leaf-row': item.isLeaf }]"
           class="pa-0"
-          @mouseenter="emit('item:mouseenter', item)"
-          @mouseleave="emit('item:mouseleave', item)"
           @click="
             if (item.isLeaf) {
               toggleSelect(item.raw);

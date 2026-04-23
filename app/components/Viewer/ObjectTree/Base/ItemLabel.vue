@@ -4,7 +4,7 @@ const { item, isLeaf = undefined } = defineProps({
   isLeaf: { type: Boolean },
 });
 
-const emit = defineEmits(["contextmenu"]);
+const emit = defineEmits(["contextmenu", "mouseenter", "mouseleave"]);
 
 const actualItem = computed(() => item.raw || item);
 
@@ -26,6 +26,8 @@ const tooltipDisabled = computed(() => {
           :class="{ 'inactive-item': actualItem.is_active === false }"
           title=""
           @contextmenu.prevent.stop="emit('contextmenu', $event)"
+          @mouseenter="emit('mouseenter')"
+          @mouseleave="emit('mouseleave')"
         >
           {{ actualItem.title }}
         </span>
