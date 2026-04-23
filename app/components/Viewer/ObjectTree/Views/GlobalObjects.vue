@@ -70,7 +70,10 @@ function isModel(item) {
 async function handleHoverEnter(item) {
   const actualItem = item.raw || item;
   const is_model = isModel(item);
-  const block_ids = is_model ? await dataStore.getAllModelComponentsViewerIds(actualItem.id) : [];
+  let block_ids = [];
+  if (is_model) {
+    block_ids = await dataStore.getAllModelComponentsViewerIds(actualItem.id);
+  }
   onHoverEnter(actualItem.id, block_ids, is_model ? "model" : "mesh");
 }
 
