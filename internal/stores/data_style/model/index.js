@@ -31,8 +31,8 @@ function useModelStyle() {
   const modelColorStyle = useModelColorStyle(componentStyleFunctions);
   const modelVisibilityStyle = useModelVisibilityStyle(componentStyleFunctions);
 
-  function visibleMeshComponents(id_ref) {
-    return useModelSelection(id_ref, dataStyleState);
+  function visibleMeshComponents(modelId) {
+    return useModelSelection(modelId, dataStyleState);
   }
 
   function applyModelStyle(modelId) {

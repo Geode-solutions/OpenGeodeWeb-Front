@@ -17,35 +17,45 @@ const tooltipDisabled = computed(() => {
 </script>
 
 <template>
-  <v-tooltip :disabled="tooltipDisabled" location="right" open-delay="400">
-    <template #activator="{ props }">
-      <span
-        v-bind="props"
-        class="tree-item-label"
-        :class="{ 'inactive-item': actualItem.is_active === false }"
-        title=""
-        @contextmenu.prevent.stop="emit('contextmenu', $event)"
-      >
-        {{ actualItem.title }}
-      </span>
-    </template>
+  <div class="tree-item-label-container w-100">
+    <v-tooltip :disabled="tooltipDisabled" location="right" open-delay="400">
+      <template #activator="{ props: tooltipProps }">
+        <span
+          v-bind="tooltipProps"
+          class="tree-item-label"
+          :class="{ 'inactive-item': actualItem.is_active === false }"
+          title=""
+          @contextmenu.prevent.stop="emit('contextmenu', $event)"
+        >
+          {{ actualItem.title }}
+        </span>
+      </template>
 
-    <div class="d-flex flex-column ga-1">
-      <span class="text-caption">
-        <strong class="text-white">ID:</strong> {{ actualItem.id }}
-      </span>
-      <span v-if="actualItem.title" class="text-caption">
-        <strong class="text-white">Name:</strong> {{ actualItem.title }}
-      </span>
-      <span class="text-caption">
-        <strong class="text-white">Status:</strong>
-        <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
-      </span>
-    </div>
-  </v-tooltip>
+      <div class="d-flex flex-column ga-1">
+        <span class="text-caption">
+          <strong class="text-white">ID:</strong> {{ actualItem.id }}
+        </span>
+        <span v-if="actualItem.title" class="text-caption">
+          <strong class="text-white">Name:</strong> {{ actualItem.title }}
+        </span>
+        <span class="text-caption">
+          <strong class="text-white">Status:</strong>
+          <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
+        </span>
+      </div>
+    </v-tooltip>
+  </div>
 </template>
 
 <style scoped>
+.tree-item-label-container {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .tree-item-label {
   white-space: nowrap;
   overflow: hidden;

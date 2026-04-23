@@ -85,6 +85,17 @@ export function useMeshEdgesEdgeAttributeStyle() {
 
   function setMeshEdgesEdgeAttributeRange(id, minimum, maximum) {
     const name = meshEdgesEdgeAttributeName(id);
+    const points = getRGBPointsFromPreset(meshEdgesEdgeAttributeColorMap(id));
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      return viewerStore.request(
+        meshEdgesEdgeAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: () =>
+            setMeshEdgesEdgeAttributeStoredConfig(id, name, { minimum, maximum }),
+        },
+      );
+    }
     return setMeshEdgesEdgeAttributeStoredConfig(id, name, {
       minimum,
       maximum,
@@ -103,13 +114,16 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
-    return viewerStore.request(
-      meshEdgesEdgeAttributeSchemas.color_map,
-      { id, points, minimum, maximum },
-      {
-        response_function: () => setMeshEdgesEdgeAttributeStoredConfig(id, name, { colorMap }),
-      },
-    );
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      return viewerStore.request(
+        meshEdgesEdgeAttributeSchemas.color_map,
+        { id, points, minimum, maximum },
+        {
+          response_function: () => setMeshEdgesEdgeAttributeStoredConfig(id, name, { colorMap }),
+        },
+      );
+    }
+    return setMeshEdgesEdgeAttributeStoredConfig(id, name, { colorMap });
   }
 
   return {

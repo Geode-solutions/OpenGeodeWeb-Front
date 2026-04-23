@@ -5,10 +5,11 @@ import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useModelComponents } from "@ogw_front/composables/use_model_components";
-
+import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id: viewId } = defineProps({ id: { type: String, required: true } });
+const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const emit = defineEmits(["show-menu"]);
 
 const treeviewStore = useTreeviewStore();
@@ -80,6 +81,31 @@ function showContextMenu(event, item) {
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });
 }
+
+function handleHoverEnter(item) {
+  const actualItem = item.raw || item;
+  
+  // Sécurité : on ne highlight que si c'est un composant (qui a une category) ou si on veut highlight tout le type
+  // Mais ici, pour éviter les exceptions, on ne highlight que les composants individuels 
+  // ou on s'assure que viewer_id existe.
+  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
+    return;
+  }
+
+  onHoverEnter(viewId, () => {
+    return actualItem.category
+      ? [actualItem.viewer_id]
+      : actualItem.children?.map((child) => child.viewer_id) || [];
+  });
+}
+
+function handleHoverLeave(item) {
+  const actualItem = item.raw || item;
+  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
+    return;
+  }
+  onHoverLeave(viewId);
+}
 </script>
 
 <template>
@@ -105,11 +131,14 @@ function showContextMenu(event, item) {
       @update:selected="updateVisibility"
       @click:item="updateVisibility([$event.id, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(viewId, $event)"
+      @item:mouseenter="handleHoverEnter"
+      @item:mouseleave="handleHoverLeave"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item"
           :is-leaf="isLeaf"
+          show-tooltip
           class="text-body-1"
           @contextmenu.prevent.stop="showContextMenu($event, item)"
         />

@@ -3,14 +3,18 @@ import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonT
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();
+const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
+const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
 const emit = defineEmits(["show-menu"]);
 
@@ -66,6 +70,36 @@ function isModel(item) {
     actualItem.viewer_type === "model" || ["BRep", "Section"].includes(actualItem.geode_object_type)
   );
 }
+
+function handleHoverEnter(item) {
+  const actualItem = item.raw || item;
+  
+  // Sécurité : Ne pas highlight si ce n'est pas un objet réel du viewer
+  if (!actualItem.viewer_type) {
+    return;
+  }
+
+  const is_model = isModel(item);
+  
+  onHoverEnter(
+    actualItem.id,
+    async () => {
+      if (is_model) {
+        return await dataStore.getAllModelComponentsViewerIds(actualItem.id);
+      }
+      return [];
+    },
+    is_model ? "model" : "mesh"
+  );
+}
+
+function handleHoverLeave(item) {
+  const actualItem = item.raw || item;
+  if (!actualItem.viewer_type) {
+    return;
+  }
+  onHoverLeave(actualItem.id);
+}
 </script>
 
 <template>
@@ -89,6 +123,8 @@ function isModel(item) {
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
+      @item:mouseenter="handleHoverEnter"
+      @item:mouseleave="handleHoverLeave"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel

@@ -16,7 +16,7 @@ const { itemProps } = defineProps({
 
 const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
 const componentId = computed(() => itemProps.meta_data.pickedComponentId);
-const selection = dataStyleStore.visibleMeshComponents(modelId);
+const selection = dataStyleStore.visibleMeshComponents(modelId.value);
 const componentType = ref(undefined);
 
 watchEffect(async () => {

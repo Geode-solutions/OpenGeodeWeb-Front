@@ -41,7 +41,6 @@ const adaptiveStyles = computed(() => {
   // Mapping : si le fond est le gris clair par défaut (0.7), darkFactor = 0.
   //           si le fond est noir (0.0), darkFactor = 1.
   const normalized = Math.min(1, brightness.value / 0.7);
-  // Courbe quadratique : reste transparent sur les zones claires, réagit fort sur le noir.
   const darkFactor = Math.pow(1 - normalized, 2);
 
   // Focus Crystal : flou et opacité quasi-nuls sur fond clair (transparent),
@@ -133,7 +132,9 @@ watch(
         style="filter: brightness(0); display: flex; align-items: center"
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2"
+        >mdi-drag-variant</v-icon
+      >
       <span
         class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
         style="
@@ -166,6 +167,7 @@ watch(
         ref="scrollContainer"
         class="flex-grow-1 overflow-y-hidden overflow-x-hidden d-flex flex-column"
         style="min-height: 0"
+        @scroll="handleScroll"
       >
         <slot />
       </div>
@@ -183,7 +185,9 @@ watch(
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
-  transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    backdrop-filter 0.3s ease;
 }
 
 .tree-box::before {
@@ -192,11 +196,15 @@ watch(
   inset: 0;
   /* L'opacité et le flou sont pilotés dynamiquement par le JS */
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
   z-index: 0;
   pointer-events: none;
-  transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    backdrop-filter 0.3s ease;
 }
 
 .tree-box > * {

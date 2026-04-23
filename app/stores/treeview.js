@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import { ref, toRaw, watch } from "vue";
+import { compareSelections } from "@ogw_front/utils/treeview";
 import { database } from "@ogw_internal/database/database";
 const PANEL_WIDTH = 300;
 
@@ -55,9 +56,21 @@ export const useTreeviewStore = defineStore("treeview", () => {
     { deep: true },
   );
 
+  watch(selection, (current, previous) => {
+    const { removed } = compareSelections(current, previous);
+    for (const id of removed) {
+      const index = opened_views.value.findIndex(
+        (view) => view.type === "component" && view.id === id,
+      );
+      if (index !== -1) {
+        closeView(index);
+      }
+    }
+  });
+
   function closeView(index) {
     if (index > 0) {
-      opened_views.value.splice(index, 1);
+      opened_views.value = opened_views.value.filter((view, view_index) => view_index !== index);
     }
   }
 
@@ -67,9 +80,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
     for (const item of items.value) {
       if (item.title === geodeObjectType) {
         item.children.push(child);
-        const opt = { numeric: true, sensitivity: "base" };
+        const options = { numeric: true, sensitivity: "base" };
         item.children.sort((childA, childB) =>
-          childA.title.localeCompare(childB.title, undefined, opt),
+          childA.title.localeCompare(childB.title, undefined, options),
         );
         found = true;
         break;
@@ -77,12 +90,12 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
     if (!found) {
       items.value.push({ id: geodeObjectType, title: geodeObjectType, children: [child] });
-      const sortOpt = { numeric: true, sensitivity: "base" };
+      const sort_options = { numeric: true, sensitivity: "base" };
       items.value.sort((groupA, groupB) =>
-        groupA.title.localeCompare(groupB.title, undefined, sortOpt),
+        groupA.title.localeCompare(groupB.title, undefined, sort_options),
       );
     }
-    selection.value.push(id);
+    selection.value = [...selection.value, id];
   }
 
   function removeItem(id) {
@@ -94,10 +107,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         if (group.children.length === 0) {
           items.value.splice(index, 1);
         }
-        const selectionIndex = selection.value.indexOf(id);
-        if (selectionIndex !== -1) {
-          selection.value.splice(selectionIndex, 1);
-        }
+        selection.value = selection.value.filter((selection_id) => selection_id !== id);
         return;
       }
     }
@@ -119,10 +129,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
     });
   }
 
-  function moveView(fromIdx, toIdx) {
-    if (fromIdx !== 0 && toIdx !== 0) {
-      const [element] = opened_views.value.splice(fromIdx, 1);
-      opened_views.value.splice(toIdx, 0, element);
+  function moveView(from_index, to_index) {
+    if (from_index !== 0 && to_index !== 0) {
+      const [element] = opened_views.value.splice(from_index, 1);
+      opened_views.value.splice(to_index, 0, element);
     }
   }
 

@@ -59,7 +59,13 @@ export const useDataStore = defineStore("data", () => {
       .map((type) => ({
         id: type,
         title: componentTitles[type],
-        children: [],
+        children: componentsByType[type].map((meshComponent) => ({
+          id: meshComponent.geode_id,
+          title: meshComponent.name,
+          category: meshComponent.type,
+          viewer_id: Number(meshComponent.viewer_id),
+          is_active: meshComponent.is_active,
+        })),
       }));
   }
 
@@ -72,6 +78,7 @@ export const useDataStore = defineStore("data", () => {
       id: meshComponent.geode_id,
       title: meshComponent.name,
       category: meshComponent.type,
+      viewer_id: Number(meshComponent.viewer_id),
       is_active: meshComponent.is_active,
     }));
   }
@@ -82,6 +89,7 @@ export const useDataStore = defineStore("data", () => {
       id: meshComponent.geode_id,
       title: meshComponent.name,
       category: meshComponent.type,
+      viewer_id: Number(meshComponent.viewer_id),
       is_active: meshComponent.is_active,
     }));
   }
@@ -236,12 +244,9 @@ export const useDataStore = defineStore("data", () => {
     return await getMeshComponentGeodeIds(modelId, "Block");
   }
 
-  async function getMeshComponentGeodeIds(modelId, type) {
-    const components = await database.model_components
-      .where("[id+type]")
-      .equals([modelId, type])
-      .toArray();
-    return components.map((component) => component.geode_id);
+  async function getAllModelComponentsViewerIds(modelId) {
+    const components = await database.model_components.where("id").equals(modelId).toArray();
+    return components.map((component) => Number.parseInt(component.viewer_id, 10));
   }
 
   async function getMeshComponentsViewerIds(modelId, meshComponentGeodeIds) {
@@ -285,6 +290,7 @@ export const useDataStore = defineStore("data", () => {
     getLinesGeodeIds,
     getSurfacesGeodeIds,
     getBlocksGeodeIds,
+    getAllModelComponentsViewerIds,
     getMeshComponentGeodeIds,
     getMeshComponentsViewerIds,
     getComponentByViewerId,
