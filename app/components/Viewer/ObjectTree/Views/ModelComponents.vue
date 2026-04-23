@@ -24,25 +24,40 @@ const opened = computed({
 });
 
 const items = dataStore.refFormatedMeshComponents(viewId);
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(viewId);
+const localSelection = ref([]);
+
+watch(
+  mesh_components_selection,
+  (val) => {
+    if (val) {
+      localSelection.value = [...val];
+    }
+  },
+  { immediate: true },
+);
 
 const {
   search,
   sortType,
   filterOptions,
   processedItems,
+  filteredIds,
   availableFilterOptions,
   toggleSort,
   customFilter,
 } = useTreeFilter(items);
 
-async function onSelectionChange(current) {
-  const previous = mesh_components_selection.value;
-  const { added, removed } = compareSelections(current, previous);
+const actuallyVisibleIds = computed(() => {
+  return localSelection.value.filter((id) => filteredIds.value.has(id));
+});
 
-  if (added.length === 0 && removed.length === 0) {
+watch(actuallyVisibleIds, async (current, previous) => {
+  const oldSelection = previous || [];
+  if (current === oldSelection) {
     return;
   }
+
+  const { added, removed } = compareSelections(current, previous);
 
   if (added.length > 0) {
     await dataStyleStore.setModelComponentsVisibility(viewId, added, true);
@@ -51,6 +66,10 @@ async function onSelectionChange(current) {
     await dataStyleStore.setModelComponentsVisibility(viewId, removed, false);
   }
   hybridViewerStore.remoteRender();
+});
+
+function onSelectionChange(current) {
+  localSelection.value = current;
 }
 
 function showContextMenu(event, item) {
@@ -79,7 +98,7 @@ function showContextMenu(event, item) {
 
     <v-treeview
       v-else
-      :selected="mesh_components_selection"
+      :selected="localSelection"
       v-model:opened="opened"
       :items="processedItems"
       :search="search"

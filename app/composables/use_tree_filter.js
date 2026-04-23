@@ -56,13 +56,41 @@ function useTreeFilter(rawItems, options = {}) {
     if (!rawItems.value) {
       return [];
     }
-    return sortAndFormatItems(
-      rawItems.value.filter((category) => {
-        const key = category.title || category.id;
-        return filterOptions.value[key] !== false;
-      }),
-      sortType.value,
-    );
+    const filteredByType = rawItems.value.filter((category) => {
+      const key = category.title || category.id;
+      return filterOptions.value[key] !== false;
+    });
+
+    const query = search.value.toLowerCase();
+    const filteredBySearch = filteredByType
+      .map((category) => {
+        const children = (category.children || []).filter((item) => {
+          if (!query) {
+            return true;
+          }
+          const title = (item.title || "").toLowerCase();
+          const idValue = String(item.id || "").toLowerCase();
+          return title.includes(query) || idValue.includes(query);
+        });
+        return { ...category, children };
+      })
+      .filter((category) => category.children.length > 0);
+
+    return sortAndFormatItems(filteredBySearch, sortType.value);
+  });
+
+  const filteredIds = computed(() => {
+    const ids = new Set();
+    const traverse = (items) => {
+      for (const item of items) {
+        ids.add(item.id);
+        if (item.children) {
+          traverse(item.children);
+        }
+      }
+    };
+    traverse(processedItems.value);
+    return ids;
   });
 
   function toggleSort() {
@@ -74,6 +102,7 @@ function useTreeFilter(rawItems, options = {}) {
     sortType,
     filterOptions,
     processedItems,
+    filteredIds,
     availableFilterOptions,
     toggleSort,
     customFilter,

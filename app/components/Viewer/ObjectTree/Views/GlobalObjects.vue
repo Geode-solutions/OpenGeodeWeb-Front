@@ -24,13 +24,18 @@ const {
   sortType,
   filterOptions,
   processedItems,
+  filteredIds,
   availableFilterOptions,
   toggleSort,
   customFilter,
 } = useTreeFilter(toRef(() => treeviewStore.items));
 
+const actuallyVisibleIds = computed(() => {
+  return treeviewStore.selection.filter((id) => filteredIds.value.has(id));
+});
+
 watch(
-  () => treeviewStore.selection,
+  actuallyVisibleIds,
   async (current, previous) => {
     const oldSelection = previous || [];
     if (current === oldSelection) {
