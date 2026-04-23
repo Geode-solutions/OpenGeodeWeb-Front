@@ -1,8 +1,5 @@
 <script setup>
-import {
-  sortAndFormatItems,
-  useTreeFilter,
-} from "@ogw_front/composables/use_tree_filter";
+import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
@@ -23,9 +20,7 @@ const {
   updateVisibility,
 } = useModelComponents(viewId);
 
-const currentView = computed(() =>
-  treeviewStore.opened_views.find((view) => view.id === viewId),
-);
+const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
 
 const opened = computed({
   get: () => currentView.value?.opened || [],
@@ -70,10 +65,7 @@ const itemsForTreeView = computed(() => {
         item[key] = category[key];
       }
     }
-    item.children = sortAndFormatItems(
-      componentsCache.value?.[category.id],
-      sortType.value,
-    );
+    item.children = sortAndFormatItems(componentsCache.value?.[category.id], sortType.value);
     return item;
   });
 });
@@ -83,9 +75,7 @@ function showContextMenu(event, item) {
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : viewId,
-    context_type: actualItem.category
-      ? "model_component"
-      : "model_component_type",
+    context_type: actualItem.category ? "model_component" : "model_component_type",
     modelId: viewId,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });

@@ -117,6 +117,65 @@ const { virtualScrollRef, stickyHeader, handleScroll } = useTreeScroll(
       </template>
     </v-virtual-scroll>
   </div>
+  <v-virtual-scroll
+    :items="displayItems"
+    :item-height="actualItemProps.height"
+    class="common-tree-view"
+  >
+    <template #default="{ item }">
+      <v-list-item
+        :class="['tree-row', { 'leaf-row': item.isLeaf }]"
+        class="pa-0"
+        @click="
+          item.isLeaf ? emit('click:item', item.raw) : toggleOpen(item.raw)
+        "
+      >
+        <div class="tree-row-content d-flex align-center px-4 ps-3 w-100">
+          <div
+            v-if="item.depth > 0"
+            class="flex-shrink-0"
+            style="width: 24px"
+          />
+          <div class="d-flex align-center flex-shrink-0">
+            <v-icon
+              v-if="!item.isLeaf"
+              :icon="item.isOpen ? 'mdi-menu-down' : 'mdi-menu-right'"
+              class="me-1"
+              color="black"
+              @click.stop="toggleOpen(item.raw)"
+            />
+            <div v-else class="icon-placeholder" />
+
+            <v-checkbox-btn
+              v-if="actualSelection.selectable"
+              :model-value="isSelected(item.raw)"
+              :indeterminate="getIndeterminate(item.raw)"
+              density="compact"
+              hide-details
+              color="black"
+              @click.stop="toggleSelect(item.raw)"
+              @mousedown.stop
+            />
+          </div>
+
+          <div
+            class="tree-title flex-grow-1 overflow-hidden d-flex align-center ms-1 pt-1"
+          >
+            <slot name="title" :item="item.raw" :is-leaf="item.isLeaf">
+              <v-list-item-title class="text-black">
+                {{ item.raw[actualItemProps.title] || item.id }}
+              </v-list-item-title>
+            </slot>
+          </div>
+
+          <div class="ms-auto d-flex align-center">
+            <slot name="append" :item="item.raw" />
+          </div>
+        </div>
+      </v-list-item>
+    </template>
+  </v-virtual-scroll>
+  >>>>>>> 647292f4e76a9b31369fd306ad3c5d2ee54c21aa
 </template>
 
 <style scoped>

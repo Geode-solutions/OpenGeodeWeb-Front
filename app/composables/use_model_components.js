@@ -25,9 +25,7 @@ export function useModelComponents(viewId) {
         return;
       }
       localCategories.value = newItems.map((newCategory) => {
-        const existing = localCategories.value.find(
-          (category) => category.id === newCategory.id,
-        );
+        const existing = localCategories.value.find((category) => category.id === newCategory.id);
         if (existing) {
           existing.title = newCategory.title || newCategory.id;
           return existing;

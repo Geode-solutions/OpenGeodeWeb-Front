@@ -114,10 +114,8 @@ export function useVirtualTree(props, emit) {
       if (lowerSearch) {
         const matches = customFilter
           ? customFilter(id, search, { raw: item })
-          : (item[actualItemProps.value.title] || "")
-            .toLowerCase()
-            .includes(lowerSearch) ||
-          String(id).toLowerCase().includes(lowerSearch);
+          : (item[actualItemProps.value.title] || "").toLowerCase().includes(lowerSearch) ||
+            String(id).toLowerCase().includes(lowerSearch);
 
         if (!hasChildren && !matches) {
           continue;
