@@ -40,14 +40,15 @@ export function useVirtualTree(props, emit) {
   }
 
   function isSelected(item) {
-    if (selectedSet.value.has(item[actualItemProps.value.value])) {
+    const id = item[actualItemProps.value.value];
+    if (selectedSet.value.has(id)) {
       return true;
     }
     if (actualSelection.value.strategy === "classic") {
       const childrenIds = getAllChildrenIds(item);
       return (
         childrenIds.length > 0 &&
-        childrenIds.every((id) => selectedSet.value.has(id))
+        childrenIds.every((childId) => selectedSet.value.has(childId))
       );
     }
     return false;
@@ -62,8 +63,8 @@ export function useVirtualTree(props, emit) {
       return false;
     }
 
-    const selectedChildren = childrenIds.filter((id) =>
-      selectedSet.value.has(id),
+    const selectedChildren = childrenIds.filter((childId) =>
+      selectedSet.value.has(childId),
     );
     return (
       selectedChildren.length > 0 &&

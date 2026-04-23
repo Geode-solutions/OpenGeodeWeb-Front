@@ -79,6 +79,7 @@ function isModel(item) {
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
       @toggle-sort="toggleSort"
+      @collapse-all="opened = []"
     />
 
     <CommonTreeView
@@ -88,7 +89,9 @@ function isModel(item) {
       :search="search"
       :custom-filter="customFilter"
       :selection="{ selectable: true }"
+      :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
+      @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -120,6 +123,19 @@ function isModel(item) {
 </template>
 
 <style scoped>
+.tree-view-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.virtual-tree-height {
+  flex-grow: 1;
+  min-height: 0;
+}
+
 .transparent-treeview {
   background-color: transparent;
   margin: 4px 0;

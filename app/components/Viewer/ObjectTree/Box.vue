@@ -112,11 +112,14 @@ watch(
       />
     </v-card-title>
     <v-divider />
-    <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column">
+    <v-card-text
+      class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column"
+      style="min-height: 0"
+    >
       <div
         ref="scrollContainer"
-        class="flex-grow-1 overflow-y-hidden overflow-x-hidden"
-        @scroll="handleScroll"
+        class="flex-grow-1 overflow-y-hidden overflow-x-hidden d-flex flex-column"
+        style="min-height: 0"
       >
         <slot />
       </div>
@@ -127,6 +130,7 @@ watch(
 <style scoped>
 .tree-box {
   height: 100%;
+  min-height: 0;
   border-radius: 16px;
   background-color: transparent !important;
   backdrop-filter: blur(2px);
@@ -137,5 +141,6 @@ watch(
   height: 40px !important;
   padding: 0 8px !important;
   background-color: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 </style>

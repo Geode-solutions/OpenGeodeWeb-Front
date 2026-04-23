@@ -100,6 +100,7 @@ function showContextMenu(event, item) {
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
       @toggle-sort="toggleSort"
+      @collapse-all="opened = []"
     />
 
     <FetchingData v-if="rawItems === undefined" :size="48" :width="4" text="" />
@@ -109,9 +110,11 @@ function showContextMenu(event, item) {
       :selected="visibleComponents"
       :items="itemsForTreeView"
       :selection="{ selectable: true, strategy: 'classic' }"
+      :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:selected="updateVisibility"
       @click:item="updateVisibility([$event.id, ...visibleComponents])"
+      @update:scroll-top="treeviewStore.setScrollTop(viewId, $event)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -126,9 +129,17 @@ function showContextMenu(event, item) {
 </template>
 
 <style scoped>
+.tree-view-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .virtual-tree-height {
-  height: calc(100vh - 200px);
-  overflow-y: auto;
+  flex-grow: 1;
+  min-height: 0;
 }
 
 .transparent-treeview {
