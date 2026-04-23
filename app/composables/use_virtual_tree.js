@@ -45,10 +45,7 @@ export function useVirtualTree(props, emit) {
     }
     if (actualSelection.value.strategy === "classic") {
       const childrenIds = getAllChildrenIds(item);
-      return (
-        childrenIds.length > 0 &&
-        childrenIds.every((id) => selectedSet.value.has(id))
-      );
+      return childrenIds.length > 0 && childrenIds.every((id) => selectedSet.value.has(id));
     }
     return false;
   }
@@ -62,13 +59,8 @@ export function useVirtualTree(props, emit) {
       return false;
     }
 
-    const selectedChildren = childrenIds.filter((id) =>
-      selectedSet.value.has(id),
-    );
-    return (
-      selectedChildren.length > 0 &&
-      selectedChildren.length < childrenIds.length
-    );
+    const selectedChildren = childrenIds.filter((id) => selectedSet.value.has(id));
+    return selectedChildren.length > 0 && selectedChildren.length < childrenIds.length;
   }
 
   function toggleSelect(item) {
@@ -113,10 +105,8 @@ export function useVirtualTree(props, emit) {
       if (lowerSearch) {
         const matches = customFilter
           ? customFilter(id, search, { raw: item })
-          : (item[actualItemProps.value.title] || "")
-            .toLowerCase()
-            .includes(lowerSearch) ||
-          String(id).toLowerCase().includes(lowerSearch);
+          : (item[actualItemProps.value.title] || "").toLowerCase().includes(lowerSearch) ||
+            String(id).toLowerCase().includes(lowerSearch);
 
         if (!hasChildren && !matches) {
           continue;

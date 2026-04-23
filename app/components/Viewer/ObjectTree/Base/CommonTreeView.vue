@@ -53,16 +53,10 @@ const {
       <v-list-item
         :class="['tree-row', { 'leaf-row': item.isLeaf }]"
         class="pa-0"
-        @click="
-          item.isLeaf ? emit('click:item', item.raw) : toggleOpen(item.raw)
-        "
+        @click="item.isLeaf ? emit('click:item', item.raw) : toggleOpen(item.raw)"
       >
         <div class="tree-row-content d-flex align-center px-4 ps-3 w-100">
-          <div
-            v-if="item.depth > 0"
-            class="flex-shrink-0"
-            style="width: 24px"
-          />
+          <div v-if="item.depth > 0" class="flex-shrink-0" style="width: 24px" />
           <div class="d-flex align-center flex-shrink-0">
             <v-icon
               v-if="!item.isLeaf"
@@ -85,9 +79,7 @@ const {
             />
           </div>
 
-          <div
-            class="tree-title flex-grow-1 overflow-hidden d-flex align-center ms-1 pt-1"
-          >
+          <div class="tree-title flex-grow-1 overflow-hidden d-flex align-center ms-1 pt-1">
             <slot name="title" :item="item.raw" :is-leaf="item.isLeaf">
               <v-list-item-title class="text-black">
                 {{ item.raw[actualItemProps.title] || item.id }}
