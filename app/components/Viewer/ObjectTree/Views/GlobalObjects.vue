@@ -32,10 +32,7 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
-} = useTreeFilter(
-  () => treeviewStore.items,
-  { recursiveSort: true },
-);
+} = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
 watch(
   () => treeviewStore.selection,
