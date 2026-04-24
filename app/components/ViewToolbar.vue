@@ -2,6 +2,7 @@
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 import ActionButton from "@ogw_front/components/ActionButton.vue";
+import CameraOrientation from "@ogw_front/components/CameraOrientation";
 import Screenshot from "@ogw_front/components/Screenshot";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -16,6 +17,11 @@ const camera_options = [
     action: () => {
       viewerStore.request(schemas.opengeodeweb_viewer.viewer.reset_camera);
     },
+  },
+  {
+    tooltip: "Camera orientation",
+    icon: "mdi-axis-arrow",
+    menu: true,
   },
   {
     tooltip: "Take a screenshot",
@@ -40,13 +46,29 @@ const camera_options = [
     },
   },
 ];
+
+function setOrientation(direction) {
+  viewerStore.request(schemas.opengeodeweb_viewer.viewer.set_camera_orientation, { direction });
+}
 </script>
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
     <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
+        <v-menu v-if="camera_option.menu" location="left" :close-on-content-click="false">
+          <template #activator="{ props }">
+            <ActionButton
+              v-bind="props"
+              :tooltip="camera_option.tooltip"
+              :icon="camera_option.icon"
+              tooltip-location="left"
+            />
+          </template>
+          <CameraOrientation @set-orientation="setOrientation" />
+        </v-menu>
         <ActionButton
+          v-else
           :tooltip="camera_option.tooltip"
           :icon="camera_option.icon"
           tooltip-location="left"

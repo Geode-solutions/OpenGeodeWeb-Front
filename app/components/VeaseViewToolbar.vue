@@ -2,6 +2,7 @@
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 import ActionButton from "@ogw_front/components/ActionButton.vue";
+import CameraOrientationButtons from "@ogw_front/components/Viewer/CameraOrientationButtons.vue";
 import Screenshot from "@ogw_front/components/Screenshot";
 import ZScaling from "@ogw_front/components/ZScaling";
 
@@ -70,7 +71,22 @@ const camera_options = [
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
+    <!-- First button: Reset camera -->
+    <v-row dense>
+      <v-col>
+        <ActionButton
+          :icon="camera_options[0].icon"
+          :tooltip="camera_options[0].tooltip"
+          @click.stop="camera_options[0].action"
+        />
+      </v-col>
+    </v-row>
+
+    <!-- Second: Camera Orientations Menu -->
+    <CameraOrientationButtons />
+
+    <!-- Remaining options -->
+    <v-row v-for="camera_option in camera_options.slice(1)" :key="camera_option.icon" dense>
       <v-col>
         <ActionButton
           :icon="camera_option.icon"
