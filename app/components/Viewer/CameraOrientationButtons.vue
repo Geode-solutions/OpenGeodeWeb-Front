@@ -53,12 +53,7 @@ function setOrientation(value) {
                   >
                     {{ opt.icon }}
                   </v-icon>
-                  <span
-                    :class="[
-                      'text-label',
-                      opt.label.length > 1 ? 'text-label-condensed' : '',
-                    ]"
-                  >
+                  <span :class="['text-label', opt.label.length > 1 ? 'text-label-condensed' : '']">
                     {{ opt.label }}
                   </span>
                 </div>
