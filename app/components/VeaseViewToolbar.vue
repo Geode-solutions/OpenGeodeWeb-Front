@@ -2,7 +2,7 @@
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 import ActionButton from "@ogw_front/components/ActionButton.vue";
-import CameraOrientation from "@ogw_front/components/CameraOrientation";
+import CameraOrientationButtons from "@ogw_front/components/Viewer/CameraOrientationButtons.vue";
 import Screenshot from "@ogw_front/components/Screenshot";
 import ZScaling from "@ogw_front/components/ZScaling";
 
@@ -33,17 +33,8 @@ const camera_options = [
     tooltip: "Reset camera",
     icon: "mdi-cube-scan",
     action: () => {
-      viewerStore.request(schemas.opengeodeweb_viewer.viewer.reset_camera, {
-        response_function: (response) => {
-          hybridViewerStore.updateLocalCamera(response);
-        },
-      });
+      hybridViewerStore.resetCamera();
     },
-  },
-  {
-    tooltip: "Camera orientation",
-    icon: "mdi-compass-outline",
-    menu: true,
   },
   {
     tooltip: "Take a screenshot",
@@ -76,38 +67,28 @@ const camera_options = [
     },
   },
 ];
-
-function setOrientation(direction) {
-  viewerStore.request(
-    schemas.opengeodeweb_viewer.viewer.set_camera_orientation,
-    { direction },
-    {
-      response_function: (response) => {
-        hybridViewerStore.updateLocalCamera(response);
-        hybridViewerStore.remoteRender();
-      },
-    },
-  );
-}
 </script>
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
+    <!-- First button: Reset camera -->
+    <v-row dense>
       <v-col>
-        <v-menu v-if="camera_option.menu" location="left" :close-on-content-click="false">
-          <template #activator="{ props }">
-            <ActionButton
-              v-bind="props"
-              :tooltip="camera_option.tooltip"
-              :icon="camera_option.icon"
-              tooltip-location="left"
-            />
-          </template>
-          <CameraOrientation @set-orientation="setOrientation" />
-        </v-menu>
         <ActionButton
-          v-else
+          :icon="camera_options[0].icon"
+          :tooltip="camera_options[0].tooltip"
+          @click.stop="camera_options[0].action"
+        />
+      </v-col>
+    </v-row>
+
+    <!-- Second: Camera Orientations Menu -->
+    <CameraOrientationButtons />
+
+    <!-- Remaining options -->
+    <v-row v-for="camera_option in camera_options.slice(1)" :key="camera_option.icon" dense>
+      <v-col>
+        <ActionButton
           :icon="camera_option.icon"
           :tooltip="camera_option.tooltip"
           @click.stop="camera_option.action"

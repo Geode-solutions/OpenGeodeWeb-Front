@@ -135,6 +135,32 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     syncRemoteCamera();
   }
 
+  const ORIENTATIONS = {
+    top: { direction: [0, 0, 1], viewUp: [0, 1, 0] },
+    bottom: { direction: [0, 0, -1], viewUp: [0, 1, 0] },
+    north: { direction: [0, 1, 0], viewUp: [0, 0, 1] },
+    south: { direction: [0, -1, 0], viewUp: [0, 0, 1] },
+    east: { direction: [1, 0, 0], viewUp: [0, 0, 1] },
+    west: { direction: [-1, 0, 0], viewUp: [0, 0, 1] },
+  };
+
+  function setCameraOrientation(orientation) {
+    const config = ORIENTATIONS[orientation];
+    if (!config || !genericRenderWindow.value) {
+      return;
+    }
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
+    camera.set({
+      position: config.direction,
+      viewUp: config.viewUp,
+      focalPoint: [0, 0, 0],
+    });
+    renderer.resetCamera();
+    genericRenderWindow.value.getRenderWindow().render();
+    syncRemoteCamera();
+  }
+
   function syncRemoteCamera() {
     console.log("syncRemoteCamera");
     const renderer = genericRenderWindow.value.getRenderer();
@@ -212,7 +238,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         syncRemoteCamera();
       },
     });
-
     let wheelEventEndTimeout = undefined;
     useEventListener(container, "wheel", () => {
       is_moving.value = true;
@@ -269,18 +294,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       if (!snapshot_camera_options) {
         return;
       }
-
       const renderer = genericRenderWindow.value.getRenderer();
       const camera = renderer.getActiveCamera();
-
       camera.setFocalPoint(...snapshot_camera_options.focal_point);
       camera.setViewUp(...snapshot_camera_options.view_up);
       camera.setPosition(...snapshot_camera_options.position);
       camera.setViewAngle(snapshot_camera_options.view_angle);
       camera.setClippingRange(...snapshot_camera_options.clipping_range);
-
       genericRenderWindow.value.getRenderWindow().render();
-
       const payload = {
         camera_options: {
           focal_point: [...snapshot_camera_options.focal_point],
@@ -297,7 +318,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         },
       });
     }
-
     if (typeof z_scale === "number") {
       await setZScaling(z_scale);
       return await applyCamera();
@@ -330,6 +350,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender,
     resize,
     resetCamera,
+    setCameraOrientation,
     setContainer,
     zScale,
     clear,
