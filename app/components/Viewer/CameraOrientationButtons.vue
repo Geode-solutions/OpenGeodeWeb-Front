@@ -5,21 +5,15 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 const hybridViewerStore = useHybridViewerStore();
 
 const orientations = [
-  { label: "Top", value: "top", tooltip: "Top View (+Z)", icon: "mdi-arrow-down-bold-box" },
-  {
-    label: "Bottom",
-    value: "bottom",
-    tooltip: "Bottom View (-Z)",
-    icon: "mdi-arrow-up-bold-box",
-  },
-  { label: "North", value: "north", tooltip: "North View (+Y)", icon: "mdi-arrow-up-bold" },
-  { label: "South", value: "south", tooltip: "South View (-Y)", icon: "mdi-arrow-down-bold" },
-  { label: "East", value: "east", tooltip: "East View (+X)", icon: "mdi-arrow-right-bold" },
-  { label: "West", value: "west", tooltip: "West View (-X)", icon: "mdi-arrow-left-bold" },
+  { label: "Top", value: "top", tooltip: "Top View (+Z)", icon: "mdi-axis-z-arrow" },
+  { label: "Bot", value: "bottom", tooltip: "Bottom View (-Z)", icon: "mdi-axis-z-arrow" },
+  { label: "N", value: "north", tooltip: "North View (+Y)", icon: "mdi-axis-y-arrow" },
+  { label: "S", value: "south", tooltip: "South View (-Y)", icon: "mdi-axis-y-arrow" },
+  { label: "E", value: "east", tooltip: "East View (+X)", icon: "mdi-axis-x-arrow" },
+  { label: "W", value: "west", tooltip: "West View (-X)", icon: "mdi-axis-x-arrow" },
 ];
 
 function setOrientation(value) {
-  console.log("Orientation button clicked:", value);
   hybridViewerStore.setCameraOrientation(value);
 }
 </script>
@@ -34,11 +28,7 @@ function setOrientation(value) {
     <template #activator="{ props }">
       <v-row dense>
         <v-col>
-          <ActionButton
-            v-bind="props"
-            icon="mdi-axis-arrow"
-            tooltip="Camera Orientations"
-          />
+          <ActionButton v-bind="props" icon="mdi-axis-arrow" tooltip="Camera Orientations" />
         </v-col>
       </v-row>
     </template>
@@ -51,12 +41,27 @@ function setOrientation(value) {
               <v-btn
                 v-bind="props"
                 icon
-                size="small"
+                size="42"
                 variant="flat"
-                color="secondary"
+                class="orientation-btn"
                 @click.stop="setOrientation(opt.value)"
               >
-                <v-icon size="20">{{ opt.icon }}</v-icon>
+                <div class="d-flex flex-column align-center justify-center" style="gap: 2px">
+                  <v-icon
+                    size="18"
+                    :style="opt.value === 'bottom' ? 'transform: rotate(180deg)' : ''"
+                  >
+                    {{ opt.icon }}
+                  </v-icon>
+                  <span
+                    :class="[
+                      'text-label',
+                      opt.label.length > 1 ? 'text-label-condensed' : '',
+                    ]"
+                  >
+                    {{ opt.label }}
+                  </span>
+                </div>
               </v-btn>
             </template>
             <span>{{ opt.tooltip }}</span>
@@ -69,7 +74,25 @@ function setOrientation(value) {
 
 <style scoped>
 .orientation-menu {
-  min-width: 140px;
+  min-width: 160px;
   background-color: rgb(var(--v-theme-surface)) !important;
+}
+
+.orientation-btn {
+  background-color: rgb(var(--v-theme-surface)) !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 50%;
+}
+
+.text-label {
+  font-size: 0.65rem !important;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.text-label-condensed {
+  font-size: 0.55rem !important;
+  letter-spacing: -0.8px !important;
 }
 </style>
