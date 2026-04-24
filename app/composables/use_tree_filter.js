@@ -27,7 +27,8 @@ function sortAndFormatItems(itemList, sortType) {
     });
 }
 
-function useTreeFilter(rawItems, options = {}) {
+function useTreeFilter(itemsIn, options = {}) {
+  const rawItems = toRef(itemsIn);
   const search = ref("");
   const sortType = ref(options.defaultSort || "name");
   const filterOptions = ref(options.defaultFilters || {});

@@ -33,7 +33,7 @@ const {
   toggleSort,
   customFilter,
 } = useTreeFilter(
-  toRef(() => treeviewStore.items),
+  () => treeviewStore.items,
   { recursiveSort: true },
 );
 
