@@ -9,7 +9,7 @@ const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps
 
 defineEmits(["toggle-open", "toggle-select"]);
 
-const INDENT_STEP = 24;
+const INDENT_STEP = 16;
 </script>
 
 <template>

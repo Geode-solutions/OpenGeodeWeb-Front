@@ -12,7 +12,7 @@ const { title, closable, icon, mdiIcon, scrollTop } = defineProps({
 });
 const emit = defineEmits(["close", "dragstart", "update:scrollTop"]);
 
-const scrollContainer = ref(undefined);
+const scrollContainer = useTemplateRef("scroll-container");
 const treeviewBox = useTemplateRef("treeview-box");
 const hybridViewerStore = useHybridViewerStore();
 
@@ -27,25 +27,26 @@ const MAX_OPACITY = 0.5;
 
 const MIN_BOOST = 1;
 const MAX_BOOST = 1.2;
+const ADAPTIVE_REFRESH_RATE = 150;
 
 const { x, y, width, height } = useElementBounding(treeviewBox);
 const brightness = ref(LUMINANCE_THRESHOLD);
 
+const updateBrightness = useThrottleFn(() => {
+  brightness.value = hybridViewerStore.getAverageBrightness({
+    x: x.value,
+    y: y.value,
+    width: width.value,
+    height: height.value,
+  });
+}, ADAPTIVE_REFRESH_RATE);
+
 let isApplyingScroll = false;
 let resizeObserver = undefined;
 
-watch(
-  [x, y, width, height, () => hybridViewerStore.latestImage],
-  () => {
-    brightness.value = hybridViewerStore.getAverageBrightness({
-      x: x.value,
-      y: y.value,
-      width: width.value,
-      height: height.value,
-    });
-  },
-  { immediate: true },
-);
+watch([x, y, width, height, () => hybridViewerStore.latestImage], updateBrightness, {
+  immediate: true,
+});
 
 const adaptiveStyles = computed(() => {
   const normalized = Math.min(1, brightness.value / LUMINANCE_THRESHOLD);
@@ -165,7 +166,7 @@ watch(
     <v-divider />
     <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column" style="min-height: 0">
       <div
-        ref="scrollContainer"
+        ref="scroll-container"
         class="flex-grow-1 overflow-y-hidden overflow-x-hidden d-flex flex-column"
         style="min-height: 0"
         @scroll="handleScroll"
