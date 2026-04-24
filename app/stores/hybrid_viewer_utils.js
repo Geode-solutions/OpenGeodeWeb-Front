@@ -1,7 +1,6 @@
 const RGB_MAX = 255;
 const BACKGROUND_GREY_VALUE = 180;
 const SAMPLE_SIZE = 10;
-const PIXEL_COUNT = 100;
 const TOTAL_CHANNELS = 400;
 const RGBA_CHANNELS = 4;
 
@@ -9,7 +8,7 @@ function getCameraOptions(camera) {
   if (!camera) {
     return undefined;
   }
-  
+
   if (typeof camera.getFocalPoint !== "function") {
     return { ...camera };
   }
@@ -90,12 +89,15 @@ function computeAverageBrightness(rect, options) {
     );
     const { data } = offscreenCtx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
 
-    let total = 0;
+    let minBrightness = 1;
     for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
-      total += (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
+      const brightness = (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
+      if (brightness < minBrightness) {
+        minBrightness = brightness;
+      }
     }
 
-    return total / PIXEL_COUNT;
+    return minBrightness;
   } catch {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }

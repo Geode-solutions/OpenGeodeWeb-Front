@@ -1,24 +1,26 @@
-export function useVirtualTree(props, emit) {
+export function useVirtualTree(propsIn, emit) {
+  const props = toRef(propsIn);
+
   const actualItemProps = computed(() => ({
     value: "id",
     title: "title",
     children: "children",
     height: 44,
-    ...toValue(props.itemProps),
+    ...props.value.itemProps,
   }));
 
   const actualSelection = computed(() => ({
     selectable: false,
     strategy: "classic",
-    ...toValue(props.selection),
+    ...props.value.selection,
   }));
 
-  const openedSet = computed(() => new Set(toValue(props.opened)));
-  const selectedSet = computed(() => new Set(toValue(props.selected)));
+  const openedSet = computed(() => new Set(props.value.opened));
+  const selectedSet = computed(() => new Set(props.value.selected));
 
   function toggleOpen(item) {
     const id = item[actualItemProps.value.value];
-    const openedArray = toValue(props.opened) || [];
+    const { opened: openedArray = [] } = props.value;
     const newOpened = new Set(openedArray);
     if (newOpened.has(id)) {
       newOpened.delete(id);
@@ -68,7 +70,7 @@ export function useVirtualTree(props, emit) {
 
   function toggleSelect(item) {
     const id = item[actualItemProps.value.value];
-    const selectedArray = toValue(props.selected) || [];
+    const { selected: selectedArray = [] } = props.value;
     const newSelected = new Set(selectedArray);
     const isCurrentlySelected = newSelected.has(id) || isSelected(item);
 
@@ -94,9 +96,8 @@ export function useVirtualTree(props, emit) {
   }
 
   function flattenTree(itemsList, depth = 0, result = []) {
-    const search = toValue(props.search);
+    const { search, customFilter } = props.value;
     const lowerSearch = search ? search.toLowerCase() : "";
-    const customFilter = toValue(props.customFilter);
 
     for (const item of itemsList) {
       const id = item[actualItemProps.value.value];
@@ -109,7 +110,7 @@ export function useVirtualTree(props, emit) {
         const matches = customFilter
           ? customFilter(id, search, { raw: item })
           : (item[actualItemProps.value.title] || "").toLowerCase().includes(lowerSearch) ||
-            String(id).toLowerCase().includes(lowerSearch);
+          String(id).toLowerCase().includes(lowerSearch);
 
         if (!hasChildren && !matches) {
           continue;
@@ -149,7 +150,7 @@ export function useVirtualTree(props, emit) {
     return result;
   }
 
-  const displayItems = computed(() => flattenTree(toValue(props.items) || []));
+  const displayItems = computed(() => flattenTree(props.value.items || []));
 
   return {
     actualItemProps,

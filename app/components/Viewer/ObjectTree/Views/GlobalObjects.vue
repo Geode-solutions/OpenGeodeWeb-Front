@@ -112,9 +112,11 @@ function handleHoverLeave(item) {
       v-model:selected="treeviewStore.selection"
       v-model:opened="opened"
       :items="processedItems"
-      :search="search"
-      :custom-filter="customFilter"
-      :selection="{ selectable: true }"
+      :options="{
+        selection: { selectable: true },
+        search,
+        customFilter,
+      }"
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"

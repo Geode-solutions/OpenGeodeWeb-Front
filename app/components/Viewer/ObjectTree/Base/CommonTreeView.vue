@@ -6,22 +6,16 @@ import { useVirtualTree } from "@ogw_front/composables/use_virtual_tree";
 
 const {
   items,
-  itemProps = {},
   opened = [],
   selected = [],
-  selection = {},
-  search = "",
-  customFilter = undefined,
   scrollTop = 0,
+  options = {},
 } = defineProps({
   items: { type: Array, required: true },
-  itemProps: { type: Object },
   opened: { type: Array },
   selected: { type: Array },
-  selection: { type: Object },
-  search: { type: String },
-  customFilter: { type: Function },
   scrollTop: { type: Number },
+  options: { type: Object },
 });
 
 const emit = defineEmits(["update:opened", "update:selected", "click:item", "update:scrollTop"]);
@@ -35,20 +29,17 @@ const {
   isSelected,
   getIndeterminate,
 } = useVirtualTree(
-  {
-    items: () => items,
-    itemProps: () => itemProps,
-    opened: () => opened,
-    selected: () => selected,
-    selection: () => selection,
-    search: () => search,
-    customFilter: () => customFilter,
-  },
+  computed(() => ({
+    items,
+    opened,
+    selected,
+    ...options,
+  })),
   emit,
 );
 
 const { virtualScrollRef, stickyHeader, handleScroll } = useTreeScroll(
-  () => scrollTop,
+  computed(() => ({ scrollTop })),
   emit,
   displayItems,
   actualItemProps,

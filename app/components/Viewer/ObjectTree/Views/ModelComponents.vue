@@ -122,7 +122,9 @@ function handleHoverLeave(item) {
       v-model:opened="opened"
       :selected="visibleComponents"
       :items="itemsForTreeView"
-      :selection="{ selectable: true, strategy: 'classic' }"
+      :options="{
+        selection: { selectable: true, strategy: 'classic' },
+      }"
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:selected="updateVisibility"

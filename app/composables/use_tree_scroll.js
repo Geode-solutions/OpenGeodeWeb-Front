@@ -1,8 +1,9 @@
-export function useTreeScroll(scrollTopGetter, emit, displayItems, actualItemProps) {
+export function useTreeScroll(propsIn, emit, displayItems, actualItemProps) {
   const SCROLL_STICKY_THRESHOLD = 10;
   const DEFAULT_ITEM_HEIGHT = 44;
 
-  const internalScrollTop = ref(toValue(scrollTopGetter));
+  const props = toRef(propsIn);
+  const internalScrollTop = ref(props.value.scrollTop || 0);
   const virtualScrollRef = ref(undefined);
 
   function handleScroll(event) {
@@ -11,7 +12,7 @@ export function useTreeScroll(scrollTopGetter, emit, displayItems, actualItemPro
   }
 
   watch(
-    () => toValue(scrollTopGetter),
+    () => props.value.scrollTop,
     (newVal) => {
       if (Math.abs(newVal - internalScrollTop.value) > 1) {
         internalScrollTop.value = newVal;

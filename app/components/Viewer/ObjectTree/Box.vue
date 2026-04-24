@@ -16,17 +16,17 @@ const scrollContainer = ref(undefined);
 const treeviewBox = useTemplateRef("treeview-box");
 const hybridViewerStore = useHybridViewerStore();
 
-const LUMINANCE_THRESHOLD = 0.7;
-const ADAPTIVE_EXPONENT = 1.4;
+const LUMINANCE_THRESHOLD = 0.65;
+const ADAPTIVE_EXPONENT = 0.3;
 
 const MIN_BLUR = 8;
 const MAX_BLUR = 25;
 
-const MIN_OPACITY = 0.1;
-const MAX_OPACITY = 0.8;
+const MIN_OPACITY = 0;
+const MAX_OPACITY = 0.5;
 
 const MIN_BOOST = 1;
-const MAX_BOOST = 1.3;
+const MAX_BOOST = 1.2;
 
 const { x, y, width, height } = useElementBounding(treeviewBox);
 const brightness = ref(LUMINANCE_THRESHOLD);
@@ -138,7 +138,9 @@ watch(
         style="filter: brightness(0); display: flex; align-items: center"
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2"
+        >mdi-drag-variant</v-icon
+      >
       <span
         class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
         style="
@@ -163,7 +165,10 @@ watch(
       />
     </v-card-title>
     <v-divider />
-    <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column" style="min-height: 0">
+    <v-card-text
+      class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column"
+      style="min-height: 0"
+    >
       <div
         ref="scrollContainer"
         class="flex-grow-1 overflow-y-hidden overflow-x-hidden d-flex flex-column"
@@ -196,8 +201,10 @@ watch(
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
   mix-blend-mode: lighten;
   z-index: 0;
   pointer-events: none;
