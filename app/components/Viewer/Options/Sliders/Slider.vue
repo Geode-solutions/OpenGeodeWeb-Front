@@ -1,8 +1,7 @@
 <script setup>
 import BasicSlider from "@ogw_front/components/Basic/Slider";
 
-const size = defineModel();
-
+const model = defineModel();
 const { tooltip } = defineProps({
   tooltip: { type: String, required: true },
 });
@@ -10,9 +9,9 @@ const { tooltip } = defineProps({
 
 <template>
   <v-col cols="auto" justify="center">
-    <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Width'" />
+    <v-icon size="30" icon="mdi-ruler" v-tooltip:left="tooltip" />
   </v-col>
   <v-col justify="center">
-    <BasicSlider v-model="size" />
+    <BasicSlider v-model="model" />
   </v-col>
 </template>

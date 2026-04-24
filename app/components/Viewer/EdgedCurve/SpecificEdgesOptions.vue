@@ -2,8 +2,8 @@
 import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
-import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/SizeSlider";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
+import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width";
 
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -24,7 +24,7 @@ const visibility = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed({
+const width = computed({
   get: () => dataStyleStore.meshEdgesWidth(id.value),
   set: async (newValue) => {
     await dataStyleStore.setMeshEdgesWidth(id.value, newValue);
@@ -89,19 +89,17 @@ const edge_attribute_color_map = computed({
 });
 </script>
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" :btn_image="EdgedCurveEdges">
+  <ViewerContextMenuItem
+    :itemProps="itemProps"
+    :btn_image="EdgedCurveEdges"
+    tooltip="Edges options"
+  >
     <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch data-testid="meshEdgesVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
         <v-row class="pa-0" align="center">
           <v-divider />
-          <v-col cols="auto" justify="center">
-            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Width'" />
-          </v-col>
-          <v-col justify="center">
-            <v-slider v-model="size" hide-details min="0" max="20" step="2" />
-          </v-col>
-          <ViewerOptionsSizeSlider v-model="size" />
+          <ViewerOptionsWidthSlider v-model="width" />
         </v-row>
         <v-row>
           <v-col>

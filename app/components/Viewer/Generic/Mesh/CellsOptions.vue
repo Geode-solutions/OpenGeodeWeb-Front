@@ -97,7 +97,7 @@ const cell_attribute_color_map = computed({
     :btn_image="btn_image"
   >
     <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch data-testid="meshCellsVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
         <ViewerOptionsColoringTypeSelector
           :id="id"
