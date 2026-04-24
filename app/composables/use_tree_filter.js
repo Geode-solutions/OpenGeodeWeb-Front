@@ -92,15 +92,18 @@ function useTreeFilter(rawItems, options = {}) {
     return map;
   });
 
-  function applySearchFilter(newSelection) {
+  function applySearchFilter(newSelection, previousSelection = []) {
     if (!search.value) {
       return newSelection;
     }
     const allItemsMap = allItems.value;
-    return newSelection.filter((id) => {
+    function matches(id) {
       const item = allItemsMap.get(id);
       return item && customFilter(id, search.value, { raw: item });
-    });
+    }
+    const hidden = previousSelection.filter((id) => !matches(id));
+    const visible = newSelection.filter((id) => matches(id));
+    return [...new Set([...hidden, ...visible])];
   }
 
   return {

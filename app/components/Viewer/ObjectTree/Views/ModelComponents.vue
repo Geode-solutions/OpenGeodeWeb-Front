@@ -40,7 +40,7 @@ const {
 } = useTreeFilter(items);
 
 async function onSelectionChange(newSelection) {
-  const current = applySearchFilter(newSelection);
+  const current = applySearchFilter(newSelection, mesh_components_selection.value);
   const previous = mesh_components_selection.value;
   const { added, removed } = compareSelections(current, previous);
 

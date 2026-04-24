@@ -35,10 +35,10 @@ const {
 } = useTreeFilter(toRef(() => treeviewStore.items));
 
 function onUpdateSelection(val) {
-  treeviewStore.selection = applySearchFilter(val);
+  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
 }
 
-const visibleSelection = computed(() => applySearchFilter(treeviewStore.selection));
+const visibleSelection = computed(() => applySearchFilter(treeviewStore.selection, []));
 
 watch(
   () => treeviewStore.selection,
