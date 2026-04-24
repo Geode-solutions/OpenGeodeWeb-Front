@@ -34,11 +34,7 @@ function setOrientation(value) {
     <template #activator="{ props }">
       <v-row dense>
         <v-col>
-          <ActionButton
-            v-bind="props"
-            icon="mdi-axis-arrow"
-            tooltip="Camera Orientations"
-          />
+          <ActionButton v-bind="props" icon="mdi-axis-arrow" tooltip="Camera Orientations" />
         </v-col>
       </v-row>
     </template>
