@@ -2,14 +2,18 @@
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();
+const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
+const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
 const emit = defineEmits(["show-menu"]);
 
@@ -62,6 +66,21 @@ function isModel(item) {
     actualItem.viewer_type === "model" || ["BRep", "Section"].includes(actualItem.geode_object_type)
   );
 }
+
+async function handleHoverEnter(item) {
+  const actualItem = item.raw || item;
+  const is_model = isModel(item);
+  let block_ids = [];
+  if (is_model) {
+    block_ids = await dataStore.getAllModelComponentsViewerIds(actualItem.id);
+  }
+  onHoverEnter(actualItem.id, block_ids, is_model ? "model" : "mesh");
+}
+
+function handleHoverLeave(item) {
+  const actualItem = item.raw || item;
+  onHoverLeave(actualItem.id);
+}
 </script>
 
 <template>
@@ -89,6 +108,8 @@ function isModel(item) {
       <template #title="{ item }">
         <ObjectTreeItemLabel
           :item="item"
+          @mouseenter="handleHoverEnter(item)"
+          @mouseleave="handleHoverLeave(item)"
           @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
         />
       </template>
