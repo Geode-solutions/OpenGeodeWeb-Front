@@ -25,6 +25,39 @@ const ACTOR_COLOR = [
 ];
 const WHEEL_TIME_OUT_MS = 600;
 
+const ORIENTATIONS = {
+  top: { direction: [0, 0, 1], viewUp: [0, 1, 0] },
+  bottom: { direction: [0, 0, -1], viewUp: [0, 1, 0] },
+  north: { direction: [0, 1, 0], viewUp: [0, 0, 1] },
+  south: { direction: [0, -1, 0], viewUp: [0, 0, 1] },
+  east: { direction: [1, 0, 0], viewUp: [0, 0, 1] },
+  west: { direction: [-1, 0, 0], viewUp: [0, 0, 1] },
+};
+
+function getCameraState(camera) {
+  return {
+    focal_point: [...camera.getFocalPoint()],
+    view_up: [...camera.getViewUp()],
+    position: [...camera.getPosition()],
+    view_angle: camera.getViewAngle(),
+    clipping_range: [...camera.getClippingRange()],
+    distance: camera.getDistance(),
+  };
+}
+
+function setCameraState(camera, state) {
+  if (!state) {
+    return;
+  }
+  camera.set({
+    focalPoint: state.focal_point,
+    viewUp: state.view_up,
+    position: state.position,
+    viewAngle: state.view_angle,
+    clippingRange: state.clipping_range,
+  });
+}
+
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
@@ -135,23 +168,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     syncRemoteCamera();
   }
 
-  const ORIENTATIONS = {
-    top: { direction: [0, 0, 1], viewUp: [0, 1, 0] },
-    bottom: { direction: [0, 0, -1], viewUp: [0, 1, 0] },
-    north: { direction: [0, 1, 0], viewUp: [0, 0, 1] },
-    south: { direction: [0, -1, 0], viewUp: [0, 0, 1] },
-    east: { direction: [1, 0, 0], viewUp: [0, 0, 1] },
-    west: { direction: [-1, 0, 0], viewUp: [0, 0, 1] },
-  };
-
   function setCameraOrientation(orientation) {
     const config = ORIENTATIONS[orientation];
     if (!config || !genericRenderWindow.value) {
       return;
     }
     const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
-    camera.set({
+    renderer.getActiveCamera().set({
       position: config.direction,
       viewUp: config.viewUp,
       focalPoint: [0, 0, 0],
@@ -162,27 +185,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function syncRemoteCamera() {
-    console.log("syncRemoteCamera");
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
-    const params = {
-      camera_options: {
-        focal_point: [...camera.getFocalPoint()],
-        view_up: [...camera.getViewUp()],
-        position: [...camera.getPosition()],
-        view_angle: camera.getViewAngle(),
-        clipping_range: [...camera.getClippingRange()],
-        distance: camera.getDistance(),
-      },
-    };
+    const params = { camera_options: getCameraState(camera) };
     viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, params, {
       response_function: () => {
         remoteRender();
-        for (const key in params.camera_options) {
-          if (Object.hasOwn(params.camera_options, key)) {
-            camera_options[key] = params.camera_options[key];
-          }
-        }
+        Object.assign(camera_options, params.camera_options);
       },
     });
   }
@@ -191,16 +200,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!snapshot_camera_options) {
       return;
     }
-
     const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
-
-    camera.setFocalPoint(...snapshot_camera_options.focal_point);
-    camera.setViewUp(...snapshot_camera_options.view_up);
-    camera.setPosition(...snapshot_camera_options.position);
-    camera.setViewAngle(snapshot_camera_options.view_angle);
-    camera.setClippingRange(...snapshot_camera_options.clipping_range);
-
+    setCameraState(renderer.getActiveCamera(), snapshot_camera_options);
     genericRenderWindow.value.getRenderWindow().render();
     Object.assign(camera_options, snapshot_camera_options);
   }
@@ -238,6 +239,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         syncRemoteCamera();
       },
     });
+
     let wheelEventEndTimeout = undefined;
     useEventListener(container, "wheel", () => {
       is_moving.value = true;
@@ -269,16 +271,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   function exportStores() {
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
-    const cameraSnapshot = camera
-      ? {
-          focal_point: [...camera.getFocalPoint()],
-          view_up: [...camera.getViewUp()],
-          position: [...camera.getPosition()],
-          view_angle: camera.getViewAngle(),
-          clipping_range: [...camera.getClippingRange()],
-          distance: camera.getDistance(),
-        }
-      : camera_options;
+    const cameraSnapshot = camera ? getCameraState(camera) : camera_options;
     return { zScale: zScale.value, camera_options: cameraSnapshot };
   }
 
@@ -288,41 +281,27 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return;
     }
     const z_scale = snapshot.zScale;
-
-    function applyCamera() {
-      const { camera_options: snapshot_camera_options } = snapshot;
-      if (!snapshot_camera_options) {
-        return;
-      }
-      const renderer = genericRenderWindow.value.getRenderer();
-      const camera = renderer.getActiveCamera();
-      camera.setFocalPoint(...snapshot_camera_options.focal_point);
-      camera.setViewUp(...snapshot_camera_options.view_up);
-      camera.setPosition(...snapshot_camera_options.position);
-      camera.setViewAngle(snapshot_camera_options.view_angle);
-      camera.setClippingRange(...snapshot_camera_options.clipping_range);
-      genericRenderWindow.value.getRenderWindow().render();
-      const payload = {
-        camera_options: {
-          focal_point: [...snapshot_camera_options.focal_point],
-          view_up: [...snapshot_camera_options.view_up],
-          position: [...snapshot_camera_options.position],
-          view_angle: snapshot_camera_options.view_angle,
-          clipping_range: [...snapshot_camera_options.clipping_range],
-        },
-      };
-      return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, payload, {
-        response_function: () => {
-          remoteRender();
-          Object.assign(camera_options, payload.camera_options);
-        },
-      });
-    }
     if (typeof z_scale === "number") {
       await setZScaling(z_scale);
-      return await applyCamera();
     }
-    return await applyCamera();
+
+    const { camera_options: snapshot_camera_options } = snapshot;
+    if (!snapshot_camera_options) {
+      return;
+    }
+
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
+    setCameraState(camera, snapshot_camera_options);
+    genericRenderWindow.value.getRenderWindow().render();
+
+    const payload = { camera_options: getCameraState(camera) };
+    return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, payload, {
+      response_function: () => {
+        remoteRender();
+        Object.assign(camera_options, payload.camera_options);
+      },
+    });
   }
 
   function clear() {
