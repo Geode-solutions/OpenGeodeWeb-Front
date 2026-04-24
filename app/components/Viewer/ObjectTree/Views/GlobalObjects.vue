@@ -31,7 +31,14 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
+  applySearchFilter,
 } = useTreeFilter(toRef(() => treeviewStore.items));
+
+function onUpdateSelection(val) {
+  treeviewStore.selection = applySearchFilter(val);
+}
+
+const visibleSelection = computed(() => applySearchFilter(treeviewStore.selection));
 
 watch(
   () => treeviewStore.selection,
@@ -94,7 +101,7 @@ function handleHoverLeave(item) {
     />
 
     <v-treeview
-      v-model:selected="treeviewStore.selection"
+      :selected="visibleSelection"
       v-model:opened="opened"
       :items="processedItems"
       :search="search"
@@ -104,6 +111,7 @@ function handleHoverLeave(item) {
       select-strategy="classic"
       selectable
       items-registration="props"
+      @update:selected="onUpdateSelection"
     >
       <template #title="{ item }">
         <ObjectTreeItemLabel

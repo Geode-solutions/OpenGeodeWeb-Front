@@ -21,8 +21,6 @@ function sortAndFormatItems(items, sortType) {
     });
     return {
       ...category,
-      id: category.id,
-      title: category.title || category.id,
       children,
     };
   });
@@ -56,17 +54,53 @@ function useTreeFilter(rawItems, options = {}) {
     if (!rawItems.value) {
       return [];
     }
-    return sortAndFormatItems(
+    const sorted = sortAndFormatItems(
       rawItems.value.filter((category) => {
         const key = category.title || category.id;
         return filterOptions.value[key] !== false;
       }),
       sortType.value,
     );
+    if (!search.value) {
+      return sorted;
+    }
+    return sorted
+      .map((category) => {
+        category.children = (category.children || []).filter((child) =>
+          customFilter(child.id, search.value, { raw: child }),
+        );
+        return category;
+      })
+      .filter((category) => category.children.length > 0);
   });
 
   function toggleSort() {
     sortType.value = sortType.value === "name" ? "id" : "name";
+  }
+
+  const allItems = computed(() => {
+    const map = new Map();
+    function traverse(items) {
+      for (const item of items) {
+        map.set(item.id, item);
+        if (item.children) {
+          traverse(item.children);
+        }
+      }
+    }
+    traverse(rawItems.value || []);
+    return map;
+  });
+
+  function applySearchFilter(newSelection) {
+    if (!search.value) {
+      return newSelection;
+    }
+    const allItemsMap = allItems.value;
+    return newSelection.filter((id) => {
+      const item = allItemsMap.get(id);
+      return item && customFilter(id, search.value, { raw: item });
+    });
   }
 
   return {
@@ -77,6 +111,7 @@ function useTreeFilter(rawItems, options = {}) {
     availableFilterOptions,
     toggleSort,
     customFilter,
+    applySearchFilter,
   };
 }
 

@@ -36,9 +36,11 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
+  applySearchFilter,
 } = useTreeFilter(items);
 
-async function onSelectionChange(current) {
+async function onSelectionChange(newSelection) {
+  const current = applySearchFilter(newSelection);
   const previous = mesh_components_selection.value;
   const { added, removed } = compareSelections(current, previous);
 
