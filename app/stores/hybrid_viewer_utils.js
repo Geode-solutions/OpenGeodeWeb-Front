@@ -33,8 +33,7 @@ export function applyCameraOptions(camera, options) {
 }
 
 export function computeAverageBrightness(rect, options) {
-  const { latestImage, offscreenCtx, offscreenCanvas, genericRenderWindow } =
-    options;
+  const { latestImage, offscreenCtx, offscreenCanvas, genericRenderWindow } = options;
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
