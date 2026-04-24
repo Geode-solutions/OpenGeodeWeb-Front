@@ -19,14 +19,14 @@ const hybridViewerStore = useHybridViewerStore();
 const LUMINANCE_THRESHOLD = 0.7;
 const ADAPTIVE_EXPONENT = 1.4;
 
-const MIN_BLUR = 1;
-const MAX_BLUR = 20;
+const MIN_BLUR = 8;
+const MAX_BLUR = 25;
 
-const MIN_OPACITY = 0.05;
-const MAX_OPACITY = 0.5;
+const MIN_OPACITY = 0.1;
+const MAX_OPACITY = 0.8;
 
 const MIN_BOOST = 1;
-const MAX_BOOST = 1.7;
+const MAX_BOOST = 1.3;
 
 const { x, y, width, height } = useElementBounding(treeviewBox);
 const brightness = ref(LUMINANCE_THRESHOLD);
@@ -198,6 +198,7 @@ watch(
   background: rgba(255, 255, 255, var(--adaptive-opacity));
   backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  mix-blend-mode: lighten;
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
