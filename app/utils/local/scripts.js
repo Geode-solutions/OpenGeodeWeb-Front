@@ -8,9 +8,32 @@ import { appMode } from "./app_mode.js";
 
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || "";
-  return envPath.split(path.delimiter).some((dir) => {
+  const paths = envPath.split(path.delimiter);
+
+  let currentDir = process.cwd();
+  while (currentDir !== path.parse(currentDir).root) {
+    const venvScripts = path.join(
+      currentDir,
+      ".venv",
+      process.platform === "win32" ? "Scripts" : "bin",
+    );
+    if (fs.existsSync(venvScripts)) {
+      paths.unshift(venvScripts);
+      break;
+    }
+    currentDir = path.dirname(currentDir);
+  }
+
+  return paths.some((dir) => {
     const filePath = path.join(dir, execName);
-    return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) return true;
+    if (process.platform === "win32") {
+      return [".exe", ".cmd", ".bat", ".ps1"].some((ext) => {
+        const withExt = `${filePath}${ext}`;
+        return fs.existsSync(withExt) && fs.statSync(withExt).isFile();
+      });
+    }
+    return false;
   });
 }
 

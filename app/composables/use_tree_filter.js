@@ -3,9 +3,8 @@ function customFilter(value, searchQuery, item) {
     return true;
   }
   const query = searchQuery.toLowerCase();
-  const title = (item.raw.title || "").toLowerCase();
-  const idValue = String(value || "").toLowerCase();
-  return title.includes(query) || idValue.includes(query);
+  const { title = "", id = value } = item.raw || {};
+  return [title, id].some((field) => String(field).toLowerCase().includes(query));
 }
 
 function sortAndFormatItems(items, sortType) {
