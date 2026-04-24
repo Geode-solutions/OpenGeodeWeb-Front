@@ -25,12 +25,10 @@ export function useHoverhighlight() {
         block_ids = block_ids_provider;
       }
 
-      
       block_ids = (Array.isArray(block_ids) ? block_ids : [])
         .map((id) => Number.parseInt(id, 10))
         .filter((id) => !Number.isNaN(id));
 
-      
       if (currentId !== id) {
         return;
       }
@@ -68,7 +66,7 @@ export function useHoverhighlight() {
       currentId = undefined;
       currentType = undefined;
     }
-    
+
     if (!currentId) {
       currentId = undefined;
       currentType = undefined;

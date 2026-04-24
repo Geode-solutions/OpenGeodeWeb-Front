@@ -55,8 +55,7 @@ function mapRect(rect, latestImage, canvasRect) {
 }
 
 function computeAverageBrightness(rect, options) {
-  const { latestImage, offscreenCtx, offscreenCanvas, genericRenderWindow } =
-    options;
+  const { latestImage, offscreenCtx, offscreenCanvas, genericRenderWindow } = options;
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
@@ -66,11 +65,7 @@ function computeAverageBrightness(rect, options) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
 
-  const { relX, relY, relW, relH } = mapRect(
-    rect,
-    latestImage,
-    canvas.getBoundingClientRect(),
-  );
+  const { relX, relY, relW, relH } = mapRect(rect, latestImage, canvas.getBoundingClientRect());
 
   offscreenCanvas.width = SAMPLE_SIZE;
   offscreenCanvas.height = SAMPLE_SIZE;

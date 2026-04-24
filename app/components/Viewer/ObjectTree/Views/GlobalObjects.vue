@@ -74,7 +74,6 @@ function isModel(item) {
 function handleHoverEnter(item) {
   const actualItem = item.raw || item;
 
-  
   if (!actualItem.viewer_type) {
     return;
   }
