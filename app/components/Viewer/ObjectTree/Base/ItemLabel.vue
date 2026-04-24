@@ -24,7 +24,6 @@ const tooltipDisabled = computed(() => {
           v-bind="tooltipProps"
           class="tree-item-label"
           :class="{ 'inactive-item': actualItem.is_active === false }"
-          title=""
           @contextmenu.prevent.stop="emit('contextmenu', $event)"
           @mouseenter="emit('mouseenter')"
           @mouseleave="emit('mouseleave')"

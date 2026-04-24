@@ -44,6 +44,15 @@ const { virtualScrollRef, stickyHeader, handleScroll } = useTreeScroll(
   displayItems,
   actualItemProps,
 );
+
+function handleItemClick(item) {
+  if (item.isLeaf) {
+    toggleSelect(item.raw);
+    emit("click:item", item.raw);
+  } else {
+    toggleOpen(item.raw);
+  }
+}
 </script>
 
 <template>
@@ -74,14 +83,7 @@ const { virtualScrollRef, stickyHeader, handleScroll } = useTreeScroll(
         <v-list-item
           :class="['tree-row-wrapper', { 'leaf-row': item.isLeaf }]"
           class="pa-0"
-          @click="
-            if (item.isLeaf) {
-              toggleSelect(item.raw);
-              emit('click:item', item.raw);
-            } else {
-              toggleOpen(item.raw);
-            }
-          "
+          @click="handleItemClick(item)"
         >
           <TreeRow
             :item="item"
