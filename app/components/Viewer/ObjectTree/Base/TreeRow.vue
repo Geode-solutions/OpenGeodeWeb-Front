@@ -70,7 +70,7 @@ const INDENT_STEP = 24;
 }
 
 :deep(.v-checkbox-btn .v-selection-control__input .v-icon) {
-  /* On force le noir */
+  
   color: #000 !important;
 }
 </style>

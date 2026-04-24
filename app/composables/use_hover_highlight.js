@@ -25,12 +25,12 @@ export function useHoverhighlight() {
         block_ids = block_ids_provider;
       }
 
-      // Sécurité : on force les entiers pour le backend
+      
       block_ids = (Array.isArray(block_ids) ? block_ids : [])
         .map((id) => Number.parseInt(id, 10))
         .filter((id) => !Number.isNaN(id));
 
-      // Sécurité : on vérifie que l'utilisateur est toujours sur le MÊME objet après l'éventuel await
+      
       if (currentId !== id) {
         return;
       }
@@ -68,7 +68,7 @@ export function useHoverhighlight() {
       currentId = undefined;
       currentType = undefined;
     }
-    // On reset l'ID même si ce n'était pas le currentId pour éviter les ghost highlights
+    
     if (!currentId) {
       currentId = undefined;
       currentType = undefined;

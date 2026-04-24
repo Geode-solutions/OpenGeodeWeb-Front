@@ -74,7 +74,7 @@ function isModel(item) {
 function handleHoverEnter(item) {
   const actualItem = item.raw || item;
 
-  // Sécurité : Ne pas highlight si ce n'est pas un objet réel du viewer
+  
   if (!actualItem.viewer_type) {
     return;
   }
