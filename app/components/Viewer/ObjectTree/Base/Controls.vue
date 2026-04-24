@@ -9,7 +9,7 @@ const { search, sortType, filterOptions, availableFilterOptions } = defineProps(
   availableFilterOptions: { type: Array, required: true },
 });
 
-const emit = defineEmits(["update:search", "toggle-sort"]);
+const emit = defineEmits(["update:search", "toggle-sort", "collapse-all"]);
 </script>
 
 <template>
@@ -53,6 +53,13 @@ const emit = defineEmits(["update:search", "toggle-sort"]);
           </v-list-item>
         </v-list>
       </v-menu>
+      <ActionButton
+        tooltip="Collapse All"
+        icon="mdi-collapse-all-outline"
+        tooltipLocation="bottom"
+        class="ml-1"
+        @click="emit('collapse-all')"
+      />
     </v-col>
   </v-row>
 </template>

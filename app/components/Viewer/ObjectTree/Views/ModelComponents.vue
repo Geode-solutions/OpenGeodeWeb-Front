@@ -1,59 +1,75 @@
 <script setup>
+import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/use_tree_filter";
+import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import { compareSelections } from "@ogw_front/utils/treeview";
-import { useDataStore } from "@ogw_front/stores/data";
-import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
+import { useModelComponents } from "@ogw_front/composables/use_model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id: viewId } = defineProps({ id: { type: String, required: true } });
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const emit = defineEmits(["show-menu"]);
 
-const dataStore = useDataStore();
-const dataStyleStore = useDataStyleStore();
-const hybridViewerStore = useHybridViewerStore();
 const treeviewStore = useTreeviewStore();
+const {
+  items: rawItems,
+  componentsCache,
+  localCategories,
+  selection: visibleComponents,
+  updateVisibility,
+} = useModelComponents(viewId);
 
 const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
+
 const opened = computed({
   get: () => currentView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(viewId, val),
 });
 
-const items = dataStore.refFormatedMeshComponents(viewId);
-const mesh_components_selection = dataStyleStore.visibleMeshComponents(viewId);
-
 const {
   search,
   sortType,
   filterOptions,
-  processedItems,
+  processedItems: filteredCategories,
   availableFilterOptions,
   toggleSort,
   customFilter,
-} = useTreeFilter(items);
+} = useTreeFilter(localCategories);
 
-async function onSelectionChange(current) {
-  const previous = mesh_components_selection.value;
-  const { added, removed } = compareSelections(current, previous);
-
-  if (added.length === 0 && removed.length === 0) {
-    return;
+const itemsForTreeView = computed(() => {
+  if (search.value && componentsCache.value) {
+    const query = search.value.toLowerCase();
+    const result = [];
+    for (const type of Object.keys(componentsCache.value)) {
+      const matches = componentsCache.value[type].filter(
+        (component) =>
+          component.title.toLowerCase().includes(query) ||
+          component.id.toLowerCase().includes(query),
+      );
+      if (matches.length > 0) {
+        result.push({
+          id: type,
+          title: `${type}s (${matches.length})`,
+          children: sortAndFormatItems(matches, sortType.value),
+        });
+      }
+    }
+    return result;
   }
 
-  if (added.length > 0) {
-    await dataStyleStore.setModelComponentsVisibility(viewId, added, true);
-  }
-  if (removed.length > 0) {
-    await dataStyleStore.setModelComponentsVisibility(viewId, removed, false);
-  }
-  hybridViewerStore.remoteRender();
-}
+  return filteredCategories.value.map((category) => {
+    const item = {};
+    for (const key in category) {
+      if (Object.hasOwn(category, key)) {
+        item[key] = category[key];
+      }
+    }
+    item.children = sortAndFormatItems(componentsCache.value?.[category.id], sortType.value);
+    return item;
+  });
+});
 
 function showContextMenu(event, item) {
   const actualItem = item.raw || item;
@@ -68,13 +84,23 @@ function showContextMenu(event, item) {
 
 function handleHoverEnter(item) {
   const actualItem = item.raw || item;
-  const block_ids = actualItem.category
-    ? [actualItem.viewer_id]
-    : actualItem.children?.map((child) => child.viewer_id) || [];
-  onHoverEnter(viewId, block_ids);
+
+  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
+    return;
+  }
+
+  onHoverEnter(viewId, () =>
+    actualItem.category
+      ? [actualItem.viewer_id]
+      : actualItem.children?.map((child) => child.viewer_id) || [],
+  );
 }
 
-function handleHoverLeave() {
+function handleHoverLeave(item) {
+  const actualItem = item.raw || item;
+  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
+    return;
+  }
   onHoverLeave(viewId);
 }
 </script>
@@ -87,52 +113,62 @@ function handleHoverLeave() {
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
       @toggle-sort="toggleSort"
+      @collapse-all="opened = []"
     />
 
-    <FetchingData v-if="items === undefined" :size="48" :width="4" text="" />
+    <FetchingData v-if="rawItems === undefined" :size="48" :width="4" text="" />
 
-    <v-treeview
-      v-else
-      :selected="mesh_components_selection"
+    <CommonTreeView
       v-model:opened="opened"
-      :items="processedItems"
-      :search="search"
-      :custom-filter="customFilter"
-      class="transparent-treeview"
-      item-value="id"
-      select-strategy="independent"
-      selectable
-      items-registration="props"
-      @update:selected="onSelectionChange"
+      :selected="visibleComponents"
+      :items="itemsForTreeView"
+      :options="{
+        selection: { selectable: true, strategy: 'classic' },
+      }"
+      :scroll-top="currentView?.scrollTop || 0"
+      class="transparent-treeview virtual-tree-height"
+      @update:selected="updateVisibility"
+      @click:item="updateVisibility([$event.id, ...visibleComponents])"
+      @update:scroll-top="treeviewStore.setScrollTop(viewId, $event)"
     >
-      <template #title="{ item }">
+      <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item"
+          :is-leaf="isLeaf"
           show-tooltip
+          class="text-body-1"
+          @contextmenu.prevent.stop="showContextMenu($event, item)"
           @mouseenter="handleHoverEnter(item)"
           @mouseleave="handleHoverLeave(item)"
-          @contextmenu="showContextMenu($event, item)"
         />
       </template>
-    </v-treeview>
+    </CommonTreeView>
   </div>
 </template>
 
 <style scoped>
+.tree-view-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.virtual-tree-height {
+  flex-grow: 1;
+  min-height: 0;
+}
+
 .transparent-treeview {
   background-color: transparent;
-  margin: 4px 0;
 }
 
-:deep(.v-list-item) {
-  transition: background-color 0.2s ease;
+:deep(.v-list-item__overlay) {
+  display: none !important;
 }
 
-:deep(.v-list-item--active > .v-list-item__overlay) {
-  opacity: 0 !important;
-}
-
-:deep(.v-list-item:hover > .v-list-item__overlay) {
-  opacity: 0.1 !important;
+.v-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 </style>

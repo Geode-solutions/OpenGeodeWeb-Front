@@ -1,4 +1,5 @@
 <script setup>
+import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
@@ -31,7 +32,7 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
-} = useTreeFilter(toRef(() => treeviewStore.items));
+} = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
 watch(
   () => treeviewStore.selection,
@@ -67,18 +68,27 @@ function isModel(item) {
   );
 }
 
-async function handleHoverEnter(item) {
+function handleHoverEnter(item) {
   const actualItem = item.raw || item;
-  const is_model = isModel(item);
-  let block_ids = [];
-  if (is_model) {
-    block_ids = await dataStore.getAllModelComponentsViewerIds(actualItem.id);
+
+  if (!actualItem.viewer_type) {
+    return;
   }
-  onHoverEnter(actualItem.id, block_ids, is_model ? "model" : "mesh");
+
+  const is_model = isModel(item);
+
+  onHoverEnter(
+    actualItem.id,
+    async () => (is_model ? await dataStore.getAllModelComponentsViewerIds(actualItem.id) : []),
+    is_model ? "model" : "mesh",
+  );
 }
 
 function handleHoverLeave(item) {
   const actualItem = item.raw || item;
+  if (!actualItem.viewer_type) {
+    return;
+  }
   onHoverLeave(actualItem.id);
 }
 </script>
@@ -91,26 +101,29 @@ function handleHoverLeave(item) {
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
       @toggle-sort="toggleSort"
+      @collapse-all="opened = []"
     />
 
-    <v-treeview
+    <CommonTreeView
       v-model:selected="treeviewStore.selection"
       v-model:opened="opened"
       :items="processedItems"
-      :search="search"
-      :custom-filter="customFilter"
-      class="transparent-treeview"
-      item-value="id"
-      select-strategy="classic"
-      selectable
-      items-registration="props"
+      :options="{
+        selection: { selectable: true },
+        search,
+        customFilter,
+      }"
+      :scroll-top="mainView?.scrollTop || 0"
+      class="transparent-treeview virtual-tree-height"
+      @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
     >
-      <template #title="{ item }">
+      <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item"
+          :is-leaf="isLeaf"
+          @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
           @mouseenter="handleHoverEnter(item)"
           @mouseleave="handleHoverLeave(item)"
-          @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
         />
       </template>
 
@@ -127,11 +140,24 @@ function handleHoverLeave(item) {
           "
         />
       </template>
-    </v-treeview>
+    </CommonTreeView>
   </div>
 </template>
 
 <style scoped>
+.tree-view-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.virtual-tree-height {
+  flex-grow: 1;
+  min-height: 0;
+}
+
 .transparent-treeview {
   background-color: transparent;
   margin: 4px 0;

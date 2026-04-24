@@ -1,4 +1,6 @@
 <script setup>
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+
 const SCROLL_SYNC_DELAY = 50;
 const SCROLL_THRESHOLD = 1;
 const { title, closable, icon, mdiIcon, scrollTop } = defineProps({
@@ -8,12 +10,58 @@ const { title, closable, icon, mdiIcon, scrollTop } = defineProps({
   mdiIcon: { type: String, default: "" },
   scrollTop: { type: Number, default: 0 },
 });
-
 const emit = defineEmits(["close", "dragstart", "update:scrollTop"]);
 
-const scrollContainer = ref(undefined);
+const scrollContainer = useTemplateRef("scroll-container");
+const treeviewBox = useTemplateRef("treeview-box");
+const hybridViewerStore = useHybridViewerStore();
+
+const LUMINANCE_THRESHOLD = 0.65;
+const ADAPTIVE_EXPONENT = 0.3;
+
+const MIN_BLUR = 8;
+const MAX_BLUR = 25;
+
+const MIN_OPACITY = 0;
+const MAX_OPACITY = 0.5;
+
+const MIN_BOOST = 1;
+const MAX_BOOST = 1.2;
+const ADAPTIVE_REFRESH_RATE = 150;
+
+const { x, y, width, height } = useElementBounding(treeviewBox);
+const brightness = ref(LUMINANCE_THRESHOLD);
+
+const updateBrightness = useThrottleFn(() => {
+  brightness.value = hybridViewerStore.getAverageBrightness({
+    x: x.value,
+    y: y.value,
+    width: width.value,
+    height: height.value,
+  });
+}, ADAPTIVE_REFRESH_RATE);
+
 let isApplyingScroll = false;
 let resizeObserver = undefined;
+
+watch([x, y, width, height, () => hybridViewerStore.latestImage], updateBrightness, {
+  immediate: true,
+});
+
+const adaptiveStyles = computed(() => {
+  const normalized = Math.min(1, brightness.value / LUMINANCE_THRESHOLD);
+  const darkFactor = (1 - normalized) ** ADAPTIVE_EXPONENT;
+
+  const blur = MIN_BLUR + darkFactor * (MAX_BLUR - MIN_BLUR);
+  const opacity = MIN_OPACITY + darkFactor * (MAX_OPACITY - MIN_OPACITY);
+  const brightnessBoost = MIN_BOOST + darkFactor * (MAX_BOOST - MIN_BOOST);
+
+  return {
+    "--adaptive-blur": `${blur}px`,
+    "--adaptive-opacity": opacity,
+    "--adaptive-brightness": brightnessBoost,
+  };
+});
 
 function handleScroll(event) {
   if (isApplyingScroll) {
@@ -69,7 +117,12 @@ watch(
 </script>
 
 <template>
-  <v-card variant="outlined" class="tree-box d-flex flex-column">
+  <v-card
+    ref="treeview-box"
+    variant="outlined"
+    class="tree-box d-flex flex-column"
+    :style="adaptiveStyles"
+  >
     <v-card-title
       class="tree-box-header d-flex align-center"
       :class="{ 'cursor-grab': closable }"
@@ -89,7 +142,15 @@ watch(
       <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
       <span
         class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
-        style="height: 24px; line-height: 1"
+        style="
+          height: 24px;
+          line-height: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          flex-shrink: 1;
+          min-width: 0;
+        "
       >
         {{ title }}
       </span>
@@ -103,10 +164,11 @@ watch(
       />
     </v-card-title>
     <v-divider />
-    <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column">
+    <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column" style="min-height: 0">
       <div
-        ref="scrollContainer"
-        class="flex-grow-1 overflow-y-auto overflow-x-hidden"
+        ref="scroll-container"
+        class="flex-grow-1 overflow-y-hidden overflow-x-hidden d-flex flex-column"
+        style="min-height: 0"
         @scroll="handleScroll"
       >
         <slot />
@@ -118,15 +180,44 @@ watch(
 <style scoped>
 .tree-box {
   height: 100%;
+  min-height: 0;
   border-radius: 16px;
   background-color: transparent !important;
-  backdrop-filter: blur(2px);
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition:
+    background-color 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+
+.tree-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  mix-blend-mode: lighten;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition:
+    background-color 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+
+.tree-box > * {
+  position: relative;
+  z-index: 1;
 }
 
 .tree-box-header {
   height: 40px !important;
-  padding: 0 8px !important;
-  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0 12px !important;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 </style>
