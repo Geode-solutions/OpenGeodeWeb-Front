@@ -30,13 +30,19 @@ const INDENT_STEP = 16;
       />
       <div v-else class="icon-placeholder" />
 
-      <v-checkbox-btn
+      <v-btn
         v-if="selection.selectable"
-        :model-value="isSelected(item.raw)"
-        :indeterminate="getIndeterminate(item.raw)"
+        :icon="
+          getIndeterminate(item.raw)
+            ? 'mdi-eye-minus'
+            : isSelected(item.raw)
+              ? 'mdi-eye'
+              : 'mdi-eye-off'
+        "
+        variant="text"
         density="compact"
-        hide-details
         color="black"
+        class="flex-shrink-0"
         @click.stop="$emit('toggle-select', item.raw)"
         @mousedown.stop
       />
@@ -67,9 +73,5 @@ const INDENT_STEP = 16;
 
 .tree-title {
   min-height: 24px;
-}
-
-:deep(.v-checkbox-btn .v-selection-control__input .v-icon) {
-  color: #000 !important;
 }
 </style>
