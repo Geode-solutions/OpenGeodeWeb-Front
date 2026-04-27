@@ -69,7 +69,7 @@ const currentCameraRotation = computed(() => {
     position[1] - focal_point[1],
     position[2] - focal_point[2],
   ];
-  const azimuth = Math.atan2(-deltaX, deltaY) * (ANGLE_OFFSET / Math.PI);
+  const azimuth = Math.atan2(deltaX, deltaY) * (ANGLE_OFFSET / Math.PI);
   const elevation = -Math.atan2(deltaZ, Math.hypot(deltaX, deltaY)) * (ANGLE_OFFSET / Math.PI);
   return `rotateX(${elevation}deg) rotateY(${azimuth}deg)`;
 });
@@ -214,7 +214,7 @@ const cubeTransform = computed(
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(60, 60, 60, 1);
   backdrop-filter: blur(2px);
   transition: all 0.3s ease;
   color: white;
