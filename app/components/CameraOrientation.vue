@@ -93,7 +93,10 @@ function selectOrientation(value) {
               @click.stop="selectOrientation(opt.value)"
             >
               <div class="d-flex flex-column align-center justify-center" style="gap: 2px">
-                <v-icon size="18" :style="opt.value === 'bottom' ? 'transform: rotate(180deg)' : ''">
+                <v-icon
+                  size="18"
+                  :style="opt.value === 'bottom' ? 'transform: rotate(180deg)' : ''"
+                >
                   {{ opt.icon }}
                 </v-icon>
                 <span :class="['text-label', opt.label.length > 1 ? 'text-label-condensed' : '']">
