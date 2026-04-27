@@ -30,7 +30,7 @@ const orientations = [
     label: "North",
     value: "North",
     face: "front",
-    rotation: "rotateX(0deg)",
+    rotation: "rotateX(0deg) rotateY(0deg)",
     position: { top: "35%", left: "20%" },
   },
   {
@@ -69,8 +69,8 @@ const currentCameraRotation = computed(() => {
     position[1] - focal_point[1],
     position[2] - focal_point[2],
   ];
-  const azimuth = Math.atan2(deltaX, deltaY) * (ANGLE_OFFSET / Math.PI);
-  const elevation = -Math.atan2(deltaZ, Math.hypot(deltaX, deltaY)) * (ANGLE_OFFSET / Math.PI);
+  const azimuth = -Math.atan2(deltaX, deltaY) * (ANGLE_OFFSET / Math.PI);
+  const elevation = Math.atan2(deltaZ, Math.hypot(deltaX, deltaY)) * (ANGLE_OFFSET / Math.PI);
   return `rotateX(${elevation}deg) rotateY(${azimuth}deg)`;
 });
 
