@@ -20,7 +20,7 @@ const camera_options = [
   },
   {
     tooltip: "Camera orientation",
-    icon: "mdi-axis-arrow",
+    icon: "mdi-rotate-3d",
     menu: true,
   },
   {

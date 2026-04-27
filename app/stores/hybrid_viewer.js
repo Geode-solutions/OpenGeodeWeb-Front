@@ -42,6 +42,7 @@ function getCameraState(camera) {
     view_angle: camera.getViewAngle(),
     clipping_range: [...camera.getClippingRange()],
     distance: camera.getDistance(),
+    viewMatrix: [...camera.getViewMatrix()],
   };
 }
 
@@ -68,6 +69,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const is_moving = ref(false);
   const zScale = ref(1);
   let viewStream = undefined;
+  let imageStyle = undefined;
   const gridActor = undefined;
 
   async function initHybridViewer() {
@@ -81,7 +83,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     });
 
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-    const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
+    imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
     imageStyle.transition = "opacity 0.1s ease-in";
     imageStyle.zIndex = 1;
 
@@ -95,13 +97,16 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       imageStyle.opacity = 1;
     });
 
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
+    camera.onModified(() => {
+      Object.assign(camera_options, getCameraState(camera));
+    });
+
     status.value = Status.CREATED;
   }
 
   async function addItem(id) {
-    if (!genericRenderWindow.value) {
-      return;
-    }
     const value = await dataStore.item(id);
     const reader = vtkXMLPolyDataReader();
     const textEncoder = new TextEncoder();
@@ -169,19 +174,54 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setCameraOrientation(orientation) {
-    const config = ORIENTATIONS[orientation];
-    if (!config) {
-      return;
-    }
+    const config = ORIENTATIONS[orientation.toLowerCase()];
     const renderer = genericRenderWindow.value.getRenderer();
-    renderer.getActiveCamera().set({
+    const camera = renderer.getActiveCamera();
+
+    const startState = getCameraState(camera);
+
+    camera.set({
       position: config.direction,
       viewUp: config.viewUp,
       focalPoint: [0, 0, 0],
     });
     renderer.resetCamera();
-    genericRenderWindow.value.getRenderWindow().render();
-    syncRemoteCamera();
+    const targetState = getCameraState(camera);
+
+    setCameraState(camera, startState);
+
+    const duration = 500;
+    const startTime = performance.now();
+    is_moving.value = true;
+    imageStyle.opacity = 0;
+
+    function animate(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = progress * (2 - progress);
+
+      const position = startState.position.map(
+        (start, i) => start + (targetState.position[i] - start) * ease,
+      );
+      const viewUp = startState.view_up.map(
+        (start, i) => start + (targetState.view_up[i] - start) * ease,
+      );
+      const focalPoint = startState.focal_point.map(
+        (start, i) => start + (targetState.focal_point[i] - start) * ease,
+      );
+
+      camera.set({ position, viewUp, focalPoint });
+      genericRenderWindow.value.getRenderWindow().render();
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        is_moving.value = false;
+        syncRemoteCamera();
+      }
+    }
+
+    requestAnimationFrame(animate);
   }
 
   function syncRemoteCamera() {
@@ -214,7 +254,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     genericRenderWindow.value.setContainer(container.value.$el);
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
     webGLRenderWindow.setUseBackgroundImage(true);
-    const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
+    imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
     imageStyle.transition = "opacity 0.1s ease-in";
     imageStyle.zIndex = 1;
     resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
@@ -335,5 +375,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     clear,
     exportStores,
     importStores,
+    camera_options,
   };
 });
