@@ -90,7 +90,12 @@ const camera_options = [
       </v-col>
     </v-row>
   </v-container>
-  <CameraOrientation v-if="showCameraOrientation" panel @close="showCameraOrientation = false" />
+  <CameraOrientation
+    v-if="showCameraOrientation"
+    panel
+    @select="hybridViewerStore.setCameraOrientation"
+    @close="showCameraOrientation = false"
+  />
   <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
   <ZScaling v-if="showZScaling" v-model="zScale" :width="400" @close="handleZScalingClose" />
 </template>

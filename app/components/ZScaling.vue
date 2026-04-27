@@ -10,6 +10,7 @@ const emit = defineEmits(["close"]);
 </script>
 <template>
   <GlassCard
+    v-click-outside="() => emit('close')"
     @click.stop
     title="Z Scaling Control"
     :width="width"

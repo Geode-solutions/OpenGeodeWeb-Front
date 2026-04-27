@@ -45,6 +45,7 @@ watch(output_extension, (value) => {
 <template>
   <GlassCard
     v-if="show_dialog"
+    v-click-outside="() => emit('close')"
     @click.stop
     title="Take a screenshot"
     :width="width"

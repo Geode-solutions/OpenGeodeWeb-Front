@@ -1,6 +1,5 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const { panel, width } = defineProps({
   panel: { type: Boolean, default: false },
@@ -8,8 +7,6 @@ const { panel, width } = defineProps({
 });
 
 const emit = defineEmits(["close", "select"]);
-
-const hybridViewerStore = useHybridViewerStore();
 
 const orientations = [
   { label: "Top", value: "top", tooltip: "Top View", icon: "mdi-axis-z-arrow" },
@@ -21,9 +18,6 @@ const orientations = [
 ];
 
 function selectOrientation(value) {
-  if (panel) {
-    hybridViewerStore.setCameraOrientation(value);
-  }
   emit("select", value);
 }
 </script>
@@ -31,6 +25,7 @@ function selectOrientation(value) {
 <template>
   <GlassCard
     v-if="panel"
+    v-click-outside="() => emit('close')"
     @click.stop
     title="Camera Orientations"
     :width="width"
@@ -48,12 +43,12 @@ function selectOrientation(value) {
               <v-btn
                 v-bind="tooltipProps"
                 icon
-                size="42"
+                size="54"
                 variant="flat"
                 class="orientation-btn"
                 @click.stop="selectOrientation(opt.value)"
               >
-                <div class="d-flex flex-column align-center justify-center" style="gap: 2px">
+                <div class="d-flex flex-column align-center justify-center" style="gap: 4px">
                   <v-icon
                     size="18"
                     :style="opt.value === 'bottom' ? 'transform: rotate(180deg)' : ''"

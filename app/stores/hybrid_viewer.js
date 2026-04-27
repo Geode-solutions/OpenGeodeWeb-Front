@@ -170,7 +170,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   function setCameraOrientation(orientation) {
     const config = ORIENTATIONS[orientation];
-    if (!config || !genericRenderWindow.value) {
+    if (!config) {
       return;
     }
     const renderer = genericRenderWindow.value.getRenderer();
