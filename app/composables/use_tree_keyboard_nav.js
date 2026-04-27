@@ -55,11 +55,7 @@ export function useTreeKeyboardNav(displayItems, emit, scrollToIndex, toggleOpen
     const prevIndex = focusedIndex.value;
     const item = displayItems.value[focusedIndex.value];
 
-    if (
-      ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"].includes(
-        event.key,
-      )
-    ) {
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
       event.preventDefault();
       focusedIndex.value = getNextIndex(event.key, item);
     } else if (event.key === "Enter" || event.key === " ") {
