@@ -36,7 +36,15 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
+  applySearchFilter,
 } = useTreeFilter(localCategories);
+
+function onUpdateSelection(newSelection) {
+  const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
+  updateVisibility(finalSelection);
+}
+
+const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
 
 const itemsForTreeView = computed(() => {
   if (search.value && componentsCache.value) {
@@ -59,16 +67,17 @@ const itemsForTreeView = computed(() => {
     return result;
   }
 
-  return filteredCategories.value.map((category) => {
-    const item = {};
-    for (const key in category) {
-      if (Object.hasOwn(category, key)) {
-        item[key] = category[key];
-      }
-    }
-    item.children = sortAndFormatItems(componentsCache.value?.[category.id], sortType.value);
-    return item;
-  });
+  const result = [];
+  for (const category of filteredCategories.value) {
+    result.push({
+      ...category,
+      children: sortAndFormatItems(
+        componentsCache.value?.[category.id],
+        sortType.value,
+      ),
+    });
+  }
+  return result;
 });
 
 function showContextMenu(event, item) {
@@ -119,16 +128,18 @@ function handleHoverLeave() {
     <FetchingData v-if="rawItems === undefined" :size="48" :width="4" text="" />
 
     <CommonTreeView
+      :selected="visibleSelection"
       v-model:opened="opened"
-      :selected="visibleComponents"
       :items="itemsForTreeView"
       :options="{
         selection: { selectable: true, strategy: 'classic' },
+        search,
+        customFilter,
       }"
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
-      @update:selected="updateVisibility"
-      @click:item="updateVisibility([$event.id, ...visibleComponents])"
+      @update:selected="onUpdateSelection"
+      @click:item="onUpdateSelection([$event.id, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
       @hover:enter="handleHoverEnter"
       @hover:leave="handleHoverLeave"

@@ -32,7 +32,14 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
+  applySearchFilter,
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
+
+function onUpdateSelection(val) {
+  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
+}
+
+const visibleSelection = computed(() => applySearchFilter(treeviewStore.selection, []));
 
 watch(
   () => treeviewStore.selection,
@@ -106,7 +113,7 @@ function handleHoverLeave({ item }) {
     />
 
     <CommonTreeView
-      v-model:selected="treeviewStore.selection"
+      :selected="visibleSelection"
       v-model:opened="opened"
       :items="processedItems"
       :options="{
@@ -116,6 +123,7 @@ function handleHoverLeave({ item }) {
       }"
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
+      @update:selected="onUpdateSelection"
       @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
       @hover:enter="handleHoverEnter"
       @hover:leave="handleHoverLeave"
