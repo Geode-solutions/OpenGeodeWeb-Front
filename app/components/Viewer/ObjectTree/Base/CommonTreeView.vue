@@ -4,18 +4,12 @@ import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeScroll } from "@ogw_front/composables/use_tree_scroll";
 import { useVirtualTree } from "@ogw_front/composables/use_virtual_tree";
 
-const {
-  items,
-  opened = [],
-  selected = [],
-  scrollTop = 0,
-  options = {},
-} = defineProps({
+const { items, opened, selected, scrollTop, options } = defineProps({
   items: { type: Array, required: true },
-  opened: { type: Array },
-  selected: { type: Array },
-  scrollTop: { type: Number },
-  options: { type: Object },
+  opened: { type: Array, required: false, default: () => [] },
+  selected: { type: Array, required: false, default: () => [] },
+  scrollTop: { type: Number, required: false, default: 0 },
+  options: { type: Object, required: false, default: () => ({}) },
 });
 
 const emit = defineEmits(["update:opened", "update:selected", "click:item", "update:scrollTop"]);

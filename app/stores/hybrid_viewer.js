@@ -13,7 +13,7 @@ import {
   applyCameraOptions,
   computeAverageBrightness,
   getCameraOptions,
-} from "./hybrid_viewer_utils";
+} from "@ogw_front/utils/hybrid_viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const RGB_MAX = 255;

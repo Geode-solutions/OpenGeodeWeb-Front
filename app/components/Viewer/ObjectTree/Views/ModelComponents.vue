@@ -8,7 +8,7 @@ import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
 import { useModelComponents } from "@ogw_front/composables/use_model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const { id: viewId } = defineProps({ id: { type: String, required: true } });
+const { id } = defineProps({ id: { type: String, required: true } });
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const emit = defineEmits(["show-menu"]);
 
@@ -19,13 +19,13 @@ const {
   localCategories,
   selection: visibleComponents,
   updateVisibility,
-} = useModelComponents(viewId);
+} = useModelComponents(id);
 
-const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === viewId));
+const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === id));
 
 const opened = computed({
   get: () => currentView.value?.opened || [],
-  set: (val) => treeviewStore.setOpened(viewId, val),
+  set: (val) => treeviewStore.setOpened(id, val),
 });
 
 const {
@@ -75,9 +75,9 @@ function showContextMenu(event, item) {
   const actualItem = item.raw || item;
   emit("show-menu", {
     event,
-    itemId: actualItem.category ? actualItem.id : viewId,
+    itemId: actualItem.category ? actualItem.id : id,
     context_type: actualItem.category ? "model_component" : "model_component_type",
-    modelId: viewId,
+    modelId: id,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });
 }
@@ -89,7 +89,7 @@ function handleHoverEnter(item) {
     return;
   }
 
-  onHoverEnter(viewId, () =>
+  onHoverEnter(id, () =>
     actualItem.category
       ? [actualItem.viewer_id]
       : actualItem.children?.map((child) => child.viewer_id) || [],
@@ -101,7 +101,7 @@ function handleHoverLeave(item) {
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
     return;
   }
-  onHoverLeave(viewId);
+  onHoverLeave(id);
 }
 </script>
 
@@ -129,7 +129,7 @@ function handleHoverLeave(item) {
       class="transparent-treeview virtual-tree-height"
       @update:selected="updateVisibility"
       @click:item="updateVisibility([$event.id, ...visibleComponents])"
-      @update:scroll-top="treeviewStore.setScrollTop(viewId, $event)"
+      @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel

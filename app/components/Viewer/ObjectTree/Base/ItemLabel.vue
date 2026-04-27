@@ -1,7 +1,7 @@
 <script setup>
-const { item, isLeaf = undefined } = defineProps({
+const { item, isLeaf } = defineProps({
   item: { type: Object, required: true },
-  isLeaf: { type: Boolean },
+  isLeaf: { type: Boolean, required: false, default: undefined },
 });
 
 const emit = defineEmits(["contextmenu", "mouseenter", "mouseleave"]);

@@ -5,10 +5,10 @@ const SCROLL_SYNC_DELAY = 50;
 const SCROLL_THRESHOLD = 1;
 const { title, closable, icon, mdiIcon, scrollTop } = defineProps({
   title: { type: String, required: true },
-  closable: { type: Boolean, default: false },
-  icon: { type: String, default: "" },
-  mdiIcon: { type: String, default: "" },
-  scrollTop: { type: Number, default: 0 },
+  closable: { type: Boolean, required: false, default: false },
+  icon: { type: String, required: false, default: "" },
+  mdiIcon: { type: String, required: false, default: "" },
+  scrollTop: { type: Number, required: false, default: 0 },
 });
 const emit = defineEmits(["close", "dragstart", "update:scrollTop"]);
 
