@@ -71,10 +71,7 @@ const itemsForTreeView = computed(() => {
   for (const category of filteredCategories.value) {
     result.push({
       ...category,
-      children: sortAndFormatItems(
-        componentsCache.value?.[category.id],
-        sortType.value,
-      ),
+      children: sortAndFormatItems(componentsCache.value?.[category.id], sortType.value),
     });
   }
   return result;

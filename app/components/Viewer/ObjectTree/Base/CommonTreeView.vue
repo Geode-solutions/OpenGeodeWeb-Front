@@ -42,8 +42,12 @@ const {
   emit,
 );
 
-const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex } =
-  useTreeScroll(computed(() => ({ scrollTop })), emit, displayItems, actualItemProps);
+const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex } = useTreeScroll(
+  computed(() => ({ scrollTop })),
+  emit,
+  displayItems,
+  actualItemProps,
+);
 
 function handleItemClick(item, index) {
   if (index !== undefined) {
