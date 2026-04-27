@@ -68,7 +68,7 @@ function isModel(item) {
   );
 }
 
-function handleHoverEnter(item) {
+function handleHoverEnter({ item, immediate = false }) {
   const actualItem = item.raw || item;
 
   if (!actualItem.viewer_type) {
@@ -81,10 +81,11 @@ function handleHoverEnter(item) {
     actualItem.id,
     async () => (is_model ? await dataStore.getAllModelComponentsViewerIds(actualItem.id) : []),
     is_model ? "model" : "mesh",
+    immediate,
   );
 }
 
-function handleHoverLeave(item) {
+function handleHoverLeave({ item }) {
   const actualItem = item.raw || item;
   if (!actualItem.viewer_type) {
     return;
@@ -116,14 +117,14 @@ function handleHoverLeave(item) {
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
+      @hover:enter="handleHoverEnter"
+      @hover:leave="handleHoverLeave"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item"
           :is-leaf="isLeaf"
           @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
-          @mouseenter="handleHoverEnter(item)"
-          @mouseleave="handleHoverLeave(item)"
         />
       </template>
 
@@ -161,17 +162,5 @@ function handleHoverLeave(item) {
 .transparent-treeview {
   background-color: transparent;
   margin: 4px 0;
-}
-
-:deep(.v-list-item) {
-  transition: background-color 0.2s ease;
-}
-
-:deep(.v-list-item--active > .v-list-item__overlay) {
-  opacity: 0 !important;
-}
-
-:deep(.v-list-item:hover > .v-list-item__overlay) {
-  opacity: 0.1 !important;
 }
 </style>

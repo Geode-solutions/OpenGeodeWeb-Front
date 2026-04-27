@@ -82,25 +82,25 @@ function showContextMenu(event, item) {
   });
 }
 
-function handleHoverEnter(item) {
+function handleHoverEnter({ item, immediate = false }) {
   const actualItem = item.raw || item;
 
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
     return;
   }
 
-  onHoverEnter(id, () =>
-    actualItem.category
-      ? [actualItem.viewer_id]
-      : actualItem.children?.map((child) => child.viewer_id) || [],
+  onHoverEnter(
+    id,
+    () =>
+      actualItem.category
+        ? [actualItem.viewer_id]
+        : actualItem.children?.map((child) => child.viewer_id) || [],
+    "model",
+    immediate,
   );
 }
 
-function handleHoverLeave(item) {
-  const actualItem = item.raw || item;
-  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
-    return;
-  }
+function handleHoverLeave() {
   onHoverLeave(id);
 }
 </script>
@@ -130,6 +130,8 @@ function handleHoverLeave(item) {
       @update:selected="updateVisibility"
       @click:item="updateVisibility([$event.id, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
+      @hover:enter="handleHoverEnter"
+      @hover:leave="handleHoverLeave"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -138,8 +140,6 @@ function handleHoverLeave(item) {
           show-tooltip
           class="text-body-1"
           @contextmenu.prevent.stop="showContextMenu($event, item)"
-          @mouseenter="handleHoverEnter(item)"
-          @mouseleave="handleHoverLeave(item)"
         />
       </template>
     </CommonTreeView>
@@ -166,9 +166,5 @@ function handleHoverLeave(item) {
 
 :deep(.v-list-item__overlay) {
   display: none !important;
-}
-
-.v-list-item:hover {
-  background-color: rgba(0, 0, 0, 0.04);
 }
 </style>

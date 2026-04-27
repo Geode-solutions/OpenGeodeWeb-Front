@@ -9,12 +9,14 @@ export function useHoverhighlight() {
   let currentId = undefined;
   let currentType = undefined;
 
-  function onHoverEnter(id, block_ids_provider = [], type = "model") {
+  function onHoverEnter(id, block_ids_provider = [], type = "model", immediate = false) {
     if (timer) {
       clearTimeout(timer);
+      timer = undefined;
     }
     const schema = vtk_schemas.opengeodeweb_viewer[type].highlight;
-    timer = setTimeout(async () => {
+
+    async function highlightAction() {
       currentId = id;
       currentType = type;
 
@@ -43,7 +45,13 @@ export function useHoverhighlight() {
       } catch (error) {
         console.error(`Highlight failed for ${type} ${id}:`, error);
       }
-    }, HOVER_DELAY);
+    }
+
+    if (immediate) {
+      highlightAction();
+    } else {
+      timer = setTimeout(highlightAction, HOVER_DELAY);
+    }
   }
 
   function onHoverLeave(id) {

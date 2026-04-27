@@ -1,6 +1,7 @@
 <script setup>
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
+import { useTreeKeyboardNav } from "@ogw_front/composables/use_tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/use_tree_scroll";
 import { useVirtualTree } from "@ogw_front/composables/use_virtual_tree";
 
@@ -12,7 +13,16 @@ const { items, opened, selected, scrollTop, options } = defineProps({
   options: { type: Object, required: false, default: () => ({}) },
 });
 
-const emit = defineEmits(["update:opened", "update:selected", "click:item", "update:scrollTop"]);
+const treeWrapper = ref(undefined);
+
+const emit = defineEmits([
+  "update:opened",
+  "update:selected",
+  "click:item",
+  "update:scrollTop",
+  "hover:enter",
+  "hover:leave",
+]);
 
 const {
   actualItemProps,
@@ -32,14 +42,13 @@ const {
   emit,
 );
 
-const { virtualScrollRef, stickyHeader, handleScroll } = useTreeScroll(
-  computed(() => ({ scrollTop })),
-  emit,
-  displayItems,
-  actualItemProps,
-);
+const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex } =
+  useTreeScroll(computed(() => ({ scrollTop })), emit, displayItems, actualItemProps);
 
-function handleItemClick(item) {
+function handleItemClick(item, index) {
+  if (index !== undefined) {
+    focusedIndex.value = index;
+  }
   if (item.isLeaf) {
     toggleSelect(item.raw);
     emit("click:item", item.raw);
@@ -47,10 +56,24 @@ function handleItemClick(item) {
     toggleOpen(item.raw);
   }
 }
+
+const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
+  displayItems,
+  emit,
+  scrollToIndex,
+  toggleOpen,
+  handleItemClick,
+);
 </script>
 
 <template>
-  <div class="common-tree-view-wrapper">
+  <div
+    ref="treeWrapper"
+    class="common-tree-view-wrapper"
+    tabindex="0"
+    @keydown="handleKeyDown"
+    @mousedown="treeWrapper.focus()"
+  >
     <StickyHeader
       v-if="stickyHeader"
       :item="stickyHeader"
@@ -73,11 +96,21 @@ function handleItemClick(item) {
       class="common-tree-view"
       @scroll="handleScroll"
     >
-      <template #default="{ item }">
+      <template #default="{ item, index }">
         <v-list-item
-          :class="['tree-row-wrapper', { 'leaf-row': item.isLeaf }]"
+          :class="[
+            'tree-row-wrapper',
+            { 'leaf-row': item.isLeaf, 'is-focused': focusedIndex === index },
+          ]"
           class="pa-0"
-          @click="handleItemClick(item)"
+          tabindex="-1"
+          @mousedown.prevent
+          @click="
+            handleItemClick(item, index);
+            treeWrapper.focus();
+          "
+          @mouseenter="emit('hover:enter', { item })"
+          @mouseleave="emit('hover:leave', { item })"
         >
           <TreeRow
             :item="item"
@@ -110,15 +143,35 @@ function handleItemClick(item) {
   min-height: 0;
 }
 
+.common-tree-view-wrapper:focus {
+  outline: none;
+}
+
 .common-tree-view {
   flex-grow: 1;
   min-height: 0;
   overflow-y: auto !important;
 }
 
+.v-list-item {
+  background-color: transparent !important;
+  transition: none !important;
+}
+
 .tree-row-wrapper {
   min-height: 44px !important;
   cursor: pointer;
+  border-radius: 8px;
+  margin: 1px 4px;
+}
+
+.tree-row-wrapper.is-focused {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+.tree-row-wrapper:hover:not(.is-focused) {
+  background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
 :deep(.v-list-item__content) {
@@ -128,9 +181,5 @@ function handleItemClick(item) {
 
 :deep(.v-list-item__overlay) {
   display: none !important;
-}
-
-.v-list-item:hover {
-  background-color: rgba(0, 0, 0, 0.04);
 }
 </style>

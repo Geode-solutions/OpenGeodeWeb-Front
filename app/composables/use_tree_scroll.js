@@ -56,10 +56,36 @@ export function useTreeScroll(propsIn, emit, displayItems, actualItemProps) {
     return undefined;
   });
 
+  function scrollToIndex(index) {
+    if (index === -1 || !virtualScrollRef.value) {
+      return;
+    }
+
+    const container = virtualScrollRef.value.$el;
+    if (!container) {
+      return;
+    }
+
+    const itemHeight = actualItemProps.value.height;
+    const itemTop = index * itemHeight;
+    const itemBottom = itemTop + itemHeight;
+
+    const currentScrollTop = container.scrollTop;
+    const containerHeight = container.clientHeight;
+    const scrollBottom = currentScrollTop + containerHeight;
+
+    if (itemTop < currentScrollTop) {
+      container.scrollTop = itemTop;
+    } else if (itemBottom > scrollBottom) {
+      container.scrollTop = itemBottom - containerHeight;
+    }
+  }
+
   return {
     internalScrollTop,
     virtualScrollRef,
     stickyHeader,
     handleScroll,
+    scrollToIndex,
   };
 }
