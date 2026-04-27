@@ -2,7 +2,7 @@
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 import ActionButton from "@ogw_front/components/ActionButton.vue";
-import CameraOrientationButtons from "@ogw_front/components/Viewer/CameraOrientationButtons.vue";
+import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
 import Screenshot from "@ogw_front/components/Screenshot";
 import ZScaling from "@ogw_front/components/ZScaling";
 
@@ -12,6 +12,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
 const take_screenshot = ref(false);
+const showCameraOrientation = ref(false);
 const showZScaling = ref(false);
 const grid_scale = ref(false);
 const zScale = ref(hybridViewerStore.zScale);
@@ -34,6 +35,13 @@ const camera_options = [
     icon: "mdi-cube-scan",
     action: () => {
       hybridViewerStore.resetCamera();
+    },
+  },
+  {
+    tooltip: "Camera Orientation",
+    icon: "mdi-axis-arrow",
+    action: () => {
+      showCameraOrientation.value = !showCameraOrientation.value;
     },
   },
   {
@@ -71,31 +79,13 @@ const camera_options = [
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <!-- First button: Reset camera -->
-    <v-row dense>
+    <v-row v-for="action in camera_options" :key="action.icon" dense>
       <v-col>
-        <ActionButton
-          :icon="camera_options[0].icon"
-          :tooltip="camera_options[0].tooltip"
-          @click.stop="camera_options[0].action"
-        />
-      </v-col>
-    </v-row>
-
-    <!-- Second: Camera Orientations Menu -->
-    <CameraOrientationButtons />
-
-    <!-- Remaining options -->
-    <v-row v-for="camera_option in camera_options.slice(1)" :key="camera_option.icon" dense>
-      <v-col>
-        <ActionButton
-          :icon="camera_option.icon"
-          :tooltip="camera_option.tooltip"
-          @click.stop="camera_option.action"
-        />
+        <ActionButton :icon="action.icon" :tooltip="action.tooltip" @click.stop="action.action" />
       </v-col>
     </v-row>
   </v-container>
+  <CameraOrientation v-if="showCameraOrientation" panel @close="showCameraOrientation = false" />
   <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
   <ZScaling v-if="showZScaling" v-model="zScale" :width="400" @close="handleZScalingClose" />
 </template>

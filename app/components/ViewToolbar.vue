@@ -2,7 +2,7 @@
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 import ActionButton from "@ogw_front/components/ActionButton.vue";
-import CameraOrientation from "@ogw_front/components/CameraOrientation";
+import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
 import Screenshot from "@ogw_front/components/Screenshot";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -65,7 +65,7 @@ function setOrientation(direction) {
               tooltip-location="left"
             />
           </template>
-          <CameraOrientation @set-orientation="setOrientation" />
+          <CameraOrientation @select="setOrientation" />
         </v-menu>
         <ActionButton
           v-else
