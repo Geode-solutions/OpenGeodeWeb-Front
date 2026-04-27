@@ -38,7 +38,7 @@ const camera_options = [
     },
   },
   {
-    tooltip: "Camera Orientation",
+    tooltip: "Camera orientation",
     icon: "mdi-axis-arrow",
     action: () => {
       showCameraOrientation.value = !showCameraOrientation.value;
@@ -79,9 +79,14 @@ const camera_options = [
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row v-for="action in camera_options" :key="action.icon" dense>
+    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
-        <ActionButton :icon="action.icon" :tooltip="action.tooltip" @click.stop="action.action" />
+        <ActionButton
+          :icon="camera_option.icon"
+          :tooltip="camera_option.tooltip"
+          tooltip-location="left"
+          @click.stop="camera_option.action"
+        />
       </v-col>
     </v-row>
   </v-container>
