@@ -68,6 +68,11 @@ async function get_allowed_objects() {
       final_object[key].object_priority = Math.max(...priorities);
     }
   }
+  const isCsv = filenames.some((f) => f.toLowerCase().endsWith(".csv"));
+  if (isCsv && !final_object["PointSet3D"]) {
+    final_object["PointSet3D"] = { is_loadable: 1, object_priority: 100 };
+  }
+
   allowed_objects.value = final_object;
   const selected_object = select_geode_object(final_object);
   if (selected_object) {

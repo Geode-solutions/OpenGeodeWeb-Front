@@ -48,7 +48,11 @@ async function get_allowed_files() {
   toggle_loading();
   const geodeStore = useGeodeStore();
   const response = await geodeStore.request(schema, {});
-  accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
+  const extensions = response.extensions.map((extension) => `.${extension}`);
+  if (!extensions.includes(".csv")) {
+    extensions.push(".csv");
+  }
+  accept.value = extensions.join(",");
   toggle_loading();
 }
 
