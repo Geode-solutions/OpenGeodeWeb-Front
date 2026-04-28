@@ -117,6 +117,7 @@
       "rules": {
         "vitest/require-hook": "off",
         "vitest/no-hooks": "off",
+        "jest/no-hooks": "off",
         "vitest/no-importing-vitest-globals": "off",
         "max-lines-per-function": "off",
         "max-statements": "off",
@@ -124,8 +125,11 @@
         "vitest/prefer-to-be-falsy": "off",
         "vitest/require-test-timeout": "warn",
         "vitest/prefer-importing-vitest-globals": "off",
-        "jest/consistent-test-it": ["error", { "fn": "test", "withinDescribe": "test" }],
-        "vitest/prefer-spy-on": "off"
+        "jest/consistent-test-it": "off",
+        "vitest/consistent-test-it": ["error", { "fn": "test", "withinDescribe": "test" }],
+        "vitest/prefer-spy-on": "off",
+        "vitest/prefer-expect-assertions": "off",
+        "jest/prefer-expect-assertions": "off"
       }
     },
     {
