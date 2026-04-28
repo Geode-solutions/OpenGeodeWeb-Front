@@ -148,9 +148,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const startState = getCameraOptions(camera);
 
     applyCameraOptions(camera, {
-      position: config.direction,
-      viewUp: config.viewUp,
-      focalPoint: [0, 0, 0],
+      ...config,
+      focal_point: [0, 0, 0],
     });
     renderer.resetCamera();
     const targetState = getCameraOptions(camera);

@@ -1,10 +1,10 @@
 const ORIENTATIONS = {
-  zplus: { direction: [0, 0, 1], viewUp: [0, 1, 0] },
-  zminus: { direction: [0, 0, -1], viewUp: [0, 1, 0] },
-  yplus: { direction: [0, 1, 0], viewUp: [0, 0, 1] },
-  yminus: { direction: [0, -1, 0], viewUp: [0, 0, 1] },
-  xplus: { direction: [1, 0, 0], viewUp: [0, 0, 1] },
-  xminus: { direction: [-1, 0, 0], viewUp: [0, 0, 1] },
+  zplus: { position: [0, 0, 1], view_up: [0, 1, 0] },
+  zminus: { position: [0, 0, -1], view_up: [0, 1, 0] },
+  yplus: { position: [0, 1, 0], view_up: [0, 0, 1] },
+  yminus: { position: [0, -1, 0], view_up: [0, 0, 1] },
+  xplus: { position: [1, 0, 0], view_up: [0, 0, 1] },
+  xminus: { position: [-1, 0, 0], view_up: [0, 0, 1] },
 };
 
 function getCameraState(camera) {
