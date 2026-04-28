@@ -1,12 +1,13 @@
 <script setup>
+import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
+import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
+import { useTreeFilter } from "@ogw_front/composables/tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();
@@ -32,7 +33,7 @@ const {
   toggleSort,
   customFilter,
   applySearchFilter,
-} = useTreeFilter(toRef(() => treeviewStore.items));
+} = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
 function onUpdateSelection(val) {
   treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
@@ -74,18 +75,28 @@ function isModel(item) {
   );
 }
 
-async function handleHoverEnter(item) {
+function handleHoverEnter({ item, immediate = false }) {
   const actualItem = item.raw || item;
-  const is_model = isModel(item);
-  let block_ids = [];
-  if (is_model) {
-    block_ids = await dataStore.getAllModelComponentsViewerIds(actualItem.id);
+
+  if (!actualItem.viewer_type) {
+    return;
   }
-  onHoverEnter(actualItem.id, block_ids, is_model ? "model" : "mesh");
+
+  const is_model = isModel(item);
+
+  onHoverEnter(
+    actualItem.id,
+    async () => (is_model ? await dataStore.getAllModelComponentsViewerIds(actualItem.id) : []),
+    is_model ? "model" : "mesh",
+    immediate,
+  );
 }
 
-function handleHoverLeave(item) {
+function handleHoverLeave({ item }) {
   const actualItem = item.raw || item;
+  if (!actualItem.viewer_type) {
+    return;
+  }
   onHoverLeave(actualItem.id);
 }
 </script>
@@ -98,26 +109,29 @@ function handleHoverLeave(item) {
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
       @toggle-sort="toggleSort"
+      @collapse-all="opened = []"
     />
 
-    <v-treeview
+    <CommonTreeView
       :selected="visibleSelection"
       v-model:opened="opened"
       :items="processedItems"
-      :search="search"
-      :custom-filter="customFilter"
-      class="transparent-treeview"
-      item-value="id"
-      select-strategy="classic"
-      selectable
-      items-registration="props"
+      :options="{
+        selection: { selectable: true },
+        search,
+        customFilter,
+      }"
+      :scroll-top="mainView?.scrollTop || 0"
+      class="transparent-treeview virtual-tree-height"
       @update:selected="onUpdateSelection"
+      @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
+      @hover:enter="handleHoverEnter"
+      @hover:leave="handleHoverLeave"
     >
-      <template #title="{ item }">
+      <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item"
-          @mouseenter="handleHoverEnter(item)"
-          @mouseleave="handleHoverLeave(item)"
+          :is-leaf="isLeaf"
           @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
         />
       </template>
@@ -135,25 +149,26 @@ function handleHoverLeave(item) {
           "
         />
       </template>
-    </v-treeview>
+    </CommonTreeView>
   </div>
 </template>
 
 <style scoped>
+.tree-view-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.virtual-tree-height {
+  flex-grow: 1;
+  min-height: 0;
+}
+
 .transparent-treeview {
   background-color: transparent;
   margin: 4px 0;
-}
-
-:deep(.v-list-item) {
-  transition: background-color 0.2s ease;
-}
-
-:deep(.v-list-item--active > .v-list-item__overlay) {
-  opacity: 0 !important;
-}
-
-:deep(.v-list-item:hover > .v-list-item__overlay) {
-  opacity: 0.1 !important;
 }
 </style>
