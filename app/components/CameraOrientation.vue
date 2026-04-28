@@ -1,4 +1,5 @@
 <script setup>
+import { ref, watch, onBeforeUnmount, useTemplateRef } from "vue";
 import GlassCard from "@ogw_front/components/GlassCard";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
@@ -62,7 +63,7 @@ const orientations = [
   },
 ];
 
-const hoveredFace = ref();
+const hoveredFace = ref(undefined);
 const hybridViewerStore = useHybridViewerStore();
 const cubeContainer = useTemplateRef("cubeContainer");
 
