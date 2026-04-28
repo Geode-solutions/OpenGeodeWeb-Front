@@ -1,68 +1,45 @@
 <script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+import ToolPanel from "@ogw_front/components/ToolPanel";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const zScale = defineModel({ type: Number, default: 1 });
+const show = defineModel("show", { type: Boolean, default: false });
+
 const { width } = defineProps({
   width: { type: Number, default: 400 },
 });
 
-const emit = defineEmits(["close"]);
+const hybridViewerStore = useHybridViewerStore();
+
+watch(show, async (isVisible) => {
+  if (!isVisible) {
+    await hybridViewerStore.setZScaling(zScale.value);
+  }
+});
 </script>
+
 <template>
-  <GlassCard
-    v-click-outside="() => emit('close')"
-    @click.stop
-    title="Z Scaling Control"
-    :width="width"
-    :ripple="false"
-    variant="panel"
-    padding="pa-0"
-    class="position-absolute rounded-xl elevation-24"
-    style="z-index: 2; top: 90px; right: 55px"
-  >
-    <v-card-text class="pa-5">
-      <v-container>
-        <v-row>
-          <v-col cols="12" class="py-2">
-            <v-slider v-model="zScale" :min="1" :max="10" :step="0.2" label="Z Scale" thumb-label />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12" class="py-2">
-            <v-text-field
-              v-model.number="zScale"
-              type="number"
-              label="Z Scale Value"
-              outlined
-              dense
-              hide-details
-              step="0.1"
-              :min="1"
-            />
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-
-    <template #actions>
-      <v-card-actions class="justify-center pb-4">
-        <v-btn variant="text" color="white" @click="emit('close')">Close</v-btn>
-        <v-btn variant="outlined" color="white" @click="emit('close')">Apply</v-btn>
-      </v-card-actions>
-    </template>
-  </GlassCard>
+  <ToolPanel v-model="show" title="Z Scaling Control" :width="width">
+    <v-container class="pa-5">
+      <v-row>
+        <v-col cols="12" class="py-2">
+          <v-slider v-model="zScale" :min="1" :max="10" :step="0.2" label="Z Scale" thumb-label />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" class="py-2">
+          <v-text-field
+            v-model.number="zScale"
+            type="number"
+            label="Z Scale Value"
+            outlined
+            dense
+            hide-details
+            step="0.1"
+            :min="1"
+          />
+        </v-col>
+      </v-row>
+    </v-container>
+  </ToolPanel>
 </template>
-
-<style scoped>
-.z-scaling-menu {
-  position: absolute;
-  z-index: 2;
-  top: 90px;
-  right: 55px;
-  border-radius: 12px !important;
-}
-
-.custom-number-input :deep(.v-input__control) {
-  min-height: 48px;
-}
-</style>

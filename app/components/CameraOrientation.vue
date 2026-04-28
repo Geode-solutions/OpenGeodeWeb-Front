@@ -1,5 +1,5 @@
 <script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+import ToolPanel from "@ogw_front/components/ToolPanel";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -9,7 +9,8 @@ const { panel, width } = defineProps({
   width: { type: Number, default: 400 },
 });
 
-const emit = defineEmits(["close", "select"]);
+const show = defineModel("show", { type: Boolean, default: false });
+const emit = defineEmits(["select"]);
 
 const orientations = [
   {
@@ -156,18 +157,14 @@ watch(hoveredFace, (newFace, oldFace) => {
 </script>
 
 <template>
-  <GlassCard
+  <ToolPanel
     v-if="panel"
-    v-click-outside="() => emit('close')"
-    @click.stop
+    v-model="show"
     title="Camera Orientations"
     :width="width"
-    :ripple="false"
-    variant="panel"
-    class="position-absolute rounded-xl pa-0 elevation-24"
     style="z-index: 2; top: 90px; right: 55px"
   >
-    <v-card-text
+    <div
       class="pa-0 overflow-hidden position-relative"
       style="
         height: 320px;
@@ -211,13 +208,8 @@ watch(hoveredFace, (newFace, oldFace) => {
         <v-tooltip activator="parent" location="top">{{ orientation.value }} View</v-tooltip>
         <span class="text-caption font-weight-black">{{ orientation.label }}</span>
       </v-btn>
-    </v-card-text>
-    <template #actions>
-      <v-card-actions class="justify-center pb-6">
-        <v-btn variant="text" size="small" @click="emit('close')">Close</v-btn>
-      </v-card-actions>
-    </template>
-  </GlassCard>
+    </div>
+  </ToolPanel>
 
   <v-list v-else density="compact" class="pa-4 orientation-menu rounded-lg" elevation="8">
     <div class="d-flex flex-column align-center" style="gap: 16px">
