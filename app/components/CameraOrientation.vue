@@ -112,9 +112,7 @@ function syncCubeCamera() {
   const renderer = genericRenderWindow.getRenderer();
   const camera = renderer.getActiveCamera();
 
-  camera.setPosition(...options.position);
-  camera.setFocalPoint(...options.focal_point);
-  camera.setViewUp(...options.view_up);
+  hybridViewerStore.setCameraState(camera, options);
   renderer.resetCamera();
   genericRenderWindow.getRenderWindow().render();
 }
@@ -164,6 +162,7 @@ watch(hoveredFace, (newFace, oldFace) => {
     @click.stop
     title="Camera Orientations"
     :width="width"
+    :ripple="false"
     variant="panel"
     class="position-absolute rounded-xl pa-0 elevation-24"
     style="z-index: 2; top: 90px; right: 55px"

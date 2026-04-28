@@ -107,6 +107,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function addItem(id) {
+    if (!genericRenderWindow.value) {
+      return;
+    }
     const value = await dataStore.item(id);
     const reader = vtkXMLPolyDataReader();
     const textEncoder = new TextEncoder();
@@ -195,9 +198,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       const ease = progress * (2 - progress);
 
       camera.set({
-        position: startState.position.map((startValue, index) => startValue + (targetState.position[index] - startValue) * ease),
-        viewUp: startState.view_up.map((startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease),
-        focalPoint: startState.focal_point.map((startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease),
+        position: startState.position.map(
+          (startValue, index) => startValue + (targetState.position[index] - startValue) * ease,
+        ),
+        viewUp: startState.view_up.map(
+          (startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease,
+        ),
+        focalPoint: startState.focal_point.map(
+          (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
+        ),
       });
 
       genericRenderWindow.value.getRenderWindow().render();
@@ -364,5 +373,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     exportStores,
     importStores,
     camera_options,
+    getCameraState,
+    setCameraState,
   };
 });
