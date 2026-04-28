@@ -185,16 +185,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     });
   }
 
-  function updateLocalCamera(snapshot_camera_options) {
-    if (!snapshot_camera_options) {
-      return;
-    }
-    const renderer = genericRenderWindow.value.getRenderer();
-    setCameraState(renderer.getActiveCamera(), snapshot_camera_options);
-    genericRenderWindow.value.getRenderWindow().render();
-    Object.assign(camera_options, snapshot_camera_options);
-  }
-
   function remoteRender() {
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
   }
@@ -275,22 +265,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     }
 
     const { camera_options: snapshot_camera_options } = snapshot;
-    if (!snapshot_camera_options) {
-      return;
+    if (snapshot_camera_options) {
+      const renderer = genericRenderWindow.value.getRenderer();
+      setCameraState(renderer.getActiveCamera(), snapshot_camera_options);
+      genericRenderWindow.value.getRenderWindow().render();
+      syncRemoteCamera();
     }
-
-    const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
-    setCameraState(camera, snapshot_camera_options);
-    genericRenderWindow.value.getRenderWindow().render();
-
-    const payload = { camera_options: getCameraState(camera) };
-    return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, payload, {
-      response_function: () => {
-        remoteRender();
-        Object.assign(camera_options, payload.camera_options);
-      },
-    });
   }
 
   function clear() {
