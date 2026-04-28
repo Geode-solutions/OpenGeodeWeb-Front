@@ -1,8 +1,8 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-
-const ANGLE_OFFSET = 180;
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 
 const { panel, width } = defineProps({
   panel: { type: Boolean, default: false },
@@ -16,69 +16,155 @@ const orientations = [
     label: "Top",
     value: "Top",
     face: "top",
-    rotation: "rotateX(-90deg)",
     position: { top: "15%", left: "50%" },
   },
   {
     label: "Bottom",
     value: "Bottom",
     face: "bottom",
-    rotation: "rotateX(90deg)",
     position: { top: "85%", left: "50%" },
   },
   {
     label: "North",
     value: "North",
     face: "front",
-    rotation: "rotateX(0deg) rotateY(0deg)",
     position: { top: "35%", left: "20%" },
   },
   {
     label: "South",
     value: "South",
     face: "back",
-    rotation: "rotateX(0deg) rotateY(180deg)",
     position: { top: "65%", left: "80%" },
   },
   {
     label: "East",
     value: "East",
     face: "right",
-    rotation: "rotateX(0deg) rotateY(-90deg)",
     position: { top: "35%", left: "80%" },
   },
   {
     label: "West",
     value: "West",
     face: "left",
-    rotation: "rotateX(0deg) rotateY(90deg)",
     position: { top: "65%", left: "20%" },
   },
 ];
 
 const hoveredFace = ref();
 const hybridViewerStore = useHybridViewerStore();
+const cubeContainer = useTemplateRef("cubeContainer");
 
-const currentCameraRotation = computed(() => {
-  const { position, focal_point } = hybridViewerStore.camera_options;
-  if (!position) {
-    return "rotateX(-30deg) rotateY(45deg)";
+let genericRenderWindow = null;
+let cubeActor = null;
+
+function initVTK() {
+  if (genericRenderWindow) return;
+
+  genericRenderWindow = vtkGenericRenderWindow({
+    background: [0, 0, 0, 0],
+    listenWindowResize: false,
+  });
+
+  cubeActor = vtkAnnotatedCubeActor();
+  cubeActor.setDefaultStyle({
+    fontFamily: "Roboto, sans-serif",
+    faceColor: "rgba(60, 60, 60, 1)",
+    fontColor: "white",
+    edgeColor: "rgba(255, 255, 255, 0.4)",
+    edgeThickness: 0.1,
+    resolution: 400,
+    fontSizeScale: (resolution) => resolution / 4,
+  });
+
+  // Mapping VTK axes to labels
+  cubeActor.setXPlusFaceProperty({ text: "East" });
+  cubeActor.setXMinusFaceProperty({ text: "West" });
+  cubeActor.setYPlusFaceProperty({ text: "North" });
+  cubeActor.setYMinusFaceProperty({ text: "South" });
+  cubeActor.setZPlusFaceProperty({ text: "Top" });
+  cubeActor.setZMinusFaceProperty({ text: "Bottom" });
+
+  cubeActor.getProperty().setBackfaceCulling(true);
+
+  const renderer = genericRenderWindow.getRenderer();
+  renderer.addActor(cubeActor);
+  renderer.resetCamera();
+}
+
+// Attach container and handle resize
+watch(cubeContainer, (newContainer) => {
+  if (newContainer && import.meta.client) {
+    initVTK();
+    genericRenderWindow.setContainer(newContainer);
+    const canvas = genericRenderWindow.getApiSpecificRenderWindow().getCanvas();
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.background = "transparent";
+    genericRenderWindow.resize();
   }
-  const [deltaX, deltaY, deltaZ] = [
-    position[0] - focal_point[0],
-    position[1] - focal_point[1],
-    position[2] - focal_point[2],
-  ];
-  const azimuth = -Math.atan2(deltaX, deltaY) * (ANGLE_OFFSET / Math.PI);
-  const elevation = Math.atan2(deltaZ, Math.hypot(deltaX, deltaY)) * (ANGLE_OFFSET / Math.PI);
-  return `rotateX(${elevation}deg) rotateY(${azimuth}deg)`;
 });
 
-const cubeTransform = computed(
-  () =>
-    orientations.find((orientation) => orientation.face === hoveredFace.value)?.rotation ||
-    currentCameraRotation.value,
+onMounted(() => {
+  if (cubeContainer.value && import.meta.client) {
+    initVTK();
+    genericRenderWindow.setContainer(cubeContainer.value);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (genericRenderWindow) {
+    genericRenderWindow.delete();
+  }
+});
+
+// Sync local cube camera with main store camera
+watch(
+  () => hybridViewerStore.camera_options,
+  (options) => {
+    if (!genericRenderWindow || !options.position) return;
+    const renderer = genericRenderWindow.getRenderer();
+    const camera = renderer.getActiveCamera();
+
+    camera.setPosition(...options.position);
+    camera.setFocalPoint(...options.focal_point);
+    camera.setViewUp(...options.view_up);
+    renderer.resetCamera();
+
+    genericRenderWindow.getRenderWindow().render();
+  },
+  { deep: true },
 );
+
+const faceMapping = {
+  right: "XPlus",
+  left: "XMinus",
+  front: "YPlus",
+  back: "YMinus",
+  top: "ZPlus",
+  bottom: "ZMinus",
+};
+
+watch(hoveredFace, (newFace, oldFace) => {
+  if (!cubeActor) return;
+
+  if (oldFace && faceMapping[oldFace]) {
+    cubeActor[`set${faceMapping[oldFace]}FaceProperty`]({
+      faceColor: "rgba(60, 60, 60, 1)",
+      fontColor: "white",
+    });
+  }
+
+  if (newFace && faceMapping[newFace]) {
+    cubeActor[`set${faceMapping[newFace]}FaceProperty`]({
+      faceColor: "rgba(255, 255, 255, 0.95)",
+      fontColor: "black",
+    });
+  }
+
+  if (genericRenderWindow) {
+    genericRenderWindow.getRenderWindow().render();
+  }
+});
 </script>
 
 <template>
@@ -118,17 +204,7 @@ const cubeTransform = computed(
         class="position-absolute d-flex align-center justify-center"
         style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
       >
-        <div class="cube-container" style="--size: 50px; --z: 25px">
-          <div class="cube" :style="{ transform: cubeTransform }">
-            <div
-              v-for="orientation in orientations"
-              :key="orientation.value"
-              :class="['cube-face', orientation.face, { active: hoveredFace === orientation.face }]"
-            >
-              <span class="font-weight-black" style="font-size: 12px">{{ orientation.label }}</span>
-            </div>
-          </div>
-        </div>
+        <div ref="cubeContainer" style="width: 100px; height: 100px" />
       </div>
 
       <v-btn
@@ -156,18 +232,11 @@ const cubeTransform = computed(
 
   <v-list v-else density="compact" class="pa-4 orientation-menu rounded-lg" elevation="8">
     <div class="d-flex flex-column align-center" style="gap: 16px">
-      <div class="cube-container" style="--size: 30px; --z: 15px">
-        <div class="cube" :style="{ transform: cubeTransform }">
-          <div
-            v-for="orientation in orientations"
-            :key="orientation.value"
-            :class="['cube-face', orientation.face, { active: hoveredFace === orientation.face }]"
-          >
-            <span class="font-weight-black" style="font-size: 5px; letter-spacing: 0px">{{
-              orientation.label
-            }}</span>
-          </div>
-        </div>
+      <div
+        class="d-flex align-center justify-center"
+        style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden"
+      >
+        <div ref="cubeContainer" class="w-100 h-100" />
       </div>
       <v-divider class="w-100" />
       <div class="d-flex flex-wrap justify-center" style="max-width: 140px">
@@ -191,39 +260,6 @@ const cubeTransform = computed(
 </template>
 
 <style scoped>
-.cube-container {
-  width: var(--size);
-  height: var(--size);
-  perspective: 600px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cube {
-  width: var(--size);
-  height: var(--size);
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-.cube-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(60, 60, 60, 1);
-  backdrop-filter: blur(2px);
-  transition: all 0.3s ease;
-  color: white;
-}
-.cube-face.active {
-  background: white;
-  color: black;
-  border-color: white;
-}
 .satellite-node {
   transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.2) !important;
@@ -235,24 +271,6 @@ const cubeTransform = computed(
   transform: translate(-50%, -50%) scale(1.1);
   border-color: white !important;
   background: rgba(255, 255, 255, 0.1) !important;
-}
-.front {
-  transform: translateZ(var(--z));
-}
-.back {
-  transform: rotateY(180deg) translateZ(var(--z));
-}
-.right {
-  transform: rotateY(90deg) translateZ(var(--z));
-}
-.left {
-  transform: rotateY(-90deg) translateZ(var(--z));
-}
-.top {
-  transform: rotateX(90deg) translateZ(var(--z));
-}
-.bottom {
-  transform: rotateX(-90deg) translateZ(var(--z));
 }
 .transition-all {
   transition: all 0.4s ease;
