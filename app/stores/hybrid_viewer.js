@@ -313,7 +313,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setVisibility,
     setZScaling,
     syncRemoteCamera,
-    updateLocalCamera,
     initHybridViewer,
     remoteRender,
     resize,
@@ -325,7 +324,5 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     exportStores,
     importStores,
     camera_options,
-    getCameraState,
-    setCameraState,
   };
 });

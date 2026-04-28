@@ -1,5 +1,6 @@
 <script setup>
 import ToolPanel from "@ogw_front/components/ToolPanel";
+import { setCameraState } from "@ogw_front/utils/vtk/camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -113,7 +114,7 @@ function syncCubeCamera() {
   const renderer = genericRenderWindow.getRenderer();
   const camera = renderer.getActiveCamera();
 
-  hybridViewerStore.setCameraState(camera, options);
+  setCameraState(camera, options);
   renderer.resetCamera();
   genericRenderWindow.getRenderWindow().render();
 }
