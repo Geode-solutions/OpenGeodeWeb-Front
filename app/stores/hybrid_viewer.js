@@ -1,15 +1,19 @@
-// oxlint-disable-next-line import/no-unassigned-import
-import "@kitware/vtk.js/Rendering/Profiles/Geometry";
+import {
+  applyCameraOptions,
+  computeAverageBrightness,
+  getCameraOptions,
+} from "@ogw_front/utils/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
 import { ACTOR_COLOR, BACKGROUND_COLOR, WHEEL_TIME_OUT_MS } from "@ogw_front/utils/vtk/constants";
-import { ORIENTATIONS, getCameraState, setCameraState } from "@ogw_front/utils/vtk/camera";
+import { ORIENTATIONS } from "@ogw_front/utils/vtk/camera";
 import { Status } from "@ogw_front/utils/status";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
@@ -24,6 +28,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   let viewStream = undefined;
   let imageStyle = undefined;
   const gridActor = undefined;
+
+  const latestImage = ref(undefined);
+  const offscreenCanvas =
+    typeof document === "undefined" ? undefined : document.createElement("canvas");
+  const offscreenCtx = offscreenCanvas
+    ? offscreenCanvas.getContext("2d", { willReadFrequently: true })
+    : undefined;
+
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
       return;
@@ -45,6 +57,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       if (is_moving.value) {
         return;
       }
+      latestImage.value = event.image;
       webGLRenderWindow.setBackgroundImage(event.image);
       imageStyle.opacity = 1;
     });
@@ -52,7 +65,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
     camera.onModified(() => {
-      Object.assign(camera_options, getCameraState(camera));
+      Object.assign(camera_options, getCameraOptions(camera));
     });
 
     status.value = Status.CREATED;
@@ -132,13 +145,17 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const config = ORIENTATIONS[orientation.toLowerCase()];
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
-    const startState = getCameraState(camera);
+    const startState = getCameraOptions(camera);
 
-    camera.set({ position: config.direction, viewUp: config.viewUp, focalPoint: [0, 0, 0] });
+    applyCameraOptions(camera, {
+      position: config.direction,
+      viewUp: config.viewUp,
+      focalPoint: [0, 0, 0],
+    });
     renderer.resetCamera();
-    const targetState = getCameraState(camera);
+    const targetState = getCameraOptions(camera);
 
-    setCameraState(camera, startState);
+    applyCameraOptions(camera, startState);
 
     const duration = 500;
     const startTime = performance.now();
@@ -176,7 +193,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   function syncRemoteCamera() {
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
-    const params = { camera_options: getCameraState(camera) };
+    const params = { camera_options: getCameraOptions(camera) };
     viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, params, {
       response_function: () => {
         remoteRender();
@@ -197,12 +214,10 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     imageStyle.transition = "opacity 0.1s ease-in";
     imageStyle.zIndex = 1;
     resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
-    console.log("setContainer", container.value.$el);
 
     useMousePressed({
       target: container,
       onPressed: (event) => {
-        console.log("onPressed");
         if (event.button === 0) {
           is_moving.value = true;
           event.stopPropagation();
@@ -214,7 +229,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           return;
         }
         is_moving.value = false;
-        console.log("onReleased");
         syncRemoteCamera();
       },
     });
@@ -247,16 +261,24 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender();
   }
 
+  function getAverageBrightness(rect) {
+    return computeAverageBrightness(rect, {
+      latestImage: latestImage.value,
+      offscreenCtx,
+      offscreenCanvas,
+      genericRenderWindow: genericRenderWindow.value,
+    });
+  }
+
   function exportStores() {
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
-    const cameraSnapshot = camera ? getCameraState(camera) : camera_options;
+    const cameraSnapshot = getCameraOptions(camera) || camera_options;
     return { zScale: zScale.value, camera_options: cameraSnapshot };
   }
 
   async function importStores(snapshot) {
     if (!snapshot) {
-      console.warn("importStores called with undefined snapshot");
       return;
     }
     const z_scale = snapshot.zScale;
@@ -267,7 +289,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const { camera_options: snapshot_camera_options } = snapshot;
     if (snapshot_camera_options) {
       const renderer = genericRenderWindow.value.getRenderer();
-      setCameraState(renderer.getActiveCamera(), snapshot_camera_options);
+      applyCameraOptions(renderer.getActiveCamera(), snapshot_camera_options);
       genericRenderWindow.value.getRenderWindow().render();
       syncRemoteCamera();
     }
@@ -304,5 +326,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     exportStores,
     importStores,
     camera_options,
+    latestImage,
+    getAverageBrightness,
   };
 });
