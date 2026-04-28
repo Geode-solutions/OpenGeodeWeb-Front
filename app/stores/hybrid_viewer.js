@@ -177,14 +177,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const config = ORIENTATIONS[orientation.toLowerCase()];
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
-
     const startState = getCameraState(camera);
 
-    camera.set({
-      position: config.direction,
-      viewUp: config.viewUp,
-      focalPoint: [0, 0, 0],
-    });
+    camera.set({ position: config.direction, viewUp: config.viewUp, focalPoint: [0, 0, 0] });
     renderer.resetCamera();
     const targetState = getCameraState(camera);
 
@@ -199,17 +194,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       const progress = Math.min((currentTime - startTime) / duration, 1);
       const ease = progress * (2 - progress);
 
-      function lerp(start, target) {
-        return start.map((s, i) => s + (target[i] - s) * ease);
-      }
-
       camera.set({
-        position: lerp(startState.position, targetState.position),
-        viewUp: lerp(startState.view_up, targetState.view_up),
-        focalPoint: lerp(startState.focal_point, targetState.focal_point),
+        position: startState.position.map((startValue, index) => startValue + (targetState.position[index] - startValue) * ease),
+        viewUp: startState.view_up.map((startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease),
+        focalPoint: startState.focal_point.map((startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease),
       });
 
       genericRenderWindow.value.getRenderWindow().render();
+
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
@@ -217,7 +209,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         syncRemoteCamera();
       }
     }
-
     requestAnimationFrame(animate);
   }
 

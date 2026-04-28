@@ -16,36 +16,48 @@ const orientations = [
     label: "Top",
     value: "Top",
     face: "top",
+    vtkKey: "ZPlus",
+    rotation: 0,
     position: { top: "15%", left: "50%" },
   },
   {
     label: "Bottom",
     value: "Bottom",
     face: "bottom",
+    vtkKey: "ZMinus",
+    rotation: 0,
     position: { top: "85%", left: "50%" },
   },
   {
     label: "North",
     value: "North",
     face: "front",
+    vtkKey: "YPlus",
+    rotation: 180,
     position: { top: "35%", left: "20%" },
   },
   {
     label: "South",
     value: "South",
     face: "back",
+    vtkKey: "YMinus",
+    rotation: 0,
     position: { top: "65%", left: "80%" },
   },
   {
     label: "East",
     value: "East",
     face: "right",
+    vtkKey: "XPlus",
+    rotation: 90,
     position: { top: "35%", left: "80%" },
   },
   {
     label: "West",
     value: "West",
     face: "left",
+    vtkKey: "XMinus",
+    rotation: -90,
     position: { top: "65%", left: "20%" },
   },
 ];
@@ -78,13 +90,12 @@ function initVTK() {
     fontSizeScale: (resolution) => resolution / 4,
   });
 
-  // Mapping VTK axes to labels with rotation for upright text
-  cubeActor.setXPlusFaceProperty({ text: "East", faceRotation: 90 });
-  cubeActor.setXMinusFaceProperty({ text: "West", faceRotation: -90 });
-  cubeActor.setYPlusFaceProperty({ text: "North", faceRotation: 180 });
-  cubeActor.setYMinusFaceProperty({ text: "South", faceRotation: 0 });
-  cubeActor.setZPlusFaceProperty({ text: "Top", faceRotation: 0 });
-  cubeActor.setZMinusFaceProperty({ text: "Bottom", faceRotation: 0 });
+  for (const orientation of orientations) {
+    cubeActor[`set${orientation.vtkKey}FaceProperty`]({
+      text: orientation.label,
+      faceRotation: orientation.rotation,
+    });
+  }
 
   cubeActor.getProperty().setBackfaceCulling(true);
 
@@ -93,81 +104,56 @@ function initVTK() {
   renderer.resetCamera();
 }
 
+function syncCubeCamera() {
+  const options = hybridViewerStore.camera_options;
+  if (!genericRenderWindow || !options.position) {
+    return;
+  }
+  const renderer = genericRenderWindow.getRenderer();
+  const camera = renderer.getActiveCamera();
+
+  camera.setPosition(...options.position);
+  camera.setFocalPoint(...options.focal_point);
+  camera.setViewUp(...options.view_up);
+  renderer.resetCamera();
+  genericRenderWindow.getRenderWindow().render();
+}
+
 watch(cubeContainer, (newContainer) => {
-  if (newContainer && import.meta.client) {
-    initVTK();
-    genericRenderWindow.setContainer(newContainer);
-    const canvas = genericRenderWindow.getApiSpecificRenderWindow().getCanvas();
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-    canvas.style.background = "transparent";
-    genericRenderWindow.resize();
+  if (!newContainer || !import.meta.client) {
+    return;
   }
+  initVTK();
+  genericRenderWindow.setContainer(newContainer);
+  const canvas = genericRenderWindow.getApiSpecificRenderWindow().getCanvas();
+  canvas.style.width = "100%";
+  canvas.style.height = "100%";
+  canvas.style.background = "transparent";
+  genericRenderWindow.resize();
+  syncCubeCamera();
 });
 
-onMounted(() => {
-  if (cubeContainer.value && import.meta.client) {
-    initVTK();
-    genericRenderWindow.setContainer(cubeContainer.value);
-  }
-});
+onBeforeUnmount(() => genericRenderWindow?.delete());
 
-onBeforeUnmount(() => {
-  if (genericRenderWindow) {
-    genericRenderWindow.delete();
-  }
-});
-
-// Sync local cube camera with main store camera
-watch(
-  () => hybridViewerStore.camera_options,
-  (options) => {
-    if (!genericRenderWindow || !options.position) {
-      return;
-    }
-    const renderer = genericRenderWindow.getRenderer();
-    const camera = renderer.getActiveCamera();
-
-    camera.setPosition(...options.position);
-    camera.setFocalPoint(...options.focal_point);
-    camera.setViewUp(...options.view_up);
-    renderer.resetCamera();
-
-    genericRenderWindow.getRenderWindow().render();
-  },
-  { deep: true },
-);
-
-const faceMapping = {
-  right: "XPlus",
-  left: "XMinus",
-  front: "YPlus",
-  back: "YMinus",
-  top: "ZPlus",
-  bottom: "ZMinus",
-};
+watch(() => hybridViewerStore.camera_options, syncCubeCamera, { deep: true });
 
 watch(hoveredFace, (newFace, oldFace) => {
   if (!cubeActor) {
     return;
   }
-  if (oldFace && faceMapping[oldFace]) {
-    cubeActor[`set${faceMapping[oldFace]}FaceProperty`]({
-      faceColor: "rgba(60, 60, 60, 1)",
-      fontColor: "white",
-    });
+  function updateFace(face, active) {
+    const config = orientations.find((orientation) => orientation.face === face);
+    if (config) {
+      cubeActor[`set${config.vtkKey}FaceProperty`]({
+        faceColor: active ? "rgba(255, 255, 255, 0.95)" : "rgba(60, 60, 60, 1)",
+        fontColor: active ? "black" : "white",
+      });
+    }
   }
 
-  if (newFace && faceMapping[newFace]) {
-    cubeActor[`set${faceMapping[newFace]}FaceProperty`]({
-      faceColor: "rgba(255, 255, 255, 0.95)",
-      fontColor: "black",
-    });
-  }
-
-  if (genericRenderWindow) {
-    genericRenderWindow.getRenderWindow().render();
-  }
+  updateFace(oldFace, false);
+  updateFace(newFace, true);
+  genericRenderWindow.getRenderWindow().render();
 });
 </script>
 
