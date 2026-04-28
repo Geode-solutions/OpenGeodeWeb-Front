@@ -1,11 +1,11 @@
 <script setup>
-import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/use_tree_filter";
+import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
-import { useModelComponents } from "@ogw_front/composables/use_model_components";
+import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
+import { useModelComponents } from "@ogw_front/composables/model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id } = defineProps({ id: { type: String, required: true } });

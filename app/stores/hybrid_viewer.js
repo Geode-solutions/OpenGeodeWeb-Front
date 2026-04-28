@@ -1,19 +1,17 @@
-/* oxlint-disable sort-imports */
-// oxlint-disable-next-line import/no-unassigned-import
-import "@kitware/vtk.js/Rendering/Profiles/Geometry";
-import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
-import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
-import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
-import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-
-import { useDataStore } from "@ogw_front/stores/data";
-import { useViewerStore } from "@ogw_front/stores/viewer";
-import { Status } from "@ogw_front/utils/status";
 import {
   applyCameraOptions,
   computeAverageBrightness,
   getCameraOptions,
 } from "@ogw_front/utils/hybrid_viewer";
+import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
+import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
+
+import { useDataStore } from "@ogw_front/stores/data";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+
+import { Status } from "@ogw_front/utils/status";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const RGB_MAX = 255;

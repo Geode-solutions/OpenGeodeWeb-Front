@@ -5,9 +5,9 @@ import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/It
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useHoverhighlight } from "@ogw_front/composables/use_hover_highlight";
+import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useTreeFilter } from "@ogw_front/composables/use_tree_filter";
+import { useTreeFilter } from "@ogw_front/composables/tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();

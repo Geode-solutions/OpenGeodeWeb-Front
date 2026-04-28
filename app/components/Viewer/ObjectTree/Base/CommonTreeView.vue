@@ -1,9 +1,9 @@
 <script setup>
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
-import { useTreeKeyboardNav } from "@ogw_front/composables/use_tree_keyboard_nav";
-import { useTreeScroll } from "@ogw_front/composables/use_tree_scroll";
-import { useVirtualTree } from "@ogw_front/composables/use_virtual_tree";
+import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
+import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
+import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
 
 const { items, opened, selected, scrollTop, options } = defineProps({
   items: { type: Array, required: true },

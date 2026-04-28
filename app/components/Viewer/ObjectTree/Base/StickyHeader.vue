@@ -9,7 +9,7 @@ const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps
   getIndeterminate: { type: Function, required: true },
 });
 
-defineEmits(["toggle-open", "toggle-select"]);
+const emit = defineEmits(["toggle-open", "toggle-select"]);
 </script>
 
 <template>
