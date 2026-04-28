@@ -1,8 +1,8 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
 const { panel, width } = defineProps({
   panel: { type: Boolean, default: false },
@@ -54,12 +54,13 @@ const hoveredFace = ref();
 const hybridViewerStore = useHybridViewerStore();
 const cubeContainer = useTemplateRef("cubeContainer");
 
-let genericRenderWindow = null;
-let cubeActor = null;
+let genericRenderWindow = undefined;
+let cubeActor = undefined;
 
 function initVTK() {
-  if (genericRenderWindow) return;
-
+  if (genericRenderWindow) {
+    return;
+  }
   genericRenderWindow = vtkGenericRenderWindow({
     background: [0, 0, 0, 0],
     listenWindowResize: false,
@@ -67,7 +68,8 @@ function initVTK() {
 
   cubeActor = vtkAnnotatedCubeActor();
   cubeActor.setDefaultStyle({
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "sans-serif",
+    fontStyle: "bold",
     faceColor: "rgba(60, 60, 60, 1)",
     fontColor: "white",
     edgeColor: "rgba(255, 255, 255, 0.4)",
@@ -76,13 +78,13 @@ function initVTK() {
     fontSizeScale: (resolution) => resolution / 4,
   });
 
-  // Mapping VTK axes to labels
-  cubeActor.setXPlusFaceProperty({ text: "East" });
-  cubeActor.setXMinusFaceProperty({ text: "West" });
-  cubeActor.setYPlusFaceProperty({ text: "North" });
-  cubeActor.setYMinusFaceProperty({ text: "South" });
-  cubeActor.setZPlusFaceProperty({ text: "Top" });
-  cubeActor.setZMinusFaceProperty({ text: "Bottom" });
+  // Mapping VTK axes to labels with rotation for upright text
+  cubeActor.setXPlusFaceProperty({ text: "East", faceRotation: 90 });
+  cubeActor.setXMinusFaceProperty({ text: "West", faceRotation: -90 });
+  cubeActor.setYPlusFaceProperty({ text: "North", faceRotation: 180 });
+  cubeActor.setYMinusFaceProperty({ text: "South", faceRotation: 0 });
+  cubeActor.setZPlusFaceProperty({ text: "Top", faceRotation: 0 });
+  cubeActor.setZMinusFaceProperty({ text: "Bottom", faceRotation: 0 });
 
   cubeActor.getProperty().setBackfaceCulling(true);
 
@@ -91,7 +93,6 @@ function initVTK() {
   renderer.resetCamera();
 }
 
-// Attach container and handle resize
 watch(cubeContainer, (newContainer) => {
   if (newContainer && import.meta.client) {
     initVTK();
@@ -121,7 +122,9 @@ onBeforeUnmount(() => {
 watch(
   () => hybridViewerStore.camera_options,
   (options) => {
-    if (!genericRenderWindow || !options.position) return;
+    if (!genericRenderWindow || !options.position) {
+      return;
+    }
     const renderer = genericRenderWindow.getRenderer();
     const camera = renderer.getActiveCamera();
 
@@ -145,8 +148,9 @@ const faceMapping = {
 };
 
 watch(hoveredFace, (newFace, oldFace) => {
-  if (!cubeActor) return;
-
+  if (!cubeActor) {
+    return;
+  }
   if (oldFace && faceMapping[oldFace]) {
     cubeActor[`set${faceMapping[oldFace]}FaceProperty`]({
       faceColor: "rgba(60, 60, 60, 1)",
