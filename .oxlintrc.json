@@ -92,6 +92,12 @@
         "ignore": [-1, 0, 1, 2, 3, 4],
         "ignoreArrayIndexes": true
       }
+    ],
+    "eslint/no-underscore-dangle": [
+      "error",
+      {
+        "allow": ["_data", "__dirname"]
+      }
     ]
   },
   "overrides": [

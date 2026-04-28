@@ -195,9 +195,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       const ease = progress * (2 - progress);
 
       camera.set({
-        position: startState.position.map((startValue, index) => startValue + (targetState.position[index] - startValue) * ease),
-        viewUp: startState.view_up.map((startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease),
-        focalPoint: startState.focal_point.map((startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease),
+        position: startState.position.map(
+          (startValue, index) => startValue + (targetState.position[index] - startValue) * ease,
+        ),
+        viewUp: startState.view_up.map(
+          (startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease,
+        ),
+        focalPoint: startState.focal_point.map(
+          (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
+        ),
       });
 
       genericRenderWindow.value.getRenderWindow().render();
