@@ -5,15 +5,13 @@ import PointSetPointsOptions from "@ogw_front/components/Viewer/PointSet/Specifi
 import EdgedCurveEdgesOptions from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesOptions";
 import EdgedCurvePointsOptions from "@ogw_front/components/Viewer/EdgedCurve/PointsOptions";
 
-// PolygonalSurface components
-import PolygonalSurfaceEdgesOptions from "@ogw_front/components/Viewer/PolygonalSurface/EdgesOptions";
-import PolygonalSurfacePointsOptions from "@ogw_front/components/Viewer/PolygonalSurface/PointsOptions";
-import PolygonalSurfacePolygonsOptions from "@ogw_front/components/Viewer/PolygonalSurface/SpecificPolygonsOptions";
+// Surface components
+import SurfaceEdgesOptions from "@ogw_front/components/Viewer/Surface/EdgesOptions";
+import SurfacePointsOptions from "@ogw_front/components/Viewer/Surface/PointsOptions";
+import SurfacePolygonsOptions from "@ogw_front/components/Viewer/Surface/PolygonsOptions";
 
 // TriangulatedSurface components
-import TriangulatedSurfaceEdgesOptions from "@ogw_front/components/Viewer/TriangulatedSurface/EdgesOptions";
-import TriangulatedSurfacePointsOptions from "@ogw_front/components/Viewer/TriangulatedSurface/PointsOptions";
-import TriangulatedSurfaceTrianglesOptions from "@ogw_front/components/Viewer/TriangulatedSurface/TrianglesOptions";
+import TriangulatedSurfaceTrianglesOptions from "@ogw_front/components/Viewer/Surface/Triangulated/TrianglesOptions";
 
 // Grid 2D components
 import Grid2DCellsOptions from "@ogw_front/components/Viewer/Grid/2D/CellsOptions";
@@ -45,14 +43,14 @@ const PointSet_menu = [PointSetPointsOptions];
 const EdgedCurve_menu = [EdgedCurvePointsOptions, EdgedCurveEdgesOptions];
 
 const PolygonalSurface_menu = [
-  PolygonalSurfacePointsOptions,
-  PolygonalSurfaceEdgesOptions,
-  PolygonalSurfacePolygonsOptions,
+  SurfacePointsOptions,
+  SurfaceEdgesOptions,
+  SurfacePolygonsOptions,
 ];
 
 const TriangulatedSurface_menu = [
-  TriangulatedSurfacePointsOptions,
-  TriangulatedSurfaceEdgesOptions,
+  SurfacePointsOptions,
+  SurfaceEdgesOptions,
   TriangulatedSurfaceTrianglesOptions,
 ];
 
