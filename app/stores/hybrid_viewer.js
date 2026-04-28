@@ -5,59 +5,12 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
+import { ACTOR_COLOR, BACKGROUND_COLOR, WHEEL_TIME_OUT_MS } from "@ogw_front/utils/vtk/constants";
+import { ORIENTATIONS, getCameraState, setCameraState } from "@ogw_front/utils/vtk/camera";
 import { Status } from "@ogw_front/utils/status";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
-const RGB_MAX = 255;
-const BACKGROUND_GREY_VALUE = 180;
-const ACTOR_DARK_VALUE = 20;
-const BACKGROUND_COLOR = [
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-];
-const ACTOR_COLOR = [
-  ACTOR_DARK_VALUE / RGB_MAX,
-  ACTOR_DARK_VALUE / RGB_MAX,
-  ACTOR_DARK_VALUE / RGB_MAX,
-];
-const WHEEL_TIME_OUT_MS = 600;
-
-const ORIENTATIONS = {
-  top: { direction: [0, 0, 1], viewUp: [0, 1, 0] },
-  bottom: { direction: [0, 0, -1], viewUp: [0, 1, 0] },
-  north: { direction: [0, 1, 0], viewUp: [0, 0, 1] },
-  south: { direction: [0, -1, 0], viewUp: [0, 0, 1] },
-  east: { direction: [1, 0, 0], viewUp: [0, 0, 1] },
-  west: { direction: [-1, 0, 0], viewUp: [0, 0, 1] },
-};
-
-function getCameraState(camera) {
-  return {
-    focal_point: camera.getFocalPoint(),
-    view_up: camera.getViewUp(),
-    position: camera.getPosition(),
-    view_angle: camera.getViewAngle(),
-    clipping_range: camera.getClippingRange(),
-    distance: camera.getDistance(),
-    viewMatrix: camera.getViewMatrix(),
-  };
-}
-
-function setCameraState(camera, state) {
-  if (!state) {
-    return;
-  }
-  camera.set({
-    focalPoint: state.focal_point,
-    viewUp: state.view_up,
-    position: state.position,
-    viewAngle: state.view_angle,
-    clippingRange: state.clipping_range,
-  });
-}
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
@@ -71,7 +24,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   let viewStream = undefined;
   let imageStyle = undefined;
   const gridActor = undefined;
-
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
       return;
