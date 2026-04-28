@@ -36,9 +36,11 @@ const {
   availableFilterOptions,
   toggleSort,
   customFilter,
+  applySearchFilter,
 } = useTreeFilter(items);
 
-async function onSelectionChange(current) {
+async function onSelectionChange(newSelection) {
+  const current = applySearchFilter(newSelection, mesh_components_selection.value);
   const previous = mesh_components_selection.value;
   const { added, removed } = compareSelections(current, previous);
 
@@ -54,6 +56,8 @@ async function onSelectionChange(current) {
   }
   hybridViewerStore.remoteRender();
 }
+
+const visibleSelection = computed(() => applySearchFilter(mesh_components_selection.value, []));
 
 function showContextMenu(event, item) {
   const actualItem = item.raw || item;
@@ -93,14 +97,14 @@ function handleHoverLeave() {
 
     <v-treeview
       v-else
-      :selected="mesh_components_selection"
+      :selected="visibleSelection"
       v-model:opened="opened"
       :items="processedItems"
       :search="search"
       :custom-filter="customFilter"
       class="transparent-treeview"
       item-value="id"
-      select-strategy="independent"
+      select-strategy="classic"
       selectable
       items-registration="props"
       @update:selected="onSelectionChange"
