@@ -29,7 +29,7 @@ const optionsStyle = computed(() => {
   if (!is_active.value || !optionsHeight.value) {
     return {};
   }
-  const angle = (itemProps.index / itemProps.totalItems) * 2 * Math.PI;
+  const angle = (index / itemProps.totalItems) * 2 * Math.PI;
   const radius = RADIUS;
   const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius;
   const height = optionsHeight.value;
@@ -89,7 +89,6 @@ function toggleOptions() {
     >
       <GlassCard
         @click.stop
-        :title="tooltip"
         width="320"
         :max-height="maxCardHeight"
         :ripple="false"
@@ -98,6 +97,7 @@ function toggleOptions() {
         class="elevation-24"
         style="overflow: hidden; display: flex; flex-direction: column"
       >
+        <v-card-title>{{ tooltip }}</v-card-title>
         <v-card-text class="pa-5" style="overflow-y: auto; flex: 1; min-height: 0">
           <slot name="options" />
         </v-card-text>
