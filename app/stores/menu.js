@@ -42,11 +42,7 @@ const PointSet_menu = [PointSetPointsOptions];
 
 const EdgedCurve_menu = [EdgedCurvePointsOptions, EdgedCurveEdgesOptions];
 
-const PolygonalSurface_menu = [
-  SurfacePointsOptions,
-  SurfaceEdgesOptions,
-  SurfacePolygonsOptions,
-];
+const PolygonalSurface_menu = [SurfacePointsOptions, SurfaceEdgesOptions, SurfacePolygonsOptions];
 
 const TriangulatedSurface_menu = [
   SurfacePointsOptions,
