@@ -19,7 +19,7 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const beforeAllTimeout = 40000;
+const beforeAllTimeout = 40_000;
 const data_folder = path.join("tests", "integration", "data", "uploads");
 
 async function runMicroservices() {

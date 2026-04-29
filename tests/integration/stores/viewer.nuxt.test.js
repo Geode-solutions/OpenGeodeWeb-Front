@@ -5,9 +5,9 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
+import { beforeAllTimeout, runMicroservices } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
-import { beforeAllTimeout, runMicroservices } from "@ogw_tests/integration/setup";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
