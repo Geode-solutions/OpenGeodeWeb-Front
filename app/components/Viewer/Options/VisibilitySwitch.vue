@@ -1,4 +1,6 @@
 <script setup>
+import BasicSwitch from "@ogw_front/components/Basic/Switch";
+
 const visibility = defineModel();
 </script>
 
@@ -8,7 +10,7 @@ const visibility = defineModel();
       <v-icon size="30" icon="mdi-eye" v-tooltip:left="'Visibility'" />
     </v-col>
     <v-col cols="auto" justify="center">
-      <v-switch v-model="visibility" inset hide-details />
+      <BasicSwitch v-model="visibility" />
     </v-col>
   </v-row>
 </template>
