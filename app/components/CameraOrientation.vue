@@ -1,6 +1,6 @@
 <script setup>
 import ToolPanel from "@ogw_front/components/ToolPanel";
-import { setCameraState } from "@ogw_front/utils/vtk/camera";
+import { applyCameraOptions } from "@ogw_front/utils/hybrid_viewer";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -88,7 +88,6 @@ function initVTK() {
 
   interactor.onEndAnimation(() => {
     isInteracting = false;
-    hybridViewerStore.syncRemoteCamera();
   });
 
   cubeActor = vtkAnnotatedCubeActor();
@@ -113,41 +112,18 @@ function initVTK() {
   cubeActor.getProperty().setBackfaceCulling(true);
 
   const renderer = genericRenderWindow.getRenderer();
-  const camera = renderer.getActiveCamera();
-
-  camera.onModified(() => {
-    if (isInteracting) {
-      syncMainCamera();
-    }
-  });
 
   renderer.addActor(cubeActor);
   renderer.resetCamera();
 }
 
-function syncMainCamera() {
-  const mainGRW = hybridViewerStore.genericRenderWindow.value;
-  const mainCamera = mainGRW.getRenderer().getActiveCamera();
-  const cubeCamera = genericRenderWindow.getRenderer().getActiveCamera();
-
-  const dir = cubeCamera.getDirectionOfProjection();
-  const dist = mainCamera.getDistance();
-  const focal = mainCamera.getFocalPoint();
-
-  mainCamera.set({
-    position: focal.map((coord, i) => coord - dir[i] * dist),
-    viewUp: cubeCamera.getViewUp(),
-  });
-  mainGRW.getRenderWindow().render();
-}
-
 function syncCubeCamera() {
   const options = hybridViewerStore.camera_options;
-  if (isInteracting || !options.position) {
+  if (!genericRenderWindow || isInteracting || !options.position) {
     return;
   }
   const camera = genericRenderWindow.getRenderer().getActiveCamera();
-  setCameraState(camera, options);
+  applyCameraOptions(camera, options);
   genericRenderWindow.getRenderer().resetCamera();
   genericRenderWindow.getRenderWindow().render();
 }
@@ -224,7 +200,7 @@ watch(hoveredFace, (newFace, oldFace) => {
         class="position-absolute d-flex align-center justify-center"
         style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
       >
-        <div ref="cubeContainer" style="width: 100px; height: 100px" />
+        <div ref="cubeContainer" style="width: 100px; height: 100px; pointer-events: none" />
       </div>
 
       <v-btn
@@ -251,7 +227,7 @@ watch(hoveredFace, (newFace, oldFace) => {
         class="d-flex align-center justify-center"
         style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden"
       >
-        <div ref="cubeContainer" class="w-100 h-100" />
+        <div ref="cubeContainer" class="w-100 h-100" style="pointer-events: none" />
       </div>
       <v-divider class="w-100" />
       <div class="d-flex flex-wrap justify-center" style="max-width: 140px">

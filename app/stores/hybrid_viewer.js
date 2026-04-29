@@ -1,8 +1,11 @@
 import {
+  ORIENTATIONS,
+  animateCamera,
   applyCameraOptions,
   computeAverageBrightness,
   getCameraOptions,
 } from "@ogw_front/utils/hybrid_viewer";
+import { dot } from "@kitware/vtk.js/Common/Core/Math";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
@@ -10,11 +13,14 @@ import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLP
 
 import {
   ACTOR_COLOR,
+  ALIGNMENT_THRESHOLD,
   BACKGROUND_COLOR,
   BUMP_MULTIPLIER,
+  EASE_EXPONENT,
+  LONG_ANIMATION_DURATION,
+  SHORT_ANIMATION_DURATION,
   WHEEL_TIME_OUT_MS,
 } from "@ogw_front/utils/vtk/constants";
-import { ORIENTATIONS } from "@ogw_front/utils/vtk/camera";
 import { Status } from "@ogw_front/utils/status";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -161,39 +167,25 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
     applyCameraOptions(camera, startState);
 
-    const duration = 500;
-    const startTime = performance.now();
+    const alignment = dot(camera.getDirectionOfProjection(), config.position);
+    const duration =
+      alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
     is_moving.value = true;
     imageStyle.opacity = 0;
 
-    function animate(currentTime) {
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-      const ease = progress * (2 - progress);
-      const bump = BUMP_MULTIPLIER * Math.sin(Math.PI * progress);
-
-      camera.set({
-        position: startState.position.map(
-          (startValue, index) =>
-            startValue + (targetState.position[index] - startValue) * ease + bump,
-        ),
-        viewUp: startState.view_up.map(
-          (startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease,
-        ),
-        focalPoint: startState.focal_point.map(
-          (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
-        ),
-      });
-
-      genericRenderWindow.value.getRenderWindow().render();
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
+    animateCamera({
+      camera,
+      startState,
+      targetState,
+      duration,
+      bumpMultiplier: BUMP_MULTIPLIER,
+      easeExponent: EASE_EXPONENT,
+      onUpdate: () => genericRenderWindow.value.getRenderWindow().render(),
+      onEnd: () => {
         is_moving.value = false;
         syncRemoteCamera();
-      }
-    }
-    requestAnimationFrame(animate);
+      },
+    });
   }
 
   function syncRemoteCamera() {
