@@ -41,18 +41,10 @@ function calc_margin(index) {
             </v-icon>
           </template>
         </v-tooltip>
-        <v-icon
-          v-else-if="feedback.type === 'error'"
-          color="white"
-          class="justify-right"
-        >
+        <v-icon v-else-if="feedback.type === 'error'" color="white" class="justify-right">
           mdi-alert-circle-outline
         </v-icon>
-        <v-icon
-          v-else-if="feedback.type === 'success'"
-          color="white"
-          class="justify-right"
-        >
+        <v-icon v-else-if="feedback.type === 'success'" color="white" class="justify-right">
           mdi-check-circle-outline
         </v-icon>
       </v-col>
