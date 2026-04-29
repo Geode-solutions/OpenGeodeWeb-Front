@@ -4,7 +4,6 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 
 const RADIUS = 80;
 const MARGIN_OFFSET = 40;
-const Z_INDEX_MENU = 1000;
 const Z_INDEX_ACTIVE_ITEM = 10;
 const Z_INDEX_BASE_ITEM = 1;
 const FULL_ANGLE = 360;
@@ -34,7 +33,7 @@ const menuX = ref(x);
 const menuY = ref(y);
 
 watch(
-  () => [x, y],
+  () => [x, y, containerWidth, containerHeight],
   ([newX, newY]) => {
     const { x: clampedX, y: clampedY } = clampPosition(newX, newY);
     menuX.value = clampedX;
@@ -110,7 +109,6 @@ function getMenuStyle() {
     position: "fixed",
     left: `${menuStore.containerLeft + menuX.value - RADIUS}px`,
     top: `${menuStore.containerTop + menuY.value - RADIUS}px`,
-    zIndex: Z_INDEX_MENU,
   };
 }
 
