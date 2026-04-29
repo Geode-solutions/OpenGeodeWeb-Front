@@ -98,4 +98,18 @@ function computeAverageBrightness(rect, options) {
   }
 }
 
-export { applyCameraOptions, computeAverageBrightness, getCameraOptions };
+function centerCameraOnPosition(camera, pickedPosition) {
+  if (!camera || !pickedPosition) {
+    return;
+  }
+  const focalPoint = camera.getFocalPoint();
+  const position = camera.getPosition();
+  camera.setFocalPoint(...pickedPosition);
+  camera.setPosition(
+    position[0] + pickedPosition[0] - focalPoint[0],
+    position[1] + pickedPosition[1] - focalPoint[1],
+    position[2] + pickedPosition[2] - focalPoint[2],
+  );
+}
+
+export { applyCameraOptions, centerCameraOnPosition, computeAverageBrightness, getCameraOptions };

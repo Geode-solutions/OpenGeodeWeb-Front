@@ -1,5 +1,6 @@
 import {
   applyCameraOptions,
+  centerCameraOnPosition,
   computeAverageBrightness,
   getCameraOptions,
 } from "@ogw_front/utils/hybrid_viewer";
@@ -189,30 +190,18 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           const rect = container.value.$el.getBoundingClientRect();
           const display_x = Math.round(event.clientX - rect.left);
           const display_y = Math.round(rect.height - (event.clientY - rect.top));
-          console.log("Picking RPC at:", display_x, display_y);
           viewerStore.request(
             viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
             { x: display_x, y: display_y },
             {
               response_function: (response) => {
-                console.log("RPC Response:", response);
                 const pickedPos = [response.x, response.y, response.z];
                 if (pickedPos.some((value) => value !== 0)) {
-                  console.log("Centering camera on:", pickedPos);
                   const renderer = genericRenderWindow.value.getRenderer();
                   const camera = renderer.getActiveCamera();
-                  const focalPoint = camera.getFocalPoint();
-                  const position = camera.getPosition();
-                  camera.setFocalPoint(...pickedPos);
-                  camera.setPosition(
-                    position[0] + pickedPos[0] - focalPoint[0],
-                    position[1] + pickedPos[1] - focalPoint[1],
-                    position[2] + pickedPos[2] - focalPoint[2],
-                  );
+                  centerCameraOnPosition(camera, pickedPos);
                   genericRenderWindow.value.getRenderWindow().render();
                   syncRemoteCamera();
-                } else {
-                  console.warn("Invalid pickedPos (all zeros):", pickedPos);
                 }
               },
             },
