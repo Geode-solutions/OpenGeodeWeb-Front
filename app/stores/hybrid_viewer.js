@@ -172,6 +172,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setContainer(container) {
+    if (!container.value) {
+      return;
+    }
     genericRenderWindow.value.setContainer(container.value.$el);
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
     webGLRenderWindow.setUseBackgroundImage(true);

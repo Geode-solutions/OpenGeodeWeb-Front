@@ -29,17 +29,50 @@ const polyhedron_attribute_name = defineModel("polyhedron_attribute_name");
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range");
 const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map");
 
-const { id } = defineProps({
+const { id, capabilities } = defineProps({
   id: { type: String, required: true },
+  capabilities: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
-const has_color = computed(() => color.value !== undefined);
-const has_textures = computed(() => textures.value !== undefined);
-const has_vertex = computed(() => vertex_attribute_range.value !== undefined);
-const has_edge = computed(() => edge_attribute_range.value !== undefined);
-const has_cells = computed(() => cell_attribute_range.value !== undefined);
-const has_polygons = computed(() => polygon_attribute_range.value !== undefined);
-const has_polyhedra = computed(() => polyhedron_attribute_range.value !== undefined);
+function isAvailable(key) {
+  if (capabilities[key] && capabilities[key].available === false) {
+    return false;
+  }
+  return true;
+}
+
+function hasColorMap(key) {
+  if (capabilities[key] && capabilities[key].hasColorMap === false) {
+    return false;
+  }
+  return true;
+}
+
+const has_color = computed(() => color.value !== undefined && isAvailable("color"));
+const has_textures = computed(() => textures.value !== undefined && isAvailable("textures"));
+const has_vertex = computed(
+  () =>
+    vertex_attribute_range.value !== undefined && isAvailable("vertex") && hasColorMap("vertex"),
+);
+const has_edge = computed(
+  () => edge_attribute_range.value !== undefined && isAvailable("edge") && hasColorMap("edge"),
+);
+const has_cells = computed(
+  () => cell_attribute_range.value !== undefined && isAvailable("cell") && hasColorMap("cell"),
+);
+const has_polygons = computed(
+  () =>
+    polygon_attribute_range.value !== undefined && isAvailable("polygon") && hasColorMap("polygon"),
+);
+const has_polyhedra = computed(
+  () =>
+    polyhedron_attribute_range.value !== undefined &&
+    isAvailable("polyhedron") &&
+    hasColorMap("polyhedron"),
+);
 
 const color_dict = { name: "Color", value: "color" };
 const textures_dict = { name: "Textures", value: "textures" };
@@ -116,7 +149,7 @@ watch(coloring_style_label, (value) => {
           <template v-if="coloring_style_key === textures_dict['value']">
             <ViewerOptionsTexturesSelector v-model="textures" :id="id" />
           </template>
-          <template v-if="coloring_style_key === vertex_dict['value']">
+          <template v-if="coloring_style_key === vertex_dict['value'] && hasColorMap('vertex')">
             <ViewerOptionsAttributeSelector
               v-model:name="vertex_attribute_name"
               v-model:range="vertex_attribute_range"
@@ -125,7 +158,7 @@ watch(coloring_style_label, (value) => {
               :schema="back_schemas.opengeodeweb_back.vertex_attribute_names"
             />
           </template>
-          <template v-if="coloring_style_key === edge_dict['value']">
+          <template v-if="coloring_style_key === edge_dict['value'] && hasColorMap('edge')">
             <ViewerOptionsAttributeSelector
               v-model:name="edge_attribute_name"
               v-model:range="edge_attribute_range"
@@ -134,7 +167,7 @@ watch(coloring_style_label, (value) => {
               :schema="back_schemas.opengeodeweb_back.edge_attribute_names"
             />
           </template>
-          <template v-if="coloring_style_key === cell_dict['value']">
+          <template v-if="coloring_style_key === cell_dict['value'] && hasColorMap('cell')">
             <ViewerOptionsAttributeSelector
               v-model:name="cell_attribute_name"
               v-model:range="cell_attribute_range"
@@ -143,7 +176,7 @@ watch(coloring_style_label, (value) => {
               :schema="back_schemas.opengeodeweb_back.cell_attribute_names"
             />
           </template>
-          <template v-if="coloring_style_key === polygon_dict['value']">
+          <template v-if="coloring_style_key === polygon_dict['value'] && hasColorMap('polygon')">
             <ViewerOptionsAttributeSelector
               v-model:name="polygon_attribute_name"
               v-model:range="polygon_attribute_range"
@@ -152,7 +185,9 @@ watch(coloring_style_label, (value) => {
               :schema="back_schemas.opengeodeweb_back.polygon_attribute_names"
             />
           </template>
-          <template v-if="coloring_style_key === polyhedron_dict['value']">
+          <template
+            v-if="coloring_style_key === polyhedron_dict['value'] && hasColorMap('polyhedron')"
+          >
             <ViewerOptionsAttributeSelector
               v-model:name="polyhedron_attribute_name"
               v-model:range="polyhedron_attribute_range"
