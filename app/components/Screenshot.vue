@@ -107,10 +107,6 @@ watch(screenshot_type, (value) => {
                 :disabled="!isClipboardSupported"
               >
                 Clipboard
-                <v-tooltip activator="parent" v-if="!isClipboardSupported">
-                  Clipboard API is only available in secure contexts
-                  (HTTPS/localhost)
-                </v-tooltip>
               </v-btn>
             </v-btn-toggle>
           </v-col>
