@@ -29,17 +29,35 @@ const polyhedron_attribute_name = defineModel("polyhedron_attribute_name");
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range");
 const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map");
 
-const { id } = defineProps({
+const { id, capabilities } = defineProps({
   id: { type: String, required: true },
+  capabilities: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
-const has_color = computed(() => color.value !== undefined);
-const has_textures = computed(() => textures.value !== undefined);
-const has_vertex = computed(() => vertex_attribute_range.value !== undefined);
-const has_edge = computed(() => edge_attribute_range.value !== undefined);
-const has_cells = computed(() => cell_attribute_range.value !== undefined);
-const has_polygons = computed(() => polygon_attribute_range.value !== undefined);
-const has_polyhedra = computed(() => polyhedron_attribute_range.value !== undefined);
+const isAvailable = (key) => {
+  if (capabilities[key] && capabilities[key].available === false) {
+    return false;
+  }
+  return true;
+};
+
+const hasColorMap = (key) => {
+  if (capabilities[key] && capabilities[key].hasColorMap === false) {
+    return false;
+  }
+  return true;
+};
+
+const has_color = computed(() => color.value !== undefined && isAvailable("color"));
+const has_textures = computed(() => textures.value !== undefined && isAvailable("textures"));
+const has_vertex = computed(() => vertex_attribute_range.value !== undefined && isAvailable("vertex"));
+const has_edge = computed(() => edge_attribute_range.value !== undefined && isAvailable("edge"));
+const has_cells = computed(() => cell_attribute_range.value !== undefined && isAvailable("cell"));
+const has_polygons = computed(() => polygon_attribute_range.value !== undefined && isAvailable("polygon"));
+const has_polyhedra = computed(() => polyhedron_attribute_range.value !== undefined && isAvailable("polyhedron"));
 
 const color_dict = { name: "Color", value: "color" };
 const textures_dict = { name: "Textures", value: "textures" };
@@ -123,6 +141,7 @@ watch(coloring_style_label, (value) => {
               v-model:colorMap="vertex_attribute_color_map"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.vertex_attribute_names"
+              :hasColorMap="hasColorMap('vertex')"
             />
           </template>
           <template v-if="coloring_style_key === edge_dict['value']">
@@ -132,6 +151,7 @@ watch(coloring_style_label, (value) => {
               v-model:colorMap="edge_attribute_color_map"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.edge_attribute_names"
+              :hasColorMap="hasColorMap('edge')"
             />
           </template>
           <template v-if="coloring_style_key === cell_dict['value']">
@@ -141,6 +161,7 @@ watch(coloring_style_label, (value) => {
               v-model:colorMap="cell_attribute_color_map"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.cell_attribute_names"
+              :hasColorMap="hasColorMap('cell')"
             />
           </template>
           <template v-if="coloring_style_key === polygon_dict['value']">
@@ -150,6 +171,7 @@ watch(coloring_style_label, (value) => {
               v-model:colorMap="polygon_attribute_color_map"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.polygon_attribute_names"
+              :hasColorMap="hasColorMap('polygon')"
             />
           </template>
           <template v-if="coloring_style_key === polyhedron_dict['value']">
@@ -159,6 +181,7 @@ watch(coloring_style_label, (value) => {
               v-model:colorMap="polyhedron_attribute_color_map"
               :id="id"
               :schema="back_schemas.opengeodeweb_back.polyhedron_attribute_names"
+              :hasColorMap="hasColorMap('polyhedron')"
             />
           </template>
         </v-col>

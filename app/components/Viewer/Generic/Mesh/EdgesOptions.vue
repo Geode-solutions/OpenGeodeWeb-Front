@@ -44,52 +44,14 @@ const color = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_name = computed({
-  get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshEdgesVertexAttributeName(id.value, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-const vertex_attribute_range = computed({
-  get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshEdgesVertexAttributeRange(id.value, newValue[0], newValue[1]);
-    hybridViewerStore.remoteRender();
-  },
-});
-const vertex_attribute_color_map = computed({
-  get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshEdgesVertexAttributeColorMap(id.value, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-const edge_attribute_name = computed({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshEdgesEdgeAttributeName(id.value, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-const edge_attribute_range = computed({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshEdgesEdgeAttributeRange(id.value, newValue[0], newValue[1]);
-    hybridViewerStore.remoteRender();
-  },
-});
-const edge_attribute_color_map = computed({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshEdgesEdgeAttributeColorMap(id.value, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Edges options" :btn_image="btn_image">
+  <ViewerContextMenuItem
+    :itemProps="itemProps"
+    tooltip="Edges options"
+    :btn_image="btn_image"
+  >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
       <template v-if="visibility">
@@ -108,12 +70,6 @@ const edge_attribute_color_map = computed({
               :id="id"
               v-model:coloring_style_key="coloring_style_key"
               v-model:color="color"
-              v-model:vertex_attribute_name="vertex_attribute_name"
-              v-model:vertex_attribute_range="vertex_attribute_range"
-              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-              v-model:edge_attribute_name="edge_attribute_name"
-              v-model:edge_attribute_range="edge_attribute_range"
-              v-model:edge_attribute_color_map="edge_attribute_color_map"
             />
           </v-col>
         </v-row>

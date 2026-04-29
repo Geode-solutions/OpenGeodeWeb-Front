@@ -45,6 +45,10 @@ function useMeshPointsVertexAttributeConfig() {
     });
   }
 
+  function meshPointsVertexAttributeName(id) {
+    return meshPointsVertexAttribute(id).name;
+  }
+
   function meshPointsVertexAttributeRange(id) {
     const name = meshPointsVertexAttributeName(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name);

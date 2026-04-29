@@ -45,52 +45,14 @@ const textures = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_name = computed({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshPolygonsVertexAttributeName(id.value, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-const vertex_attribute_range = computed({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshPolygonsVertexAttributeRange(id.value, newValue[0], newValue[1]);
-    hybridViewerStore.remoteRender();
-  },
-});
-const vertex_attribute_color_map = computed({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshPolygonsVertexAttributeColorMap(id.value, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-const polygon_attribute_name = computed({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshPolygonsPolygonAttributeName(id.value, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-const polygon_attribute_range = computed({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshPolygonsPolygonAttributeRange(id.value, newValue[0], newValue[1]);
-    hybridViewerStore.remoteRender();
-  },
-});
-const polygon_attribute_color_map = computed({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id.value),
-  set: async (newValue) => {
-    await dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(id.value, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" :tooltip="tooltip" :btn_image="btn_image">
+  <ViewerContextMenuItem
+    :itemProps="itemProps"
+    :tooltip="tooltip"
+    :btn_image="btn_image"
+  >
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
       <template v-if="visibility">
@@ -99,12 +61,6 @@ const polygon_attribute_color_map = computed({
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
-          v-model:vertex_attribute_name="vertex_attribute_name"
-          v-model:vertex_attribute_range="vertex_attribute_range"
-          v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:polygon_attribute_name="polygon_attribute_name"
-          v-model:polygon_attribute_range="polygon_attribute_range"
-          v-model:polygon_attribute_color_map="polygon_attribute_color_map"
         />
       </template>
     </template>

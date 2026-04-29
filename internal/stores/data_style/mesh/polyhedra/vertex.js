@@ -45,6 +45,10 @@ function useMeshPolyhedraVertexAttributeConfig() {
     });
   }
 
+  function meshPolyhedraVertexAttributeName(id) {
+    return meshPolyhedraVertexAttribute(id).name;
+  }
+
   function meshPolyhedraVertexAttributeRange(id) {
     const name = meshPolyhedraVertexAttributeName(id);
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name);
