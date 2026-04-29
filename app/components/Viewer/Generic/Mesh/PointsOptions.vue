@@ -68,11 +68,7 @@ const vertex_attribute_color_map = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem
-    :itemProps="itemProps"
-    tooltip="Points options"
-    :btn_image="btn_image"
-  >
+  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Points options" :btn_image="btn_image">
     <template #options>
       <ViewerOptionsVisibilitySwitch v-model="visibility" />
       <template v-if="visibility">

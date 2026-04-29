@@ -53,11 +53,17 @@ const hasColorMap = (key) => {
 
 const has_color = computed(() => color.value !== undefined && isAvailable("color"));
 const has_textures = computed(() => textures.value !== undefined && isAvailable("textures"));
-const has_vertex = computed(() => vertex_attribute_range.value !== undefined && isAvailable("vertex"));
+const has_vertex = computed(
+  () => vertex_attribute_range.value !== undefined && isAvailable("vertex"),
+);
 const has_edge = computed(() => edge_attribute_range.value !== undefined && isAvailable("edge"));
 const has_cells = computed(() => cell_attribute_range.value !== undefined && isAvailable("cell"));
-const has_polygons = computed(() => polygon_attribute_range.value !== undefined && isAvailable("polygon"));
-const has_polyhedra = computed(() => polyhedron_attribute_range.value !== undefined && isAvailable("polyhedron"));
+const has_polygons = computed(
+  () => polygon_attribute_range.value !== undefined && isAvailable("polygon"),
+);
+const has_polyhedra = computed(
+  () => polyhedron_attribute_range.value !== undefined && isAvailable("polyhedron"),
+);
 
 const color_dict = { name: "Color", value: "color" };
 const textures_dict = { name: "Textures", value: "textures" };
