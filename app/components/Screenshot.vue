@@ -13,9 +13,6 @@ const { show_dialog, width } = defineProps({
   width: { type: Number, required: false, default: 400 },
 });
 
-const isClipboardSupported = computed(() => {
-  return !!(navigator.clipboard && window.isSecureContext);
-});
 
 const output_extensions =
   viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties
@@ -44,6 +41,7 @@ async function takeScreenshot() {
             response.blob,
             `${current_filename}.${output_extension.value}`,
           );
+          feedbackStore.add_success("Screenshot downloaded");
         } else {
           try {
             const pngBlob = new Blob([response.blob], { type: "image/png" });
@@ -101,11 +99,7 @@ watch(screenshot_type, (value) => {
               <v-btn value="file" prepend-icon="mdi-file-download-outline">
                 File
               </v-btn>
-              <v-btn
-                value="clipboard"
-                prepend-icon="mdi-content-copy"
-                :disabled="!isClipboardSupported"
-              >
+              <v-btn value="clipboard" prepend-icon="mdi-content-copy">
                 Clipboard
               </v-btn>
             </v-btn-toggle>
