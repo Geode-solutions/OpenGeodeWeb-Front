@@ -17,7 +17,13 @@ function apply() {
 </script>
 
 <template>
-  <ToolPanel v-model="show" title="Z Scaling Control" :width="width" action-label="Apply" @action="apply">
+  <ToolPanel
+    v-model="show"
+    title="Z Scaling Control"
+    :width="width"
+    action-label="Apply"
+    @action="apply"
+  >
     <v-container class="pa-5">
       <v-row>
         <v-col cols="12" class="py-2">
