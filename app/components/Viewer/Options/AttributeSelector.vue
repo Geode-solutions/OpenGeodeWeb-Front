@@ -8,10 +8,9 @@ const name = defineModel("name", { type: String });
 const range = defineModel("range", { type: Array });
 const colorMap = defineModel("colorMap", { type: String });
 
-const { id, schema, hasColorMap } = defineProps({
+const { id, schema } = defineProps({
   id: { type: String, required: true },
   schema: { type: Object, required: true },
-  hasColorMap: { type: Boolean, required: false, default: true },
 });
 
 const attributes = ref([]);
@@ -99,7 +98,7 @@ watch(
     label="Select an attribute"
   />
   <ViewerOptionsAttributeColorBar
-    v-if="name && hasColorMap"
+    v-if="name"
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="colorMap"
