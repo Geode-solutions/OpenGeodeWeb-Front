@@ -2,11 +2,13 @@
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 import ActionButton from "@ogw_front/components/ActionButton.vue";
+import CameraManager from "@ogw_front/components/CameraManager";
 import Screenshot from "@ogw_front/components/Screenshot";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const viewerStore = useViewerStore();
 const take_screenshot = ref(false);
+const show_camera_manager = ref(false);
 const grid_scale = ref(false);
 
 const camera_options = [
@@ -15,6 +17,13 @@ const camera_options = [
     icon: "mdi-cube-scan",
     action: () => {
       viewerStore.request(schemas.opengeodeweb_viewer.viewer.reset_camera);
+    },
+  },
+  {
+    tooltip: "Manage camera positions",
+    icon: "mdi-camera-retake",
+    action: () => {
+      show_camera_manager.value = !show_camera_manager.value;
     },
   },
   {
@@ -44,7 +53,11 @@ const camera_options = [
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
+    <v-row
+      v-for="camera_option in camera_options"
+      :key="camera_option.icon"
+      dense
+    >
       <v-col>
         <ActionButton
           :tooltip="camera_option.tooltip"
@@ -56,6 +69,10 @@ const camera_options = [
     </v-row>
   </v-container>
   <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
+  <CameraManager
+    :show_dialog="show_camera_manager"
+    @close="show_camera_manager = false"
+  />
 </template>
 
 <style module>

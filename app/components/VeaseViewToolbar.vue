@@ -2,6 +2,7 @@
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 import ActionButton from "@ogw_front/components/ActionButton.vue";
+import CameraManager from "@ogw_front/components/CameraManager";
 import Screenshot from "@ogw_front/components/Screenshot";
 import ZScaling from "@ogw_front/components/ZScaling";
 
@@ -11,6 +12,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
 const take_screenshot = ref(false);
+const show_camera_manager = ref(false);
 const showZScaling = ref(false);
 const grid_scale = ref(false);
 const zScale = ref(hybridViewerStore.zScale);
@@ -33,6 +35,13 @@ const camera_options = [
     icon: "mdi-cube-scan",
     action: () => {
       hybridViewerStore.resetCamera();
+    },
+  },
+  {
+    tooltip: "Manage camera positions",
+    icon: "mdi-camera-retake",
+    action: () => {
+      show_camera_manager.value = !show_camera_manager.value;
     },
   },
   {
@@ -70,18 +79,32 @@ const camera_options = [
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
+    <v-row
+      v-for="camera_option in camera_options"
+      :key="camera_option.icon"
+      dense
+    >
       <v-col>
         <ActionButton
           :icon="camera_option.icon"
           :tooltip="camera_option.tooltip"
+          tooltip-location="left"
           @click.stop="camera_option.action"
         />
       </v-col>
     </v-row>
   </v-container>
   <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
-  <ZScaling v-if="showZScaling" v-model="zScale" :width="400" @close="handleZScalingClose" />
+  <CameraManager
+    :show_dialog="show_camera_manager"
+    @close="show_camera_manager = false"
+  />
+  <ZScaling
+    v-if="showZScaling"
+    v-model="zScale"
+    :width="400"
+    @close="handleZScalingClose"
+  />
 </template>
 
 <style module>

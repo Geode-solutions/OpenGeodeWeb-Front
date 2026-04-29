@@ -146,6 +146,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     genericRenderWindow.value.getRenderWindow().render();
     syncRemoteCamera();
   }
+ 
+  function setCamera(new_camera_options) {
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
+    applyCameraOptions(camera, new_camera_options);
+    genericRenderWindow.value.getRenderWindow().render();
+    syncRemoteCamera();
+  }
 
   function syncRemoteCamera() {
     const renderer = genericRenderWindow.value.getRenderer();
@@ -300,6 +308,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setVisibility,
     setZScaling,
     syncRemoteCamera,
+    setCamera,
     initHybridViewer,
     remoteRender,
     resize,

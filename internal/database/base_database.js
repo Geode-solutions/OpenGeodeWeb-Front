@@ -5,6 +5,7 @@ import { modelComponentDataStyleTable } from "./tables/model_component_datastyle
 import { modelComponentTypeDataStyleTable } from "./tables/model_component_type_datastyle";
 import { modelComponentsRelationTable } from "./tables/model_components_relation";
 import { modelComponentsTable } from "./tables/model_components";
+import { cameraPositionsTable } from "./tables/camera_positions";
 
 export class BaseDatabase extends Dexie {
   static get initialStores() {
@@ -15,6 +16,7 @@ export class BaseDatabase extends Dexie {
       [modelComponentDataStyleTable.name]: modelComponentDataStyleTable.schema,
       [modelComponentTypeDataStyleTable.name]: modelComponentTypeDataStyleTable.schema,
       [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
+      [cameraPositionsTable.name]: cameraPositionsTable.schema,
       treeview_config: "id",
     };
   }
