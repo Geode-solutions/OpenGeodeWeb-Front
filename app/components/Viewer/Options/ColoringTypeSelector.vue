@@ -37,19 +37,19 @@ const { id, capabilities } = defineProps({
   },
 });
 
-const isAvailable = (key) => {
+function isAvailable(key) {
   if (capabilities[key] && capabilities[key].available === false) {
     return false;
   }
   return true;
-};
+}
 
-const hasColorMap = (key) => {
+function hasColorMap(key) {
   if (capabilities[key] && capabilities[key].hasColorMap === false) {
     return false;
   }
   return true;
-};
+}
 
 const has_color = computed(() => color.value !== undefined && isAvailable("color"));
 const has_textures = computed(() => textures.value !== undefined && isAvailable("textures"));
