@@ -3,8 +3,8 @@ import GlassCard from "@ogw_front/components/GlassCard";
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-import { useViewerStore } from "@ogw_front/stores/viewer";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const emit = defineEmits(["close"]);
 
@@ -41,12 +41,12 @@ async function takeScreenshot() {
             const pngBlob = new Blob([response.blob], { type: "image/png" });
             await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })]);
             feedbackStore.add_success("Screenshot copied to clipboard");
-          } catch (err) {
+          } catch (error) {
             feedbackStore.add_error(
-              null,
-              null,
+              undefined,
+              undefined,
               "Clipboard Error",
-              `Failed to copy screenshot to clipboard: ${err.message}`,
+              `Failed to copy screenshot to clipboard: ${error.message}`,
             );
           }
         }
@@ -57,11 +57,15 @@ async function takeScreenshot() {
 }
 
 watch(output_extension, (value) => {
-  if (value !== "png") include_background.value = true;
+  if (value !== "png") {
+    include_background.value = true;
+  }
 });
 
 watch(screenshot_type, (value) => {
-  if (value === "clipboard") output_extension.value = "png";
+  if (value === "clipboard") {
+    output_extension.value = "png";
+  }
 });
 </script>
 <template>
