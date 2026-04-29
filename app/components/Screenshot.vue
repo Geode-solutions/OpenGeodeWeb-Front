@@ -13,7 +13,6 @@ const { show_dialog, width } = defineProps({
   width: { type: Number, required: false, default: 400 },
 });
 
-
 const output_extensions =
   viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties
     .output_extension.enum;
