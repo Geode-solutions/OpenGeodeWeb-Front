@@ -8,7 +8,12 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
-import { ACTOR_COLOR, BACKGROUND_COLOR, WHEEL_TIME_OUT_MS } from "@ogw_front/utils/vtk/constants";
+import {
+  ACTOR_COLOR,
+  BACKGROUND_COLOR,
+  BUMP_MULTIPLIER,
+  WHEEL_TIME_OUT_MS,
+} from "@ogw_front/utils/vtk/constants";
 import { ORIENTATIONS } from "@ogw_front/utils/vtk/camera";
 import { Status } from "@ogw_front/utils/status";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -164,10 +169,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     function animate(currentTime) {
       const progress = Math.min((currentTime - startTime) / duration, 1);
       const ease = progress * (2 - progress);
+      const bump = BUMP_MULTIPLIER * Math.sin(Math.PI * progress);
 
       camera.set({
         position: startState.position.map(
-          (startValue, index) => startValue + (targetState.position[index] - startValue) * ease,
+          (startValue, index) =>
+            startValue + (targetState.position[index] - startValue) * ease + bump,
         ),
         viewUp: startState.view_up.map(
           (startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease,

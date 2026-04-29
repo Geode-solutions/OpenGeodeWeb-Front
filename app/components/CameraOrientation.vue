@@ -70,6 +70,7 @@ const cubeContainer = useTemplateRef("cubeContainer");
 
 let genericRenderWindow = undefined;
 let cubeActor = undefined;
+let isInteracting = false;
 
 function initVTK() {
   if (genericRenderWindow) {
@@ -78,6 +79,16 @@ function initVTK() {
   genericRenderWindow = vtkGenericRenderWindow({
     background: [0, 0, 0, 0],
     listenWindowResize: false,
+  });
+
+  const interactor = genericRenderWindow.getInteractor();
+  interactor.onStartAnimation(() => {
+    isInteracting = true;
+  });
+
+  interactor.onEndAnimation(() => {
+    isInteracting = false;
+    hybridViewerStore.syncRemoteCamera();
   });
 
   cubeActor = vtkAnnotatedCubeActor();
@@ -102,20 +113,42 @@ function initVTK() {
   cubeActor.getProperty().setBackfaceCulling(true);
 
   const renderer = genericRenderWindow.getRenderer();
+  const camera = renderer.getActiveCamera();
+
+  camera.onModified(() => {
+    if (isInteracting) {
+      syncMainCamera();
+    }
+  });
+
   renderer.addActor(cubeActor);
   renderer.resetCamera();
 }
 
+function syncMainCamera() {
+  const mainGRW = hybridViewerStore.genericRenderWindow.value;
+  const mainCamera = mainGRW.getRenderer().getActiveCamera();
+  const cubeCamera = genericRenderWindow.getRenderer().getActiveCamera();
+
+  const dir = cubeCamera.getDirectionOfProjection();
+  const dist = mainCamera.getDistance();
+  const focal = mainCamera.getFocalPoint();
+
+  mainCamera.set({
+    position: focal.map((coord, i) => coord - dir[i] * dist),
+    viewUp: cubeCamera.getViewUp(),
+  });
+  mainGRW.getRenderWindow().render();
+}
+
 function syncCubeCamera() {
   const options = hybridViewerStore.camera_options;
-  if (!genericRenderWindow || !options.position) {
+  if (isInteracting || !options.position) {
     return;
   }
-  const renderer = genericRenderWindow.getRenderer();
-  const camera = renderer.getActiveCamera();
-
+  const camera = genericRenderWindow.getRenderer().getActiveCamera();
   setCameraState(camera, options);
-  renderer.resetCamera();
+  genericRenderWindow.getRenderer().resetCamera();
   genericRenderWindow.getRenderWindow().render();
 }
 
