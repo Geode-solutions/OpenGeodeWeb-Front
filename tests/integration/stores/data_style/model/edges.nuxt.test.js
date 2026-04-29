@@ -5,12 +5,11 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
-import { setupIntegrationTests } from "@ogw_tests/integration/setup";
+import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const INTERVAL_TIMEOUT = 25_000;
 const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
@@ -29,7 +28,7 @@ let id = "",
 describe("model edges", () => {
   beforeAll(async () => {
     ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-  }, INTERVAL_TIMEOUT);
+  }, beforeAllTimeout);
 
   afterAll(async () => {
     console.log("afterAll model edges kill", projectFolderPath);

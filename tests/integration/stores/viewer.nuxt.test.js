@@ -7,12 +7,11 @@ import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb
 // Local imports
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
-import { runMicroservices } from "@ogw_tests/integration/setup";
+import { beforeAllTimeout, runMicroservices } from "@ogw_tests/integration/setup";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const CONNECT_TIMEOUT = 25_000;
-const INTERVAL_TIMEOUT = 60_000;
 
 let projectFolderPath = "";
 
@@ -20,7 +19,7 @@ describe("viewer Store", () => {
   beforeAll(async () => {
     setupActivePinia();
     ({ projectFolderPath } = await runMicroservices());
-  }, INTERVAL_TIMEOUT);
+  }, beforeAllTimeout);
 
   afterAll(async () => {
     await cleanupBackend(projectFolderPath);

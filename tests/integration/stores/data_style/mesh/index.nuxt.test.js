@@ -5,12 +5,11 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
-import { setupIntegrationTests } from "@ogw_tests/integration/setup";
+import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const INTERVAL_TIMEOUT = 20_000;
 const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh;
 const file_name = "test.og_rgd3d";
 const geode_object = "RegularGrid3D";
@@ -21,7 +20,7 @@ let id = "",
 describe("mesh", () => {
   beforeAll(async () => {
     ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-  }, INTERVAL_TIMEOUT);
+  }, beforeAllTimeout);
 
   afterAll(async () => {
     console.log("afterAll mesh index kill", projectFolderPath);
