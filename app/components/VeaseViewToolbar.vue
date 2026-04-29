@@ -96,7 +96,7 @@ const camera_options = [
     @select="hybridViewerStore.setCameraOrientation"
   />
   <Screenshot v-model="take_screenshot" />
-  <ZScaling v-model:show="showZScaling" v-model="zScale" :width="400" />
+  <ZScaling v-model:show="showZScaling" v-model="zScale" :width="400" @apply="handleZScalingClose" />
 </template>
 
 <style module>

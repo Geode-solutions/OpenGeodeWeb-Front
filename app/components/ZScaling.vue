@@ -1,6 +1,5 @@
 <script setup>
 import ToolPanel from "@ogw_front/components/ToolPanel";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const zScale = defineModel({ type: Number, default: 1 });
 const show = defineModel("show", { type: Boolean, default: false });
@@ -9,17 +8,16 @@ const { width } = defineProps({
   width: { type: Number, default: 400 },
 });
 
-const hybridViewerStore = useHybridViewerStore();
+const emit = defineEmits(["apply"]);
 
-watch(show, async (isVisible) => {
-  if (!isVisible) {
-    await hybridViewerStore.setZScaling(zScale.value);
-  }
-});
+function apply() {
+  emit("apply");
+  show.value = false;
+}
 </script>
 
 <template>
-  <ToolPanel v-model="show" title="Z Scaling Control" :width="width">
+  <ToolPanel v-model="show" title="Z Scaling Control" :width="width" action-label="Apply" @action="apply">
     <v-container class="pa-5">
       <v-row>
         <v-col cols="12" class="py-2">
