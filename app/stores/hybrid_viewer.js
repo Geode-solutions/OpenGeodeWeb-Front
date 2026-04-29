@@ -1,8 +1,8 @@
 import {
-  applyCameraOptions,
-  centerCameraOnPosition,
+  applySnapshot,
   computeAverageBrightness,
   getCameraOptions,
+  performClickPicking,
 } from "@ogw_front/utils/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -190,25 +190,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           return;
         }
         if (is_picking.value) {
-          const rect = container.value.$el.getBoundingClientRect();
-          const display_x = Math.round(event.clientX - rect.left);
-          const display_y = Math.round(rect.height - (event.clientY - rect.top));
-          viewerStore.request(
-            viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
-            { x: display_x, y: display_y },
-            {
-              response_function: (response) => {
-                const pickedPos = [response.x, response.y, response.z];
-                if (pickedPos.some((value) => value !== 0)) {
-                  const renderer = genericRenderWindow.value.getRenderer();
-                  const camera = renderer.getActiveCamera();
-                  centerCameraOnPosition(camera, pickedPos);
-                  genericRenderWindow.value.getRenderWindow().render();
-                  syncRemoteCamera();
-                }
-              },
-            },
-          );
+          performClickPicking(event, {
+            container: container.value.$el,
+            viewerStore,
+            viewer_schemas,
+            genericRenderWindow: genericRenderWindow.value,
+            syncRemoteCamera,
+          });
           is_picking.value = false;
           return;
         }
@@ -270,40 +258,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function importStores(snapshot) {
-    if (!snapshot) {
-      return;
-    }
-    const z_scale = snapshot.zScale;
-
-    function applyCamera() {
-      const { camera_options: snapshot_camera_options } = snapshot;
-      if (!snapshot_camera_options) {
-        return;
-      }
-
-      const renderer = genericRenderWindow.value.getRenderer();
-      const camera = renderer.getActiveCamera();
-
-      applyCameraOptions(camera, snapshot_camera_options);
-
-      genericRenderWindow.value.getRenderWindow().render();
-
-      const payload = {
-        camera_options: getCameraOptions(snapshot_camera_options),
-      };
-      return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, payload, {
-        response_function: () => {
-          remoteRender();
-          Object.assign(camera_options, payload.camera_options);
-        },
-      });
-    }
-
-    if (typeof z_scale === "number") {
-      await setZScaling(z_scale);
-      return await applyCamera();
-    }
-    return await applyCamera();
+    return await applySnapshot(snapshot, {
+      genericRenderWindow: genericRenderWindow.value,
+      viewerStore,
+      viewer_schemas,
+      camera_options,
+      setZScaling,
+      remoteRender,
+    });
   }
 
   function clear() {

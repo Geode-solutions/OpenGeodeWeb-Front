@@ -112,4 +112,74 @@ function centerCameraOnPosition(camera, pickedPosition) {
   );
 }
 
-export { applyCameraOptions, centerCameraOnPosition, computeAverageBrightness, getCameraOptions };
+function performClickPicking(event, options) {
+  const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
+  const rect = container.getBoundingClientRect();
+  const display_x = Math.round(event.clientX - rect.left);
+  const display_y = Math.round(rect.height - (event.clientY - rect.top));
+  viewerStore.request(
+    viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
+    { x: display_x, y: display_y },
+    {
+      response_function: (response) => {
+        const pickedPos = [response.x, response.y, response.z];
+        if (pickedPos.some((value) => value !== 0)) {
+          const camera = genericRenderWindow.getRenderer().getActiveCamera();
+          centerCameraOnPosition(camera, pickedPos);
+          genericRenderWindow.getRenderWindow().render();
+          syncRemoteCamera();
+        }
+      },
+    },
+  );
+}
+
+async function applySnapshot(snapshot, options) {
+  const {
+    genericRenderWindow,
+    viewerStore,
+    viewer_schemas,
+    camera_options,
+    setZScaling,
+    remoteRender,
+  } = options;
+  if (!snapshot) {
+    return;
+  }
+  const z_scale = snapshot.zScale;
+
+  function applyCamera() {
+    const { camera_options: snapshot_camera_options } = snapshot;
+    if (!snapshot_camera_options) {
+      return;
+    }
+    const renderer = genericRenderWindow.getRenderer();
+    const camera = renderer.getActiveCamera();
+    applyCameraOptions(camera, snapshot_camera_options);
+    genericRenderWindow.getRenderWindow().render();
+
+    const payload = {
+      camera_options: getCameraOptions(snapshot_camera_options),
+    };
+    return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, payload, {
+      response_function: () => {
+        remoteRender();
+        Object.assign(camera_options, payload.camera_options);
+      },
+    });
+  }
+
+  if (typeof z_scale === "number") {
+    await setZScaling(z_scale);
+  }
+  return await applyCamera();
+}
+
+export {
+  applyCameraOptions,
+  applySnapshot,
+  centerCameraOnPosition,
+  computeAverageBrightness,
+  getCameraOptions,
+  performClickPicking,
+};
