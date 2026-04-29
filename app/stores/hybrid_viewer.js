@@ -187,17 +187,17 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         }
         if (is_picking.value) {
           const rect = container.value.$el.getBoundingClientRect();
-          const x = event.clientX - rect.left;
-          const y = rect.height - (event.clientY - rect.top);
-          console.log("Picking RPC at:", x, y);
+          const display_x = Math.round(event.clientX - rect.left);
+          const display_y = Math.round(rect.height - (event.clientY - rect.top));
+          console.log("Picking RPC at:", display_x, display_y);
           viewerStore.request(
             viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
-            { x, y },
+            { x: display_x, y: display_y },
             {
               response_function: (response) => {
                 console.log("RPC Response:", response);
-                const pickedPos = response.world_position;
-                if (pickedPos && pickedPos.some((v) => v !== 0)) {
+                const pickedPos = [response.x, response.y, response.z];
+                if (pickedPos.some((value) => value !== 0)) {
                   console.log("Centering camera on:", pickedPos);
                   const renderer = genericRenderWindow.value.getRenderer();
                   const camera = renderer.getActiveCamera();
@@ -212,7 +212,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
                   genericRenderWindow.value.getRenderWindow().render();
                   syncRemoteCamera();
                 } else {
-                  console.warn("Invalid pickedPos:", pickedPos);
+                  console.warn("Invalid pickedPos (all zeros):", pickedPos);
                 }
               },
             },
