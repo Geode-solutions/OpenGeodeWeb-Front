@@ -64,7 +64,8 @@ const has_cells = computed(
   () => cell_attribute_range.value !== undefined && isAvailable("cell") && hasColorMap("cell"),
 );
 const has_polygons = computed(
-  () => polygon_attribute_range.value !== undefined && isAvailable("polygon") && hasColorMap("polygon"),
+  () =>
+    polygon_attribute_range.value !== undefined && isAvailable("polygon") && hasColorMap("polygon"),
 );
 const has_polyhedra = computed(
   () =>
