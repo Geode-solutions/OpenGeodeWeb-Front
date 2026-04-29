@@ -37,6 +37,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const camera_options = reactive({});
   const genericRenderWindow = reactive({});
   const is_moving = ref(false);
+  const is_picking = ref(false);
   const zScale = ref(1);
   let viewStream = undefined;
   const gridActor = undefined;
@@ -181,11 +182,47 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     useMousePressed({
       target: container,
       onPressed: (event) => {
-        if (event.button === 0) {
-          is_moving.value = true;
-          event.stopPropagation();
-          imageStyle.opacity = 0;
+        if (event.button !== 0) {
+          return;
         }
+        if (is_picking.value) {
+          const rect = container.value.$el.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = rect.height - (event.clientY - rect.top);
+          console.log("Picking RPC at:", x, y);
+          viewerStore.request(
+            viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
+            { x, y },
+            {
+              response_function: (response) => {
+                console.log("RPC Response:", response);
+                const pickedPos = response.world_position;
+                if (pickedPos && pickedPos.some((v) => v !== 0)) {
+                  console.log("Centering camera on:", pickedPos);
+                  const renderer = genericRenderWindow.value.getRenderer();
+                  const camera = renderer.getActiveCamera();
+                  const focalPoint = camera.getFocalPoint();
+                  const position = camera.getPosition();
+                  camera.setFocalPoint(...pickedPos);
+                  camera.setPosition(
+                    position[0] + pickedPos[0] - focalPoint[0],
+                    position[1] + pickedPos[1] - focalPoint[1],
+                    position[2] + pickedPos[2] - focalPoint[2],
+                  );
+                  genericRenderWindow.value.getRenderWindow().render();
+                  syncRemoteCamera();
+                } else {
+                  console.warn("Invalid pickedPos:", pickedPos);
+                }
+              },
+            },
+          );
+          is_picking.value = false;
+          return;
+        }
+        is_moving.value = true;
+        event.stopPropagation();
+        imageStyle.opacity = 0;
       },
       onReleased: () => {
         if (!is_moving.value) {
@@ -303,6 +340,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     resetCamera,
     setContainer,
     zScale,
+    is_picking,
     clear,
     exportStores,
     importStores,

@@ -65,6 +65,14 @@ const camera_options = [
       showZScaling.value = !showZScaling.value;
     },
   },
+  {
+    tooltip: "Center on click",
+    icon: "mdi-crosshairs-question",
+    color: hybridViewerStore.is_picking ? "primary" : undefined,
+    action: () => {
+      hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
+    },
+  },
 ];
 </script>
 
