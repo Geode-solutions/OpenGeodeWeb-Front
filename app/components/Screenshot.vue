@@ -48,9 +48,7 @@ async function takeScreenshot() {
           try {
             const pngBlob = new Blob([response.blob], { type: "image/png" });
             await navigator.clipboard.write([
-              new ClipboardItem({
-                "image/png": pngBlob,
-              }),
+              new ClipboardItem({ "image/png": pngBlob }),
             ]);
             feedbackStore.add_success("Screenshot copied to clipboard");
           } catch (err) {
@@ -69,15 +67,11 @@ async function takeScreenshot() {
 }
 
 watch(output_extension, (value) => {
-  if (value !== "png") {
-    include_background.value = true;
-  }
+  if (value !== "png") include_background.value = true;
 });
 
 watch(screenshot_type, (value) => {
-  if (value === "clipboard") {
-    output_extension.value = "png";
-  }
+  if (value === "clipboard") output_extension.value = "png";
 });
 </script>
 <template>
@@ -104,9 +98,9 @@ watch(screenshot_type, (value) => {
               class="mb-4"
               density="comfortable"
             >
-              <v-btn value="file" prepend-icon="mdi-file-download-outline"
-                >File</v-btn
-              >
+              <v-btn value="file" prepend-icon="mdi-file-download-outline">
+                File
+              </v-btn>
               <v-btn
                 value="clipboard"
                 prepend-icon="mdi-content-copy"
@@ -152,9 +146,9 @@ watch(screenshot_type, (value) => {
 
     <template #actions>
       <v-card-actions class="justify-center pb-4">
-        <v-btn variant="text" color="primary" @click="emit('close')"
-          >Close</v-btn
-        >
+        <v-btn variant="text" color="primary" @click="emit('close')">
+          Close
+        </v-btn>
         <v-btn
           variant="outlined"
           :disabled="
@@ -162,8 +156,9 @@ watch(screenshot_type, (value) => {
           "
           color="primary"
           @click="takeScreenshot()"
-          >Screenshot</v-btn
         >
+          Screenshot
+        </v-btn>
       </v-card-actions>
     </template>
   </GlassCard>
