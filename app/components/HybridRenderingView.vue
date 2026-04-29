@@ -46,7 +46,7 @@ function debounce(func, wait) {
 
 <template>
   <ClientOnly>
-    <div class="fill-height" style="position: relative; height: 100%">
+    <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ViewToolbar />
       <slot name="ui"></slot>
       <v-col

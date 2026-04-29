@@ -3,15 +3,14 @@ import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
+import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
-import { setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const INTERVAL_TIMEOUT = 20_000;
 const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
@@ -30,7 +29,7 @@ let id = "",
 describe("model corners", () => {
   beforeAll(async () => {
     ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
-  }, INTERVAL_TIMEOUT);
+  }, beforeAllTimeout);
 
   afterAll(async () => {
     console.log("afterAll model corners kill", projectFolderPath);

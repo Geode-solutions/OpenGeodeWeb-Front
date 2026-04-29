@@ -1,6 +1,7 @@
 <script setup>
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
+import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -9,9 +10,10 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const { itemProps, btn_image } = defineProps({
+const { itemProps, btn_image, tooltip } = defineProps({
   itemProps: { type: Object, required: true },
   btn_image: { type: String, required: true },
+  tooltip: { type: String, required: false, default: "Points options" },
 });
 
 const id = toRef(() => itemProps.id);
@@ -68,18 +70,21 @@ const vertex_attribute_color_map = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" tooltip="Points options" :btn_image="btn_image">
+  <ViewerContextMenuItem
+    data-testid="meshPointsMenu"
+    :itemProps="itemProps"
+    :tooltip="tooltip"
+    :btn_image="btn_image"
+  >
     <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch
+        data-testid="meshPointsVisibilitySwitch"
+        v-model="visibility"
+      />
       <template v-if="visibility">
         <v-row class="pa-0" align="center">
           <v-divider />
-          <v-col cols="auto" justify="center">
-            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Size'" />
-          </v-col>
-          <v-col justify="center">
-            <v-slider v-model="size" hide-details min="0" max="20" step="2" />
-          </v-col>
+          <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
         </v-row>
         <v-row>
           <v-col>
