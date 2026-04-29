@@ -90,9 +90,17 @@ const polygon_attribute_color_map = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" :tooltip="tooltip" :btn_image="btn_image">
+  <ViewerContextMenuItem
+    data-testid="meshPolygonsMenu"
+    :itemProps="itemProps"
+    :tooltip="tooltip"
+    :btn_image="btn_image"
+  >
     <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch
+        data-testid="meshPolygonsVisibilitySwitch"
+        v-model="visibility"
+      />
       <template v-if="visibility">
         <ViewerOptionsColoringTypeSelector
           :id="id"
