@@ -12,6 +12,7 @@ import { setupActivePinia } from "@ogw_tests/utils";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const CONNECT_TIMEOUT = 25_000;
+const INTERVAL_TIMEOUT = 60_000;
 
 let projectFolderPath = "";
 
@@ -19,7 +20,7 @@ describe("viewer Store", () => {
   beforeAll(async () => {
     setupActivePinia();
     ({ projectFolderPath } = await runMicroservices());
-  });
+  }, INTERVAL_TIMEOUT);
 
   afterAll(async () => {
     await cleanupBackend(projectFolderPath);
