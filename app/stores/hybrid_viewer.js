@@ -43,6 +43,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   let viewStream = undefined;
   const gridActor = undefined;
 
+  watch(is_picking, (value) => {
+    const element = genericRenderWindow.value
+      ?.getApiSpecificRenderWindow()
+      ?.getCanvas()?.parentElement;
+    if (element) {
+      element.style.cursor = value ? "crosshair" : "default";
+    }
+  });
+
   const latestImage = ref(undefined);
   const offscreenCanvas =
     typeof document === "undefined" ? undefined : document.createElement("canvas");
