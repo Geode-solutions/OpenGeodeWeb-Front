@@ -3,8 +3,8 @@ import ToolPanel from "@ogw_front/components/ToolPanel";
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-import { useViewerStore } from "@ogw_front/stores/viewer";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const show = defineModel({ type: Boolean, default: false });
 
@@ -63,11 +63,15 @@ async function takeScreenshot() {
 }
 
 watch(output_extension, (value) => {
-  if (value !== "png") include_background.value = true;
+  if (value !== "png") {
+    include_background.value = true;
+  }
 });
 
 watch(screenshot_type, (value) => {
-  if (value === "clipboard") output_extension.value = "png";
+  if (value === "clipboard") {
+    output_extension.value = "png";
+  }
 });
 </script>
 
