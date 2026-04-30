@@ -6,7 +6,7 @@ class Database extends BaseDatabase {
   constructor() {
     super("Database");
 
-    this.version(1).stores(BaseDatabase.initialStores);
+    this.version(3).stores(BaseDatabase.initialStores);
   }
 
   static async addTable(tableName, schemaDefinition) {

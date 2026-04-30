@@ -1,17 +1,18 @@
 <script setup>
-import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
 import ActionButton from "@ogw_front/components/ActionButton.vue";
+import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
+import CameraManager from "@ogw_front/components/CameraManager";
 import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
 import Screenshot from "@ogw_front/components/Screenshot";
 import ZScaling from "@ogw_front/components/ZScaling";
-
+import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
 const take_screenshot = ref(false);
+const show_camera_manager = ref(false);
 const showCameraOrientation = ref(false);
 const showZScaling = ref(false);
 const grid_scale = ref(false);
@@ -42,6 +43,14 @@ const camera_options = [
     icon: "mdi-rotate-3d",
     action: () => {
       showCameraOrientation.value = !showCameraOrientation.value;
+    },
+  },
+  {
+    tooltip: "Manage camera positions",
+    icon: CameraBookmarkIcon,
+    iconSize: 34,
+    action: () => {
+      show_camera_manager.value = !show_camera_manager.value;
     },
   },
   {
@@ -84,6 +93,7 @@ const camera_options = [
         <ActionButton
           :icon="camera_option.icon"
           :tooltip="camera_option.tooltip"
+          :icon-size="camera_option.iconSize"
           tooltip-location="left"
           @click.stop="camera_option.action"
         />
@@ -96,6 +106,7 @@ const camera_options = [
     @select="hybridViewerStore.setCameraOrientation"
   />
   <Screenshot v-model="take_screenshot" />
+  <CameraManager :show_dialog="show_camera_manager" @close="show_camera_manager = false" />
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"
