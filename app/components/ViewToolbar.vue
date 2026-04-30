@@ -38,6 +38,13 @@ const camera_options = [
     },
   },
   {
+    tooltip: "Center on click",
+    icon: "mdi-crosshairs-question",
+    action: () => {
+      hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
+    },
+  },
+  {
     tooltip: "Camera orientation",
     icon: "mdi-rotate-3d",
     action: () => {
