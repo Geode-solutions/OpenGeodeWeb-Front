@@ -20,7 +20,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const offscreenCtx = offscreenCanvas ? offscreenCanvas.getContext("2d", { willReadFrequently: true }) : undefined;
 
   async function initHybridViewer() {
-    if (status.value !== Status.NOT_CREATED) return;
+    if (status.value !== Status.NOT_CREATED) { return; }
     status.value = Status.CREATING;
     genericRenderWindow.value = vtkGenericRenderWindow({ background: BACKGROUND_COLOR, listenWindowResize: false });
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
@@ -29,7 +29,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     await viewerStore.ws_connect();
     viewStream = viewerStore.client.getImageStream().createViewStream("-1");
     viewStream.onImageReady((event) => {
-      if (is_moving.value) return;
+      if (is_moving.value) { return; }
       latestImage.value = event.image;
       webGLRenderWindow.setBackgroundImage(event.image);
       imageStyle.opacity = 1;
@@ -43,7 +43,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function addItem(id) {
-    if (!genericRenderWindow.value) return;
+    if (!genericRenderWindow.value) { return; }
     const value = await dataStore.item(id), reader = vtkXMLPolyDataReader(), textEncoder = new TextEncoder();
     await reader.parseAsArrayBuffer(textEncoder.encode(value.binary_light_viewable));
     const polydata = reader.getOutputData(0), mapper = vtkMapper(), actor = vtkActor();
@@ -53,19 +53,19 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const renderer = genericRenderWindow.value.getRenderer();
     const isFirst = renderer.getActors().length === 0;
     renderer.addActor(actor);
-    if (isFirst) renderer.resetCamera();
+    if (isFirst) { renderer.resetCamera(); }
     hybridDb[id] = { actor, polydata, mapper };
   }
 
   function removeItem(id) {
-    if (!hybridDb[id]) return;
+    if (!hybridDb[id]) { return; }
     genericRenderWindow.value.getRenderer().removeActor(hybridDb[id].actor);
     genericRenderWindow.value.getRenderWindow().render();
     delete hybridDb[id];
   }
 
   function setVisibility(id, visibility) {
-    if (!hybridDb[id]) return;
+    if (!hybridDb[id]) { return; }
     hybridDb[id].actor.setVisibility(visibility);
     genericRenderWindow.value.getRenderWindow().render();
   }
@@ -82,7 +82,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     renderer.resetCamera();
     genericRenderWindow.value.getRenderWindow().render();
     const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling;
-    if (schema) await viewerStore.request(schema, { z_scale });
+    if (schema) { await viewerStore.request(schema, { z_scale }); }
     remoteRender();
   }
 
@@ -96,7 +96,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const renderer = genericRenderWindow.value.getRenderer(), camera = renderer.getActiveCamera();
     const startState = getCameraOptions(camera), targetState = new_camera_options;
     is_moving.value = true;
-    if (imageStyle) imageStyle.opacity = 0;
+    if (imageStyle) { imageStyle.opacity = 0; }
     animateCamera({
       camera, startState, targetState, duration: SHORT_ANIMATION_DURATION, bumpMultiplier: 0, easeExponent: EASE_EXPONENT,
       onUpdate: () => genericRenderWindow.value.getRenderWindow().render(),
@@ -117,7 +117,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     applyCameraOptions(camera, startState);
     const duration = dot(camera.getDirectionOfProjection(), config.position) > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
     is_moving.value = true;
-    imageStyle.opacity = 0;
+    if (imageStyle) { imageStyle.opacity = 0; }
     animateCamera({
       camera, startState, targetState, duration, bumpMultiplier: BUMP_MULTIPLIER, easeExponent: EASE_EXPONENT,
       onUpdate: () => genericRenderWindow.value.getRenderWindow().render(),
@@ -135,7 +135,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   function remoteRender() { return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render); }
 
   function setContainer(container) {
-    if (!container.value) return;
+    if (!container.value) { return; }
     genericRenderWindow.value.setContainer(container.value.$el);
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
     webGLRenderWindow.setUseBackgroundImage(true);
@@ -155,7 +155,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function resize(width, height) {
-    if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) return;
+    if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) { return; }
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow(), canvas = webGLRenderWindow.getCanvas();
     canvas.width = width; canvas.height = height;
     await nextTick();
@@ -175,8 +175,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function importStores(snapshot) {
-    if (!snapshot) return;
-    if (typeof snapshot.zScale === "number") await setZScaling(snapshot.zScale);
+    if (!snapshot) { return; }
+    if (typeof snapshot.zScale === "number") { await setZScaling(snapshot.zScale); }
     if (snapshot.camera_options) {
       applyCameraOptions(genericRenderWindow.value.getRenderer().getActiveCamera(), snapshot.camera_options);
       genericRenderWindow.value.getRenderWindow().render();
