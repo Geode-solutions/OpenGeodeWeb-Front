@@ -2,19 +2,46 @@
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 import ActionButton from "@ogw_front/components/ActionButton.vue";
+import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
 import Screenshot from "@ogw_front/components/Screenshot";
+import ZScaling from "@ogw_front/components/ZScaling";
+
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
 const take_screenshot = ref(false);
+const showCameraOrientation = ref(false);
+const showZScaling = ref(false);
 const grid_scale = ref(false);
+const zScale = ref(hybridViewerStore.zScale);
+
+watch(
+  () => hybridViewerStore.zScale,
+  (newVal) => {
+    zScale.value = newVal;
+  },
+);
+
+async function handleZScalingClose() {
+  await hybridViewerStore.setZScaling(zScale.value);
+  showZScaling.value = false;
+}
 
 const camera_options = [
   {
     tooltip: "Reset camera",
     icon: "mdi-cube-scan",
     action: () => {
-      viewerStore.request(schemas.opengeodeweb_viewer.viewer.reset_camera);
+      hybridViewerStore.resetCamera();
+    },
+  },
+  {
+    tooltip: "Camera orientation",
+    icon: "mdi-rotate-3d",
+    action: () => {
+      showCameraOrientation.value = !showCameraOrientation.value;
     },
   },
   {
@@ -34,9 +61,17 @@ const camera_options = [
         {
           response_function: () => {
             grid_scale.value = !grid_scale.value;
+            hybridViewerStore.remoteRender();
           },
         },
       );
+    },
+  },
+  {
+    tooltip: "Z Scaling Control",
+    icon: "mdi-sort",
+    action: () => {
+      showZScaling.value = !showZScaling.value;
     },
   },
 ];
@@ -47,15 +82,26 @@ const camera_options = [
     <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
         <ActionButton
-          :tooltip="camera_option.tooltip"
           :icon="camera_option.icon"
+          :tooltip="camera_option.tooltip"
           tooltip-location="left"
-          @click="camera_option.action"
+          @click.stop="camera_option.action"
         />
       </v-col>
     </v-row>
   </v-container>
-  <Screenshot :show_dialog="take_screenshot" @close="take_screenshot = false" />
+  <CameraOrientation
+    v-model:show="showCameraOrientation"
+    panel
+    @select="hybridViewerStore.setCameraOrientation"
+  />
+  <Screenshot v-model="take_screenshot" />
+  <ZScaling
+    v-model:show="showZScaling"
+    v-model="zScale"
+    :width="400"
+    @apply="handleZScalingClose"
+  />
 </template>
 
 <style module>
