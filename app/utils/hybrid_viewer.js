@@ -1,4 +1,10 @@
-import { ALIGNMENT_THRESHOLD, BUMP_MULTIPLIER, EASE_EXPONENT, LONG_ANIMATION_DURATION, SHORT_ANIMATION_DURATION } from "@ogw_front/utils/vtk/constants";
+import {
+  ALIGNMENT_THRESHOLD,
+  BUMP_MULTIPLIER,
+  EASE_EXPONENT,
+  LONG_ANIMATION_DURATION,
+  SHORT_ANIMATION_DURATION,
+} from "@ogw_front/utils/vtk/constants";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
 
 const RGB_MAX = 255;
@@ -17,7 +23,9 @@ const ORIENTATIONS = {
 };
 
 function getCameraOptions(camera) {
-  if (!camera?.getFocalPoint) { return camera; }
+  if (!camera?.getFocalPoint) {
+    return camera;
+  }
   return {
     focal_point: [...(camera.getFocalPoint() ?? [])],
     view_up: [...(camera.getViewUp() ?? [])],
@@ -57,36 +65,75 @@ function computeAverageBrightness(rect, options) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
   const canvas = genericRenderWindow.getApiSpecificRenderWindow().getCanvas();
-  if (!canvas) { return BACKGROUND_GREY_VALUE / RGB_MAX; }
+  if (!canvas) {
+    return BACKGROUND_GREY_VALUE / RGB_MAX;
+  }
   const { relX, relY, relW, relH } = mapRect(rect, latestImage, canvas.getBoundingClientRect());
   offscreenCanvas.width = SAMPLE_SIZE;
   offscreenCanvas.height = SAMPLE_SIZE;
   try {
-    offscreenCtx.drawImage(latestImage, Math.max(0, relX), Math.max(0, relY), Math.min(latestImage.width, relW), Math.min(latestImage.height, relH), 0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
+    offscreenCtx.drawImage(
+      latestImage,
+      Math.max(0, relX),
+      Math.max(0, relY),
+      Math.min(latestImage.width, relW),
+      Math.min(latestImage.height, relH),
+      0,
+      0,
+      SAMPLE_SIZE,
+      SAMPLE_SIZE,
+    );
     const { data } = offscreenCtx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
     let minBrightness = 1;
     for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
       const brightness = (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
-      if (brightness < minBrightness) { minBrightness = brightness; }
+      if (brightness < minBrightness) {
+        minBrightness = brightness;
+      }
     }
     return minBrightness;
-  } catch { return BACKGROUND_GREY_VALUE / RGB_MAX; }
+  } catch {
+    return BACKGROUND_GREY_VALUE / RGB_MAX;
+  }
 }
 
 function animateCamera(options) {
-  const { camera, startState, targetState, duration, bumpMultiplier, easeExponent, onUpdate, onEnd } = options;
+  const {
+    camera,
+    startState,
+    targetState,
+    duration,
+    bumpMultiplier,
+    easeExponent,
+    onUpdate,
+    onEnd,
+  } = options;
   const startTime = performance.now();
   function animate(currentTime) {
     const progress = Math.min((currentTime - startTime) / duration, 1);
-    const ease = duration > SHORT_ANIMATION_DURATION ? 1 - (1 - progress) ** easeExponent : progress * (2 - progress);
+    const ease =
+      duration > SHORT_ANIMATION_DURATION
+        ? 1 - (1 - progress) ** easeExponent
+        : progress * (2 - progress);
     const bump = bumpMultiplier * Math.sin(Math.PI * progress);
     camera.set({
-      position: startState.position.map((startValue, index) => startValue + (targetState.position[index] - startValue) * ease + bump),
-      viewUp: startState.view_up.map((startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease),
-      focalPoint: startState.focal_point.map((startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease),
+      position: startState.position.map(
+        (startValue, index) =>
+          startValue + (targetState.position[index] - startValue) * ease + bump,
+      ),
+      viewUp: startState.view_up.map(
+        (startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease,
+      ),
+      focalPoint: startState.focal_point.map(
+        (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
+      ),
     });
     onUpdate();
-    if (progress < 1) { requestAnimationFrame(animate); } else { onEnd(); }
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      onEnd();
+    }
   }
   requestAnimationFrame(animate);
 }
@@ -100,9 +147,19 @@ function performCameraOrientation(options) {
   const targetState = getCameraOptions(camera);
   applyCameraOptions(camera, startState);
   const alignment = dot(camera.getDirectionOfProjection(), config.position);
-  const duration = alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
+  const duration =
+    alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
   onStart();
-  animateCamera({ camera, startState, targetState, duration, bumpMultiplier: BUMP_MULTIPLIER, easeExponent: EASE_EXPONENT, onUpdate: () => renderWindow.render(), onEnd });
+  animateCamera({
+    camera,
+    startState,
+    targetState,
+    duration,
+    bumpMultiplier: BUMP_MULTIPLIER,
+    easeExponent: EASE_EXPONENT,
+    onUpdate: () => renderWindow.render(),
+    onEnd,
+  });
 }
 
 export {
