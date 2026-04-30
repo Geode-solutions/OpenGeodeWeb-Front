@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="svg"
+   version="1.1"
+   width="400"
+   height="400"
+   viewBox="0 0 400 400"
+   xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="cutout-mask">
+      <rect width="400" height="400" fill="white" />
+      <!-- Trou de l'objectif -->
+      <circle cx="175" cy="230" r="55" fill="black" />
+      <!-- Trou du Marque-page (Bookmark) en négatif -->
+      <path d="M 265,140 L 315,140 L 315,280 L 290,255 L 265,280 Z" fill="black" />
+    </mask>
+  </defs>
+  
+  <g fill="#131313">
+    <!-- Corps de la caméra massif qui sera découpé par le masque -->
+    <path d="M 100,140 C 80,140 60,160 60,180 L 60,300 C 60,320 80,340 100,340 L 320,340 C 340,340 360,320 360,300 L 360,180 C 360,160 340,140 320,140 L 260,140 L 240,100 L 160,100 L 140,140 Z" mask="url(#cutout-mask)" />
+    
+    <!-- Petit reflet/iris pour le détail de l'objectif -->
+    <circle cx="175" cy="230" r="22" />
+  </g>
+</svg>
