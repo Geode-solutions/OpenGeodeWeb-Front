@@ -59,10 +59,7 @@ function startEditing(position) {
 
 async function saveRename() {
   if (editingName.value) {
-    await cameraManagerStore.renameCameraPosition(
-      editingId.value,
-      editingName.value,
-    );
+    await cameraManagerStore.renameCameraPosition(editingId.value, editingName.value);
   }
   editingId.value = undefined;
 }
@@ -135,11 +132,7 @@ function getObjectName(objectId) {
       <v-divider></v-divider>
 
       <!-- Saved Positions List -->
-      <v-list
-        v-if="savedPositions.length > 0"
-        class="bg-transparent pa-2"
-        lines="two"
-      >
+      <v-list v-if="savedPositions.length > 0" class="bg-transparent pa-2" lines="two">
         <v-list-item
           v-for="position in savedPositions"
           :key="position.id"
@@ -207,9 +200,7 @@ function getObjectName(objectId) {
         </v-list-item>
       </v-list>
       <div v-else class="text-center text-grey-lighten-1 py-8 italic">
-        <v-icon size="48" class="mb-2 d-block mx-auto opacity-20"
-          >mdi-camera-off</v-icon
-        >
+        <v-icon size="48" class="mb-2 d-block mx-auto opacity-20">mdi-camera-off</v-icon>
         No saved positions yet.
       </div>
     </v-card-text>
@@ -218,9 +209,7 @@ function getObjectName(objectId) {
 
     <v-card-actions class="pa-4">
       <v-spacer></v-spacer>
-      <v-btn variant="text" color="grey-darken-1" @click="emit('close')"
-        >Close</v-btn
-      >
+      <v-btn variant="text" color="grey-darken-1" @click="emit('close')">Close</v-btn>
     </v-card-actions>
   </GlassCard>
 </template>
