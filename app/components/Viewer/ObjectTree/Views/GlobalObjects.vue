@@ -138,6 +138,14 @@ function handleHoverLeave({ item }) {
 
       <template #append="{ item }">
         <v-btn
+          v-if="item.viewer_type"
+          icon="mdi-image-filter-center-focus"
+          size="small"
+          variant="text"
+          v-tooltip="'Focus camera on object'"
+          @click.stop="hybridViewerStore.focusCameraOnObject(item.id)"
+        />
+        <v-btn
           v-if="isModel(item)"
           icon="mdi-magnify-expand"
           size="medium"

@@ -9,6 +9,7 @@ import {
   WHEEL_TIME_OUT_MS,
   applySnapshot,
   computeAverageBrightness,
+  focusCameraOnBounds,
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
@@ -159,6 +160,18 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     syncRemoteCamera();
   }
 
+  function focusCameraOnObject(id) {
+    if (!hybridDb[id]) {
+      return;
+    }
+    const bounds = hybridDb[id].actor.getBounds();
+    focusCameraOnBounds(bounds, {
+      genericRenderWindow: genericRenderWindow.value,
+      imageStyle,
+      syncRemoteCamera,
+    });
+  }
+
   function setCameraOrientation(orientation) {
     performCameraOrientation(orientation, {
       genericRenderWindow: genericRenderWindow.value,
@@ -229,6 +242,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           return;
         }
         is_moving.value = false;
+        genericRenderWindow.value.getRenderer().resetCameraClippingRange();
         syncRemoteCamera();
       },
     });
@@ -240,6 +254,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       clearTimeout(wheelEventEndTimeout);
       wheelEventEndTimeout = setTimeout(() => {
         is_moving.value = false;
+        genericRenderWindow.value.getRenderer().resetCameraClippingRange();
         syncRemoteCamera();
       }, WHEEL_TIME_OUT_MS);
     });
@@ -309,6 +324,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender,
     resize,
     resetCamera,
+    focusCameraOnObject,
     setCameraOrientation,
     setContainer,
     zScale,
