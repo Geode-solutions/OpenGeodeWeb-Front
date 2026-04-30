@@ -95,6 +95,7 @@ const vertex_attribute_color_map = computed({
               v-model:vertex_attribute_name="vertex_attribute_name"
               v-model:vertex_attribute_range="vertex_attribute_range"
               v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+              :capabilities="{ vertex: { available: false } }"
             />
           </v-col>
         </v-row>

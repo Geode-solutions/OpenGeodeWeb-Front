@@ -1,15 +1,13 @@
 <script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+import ToolPanel from "@ogw_front/components/ToolPanel";
 import fileDownload from "js-file-download";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-import { useViewerStore } from "@ogw_front/stores/viewer";
+const show = defineModel({ type: Boolean, default: false });
 
-const emit = defineEmits(["close"]);
-
-const { show_dialog, width } = defineProps({
-  show_dialog: { type: Boolean, required: true },
-  width: { type: Number, required: false, default: 400 },
+const { width } = defineProps({
+  width: { type: Number, default: 400 },
 });
 
 const output_extensions =
@@ -33,7 +31,7 @@ async function takeScreenshot() {
       },
     },
   );
-  emit("close");
+  show.value = false;
 }
 
 watch(output_extension, (value) => {
@@ -42,58 +40,41 @@ watch(output_extension, (value) => {
   }
 });
 </script>
+
 <template>
-  <GlassCard
-    v-if="show_dialog"
-    @click.stop
+  <ToolPanel
+    v-model="show"
     title="Take a screenshot"
     :width="width"
-    :ripple="false"
-    variant="panel"
-    padding="pa-0"
-    class="position-absolute elevation-24"
-    style="z-index: 2; top: 90px; right: 55px"
+    close-label="Cancel"
+    action-label="Screenshot"
+    @action="takeScreenshot"
   >
-    <v-card-text class="pa-5">
-      <v-container>
-        <v-row>
-          <v-col cols="8" class="py-0">
-            <v-text-field v-model="filename" label="File name"></v-text-field>
-          </v-col>
-          <v-col cols="4" class="py-0">
-            <v-select
-              v-model="output_extension"
-              :items="output_extensions"
-              label="Extension"
-              required
-            />
-          </v-col>
-        </v-row>
+    <v-container class="pa-5">
+      <v-row>
+        <v-col cols="8" class="py-0">
+          <v-text-field v-model="filename" label="File name"></v-text-field>
+        </v-col>
+        <v-col cols="4" class="py-0">
+          <v-select
+            v-model="output_extension"
+            :items="output_extensions"
+            label="Extension"
+            required
+          />
+        </v-col>
+      </v-row>
 
-        <v-row>
-          <v-col cols="12" class="py-0">
-            <v-switch
-              v-model="include_background"
-              :disabled="output_extension !== 'png'"
-              label="Include background"
-              inset
-            ></v-switch>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-
-    <template #actions>
-      <v-card-actions class="justify-center pb-4">
-        <v-btn variant="text" color="primary" @click="emit('close')">Close</v-btn>
-        <v-btn
-          variant="outlined"
-          :disabled="!filename || !output_extension"
-          color="primary"
-          @click="takeScreenshot()"
-          >Screenshot</v-btn
-        >
-      </v-card-actions>
-    </template>
-  </GlassCard>
+      <v-row>
+        <v-col cols="12" class="py-0">
+          <v-switch
+            v-model="include_background"
+            :disabled="output_extension !== 'png'"
+            label="Include background"
+            inset
+          ></v-switch>
+        </v-col>
+      </v-row>
+    </v-container>
+  </ToolPanel>
 </template>

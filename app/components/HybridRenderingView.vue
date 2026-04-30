@@ -1,5 +1,5 @@
 <script setup>
-import VeaseViewToolbar from "@ogw_front/components/VeaseViewToolbar";
+import ViewToolbar from "@ogw_front/components/ViewToolbar";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -47,7 +47,7 @@ function debounce(func, wait) {
 <template>
   <ClientOnly>
     <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
-      <VeaseViewToolbar />
+      <ViewToolbar />
       <slot name="ui"></slot>
       <v-col
         class="pa-0"

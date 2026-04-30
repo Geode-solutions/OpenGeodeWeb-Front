@@ -1,45 +1,42 @@
+import { SHORT_ANIMATION_DURATION } from "@ogw_front/utils/vtk/constants";
 const RGB_MAX = 255;
 const BACKGROUND_GREY_VALUE = 180;
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
 const RGBA_CHANNELS = 4;
 
-function getCameraOptions(camera) {
-  if (!camera) {
-    return undefined;
-  }
+const ORIENTATIONS = {
+  zplus: { position: [0, 0, 1], view_up: [0, 1, 0] },
+  zminus: { position: [0, 0, -1], view_up: [0, 1, 0] },
+  yplus: { position: [0, 1, 0], view_up: [0, 0, 1] },
+  yminus: { position: [0, -1, 0], view_up: [0, 0, 1] },
+  xplus: { position: [1, 0, 0], view_up: [0, 0, 1] },
+  xminus: { position: [-1, 0, 0], view_up: [0, 0, 1] },
+};
 
-  if (typeof camera.getFocalPoint !== "function") {
-    return { ...camera };
+function getCameraOptions(camera) {
+  if (!camera?.getFocalPoint) {
+    return camera;
   }
   return {
-    focal_point: [...camera.getFocalPoint()],
-    view_up: [...camera.getViewUp()],
-    position: [...camera.getPosition()],
+    focal_point: [...(camera.getFocalPoint() ?? [])],
+    view_up: [...(camera.getViewUp() ?? [])],
+    position: [...(camera.getPosition() ?? [])],
     view_angle: camera.getViewAngle(),
-    clipping_range: [...camera.getClippingRange()],
+    clipping_range: [...(camera.getClippingRange() ?? [])],
     distance: camera.getDistance(),
   };
 }
 
 function applyCameraOptions(camera, options) {
-  if (!camera || !options) {
-    return;
-  }
-  if (options.focal_point) {
-    camera.setFocalPoint(...options.focal_point);
-  }
-  if (options.view_up) {
-    camera.setViewUp(...options.view_up);
-  }
-  if (options.position) {
-    camera.setPosition(...options.position);
-  }
-  if (options.view_angle) {
-    camera.setViewAngle(options.view_angle);
-  }
-  if (options.clipping_range) {
-    camera.setClippingRange(...options.clipping_range);
+  if (camera?.set && options) {
+    camera.set({
+      focalPoint: options.focal_point,
+      viewUp: options.view_up,
+      position: options.position,
+      viewAngle: options.view_angle,
+      clippingRange: options.clipping_range,
+    });
   }
 }
 
@@ -98,4 +95,55 @@ function computeAverageBrightness(rect, options) {
   }
 }
 
-export { applyCameraOptions, computeAverageBrightness, getCameraOptions };
+function animateCamera(options) {
+  const {
+    camera,
+    startState,
+    targetState,
+    duration,
+    bumpMultiplier,
+    easeExponent,
+    onUpdate,
+    onEnd,
+  } = options;
+  const startTime = performance.now();
+
+  function animate(currentTime) {
+    const progress = Math.min((currentTime - startTime) / duration, 1);
+    const ease =
+      duration > SHORT_ANIMATION_DURATION
+        ? 1 - (1 - progress) ** easeExponent
+        : progress * (2 - progress);
+    const bump = bumpMultiplier * Math.sin(Math.PI * progress);
+
+    camera.set({
+      position: startState.position.map(
+        (startValue, index) =>
+          startValue + (targetState.position[index] - startValue) * ease + bump,
+      ),
+      viewUp: startState.view_up.map(
+        (startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease,
+      ),
+      focalPoint: startState.focal_point.map(
+        (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
+      ),
+    });
+
+    onUpdate();
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      onEnd();
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+export {
+  ORIENTATIONS,
+  animateCamera,
+  applyCameraOptions,
+  computeAverageBrightness,
+  getCameraOptions,
+};

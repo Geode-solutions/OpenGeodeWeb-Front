@@ -49,12 +49,28 @@ function useMeshPointsVertexAttributeConfig() {
     return meshPointsVertexAttribute(id).name;
   }
 
+  function meshPointsVertexAttributeRange(id) {
+    const name = meshPointsVertexAttributeName(id);
+    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name);
+    const { minimum, maximum } = storedConfig;
+    return [minimum, maximum];
+  }
+
+  function meshPointsVertexAttributeColorMap(id) {
+    const name = meshPointsVertexAttributeName(id);
+    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name);
+    const { colorMap } = storedConfig;
+    return colorMap;
+  }
+
   return {
     meshPointsVertexAttribute,
     meshPointsVertexAttributeStoredConfig,
     setMeshPointsVertexAttributeStoredConfig,
     mutateMeshPointsVertexStyle,
     meshPointsVertexAttributeName,
+    meshPointsVertexAttributeRange,
+    meshPointsVertexAttributeColorMap,
   };
 }
 
@@ -133,23 +149,7 @@ export function useMeshPointsVertexAttributeStyle() {
   const config = useMeshPointsVertexAttributeConfig();
   const actions = useMeshPointsVertexAttributeActions();
 
-  function meshPointsVertexAttributeRange(id) {
-    const name = config.meshPointsVertexAttributeName(id);
-    const storedConfig = config.meshPointsVertexAttributeStoredConfig(id, name);
-    const { minimum, maximum } = storedConfig;
-    return [minimum, maximum];
-  }
-
-  function meshPointsVertexAttributeColorMap(id) {
-    const name = config.meshPointsVertexAttributeName(id);
-    const storedConfig = config.meshPointsVertexAttributeStoredConfig(id, name);
-    const { colorMap } = storedConfig;
-    return colorMap;
-  }
-
   return {
-    meshPointsVertexAttributeRange,
-    meshPointsVertexAttributeColorMap,
     ...config,
     ...actions,
   };
