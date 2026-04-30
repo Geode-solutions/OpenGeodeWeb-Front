@@ -12,7 +12,7 @@ import {
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
-} from "@ogw_front/utils/hybrid_viewer";
+} from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
