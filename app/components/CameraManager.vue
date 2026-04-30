@@ -30,25 +30,26 @@ async function saveCurrentPosition() {
   }
   await cameraManagerStore.saveCameraPosition(
     newPositionName.value,
+    toRaw(hybridViewerStore.camera_options),
     selectedObjectId.value,
   );
   newPositionName.value = "";
   selectedObjectId.value = undefined;
 }
 
-async function restorePosition(id) {
-  const position = await cameraManagerStore.getCameraPosition(id);
+async function restorePosition(positionId) {
+  const position = await cameraManagerStore.getCameraPosition(positionId);
   if (position) {
     if (hybridViewerStore.genericRenderWindow) {
       hybridViewerStore.setCamera(position.camera_options);
     } else {
-      await cameraManagerStore.restoreCameraPosition(id);
+      await cameraManagerStore.restoreCameraPosition(positionId);
     }
   }
 }
 
-async function deletePosition(id) {
-  await cameraManagerStore.deleteCameraPosition(id);
+async function deletePosition(positionId) {
+  await cameraManagerStore.deleteCameraPosition(positionId);
 }
 
 function startEditing(position) {
@@ -70,7 +71,7 @@ function getObjectName(objectId) {
   if (!objectId) {
     return "None";
   }
-  const obj = allObjects.value.find((o) => o.id === objectId);
+  const obj = allObjects.value.find((object) => object.id === objectId);
   return obj ? obj.name : "Unknown";
 }
 </script>

@@ -21,12 +21,7 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     return await database.camera_positions.get(id);
   }
 
-  async function saveCameraPosition(name, object_id = undefined) {
-    const response = await viewerStore.request(
-      viewer_schemas.opengeodeweb_viewer.viewer.get_camera,
-    );
-    const { camera_options } = response;
-
+  async function saveCameraPosition(name, camera_options, object_id = undefined) {
     await database.camera_positions.put({
       name,
       object_id,
