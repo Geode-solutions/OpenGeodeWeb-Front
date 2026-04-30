@@ -88,11 +88,7 @@ const camera_options = [
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
-    <v-row
-      v-for="camera_option in camera_options"
-      :key="camera_option.icon"
-      dense
-    >
+    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
         <ActionButton
           :icon="camera_option.icon"
@@ -110,10 +106,7 @@ const camera_options = [
     @select="hybridViewerStore.setCameraOrientation"
   />
   <Screenshot v-model="take_screenshot" />
-  <CameraManager
-    :show_dialog="show_camera_manager"
-    @close="show_camera_manager = false"
-  />
+  <CameraManager :show_dialog="show_camera_manager" @close="show_camera_manager = false" />
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"

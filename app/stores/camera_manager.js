@@ -16,7 +16,7 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
       { initialValue: [] },
     );
   }
- 
+
   async function getCameraPosition(id) {
     return await database.camera_positions.get(id);
   }
