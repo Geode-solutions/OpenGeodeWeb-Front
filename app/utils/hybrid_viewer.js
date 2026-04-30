@@ -132,17 +132,17 @@ function centerCameraOnPosition(camera, pickedPosition) {
 function performClickPicking(event, options) {
   const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
   const rect = container.getBoundingClientRect();
-  const display_x = Math.round(event.clientX - rect.left);
-  const display_y = Math.round(rect.height - (event.clientY - rect.top));
   viewerStore.request(
     viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
-    { x: display_x, y: display_y },
     {
-      response_function: (response) => {
-        const pickedPos = [response.x, response.y, response.z];
-        if (pickedPos.some((value) => value !== 0)) {
-          const camera = genericRenderWindow.getRenderer().getActiveCamera();
-          centerCameraOnPosition(camera, pickedPos);
+      x: Math.round(event.clientX - rect.left),
+      y: Math.round(rect.height - (event.clientY - rect.top)),
+    },
+    {
+      response_function: ({ x, y, z }) => {
+        const pickedPos = [x, y, z];
+        if (pickedPos.some((val) => val !== 0)) {
+          centerCameraOnPosition(genericRenderWindow.getRenderer().getActiveCamera(), pickedPos);
           genericRenderWindow.getRenderWindow().render();
           syncRemoteCamera();
         }
