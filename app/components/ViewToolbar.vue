@@ -3,11 +3,11 @@ import ActionButton from "@ogw_front/components/ActionButton.vue";
 import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
 import CameraManager from "@ogw_front/components/CameraManager";
 import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
-import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import Screenshot from "@ogw_front/components/Screenshot";
+import ZScaling from "@ogw_front/components/ZScaling";
+import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import ZScaling from "@ogw_front/components/ZScaling";
 
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
