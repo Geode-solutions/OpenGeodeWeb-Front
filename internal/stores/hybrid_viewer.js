@@ -1,6 +1,26 @@
-import { SHORT_ANIMATION_DURATION } from "@ogw_front/utils/vtk/constants";
+import { dot } from "@kitware/vtk.js/Common/Core/Math";
+
 const RGB_MAX = 255;
 const BACKGROUND_GREY_VALUE = 180;
+const ACTOR_DARK_VALUE = 20;
+
+const BACKGROUND_COLOR = [
+  BACKGROUND_GREY_VALUE / RGB_MAX,
+  BACKGROUND_GREY_VALUE / RGB_MAX,
+  BACKGROUND_GREY_VALUE / RGB_MAX,
+];
+const ACTOR_COLOR = [
+  ACTOR_DARK_VALUE / RGB_MAX,
+  ACTOR_DARK_VALUE / RGB_MAX,
+  ACTOR_DARK_VALUE / RGB_MAX,
+];
+const WHEEL_TIME_OUT_MS = 600;
+const BUMP_MULTIPLIER = 0.2;
+const ALIGNMENT_THRESHOLD = 0.9;
+const LONG_ANIMATION_DURATION = 1000;
+const SHORT_ANIMATION_DURATION = 500;
+const EASE_EXPONENT = 1.1;
+
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
 const RGBA_CHANNELS = 4;
@@ -95,6 +115,42 @@ function computeAverageBrightness(rect, options) {
   }
 }
 
+function centerCameraOnPosition(camera, pickedPosition) {
+  if (!camera || !pickedPosition) {
+    return;
+  }
+  const focalPoint = camera.getFocalPoint();
+  const position = camera.getPosition();
+  camera.setFocalPoint(...pickedPosition);
+  camera.setPosition(
+    position[0] + pickedPosition[0] - focalPoint[0],
+    position[1] + pickedPosition[1] - focalPoint[1],
+    position[2] + pickedPosition[2] - focalPoint[2],
+  );
+}
+
+function performClickPicking(event, options) {
+  const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
+  const rect = container.getBoundingClientRect();
+  viewerStore.request(
+    viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
+    {
+      x: Math.round(event.clientX - rect.left),
+      y: Math.round(rect.height - (event.clientY - rect.top)),
+    },
+    {
+      response_function: ({ x, y, z }) => {
+        const pickedPos = [x, y, z];
+        if (pickedPos.some((val) => val !== 0)) {
+          centerCameraOnPosition(genericRenderWindow.getRenderer().getActiveCamera(), pickedPos);
+          genericRenderWindow.getRenderWindow().render();
+          syncRemoteCamera();
+        }
+      },
+    },
+  );
+}
+
 function animateCamera(options) {
   const {
     camera,
@@ -140,10 +196,81 @@ function animateCamera(options) {
   requestAnimationFrame(animate);
 }
 
+async function applySnapshot(snapshot, options) {
+  const { genericRenderWindow, setZScaling, syncRemoteCamera } = options;
+  if (!snapshot) {
+    return;
+  }
+  const z_scale = snapshot.zScale;
+  if (typeof z_scale === "number") {
+    await setZScaling(z_scale);
+  }
+  const { camera_options: snapshot_camera_options } = snapshot;
+  if (snapshot_camera_options) {
+    applyCameraOptions(
+      genericRenderWindow.getRenderer().getActiveCamera(),
+      snapshot_camera_options,
+    );
+    genericRenderWindow.getRenderWindow().render();
+    syncRemoteCamera();
+  }
+}
+
+function performCameraOrientation(orientation, options) {
+  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera, constants } = options;
+  const config = ORIENTATIONS[orientation.toLowerCase()];
+  const renderer = genericRenderWindow.getRenderer();
+  const camera = renderer.getActiveCamera();
+  const startState = getCameraOptions(camera);
+
+  applyCameraOptions(camera, {
+    ...config,
+    focal_point: [0, 0, 0],
+  });
+  renderer.resetCamera();
+  const targetState = getCameraOptions(camera);
+
+  applyCameraOptions(camera, startState);
+
+  const alignment = dot(camera.getDirectionOfProjection(), config.position);
+  const duration =
+    alignment > constants.ALIGNMENT_THRESHOLD
+      ? constants.LONG_ANIMATION_DURATION
+      : constants.SHORT_ANIMATION_DURATION;
+  is_moving.value = true;
+  imageStyle.opacity = 0;
+
+  animateCamera({
+    camera,
+    startState,
+    targetState,
+    duration,
+    bumpMultiplier: constants.BUMP_MULTIPLIER,
+    easeExponent: constants.EASE_EXPONENT,
+    onUpdate: () => genericRenderWindow.getRenderWindow().render(),
+    onEnd: () => {
+      is_moving.value = false;
+      syncRemoteCamera();
+    },
+  });
+}
+
 export {
+  BACKGROUND_COLOR,
+  ACTOR_COLOR,
+  WHEEL_TIME_OUT_MS,
+  BUMP_MULTIPLIER,
+  ALIGNMENT_THRESHOLD,
+  LONG_ANIMATION_DURATION,
+  SHORT_ANIMATION_DURATION,
+  EASE_EXPONENT,
   ORIENTATIONS,
   animateCamera,
   applyCameraOptions,
+  applySnapshot,
+  centerCameraOnPosition,
   computeAverageBrightness,
   getCameraOptions,
+  performCameraOrientation,
+  performClickPicking,
 };

@@ -1,17 +1,4 @@
 import {
-  ORIENTATIONS,
-  animateCamera,
-  applyCameraOptions,
-  computeAverageBrightness,
-  getCameraOptions,
-} from "@ogw_front/utils/hybrid_viewer";
-import { dot } from "@kitware/vtk.js/Common/Core/Math";
-import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
-import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
-import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
-
-import {
   ACTOR_COLOR,
   ALIGNMENT_THRESHOLD,
   BACKGROUND_COLOR,
@@ -20,7 +7,17 @@ import {
   LONG_ANIMATION_DURATION,
   SHORT_ANIMATION_DURATION,
   WHEEL_TIME_OUT_MS,
-} from "@ogw_front/utils/vtk/constants";
+  applySnapshot,
+  computeAverageBrightness,
+  getCameraOptions,
+  performCameraOrientation,
+  performClickPicking,
+} from "@ogw_internal/stores/hybrid_viewer";
+import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
+import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
+
 import { Status } from "@ogw_front/utils/status";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -35,10 +32,20 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const camera_options = reactive({});
   const genericRenderWindow = reactive({});
   const is_moving = ref(false);
+  const is_picking = ref(false);
   const zScale = ref(1);
   let viewStream = undefined;
   let imageStyle = undefined;
   const gridActor = undefined;
+
+  watch(is_picking, (value) => {
+    const element = genericRenderWindow.value
+      ?.getApiSpecificRenderWindow()
+      ?.getCanvas()?.parentElement;
+    if (element) {
+      element.style.cursor = value ? "crosshair" : "default";
+    }
+  });
 
   const latestImage = ref(undefined);
   const offscreenCanvas =
@@ -153,37 +160,17 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setCameraOrientation(orientation) {
-    const config = ORIENTATIONS[orientation.toLowerCase()];
-    const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
-    const startState = getCameraOptions(camera);
-
-    applyCameraOptions(camera, {
-      ...config,
-      focal_point: [0, 0, 0],
-    });
-    renderer.resetCamera();
-    const targetState = getCameraOptions(camera);
-
-    applyCameraOptions(camera, startState);
-
-    const alignment = dot(camera.getDirectionOfProjection(), config.position);
-    const duration =
-      alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
-    is_moving.value = true;
-    imageStyle.opacity = 0;
-
-    animateCamera({
-      camera,
-      startState,
-      targetState,
-      duration,
-      bumpMultiplier: BUMP_MULTIPLIER,
-      easeExponent: EASE_EXPONENT,
-      onUpdate: () => genericRenderWindow.value.getRenderWindow().render(),
-      onEnd: () => {
-        is_moving.value = false;
-        syncRemoteCamera();
+    performCameraOrientation(orientation, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle,
+      syncRemoteCamera,
+      constants: {
+        ALIGNMENT_THRESHOLD,
+        BUMP_MULTIPLIER,
+        EASE_EXPONENT,
+        LONG_ANIMATION_DURATION,
+        SHORT_ANIMATION_DURATION,
       },
     });
   }
@@ -219,11 +206,23 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     useMousePressed({
       target: container,
       onPressed: (event) => {
-        if (event.button === 0) {
-          is_moving.value = true;
-          event.stopPropagation();
-          imageStyle.opacity = 0;
+        if (event.button !== 0) {
+          return;
         }
+        if (is_picking.value) {
+          performClickPicking(event, {
+            container: container.value.$el,
+            viewerStore,
+            viewer_schemas,
+            genericRenderWindow: genericRenderWindow.value,
+            syncRemoteCamera,
+          });
+          is_picking.value = false;
+          return;
+        }
+        is_moving.value = true;
+        event.stopPropagation();
+        imageStyle.opacity = 0;
       },
       onReleased: () => {
         if (!is_moving.value) {
@@ -279,21 +278,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function importStores(snapshot) {
-    if (!snapshot) {
-      return;
-    }
-    const z_scale = snapshot.zScale;
-    if (typeof z_scale === "number") {
-      await setZScaling(z_scale);
-    }
-
-    const { camera_options: snapshot_camera_options } = snapshot;
-    if (snapshot_camera_options) {
-      const renderer = genericRenderWindow.value.getRenderer();
-      applyCameraOptions(renderer.getActiveCamera(), snapshot_camera_options);
-      genericRenderWindow.value.getRenderWindow().render();
-      syncRemoteCamera();
-    }
+    await applySnapshot(snapshot, {
+      genericRenderWindow: genericRenderWindow.value,
+      setZScaling,
+      syncRemoteCamera,
+    });
   }
 
   function clear() {
@@ -323,6 +312,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setCameraOrientation,
     setContainer,
     zScale,
+    is_picking,
     clear,
     exportStores,
     importStores,
