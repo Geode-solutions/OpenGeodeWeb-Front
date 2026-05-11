@@ -145,48 +145,52 @@ function performClickPicking(event, options) {
   );
 }
 
-function vecSub(a, b) {
-  return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+function vecSub(vector, other) {
+  return [vector[0] - other[0], vector[1] - other[1], vector[2] - other[2]];
 }
 
-function vecLength(v) {
-  return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+function vecLength(vector) {
+  return Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
 }
 
-function vecNormalize(v) {
-  const len = vecLength(v);
+function vecNormalize(vector) {
+  const len = vecLength(vector);
   if (len < 1e-10) {
     return [0, 0, 1];
   }
-  return [v[0] / len, v[1] / len, v[2] / len];
+  return [vector[0] / len, vector[1] / len, vector[2] / len];
 }
 
-function slerp(a, b, t) {
-  const na = vecNormalize(a);
-  const nb = vecNormalize(b);
-  let d = na[0] * nb[0] + na[1] * nb[1] + na[2] * nb[2];
-  d = Math.max(-1, Math.min(1, d));
-  if (d > 0.9995) {
+function slerp(from, to, ratio) {
+  const normFrom = vecNormalize(from);
+  const normTo = vecNormalize(to);
+  let dotProduct = normFrom[0] * normTo[0] + normFrom[1] * normTo[1] + normFrom[2] * normTo[2];
+  dotProduct = Math.max(-1, Math.min(1, dotProduct));
+  if (dotProduct > 0.9995) {
     return vecNormalize([
-      na[0] + (nb[0] - na[0]) * t,
-      na[1] + (nb[1] - na[1]) * t,
-      na[2] + (nb[2] - na[2]) * t,
+      normFrom[0] + (normTo[0] - normFrom[0]) * ratio,
+      normFrom[1] + (normTo[1] - normFrom[1]) * ratio,
+      normFrom[2] + (normTo[2] - normFrom[2]) * ratio,
     ]);
   }
-  const theta = Math.acos(d);
+  const theta = Math.acos(dotProduct);
   const sinTheta = Math.sin(theta);
-  const wa = Math.sin((1 - t) * theta) / sinTheta;
-  const wb = Math.sin(t * theta) / sinTheta;
-  return [na[0] * wa + nb[0] * wb, na[1] * wa + nb[1] * wb, na[2] * wa + nb[2] * wb];
+  const weightFrom = Math.sin((1 - ratio) * theta) / sinTheta;
+  const weightTo = Math.sin(ratio * theta) / sinTheta;
+  return [
+    normFrom[0] * weightFrom + normTo[0] * weightTo,
+    normFrom[1] * weightFrom + normTo[1] * weightTo,
+    normFrom[2] * weightFrom + normTo[2] * weightTo,
+  ];
 }
 
 function computeAnimationDuration(startState, targetState) {
   const startDir = vecNormalize(vecSub(startState.position, startState.focal_point));
   const targetDir = vecNormalize(vecSub(targetState.position, targetState.focal_point));
-  const d = Math.max(-1, Math.min(1, dot(startDir, targetDir)));
-  const angle = Math.acos(d);
-  const ratio = angle / Math.PI;
-  return SHORT_ANIMATION_DURATION + (LONG_ANIMATION_DURATION - SHORT_ANIMATION_DURATION) * ratio;
+  const dotProduct = Math.max(-1, Math.min(1, dot(startDir, targetDir)));
+  const angle = Math.acos(dotProduct);
+  const angleRatio = angle / Math.PI;
+  return SHORT_ANIMATION_DURATION + (LONG_ANIMATION_DURATION - SHORT_ANIMATION_DURATION) * angleRatio;
 }
 
 function animateCamera(options) {
