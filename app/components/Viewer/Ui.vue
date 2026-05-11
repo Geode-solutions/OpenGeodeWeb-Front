@@ -72,6 +72,8 @@ defineExpose({ get_viewer_id });
         @click="viewerStore.toggle_picking_mode(false)"
       >
         Picking active — click in the viewer &middot; Esc to stop
+        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
+        <v-icon icon="mdi-close" size="small" />
       </v-chip>
     </div>
   </v-fade-transition>
