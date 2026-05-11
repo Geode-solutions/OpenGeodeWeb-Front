@@ -1,6 +1,6 @@
 <script setup>
 import ToolPanel from "@ogw_front/components/ToolPanel";
-import { applyCameraOptions } from "@ogw_front/utils/hybrid_viewer";
+import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";

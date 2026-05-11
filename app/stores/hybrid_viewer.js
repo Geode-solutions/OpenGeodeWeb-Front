@@ -1,24 +1,29 @@
 import {
   ACTOR_COLOR,
+  ALIGNMENT_THRESHOLD,
   BACKGROUND_COLOR,
+  BUMP_MULTIPLIER,
   EASE_EXPONENT,
+  LONG_ANIMATION_DURATION,
   SHORT_ANIMATION_DURATION,
   WHEEL_TIME_OUT_MS,
-} from "@ogw_front/utils/vtk/constants";
-import {
   animateCamera,
   applyCameraOptions,
+  applySnapshot,
+  computeAnimationDuration,
   computeAverageBrightness,
   getCameraOptions,
   performCameraOrientation,
-} from "@ogw_front/utils/hybrid_viewer";
-import { Status } from "@ogw_front/utils/status";
-import { useDataStore } from "@ogw_front/stores/data";
-import { useViewerStore } from "@ogw_front/stores/viewer";
+  performClickPicking,
+} from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
+
+import { Status } from "@ogw_front/utils/status";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -30,12 +35,23 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const genericRenderWindow = reactive({});
   const status = ref(Status.NOT_CREATED);
   const is_moving = ref(false);
-  const latestImage = ref(undefined);
+  const is_picking = ref(false);
   const zScale = ref(1);
   let imageStyle = undefined;
   let viewStream = undefined;
   let wheelEventEndTimeout = undefined;
   const gridActor = undefined;
+
+  watch(is_picking, (value) => {
+    const element = genericRenderWindow.value
+      ?.getApiSpecificRenderWindow()
+      ?.getCanvas()?.parentElement;
+    if (element) {
+      element.style.cursor = value ? "crosshair" : "default";
+    }
+  });
+
+  const latestImage = ref(undefined);
   const offscreenCanvas =
     typeof document === "undefined" ? undefined : document.createElement("canvas");
   const offscreenCtx = offscreenCanvas
@@ -138,6 +154,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   function setCamera(new_camera_options) {
     const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
     const startState = getCameraOptions(camera);
+    const duration = computeAnimationDuration(startState, new_camera_options);
     is_moving.value = true;
     if (imageStyle) {
       imageStyle.opacity = 0;
@@ -146,7 +163,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       camera,
       startState,
       targetState: new_camera_options,
-      duration: SHORT_ANIMATION_DURATION,
+      duration,
       bumpMultiplier: 0,
       easeExponent: EASE_EXPONENT,
       onUpdate: () => genericRenderWindow.value.getRenderWindow().render(),
@@ -160,20 +177,17 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setCameraOrientation(orientation) {
-    performCameraOrientation({
-      orientation,
-      camera: genericRenderWindow.value.getRenderer().getActiveCamera(),
-      renderer: genericRenderWindow.value.getRenderer(),
-      renderWindow: genericRenderWindow.value.getRenderWindow(),
-      onStart: () => {
-        is_moving.value = true;
-        if (imageStyle) {
-          imageStyle.opacity = 0;
-        }
-      },
-      onEnd: () => {
-        is_moving.value = false;
-        syncRemoteCamera();
+    performCameraOrientation(orientation, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle,
+      syncRemoteCamera,
+      constants: {
+        ALIGNMENT_THRESHOLD,
+        BUMP_MULTIPLIER,
+        EASE_EXPONENT,
+        LONG_ANIMATION_DURATION,
+        SHORT_ANIMATION_DURATION,
       },
     });
   }
@@ -210,13 +224,23 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     useMousePressed({
       target: container,
       onPressed: (event) => {
-        if (event.button === 0) {
-          is_moving.value = true;
-          event.stopPropagation();
-          if (imageStyle) {
-            imageStyle.opacity = 0;
-          }
+        if (event.button !== 0) {
+          return;
         }
+        if (is_picking.value) {
+          performClickPicking(event, {
+            container: container.value.$el,
+            viewerStore,
+            viewer_schemas,
+            genericRenderWindow: genericRenderWindow.value,
+            syncRemoteCamera,
+          });
+          is_picking.value = false;
+          return;
+        }
+        is_moving.value = true;
+        event.stopPropagation();
+        imageStyle.opacity = 0;
       },
       onReleased: () => {
         if (is_moving.value) {
@@ -268,20 +292,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function importStores(snapshot) {
-    if (!snapshot) {
-      return;
-    }
-    if (typeof snapshot.zScale === "number") {
-      await setZScaling(snapshot.zScale);
-    }
-    if (snapshot.camera_options) {
-      applyCameraOptions(
-        genericRenderWindow.value.getRenderer().getActiveCamera(),
-        snapshot.camera_options,
-      );
-      genericRenderWindow.value.getRenderWindow().render();
-      syncRemoteCamera();
-    }
+    await applySnapshot(snapshot, {
+      genericRenderWindow: genericRenderWindow.value,
+      setZScaling,
+      syncRemoteCamera,
+      setCamera,
+    });
   }
 
   function clear() {
@@ -311,6 +327,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setCameraOrientation,
     setContainer,
     zScale,
+    is_picking,
     clear,
     exportStores,
     importStores,
