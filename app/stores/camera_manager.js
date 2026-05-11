@@ -21,10 +21,9 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     return await database.camera_positions.get(id);
   }
 
-  async function saveCameraPosition(name, camera_options, object_id = undefined) {
+  async function saveCameraPosition(name, camera_options) {
     await database.camera_positions.put({
       name,
-      object_id,
       camera_options,
     });
   }
