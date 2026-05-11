@@ -27,7 +27,7 @@ export const useViewerStore = defineStore(
     const client = ref({});
     const config = ref(undefined);
     const picking_mode = ref(false);
-    const picked_point = ref({ x: undefined, y: undefined, z: undefined, timestamp: 0 });
+    const picked_point = ref({ x: undefined, y: undefined, z: undefined });
     const request_counter = ref(0);
     const status = ref(Status.NOT_CONNECTED);
     const buzy = ref(0);
@@ -67,10 +67,7 @@ export const useViewerStore = defineStore(
         y: Math.round(y),
       });
       const { x: world_x, y: world_y, z: world_z } = response;
-      picked_point.value.x = world_x;
-      picked_point.value.y = world_y;
-      picked_point.value.z = world_z;
-      picked_point.value.timestamp = Date.now();
+      picked_point.value = { x: world_x, y: world_y, z: world_z };
     }
 
     function ws_connect() {

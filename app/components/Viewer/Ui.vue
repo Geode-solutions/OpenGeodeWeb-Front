@@ -14,7 +14,6 @@ const { displayMenu, containerWidth, containerHeight } = defineProps({
 });
 
 const emit = defineEmits(["show-menu"]);
-
 const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const viewerStore = useViewerStore();
