@@ -20,6 +20,8 @@ const ALIGNMENT_THRESHOLD = 0.9;
 const LONG_ANIMATION_DURATION = 1000;
 const SHORT_ANIMATION_DURATION = 500;
 const EASE_EXPONENT = 1.1;
+const NEAR_ZERO_THRESHOLD = 1e-10;
+const SLERP_LINEAR_THRESHOLD = 0.9995;
 
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
@@ -150,37 +152,37 @@ function vecSub(vector, other) {
 }
 
 function vecLength(vector) {
-  return Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
+  return Math.hypot(vector[0], vector[1], vector[2]);
 }
 
 function vecNormalize(vector) {
   const len = vecLength(vector);
-  if (len < 1e-10) {
+  if (len < NEAR_ZERO_THRESHOLD) {
     return [0, 0, 1];
   }
   return [vector[0] / len, vector[1] / len, vector[2] / len];
 }
 
-function slerp(from, to, ratio) {
+function slerp(from, target, ratio) {
   const normFrom = vecNormalize(from);
-  const normTo = vecNormalize(to);
-  let dotProduct = normFrom[0] * normTo[0] + normFrom[1] * normTo[1] + normFrom[2] * normTo[2];
+  const normTarget = vecNormalize(target);
+  let dotProduct = normFrom[0] * normTarget[0] + normFrom[1] * normTarget[1] + normFrom[2] * normTarget[2];
   dotProduct = Math.max(-1, Math.min(1, dotProduct));
-  if (dotProduct > 0.9995) {
+  if (dotProduct > SLERP_LINEAR_THRESHOLD) {
     return vecNormalize([
-      normFrom[0] + (normTo[0] - normFrom[0]) * ratio,
-      normFrom[1] + (normTo[1] - normFrom[1]) * ratio,
-      normFrom[2] + (normTo[2] - normFrom[2]) * ratio,
+      normFrom[0] + (normTarget[0] - normFrom[0]) * ratio,
+      normFrom[1] + (normTarget[1] - normFrom[1]) * ratio,
+      normFrom[2] + (normTarget[2] - normFrom[2]) * ratio,
     ]);
   }
   const theta = Math.acos(dotProduct);
   const sinTheta = Math.sin(theta);
   const weightFrom = Math.sin((1 - ratio) * theta) / sinTheta;
-  const weightTo = Math.sin(ratio * theta) / sinTheta;
+  const weightTarget = Math.sin(ratio * theta) / sinTheta;
   return [
-    normFrom[0] * weightFrom + normTo[0] * weightTo,
-    normFrom[1] * weightFrom + normTo[1] * weightTo,
-    normFrom[2] * weightFrom + normTo[2] * weightTo,
+    normFrom[0] * weightFrom + normTarget[0] * weightTarget,
+    normFrom[1] * weightFrom + normTarget[1] * weightTarget,
+    normFrom[2] * weightFrom + normTarget[2] * weightTarget,
   ];
 }
 
@@ -219,11 +221,11 @@ function animateCamera(options) {
     const dir = slerp(startDir, targetDir, ease);
     const dist = startDist + (targetDist - startDist) * ease + bump;
     const focalPoint = startState.focal_point.map(
-      (v, i) => v + (targetState.focal_point[i] - v) * ease,
+      (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
     );
     const viewUp = slerp(startState.view_up, targetState.view_up, ease);
     camera.set({
-      position: focalPoint.map((fp, i) => fp + dir[i] * dist),
+      position: focalPoint.map((focalCoord, index) => focalCoord + dir[index] * dist),
       viewUp,
       focalPoint,
     });
