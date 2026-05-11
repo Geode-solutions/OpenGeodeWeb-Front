@@ -1,11 +1,11 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
-import Saver from "@ogw_front/components/CameraManager/Saver";
 import List from "@ogw_front/components/CameraManager/List";
+import Saver from "@ogw_front/components/CameraManager/Saver";
 
 const emit = defineEmits(["close"]);
 
-defineProps({
+const { show_dialog, width } = defineProps({
   show_dialog: { type: Boolean, required: true },
   width: { type: Number, required: false, default: 450 },
 });
