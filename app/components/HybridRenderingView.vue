@@ -63,6 +63,7 @@ async function handleClick(event) {
       <v-col
         class="pa-0"
         ref="viewer"
+        :class="{ 'picking-cursor': viewerStore.picking_mode }"
         style="height: 100%; overflow: hidden; position: relative; z-index: 0"
         @click="handleClick"
       />
@@ -70,8 +71,11 @@ async function handleClick(event) {
   </ClientOnly>
 </template>
 
-<style>
+<style scoped>
 img {
   pointer-events: none;
+}
+.picking-cursor {
+  cursor: crosshair !important;
 }
 </style>
