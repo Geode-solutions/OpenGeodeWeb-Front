@@ -310,9 +310,7 @@ function performCameraOrientation(orientation, options) {
 
   const alignment = dot(camera.getDirectionOfProjection(), config.position);
   const duration =
-    alignment > ALIGNMENT_THRESHOLD
-      ? LONG_ANIMATION_DURATION
-      : SHORT_ANIMATION_DURATION;
+    alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
   is_moving.value = true;
   imageStyle.opacity = 0;
 
