@@ -192,7 +192,9 @@ function computeAnimationDuration(startState, targetState) {
   const dotProduct = Math.max(-1, Math.min(1, dot(startDir, targetDir)));
   const angle = Math.acos(dotProduct);
   const angleRatio = angle / Math.PI;
-  return SHORT_ANIMATION_DURATION + (LONG_ANIMATION_DURATION - SHORT_ANIMATION_DURATION) * angleRatio;
+  return (
+    SHORT_ANIMATION_DURATION + (LONG_ANIMATION_DURATION - SHORT_ANIMATION_DURATION) * angleRatio
+  );
 }
 
 function animateCamera(options) {
