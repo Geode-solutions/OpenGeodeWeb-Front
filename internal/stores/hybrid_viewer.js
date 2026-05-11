@@ -265,8 +265,34 @@ async function applySnapshot(snapshot, options) {
   }
 }
 
+function performSetCamera(targetCameraOptions, options) {
+  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera } = options;
+  const camera = genericRenderWindow.getRenderer().getActiveCamera();
+  const startState = getCameraOptions(camera);
+  const duration = computeAnimationDuration(startState, targetCameraOptions);
+  is_moving.value = true;
+  if (imageStyle) {
+    imageStyle.opacity = 0;
+  }
+  animateCamera({
+    camera,
+    startState,
+    targetState: targetCameraOptions,
+    duration,
+    bumpMultiplier: 0,
+    easeExponent: EASE_EXPONENT,
+    onUpdate: () => genericRenderWindow.getRenderWindow().render(),
+    onEnd: () => {
+      applyCameraOptions(camera, targetCameraOptions);
+      genericRenderWindow.getRenderWindow().render();
+      is_moving.value = false;
+      syncRemoteCamera();
+    },
+  });
+}
+
 function performCameraOrientation(orientation, options) {
-  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera, constants } = options;
+  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera } = options;
   const config = ORIENTATIONS[orientation.toLowerCase()];
   const renderer = genericRenderWindow.getRenderer();
   const camera = renderer.getActiveCamera();
@@ -283,9 +309,9 @@ function performCameraOrientation(orientation, options) {
 
   const alignment = dot(camera.getDirectionOfProjection(), config.position);
   const duration =
-    alignment > constants.ALIGNMENT_THRESHOLD
-      ? constants.LONG_ANIMATION_DURATION
-      : constants.SHORT_ANIMATION_DURATION;
+    alignment > ALIGNMENT_THRESHOLD
+      ? LONG_ANIMATION_DURATION
+      : SHORT_ANIMATION_DURATION;
   is_moving.value = true;
   imageStyle.opacity = 0;
 
@@ -294,8 +320,8 @@ function performCameraOrientation(orientation, options) {
     startState,
     targetState,
     duration,
-    bumpMultiplier: constants.BUMP_MULTIPLIER,
-    easeExponent: constants.EASE_EXPONENT,
+    bumpMultiplier: BUMP_MULTIPLIER,
+    easeExponent: EASE_EXPONENT,
     onUpdate: () => genericRenderWindow.getRenderWindow().render(),
     onEnd: () => {
       is_moving.value = false;
@@ -323,4 +349,5 @@ export {
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
+  performSetCamera,
 };

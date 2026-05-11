@@ -1,20 +1,13 @@
 import {
   ACTOR_COLOR,
-  ALIGNMENT_THRESHOLD,
   BACKGROUND_COLOR,
-  BUMP_MULTIPLIER,
-  EASE_EXPONENT,
-  LONG_ANIMATION_DURATION,
-  SHORT_ANIMATION_DURATION,
   WHEEL_TIME_OUT_MS,
-  animateCamera,
-  applyCameraOptions,
   applySnapshot,
-  computeAnimationDuration,
   computeAverageBrightness,
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
+  performSetCamera,
 } from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -152,27 +145,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setCamera(new_camera_options) {
-    const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
-    const startState = getCameraOptions(camera);
-    const duration = computeAnimationDuration(startState, new_camera_options);
-    is_moving.value = true;
-    if (imageStyle) {
-      imageStyle.opacity = 0;
-    }
-    animateCamera({
-      camera,
-      startState,
-      targetState: new_camera_options,
-      duration,
-      bumpMultiplier: 0,
-      easeExponent: EASE_EXPONENT,
-      onUpdate: () => genericRenderWindow.value.getRenderWindow().render(),
-      onEnd: () => {
-        applyCameraOptions(camera, new_camera_options);
-        genericRenderWindow.value.getRenderWindow().render();
-        is_moving.value = false;
-        syncRemoteCamera();
-      },
+    performSetCamera(new_camera_options, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle,
+      syncRemoteCamera,
     });
   }
 
@@ -182,13 +159,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       is_moving,
       imageStyle,
       syncRemoteCamera,
-      constants: {
-        ALIGNMENT_THRESHOLD,
-        BUMP_MULTIPLIER,
-        EASE_EXPONENT,
-        LONG_ANIMATION_DURATION,
-        SHORT_ANIMATION_DURATION,
-      },
     });
   }
 
