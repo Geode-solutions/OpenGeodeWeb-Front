@@ -166,7 +166,8 @@ function vecNormalize(vector) {
 function slerp(from, target, ratio) {
   const normFrom = vecNormalize(from);
   const normTarget = vecNormalize(target);
-  let dotProduct = normFrom[0] * normTarget[0] + normFrom[1] * normTarget[1] + normFrom[2] * normTarget[2];
+  let dotProduct =
+    normFrom[0] * normTarget[0] + normFrom[1] * normTarget[1] + normFrom[2] * normTarget[2];
   dotProduct = Math.max(-1, Math.min(1, dotProduct));
   if (dotProduct > SLERP_LINEAR_THRESHOLD) {
     return vecNormalize([
