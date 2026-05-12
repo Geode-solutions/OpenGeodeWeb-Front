@@ -90,9 +90,14 @@ const cell_attribute_color_map = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" :tooltip="tooltip" :btn_image="btn_image">
+  <ViewerContextMenuItem
+    data-testid="meshCellsMenu"
+    :itemProps="itemProps"
+    :tooltip="tooltip"
+    :btn_image="btn_image"
+  >
     <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch data-testid="meshCellsVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
         <ViewerOptionsColoringTypeSelector
           :id="id"

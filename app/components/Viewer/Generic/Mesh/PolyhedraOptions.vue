@@ -87,9 +87,17 @@ const polyhedron_attribute_color_map = computed({
 </script>
 
 <template>
-  <ViewerContextMenuItem :itemProps="itemProps" :tooltip="tooltip" :btn_image="btn_image">
+  <ViewerContextMenuItem
+    data-testid="meshPolyhedraMenu"
+    :itemProps="itemProps"
+    :tooltip="tooltip"
+    :btn_image="btn_image"
+  >
     <template #options>
-      <ViewerOptionsVisibilitySwitch v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch
+        data-testid="meshPolyhedraVisibilitySwitch"
+        v-model="visibility"
+      />
       <template v-if="visibility">
         <ViewerOptionsColoringTypeSelector
           :id="id"
@@ -101,6 +109,10 @@ const polyhedron_attribute_color_map = computed({
           v-model:polyhedron_attribute_name="polyhedron_attribute_name"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
+          :capabilities="{
+            vertex: { available: true, hasColorMap: false },
+            polyhedron: { available: true, hasColorMap: true },
+          }"
         />
       </template>
     </template>

@@ -1,6 +1,7 @@
 <script setup>
 import SurfacePoints from "@ogw_front/assets/viewer_svgs/surface_points.svg";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
+import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -46,20 +47,7 @@ const size = computed({
       <template v-if="visibility">
         <v-row class="pa-0" align="center">
           <v-divider />
-          <v-col cols="auto" justify="center">
-            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Size'" />
-          </v-col>
-          <v-col justify="center">
-            <v-slider
-              v-model="size"
-              hide-details
-              min="0"
-              max="20"
-              step="2"
-              thumb-color="black"
-              ticks
-            />
-          </v-col>
+          <ViewerOptionsSizeSlider data-testid="modelPointsSizeSlider" v-model="size" />
         </v-row>
       </template>
     </template>

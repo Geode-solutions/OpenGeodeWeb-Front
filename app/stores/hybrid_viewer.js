@@ -1,5 +1,18 @@
-// oxlint-disable-next-line import/no-unassigned-import
-import "@kitware/vtk.js/Rendering/Profiles/Geometry";
+import {
+  ACTOR_COLOR,
+  ALIGNMENT_THRESHOLD,
+  BACKGROUND_COLOR,
+  BUMP_MULTIPLIER,
+  EASE_EXPONENT,
+  LONG_ANIMATION_DURATION,
+  SHORT_ANIMATION_DURATION,
+  WHEEL_TIME_OUT_MS,
+  applySnapshot,
+  computeAverageBrightness,
+  getCameraOptions,
+  performCameraOrientation,
+  performClickPicking,
+} from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
@@ -8,22 +21,8 @@ import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLP
 import { Status } from "@ogw_front/utils/status";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-const RGB_MAX = 255;
-const BACKGROUND_GREY_VALUE = 180;
-const ACTOR_DARK_VALUE = 20;
-const BACKGROUND_COLOR = [
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-];
-const ACTOR_COLOR = [
-  ACTOR_DARK_VALUE / RGB_MAX,
-  ACTOR_DARK_VALUE / RGB_MAX,
-  ACTOR_DARK_VALUE / RGB_MAX,
-];
-const WHEEL_TIME_OUT_MS = 600;
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
@@ -33,9 +32,27 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const camera_options = reactive({});
   const genericRenderWindow = reactive({});
   const is_moving = ref(false);
+  const is_picking = ref(false);
   const zScale = ref(1);
   let viewStream = undefined;
+  let imageStyle = undefined;
   const gridActor = undefined;
+
+  watch(is_picking, (value) => {
+    const element = genericRenderWindow.value
+      ?.getApiSpecificRenderWindow()
+      ?.getCanvas()?.parentElement;
+    if (element) {
+      element.style.cursor = value ? "crosshair" : "default";
+    }
+  });
+
+  const latestImage = ref(undefined);
+  const offscreenCanvas =
+    typeof document === "undefined" ? undefined : document.createElement("canvas");
+  const offscreenCtx = offscreenCanvas
+    ? offscreenCanvas.getContext("2d", { willReadFrequently: true })
+    : undefined;
 
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
@@ -48,7 +65,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     });
 
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-    const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
+    imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
     imageStyle.transition = "opacity 0.1s ease-in";
     imageStyle.zIndex = 1;
 
@@ -58,8 +75,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       if (is_moving.value) {
         return;
       }
+      latestImage.value = event.image;
       webGLRenderWindow.setBackgroundImage(event.image);
       imageStyle.opacity = 1;
+    });
+
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
+    camera.onModified(() => {
+      Object.assign(camera_options, getCameraOptions(camera));
     });
 
     status.value = Status.CREATED;
@@ -135,28 +159,30 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     syncRemoteCamera();
   }
 
+  function setCameraOrientation(orientation) {
+    performCameraOrientation(orientation, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle,
+      syncRemoteCamera,
+      constants: {
+        ALIGNMENT_THRESHOLD,
+        BUMP_MULTIPLIER,
+        EASE_EXPONENT,
+        LONG_ANIMATION_DURATION,
+        SHORT_ANIMATION_DURATION,
+      },
+    });
+  }
+
   function syncRemoteCamera() {
-    console.log("syncRemoteCamera");
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
-    const params = {
-      camera_options: {
-        focal_point: [...camera.getFocalPoint()],
-        view_up: [...camera.getViewUp()],
-        position: [...camera.getPosition()],
-        view_angle: camera.getViewAngle(),
-        clipping_range: [...camera.getClippingRange()],
-        distance: camera.getDistance(),
-      },
-    };
+    const params = { camera_options: getCameraOptions(camera) };
     viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, params, {
       response_function: () => {
         remoteRender();
-        for (const key in params.camera_options) {
-          if (Object.hasOwn(params.camera_options, key)) {
-            camera_options[key] = params.camera_options[key];
-          }
-        }
+        Object.assign(camera_options, params.camera_options);
       },
     });
   }
@@ -166,31 +192,43 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setContainer(container) {
+    if (!container.value) {
+      return;
+    }
     genericRenderWindow.value.setContainer(container.value.$el);
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
     webGLRenderWindow.setUseBackgroundImage(true);
-    const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
+    imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
     imageStyle.transition = "opacity 0.1s ease-in";
     imageStyle.zIndex = 1;
     resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
-    console.log("setContainer", container.value.$el);
 
     useMousePressed({
       target: container,
       onPressed: (event) => {
-        console.log("onPressed");
-        if (event.button === 0) {
-          is_moving.value = true;
-          event.stopPropagation();
-          imageStyle.opacity = 0;
+        if (event.button !== 0) {
+          return;
         }
+        if (is_picking.value) {
+          performClickPicking(event, {
+            container: container.value.$el,
+            viewerStore,
+            viewer_schemas,
+            genericRenderWindow: genericRenderWindow.value,
+            syncRemoteCamera,
+          });
+          is_picking.value = false;
+          return;
+        }
+        is_moving.value = true;
+        event.stopPropagation();
+        imageStyle.opacity = 0;
       },
       onReleased: () => {
         if (!is_moving.value) {
           return;
         }
         is_moving.value = false;
-        console.log("onReleased");
         syncRemoteCamera();
       },
     });
@@ -223,68 +261,28 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender();
   }
 
+  function getAverageBrightness(rect) {
+    return computeAverageBrightness(rect, {
+      latestImage: latestImage.value,
+      offscreenCtx,
+      offscreenCanvas,
+      genericRenderWindow: genericRenderWindow.value,
+    });
+  }
+
   function exportStores() {
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
-    const cameraSnapshot = camera
-      ? {
-          focal_point: [...camera.getFocalPoint()],
-          view_up: [...camera.getViewUp()],
-          position: [...camera.getPosition()],
-          view_angle: camera.getViewAngle(),
-          clipping_range: [...camera.getClippingRange()],
-          distance: camera.getDistance(),
-        }
-      : camera_options;
+    const cameraSnapshot = getCameraOptions(camera) || camera_options;
     return { zScale: zScale.value, camera_options: cameraSnapshot };
   }
 
   async function importStores(snapshot) {
-    if (!snapshot) {
-      console.warn("importStores called with undefined snapshot");
-      return;
-    }
-    const z_scale = snapshot.zScale;
-
-    function applyCamera() {
-      const { camera_options: snapshot_camera_options } = snapshot;
-      if (!snapshot_camera_options) {
-        return;
-      }
-
-      const renderer = genericRenderWindow.value.getRenderer();
-      const camera = renderer.getActiveCamera();
-
-      camera.setFocalPoint(...snapshot_camera_options.focal_point);
-      camera.setViewUp(...snapshot_camera_options.view_up);
-      camera.setPosition(...snapshot_camera_options.position);
-      camera.setViewAngle(snapshot_camera_options.view_angle);
-      camera.setClippingRange(...snapshot_camera_options.clipping_range);
-
-      genericRenderWindow.value.getRenderWindow().render();
-
-      const payload = {
-        camera_options: {
-          focal_point: [...snapshot_camera_options.focal_point],
-          view_up: [...snapshot_camera_options.view_up],
-          position: [...snapshot_camera_options.position],
-          view_angle: snapshot_camera_options.view_angle,
-          clipping_range: [...snapshot_camera_options.clipping_range],
-        },
-      };
-      return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, payload, {
-        response_function: () => {
-          remoteRender();
-          Object.assign(camera_options, payload.camera_options);
-        },
-      });
-    }
-
-    if (typeof z_scale === "number") {
-      await setZScaling(z_scale);
-      return await applyCamera();
-    }
-    return await applyCamera();
+    await applySnapshot(snapshot, {
+      genericRenderWindow: genericRenderWindow.value,
+      setZScaling,
+      syncRemoteCamera,
+    });
   }
 
   function clear() {
@@ -311,10 +309,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender,
     resize,
     resetCamera,
+    setCameraOrientation,
     setContainer,
     zScale,
+    is_picking,
     clear,
     exportStores,
     importStores,
+    camera_options,
+    latestImage,
+    getAverageBrightness,
   };
 });

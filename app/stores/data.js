@@ -63,10 +63,47 @@ export const useDataStore = defineStore("data", () => {
           id: meshComponent.geode_id,
           title: meshComponent.name,
           category: meshComponent.type,
-          viewer_id: meshComponent.viewer_id,
+          viewer_id: Number(meshComponent.viewer_id),
           is_active: meshComponent.is_active,
         })),
       }));
+  }
+
+  async function getMeshComponentsByType(modelId, type) {
+    const components = await database.model_components
+      .where("[id+type]")
+      .equals([modelId, type])
+      .toArray();
+    return components.map((meshComponent) => ({
+      id: meshComponent.geode_id,
+      title: meshComponent.name,
+      category: meshComponent.type,
+      viewer_id: Number(meshComponent.viewer_id),
+      is_active: meshComponent.is_active,
+    }));
+  }
+
+  async function getAllMeshComponents(modelId) {
+    const items = await database.model_components.where("id").equals(modelId).toArray();
+    return items.map((meshComponent) => ({
+      id: meshComponent.geode_id,
+      title: meshComponent.name,
+      category: meshComponent.type,
+      viewer_id: Number(meshComponent.viewer_id),
+      is_active: meshComponent.is_active,
+    }));
+  }
+
+  async function fetchAllMeshComponents(modelId) {
+    const components = await getAllMeshComponents(modelId);
+    const byType = {};
+    for (const component of components) {
+      if (!byType[component.category]) {
+        byType[component.category] = [];
+      }
+      byType[component.category].push(component);
+    }
+    return byType;
   }
 
   function refFormatedMeshComponents(modelId) {
@@ -240,6 +277,8 @@ export const useDataStore = defineStore("data", () => {
     meshComponentType,
     formatedMeshComponents,
     refFormatedMeshComponents,
+    getMeshComponentsByType,
+    getAllMeshComponents,
     registerObject,
     deregisterObject,
     addItem,
@@ -259,5 +298,6 @@ export const useDataStore = defineStore("data", () => {
     exportStores,
     importStores,
     clear,
+    fetchAllMeshComponents,
   };
 });

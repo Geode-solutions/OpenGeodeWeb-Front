@@ -48,7 +48,7 @@ watch(
   { immediate: true },
 );
 
-watch(maxWidth, (newMax) => {
+watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
   const hasAdditional = additionalViews.value.length > 0;
   const gap = hasAdditional ? GAP_WIDTH : 0;
   const total =
@@ -143,20 +143,20 @@ function onVerticalResizeStart(event, index) {
     const deltaPercent = (deltaY / containerHeight) * PERCENT_100;
     const minHeightPercent = (HEIGHT_MIN / containerHeight) * PERCENT_100;
 
-    let newH1 = startHeight1 + deltaPercent;
-    let newH2 = startHeight2 - deltaPercent;
+    let newHeight1 = startHeight1 + deltaPercent;
+    let newHeight2 = startHeight2 - deltaPercent;
 
-    if (newH1 < minHeightPercent) {
-      newH1 = minHeightPercent;
-      newH2 = startHeight1 + startHeight2 - minHeightPercent;
-    } else if (newH2 < minHeightPercent) {
-      newH2 = minHeightPercent;
-      newH1 = startHeight1 + startHeight2 - minHeightPercent;
+    if (newHeight1 < minHeightPercent) {
+      newHeight1 = minHeightPercent;
+      newHeight2 = startHeight1 + startHeight2 - minHeightPercent;
+    } else if (newHeight2 < minHeightPercent) {
+      newHeight2 = minHeightPercent;
+      newHeight1 = startHeight1 + startHeight2 - minHeightPercent;
     }
 
     const newHeights = [...rowHeights.value];
-    newHeights[index] = newH1;
-    newHeights[index + 1] = newH2;
+    newHeights[index] = newHeight1;
+    newHeights[index + 1] = newHeight2;
     treeviewStore.setRowHeights(newHeights);
 
     document.body.style.userSelect = "none";
@@ -272,7 +272,7 @@ function onVerticalResizeStart(event, index) {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   flex-shrink: 0;
 }
@@ -286,6 +286,8 @@ function onVerticalResizeStart(event, index) {
 }
 
 .view-wrapper {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   padding: 2px;
   transition: transform 0.2s;

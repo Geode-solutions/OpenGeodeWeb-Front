@@ -1,7 +1,7 @@
 <script setup>
 const { modelValue, label } = defineProps({
   modelValue: { type: String, default: "" },
-  label: { type: String, default: "Search..." },
+  label: { type: String, default: "" },
 });
 
 const emit = defineEmits(["update:modelValue"]);
