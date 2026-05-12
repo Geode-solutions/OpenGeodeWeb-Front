@@ -1,23 +1,22 @@
 <script setup>
-const { headers, rows, loading, xCol, yCol, zCol, separator, skipRows } = defineProps({
+const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = defineProps({
   headers: { type: Array, required: true },
   rows: { type: Array, required: true },
   loading: { type: Boolean, default: false },
-  xCol: { type: String, default: undefined },
-  yCol: { type: String, default: undefined },
-  zCol: { type: String, default: undefined },
+  coordinates: { type: Object, default: () => ({ x: undefined, y: undefined, z: undefined }) },
   separator: { type: String, default: "," },
-  skipRows: { type: Number, default: 0 },
+  headerRow: { type: Number, default: 0 },
+  firstRow: { type: Number, default: 1 },
 });
 
 function getColumnClass(key) {
-  if (key === xCol) {
+  if (key === coordinates.x) {
     return "x-col-highlight";
   }
-  if (key === yCol) {
+  if (key === coordinates.y) {
     return "y-col-highlight";
   }
-  if (key === zCol) {
+  if (key === coordinates.z) {
     return "z-col-highlight";
   }
   return "";
@@ -39,7 +38,7 @@ function getColumnClass(key) {
     </div>
 
     <v-data-table
-      :key="`${separator}-${skipRows}`"
+      :key="`${separator}-${headerRow}-${firstRow}`"
       :headers="headers"
       :items="rows"
       class="bg-transparent"

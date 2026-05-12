@@ -1,7 +1,7 @@
 <script setup>
-import { useToggle } from "@vueuse/core";
 import CsvSettings from "./CsvSettings.vue";
 import CsvTable from "./CsvTable.vue";
+import { useToggle } from "@vueuse/core";
 
 const { file, modelValue } = defineProps({
   file: { type: Object, required: true },
@@ -17,11 +17,12 @@ const PREVIEW_ROWS_LIMIT = 101;
 const emit = defineEmits(["update:modelValue", "confirm"]);
 
 const separator = ref(",");
-const skipRows = ref(0);
+const headerRow = ref(0);
+const firstRow = ref(1);
 
-const xCol = ref(undefined);
-const yCol = ref(undefined);
-const zCol = ref(undefined);
+const xColumn = ref(undefined);
+const yColumn = ref(undefined);
+const zColumn = ref(undefined);
 
 const rawContent = ref("");
 const previewRows = ref([]);
@@ -31,18 +32,27 @@ const loading = ref(false);
 const toggleLoading = useToggle(loading);
 
 function autoDetectSeparator(content) {
-  const lines = content.slice(0, MAX_CONTENT_SLICE).split(/\r?\n/u).slice(0, MAX_LINES_FOR_DETECTION);
+  const lines = content
+    .slice(0, MAX_CONTENT_SLICE)
+    .split(/\r?\n/u)
+    .slice(0, MAX_LINES_FOR_DETECTION);
   const candidates = [",", ";", "\t", "|"];
   let best = ",";
   let maxCount = -1;
 
   for (const candidate of candidates) {
     const counts = lines.map((line) => line.split(candidate).length);
-    const average = counts.reduce((total, count) => total + count, 0) / counts.length;
+    const average =
+      counts.reduce((total, count) => total + count, 0) / counts.length;
     const variance =
-      counts.reduce((total, count) => total + (count - average) ** 2, 0) / counts.length;
+      counts.reduce((total, count) => total + (count - average) ** 2, 0) /
+      counts.length;
 
-    if (average > MIN_AVG_COUNT && variance < MAX_VARIANCE && average > maxCount) {
+    if (
+      average > MIN_AVG_COUNT &&
+      variance < MAX_VARIANCE &&
+      average > maxCount
+    ) {
       maxCount = average;
       best = candidate;
     }
@@ -76,8 +86,9 @@ function parseContent() {
     return;
   }
 
-  const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
-  const effectiveLines = allLines.slice(skipRows.value);
+  const allLines = rawContent.value
+    .split(/\r?\n/u)
+    .filter((line) => line.trim() !== "");
 
   function splitLine(line) {
     if (!separator.value) {
@@ -101,39 +112,43 @@ function parseContent() {
     return result;
   }
 
-  parsedAll.value = effectiveLines.map((line) => splitLine(line));
+  const headerLine = allLines[headerRow.value];
+  const rawHeaders = headerLine ? splitLine(headerLine) : [];
 
-  if (parsedAll.value.length > 0) {
-    const [rawHeaders] = parsedAll.value;
-    previewHeaders.value = rawHeaders.map((header, index) => ({
-      title: header || `Column ${index + 1}`,
-      key: `col${index}`,
-      align: "start",
-      sortable: true,
-    }));
+  previewHeaders.value = rawHeaders.map((header, index) => ({
+    title: header || `Column ${index + 1}`,
+    key: `col${index}`,
+    align: "start",
+    sortable: true,
+  }));
 
-    previewRows.value = parsedAll.value.slice(1, PREVIEW_ROWS_LIMIT).map((row) => {
-      const obj = {};
-      for (let index = 0; index < row.length; index += 1) {
-        obj[`col${index}`] = row[index];
-      }
-      return obj;
-    });
-  } else {
-    previewHeaders.value = [];
-    previewRows.value = [];
-  }
+  const dataLines = allLines.slice(
+    firstRow.value,
+    firstRow.value + PREVIEW_ROWS_LIMIT,
+  );
+  previewRows.value = dataLines.map((line) => {
+    const row = splitLine(line);
+    const obj = {};
+    for (let index = 0; index < row.length; index += 1) {
+      obj[`col${index}`] = row[index];
+    }
+    return obj;
+  });
 }
-;
-
 const computedResult = computed(() => {
-  const xIndex = previewHeaders.value.findIndex((header) => header.key === xCol.value);
-  const yIndex = previewHeaders.value.findIndex((header) => header.key === yCol.value);
-  const zIndex = previewHeaders.value.findIndex((header) => header.key === zCol.value);
+  const xIndex = previewHeaders.value.findIndex(
+    (header) => header.key === xColumn.value,
+  );
+  const yIndex = previewHeaders.value.findIndex(
+    (header) => header.key === yColumn.value,
+  );
+  const zIndex = previewHeaders.value.findIndex(
+    (header) => header.key === zColumn.value,
+  );
 
   return {
-    firstRow: skipRows.value > 0 ? skipRows.value : 1,
-    headerRow: 0,
+    firstRow: firstRow.value,
+    headerRow: headerRow.value,
     separator: separator.value,
     xColumn: xIndex === -1 ? 0 : xIndex,
     yColumn: yIndex === -1 ? 1 : yIndex,
@@ -141,11 +156,11 @@ const computedResult = computed(() => {
   };
 });
 
-watch([separator, skipRows], () => {
+watch([separator, headerRow, firstRow], () => {
   parseContent();
-  xCol.value = undefined;
-  yCol.value = undefined;
-  zCol.value = undefined;
+  xColumn.value = undefined;
+  yColumn.value = undefined;
+  zColumn.value = undefined;
 });
 
 watch(
@@ -179,14 +194,22 @@ function onConfirm() {
     @update:model-value="emit('update:modelValue', $event)"
     max-width="1200px"
   >
-    <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10" color="grey-darken-4">
+    <v-card
+      class="glass-ui rounded-xl overflow-hidden border-opacity-10"
+      color="grey-darken-4"
+    >
       <v-toolbar color="transparent" flat class="px-4">
-        <v-icon icon="mdi-file-delimited-outline" color="primary" class="mr-3" />
+        <v-icon icon="mdi-file-table" size="32" color="primary" class="ml-1" />
         <v-toolbar-title class="text-h6 font-weight-bold text-white">
           CSV Previewer & Configuration
         </v-toolbar-title>
         <v-spacer />
-        <v-btn icon="mdi-close" variant="text" color="white" @click="emit('update:modelValue', false)" />
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          color="white"
+          @click="emit('update:modelValue', false)"
+        />
       </v-toolbar>
 
       <v-divider class="border-opacity-10" />
@@ -194,10 +217,11 @@ function onConfirm() {
       <div class="previewer-grid">
         <CsvSettings
           v-model:separator="separator"
-          v-model:skip-rows="skipRows"
-          v-model:x-col="xCol"
-          v-model:y-col="yCol"
-          v-model:z-col="zCol"
+          v-model:header-row="headerRow"
+          v-model:first-row="firstRow"
+          v-model:x-column="xColumn"
+          v-model:y-column="yColumn"
+          v-model:z-column="zColumn"
           :headers="previewHeaders"
         />
 
@@ -205,11 +229,10 @@ function onConfirm() {
           :headers="previewHeaders"
           :rows="previewRows"
           :loading="loading"
-          :x-col="xCol"
-          :y-col="yCol"
-          :z-col="zCol"
+          :coordinates="{ x: xColumn, y: yColumn, z: zColumn }"
           :separator="separator"
-          :skip-rows="skipRows"
+          :header-row="headerRow"
+          :first-row="firstRow"
         />
       </div>
 

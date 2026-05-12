@@ -1,19 +1,21 @@
 <script setup>
-const { separator, skipRows, xCol, yCol, zCol, headers } = defineProps({
+const { separator, headerRow, firstRow, xColumn, yColumn, zColumn, headers } = defineProps({
   separator: { type: String, required: true },
-  skipRows: { type: Number, required: true },
-  xCol: { type: String, default: undefined },
-  yCol: { type: String, default: undefined },
-  zCol: { type: String, default: undefined },
+  headerRow: { type: Number, required: true },
+  firstRow: { type: Number, required: true },
+  xColumn: { type: String, default: undefined },
+  yColumn: { type: String, default: undefined },
+  zColumn: { type: String, default: undefined },
   headers: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits([
   "update:separator",
-  "update:skipRows",
-  "update:xCol",
-  "update:yCol",
-  "update:zCol",
+  "update:headerRow",
+  "update:firstRow",
+  "update:xColumn",
+  "update:yColumn",
+  "update:zColumn",
 ]);
 
 const separators = [
@@ -28,24 +30,29 @@ const internalSeparator = computed({
   set: (value) => emit("update:separator", value),
 });
 
-const internalSkipRows = computed({
-  get: () => skipRows,
-  set: (value) => emit("update:skipRows", value),
+const internalHeaderRow = computed({
+  get: () => headerRow,
+  set: (value) => emit("update:headerRow", value),
 });
 
-const internalXCol = computed({
-  get: () => xCol,
-  set: (value) => emit("update:xCol", value),
+const internalFirstRow = computed({
+  get: () => firstRow,
+  set: (value) => emit("update:firstRow", value),
 });
 
-const internalYCol = computed({
-  get: () => yCol,
-  set: (value) => emit("update:yCol", value),
+const internalXColumn = computed({
+  get: () => xColumn,
+  set: (value) => emit("update:xColumn", value),
 });
 
-const internalZCol = computed({
-  get: () => zCol,
-  set: (value) => emit("update:zCol", value),
+const internalYColumn = computed({
+  get: () => yColumn,
+  set: (value) => emit("update:yColumn", value),
+});
+
+const internalZColumn = computed({
+  get: () => zColumn,
+  set: (value) => emit("update:zColumn", value),
 });
 </script>
 
@@ -79,12 +86,25 @@ const internalZCol = computed({
     <div class="text-overline mb-4 text-primary font-weight-bold">Row Configuration</div>
 
     <v-text-field
-      v-model.number="internalSkipRows"
+      v-model.number="internalHeaderRow"
       type="number"
-      label="Skip Rows"
+      label="Header Row"
       variant="outlined"
       density="compact"
-      hint="Number of rows to ignore at the start"
+      hint="Index of the row containing headers"
+      persistent-hint
+      class="mb-4"
+      min="0"
+      rounded="lg"
+    />
+
+    <v-text-field
+      v-model.number="internalFirstRow"
+      type="number"
+      label="First Data Row"
+      variant="outlined"
+      density="compact"
+      hint="Index of the first row containing data"
       persistent-hint
       class="mb-6"
       min="0"
@@ -96,11 +116,11 @@ const internalZCol = computed({
     <div class="text-overline mb-4 text-primary font-weight-bold">Spatial Mapping</div>
 
     <v-select
-      v-model="internalXCol"
+      v-model="internalXColumn"
       :items="headers"
       item-title="title"
       item-value="key"
-      label="X Coordinate Column"
+      label="X Column"
       variant="outlined"
       density="compact"
       prepend-inner-icon="mdi-axis-x-arrow"
@@ -111,11 +131,11 @@ const internalZCol = computed({
     />
 
     <v-select
-      v-model="internalYCol"
+      v-model="internalYColumn"
       :items="headers"
       item-title="title"
       item-value="key"
-      label="Y Coordinate Column"
+      label="Y Column"
       variant="outlined"
       density="compact"
       prepend-inner-icon="mdi-axis-y-arrow"
@@ -126,11 +146,11 @@ const internalZCol = computed({
     />
 
     <v-select
-      v-model="internalZCol"
+      v-model="internalZColumn"
       :items="headers"
       item-title="title"
       item-value="key"
-      label="Z Coordinate Column"
+      label="Z Column"
       variant="outlined"
       density="compact"
       prepend-inner-icon="mdi-axis-z-arrow"

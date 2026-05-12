@@ -87,7 +87,7 @@ async function upload_files() {
 watch(
   () => internal_files.value,
   async (newFiles) => {
-    const csvFiles = newFiles.filter(isCsv);
+    const csvFiles = newFiles.filter((file) => isCsv(file));
     const unconfiguredCsv = csvFiles.find((file) => !file.isConfigured);
 
     if (unconfiguredCsv) {
@@ -192,7 +192,7 @@ watch(
               isCsv(file)
                 ? file.isConfigured
                   ? "mdi-file-check"
-                  : "mdi-file-delimited"
+                  : "mdi-file-table"
                 : "mdi-file-outline"
             }}
           </v-icon>
@@ -203,12 +203,16 @@ watch(
               <v-btn
                 v-bind="tooltipProps"
                 icon="mdi-cog"
-                size="x-small"
                 variant="flat"
                 :color="file.isConfigured ? 'success' : 'primary'"
                 :class="['ml-2', { 'pulse-animation': !file.isConfigured }]"
+                width="24"
+                height="24"
+                density="compact"
                 @click.stop="openCsvPreviewer(file, index)"
-              />
+              >
+                <v-icon size="14">mdi-cog</v-icon>
+              </v-btn>
             </template>
           </v-tooltip>
 
