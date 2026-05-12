@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     console.log("Service URL created:", response.uri);
     return {
       statusCode: 200,
-      url: response.uri.replace(/^https?:\/\//i, ""),
+      url: response.uri.replace(/^https?:\/\//iu, ""),
     };
   } catch (error) {
     console.log(error);

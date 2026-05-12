@@ -30,7 +30,7 @@ const emailRules = [
     return "E-mail is required.";
   },
   (value) => {
-    if (/.+@.+\..+/.test(value)) {
+    if (/.+@.+\..+/u.test(value)) {
       return true;
     }
     return "E-mail must be valid.";

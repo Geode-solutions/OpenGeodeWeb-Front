@@ -1,3 +1,9 @@
+import {
+  LONG_ANIMATION_DURATION,
+  SHORT_ANIMATION_DURATION,
+  animateCamera,
+  computeAnimationDuration,
+} from "@ogw_internal/stores/hybrid_viewer_camera_animation";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
 
 const RGB_MAX = 255;
@@ -17,8 +23,6 @@ const ACTOR_COLOR = [
 const WHEEL_TIME_OUT_MS = 600;
 const BUMP_MULTIPLIER = 0.2;
 const ALIGNMENT_THRESHOLD = 0.9;
-const LONG_ANIMATION_DURATION = 1000;
-const SHORT_ANIMATION_DURATION = 500;
 const EASE_EXPONENT = 1.1;
 
 const SAMPLE_SIZE = 10;
@@ -76,17 +80,13 @@ function computeAverageBrightness(rect, options) {
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
-
   const canvas = genericRenderWindow.getApiSpecificRenderWindow().getCanvas();
   if (!canvas) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
-
   const { relX, relY, relW, relH } = mapRect(rect, latestImage, canvas.getBoundingClientRect());
-
   offscreenCanvas.width = SAMPLE_SIZE;
   offscreenCanvas.height = SAMPLE_SIZE;
-
   try {
     offscreenCtx.drawImage(
       latestImage,
@@ -100,7 +100,6 @@ function computeAverageBrightness(rect, options) {
       SAMPLE_SIZE,
     );
     const { data } = offscreenCtx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
-
     let minBrightness = 1;
     for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
       const brightness = (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
@@ -108,7 +107,6 @@ function computeAverageBrightness(rect, options) {
         minBrightness = brightness;
       }
     }
-
     return minBrightness;
   } catch {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
@@ -150,54 +148,8 @@ function performClickPicking(event, options) {
     },
   );
 }
-
-function animateCamera(options) {
-  const {
-    camera,
-    startState,
-    targetState,
-    duration,
-    bumpMultiplier,
-    easeExponent,
-    onUpdate,
-    onEnd,
-  } = options;
-  const startTime = performance.now();
-
-  function animate(currentTime) {
-    const progress = Math.min((currentTime - startTime) / duration, 1);
-    const ease =
-      duration > SHORT_ANIMATION_DURATION
-        ? 1 - (1 - progress) ** easeExponent
-        : progress * (2 - progress);
-    const bump = bumpMultiplier * Math.sin(Math.PI * progress);
-
-    camera.set({
-      position: startState.position.map(
-        (startValue, index) =>
-          startValue + (targetState.position[index] - startValue) * ease + bump,
-      ),
-      viewUp: startState.view_up.map(
-        (startValue, index) => startValue + (targetState.view_up[index] - startValue) * ease,
-      ),
-      focalPoint: startState.focal_point.map(
-        (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
-      ),
-    });
-
-    onUpdate();
-
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      onEnd();
-    }
-  }
-  requestAnimationFrame(animate);
-}
-
 async function applySnapshot(snapshot, options) {
-  const { genericRenderWindow, setZScaling, syncRemoteCamera } = options;
+  const { genericRenderWindow, setZScaling, syncRemoteCamera, setCamera } = options;
   if (!snapshot) {
     return;
   }
@@ -207,17 +159,47 @@ async function applySnapshot(snapshot, options) {
   }
   const { camera_options: snapshot_camera_options } = snapshot;
   if (snapshot_camera_options) {
-    applyCameraOptions(
-      genericRenderWindow.getRenderer().getActiveCamera(),
-      snapshot_camera_options,
-    );
-    genericRenderWindow.getRenderWindow().render();
-    syncRemoteCamera();
+    if (setCamera) {
+      setCamera(snapshot_camera_options);
+    } else {
+      applyCameraOptions(
+        genericRenderWindow.getRenderer().getActiveCamera(),
+        snapshot_camera_options,
+      );
+      genericRenderWindow.getRenderWindow().render();
+      syncRemoteCamera();
+    }
   }
 }
 
+function performSetCamera(targetCameraOptions, options) {
+  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera } = options;
+  const camera = genericRenderWindow.getRenderer().getActiveCamera();
+  const startState = getCameraOptions(camera);
+  const duration = computeAnimationDuration(startState, targetCameraOptions);
+  is_moving.value = true;
+  if (imageStyle) {
+    imageStyle.opacity = 0;
+  }
+  animateCamera({
+    camera,
+    startState,
+    targetState: targetCameraOptions,
+    duration,
+    bumpMultiplier: 0,
+    easeExponent: EASE_EXPONENT,
+    onUpdate: () => genericRenderWindow.getRenderWindow().render(),
+    onEnd: () => {
+      applyCameraOptions(camera, targetCameraOptions);
+      genericRenderWindow.getRenderWindow().render();
+      is_moving.value = false;
+      syncRemoteCamera();
+    },
+  });
+}
+
 function performCameraOrientation(orientation, options) {
-  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera, constants } = options;
+  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera } = options;
   const config = ORIENTATIONS[orientation.toLowerCase()];
   const renderer = genericRenderWindow.getRenderer();
   const camera = renderer.getActiveCamera();
@@ -234,9 +216,7 @@ function performCameraOrientation(orientation, options) {
 
   const alignment = dot(camera.getDirectionOfProjection(), config.position);
   const duration =
-    alignment > constants.ALIGNMENT_THRESHOLD
-      ? constants.LONG_ANIMATION_DURATION
-      : constants.SHORT_ANIMATION_DURATION;
+    alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
   is_moving.value = true;
   imageStyle.opacity = 0;
 
@@ -245,8 +225,8 @@ function performCameraOrientation(orientation, options) {
     startState,
     targetState,
     duration,
-    bumpMultiplier: constants.BUMP_MULTIPLIER,
-    easeExponent: constants.EASE_EXPONENT,
+    bumpMultiplier: BUMP_MULTIPLIER,
+    easeExponent: EASE_EXPONENT,
     onUpdate: () => genericRenderWindow.getRenderWindow().render(),
     onEnd: () => {
       is_moving.value = false;
@@ -261,11 +241,8 @@ export {
   WHEEL_TIME_OUT_MS,
   BUMP_MULTIPLIER,
   ALIGNMENT_THRESHOLD,
-  LONG_ANIMATION_DURATION,
-  SHORT_ANIMATION_DURATION,
   EASE_EXPONENT,
   ORIENTATIONS,
-  animateCamera,
   applyCameraOptions,
   applySnapshot,
   centerCameraOnPosition,
@@ -273,4 +250,5 @@ export {
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
+  performSetCamera,
 };
