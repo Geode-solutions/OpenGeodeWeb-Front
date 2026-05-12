@@ -97,7 +97,7 @@ await missing_files();
     <v-row>
       <v-col cols="12">
         <FileUploader
-          v-bind="{ multiple, accept, files, allow_csv_config: true }"
+          v-bind="{ multiple, accept, files, auto_upload: false, allow_csv_config: true }"
           @files_uploaded="files_uploaded_event"
         />
       </v-col>

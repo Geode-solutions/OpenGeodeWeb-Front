@@ -96,7 +96,7 @@ watch(
       await upload_files();
     }
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 watch(

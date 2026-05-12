@@ -20,7 +20,7 @@ const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 describe("missing files selector", () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
-  geodeStore.base_url = "";
+  geodeStore.base_url = "/";
 
   test("select file", async () => {
     geodeStore.request = vi.fn((schema, params, callbacks) => {
@@ -57,6 +57,7 @@ describe("missing files selector", () => {
       writable: true,
     });
     await v_file_input.trigger("change");
+    await flushPromises();
     const v_btn = file_uploader.findComponent(components.VBtn);
 
     registerEndpoint(upload_file_schema.$id, {
