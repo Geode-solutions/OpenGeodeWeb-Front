@@ -25,6 +25,15 @@ const emit = defineEmits(["click"]);
     icon
     @click="emit('click', $event)"
   >
-    <v-icon :size="iconSize">{{ icon }}</v-icon>
+    <v-icon v-if="typeof icon === 'string' && icon.startsWith('mdi-')" :size="iconSize">{{
+      icon
+    }}</v-icon>
+    <v-img
+      v-else
+      :src="icon"
+      :height="iconSize"
+      :width="iconSize"
+      class="d-flex justify-center align-center"
+    />
   </v-btn>
 </template>
