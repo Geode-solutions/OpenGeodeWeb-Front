@@ -1,10 +1,10 @@
 <script setup>
-const props = defineProps({
+const { separator, skipRows, xCol, yCol, zCol, headers } = defineProps({
   separator: { type: String, required: true },
   skipRows: { type: Number, required: true },
-  xCol: { type: String, default: null },
-  yCol: { type: String, default: null },
-  zCol: { type: String, default: null },
+  xCol: { type: String, default: undefined },
+  yCol: { type: String, default: undefined },
+  zCol: { type: String, default: undefined },
   headers: { type: Array, default: () => [] },
 });
 
@@ -24,28 +24,28 @@ const separators = [
 ];
 
 const internalSeparator = computed({
-  get: () => props.separator,
-  set: (val) => emit("update:separator", val),
+  get: () => separator,
+  set: (value) => emit("update:separator", value),
 });
 
 const internalSkipRows = computed({
-  get: () => props.skipRows,
-  set: (val) => emit("update:skipRows", val),
+  get: () => skipRows,
+  set: (value) => emit("update:skipRows", value),
 });
 
 const internalXCol = computed({
-  get: () => props.xCol,
-  set: (val) => emit("update:xCol", val),
+  get: () => xCol,
+  set: (value) => emit("update:xCol", value),
 });
 
 const internalYCol = computed({
-  get: () => props.yCol,
-  set: (val) => emit("update:yCol", val),
+  get: () => yCol,
+  set: (value) => emit("update:yCol", value),
 });
 
 const internalZCol = computed({
-  get: () => props.zCol,
-  set: (val) => emit("update:zCol", val),
+  get: () => zCol,
+  set: (value) => emit("update:zCol", value),
 });
 </script>
 

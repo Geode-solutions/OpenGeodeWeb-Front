@@ -12,23 +12,19 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview";
 const SECOND = 1000;
 
 async function importWorkflow(files) {
-  console.log("importWorkflow", { files });
   const start = Date.now();
   const promise_array = [];
   for (const file of files) {
     const { filename, geode_object_type } = file;
-    console.log({ filename }, { geode_object_type });
     promise_array.push(importFile(filename, geode_object_type));
   }
   const results = await Promise.all(promise_array);
   const hybridViewerStore = useHybridViewerStore();
   hybridViewerStore.remoteRender();
-  console.log("importWorkflow completed in", (Date.now() - start) / SECOND);
   return results;
 }
 
 function buildImportItemFromPayloadApi(value, geode_object_type) {
-  console.log("buildImportItemFromPayloadApi", { value, geode_object_type });
   return {
     geode_object_type,
     ...value,

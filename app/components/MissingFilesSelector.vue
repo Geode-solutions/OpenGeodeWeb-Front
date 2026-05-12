@@ -36,7 +36,10 @@ async function missing_files() {
   const geodeStore = useGeodeStore();
 
   const promise_array = filenames.map(async (filename) => {
-    if (filename.toLowerCase().endsWith(".csv")) {
+    if (
+      filename.toLowerCase().endsWith(".csv") ||
+      filename.toLowerCase().endsWith(".csv.json")
+    ) {
       return { has_missing_files: false, mandatory_files: [], additional_files: [] };
     }
     const response = await geodeStore.request(schema, {
@@ -53,7 +56,10 @@ async function missing_files() {
     mandatory_files.value = [...mandatory_files.value, ...value.mandatory_files];
     additional_files.value = [...additional_files.value, ...value.additional_files];
   }
-  const main_csvs = files.filter((f) => f.name.toLowerCase().endsWith(".csv"));
+  const main_csvs = files.filter(
+    (file) =>
+      file.name.toLowerCase().endsWith(".csv") || file.name.toLowerCase().endsWith(".csv.json"),
+  );
   if (main_csvs.length > 0) {
     has_missing_files.value = true;
     if (accept.value === "") {

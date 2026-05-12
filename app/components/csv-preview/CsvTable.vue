@@ -1,21 +1,27 @@
 <script setup>
-const props = defineProps({
+const { headers, rows, loading, xCol, yCol, zCol, separator, skipRows } = defineProps({
   headers: { type: Array, required: true },
   rows: { type: Array, required: true },
   loading: { type: Boolean, default: false },
-  xCol: { type: String, default: null },
-  yCol: { type: String, default: null },
-  zCol: { type: String, default: null },
+  xCol: { type: String, default: undefined },
+  yCol: { type: String, default: undefined },
+  zCol: { type: String, default: undefined },
   separator: { type: String, default: "," },
   skipRows: { type: Number, default: 0 },
 });
 
-const getColumnClass = (key) => {
-  if (key === props.xCol) return "x-col-highlight";
-  if (key === props.yCol) return "y-col-highlight";
-  if (key === props.zCol) return "z-col-highlight";
+function getColumnClass(key) {
+  if (key === xCol) {
+    return "x-col-highlight";
+  }
+  if (key === yCol) {
+    return "y-col-highlight";
+  }
+  if (key === zCol) {
+    return "z-col-highlight";
+  }
   return "";
-};
+}
 </script>
 
 <template>
@@ -44,9 +50,9 @@ const getColumnClass = (key) => {
       fixed-header
       height="100%"
     >
-      <template v-for="h in headers" v-slot:[`item.${h.key}`]="{ item }">
-        <div :class="getColumnClass(h.key)" class="px-2 py-1 rounded text-truncate">
-          {{ item[h.key] }}
+      <template v-for="header in headers" v-slot:[`item.${header.key}`]="{ item }">
+        <div :class="getColumnClass(header.key)" class="px-2 py-1 rounded text-truncate">
+          {{ item[header.key] }}
         </div>
       </template>
 

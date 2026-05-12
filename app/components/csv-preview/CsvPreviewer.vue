@@ -3,77 +3,91 @@ import { useToggle } from "@vueuse/core";
 import CsvSettings from "./CsvSettings.vue";
 import CsvTable from "./CsvTable.vue";
 
-const props = defineProps({
+const { file, modelValue } = defineProps({
   file: { type: Object, required: true },
   modelValue: { type: Boolean, default: false },
 });
+
+const MAX_CONTENT_SLICE = 1000;
+const MAX_LINES_FOR_DETECTION = 5;
+const MIN_AVG_COUNT = 1.5;
+const MAX_VARIANCE = 0.5;
+const PREVIEW_ROWS_LIMIT = 101;
 
 const emit = defineEmits(["update:modelValue", "confirm"]);
 
 const separator = ref(",");
 const skipRows = ref(0);
 
-const xCol = ref(null);
-const yCol = ref(null);
-const zCol = ref(null);
+const xCol = ref(undefined);
+const yCol = ref(undefined);
+const zCol = ref(undefined);
 
 const rawContent = ref("");
 const previewRows = ref([]);
 const previewHeaders = ref([]);
+const parsedAll = ref([]);
 const loading = ref(false);
 const toggleLoading = useToggle(loading);
 
-const autoDetectSeparator = (content) => {
-  const lines = content.slice(0, 1000).split(/\r?\n/).slice(0, 5);
+function autoDetectSeparator(content) {
+  const lines = content.slice(0, MAX_CONTENT_SLICE).split(/\r?\n/u).slice(0, MAX_LINES_FOR_DETECTION);
   const candidates = [",", ";", "\t", "|"];
   let best = ",";
   let maxCount = -1;
 
-  candidates.forEach((c) => {
-    const counts = lines.map((l) => l.split(c).length);
-    const avg = counts.reduce((a, b) => a + b, 0) / counts.length;
-    const variance = counts.reduce((a, b) => a + (b - avg) ** 2, 0) / counts.length;
+  for (const candidate of candidates) {
+    const counts = lines.map((line) => line.split(candidate).length);
+    const average = counts.reduce((total, count) => total + count, 0) / counts.length;
+    const variance =
+      counts.reduce((total, count) => total + (count - average) ** 2, 0) / counts.length;
 
-    if (avg > 1.5 && variance < 0.5 && avg > maxCount) {
-      maxCount = avg;
-      best = c;
+    if (average > MIN_AVG_COUNT && variance < MAX_VARIANCE && average > maxCount) {
+      maxCount = average;
+      best = candidate;
     }
-  });
+  }
   return best;
-};
+}
 
-const readAndParse = async () => {
-  if (!props.file) return;
+function readAndParse() {
+  if (!file) {
+    return;
+  }
   toggleLoading(true);
 
   const reader = new FileReader();
-  reader.onload = (e) => {
-    rawContent.value = e.target.result;
+  reader.addEventListener("load", (event) => {
+    rawContent.value = event.target.result;
     if (!separator.value || separator.value === ",") {
       separator.value = autoDetectSeparator(rawContent.value);
     }
     parseContent();
     toggleLoading(false);
-  };
-  reader.onerror = () => {
+  });
+  reader.addEventListener("error", () => {
     toggleLoading(false);
-  };
-  reader.readAsText(props.file, "UTF-8");
-};
+  });
+  reader.readAsText(file, "utf8");
+}
 
-const parseContent = () => {
-  if (!rawContent.value) return;
+function parseContent() {
+  if (!rawContent.value) {
+    return;
+  }
 
-  const allLines = rawContent.value.split(/\r?\n/).filter((l) => l.trim() !== "");
+  const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
   const effectiveLines = allLines.slice(skipRows.value);
 
-  const splitLine = (line) => {
-    if (!separator.value) return [line];
+  function splitLine(line) {
+    if (!separator.value) {
+      return [line];
+    }
     const result = [];
     let current = "";
     let inQuotes = false;
-    for (let i = 0; i < line.length; i += 1) {
-      const char = line[i];
+    for (let index = 0; index < line.length; index += 1) {
+      const char = line[index];
       if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === separator.value && !inQuotes) {
@@ -85,72 +99,78 @@ const parseContent = () => {
     }
     result.push(current.trim());
     return result;
-  };
+  }
 
-  const parsedAll = effectiveLines.map(splitLine);
+  parsedAll.value = effectiveLines.map((line) => splitLine(line));
 
-  if (parsedAll.length > 0) {
-    const rawHeaders = parsedAll[0];
-    previewHeaders.value = rawHeaders.map((h, i) => ({
-      title: h || `Column ${i + 1}`,
-      key: `col${i}`,
+  if (parsedAll.value.length > 0) {
+    const [rawHeaders] = parsedAll.value;
+    previewHeaders.value = rawHeaders.map((header, index) => ({
+      title: header || `Column ${index + 1}`,
+      key: `col${index}`,
       align: "start",
       sortable: true,
     }));
 
-    previewRows.value = parsedAll
-      .slice(1, 101)
-      .map((row) => {
-        const obj = {};
-        row.forEach((cell, i) => {
-          obj[`col${i}`] = cell;
-        });
-        return obj;
-      });
+    previewRows.value = parsedAll.value.slice(1, PREVIEW_ROWS_LIMIT).map((row) => {
+      const obj = {};
+      for (let index = 0; index < row.length; index += 1) {
+        obj[`col${index}`] = row[index];
+      }
+      return obj;
+    });
   } else {
     previewHeaders.value = [];
     previewRows.value = [];
   }
-};
+}
+;
 
 const computedResult = computed(() => {
+  const xIndex = previewHeaders.value.findIndex((header) => header.key === xCol.value);
+  const yIndex = previewHeaders.value.findIndex((header) => header.key === yCol.value);
+  const zIndex = previewHeaders.value.findIndex((header) => header.key === zCol.value);
+
   return {
+    firstRow: skipRows.value > 0 ? skipRows.value : 1,
+    headerRow: 0,
     separator: separator.value,
-    skipRows: skipRows.value,
-    coordinateMapping: {
-      x: previewHeaders.value.findIndex((h) => h.key === xCol.value),
-      y: previewHeaders.value.findIndex((h) => h.key === yCol.value),
-      z: previewHeaders.value.findIndex((h) => h.key === zCol.value),
-    },
+    xColumn: xIndex === -1 ? 0 : xIndex,
+    yColumn: yIndex === -1 ? 1 : yIndex,
+    zColumn: zIndex === -1 ? 2 : zIndex,
   };
 });
 
 watch([separator, skipRows], () => {
   parseContent();
-  xCol.value = null;
-  yCol.value = null;
-  zCol.value = null;
+  xCol.value = undefined;
+  yCol.value = undefined;
+  zCol.value = undefined;
 });
 
 watch(
-  () => props.modelValue,
+  () => modelValue,
   (val) => {
-    if (val) readAndParse();
+    if (val) {
+      readAndParse();
+    }
   },
   { immediate: true },
 );
 
 watch(
-  () => props.file,
+  () => file,
   (newFile) => {
-    if (newFile && props.modelValue) readAndParse();
+    if (newFile && modelValue) {
+      readAndParse();
+    }
   },
 );
 
-const onConfirm = () => {
+function onConfirm() {
   emit("confirm", computedResult.value);
   emit("update:modelValue", false);
-};
+}
 </script>
 
 <template>

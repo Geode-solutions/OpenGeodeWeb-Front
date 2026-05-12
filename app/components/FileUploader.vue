@@ -1,45 +1,29 @@
 <script setup>
 import { useGeodeStore } from "@ogw_front/stores/geode";
-import { useTemplateRef } from "vue";
 
-import DragAndDrop from "@ogw_front/components/DragAndDrop";
 import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer";
+import DragAndDrop from "@ogw_front/components/DragAndDrop";
 
-const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"]);
+const emit = defineEmits(["files_uploaded"]);
 
-const {
-  multiple,
-  accept,
-  files,
-  auto_upload,
-  mini,
-  show_overlay: showOverlay,
-  allow_csv_config: allowCsvConfig,
-} = defineProps({
-  multiple: { type: Boolean, required: true },
-  accept: { type: String, required: true },
-  files: { type: Array, required: false, default: [] },
-  auto_upload: { type: Boolean, required: false, default: false },
-  mini: { type: Boolean, required: false, default: false },
-  show_overlay: { type: Boolean, required: false, default: true },
-  allow_csv_config: { type: Boolean, required: false, default: false },
+const { multiple, accept, files, auto_upload, showOverlay } = defineProps({
+  multiple: { type: Boolean, default: false },
+  accept: { type: String, default: "" },
+  files: { type: Array, default: () => [] },
+  auto_upload: { type: Boolean, default: true },
+  showOverlay: { type: Boolean, default: false },
 });
 
 const geodeStore = useGeodeStore();
-
-const internal_files = ref(files);
-const loading = ref(false);
-const files_uploaded = ref(false);
-const dragAndDropRef = useTemplateRef("dragAndDropRef");
-
+const dragAndDropRef = ref(undefined);
+const internal_files = ref([...files]);
 const csv_dialog = ref(false);
-const current_csv_file = ref(null);
+const current_csv_file = ref(undefined);
 const current_csv_index = ref(-1);
-
-const toggle_loading = useToggle(loading);
+const loading = ref(false);
 
 function isCsv(file) {
-  return allowCsvConfig && file.name.toLowerCase().endsWith(".csv");
+  return file.name.toLowerCase().endsWith(".csv");
 }
 
 function openCsvPreviewer(file, index) {
@@ -49,19 +33,21 @@ function openCsvPreviewer(file, index) {
 }
 
 function onCsvConfirm(result) {
-  const json_content = JSON.stringify(result, null, 2);
+  const json_content = JSON.stringify(result, undefined, 2);
+  const base_name = current_csv_file.value.name.slice(
+    0,
+    current_csv_file.value.name.lastIndexOf("."),
+  );
+  const json_filename = `${base_name}.json`;
+
   const blob = new Blob([json_content], { type: "application/json" });
-  const json_filename = `${current_csv_file.value.name}.json`;
   const json_file = new File([blob], json_filename, {
     type: "application/json",
   });
 
-  // Keep original CSV and append JSON config file
-  internal_files.value.push(json_file);
-  csv_dialog.value = false;
-
-  // Mark CSV as configured (for UI purposes)
   current_csv_file.value.isConfigured = true;
+  internal_files.value = [...internal_files.value, json_file];
+  csv_dialog.value = false;
 }
 
 function processSelectedFiles(selected_files) {
@@ -73,68 +59,63 @@ function processSelectedFiles(selected_files) {
 }
 
 function removeFile(index) {
-  internal_files.value.splice(index, 1);
-  if (internal_files.value.length === 0) {
-    files_uploaded.value = false;
-    emit("files_uploaded", []);
+  const fileToRemove = internal_files.value[index];
+  if (isCsv(fileToRemove)) {
+    const base_name = fileToRemove.name.slice(
+      0,
+      fileToRemove.name.lastIndexOf("."),
+    );
+    const sidecarName = `${base_name}.json`;
+    internal_files.value = internal_files.value.filter(
+      (file, idx) => idx !== index && file.name !== sidecarName,
+    );
+  } else {
+    internal_files.value.splice(index, 1);
   }
 }
 
 async function upload_files() {
-  const hasUnconfiguredCsv = internal_files.value.some((file) => isCsv(file) && !file.isConfigured);
-  if (hasUnconfiguredCsv) {
-    const index = internal_files.value.findIndex((file) => isCsv(file) && !file.isConfigured);
-    openCsvPreviewer(internal_files.value[index], index);
-    return;
-  }
-
-  // Dev-only: download config JSON files
-  internal_files.value.forEach((file) => {
-    if (file.name.endsWith(".csv.json")) {
-      const url = URL.createObjectURL(file);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = file.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
-  });
-
-  toggle_loading();
-  const promise_array = internal_files.value.map((file) => geodeStore.upload(file));
+  loading.value = true;
+  const promise_array = internal_files.value.map((file) =>
+    geodeStore.upload(file),
+  );
   await Promise.all(promise_array);
-  files_uploaded.value = true;
+  loading.value = false;
   emit("files_uploaded", internal_files.value);
-
-  toggle_loading();
-}
-
-if (files.length > 0) {
-  internal_files.value = files;
-  if (auto_upload) {
-    upload_files();
-  }
 }
 
 watch(
-  () => files,
-  (newVal) => {
-    internal_files.value = newVal;
+  () => internal_files.value,
+  async (newFiles) => {
+    const csvFiles = newFiles.filter(isCsv);
+    const unconfiguredCsv = csvFiles.find((file) => !file.isConfigured);
+
+    if (unconfiguredCsv) {
+      openCsvPreviewer(
+        unconfiguredCsv,
+        internal_files.value.indexOf(unconfiguredCsv),
+      );
+      return;
+    }
+
+    const allConfigured = newFiles.every(
+      (file) => !isCsv(file) || file.isConfigured,
+    );
+
+    if (auto_upload && allConfigured && newFiles.length > 0) {
+      await upload_files();
+    }
   },
   { deep: true },
 );
 
-watch(internal_files, (value) => {
-  files_uploaded.value = false;
-  if (auto_upload && value.length > 0) {
-    const hasUnconfiguredCsv = value.some((file) => isCsv(file));
-    if (!hasUnconfiguredCsv) {
-      upload_files();
-    }
-  }
-});
+watch(
+  () => files,
+  (newVal) => {
+    internal_files.value = [...newVal];
+  },
+  { deep: true },
+);
 </script>
 
 <template>
@@ -145,13 +126,6 @@ watch(internal_files, (value) => {
     :accept
     :loading
     :show-extensions="false"
-    :inline="true"
-    :show-overlay="showOverlay"
-    :texts="{
-      idle: 'Select files',
-      drop: 'Drop files here',
-      loading: 'Loading...',
-    }"
     @files-selected="processSelectedFiles"
   />
 
@@ -170,9 +144,18 @@ watch(internal_files, (value) => {
   <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
       <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
-      <span class="text-subtitle-1 font-weight-bold text-white"> Selected files </span>
-      <v-chip size="small" class="ml-3 bg-white-opacity-10" color="white" variant="flat">
-        {{ internal_files.length }}
+      <span class="text-subtitle-1 font-weight-bold text-white">
+        Selected files
+      </span>
+      <v-chip
+        size="small"
+        class="ml-3 bg-white-opacity-10"
+        color="white"
+        variant="flat"
+      >
+        {{
+          internal_files.filter((file) => !file.name.endsWith(".json")).length
+        }}
       </v-chip>
       <v-spacer />
       <v-btn
@@ -189,44 +172,60 @@ watch(internal_files, (value) => {
     </v-sheet>
 
     <v-sheet class="d-flex flex-wrap ga-2" color="transparent">
-      <v-chip
-        v-for="(file, index) in internal_files"
-        :key="index"
-        closable
-        size="default"
-        color="white"
-        variant="outlined"
-        class="font-weight-medium glass-ui border-opacity-10 px-4"
-        style="background: rgba(255, 255, 255, 0.05) !important"
-        @click:close="removeFile(index)"
-      >
-        <v-icon start size="18" :color="file.name.endsWith('.json') ? 'success' : 'primary'">
-          {{ file.name.endsWith(".json") ? "mdi-file-code" : "mdi-file-outline" }}
-        </v-icon>
-        <span class="text-white">{{ file.name }}</span>
+      <template v-for="(file, index) in internal_files" :key="index">
+        <v-chip
+          v-if="!file.name.endsWith('.json')"
+          closable
+          size="default"
+          color="white"
+          variant="outlined"
+          class="font-weight-medium glass-ui border-opacity-10 px-4"
+          style="background: rgba(255, 255, 255, 0.05) !important"
+          @click:close="removeFile(index)"
+        >
+          <v-icon
+            start
+            size="18"
+            :color="isCsv(file) && file.isConfigured ? 'success' : 'primary'"
+          >
+            {{
+              isCsv(file)
+                ? file.isConfigured
+                  ? "mdi-file-check"
+                  : "mdi-file-delimited"
+                : "mdi-file-outline"
+            }}
+          </v-icon>
+          <span class="text-white">{{ file.displayName || file.name }}</span>
 
-        <v-tooltip v-if="isCsv(file)" text="Configure CSV" location="bottom">
-          <template #activator="{ props: tooltipProps }">
-            <v-btn
-              v-bind="tooltipProps"
-              icon="mdi-cog"
-              size="x-small"
-              variant="flat"
-              :color="file.isConfigured ? 'success' : 'primary'"
-              :class="['ml-2', { 'pulse-animation': !file.isConfigured }]"
-              @click.stop="openCsvPreviewer(file, index)"
-            />
+          <v-tooltip v-if="isCsv(file)" text="Configure CSV" location="bottom">
+            <template #activator="{ props: tooltipProps }">
+              <v-btn
+                v-bind="tooltipProps"
+                icon="mdi-cog"
+                size="x-small"
+                variant="flat"
+                :color="file.isConfigured ? 'success' : 'primary'"
+                :class="['ml-2', { 'pulse-animation': !file.isConfigured }]"
+                @click.stop="openCsvPreviewer(file, index)"
+              />
+            </template>
+          </v-tooltip>
+
+          <template #close>
+            <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100"
+              >mdi-close-circle</v-icon
+            >
           </template>
-        </v-tooltip>
-
-        <template #close>
-          <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100">mdi-close-circle</v-icon>
-        </template>
-      </v-chip>
+        </v-chip>
+      </template>
     </v-sheet>
   </v-card-text>
 
-  <v-card-actions v-if="!auto_upload && internal_files.length" class="mt-8 pa-0">
+  <v-card-actions
+    v-if="!auto_upload && internal_files.length"
+    class="mt-8 pa-0"
+  >
     <v-btn
       color="primary"
       variant="flat"
@@ -238,7 +237,15 @@ watch(internal_files, (value) => {
       @click="upload_files"
     >
       <v-icon start size="22">mdi-cloud-upload</v-icon>
-      Upload {{ internal_files.length }} file<span v-if="internal_files.length > 1">s</span>
+      Upload
+      {{ internal_files.filter((file) => !file.name.endsWith(".json")).length }}
+      file<span
+        v-if="
+          internal_files.filter((file) => !file.name.endsWith('.json')).length >
+          1
+        "
+        >s</span
+      >
     </v-btn>
   </v-card-actions>
 
@@ -251,37 +258,24 @@ watch(internal_files, (value) => {
 </template>
 
 <style scoped>
-.border-dashed {
-  border: 2px dashed rgba(255, 255, 255, 0.1) !important;
-  transition: all 0.3s ease;
+.glass-ui {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px);
 }
-
-.border-dashed:hover {
-  border-color: rgba(var(--v-theme-primary), 0.4) !important;
-  background: rgba(var(--v-theme-primary), 0.02) !important;
+.hover-opacity-100:hover {
+  opacity: 1 !important;
 }
-
-.custom-upload-btn {
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(var(--v-theme-primary), 0.3);
-}
-
 .pulse-animation {
   animation: pulse 2s infinite;
-  box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.7);
 }
-
 @keyframes pulse {
   0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.7);
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.4);
   }
   70% {
-    transform: scale(1);
     box-shadow: 0 0 0 10px rgba(var(--v-theme-primary), 0);
   }
   100% {
-    transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0);
   }
 }
