@@ -9,10 +9,8 @@ import { useGeodeStore } from "@ogw_front/stores/geode";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const SECOND = 1000;
 
 async function importWorkflow(files) {
-  const start = Date.now();
   const promise_array = [];
   for (const file of files) {
     const { filename, geode_object_type } = file;
