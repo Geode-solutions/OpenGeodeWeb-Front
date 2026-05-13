@@ -6,12 +6,13 @@ import DragAndDrop from "@ogw_front/components/DragAndDrop";
 
 const emit = defineEmits(["files_uploaded"]);
 
-const { multiple, accept, files, auto_upload, showOverlay } = defineProps({
+const { multiple, accept, files, auto_upload, showOverlay, mini } = defineProps({
   multiple: { type: Boolean, default: false },
   accept: { type: String, default: "" },
   files: { type: Array, default: () => [] },
   auto_upload: { type: Boolean, default: true },
   showOverlay: { type: Boolean, default: false },
+  mini: { type: Boolean, default: false },
 });
 
 const geodeStore = useGeodeStore();
@@ -21,6 +22,8 @@ const csv_dialog = ref(false);
 const current_csv_file = ref(undefined);
 const current_csv_index = ref(-1);
 const loading = ref(false);
+const files_uploaded = ref(false);
+const toggle_loading = useToggle(loading);
 
 function isCsv(file) {
   return file.name.toLowerCase().endsWith(".csv");
@@ -61,21 +64,28 @@ function processSelectedFiles(selected_files) {
 
 function removeFile(index) {
   internal_files.value.splice(index, 1);
+  if (internal_files.value.length === 0) {
+    files_uploaded.value = false;
+    emit("files_uploaded", []);
+  }
 }
 
 async function upload_files() {
-  loading.value = true;
+  toggle_loading();
   const promise_array = internal_files.value.map((file) => geodeStore.upload(file));
   await Promise.all(promise_array);
-  loading.value = false;
+  files_uploaded.value = true;
+  toggle_loading();
   emit("files_uploaded", internal_files.value);
 }
 
 watch(
   () => internal_files.value,
   async (newFiles) => {
-    const csvFiles = newFiles.filter((file) => isCsv(file));
-    const unconfiguredCsv = csvFiles.find((file) => !file.isConfigured);
+    if (newFiles.length === 0) {
+      return;
+    }
+    const unconfiguredCsv = newFiles.find((file) => isCsv(file) && !file.isConfigured);
 
     if (unconfiguredCsv) {
       openCsvPreviewer(unconfiguredCsv, internal_files.value.indexOf(unconfiguredCsv));
@@ -84,7 +94,7 @@ watch(
 
     const allConfigured = newFiles.every((file) => !isCsv(file) || file.isConfigured);
 
-    if (auto_upload && allConfigured && newFiles.length > 0) {
+    if (auto_upload && allConfigured) {
       await upload_files();
     }
   },
@@ -101,27 +111,47 @@ watch(
 </script>
 
 <template>
-  <DragAndDrop
-    v-if="!internal_files.length"
-    ref="dragAndDropRef"
-    :multiple
-    :accept
-    :loading
-    :show-extensions="false"
-    @files-selected="processSelectedFiles"
-  />
+  <template v-if="mini">
+    <v-btn
+      icon="mdi-plus"
+      variant="text"
+      color="primary"
+      :loading="loading"
+      class="mt-2"
+      @click="dragAndDropRef?.triggerFileDialog"
+    />
+    <DragAndDrop
+      ref="dragAndDropRef"
+      class="d-none"
+      :multiple
+      :accept
+      @files-selected="processSelectedFiles"
+    />
+  </template>
 
-  <DragAndDrop
-    v-else
-    ref="dragAndDropRef"
-    :multiple
-    :accept
-    :loading
-    :show-extensions="false"
-    :inline="false"
-    :show-overlay="showOverlay"
-    @files-selected="processSelectedFiles"
-  />
+  <template v-else>
+    <DragAndDrop
+      v-if="!internal_files.length"
+      ref="dragAndDropRef"
+      :multiple
+      :accept
+      :loading
+      :show-extensions="false"
+      @files-selected="processSelectedFiles"
+    />
+
+    <DragAndDrop
+      v-else
+      ref="dragAndDropRef"
+      :multiple
+      :accept
+      :loading
+      :show-extensions="false"
+      :inline="false"
+      :show-overlay="showOverlay"
+      @files-selected="processSelectedFiles"
+    />
+  </template>
 
   <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
