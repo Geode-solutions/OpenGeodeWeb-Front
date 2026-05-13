@@ -29,6 +29,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const status = ref(Status.NOT_CREATED);
   const is_moving = ref(false);
   const is_picking = ref(false);
+  const is_hover_highlight = ref(false);
+  const hover_highlight_field_type = ref("CELL");
   const zScale = ref(1);
   let imageStyle = undefined;
   let viewStream = undefined;
@@ -181,6 +183,32 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
   }
 
+  const performHoverHighlight = useThrottleFn((event) => {
+    if (!is_hover_highlight.value) {
+      return;
+    }
+    const container = genericRenderWindow.value.getContainer();
+    if (!container) {
+      return;
+    }
+    const rect = container.getBoundingClientRect();
+    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight, {
+      x: Math.round(event.clientX - rect.left),
+      y: Math.round(rect.height - (event.clientY - rect.top)),
+      field_type: hover_highlight_field_type.value,
+      ids: Object.keys(hybridDb),
+    });
+  }, 50);
+
+  function clearHoverHighlight() {
+    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight, {
+      x: -1,
+      y: -1,
+      field_type: hover_highlight_field_type.value,
+      ids: Object.keys(hybridDb),
+    });
+  }
+
   function setContainer(container) {
     if (!container.value) {
       return;
@@ -219,6 +247,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         }
       },
     });
+    useEventListener(container, "mousemove", performHoverHighlight);
     useEventListener(container, "wheel", () => {
       is_moving.value = true;
       if (imageStyle) {
@@ -298,6 +327,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setContainer,
     zScale,
     is_picking,
+    is_hover_highlight,
+    hover_highlight_field_type,
+    clearHoverHighlight,
     clear,
     exportStores,
     importStores,

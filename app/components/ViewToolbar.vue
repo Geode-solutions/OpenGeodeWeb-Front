@@ -30,7 +30,7 @@ async function handleZScalingClose() {
   showZScaling.value = false;
 }
 
-const camera_options = [
+const camera_options = computed(() => [
   {
     tooltip: "Reset camera",
     icon: "mdi-cube-scan",
@@ -41,8 +41,50 @@ const camera_options = [
   {
     tooltip: "Center on click",
     icon: "mdi-crosshairs-question",
+    color: hybridViewerStore.is_picking ? "primary" : undefined,
     action: () => {
       hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
+    },
+  },
+  {
+    tooltip: "Highlight cells on hover",
+    icon: "mdi-select-drag",
+    color:
+      hybridViewerStore.is_hover_highlight && hybridViewerStore.hover_highlight_field_type === "CELL"
+        ? "primary"
+        : undefined,
+    action: () => {
+      if (
+        hybridViewerStore.is_hover_highlight &&
+        hybridViewerStore.hover_highlight_field_type === "CELL"
+      ) {
+        hybridViewerStore.is_hover_highlight = false;
+        hybridViewerStore.clearHoverHighlight();
+      } else {
+        hybridViewerStore.is_hover_highlight = true;
+        hybridViewerStore.hover_highlight_field_type = "CELL";
+      }
+    },
+  },
+  {
+    tooltip: "Highlight points on hover",
+    icon: "mdi-select-marker",
+    color:
+      hybridViewerStore.is_hover_highlight &&
+      hybridViewerStore.hover_highlight_field_type === "POINT"
+        ? "primary"
+        : undefined,
+    action: () => {
+      if (
+        hybridViewerStore.is_hover_highlight &&
+        hybridViewerStore.hover_highlight_field_type === "POINT"
+      ) {
+        hybridViewerStore.is_hover_highlight = false;
+        hybridViewerStore.clearHoverHighlight();
+      } else {
+        hybridViewerStore.is_hover_highlight = true;
+        hybridViewerStore.hover_highlight_field_type = "POINT";
+      }
     },
   },
   {
@@ -70,6 +112,7 @@ const camera_options = [
   {
     tooltip: "Toggle grid scale",
     icon: "mdi-ruler-square",
+    color: grid_scale.value ? "primary" : undefined,
     action: () => {
       viewerStore.request(
         schemas.opengeodeweb_viewer.viewer.grid_scale,
@@ -90,7 +133,7 @@ const camera_options = [
       showZScaling.value = !showZScaling.value;
     },
   },
-];
+]);
 </script>
 
 <template>
@@ -100,6 +143,7 @@ const camera_options = [
         <ActionButton
           :icon="camera_option.icon"
           :tooltip="camera_option.tooltip"
+          :color="camera_option.color"
           :icon-size="camera_option.iconSize"
           tooltip-location="left"
           @click.stop="camera_option.action"
