@@ -14,7 +14,6 @@ const { displayMenu, containerWidth, containerHeight } = defineProps({
 });
 
 const emit = defineEmits(["show-menu"]);
-
 const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const viewerStore = useViewerStore();
@@ -56,4 +55,52 @@ defineExpose({ get_viewer_id });
     :container-width="containerWidth"
     :container-height="containerHeight"
   />
+
+  <v-fade-transition>
+    <div
+      v-if="viewerStore.picking_mode"
+      class="picking-message-container d-flex justify-center w-100 pa-4"
+    >
+      <v-chip
+        color="secondary"
+        elevation="8"
+        size="large"
+        variant="flat"
+        prepend-icon="mdi-crosshairs-gps"
+        class="pick-pulse"
+        style="pointer-events: auto"
+        @click="viewerStore.toggle_picking_mode(false)"
+      >
+        Picking active — click in the viewer &middot; Esc to stop
+        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
+        <v-icon icon="mdi-close" size="small" />
+      </v-chip>
+    </div>
+  </v-fade-transition>
 </template>
+
+<style scoped>
+.picking-message-container {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-secondary), 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--v-theme-secondary), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-secondary), 0);
+  }
+}
+
+.pick-pulse {
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+</style>
