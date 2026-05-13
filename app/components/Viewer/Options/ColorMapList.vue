@@ -1,5 +1,5 @@
 <script setup>
-import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps";
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { newInstance as vtkColorTransferFunction } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
 
 const LAST_POINT_OFFSET = 4;
@@ -50,14 +50,13 @@ function drawPresetCanvas(presetName, canvas) {
   if (!canvas) {
     return;
   }
-  const preset = vtkColorMaps.getPresetByName(presetName);
-  if (!preset || !preset.RGBPoints) {
+  const rgbPoints = getRGBPointsFromPreset(presetName);
+  if (!rgbPoints || rgbPoints.length === 0) {
     return;
   }
   const ctx = canvas.getContext("2d");
   const { height, width } = canvas;
   const lut = vtkColorTransferFunction();
-  const rgbPoints = preset.RGBPoints;
   for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {
     lut.addRGBPoint(
       rgbPoints[pointIdx],
@@ -161,8 +160,8 @@ watch(filteredPresets, drawAllCanvases);
           </template>
 
           <v-list-item
-            v-for="(child, cIdx) in item.Children"
-            :key="cIdx"
+            v-for="(child, childIdx) in item.Children"
+            :key="childIdx"
             :active="child.Name === selectedPresetName"
             @click="emit('select', child)"
             class="px-2 mb-1"
@@ -171,7 +170,7 @@ watch(filteredPresets, drawAllCanvases);
             <div class="d-flex flex-column py-1">
               <span class="text-caption text-grey-lighten-1 mb-1">{{ child.Name }}</span>
               <canvas
-                :ref="(el) => setCanvasRef(child.Name, el, `g-${index}-${cIdx}`)"
+                :ref="(element) => setCanvasRef(child.Name, element, `g-${index}-${childIdx}`)"
                 width="200"
                 height="18"
                 class="w-100 rounded-xs border-thin"
@@ -191,7 +190,7 @@ watch(filteredPresets, drawAllCanvases);
           <div class="d-flex flex-column py-1">
             <span class="text-caption text-grey-lighten-1 mb-1">{{ item.Name }}</span>
             <canvas
-              :ref="(el) => setCanvasRef(item.Name, el, `s-${index}`)"
+              :ref="(element) => setCanvasRef(item.Name, element, `s-${index}`)"
               width="200"
               height="18"
               class="w-100 rounded-xs border-thin"
