@@ -99,6 +99,20 @@ function handleHoverLeave({ item }) {
   }
   onHoverLeave(actualItem.id);
 }
+
+function expandAll() {
+  const allIds = [];
+  function traverse(itemsList) {
+    for (const item of itemsList) {
+      if (item.children && item.children.length > 0) {
+        allIds.push(item.id);
+        traverse(item.children);
+      }
+    }
+  }
+  traverse(treeviewStore.items);
+  opened.value = allIds;
+}
 </script>
 
 <template>
@@ -108,8 +122,10 @@ function handleHoverLeave({ item }) {
       :sort-type="sortType"
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
+      :is-collapsed="opened.length === 0"
       @toggle-sort="toggleSort"
       @collapse-all="opened = []"
+      @expand-all="expandAll"
     />
 
     <CommonTreeView
