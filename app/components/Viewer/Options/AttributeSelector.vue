@@ -81,7 +81,7 @@ watch(
     ) {
       resetRange();
       if (colorMap.value === undefined) {
-        colorMap.value = "Cool to Warm";
+        colorMap.value = "batlow";
       }
     }
   },
