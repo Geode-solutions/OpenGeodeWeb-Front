@@ -155,12 +155,17 @@ function handleHoverLeave() {
 
       <template #append="{ item }">
         <v-btn
-          v-if="item.category"
+          v-if="item.category || (item.children && item.children.length > 0)"
           icon="mdi-target"
           size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"
-          @click.stop="hybridViewerStore.focusCameraOnObject(id)"
+          @click.stop="
+            hybridViewerStore.focusCameraOnObject(
+              id,
+              item.category ? [item.viewer_id] : item.children.map((child) => child.viewer_id),
+            )
+          "
         />
       </template>
     </CommonTreeView>

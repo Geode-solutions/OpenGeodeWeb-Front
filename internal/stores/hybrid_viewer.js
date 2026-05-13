@@ -235,6 +235,47 @@ function performCameraOrientation(orientation, options) {
   });
 }
 
+async function performFocusCameraOnObject(id, options) {
+  const {
+    hybridDb,
+    viewerStore,
+    viewer_schemas,
+    genericRenderWindow,
+    block_ids = [],
+    is_moving,
+    imageStyle,
+    syncRemoteCamera,
+  } = options;
+
+  if (!hybridDb[id]) {
+    return;
+  }
+
+  let bounds = [];
+  if (block_ids.length > 0) {
+    bounds = await viewerStore.request(
+      viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds,
+      { id, block_ids },
+    );
+  } else {
+    bounds = hybridDb[id].actor.getBounds();
+  }
+
+  const renderer = genericRenderWindow.getRenderer();
+  const camera = renderer.getActiveCamera();
+  const startOptions = getCameraOptions(camera);
+  renderer.resetCamera(bounds);
+  const targetOptions = getCameraOptions(camera);
+  applyCameraOptions(camera, startOptions);
+
+  performSetCamera(targetOptions, {
+    genericRenderWindow,
+    is_moving,
+    imageStyle,
+    syncRemoteCamera,
+  });
+}
+
 export {
   BACKGROUND_COLOR,
   ACTOR_COLOR,
@@ -250,5 +291,6 @@ export {
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
+  performFocusCameraOnObject,
   performSetCamera,
 };

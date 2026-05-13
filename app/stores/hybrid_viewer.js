@@ -2,12 +2,12 @@ import {
   ACTOR_COLOR,
   BACKGROUND_COLOR,
   WHEEL_TIME_OUT_MS,
-  applyCameraOptions,
   applySnapshot,
   computeAverageBrightness,
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
+  performFocusCameraOnObject,
   performSetCamera,
 } from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
@@ -145,18 +145,17 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     syncRemoteCamera();
   }
 
-  function focusCameraOnObject(id) {
-    if (!hybridDb[id]) {
-      return;
-    }
-    const bounds = hybridDb[id].actor.getBounds();
-    const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
-    const startOptions = getCameraOptions(camera);
-    renderer.resetCamera(bounds);
-    const targetOptions = getCameraOptions(camera);
-    applyCameraOptions(camera, startOptions);
-    setCamera(targetOptions);
+  async function focusCameraOnObject(id, block_ids = []) {
+    await performFocusCameraOnObject(id, {
+      hybridDb,
+      viewerStore,
+      viewer_schemas,
+      genericRenderWindow: genericRenderWindow.value,
+      block_ids,
+      is_moving,
+      imageStyle,
+      syncRemoteCamera,
+    });
   }
 
   function setCameraOrientation(orientation) {
