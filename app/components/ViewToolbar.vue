@@ -50,7 +50,8 @@ const camera_options = computed(() => [
     tooltip: "Highlight cells on hover",
     icon: "mdi-select-drag",
     color:
-      hybridViewerStore.is_hover_highlight && hybridViewerStore.hover_highlight_field_type === "CELL"
+      hybridViewerStore.is_hover_highlight &&
+      hybridViewerStore.hover_highlight_field_type === "CELL"
         ? "primary"
         : undefined,
     action: () => {
