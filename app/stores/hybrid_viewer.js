@@ -5,7 +5,6 @@ import {
   applyCameraOptions,
   applySnapshot,
   computeAverageBrightness,
-  focusCameraOnBounds,
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,

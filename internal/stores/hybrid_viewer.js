@@ -127,20 +127,6 @@ function centerCameraOnPosition(camera, pickedPosition) {
   );
 }
 
-function focusCameraOnBounds(bounds, options) {
-  const { genericRenderWindow, imageStyle, syncRemoteCamera } = options;
-  if (!bounds || bounds.length < 6 || bounds.some((v) => !isFinite(v))) {
-    return;
-  }
-  const renderer = genericRenderWindow.getRenderer();
-  renderer.resetCamera(bounds);
-  if (imageStyle) {
-    imageStyle.opacity = 0;
-  }
-  genericRenderWindow.getRenderWindow().render();
-  syncRemoteCamera();
-}
-
 function performClickPicking(event, options) {
   const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
   const rect = container.getBoundingClientRect();
@@ -261,7 +247,6 @@ export {
   applySnapshot,
   centerCameraOnPosition,
   computeAverageBrightness,
-  focusCameraOnBounds,
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
