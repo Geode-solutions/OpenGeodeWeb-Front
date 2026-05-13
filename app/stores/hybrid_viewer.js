@@ -1,11 +1,6 @@
 import {
   ACTOR_COLOR,
-  ALIGNMENT_THRESHOLD,
   BACKGROUND_COLOR,
-  BUMP_MULTIPLIER,
-  EASE_EXPONENT,
-  LONG_ANIMATION_DURATION,
-  SHORT_ANIMATION_DURATION,
   WHEEL_TIME_OUT_MS,
   applySnapshot,
   computeAverageBrightness,
@@ -13,6 +8,7 @@ import {
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
+  performSetCamera,
 } from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -27,16 +23,17 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
-  const viewerStore = useViewerStore();
   const hybridDb = reactive({});
-  const status = ref(Status.NOT_CREATED);
+  const viewerStore = useViewerStore();
   const camera_options = reactive({});
   const genericRenderWindow = reactive({});
+  const status = ref(Status.NOT_CREATED);
   const is_moving = ref(false);
   const is_picking = ref(false);
   const zScale = ref(1);
-  let viewStream = undefined;
   let imageStyle = undefined;
+  let viewStream = undefined;
+  let wheelEventEndTimeout = undefined;
   const gridActor = undefined;
 
   watch(is_picking, (value) => {
@@ -64,12 +61,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       background: BACKGROUND_COLOR,
       listenWindowResize: false,
     });
-
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
     imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
-    imageStyle.transition = "opacity 0.1s ease-in";
-    imageStyle.zIndex = 1;
-
+    Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
     await viewerStore.ws_connect();
     viewStream = viewerStore.client.getImageStream().createViewStream("-1");
     viewStream.onImageReady((event) => {
@@ -80,13 +74,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       webGLRenderWindow.setBackgroundImage(event.image);
       imageStyle.opacity = 1;
     });
-
-    const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
+    const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
+    Object.assign(camera_options, getCameraOptions(camera));
     camera.onModified(() => {
       Object.assign(camera_options, getCameraOptions(camera));
     });
-
     status.value = Status.CREATED;
   }
 
@@ -94,14 +86,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return;
     }
-    const value = await dataStore.item(id);
     const reader = vtkXMLPolyDataReader();
-    const textEncoder = new TextEncoder();
-    await reader.parseAsArrayBuffer(textEncoder.encode(value.binary_light_viewable));
-    const polydata = reader.getOutputData(0);
-    const mapper = vtkMapper();
-    mapper.setInputData(polydata);
+    const value = await dataStore.item(id);
+    await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
     const actor = vtkActor();
+    const mapper = vtkMapper();
+    const polydata = reader.getOutputData(0);
+    mapper.setInputData(polydata);
     actor.getProperty().setColor(ACTOR_COLOR);
     actor.setMapper(mapper);
     const renderer = genericRenderWindow.value.getRenderer();
@@ -117,8 +108,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!hybridDb[id]) {
       return;
     }
-    const renderer = genericRenderWindow.value.getRenderer();
-    renderer.removeActor(hybridDb[id].actor);
+    genericRenderWindow.value.getRenderer().removeActor(hybridDb[id].actor);
     genericRenderWindow.value.getRenderWindow().render();
     delete hybridDb[id];
   }
@@ -128,14 +118,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return;
     }
     hybridDb[id].actor.setVisibility(visibility);
-    const renderWindow = genericRenderWindow.value.getRenderWindow();
-    renderWindow.render();
+    genericRenderWindow.value.getRenderWindow().render();
   }
+
   async function setZScaling(z_scale) {
     zScale.value = z_scale;
     const renderer = genericRenderWindow.value.getRenderer();
-    const actors = renderer.getActors();
-    for (const actor of actors) {
+    for (const actor of renderer.getActors()) {
       if (actor !== gridActor) {
         const scale = actor.getScale();
         actor.setScale(scale[0], scale[1], z_scale);
@@ -144,18 +133,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     renderer.resetCamera();
     genericRenderWindow.value.getRenderWindow().render();
     const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling;
-    if (!schema) {
-      return;
+    if (schema) {
+      await viewerStore.request(schema, { z_scale });
     }
-    await viewerStore.request(schema, {
-      z_scale,
-    });
     remoteRender();
   }
 
   function resetCamera() {
-    const renderer = genericRenderWindow.value.getRenderer();
-    renderer.resetCamera();
+    genericRenderWindow.value.getRenderer().resetCamera();
     genericRenderWindow.value.getRenderWindow().render();
     syncRemoteCamera();
   }
@@ -178,26 +163,22 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       is_moving,
       imageStyle,
       syncRemoteCamera,
-      constants: {
-        ALIGNMENT_THRESHOLD,
-        BUMP_MULTIPLIER,
-        EASE_EXPONENT,
-        LONG_ANIMATION_DURATION,
-        SHORT_ANIMATION_DURATION,
-      },
     });
   }
 
   function syncRemoteCamera() {
-    const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
-    const params = { camera_options: getCameraOptions(camera) };
-    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, params, {
-      response_function: () => {
-        remoteRender();
-        Object.assign(camera_options, params.camera_options);
+    const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
+    const options = getCameraOptions(camera);
+    viewerStore.request(
+      viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+      { camera_options: options },
+      {
+        response_function: () => {
+          remoteRender();
+          Object.assign(camera_options, options);
+        },
       },
-    });
+    );
   }
 
   function remoteRender() {
@@ -212,10 +193,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
     webGLRenderWindow.setUseBackgroundImage(true);
     imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
-    imageStyle.transition = "opacity 0.1s ease-in";
-    imageStyle.zIndex = 1;
+    Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
     resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
-
     useMousePressed({
       target: container,
       onPressed: (event) => {
@@ -238,19 +217,20 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         imageStyle.opacity = 0;
       },
       onReleased: () => {
-        if (!is_moving.value) {
-          return;
+        if (is_moving.value) {
+          is_moving.value = false;
+          syncRemoteCamera();
         }
         is_moving.value = false;
         genericRenderWindow.value.getRenderer().resetCameraClippingRange();
         syncRemoteCamera();
       },
     });
-
-    let wheelEventEndTimeout = undefined;
     useEventListener(container, "wheel", () => {
       is_moving.value = true;
-      imageStyle.opacity = 0;
+      if (imageStyle) {
+        imageStyle.opacity = 0;
+      }
       clearTimeout(wheelEventEndTimeout);
       wheelEventEndTimeout = setTimeout(() => {
         is_moving.value = false;
@@ -271,8 +251,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     await nextTick();
     webGLRenderWindow.setSize(width, height);
     viewStream.setSize(width, height);
-    const renderWindow = genericRenderWindow.value.getRenderWindow();
-    renderWindow.render();
+    genericRenderWindow.value.getRenderWindow().render();
     remoteRender();
   }
 
@@ -286,10 +265,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function exportStores() {
-    const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
-    const cameraSnapshot = getCameraOptions(camera) || camera_options;
-    return { zScale: zScale.value, camera_options: cameraSnapshot };
+    const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
+    return { zScale: zScale.value, camera_options: getCameraOptions(camera) || camera_options };
   }
 
   async function importStores(snapshot) {
@@ -297,13 +274,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       genericRenderWindow: genericRenderWindow.value,
       setZScaling,
       syncRemoteCamera,
+      setCamera,
     });
   }
 
   function clear() {
     const renderer = genericRenderWindow.value.getRenderer();
-    const actors = renderer.getActors();
-    for (const actor of actors) {
+    for (const actor of renderer.getActors()) {
       renderer.removeActor(actor);
     }
     genericRenderWindow.value.getRenderWindow().render();
@@ -320,6 +297,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setVisibility,
     setZScaling,
     syncRemoteCamera,
+    setCamera,
     initHybridViewer,
     remoteRender,
     resize,

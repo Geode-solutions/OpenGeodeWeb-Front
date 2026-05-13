@@ -49,7 +49,7 @@ async function runScript(
   child.on("kill", () => {
     console.log(`[${execName}] process killed`);
   });
-  child.name = command.replace(/^.*[\\/]/, "");
+  child.name = command.replace(/^.*[\\/]/u, "");
 
   try {
     return await pTimeout(waitForReady(child, expectedResponse), {
