@@ -68,10 +68,7 @@ onUnmounted(() => {
           "
         />
 
-        <div
-          class="d-flex align-center justify-center pa-6"
-          style="min-height: 100%"
-        >
+        <div class="d-flex align-center justify-center pa-6" style="min-height: 100%">
           <div
             class="d-flex flex-column align-center text-center w-100"
             style="max-width: 650px; gap: clamp(1rem, 4vh, 2rem)"

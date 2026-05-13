@@ -1,12 +1,11 @@
 <script setup>
-const { item, itemProps, selection, isSelected, getIndeterminate } =
-  defineProps({
-    item: { type: Object, required: true },
-    itemProps: { type: Object, required: true },
-    selection: { type: Object, required: true },
-    isSelected: { type: Function, required: true },
-    getIndeterminate: { type: Function, required: true },
-  });
+const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({
+  item: { type: Object, required: true },
+  itemProps: { type: Object, required: true },
+  selection: { type: Object, required: true },
+  isSelected: { type: Function, required: true },
+  getIndeterminate: { type: Function, required: true },
+});
 
 defineEmits(["toggle-open", "toggle-select"]);
 
@@ -49,14 +48,9 @@ const INDENT_STEP = 16;
       />
     </div>
 
-    <div
-      class="tree-title flex-grow-1 overflow-hidden d-flex align-center ms-1 pt-1"
-    >
+    <div class="tree-title flex-grow-1 overflow-hidden d-flex align-center ms-1 pt-1">
       <slot name="title" :item="item.raw" :is-leaf="item.isLeaf">
-        <v-list-item-title
-          :class="{ 'font-weight-bold': !item.isLeaf }"
-          class="text-black"
-        >
+        <v-list-item-title :class="{ 'font-weight-bold': !item.isLeaf }" class="text-black">
           {{ item.raw[itemProps.title] || item.id }}
         </v-list-item-title>
       </slot>
