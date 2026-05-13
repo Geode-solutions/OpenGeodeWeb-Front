@@ -253,10 +253,10 @@ async function performFocusCameraOnObject(id, options) {
 
   let bounds = [];
   if (block_ids.length > 0) {
-    bounds = await viewerStore.request(
-      viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds,
-      { id, block_ids },
-    );
+    bounds = await viewerStore.request(viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds, {
+      id,
+      block_ids,
+    });
   } else {
     bounds = hybridDb[id].actor.getBounds();
   }
