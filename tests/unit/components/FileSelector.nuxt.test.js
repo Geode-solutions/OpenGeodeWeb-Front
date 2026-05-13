@@ -21,7 +21,7 @@ const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 describe("file selector", () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
-  geodeStore.base_url = "";
+  geodeStore.base_url = "/";
 
   test("select file", async () => {
     registerEndpoint(allowed_files_schema.$id, {
@@ -52,6 +52,7 @@ describe("file selector", () => {
       writable: true,
     });
     await v_file_input.trigger("change");
+    await flushPromises();
     const v_btn = wrapper.findComponent(components.VBtn);
     await v_btn.trigger("click");
     await flushPromises();

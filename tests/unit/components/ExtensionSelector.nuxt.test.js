@@ -21,7 +21,7 @@ const geodeStore = useGeodeStore();
 
 describe("extension selector", () => {
   beforeEach(() => {
-    geodeStore.base_url = "";
+    geodeStore.base_url = "/";
 
     geodeStore.request = vi.fn(() => {
       const response = {

@@ -9,10 +9,11 @@ const schema = schemas.opengeodeweb_back.missing_files;
 
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
-const { multiple, geode_object_type, filenames } = defineProps({
+const { multiple, geode_object_type, filenames, files } = defineProps({
   multiple: { type: Boolean, required: true },
   geode_object_type: { type: String, required: true },
   filenames: { type: Array, required: true },
+  files: { type: Array, required: false, default: () => [] },
 });
 
 const accept = ref("");
@@ -34,12 +35,17 @@ async function missing_files() {
   additional_files.value = [];
   const geodeStore = useGeodeStore();
 
-  const promise_array = filenames.map(async (filename) => {
-    const response = await geodeStore.request(schema, {
-      geode_object_type,
-      filename,
-    });
-    return response;
+  const promise_array = filenames.map((filename) => {
+    const isCsvFile =
+      filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
+    if (isCsvFile) {
+      return Promise.resolve({
+        has_missing_files: false,
+        mandatory_files: [],
+        additional_files: [],
+      });
+    }
+    return geodeStore.request(schema, { geode_object_type, filename });
   });
   const values = await Promise.all(promise_array);
   for (const value of values) {
@@ -49,11 +55,19 @@ async function missing_files() {
     mandatory_files.value = [...mandatory_files.value, ...value.mandatory_files];
     additional_files.value = [...additional_files.value, ...value.additional_files];
   }
-  if (has_missing_files.value) {
-    accept.value = [...mandatory_files.value, ...additional_files.value]
-      .map((filename) => `.${filename.split(".").pop()}`)
-      .join(",");
-  } else {
+  const unconfigured_csvs = files.filter(
+    (file) =>
+      (file.name.toLowerCase().endsWith(".csv") || file.name.toLowerCase().endsWith(".csv.json")) &&
+      !file.isConfigured,
+  );
+  if (unconfigured_csvs.length > 0) {
+    has_missing_files.value = true;
+    if (accept.value === "") {
+      accept.value = ".json";
+    }
+  }
+
+  if (!has_missing_files.value) {
     emit("increment_step");
   }
   toggle_loading();
@@ -85,7 +99,10 @@ await missing_files();
     </v-row>
     <v-row>
       <v-col cols="12">
-        <FileUploader v-bind="{ multiple, accept }" @files_uploaded="files_uploaded_event" />
+        <FileUploader
+          v-bind="{ multiple, accept, files, auto_upload: false }"
+          @files_uploaded="files_uploaded_event"
+        />
       </v-col>
     </v-row>
     <v-row>
