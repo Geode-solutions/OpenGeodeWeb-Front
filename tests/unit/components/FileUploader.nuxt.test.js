@@ -18,7 +18,7 @@ const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 describe("file uploader", () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
-  geodeStore.base_url = "";
+  geodeStore.base_url = "/";
 
   registerEndpoint(upload_file_schema.$id, {
     method: upload_file_schema.methods[FIRST_INDEX],
@@ -37,7 +37,7 @@ describe("file uploader", () => {
         global: {
           plugins: [vuetify, pinia],
         },
-        props: { multiple: false, accept: "*.txt" },
+        props: { multiple: false, accept: "*.txt", auto_upload: false },
       });
 
       const v_file_input = wrapper.find('input[type="file"]');
@@ -46,6 +46,7 @@ describe("file uploader", () => {
         writable: true,
       });
       await v_file_input.trigger("change");
+      await flushPromises();
       const v_btn = wrapper.findComponent(components.VBtn);
 
       await v_btn.trigger("click");

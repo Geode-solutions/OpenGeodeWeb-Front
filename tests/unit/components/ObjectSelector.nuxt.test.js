@@ -19,7 +19,7 @@ const { allowed_objects } = schemas.opengeodeweb_back;
 describe("object selector", () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
-  geodeStore.base_url = "";
+  geodeStore.base_url = "/";
 
   test("loadable with one class", async () => {
     const response = {

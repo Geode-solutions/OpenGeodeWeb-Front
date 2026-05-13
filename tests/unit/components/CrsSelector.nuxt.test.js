@@ -17,7 +17,7 @@ describe("crs selector", () => {
   beforeEach(() => {
     pinia = setupActivePinia();
     geodeStore = useGeodeStore();
-    geodeStore.base_url = "";
+    geodeStore.base_url = "/";
   });
 
   test("default behavior", async () => {
