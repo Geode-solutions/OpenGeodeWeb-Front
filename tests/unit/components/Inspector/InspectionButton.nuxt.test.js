@@ -12,7 +12,7 @@ import { useGeodeStore } from "@ogw_front/stores/geode";
 describe("inspector inspection button", () => {
   const pinia = setupActivePinia();
   const geodeStore = useGeodeStore();
-  geodeStore.base_url = "";
+  geodeStore.base_url = "/";
 
   test("with issues", async () => {
     const inspection_result = {
