@@ -32,7 +32,7 @@ function openCsvPreviewer(file, index) {
   csv_dialog.value = true;
 }
 
-function onCsvConfirm(result) {
+async function onCsvConfirm(result) {
   const json_content = JSON.stringify(result, undefined, 2);
   const base_name = current_csv_file.value.name.slice(
     0,
@@ -46,7 +46,8 @@ function onCsvConfirm(result) {
   });
 
   current_csv_file.value.isConfigured = true;
-  internal_files.value = [...internal_files.value, json_file];
+  await geodeStore.upload(json_file);
+  internal_files.value = [...internal_files.value];
   csv_dialog.value = false;
 }
 
@@ -59,16 +60,7 @@ function processSelectedFiles(selected_files) {
 }
 
 function removeFile(index) {
-  const fileToRemove = internal_files.value[index];
-  if (isCsv(fileToRemove)) {
-    const base_name = fileToRemove.name.slice(0, fileToRemove.name.lastIndexOf("."));
-    const sidecarName = `${base_name}.json`;
-    internal_files.value = internal_files.value.filter(
-      (file, idx) => idx !== index && file.name !== sidecarName,
-    );
-  } else {
-    internal_files.value.splice(index, 1);
-  }
+  internal_files.value.splice(index, 1);
 }
 
 async function upload_files() {
@@ -136,7 +128,7 @@ watch(
       <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
       <span class="text-subtitle-1 font-weight-bold text-white"> Selected files </span>
       <v-chip size="small" class="ml-3 bg-white-opacity-10" color="white" variant="flat">
-        {{ internal_files.filter((file) => !file.name.endsWith(".json")).length }}
+        {{ internal_files.length }}
       </v-chip>
       <v-spacer />
       <v-btn
@@ -155,7 +147,6 @@ watch(
     <v-sheet class="d-flex flex-wrap ga-2" color="transparent">
       <template v-for="(file, index) in internal_files" :key="index">
         <v-chip
-          v-if="!file.name.endsWith('.json')"
           closable
           size="default"
           color="white"
@@ -214,10 +205,8 @@ watch(
     >
       <v-icon start size="22">mdi-cloud-upload</v-icon>
       Upload
-      {{ internal_files.filter((file) => !file.name.endsWith(".json")).length }}
-      file<span v-if="internal_files.filter((file) => !file.name.endsWith('.json')).length > 1"
-        >s</span
-      >
+      {{ internal_files.length }}
+      file<span v-if="internal_files.length > 1">s</span>
     </v-btn>
   </v-card-actions>
 

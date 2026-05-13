@@ -10,12 +10,9 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 async function importWorkflow(files) {
-  const promise_array = [];
-  for (const file of files) {
-    const { filename, geode_object_type } = file;
-    promise_array.push(importFile(filename, geode_object_type));
-  }
-  const results = await Promise.all(promise_array);
+  const results = await Promise.all(
+    files.map(({ filename, geode_object_type }) => importFile(filename, geode_object_type)),
+  );
   const hybridViewerStore = useHybridViewerStore();
   hybridViewerStore.remoteRender();
   return results;

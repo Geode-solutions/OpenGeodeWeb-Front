@@ -27,7 +27,6 @@ const zColumn = ref(undefined);
 const rawContent = ref("");
 const previewRows = ref([]);
 const previewHeaders = ref([]);
-const parsedAll = ref([]);
 const loading = ref(false);
 const toggleLoading = useToggle(loading);
 
