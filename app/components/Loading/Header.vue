@@ -8,18 +8,17 @@ const { logo } = defineProps({
 </script>
 
 <template>
-  <v-row justify="center" class="mb-8">
+  <v-row justify="center" class="mb-4 mb-sm-8">
     <v-img
       :src="logo"
-      height="180"
-      width="180"
+      class="responsive-logo"
       style="filter: drop-shadow(0 0 20px rgba(var(--v-theme-primary), 0.4))"
     />
   </v-row>
 
-  <v-card color="transparent" elevation="0" class="mb-8 overflow-visible">
+  <v-card color="transparent" elevation="0" class="mb-4 mb-sm-8 overflow-visible">
     <v-card-title
-      class="text-h2 font-weight-black text-white text-wrap pa-0 d-block"
+      class="font-weight-black text-white text-wrap pa-0 d-block responsive-title"
       style="text-shadow: 0 0 20px rgba(255, 255, 255, 0.3)"
     >
       STARTING UP
@@ -35,7 +34,17 @@ const { logo } = defineProps({
 </template>
 
 <style scoped>
+.responsive-logo {
+  width: clamp(100px, 20vw, 180px);
+  height: clamp(100px, 20vw, 180px);
+}
+
+.responsive-title {
+  font-size: clamp(2rem, 8vw, 4rem) !important;
+  line-height: 1.1 !important;
+}
+
 .ls-widest {
-  letter-spacing: 0.6em !important;
+  letter-spacing: clamp(0.2em, 2vw, 0.6em) !important;
 }
 </style>
