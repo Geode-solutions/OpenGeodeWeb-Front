@@ -1,7 +1,11 @@
-import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps";
+import scientificPresets from "@ogw_front/assets/scientific_colormaps.json";
 
 function getRGBPointsFromPreset(presetName) {
-  return vtkColorMaps.getPresetByName(presetName)?.RGBPoints ?? [];
+  return (
+    scientificPresets
+      .flatMap((category) => category.Children)
+      .find((preset) => preset.Name === presetName)?.RGBPoints ?? []
+  );
 }
 
-export { getRGBPointsFromPreset };
+export { getRGBPointsFromPreset, scientificPresets };
