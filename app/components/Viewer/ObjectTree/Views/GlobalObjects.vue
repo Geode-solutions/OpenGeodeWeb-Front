@@ -140,7 +140,7 @@ function handleHoverLeave({ item }) {
         <v-btn
           v-if="item.viewer_type"
           icon="mdi-target"
-          size="small"
+          size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"
           @click.stop="hybridViewerStore.focusCameraOnObject(item.id)"
@@ -149,7 +149,7 @@ function handleHoverLeave({ item }) {
           v-if="isModel(item)"
           icon="mdi-magnify-expand"
           size="medium"
-          class="ml-8"
+          class="ml-2"
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
