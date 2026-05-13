@@ -2,6 +2,7 @@ import {
   ACTOR_COLOR,
   BACKGROUND_COLOR,
   WHEEL_TIME_OUT_MS,
+  applyCameraOptions,
   applySnapshot,
   computeAverageBrightness,
   focusCameraOnBounds,
@@ -150,11 +151,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return;
     }
     const bounds = hybridDb[id].actor.getBounds();
-    focusCameraOnBounds(bounds, {
-      genericRenderWindow: genericRenderWindow.value,
-      imageStyle,
-      syncRemoteCamera,
-    });
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
+    const startOptions = getCameraOptions(camera);
+    renderer.resetCamera(bounds);
+    const targetOptions = getCameraOptions(camera);
+    applyCameraOptions(camera, startOptions);
+    setCamera(targetOptions);
   }
 
   function setCameraOrientation(orientation) {
