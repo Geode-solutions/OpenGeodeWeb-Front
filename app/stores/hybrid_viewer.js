@@ -166,6 +166,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     });
   }
 
+  function setCamera(targetCameraOptions) {
+    performSetCamera(targetCameraOptions, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle,
+      syncRemoteCamera,
+    });
+  }
+
   function syncRemoteCamera() {
     const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
     const options = getCameraOptions(camera);
