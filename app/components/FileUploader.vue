@@ -16,8 +16,8 @@ const { multiple, accept, files, auto_upload, showOverlay, mini } = defineProps(
 });
 
 const geodeStore = useGeodeStore();
+const internal_files = ref(files);
 const dragAndDropRef = ref(undefined);
-const internal_files = ref([...files]);
 const csv_dialog = ref(false);
 const current_csv_file = ref(undefined);
 const current_csv_index = ref(-1);
@@ -98,13 +98,20 @@ watch(
       await upload_files();
     }
   },
-  { deep: true, immediate: true },
+  { deep: true },
 );
+
+if (files.length > 0) {
+  internal_files.value = files;
+  if (auto_upload) {
+    upload_files();
+  }
+}
 
 watch(
   () => files,
   (newVal) => {
-    internal_files.value = [...newVal];
+    internal_files.value = newVal;
   },
   { deep: true },
 );
