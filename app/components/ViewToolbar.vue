@@ -50,11 +50,10 @@ const camera_options = computed(() => [
     tooltip: "Highlight on hover",
     icon: "mdi-cursor-default-click",
     color: hybridViewerStore.is_hover_highlight ? "primary" : undefined,
-    action: () => {},
     menu: [
       {
         title: "Cells",
-        icon: "mdi-select-drag",
+        icon: "mdi-select-all",
         action: () => {
           if (
             hybridViewerStore.is_hover_highlight &&
@@ -70,7 +69,7 @@ const camera_options = computed(() => [
       },
       {
         title: "Points",
-        icon: "mdi-select-marker",
+        icon: "mdi-select-drag",
         action: () => {
           if (
             hybridViewerStore.is_hover_highlight &&
@@ -181,7 +180,7 @@ const camera_options = computed(() => [
           :color="camera_option.color"
           :icon-size="camera_option.iconSize"
           tooltip-location="left"
-          @click.stop="camera_option.action"
+          @click.stop="camera_option.action?.()"
         />
       </v-col>
     </v-row>
