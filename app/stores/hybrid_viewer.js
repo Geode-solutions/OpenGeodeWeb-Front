@@ -7,6 +7,7 @@ import {
   getCameraOptions,
   performCameraOrientation,
   performClickPicking,
+  performFocusCameraOnObject,
   performSetCamera,
 } from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
@@ -146,9 +147,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     syncRemoteCamera();
   }
 
-  function setCamera(new_camera_options) {
-    performSetCamera(new_camera_options, {
+  async function focusCameraOnObject(id, block_ids = []) {
+    await performFocusCameraOnObject(id, {
+      hybridDb,
+      viewerStore,
+      viewer_schemas,
       genericRenderWindow: genericRenderWindow.value,
+      block_ids,
       is_moving,
       imageStyle,
       syncRemoteCamera,
@@ -157,6 +162,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   function setCameraOrientation(orientation) {
     performCameraOrientation(orientation, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle,
+      syncRemoteCamera,
+    });
+  }
+
+  function setCamera(targetCameraOptions) {
+    performSetCamera(targetCameraOptions, {
       genericRenderWindow: genericRenderWindow.value,
       is_moving,
       imageStyle,
@@ -245,6 +259,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           is_moving.value = false;
           syncRemoteCamera();
         }
+        is_moving.value = false;
+        genericRenderWindow.value.getRenderer().resetCameraClippingRange();
+        syncRemoteCamera();
       },
     });
     useEventListener(container, "mousemove", performHoverHighlight);
@@ -256,6 +273,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       clearTimeout(wheelEventEndTimeout);
       wheelEventEndTimeout = setTimeout(() => {
         is_moving.value = false;
+        genericRenderWindow.value.getRenderer().resetCameraClippingRange();
         syncRemoteCamera();
       }, WHEEL_TIME_OUT_MS);
     });
@@ -323,6 +341,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender,
     resize,
     resetCamera,
+    focusCameraOnObject,
     setCameraOrientation,
     setContainer,
     zScale,
