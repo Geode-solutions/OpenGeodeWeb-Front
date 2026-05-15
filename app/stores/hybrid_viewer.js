@@ -3,19 +3,22 @@ import {
   BACKGROUND_COLOR,
   HOVER_THROTTLE_MS,
   WHEEL_TIME_OUT_MS,
-  applySnapshot,
   computeAverageBrightness,
-  getCameraOptions,
   performAddItem,
-  performCameraOrientation,
   performClearHoverHighlight,
   performClickPicking,
-  performFocusCameraOnObject,
   performHoverHighlight,
-  performSetCamera,
+  performSetContainer,
   performSetZScaling,
-  performSyncRemoteCamera,
 } from "@ogw_internal/stores/hybrid_viewer";
+import {
+  applySnapshot,
+  getCameraOptions,
+  performCameraOrientation,
+  performFocusCameraOnObject,
+  performSetCamera,
+  performSyncRemoteCamera,
+} from "@ogw_internal/stores/hybrid_viewer_camera";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
@@ -204,58 +207,23 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function setContainer(container) {
-    if (!container.value) {
-      return;
-    }
-    genericRenderWindow.value.setContainer(container.value.$el);
-    const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-    webGLRenderWindow.setUseBackgroundImage(true);
-    imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
-    Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
-    resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
-    useMousePressed({
-      target: container,
-      onPressed: (event) => {
-        if (event.button !== 0) {
-          return;
-        }
-        if (is_picking.value) {
-          performClickPicking(event, {
-            container: container.value.$el,
-            viewerStore,
-            viewer_schemas,
-            genericRenderWindow: genericRenderWindow.value,
-            syncRemoteCamera,
-          });
-          is_picking.value = false;
-          return;
-        }
-        is_moving.value = true;
-        event.stopPropagation();
-        imageStyle.opacity = 0;
-      },
-      onReleased: () => {
-        if (is_moving.value) {
-          is_moving.value = false;
-          syncRemoteCamera();
-        }
-        is_moving.value = false;
-        genericRenderWindow.value.getRenderer().resetCameraClippingRange();
-        syncRemoteCamera();
-      },
-    });
-    useEventListener(container, "mousemove", throttledHoverHighlight);
-    useEventListener(container, "wheel", () => {
-      is_moving.value = true;
-      if (imageStyle) {
-        imageStyle.opacity = 0;
-      }
-      clearTimeout(wheelEventEndTimeout);
-      wheelEventEndTimeout = setTimeout(() => {
-        is_moving.value = false;
-        genericRenderWindow.value.getRenderer().resetCameraClippingRange();
-        syncRemoteCamera();
-      }, WHEEL_TIME_OUT_MS);
+    performSetContainer({
+      container,
+      genericRenderWindow: genericRenderWindow.value,
+      imageStyleSetter: (style) => (imageStyle = style),
+      resize,
+      useMousePressed,
+      useEventListener,
+      is_picking,
+      is_moving,
+      performClickPicking,
+      viewerStore,
+      viewer_schemas,
+      syncRemoteCamera,
+      throttledHoverHighlight,
+      WHEEL_TIME_OUT_MS,
+      wheelEventEndTimeout,
+      wheelTimeoutSetter: (timeout) => (wheelEventEndTimeout = timeout),
     });
   }
 

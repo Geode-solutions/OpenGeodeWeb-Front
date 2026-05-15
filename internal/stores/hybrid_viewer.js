@@ -1,10 +1,4 @@
-import {
-  LONG_ANIMATION_DURATION,
-  SHORT_ANIMATION_DURATION,
-  animateCamera,
-  computeAnimationDuration,
-} from "@ogw_internal/stores/hybrid_viewer_camera_animation";
-import { dot } from "@kitware/vtk.js/Common/Core/Math";
+import { centerCameraOnPosition } from "./hybrid_viewer_camera";
 
 const RGB_MAX = 255;
 const BACKGROUND_GREY_VALUE = 180;
@@ -21,50 +15,11 @@ const ACTOR_COLOR = [
   ACTOR_DARK_VALUE / RGB_MAX,
 ];
 const WHEEL_TIME_OUT_MS = 600;
-const BUMP_MULTIPLIER = 0.2;
-const ALIGNMENT_THRESHOLD = 0.9;
-const EASE_EXPONENT = 1.1;
+const HOVER_THROTTLE_MS = 50;
 
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
 const RGBA_CHANNELS = 4;
-
-const ORIENTATIONS = {
-  zplus: { position: [0, 0, 1], view_up: [0, 1, 0] },
-  zminus: { position: [0, 0, -1], view_up: [0, 1, 0] },
-  yplus: { position: [0, 1, 0], view_up: [0, 0, 1] },
-  yminus: { position: [0, -1, 0], view_up: [0, 0, 1] },
-  xplus: { position: [1, 0, 0], view_up: [0, 0, 1] },
-  xminus: { position: [-1, 0, 0], view_up: [0, 0, 1] },
-};
-
-const HOVER_THROTTLE_MS = 50;
-
-function getCameraOptions(camera) {
-  if (!camera?.getFocalPoint) {
-    return camera;
-  }
-  return {
-    focal_point: [...(camera.getFocalPoint() ?? [])],
-    view_up: [...(camera.getViewUp() ?? [])],
-    position: [...(camera.getPosition() ?? [])],
-    view_angle: camera.getViewAngle(),
-    clipping_range: [...(camera.getClippingRange() ?? [])],
-    distance: camera.getDistance(),
-  };
-}
-
-function applyCameraOptions(camera, options) {
-  if (camera?.set && options) {
-    camera.set({
-      focalPoint: options.focal_point,
-      viewUp: options.view_up,
-      position: options.position,
-      viewAngle: options.view_angle,
-      clippingRange: options.clipping_range,
-    });
-  }
-}
 
 function mapRect(rect, latestImage, canvasRect) {
   const scaleX = latestImage.width / canvasRect.width;
@@ -115,20 +70,6 @@ function computeAverageBrightness(rect, options) {
   }
 }
 
-function centerCameraOnPosition(camera, pickedPosition) {
-  if (!camera || !pickedPosition) {
-    return;
-  }
-  const focalPoint = camera.getFocalPoint();
-  const position = camera.getPosition();
-  camera.setFocalPoint(...pickedPosition);
-  camera.setPosition(
-    position[0] + pickedPosition[0] - focalPoint[0],
-    position[1] + pickedPosition[1] - focalPoint[1],
-    position[2] + pickedPosition[2] - focalPoint[2],
-  );
-}
-
 function performClickPicking(event, options) {
   const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
   const rect = container.getBoundingClientRect();
@@ -142,7 +83,8 @@ function performClickPicking(event, options) {
       response_function: ({ x, y, z }) => {
         const pickedPos = [x, y, z];
         if (pickedPos.some((val) => val !== 0)) {
-          centerCameraOnPosition(genericRenderWindow.getRenderer().getActiveCamera(), pickedPos);
+          const camera = genericRenderWindow.getRenderer().getActiveCamera();
+          centerCameraOnPosition(camera, pickedPos);
           genericRenderWindow.getRenderWindow().render();
           syncRemoteCamera();
         }
@@ -150,133 +92,7 @@ function performClickPicking(event, options) {
     },
   );
 }
-async function applySnapshot(snapshot, options) {
-  const { genericRenderWindow, setZScaling, syncRemoteCamera, setCamera } = options;
-  if (!snapshot) {
-    return;
-  }
-  const z_scale = snapshot.zScale;
-  if (typeof z_scale === "number") {
-    await setZScaling(z_scale);
-  }
-  const { camera_options: snapshot_camera_options } = snapshot;
-  if (snapshot_camera_options) {
-    if (setCamera) {
-      setCamera(snapshot_camera_options);
-    } else {
-      applyCameraOptions(
-        genericRenderWindow.getRenderer().getActiveCamera(),
-        snapshot_camera_options,
-      );
-      genericRenderWindow.getRenderWindow().render();
-      syncRemoteCamera();
-    }
-  }
-}
 
-function performSetCamera(targetCameraOptions, options) {
-  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera } = options;
-  const camera = genericRenderWindow.getRenderer().getActiveCamera();
-  const startState = getCameraOptions(camera);
-  const duration = computeAnimationDuration(startState, targetCameraOptions);
-  is_moving.value = true;
-  if (imageStyle) {
-    imageStyle.opacity = 0;
-  }
-  animateCamera({
-    camera,
-    startState,
-    targetState: targetCameraOptions,
-    duration,
-    bumpMultiplier: 0,
-    easeExponent: EASE_EXPONENT,
-    onUpdate: () => genericRenderWindow.getRenderWindow().render(),
-    onEnd: () => {
-      applyCameraOptions(camera, targetCameraOptions);
-      genericRenderWindow.getRenderWindow().render();
-      is_moving.value = false;
-      syncRemoteCamera();
-    },
-  });
-}
-
-function performCameraOrientation(orientation, options) {
-  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera } = options;
-  const config = ORIENTATIONS[orientation.toLowerCase()];
-  const renderer = genericRenderWindow.getRenderer();
-  const camera = renderer.getActiveCamera();
-  const startState = getCameraOptions(camera);
-
-  applyCameraOptions(camera, {
-    ...config,
-    focal_point: [0, 0, 0],
-  });
-  renderer.resetCamera();
-  const targetState = getCameraOptions(camera);
-
-  applyCameraOptions(camera, startState);
-
-  const alignment = dot(camera.getDirectionOfProjection(), config.position);
-  const duration =
-    alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
-  is_moving.value = true;
-  imageStyle.opacity = 0;
-
-  animateCamera({
-    camera,
-    startState,
-    targetState,
-    duration,
-    bumpMultiplier: BUMP_MULTIPLIER,
-    easeExponent: EASE_EXPONENT,
-    onUpdate: () => genericRenderWindow.getRenderWindow().render(),
-    onEnd: () => {
-      is_moving.value = false;
-      syncRemoteCamera();
-    },
-  });
-}
-
-async function performFocusCameraOnObject(id, options) {
-  const {
-    hybridDb,
-    viewerStore,
-    viewer_schemas,
-    genericRenderWindow,
-    block_ids = [],
-    is_moving,
-    imageStyle,
-    syncRemoteCamera,
-  } = options;
-
-  if (!hybridDb[id]) {
-    return;
-  }
-
-  let bounds = [];
-  if (block_ids.length > 0) {
-    bounds = await viewerStore.request(viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds, {
-      id,
-      block_ids,
-    });
-  } else {
-    bounds = hybridDb[id].actor.getBounds();
-  }
-
-  const renderer = genericRenderWindow.getRenderer();
-  const camera = renderer.getActiveCamera();
-  const startOptions = getCameraOptions(camera);
-  renderer.resetCamera(bounds);
-  const targetOptions = getCameraOptions(camera);
-  applyCameraOptions(camera, startOptions);
-
-  performSetCamera(targetOptions, {
-    genericRenderWindow,
-    is_moving,
-    imageStyle,
-    syncRemoteCamera,
-  });
-}
 function performHoverHighlight(event, options) {
   const {
     is_hover_highlight,
@@ -317,23 +133,6 @@ function performClearHoverHighlight(options) {
     field_type: hover_highlight_field_type.value,
     ids: Object.keys(hybridDb),
   });
-}
-
-function performSyncRemoteCamera(options) {
-  const { genericRenderWindow, viewerStore, viewer_schemas, remoteRender, camera_options } =
-    options;
-  const camera = genericRenderWindow.getRenderer().getActiveCamera();
-  const options_camera = getCameraOptions(camera);
-  viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-    { camera_options: options_camera },
-    {
-      response_function: () => {
-        remoteRender();
-        Object.assign(camera_options, options_camera);
-      },
-    },
-  );
 }
 
 async function performAddItem(id, options) {
@@ -381,27 +180,92 @@ async function performSetZScaling(z_scale, options) {
   remoteRender();
 }
 
+function performSetContainer(options) {
+  const {
+    container,
+    genericRenderWindow,
+    imageStyleSetter,
+    resize,
+    useMousePressed,
+    useEventListener,
+    is_picking,
+    is_moving,
+    performClickPicking,
+    viewerStore,
+    viewer_schemas,
+    syncRemoteCamera,
+    throttledHoverHighlight,
+    WHEEL_TIME_OUT_MS,
+    wheelEventEndTimeout,
+    wheelTimeoutSetter,
+  } = options;
+
+  if (!container.value) return;
+
+  genericRenderWindow.setContainer(container.value.$el);
+  const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
+  webGLRenderWindow.setUseBackgroundImage(true);
+  const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
+  Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
+  imageStyleSetter(imageStyle);
+
+  resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
+
+  useMousePressed({
+    target: container,
+    onPressed: (event) => {
+      if (event.button !== 0) return;
+      if (is_picking.value) {
+        performClickPicking(event, {
+          container: container.value.$el,
+          viewerStore,
+          viewer_schemas,
+          genericRenderWindow,
+          syncRemoteCamera,
+        });
+        is_picking.value = false;
+        return;
+      }
+      is_moving.value = true;
+      event.stopPropagation();
+      imageStyle.opacity = 0;
+    },
+    onReleased: () => {
+      if (is_moving.value) {
+        is_moving.value = false;
+        syncRemoteCamera();
+      }
+      is_moving.value = false;
+      genericRenderWindow.getRenderer().resetCameraClippingRange();
+      syncRemoteCamera();
+    },
+  });
+
+  useEventListener(container, "mousemove", throttledHoverHighlight);
+  useEventListener(container, "wheel", () => {
+    is_moving.value = true;
+    if (imageStyle) imageStyle.opacity = 0;
+    clearTimeout(wheelEventEndTimeout);
+    wheelTimeoutSetter(
+      setTimeout(() => {
+        is_moving.value = false;
+        genericRenderWindow.getRenderer().resetCameraClippingRange();
+        syncRemoteCamera();
+      }, WHEEL_TIME_OUT_MS),
+    );
+  });
+}
+
 export {
   BACKGROUND_COLOR,
   ACTOR_COLOR,
   WHEEL_TIME_OUT_MS,
   HOVER_THROTTLE_MS,
-  BUMP_MULTIPLIER,
-  ALIGNMENT_THRESHOLD,
-  EASE_EXPONENT,
-  ORIENTATIONS,
-  applyCameraOptions,
-  applySnapshot,
-  centerCameraOnPosition,
   computeAverageBrightness,
-  getCameraOptions,
   performAddItem,
-  performCameraOrientation,
   performClearHoverHighlight,
   performClickPicking,
-  performFocusCameraOnObject,
   performHoverHighlight,
-  performSetCamera,
+  performSetContainer,
   performSetZScaling,
-  performSyncRemoteCamera,
 };
