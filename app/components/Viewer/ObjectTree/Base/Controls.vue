@@ -25,7 +25,7 @@ watch(
 </script>
 
 <template>
-  <v-row dense align="center" class="pa-2 py-1">
+  <v-row dense align="center" class="pa-1 py-0">
     <v-col cols="12">
       <div
         class="controls-capsule d-flex align-center rounded-pill px-1 overflow-hidden"
@@ -124,7 +124,7 @@ watch(
 
 <style scoped>
 .controls-capsule {
-  height: 40px;
+  height: 32px;
   border: 1px solid transparent;
   transition: all 0.3s ease;
   width: fit-content;
@@ -144,12 +144,12 @@ watch(
 :deep(.v-field__input) {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  min-height: 40px !important;
+  min-height: 32px !important;
   display: flex;
   align-items: center;
 }
 
 :deep(.v-field__field) {
-  height: 40px !important;
+  height: 32px !important;
 }
 </style>

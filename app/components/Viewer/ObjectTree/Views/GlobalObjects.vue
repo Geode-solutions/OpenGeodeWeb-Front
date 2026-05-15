@@ -193,6 +193,6 @@ function expandAll() {
 
 .transparent-treeview {
   background-color: transparent;
-  margin: 4px 0;
+  margin: 2px 0;
 }
 </style>

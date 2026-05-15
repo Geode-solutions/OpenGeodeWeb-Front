@@ -3,15 +3,17 @@ import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalO
 import ModelComponents from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponents.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
+import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const WIDTH_MIN = 200;
+const WIDTH_MIN = 100;
 const HEIGHT_MIN = 150;
-const GAP_WIDTH = 10;
+const GAP_WIDTH = 0;
 const PERCENT_100 = 100;
 
 const TOTAL_PERCENT = 100;
 const MAX_PANEL_WIDTH_RATIO = 0.8;
+const AUTO_CLOSE_THRESHOLD = 80;
 
 const { containerWidth } = defineProps({
   containerWidth: { type: Number, required: true },
@@ -20,16 +22,23 @@ const { containerWidth } = defineProps({
 const treeviewStore = useTreeviewStore();
 const emit = defineEmits(["show-menu"]);
 
+const activityBar = useTemplateRef("activity-bar");
+const { adaptiveStyles: activityBarAdaptiveStyles } = useAdaptiveStyles(activityBar);
+
 const maxWidth = computed(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
-const mainView = computed(() => treeviewStore.opened_views[0]);
-const additionalViews = computed(() => treeviewStore.opened_views.slice(1));
+const mainView = computed(() => treeviewStore.opened_views.find((view) => view.id === "main"));
+const additionalViews = computed(() =>
+  treeviewStore.opened_views.filter((view) => view.id !== "main"),
+);
 
 const totalWidth = computed(() => {
   const hasAdditional = additionalViews.value.length > 0;
-  const gap = hasAdditional ? GAP_WIDTH : 0;
+  const hasMain = Boolean(mainView.value);
+  const gap = hasAdditional && hasMain ? GAP_WIDTH : 0;
+  const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
-  return `${treeviewStore.panelWidth + secondColWidth + gap}px`;
+  return `${firstColWidth + secondColWidth + gap}px`;
 });
 
 const rowHeights = computed({
@@ -90,7 +99,7 @@ function onResizeStart(event) {
   const startX = event.clientX;
   function resize(move_event) {
     const deltaX = move_event.clientX - startX;
-    let newWidth = Math.max(WIDTH_MIN, startWidth + deltaX);
+    let newWidth = startWidth + deltaX;
     const hasAdditional = additionalViews.value.length > 0;
     const gap = hasAdditional ? GAP_WIDTH : 0;
     const currentTotalWidth =
@@ -98,6 +107,12 @@ function onResizeStart(event) {
     if (currentTotalWidth > maxWidth.value) {
       newWidth = maxWidth.value - (hasAdditional ? treeviewStore.additionalPanelWidth : 0) - gap;
     }
+
+    if (newWidth < AUTO_CLOSE_THRESHOLD) {
+      treeviewStore.closeView("main");
+      return;
+    }
+
     treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
@@ -115,11 +130,13 @@ function onAdditionalResizeStart(event) {
   const startX = event.clientX;
   function resize(move_event) {
     const deltaX = move_event.clientX - startX;
-    let newWidth = Math.max(WIDTH_MIN, startWidth + deltaX);
+    const newWidth = startWidth + deltaX;
     const currentTotalWidth = treeviewStore.panelWidth + newWidth + GAP_WIDTH;
-    if (currentTotalWidth > maxWidth.value) {
-      newWidth = maxWidth.value - treeviewStore.panelWidth - GAP_WIDTH;
+    if (newWidth < AUTO_CLOSE_THRESHOLD) {
+      treeviewStore.closeView(additionalViews.value.at(-1).id);
+      return;
     }
+
     treeviewStore.setAdditionalPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
@@ -177,88 +194,154 @@ function onVerticalResizeStart(event, index) {
 <template>
   <div
     v-if="treeviewStore.items.length > 0"
-    class="treeview-container d-flex"
-    :style="{ width: totalWidth }"
+    class="treeview-layout d-flex"
     @contextmenu.prevent
     @mousedown.stop
   >
     <div
-      class="column main-column"
-      :style="{
-        width: `${treeviewStore.panelWidth}px`,
-      }"
+      ref="activity-bar"
+      class="activity-bar d-flex flex-column align-center py-2"
+      :style="activityBarAdaptiveStyles"
     >
-      <ViewerObjectTreeBox
-        :title="mainView.title"
-        mdi-icon="mdi-file-tree-outline"
-        :scroll-top="mainView.scrollTop"
-        @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
+      <v-btn
+        icon="mdi-file-tree-outline"
+        variant="text"
+        :color="mainView ? 'primary' : 'black'"
+        class="mb-2"
+        v-tooltip="'Toggle Objects'"
+        @click="treeviewStore.toggleView('main')"
+      />
+    </div>
+
+    <div class="treeview-container d-flex" :style="{ width: totalWidth }">
+      <div
+        v-if="mainView"
+        class="column main-column"
+        :style="{
+          width: `${treeviewStore.panelWidth}px`,
+        }"
       >
-        <GlobalObjects data-testid="mainObjectTree" @show-menu="emit('show-menu', $event)" />
-      </ViewerObjectTreeBox>
-    </div>
-
-    <div v-if="additionalViews.length > 0" class="column-separator" @mousedown="onResizeStart" />
-
-    <div
-      v-if="additionalViews.length > 0"
-      class="column additional-column"
-      :style="{
-        width: `${treeviewStore.additionalPanelWidth}px`,
-      }"
-    >
-      <template v-for="(view, index) in additionalViews" :key="view.id">
-        <div
-          class="view-wrapper"
-          :class="{
-            'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
-          }"
-          :style="{ flex: `0 0 ${rowHeights[index]}%` }"
-          @dragover="onDragOver"
-          @drop="onDrop(index + 1)"
+        <ViewerObjectTreeBox
+          :title="mainView?.title || 'Objects'"
+          mdi-icon="mdi-file-tree-outline"
+          :scroll-top="mainView?.scrollTop || 0"
+          closable
+          :border-radius="additionalViews.length > 0 ? '0' : '0 16px 16px 0'"
+          :border-left="false"
+          @close="treeviewStore.closeView('main')"
+          @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
         >
-          <ViewerObjectTreeBox
-            :title="view.title"
-            :icon="geode_objects[view.geode_object_type]?.image"
-            :scroll-top="view.scrollTop"
-            closable
-            @close="treeviewStore.closeView(index + 1)"
-            @dragstart="onDragStart(index + 1)"
-            @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
+          <GlobalObjects data-testid="mainObjectTree" @show-menu="emit('show-menu', $event)" />
+        </ViewerObjectTreeBox>
+      </div>
+
+      <div
+        v-if="mainView && additionalViews.length > 0"
+        class="column-separator"
+        @mousedown="onResizeStart"
+      />
+
+      <div
+        v-if="additionalViews.length > 0"
+        class="column additional-column"
+        :style="{
+          width: `${treeviewStore.additionalPanelWidth}px`,
+        }"
+      >
+        <template v-for="(view, index) in additionalViews" :key="view.id">
+          <div
+            class="view-wrapper"
+            :class="{
+              'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
+            }"
+            :style="{ flex: `0 0 ${rowHeights[index]}%` }"
+            @dragover="onDragOver"
+            @drop="onDrop(index + 1)"
           >
-            <ModelComponents
-              data-testid="modelComponentsObjectTree"
-              :id="view.id"
-              @show-menu="emit('show-menu', $event)"
-            />
-          </ViewerObjectTreeBox>
-        </div>
-        <div
-          v-if="index < additionalViews.length - 1"
-          class="v-split-resizer"
-          @mousedown="onVerticalResizeStart($event, index)"
-        />
-      </template>
+            <ViewerObjectTreeBox
+              :title="view.title"
+              :icon="geode_objects[view.geode_object_type]?.image"
+              :scroll-top="view.scrollTop"
+              closable
+              :border-radius="index === additionalViews.length - 1 ? '0 16px 16px 0' : '0'"
+              :border-left="false"
+              @close="treeviewStore.closeView(view.id)"
+              @dragstart="onDragStart(index + 1)"
+              @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
+            >
+              <ModelComponents
+                data-testid="modelComponentsObjectTree"
+                :id="view.id"
+                @show-menu="emit('show-menu', $event)"
+              />
+            </ViewerObjectTreeBox>
+          </div>
+          <div
+            v-if="index < additionalViews.length - 1"
+            class="v-split-resizer"
+            @mousedown="onVerticalResizeStart($event, index)"
+          />
+        </template>
+      </div>
+      <div
+        v-if="treeviewStore.opened_views.length > 0"
+        class="total-resizer"
+        @mousedown="
+          additionalViews.length > 0
+            ? onAdditionalResizeStart($event)
+            : mainView
+              ? onResizeStart($event)
+              : undefined
+        "
+      />
     </div>
-    <div
-      class="total-resizer"
-      @mousedown="
-        additionalViews.length > 0 ? onAdditionalResizeStart($event) : onResizeStart($event)
-      "
-    />
   </div>
 </template>
 
 <style scoped>
-.treeview-container {
+.treeview-layout {
   position: absolute;
   z-index: 2;
   left: 0;
   top: 0;
   height: calc(100vh - 100px);
-  margin-top: 10px;
-  margin-left: 10px;
+  margin-top: 8px;
   pointer-events: auto;
+}
+
+.activity-bar {
+  width: 48px;
+  height: 100%;
+  border-radius: 16px 0 0 16px;
+  margin-left: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.activity-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  mix-blend-mode: lighten;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition:
+    background-color 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+
+.activity-bar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.treeview-container {
+  height: 100%;
   width: max-content;
   min-width: min-content;
 }
@@ -289,7 +372,6 @@ function onVerticalResizeStart(event, index) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 2px;
   transition: transform 0.2s;
   min-height: 150px;
 }
@@ -361,6 +443,6 @@ function onVerticalResizeStart(event, index) {
 }
 
 .total-resizer:hover {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: transparent;
 }
 </style>
