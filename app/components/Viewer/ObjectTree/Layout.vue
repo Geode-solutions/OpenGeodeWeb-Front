@@ -281,6 +281,7 @@ function onVerticalResizeStart(event, index) {
       </template>
     </div>
     <div
+      v-if="treeviewStore.opened_views.length > 0"
       class="total-resizer"
       @mousedown="
         additionalViews.length > 0 ? onAdditionalResizeStart($event) : mainView ? onResizeStart($event) : undefined
@@ -435,6 +436,6 @@ function onVerticalResizeStart(event, index) {
 }
 
 .total-resizer:hover {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: transparent;
 }
 </style>
