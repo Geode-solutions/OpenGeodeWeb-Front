@@ -5,11 +5,13 @@ import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelComponents } from "@ogw_front/composables/model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id } = defineProps({ id: { type: String, required: true } });
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
+const hybridViewerStore = useHybridViewerStore();
 const emit = defineEmits(["show-menu"]);
 
 const treeviewStore = useTreeviewStore();
@@ -109,6 +111,20 @@ function handleHoverEnter({ item, immediate = false }) {
 function handleHoverLeave() {
   onHoverLeave(id);
 }
+
+function expandAll() {
+  const allIds = [];
+  function traverse(itemsList) {
+    for (const item of itemsList) {
+      if (item.children && item.children.length > 0) {
+        allIds.push(item.id);
+        traverse(item.children);
+      }
+    }
+  }
+  traverse(itemsForTreeView.value);
+  opened.value = allIds;
+}
 </script>
 
 <template>
@@ -118,8 +134,10 @@ function handleHoverLeave() {
       :sort-type="sortType"
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
+      :is-collapsed="opened.length === 0"
       @toggle-sort="toggleSort"
       @collapse-all="opened = []"
+      @expand-all="expandAll"
     />
 
     <FetchingData v-if="rawItems === undefined" :size="48" :width="4" text="" />
@@ -148,6 +166,22 @@ function handleHoverLeave() {
           show-tooltip
           class="text-body-1"
           @contextmenu.prevent.stop="showContextMenu($event, item)"
+        />
+      </template>
+
+      <template #append="{ item }">
+        <v-btn
+          v-if="item.category || (item.children && item.children.length > 0)"
+          icon="mdi-target"
+          size="medium"
+          variant="text"
+          v-tooltip="'Focus camera on object'"
+          @click.stop="
+            hybridViewerStore.focusCameraOnObject(
+              id,
+              item.category ? [item.viewer_id] : item.children.map((child) => child.viewer_id),
+            )
+          "
         />
       </template>
     </CommonTreeView>

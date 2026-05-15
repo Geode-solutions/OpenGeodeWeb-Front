@@ -44,7 +44,7 @@ onUnmounted(() => {
     <Teleport to="body">
       <div
         v-if="show"
-        class="d-flex align-center justify-center transition-swing"
+        class="transition-swing overflow-y-auto"
         style="
           position: fixed;
           inset: 0;
@@ -58,23 +58,26 @@ onUnmounted(() => {
       >
         <div
           style="
-            position: absolute;
+            position: fixed;
             inset: 0;
             background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
             background-size: 40px 40px;
             background-position: center;
             pointer-events: none;
+            z-index: -1;
           "
         />
 
-        <div
-          class="d-flex flex-column align-center text-center"
-          style="max-width: 650px; width: 100%; padding: 0 24px; gap: 1.5rem"
-        >
-          <LoadingHeader :logo="logo" />
-          <LoadingEcoMessages :app-name="appName" />
-          <LoadingProgress :progress="progress" />
-          <LoadingFooter />
+        <div class="d-flex align-center justify-center pa-6" style="min-height: 100%">
+          <div
+            class="d-flex flex-column align-center text-center w-100"
+            style="max-width: 650px; gap: clamp(1rem, 4vh, 2rem)"
+          >
+            <LoadingHeader :logo="logo" />
+            <LoadingEcoMessages :app-name="appName" />
+            <LoadingProgress :progress="progress" />
+            <LoadingFooter />
+          </div>
         </div>
       </div>
     </Teleport>
