@@ -337,7 +337,15 @@ function performSyncRemoteCamera(options) {
 }
 
 async function performAddItem(id, options) {
-  const { genericRenderWindow, dataStore, vtkXMLPolyDataReader, vtkActor, vtkMapper, ACTOR_COLOR, hybridDb } = options;
+  const {
+    genericRenderWindow,
+    dataStore,
+    vtkXMLPolyDataReader,
+    vtkActor,
+    vtkMapper,
+    ACTOR_COLOR,
+    hybridDb,
+  } = options;
   if (!genericRenderWindow) return;
   const reader = vtkXMLPolyDataReader(),
     value = await dataStore.item(id);
