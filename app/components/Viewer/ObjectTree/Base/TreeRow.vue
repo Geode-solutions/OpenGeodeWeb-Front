@@ -34,10 +34,10 @@ const INDENT_STEP = 16;
         v-if="selection.selectable"
         :icon="
           getIndeterminate(item.raw)
-            ? 'mdi-eye-minus'
+            ? 'mdi-eye-minus-outline'
             : isSelected(item.raw)
               ? 'mdi-eye'
-              : 'mdi-eye-off'
+              : 'mdi-eye-off-outline'
         "
         variant="text"
         density="compact"

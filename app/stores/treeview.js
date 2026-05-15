@@ -216,6 +216,24 @@ export const useTreeviewStore = defineStore("treeview", () => {
     };
   }
 
+  function renameItem(id, newName) {
+    for (const group of items.value) {
+      const child = group.children.find((childItem) => childItem.id === id);
+      if (child) {
+        child.title = newName;
+        const options = { numeric: true, sensitivity: "base" };
+        group.children.sort((childA, childB) =>
+          childA.title.localeCompare(childB.title, undefined, options),
+        );
+        break;
+      }
+    }
+    const view = opened_views.value.find((openedView) => openedView.id === id);
+    if (view) {
+      view.title = newName;
+    }
+  }
+
   return {
     items,
     selection,
@@ -226,6 +244,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     rowHeights,
     addItem,
     removeItem,
+    renameItem,
     displayAdditionalTree,
     closeView,
     moveView,

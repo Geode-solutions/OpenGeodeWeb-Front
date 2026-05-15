@@ -40,18 +40,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-sheet color="transparent" height="160" class="position-relative overflow-visible mb-4">
+  <v-sheet color="transparent" min-height="160" class="position-relative overflow-visible mb-4">
     <v-scroll-y-reverse-transition mode="out-in">
       <v-card
         :key="currentMessage"
         rounded="lg"
-        class="pa-6 border mx-auto"
+        class="pa-4 pa-sm-6 border mx-auto"
         color="rgba(255, 255, 255, 0.05)"
         elevation="0"
         style="border-color: rgba(255, 255, 255, 0.1) !important"
       >
         <v-card-title
-          class="d-flex align-center ga-3 pa-0 mb-3 text-subtitle-1 font-weight-bold text-white text-wrap"
+          class="d-flex align-center ga-3 pa-0 mb-2 mb-sm-3 text-body-1 text-sm-subtitle-1 font-weight-bold text-white text-wrap"
         >
           <v-icon
             :icon="ecoMessages[currentMessage].icon"
