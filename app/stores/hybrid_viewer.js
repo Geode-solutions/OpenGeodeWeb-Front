@@ -1,13 +1,16 @@
 import {
   ACTOR_COLOR,
   BACKGROUND_COLOR,
+  HOVER_THROTTLE_MS,
   WHEEL_TIME_OUT_MS,
   applySnapshot,
   computeAverageBrightness,
   getCameraOptions,
   performCameraOrientation,
+  performClearHoverHighlight,
   performClickPicking,
   performFocusCameraOnObject,
+  performHoverHighlight,
   performSetCamera,
 } from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
@@ -197,29 +200,25 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
   }
 
-  const performHoverHighlight = useThrottleFn((event) => {
-    if (!is_hover_highlight.value) {
-      return;
-    }
-    const container = genericRenderWindow.value.getContainer();
-    if (!container) {
-      return;
-    }
-    const rect = container.getBoundingClientRect();
-    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight, {
-      x: Math.round(event.clientX - rect.left),
-      y: Math.round(rect.height - (event.clientY - rect.top)),
-      field_type: hover_highlight_field_type.value,
-      ids: Object.keys(hybridDb),
-    });
-  }, 50);
+  const performHoverHighlight = useThrottleFn(
+    (event) =>
+      performHoverHighlight(event, {
+        is_hover_highlight,
+        genericRenderWindow: genericRenderWindow.value,
+        viewerStore,
+        viewer_schemas,
+        hover_highlight_field_type,
+        hybridDb,
+      }),
+    HOVER_THROTTLE_MS,
+  );
 
   function clearHoverHighlight() {
-    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight, {
-      x: -1,
-      y: -1,
-      field_type: hover_highlight_field_type.value,
-      ids: Object.keys(hybridDb),
+    performClearHoverHighlight({
+      viewerStore,
+      viewer_schemas,
+      hover_highlight_field_type,
+      hybridDb,
     });
   }
 
