@@ -1,67 +1,26 @@
 <script setup>
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 
 const SCROLL_SYNC_DELAY = 50;
 const SCROLL_THRESHOLD = 1;
-const { title, closable, icon, mdiIcon, scrollTop } = defineProps({
+const { title, closable, icon, mdiIcon, scrollTop, borderRadius } = defineProps({
   title: { type: String, required: true },
   closable: { type: Boolean, required: false, default: false },
   icon: { type: String, required: false, default: "" },
   mdiIcon: { type: String, required: false, default: "" },
   scrollTop: { type: Number, required: false, default: 0 },
+  borderRadius: { type: String, required: false, default: "16px" },
+  borderLeft: { type: Boolean, required: false, default: true },
 });
 const emit = defineEmits(["close", "dragstart", "update:scrollTop"]);
 
 const scrollContainer = useTemplateRef("scroll-container");
 const treeviewBox = useTemplateRef("treeview-box");
-const hybridViewerStore = useHybridViewerStore();
 
-const LUMINANCE_THRESHOLD = 0.65;
-const ADAPTIVE_EXPONENT = 0.3;
-
-const MIN_BLUR = 8;
-const MAX_BLUR = 25;
-
-const MIN_OPACITY = 0;
-const MAX_OPACITY = 0.5;
-
-const MIN_BOOST = 1;
-const MAX_BOOST = 1.2;
-const ADAPTIVE_REFRESH_RATE = 150;
-
-const { x, y, width, height } = useElementBounding(treeviewBox);
-const brightness = ref(LUMINANCE_THRESHOLD);
-
-const updateBrightness = useThrottleFn(() => {
-  brightness.value = hybridViewerStore.getAverageBrightness({
-    x: x.value,
-    y: y.value,
-    width: width.value,
-    height: height.value,
-  });
-}, ADAPTIVE_REFRESH_RATE);
+const { adaptiveStyles } = useAdaptiveStyles(treeviewBox);
 
 let isApplyingScroll = false;
 let resizeObserver = undefined;
-
-watch([x, y, width, height, () => hybridViewerStore.latestImage], updateBrightness, {
-  immediate: true,
-});
-
-const adaptiveStyles = computed(() => {
-  const normalized = Math.min(1, brightness.value / LUMINANCE_THRESHOLD);
-  const darkFactor = (1 - normalized) ** ADAPTIVE_EXPONENT;
-
-  const blur = MIN_BLUR + darkFactor * (MAX_BLUR - MIN_BLUR);
-  const opacity = MIN_OPACITY + darkFactor * (MAX_OPACITY - MIN_OPACITY);
-  const brightnessBoost = MIN_BOOST + darkFactor * (MAX_BOOST - MIN_BOOST);
-
-  return {
-    "--adaptive-blur": `${blur}px`,
-    "--adaptive-opacity": opacity,
-    "--adaptive-brightness": brightnessBoost,
-  };
-});
 
 function handleScroll(event) {
   if (isApplyingScroll) {
@@ -121,7 +80,7 @@ watch(
     ref="treeview-box"
     variant="outlined"
     class="tree-box d-flex flex-column"
-    :style="adaptiveStyles"
+    :style="[adaptiveStyles, { borderRadius, borderLeft: borderLeft ? undefined : 'none' }]"
   >
     <v-card-title
       class="tree-box-header d-flex align-center"
@@ -181,7 +140,6 @@ watch(
 .tree-box {
   height: 100%;
   min-height: 0;
-  border-radius: 16px;
   background-color: transparent !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
@@ -214,8 +172,8 @@ watch(
 }
 
 .tree-box-header {
-  height: 40px !important;
-  padding: 0 12px !important;
+  height: 32px !important;
+  padding: 0 10px !important;
   background-color: rgba(255, 255, 255, 0.05);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   flex-shrink: 0;

@@ -9,11 +9,11 @@ const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps
 
 defineEmits(["toggle-open", "toggle-select"]);
 
-const INDENT_STEP = 16;
+const INDENT_STEP = 10;
 </script>
 
 <template>
-  <div class="tree-row-content d-flex align-center px-4 ps-3 w-100">
+  <div class="tree-row-content d-flex align-center px-2 ps-2 w-100">
     <div
       v-if="item.depth > 0"
       class="flex-shrink-0"
@@ -50,7 +50,11 @@ const INDENT_STEP = 16;
 
     <div class="tree-title flex-grow-1 overflow-hidden d-flex align-center ms-1 pt-1">
       <slot name="title" :item="item.raw" :is-leaf="item.isLeaf">
-        <v-list-item-title :class="{ 'font-weight-bold': !item.isLeaf }" class="text-black">
+        <v-list-item-title
+          :class="{ 'font-weight-bold': !item.isLeaf }"
+          class="text-black"
+          style="font-size: 0.8rem !important"
+        >
           {{ item.raw[itemProps.title] || item.id }}
         </v-list-item-title>
       </slot>
@@ -64,7 +68,7 @@ const INDENT_STEP = 16;
 
 <style scoped>
 .tree-row-content {
-  min-height: 44px;
+  min-height: 28px;
 }
 
 .icon-placeholder {

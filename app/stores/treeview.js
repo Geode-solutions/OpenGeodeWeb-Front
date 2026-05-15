@@ -68,9 +68,22 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   });
 
-  function closeView(index) {
-    if (index > 0) {
-      opened_views.value = opened_views.value.filter((view, view_index) => view_index !== index);
+  function closeView(id) {
+    opened_views.value = opened_views.value.filter((view) => view.id !== id);
+  }
+
+  function toggleView(id) {
+    const index = opened_views.value.findIndex((view) => view.id === id);
+    if (index !== -1) {
+      closeView(id);
+    } else if (id === "main") {
+      opened_views.value.unshift({
+        type: "object",
+        id: "main",
+        title: "Objects",
+        scrollTop: 0,
+        opened: [],
+      });
     }
   }
 
@@ -116,7 +129,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function displayAdditionalTree(id, title, geodeObjectType) {
     const index = opened_views.value.findIndex((view) => view.id === id);
     if (index !== -1) {
-      return closeView(index);
+      return closeView(id);
     }
     additionalPanelWidth.value = panelWidth.value;
     opened_views.value.push({
@@ -228,6 +241,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     removeItem,
     displayAdditionalTree,
     closeView,
+    toggleView,
     moveView,
     importStores,
     displayFileTree,

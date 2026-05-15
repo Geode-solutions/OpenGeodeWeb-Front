@@ -163,10 +163,10 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
 }
 
 .tree-row-wrapper {
-  min-height: 44px !important;
+  min-height: 28px !important;
   cursor: pointer;
-  border-radius: 8px;
-  margin: 1px 4px;
+  border-radius: 4px;
+  margin: 0 2px;
 }
 
 .tree-row-wrapper.is-focused {
