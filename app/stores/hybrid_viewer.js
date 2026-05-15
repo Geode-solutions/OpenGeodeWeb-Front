@@ -6,12 +6,15 @@ import {
   applySnapshot,
   computeAverageBrightness,
   getCameraOptions,
+  performAddItem,
   performCameraOrientation,
   performClearHoverHighlight,
   performClickPicking,
   performFocusCameraOnObject,
   performHoverHighlight,
   performSetCamera,
+  performSetZScaling,
+  performSyncRemoteCamera,
 } from "@ogw_internal/stores/hybrid_viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -88,25 +91,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function addItem(id) {
-    if (!genericRenderWindow.value) {
-      return;
-    }
-    const reader = vtkXMLPolyDataReader();
-    const value = await dataStore.item(id);
-    await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
-    const actor = vtkActor();
-    const mapper = vtkMapper();
-    const polydata = reader.getOutputData(0);
-    mapper.setInputData(polydata);
-    actor.getProperty().setColor(ACTOR_COLOR);
-    actor.setMapper(mapper);
-    const renderer = genericRenderWindow.value.getRenderer();
-    const isFirst = renderer.getActors().length === 0;
-    renderer.addActor(actor);
-    if (isFirst) {
-      renderer.resetCamera();
-    }
-    hybridDb[id] = { actor, polydata, mapper };
+    await performAddItem(id, { genericRenderWindow: genericRenderWindow.value, dataStore, vtkXMLPolyDataReader, vtkActor, vtkMapper, ACTOR_COLOR, hybridDb });
   }
 
   function removeItem(id) {
@@ -127,21 +112,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function setZScaling(z_scale) {
-    zScale.value = z_scale;
-    const renderer = genericRenderWindow.value.getRenderer();
-    for (const actor of renderer.getActors()) {
-      if (actor !== gridActor) {
-        const scale = actor.getScale();
-        actor.setScale(scale[0], scale[1], z_scale);
-      }
-    }
-    renderer.resetCamera();
-    genericRenderWindow.value.getRenderWindow().render();
-    const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling;
-    if (schema) {
-      await viewerStore.request(schema, { z_scale });
-    }
-    remoteRender();
+    await performSetZScaling(z_scale, { zScale, genericRenderWindow: genericRenderWindow.value, gridActor, viewerStore, viewer_schemas, remoteRender });
   }
 
   function resetCamera() {
@@ -182,25 +153,20 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function syncRemoteCamera() {
-    const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
-    const options = getCameraOptions(camera);
-    viewerStore.request(
-      viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-      { camera_options: options },
-      {
-        response_function: () => {
-          remoteRender();
-          Object.assign(camera_options, options);
-        },
-      },
-    );
+    performSyncRemoteCamera({
+      genericRenderWindow: genericRenderWindow.value,
+      viewerStore,
+      viewer_schemas,
+      remoteRender,
+      camera_options,
+    });
   }
 
   function remoteRender() {
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
   }
 
-  const performHoverHighlight = useThrottleFn(
+  const throttledHoverHighlight = useThrottleFn(
     (event) =>
       performHoverHighlight(event, {
         is_hover_highlight,
@@ -263,7 +229,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         syncRemoteCamera();
       },
     });
-    useEventListener(container, "mousemove", performHoverHighlight);
+    useEventListener(container, "mousemove", throttledHoverHighlight);
     useEventListener(container, "wheel", () => {
       is_moving.value = true;
       if (imageStyle) {

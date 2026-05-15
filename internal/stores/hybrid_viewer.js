@@ -319,6 +319,55 @@ function performClearHoverHighlight(options) {
   });
 }
 
+function performSyncRemoteCamera(options) {
+  const { genericRenderWindow, viewerStore, viewer_schemas, remoteRender, camera_options } = options;
+  const camera = genericRenderWindow.getRenderer().getActiveCamera();
+  const options_camera = getCameraOptions(camera);
+  viewerStore.request(
+    viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+    { camera_options: options_camera },
+    {
+      response_function: () => {
+        remoteRender();
+        Object.assign(camera_options, options_camera);
+      },
+    },
+  );
+}
+
+async function performAddItem(id, options) {
+  const { genericRenderWindow, dataStore, vtkXMLPolyDataReader, vtkActor, vtkMapper, ACTOR_COLOR, hybridDb } = options;
+  if (!genericRenderWindow) return;
+  const reader = vtkXMLPolyDataReader(), value = await dataStore.item(id);
+  await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
+  const actor = vtkActor(), mapper = vtkMapper(), polydata = reader.getOutputData(0);
+  mapper.setInputData(polydata);
+  actor.getProperty().setColor(ACTOR_COLOR);
+  actor.setMapper(mapper);
+  const renderer = genericRenderWindow.getRenderer();
+  const isFirst = renderer.getActors().length === 0;
+  renderer.addActor(actor);
+  if (isFirst) renderer.resetCamera();
+  hybridDb[id] = { actor, polydata, mapper };
+}
+
+async function performSetZScaling(z_scale, options) {
+  const { zScale, genericRenderWindow, gridActor, viewerStore, viewer_schemas, remoteRender } = options;
+  zScale.value = z_scale;
+  const renderer = genericRenderWindow.getRenderer();
+  for (const actor of renderer.getActors()) {
+    if (actor !== gridActor) {
+      const scale = actor.getScale();
+      actor.setScale(scale[0], scale[1], z_scale);
+    }
+  }
+  renderer.resetCamera();
+  genericRenderWindow.getRenderWindow().render();
+  const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling;
+  if (schema) await viewerStore.request(schema, { z_scale });
+  remoteRender();
+}
+
 export {
   BACKGROUND_COLOR,
   ACTOR_COLOR,
@@ -333,10 +382,13 @@ export {
   centerCameraOnPosition,
   computeAverageBrightness,
   getCameraOptions,
+  performAddItem,
   performCameraOrientation,
   performClearHoverHighlight,
   performClickPicking,
   performFocusCameraOnObject,
   performHoverHighlight,
   performSetCamera,
+  performSetZScaling,
+  performSyncRemoteCamera,
 };
