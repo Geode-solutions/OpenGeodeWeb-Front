@@ -38,6 +38,8 @@ const ORIENTATIONS = {
   xminus: { position: [-1, 0, 0], view_up: [0, 0, 1] },
 };
 
+const HOVER_THROTTLE_MS = 50;
+
 function getCameraOptions(camera) {
   if (!camera?.getFocalPoint) {
     return camera;
@@ -275,11 +277,53 @@ async function performFocusCameraOnObject(id, options) {
     syncRemoteCamera,
   });
 }
+function performHoverHighlight(event, options) {
+  const {
+    is_hover_highlight,
+    genericRenderWindow,
+    viewerStore,
+    viewer_schemas,
+    hover_highlight_field_type,
+    hybridDb,
+    onResponse,
+  } = options;
+  if (!is_hover_highlight.value) {
+    return;
+  }
+  const container = genericRenderWindow.getContainer();
+  if (!container) {
+    return;
+  }
+  const rect = container.getBoundingClientRect();
+  viewerStore.request(
+    viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight,
+    {
+      x: Math.round(event.clientX - rect.left),
+      y: Math.round(rect.height - (event.clientY - rect.top)),
+      field_type: hover_highlight_field_type.value,
+      ids: Object.keys(hybridDb),
+    },
+    {
+      response_function: onResponse,
+    },
+  );
+}
+
+function performClearHoverHighlight(options) {
+  const { viewerStore, viewer_schemas, hover_highlight_field_type, hybridDb } = options;
+  viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight, {
+    x: -1,
+    y: -1,
+    field_type: hover_highlight_field_type.value,
+    ids: Object.keys(hybridDb),
+  });
+}
 
 export {
   BACKGROUND_COLOR,
   ACTOR_COLOR,
   WHEEL_TIME_OUT_MS,
+  HOVER_THROTTLE_MS,
   BUMP_MULTIPLIER,
   ALIGNMENT_THRESHOLD,
   EASE_EXPONENT,
@@ -290,7 +334,9 @@ export {
   computeAverageBrightness,
   getCameraOptions,
   performCameraOrientation,
+  performClearHoverHighlight,
   performClickPicking,
   performFocusCameraOnObject,
+  performHoverHighlight,
   performSetCamera,
 };
