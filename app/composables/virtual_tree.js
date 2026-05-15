@@ -112,10 +112,6 @@ export function useVirtualTree(propsIn, emit) {
           : (item[actualItemProps.value.title] || "").toLowerCase().includes(lowerSearch) ||
             String(id).toLowerCase().includes(lowerSearch);
 
-        if (!hasChildren && !matches) {
-          continue;
-        }
-
         if (hasChildren) {
           const subtree = [];
           flattenTree(children, depth + 1, subtree);
@@ -127,10 +123,15 @@ export function useVirtualTree(propsIn, emit) {
             raw: item,
             id,
             depth,
-            isOpen: true,
+            isOpen,
             isLeaf: false,
           });
-          result.push(...subtree);
+          if (isOpen) {
+            result.push(...subtree);
+          }
+          continue;
+        }
+        if (!matches) {
           continue;
         }
       }
@@ -150,7 +151,28 @@ export function useVirtualTree(propsIn, emit) {
     return result;
   }
 
+  function traverse(itemsList, allIds) {
+    for (const item of itemsList) {
+      const children = item[actualItemProps.value.children];
+      if (children && children.length > 0) {
+        allIds.push(item[actualItemProps.value.value]);
+        traverse(children, allIds);
+      }
+    }
+  }
+
   const displayItems = computed(() => flattenTree(props.value.items || []));
+
+  watch(
+    () => props.value.search,
+    (newSearch, oldSearch) => {
+      if (newSearch && !oldSearch) {
+        const allIds = [];
+        traverse(props.value.items || [], allIds);
+        emit("update:opened", [...new Set([...(props.value.opened || []), ...allIds])]);
+      }
+    },
+  );
 
   return {
     actualItemProps,

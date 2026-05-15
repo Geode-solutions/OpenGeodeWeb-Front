@@ -111,6 +111,20 @@ function handleHoverEnter({ item, immediate = false }) {
 function handleHoverLeave() {
   onHoverLeave(id);
 }
+
+function expandAll() {
+  const allIds = [];
+  function traverse(itemsList) {
+    for (const item of itemsList) {
+      if (item.children && item.children.length > 0) {
+        allIds.push(item.id);
+        traverse(item.children);
+      }
+    }
+  }
+  traverse(itemsForTreeView.value);
+  opened.value = allIds;
+}
 </script>
 
 <template>
@@ -120,8 +134,10 @@ function handleHoverLeave() {
       :sort-type="sortType"
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
+      :is-collapsed="opened.length === 0"
       @toggle-sort="toggleSort"
       @collapse-all="opened = []"
+      @expand-all="expandAll"
     />
 
     <FetchingData v-if="rawItems === undefined" :size="48" :width="4" text="" />
