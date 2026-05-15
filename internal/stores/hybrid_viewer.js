@@ -320,7 +320,8 @@ function performClearHoverHighlight(options) {
 }
 
 function performSyncRemoteCamera(options) {
-  const { genericRenderWindow, viewerStore, viewer_schemas, remoteRender, camera_options } = options;
+  const { genericRenderWindow, viewerStore, viewer_schemas, remoteRender, camera_options } =
+    options;
   const camera = genericRenderWindow.getRenderer().getActiveCamera();
   const options_camera = getCameraOptions(camera);
   viewerStore.request(
@@ -336,11 +337,22 @@ function performSyncRemoteCamera(options) {
 }
 
 async function performAddItem(id, options) {
-  const { genericRenderWindow, dataStore, vtkXMLPolyDataReader, vtkActor, vtkMapper, ACTOR_COLOR, hybridDb } = options;
+  const {
+    genericRenderWindow,
+    dataStore,
+    vtkXMLPolyDataReader,
+    vtkActor,
+    vtkMapper,
+    ACTOR_COLOR,
+    hybridDb,
+  } = options;
   if (!genericRenderWindow) return;
-  const reader = vtkXMLPolyDataReader(), value = await dataStore.item(id);
+  const reader = vtkXMLPolyDataReader(),
+    value = await dataStore.item(id);
   await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
-  const actor = vtkActor(), mapper = vtkMapper(), polydata = reader.getOutputData(0);
+  const actor = vtkActor(),
+    mapper = vtkMapper(),
+    polydata = reader.getOutputData(0);
   mapper.setInputData(polydata);
   actor.getProperty().setColor(ACTOR_COLOR);
   actor.setMapper(mapper);
@@ -352,7 +364,8 @@ async function performAddItem(id, options) {
 }
 
 async function performSetZScaling(z_scale, options) {
-  const { zScale, genericRenderWindow, gridActor, viewerStore, viewer_schemas, remoteRender } = options;
+  const { zScale, genericRenderWindow, gridActor, viewerStore, viewer_schemas, remoteRender } =
+    options;
   zScale.value = z_scale;
   const renderer = genericRenderWindow.getRenderer();
   for (const actor of renderer.getActors()) {
