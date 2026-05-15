@@ -91,15 +91,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function addItem(id) {
-    await performAddItem(id, {
-      genericRenderWindow: genericRenderWindow.value,
-      dataStore,
-      vtkXMLPolyDataReader,
-      vtkActor,
-      vtkMapper,
-      ACTOR_COLOR,
-      hybridDb,
-    });
+    await performAddItem(id, { genericRenderWindow: genericRenderWindow.value, dataStore, vtkXMLPolyDataReader, vtkActor, vtkMapper, ACTOR_COLOR, hybridDb });
   }
 
   function removeItem(id) {
@@ -120,14 +112,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function setZScaling(z_scale) {
-    await performSetZScaling(z_scale, {
-      zScale,
-      genericRenderWindow: genericRenderWindow.value,
-      gridActor,
-      viewerStore,
-      viewer_schemas,
-      remoteRender,
-    });
+    await performSetZScaling(z_scale, { zScale, genericRenderWindow: genericRenderWindow.value, gridActor, viewerStore, viewer_schemas, remoteRender });
   }
 
   function resetCamera() {
