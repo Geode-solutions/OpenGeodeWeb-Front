@@ -28,7 +28,9 @@ const { adaptiveStyles: activityBarAdaptiveStyles } = useAdaptiveStyles(activity
 const maxWidth = computed(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
 const mainView = computed(() => treeviewStore.opened_views.find((view) => view.id === "main"));
-const additionalViews = computed(() => treeviewStore.opened_views.filter((view) => view.id !== "main"));
+const additionalViews = computed(() =>
+  treeviewStore.opened_views.filter((view) => view.id !== "main"),
+);
 
 const totalWidth = computed(() => {
   const hasAdditional = additionalViews.value.length > 0;
@@ -211,82 +213,87 @@ function onVerticalResizeStart(event, index) {
       />
     </div>
 
-    <div
-      class="treeview-container d-flex"
-      :style="{ width: totalWidth }"
-    >
-    <div
-      v-if="mainView"
-      class="column main-column"
-      :style="{
-        width: `${treeviewStore.panelWidth}px`,
-      }"
-    >
-      <ViewerObjectTreeBox
-        :title="mainView?.title || 'Objects'"
-        mdi-icon="mdi-file-tree-outline"
-        :scroll-top="mainView?.scrollTop || 0"
-        closable
-        :border-radius="additionalViews.length > 0 ? '0' : '0 16px 16px 0'"
-        :border-left="false"
-        @close="treeviewStore.closeView('main')"
-        @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
+    <div class="treeview-container d-flex" :style="{ width: totalWidth }">
+      <div
+        v-if="mainView"
+        class="column main-column"
+        :style="{
+          width: `${treeviewStore.panelWidth}px`,
+        }"
       >
-        <GlobalObjects data-testid="mainObjectTree" @show-menu="emit('show-menu', $event)" />
-      </ViewerObjectTreeBox>
-    </div>
-
-    <div v-if="mainView && additionalViews.length > 0" class="column-separator" @mousedown="onResizeStart" />
-
-    <div
-      v-if="additionalViews.length > 0"
-      class="column additional-column"
-      :style="{
-        width: `${treeviewStore.additionalPanelWidth}px`,
-      }"
-    >
-      <template v-for="(view, index) in additionalViews" :key="view.id">
-        <div
-          class="view-wrapper"
-          :class="{
-            'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
-          }"
-          :style="{ flex: `0 0 ${rowHeights[index]}%` }"
-          @dragover="onDragOver"
-          @drop="onDrop(index + 1)"
+        <ViewerObjectTreeBox
+          :title="mainView?.title || 'Objects'"
+          mdi-icon="mdi-file-tree-outline"
+          :scroll-top="mainView?.scrollTop || 0"
+          closable
+          :border-radius="additionalViews.length > 0 ? '0' : '0 16px 16px 0'"
+          :border-left="false"
+          @close="treeviewStore.closeView('main')"
+          @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
         >
-          <ViewerObjectTreeBox
-            :title="view.title"
-            :icon="geode_objects[view.geode_object_type]?.image"
-            :scroll-top="view.scrollTop"
-            closable
-            :border-radius="index === additionalViews.length - 1 ? '0 16px 16px 0' : '0'"
-            :border-left="false"
-            @close="treeviewStore.closeView(view.id)"
-            @dragstart="onDragStart(index + 1)"
-            @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
+          <GlobalObjects data-testid="mainObjectTree" @show-menu="emit('show-menu', $event)" />
+        </ViewerObjectTreeBox>
+      </div>
+
+      <div
+        v-if="mainView && additionalViews.length > 0"
+        class="column-separator"
+        @mousedown="onResizeStart"
+      />
+
+      <div
+        v-if="additionalViews.length > 0"
+        class="column additional-column"
+        :style="{
+          width: `${treeviewStore.additionalPanelWidth}px`,
+        }"
+      >
+        <template v-for="(view, index) in additionalViews" :key="view.id">
+          <div
+            class="view-wrapper"
+            :class="{
+              'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
+            }"
+            :style="{ flex: `0 0 ${rowHeights[index]}%` }"
+            @dragover="onDragOver"
+            @drop="onDrop(index + 1)"
           >
-            <ModelComponents
-              data-testid="modelComponentsObjectTree"
-              :id="view.id"
-              @show-menu="emit('show-menu', $event)"
-            />
-          </ViewerObjectTreeBox>
-        </div>
-        <div
-          v-if="index < additionalViews.length - 1"
-          class="v-split-resizer"
-          @mousedown="onVerticalResizeStart($event, index)"
-        />
-      </template>
-    </div>
-    <div
-      v-if="treeviewStore.opened_views.length > 0"
-      class="total-resizer"
-      @mousedown="
-        additionalViews.length > 0 ? onAdditionalResizeStart($event) : mainView ? onResizeStart($event) : undefined
-      "
-    />
+            <ViewerObjectTreeBox
+              :title="view.title"
+              :icon="geode_objects[view.geode_object_type]?.image"
+              :scroll-top="view.scrollTop"
+              closable
+              :border-radius="index === additionalViews.length - 1 ? '0 16px 16px 0' : '0'"
+              :border-left="false"
+              @close="treeviewStore.closeView(view.id)"
+              @dragstart="onDragStart(index + 1)"
+              @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
+            >
+              <ModelComponents
+                data-testid="modelComponentsObjectTree"
+                :id="view.id"
+                @show-menu="emit('show-menu', $event)"
+              />
+            </ViewerObjectTreeBox>
+          </div>
+          <div
+            v-if="index < additionalViews.length - 1"
+            class="v-split-resizer"
+            @mousedown="onVerticalResizeStart($event, index)"
+          />
+        </template>
+      </div>
+      <div
+        v-if="treeviewStore.opened_views.length > 0"
+        class="total-resizer"
+        @mousedown="
+          additionalViews.length > 0
+            ? onAdditionalResizeStart($event)
+            : mainView
+              ? onResizeStart($event)
+              : undefined
+        "
+      />
     </div>
   </div>
 </template>
