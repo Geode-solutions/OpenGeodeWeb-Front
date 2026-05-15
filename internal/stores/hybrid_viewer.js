@@ -142,10 +142,12 @@ async function performAddItem(id, options) {
     vtkXMLPolyDataReader,
     vtkActor,
     vtkMapper,
-    ACTOR_COLOR,
+    actorColor,
     hybridDb,
   } = options;
-  if (!genericRenderWindow) return;
+  if (!genericRenderWindow) {
+    return;
+  }
   const reader = vtkXMLPolyDataReader(),
     value = await dataStore.item(id);
   await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
@@ -153,12 +155,14 @@ async function performAddItem(id, options) {
     mapper = vtkMapper(),
     polydata = reader.getOutputData(0);
   mapper.setInputData(polydata);
-  actor.getProperty().setColor(ACTOR_COLOR);
+  actor.getProperty().setColor(actorColor);
   actor.setMapper(mapper);
   const renderer = genericRenderWindow.getRenderer();
   const isFirst = renderer.getActors().length === 0;
   renderer.addActor(actor);
-  if (isFirst) renderer.resetCamera();
+  if (isFirst) {
+    renderer.resetCamera();
+  }
   hybridDb[id] = { actor, polydata, mapper };
 }
 
@@ -176,7 +180,9 @@ async function performSetZScaling(z_scale, options) {
   renderer.resetCamera();
   genericRenderWindow.getRenderWindow().render();
   const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling;
-  if (schema) await viewerStore.request(schema, { z_scale });
+  if (schema) {
+    await viewerStore.request(schema, { z_scale });
+  }
   remoteRender();
 }
 
@@ -190,17 +196,19 @@ function performSetContainer(options) {
     useEventListener,
     is_picking,
     is_moving,
-    performClickPicking,
+    clickPickingCallback,
     viewerStore,
     viewer_schemas,
     syncRemoteCamera,
     throttledHoverHighlight,
-    WHEEL_TIME_OUT_MS,
+    wheelTimeoutMs,
     wheelEventEndTimeout,
     wheelTimeoutSetter,
   } = options;
 
-  if (!container.value) return;
+  if (!container.value) {
+    return;
+  }
 
   genericRenderWindow.setContainer(container.value.$el);
   const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
@@ -214,9 +222,11 @@ function performSetContainer(options) {
   useMousePressed({
     target: container,
     onPressed: (event) => {
-      if (event.button !== 0) return;
+      if (event.button !== 0) {
+        return;
+      }
       if (is_picking.value) {
-        performClickPicking(event, {
+        clickPickingCallback(event, {
           container: container.value.$el,
           viewerStore,
           viewer_schemas,
@@ -244,14 +254,16 @@ function performSetContainer(options) {
   useEventListener(container, "mousemove", throttledHoverHighlight);
   useEventListener(container, "wheel", () => {
     is_moving.value = true;
-    if (imageStyle) imageStyle.opacity = 0;
+    if (imageStyle) {
+      imageStyle.opacity = 0;
+    }
     clearTimeout(wheelEventEndTimeout);
     wheelTimeoutSetter(
       setTimeout(() => {
         is_moving.value = false;
         genericRenderWindow.getRenderer().resetCameraClippingRange();
         syncRemoteCamera();
-      }, WHEEL_TIME_OUT_MS),
+      }, wheelTimeoutMs),
     );
   });
 }

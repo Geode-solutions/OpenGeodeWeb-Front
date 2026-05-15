@@ -100,7 +100,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       vtkXMLPolyDataReader,
       vtkActor,
       vtkMapper,
-      ACTOR_COLOR,
+      actorColor: ACTOR_COLOR,
       hybridDb,
     });
   }
@@ -216,12 +216,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       useEventListener,
       is_picking,
       is_moving,
-      performClickPicking,
+      clickPickingCallback: performClickPicking,
       viewerStore,
       viewer_schemas,
       syncRemoteCamera,
       throttledHoverHighlight,
-      WHEEL_TIME_OUT_MS,
+      wheelTimeoutMs: WHEEL_TIME_OUT_MS,
       wheelEventEndTimeout,
       wheelTimeoutSetter: (timeout) => (wheelEventEndTimeout = timeout),
     });
