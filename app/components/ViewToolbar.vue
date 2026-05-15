@@ -143,9 +143,7 @@ const camera_options = computed(() => [
             <ActionButton
               v-bind="props"
               :icon="
-                typeof camera_option.icon === 'function'
-                  ? camera_option.icon()
-                  : camera_option.icon
+                typeof camera_option.icon === 'function' ? camera_option.icon() : camera_option.icon
               "
               :tooltip="camera_option.tooltip"
               :color="camera_option.color"
