@@ -27,6 +27,7 @@ import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLP
 import { Status } from "@ogw_front/utils/status";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import { database } from "@ogw_internal/database/database.js";
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -41,6 +42,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const is_picking = ref(false);
   const is_hover_highlight = ref(false);
   const hover_highlight_field_type = ref("CELL");
+  const hoverData = ref(null);
+  const hoverPosition = ref({ x: 0, y: 0 });
   const zScale = ref(1);
   let imageStyle = undefined;
   let viewStream = undefined;
@@ -185,7 +188,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   const throttledHoverHighlight = useThrottleFn(
-    (event) =>
+    (event) => {
+      hoverPosition.value = { x: event.clientX, y: event.clientY };
       performHoverHighlight(event, {
         is_hover_highlight,
         genericRenderWindow: genericRenderWindow.value,
@@ -193,11 +197,44 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
         viewer_schemas,
         hover_highlight_field_type,
         hybridDb,
-      }),
+        onResponse: async (response) => {
+          if (!is_hover_highlight.value) {
+            hoverData.value = null;
+            return;
+          }
+          if (response && response.id && response.picked_id !== undefined && response.picked_id !== -1) {
+            let componentInfo = null;
+            if (response.geode_id) {
+              const component = await database.model_components
+                .where("[id+geode_id]")
+                .equals([response.id, response.geode_id])
+                .first();
+              if (component) {
+                componentInfo = {
+                  name: component.name,
+                  id: component.geode_id,
+                  type: component.type,
+                };
+              }
+            }
+            hoverData.value = {
+              modelId: response.id,
+              pickedId: response.picked_id,
+              fieldType: response.field_type,
+              component: componentInfo,
+              attributes: response.attributes || {},
+            };
+          } else {
+            hoverData.value = null;
+          }
+        },
+      });
+    },
     HOVER_THROTTLE_MS,
   );
 
   function clearHoverHighlight() {
+    hoverData.value = null;
     performClearHoverHighlight({
       viewerStore,
       viewer_schemas,
@@ -297,6 +334,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     is_hover_highlight,
     hover_highlight_field_type,
     clearHoverHighlight,
+    hoverData,
+    hoverPosition,
     clear,
     exportStores,
     importStores,
