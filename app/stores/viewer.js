@@ -145,7 +145,7 @@ export const useViewerStore = defineStore(
       return appStore.request(schema, params, {
         response_function: (response) => {
           console.log(`[VIEWER] Viewer launched on port ${response.port}`);
-          this.default_local_port = response.port;
+          default_local_port.value = response.port;
         },
       });
     }
