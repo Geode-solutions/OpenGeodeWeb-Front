@@ -25,12 +25,13 @@ import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
 import { Status } from "@ogw_front/utils/status";
+import { database } from "@ogw_internal/database/database.js";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import { database } from "@ogw_internal/database/database.js";
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
+// oxlint-disable max-lines-per-function max-statements
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
   const hybridDb = reactive({});
@@ -42,7 +43,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const is_picking = ref(false);
   const is_hover_highlight = ref(false);
   const hover_highlight_field_type = ref("CELL");
-  const hoverData = ref(null);
+  const hoverData = ref(undefined);
   const hoverPosition = ref({ x: 0, y: 0 });
   const zScale = ref(1);
   let imageStyle = undefined;
@@ -187,54 +188,102 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
   }
 
-  const throttledHoverHighlight = useThrottleFn(
-    (event) => {
-      hoverPosition.value = { x: event.clientX, y: event.clientY };
-      performHoverHighlight(event, {
-        is_hover_highlight,
-        genericRenderWindow: genericRenderWindow.value,
-        viewerStore,
-        viewer_schemas,
-        hover_highlight_field_type,
-        hybridDb,
-        onResponse: async (response) => {
-          if (!is_hover_highlight.value) {
-            hoverData.value = null;
-            return;
-          }
-          if (response && response.id && response.picked_id !== undefined && response.picked_id !== -1) {
-            let componentInfo = null;
-            if (response.geode_id) {
-              const component = await database.model_components
-                .where("[id+geode_id]")
-                .equals([response.id, response.geode_id])
-                .first();
-              if (component) {
-                componentInfo = {
-                  name: component.name,
-                  id: component.geode_id,
-                  type: component.type,
-                };
-              }
-            }
-            hoverData.value = {
-              modelId: response.id,
-              pickedId: response.picked_id,
-              fieldType: response.field_type,
-              component: componentInfo,
-              attributes: response.attributes || {},
+  let hoverTimeout = undefined;
+  const currentHoverId = ref(undefined);
+
+  function clearHoverData() {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = undefined;
+    }
+    hoverData.value = undefined;
+    currentHoverId.value = undefined;
+  }
+
+  const throttledHoverHighlight = useThrottleFn((event) => {
+    const containerElement = genericRenderWindow.value?.getContainer();
+    let relativeMousePosition = { x: 0, y: 0 };
+    if (containerElement) {
+      const containerRect = containerElement.getBoundingClientRect();
+      relativeMousePosition = {
+        x: event.clientX - containerRect.left,
+        y: event.clientY - containerRect.top,
+      };
+    } else {
+      relativeMousePosition = { x: event.clientX, y: event.clientY };
+    }
+
+    performHoverHighlight(event, {
+      is_hover_highlight,
+      genericRenderWindow: genericRenderWindow.value,
+      viewerStore,
+      viewer_schemas,
+      hover_highlight_field_type,
+      hybridDb,
+      onResponse: async (response) => {
+        const isResponseValid =
+          response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
+        if (!is_hover_highlight.value || !isResponseValid) {
+          clearHoverData();
+          return;
+        }
+
+        const hoverKey = `${response.id}_${response.field_type}_${response.picked_id}`;
+        if (currentHoverId.value === hoverKey) {
+          return;
+        }
+
+        if (hoverTimeout) {
+          clearTimeout(hoverTimeout);
+          hoverTimeout = undefined;
+        }
+
+        hoverData.value = undefined;
+        currentHoverId.value = hoverKey;
+
+        let componentInfo = undefined;
+        let modelName = undefined;
+
+        const modelRecord = await database.data.get(response.id);
+        if (modelRecord) {
+          modelName = modelRecord.name;
+        }
+
+        if (response.geode_id) {
+          const component = await database.model_components
+            .where("[id+geode_id]")
+            .equals([response.id, response.geode_id])
+            .first();
+          if (component) {
+            componentInfo = {
+              name: component.name,
+              id: component.geode_id,
+              type: component.type,
             };
-          } else {
-            hoverData.value = null;
           }
-        },
-      });
-    },
-    HOVER_THROTTLE_MS,
-  );
+        }
+
+        const newHoverData = {
+          modelId: response.id,
+          modelName,
+          blockName: response.geode_id,
+          pickedId: response.picked_id,
+          fieldType: response.field_type,
+          component: componentInfo,
+          attributes: response.attributes || {},
+        };
+
+        hoverTimeout = setTimeout(() => {
+          hoverPosition.value = relativeMousePosition;
+          hoverData.value = newHoverData;
+          hoverTimeout = undefined;
+        }, 500);
+      },
+    });
+  }, HOVER_THROTTLE_MS);
 
   function clearHoverHighlight() {
-    hoverData.value = null;
+    clearHoverData();
     performClearHoverHighlight({
       viewerStore,
       viewer_schemas,
