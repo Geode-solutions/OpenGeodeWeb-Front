@@ -1,11 +1,11 @@
-import scientificPresets from "@ogw_front/assets/scientific_colormaps.json";
+import colormaps from "@ogw_front/assets/colormaps.json";
 
 function getRGBPointsFromPreset(presetName) {
   return (
-    scientificPresets
+    colormaps
       .flatMap((category) => category.Children)
       .find((preset) => preset.Name === presetName)?.RGBPoints ?? []
   );
 }
 
-export { getRGBPointsFromPreset, scientificPresets };
+export { getRGBPointsFromPreset, colormaps };
