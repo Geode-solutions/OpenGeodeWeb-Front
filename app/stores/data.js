@@ -12,9 +12,12 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
+  const data_db = database.data;
+  const model_components_db = database.model_components;
+  const model_components_relation_db = database.model_components_relation;
 
   async function item(id) {
-    const data_item = await database.data.get(id);
+    const data_item = await data_db.get(id);
     if (!data_item) {
       throw new Error(`Item not found: ${id}`);
     }
@@ -23,20 +26,20 @@ export const useDataStore = defineStore("data", () => {
 
   function refItem(id) {
     return useObservable(
-      liveQuery(() => database.data.get(id)),
+      liveQuery(() => data_db.get(id)),
       { initialValue: {} },
     );
   }
 
   function refAllItems() {
     return useObservable(
-      liveQuery(() => database.data.toArray()),
+      liveQuery(() => data_db.toArray()),
       { initialValue: [] },
     );
   }
 
   async function formatedMeshComponents(modelId) {
-    const items = await database.model_components.where("id").equals(modelId).toArray();
+    const items = await model_components_db.where("id").equals(modelId).toArray();
     const componentTitles = {
       Corner: "Corners",
       Line: "Lines",
@@ -70,7 +73,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function getMeshComponentsByType(modelId, type) {
-    const components = await database.model_components
+    const components = await model_components_db
       .where("[id+type]")
       .equals([modelId, type])
       .toArray();
@@ -84,7 +87,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function getAllMeshComponents(modelId) {
-    const items = await database.model_components.where("id").equals(modelId).toArray();
+    const items = await model_components_db.where("id").equals(modelId).toArray();
     return items.map((meshComponent) => ({
       id: meshComponent.geode_id,
       title: meshComponent.name,
@@ -114,7 +117,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function meshComponentType(modelId, geode_id) {
-    const component = await database.model_components
+    const component = await model_components_db
       .where("[id+geode_id]")
       .equals([modelId, geode_id])
       .first();
@@ -139,7 +142,7 @@ export const useDataStore = defineStore("data", () => {
       created_at: new Date().toISOString(),
       binary_light_viewable: new_item.binary_light_viewable,
     };
-    return database.data.put(itemData);
+    return data_db.put(itemData);
   }
 
   function addComponents(new_item) {
@@ -162,7 +165,7 @@ export const useDataStore = defineStore("data", () => {
     if (new_item.collection_components) {
       addModelComponents(new_item.collection_components);
     }
-    return database.model_components.bulkPut(allComponents);
+    return model_components_db.bulkPut(allComponents);
   }
 
   function addComponentRelations(new_item) {
@@ -194,11 +197,11 @@ export const useDataStore = defineStore("data", () => {
         }
       }
     }
-    return database.model_components_relation.bulkPut(relations);
+    return model_components_relation_db.bulkPut(relations);
   }
 
   async function getComponentByViewerId(modelId, viewer_id) {
-    const component = await database.model_components
+    const component = await model_components_db
       .where("viewer_id")
       .equals(Number(viewer_id))
       .and((model_component) => model_component.id === modelId)
@@ -207,21 +210,21 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function deleteItem(id) {
-    await database.data.delete(id);
+    await data_db.delete(id);
     await deleteModelComponents(id);
   }
 
   async function updateItem(id, changes) {
-    await database.data.update(id, changes);
+    await data_db.update(id, changes);
   }
 
   async function deleteModelComponents(modelId) {
-    await database.model_components.where("id").equals(modelId).delete();
+    await model_components_db.where("id").equals(modelId).delete();
     await database.model_components_relation.where("id").equals(modelId).delete();
   }
 
   async function getMeshComponentGeodeIds(modelId, type) {
-    const components = await database.model_components
+    const components = await model_components_db
       .where("[id+type]")
       .equals([modelId, type])
       .toArray();
@@ -245,12 +248,12 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function getAllModelComponentsViewerIds(modelId) {
-    const components = await database.model_components.where("id").equals(modelId).toArray();
+    const components = await model_components_db.where("id").equals(modelId).toArray();
     return components.map((component) => Number.parseInt(component.viewer_id, 10));
   }
 
   async function getMeshComponentsViewerIds(modelId, meshComponentGeodeIds) {
-    const components = await database.model_components
+    const components = await model_components_db
       .where("[id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray();
@@ -258,7 +261,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function exportStores() {
-    const items = await database.data.toArray();
+    const items = await data_db.toArray();
     return { items };
   }
 
@@ -267,7 +270,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function clear() {
-    await database.data.clear();
+    await data_db.clear();
   }
 
   return {

@@ -5,14 +5,18 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index";
 
+// oxlint-disable-next-line max-lines-per-function
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState();
   const meshStyleStore = useMeshStyle();
   const modelStyleStore = useModelStyle();
   const dataStore = useDataStore();
+  const data_style_db = database.data_style;
+  const model_component_type_datastyle_db = database.model_component_type_datastyle;
+  const component_datastyle_db = database.component_datastyle;
 
   async function addDataStyle(id, geode_object) {
-    await database.data_style.put(structuredClone({ id, ...getDefaultStyle(geode_object) }));
+    await data_style_db.put(structuredClone({ id, ...getDefaultStyle(geode_object) }));
   }
 
   async function setVisibility(id, visibility) {
@@ -57,13 +61,13 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     await dataStyleState.clear();
 
     const style_promises = Object.entries(stylesSnapshot).map(([id, style]) =>
-      database.data_style.put(structuredClone({ id, ...style })),
+      data_style_db.put(structuredClone({ id, ...style })),
     );
     const component_style_promises = Object.values(componentStylesSnapshot).map((style) =>
-      database.model_component_datastyle.put(structuredClone(style)),
+      component_datastyle_db.put(structuredClone(style)),
     );
     const model_component_type_style_promises = Object.values(modelComponentTypeStylesSnapshot).map(
-      (style) => database.model_component_type_datastyle.put(structuredClone(style)),
+      (style) => model_component_type_datastyle_db.put(structuredClone(style)),
     );
 
     await Promise.all([
