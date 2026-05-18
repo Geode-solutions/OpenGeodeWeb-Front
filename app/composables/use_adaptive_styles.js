@@ -9,15 +9,37 @@ const MIN_BLUR = 8;
 const MAX_BLUR = 25;
 
 const MIN_OPACITY = 0;
-const MAX_OPACITY = 0.5;
+const MAX_OPACITY = 0.85;
 
 const MIN_BOOST = 1;
 const MAX_BOOST = 1.2;
 const ADAPTIVE_REFRESH_RATE = 150;
 
-export function useAdaptiveStyles(targetRef) {
+export function useAdaptiveStyles(target) {
   const hybridViewerStore = useHybridViewerStore();
-  const { x, y, width, height } = useElementBounding(targetRef);
+  
+  let x, y, width, height;
+  if (target && (target.value !== undefined || typeof target === "function" || target.x !== undefined)) {
+    const unwrapped = computed(() => {
+      const val = typeof target === "function" ? target() : (target.value !== undefined ? target.value : target);
+      return {
+        x: typeof val?.x === "object" && val.x !== null && val.x.value !== undefined ? val.x.value : (val?.x ?? 0),
+        y: typeof val?.y === "object" && val.y !== null && val.y.value !== undefined ? val.y.value : (val?.y ?? 0),
+        width: typeof val?.width === "object" && val.width !== null && val.width.value !== undefined ? val.width.value : (val?.width ?? 0),
+        height: typeof val?.height === "object" && val.height !== null && val.height.value !== undefined ? val.height.value : (val?.height ?? 0),
+      };
+    });
+    x = computed(() => unwrapped.value.x);
+    y = computed(() => unwrapped.value.y);
+    width = computed(() => unwrapped.value.width);
+    height = computed(() => unwrapped.value.height);
+  } else {
+    const bounding = useElementBounding(target);
+    x = bounding.x;
+    y = bounding.y;
+    width = bounding.width;
+    height = bounding.height;
+  }
   const brightness = ref(LUMINANCE_THRESHOLD);
 
   const updateBrightness = useThrottleFn(() => {

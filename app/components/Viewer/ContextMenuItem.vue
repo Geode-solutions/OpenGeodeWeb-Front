@@ -2,7 +2,6 @@
 import GlassCard from "@ogw_front/components/GlassCard";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTheme } from "vuetify";
-
 const CARD_WIDTH = 320;
 const CARD_HEIGHT = 500;
 const MARGIN = 60;
@@ -12,6 +11,9 @@ const OFFSET = 40;
 const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
+
+import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
+
 const { index, itemProps, tooltip, btn_image } = defineProps({
   index: { type: Number, required: true },
   itemProps: { type: Object, required: true },
@@ -19,11 +21,51 @@ const { index, itemProps, tooltip, btn_image } = defineProps({
   btn_image: { type: String, required: true },
 });
 
+const buttonCoords = computed(() => {
+  const angle = (index / itemProps.totalItems) * 2 * Math.PI;
+  const dx = Math.cos(angle) * RADIUS;
+  const dy = Math.sin(angle) * RADIUS;
+  const size = 40;
+  return {
+    x: menuStore.containerLeft + menuStore.menuX + dx - size / 2,
+    y: menuStore.containerTop + menuStore.menuY + dy - size / 2,
+    width: size,
+    height: size,
+  };
+});
+
+const { adaptiveStyles } = useAdaptiveStyles(buttonCoords);
+
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
+
+const treeviewStore = useTreeviewStore();
+const isOverTreeview = computed(() => {
+  const hasAdditional = treeviewStore.opened_views.some(v => v.id !== "main");
+  const hasMain = treeviewStore.opened_views.some(v => v.id === "main");
+  const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
+  const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
+  const treeviewWidth = 10 + 48 + firstColWidth + secondColWidth + 20;
+  return buttonCoords.value.x < treeviewWidth;
+});
+
+const computedItemStyles = computed(() => {
+  if (isOverTreeview.value) {
+    return {
+      "--adaptive-blur": "15px",
+      "--adaptive-opacity": 0.85,
+      "--adaptive-brightness": 1.15,
+    };
+  }
+  return adaptiveStyles.value;
+});
+
 const is_active = computed(() => menuStore.active_item_index === index);
 const optionsRef = ref(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
 
-const maxCardHeight = computed(() => Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET));
+const maxCardHeight = computed(() =>
+  Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET),
+);
 
 const optionsStyle = computed(() => {
   if (!is_active.value || !optionsHeight.value) {
@@ -38,8 +80,12 @@ const optionsStyle = computed(() => {
 
   if (absoluteButtonY - height / 2 < margin) {
     offsetY = margin - (absoluteButtonY - height / 2);
-  } else if (absoluteButtonY + height / 2 > menuStore.containerHeight - margin) {
-    offsetY = menuStore.containerHeight - margin - (absoluteButtonY + height / 2);
+  } else if (
+    absoluteButtonY + height / 2 >
+    menuStore.containerHeight - margin
+  ) {
+    offsetY =
+      menuStore.containerHeight - margin - (absoluteButtonY + height / 2);
   }
   return { top: `calc(50% + ${offsetY}px)` };
 });
@@ -49,11 +95,14 @@ const optionsClass = computed(() => {
   const margin = MARGIN;
   const radius = RADIUS;
   if (loc === "right") {
-    return menuStore.menuX + radius + margin + CARD_WIDTH > menuStore.containerWidth
+    return menuStore.menuX + radius + margin + CARD_WIDTH >
+      menuStore.containerWidth
       ? "options-left"
       : "options-right";
   }
-  return menuStore.menuX - radius - margin - CARD_WIDTH < 0 ? "options-right" : "options-left";
+  return menuStore.menuX - radius - margin - CARD_WIDTH < 0
+    ? "options-right"
+    : "options-left";
 });
 
 function toggleOptions() {
@@ -62,17 +111,28 @@ function toggleOptions() {
 </script>
 <template>
   <v-sheet class="menu-item-container transition-swing" color="transparent">
-    <v-tooltip :location="itemProps.tooltip_location" :origin="itemProps.tooltip_origin">
+    <v-tooltip
+      :location="itemProps.tooltip_location"
+      :origin="itemProps.tooltip_origin"
+    >
       <template v-slot:activator="{ props: tooltipProps }">
         <v-btn
+          ref="itemBtnRef"
           icon
+          variant="outlined"
           :active="is_active"
           @click.stop="toggleOptions"
           v-bind="tooltipProps"
-          class="menu-btn bg-white border"
+          class="menu-btn"
           elevation="2"
+          :style="computedItemStyles"
         >
-          <v-img :src="btn_image" height="28" width="28" />
+          <v-img
+            :src="btn_image"
+            height="28"
+            width="28"
+            style="pointer-events: none; object-fit: contain"
+          />
         </v-btn>
       </template>
       <span>{{ tooltip }}</span>
@@ -98,7 +158,10 @@ function toggleOptions() {
         style="overflow: hidden; display: flex; flex-direction: column"
       >
         <v-card-title>{{ tooltip }}</v-card-title>
-        <v-card-text class="pa-5" style="overflow-y: auto; flex: 1; min-height: 0">
+        <v-card-text
+          class="pa-5"
+          style="overflow-y: auto; flex: 1; min-height: 0"
+        >
           <slot name="options" />
         </v-card-text>
       </GlassCard>
@@ -120,18 +183,47 @@ function toggleOptions() {
 }
 
 .menu-btn {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  position: relative;
+  overflow: hidden;
   transition: all 0.2s ease;
-  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.menu-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition:
+    background-color 0.2s ease,
+    backdrop-filter 0.2s ease;
 }
 
 .menu-btn:hover {
   transform: scale(1.1);
-  background-color: #e3f2fd !important;
+}
+
+.menu-btn:hover::before {
+  background: rgba(255, 255, 255, calc(var(--adaptive-opacity, 0.15) + 0.15));
 }
 
 .menu-btn.v-btn--active {
   background-color: v-bind(primaryColor) !important;
   color: white !important;
+}
+
+.menu-btn.v-btn--active::before {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .menu-btn.v-btn--active ::v-deep(.v-img__img) {
