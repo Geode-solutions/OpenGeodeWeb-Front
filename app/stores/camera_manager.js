@@ -9,27 +9,28 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 export const useCameraManagerStore = defineStore("camera_manager", () => {
   const viewerStore = useViewerStore();
+  const camera_positions_db = database.camera_positions;
 
   function refAllCameraPositions() {
     return useObservable(
-      liveQuery(() => database.camera_positions.toArray()),
+      liveQuery(() => camera_positions_db.toArray()),
       { initialValue: [] },
     );
   }
 
   async function getCameraPosition(id) {
-    return await database.camera_positions.get(id);
+    return await camera_positions_db.get(id);
   }
 
   async function saveCameraPosition(name, camera_options) {
-    await database.camera_positions.put({
+    await camera_positions_db.put({
       name,
       camera_options,
     });
   }
 
   async function restoreCameraPosition(id) {
-    const position = await database.camera_positions.get(id);
+    const position = await camera_positions_db.get(id);
     if (position) {
       await viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, {
         camera_options: position.camera_options,
@@ -38,11 +39,11 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
   }
 
   async function deleteCameraPosition(id) {
-    await database.camera_positions.delete(id);
+    await camera_positions_db.delete(id);
   }
 
   async function renameCameraPosition(id, newName) {
-    await database.camera_positions.update(id, { name: newName });
+    await camera_positions_db.update(id, { name: newName });
   }
 
   return {

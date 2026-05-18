@@ -4,9 +4,13 @@ import merge from "lodash/merge";
 import { useObservable } from "@vueuse/rxjs";
 
 export function useDataStyleState() {
+  const data_style_db = database.data_style;
+  const model_component_datastyle_db = database.model_component_datastyle;
+  const model_component_type_datastyle_db = database.model_component_type_datastyle;
+
   const styles = useObservable(
     liveQuery(async () => {
-      const allStyles = await database.data_style.toArray();
+      const allStyles = await data_style_db.toArray();
       const accumulator = {};
       for (const style of allStyles) {
         accumulator[style.id] = style;
@@ -35,7 +39,7 @@ export function useDataStyleState() {
 
   const modelComponentTypeStyles = useObservable(
     liveQuery(async () => {
-      const all = await database.model_component_type_datastyle.toArray();
+      const all = await model_component_type_datastyle_db.toArray();
       const accumulator = {};
       for (const style of all) {
         const key = `${style.id_model}_${style.type}`;
@@ -48,7 +52,7 @@ export function useDataStyleState() {
 
   const componentStyles = useObservable(
     liveQuery(async () => {
-      const all = await database.model_component_datastyle.toArray();
+      const all = await model_component_datastyle_db.toArray();
       const accumulator = {};
       for (const style of all) {
         const key = `${style.id_model}_${style.id_component}`;
@@ -66,7 +70,7 @@ export function useDataStyleState() {
   function mutateStyle(id, values) {
     const style = getStyle(id);
     merge(style, values);
-    return database.data_style.put(structuredClone({ id, ...toRaw(style) }));
+    return data_style_db.put(structuredClone({ id, ...toRaw(style) }));
   }
 
   function getComponentStyle(id_model, id_component) {
@@ -81,9 +85,9 @@ export function useDataStyleState() {
 
   function clear() {
     return Promise.all([
-      database.data_style.clear(),
-      database.model_component_datastyle.clear(),
-      database.model_component_type_datastyle.clear(),
+      data_style_db.clear(),
+      model_component_datastyle_db.clear(),
+      model_component_type_datastyle_db.clear(),
     ]);
   }
 
