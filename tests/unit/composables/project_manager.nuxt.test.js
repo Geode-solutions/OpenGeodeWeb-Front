@@ -4,8 +4,8 @@
 // Third party imports
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Local imports
-import { exportProject, importProject } from "@ogw_front/composables/project_manager";
+import { useProjectManager } from "@ogw_front/composables/project_manager";
+const { exportProject, importProjectFile: importProject } = useProjectManager();
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 
