@@ -9,17 +9,25 @@ const MIN_BLUR = 8;
 const MAX_BLUR = 25;
 
 const MIN_OPACITY = 0;
-const MAX_OPACITY = 0.85;
+const MAX_OPACITY = 0.5;
 
 const MIN_BOOST = 1;
 const MAX_BOOST = 1.2;
 const ADAPTIVE_REFRESH_RATE = 150;
 
-export function useAdaptiveStyles(target) {
+export function useAdaptiveStyles(target, options = {}) {
   const hybridViewerStore = useHybridViewerStore();
-  
+
+  const isCoordinates = 
+    target && 
+    (
+      typeof target === "function" || 
+      (target.value !== undefined && target.value !== null && target.value.x !== undefined) || 
+      (target.x !== undefined && target.value === undefined)
+    );
+
   let x, y, width, height;
-  if (target && (target.value !== undefined || typeof target === "function" || target.x !== undefined)) {
+  if (isCoordinates) {
     const unwrapped = computed(() => {
       const val = typeof target === "function" ? target() : (target.value !== undefined ? target.value : target);
       return {
@@ -60,7 +68,8 @@ export function useAdaptiveStyles(target) {
     const darkFactor = (1 - normalized) ** ADAPTIVE_EXPONENT;
 
     const blur = MIN_BLUR + darkFactor * (MAX_BLUR - MIN_BLUR);
-    const opacity = MIN_OPACITY + darkFactor * (MAX_OPACITY - MIN_OPACITY);
+    const maxOpacity = options.maxOpacity ?? MAX_OPACITY;
+    const opacity = MIN_OPACITY + darkFactor * (maxOpacity - MIN_OPACITY);
     const brightnessBoost = MIN_BOOST + darkFactor * (MAX_BOOST - MIN_BOOST);
 
     return {

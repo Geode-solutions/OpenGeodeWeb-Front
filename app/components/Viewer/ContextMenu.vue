@@ -27,6 +27,21 @@ const { id, x, y, containerWidth, containerHeight } = defineProps({
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
 
+function cleanItemName(fullName, id) {
+  if (!fullName) return "";
+  if (id && fullName.endsWith(` - ${id}`)) {
+    return fullName.substring(0, fullName.length - ` - ${id}`.length);
+  }
+  const uuidRegex = / - [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return fullName.replace(uuidRegex, "");
+}
+
+const cleanName = computed(() => {
+  const meta = menuStore.current_meta_data;
+  if (!meta) return "Unnamed Object";
+  return cleanItemName(meta.name, meta.id) || "Unnamed Object";
+});
+
 const show_menu = ref(true);
 const isDragging = ref(false);
 const dragStartX = ref(0);
@@ -81,6 +96,24 @@ let dragStartClientX = 0;
 let dragStartClientY = 0;
 const showName = ref(false);
 
+const copied = ref(false);
+function copyId(id) {
+  if (!id) return;
+  navigator.clipboard.writeText(id).then(() => {
+    copied.value = true;
+    setTimeout(() => {
+      copied.value = false;
+    }, 1500);
+  });
+}
+
+const formattedId = computed(() => {
+  const id = meta_data.value?.id;
+  if (!id) return "";
+  if (id.length <= 15) return id;
+  return `${id.substring(0, 8)}...${id.substring(id.length - 7)}`;
+});
+
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();
@@ -94,7 +127,7 @@ const isOverTreeview = computed(() => {
 });
 
 const activatorBtn = ref(undefined);
-const { adaptiveStyles } = useAdaptiveStyles(activatorBtn);
+const { adaptiveStyles } = useAdaptiveStyles(activatorBtn, { maxOpacity: 0.85 });
 
 const computedItemStyles = computed(() => {
   if (isOverTreeview.value) {
@@ -281,19 +314,22 @@ function getItemStyle(index) {
                 class="text-subtitle-2 font-weight-bold text-truncate text-white"
                 style="line-height: 1.3"
               >
-                {{ meta_data.name || "Unnamed Object" }}
+                {{ cleanName }}
               </div>
               <div
-                class="text-grey-lighten-1 mt-1"
-                style="
-                  font-family: monospace;
-                  font-size: 0.6rem;
-                  opacity: 0.7;
-                  word-break: break-all;
-                  line-height: 1.2;
-                "
+                v-if="meta_data.id"
+                class="id-badge-container mt-1 d-inline-flex align-center px-2 py-0.5"
+                @click.stop="copyId(meta_data.id)"
               >
-                ID: {{ meta_data.id }}
+                <span class="id-text">
+                  {{ copied ? "COPIED!" : formattedId }}
+                </span>
+                <v-icon
+                  :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+                  size="10"
+                  :color="copied ? 'success' : 'white'"
+                  class="ml-1"
+                />
               </div>
             </GlassCard>
           </div>
@@ -381,5 +417,33 @@ function getItemStyle(index) {
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
+}
+
+.id-badge-container {
+  font-family: monospace;
+  font-size: 0.6rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  opacity: 0.8;
+}
+
+.id-badge-container:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+.id-badge-container:active {
+  transform: scale(0.97);
+}
+
+.id-text {
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.85);
 }
 </style>

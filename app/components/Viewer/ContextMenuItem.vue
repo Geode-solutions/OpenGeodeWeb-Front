@@ -34,7 +34,7 @@ const buttonCoords = computed(() => {
   };
 });
 
-const { adaptiveStyles } = useAdaptiveStyles(buttonCoords);
+const { adaptiveStyles } = useAdaptiveStyles(buttonCoords, { maxOpacity: 0.85 });
 
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 

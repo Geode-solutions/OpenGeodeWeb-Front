@@ -49,6 +49,20 @@ function handleIntermediateMenuUpdate(val) {
     resolveIntermediate = undefined;
   }
 }
+function cleanItemName(fullName, id) {
+  if (!fullName) return "";
+  if (id && fullName.endsWith(` - ${id}`)) {
+    return fullName.substring(0, fullName.length - ` - ${id}`.length);
+  }
+  const uuidRegex = / - [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return fullName.replace(uuidRegex, "");
+}
+
+function formatListId(id) {
+  if (!id) return "";
+  if (id.length <= 16) return id;
+  return `${id.substring(0, 8)}...${id.substring(id.length - 8)}`;
+}
 
 async function get_viewer_id(x, y) {
   const activeIds = new Set(dataItems.value.map((item) => item.id));
@@ -97,17 +111,17 @@ async function get_viewer_id(x, y) {
   for (const pick of pickedList) {
     try {
       const item = await dataStore.item(pick.id);
-      let displayName = item.name || pick.id;
+      let cleanName = cleanItemName(item.name, pick.id) || "Unnamed Object";
       if (item.viewer_type === "model" && pick.viewer_id !== undefined) {
         const component = await dataStore.getComponentByViewerId(pick.id, pick.viewer_id);
         if (component && component.name) {
-          displayName = `${displayName} - ${component.name}`;
+          cleanName = `${cleanName} - ${component.name}`;
         }
       }
       proposedItems.push({
         id: pick.id,
         viewer_id: pick.viewer_id,
-        name: displayName,
+        name: cleanName,
         viewer_type: item.viewer_type,
         geode_object_type: item.geode_object_type,
       });
@@ -115,7 +129,7 @@ async function get_viewer_id(x, y) {
       proposedItems.push({
         id: pick.id,
         viewer_id: pick.viewer_id,
-        name: pick.id,
+        name: "Unnamed Object",
         viewer_type: undefined,
         geode_object_type: undefined,
       });
@@ -133,8 +147,13 @@ async function get_viewer_id(x, y) {
       .querySelector('[data-testid="hybridViewer"]')
       ?.getBoundingClientRect() || { left: 0, top: 0 };
 
-  intermediateMenuX.value = containerRect.left + x;
-  intermediateMenuY.value = containerRect.top + yUI;
+  const MENU_WIDTH = 340;
+  const MENU_HEIGHT = 280;
+  const clampedX = Math.min(Math.max(x, 10), containerWidth - MENU_WIDTH - 10);
+  const clampedY = Math.min(Math.max(yUI, 10), containerHeight - MENU_HEIGHT - 10);
+
+  intermediateMenuX.value = containerRect.left + clampedX;
+  intermediateMenuY.value = containerRect.top + clampedY;
   displayIntermediate.value = true;
 
   return new Promise((resolve) => {
@@ -197,31 +216,30 @@ defineExpose({ get_viewer_id });
           @click="selectIntermediateItem(item)"
         >
           <template #prepend>
-             <v-avatar
+            <v-img
               v-if="geode_objects[item.geode_object_type]?.image"
-              size="24"
-              rounded="0"
+              :src="geode_objects[item.geode_object_type].image"
+              height="24"
+              width="24"
+              max-width="24"
               class="mr-3"
-            >
-              <v-img
-                :src="geode_objects[item.geode_object_type].image"
-                style="object-fit: contain;"
-              />
-            </v-avatar>
+              style="object-fit: contain; filter: brightness(0) invert(1);"
+            />
             <v-icon
               v-else
               icon="mdi-cube-outline"
               size="24"
-              color="secondary"
+              color="white"
               class="mr-3"
             />
           </template>
           
-          <v-list-item-title class="font-weight-medium text-body-2 text-truncate">
+          <v-list-item-title class="font-weight-bold text-body-2 text-truncate text-white">
             {{ item.name }}
           </v-list-item-title>
-          <v-list-item-subtitle class="text-caption text-truncate text-medium-emphasis">
-            {{ item.geode_object_type }}
+          <v-list-item-subtitle class="text-caption text-truncate text-medium-emphasis mt-0.5 d-flex align-center">
+            <span class="font-weight-medium mr-1">{{ item.geode_object_type }}</span>
+            <span style="font-family: monospace; opacity: 0.65; font-size: 0.72rem;">&middot; {{ formatListId(item.id) }}</span>
           </v-list-item-subtitle>
         </v-list-item>
       </v-list>
