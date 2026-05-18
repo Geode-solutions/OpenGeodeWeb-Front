@@ -205,6 +205,7 @@ async function handleClick(event) {
             class="border-top pt-2 mt-1"
             style="border-color: rgba(255, 255, 255, 0.1) !important"
           >
+            <div class="font-weight-bold mb-1 text-grey-lighten-1">Attributes:</div>
             <div class="d-flex flex-column ga-1">
               <!-- Coordinates -->
               <div
