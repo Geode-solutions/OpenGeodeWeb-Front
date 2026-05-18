@@ -60,19 +60,22 @@ async function handleClick(event) {
     <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ViewToolbar />
       <slot name="ui"></slot>
-      
+
       <!-- Floating Hover Tooltip -->
       <v-card
         v-if="hybridViewerStore.hoverData"
         class="floating-tooltip pa-3 rounded-lg"
         :style="{
           left: `${hybridViewerStore.hoverPosition.x}px`,
-          top: `${hybridViewerStore.hoverPosition.y}px`
+          top: `${hybridViewerStore.hoverPosition.y}px`,
         }"
       >
         <div class="d-flex flex-column ga-2 text-white">
           <!-- Component Header -->
-          <div class="d-flex align-center border-bottom pb-1 mb-1" style="border-color: rgba(255,255,255,0.1) !important">
+          <div
+            class="d-flex align-center border-bottom pb-1 mb-1"
+            style="border-color: rgba(255, 255, 255, 0.1) !important"
+          >
             <v-icon
               :icon="
                 hybridViewerStore.hoverData.component?.type === 'Block'
@@ -91,19 +94,30 @@ async function handleClick(event) {
               class="mr-2 text-teal-accent-2"
             />
             <span class="font-weight-bold text-subtitle-2">
-              {{ hybridViewerStore.hoverData.component?.name || `${hybridViewerStore.hoverData.fieldType} #${hybridViewerStore.hoverData.pickedId}` }}
+              {{
+                hybridViewerStore.hoverData.component?.name ||
+                `${hybridViewerStore.hoverData.fieldType} #${hybridViewerStore.hoverData.pickedId}`
+              }}
             </span>
           </div>
 
           <!-- Component Details -->
-          <div v-if="hybridViewerStore.hoverData.component" class="text-caption d-flex flex-column ga-1">
+          <div
+            v-if="hybridViewerStore.hoverData.component"
+            class="text-caption d-flex flex-column ga-1"
+          >
             <div>
               <span class="text-grey-lighten-1">Type:</span>
-              <span class="ml-1 text-teal-accent-1 font-weight-medium">{{ hybridViewerStore.hoverData.component.type }}</span>
+              <span class="ml-1 text-teal-accent-1 font-weight-medium">{{
+                hybridViewerStore.hoverData.component.type
+              }}</span>
             </div>
             <div>
               <span class="text-grey-lighten-1">ID:</span>
-              <span class="ml-1 text-grey-lighten-2 font-mono text-caption" style="font-size: 0.75rem !important">
+              <span
+                class="ml-1 text-grey-lighten-2 font-mono text-caption"
+                style="font-size: 0.75rem !important"
+              >
                 {{ hybridViewerStore.hoverData.component.id }}
               </span>
             </div>
@@ -113,15 +127,36 @@ async function handleClick(event) {
           <div
             v-if="Object.keys(hybridViewerStore.hoverData.attributes).length > 0"
             class="text-caption d-flex flex-column ga-1 border-top pt-2 mt-1"
-            style="border-color: rgba(255,255,255,0.1) !important"
+            style="border-color: rgba(255, 255, 255, 0.1) !important"
           >
             <!-- Coordinates -->
-            <div v-if="hybridViewerStore.hoverData.attributes.coordinates" class="d-flex flex-column ga-0.5">
+            <div
+              v-if="hybridViewerStore.hoverData.attributes.coordinates"
+              class="d-flex flex-column ga-0.5"
+            >
               <span class="text-grey-lighten-1 font-weight-bold">Position:</span>
-              <div class="pl-2 font-mono text-grey-lighten-2 d-flex ga-2" style="font-size: 0.75rem !important">
-                <span>X: {{ Number(hybridViewerStore.hoverData.attributes.coordinates[0]).toFixed(3) }}</span>
-                <span>Y: {{ Number(hybridViewerStore.hoverData.attributes.coordinates[1]).toFixed(3) }}</span>
-                <span>Z: {{ Number(hybridViewerStore.hoverData.attributes.coordinates[2]).toFixed(3) }}</span>
+              <div
+                class="pl-2 font-mono text-grey-lighten-2 d-flex ga-2"
+                style="font-size: 0.75rem !important"
+              >
+                <span
+                  >X:
+                  {{
+                    Number(hybridViewerStore.hoverData.attributes.coordinates[0]).toFixed(3)
+                  }}</span
+                >
+                <span
+                  >Y:
+                  {{
+                    Number(hybridViewerStore.hoverData.attributes.coordinates[1]).toFixed(3)
+                  }}</span
+                >
+                <span
+                  >Z:
+                  {{
+                    Number(hybridViewerStore.hoverData.attributes.coordinates[2]).toFixed(3)
+                  }}</span
+                >
               </div>
             </div>
 
@@ -130,7 +165,7 @@ async function handleClick(event) {
               <div v-if="name !== 'coordinates'" class="d-flex justify-space-between ga-3">
                 <span class="text-grey-lighten-1">{{ name }}:</span>
                 <span class="text-teal-accent-1 font-weight-medium font-mono">
-                  {{ typeof val === 'number' ? Number(val).toFixed(4) : val }}
+                  {{ typeof val === "number" ? Number(val).toFixed(4) : val }}
                 </span>
               </div>
             </template>

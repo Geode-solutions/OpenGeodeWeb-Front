@@ -187,51 +187,53 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
   }
 
-  const throttledHoverHighlight = useThrottleFn(
-    (event) => {
-      hoverPosition.value = { x: event.clientX, y: event.clientY };
-      performHoverHighlight(event, {
-        is_hover_highlight,
-        genericRenderWindow: genericRenderWindow.value,
-        viewerStore,
-        viewer_schemas,
-        hover_highlight_field_type,
-        hybridDb,
-        onResponse: async (response) => {
-          if (!is_hover_highlight.value) {
-            hoverData.value = null;
-            return;
-          }
-          if (response && response.id && response.picked_id !== undefined && response.picked_id !== -1) {
-            let componentInfo = null;
-            if (response.geode_id) {
-              const component = await database.model_components
-                .where("[id+geode_id]")
-                .equals([response.id, response.geode_id])
-                .first();
-              if (component) {
-                componentInfo = {
-                  name: component.name,
-                  id: component.geode_id,
-                  type: component.type,
-                };
-              }
+  const throttledHoverHighlight = useThrottleFn((event) => {
+    hoverPosition.value = { x: event.clientX, y: event.clientY };
+    performHoverHighlight(event, {
+      is_hover_highlight,
+      genericRenderWindow: genericRenderWindow.value,
+      viewerStore,
+      viewer_schemas,
+      hover_highlight_field_type,
+      hybridDb,
+      onResponse: async (response) => {
+        if (!is_hover_highlight.value) {
+          hoverData.value = null;
+          return;
+        }
+        if (
+          response &&
+          response.id &&
+          response.picked_id !== undefined &&
+          response.picked_id !== -1
+        ) {
+          let componentInfo = null;
+          if (response.geode_id) {
+            const component = await database.model_components
+              .where("[id+geode_id]")
+              .equals([response.id, response.geode_id])
+              .first();
+            if (component) {
+              componentInfo = {
+                name: component.name,
+                id: component.geode_id,
+                type: component.type,
+              };
             }
-            hoverData.value = {
-              modelId: response.id,
-              pickedId: response.picked_id,
-              fieldType: response.field_type,
-              component: componentInfo,
-              attributes: response.attributes || {},
-            };
-          } else {
-            hoverData.value = null;
           }
-        },
-      });
-    },
-    HOVER_THROTTLE_MS,
-  );
+          hoverData.value = {
+            modelId: response.id,
+            pickedId: response.picked_id,
+            fieldType: response.field_type,
+            component: componentInfo,
+            attributes: response.attributes || {},
+          };
+        } else {
+          hoverData.value = null;
+        }
+      },
+    });
+  }, HOVER_THROTTLE_MS);
 
   function clearHoverHighlight() {
     hoverData.value = null;
