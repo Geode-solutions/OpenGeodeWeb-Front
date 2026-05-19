@@ -104,14 +104,22 @@ export function useOverlappingPicker() {
 
     const yUI = containerHeight - y;
     const MENU_WIDTH = 340;
-    const MENU_HEIGHT = 280;
+    const MENU_BASE_HEIGHT = 55;
+    const MENU_ITEM_HEIGHT = 48;
+    const MENU_HEIGHT = MENU_BASE_HEIGHT + proposedItems.length * MENU_ITEM_HEIGHT;
     const CLAMP_MARGIN = 10;
     const clampedX = Math.min(
       Math.max(x, CLAMP_MARGIN),
       containerWidth - MENU_WIDTH - CLAMP_MARGIN,
     );
-    const clampedY = Math.min(
-      Math.max(yUI, CLAMP_MARGIN),
+    let clampedY = yUI;
+    if (yUI + MENU_HEIGHT > containerHeight - CLAMP_MARGIN) {
+      clampedY = Math.max(yUI - MENU_HEIGHT, CLAMP_MARGIN);
+    } else {
+      clampedY = Math.max(yUI, CLAMP_MARGIN);
+    }
+    clampedY = Math.min(
+      Math.max(clampedY, CLAMP_MARGIN),
       containerHeight - MENU_HEIGHT - CLAMP_MARGIN,
     );
 

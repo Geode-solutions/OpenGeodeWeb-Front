@@ -1,6 +1,6 @@
 <script setup>
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker";
-import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu";
+import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
 import { getCurrentInstance } from "vue";
 import { useMenuStore } from "@ogw_front/stores/menu";

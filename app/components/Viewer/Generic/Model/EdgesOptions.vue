@@ -1,6 +1,6 @@
 <script setup>
 import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
 import { useDataStyleStore } from "@ogw_front/stores/data_style";

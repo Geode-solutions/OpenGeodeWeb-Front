@@ -1,6 +1,6 @@
 <script setup>
 import SurfacePoints from "@ogw_front/assets/viewer_svgs/surface_points.svg";
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
