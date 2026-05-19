@@ -1,5 +1,6 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
+import { middleTruncate } from "@ogw_front/utils/string";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
@@ -14,6 +15,9 @@ const COPIED_TIMEOUT = 1500;
 const MAX_SHORT_ID_LENGTH = 15;
 const ID_SLICE_START = 8;
 const ID_SLICE_END_OFFSET = 7;
+const TRUNCATE_MAX_LENGTH = 22;
+const TRUNCATE_START_CHARS = 12;
+const TRUNCATE_END_CHARS = 7;
 
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
@@ -28,7 +32,11 @@ watch(
       return;
     }
 
-    if (newMeta.viewer_type === "model_component" && newMeta.modelId && newMeta.pickedComponentId) {
+    if (
+      newMeta.viewer_type === "model_component" &&
+      newMeta.modelId &&
+      newMeta.pickedComponentId
+    ) {
       try {
         const comp = await dataStore.getComponentByViewerId(
           newMeta.modelId,
@@ -44,7 +52,10 @@ watch(
       }
     } else if (newMeta.id && newMeta.pickedComponentId) {
       try {
-        const comp = await dataStore.getComponentByViewerId(newMeta.id, newMeta.pickedComponentId);
+        const comp = await dataStore.getComponentByViewerId(
+          newMeta.id,
+          newMeta.pickedComponentId,
+        );
         if (comp && comp.name) {
           componentName.value = comp.name;
         }
@@ -65,6 +76,19 @@ const cleanName = computed(() => {
     return componentName.value;
   }
   return meta.name || "Unnamed Object";
+});
+
+const displayTitle = computed(() => {
+  const name = cleanName.value;
+  if (!name) {
+    return "";
+  }
+  return middleTruncate(
+    name,
+    TRUNCATE_MAX_LENGTH,
+    TRUNCATE_START_CHARS,
+    TRUNCATE_END_CHARS,
+  );
 });
 
 const copied = ref(false);
@@ -96,9 +120,13 @@ const formattedId = computed(() => {
 </script>
 
 <template>
-  <!-- Direct local name display (no teleportation, no lag!) -->
   <v-fade-transition>
-    <v-sheet v-if="show" class="object-name-popover bg-transparent" @mousedown.stop @click.stop>
+    <v-sheet
+      v-if="show"
+      class="object-name-popover bg-transparent"
+      @mousedown.stop
+      @click.stop
+    >
       <GlassCard
         variant="panel"
         padding="pa-2 px-3"
@@ -113,7 +141,7 @@ const formattedId = computed(() => {
             cols="auto"
             style="line-height: 1.3"
           >
-            {{ cleanName }}
+            {{ displayTitle }}
           </v-col>
           <v-col
             class="text-caption font-weight-black text-uppercase text-secondary pa-0"
