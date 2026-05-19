@@ -1,14 +1,15 @@
 import {
   ACTOR_COLOR,
   BACKGROUND_COLOR,
-  HOVER_THROTTLE_MS,
   WHEEL_TIME_OUT_MS,
   computeAverageBrightness,
   performAddItem,
+  performClear,
   performClearHoverHighlight,
   performClickPicking,
-  performHoverHighlight,
+  performRemoveItem,
   performSetContainer,
+  performSetVisibility,
   performSetZScaling,
 } from "@ogw_internal/stores/hybrid_viewer";
 import {
@@ -19,13 +20,16 @@ import {
   performSetCamera,
   performSyncRemoteCamera,
 } from "@ogw_internal/stores/hybrid_viewer_camera";
+import {
+  createClearHoverData,
+  createHoverHighlight,
+} from "@ogw_internal/stores/hybrid_viewer_highlight";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
 import { Status } from "@ogw_front/utils/status";
-import { database } from "@ogw_internal/database/database.js";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -110,20 +114,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function removeItem(id) {
-    if (!hybridDb[id]) {
-      return;
-    }
-    genericRenderWindow.value.getRenderer().removeActor(hybridDb[id].actor);
-    genericRenderWindow.value.getRenderWindow().render();
-    delete hybridDb[id];
+    performRemoveItem(id, { genericRenderWindow: genericRenderWindow.value, hybridDb });
   }
 
   function setVisibility(id, visibility) {
-    if (!hybridDb[id]) {
-      return;
-    }
-    hybridDb[id].actor.setVisibility(visibility);
-    genericRenderWindow.value.getRenderWindow().render();
+    performSetVisibility(id, visibility, {
+      genericRenderWindow: genericRenderWindow.value,
+      hybridDb,
+    });
   }
 
   async function setZScaling(z_scale) {
@@ -188,99 +186,24 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
   }
 
-  let hoverTimeout = undefined;
+  const hoverTimeoutRef = ref(undefined);
   const currentHoverId = ref(undefined);
 
-  function clearHoverData() {
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      hoverTimeout = undefined;
-    }
-    hoverData.value = undefined;
-    currentHoverId.value = undefined;
-  }
+  const clearHoverData = createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId);
 
-  const throttledHoverHighlight = useThrottleFn((event) => {
-    const containerElement = genericRenderWindow.value?.getContainer();
-    let relativeMousePosition = { x: 0, y: 0 };
-    if (containerElement) {
-      const containerRect = containerElement.getBoundingClientRect();
-      relativeMousePosition = {
-        x: event.clientX - containerRect.left,
-        y: event.clientY - containerRect.top,
-      };
-    } else {
-      relativeMousePosition = { x: event.clientX, y: event.clientY };
-    }
-
-    performHoverHighlight(event, {
-      is_hover_highlight,
-      genericRenderWindow: genericRenderWindow.value,
-      viewerStore,
-      viewer_schemas,
-      hover_highlight_field_type,
-      hybridDb,
-      onResponse: async (response) => {
-        const isResponseValid =
-          response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
-        if (!is_hover_highlight.value || !isResponseValid) {
-          clearHoverData();
-          return;
-        }
-
-        const hoverKey = `${response.id}_${response.field_type}_${response.picked_id}`;
-        if (currentHoverId.value === hoverKey) {
-          return;
-        }
-
-        if (hoverTimeout) {
-          clearTimeout(hoverTimeout);
-          hoverTimeout = undefined;
-        }
-
-        hoverData.value = undefined;
-        currentHoverId.value = hoverKey;
-
-        let componentInfo = undefined;
-        let modelName = undefined;
-
-        const modelRecord = await database.data.get(response.id);
-        if (modelRecord) {
-          modelName = modelRecord.name;
-        }
-
-        if (response.geode_id) {
-          const component = await database.model_components
-            .where("[id+geode_id]")
-            .equals([response.id, response.geode_id])
-            .first();
-          if (component) {
-            componentInfo = {
-              name: component.name,
-              id: component.geode_id,
-              type: component.type,
-            };
-          }
-        }
-
-        const newHoverData = {
-          modelId: response.id,
-          modelName,
-          blockName: response.geode_id,
-          pickedId: response.picked_id,
-          fieldType: response.field_type,
-          component: componentInfo,
-          attributes: response.attributes || {},
-        };
-
-        hoverTimeout = setTimeout(() => {
-          hoverPosition.value = relativeMousePosition;
-          hoverData.value = newHoverData;
-          hoverTimeout = undefined;
-        }, 500);
-      },
-    });
-  }, HOVER_THROTTLE_MS);
+  const hoverHighlight = createHoverHighlight({
+    genericRenderWindow,
+    is_hover_highlight,
+    viewerStore,
+    viewer_schemas,
+    hover_highlight_field_type,
+    hybridDb,
+    hoverData,
+    hoverPosition,
+    currentHoverId,
+    hoverTimeoutRef,
+    clearHoverData,
+  });
 
   function clearHoverHighlight() {
     clearHoverData();
@@ -306,7 +229,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       viewerStore,
       viewer_schemas,
       syncRemoteCamera,
-      throttledHoverHighlight,
+      hoverHighlight,
       wheelTimeoutMs: WHEEL_TIME_OUT_MS,
       wheelEventEndTimeout,
       wheelTimeoutSetter: (timeout) => (wheelEventEndTimeout = timeout),
@@ -352,14 +275,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function clear() {
-    const renderer = genericRenderWindow.value.getRenderer();
-    for (const actor of renderer.getActors()) {
-      renderer.removeActor(actor);
-    }
-    genericRenderWindow.value.getRenderWindow().render();
-    for (const id of Object.keys(hybridDb)) {
-      delete hybridDb[id];
-    }
+    performClear({ genericRenderWindow: genericRenderWindow.value, hybridDb });
   }
 
   return {
