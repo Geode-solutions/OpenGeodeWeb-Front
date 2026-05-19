@@ -37,7 +37,7 @@ const buttonCoords = computed(() => {
 
 const { adaptiveStyles } = useAdaptiveStyles(buttonCoords, {
   minOpacity: 0.15,
-  maxOpacity: 1.0,
+  maxOpacity: 1,
 });
 
 const TREEVIEW_MARGIN_LEFT = 10;
