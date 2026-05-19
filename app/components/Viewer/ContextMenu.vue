@@ -46,24 +46,12 @@ const {
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
 
-function cleanItemName(fullName, itemId) {
-  if (!fullName) {
-    return "";
-  }
-  if (itemId && fullName.endsWith(` - ${itemId}`)) {
-    return fullName.slice(0, fullName.length - ` - ${itemId}`.length);
-  }
-  const uuidRegex =
-    / - [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
-  return fullName.replace(uuidRegex, "");
-}
-
 const cleanName = computed(() => {
   const meta = menuStore.current_meta_data;
   if (!meta) {
     return "Unnamed Object";
   }
-  return cleanItemName(meta.name, meta.id) || "Unnamed Object";
+  return meta.name || "Unnamed Object";
 });
 
 const show_menu = ref(true);

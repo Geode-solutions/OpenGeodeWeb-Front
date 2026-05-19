@@ -1,17 +1,11 @@
 <script setup>
+import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
-import { useDataStore } from "@ogw_front/stores/data";
-import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { getCurrentInstance } from "vue";
 import { useMenuStore } from "@ogw_front/stores/menu";
+import { useOverlappingPicker } from "@ogw_front/composables/use_overlapping_picker";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
-const MAX_SHORT_ID_LENGTH = 16;
-const ID_SLICE_START = 8;
-const ID_SLICE_END_OFFSET = 8;
-const CLAMP_MARGIN = 10;
 
 const { displayMenu, containerWidth, containerHeight } = defineProps({
   displayMenu: { type: Boolean, required: true },
@@ -20,136 +14,19 @@ const { displayMenu, containerWidth, containerHeight } = defineProps({
 });
 
 const emit = defineEmits(["show-menu"]);
-const dataStore = useDataStore();
-const dataStyleStore = useDataStyleStore();
-const viewerStore = useViewerStore();
 const menuStore = useMenuStore();
-const dataItems = dataStore.refAllItems();
+const viewerStore = useViewerStore();
 
-const displayIntermediate = ref(false);
-const intermediateItems = ref([]);
-const intermediateMenuX = ref(0);
-const intermediateMenuY = ref(0);
-let resolveIntermediate = undefined;
+const {
+  displayIntermediate,
+  intermediateItems,
+  getIntermediateMenuStyle,
+  selectIntermediateItem,
+  handleIntermediateMenuUpdate,
+  get_viewer_id: trigger_picker,
+} = useOverlappingPicker();
 
-function getIntermediateMenuStyle() {
-  return {
-    position: "fixed",
-    left: `${intermediateMenuX.value}px`,
-    top: `${intermediateMenuY.value}px`,
-  };
-}
-
-function selectIntermediateItem(item) {
-  if (resolveIntermediate) {
-    resolveIntermediate(item);
-    resolveIntermediate = undefined;
-  }
-}
-
-function handleIntermediateMenuUpdate(val) {
-  if (!val && resolveIntermediate) {
-    resolveIntermediate(undefined);
-    resolveIntermediate = undefined;
-  }
-}
-
-function cleanItemName(fullName, id) {
-  if (!fullName) {
-    return "";
-  }
-  if (id && fullName.endsWith(` - ${id}`)) {
-    return fullName.slice(0, fullName.length - ` - ${id}`.length);
-  }
-  const uuidRegex =
-    / - [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
-  return fullName.replace(uuidRegex, "");
-}
-
-function formatListId(id) {
-  if (!id) {
-    return "";
-  }
-  if (id.length <= MAX_SHORT_ID_LENGTH) {
-    return id;
-  }
-  return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
-}
-
-function fetchProposedItems(pickedList) {
-  return Promise.all(
-    pickedList.map(async (pick) => {
-      try {
-        const item = await dataStore.item(pick.id);
-        const cleanName = cleanItemName(item.name, pick.id) || "Unnamed Object";
-        return {
-          id: pick.id,
-          viewer_id: pick.viewer_id,
-          name: cleanName,
-          viewer_type: item.viewer_type,
-          geode_object_type: item.geode_object_type,
-        };
-      } catch {
-        return {
-          id: pick.id,
-          viewer_id: pick.viewer_id,
-          name: "Unnamed Object",
-          viewer_type: undefined,
-          geode_object_type: undefined,
-        };
-      }
-    }),
-  );
-}
-
-async function get_viewer_id(x, y) {
-  const activeIds = new Set(dataItems.value.map((item) => item.id));
-  const ids = Object.keys(dataStyleStore.styles).filter((styleId) =>
-    activeIds.has(styleId),
-  );
-
-  let result = { id: undefined, viewer_id: undefined };
-  let pickedResponse = undefined;
-
-  await viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.picked_ids,
-    { x, y, ids },
-    {
-      response_function: (response) => {
-        pickedResponse = response;
-      },
-    },
-  );
-
-  if (
-    !pickedResponse ||
-    !pickedResponse.array_ids ||
-    pickedResponse.array_ids.length === 0
-  ) {
-    return result;
-  }
-
-  const { array_ids, viewer_id, picked_data } = pickedResponse;
-
-  const pickedList = [];
-  if (picked_data && picked_data.length > 0) {
-    pickedList.push(...picked_data);
-  } else {
-    for (const pickId of array_ids) {
-      pickedList.push({ id: pickId, viewer_id });
-    }
-  }
-
-  if (pickedList.length <= 1) {
-    result = { id: pickedList[0]?.id, viewer_id: pickedList[0]?.viewer_id };
-    return result;
-  }
-
-  const proposedItems = await fetchProposedItems(pickedList);
-
-  intermediateItems.value = proposedItems;
-
-  const yUI = containerHeight - y;
+function get_viewer_id(x, y) {
   const instance = getCurrentInstance();
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')
@@ -158,31 +35,12 @@ async function get_viewer_id(x, y) {
       .querySelector('[data-testid="hybridViewer"]')
       ?.getBoundingClientRect() || { left: 0, top: 0 };
 
-  const MENU_WIDTH = 340;
-  const MENU_HEIGHT = 280;
-  const clampedX = Math.min(
-    Math.max(x, CLAMP_MARGIN),
-    containerWidth - MENU_WIDTH - CLAMP_MARGIN,
-  );
-  const clampedY = Math.min(
-    Math.max(yUI, CLAMP_MARGIN),
-    containerHeight - MENU_HEIGHT - CLAMP_MARGIN,
-  );
-
-  intermediateMenuX.value = containerRect.left + clampedX;
-  intermediateMenuY.value = containerRect.top + clampedY;
-  displayIntermediate.value = true;
-
-  /* eslint-disable-next-line promise/avoid-new */
-  return new Promise((resolve) => {
-    resolveIntermediate = (chosenResult) => {
-      displayIntermediate.value = false;
-      resolve(
-        chosenResult
-          ? { id: chosenResult.id, viewer_id: chosenResult.viewer_id }
-          : { id: undefined, viewer_id: undefined },
-      );
-    };
+  return trigger_picker({
+    x,
+    y,
+    containerWidth,
+    containerHeight,
+    containerRect,
   });
 }
 
@@ -203,82 +61,13 @@ defineExpose({ get_viewer_id });
     :container-height="containerHeight"
   />
 
-  <!-- Premium Glassmorphic Intermediate Selection Pre-Menu -->
-  <v-menu
-    :model-value="displayIntermediate"
-    :close-on-content-click="true"
-    :style="getIntermediateMenuStyle()"
-    :overlay="false"
-    @update:model-value="handleIntermediateMenuUpdate"
-  >
-    <GlassCard
-      variant="panel"
-      padding="pa-0"
-      rounded="lg"
-      class="elevation-12"
-      min-width="260"
-      max-width="340"
-    >
-      <v-card-title
-        class="d-flex align-center py-2 px-3 text-caption text-uppercase font-weight-black text-medium-emphasis"
-      >
-        <v-icon
-          icon="mdi-layers-triple"
-          size="small"
-          class="mr-2"
-          color="secondary"
-        />
-        Overlapping objects
-      </v-card-title>
-
-      <v-divider />
-
-      <v-list class="py-1 bg-transparent" density="compact">
-        <v-list-item
-          v-for="item in intermediateItems"
-          :key="`${item.id}-${item.viewer_id}`"
-          class="intermediate-picker-item px-3 py-2"
-          @click="selectIntermediateItem(item)"
-        >
-          <template #prepend>
-            <v-img
-              v-if="geode_objects[item.geode_object_type]?.image"
-              :src="geode_objects[item.geode_object_type].image"
-              height="24"
-              width="24"
-              max-width="24"
-              class="mr-3"
-              style="object-fit: contain; filter: brightness(0) invert(1)"
-            />
-            <v-icon
-              v-else
-              icon="mdi-cube-outline"
-              size="24"
-              color="white"
-              class="mr-3"
-            />
-          </template>
-
-          <v-list-item-title
-            class="font-weight-bold text-body-2 text-truncate text-white"
-          >
-            {{ item.name }}
-          </v-list-item-title>
-          <v-list-item-subtitle
-            class="text-caption text-truncate text-medium-emphasis mt-0.5 d-flex align-center"
-          >
-            <span class="font-weight-medium mr-1">{{
-              item.geode_object_type
-            }}</span>
-            <span
-              style="font-family: monospace; opacity: 0.65; font-size: 0.72rem"
-              >&middot; {{ formatListId(item.id) }}</span
-            >
-          </v-list-item-subtitle>
-        </v-list-item>
-      </v-list>
-    </GlassCard>
-  </v-menu>
+  <OverlappingObjectsPicker
+    :display-intermediate="displayIntermediate"
+    :intermediate-items="intermediateItems"
+    :menu-style="getIntermediateMenuStyle()"
+    @select="selectIntermediateItem"
+    @update:display-intermediate="handleIntermediateMenuUpdate"
+  />
 
   <v-fade-transition>
     <div
@@ -326,16 +115,5 @@ defineExpose({ get_viewer_id });
 
 .pick-pulse {
   animation: pulse-ring 1.5s ease-out infinite;
-}
-
-.intermediate-picker-item {
-  transition: all 0.2s ease;
-  border-radius: 8px !important;
-  margin: 2px 6px;
-}
-
-.intermediate-picker-item:hover {
-  background: rgba(var(--v-theme-secondary), 0.1) !important;
-  transform: translateX(4px);
 }
 </style>
