@@ -16,7 +16,7 @@ const viewerStore = useViewerStore();
 const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-const tooltipRef = ref(undefined);
+const tooltipRef = useTemplateRef("tooltip");
 const { width: tooltipWidth, height: tooltipHeight } = useElementSize(tooltipRef);
 
 const tooltipStyle = computed(() => {
@@ -28,7 +28,6 @@ const tooltipStyle = computed(() => {
   const measuredTooltipWidth = tooltipWidth.value;
   const measuredTooltipHeight = tooltipHeight.value;
   const tooltipOffsetGap = 20;
-
   let left = mouseX + tooltipOffsetGap;
   if (left + measuredTooltipWidth > elementWidth.value) {
     left = mouseX - measuredTooltipWidth - tooltipOffsetGap;
@@ -36,7 +35,6 @@ const tooltipStyle = computed(() => {
   if (left < 0) {
     left = TOOLTIP_SCREEN_MARGIN;
   }
-
   let top = mouseY - measuredTooltipHeight - tooltipOffsetGap;
   if (top < 0) {
     top = mouseY + tooltipOffsetGap;
@@ -44,7 +42,6 @@ const tooltipStyle = computed(() => {
   if (top + measuredTooltipHeight > elementHeight.value) {
     top = elementHeight.value - measuredTooltipHeight - TOOLTIP_SCREEN_MARGIN;
   }
-
   return {
     left: `${left}px`,
     top: `${top}px`,
@@ -145,20 +142,18 @@ async function handleClick(event) {
 
       <GlassCard
         v-if="hybridViewerStore.hoverData"
-        ref="tooltipRef"
+        ref="tooltip"
         variant="panel"
         padding="pa-3"
         rounded="lg"
         class="floating-tooltip"
         :style="tooltipStyle"
       >
-        <div class="d-flex flex-column ga-1.5 text-white text-caption" style="min-width: 220px">
-          <!-- Main Details -->
-          <div class="d-flex flex-column ga-1">
-            <!-- Name -->
-            <div>
-              <span class="text-grey-lighten-1 font-weight-bold">Name:</span>
-              <span class="ml-1 text-teal-accent-1 font-weight-medium">
+        <v-container fluid class="pa-0 tooltip-container">
+          <v-row no-gutters class="flex-column ga-1">
+            <v-col>
+              <span class="tooltip-label">Name:</span>
+              <span class="tooltip-value">
                 {{
                   hybridViewerStore.hoverData.component?.name ||
                   hybridViewerStore.hoverData.component?.id ||
@@ -167,58 +162,44 @@ async function handleClick(event) {
                   `${capitalize(hybridViewerStore.hoverData.fieldType.toLowerCase())} #${hybridViewerStore.hoverData.pickedId}`
                 }}
               </span>
-            </div>
-
-            <!-- Id -->
-            <div>
-              <span class="text-grey-lighten-1 font-weight-bold">Id:</span>
-              <span
-                class="ml-1 text-grey-lighten-2 font-mono text-caption"
-                style="font-size: 0.75rem !important"
-              >
+            </v-col>
+            <v-col>
+              <span class="tooltip-label">Id:</span>
+              <span class="tooltip-value-dim font-mono">
                 {{
                   hybridViewerStore.hoverData.component?.id || hybridViewerStore.hoverData.modelId
                 }}
               </span>
-            </div>
-
-            <!-- Index -->
-            <div v-if="originalIndex !== undefined">
-              <span class="text-grey-lighten-1 font-weight-bold">Index:</span>
-              <span class="ml-1 text-teal-accent-1 font-weight-medium font-mono">
+            </v-col>
+            <v-col v-if="originalIndex !== undefined">
+              <span class="tooltip-label">Index:</span>
+              <span class="tooltip-value font-mono">
                 {{ originalIndex }}
               </span>
-            </div>
-
-            <!-- Type -->
-            <div v-if="hybridViewerStore.hoverData.component?.type">
-              <span class="text-grey-lighten-1 font-weight-bold">Type:</span>
-              <span class="ml-1 text-teal-accent-1 font-weight-medium">
+            </v-col>
+            <v-col v-if="hybridViewerStore.hoverData.component?.type">
+              <span class="tooltip-label">Type:</span>
+              <span class="tooltip-value">
                 {{ hybridViewerStore.hoverData.component.type }}
               </span>
-            </div>
-          </div>
-
-          <!-- Separator & Attributes -->
-          <div v-if="hasOtherAttributes">
+            </v-col>
+          </v-row>
+          <template v-if="hasOtherAttributes">
             <v-divider class="my-2" opacity="0.15" />
-            <div class="d-flex flex-column ga-1">
-              <!-- Coordinates -->
-              <div
+            <v-row no-gutters class="flex-column ga-1">
+              <v-col
                 v-if="hybridViewerStore.hoverData.attributes.coordinates"
                 class="d-flex justify-space-between ga-3"
               >
-                <span class="text-grey-lighten-1 font-weight-bold">Position:</span>
-                <span class="text-teal-accent-1 font-weight-medium font-mono">
+                <span class="tooltip-label">Position:</span>
+                <span class="tooltip-value font-mono">
                   [ {{ Number(hybridViewerStore.hoverData.attributes.coordinates[0]).toFixed(3) }},
                   {{ Number(hybridViewerStore.hoverData.attributes.coordinates[1]).toFixed(3) }},
                   {{ Number(hybridViewerStore.hoverData.attributes.coordinates[2]).toFixed(3) }} ]
                 </span>
-              </div>
-
-              <!-- Custom scalar fields -->
+              </v-col>
               <template v-for="(val, name) in hybridViewerStore.hoverData.attributes" :key="name">
-                <div
+                <v-col
                   v-if="
                     name !== 'coordinates' &&
                     name !== 'vtkOriginalCellIds' &&
@@ -226,15 +207,15 @@ async function handleClick(event) {
                   "
                   class="d-flex justify-space-between ga-3"
                 >
-                  <span class="text-grey-lighten-1 font-weight-bold">{{ capitalize(name) }}:</span>
-                  <span class="text-teal-accent-1 font-weight-medium font-mono">
+                  <span class="tooltip-label">{{ capitalize(name) }}:</span>
+                  <span class="tooltip-value font-mono">
                     {{ formatAttributeValue(val) }}
                   </span>
-                </div>
+                </v-col>
               </template>
-            </div>
-          </div>
-        </div>
+            </v-row>
+          </template>
+        </v-container>
       </GlassCard>
 
       <v-col
@@ -265,5 +246,29 @@ img {
 }
 .font-mono {
   font-family: monospace !important;
+}
+.tooltip-container {
+  min-width: 220px;
+  color: white;
+  font-size: 0.875rem;
+}
+.tooltip-label {
+  color: #bdbdbd;
+  font-weight: bold;
+}
+.tooltip-value {
+  color: #a7ffeb;
+  font-weight: 500;
+}
+.tooltip-value-dim {
+  color: #eeeeee;
+  font-size: 0.75rem !important;
+}
+.tooltip-label + .tooltip-value,
+.tooltip-label + .tooltip-value-dim {
+  margin-left: 4px;
+}
+.justify-space-between > .tooltip-value {
+  margin-left: 0 !important;
 }
 </style>
