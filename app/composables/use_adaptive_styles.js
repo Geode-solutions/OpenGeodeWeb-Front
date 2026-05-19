@@ -83,8 +83,9 @@ export function useAdaptiveStyles(target, options = {}) {
     const darkFactor = (1 - normalized) ** ADAPTIVE_EXPONENT;
 
     const blur = MIN_BLUR + darkFactor * (MAX_BLUR - MIN_BLUR);
+    const minOpacity = options.minOpacity ?? MIN_OPACITY;
     const maxOpacity = options.maxOpacity ?? MAX_OPACITY;
-    const opacity = MIN_OPACITY + darkFactor * (maxOpacity - MIN_OPACITY);
+    const opacity = minOpacity + darkFactor * (maxOpacity - minOpacity);
     const brightnessBoost = MIN_BOOST + darkFactor * (MAX_BOOST - MIN_BOOST);
 
     return {

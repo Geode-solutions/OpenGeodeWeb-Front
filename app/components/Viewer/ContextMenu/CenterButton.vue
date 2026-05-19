@@ -15,7 +15,8 @@ const dragThreshold = 3;
 
 const activatorBtn = ref(undefined);
 const { adaptiveStyles } = useAdaptiveStyles(activatorBtn, {
-  maxOpacity: 0.85,
+  minOpacity: 0.15,
+  maxOpacity: 1.0,
 });
 
 const computedItemStyles = computed(() => {
