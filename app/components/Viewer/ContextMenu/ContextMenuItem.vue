@@ -60,7 +60,9 @@ const isOverTreeview = computed(() => {
 
 const isOverToolbar = computed(() => {
   const toolbarEl = document.querySelector(".view-toolbar");
-  if (!toolbarEl) return false;
+  if (!toolbarEl) {
+    return false;
+  }
   const rect = toolbarEl.getBoundingClientRect();
   const btn = buttonCoords.value;
   return (

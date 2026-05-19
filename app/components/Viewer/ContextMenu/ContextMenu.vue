@@ -20,6 +20,8 @@ const CLOSE_DELAY = 100;
 const TREEVIEW_MARGIN_LEFT = 10;
 const TREEVIEW_ICON_WIDTH = 48;
 const TREEVIEW_MARGIN_RIGHT = 20;
+const CENTER_BUTTON_SIZE = 52;
+const CENTER_BUTTON_HALF_SIZE = 26;
 
 const menuStore = useMenuStore();
 const treeviewStore = useTreeviewStore();
@@ -76,7 +78,9 @@ watch(
 const menuItemCount = computed(() => menu_items.value.length);
 
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
+  const hasAdditional = treeviewStore.opened_views.some(
+    (view) => view.id !== "main",
+  );
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
@@ -91,12 +95,14 @@ const isOverTreeview = computed(() => {
 
 const isOverToolbar = computed(() => {
   const toolbarEl = document.querySelector(".view-toolbar");
-  if (!toolbarEl) return false;
+  if (!toolbarEl) {
+    return false;
+  }
   const rect = toolbarEl.getBoundingClientRect();
-  const btnX = menuStore.containerLeft + menuX.value - 26;
-  const btnY = menuStore.containerTop + menuY.value - 26;
-  const btnWidth = 52;
-  const btnHeight = 52;
+  const btnX = menuStore.containerLeft + menuX.value - CENTER_BUTTON_HALF_SIZE;
+  const btnY = menuStore.containerTop + menuY.value - CENTER_BUTTON_HALF_SIZE;
+  const btnWidth = CENTER_BUTTON_SIZE;
+  const btnHeight = CENTER_BUTTON_SIZE;
   return (
     btnX < rect.right &&
     btnX + btnWidth > rect.left &&
