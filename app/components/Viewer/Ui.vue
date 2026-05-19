@@ -1,13 +1,17 @@
 <script setup>
-import { ref, getCurrentInstance } from "vue";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
+import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+
+const MAX_SHORT_ID_LENGTH = 16;
+const ID_SLICE_START = 8;
+const ID_SLICE_END_OFFSET = 8;
+const CLAMP_MARGIN = 10;
 
 const { displayMenu, containerWidth, containerHeight } = defineProps({
   displayMenu: { type: Boolean, required: true },
@@ -49,19 +53,53 @@ function handleIntermediateMenuUpdate(val) {
     resolveIntermediate = undefined;
   }
 }
+
 function cleanItemName(fullName, id) {
-  if (!fullName) return "";
-  if (id && fullName.endsWith(` - ${id}`)) {
-    return fullName.substring(0, fullName.length - ` - ${id}`.length);
+  if (!fullName) {
+    return "";
   }
-  const uuidRegex = / - [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (id && fullName.endsWith(` - ${id}`)) {
+    return fullName.slice(0, fullName.length - ` - ${id}`.length);
+  }
+  const uuidRegex =
+    / - [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
   return fullName.replace(uuidRegex, "");
 }
 
 function formatListId(id) {
-  if (!id) return "";
-  if (id.length <= 16) return id;
-  return `${id.substring(0, 8)}...${id.substring(id.length - 8)}`;
+  if (!id) {
+    return "";
+  }
+  if (id.length <= MAX_SHORT_ID_LENGTH) {
+    return id;
+  }
+  return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
+}
+
+function fetchProposedItems(pickedList) {
+  return Promise.all(
+    pickedList.map(async (pick) => {
+      try {
+        const item = await dataStore.item(pick.id);
+        const cleanName = cleanItemName(item.name, pick.id) || "Unnamed Object";
+        return {
+          id: pick.id,
+          viewer_id: pick.viewer_id,
+          name: cleanName,
+          viewer_type: item.viewer_type,
+          geode_object_type: item.geode_object_type,
+        };
+      } catch {
+        return {
+          id: pick.id,
+          viewer_id: pick.viewer_id,
+          name: "Unnamed Object",
+          viewer_type: undefined,
+          geode_object_type: undefined,
+        };
+      }
+    }),
+  );
 }
 
 async function get_viewer_id(x, y) {
@@ -107,34 +145,7 @@ async function get_viewer_id(x, y) {
     return result;
   }
 
-  const proposedItems = [];
-  for (const pick of pickedList) {
-    try {
-      const item = await dataStore.item(pick.id);
-      let cleanName = cleanItemName(item.name, pick.id) || "Unnamed Object";
-      if (item.viewer_type === "model" && pick.viewer_id !== undefined) {
-        const component = await dataStore.getComponentByViewerId(pick.id, pick.viewer_id);
-        if (component && component.name) {
-          cleanName = `${cleanName} - ${component.name}`;
-        }
-      }
-      proposedItems.push({
-        id: pick.id,
-        viewer_id: pick.viewer_id,
-        name: cleanName,
-        viewer_type: item.viewer_type,
-        geode_object_type: item.geode_object_type,
-      });
-    } catch (e) {
-      proposedItems.push({
-        id: pick.id,
-        viewer_id: pick.viewer_id,
-        name: "Unnamed Object",
-        viewer_type: undefined,
-        geode_object_type: undefined,
-      });
-    }
-  }
+  const proposedItems = await fetchProposedItems(pickedList);
 
   intermediateItems.value = proposedItems;
 
@@ -149,13 +160,20 @@ async function get_viewer_id(x, y) {
 
   const MENU_WIDTH = 340;
   const MENU_HEIGHT = 280;
-  const clampedX = Math.min(Math.max(x, 10), containerWidth - MENU_WIDTH - 10);
-  const clampedY = Math.min(Math.max(yUI, 10), containerHeight - MENU_HEIGHT - 10);
+  const clampedX = Math.min(
+    Math.max(x, CLAMP_MARGIN),
+    containerWidth - MENU_WIDTH - CLAMP_MARGIN,
+  );
+  const clampedY = Math.min(
+    Math.max(yUI, CLAMP_MARGIN),
+    containerHeight - MENU_HEIGHT - CLAMP_MARGIN,
+  );
 
   intermediateMenuX.value = containerRect.left + clampedX;
   intermediateMenuY.value = containerRect.top + clampedY;
   displayIntermediate.value = true;
 
+  /* eslint-disable-next-line promise/avoid-new */
   return new Promise((resolve) => {
     resolveIntermediate = (chosenResult) => {
       displayIntermediate.value = false;
@@ -201,13 +219,20 @@ defineExpose({ get_viewer_id });
       min-width="260"
       max-width="340"
     >
-      <v-card-title class="d-flex align-center py-2 px-3 text-caption text-uppercase font-weight-black text-medium-emphasis">
-        <v-icon icon="mdi-layers-triple" size="small" class="mr-2" color="secondary" />
+      <v-card-title
+        class="d-flex align-center py-2 px-3 text-caption text-uppercase font-weight-black text-medium-emphasis"
+      >
+        <v-icon
+          icon="mdi-layers-triple"
+          size="small"
+          class="mr-2"
+          color="secondary"
+        />
         Overlapping objects
       </v-card-title>
-      
+
       <v-divider />
-      
+
       <v-list class="py-1 bg-transparent" density="compact">
         <v-list-item
           v-for="item in intermediateItems"
@@ -223,7 +248,7 @@ defineExpose({ get_viewer_id });
               width="24"
               max-width="24"
               class="mr-3"
-              style="object-fit: contain; filter: brightness(0) invert(1);"
+              style="object-fit: contain; filter: brightness(0) invert(1)"
             />
             <v-icon
               v-else
@@ -233,13 +258,22 @@ defineExpose({ get_viewer_id });
               class="mr-3"
             />
           </template>
-          
-          <v-list-item-title class="font-weight-bold text-body-2 text-truncate text-white">
+
+          <v-list-item-title
+            class="font-weight-bold text-body-2 text-truncate text-white"
+          >
             {{ item.name }}
           </v-list-item-title>
-          <v-list-item-subtitle class="text-caption text-truncate text-medium-emphasis mt-0.5 d-flex align-center">
-            <span class="font-weight-medium mr-1">{{ item.geode_object_type }}</span>
-            <span style="font-family: monospace; opacity: 0.65; font-size: 0.72rem;">&middot; {{ formatListId(item.id) }}</span>
+          <v-list-item-subtitle
+            class="text-caption text-truncate text-medium-emphasis mt-0.5 d-flex align-center"
+          >
+            <span class="font-weight-medium mr-1">{{
+              item.geode_object_type
+            }}</span>
+            <span
+              style="font-family: monospace; opacity: 0.65; font-size: 0.72rem"
+              >&middot; {{ formatListId(item.id) }}</span
+            >
           </v-list-item-subtitle>
         </v-list-item>
       </v-list>

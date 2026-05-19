@@ -1,7 +1,9 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
+import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTheme } from "vuetify";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 const CARD_WIDTH = 320;
 const CARD_HEIGHT = 500;
 const MARGIN = 60;
@@ -12,7 +14,6 @@ const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
 
-import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 
 const { index, itemProps, tooltip, btn_image } = defineProps({
   index: { type: Number, required: true },
@@ -23,12 +24,12 @@ const { index, itemProps, tooltip, btn_image } = defineProps({
 
 const buttonCoords = computed(() => {
   const angle = (index / itemProps.totalItems) * 2 * Math.PI;
-  const dx = Math.cos(angle) * RADIUS;
-  const dy = Math.sin(angle) * RADIUS;
+  const deltaX = Math.cos(angle) * RADIUS;
+  const deltaY = Math.sin(angle) * RADIUS;
   const size = 40;
   return {
-    x: menuStore.containerLeft + menuStore.menuX + dx - size / 2,
-    y: menuStore.containerTop + menuStore.menuY + dy - size / 2,
+    x: menuStore.containerLeft + menuStore.menuX + deltaX - size / 2,
+    y: menuStore.containerTop + menuStore.menuY + deltaY - size / 2,
     width: size,
     height: size,
   };
@@ -36,15 +37,18 @@ const buttonCoords = computed(() => {
 
 const { adaptiveStyles } = useAdaptiveStyles(buttonCoords, { maxOpacity: 0.85 });
 
-import { useTreeviewStore } from "@ogw_front/stores/treeview";
+
+const TREEVIEW_MARGIN_LEFT = 10;
+const TREEVIEW_MARGIN_RIGHT = 20;
+const TREEVIEW_ICON_WIDTH = 48;
 
 const treeviewStore = useTreeviewStore();
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some(v => v.id !== "main");
-  const hasMain = treeviewStore.opened_views.some(v => v.id === "main");
+  const hasAdditional = treeviewStore.opened_views.some(view => view.id !== "main");
+  const hasMain = treeviewStore.opened_views.some(view => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
-  const treeviewWidth = 10 + 48 + firstColWidth + secondColWidth + 20;
+  const treeviewWidth = TREEVIEW_MARGIN_LEFT + TREEVIEW_ICON_WIDTH + firstColWidth + secondColWidth + TREEVIEW_MARGIN_RIGHT;
   return buttonCoords.value.x < treeviewWidth;
 });
 

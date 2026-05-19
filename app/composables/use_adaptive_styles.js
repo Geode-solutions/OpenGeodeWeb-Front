@@ -15,6 +15,13 @@ const MIN_BOOST = 1;
 const MAX_BOOST = 1.2;
 const ADAPTIVE_REFRESH_RATE = 150;
 
+function getValue(val) {
+  if (typeof val === "object" && val !== null && val.value !== undefined) {
+    return val.value;
+  }
+  return val ?? 0;
+}
+
 export function useAdaptiveStyles(target, options = {}) {
   const hybridViewerStore = useHybridViewerStore();
 
@@ -26,28 +33,38 @@ export function useAdaptiveStyles(target, options = {}) {
       (target.x !== undefined && target.value === undefined)
     );
 
-  let x, y, width, height;
-  if (isCoordinates) {
-    const unwrapped = computed(() => {
-      const val = typeof target === "function" ? target() : (target.value !== undefined ? target.value : target);
+  const bounding = useElementBounding(isCoordinates ? undefined : target);
+
+  const unwrapped = computed(() => {
+    if (isCoordinates) {
+      let val = undefined;
+      if (typeof target === "function") {
+        val = target();
+      } else if (target.value === undefined) {
+        val = target;
+      } else {
+        val = target.value;
+      }
       return {
-        x: typeof val?.x === "object" && val.x !== null && val.x.value !== undefined ? val.x.value : (val?.x ?? 0),
-        y: typeof val?.y === "object" && val.y !== null && val.y.value !== undefined ? val.y.value : (val?.y ?? 0),
-        width: typeof val?.width === "object" && val.width !== null && val.width.value !== undefined ? val.width.value : (val?.width ?? 0),
-        height: typeof val?.height === "object" && val.height !== null && val.height.value !== undefined ? val.height.value : (val?.height ?? 0),
+        x: getValue(val?.x),
+        y: getValue(val?.y),
+        width: getValue(val?.width),
+        height: getValue(val?.height),
       };
-    });
-    x = computed(() => unwrapped.value.x);
-    y = computed(() => unwrapped.value.y);
-    width = computed(() => unwrapped.value.width);
-    height = computed(() => unwrapped.value.height);
-  } else {
-    const bounding = useElementBounding(target);
-    x = bounding.x;
-    y = bounding.y;
-    width = bounding.width;
-    height = bounding.height;
-  }
+    }
+    return {
+      x: bounding.x.value,
+      y: bounding.y.value,
+      width: bounding.width.value,
+      height: bounding.height.value,
+    };
+  });
+
+  const x = computed(() => unwrapped.value.x);
+  const y = computed(() => unwrapped.value.y);
+  const width = computed(() => unwrapped.value.width);
+  const height = computed(() => unwrapped.value.height);
+
   const brightness = ref(LUMINANCE_THRESHOLD);
 
   const updateBrightness = useThrottleFn(() => {

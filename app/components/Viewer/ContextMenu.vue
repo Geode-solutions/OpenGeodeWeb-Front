@@ -1,8 +1,9 @@
 <script setup>
-import { useEventListener } from "@vueuse/core";
-import { useMenuStore } from "@ogw_front/stores/menu";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
+import { useEventListener } from "@vueuse/core";
+import { useMenuStore } from "@ogw_front/stores/menu";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const RADIUS = 80;
 const MARGIN_OFFSET = 40;
@@ -15,9 +16,27 @@ const ANGLE_225 = 225;
 const ANGLE_315 = 315;
 const CLOSE_DELAY = 100;
 
+const COPIED_TIMEOUT = 1500;
+const MAX_SHORT_ID_LENGTH = 15;
+const ID_SLICE_START = 8;
+const ID_SLICE_END_OFFSET = 7;
+const TREEVIEW_MARGIN_LEFT = 10;
+const TREEVIEW_ICON_WIDTH = 48;
+const TREEVIEW_MARGIN_RIGHT = 20;
+const ADAPTIVE_BLUR_VAL = "15px";
+const ADAPTIVE_OPACITY_VAL = 0.85;
+const ADAPTIVE_BRIGHTNESS_VAL = 1.15;
+const DRAG_THRESHOLD_VAL = 3;
+
 const menuStore = useMenuStore();
 
-const { id, x, y, containerWidth, containerHeight } = defineProps({
+const {
+  id: propId,
+  x,
+  y,
+  containerWidth,
+  containerHeight,
+} = defineProps({
   id: { type: String, required: true },
   x: { type: Number, required: true },
   y: { type: Number, required: true },
@@ -27,18 +46,23 @@ const { id, x, y, containerWidth, containerHeight } = defineProps({
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
 
-function cleanItemName(fullName, id) {
-  if (!fullName) return "";
-  if (id && fullName.endsWith(` - ${id}`)) {
-    return fullName.substring(0, fullName.length - ` - ${id}`.length);
+function cleanItemName(fullName, itemId) {
+  if (!fullName) {
+    return "";
   }
-  const uuidRegex = / - [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (itemId && fullName.endsWith(` - ${itemId}`)) {
+    return fullName.slice(0, fullName.length - ` - ${itemId}`.length);
+  }
+  const uuidRegex =
+    / - [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
   return fullName.replace(uuidRegex, "");
 }
 
 const cleanName = computed(() => {
   const meta = menuStore.current_meta_data;
-  if (!meta) return "Unnamed Object";
+  if (!meta) {
+    return "Unnamed Object";
+  }
   return cleanItemName(meta.name, meta.id) || "Unnamed Object";
 });
 
@@ -91,50 +115,66 @@ watch(
 const menuItemCount = computed(() => menu_items.value.length);
 
 let dragMoved = false;
-const dragThreshold = 3;
+const dragThreshold = DRAG_THRESHOLD_VAL;
 let dragStartClientX = 0;
 let dragStartClientY = 0;
 const showName = ref(false);
 
 const copied = ref(false);
-function copyId(id) {
-  if (!id) return;
-  navigator.clipboard.writeText(id).then(() => {
+async function copyId(targetId) {
+  if (!targetId) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(targetId);
     copied.value = true;
     setTimeout(() => {
       copied.value = false;
-    }, 1500);
-  });
+    }, COPIED_TIMEOUT);
+  } catch (error) {
+    console.error("Failed to copy ID:", error);
+  }
 }
 
 const formattedId = computed(() => {
-  const id = meta_data.value?.id;
-  if (!id) return "";
-  if (id.length <= 15) return id;
-  return `${id.substring(0, 8)}...${id.substring(id.length - 7)}`;
+  const metaId = meta_data.value?.id;
+  if (!metaId) {
+    return "";
+  }
+  if (metaId.length <= MAX_SHORT_ID_LENGTH) {
+    return metaId;
+  }
+  return `${metaId.slice(0, ID_SLICE_START)}...${metaId.slice(metaId.length - ID_SLICE_END_OFFSET)}`;
 });
-
-import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const treeviewStore = useTreeviewStore();
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some(v => v.id !== "main");
-  const hasMain = treeviewStore.opened_views.some(v => v.id === "main");
+  const hasAdditional = treeviewStore.opened_views.some(
+    (view) => view.id !== "main",
+  );
+  const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
-  const treeviewWidth = 10 + 48 + firstColWidth + secondColWidth + 20;
+  const treeviewWidth =
+    TREEVIEW_MARGIN_LEFT +
+    TREEVIEW_ICON_WIDTH +
+    firstColWidth +
+    secondColWidth +
+    TREEVIEW_MARGIN_RIGHT;
   return menuX.value < treeviewWidth;
 });
 
 const activatorBtn = ref(undefined);
-const { adaptiveStyles } = useAdaptiveStyles(activatorBtn, { maxOpacity: 0.85 });
+const { adaptiveStyles } = useAdaptiveStyles(activatorBtn, {
+  maxOpacity: 0.85,
+});
 
 const computedItemStyles = computed(() => {
   if (isOverTreeview.value) {
     return {
-      "--adaptive-blur": "15px",
-      "--adaptive-opacity": 0.85,
-      "--adaptive-brightness": 1.15,
+      "--adaptive-blur": ADAPTIVE_BLUR_VAL,
+      "--adaptive-opacity": ADAPTIVE_OPACITY_VAL,
+      "--adaptive-brightness": ADAPTIVE_BRIGHTNESS_VAL,
     };
   }
   return adaptiveStyles.value;
@@ -160,7 +200,7 @@ function clampPosition(posX, posY) {
 function handleDrag(event) {
   const deltaX = event.clientX - dragStartClientX;
   const deltaY = event.clientY - dragStartClientY;
-  const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+  const distance = Math.hypot(deltaX, deltaY);
 
   if (distance > dragThreshold) {
     dragMoved = true;
@@ -305,16 +345,16 @@ function getItemStyle(index) {
               max-width="250"
             >
               <div
-                class="text-caption font-weight-black text-uppercase text-secondary"
-                style="font-size: 0.68rem; line-height: 1.2"
-              >
-                {{ meta_data.geode_object_type }}
-              </div>
-              <div
                 class="text-subtitle-2 font-weight-bold text-truncate text-white"
                 style="line-height: 1.3"
               >
                 {{ cleanName }}
+              </div>
+              <div
+                class="text-caption font-weight-black text-uppercase text-secondary"
+                style="font-size: 0.68rem; line-height: 1.2"
+              >
+                {{ meta_data.geode_object_type }}
               </div>
               <div
                 v-if="meta_data.id"
