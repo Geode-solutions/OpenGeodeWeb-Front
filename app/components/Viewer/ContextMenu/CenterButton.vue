@@ -68,12 +68,7 @@ function onCenterClick(event) {
     @mouseup="onMouseUp"
     @click.stop="onCenterClick"
   >
-    <v-icon
-      icon="mdi-information-outline"
-      size="28"
-      color="primary"
-      style="pointer-events: none"
-    />
+    <v-icon icon="mdi-information-outline" size="28" color="primary" style="pointer-events: none" />
   </v-btn>
 </template>
 
@@ -91,10 +86,8 @@ function onCenterClick(event) {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;

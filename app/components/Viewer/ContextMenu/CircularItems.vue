@@ -25,10 +25,7 @@ function getItemStyle(index) {
     transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
     transition: "opacity 0.2s ease, transform 0.2s ease",
     position: "absolute",
-    zIndex:
-      menuStore.active_item_index === index
-        ? Z_INDEX_ACTIVE_ITEM
-        : Z_INDEX_BASE_ITEM,
+    zIndex: menuStore.active_item_index === index ? Z_INDEX_ACTIVE_ITEM : Z_INDEX_BASE_ITEM,
   };
 }
 

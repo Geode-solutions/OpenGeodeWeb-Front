@@ -7,13 +7,7 @@ import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const {
-  id,
-  x,
-  y,
-  containerWidth,
-  containerHeight,
-} = defineProps({
+const { id, x, y, containerWidth, containerHeight } = defineProps({
   id: { type: String, required: true },
   x: { type: Number, required: true },
   y: { type: Number, required: true },
@@ -83,9 +77,7 @@ watch(
 const menuItemCount = computed(() => menu_items.value.length);
 
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some(
-    (view) => view.id !== "main",
-  );
+  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
@@ -168,10 +160,7 @@ function toggleShowName() {
           @click="toggleShowName"
         />
 
-        <InfoCard
-          v-model:show="showName"
-          :meta-data="meta_data"
-        />
+        <InfoCard v-model:show="showName" :meta-data="meta_data" />
       </div>
     </div>
   </v-menu>

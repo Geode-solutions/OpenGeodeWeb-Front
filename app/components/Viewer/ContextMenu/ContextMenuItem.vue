@@ -45,9 +45,7 @@ const TREEVIEW_ICON_WIDTH = 48;
 
 const treeviewStore = useTreeviewStore();
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some(
-    (view) => view.id !== "main",
-  );
+  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
@@ -75,9 +73,7 @@ const is_active = computed(() => menuStore.active_item_index === index);
 const optionsRef = ref(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
 
-const maxCardHeight = computed(() =>
-  Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET),
-);
+const maxCardHeight = computed(() => Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET));
 
 const optionsStyle = computed(() => {
   if (!is_active.value || !optionsHeight.value) {
@@ -92,12 +88,8 @@ const optionsStyle = computed(() => {
 
   if (absoluteButtonY - height / 2 < margin) {
     offsetY = margin - (absoluteButtonY - height / 2);
-  } else if (
-    absoluteButtonY + height / 2 >
-    menuStore.containerHeight - margin
-  ) {
-    offsetY =
-      menuStore.containerHeight - margin - (absoluteButtonY + height / 2);
+  } else if (absoluteButtonY + height / 2 > menuStore.containerHeight - margin) {
+    offsetY = menuStore.containerHeight - margin - (absoluteButtonY + height / 2);
   }
   return { top: `calc(50% + ${offsetY}px)` };
 });
@@ -107,14 +99,11 @@ const optionsClass = computed(() => {
   const margin = MARGIN;
   const radius = RADIUS;
   if (loc === "right") {
-    return menuStore.menuX + radius + margin + CARD_WIDTH >
-      menuStore.containerWidth
+    return menuStore.menuX + radius + margin + CARD_WIDTH > menuStore.containerWidth
       ? "options-left"
       : "options-right";
   }
-  return menuStore.menuX - radius - margin - CARD_WIDTH < 0
-    ? "options-right"
-    : "options-left";
+  return menuStore.menuX - radius - margin - CARD_WIDTH < 0 ? "options-right" : "options-left";
 });
 
 function toggleOptions() {
@@ -123,10 +112,7 @@ function toggleOptions() {
 </script>
 <template>
   <v-sheet class="menu-item-container transition-swing" color="transparent">
-    <v-tooltip
-      :location="itemProps.tooltip_location"
-      :origin="itemProps.tooltip_origin"
-    >
+    <v-tooltip :location="itemProps.tooltip_location" :origin="itemProps.tooltip_origin">
       <template v-slot:activator="{ props: tooltipProps }">
         <v-btn
           ref="itemBtnRef"
@@ -170,10 +156,7 @@ function toggleOptions() {
         style="overflow: hidden; display: flex; flex-direction: column"
       >
         <v-card-title>{{ tooltip }}</v-card-title>
-        <v-card-text
-          class="pa-5"
-          style="overflow-y: auto; flex: 1; min-height: 0"
-        >
+        <v-card-text class="pa-5" style="overflow-y: auto; flex: 1; min-height: 0">
           <slot name="options" />
         </v-card-text>
       </GlassCard>
@@ -207,10 +190,8 @@ function toggleOptions() {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
