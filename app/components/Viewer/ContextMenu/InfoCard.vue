@@ -28,11 +28,7 @@ watch(
       return;
     }
 
-    if (
-      newMeta.viewer_type === "model_component" &&
-      newMeta.modelId &&
-      newMeta.pickedComponentId
-    ) {
+    if (newMeta.viewer_type === "model_component" && newMeta.modelId && newMeta.pickedComponentId) {
       try {
         const comp = await dataStore.getComponentByViewerId(
           newMeta.modelId,
@@ -48,10 +44,7 @@ watch(
       }
     } else if (newMeta.id && newMeta.pickedComponentId) {
       try {
-        const comp = await dataStore.getComponentByViewerId(
-          newMeta.id,
-          newMeta.pickedComponentId,
-        );
+        const comp = await dataStore.getComponentByViewerId(newMeta.id, newMeta.pickedComponentId);
         if (comp && comp.name) {
           componentName.value = comp.name;
         }
@@ -105,12 +98,7 @@ const formattedId = computed(() => {
 <template>
   <!-- Direct local name display (no teleportation, no lag!) -->
   <v-fade-transition>
-    <v-sheet
-      v-if="show"
-      class="object-name-popover bg-transparent"
-      @mousedown.stop
-      @click.stop
-    >
+    <v-sheet v-if="show" class="object-name-popover bg-transparent" @mousedown.stop @click.stop>
       <GlassCard
         variant="panel"
         padding="pa-2 px-3"
