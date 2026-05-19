@@ -1,6 +1,7 @@
 <script setup>
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useGeodeStore } from "@ogw_front/stores/geode";
+
 const schema = schemas.opengeodeweb_back.inspect_file;
 
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
