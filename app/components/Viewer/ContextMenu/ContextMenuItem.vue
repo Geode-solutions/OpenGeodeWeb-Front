@@ -115,7 +115,6 @@ function toggleOptions() {
     <v-tooltip :location="itemProps.tooltip_location" :origin="itemProps.tooltip_origin">
       <template v-slot:activator="{ props: tooltipProps }">
         <v-btn
-          ref="itemBtnRef"
           icon
           variant="outlined"
           :active="is_active"
