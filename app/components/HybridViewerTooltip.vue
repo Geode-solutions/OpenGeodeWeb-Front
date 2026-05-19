@@ -31,7 +31,7 @@ const tooltipStyle = computed(() => {
   const tooltipOffsetGap = 20;
 
   let left = mouseX + tooltipOffsetGap;
-  if (left + measuredTooltipWidth > props.containerWidth) {
+  if (left + measuredTooltipWidth > containerWidth) {
     left = mouseX - measuredTooltipWidth - tooltipOffsetGap;
   }
   if (left < 0) {
@@ -42,8 +42,8 @@ const tooltipStyle = computed(() => {
   if (top < 0) {
     top = mouseY + tooltipOffsetGap;
   }
-  if (top + measuredTooltipHeight > props.containerHeight) {
-    top = props.containerHeight - measuredTooltipHeight - TOOLTIP_SCREEN_MARGIN;
+  if (top + measuredTooltipHeight > containerHeight) {
+    top = containerHeight - measuredTooltipHeight - TOOLTIP_SCREEN_MARGIN;
   }
 
   return {
