@@ -1,5 +1,4 @@
 <script setup>
-import { computed, ref, shallowRef, watch } from "vue";
 import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton";
 import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems";
 import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard";
@@ -77,7 +76,9 @@ watch(
 const menuItemCount = computed(() => menu_items.value.length);
 
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
+  const hasAdditional = treeviewStore.opened_views.some(
+    (view) => view.id !== "main",
+  );
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
