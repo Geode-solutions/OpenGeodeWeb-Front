@@ -91,6 +91,22 @@ const isOverTreeview = computed(() => {
   return menuX.value < treeviewWidth;
 });
 
+const isOverToolbar = computed(() => {
+  const toolbarEl = document.querySelector(".view-toolbar");
+  if (!toolbarEl) return false;
+  const rect = toolbarEl.getBoundingClientRect();
+  const btnX = menuStore.containerLeft + menuX.value - 26;
+  const btnY = menuStore.containerTop + menuY.value - 26;
+  const btnWidth = 52;
+  const btnHeight = 52;
+  return (
+    btnX < rect.right &&
+    btnX + btnWidth > rect.left &&
+    btnY < rect.bottom &&
+    btnY + btnHeight > rect.top
+  );
+});
+
 function startDrag(event) {
   isDragging.value = true;
   dragStartX.value = event.clientX - menuX.value;
@@ -157,6 +173,7 @@ function toggleShowName() {
 
         <CenterButton
           :is-over-treeview="isOverTreeview"
+          :is-over-toolbar="isOverToolbar"
           @drag="startDrag"
           @click="toggleShowName"
         />

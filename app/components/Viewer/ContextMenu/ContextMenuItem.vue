@@ -58,8 +58,21 @@ const isOverTreeview = computed(() => {
   return buttonCoords.value.x < treeviewWidth;
 });
 
+const isOverToolbar = computed(() => {
+  const toolbarEl = document.querySelector(".view-toolbar");
+  if (!toolbarEl) return false;
+  const rect = toolbarEl.getBoundingClientRect();
+  const btn = buttonCoords.value;
+  return (
+    btn.x < rect.right &&
+    btn.x + btn.width > rect.left &&
+    btn.y < rect.bottom &&
+    btn.y + btn.height > rect.top
+  );
+});
+
 const computedItemStyles = computed(() => {
-  if (isOverTreeview.value) {
+  if (isOverTreeview.value || isOverToolbar.value) {
     return {
       "--adaptive-blur": "15px",
       "--adaptive-opacity": 0.85,

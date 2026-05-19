@@ -1,8 +1,9 @@
 <script setup>
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 
-const { isOverTreeview } = defineProps({
+const { isOverTreeview, isOverToolbar } = defineProps({
   isOverTreeview: { type: Boolean, required: true },
+  isOverToolbar: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["drag", "click"]);
@@ -18,7 +19,7 @@ const { adaptiveStyles } = useAdaptiveStyles(activatorBtn, {
 });
 
 const computedItemStyles = computed(() => {
-  if (isOverTreeview) {
+  if (isOverTreeview || isOverToolbar) {
     return {
       "--adaptive-blur": ADAPTIVE_BLUR_VAL,
       "--adaptive-opacity": ADAPTIVE_OPACITY_VAL,
