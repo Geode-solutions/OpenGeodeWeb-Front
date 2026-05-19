@@ -1,4 +1,5 @@
 <script setup>
+import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip";
 import ViewToolbar from "@ogw_front/components/ViewToolbar";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -60,6 +61,7 @@ async function handleClick(event) {
     <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ViewToolbar />
       <slot name="ui"></slot>
+      <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />
       <v-col
         class="pa-0"
         ref="viewer"

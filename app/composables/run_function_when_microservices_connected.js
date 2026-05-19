@@ -1,4 +1,5 @@
 import { useInfraStore } from "@ogw_front/stores/infra";
+
 export function run_function_when_microservices_connected(function_to_run) {
   const infraStore = useInfraStore();
   const { microservices_connected } = storeToRefs(infraStore);
