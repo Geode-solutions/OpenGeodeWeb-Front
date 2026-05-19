@@ -31,9 +31,10 @@ function get_viewer_id(x, y) {
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')
     ?.getBoundingClientRect() ||
-    document
-      .querySelector('[data-testid="hybridViewer"]')
-      ?.getBoundingClientRect() || { left: 0, top: 0 };
+    document.querySelector('[data-testid="hybridViewer"]')?.getBoundingClientRect() || {
+      left: 0,
+      top: 0,
+    };
 
   return trigger_picker({
     x,

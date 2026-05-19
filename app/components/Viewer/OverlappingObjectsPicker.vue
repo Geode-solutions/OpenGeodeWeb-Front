@@ -39,12 +39,7 @@ function handleUpdate(val) {
       <v-card-title
         class="d-flex align-center py-2 px-3 text-caption text-uppercase font-weight-black text-medium-emphasis"
       >
-        <v-icon
-          icon="mdi-layers-triple"
-          size="small"
-          class="mr-2"
-          color="secondary"
-        />
+        <v-icon icon="mdi-layers-triple" size="small" class="mr-2" color="secondary" />
         Overlapping objects
       </v-card-title>
 
@@ -67,28 +62,17 @@ function handleUpdate(val) {
               class="mr-3"
               style="object-fit: contain; filter: brightness(0) invert(1)"
             />
-            <v-icon
-              v-else
-              icon="mdi-cube-outline"
-              size="24"
-              color="white"
-              class="mr-3"
-            />
+            <v-icon v-else icon="mdi-cube-outline" size="24" color="white" class="mr-3" />
           </template>
 
-          <v-list-item-title
-            class="font-weight-bold text-body-2 text-truncate text-white"
-          >
+          <v-list-item-title class="font-weight-bold text-body-2 text-truncate text-white">
             {{ item.name }}
           </v-list-item-title>
           <v-list-item-subtitle
             class="text-caption text-truncate text-medium-emphasis mt-0.5 d-flex align-center"
           >
-            <span class="font-weight-medium mr-1">{{
-              item.geode_object_type
-            }}</span>
-            <span
-              style="font-family: monospace; opacity: 0.65; font-size: 0.72rem"
+            <span class="font-weight-medium mr-1">{{ item.geode_object_type }}</span>
+            <span style="font-family: monospace; opacity: 0.65; font-size: 0.72rem"
               >&middot; {{ formatListId(item.id) }}</span
             >
           </v-list-item-subtitle>

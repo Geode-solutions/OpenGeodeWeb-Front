@@ -25,13 +25,11 @@ function getValue(val) {
 export function useAdaptiveStyles(target, options = {}) {
   const hybridViewerStore = useHybridViewerStore();
 
-  const isCoordinates = 
-    target && 
-    (
-      typeof target === "function" || 
-      (target.value !== undefined && target.value !== null && target.value.x !== undefined) || 
-      (target.x !== undefined && target.value === undefined)
-    );
+  const isCoordinates =
+    target &&
+    (typeof target === "function" ||
+      (target.value !== undefined && target.value !== null && target.value.x !== undefined) ||
+      (target.x !== undefined && target.value === undefined));
 
   const bounding = useElementBounding(isCoordinates ? undefined : target);
 

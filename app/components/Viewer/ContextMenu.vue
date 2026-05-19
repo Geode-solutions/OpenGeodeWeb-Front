@@ -137,9 +137,7 @@ const formattedId = computed(() => {
 
 const treeviewStore = useTreeviewStore();
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some(
-    (view) => view.id !== "main",
-  );
+  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
@@ -258,10 +256,7 @@ function getItemStyle(index) {
     transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
     transition: "opacity 0.2s ease, transform 0.2s ease",
     position: "absolute",
-    zIndex:
-      menuStore.active_item_index === index
-        ? Z_INDEX_ACTIVE_ITEM
-        : Z_INDEX_BASE_ITEM,
+    zIndex: menuStore.active_item_index === index ? Z_INDEX_ACTIVE_ITEM : Z_INDEX_BASE_ITEM,
   };
 }
 </script>
@@ -318,12 +313,7 @@ function getItemStyle(index) {
 
         <!-- Direct local name display (no teleportation, no lag!) -->
         <transition name="fade-scale">
-          <div
-            v-if="showName"
-            class="object-name-popover"
-            @mousedown.stop
-            @click.stop
-          >
+          <div v-if="showName" class="object-name-popover" @mousedown.stop @click.stop>
             <GlassCard
               variant="panel"
               padding="pa-2 px-3"
@@ -418,10 +408,8 @@ function getItemStyle(index) {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;

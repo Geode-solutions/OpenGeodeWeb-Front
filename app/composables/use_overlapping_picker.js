@@ -63,17 +63,9 @@ export function useOverlappingPicker() {
     }
   }
 
-  async function get_viewer_id({
-    x,
-    y,
-    containerWidth,
-    containerHeight,
-    containerRect,
-  }) {
+  async function get_viewer_id({ x, y, containerWidth, containerHeight, containerRect }) {
     const activeIds = new Set(dataItems.value.map((item) => item.id));
-    const ids = Object.keys(dataStyleStore.styles).filter((styleId) =>
-      activeIds.has(styleId),
-    );
+    const ids = Object.keys(dataStyleStore.styles).filter((styleId) => activeIds.has(styleId));
 
     const result = { id: undefined, viewer_id: undefined };
     let pickedResponse = undefined;
@@ -88,11 +80,7 @@ export function useOverlappingPicker() {
       },
     );
 
-    if (
-      !pickedResponse ||
-      !pickedResponse.array_ids ||
-      pickedResponse.array_ids.length === 0
-    ) {
+    if (!pickedResponse || !pickedResponse.array_ids || pickedResponse.array_ids.length === 0) {
       return result;
     }
 
