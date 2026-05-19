@@ -1,5 +1,6 @@
 <script setup>
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
+import { useMenuStore } from "@ogw_front/stores/menu";
 
 const { isOverTreeview, isOverToolbar } = defineProps({
   isOverTreeview: { type: Boolean, required: true },
@@ -13,8 +14,19 @@ const ADAPTIVE_OPACITY_VAL = 0.85;
 const ADAPTIVE_BRIGHTNESS_VAL = 1.15;
 const dragThreshold = 3;
 
-const activatorBtn = ref(undefined);
-const { adaptiveStyles } = useAdaptiveStyles(activatorBtn, {
+const menuStore = useMenuStore();
+
+const centerButtonCoords = computed(() => {
+  const size = 52;
+  return {
+    x: menuStore.containerLeft + menuStore.menuX - size / 2,
+    y: menuStore.containerTop + menuStore.menuY - size / 2,
+    width: size,
+    height: size,
+  };
+});
+
+const { adaptiveStyles } = useAdaptiveStyles(centerButtonCoords, {
   minOpacity: 0.15,
   maxOpacity: 1,
 });
@@ -59,7 +71,6 @@ function onCenterClick(event) {
 
 <template>
   <v-btn
-    ref="activatorBtn"
     icon
     variant="outlined"
     class="central-selector-btn elevation-6"
