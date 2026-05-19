@@ -4,6 +4,7 @@ import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTheme } from "vuetify";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
+
 const CARD_WIDTH = 320;
 const CARD_HEIGHT = 500;
 const MARGIN = 60;
