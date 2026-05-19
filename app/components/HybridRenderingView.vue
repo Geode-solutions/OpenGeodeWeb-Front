@@ -200,12 +200,8 @@ async function handleClick(event) {
           </div>
 
           <!-- Separator & Attributes -->
-          <div
-            v-if="hasOtherAttributes"
-            class="border-top pt-2 mt-1"
-            style="border-color: rgba(255, 255, 255, 0.1) !important"
-          >
-            <div class="font-weight-bold mb-1 text-grey-lighten-1">Attributes:</div>
+          <div v-if="hasOtherAttributes">
+            <v-divider class="my-2" opacity="0.15" />
             <div class="d-flex flex-column ga-1">
               <!-- Coordinates -->
               <div

@@ -277,7 +277,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
           hoverPosition.value = relativeMousePosition;
           hoverData.value = newHoverData;
           hoverTimeout = undefined;
-        }, 1000);
+        }, 500);
       },
     });
   }, HOVER_THROTTLE_MS);
