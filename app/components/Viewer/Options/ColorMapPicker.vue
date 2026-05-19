@@ -1,5 +1,5 @@
 <script setup>
-import { getRGBPointsFromPreset, scientificPresets } from "@ogw_front/utils/colormap";
+import { colormaps, getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import ColorMapList from "./ColorMapList.vue";
 import { newInstance } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
 
@@ -18,13 +18,13 @@ const lutCanvas = ref();
 
 const presets = computed(() => {
   let currentPreset = undefined;
-  for (const category of scientificPresets) {
+  for (const category of colormaps) {
     currentPreset = category.Children.find((preset) => preset.Name === selectedPresetName.value);
     if (currentPreset) {
       break;
     }
   }
-  return [currentPreset, ...scientificPresets].filter(Boolean);
+  return [currentPreset, ...colormaps].filter(Boolean);
 });
 
 function drawLutCanvas() {

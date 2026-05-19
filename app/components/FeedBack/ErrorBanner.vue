@@ -1,5 +1,6 @@
 <script setup>
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+
 const feedbackStore = useFeedbackStore();
 
 function reload() {

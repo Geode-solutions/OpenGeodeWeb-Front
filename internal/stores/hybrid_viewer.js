@@ -16,6 +16,7 @@ const ACTOR_COLOR = [
 ];
 const WHEEL_TIME_OUT_MS = 600;
 const HOVER_THROTTLE_MS = 50;
+const HOVER_TIMEOUT_MS = 500;
 
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
@@ -118,7 +119,7 @@ function performHoverHighlight(event, options) {
   }
   const rect = container.getBoundingClientRect();
   viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight,
+    viewer_schemas.opengeodeweb_viewer.viewer.highlight,
     {
       x: Math.round(event.clientX - rect.left),
       y: Math.round(rect.height - (event.clientY - rect.top)),
@@ -133,7 +134,7 @@ function performHoverHighlight(event, options) {
 
 function performClearHoverHighlight(options) {
   const { viewerStore, viewer_schemas, hover_highlight_field_type, hybridDb } = options;
-  viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight, {
+  viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.highlight, {
     x: -1,
     y: -1,
     field_type: hover_highlight_field_type.value,
@@ -206,7 +207,7 @@ function performSetContainer(options) {
     viewerStore,
     viewer_schemas,
     syncRemoteCamera,
-    throttledHoverHighlight,
+    hoverHighlight,
     wheelTimeoutMs,
     wheelEventEndTimeout,
     wheelTimeoutSetter,
@@ -257,7 +258,7 @@ function performSetContainer(options) {
     },
   });
 
-  useEventListener(container, "mousemove", throttledHoverHighlight);
+  useEventListener(container, "mousemove", hoverHighlight);
   useEventListener(container, "wheel", () => {
     is_moving.value = true;
     if (imageStyle) {
@@ -274,11 +275,43 @@ function performSetContainer(options) {
   });
 }
 
+function performRemoveItem(id, options) {
+  const { genericRenderWindow, hybridDb } = options;
+  if (!hybridDb[id]) {
+    return;
+  }
+  genericRenderWindow.getRenderer().removeActor(hybridDb[id].actor);
+  genericRenderWindow.getRenderWindow().render();
+  delete hybridDb[id];
+}
+
+function performSetVisibility(id, visibility, options) {
+  const { genericRenderWindow, hybridDb } = options;
+  if (!hybridDb[id]) {
+    return;
+  }
+  hybridDb[id].actor.setVisibility(visibility);
+  genericRenderWindow.getRenderWindow().render();
+}
+
+function performClear(options) {
+  const { genericRenderWindow, hybridDb } = options;
+  const renderer = genericRenderWindow.getRenderer();
+  for (const actor of renderer.getActors()) {
+    renderer.removeActor(actor);
+  }
+  genericRenderWindow.getRenderWindow().render();
+  for (const id of Object.keys(hybridDb)) {
+    delete hybridDb[id];
+  }
+}
+
 export {
   BACKGROUND_COLOR,
   ACTOR_COLOR,
   WHEEL_TIME_OUT_MS,
   HOVER_THROTTLE_MS,
+  HOVER_TIMEOUT_MS,
   computeAverageBrightness,
   performAddItem,
   performClearHoverHighlight,
@@ -286,4 +319,7 @@ export {
   performHoverHighlight,
   performSetContainer,
   performSetZScaling,
+  performRemoveItem,
+  performSetVisibility,
+  performClear,
 };
