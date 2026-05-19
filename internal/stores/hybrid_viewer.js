@@ -113,7 +113,7 @@ function performHoverHighlight(event, options) {
   }
   const rect = container.getBoundingClientRect();
   viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight,
+    viewer_schemas.opengeodeweb_viewer.viewer.highlight,
     {
       x: Math.round(event.clientX - rect.left),
       y: Math.round(rect.height - (event.clientY - rect.top)),
@@ -128,7 +128,7 @@ function performHoverHighlight(event, options) {
 
 function performClearHoverHighlight(options) {
   const { viewerStore, viewer_schemas, hover_highlight_field_type, hybridDb } = options;
-  viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.hover_highlight, {
+  viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.highlight, {
     x: -1,
     y: -1,
     field_type: hover_highlight_field_type.value,
