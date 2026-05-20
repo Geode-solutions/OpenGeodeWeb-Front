@@ -1,7 +1,7 @@
 <script setup>
+import { colormaps, getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import ColorMapList from "./ColorMapList.vue";
 import { newInstance } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
-import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps";
 
 const LAST_POINT_OFFSET = 4;
 const THREE = 3;
@@ -11,56 +11,28 @@ const { max, min } = defineProps({
   max: { type: Number, required: true },
 });
 
-const selectedPresetName = defineModel("selectedPresetName", { default: "Cool to Warm" });
+const selectedPresetName = defineModel("selectedPresetName", { default: "batlow" });
 
 const menuOpen = ref(false);
 const lutCanvas = ref();
 
 const presets = computed(() => {
-  const allPresets = vtkColorMaps.rgbPresetNames.map((name) => vtkColorMaps.getPresetByName(name));
-
-  const paraviewNames = [
-    "Cool to Warm",
-    "Warm to Cool",
-    "rainbow",
-    "Grayscale",
-    "X Ray",
-    "Black-Body Radiation",
-    "erdc_rainbow_bright",
-  ];
-  const matplotlibNames = [
-    "Viridis (matplotlib)",
-    "Plasma (matplotlib)",
-    "Inferno (matplotlib)",
-    "Magma (matplotlib)",
-  ];
-
-  const paraviewPresets = paraviewNames
-    .map((name) => vtkColorMaps.getPresetByName(name))
-    .filter(Boolean);
-  const matplotlibPresets = matplotlibNames
-    .map((name) => vtkColorMaps.getPresetByName(name))
-    .filter(Boolean);
-  const otherPresets = allPresets.filter(
-    (preset) => !paraviewNames.includes(preset.Name) && !matplotlibNames.includes(preset.Name),
-  );
-
-  const currentPreset = vtkColorMaps.getPresetByName(selectedPresetName.value);
-
-  return [
-    currentPreset,
-    { Name: "ParaView", Children: paraviewPresets },
-    { Name: "Matplotlib", Children: matplotlibPresets },
-    { Name: "Others", Children: otherPresets },
-  ].filter(Boolean);
+  let currentPreset = undefined;
+  for (const category of colormaps) {
+    currentPreset = category.Children.find((preset) => preset.Name === selectedPresetName.value);
+    if (currentPreset) {
+      break;
+    }
+  }
+  return [currentPreset, ...colormaps].filter(Boolean);
 });
 
 function drawLutCanvas() {
   if (!lutCanvas.value) {
     return;
   }
-  const preset = vtkColorMaps.getPresetByName(selectedPresetName.value);
-  if (!preset || !preset.RGBPoints) {
+  const rgbPoints = getRGBPointsFromPreset(selectedPresetName.value);
+  if (!rgbPoints || rgbPoints.length === 0) {
     return;
   }
 
@@ -69,7 +41,6 @@ function drawLutCanvas() {
   const { height, width } = canvas;
 
   const lut = newInstance();
-  const rgbPoints = preset.RGBPoints;
 
   for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {
     lut.addRGBPoint(

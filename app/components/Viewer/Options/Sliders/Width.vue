@@ -1,5 +1,6 @@
 <script setup>
 import Slider from "./Slider";
+
 const width = defineModel();
 </script>
 

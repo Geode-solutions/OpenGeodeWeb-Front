@@ -1,4 +1,5 @@
 <script setup>
+import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip";
 import ViewToolbar from "@ogw_front/components/ViewToolbar";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -42,6 +43,17 @@ function debounce(func, wait) {
     timeout = setTimeout(later, wait);
   };
 }
+
+async function handleClick(event) {
+  if (viewerStore.picking_mode) {
+    const rect = container.value.$el.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = elementHeight.value - (event.clientY - rect.top);
+    await viewerStore.set_picked_point(x, y);
+    return;
+  }
+  emit("click", event);
+}
 </script>
 
 <template>
@@ -49,19 +61,23 @@ function debounce(func, wait) {
     <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ViewToolbar />
       <slot name="ui"></slot>
+      <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />
       <v-col
         class="pa-0"
         ref="viewer"
+        :class="{ 'picking-cursor': viewerStore.picking_mode }"
         style="height: 100%; overflow: hidden; position: relative; z-index: 0"
-        @click="emit('click', $event)"
-        @keydown.esc="viewerStore.toggle_picking_mode(false)"
+        @click="handleClick"
       />
     </div>
   </ClientOnly>
 </template>
 
-<style>
+<style scoped>
 img {
   pointer-events: none;
+}
+.picking-cursor {
+  cursor: crosshair !important;
 }
 </style>

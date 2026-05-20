@@ -1,7 +1,10 @@
-import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps";
+import colormaps from "@ogw_front/assets/colormaps.json";
 
 function getRGBPointsFromPreset(presetName) {
-  return vtkColorMaps.getPresetByName(presetName)?.RGBPoints ?? [];
+  return (
+    colormaps.flatMap((category) => category.Children).find((preset) => preset.Name === presetName)
+      ?.RGBPoints ?? []
+  );
 }
 
-export { getRGBPointsFromPreset };
+export { getRGBPointsFromPreset, colormaps };

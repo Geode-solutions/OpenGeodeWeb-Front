@@ -4,10 +4,9 @@
 // Third party imports
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Local imports
+import { exportProject, importProject } from "@ogw_front/composables/project_manager";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
-import { useProjectManager } from "@ogw_front/composables/project_manager";
 
 // Constants
 const PANEL_WIDTH = 300;
@@ -245,7 +244,6 @@ describe("projectManager composable (compact)", () => {
   });
 
   test("exportProject", async () => {
-    const { exportProject } = useProjectManager();
     const { default: fileDownload } = await import("js-file-download");
 
     await exportProject();
@@ -254,24 +252,22 @@ describe("projectManager composable (compact)", () => {
   });
 
   test("importProjectFile with snapshot - Viewer and Stores", async () => {
-    const { importProjectFile } = useProjectManager();
     const file = new Blob(['{"dataBase":{"db":{}}}'], {
       type: "application/json",
     });
 
-    await importProjectFile(file);
+    await importProject(file);
 
     verifyViewerCalls();
     verifyStoreImports();
   });
 
   test("importProjectFile with snapshot - Data and Rendering", async () => {
-    const { importProjectFile } = useProjectManager();
     const file = new Blob(['{"dataBase":{"db":{}}}'], {
       type: "application/json",
     });
 
-    await importProjectFile(file);
+    await importProject(file);
 
     verifyDataManagement();
     verifyRemaining();

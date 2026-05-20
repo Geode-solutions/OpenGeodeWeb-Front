@@ -62,12 +62,20 @@ async function get_allowed_objects() {
     const load_scores = allowed_objects_list.map((obj) => obj[key].is_loadable);
     const priorities = allowed_objects_list
       .map((obj) => obj[key].object_priority)
-      .filter((priority) => priority !== undefined && priority !== null);
+      .filter((priority) => priority !== undefined);
     final_object[key] = { is_loadable: Math.min(...load_scores) };
     if (priorities.length > 0) {
       final_object[key].object_priority = Math.max(...priorities);
     }
   }
+  const isCsv = filenames.some(
+    (filename) =>
+      filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json"),
+  );
+  if (isCsv && !final_object["PointSet3D"]) {
+    final_object["PointSet3D"] = { is_loadable: 1, object_priority: 100 };
+  }
+
   allowed_objects.value = final_object;
   const selected_object = select_geode_object(final_object);
   if (selected_object) {

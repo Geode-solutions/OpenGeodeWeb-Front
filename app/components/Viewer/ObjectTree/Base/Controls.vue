@@ -2,14 +2,15 @@
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 
-const { search, sortType, filterOptions, availableFilterOptions } = defineProps({
+const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } = defineProps({
   search: { type: String, required: true },
   sortType: { type: String, required: true },
   filterOptions: { type: Object, required: true },
   availableFilterOptions: { type: Array, required: true },
+  isCollapsed: { type: Boolean, required: false, default: false },
 });
 
-const emit = defineEmits(["update:search", "toggle-sort", "collapse-all"]);
+const emit = defineEmits(["update:search", "toggle-sort", "collapse-all", "expand-all"]);
 
 const showSearch = ref(false);
 
@@ -24,7 +25,7 @@ watch(
 </script>
 
 <template>
-  <v-row dense align="center" class="pa-2 py-1">
+  <v-row dense align="center" class="pa-1 py-0">
     <v-col cols="12">
       <div
         class="controls-capsule d-flex align-center rounded-pill px-1 overflow-hidden"
@@ -98,12 +99,22 @@ watch(
             </v-list>
           </v-menu>
           <ActionButton
+            v-if="!isCollapsed"
             tooltip="Collapse All"
             icon="mdi-collapse-all-outline"
             variant="text"
             color="black"
             tooltipLocation="bottom"
             @click="emit('collapse-all')"
+          />
+          <ActionButton
+            v-else
+            tooltip="Expand All"
+            icon="mdi-expand-all-outline"
+            variant="text"
+            color="black"
+            tooltipLocation="bottom"
+            @click="emit('expand-all')"
           />
         </div>
       </div>
@@ -113,7 +124,7 @@ watch(
 
 <style scoped>
 .controls-capsule {
-  height: 40px;
+  height: 32px;
   border: 1px solid transparent;
   transition: all 0.3s ease;
   width: fit-content;
@@ -133,12 +144,12 @@ watch(
 :deep(.v-field__input) {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  min-height: 40px !important;
+  min-height: 32px !important;
   display: flex;
   align-items: center;
 }
 
 :deep(.v-field__field) {
-  height: 40px !important;
+  height: 32px !important;
 }
 </style>

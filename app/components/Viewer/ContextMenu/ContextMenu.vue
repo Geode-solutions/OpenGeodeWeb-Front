@@ -1,19 +1,10 @@
 <script setup>
+import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton";
+import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems";
+import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard";
 import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
-
-const RADIUS = 80;
-const MARGIN_OFFSET = 40;
-const Z_INDEX_ACTIVE_ITEM = 10;
-const Z_INDEX_BASE_ITEM = 1;
-const FULL_ANGLE = 360;
-const ANGLE_45 = 45;
-const ANGLE_135 = 135;
-const ANGLE_225 = 225;
-const ANGLE_315 = 315;
-const CLOSE_DELAY = 100;
-
-const menuStore = useMenuStore();
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id, x, y, containerWidth, containerHeight } = defineProps({
   id: { type: String, required: true },
@@ -23,9 +14,22 @@ const { id, x, y, containerWidth, containerHeight } = defineProps({
   containerHeight: { type: Number, required: true },
 });
 
+const RADIUS = 80;
+const MARGIN_OFFSET = 40;
+const CLOSE_DELAY = 100;
+const TREEVIEW_MARGIN_LEFT = 10;
+const TREEVIEW_ICON_WIDTH = 48;
+const TREEVIEW_MARGIN_RIGHT = 20;
+const CENTER_BUTTON_SIZE = 52;
+const CENTER_BUTTON_HALF_SIZE = 26;
+
+const menuStore = useMenuStore();
+const treeviewStore = useTreeviewStore();
+
 const meta_data = computed(() => menuStore.current_meta_data || {});
 
 const show_menu = ref(true);
+const showName = ref(false);
 const isDragging = ref(false);
 const dragStartX = ref(0);
 const dragStartY = ref(0);
@@ -73,11 +77,42 @@ watch(
 
 const menuItemCount = computed(() => menu_items.value.length);
 
+const isOverTreeview = computed(() => {
+  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
+  const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
+  const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
+  const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
+  const treeviewWidth =
+    TREEVIEW_MARGIN_LEFT +
+    TREEVIEW_ICON_WIDTH +
+    firstColWidth +
+    secondColWidth +
+    TREEVIEW_MARGIN_RIGHT;
+  return menuX.value < treeviewWidth;
+});
+
+const isOverToolbar = computed(() => {
+  const toolbarEl = document.querySelector(".view-toolbar");
+  if (!toolbarEl) {
+    return false;
+  }
+  const rect = toolbarEl.getBoundingClientRect();
+  const btnX = menuStore.containerLeft + menuX.value - CENTER_BUTTON_HALF_SIZE;
+  const btnY = menuStore.containerTop + menuY.value - CENTER_BUTTON_HALF_SIZE;
+  const btnWidth = CENTER_BUTTON_SIZE;
+  const btnHeight = CENTER_BUTTON_SIZE;
+  return (
+    btnX < rect.right &&
+    btnX + btnWidth > rect.left &&
+    btnY < rect.bottom &&
+    btnY + btnHeight > rect.top
+  );
+});
+
 function startDrag(event) {
   isDragging.value = true;
   dragStartX.value = event.clientX - menuX.value;
   dragStartY.value = event.clientY - menuY.value;
-  event.preventDefault();
 }
 
 function clampPosition(posX, posY) {
@@ -112,42 +147,8 @@ function getMenuStyle() {
   };
 }
 
-function getTooltipLocation(index) {
-  const angle = (index / menuItemCount.value) * FULL_ANGLE;
-  if (angle < ANGLE_45 || angle >= ANGLE_315) {
-    return "right";
-  }
-  if (angle >= ANGLE_45 && angle < ANGLE_135) {
-    return "top";
-  }
-  if (angle >= ANGLE_135 && angle < ANGLE_225) {
-    return "left";
-  }
-  return "bottom";
-}
-
-function getTooltipOrigin(index) {
-  const angle = (index / menuItemCount.value) * FULL_ANGLE;
-  if (angle < ANGLE_45 || angle >= ANGLE_315) {
-    return "left";
-  }
-  if (angle >= ANGLE_45 && angle < ANGLE_135) {
-    return "bottom";
-  }
-  if (angle >= ANGLE_135 && angle < ANGLE_225) {
-    return "right";
-  }
-  return "top";
-}
-
-function getItemStyle(index) {
-  const angle = (index / menuItemCount.value) * 2 * Math.PI;
-  return {
-    transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
-    transition: "opacity 0.2s ease, transform 0.2s ease",
-    position: "absolute",
-    zIndex: menuStore.active_item_index === index ? Z_INDEX_ACTIVE_ITEM : Z_INDEX_BASE_ITEM,
-  };
+function toggleShowName() {
+  showName.value = !showName.value;
 }
 </script>
 
@@ -165,22 +166,21 @@ function getItemStyle(index) {
         class="circular-menu-items"
         :style="{ width: `${RADIUS * 2}px`, height: `${RADIUS * 2}px` }"
       >
-        <component
-          v-for="(item, index) in menu_items"
-          :is="item"
-          :key="index"
-          :index="index"
-          :itemProps="{
-            id: id,
-            meta_data,
-            tooltip_location: getTooltipLocation(index),
-            tooltip_origin: getTooltipOrigin(index),
-            totalItems: menuItemCount,
-          }"
-          class="menu-item-wrapper"
-          :style="getItemStyle(index)"
-          @mousedown.stop
+        <CircularItems
+          :menu-items="menu_items"
+          :id="id"
+          :meta-data="meta_data"
+          :menu-item-count="menuItemCount"
         />
+
+        <CenterButton
+          :is-over-treeview="isOverTreeview"
+          :is-over-toolbar="isOverToolbar"
+          @drag="startDrag"
+          @click="toggleShowName"
+        />
+
+        <InfoCard v-model:show="showName" :meta-data="meta_data" />
       </div>
     </div>
   </v-menu>
@@ -200,6 +200,8 @@ function getItemStyle(index) {
   height: 100%;
   border-radius: 50%;
   cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .circular-menu-drag-handle:active {
@@ -214,11 +216,5 @@ function getItemStyle(index) {
   border-radius: 50%;
   background-color: transparent;
   border: none;
-}
-
-.menu-item-wrapper {
-  position: absolute;
-  transform-origin: center;
-  will-change: transform, opacity;
 }
 </style>

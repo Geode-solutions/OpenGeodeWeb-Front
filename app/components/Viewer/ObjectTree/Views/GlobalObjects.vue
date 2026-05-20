@@ -99,6 +99,20 @@ function handleHoverLeave({ item }) {
   }
   onHoverLeave(actualItem.id);
 }
+
+function expandAll() {
+  const allIds = [];
+  function traverse(itemsList) {
+    for (const item of itemsList) {
+      if (item.children && item.children.length > 0) {
+        allIds.push(item.id);
+        traverse(item.children);
+      }
+    }
+  }
+  traverse(treeviewStore.items);
+  opened.value = allIds;
+}
 </script>
 
 <template>
@@ -108,8 +122,10 @@ function handleHoverLeave({ item }) {
       :sort-type="sortType"
       :filter-options="filterOptions"
       :available-filter-options="availableFilterOptions"
+      :is-collapsed="opened.length === 0"
       @toggle-sort="toggleSort"
       @collapse-all="opened = []"
+      @expand-all="expandAll"
     />
 
     <CommonTreeView
@@ -138,10 +154,18 @@ function handleHoverLeave({ item }) {
 
       <template #append="{ item }">
         <v-btn
+          v-if="item.viewer_type"
+          icon="mdi-target"
+          size="medium"
+          variant="text"
+          v-tooltip="'Focus camera on object'"
+          @click.stop="hybridViewerStore.focusCameraOnObject(item.id)"
+        />
+        <v-btn
           v-if="isModel(item)"
           icon="mdi-magnify-expand"
           size="medium"
-          class="ml-8"
+          class="ml-2"
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
@@ -169,6 +193,6 @@ function handleHoverLeave({ item }) {
 
 .transparent-treeview {
   background-color: transparent;
-  margin: 4px 0;
+  margin: 2px 0;
 }
 </style>

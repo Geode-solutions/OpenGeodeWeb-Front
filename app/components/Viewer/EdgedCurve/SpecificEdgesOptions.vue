@@ -1,6 +1,6 @@
 <script setup>
 import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg";
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width";

@@ -3,31 +3,32 @@ import merge from "lodash/merge";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+// oxlint-disable-next-line max-lines-per-function
 export function useModelCommonStyle() {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
+  const model_component_datastyle_db = database.model_component_datastyle;
+  const model_component_type_datastyle_db = database.model_component_type_datastyle;
 
   async function mutateComponentStyle(id_model, id_component, values) {
-    const table = database.model_component_datastyle;
     const key = [id_model, id_component];
-    const entry = (await table.get(key)) || { id_model, id_component };
+    const entry = (await model_component_datastyle_db.get(key)) || { id_model, id_component };
     merge(entry, values);
-    return table.put(structuredClone(toRaw(entry)));
+    return model_component_datastyle_db.put(structuredClone(toRaw(entry)));
   }
 
   function mutateModelComponentTypeStyle(id_model, type, values) {
-    return database.transaction("rw", database.model_component_type_datastyle, async () => {
-      const table = database.model_component_type_datastyle;
+    return database.transaction("rw", model_component_type_datastyle_db, async () => {
       const key = [id_model, type];
-      const entry = (await table.get(key)) || { id_model, type };
+      const entry = (await model_component_type_datastyle_db.get(key)) || { id_model, type };
       merge(entry, values);
-      return table.put(structuredClone(toRaw(entry)));
+      return model_component_type_datastyle_db.put(structuredClone(toRaw(entry)));
     });
   }
 
   function mutateComponentStyles(id_model, id_components, values) {
-    return database.transaction("rw", database.model_component_datastyle, async () => {
-      const all_styles = await database.model_component_datastyle
+    return database.transaction("rw", model_component_datastyle_db, async () => {
+      const all_styles = await model_component_datastyle_db
         .where("id_model")
         .equals(id_model)
         .toArray();
@@ -43,14 +44,14 @@ export function useModelCommonStyle() {
         return toRaw(style);
       });
 
-      return database.model_component_datastyle.bulkPut(structuredClone(updates));
+      return model_component_datastyle_db.bulkPut(structuredClone(updates));
     });
   }
 
   function bulkMutateComponentStylesPerComponent(id_model, component_updates) {
-    return database.transaction("rw", database.model_component_datastyle, async () => {
+    return database.transaction("rw", model_component_datastyle_db, async () => {
       const component_ids = new Set(component_updates.map((update) => update.id_component));
-      const all_styles = await database.model_component_datastyle
+      const all_styles = await model_component_datastyle_db
         .where("id_model")
         .equals(id_model)
         .and((style) => component_ids.has(style.id_component))
@@ -61,7 +62,7 @@ export function useModelCommonStyle() {
         merge(style, values);
         return toRaw(style);
       });
-      return database.model_component_datastyle.bulkPut(structuredClone(updates));
+      return model_component_datastyle_db.bulkPut(structuredClone(updates));
     });
   }
 

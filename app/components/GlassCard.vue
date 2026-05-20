@@ -1,5 +1,6 @@
 <script setup>
 import { computed, useAttrs } from "vue";
+
 const { variant, rounded, padding, theme } = defineProps({
   variant: {
     type: String,

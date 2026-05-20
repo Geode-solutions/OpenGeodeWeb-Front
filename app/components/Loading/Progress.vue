@@ -15,7 +15,7 @@ const { progress } = defineProps({
     rounded
     bg-color="white"
     bg-opacity="0.15"
-    class="custom-progress-glow mt-8"
+    class="custom-progress-glow mt-4 mt-sm-8"
   />
 </template>
 

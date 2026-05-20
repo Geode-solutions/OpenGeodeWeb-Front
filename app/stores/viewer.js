@@ -27,7 +27,7 @@ export const useViewerStore = defineStore(
     const client = ref({});
     const config = ref(undefined);
     const picking_mode = ref(false);
-    const picked_point = ref({ x: undefined, y: undefined });
+    const picked_point = ref({ x: undefined, y: undefined, z: undefined });
     const request_counter = ref(0);
     const status = ref(Status.NOT_CONNECTED);
     const buzy = ref(0);
@@ -62,14 +62,12 @@ export const useViewerStore = defineStore(
     }
 
     async function set_picked_point(x, y) {
-      const response = await request(schemas.opengeodeweb_viewer.generic.get_point_position, {
-        x,
-        y,
+      const response = await request(schemas.opengeodeweb_viewer.viewer.get_point_position, {
+        x: Math.round(x),
+        y: Math.round(y),
       });
-      const { x: world_x, y: world_y } = response;
-      picked_point.value.x = world_x;
-      picked_point.value.y = world_y;
-      picking_mode.value = false;
+      const { x: world_x, y: world_y, z: world_z } = response;
+      picked_point.value = { x: world_x, y: world_y, z: world_z };
     }
 
     function ws_connect() {
@@ -147,7 +145,7 @@ export const useViewerStore = defineStore(
       return appStore.request(schema, params, {
         response_function: (response) => {
           console.log(`[VIEWER] Viewer launched on port ${response.port}`);
-          this.default_local_port = response.port;
+          default_local_port.value = response.port;
         },
       });
     }
