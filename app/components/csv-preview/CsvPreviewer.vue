@@ -35,7 +35,7 @@ function autoDetectSeparator(content) {
     .slice(0, MAX_CONTENT_SLICE)
     .split(/\r?\n/u)
     .slice(0, MAX_LINES_FOR_DETECTION);
-  const candidates = [",", ";", "\t", "|"];
+  const candidates = [",", ";", "\t", "|", " "];
   let best = ",";
   let maxCount = -1;
 
@@ -132,11 +132,22 @@ const computedResult = computed(() => {
     firstRow: firstRow.value,
     headerRow: headerRow.value,
     separator: separator.value,
-    xColumn: xIndex === -1 ? 0 : xIndex,
-    yColumn: yIndex === -1 ? 1 : yIndex,
-    zColumn: zIndex === -1 ? 2 : zIndex,
+    xColumn: xIndex,
+    yColumn: yIndex,
+    zColumn: zIndex,
   };
 });
+
+const isFormValid = computed(
+  () =>
+    separator.value !== "" &&
+    separator.value !== undefined &&
+    headerRow.value !== undefined &&
+    firstRow.value !== undefined &&
+    xColumn.value !== undefined &&
+    yColumn.value !== undefined &&
+    zColumn.value !== undefined,
+);
 
 watch([separator, headerRow, firstRow], () => {
   parseContent();
@@ -232,7 +243,7 @@ function onConfirm() {
           color="primary"
           class="text-none px-8 rounded-lg font-weight-bold"
           @click="onConfirm"
-          :disabled="!previewHeaders.length"
+          :disabled="!previewHeaders.length || !isFormValid"
         >
           Confirm
         </v-btn>
