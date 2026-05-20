@@ -8,7 +8,7 @@ import { appMode } from "@ogw_front/utils/local/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useProjectManager } from "@ogw_front/composables/project_manager";
 
-const { exportProject, importProjectFile: importProject } = useProjectManager();
+const { exportProject, importProject } = useProjectManager();
 
 // Constants
 const PANEL_WIDTH = 300;

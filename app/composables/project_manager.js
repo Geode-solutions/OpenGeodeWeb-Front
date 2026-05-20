@@ -29,7 +29,7 @@ async function exportProject() {
   return { result };
 }
 
-async function importProjectFile(file) {
+async function importProject(file) {
   const geodeStore = useGeodeStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();
@@ -96,5 +96,5 @@ async function importProjectFile(file) {
 }
 
 export function useProjectManager() {
-  return { exportProject, importProjectFile };
+  return { exportProject, importProject };
 }
