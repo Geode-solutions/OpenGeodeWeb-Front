@@ -110,9 +110,13 @@ function performHoverHighlight(event, options) {
     hybridDb,
     onResponse,
   } = options;
-  if (!is_hover_highlight.value) { return; }
+  if (!is_hover_highlight.value) {
+    return;
+  }
   const container = genericRenderWindow.getContainer();
-  if (!container) { return; }
+  if (!container) {
+    return;
+  }
   const rect = container.getBoundingClientRect();
   viewerStore.request(
     viewer_schemas.opengeodeweb_viewer.viewer.highlight,
@@ -148,7 +152,9 @@ async function performAddItem(id, options) {
     actorColor,
     hybridDb,
   } = options;
-  if (!genericRenderWindow) { return; }
+  if (!genericRenderWindow) {
+    return;
+  }
   const reader = vtkXMLPolyDataReader(),
     value = await dataStore.item(id);
   await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
@@ -207,7 +213,9 @@ function performSetContainer(options) {
     wheelTimeoutSetter,
   } = options;
 
-  if (!container.value) { return; }
+  if (!container.value) {
+    return;
+  }
 
   genericRenderWindow.setContainer(container.value.$el);
   const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
@@ -223,7 +231,9 @@ function performSetContainer(options) {
   useMousePressed({
     target: container,
     onPressed: (event) => {
-      if (event.button !== 0) { return; }
+      if (event.button !== 0) {
+        return;
+      }
       if (is_picking.value) {
         clickPickingCallback(event, {
           container: container.value.$el,
@@ -252,13 +262,17 @@ function performSetContainer(options) {
   useEventListener(container, "mousemove", (event) => {
     if (is_moving.value) {
       has_dragged = true;
-      if (imageStyle) { imageStyle.opacity = 0; }
+      if (imageStyle) {
+        imageStyle.opacity = 0;
+      }
     }
     hoverHighlight(event);
   });
   useEventListener(container, "wheel", () => {
     is_moving.value = true;
-    if (imageStyle) { imageStyle.opacity = 0; }
+    if (imageStyle) {
+      imageStyle.opacity = 0;
+    }
     clearTimeout(wheelEventEndTimeout);
     wheelTimeoutSetter(
       setTimeout(() => {
