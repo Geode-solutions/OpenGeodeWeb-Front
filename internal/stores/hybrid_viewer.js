@@ -4,23 +4,16 @@ const RGB_MAX = 255;
 const BACKGROUND_GREY_VALUE = 180;
 const ACTOR_DARK_VALUE = 20;
 
-const BACKGROUND_COLOR = [
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-  BACKGROUND_GREY_VALUE / RGB_MAX,
-];
-const ACTOR_COLOR = [
-  ACTOR_DARK_VALUE / RGB_MAX,
-  ACTOR_DARK_VALUE / RGB_MAX,
-  ACTOR_DARK_VALUE / RGB_MAX,
-];
-const WHEEL_TIME_OUT_MS = 600;
-const HOVER_THROTTLE_MS = 50;
-const HOVER_TIMEOUT_MS = 500;
-
-const SAMPLE_SIZE = 10;
-const TOTAL_CHANNELS = 400;
-const RGBA_CHANNELS = 4;
+const bgVal = BACKGROUND_GREY_VALUE / RGB_MAX;
+const BACKGROUND_COLOR = [bgVal, bgVal, bgVal];
+const actVal = ACTOR_DARK_VALUE / RGB_MAX;
+const ACTOR_COLOR = [actVal, actVal, actVal];
+const HOVER_THROTTLE_MS = 50,
+  HOVER_TIMEOUT_MS = 500,
+  WHEEL_TIME_OUT_MS = 600;
+const RGBA_CHANNELS = 4,
+  SAMPLE_SIZE = 10,
+  TOTAL_CHANNELS = 400;
 
 function mapRect(rect, latestImage, canvasRect) {
   const scaleX = latestImage.width / canvasRect.width;
@@ -226,6 +219,7 @@ function performSetContainer(options) {
 
   resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
 
+  let has_dragged = false;
   useMousePressed({
     target: container,
     onPressed: (event) => {
@@ -244,21 +238,28 @@ function performSetContainer(options) {
         return;
       }
       is_moving.value = true;
+      has_dragged = false;
       event.stopPropagation();
-      imageStyle.opacity = 0;
     },
     onReleased: () => {
-      if (is_moving.value) {
-        is_moving.value = false;
+      is_moving.value = false;
+      if (has_dragged) {
+        genericRenderWindow.getRenderer().resetCameraClippingRange();
         syncRemoteCamera();
       }
-      is_moving.value = false;
-      genericRenderWindow.getRenderer().resetCameraClippingRange();
-      syncRemoteCamera();
+      has_dragged = false;
     },
   });
 
-  useEventListener(container, "mousemove", hoverHighlight);
+  useEventListener(container, "mousemove", (event) => {
+    if (is_moving.value) {
+      has_dragged = true;
+      if (imageStyle) {
+        imageStyle.opacity = 0;
+      }
+    }
+    hoverHighlight(event);
+  });
   useEventListener(container, "wheel", () => {
     is_moving.value = true;
     if (imageStyle) {

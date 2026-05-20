@@ -30,7 +30,7 @@ export const useViewerStore = defineStore(
     const picked_point = ref({ x: undefined, y: undefined, z: undefined });
     const request_counter = ref(0);
     const status = ref(Status.NOT_CONNECTED);
-    const buzy = ref(0);
+    const busy = ref(0);
 
     const protocol = computed(() => {
       if (infraStore.app_mode === appMode.CLOUD) {
@@ -88,7 +88,7 @@ export const useViewerStore = defineStore(
           }
 
           client.value.onBusyChange((count) => {
-            buzy.value = count;
+            busy.value = count;
           });
           client.value.onConnectionError((httpReq) => {
             const message = httpReq?.response?.error || `Connection error`;
