@@ -110,13 +110,9 @@ function performHoverHighlight(event, options) {
     hybridDb,
     onResponse,
   } = options;
-  if (!is_hover_highlight.value) {
-    return;
-  }
+  if (!is_hover_highlight.value) { return; }
   const container = genericRenderWindow.getContainer();
-  if (!container) {
-    return;
-  }
+  if (!container) { return; }
   const rect = container.getBoundingClientRect();
   viewerStore.request(
     viewer_schemas.opengeodeweb_viewer.viewer.highlight,
@@ -152,9 +148,7 @@ async function performAddItem(id, options) {
     actorColor,
     hybridDb,
   } = options;
-  if (!genericRenderWindow) {
-    return;
-  }
+  if (!genericRenderWindow) { return; }
   const reader = vtkXMLPolyDataReader(),
     value = await dataStore.item(id);
   await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
@@ -213,9 +207,7 @@ function performSetContainer(options) {
     wheelTimeoutSetter,
   } = options;
 
-  if (!container.value) {
-    return;
-  }
+  if (!container.value) { return; }
 
   genericRenderWindow.setContainer(container.value.$el);
   const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
@@ -226,12 +218,12 @@ function performSetContainer(options) {
 
   resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
 
+  let has_dragged = false;
+
   useMousePressed({
     target: container,
     onPressed: (event) => {
-      if (event.button !== 0) {
-        return;
-      }
+      if (event.button !== 0) { return; }
       if (is_picking.value) {
         clickPickingCallback(event, {
           container: container.value.$el,
@@ -244,26 +236,29 @@ function performSetContainer(options) {
         return;
       }
       is_moving.value = true;
+      has_dragged = false;
       event.stopPropagation();
-      imageStyle.opacity = 0;
     },
     onReleased: () => {
-      if (is_moving.value) {
-        is_moving.value = false;
+      is_moving.value = false;
+      if (has_dragged) {
+        genericRenderWindow.getRenderer().resetCameraClippingRange();
         syncRemoteCamera();
       }
-      is_moving.value = false;
-      genericRenderWindow.getRenderer().resetCameraClippingRange();
-      syncRemoteCamera();
+      has_dragged = false;
     },
   });
 
-  useEventListener(container, "mousemove", hoverHighlight);
+  useEventListener(container, "mousemove", (event) => {
+    if (is_moving.value) {
+      has_dragged = true;
+      if (imageStyle) { imageStyle.opacity = 0; }
+    }
+    hoverHighlight(event);
+  });
   useEventListener(container, "wheel", () => {
     is_moving.value = true;
-    if (imageStyle) {
-      imageStyle.opacity = 0;
-    }
+    if (imageStyle) { imageStyle.opacity = 0; }
     clearTimeout(wheelEventEndTimeout);
     wheelTimeoutSetter(
       setTimeout(() => {
