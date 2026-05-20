@@ -7,16 +7,19 @@ const { steps, current_step_index } = toRefs(stepper_tree);
 </script>
 
 <template>
-  <v-card-item class="flex-shrink-0 pa-0">
-    <div class="px-3 pt-3 pb-1">
-      <div class="d-flex align-center mb-1">
-        <v-icon icon="mdi-file-upload-outline" class="mr-2 title-text" size="20" />
-        <h2 class="text-subtitle-1 font-weight-bold title-text mb-0">Import Data</h2>
-      </div>
-      <p class="text-caption text-white opacity-70 mb-0">
-        Select and configure files for a seamless import.
-      </p>
-    </div>
+  <v-card-item class="pb-1 pt-3 align-center flex-shrink-0">
+    <template v-slot:prepend>
+      <v-avatar size="32" rounded="0" class="me-2" color="transparent">
+        <v-icon icon="mdi-file-upload-outline" color="primary" size="24" />
+      </v-avatar>
+    </template>
+
+    <v-card-title class="text-subtitle-1 text-primary font-weight-bold" style="line-height: 1.2;">
+      Import Data
+    </v-card-title>
+    <v-card-subtitle class="ma-0 mt-0.5 opacity-70 flex-shrink-0 text-caption text-wrap" style="font-size: 0.72rem !important; line-height: 1.2;">
+      Select and configure files for a seamless import.
+    </v-card-subtitle>
   </v-card-item>
 
   <v-stepper-vertical
@@ -38,33 +41,41 @@ const { steps, current_step_index } = toRefs(stepper_tree);
 <style scoped>
 .custom-stepper :deep(.v-stepper-vertical-item) {
   background: transparent !important;
+  padding: 8px 10px !important;
 }
 
 .custom-stepper :deep(.v-stepper-vertical-item__content) {
   background: rgba(255, 255, 255, 0.03) !important;
   border-radius: 12px;
-  margin: 2px 4px 4px 20px !important;
-  padding: 4px !important;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin: 4px 0px 4px 18px !important;
+  padding: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  flex: none !important;
 }
 
 .custom-stepper :deep(.v-avatar) {
-  width: 24px !important;
-  height: 24px !important;
-  min-width: 24px !important;
-  font-size: 0.75rem !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  font-size: 0.65rem !important;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
   color: white !important;
 }
 
 .custom-stepper :deep(.v-stepper-vertical-item--active .v-avatar) {
-  background: #3c9983 !important;
-  border-color: #3c9983;
+  background: var(--v-primary-base, #4db6ac) !important;
+  border-color: var(--v-primary-base, #4db6ac) !important;
   color: #0a0f0e !important;
+  box-shadow: 0 0 8px rgba(77, 182, 172, 0.4);
 }
 
 .custom-stepper :deep(.v-stepper-vertical-item__connector) {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  border-width: 1.5px !important;
+}
+
+.custom-stepper :deep(.v-stepper-vertical-item__title) {
+  font-size: 0.72rem !important;
 }
 </style>

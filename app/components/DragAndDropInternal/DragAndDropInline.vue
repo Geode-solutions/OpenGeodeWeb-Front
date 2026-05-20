@@ -26,30 +26,31 @@ const emit = defineEmits(["click"]);
       class="drag-card-inline text-center cursor-pointer transition-swing"
       :class="{ 'dragging-active': isDragging, 'elevation-8': isHovering }"
       variant="ui"
+      padding="pa-4"
       @click="emit('click')"
     >
       <v-sheet
-        class="mx-auto mb-4 d-flex align-center justify-center transition-swing"
+        class="mx-auto mb-2 d-flex align-center justify-center transition-swing"
         :color="isHovering || isDragging ? 'primary' : 'rgba(255,255,255,0.05)'"
         rounded="circle"
-        width="64"
-        height="64"
+        width="48"
+        height="48"
       >
         <v-icon
           :icon="loading ? 'mdi-loading' : 'mdi-cloud-upload'"
-          size="32"
+          size="24"
           :color="isHovering || isDragging ? 'white' : 'primary'"
           :class="{ rotating: loading }"
         />
       </v-sheet>
 
       <v-card-text class="pa-0">
-        <v-sheet class="text-h6 font-weight-bold text-white d-block mb-1 bg-transparent">
+        <v-sheet class="text-subtitle-2 font-weight-bold text-white d-block mb-1 bg-transparent" style="line-height: 1.3;">
           {{ loading ? texts.loading : isDragging ? texts.drop : texts.idle }}
         </v-sheet>
         <v-sheet
           v-if="accept && showExtensions"
-          class="text-body-2 text-white opacity-60 bg-transparent"
+          class="text-caption text-white opacity-60 bg-transparent"
         >
           {{ accept }}
         </v-sheet>

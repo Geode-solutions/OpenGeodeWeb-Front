@@ -83,8 +83,6 @@ const sortedChips = computed(() => {
     </template>
 
     <v-card-text class="pt-0 px-1">
-      <v-divider class="mb-2 mt-1 opacity-10" />
-
       <component
         v-if="step_index === current_step_index"
         :key="step_index"
