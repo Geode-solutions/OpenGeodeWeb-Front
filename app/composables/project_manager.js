@@ -95,6 +95,4 @@ async function importProject(file) {
   treeviewStore.isImporting = false;
 }
 
-export function useProjectManager() {
-  return { exportProject, importProject };
-}
+export { exportProject, importProject };

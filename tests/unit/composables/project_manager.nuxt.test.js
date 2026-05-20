@@ -4,11 +4,9 @@
 // Third party imports
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { exportProject, importProject } from "@ogw_front/composables/project_manager";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
-import { useProjectManager } from "@ogw_front/composables/project_manager";
-
-const { exportProject, importProject } = useProjectManager();
 
 // Constants
 const PANEL_WIDTH = 300;
