@@ -5,6 +5,7 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const { displayMenu, containerWidth, containerHeight } = defineProps({
@@ -18,7 +19,19 @@ const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const viewerStore = useViewerStore();
 const menuStore = useMenuStore();
+const hybridViewerStore = useHybridViewerStore();
 const dataItems = dataStore.refAllItems();
+
+function stopHoverHighlight() {
+  hybridViewerStore.is_hover_highlight = false;
+  hybridViewerStore.clearHoverHighlight();
+}
+
+onKeyStroke("Escape", () => {
+  if (hybridViewerStore.is_hover_highlight) {
+    stopHoverHighlight();
+  }
+});
 
 async function get_viewer_id(x, y) {
   const activeIds = new Set(dataItems.value.map((item) => item.id));
@@ -72,6 +85,29 @@ defineExpose({ get_viewer_id });
         @click="viewerStore.toggle_picking_mode(false)"
       >
         Picking active — click in the viewer &middot; Esc to stop
+        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
+        <v-icon icon="mdi-close" size="small" />
+      </v-chip>
+    </div>
+  </v-fade-transition>
+
+  <v-fade-transition>
+    <div
+      v-if="hybridViewerStore.is_hover_highlight"
+      class="picking-message-container d-flex justify-center w-100 pa-4"
+    >
+      <v-chip
+        color="primary"
+        elevation="8"
+        size="large"
+        variant="flat"
+        class="pick-pulse"
+        style="pointer-events: auto"
+        @click="stopHoverHighlight"
+      >
+        Highlight active ({{
+          hybridViewerStore.hover_highlight_field_type === "CELL" ? "Cells" : "Points"
+        }}) &middot; Esc to stop
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />
       </v-chip>
