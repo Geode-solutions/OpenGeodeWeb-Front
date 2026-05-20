@@ -138,15 +138,16 @@ const computedResult = computed(() => {
   };
 });
 
-const isFormValid = computed(() => (
-  separator.value !== "" &&
-  separator.value !== undefined &&
-  headerRow.value !== undefined &&
-  firstRow.value !== undefined &&
-  xColumn.value !== undefined &&
-  yColumn.value !== undefined &&
-  zColumn.value !== undefined
-));
+const isFormValid = computed(
+  () =>
+    separator.value !== "" &&
+    separator.value !== undefined &&
+    headerRow.value !== undefined &&
+    firstRow.value !== undefined &&
+    xColumn.value !== undefined &&
+    yColumn.value !== undefined &&
+    zColumn.value !== undefined,
+);
 
 watch([separator, headerRow, firstRow], () => {
   parseContent();

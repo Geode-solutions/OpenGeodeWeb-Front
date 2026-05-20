@@ -43,7 +43,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(selectedType, (newVal) => {
