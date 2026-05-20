@@ -37,11 +37,11 @@ async function runScript(
     command = path.join(executablePath(execPath), executableName(execName));
   }
   console.log("runScript", command, args);
-  const child = child_process.spawn(command, args, {
+
+  const child = child_process.spawn(process.platform === "win32" ? command : `"${command}"`, args, {
     encoding: "utf8",
     shell: true,
   });
-
   child.stdout.on("data", (data) => console.log(`[${execName}] ${data.toString()}`));
   child.stderr.on("data", (data) => console.log(`[${execName}] ${data.toString()}`));
 

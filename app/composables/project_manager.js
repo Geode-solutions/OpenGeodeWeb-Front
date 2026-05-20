@@ -29,7 +29,7 @@ async function exportProject() {
   return { result };
 }
 
-async function importProject(project) {
+async function importProject(file) {
   const geodeStore = useGeodeStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();
@@ -56,11 +56,11 @@ async function importProject(project) {
 
   const schemaImport = back_schemas.opengeodeweb_back.import_project;
   const form = new FormData();
-  const originalFileName = project && project.name ? project.name : "project.vease";
+  const originalFileName = file && file.name ? file.name : "project.vease";
   if (!originalFileName.toLowerCase().endsWith(".vease")) {
     throw new Error("Uploaded file must be a .vease");
   }
-  form.append("file", project, originalFileName);
+  form.append("file", file, originalFileName);
 
   const result = await $fetch(schemaImport.$id, {
     baseURL: geodeStore.base_url,

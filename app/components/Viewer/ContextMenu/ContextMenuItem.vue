@@ -1,7 +1,9 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
+import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTheme } from "vuetify";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const CARD_WIDTH = 320;
 const CARD_HEIGHT = 500;
@@ -12,11 +14,75 @@ const OFFSET = 40;
 const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
+
 const { index, itemProps, tooltip, btn_image } = defineProps({
   index: { type: Number, required: true },
   itemProps: { type: Object, required: true },
   tooltip: { type: String, required: true },
   btn_image: { type: String, required: true },
+});
+
+const buttonCoords = computed(() => {
+  const angle = (index / itemProps.totalItems) * 2 * Math.PI;
+  const deltaX = Math.cos(angle) * RADIUS;
+  const deltaY = Math.sin(angle) * RADIUS;
+  const size = 40;
+  return {
+    x: menuStore.containerLeft + menuStore.menuX + deltaX - size / 2,
+    y: menuStore.containerTop + menuStore.menuY + deltaY - size / 2,
+    width: size,
+    height: size,
+  };
+});
+
+const { adaptiveStyles } = useAdaptiveStyles(buttonCoords, {
+  minOpacity: 0.35,
+  maxOpacity: 1,
+});
+
+const TREEVIEW_MARGIN_LEFT = 10;
+const TREEVIEW_MARGIN_RIGHT = 20;
+const TREEVIEW_ICON_WIDTH = 48;
+
+const treeviewStore = useTreeviewStore();
+const isOverTreeview = computed(() => {
+  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
+  const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
+  const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
+  const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
+  const treeviewWidth =
+    TREEVIEW_MARGIN_LEFT +
+    TREEVIEW_ICON_WIDTH +
+    firstColWidth +
+    secondColWidth +
+    TREEVIEW_MARGIN_RIGHT;
+  return buttonCoords.value.x < treeviewWidth;
+});
+
+const isOverToolbar = computed(() => {
+  const toolbarEl = document.querySelector(".view-toolbar");
+  if (!toolbarEl) {
+    return false;
+  }
+  const rect = toolbarEl.getBoundingClientRect();
+  const btn = buttonCoords.value;
+  return (
+    btn.x < rect.right &&
+    btn.x + btn.width > rect.left &&
+    btn.y < rect.bottom &&
+    btn.y + btn.height > rect.top
+  );
+});
+
+const computedItemStyles = computed(() => {
+  if (isOverTreeview.value || isOverToolbar.value) {
+    return {
+      "--adaptive-blur": "15px",
+      "--adaptive-opacity": 0.85,
+      "--adaptive-brightness": 1.15,
+    };
+  }
+  return adaptiveStyles.value;
 });
 
 const is_active = computed(() => menuStore.active_item_index === index);
@@ -66,13 +132,20 @@ function toggleOptions() {
       <template v-slot:activator="{ props: tooltipProps }">
         <v-btn
           icon
+          variant="outlined"
           :active="is_active"
           @click.stop="toggleOptions"
           v-bind="tooltipProps"
-          class="menu-btn bg-white border"
+          class="menu-btn"
           elevation="2"
+          :style="computedItemStyles"
         >
-          <v-img :src="btn_image" height="28" width="28" />
+          <v-img
+            :src="btn_image"
+            height="28"
+            width="28"
+            style="pointer-events: none; object-fit: contain"
+          />
         </v-btn>
       </template>
       <span>{{ tooltip }}</span>
@@ -120,18 +193,45 @@ function toggleOptions() {
 }
 
 .menu-btn {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  position: relative;
+  overflow: hidden;
   transition: all 0.2s ease;
-  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.menu-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition:
+    background-color 0.2s ease,
+    backdrop-filter 0.2s ease;
 }
 
 .menu-btn:hover {
   transform: scale(1.1);
-  background-color: #e3f2fd !important;
+}
+
+.menu-btn:hover::before {
+  background: rgba(255, 255, 255, calc(var(--adaptive-opacity, 0.15) + 0.15));
 }
 
 .menu-btn.v-btn--active {
   background-color: v-bind(primaryColor) !important;
   color: white !important;
+}
+
+.menu-btn.v-btn--active::before {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .menu-btn.v-btn--active ::v-deep(.v-img__img) {

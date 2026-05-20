@@ -24,6 +24,10 @@ export const useDataStore = defineStore("data", () => {
     return data_item;
   }
 
+  async function allItems() {
+    return await data_db.toArray();
+  }
+
   function refItem(id) {
     return useObservable(
       liveQuery(() => data_db.get(id)),
@@ -276,6 +280,7 @@ export const useDataStore = defineStore("data", () => {
   return {
     refAllItems,
     item,
+    allItems,
     refItem,
     meshComponentType,
     formatedMeshComponents,
