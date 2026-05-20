@@ -22,12 +22,42 @@ const separators = [
   { title: "Comma (,)", value: "," },
   { title: "Semicolon (;)", value: ";" },
   { title: "Tab (\\t)", value: "\t" },
+  { title: "Space ( )", value: " " },
   { title: "Pipe (|)", value: "|" },
+  { title: "Custom", value: "custom" },
 ];
 
-const internalSeparator = computed({
-  get: () => separator,
-  set: (value) => emit("update:separator", value),
+const selectedType = ref(",");
+const customValue = ref("");
+
+watch(
+  () => separator,
+  (newVal) => {
+    const predefined = separators.find((sep) => sep.value === newVal && sep.value !== "custom");
+    if (predefined) {
+      selectedType.value = predefined.value;
+    } else {
+      selectedType.value = "custom";
+      if (customValue.value !== newVal) {
+        customValue.value = newVal || "";
+      }
+    }
+  },
+  { immediate: true }
+);
+
+watch(selectedType, (newVal) => {
+  if (newVal === "custom") {
+    emit("update:separator", customValue.value);
+  } else {
+    emit("update:separator", newVal);
+  }
+});
+
+watch(customValue, (newVal) => {
+  if (selectedType.value === "custom") {
+    emit("update:separator", newVal);
+  }
 });
 
 const internalHeaderRow = computed({
@@ -61,8 +91,10 @@ const internalZColumn = computed({
     <div class="text-overline mb-4 text-primary font-weight-bold">Parser Settings</div>
 
     <v-select
-      v-model="internalSeparator"
+      v-model="selectedType"
       :items="separators"
+      item-title="title"
+      item-value="value"
       label="Separator"
       variant="outlined"
       density="compact"
@@ -71,8 +103,8 @@ const internalZColumn = computed({
     />
 
     <v-text-field
-      v-if="!separators.find((s) => s.value === separator)"
-      v-model="internalSeparator"
+      v-if="selectedType === 'custom'"
+      v-model="customValue"
       label="Custom Separator"
       variant="outlined"
       density="compact"
