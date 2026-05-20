@@ -8,8 +8,12 @@ const bgVal = BACKGROUND_GREY_VALUE / RGB_MAX;
 const BACKGROUND_COLOR = [bgVal, bgVal, bgVal];
 const actVal = ACTOR_DARK_VALUE / RGB_MAX;
 const ACTOR_COLOR = [actVal, actVal, actVal];
-const HOVER_THROTTLE_MS = 50, HOVER_TIMEOUT_MS = 500, WHEEL_TIME_OUT_MS = 600;
-const RGBA_CHANNELS = 4, SAMPLE_SIZE = 10, TOTAL_CHANNELS = 400;
+const HOVER_THROTTLE_MS = 50,
+  HOVER_TIMEOUT_MS = 500,
+  WHEEL_TIME_OUT_MS = 600;
+const RGBA_CHANNELS = 4,
+  SAMPLE_SIZE = 10,
+  TOTAL_CHANNELS = 400;
 
 function mapRect(rect, latestImage, canvasRect) {
   const scaleX = latestImage.width / canvasRect.width;
