@@ -35,7 +35,13 @@ function close() {
     <template #actions>
       <slot name="actions">
         <v-card-actions class="justify-center pb-3 pt-0" style="gap: 8px">
-          <v-btn variant="text" size="small" color="white" class="text-caption text-none" @click="close">
+          <v-btn
+            variant="text"
+            size="small"
+            color="white"
+            class="text-caption text-none"
+            @click="close"
+          >
             {{ closeLabel }}
           </v-btn>
           <v-btn
