@@ -3,6 +3,7 @@ import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingOb
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
 import { getCurrentInstance } from "vue";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useOverlappingPicker } from "@ogw_front/composables/use_overlapping_picker";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -16,6 +17,18 @@ const { displayMenu, containerWidth, containerHeight } = defineProps({
 const emit = defineEmits(["show-menu"]);
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
+const hybridViewerStore = useHybridViewerStore();
+
+function stopHoverHighlight() {
+  hybridViewerStore.is_hover_highlight = false;
+  hybridViewerStore.clearHoverHighlight();
+}
+
+onKeyStroke("Escape", () => {
+  if (hybridViewerStore.is_hover_highlight) {
+    stopHoverHighlight();
+  }
+});
 
 const {
   displayIntermediate,
