@@ -135,7 +135,7 @@ const camera_options = computed(() => [
 </script>
 
 <template>
-  <v-container :class="[$style.floatToolbar, 'pa-0']" width="auto">
+  <v-container :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']" width="auto">
     <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
         <v-menu v-if="camera_option.menu" location="start" :close-on-content-click="false">

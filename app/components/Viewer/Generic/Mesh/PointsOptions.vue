@@ -1,5 +1,5 @@
 <script setup>
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenuItem";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";

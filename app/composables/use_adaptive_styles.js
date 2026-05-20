@@ -15,9 +15,54 @@ const MIN_BOOST = 1;
 const MAX_BOOST = 1.2;
 const ADAPTIVE_REFRESH_RATE = 150;
 
-export function useAdaptiveStyles(targetRef) {
+function getValue(val) {
+  if (typeof val === "object" && val !== null && val.value !== undefined) {
+    return val.value;
+  }
+  return val ?? 0;
+}
+
+export function useAdaptiveStyles(target, options = {}) {
   const hybridViewerStore = useHybridViewerStore();
-  const { x, y, width, height } = useElementBounding(targetRef);
+
+  const isCoordinates =
+    target &&
+    (typeof target === "function" ||
+      (target.value !== undefined && target.value !== null && target.value.x !== undefined) ||
+      (target.x !== undefined && target.value === undefined));
+
+  const bounding = useElementBounding(isCoordinates ? undefined : target);
+
+  const unwrapped = computed(() => {
+    if (isCoordinates) {
+      let val = undefined;
+      if (typeof target === "function") {
+        val = target();
+      } else if (target.value === undefined) {
+        val = target;
+      } else {
+        val = target.value;
+      }
+      return {
+        x: getValue(val?.x),
+        y: getValue(val?.y),
+        width: getValue(val?.width),
+        height: getValue(val?.height),
+      };
+    }
+    return {
+      x: bounding.x.value,
+      y: bounding.y.value,
+      width: bounding.width.value,
+      height: bounding.height.value,
+    };
+  });
+
+  const x = computed(() => unwrapped.value.x);
+  const y = computed(() => unwrapped.value.y);
+  const width = computed(() => unwrapped.value.width);
+  const height = computed(() => unwrapped.value.height);
+
   const brightness = ref(LUMINANCE_THRESHOLD);
 
   const updateBrightness = useThrottleFn(() => {
@@ -38,7 +83,9 @@ export function useAdaptiveStyles(targetRef) {
     const darkFactor = (1 - normalized) ** ADAPTIVE_EXPONENT;
 
     const blur = MIN_BLUR + darkFactor * (MAX_BLUR - MIN_BLUR);
-    const opacity = MIN_OPACITY + darkFactor * (MAX_OPACITY - MIN_OPACITY);
+    const minOpacity = options.minOpacity ?? MIN_OPACITY;
+    const maxOpacity = options.maxOpacity ?? MAX_OPACITY;
+    const opacity = minOpacity + darkFactor * (maxOpacity - minOpacity);
     const brightnessBoost = MIN_BOOST + darkFactor * (MAX_BOOST - MIN_BOOST);
 
     return {

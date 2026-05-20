@@ -42,7 +42,13 @@ function computeAverageBrightness(rect, options) {
   if (!canvas) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
+  if (rect.width <= 0 || rect.height <= 0) {
+    return BACKGROUND_GREY_VALUE / RGB_MAX;
+  }
   const { relX, relY, relW, relH } = mapRect(rect, latestImage, canvas.getBoundingClientRect());
+  if (relW <= 0 || relH <= 0) {
+    return BACKGROUND_GREY_VALUE / RGB_MAX;
+  }
   offscreenCanvas.width = SAMPLE_SIZE;
   offscreenCanvas.height = SAMPLE_SIZE;
   try {
