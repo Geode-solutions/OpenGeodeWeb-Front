@@ -8,12 +8,14 @@ const { steps, current_step_index } = toRefs(stepper_tree);
 
 <template>
   <v-card-item class="flex-shrink-0 pa-0">
-    <div class="px-8 pt-8 pb-4">
-      <div class="d-flex align-center mb-2">
-        <v-icon icon="mdi-file-upload-outline" class="mr-3 title-text" size="32" />
-        <h2 class="title-text">Import Data</h2>
+    <div class="px-3 pt-3 pb-1">
+      <div class="d-flex align-center mb-1">
+        <v-icon icon="mdi-file-upload-outline" class="mr-2 title-text" size="20" />
+        <h2 class="text-subtitle-1 font-weight-bold title-text mb-0">Import Data</h2>
       </div>
-      <p class="text-white text-body-1">Select and configure your files for a seamless import.</p>
+      <p class="text-caption text-white opacity-70 mb-0">
+        Select and configure files for a seamless import.
+      </p>
     </div>
   </v-card-item>
 
@@ -41,12 +43,16 @@ const { steps, current_step_index } = toRefs(stepper_tree);
 .custom-stepper :deep(.v-stepper-vertical-item__content) {
   background: rgba(255, 255, 255, 0.03) !important;
   border-radius: 12px;
-  margin: 8px 16px 16px 40px !important;
-  padding: 16px !important;
+  margin: 2px 4px 4px 20px !important;
+  padding: 4px !important;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .custom-stepper :deep(.v-avatar) {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  font-size: 0.75rem !important;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.1) !important;
   color: white !important;

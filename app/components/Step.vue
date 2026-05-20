@@ -54,10 +54,10 @@ const sortedChips = computed(() => {
     hide-actions
   >
     <template #title>
-      <v-sheet color="transparent" class="d-flex flex-column justify-center ps-2">
+      <v-sheet color="transparent" class="d-flex flex-column justify-center ps-1">
         <p
           tag="h3"
-          class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
+          class="text-caption font-weight-bold mb-0 transition-swing"
           :class="current_step_index === step_index ? 'text-primary' : 'text-grey-darken-1'"
         >
           {{ steps[step_index].step_title }}
@@ -66,13 +66,13 @@ const sortedChips = computed(() => {
         <v-sheet
           v-if="sortedChips.length && current_step_index >= step_index"
           color="transparent"
-          class="d-flex flex-wrap mt-2"
+          class="d-flex flex-wrap mt-1"
         >
           <v-chip
             v-for="(chip, chip_index) in sortedChips"
             :key="chip_index"
-            size="small"
-            class="me-2 mb-1 font-weight-medium"
+            size="x-small"
+            class="me-1 mb-1 font-weight-medium text-caption"
             color="primary"
             variant="tonal"
           >
@@ -82,8 +82,8 @@ const sortedChips = computed(() => {
       </v-sheet>
     </template>
 
-    <v-card-text class="pt-0">
-      <v-divider class="mb-6 opacity-10" />
+    <v-card-text class="pt-0 px-1">
+      <v-divider class="mb-2 mt-1 opacity-10" />
 
       <component
         v-if="step_index === current_step_index"

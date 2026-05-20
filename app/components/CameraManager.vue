@@ -7,7 +7,7 @@ const emit = defineEmits(["close"]);
 
 const { show_dialog, width } = defineProps({
   show_dialog: { type: Boolean, required: true },
-  width: { type: Number, required: false, default: 450 },
+  width: { type: Number, required: false, default: 260 },
 });
 </script>
 
@@ -31,9 +31,17 @@ const { show_dialog, width } = defineProps({
 
     <v-divider></v-divider>
 
-    <v-card-actions class="pa-4">
+    <v-card-actions class="pa-2">
       <v-spacer></v-spacer>
-      <v-btn variant="text" color="grey-darken-1" @click="emit('close')">Close</v-btn>
+      <v-btn variant="text" size="small" color="white" class="text-caption text-none" @click="emit('close')">Close</v-btn>
     </v-card-actions>
   </GlassCard>
 </template>
+
+<style scoped>
+:deep(.v-card-title) {
+  font-size: 0.95rem !important;
+  font-weight: bold !important;
+  padding: 10px 14px 6px 14px !important;
+}
+</style>

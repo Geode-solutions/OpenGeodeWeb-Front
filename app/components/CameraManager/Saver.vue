@@ -1,4 +1,5 @@
 <script setup>
+import { ref, toRaw } from "vue";
 import { useCameraManagerStore } from "@ogw_front/stores/camera_manager";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -20,7 +21,7 @@ async function saveCurrentPosition() {
 </script>
 
 <template>
-  <v-container class="pa-5 pb-2 bg-surface-variant-lighten-5">
+  <v-container class="pa-3 pb-1 bg-surface-variant-lighten-5">
     <v-row dense>
       <v-col cols="12">
         <v-text-field
@@ -30,7 +31,7 @@ async function saveCurrentPosition() {
           density="compact"
           variant="outlined"
           hide-details
-          class="mb-3"
+          class="mb-2 text-caption"
         ></v-text-field>
       </v-col>
       <v-col cols="12" class="d-flex align-center">
@@ -38,9 +39,11 @@ async function saveCurrentPosition() {
           color="primary"
           variant="elevated"
           block
+          size="small"
           :disabled="!newPositionName"
           @click="saveCurrentPosition"
-          height="40"
+          height="32"
+          class="text-caption font-weight-bold"
         >
           Save
         </v-btn>

@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from "vue";
 import { useCameraManagerStore } from "@ogw_front/stores/camera_manager";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -39,11 +40,11 @@ async function saveRename() {
 </script>
 
 <template>
-  <v-list v-if="savedPositions.length > 0" class="bg-transparent pa-2">
+  <v-list v-if="savedPositions.length > 0" class="bg-transparent pa-1">
     <v-list-item
       v-for="position in savedPositions"
       :key="position.id"
-      class="rounded-lg mb-1"
+      class="rounded-lg mb-1 px-2"
       :active="editingId === position.id"
       active-color="primary"
     >
@@ -52,16 +53,16 @@ async function saveRename() {
           icon
           variant="tonal"
           color="success"
-          size="small"
-          class="mr-2"
+          size="x-small"
+          class="mr-1"
           @click="restorePosition(position.id)"
         >
-          <v-icon size="20">mdi-play</v-icon>
+          <v-icon size="14">mdi-play</v-icon>
           <v-tooltip activator="parent" location="top">Restore</v-tooltip>
         </v-btn>
       </template>
 
-      <v-list-item-title class="font-weight-bold">
+      <v-list-item-title class="font-weight-semibold text-caption">
         <v-text-field
           v-if="editingId === position.id"
           v-model="editingName"
@@ -69,6 +70,7 @@ async function saveRename() {
           variant="underlined"
           hide-details
           autofocus
+          class="text-caption"
           @keyup.enter="saveRename"
           @blur="saveRename"
         ></v-text-field>
@@ -76,39 +78,42 @@ async function saveRename() {
       </v-list-item-title>
 
       <template #append>
-        <div class="d-flex g-1">
+        <div class="d-flex ga-1">
           <v-btn
             icon
             variant="text"
-            size="small"
+            size="x-small"
             color="grey-darken-1"
             @click="startEditing(position)"
           >
-            <v-icon size="18">mdi-pencil</v-icon>
+            <v-icon size="14">mdi-pencil</v-icon>
             <v-tooltip activator="parent" location="top">Rename</v-tooltip>
           </v-btn>
           <v-btn
             icon
             variant="text"
-            size="small"
+            size="x-small"
             color="error"
             @click="deletePosition(position.id)"
           >
-            <v-icon size="18">mdi-delete</v-icon>
+            <v-icon size="14">mdi-delete</v-icon>
             <v-tooltip activator="parent" location="top">Delete</v-tooltip>
           </v-btn>
         </div>
       </template>
     </v-list-item>
   </v-list>
-  <div v-else class="text-center text-grey-lighten-1 py-8 italic">
-    <v-icon size="48" class="mb-2 d-block mx-auto opacity-20">mdi-camera-off</v-icon>
+  <div v-else class="text-center text-grey-lighten-1 py-4 italic text-caption">
+    <v-icon size="32" class="mb-1 d-block mx-auto opacity-20">mdi-camera-off</v-icon>
     No saved positions yet.
   </div>
 </template>
 
 <style scoped>
 :deep(.v-list-item__prepend) {
-  margin-inline-end: 12px !important;
+  margin-inline-end: 6px !important;
+}
+:deep(.v-list-item__append) {
+  margin-inline-start: 6px !important;
 }
 </style>
