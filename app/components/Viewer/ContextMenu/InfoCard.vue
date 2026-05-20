@@ -50,18 +50,6 @@ watch(
       } catch {
         componentName.value = newMeta.pickedComponentId;
       }
-    } else if (newMeta.id && newMeta.pickedComponentId) {
-      try {
-        const comp = await dataStore.getComponentByViewerId(
-          newMeta.id,
-          newMeta.pickedComponentId,
-        );
-        if (comp && comp.name) {
-          componentName.value = comp.name;
-        }
-      } catch {
-        // Component not found in DB, fallback to default name
-      }
     }
   },
   { immediate: true },

@@ -27,7 +27,7 @@ const centerButtonCoords = computed(() => {
 });
 
 const { adaptiveStyles } = useAdaptiveStyles(centerButtonCoords, {
-  minOpacity: 0.15,
+  minOpacity: 0.35,
   maxOpacity: 1,
 });
 
