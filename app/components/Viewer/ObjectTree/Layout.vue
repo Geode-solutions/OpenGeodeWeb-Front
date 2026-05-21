@@ -24,14 +24,11 @@ const treeviewStore = useTreeviewStore();
 const emit = defineEmits(["show-menu"]);
 
 const activityBar = useTemplateRef("activity-bar");
-const { adaptiveStyles: activityBarAdaptiveStyles } =
-  useAdaptiveStyles(activityBar);
+const { adaptiveStyles: activityBarAdaptiveStyles } = useAdaptiveStyles(activityBar);
 
 const maxWidth = computed(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
-const mainView = computed(() =>
-  treeviewStore.opened_views.find((view) => view.id === "main"),
-);
+const mainView = computed(() => treeviewStore.opened_views.find((view) => view.id === "main"));
 const additionalViews = computed(() =>
   treeviewStore.opened_views.filter((view) => view.id !== "main"),
 );
@@ -55,9 +52,7 @@ watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      treeviewStore.setRowHeights(
-        Array.from({ length: newLength }).fill(PERCENT_100 / newLength),
-      );
+      treeviewStore.setRowHeights(Array.from({ length: newLength }).fill(PERCENT_100 / newLength));
     }
   },
   { immediate: true },
@@ -67,9 +62,7 @@ watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
   const hasAdditional = additionalViews.value.length > 0;
   const gap = hasAdditional ? GAP_WIDTH : 0;
   const total =
-    treeviewStore.panelWidth +
-    (hasAdditional ? treeviewStore.additionalPanelWidth : 0) +
-    gap;
+    treeviewStore.panelWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
 
   if (total > newMax) {
     if (hasAdditional) {
@@ -113,10 +106,7 @@ function onResizeStart(event) {
     const currentTotalWidth =
       newWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
     if (currentTotalWidth > maxWidth.value) {
-      newWidth =
-        maxWidth.value -
-        (hasAdditional ? treeviewStore.additionalPanelWidth : 0) -
-        gap;
+      newWidth = maxWidth.value - (hasAdditional ? treeviewStore.additionalPanelWidth : 0) - gap;
     }
 
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
@@ -240,14 +230,9 @@ function onVerticalResizeStart(event, index) {
           :border-radius="additionalViews.length > 0 ? '0' : '0 16px 16px 0'"
           :border-left="false"
           @close="treeviewStore.closeView('main')"
-          @update:scroll-top="
-            mainView && treeviewStore.setScrollTop(mainView.id, $event)
-          "
+          @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
         >
-          <GlobalObjects
-            data-testid="mainObjectTree"
-            @show-menu="emit('show-menu', $event)"
-          />
+          <GlobalObjects data-testid="mainObjectTree" @show-menu="emit('show-menu', $event)" />
         </ViewerObjectTreeBox>
       </div>
 
@@ -268,8 +253,7 @@ function onVerticalResizeStart(event, index) {
           <div
             class="view-wrapper"
             :class="{
-              'drag-over':
-                draggedIndex !== undefined && draggedIndex !== index + 1,
+              'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
             }"
             :style="{ flex: `0 0 ${rowHeights[index]}%` }"
             @dragover="onDragOver"
@@ -287,11 +271,7 @@ function onVerticalResizeStart(event, index) {
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
             >
               <component
-                :is="
-                  view.viewType === 'model_collections'
-                    ? ModelCollections
-                    : ModelComponents
-                "
+                :is="view.viewType === 'model_collections' ? ModelCollections : ModelComponents"
                 data-testid="modelComponentsObjectTree"
                 :id="view.modelId || view.id"
                 :view-id="view.id"
@@ -347,10 +327,8 @@ function onVerticalResizeStart(event, index) {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   mix-blend-mode: lighten;
   z-index: 0;
   pointer-events: none;
