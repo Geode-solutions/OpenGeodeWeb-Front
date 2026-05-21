@@ -50,6 +50,12 @@ const camera_options = computed(() => [
     tooltip: "Highlight on hover",
     icon: "mdi-cursor-default-click",
     color: hybridViewerStore.is_hover_highlight ? "primary" : undefined,
+    action: hybridViewerStore.is_hover_highlight
+      ? () => {
+          hybridViewerStore.is_hover_highlight = false;
+          hybridViewerStore.clearHoverHighlight();
+        }
+      : undefined,
     menu: [
       {
         title: "Cells",
@@ -138,7 +144,11 @@ const camera_options = computed(() => [
   <v-container :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']" width="auto">
     <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
-        <v-menu v-if="camera_option.menu" location="start" :close-on-content-click="false">
+        <v-menu
+          v-if="camera_option.menu && !camera_option.action"
+          location="start"
+          :close-on-content-click="false"
+        >
           <template #activator="{ props }">
             <ActionButton
               v-bind="props"

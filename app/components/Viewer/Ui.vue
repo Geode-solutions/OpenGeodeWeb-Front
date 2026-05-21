@@ -3,6 +3,7 @@ import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingOb
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
 import { getCurrentInstance } from "vue";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useOverlappingPicker } from "@ogw_front/composables/use_overlapping_picker";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -16,6 +17,18 @@ const { displayMenu, containerWidth, containerHeight } = defineProps({
 const emit = defineEmits(["show-menu"]);
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
+const hybridViewerStore = useHybridViewerStore();
+
+function stopHoverHighlight() {
+  hybridViewerStore.is_hover_highlight = false;
+  hybridViewerStore.clearHoverHighlight();
+}
+
+onKeyStroke("Escape", () => {
+  if (hybridViewerStore.is_hover_highlight) {
+    stopHoverHighlight();
+  }
+});
 
 const {
   displayIntermediate,
@@ -86,6 +99,29 @@ defineExpose({ get_viewer_id });
         @click="viewerStore.toggle_picking_mode(false)"
       >
         Picking active — click in the viewer &middot; Esc to stop
+        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
+        <v-icon icon="mdi-close" size="small" />
+      </v-chip>
+    </div>
+  </v-fade-transition>
+
+  <v-fade-transition>
+    <div
+      v-if="hybridViewerStore.is_hover_highlight"
+      class="picking-message-container d-flex justify-center w-100 pa-4"
+    >
+      <v-chip
+        color="primary"
+        elevation="8"
+        size="large"
+        variant="flat"
+        class="pick-pulse"
+        style="pointer-events: auto"
+        @click="stopHoverHighlight"
+      >
+        Highlight active ({{
+          hybridViewerStore.hover_highlight_field_type === "CELL" ? "Cells" : "Points"
+        }}) &middot; Esc to stop
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />
       </v-chip>
