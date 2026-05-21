@@ -2,6 +2,7 @@ import { dot } from "@kitware/vtk.js/Common/Core/Math";
 
 const NEAR_ZERO_THRESHOLD = 1e-10;
 const SLERP_LINEAR_THRESHOLD = 0.9995;
+const SLERP_ANTIPODAL_THRESHOLD = -0.9995;
 const LONG_ANIMATION_DURATION = 1000;
 const SHORT_ANIMATION_DURATION = 500;
 
@@ -21,7 +22,11 @@ function vecNormalize(vector) {
   return [vector[0] / len, vector[1] / len, vector[2] / len];
 }
 
-function slerp(from, target, ratio) {
+function vecCross(a, b) {
+  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+}
+
+function slerp(from, target, ratio, antipodalMid = undefined) {
   const normFrom = vecNormalize(from);
   const normTarget = vecNormalize(target);
   let dotProduct =
@@ -34,6 +39,14 @@ function slerp(from, target, ratio) {
       normFrom[2] + (normTarget[2] - normFrom[2]) * ratio,
     ]);
   }
+
+  if (dotProduct < SLERP_ANTIPODAL_THRESHOLD) {
+    const mid = antipodalMid;
+    return ratio < 0.5
+      ? slerp(normFrom, mid, ratio * 2)
+      : slerp(mid, normTarget, (ratio - 0.5) * 2);
+  }
+
   const theta = Math.acos(dotProduct);
   const sinTheta = Math.sin(theta);
   const weightFrom = Math.sin((1 - ratio) * theta) / sinTheta;
@@ -71,6 +84,19 @@ function animateCamera(options) {
   const targetDir = vecSub(targetState.position, targetState.focal_point);
   const startDist = vecLength(startDir);
   const targetDist = vecLength(targetDir);
+  const normStartDir = vecNormalize(startDir);
+  const normTargetDir = vecNormalize(targetDir);
+  const dirDot =
+    normStartDir[0] * normTargetDir[0] +
+    normStartDir[1] * normTargetDir[1] +
+    normStartDir[2] * normTargetDir[2];
+  // For antipodal directions, pre-compute a midpoint using cross(startDir, viewUp)
+  // so the arc stays in the camera's up plane and never triggers gimbal lock.
+  const antipodalMid =
+    dirDot < SLERP_ANTIPODAL_THRESHOLD
+      ? vecNormalize(vecCross(normStartDir, vecNormalize(startState.view_up)))
+      : null;
+
   const startTime = performance.now();
   function animate(currentTime) {
     const progress = Math.min((currentTime - startTime) / duration, 1);
@@ -79,7 +105,7 @@ function animateCamera(options) {
         ? 1 - (1 - progress) ** easeExponent
         : progress * (2 - progress);
     const bump = bumpMultiplier * Math.sin(Math.PI * progress);
-    const dir = slerp(startDir, targetDir, ease);
+    const dir = slerp(startDir, targetDir, ease, antipodalMid);
     const dist = startDist + (targetDist - startDist) * ease + bump;
     const focalPoint = startState.focal_point.map(
       (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
