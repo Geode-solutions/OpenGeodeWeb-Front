@@ -2,6 +2,7 @@
 import PointSetPoints from "@ogw_front/assets/viewer_svgs/point_set_points.svg";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
+import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -81,12 +82,7 @@ const vertex_attribute_color_map = computed({
       <template v-if="visibility">
         <v-row class="pa-0" align="center">
           <v-divider />
-          <v-col cols="auto" justify="center">
-            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Size'" />
-          </v-col>
-          <v-col justify="center">
-            <v-slider v-model="size" hide-details min="0" max="20" step="2" />
-          </v-col>
+          <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
         </v-row>
         <v-row>
           <v-col>
