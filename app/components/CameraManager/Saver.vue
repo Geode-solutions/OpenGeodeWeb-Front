@@ -1,5 +1,4 @@
 <script setup>
-import { ref, toRaw } from "vue";
 import { useCameraManagerStore } from "@ogw_front/stores/camera_manager";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
