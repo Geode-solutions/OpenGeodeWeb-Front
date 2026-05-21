@@ -3,7 +3,10 @@ const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = 
   headers: { type: Array, required: true },
   rows: { type: Array, required: true },
   loading: { type: Boolean, default: false },
-  coordinates: { type: Object, default: () => ({ x: undefined, y: undefined, z: undefined }) },
+  coordinates: {
+    type: Object,
+    default: () => ({ x: undefined, y: undefined, z: undefined }),
+  },
   separator: { type: String, default: "," },
   headerRow: { type: Number, default: 0 },
   firstRow: { type: Number, default: 1 },
@@ -24,7 +27,7 @@ function getColumnClass(key) {
 </script>
 
 <template>
-  <div class="d-flex flex-column bg-black-opacity-20 overflow-hidden">
+  <div class="d-flex flex-column bg-black-opacity-20 overflow-hidden h-100">
     <div class="pa-4 d-flex align-center border-b border-opacity-10">
       <v-icon icon="mdi-table-eye" size="small" class="mr-2 opacity-60" />
       <span class="text-subtitle-2 font-weight-medium opacity-80">
@@ -37,17 +40,17 @@ function getColumnClass(key) {
       </v-chip>
     </div>
 
-    <v-data-table
+    <v-data-table-virtual
       :key="`${separator}-${headerRow}-${firstRow}`"
       :headers="headers"
       :items="rows"
-      class="bg-transparent"
+      class="bg-transparent flex-grow-1"
+      style="min-height: 0; min-width: 0"
       density="compact"
       hover
-      hide-default-footer
       :loading="loading"
       fixed-header
-      height="100%"
+      item-height="35"
     >
       <template v-for="header in headers" v-slot:[`item.${header.key}`]="{ item }">
         <div :class="getColumnClass(header.key)" class="px-2 py-1 rounded text-truncate">
@@ -62,7 +65,7 @@ function getColumnClass(key) {
           <div class="text-caption">Check your parser settings</div>
         </div>
       </template>
-    </v-data-table>
+    </v-data-table-virtual>
   </div>
 </template>
 
