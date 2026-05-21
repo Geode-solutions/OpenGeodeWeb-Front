@@ -127,7 +127,7 @@ const modelComponentsColor = computed({
     if (selection.value.length > 0) {
       return dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]);
     }
-    return { r: 255, g: 255, b: 255 };
+    return { red: 255, green: 255, blue: 255 };
   },
   set: async (color) => {
     if (selection.value.length > 0) {
