@@ -32,6 +32,7 @@ export const useDataStore = defineStore("data", () => {
   } = useDataMesh();
 
   const {
+    hasCollectionComponents,
     getAllCollectionComponents,
     fetchAllCollectionComponents,
     formatedCollectionComponents,
@@ -231,6 +232,7 @@ export const useDataStore = defineStore("data", () => {
     getSurfacesGeodeIds,
     getBlocksGeodeIds,
 
+    hasCollectionComponents,
     getAllCollectionComponents,
     fetchAllCollectionComponents,
     formatedCollectionComponents,

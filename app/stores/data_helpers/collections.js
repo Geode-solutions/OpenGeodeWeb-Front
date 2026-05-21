@@ -8,6 +8,15 @@ export function useDataCollections() {
   const model_components_relation_db = database.model_components_relation;
   const { getAllMeshComponents } = useDataMesh();
 
+  async function hasCollectionComponents(modelId) {
+    const count = await model_components_db
+      .where("id")
+      .equals(modelId)
+      .and((component) => ['Horizon', 'Fault', 'FaultBlock', 'StratigraphicUnit', 'ModelBoundary'].includes(component.type))
+      .count();
+    return count > 0;
+  }
+
   async function getAllCollectionComponents(modelId) {
     const items = await model_components_db.where("id").equals(modelId).toArray();
     return items.filter((component) => ['Horizon', 'Fault', 'FaultBlock', 'StratigraphicUnit', 'ModelBoundary'].includes(component.type)).map((component) => ({
@@ -70,6 +79,7 @@ export function useDataCollections() {
   }
 
   return {
+    hasCollectionComponents,
     getAllCollectionComponents,
     fetchAllCollectionComponents,
     formatedCollectionComponents,

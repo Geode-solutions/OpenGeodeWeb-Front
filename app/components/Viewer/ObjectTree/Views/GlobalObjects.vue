@@ -85,10 +85,10 @@ watch(
       if (hasCollectionsMap[model.id] === undefined) {
         hasCollectionsMap[model.id] = false;
         try {
-          const collections = await dataStore.fetchAllCollectionComponents(model.id);
-          hasCollectionsMap[model.id] = Object.keys(collections).length > 0;
+          const hasCollections = await dataStore.hasCollectionComponents(model.id);
+          hasCollectionsMap[model.id] = hasCollections;
         } catch (error) {
-          console.error("Failed to fetch collections", error);
+          console.error("Failed to check collections", error);
         }
       }
     });
