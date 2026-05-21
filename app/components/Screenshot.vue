@@ -9,7 +9,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const show = defineModel({ type: Boolean, default: false });
 
 const { width } = defineProps({
-  width: { type: Number, default: 400 },
+  width: { type: Number, default: 260 },
 });
 
 const output_extensions =
@@ -77,55 +77,92 @@ watch(screenshot_type, (value) => {
     action-label="Screenshot"
     @action="takeScreenshot"
   >
-    <v-container class="pa-5">
-      <v-row justify="center">
+    <v-container class="pa-3 py-1">
+      <v-row justify="center" dense>
         <v-col cols="12" class="py-0 d-flex justify-center">
           <v-btn-toggle
             v-model="screenshot_type"
             mandatory
             color="primary"
             variant="outlined"
-            class="mb-4"
-            density="comfortable"
+            class="mb-2"
+            density="compact"
           >
-            <v-btn value="file" prepend-icon="mdi-file-download-outline"> File </v-btn>
-            <v-btn value="clipboard" prepend-icon="mdi-content-copy"> Clipboard </v-btn>
+            <v-btn
+              value="file"
+              prepend-icon="mdi-file-download-outline"
+              size="small"
+              class="text-caption text-none"
+            >
+              File
+            </v-btn>
+            <v-btn
+              value="clipboard"
+              prepend-icon="mdi-content-copy"
+              size="small"
+              class="text-caption text-none"
+            >
+              Clipboard
+            </v-btn>
           </v-btn-toggle>
         </v-col>
       </v-row>
 
-      <v-row v-if="screenshot_type === 'file'">
-        <v-col cols="8" class="py-0">
-          <v-text-field v-model="filename" label="File name"></v-text-field>
+      <v-row dense v-if="screenshot_type === 'file'">
+        <v-col cols="12" class="py-1">
+          <v-text-field
+            v-model="filename"
+            label="File name"
+            variant="outlined"
+            density="compact"
+            hide-details
+            class="text-caption"
+          ></v-text-field>
         </v-col>
-        <v-col cols="4" class="py-0">
+        <v-col cols="12" class="py-1">
           <v-select
             v-model="output_extension"
             :items="output_extensions"
             label="Extension"
+            variant="outlined"
+            density="compact"
+            hide-details
             required
+            class="text-caption"
           />
         </v-col>
       </v-row>
 
-      <v-row>
-        <v-col cols="12" class="py-0">
+      <v-row dense>
+        <v-col cols="12" class="py-1">
           <v-switch
             v-model="include_background"
             :disabled="screenshot_type === 'file' && output_extension !== 'png'"
             label="Include background"
+            density="compact"
+            hide-details
             inset
+            class="text-caption"
           ></v-switch>
         </v-col>
       </v-row>
     </v-container>
 
     <template #actions>
-      <v-card-actions class="justify-center pb-6" style="gap: 12px">
-        <v-btn variant="text" size="small" color="white" @click="show = false"> Cancel </v-btn>
+      <v-card-actions class="justify-center pb-3 pt-0" style="gap: 8px">
+        <v-btn
+          variant="text"
+          size="small"
+          color="white"
+          class="text-caption text-none"
+          @click="show = false"
+        >
+          Cancel
+        </v-btn>
         <v-btn
           variant="outlined"
           size="small"
+          class="text-caption text-none"
           :disabled="(screenshot_type === 'file' && !filename) || !output_extension"
           color="white"
           @click="takeScreenshot()"
