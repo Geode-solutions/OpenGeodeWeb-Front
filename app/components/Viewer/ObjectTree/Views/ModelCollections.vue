@@ -27,7 +27,9 @@ const {
   updateVisibility,
 } = useModelCollections(id);
 
-const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === actualViewId));
+const currentView = computed(() =>
+  treeviewStore.opened_views.find((view) => view.id === actualViewId),
+);
 
 const opened = computed({
   get: () => currentView.value?.opened || [],
@@ -102,14 +104,8 @@ function handleHoverEnter({ item, immediate = false }) {
   }
 
   const viewerIdsToHover = extractIds(actualItem);
-  
 
-  onHoverEnter(
-    id,
-    () => viewerIdsToHover,
-    "model",
-    immediate,
-  );
+  onHoverEnter(id, () => viewerIdsToHover, "model", immediate);
 }
 
 function handleHoverLeave() {
@@ -132,7 +128,7 @@ function expandAll() {
 
 function extractIds(node) {
   if (node.children && node.children.length > 0) {
-    return node.children.flatMap(child => extractIds(child));
+    return node.children.flatMap((child) => extractIds(child));
   }
   if (node.viewer_id !== undefined && node.viewer_id !== null) {
     return [node.viewer_id];
@@ -195,12 +191,7 @@ function getLeafViewerIds(item) {
           size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"
-          @click.stop="
-            hybridViewerStore.focusCameraOnObject(
-              id,
-              getLeafViewerIds(item)
-            )
-          "
+          @click.stop="hybridViewerStore.focusCameraOnObject(id, getLeafViewerIds(item))"
         />
       </template>
     </CommonTreeView>

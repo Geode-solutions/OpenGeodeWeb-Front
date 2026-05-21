@@ -27,7 +27,9 @@ const {
   updateVisibility,
 } = useModelComponents(id);
 
-const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === actualViewId));
+const currentView = computed(() =>
+  treeviewStore.opened_views.find((view) => view.id === actualViewId),
+);
 
 const opened = computed({
   get: () => currentView.value?.opened || [],

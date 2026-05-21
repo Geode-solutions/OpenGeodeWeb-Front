@@ -24,10 +24,10 @@ export function useModelCollections(viewId) {
         localCategories.value = [];
         return;
       }
-      
+
       const data = await dataStore.fetchAllCollectionComponents(viewId);
       collectionsCache.value = markRaw(data);
-      
+
       localCategories.value = newItems.map((newCategory) => {
         const existing = localCategories.value.find((category) => category.id === newCategory.id);
         if (existing) {
