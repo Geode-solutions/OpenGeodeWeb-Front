@@ -80,7 +80,9 @@ const hasCollectionsMap = reactive({});
 watch(
   () => treeviewStore.items,
   async (newItems) => {
-    const models = newItems.flatMap((group) => group.children || []).filter((item) => isModel(item));
+    const models = newItems
+      .flatMap((group) => group.children || [])
+      .filter((item) => isModel(item));
     const fetchPromises = models.map(async (model) => {
       if (hasCollectionsMap[model.id] === undefined) {
         hasCollectionsMap[model.id] = false;
@@ -192,7 +194,12 @@ function expandAll() {
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
-            treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type, 'model_components')
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+              'model_components',
+            )
           "
         />
         <v-btn
@@ -203,7 +210,12 @@ function expandAll() {
           variant="text"
           v-tooltip="'Model\'s collections'"
           @click.stop="
-            treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type, 'model_collections')
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+              'model_collections',
+            )
           "
         />
       </template>

@@ -24,7 +24,7 @@ export function useModelComponents(viewId) {
         localCategories.value = [];
         return;
       }
-      
+
       const data = await dataStore.fetchAllMeshComponents(viewId);
       componentsCache.value = markRaw(data);
 

@@ -12,20 +12,30 @@ export function useDataCollections() {
     const count = await model_components_db
       .where("id")
       .equals(modelId)
-      .and((component) => ['Horizon', 'Fault', 'FaultBlock', 'StratigraphicUnit', 'ModelBoundary'].includes(component.type))
+      .and((component) =>
+        ["Horizon", "Fault", "FaultBlock", "StratigraphicUnit", "ModelBoundary"].includes(
+          component.type,
+        ),
+      )
       .count();
     return count > 0;
   }
 
   async function getAllCollectionComponents(modelId) {
     const items = await model_components_db.where("id").equals(modelId).toArray();
-    return items.filter((component) => ['Horizon', 'Fault', 'FaultBlock', 'StratigraphicUnit', 'ModelBoundary'].includes(component.type)).map((component) => ({
-      id: component.geode_id,
-      title: component.name,
-      category: component.type,
-      viewer_id: Number(component.viewer_id),
-      is_active: component.is_active,
-    }));
+    return items
+      .filter((component) =>
+        ["Horizon", "Fault", "FaultBlock", "StratigraphicUnit", "ModelBoundary"].includes(
+          component.type,
+        ),
+      )
+      .map((component) => ({
+        id: component.geode_id,
+        title: component.name,
+        category: component.type,
+        viewer_id: Number(component.viewer_id),
+        is_active: component.is_active,
+      }));
   }
 
   async function fetchAllCollectionComponents(modelId) {
@@ -42,11 +52,15 @@ export function useDataCollections() {
       if (!byType[component.category]) {
         byType[component.category] = [];
       }
-      const itemRelations = relations.filter(relation => relation.parent === component.id && relation.type === "collection");
-      const children = itemRelations.map(relation => meshComponentsById[relation.child]).filter(Boolean);
+      const itemRelations = relations.filter(
+        (relation) => relation.parent === component.id && relation.type === "collection",
+      );
+      const children = itemRelations
+        .map((relation) => meshComponentsById[relation.child])
+        .filter(Boolean);
       byType[component.category].push({
         ...component,
-        children
+        children,
       });
     }
     return byType;
@@ -59,7 +73,7 @@ export function useDataCollections() {
       Fault: "Faults",
       FaultBlock: "FaultBlocks",
       StratigraphicUnit: "StratigraphicUnits",
-      ModelBoundary: "ModelBoundaries"
+      ModelBoundary: "ModelBoundaries",
     };
 
     return Object.keys(collectionTitles)
@@ -67,7 +81,7 @@ export function useDataCollections() {
       .map((type) => ({
         id: type,
         title: collectionTitles[type],
-        children: byType[type]
+        children: byType[type],
       }));
   }
 

@@ -172,8 +172,6 @@ export const useDataStore = defineStore("data", () => {
     await database.model_components_relation.where("id").equals(modelId).delete();
   }
 
-
-
   async function getAllModelComponentsViewerIds(modelId) {
     const components = await model_components_db.where("id").equals(modelId).toArray();
     return components.map((component) => Number.parseInt(component.viewer_id, 10));
