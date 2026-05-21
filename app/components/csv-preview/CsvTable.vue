@@ -1,17 +1,16 @@
 <script setup>
-const { headers, rows, loading, coordinates, separator, headerRow, firstRow } =
-  defineProps({
-    headers: { type: Array, required: true },
-    rows: { type: Array, required: true },
-    loading: { type: Boolean, default: false },
-    coordinates: {
-      type: Object,
-      default: () => ({ x: undefined, y: undefined, z: undefined }),
-    },
-    separator: { type: String, default: "," },
-    headerRow: { type: Number, default: 0 },
-    firstRow: { type: Number, default: 1 },
-  });
+const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = defineProps({
+  headers: { type: Array, required: true },
+  rows: { type: Array, required: true },
+  loading: { type: Boolean, default: false },
+  coordinates: {
+    type: Object,
+    default: () => ({ x: undefined, y: undefined, z: undefined }),
+  },
+  separator: { type: String, default: "," },
+  headerRow: { type: Number, default: 0 },
+  firstRow: { type: Number, default: 1 },
+});
 
 function getColumnClass(key) {
   if (key === coordinates.x) {
@@ -46,29 +45,21 @@ function getColumnClass(key) {
       :headers="headers"
       :items="rows"
       class="bg-transparent flex-grow-1"
-      style="min-height: 0; min-width: 0;"
+      style="min-height: 0; min-width: 0"
       density="compact"
       hover
       :loading="loading"
       fixed-header
       item-height="35"
     >
-      <template
-        v-for="header in headers"
-        v-slot:[`item.${header.key}`]="{ item }"
-      >
-        <div
-          :class="getColumnClass(header.key)"
-          class="px-2 py-1 rounded text-truncate"
-        >
+      <template v-for="header in headers" v-slot:[`item.${header.key}`]="{ item }">
+        <div :class="getColumnClass(header.key)" class="px-2 py-1 rounded text-truncate">
           {{ item[header.key] }}
         </div>
       </template>
 
       <template #no-data>
-        <div
-          class="d-flex flex-column align-center justify-center h-100 py-12 opacity-40"
-        >
+        <div class="d-flex flex-column align-center justify-center h-100 py-12 opacity-40">
           <v-icon size="64" icon="mdi-table-off" />
           <div class="text-h6 mt-2">No preview available</div>
           <div class="text-caption">Check your parser settings</div>
