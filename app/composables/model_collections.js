@@ -3,18 +3,18 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-export function useModelComponents(viewId) {
+export function useModelCollections(viewId) {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
 
-  const items = dataStore.refFormatedMeshComponents(viewId);
-  const componentsCache = ref(undefined);
+  const items = dataStore.refFormatedCollectionComponents(viewId);
+  const collectionsCache = ref(undefined);
   const localCategories = ref([]);
 
   onMounted(async () => {
-    const data = await dataStore.fetchAllMeshComponents(viewId);
-    componentsCache.value = markRaw(data);
+    const data = await dataStore.fetchAllCollectionComponents(viewId);
+    collectionsCache.value = markRaw(data);
   });
 
   watch(
@@ -25,9 +25,9 @@ export function useModelComponents(viewId) {
         return;
       }
       
-      const data = await dataStore.fetchAllMeshComponents(viewId);
-      componentsCache.value = markRaw(data);
-
+      const data = await dataStore.fetchAllCollectionComponents(viewId);
+      collectionsCache.value = markRaw(data);
+      
       localCategories.value = newItems.map((newCategory) => {
         const existing = localCategories.value.find((category) => category.id === newCategory.id);
         if (existing) {
@@ -64,7 +64,7 @@ export function useModelComponents(viewId) {
 
   return {
     items,
-    componentsCache,
+    collectionsCache,
     localCategories,
     selection,
     updateVisibility,

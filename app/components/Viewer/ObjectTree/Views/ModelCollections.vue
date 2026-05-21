@@ -6,7 +6,7 @@ import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Con
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useModelComponents } from "@ogw_front/composables/model_components";
+import { useModelCollections } from "@ogw_front/composables/model_collections";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id, viewId } = defineProps({
@@ -21,11 +21,11 @@ const emit = defineEmits(["show-menu"]);
 const treeviewStore = useTreeviewStore();
 const {
   items: rawItems,
-  componentsCache,
+  collectionsCache: componentsCache,
   localCategories,
   selection: visibleComponents,
   updateVisibility,
-} = useModelComponents(id);
+} = useModelCollections(id);
 
 const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === actualViewId));
 
@@ -101,12 +101,12 @@ function handleHoverEnter({ item, immediate = false }) {
     return;
   }
 
+  const viewerIdsToHover = extractIds(actualItem);
+  
+
   onHoverEnter(
     id,
-    () =>
-      actualItem.category
-        ? [actualItem.viewer_id]
-        : actualItem.children?.map((child) => child.viewer_id) || [],
+    () => viewerIdsToHover,
     "model",
     immediate,
   );
@@ -128,6 +128,21 @@ function expandAll() {
   }
   traverse(itemsForTreeView.value);
   opened.value = allIds;
+}
+
+function extractIds(node) {
+  if (node.children && node.children.length > 0) {
+    return node.children.flatMap(child => extractIds(child));
+  }
+  if (node.viewer_id !== undefined && node.viewer_id !== null) {
+    return [node.viewer_id];
+  }
+  return [];
+}
+
+function getLeafViewerIds(item) {
+  const actualItem = item.raw || item;
+  return extractIds(actualItem);
 }
 </script>
 
@@ -183,7 +198,7 @@ function expandAll() {
           @click.stop="
             hybridViewerStore.focusCameraOnObject(
               id,
-              item.category ? [item.viewer_id] : item.children.map((child) => child.viewer_id),
+              getLeafViewerIds(item)
             )
           "
         />
