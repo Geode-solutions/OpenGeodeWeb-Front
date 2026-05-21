@@ -119,17 +119,68 @@ const colorModes = [
 const modelComponentTypeLabel = computed(() =>
   componentType.value ? `${componentType.value}s Options` : "",
 );
+
+const modelComponentsColorMode = ref("constant");
+
+const modelComponentsColor = computed({
+  get: () => {
+    if (selection.value.length > 0) {
+      return dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]);
+    }
+    return { "r": 255, "g": 255, "b": 255 };
+  },
+  set: async (color) => {
+    if (selection.value.length > 0) {
+      await dataStyleStore.setModelComponentsColor(
+        modelId.value,
+        selection.value,
+        color,
+        modelComponentsColorMode.value,
+      );
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
+watch(modelComponentsColorMode, async (colorMode) => {
+  if (colorMode === "random" && selection.value.length > 0) {
+    await dataStyleStore.setModelComponentsColor(
+      modelId.value,
+      selection.value,
+      undefined,
+      colorMode,
+    );
+    hybridViewerStore.remoteRender();
+  }
+});
 </script>
 
 <template>
-  <div class="model-style-card">
+  <v-sheet class="model-style-card" color="transparent">
     <OptionsSection title="Model Options">
       <VisibilitySwitch v-model="modelVisibility" />
     </OptionsSection>
 
+    <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-6">
+      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
+      <v-select
+        v-model="modelComponentsColorMode"
+        :items="colorModes"
+        density="compact"
+        hide-details
+        class="mb-3"
+        variant="outlined"
+      />
+
+      <template v-if="modelComponentsColorMode === 'constant'">
+        <v-label class="text-caption mb-1">Color</v-label>
+        <ViewerOptionsColorPicker v-model="modelComponentsColor" />
+      </template>
+    </OptionsSection>
+
     <OptionsSection v-if="componentType" :title="modelComponentTypeLabel" class="mt-6">
       <VisibilitySwitch v-model="modelComponentTypeVisibility" />
-      <div class="text-caption mb-1 mt-2">Color Mode</div>
+      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
       <v-select
         v-model="modelComponentTypeColorMode"
         :items="colorModes"
@@ -140,14 +191,14 @@ const modelComponentTypeLabel = computed(() =>
       />
 
       <template v-if="modelComponentTypeColorMode === 'constant'">
-        <div class="text-caption mb-1">Color</div>
+        <v-label class="text-caption mb-1">Color</v-label>
         <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
       </template>
     </OptionsSection>
 
     <OptionsSection v-if="componentId" title="Component Options" class="mt-6">
       <VisibilitySwitch v-model="componentVisibility" />
-      <div class="text-caption mb-1 mt-2">Color Mode</div>
+      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
       <v-select
         v-model="componentColorMode"
         :items="colorModes"
@@ -158,11 +209,11 @@ const modelComponentTypeLabel = computed(() =>
       />
 
       <template v-if="componentColorMode === 'constant'">
-        <div class="text-caption mb-1">Color</div>
+        <v-label class="text-caption mb-1">Color</v-label>
         <ViewerOptionsColorPicker v-model="componentColor" />
       </template>
     </OptionsSection>
-  </div>
+  </v-sheet>
 </template>
 
 <style scoped>
