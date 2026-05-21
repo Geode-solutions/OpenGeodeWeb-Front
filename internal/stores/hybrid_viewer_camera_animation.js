@@ -5,6 +5,7 @@ const SLERP_LINEAR_THRESHOLD = 0.9995;
 const SLERP_ANTIPODAL_THRESHOLD = -0.9995;
 const LONG_ANIMATION_DURATION = 1000;
 const SHORT_ANIMATION_DURATION = 500;
+const SLERP_MIDPOINT = 0.5;
 
 function vecSub(vector, other) {
   return [vector[0] - other[0], vector[1] - other[1], vector[2] - other[2]];
@@ -22,8 +23,12 @@ function vecNormalize(vector) {
   return [vector[0] / len, vector[1] / len, vector[2] / len];
 }
 
-function vecCross(a, b) {
-  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+function vecCross(vector, other) {
+  return [
+    vector[1] * other[2] - vector[2] * other[1],
+    vector[2] * other[0] - vector[0] * other[2],
+    vector[0] * other[1] - vector[1] * other[0],
+  ];
 }
 
 function slerp(from, target, ratio, antipodalMid = undefined) {
@@ -42,9 +47,9 @@ function slerp(from, target, ratio, antipodalMid = undefined) {
 
   if (dotProduct < SLERP_ANTIPODAL_THRESHOLD) {
     const mid = antipodalMid;
-    return ratio < 0.5
+    return ratio < SLERP_MIDPOINT
       ? slerp(normFrom, mid, ratio * 2)
-      : slerp(mid, normTarget, (ratio - 0.5) * 2);
+      : slerp(mid, normTarget, (ratio - SLERP_MIDPOINT) * 2);
   }
 
   const theta = Math.acos(dotProduct);
@@ -90,12 +95,10 @@ function animateCamera(options) {
     normStartDir[0] * normTargetDir[0] +
     normStartDir[1] * normTargetDir[1] +
     normStartDir[2] * normTargetDir[2];
-  // For antipodal directions, pre-compute a midpoint using cross(startDir, viewUp)
-  // so the arc stays in the camera's up plane and never triggers gimbal lock.
   const antipodalMid =
     dirDot < SLERP_ANTIPODAL_THRESHOLD
       ? vecNormalize(vecCross(normStartDir, vecNormalize(startState.view_up)))
-      : null;
+      : undefined;
 
   const startTime = performance.now();
   function animate(currentTime) {
