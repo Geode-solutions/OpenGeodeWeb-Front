@@ -1,6 +1,6 @@
 <script setup>
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.inspect_file;
 
@@ -18,9 +18,9 @@ async function get_inspection_results() {
     geode_object_type,
     filename,
   };
-  const geodeStore = useGeodeStore();
+  const backStore = useBackStore();
 
-  await geodeStore.request(schema, params, {
+  await backStore.request(schema, params, {
     response_function: (response) => {
       emit("update_values", {
         inspection_result: [response.inspection_result],

@@ -2,7 +2,7 @@
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.allowed_objects;
 
@@ -12,7 +12,7 @@ const { filenames } = defineProps({
   filenames: { type: Array, required: true },
 });
 
-const geodeStore = useGeodeStore();
+const backStore = useBackStore();
 
 const loading = ref(false);
 const allowed_objects = ref({});
@@ -52,7 +52,7 @@ async function get_allowed_objects() {
   toggle_loading();
   allowed_objects.value = {};
 
-  const promise_array = filenames.map((filename) => geodeStore.request(schema, { filename }));
+  const promise_array = filenames.map((filename) => backStore.request(schema, { filename }));
   const responses = await Promise.all(promise_array);
   const allowed_objects_list = responses.map((response) => response.allowed_objects);
   const all_keys = [...new Set(allowed_objects_list.flatMap((obj) => Object.keys(obj)))];

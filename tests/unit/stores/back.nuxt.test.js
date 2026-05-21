@@ -7,7 +7,7 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 // CONSTANTS
@@ -18,91 +18,91 @@ const STATUS_500 = 500;
 const EXPECTED_ONE_REQUEST = 1;
 const EXPECTED_NO_REQUEST = 0;
 
-describe("geode store", () => {
+describe("back store", () => {
   beforeEach(() => {
     setupActivePinia();
   });
 
   test("state", () => {
-    const geodeStore = useGeodeStore();
-    expectTypeOf(geodeStore.default_local_port).toBeString();
-    expectTypeOf(geodeStore.request_counter).toBeNumber();
-    expectTypeOf(geodeStore.status).toBeString();
+    const backStore = useBackStore();
+    expectTypeOf(backStore.default_local_port).toBeString();
+    expectTypeOf(backStore.request_counter).toBeNumber();
+    expectTypeOf(backStore.status).toBeString();
   });
 
   describe("protocol", () => {
     test("app_mode CLOUD", () => {
       const infraStore = useInfraStore();
-      const geodeStore = useGeodeStore();
+      const backStore = useBackStore();
       infraStore.app_mode = appMode.CLOUD;
-      expect(geodeStore.protocol).toBe("https");
+      expect(backStore.protocol).toBe("https");
     });
 
     test("app_mode BROWSER/DESKTOP", () => {
       const infraStore = useInfraStore();
-      const geodeStore = useGeodeStore();
+      const backStore = useBackStore();
       infraStore.app_mode = appMode.BROWSER;
-      expect(geodeStore.protocol).toBe("http");
+      expect(backStore.protocol).toBe("http");
       infraStore.app_mode = appMode.DESKTOP;
-      expect(geodeStore.protocol).toBe("http");
+      expect(backStore.protocol).toBe("http");
     });
   });
 
   describe("port", () => {
     test("app_mode CLOUD", () => {
       const infraStore = useInfraStore();
-      const geodeStore = useGeodeStore();
+      const backStore = useBackStore();
       infraStore.app_mode = appMode.CLOUD;
-      expect(geodeStore.port).toBe(PORT_443);
+      expect(backStore.port).toBe(PORT_443);
     });
 
     test("app_mode BROWSER/DESKTOP", () => {
       const infraStore = useInfraStore();
-      const geodeStore = useGeodeStore();
+      const backStore = useBackStore();
       infraStore.app_mode = appMode.BROWSER;
-      expect(geodeStore.port).toBe(geodeStore.default_local_port);
+      expect(backStore.port).toBe(backStore.default_local_port);
       infraStore.app_mode = appMode.DESKTOP;
-      expect(geodeStore.port).toBe(geodeStore.default_local_port);
+      expect(backStore.port).toBe(backStore.default_local_port);
     });
 
     test("override default_local_port", () => {
       const infraStore = useInfraStore();
-      const geodeStore = useGeodeStore();
+      const backStore = useBackStore();
       infraStore.app_mode = appMode.DESKTOP;
-      geodeStore.default_local_port = PORT_12;
-      expect(geodeStore.port).toBe(PORT_12);
+      backStore.default_local_port = PORT_12;
+      expect(backStore.port).toBe(PORT_12);
     });
   });
 
   describe("base_url", () => {
     test("app_mode BROWSER", () => {
       const infraStore = useInfraStore();
-      const geodeStore = useGeodeStore();
+      const backStore = useBackStore();
       infraStore.app_mode = appMode.BROWSER;
       infraStore.domain_name = "localhost";
-      expect(geodeStore.base_url).toBe(`http://localhost:${PORT_5000}`);
+      expect(backStore.base_url).toBe(`http://localhost:${PORT_5000}`);
     });
 
     test("app_mode CLOUD", () => {
       const infraStore = useInfraStore();
-      const geodeStore = useGeodeStore();
+      const backStore = useBackStore();
       infraStore.app_mode = appMode.CLOUD;
       infraStore.domain_name = "example.com";
-      expect(geodeStore.base_url).toBe(`https://example.com:${PORT_443}/geode`);
+      expect(backStore.base_url).toBe(`https://example.com:${PORT_443}/geode`);
     });
   });
 
   describe("is_busy", () => {
     test("is_busy", () => {
-      const geodeStore = useGeodeStore();
-      geodeStore.request_counter = EXPECTED_ONE_REQUEST;
-      expect(geodeStore.is_busy).toBe(true);
+      const backStore = useBackStore();
+      backStore.request_counter = EXPECTED_ONE_REQUEST;
+      expect(backStore.is_busy).toBe(true);
     });
 
     test("not is_busy", () => {
-      const geodeStore = useGeodeStore();
-      geodeStore.request_counter = EXPECTED_NO_REQUEST;
-      expect(geodeStore.is_busy).toBe(false);
+      const backStore = useBackStore();
+      backStore.request_counter = EXPECTED_NO_REQUEST;
+      expect(backStore.is_busy).toBe(false);
     });
   });
 });
@@ -116,32 +116,32 @@ describe("geode store actions", () => {
 
   describe("ping", () => {
     test("response", async () => {
-      const geodeStore = useGeodeStore();
-      geodeStore.base_url = "";
+      const backStore = useBackStore();
+      backStore.base_url = "";
       getFakeCall.mockReturnValue({});
-      await geodeStore.ping();
-      expect(geodeStore.status).toBe(Status.CONNECTED);
+      await backStore.ping();
+      expect(backStore.status).toBe(Status.CONNECTED);
     });
 
     test("response_error", async () => {
-      const geodeStore = useGeodeStore();
-      geodeStore.base_url = "";
+      const backStore = useBackStore();
+      backStore.base_url = "";
       getFakeCall.mockImplementation(() => {
         throw createError({ status: STATUS_500 });
       });
-      await expect(geodeStore.ping()).rejects.toThrow("500");
-      expect(geodeStore.status).toBe(Status.NOT_CONNECTED);
+      await expect(backStore.ping()).rejects.toThrow("500");
+      expect(backStore.status).toBe(Status.NOT_CONNECTED);
     });
   });
 
   describe("request counter", () => {
     test("increment/decrement", async () => {
-      const geodeStore = useGeodeStore();
-      expect(geodeStore.request_counter).toBe(EXPECTED_NO_REQUEST);
-      await geodeStore.start_request();
-      expect(geodeStore.request_counter).toBe(EXPECTED_ONE_REQUEST);
-      await geodeStore.stop_request();
-      expect(geodeStore.request_counter).toBe(EXPECTED_NO_REQUEST);
+      const backStore = useBackStore();
+      expect(backStore.request_counter).toBe(EXPECTED_NO_REQUEST);
+      await backStore.start_request();
+      expect(backStore.request_counter).toBe(EXPECTED_ONE_REQUEST);
+      await backStore.stop_request();
+      expect(backStore.request_counter).toBe(EXPECTED_NO_REQUEST);
     });
   });
 });

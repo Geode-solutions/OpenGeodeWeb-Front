@@ -2,7 +2,7 @@
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 import FetchingData from "@ogw_front/components/FetchingData";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
@@ -19,10 +19,10 @@ const toggle_loading = useToggle(loading);
 async function get_output_file_extensions() {
   toggle_loading();
   geode_objects_and_output_extensions.value = {};
-  const geodeStore = useGeodeStore();
+  const backStore = useBackStore();
   const values = await Promise.all(
     filenames.map(async (filename) => {
-      const response = await geodeStore.request(schema, {
+      const response = await backStore.request(schema, {
         geode_object_type,
         filename,
       });

@@ -7,12 +7,12 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import InspectorInspectionButton from "@ogw_front/components/Inspector/InspectionButton";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 describe("inspector inspection button", () => {
   const pinia = setupActivePinia();
-  const geodeStore = useGeodeStore();
-  geodeStore.base_url = "/";
+  const backStore = useBackStore();
+  backStore.base_url = "/";
 
   test("with issues", async () => {
     const inspection_result = {
@@ -31,7 +31,7 @@ describe("inspector inspection button", () => {
         },
       ],
     };
-    geodeStore.request = vi.fn((_schema, _params, callbacks) => {
+    backStore.request = vi.fn((_schema, _params, callbacks) => {
       callbacks?.response_function?.({ inspection_result });
       return Promise.resolve({ inspection_result });
     });
