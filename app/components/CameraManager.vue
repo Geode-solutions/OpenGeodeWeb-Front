@@ -33,7 +33,14 @@ const { show_dialog, width } = defineProps({
 
     <v-card-actions class="pa-2">
       <v-spacer></v-spacer>
-      <v-btn variant="text" size="small" color="white" class="text-caption text-none" @click="emit('close')">Close</v-btn>
+      <v-btn
+        variant="text"
+        size="small"
+        color="white"
+        class="text-caption text-none"
+        @click="emit('close')"
+        >Close</v-btn
+      >
     </v-card-actions>
   </GlassCard>
 </template>
