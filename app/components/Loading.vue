@@ -85,7 +85,7 @@ onUnmounted(() => {
             <LoadingHeader :logo="logo" />
             <LoadingEcoMessages :app-name="appName" />
             <LoadingProgress :progress="progress" />
-            
+
             <div class="d-flex flex-wrap justify-center gap-4 w-100 mt-4">
               <v-chip
                 v-for="store in extensionStores"
@@ -93,7 +93,12 @@ onUnmounted(() => {
                 :color="store.status === Status.CONNECTED ? 'success' : 'primary'"
                 variant="flat"
               >
-                <v-icon start :icon="store.status === Status.CONNECTED ? 'mdi-check-circle' : 'mdi-loading mdi-spin'" />
+                <v-icon
+                  start
+                  :icon="
+                    store.status === Status.CONNECTED ? 'mdi-check-circle' : 'mdi-loading mdi-spin'
+                  "
+                />
                 {{ store.$id.charAt(0).toUpperCase() + store.$id.slice(1) }}
               </v-chip>
             </div>
