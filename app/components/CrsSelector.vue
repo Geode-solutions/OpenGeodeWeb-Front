@@ -1,6 +1,6 @@
 <script setup>
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geographic_coordinate_systems;
 
@@ -16,7 +16,7 @@ const data_table_loading = ref(false);
 const crs_list = ref([]);
 const selected_crs = ref([]);
 const toggle_loading = useToggle(data_table_loading);
-const geodeStore = useGeodeStore();
+const backStore = useBackStore();
 
 watch(selected_crs, (new_value) => {
   const crs = get_selected_crs(new_value[0]);
@@ -38,7 +38,7 @@ function get_selected_crs(crs_code) {
 async function get_crs_table() {
   const params = { geode_object_type };
   toggle_loading();
-  await geodeStore.request(schema, params, {
+  await backStore.request(schema, params, {
     response_function: (response) => {
       crs_list.value = response.crs_list;
     },

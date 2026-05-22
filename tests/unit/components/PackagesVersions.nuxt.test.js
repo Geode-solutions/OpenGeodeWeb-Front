@@ -3,15 +3,15 @@ import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import PackagesVersions from "@ogw_front/components/PackagesVersions";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const FIRST_INDEX = 0;
 
 describe("packages versions", () => {
   test("mount", async () => {
     const pinia = setupActivePinia();
-    const geodeStore = useGeodeStore();
-    geodeStore.base_url = "/";
+    const backStore = useBackStore();
+    backStore.base_url = "/";
 
     const schema = {
       $id: "/versions",

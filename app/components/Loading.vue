@@ -1,4 +1,7 @@
 <script setup>
+import { Status } from "@ogw_front/utils/status";
+import { useInfraStore } from "@ogw_front/stores/infra";
+
 const { logo, appName } = defineProps({
   logo: {
     type: String,
@@ -9,6 +12,12 @@ const { logo, appName } = defineProps({
     required: true,
   },
 });
+
+const infraStore = useInfraStore();
+
+const extensionStores = computed(() =>
+  infraStore.microservices.filter((store) => store.$id !== "back" && store.$id !== "viewer"),
+);
 
 const show = ref(false);
 const progress = ref(0);
@@ -76,6 +85,24 @@ onUnmounted(() => {
             <LoadingHeader :logo="logo" />
             <LoadingEcoMessages :app-name="appName" />
             <LoadingProgress :progress="progress" />
+
+            <div class="d-flex flex-wrap justify-center gap-4 w-100 mt-4">
+              <v-chip
+                v-for="store in extensionStores"
+                :key="store.$id"
+                :color="store.status === Status.CONNECTED ? 'success' : 'primary'"
+                variant="flat"
+              >
+                <v-icon
+                  start
+                  :icon="
+                    store.status === Status.CONNECTED ? 'mdi-check-circle' : 'mdi-loading mdi-spin'
+                  "
+                />
+                {{ store.$id.charAt(0).toUpperCase() + store.$id.slice(1) }}
+              </v-chip>
+            </div>
+
             <LoadingFooter />
           </div>
         </div>

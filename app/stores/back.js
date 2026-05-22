@@ -10,11 +10,12 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 const MILLISECONDS_IN_SECOND = 1000;
 const DEFAULT_PING_INTERVAL_SECONDS = 10;
 
-export const useGeodeStore = defineStore("geode", {
+export const useBackStore = defineStore("back", {
   state: () => ({
     default_local_port: "5000",
     request_counter: 0,
     status: Status.NOT_CONNECTED,
+    version: "0.0.0",
   }),
   getters: {
     protocol() {
@@ -144,6 +145,20 @@ export const useGeodeStore = defineStore("geode", {
             if (callbacks.response_function) {
               await callbacks.response_function(response);
             }
+          },
+        },
+      );
+    },
+    get_version(schema) {
+      if (!schema) {
+        return;
+      }
+      return this.request(
+        schema,
+        {},
+        {
+          response_function: (response) => {
+            this.version = response.microservice_version;
           },
         },
       );

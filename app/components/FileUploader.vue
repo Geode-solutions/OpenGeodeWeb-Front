@@ -1,5 +1,5 @@
 <script setup>
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer";
 import DragAndDrop from "@ogw_front/components/DragAndDrop";
@@ -15,7 +15,7 @@ const { multiple, accept, files, auto_upload, showOverlay, mini } = defineProps(
   mini: { type: Boolean, default: false },
 });
 
-const geodeStore = useGeodeStore();
+const backStore = useBackStore();
 const internal_files = ref(files);
 const dragAndDropRef = useTemplateRef("dragAndDropRef");
 const csv_dialog = ref(false);
@@ -49,7 +49,7 @@ async function onCsvConfirm(result) {
   });
 
   current_csv_file.value.isConfigured = true;
-  await geodeStore.upload(json_file);
+  await backStore.upload(json_file);
   internal_files.value = [...internal_files.value];
   csv_dialog.value = false;
 }
@@ -72,7 +72,7 @@ function removeFile(index) {
 
 async function upload_files() {
   toggle_loading();
-  const promise_array = internal_files.value.map((file) => geodeStore.upload(file));
+  const promise_array = internal_files.value.map((file) => backStore.upload(file));
   await Promise.all(promise_array);
   files_uploaded.value = true;
   toggle_loading();

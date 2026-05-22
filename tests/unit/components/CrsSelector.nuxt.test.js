@@ -5,19 +5,19 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import CrsSelector from "@ogw_front/components/CrsSelector";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
 const FIRST_INDEX = 0;
 
 let pinia = undefined;
-let geodeStore = undefined;
+let backStore = undefined;
 
 describe("crs selector", () => {
   beforeEach(() => {
     pinia = setupActivePinia();
-    geodeStore = useGeodeStore();
-    geodeStore.base_url = "/";
+    backStore = useBackStore();
+    backStore.base_url = "/";
   });
 
   test("default behavior", async () => {
@@ -29,8 +29,8 @@ describe("crs selector", () => {
       },
     ];
 
-    // Mock geodeStore.request instead of registerEndpoint
-    geodeStore.request = vi.fn((schema, params, callbacks) => {
+    // Mock backStore.request instead of registerEndpoint
+    backStore.request = vi.fn((schema, params, callbacks) => {
       callbacks.response_function({ crs_list });
       return Promise.resolve({ crs_list });
     });

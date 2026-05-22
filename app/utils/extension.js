@@ -35,8 +35,6 @@ async function registerRunningExtensions() {
         });
         appStore.registerStore(store);
         console.log("[ExtensionManager] Store registered:", store.$id);
-        await store.connect();
-        console.log("[ExtensionManager] Microservice connected:", store.$id);
         infraStore.register_microservice(store);
       }
       return {
