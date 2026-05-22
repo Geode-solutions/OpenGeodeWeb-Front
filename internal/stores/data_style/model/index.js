@@ -2,6 +2,7 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelBlocksStyle } from "./blocks";
 import { useModelColorStyle } from "./color";
+import { useModelComponentAttributeStyle } from "./attribute";
 import { useModelCornersStyle } from "./corners";
 import { useModelEdgesStyle } from "./edges";
 import { useModelLinesStyle } from "./lines";
@@ -20,6 +21,7 @@ function useModelStyle() {
   const modelLinesStyle = useModelLinesStyle();
   const modelPointsStyle = useModelPointsStyle();
   const modelSurfacesStyle = useModelSurfacesStyle();
+  const modelComponentAttributeStyle = useModelComponentAttributeStyle();
 
   const componentStyleFunctions = {
     Corner: modelCornersStyle,
@@ -46,6 +48,7 @@ function useModelStyle() {
       modelCornersStyle.applyModelCornersStyle(modelId),
       modelPointsStyle.applyModelPointsStyle(modelId),
       modelEdgesStyle.applyModelEdgesStyle(modelId),
+      modelComponentAttributeStyle.applyModelComponentAttributeStyle(modelId),
     ]);
   }
 
@@ -74,6 +77,7 @@ function useModelStyle() {
     ...modelLinesStyle,
     ...modelPointsStyle,
     ...modelSurfacesStyle,
+    ...modelComponentAttributeStyle,
   };
 }
 

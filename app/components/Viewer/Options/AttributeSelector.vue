@@ -8,9 +8,11 @@ const name = defineModel("name", { type: String });
 const range = defineModel("range", { type: Array });
 const colorMap = defineModel("colorMap", { type: String });
 
-const { id, schema } = defineProps({
+const { id, schema, componentId, componentType } = defineProps({
   id: { type: String, required: true },
   schema: { type: Object, required: true },
+  componentId: { type: String, default: undefined },
+  componentType: { type: String, default: undefined },
 });
 
 const attributes = ref([]);
@@ -49,9 +51,16 @@ function resetRange() {
 }
 
 function getAttributes() {
+  const params = { id };
+  if (componentId !== undefined) {
+    params.component_id = componentId;
+  }
+  if (componentType !== undefined) {
+    params.component_type = componentType;
+  }
   geodeStore.request(
     schema,
-    { id },
+    params,
     {
       response_function: (response) => {
         attributes.value = response.attributes;
@@ -65,7 +74,7 @@ onMounted(() => {
 });
 
 watch(
-  () => [id, schema],
+  () => [id, schema, componentId, componentType],
   () => {
     getAttributes();
   },

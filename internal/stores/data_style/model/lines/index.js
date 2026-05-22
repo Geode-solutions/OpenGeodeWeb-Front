@@ -32,11 +32,14 @@ export function useModelLinesStyle() {
       visibilityGroups[visibility].push(line_id);
 
       const color_mode = style.color_mode || "constant";
-      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[color_key]) {
-        colorGroups[color_key] = { color_mode, color: style.color, lines_ids: [] };
+      const coloring_style_key = style.coloring_style_key || "color";
+      if (coloring_style_key === "color") {
+        const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+        if (!colorGroups[color_key]) {
+          colorGroups[color_key] = { color_mode, color: style.color, lines_ids: [] };
+        }
+        colorGroups[color_key].lines_ids.push(line_id);
       }
-      colorGroups[color_key].lines_ids.push(line_id);
     }
 
     const promises = [

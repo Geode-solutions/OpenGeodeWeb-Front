@@ -32,11 +32,14 @@ export function useModelSurfacesStyle() {
       visibilityGroups[visibility].push(surfaces_id);
 
       const color_mode = style.color_mode || "constant";
-      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[color_key]) {
-        colorGroups[color_key] = { color_mode, color: style.color, surfaces_ids: [] };
+      const coloring_style_key = style.coloring_style_key || "color";
+      if (coloring_style_key === "color") {
+        const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+        if (!colorGroups[color_key]) {
+          colorGroups[color_key] = { color_mode, color: style.color, surfaces_ids: [] };
+        }
+        colorGroups[color_key].surfaces_ids.push(surfaces_id);
       }
-      colorGroups[color_key].surfaces_ids.push(surfaces_id);
     }
 
     const promises = [

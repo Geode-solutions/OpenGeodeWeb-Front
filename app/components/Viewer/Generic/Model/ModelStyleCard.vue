@@ -1,10 +1,11 @@
 <script setup>
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
-import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { computed, ref, watchEffect } from "vue";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -57,102 +58,711 @@ const componentVisibility = computed({
   },
 });
 
-const componentColor = computed({
+function getCapabilities(type) {
+  if (type === "Block") {
+    return {
+      vertex: { available: true, hasColorMap: true },
+      polyhedron: { available: true, hasColorMap: true },
+    };
+  } else if (type === "Surface") {
+    return {
+      vertex: { available: true, hasColorMap: true },
+      polygon: { available: true, hasColorMap: true },
+    };
+  } else if (type === "Line") {
+    return {
+      vertex: { available: true, hasColorMap: true },
+      edge: { available: true, hasColorMap: true },
+    };
+  } else if (type === "Corner") {
+    return {
+      vertex: { available: true, hasColorMap: true },
+    };
+  }
+  return {
+    vertex: { available: true, hasColorMap: true },
+    cell: { available: true, hasColorMap: true },
+    edge: { available: true, hasColorMap: true },
+    polygon: { available: true, hasColorMap: true },
+    polyhedron: { available: true, hasColorMap: true },
+  };
+}
+
+const modelColoringStyleKey = computed({
+  get: () => dataStyleStore.modelComponentColoringStyleKey(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentColoringStyleKey(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelColor = computed({
+  get: () => dataStyleStore.modelComponentColor(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentColor(modelId.value, undefined, undefined, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelVertexAttributeName = computed({
+  get: () => dataStyleStore.modelComponentAttributeName(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+      "vertex",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelVertexAttributeRange = computed({
+  get: () => dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelVertexAttributeColorMap = computed({
+  get: () => dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelCellAttributeName = computed({
+  get: () => dataStyleStore.modelComponentAttributeName(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+      "cells",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelCellAttributeRange = computed({
+  get: () => dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelCellAttributeColorMap = computed({
+  get: () => dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelEdgeAttributeName = computed({
+  get: () => dataStyleStore.modelComponentAttributeName(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+      "edges",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelEdgeAttributeRange = computed({
+  get: () => dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelEdgeAttributeColorMap = computed({
+  get: () => dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelPolygonAttributeName = computed({
+  get: () => dataStyleStore.modelComponentAttributeName(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+      "polygons",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelPolygonAttributeRange = computed({
+  get: () => dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelPolygonAttributeColorMap = computed({
+  get: () => dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelPolyhedronAttributeName = computed({
+  get: () => dataStyleStore.modelComponentAttributeName(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+      "polyhedra",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelPolyhedronAttributeRange = computed({
+  get: () => dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const modelPolyhedronAttributeColorMap = computed({
+  get: () => dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const typeColoringStyleKey = computed({
   get: () =>
-    componentId.value
-      ? dataStyleStore.getModelComponentEffectiveColor(
-          modelId.value,
-          componentId.value,
-          componentType.value,
-        )
-      : undefined,
-  set: async (color) => {
-    if (componentId.value) {
-      await dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], color);
-      hybridViewerStore.remoteRender();
-    }
+    dataStyleStore.modelComponentColoringStyleKey(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentColoringStyleKey(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
   },
 });
-
-const modelComponentTypeColor = computed({
+const typeColor = computed({
+  get: () => dataStyleStore.modelComponentColor(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentColor(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeVertexAttributeName = computed({
   get: () =>
-    componentType.value
-      ? dataStyleStore.getModelComponentTypeColor(modelId.value, componentType.value)
-      : undefined,
-  set: async (color) => {
-    if (componentType.value) {
-      await dataStyleStore.setModelComponentTypeColor(modelId.value, componentType.value, color);
-      hybridViewerStore.remoteRender();
-    }
+    dataStyleStore.modelComponentAttributeName(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+      "vertex",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeVertexAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeVertexAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeCellAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+      "cells",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeCellAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeCellAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeEdgeAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+      "edges",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeEdgeAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typeEdgeAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typePolygonAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+      "polygons",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typePolygonAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typePolygonAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typePolyhedronAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+      "polyhedra",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typePolyhedronAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const typePolyhedronAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, undefined, componentType.value),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      undefined,
+      componentType.value,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 
-const modelComponentTypeColorMode = computed({
-  get: () => dataStyleStore.getModelComponentTypeColorMode(modelId.value, componentType.value),
-  set: async (colorMode) => {
-    if (componentType.value) {
-      await dataStyleStore.setModelComponentTypeColorMode(
-        modelId.value,
-        componentType.value,
-        colorMode,
-      );
-      hybridViewerStore.remoteRender();
-    }
+const compColoringStyleKey = computed({
+  get: () =>
+    dataStyleStore.modelComponentColoringStyleKey(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentColoringStyleKey(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
   },
 });
-
-const componentColorMode = computed({
-  get: () => dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value),
-  set: async (colorMode) => {
-    if (componentId.value) {
-      await dataStyleStore.setModelComponentColorMode(modelId.value, componentId.value, colorMode);
-      hybridViewerStore.remoteRender();
-    }
+const compColor = computed({
+  get: () => dataStyleStore.modelComponentColor(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentColor(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
   },
 });
-
-const colorModes = [
-  { title: "Constant", value: "constant" },
-  { title: "Random", value: "random" },
-];
+const compVertexAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+      "vertex",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compVertexAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compVertexAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compCellAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+      "cells",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compCellAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compCellAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compEdgeAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+      "edges",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compEdgeAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compEdgeAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compPolygonAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+      "polygons",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compPolygonAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compPolygonAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compPolyhedronAttributeName = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeName(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeName(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+      "polyhedra",
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compPolyhedronAttributeRange = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeRange(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeRange(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const compPolyhedronAttributeColorMap = computed({
+  get: () =>
+    dataStyleStore.modelComponentAttributeColorMap(modelId.value, componentId.value, undefined),
+  set: async (newValue) => {
+    await dataStyleStore.setModelComponentAttributeColorMap(
+      modelId.value,
+      componentId.value,
+      undefined,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 
 const modelComponentTypeLabel = computed(() =>
   componentType.value ? `${componentType.value}s Options` : "",
 );
-
-const modelComponentsColorMode = ref("constant");
-
-const modelComponentsColor = computed({
-  get: () => {
-    if (selection.value.length > 0) {
-      return dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]);
-    }
-    return { red: 255, green: 255, blue: 255 };
-  },
-  set: async (color) => {
-    if (selection.value.length > 0) {
-      await dataStyleStore.setModelComponentsColor(
-        modelId.value,
-        selection.value,
-        color,
-        modelComponentsColorMode.value,
-      );
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-watch(modelComponentsColorMode, async (colorMode) => {
-  if (colorMode === "random" && selection.value.length > 0) {
-    await dataStyleStore.setModelComponentsColor(
-      modelId.value,
-      selection.value,
-      undefined,
-      colorMode,
-    );
-    hybridViewerStore.remoteRender();
-  }
-});
 </script>
 
 <template>
@@ -162,56 +772,84 @@ watch(modelComponentsColorMode, async (colorMode) => {
     </OptionsSection>
 
     <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-6">
-      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
-      <v-select
-        v-model="modelComponentsColorMode"
-        :items="colorModes"
-        density="compact"
-        hide-details
-        class="mb-3"
-        variant="outlined"
+      <ViewerOptionsColoringTypeSelector
+        :id="modelId"
+        v-model:coloring_style_key="modelColoringStyleKey"
+        v-model:color="modelColor"
+        v-model:vertex_attribute_name="modelVertexAttributeName"
+        v-model:vertex_attribute_range="modelVertexAttributeRange"
+        v-model:vertex_attribute_color_map="modelVertexAttributeColorMap"
+        v-model:cell_attribute_name="modelCellAttributeName"
+        v-model:cell_attribute_range="modelCellAttributeRange"
+        v-model:cell_attribute_color_map="modelCellAttributeColorMap"
+        v-model:edge_attribute_name="modelEdgeAttributeName"
+        v-model:edge_attribute_range="modelEdgeAttributeRange"
+        v-model:edge_attribute_color_map="modelEdgeAttributeColorMap"
+        v-model:polygon_attribute_name="modelPolygonAttributeName"
+        v-model:polygon_attribute_range="modelPolygonAttributeRange"
+        v-model:polygon_attribute_color_map="modelPolygonAttributeColorMap"
+        v-model:polyhedron_attribute_name="modelPolyhedronAttributeName"
+        v-model:polyhedron_attribute_range="modelPolyhedronAttributeRange"
+        v-model:polyhedron_attribute_color_map="modelPolyhedronAttributeColorMap"
+        :capabilities="getCapabilities(undefined)"
       />
-
-      <template v-if="modelComponentsColorMode === 'constant'">
-        <v-label class="text-caption mb-1">Color</v-label>
-        <ViewerOptionsColorPicker v-model="modelComponentsColor" />
-      </template>
     </OptionsSection>
 
     <OptionsSection v-if="componentType" :title="modelComponentTypeLabel" class="mt-6">
       <VisibilitySwitch v-model="modelComponentTypeVisibility" />
-      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
-      <v-select
-        v-model="modelComponentTypeColorMode"
-        :items="colorModes"
-        density="compact"
-        hide-details
-        class="mb-3"
-        variant="outlined"
-      />
-
-      <template v-if="modelComponentTypeColorMode === 'constant'">
-        <v-label class="text-caption mb-1">Color</v-label>
-        <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
-      </template>
+      <div v-if="modelComponentTypeVisibility" class="mt-4">
+        <ViewerOptionsColoringTypeSelector
+          :id="modelId"
+          v-model:coloring_style_key="typeColoringStyleKey"
+          v-model:color="typeColor"
+          v-model:vertex_attribute_name="typeVertexAttributeName"
+          v-model:vertex_attribute_range="typeVertexAttributeRange"
+          v-model:vertex_attribute_color_map="typeVertexAttributeColorMap"
+          v-model:cell_attribute_name="typeCellAttributeName"
+          v-model:cell_attribute_range="typeCellAttributeRange"
+          v-model:cell_attribute_color_map="typeCellAttributeColorMap"
+          v-model:edge_attribute_name="typeEdgeAttributeName"
+          v-model:edge_attribute_range="typeEdgeAttributeRange"
+          v-model:edge_attribute_color_map="typeEdgeAttributeColorMap"
+          v-model:polygon_attribute_name="typePolygonAttributeName"
+          v-model:polygon_attribute_range="typePolygonAttributeRange"
+          v-model:polygon_attribute_color_map="typePolygonAttributeColorMap"
+          v-model:polyhedron_attribute_name="typePolyhedronAttributeName"
+          v-model:polyhedron_attribute_range="typePolyhedronAttributeRange"
+          v-model:polyhedron_attribute_color_map="typePolyhedronAttributeColorMap"
+          :capabilities="getCapabilities(componentType)"
+          :componentType="componentType"
+        />
+      </div>
     </OptionsSection>
 
     <OptionsSection v-if="componentId" title="Component Options" class="mt-6">
       <VisibilitySwitch v-model="componentVisibility" />
-      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
-      <v-select
-        v-model="componentColorMode"
-        :items="colorModes"
-        density="compact"
-        hide-details
-        class="mb-3"
-        variant="outlined"
-      />
-
-      <template v-if="componentColorMode === 'constant'">
-        <v-label class="text-caption mb-1">Color</v-label>
-        <ViewerOptionsColorPicker v-model="componentColor" />
-      </template>
+      <div v-if="componentVisibility" class="mt-4">
+        <ViewerOptionsColoringTypeSelector
+          :id="modelId"
+          v-model:coloring_style_key="compColoringStyleKey"
+          v-model:color="compColor"
+          v-model:vertex_attribute_name="compVertexAttributeName"
+          v-model:vertex_attribute_range="compVertexAttributeRange"
+          v-model:vertex_attribute_color_map="compVertexAttributeColorMap"
+          v-model:cell_attribute_name="compCellAttributeName"
+          v-model:cell_attribute_range="compCellAttributeRange"
+          v-model:cell_attribute_color_map="compCellAttributeColorMap"
+          v-model:edge_attribute_name="compEdgeAttributeName"
+          v-model:edge_attribute_range="compEdgeAttributeRange"
+          v-model:edge_attribute_color_map="compEdgeAttributeColorMap"
+          v-model:polygon_attribute_name="compPolygonAttributeName"
+          v-model:polygon_attribute_range="compPolygonAttributeRange"
+          v-model:polygon_attribute_color_map="compPolygonAttributeColorMap"
+          v-model:polyhedron_attribute_name="compPolyhedronAttributeName"
+          v-model:polyhedron_attribute_range="compPolyhedronAttributeRange"
+          v-model:polyhedron_attribute_color_map="compPolyhedronAttributeColorMap"
+          :capabilities="getCapabilities(componentType)"
+          :componentId="componentId"
+          :componentType="componentType"
+        />
+      </div>
     </OptionsSection>
   </v-sheet>
 </template>

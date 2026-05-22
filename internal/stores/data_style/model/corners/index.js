@@ -32,11 +32,14 @@ export function useModelCornersStyle() {
       visibilityGroups[visibility].push(corner_id);
 
       const color_mode = style.color_mode || "constant";
-      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[color_key]) {
-        colorGroups[color_key] = { color_mode, color: style.color, corners_ids: [] };
+      const coloring_style_key = style.coloring_style_key || "color";
+      if (coloring_style_key === "color") {
+        const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+        if (!colorGroups[color_key]) {
+          colorGroups[color_key] = { color_mode, color: style.color, corners_ids: [] };
+        }
+        colorGroups[color_key].corners_ids.push(corner_id);
       }
-      colorGroups[color_key].corners_ids.push(corner_id);
     }
 
     const promises = [
