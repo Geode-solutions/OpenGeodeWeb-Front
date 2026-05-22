@@ -6,6 +6,7 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state.js";
 import { useModelCommonStyle } from "./common.js";
 import { useViewerStore } from "@ogw_front/stores/viewer.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import { MESH_TYPES } from "@ogw_front/utils/default_styles";
 
 const attributeNameSchema = viewer_schemas.opengeodeweb_viewer.model.attribute_name;
 const attributeColorMapSchema = viewer_schemas.opengeodeweb_viewer.model.attribute_color_map;
@@ -315,14 +316,32 @@ export function useModelComponentAttributeStyle() {
     const type =
       component_type ||
       (component_id ? await resolveComponentType(id_model, component_id) : undefined);
-    const color_schema = getComponentColorSchema(type);
-    await modelCommonStyle.setModelTypeColor(
-      id_model,
-      component_ids,
-      color,
-      color_schema,
-      "constant",
-    );
+
+    if (type !== undefined) {
+      const color_schema = getComponentColorSchema(type);
+      await modelCommonStyle.setModelTypeColor(
+        id_model,
+        component_ids,
+        color,
+        color_schema,
+        "constant",
+      );
+    } else {
+      await Promise.all(
+        MESH_TYPES.map(async (compType) => {
+          const typeIds = await dataStore.getMeshComponentGeodeIds(id_model, compType);
+          if (!typeIds?.length) return;
+          const color_schema = getComponentColorSchema(compType);
+          return modelCommonStyle.setModelTypeColor(
+            id_model,
+            typeIds,
+            color,
+            color_schema,
+            "constant",
+          );
+        }),
+      );
+    }
   }
 
   async function resolveComponentType(id_model, component_id) {
