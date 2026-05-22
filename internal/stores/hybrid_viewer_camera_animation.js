@@ -4,6 +4,7 @@ const NEAR_ZERO_THRESHOLD = 1e-10;
 const SLERP_LINEAR_THRESHOLD = 0.9995;
 const LONG_ANIMATION_DURATION = 1000;
 const SHORT_ANIMATION_DURATION = 500;
+const MID_ANIMATION_RATIO = 0.5;
 
 function vecSub(vector, other) {
   return [vector[0] - other[0], vector[1] - other[1], vector[2] - other[2]];
@@ -21,7 +22,7 @@ function vecNormalize(vector) {
   return [vector[0] / len, vector[1] / len, vector[2] / len];
 }
 
-function slerp(from, target, ratio) {
+function slerp(from, target, ratio, mid) {
   const normFrom = vecNormalize(from);
   const normTarget = vecNormalize(target);
   let dotProduct =
@@ -33,6 +34,11 @@ function slerp(from, target, ratio) {
       normFrom[1] + (normTarget[1] - normFrom[1]) * ratio,
       normFrom[2] + (normTarget[2] - normFrom[2]) * ratio,
     ]);
+  }
+  if (dotProduct < -SLERP_LINEAR_THRESHOLD && mid) {
+    return ratio < MID_ANIMATION_RATIO
+      ? slerp(normFrom, mid, ratio * 2)
+      : slerp(mid, normTarget, (ratio - MID_ANIMATION_RATIO) * 2);
   }
   const theta = Math.acos(dotProduct);
   const sinTheta = Math.sin(theta);
@@ -71,6 +77,22 @@ function animateCamera(options) {
   const targetDir = vecSub(targetState.position, targetState.focal_point);
   const startDist = vecLength(startDir);
   const targetDist = vecLength(targetDir);
+
+  const normStart = vecNormalize(startDir);
+  const normTarget = vecNormalize(targetDir);
+  const startTargetDot =
+    normStart[0] * normTarget[0] + normStart[1] * normTarget[1] + normStart[2] * normTarget[2];
+
+  let antipodalMid = undefined;
+  if (startTargetDot < -SLERP_LINEAR_THRESHOLD) {
+    const normUp = vecNormalize(startState.view_up);
+    antipodalMid = vecNormalize([
+      normStart[1] * normUp[2] - normStart[2] * normUp[1],
+      normStart[2] * normUp[0] - normStart[0] * normUp[2],
+      normStart[0] * normUp[1] - normStart[1] * normUp[0],
+    ]);
+  }
+
   const startTime = performance.now();
   function animate(currentTime) {
     const progress = Math.min((currentTime - startTime) / duration, 1);
@@ -79,7 +101,7 @@ function animateCamera(options) {
         ? 1 - (1 - progress) ** easeExponent
         : progress * (2 - progress);
     const bump = bumpMultiplier * Math.sin(Math.PI * progress);
-    const dir = slerp(startDir, targetDir, ease);
+    const dir = slerp(startDir, targetDir, ease, antipodalMid);
     const dist = startDist + (targetDist - startDist) * ease + bump;
     const focalPoint = startState.focal_point.map(
       (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
