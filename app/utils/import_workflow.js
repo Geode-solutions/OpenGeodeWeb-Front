@@ -3,9 +3,9 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 // Local imports
+import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useGeodeStore } from "@ogw_front/stores/geode";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
@@ -55,8 +55,8 @@ async function importItem(item) {
 }
 
 async function importFile(filename, geode_object_type) {
-  const geodeStore = useGeodeStore();
-  const response = await geodeStore.request(back_schemas.opengeodeweb_back.save_viewable_file, {
+  const backStore = useBackStore();
+  const response = await backStore.request(back_schemas.opengeodeweb_back.save_viewable_file, {
     geode_object_type,
     filename,
   });

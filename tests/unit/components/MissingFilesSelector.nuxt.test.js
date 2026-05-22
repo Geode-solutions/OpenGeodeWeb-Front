@@ -9,7 +9,7 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import FileUploader from "@ogw_front/components/FileUploader";
 import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
 const FIRST_INDEX = 0;
@@ -19,11 +19,11 @@ const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 
 describe("missing files selector", () => {
   const pinia = setupActivePinia();
-  const geodeStore = useGeodeStore();
-  geodeStore.base_url = "/";
+  const backStore = useBackStore();
+  backStore.base_url = "/";
 
   test("select file", async () => {
-    geodeStore.request = vi.fn((schema, params, callbacks) => {
+    backStore.request = vi.fn((schema, params, callbacks) => {
       callbacks?.response_function?.({
         has_missing_files: true,
         mandatory_files: ["fake_file.txt"],

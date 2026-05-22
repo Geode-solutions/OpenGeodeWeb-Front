@@ -80,7 +80,7 @@ const snapshotMock = {
   },
 };
 
-const geodeStoreMock = {
+const backStoreMock = {
   start_request: vi.fn(),
   stop_request: vi.fn(),
   base_url: vi.fn(() => ""),
@@ -173,8 +173,8 @@ vi.mock(import("@ogw_front/stores/data_style"), () => ({
 vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
   useHybridViewerStore: () => hybridViewerStoreMock,
 }));
-vi.mock(import("@ogw_front/stores/geode"), () => ({
-  useGeodeStore: () => geodeStoreMock,
+vi.mock(import("@ogw_front/stores/back"), () => ({
+  useBackStore: () => backStoreMock,
 }));
 vi.mock(import("@ogw_front/stores/app"), () => ({
   useAppStore: () => ({

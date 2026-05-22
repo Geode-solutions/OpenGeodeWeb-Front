@@ -52,7 +52,7 @@ describe("app store", () => {
           load: vi.fn(),
         };
         const mock_store_2 = {
-          $id: "geodeStore",
+          $id: "backStore",
           save: vi.fn(),
           load: vi.fn(),
         };
@@ -62,7 +62,7 @@ describe("app store", () => {
 
         expect(appStore.stores).toHaveLength(MULTIPLE_STORES_LENGTH);
         expect(appStore.stores[FIRST_INDEX].$id).toBe("userStore");
-        expect(appStore.stores[SECOND_INDEX].$id).toBe("geodeStore");
+        expect(appStore.stores[SECOND_INDEX].$id).toBe("backStore");
       });
     });
 
@@ -78,7 +78,7 @@ describe("app store", () => {
           importStores: vi.fn(),
         };
         const mock_store_2 = {
-          $id: "geodeStore",
+          $id: "backStore",
           exportStores: vi.fn().mockReturnValue({ items: [], total: 0 }),
           importStores: vi.fn(),
         };
@@ -92,7 +92,7 @@ describe("app store", () => {
         expect(mock_store_2.exportStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE);
         expect(snapshot).toStrictEqual({
           userStore: { name: "toto", email: "toto@titi.com" },
-          geodeStore: { items: [], total: 0 },
+          backStore: { items: [], total: 0 },
         });
       });
 
@@ -134,19 +134,19 @@ describe("app store", () => {
           $id: "userStore",
           importStores: vi.fn().mockResolvedValue(),
         };
-        const geodeStore = {
-          $id: "geodeStore",
+        const backStore = {
+          $id: "backStore",
           importStores: vi.fn().mockResolvedValue(),
         };
         appStore.registerStore(userStore);
-        appStore.registerStore(geodeStore);
+        appStore.registerStore(backStore);
         const snapshot = {
           userStore: { some: "data" },
-          geodeStore: { other: "data" },
+          backStore: { other: "data" },
         };
         await appStore.importStores(snapshot);
         expect(userStore.importStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE);
-        expect(geodeStore.importStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE);
+        expect(backStore.importStores).toHaveBeenCalledTimes(CALL_COUNT_ONCE);
       });
 
       test("skip stores without importStores method", async () => {

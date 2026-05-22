@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ref, toRaw, watch } from "vue";
+import { ref, watch } from "vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { database } from "@ogw_internal/database/database";
 
@@ -45,13 +45,20 @@ export const useTreeviewStore = defineStore("treeview", () => {
   watch(
     [opened_views, panelWidth, additionalPanelWidth, selection, rowHeights],
     () => {
+      // oxlint-disable-next-line unicorn/prefer-structured-clone
+      const clean_opened_views = JSON.parse(JSON.stringify(opened_views.value));
+      // oxlint-disable-next-line unicorn/prefer-structured-clone
+      const clean_selectionIds = JSON.parse(JSON.stringify(selection.value));
+      // oxlint-disable-next-line unicorn/prefer-structured-clone
+      const clean_rowHeights = JSON.parse(JSON.stringify(rowHeights.value));
+
       database.treeview_config.put({
         id: "main",
-        opened_views: toRaw(opened_views.value),
+        opened_views: clean_opened_views,
         panelWidth: panelWidth.value,
         additionalPanelWidth: additionalPanelWidth.value,
-        selectionIds: toRaw(selection.value),
-        rowHeights: toRaw(rowHeights.value),
+        selectionIds: clean_selectionIds,
+        rowHeights: clean_rowHeights,
       });
     },
     { deep: true },
@@ -127,15 +134,18 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function displayAdditionalTree(id, title, geodeObjectType) {
-    const index = opened_views.value.findIndex((view) => view.id === id);
+  function displayAdditionalTree(id, title, geodeObjectType, viewType = "model_components") {
+    const viewId = `${id}_${viewType}`;
+    const index = opened_views.value.findIndex((view) => view.id === viewId);
     if (index !== -1) {
-      return closeView(id);
+      return closeView(viewId);
     }
     additionalPanelWidth.value = panelWidth.value;
     opened_views.value.push({
       type: "component",
-      id,
+      id: viewId,
+      modelId: id,
+      viewType,
       title: title || id,
       geode_object_type: geodeObjectType,
       scrollTop: 0,

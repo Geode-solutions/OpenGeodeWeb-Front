@@ -6,24 +6,24 @@ import { flushPromises } from "@vue/test-utils";
 import { Status } from "@ogw_front/utils/status";
 import { run_function_when_microservices_connected } from "@ogw_front/composables/run_function_when_microservices_connected";
 import { setupActivePinia } from "@ogw_tests/utils";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const dumb_obj = { dumb_method: () => true };
 let infraStore = undefined;
-let geodeStore = undefined;
+let backStore = undefined;
 let viewerStore = undefined;
 
 describe("when_microservices_connected_run_function", () => {
   beforeEach(() => {
     setupActivePinia();
     infraStore = useInfraStore();
-    geodeStore = useGeodeStore();
+    backStore = useBackStore();
     viewerStore = useViewerStore();
 
     // Register microservices in infra store
-    infraStore.register_microservice(geodeStore, {
+    infraStore.register_microservice(backStore, {
       request: vi.fn(),
       connect: vi.fn(),
       launch: vi.fn(),
@@ -34,14 +34,14 @@ describe("when_microservices_connected_run_function", () => {
       launch: vi.fn(),
     });
 
-    geodeStore.$patch({ status: Status.NOT_CONNECTED });
+    backStore.$patch({ status: Status.NOT_CONNECTED });
     viewerStore.$patch({ status: Status.NOT_CONNECTED });
   });
 
   test("microservices not connected", () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method");
     run_function_when_microservices_connected(dumb_obj.dumb_method);
-    geodeStore.$patch({ status: Status.NOT_CONNECTED });
+    backStore.$patch({ status: Status.NOT_CONNECTED });
     viewerStore.$patch({ status: Status.NOT_CONNECTED });
     expect(spy).not.toHaveBeenCalled();
   });
@@ -49,7 +49,7 @@ describe("when_microservices_connected_run_function", () => {
   test("microservices connected", async () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method");
     run_function_when_microservices_connected(dumb_obj.dumb_method);
-    geodeStore.$patch({ status: Status.CONNECTED });
+    backStore.$patch({ status: Status.CONNECTED });
     viewerStore.$patch({ status: Status.CONNECTED });
     await flushPromises();
     expect(spy).toHaveBeenCalledWith();

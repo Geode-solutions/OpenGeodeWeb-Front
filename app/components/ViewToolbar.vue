@@ -203,7 +203,7 @@ const camera_options = computed(() => [
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"
-    :width="400"
+    :width="260"
     @apply="handleZScalingClose"
   />
 </template>

@@ -1,7 +1,7 @@
 <script setup>
 import FileUploader from "@ogw_front/components/FileUploader";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const emit = defineEmits(["update_value"]);
 
@@ -18,14 +18,14 @@ const texture_id = ref("");
 texture_id.value = texture_id;
 
 const texture_coordinates = ref([]);
-const geodeStore = useGeodeStore();
+const backStore = useBackStore();
 
 onMounted(() => {
   getTextureCoordinates();
 });
 
 function getTextureCoordinates() {
-  geodeStore.request(
+  backStore.request(
     back_schemas.opengeodeweb_back.texture_coordinates,
     { id },
     {
@@ -38,7 +38,7 @@ function getTextureCoordinates() {
 
 async function files_uploaded_event(value) {
   if (value.length > 0) {
-    await geodeStore.request(
+    await backStore.request(
       back_schemas.opengeodeweb_back.save_viewable_file,
       {
         schema: back_schemas.opengeodeweb_back.save_viewable_file,

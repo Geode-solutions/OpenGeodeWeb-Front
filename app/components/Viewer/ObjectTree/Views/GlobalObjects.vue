@@ -75,6 +75,31 @@ function isModel(item) {
   );
 }
 
+const hasCollectionsMap = reactive({});
+
+watch(
+  () => treeviewStore.items,
+  async (newItems) => {
+    const models = newItems
+      .flatMap((group) => group.children || [])
+      .filter((item) => isModel(item));
+    const fetchPromises = models.map(async (model) => {
+      if (hasCollectionsMap[model.id] === undefined) {
+        hasCollectionsMap[model.id] = false;
+        try {
+          const hasCollections = await dataStore.hasCollectionComponents(model.id);
+          hasCollectionsMap[model.id] = hasCollections;
+        } catch (error) {
+          console.error("Failed to check collections", error);
+        }
+      }
+    });
+
+    await Promise.all(fetchPromises);
+  },
+  { immediate: true, deep: true },
+);
+
 function handleHoverEnter({ item, immediate = false }) {
   const actualItem = item.raw || item;
 
@@ -169,7 +194,28 @@ function expandAll() {
           variant="text"
           v-tooltip="'Model\'s mesh components'"
           @click.stop="
-            treeviewStore.displayAdditionalTree(item.id, item.title, item.geode_object_type)
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+              'model_components',
+            )
+          "
+        />
+        <v-btn
+          v-if="isModel(item) && hasCollectionsMap[item.id]"
+          icon="mdi-format-list-group"
+          size="medium"
+          class="ml-2"
+          variant="text"
+          v-tooltip="'Model\'s collections'"
+          @click.stop="
+            treeviewStore.displayAdditionalTree(
+              item.id,
+              item.title,
+              item.geode_object_type,
+              'model_collections',
+            )
           "
         />
       </template>

@@ -3,7 +3,7 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 import FetchingData from "@ogw_front/components/FetchingData";
 import FileUploader from "@ogw_front/components/FileUploader";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.missing_files;
 
@@ -33,7 +33,7 @@ async function missing_files() {
   has_missing_files.value = false;
   mandatory_files.value = [];
   additional_files.value = [];
-  const geodeStore = useGeodeStore();
+  const backStore = useBackStore();
 
   const promise_array = filenames.map((filename) => {
     const isCsvFile =
@@ -45,7 +45,7 @@ async function missing_files() {
         additional_files: [],
       });
     }
-    return geodeStore.request(schema, { geode_object_type, filename });
+    return backStore.request(schema, { geode_object_type, filename });
   });
   const values = await Promise.all(promise_array);
   for (const value of values) {

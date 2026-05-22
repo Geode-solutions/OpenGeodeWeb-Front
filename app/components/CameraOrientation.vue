@@ -7,7 +7,7 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 
 const { panel, width } = defineProps({
   panel: { type: Boolean, default: false },
-  width: { type: Number, default: 400 },
+  width: { type: Number, default: 260 },
 });
 
 const show = defineModel("show", { type: Boolean, default: false });
@@ -36,7 +36,7 @@ const orientations = [
     face: "front",
     vtkKey: "YPlus",
     rotation: 180,
-    position: { top: "35%", left: "20%" },
+    position: { top: "35%", left: "22%" },
   },
   {
     label: "Y-",
@@ -44,7 +44,7 @@ const orientations = [
     face: "back",
     vtkKey: "YMinus",
     rotation: 0,
-    position: { top: "65%", left: "80%" },
+    position: { top: "65%", left: "78%" },
   },
   {
     label: "X+",
@@ -52,7 +52,7 @@ const orientations = [
     face: "right",
     vtkKey: "XPlus",
     rotation: 90,
-    position: { top: "35%", left: "80%" },
+    position: { top: "35%", left: "78%" },
   },
   {
     label: "X-",
@@ -60,7 +60,7 @@ const orientations = [
     face: "left",
     vtkKey: "XMinus",
     rotation: -90,
-    position: { top: "65%", left: "20%" },
+    position: { top: "65%", left: "22%" },
   },
 ];
 
@@ -177,7 +177,7 @@ watch(hoveredFace, (newFace, oldFace) => {
     <div
       class="pa-0 overflow-hidden position-relative"
       style="
-        height: 320px;
+        height: 220px;
         background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 70%);
       "
     >
@@ -200,7 +200,7 @@ watch(hoveredFace, (newFace, oldFace) => {
         class="position-absolute d-flex align-center justify-center"
         style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
       >
-        <div ref="cubeContainer" style="width: 100px; height: 100px; pointer-events: none" />
+        <div ref="cubeContainer" style="width: 70px; height: 70px; pointer-events: none" />
       </div>
 
       <v-btn
@@ -208,7 +208,7 @@ watch(hoveredFace, (newFace, oldFace) => {
         :key="orientation.value"
         icon
         variant="tonal"
-        size="44"
+        size="32"
         class="satellite-node position-absolute"
         :style="orientation.position"
         @mouseenter="hoveredFace = orientation.face"
@@ -216,7 +216,9 @@ watch(hoveredFace, (newFace, oldFace) => {
         @click.stop="emit('select', orientation.value)"
       >
         <v-tooltip activator="parent" location="top">{{ orientation.value }} View</v-tooltip>
-        <span class="text-caption font-weight-black">{{ orientation.label }}</span>
+        <span class="text-caption font-weight-black" style="font-size: 0.7rem !important">{{
+          orientation.label
+        }}</span>
       </v-btn>
     </div>
   </ToolPanel>
