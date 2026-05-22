@@ -30,13 +30,14 @@ export function useVirtualTree(propsIn, emit) {
     emit("update:opened", [...newOpened]);
   }
 
-  function getAllChildrenIds(item, ids = []) {
+  function getLeafChildrenIds(item, ids = []) {
     const children = item[actualItemProps.value.children];
-    if (children) {
+    if (children && children.length > 0) {
       for (const child of children) {
-        ids.push(child[actualItemProps.value.value]);
-        getAllChildrenIds(child, ids);
+        getLeafChildrenIds(child, ids);
       }
+    } else {
+      ids.push(item[actualItemProps.value.value]);
     }
     return ids;
   }
@@ -47,7 +48,7 @@ export function useVirtualTree(propsIn, emit) {
       return true;
     }
     if (actualSelection.value.strategy === "classic") {
-      const childrenIds = getAllChildrenIds(item);
+      const childrenIds = getLeafChildrenIds(item);
       return (
         childrenIds.length > 0 && childrenIds.every((childId) => selectedSet.value.has(childId))
       );
@@ -59,7 +60,7 @@ export function useVirtualTree(propsIn, emit) {
     if (actualSelection.value.strategy !== "classic") {
       return false;
     }
-    const childrenIds = getAllChildrenIds(item);
+    const childrenIds = getLeafChildrenIds(item);
     if (childrenIds.length === 0) {
       return false;
     }
@@ -75,7 +76,7 @@ export function useVirtualTree(propsIn, emit) {
     const isCurrentlySelected = newSelected.has(id) || isSelected(item);
 
     if (actualSelection.value.strategy === "classic") {
-      const childrenIds = getAllChildrenIds(item);
+      const childrenIds = getLeafChildrenIds(item);
       if (isCurrentlySelected) {
         newSelected.delete(id);
         for (const childId of childrenIds) {

@@ -1,5 +1,6 @@
 <script setup>
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
+import ModelCollections from "@ogw_front/components/Viewer/ObjectTree/Views/ModelCollections.vue";
 import ModelComponents from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponents.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
@@ -263,15 +264,17 @@ function onVerticalResizeStart(event, index) {
               :icon="geode_objects[view.geode_object_type]?.image"
               :scroll-top="view.scrollTop"
               closable
-              :border-radius="index === additionalViews.length - 1 ? '0 16px 16px 0' : '0'"
+              :border-radius="`0 ${index === 0 ? '16px' : '0'} ${index === additionalViews.length - 1 ? '16px' : '0'} 0`"
               :border-left="false"
               @close="treeviewStore.closeView(view.id)"
               @dragstart="onDragStart(index + 1)"
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
             >
-              <ModelComponents
+              <component
+                :is="view.viewType === 'model_collections' ? ModelCollections : ModelComponents"
                 data-testid="modelComponentsObjectTree"
-                :id="view.id"
+                :id="view.modelId || view.id"
+                :view-id="view.id"
                 @show-menu="emit('show-menu', $event)"
               />
             </ViewerObjectTreeBox>
