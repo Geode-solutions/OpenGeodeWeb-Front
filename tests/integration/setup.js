@@ -14,7 +14,7 @@ import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { importFile } from "@ogw_front/utils/import_workflow";
 import { setupActivePinia } from "@ogw_tests/utils";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -23,7 +23,7 @@ const beforeAllTimeout = 40_000;
 const data_folder = path.join("tests", "integration", "data", "uploads");
 
 async function runMicroservices() {
-  const geodeStore = useGeodeStore();
+  const backStore = useBackStore();
   const infraStore = useInfraStore();
   const viewerStore = useViewerStore();
   infraStore.app_mode = appMode.BROWSER;
@@ -53,7 +53,7 @@ async function runMicroservices() {
     port: viewer_port,
   });
 
-  geodeStore.default_local_port = back_port;
+  backStore.default_local_port = back_port;
   viewerStore.default_local_port = viewer_port;
 
   return {

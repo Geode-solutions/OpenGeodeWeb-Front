@@ -5,9 +5,9 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
 
 import { useAppStore } from "@ogw_front/stores/app";
+import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useGeodeStore } from "@ogw_front/stores/geode";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -15,13 +15,13 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 async function exportProject() {
   console.log("[export triggered]");
   const appStore = useAppStore();
-  const geodeStore = useGeodeStore();
+  const backStore = useBackStore();
   const snapshot = await appStore.exportStores();
   const schema = back_schemas.opengeodeweb_back.export_project;
   const defaultName = "project.vease";
 
   const result = await $fetch(schema.$id, {
-    baseURL: geodeStore.base_url,
+    baseURL: backStore.base_url,
     method: schema.methods.find((method) => method !== "OPTIONS"),
     body: { snapshot, filename: defaultName },
   });
@@ -30,7 +30,7 @@ async function exportProject() {
 }
 
 async function importProject(file) {
-  const geodeStore = useGeodeStore();
+  const backStore = useBackStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();
   const dataStore = useDataStore();
@@ -63,7 +63,7 @@ async function importProject(file) {
   form.append("file", file, originalFileName);
 
   const result = await $fetch(schemaImport.$id, {
-    baseURL: geodeStore.base_url,
+    baseURL: backStore.base_url,
     method: "POST",
     body: form,
   });

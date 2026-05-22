@@ -30,6 +30,7 @@ export const useViewerStore = defineStore(
     const picked_point = ref({ x: undefined, y: undefined, z: undefined });
     const request_counter = ref(0);
     const status = ref(Status.NOT_CONNECTED);
+    const version = ref("0.0.0");
     const busy = ref(0);
 
     const protocol = computed(() => {
@@ -185,6 +186,21 @@ export const useViewerStore = defineStore(
       );
     }
 
+    function get_version(schema) {
+      if (!schema) {
+        return;
+      }
+      return request(
+        schema,
+        {},
+        {
+          response_function: (response) => {
+            version.value = response.microservice_version;
+          },
+        },
+      );
+    }
+
     return {
       default_local_port,
       client,
@@ -205,6 +221,8 @@ export const useViewerStore = defineStore(
       launch,
       connect,
       request,
+      version,
+      get_version,
     };
   },
   {

@@ -3,7 +3,7 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 import FetchingData from "@ogw_front/components/FetchingData";
 import FileUploader from "@ogw_front/components/FileUploader";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.allowed_files;
 
@@ -46,8 +46,8 @@ function files_uploaded_event(value) {
 
 async function get_allowed_files() {
   toggle_loading();
-  const geodeStore = useGeodeStore();
-  const response = await geodeStore.request(schema, {});
+  const backStore = useBackStore();
+  const response = await backStore.request(schema, {});
   accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
   toggle_loading();
 }

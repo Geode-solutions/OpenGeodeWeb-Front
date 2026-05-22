@@ -8,7 +8,7 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
 const FIRST_INDEX = 0;
@@ -17,13 +17,13 @@ const SECOND_INDEX = 1;
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
 
 const pinia = setupActivePinia();
-const geodeStore = useGeodeStore();
+const backStore = useBackStore();
 
 describe("extension selector", () => {
   beforeEach(() => {
-    geodeStore.base_url = "/";
+    backStore.base_url = "/";
 
-    geodeStore.request = vi.fn(() => {
+    backStore.request = vi.fn(() => {
       const response = {
         geode_objects_and_output_extensions: {
           BRep: { msh: { is_saveable: true } },

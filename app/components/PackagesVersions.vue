@@ -1,16 +1,16 @@
 <script setup>
 import { Status } from "@ogw_front/utils/status";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const { schema } = defineProps({
   schema: { type: Object, required: true },
 });
 
-const geodeStore = useGeodeStore();
+const backStore = useBackStore();
 const packages_versions = ref([]);
 
 async function get_packages_versions() {
-  await geodeStore.request(
+  await backStore.request(
     schema,
     {},
     {
@@ -22,7 +22,7 @@ async function get_packages_versions() {
 }
 
 watch(
-  () => geodeStore.status,
+  () => backStore.status,
   (value) => {
     if (value === Status.CONNECTED) {
       get_packages_versions();

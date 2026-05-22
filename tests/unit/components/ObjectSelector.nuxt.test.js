@@ -6,7 +6,7 @@ import { flushPromises } from "@vue/test-utils";
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import ObjectSelector from "@ogw_front/components/ObjectSelector";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
 const FIRST_INDEX = 0;
@@ -18,8 +18,8 @@ const { allowed_objects } = schemas.opengeodeweb_back;
 
 describe("object selector", () => {
   const pinia = setupActivePinia();
-  const geodeStore = useGeodeStore();
-  geodeStore.base_url = "/";
+  const backStore = useBackStore();
+  backStore.base_url = "/";
 
   test("loadable with one class", async () => {
     const response = {

@@ -1,8 +1,8 @@
 <script setup>
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
-const geodeStore = useGeodeStore();
+const backStore = useBackStore();
 
 const name = defineModel("name", { type: String });
 const range = defineModel("range", { type: Array });
@@ -58,7 +58,7 @@ function getAttributes() {
   if (componentType !== undefined) {
     params.component_type = componentType;
   }
-  geodeStore.request(
+  backStore.request(
     schema,
     params,
     {

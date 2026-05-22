@@ -9,7 +9,7 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import FileSelector from "@ogw_front/components/FileSelector";
 import FileUploader from "@ogw_front/components/FileUploader";
-import { useGeodeStore } from "@ogw_front/stores/geode";
+import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
 const FIRST_INDEX = 0;
@@ -20,8 +20,8 @@ const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 
 describe("file selector", () => {
   const pinia = setupActivePinia();
-  const geodeStore = useGeodeStore();
-  geodeStore.base_url = "/";
+  const backStore = useBackStore();
+  backStore.base_url = "/";
 
   test("select file", async () => {
     registerEndpoint(allowed_files_schema.$id, {
