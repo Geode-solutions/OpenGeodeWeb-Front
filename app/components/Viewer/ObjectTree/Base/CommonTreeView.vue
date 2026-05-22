@@ -124,6 +124,8 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
             :get-indeterminate="getIndeterminate"
             @toggle-open="toggleOpen"
             @toggle-select="toggleSelect"
+            @hover-eye-enter="emit('hover:leave', { item })"
+            @hover-eye-leave="emit('hover:enter', { item })"
           >
             <template #title="slotProps">
               <slot name="title" v-bind="slotProps" />

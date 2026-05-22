@@ -7,7 +7,7 @@ const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps
   getIndeterminate: { type: Function, required: true },
 });
 
-defineEmits(["toggle-open", "toggle-select"]);
+defineEmits(["toggle-open", "toggle-select", "hover-eye-enter", "hover-eye-leave"]);
 
 const INDENT_STEP = 10;
 </script>
@@ -45,6 +45,8 @@ const INDENT_STEP = 10;
         class="flex-shrink-0"
         @click.stop="$emit('toggle-select', item.raw)"
         @mousedown.stop
+        @mouseenter="$emit('hover-eye-enter', item.raw)"
+        @mouseleave="$emit('hover-eye-leave', item.raw)"
       />
     </div>
 
