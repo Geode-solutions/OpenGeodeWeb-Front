@@ -833,7 +833,7 @@ const modelComponentTypeLabel = computed(() =>
       <VisibilitySwitch v-model="modelVisibility" />
     </OptionsSection>
 
-    <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-6">
+    <OptionsSection title="Components Options" class="mt-6">
       <ViewerOptionsColoringTypeSelector
         :id="modelId"
         :isModel="true"
