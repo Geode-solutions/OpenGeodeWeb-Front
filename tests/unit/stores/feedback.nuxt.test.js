@@ -55,6 +55,18 @@ describe("feedback store", () => {
       });
     });
 
+    describe("add_warning", () => {
+      test("add_warning", async () => {
+        const feedbackStore = useFeedbackStore();
+        feedbackStore.feedbacks_timeout_miliseconds = 500;
+        await feedbackStore.add_warning("test warning description");
+        expect(feedbackStore.feedbacks).toHaveLength(1);
+        expect(feedbackStore.feedbacks[0].type).toBe("warning");
+        vi.runAllTimers();
+        expect(feedbackStore.feedbacks).toHaveLength(0);
+      });
+    });
+
     describe("delete_feedback", () => {
       test("delete_feedback", async () => {
         const feedbackStore = useFeedbackStore();
