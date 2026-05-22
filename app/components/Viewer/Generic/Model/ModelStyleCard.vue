@@ -1,11 +1,10 @@
 <script setup>
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
-import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { computed, ref, watchEffect } from "vue";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -774,6 +773,7 @@ const modelComponentTypeLabel = computed(() =>
     <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-6">
       <ViewerOptionsColoringTypeSelector
         :id="modelId"
+        :isModel="true"
         v-model:coloring_style_key="modelColoringStyleKey"
         v-model:color="modelColor"
         v-model:vertex_attribute_name="modelVertexAttributeName"
@@ -800,6 +800,7 @@ const modelComponentTypeLabel = computed(() =>
       <div v-if="modelComponentTypeVisibility" class="mt-4">
         <ViewerOptionsColoringTypeSelector
           :id="modelId"
+          :isModel="true"
           v-model:coloring_style_key="typeColoringStyleKey"
           v-model:color="typeColor"
           v-model:vertex_attribute_name="typeVertexAttributeName"
@@ -828,6 +829,7 @@ const modelComponentTypeLabel = computed(() =>
       <div v-if="componentVisibility" class="mt-4">
         <ViewerOptionsColoringTypeSelector
           :id="modelId"
+          :isModel="true"
           v-model:coloring_style_key="compColoringStyleKey"
           v-model:color="compColor"
           v-model:vertex_attribute_name="compVertexAttributeName"

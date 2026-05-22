@@ -41,7 +41,7 @@ export function useModelComponentAttributeStyle() {
         .where("id")
         .equals(id_model)
         .toArray();
-      const geode_ids = model_components.map((c) => c.geode_id);
+      const geode_ids = model_components.map((comp) => comp.geode_id);
       if (geode_ids?.length) {
         await modelCommonStyle.mutateComponentStyles(id_model, geode_ids, values);
       }
@@ -69,7 +69,7 @@ export function useModelComponentAttributeStyle() {
         .where("id")
         .equals(id_model)
         .toArray();
-      return model_components.map((c) => c.geode_id);
+      return model_components.map((comp) => comp.geode_id);
     }
   }
 
@@ -148,9 +148,14 @@ export function useModelComponentAttributeStyle() {
       return;
     }
 
+    const mapped_field_type =
+      field_type === "vertex" || field_type === "vertices" || field_type === "points"
+        ? "points"
+        : "cells";
+
     return viewerStore.request(
       attributeNameSchema,
-      { id: id_model, block_ids: viewer_ids, name, field_type },
+      { id: id_model, block_ids: viewer_ids, name, field_type: mapped_field_type },
       {
         response_function: async () => {
           const updates = { name };
@@ -345,15 +350,15 @@ export function useModelComponentAttributeStyle() {
 
     // 2. Iterate component types
     const types = ["Block", "Surface", "Line", "Corner"];
-    for (const t of types) {
-      const typeStyle = dataStyleState.getModelComponentTypeStyle(id_model, t);
+    for (const compType of types) {
+      const typeStyle = dataStyleState.getModelComponentTypeStyle(id_model, compType);
       if (typeStyle.coloring_style_key && typeStyle.coloring_style_key !== "color") {
-        const name = modelComponentAttributeName(id_model, undefined, t);
+        const name = modelComponentAttributeName(id_model, undefined, compType);
         if (name) {
-          await setModelComponentAttributeName(id_model, undefined, t, name);
-          const [min, max] = modelComponentAttributeRange(id_model, undefined, t);
+          await setModelComponentAttributeName(id_model, undefined, compType, name);
+          const [min, max] = modelComponentAttributeRange(id_model, undefined, compType);
           if (min !== undefined && max !== undefined) {
-            await setModelComponentAttributeRange(id_model, undefined, t, min, max);
+            await setModelComponentAttributeRange(id_model, undefined, compType, min, max);
           }
         }
       }

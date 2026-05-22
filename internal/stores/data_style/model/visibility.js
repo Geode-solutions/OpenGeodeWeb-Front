@@ -41,10 +41,10 @@ async function dispatchToComponentTypes(
     Corner: [],
   };
 
-  for (const id of componentIds) {
-    const type = componentsMap[id]?.type;
+  for (const compId of componentIds) {
+    const type = componentsMap[compId]?.type;
     if (type && idsByComponent[type]) {
-      idsByComponent[type].push(id);
+      idsByComponent[type].push(compId);
     }
   }
 
@@ -142,8 +142,8 @@ function useModelVisibilityStyle(componentStyleFunctions) {
   }
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
-    const typeIds = componentIds.filter((id) => MESH_TYPES.includes(id));
-    const individualIds = componentIds.filter((id) => !MESH_TYPES.includes(id));
+    const typeIds = componentIds.filter((compId) => MESH_TYPES.includes(compId));
+    const individualIds = componentIds.filter((compId) => !MESH_TYPES.includes(compId));
 
     const promises = [];
     for (const typeId of typeIds) {
