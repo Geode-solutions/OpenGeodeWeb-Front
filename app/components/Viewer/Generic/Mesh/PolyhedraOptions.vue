@@ -99,6 +99,7 @@ const polyhedron_attribute_color_map = computed({
         v-model="visibility"
       />
       <template v-if="visibility">
+        <v-divider />
         <ViewerOptionsColoringTypeSelector
           :id="id"
           v-model:coloring_style_key="coloring_style_key"

@@ -125,7 +125,6 @@ watch(coloring_style_label, (value) => {
 </script>
 <template>
   <v-row justify="center" align="center">
-    <v-divider />
     <v-col>
       <v-row justify="center" align="center">
         <v-col cols="auto">

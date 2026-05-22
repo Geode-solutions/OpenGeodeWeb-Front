@@ -77,16 +77,23 @@ const vertex_attribute_color_map = computed({
     :btn_image="btn_image"
   >
     <template #options>
-      <ViewerOptionsVisibilitySwitch
-        data-testid="meshPointsVisibilitySwitch"
-        v-model="visibility"
-      />
+      <v-row class="pa-1">
+        <v-col>
+          <ViewerOptionsVisibilitySwitch
+            data-testid="meshPointsVisibilitySwitch"
+            v-model="visibility"
+          />
+        </v-col>
+      </v-row>
       <template v-if="visibility">
-        <v-row class="pa-0" align="center">
-          <v-divider />
-          <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
+        <v-divider />
+        <v-row class="pa-1">
+          <v-col>
+            <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
+          </v-col>
         </v-row>
-        <v-row>
+        <v-divider />
+        <v-row class="pa-1">
           <v-col>
             <ViewerOptionsColoringTypeSelector
               :id="id"

@@ -80,10 +80,8 @@ const vertex_attribute_color_map = computed({
         v-model="visibility"
       />
       <template v-if="visibility">
-        <v-row class="pa-0" align="center">
-          <v-divider />
-          <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
-        </v-row>
+        <v-divider />
+        <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
         <v-row>
           <v-col>
             <ViewerOptionsColoringTypeSelector

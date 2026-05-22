@@ -45,10 +45,8 @@ const size = computed({
         v-model="visibility"
       />
       <template v-if="visibility">
-        <v-row class="pa-0" align="center">
-          <v-divider />
-          <ViewerOptionsSizeSlider data-testid="modelPointsSizeSlider" v-model="size" />
-        </v-row>
+        <v-divider />
+        <ViewerOptionsSizeSlider data-testid="modelPointsSizeSlider" v-model="size" />
       </template>
     </template>
   </ViewerContextMenuItem>
