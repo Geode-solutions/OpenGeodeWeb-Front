@@ -222,7 +222,7 @@ describe("infra store", () => {
         expect(infraStore.microservices_busy).toBe(true);
       });
 
-      test("geode true & viewer true", () => {
+      test("back false & viewer false", () => {
         const infraStore = useInfraStore();
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
@@ -247,7 +247,7 @@ describe("infra store", () => {
 
   describe("actions", () => {
     describe("register_microservice", () => {
-      test("register geode microservice", () => {
+      test("register back microservice", () => {
         const infraStore = useInfraStore();
         const backStore = useBackStore();
 
@@ -258,7 +258,7 @@ describe("infra store", () => {
         });
 
         expect(infraStore.microservices).toHaveLength(1);
-        expect(infraStore.microservices[0].$id).toBe("geode");
+        expect(infraStore.microservices[0].$id).toBe("back");
       });
 
       test("register multiple microservices", () => {
