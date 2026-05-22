@@ -7,8 +7,8 @@ import { useModelCommonStyle } from "./common.js";
 import { useViewerStore } from "@ogw_front/stores/viewer.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-const attributeNameSchema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute_name;
-const attributeColorMapSchema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute_color_map;
+const attributeNameSchema = viewer_schemas.opengeodeweb_viewer.model.attribute_name;
+const attributeColorMapSchema = viewer_schemas.opengeodeweb_viewer.model.attribute_color_map;
 
 export function useModelComponentAttributeStyle() {
   const viewerStore = useViewerStore();
