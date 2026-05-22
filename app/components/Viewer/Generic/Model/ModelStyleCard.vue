@@ -87,6 +87,69 @@ function getCapabilities(type) {
   };
 }
 
+const modelColorMode = computed({
+  get: () => {
+    if (selection.value.length > 0) {
+      return dataStyleStore.getModelComponentColorMode(modelId.value, selection.value[0]);
+    }
+    return "constant";
+  },
+  set: async (newValue) => {
+    if (selection.value.length > 0) {
+      if (newValue === "random") {
+        await dataStyleStore.setModelComponentsColor(
+          modelId.value,
+          selection.value,
+          undefined,
+          newValue,
+        );
+      } else {
+        await dataStyleStore.setModelComponentsColor(
+          modelId.value,
+          selection.value,
+          modelColor.value,
+          newValue,
+        );
+      }
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
+const typeColorMode = computed({
+  get: () =>
+    componentType.value
+      ? dataStyleStore.getModelComponentTypeColorMode(modelId.value, componentType.value)
+      : "constant",
+  set: async (newValue) => {
+    if (componentType.value) {
+      await dataStyleStore.setModelComponentTypeColorMode(
+        modelId.value,
+        componentType.value,
+        newValue,
+      );
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
+const compColorMode = computed({
+  get: () =>
+    componentId.value
+      ? dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value)
+      : "constant",
+  set: async (newValue) => {
+    if (componentId.value) {
+      await dataStyleStore.setModelComponentColorMode(
+        modelId.value,
+        componentId.value,
+        newValue,
+      );
+      hybridViewerStore.remoteRender();
+    }
+  },
+});
+
 const modelColoringStyleKey = computed({
   get: () => dataStyleStore.modelComponentColoringStyleKey(modelId.value, undefined, undefined),
   set: async (newValue) => {
@@ -776,6 +839,7 @@ const modelComponentTypeLabel = computed(() =>
         :isModel="true"
         v-model:coloring_style_key="modelColoringStyleKey"
         v-model:color="modelColor"
+        v-model:color_mode="modelColorMode"
         v-model:vertex_attribute_name="modelVertexAttributeName"
         v-model:vertex_attribute_range="modelVertexAttributeRange"
         v-model:vertex_attribute_color_map="modelVertexAttributeColorMap"
@@ -794,7 +858,7 @@ const modelComponentTypeLabel = computed(() =>
         :capabilities="getCapabilities(undefined)"
       />
     </OptionsSection>
-
+ 
     <OptionsSection v-if="componentType" :title="modelComponentTypeLabel" class="mt-6">
       <VisibilitySwitch v-model="modelComponentTypeVisibility" />
       <div v-if="modelComponentTypeVisibility" class="mt-4">
@@ -803,6 +867,7 @@ const modelComponentTypeLabel = computed(() =>
           :isModel="true"
           v-model:coloring_style_key="typeColoringStyleKey"
           v-model:color="typeColor"
+          v-model:color_mode="typeColorMode"
           v-model:vertex_attribute_name="typeVertexAttributeName"
           v-model:vertex_attribute_range="typeVertexAttributeRange"
           v-model:vertex_attribute_color_map="typeVertexAttributeColorMap"
@@ -823,7 +888,7 @@ const modelComponentTypeLabel = computed(() =>
         />
       </div>
     </OptionsSection>
-
+ 
     <OptionsSection v-if="componentId" title="Component Options" class="mt-6">
       <VisibilitySwitch v-model="componentVisibility" />
       <div v-if="componentVisibility" class="mt-4">
@@ -832,6 +897,7 @@ const modelComponentTypeLabel = computed(() =>
           :isModel="true"
           v-model:coloring_style_key="compColoringStyleKey"
           v-model:color="compColor"
+          v-model:color_mode="compColorMode"
           v-model:vertex_attribute_name="compVertexAttributeName"
           v-model:vertex_attribute_range="compVertexAttributeRange"
           v-model:vertex_attribute_color_map="compVertexAttributeColorMap"

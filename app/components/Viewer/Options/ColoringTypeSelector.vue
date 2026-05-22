@@ -30,6 +30,8 @@ const polyhedron_attribute_name = defineModel("polyhedron_attribute_name");
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range");
 const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map");
 
+const color_mode = defineModel("color_mode", { type: String, default: "constant" });
+
 const props = defineProps({
   id: { type: String, required: true },
   capabilities: {
@@ -119,13 +121,22 @@ const coloring_styles = computed(() => {
   return { labels, values };
 });
 
-const coloring_style_label = ref(
-  coloring_styles.value.labels[coloring_styles.value.values.indexOf(coloring_style_key.value)],
+const coloring_style_label = ref("");
+
+watch(
+  [coloring_style_key, coloring_styles],
+  () => {
+    const idx = coloring_styles.value.values.indexOf(coloring_style_key.value);
+    coloring_style_label.value = idx !== -1 ? coloring_styles.value.labels[idx] : "";
+  },
+  { immediate: true },
 );
 
 watch(coloring_style_label, (value) => {
-  coloring_style_key.value =
-    coloring_styles.value.values[coloring_styles.value.labels.indexOf(value)];
+  const idx = coloring_styles.value.labels.indexOf(value);
+  if (idx !== -1) {
+    coloring_style_key.value = coloring_styles.value.values[idx];
+  }
 });
 </script>
 <template>
@@ -149,7 +160,24 @@ watch(coloring_style_label, (value) => {
         <v-spacer />
         <v-col cols="10">
           <template v-if="coloring_style_key === color_dict['value']">
-            <ViewerOptionsColorPicker v-model="color" />
+            <template v-if="isModelSelector">
+              <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
+              <v-select
+                v-model="color_mode"
+                :items="[
+                  { title: 'Constant', value: 'constant' },
+                  { title: 'Random', value: 'random' }
+                ]"
+                density="compact"
+                hide-details
+                class="mb-3"
+                variant="outlined"
+              />
+            </template>
+            <template v-if="!isModelSelector || color_mode === 'constant'">
+              <v-label v-if="isModelSelector" class="text-caption mb-1">Color</v-label>
+              <ViewerOptionsColorPicker v-model="color" />
+            </template>
           </template>
           <template v-if="coloring_style_key === textures_dict['value']">
             <ViewerOptionsTexturesSelector v-model="textures" :id="id" />
