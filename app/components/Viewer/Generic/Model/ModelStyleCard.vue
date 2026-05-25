@@ -13,7 +13,7 @@ const dataStore = useDataStore();
 const treeviewStore = useTreeviewStore();
 
 function getBatchComponentIds(currentId) {
-  const activeItems = treeviewStore.activeItems;
+  const { activeItems } = treeviewStore;
   if (activeItems.includes(currentId) && activeItems.length > 1) {
     return activeItems;
   }
