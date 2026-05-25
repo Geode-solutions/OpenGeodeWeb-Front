@@ -223,10 +223,10 @@ function performSetContainer(options) {
   useMousePressed({
     target: container,
     onPressed: (event) => {
-      if (event.button !== 0) {
+      if (event.button !== 0 && event.button !== 1) {
         return;
       }
-      if (is_picking.value) {
+      if (event.button === 0 && is_picking.value) {
         clickPickingCallback(event, {
           container: container.value.$el,
           viewerStore,
