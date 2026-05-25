@@ -1,7 +1,7 @@
 import { computed, ref, shallowRef } from "vue";
 import { describe, expect, test } from "vitest";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
-import { useStepperTree } from "@ogw_front/composables/stepper_tree";
+import { useStepperTree } from "@ogw_front/composables/stepper_tree.js";
 import { vuetify } from "@ogw_tests/utils";
 
 import ObjectSelector from "@ogw_front/components/ObjectSelector";

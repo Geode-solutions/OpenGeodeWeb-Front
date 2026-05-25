@@ -19,7 +19,7 @@ const { current_step_index, steps } = toRefs(state);
 
 
 const sortedChips = computed(() => {
-  const chips = steps.value[props.step_index]?.chips || [];
+  const chips = steps.value[step_index]?.chips || [];
   return chips.toSorted((chipA, chipB) =>
     chipA.localeCompare(chipB, undefined, {
       numeric: true,

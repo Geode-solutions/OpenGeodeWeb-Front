@@ -5,7 +5,7 @@ import { mount } from "@vue/test-utils";
 
 import ObjectSelector from "@ogw_front/components/ObjectSelector";
 import Step from "@ogw_front/components/Step";
-import { useStepperTree } from "@ogw_front/composables/stepper_tree";
+import { useStepperTree } from "@ogw_front/composables/stepper_tree.js";
 
 import { vuetify } from "@ogw_tests/utils";
 
