@@ -59,11 +59,11 @@ async function get_allowed_objects() {
   const allowed_objects_list = responses.map((response) => response.allowed_objects);
   const all_keys = [...new Set(allowed_objects_list.flatMap((obj) => Object.keys(obj)))];
   const common_keys = all_keys.filter((key) => allowed_objects_list.every((obj) => key in obj));
-  
+
   if (filenames.length > 1 && all_keys.length > 0 && common_keys.length === 0) {
     multiple_files_no_common.value = true;
   }
-  
+
   const final_object = {};
   for (const key of common_keys) {
     const load_scores = allowed_objects_list.map((obj) => obj[key].is_loadable);
