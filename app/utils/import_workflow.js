@@ -28,7 +28,7 @@ async function importWorkflow(files) {
     );
     results.push(...chunk_results);
     await processChunk(chunkIndex + 1);
-  };
+  }
   await processChunk(0);
   const hybridViewerStore = useHybridViewerStore();
   hybridViewerStore.remoteRender();
@@ -111,7 +111,7 @@ async function importWorkflowFromSnapshot(items) {
     const chunk_ids = await Promise.all(chunk.map((item) => importItem(item)));
     ids.push(...chunk_ids);
     await processChunk(chunkIndex + 1);
-  };
+  }
   await processChunk(0);
   hybridViewerStore.remoteRender();
   console.log("[importWorkflowFromSnapshot] done", { ids });
