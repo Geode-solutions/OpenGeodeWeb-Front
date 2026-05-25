@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
         }
 
         const frontendFilePath = extensionFrontendPath(
-          projectFolderPath,
+          unzippedExtensionPath,
           frontendFile,
           path.resolve(),
           id,
