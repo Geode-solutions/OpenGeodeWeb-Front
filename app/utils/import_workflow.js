@@ -11,9 +11,25 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 async function importWorkflow(files) {
-  const results = await Promise.all(
-    files.map(({ filename, geode_object_type }) => importFile(filename, geode_object_type)),
-  );
+  const chunk_size = 5;
+  const chunks = [];
+  for (let i = 0; i < files.length; i += chunk_size) {
+    chunks.push(files.slice(i, i + chunk_size));
+  }
+
+  const results = [];
+  async function processChunk(chunkIndex) {
+    if (chunkIndex >= chunks.length) {
+      return;
+    }
+    const chunk = chunks[chunkIndex];
+    const chunk_results = await Promise.all(
+      chunk.map(({ filename, geode_object_type }) => importFile(filename, geode_object_type)),
+    );
+    results.push(...chunk_results);
+    await processChunk(chunkIndex + 1);
+  };
+  await processChunk(0);
   const hybridViewerStore = useHybridViewerStore();
   hybridViewerStore.remoteRender();
   return results;
@@ -80,7 +96,23 @@ async function importWorkflowFromSnapshot(items) {
   console.log("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
 
-  const ids = await Promise.all(items.map((item) => importItem(item)));
+  const chunk_size = 5;
+  const chunks = [];
+  for (let i = 0; i < items.length; i += chunk_size) {
+    chunks.push(items.slice(i, i + chunk_size));
+  }
+
+  const ids = [];
+  async function processChunk(chunkIndex) {
+    if (chunkIndex >= chunks.length) {
+      return;
+    }
+    const chunk = chunks[chunkIndex];
+    const chunk_ids = await Promise.all(chunk.map((item) => importItem(item)));
+    ids.push(...chunk_ids);
+    await processChunk(chunkIndex + 1);
+  };
+  await processChunk(0);
   hybridViewerStore.remoteRender();
   console.log("[importWorkflowFromSnapshot] done", { ids });
   return ids;
