@@ -1,9 +1,6 @@
-export function useStepperTree(initial_state = {}) {
+export function useStepperTree(steps, initial_state = {}) {
   const initial_state_unref = {};
   for (const [key, value] of Object.entries(initial_state)) {
-    if (key === "steps") {
-      continue;
-    }
     const unref_val = unref(value);
     if (Array.isArray(unref_val)) {
       initial_state_unref[key] = [...unref_val];
@@ -14,6 +11,7 @@ export function useStepperTree(initial_state = {}) {
   const state = reactive({
     current_step_index: 0,
     navigating_back: false,
+    steps,
     ...initial_state,
   });
 
