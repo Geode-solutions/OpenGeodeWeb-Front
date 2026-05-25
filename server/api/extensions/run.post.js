@@ -56,9 +56,8 @@ export default defineEventHandler(async (event) => {
             statusMessage: "Invalid extension file: missing backend executable",
           });
         }
-
         const frontendFilePath = extensionFrontendPath(
-          projectFolderPath,
+          unzippedExtensionPath,
           frontendFile,
           path.resolve(),
           id,
