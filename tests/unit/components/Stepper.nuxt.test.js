@@ -28,7 +28,7 @@ describe("stepper", () => {
           chips: computed(() => [geode_object_type.value].filter((chip) => chip !== "")),
         },
       ],
-      { geode_object_type }
+      { geode_object_type },
     );
     const wrapper = await mountSuspended(Stepper, {
       global: {
