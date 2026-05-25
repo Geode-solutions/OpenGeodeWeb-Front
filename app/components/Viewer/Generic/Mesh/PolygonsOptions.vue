@@ -22,28 +22,36 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.meshPolygonsVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsVisibility(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVisibility(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const coloring_style_key = computed({
   get: () => dataStyleStore.meshPolygonsActiveColoring(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsActiveColoring(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsActiveColoring(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const color = computed({
   get: () => dataStyleStore.meshPolygonsColor(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsColor(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsColor(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const textures = computed({
   get: () => dataStyleStore.meshPolygonsTextures(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsTextures(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsTextures(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });

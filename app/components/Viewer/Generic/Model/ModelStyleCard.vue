@@ -52,7 +52,7 @@ const modelComponentTypeVisibility = computed({
   set: async (newValue) => {
     const targetTypes = getBatchComponentIds(componentType.value);
     const promises = targetTypes.map((type) =>
-      dataStyleStore.setModelComponentTypeVisibility(modelId.value, type, newValue)
+      dataStyleStore.setModelComponentTypeVisibility(modelId.value, type, newValue),
     );
     await Promise.all(promises);
     hybridViewerStore.remoteRender();
@@ -95,7 +95,7 @@ const modelComponentTypeColor = computed({
     if (componentType.value) {
       const targetTypes = getBatchComponentIds(componentType.value);
       const promises = targetTypes.map((type) =>
-        dataStyleStore.setModelComponentTypeColor(modelId.value, type, color)
+        dataStyleStore.setModelComponentTypeColor(modelId.value, type, color),
       );
       await Promise.all(promises);
       hybridViewerStore.remoteRender();
@@ -109,7 +109,7 @@ const modelComponentTypeColorMode = computed({
     if (componentType.value) {
       const targetTypes = getBatchComponentIds(componentType.value);
       const promises = targetTypes.map((type) =>
-        dataStyleStore.setModelComponentTypeColorMode(modelId.value, type, colorMode)
+        dataStyleStore.setModelComponentTypeColorMode(modelId.value, type, colorMode),
       );
       await Promise.all(promises);
       hybridViewerStore.remoteRender();
@@ -123,7 +123,7 @@ const componentColorMode = computed({
     if (componentId.value) {
       const targetIds = getBatchComponentIds(componentId.value);
       const promises = targetIds.map((id) =>
-        dataStyleStore.setModelComponentColorMode(modelId.value, id, colorMode)
+        dataStyleStore.setModelComponentColorMode(modelId.value, id, colorMode),
       );
       await Promise.all(promises);
       hybridViewerStore.remoteRender();

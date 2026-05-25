@@ -22,70 +22,90 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.meshEdgesVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesVisibility(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesVisibility(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const width = computed({
   get: () => dataStyleStore.meshEdgesWidth(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesWidth(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesWidth(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const coloring_style_key = computed({
   get: () => dataStyleStore.meshEdgesActiveColoring(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesActiveColoring(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesActiveColoring(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const color = computed({
   get: () => dataStyleStore.meshEdgesColor(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesColor(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesColor(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, newValue[0], newValue[1]));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, newValue[0], newValue[1]),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesVertexAttributeColorMap(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesVertexAttributeColorMap(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_name = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_range = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, newValue[0], newValue[1]));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, newValue[0], newValue[1]),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_color_map = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesEdgeAttributeColorMap(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesEdgeAttributeColorMap(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });

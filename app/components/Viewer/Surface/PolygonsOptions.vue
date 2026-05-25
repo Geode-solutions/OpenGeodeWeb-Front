@@ -22,70 +22,90 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.meshPolygonsVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsVisibility(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVisibility(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const coloring_style_key = computed({
   get: () => dataStyleStore.meshPolygonsActiveColoring(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsActiveColoring(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsActiveColoring(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const color = computed({
   get: () => dataStyleStore.meshPolygonsColor(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsColor(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsColor(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const textures = computed({
   get: () => dataStyleStore.meshPolygonsTextures(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsTextures(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsTextures(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, newValue[0], newValue[1]));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, newValue[0], newValue[1]),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsVertexAttributeColorMap(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeColorMap(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const polygon_attribute_name = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const polygon_attribute_range = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, newValue[0], newValue[1]));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, newValue[0], newValue[1]),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const polygon_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });

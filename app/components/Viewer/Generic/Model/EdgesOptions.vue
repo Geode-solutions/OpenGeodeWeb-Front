@@ -20,7 +20,9 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.modelEdgesVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setModelEdgesVisibility(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setModelEdgesVisibility(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });

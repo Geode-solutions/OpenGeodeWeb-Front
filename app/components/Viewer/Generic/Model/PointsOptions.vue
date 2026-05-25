@@ -21,14 +21,18 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.modelPointsVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setModelPointsVisibility(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setModelPointsVisibility(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const size = computed({
   get: () => dataStyleStore.modelPointsSize(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setModelPointsSize(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setModelPointsSize(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });

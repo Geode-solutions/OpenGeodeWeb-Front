@@ -58,11 +58,11 @@ function handleItemClick(item, index, event) {
   if (index !== undefined) {
     focusedIndex.value = index;
   }
-  
+
   if (event && (event.ctrlKey || event.metaKey || event.shiftKey)) {
     const newActive = new Set(active);
     const id = item.raw[actualItemProps.value.value];
-    
+
     if (event.shiftKey && lastActiveIndex.value !== -1 && index !== undefined) {
       const start = Math.min(lastActiveIndex.value, index);
       const end = Math.max(lastActiveIndex.value, index);
@@ -93,7 +93,7 @@ function handleItemClick(item, index, event) {
     if (index !== undefined) {
       lastActiveIndex.value = index;
     }
-    
+
     toggleSelect(item.raw);
     emit("click:item", item.raw);
   } else {
@@ -144,7 +144,11 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
         <v-list-item
           :class="[
             'tree-row-wrapper',
-            { 'leaf-row': item.isLeaf, 'is-focused': focusedIndex === index, 'is-active': item.isActive },
+            {
+              'leaf-row': item.isLeaf,
+              'is-focused': focusedIndex === index,
+              'is-active': item.isActive,
+            },
           ]"
           class="pa-0"
           tabindex="-1"
