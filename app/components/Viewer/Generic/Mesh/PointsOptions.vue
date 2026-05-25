@@ -4,7 +4,7 @@ import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Opti
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
-import { useBatchStyle } from "@ogw_front/composables/use_batch_style";
+import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
