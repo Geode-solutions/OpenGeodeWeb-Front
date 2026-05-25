@@ -71,22 +71,43 @@ export function useModelSurfacesStyle() {
       ...Object.values(colorGroups).map(({ color_mode, color, surfaces_ids: ids }) =>
         modelColorStyle.setModelSurfacesColor(modelId, ids, color, color_mode),
       ),
-      ...Object.values(attributeGroups).flatMap(({ color_mode, name, minimum, maximum, colorMap, surfaces_ids: ids }) => {
-        const list = [
-          modelAttributeStyle.setModelComponentsAttributeName(modelId, ids, color_mode, "Surface", name)
-        ];
-        if (minimum !== undefined && maximum !== undefined) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeRange(modelId, ids, color_mode, "Surface", minimum, maximum)
-          );
-        }
-        if (colorMap) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeColorMap(modelId, ids, color_mode, "Surface", colorMap)
-          );
-        }
-        return list;
-      }),
+      ...Object.values(attributeGroups).flatMap(
+        ({ color_mode, name, minimum, maximum, colorMap, surfaces_ids: ids }) => {
+          const list = [
+            modelAttributeStyle.setModelComponentsAttributeName(
+              modelId,
+              ids,
+              color_mode,
+              "Surface",
+              name,
+            ),
+          ];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(
+              modelAttributeStyle.setModelComponentsAttributeRange(
+                modelId,
+                ids,
+                color_mode,
+                "Surface",
+                minimum,
+                maximum,
+              ),
+            );
+          }
+          if (colorMap) {
+            list.push(
+              modelAttributeStyle.setModelComponentsAttributeColorMap(
+                modelId,
+                ids,
+                color_mode,
+                "Surface",
+                colorMap,
+              ),
+            );
+          }
+          return list;
+        },
+      ),
     ];
 
     return Promise.all(promises);

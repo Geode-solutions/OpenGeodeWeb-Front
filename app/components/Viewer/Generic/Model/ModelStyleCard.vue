@@ -36,10 +36,7 @@ watchEffect(async () => {
   targetComponentIds.value = [];
   if (componentType.value && modelId.value) {
     const activeType = componentType.value;
-    const ids = await dataStore.getMeshComponentGeodeIds(
-      modelId.value,
-      activeType,
-    );
+    const ids = await dataStore.getMeshComponentGeodeIds(modelId.value, activeType);
     if (componentType.value === activeType) {
       targetComponentIds.value = ids;
     }

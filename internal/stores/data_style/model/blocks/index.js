@@ -71,22 +71,43 @@ export function useModelBlocksStyle() {
       ...Object.values(colorGroups).map(({ color_mode, color, blocks_ids: ids }) =>
         modelColorStyle.setModelBlocksColor(modelId, ids, color, color_mode),
       ),
-      ...Object.values(attributeGroups).flatMap(({ color_mode, name, minimum, maximum, colorMap, blocks_ids: ids }) => {
-        const list = [
-          modelAttributeStyle.setModelComponentsAttributeName(modelId, ids, color_mode, "Block", name)
-        ];
-        if (minimum !== undefined && maximum !== undefined) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeRange(modelId, ids, color_mode, "Block", minimum, maximum)
-          );
-        }
-        if (colorMap) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeColorMap(modelId, ids, color_mode, "Block", colorMap)
-          );
-        }
-        return list;
-      }),
+      ...Object.values(attributeGroups).flatMap(
+        ({ color_mode, name, minimum, maximum, colorMap, blocks_ids: ids }) => {
+          const list = [
+            modelAttributeStyle.setModelComponentsAttributeName(
+              modelId,
+              ids,
+              color_mode,
+              "Block",
+              name,
+            ),
+          ];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(
+              modelAttributeStyle.setModelComponentsAttributeRange(
+                modelId,
+                ids,
+                color_mode,
+                "Block",
+                minimum,
+                maximum,
+              ),
+            );
+          }
+          if (colorMap) {
+            list.push(
+              modelAttributeStyle.setModelComponentsAttributeColorMap(
+                modelId,
+                ids,
+                color_mode,
+                "Block",
+                colorMap,
+              ),
+            );
+          }
+          return list;
+        },
+      ),
     ];
 
     return Promise.all(promises);

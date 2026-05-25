@@ -71,22 +71,43 @@ export function useModelLinesStyle() {
       ...Object.values(colorGroups).map(({ color_mode, color, lines_ids: ids }) =>
         modelColorStyle.setModelLinesColor(modelId, ids, color, color_mode),
       ),
-      ...Object.values(attributeGroups).flatMap(({ color_mode, name, minimum, maximum, colorMap, lines_ids: ids }) => {
-        const list = [
-          modelAttributeStyle.setModelComponentsAttributeName(modelId, ids, color_mode, "Line", name)
-        ];
-        if (minimum !== undefined && maximum !== undefined) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeRange(modelId, ids, color_mode, "Line", minimum, maximum)
-          );
-        }
-        if (colorMap) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeColorMap(modelId, ids, color_mode, "Line", colorMap)
-          );
-        }
-        return list;
-      }),
+      ...Object.values(attributeGroups).flatMap(
+        ({ color_mode, name, minimum, maximum, colorMap, lines_ids: ids }) => {
+          const list = [
+            modelAttributeStyle.setModelComponentsAttributeName(
+              modelId,
+              ids,
+              color_mode,
+              "Line",
+              name,
+            ),
+          ];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(
+              modelAttributeStyle.setModelComponentsAttributeRange(
+                modelId,
+                ids,
+                color_mode,
+                "Line",
+                minimum,
+                maximum,
+              ),
+            );
+          }
+          if (colorMap) {
+            list.push(
+              modelAttributeStyle.setModelComponentsAttributeColorMap(
+                modelId,
+                ids,
+                color_mode,
+                "Line",
+                colorMap,
+              ),
+            );
+          }
+          return list;
+        },
+      ),
     ];
 
     return Promise.all(promises);

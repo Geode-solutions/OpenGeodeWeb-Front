@@ -71,22 +71,43 @@ export function useModelCornersStyle() {
       ...Object.values(colorGroups).map(({ color_mode, color, corners_ids: ids }) =>
         modelColorStyle.setModelCornersColor(modelId, ids, color, color_mode),
       ),
-      ...Object.values(attributeGroups).flatMap(({ color_mode, name, minimum, maximum, colorMap, corners_ids: ids }) => {
-        const list = [
-          modelAttributeStyle.setModelComponentsAttributeName(modelId, ids, color_mode, "Corner", name)
-        ];
-        if (minimum !== undefined && maximum !== undefined) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeRange(modelId, ids, color_mode, "Corner", minimum, maximum)
-          );
-        }
-        if (colorMap) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeColorMap(modelId, ids, color_mode, "Corner", colorMap)
-          );
-        }
-        return list;
-      }),
+      ...Object.values(attributeGroups).flatMap(
+        ({ color_mode, name, minimum, maximum, colorMap, corners_ids: ids }) => {
+          const list = [
+            modelAttributeStyle.setModelComponentsAttributeName(
+              modelId,
+              ids,
+              color_mode,
+              "Corner",
+              name,
+            ),
+          ];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(
+              modelAttributeStyle.setModelComponentsAttributeRange(
+                modelId,
+                ids,
+                color_mode,
+                "Corner",
+                minimum,
+                maximum,
+              ),
+            );
+          }
+          if (colorMap) {
+            list.push(
+              modelAttributeStyle.setModelComponentsAttributeColorMap(
+                modelId,
+                ids,
+                color_mode,
+                "Corner",
+                colorMap,
+              ),
+            );
+          }
+          return list;
+        },
+      ),
     ];
 
     return Promise.all(promises);

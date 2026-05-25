@@ -104,7 +104,14 @@ export function useModelAttributeStyle() {
     );
   }
 
-  async function setModelComponentsAttributeRange(modelId, componentIds, attrType, type, minimum, maximum) {
+  async function setModelComponentsAttributeRange(
+    modelId,
+    componentIds,
+    attrType,
+    type,
+    minimum,
+    maximum,
+  ) {
     if (!componentIds?.length) return;
     const schema = SCHEMAS[type]?.[attrType];
     if (!schema) return;
@@ -157,7 +164,13 @@ export function useModelAttributeStyle() {
     }
   }
 
-  async function setModelComponentsAttributeColorMap(modelId, componentIds, attrType, type, colorMap) {
+  async function setModelComponentsAttributeColorMap(
+    modelId,
+    componentIds,
+    attrType,
+    type,
+    colorMap,
+  ) {
     if (!componentIds?.length) return;
     const schema = SCHEMAS[type]?.[attrType];
     if (!schema) return;

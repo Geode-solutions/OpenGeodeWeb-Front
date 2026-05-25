@@ -29,7 +29,17 @@ const polyhedron_attribute_name = defineModel("polyhedron_attribute_name");
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range");
 const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map");
 
-const { id, componentId, capabilities, vertexSchema, edgeSchema, cellSchema, polygonSchema, polyhedronSchema, allowRandom } = defineProps({
+const {
+  id,
+  componentId,
+  capabilities,
+  vertexSchema,
+  edgeSchema,
+  cellSchema,
+  polygonSchema,
+  polyhedronSchema,
+  allowRandom,
+} = defineProps({
   id: { type: String, required: true },
   componentId: { type: String, default: undefined },
   capabilities: {
@@ -152,12 +162,16 @@ watch(coloring_style_label, (value) => {
   }
 });
 
-watch(coloring_style_key, (value) => {
-  const index = coloring_styles.value.values.indexOf(value);
-  if (index !== -1) {
-    coloring_style_label.value = coloring_styles.value.labels[index];
-  }
-}, { immediate: true });
+watch(
+  coloring_style_key,
+  (value) => {
+    const index = coloring_styles.value.values.indexOf(value);
+    if (index !== -1) {
+      coloring_style_label.value = coloring_styles.value.labels[index];
+    }
+  },
+  { immediate: true },
+);
 </script>
 <template>
   <v-row justify="center" align="center">
