@@ -16,8 +16,6 @@ const emit = defineEmits(["reset_values"]);
 const { state, increment_step, decrement_step, update_values } = stepper_tree;
 const { current_step_index, steps } = toRefs(state);
 
-
-
 const sortedChips = computed(() => {
   const chips = steps.value[props.step_index]?.chips || [];
   return chips.toSorted((chipA, chipB) =>
