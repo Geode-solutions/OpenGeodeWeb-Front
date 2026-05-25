@@ -28,10 +28,19 @@ export function useStepperTree(initial_state = {}) {
     state.current_step_index -= 1;
   }
 
+  function reset_values(default_values = {}) {
+    state.current_step_index = 0;
+    state.navigating_back = false;
+    for (const [key, value] of Object.entries(default_values)) {
+      state[key] = value;
+    }
+  }
+
   return {
     state,
     update_values,
     increment_step,
     decrement_step,
+    reset_values,
   };
 }
