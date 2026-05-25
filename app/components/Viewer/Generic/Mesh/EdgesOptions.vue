@@ -23,28 +23,36 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.meshEdgesVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesVisibility(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesVisibility(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const size = computed({
   get: () => dataStyleStore.meshEdgesWidth(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesWidth(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesWidth(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const coloring_style_key = computed({
   get: () => dataStyleStore.meshEdgesActiveColoring(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesActiveColoring(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesActiveColoring(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const color = computed({
   get: () => dataStyleStore.meshEdgesColor(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshEdgesColor(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesColor(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });

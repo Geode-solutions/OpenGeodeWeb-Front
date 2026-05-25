@@ -22,70 +22,90 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.meshCellsVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsVisibility(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVisibility(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const coloring_style_key = computed({
   get: () => dataStyleStore.meshCellsActiveColoring(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsActiveColoring(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsActiveColoring(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const color = computed({
   get: () => dataStyleStore.meshCellsColor(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsColor(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsColor(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const textures = computed({
   get: () => dataStyleStore.meshCellsTextures(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsTextures(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsTextures(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsVertexAttributeRange(targetId, newValue[0], newValue[1]));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeRange(targetId, newValue[0], newValue[1]),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsVertexAttributeColorMap(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeColorMap(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const cell_attribute_name = computed({
   get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const cell_attribute_range = computed({
   get: () => dataStyleStore.meshCellsCellAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsCellAttributeRange(targetId, newValue[0], newValue[1]));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsCellAttributeRange(targetId, newValue[0], newValue[1]),
+    );
     hybridViewerStore.remoteRender();
   },
 });
 const cell_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsCellAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshCellsCellAttributeColorMap(targetId, newValue));
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsCellAttributeColorMap(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
