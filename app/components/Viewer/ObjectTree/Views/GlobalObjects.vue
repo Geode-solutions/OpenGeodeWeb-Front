@@ -156,6 +156,7 @@ function expandAll() {
     <CommonTreeView
       :selected="visibleSelection"
       v-model:opened="opened"
+      v-model:active="treeviewStore.activeItems"
       :items="processedItems"
       :options="{
         selection: { selectable: true },

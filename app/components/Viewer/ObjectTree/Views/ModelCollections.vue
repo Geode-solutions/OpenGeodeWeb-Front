@@ -160,6 +160,7 @@ function getLeafViewerIds(item) {
     <CommonTreeView
       :selected="visibleSelection"
       v-model:opened="opened"
+      v-model:active="treeviewStore.activeItems"
       :items="itemsForTreeView"
       :options="{
         selection: { selectable: true, strategy: 'classic' },
