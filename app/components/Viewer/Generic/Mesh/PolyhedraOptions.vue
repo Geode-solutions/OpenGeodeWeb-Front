@@ -3,11 +3,13 @@ import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/Cont
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
+import { useBatchStyle } from "@ogw_front/composables/use_batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
+const { applyBatchStyle } = useBatchStyle();
 
 const { itemProps, btn_image, tooltip } = defineProps({
   itemProps: { type: Object, required: true },
@@ -20,49 +22,49 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraVisibility(id.value, newValue);
+    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolyhedraVisibility(targetId, newValue));
     hybridViewerStore.remoteRender();
   },
 });
 const coloring_style_key = computed({
   get: () => dataStyleStore.meshPolyhedraActiveColoring(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraActiveColoring(id.value, newValue);
+    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolyhedraActiveColoring(targetId, newValue));
     hybridViewerStore.remoteRender();
   },
 });
 const color = computed({
   get: () => dataStyleStore.meshPolyhedraColor(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraColor(id.value, newValue);
+    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolyhedraColor(targetId, newValue));
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraVertexAttributeName(id.value, newValue);
+    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue));
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraVertexAttributeRange(id.value, newValue[0], newValue[1]);
+    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, newValue[0], newValue[1]));
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeColorMap(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(id.value, newValue);
+    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(targetId, newValue));
     hybridViewerStore.remoteRender();
   },
 });
 const polyhedron_attribute_name = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id.value, newValue);
+    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue));
     hybridViewerStore.remoteRender();
   },
 });
@@ -80,7 +82,7 @@ const polyhedron_attribute_range = computed({
 const polyhedron_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(id.value, newValue);
+    await applyBatchStyle(id.value, (targetId) => dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(targetId, newValue));
     hybridViewerStore.remoteRender();
   },
 });

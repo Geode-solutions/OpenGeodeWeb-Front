@@ -9,6 +9,7 @@ const PANEL_WIDTH = 300;
 export const useTreeviewStore = defineStore("treeview", () => {
   const items = ref([]);
   const selection = ref([]);
+  const activeItems = ref([]);
   const opened_views = ref([
     { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
   ]);
@@ -192,6 +193,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function clear() {
     items.value = [];
     selection.value = [];
+    activeItems.value = [];
     pendingSelectionIds.value = [];
     opened_views.value = [
       { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
@@ -261,6 +263,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   return {
     items,
     selection,
+    activeItems,
     opened_views,
     panelWidth,
     additionalPanelWidth,
