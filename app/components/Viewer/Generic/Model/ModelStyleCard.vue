@@ -33,13 +33,16 @@ watchEffect(async () => {
 
 const targetComponentIds = ref([]);
 watchEffect(async () => {
+  targetComponentIds.value = [];
   if (componentType.value && modelId.value) {
-    targetComponentIds.value = await dataStore.getMeshComponentGeodeIds(
+    const activeType = componentType.value;
+    const ids = await dataStore.getMeshComponentGeodeIds(
       modelId.value,
-      componentType.value,
+      activeType,
     );
-  } else {
-    targetComponentIds.value = [];
+    if (componentType.value === activeType) {
+      targetComponentIds.value = ids;
+    }
   }
 });
 
