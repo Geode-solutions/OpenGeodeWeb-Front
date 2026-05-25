@@ -8,8 +8,9 @@ const name = defineModel("name", { type: String });
 const range = defineModel("range", { type: Array });
 const colorMap = defineModel("colorMap", { type: String });
 
-const { id, schema } = defineProps({
+const { id, componentId, schema } = defineProps({
   id: { type: String, required: true },
+  componentId: { type: String, default: undefined },
   schema: { type: Object, required: true },
 });
 
@@ -49,9 +50,16 @@ function resetRange() {
 }
 
 function getAttributes() {
+  if (schema.required && schema.required.includes("component_id") && componentId === undefined) {
+    return;
+  }
+  const params = { id };
+  if (componentId !== undefined) {
+    params.component_id = componentId;
+  }
   backStore.request(
     schema,
-    { id },
+    params,
     {
       response_function: (response) => {
         attributes.value = response.attributes;
@@ -65,7 +73,7 @@ onMounted(() => {
 });
 
 watch(
-  () => [id, schema],
+  () => [id, componentId, schema],
   () => {
     getAttributes();
   },
@@ -86,6 +94,12 @@ watch(
     }
   },
 );
+
+watch(name, (newName, oldName) => {
+  if (newName !== oldName) {
+    resetRange();
+  }
+});
 </script>
 
 <template>
