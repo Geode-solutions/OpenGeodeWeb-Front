@@ -14,9 +14,8 @@ describe("stepper", () => {
   test("mount", async () => {
     const geode_object_type = ref("BRep");
     const files = ref([]);
-    const stepper_tree = useStepperTree({
-      geode_object_type,
-      steps: [
+    const stepper_tree = useStepperTree(
+      [
         {
           step_title: "Confirm the data type",
           component: {
@@ -29,7 +28,8 @@ describe("stepper", () => {
           chips: computed(() => [geode_object_type.value].filter((chip) => chip !== "")),
         },
       ],
-    });
+      { geode_object_type }
+    );
     const wrapper = await mountSuspended(Stepper, {
       global: {
         plugins: [vuetify],
