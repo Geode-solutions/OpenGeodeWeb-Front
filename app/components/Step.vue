@@ -6,37 +6,20 @@ function truncate(text, maxLength) {
   return text;
 }
 
-const { step_index } = defineProps({
+const { step_index, stepper_tree } = defineProps({
   step_index: { type: Number, required: true },
+  stepper_tree: { type: Object, required: true },
 });
 
 const emit = defineEmits(["reset_values"]);
 
-const stepper_tree = inject("stepper_tree");
-const { current_step_index, steps } = toRefs(stepper_tree);
+const { state, increment_step, decrement_step, update_values } = stepper_tree;
+const { current_step_index, steps } = toRefs(state);
 
-watch(current_step_index, (newVal, oldVal) => {
-  if (newVal < oldVal) {
-    stepper_tree.navigating_back = true;
-  }
-});
 
-function update_values_event(keys_values_object) {
-  for (const [key, value] of Object.entries(keys_values_object)) {
-    stepper_tree[key] = value;
-  }
-}
-
-function increment_step() {
-  stepper_tree.current_step_index += 1;
-}
-
-function decrement_step() {
-  stepper_tree.current_step_index -= 1;
-}
 
 const sortedChips = computed(() => {
-  const chips = steps.value[step_index]?.chips || [];
+  const chips = steps.value[props.step_index]?.chips || [];
   return chips.toSorted((chipA, chipB) =>
     chipA.localeCompare(chipB, undefined, {
       numeric: true,
@@ -92,7 +75,7 @@ const sortedChips = computed(() => {
         v-bind="steps[step_index].component.component_options"
         @increment_step="increment_step"
         @decrement_step="decrement_step"
-        @update_values="update_values_event"
+        @update_values="update_values"
         @reset_values="emit('reset_values')"
       />
     </v-card-text>

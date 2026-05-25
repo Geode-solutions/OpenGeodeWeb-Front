@@ -1,10 +1,11 @@
-import { computed, reactive, ref, shallowRef } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import { describe, expect, test } from "vitest";
 import ResizeObserver from "resize-observer-polyfill";
 import { mount } from "@vue/test-utils";
 
 import ObjectSelector from "@ogw_front/components/ObjectSelector";
 import Step from "@ogw_front/components/Step";
+import { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
 import { vuetify } from "@ogw_tests/utils";
 
@@ -14,8 +15,7 @@ describe("step", () => {
   test("brep", () => {
     const geode_object_type = ref("BRep");
     const files = ref([]);
-    const stepper_tree = reactive({
-      current_step_index: ref(0),
+    const stepper_tree = useStepperTree({
       geode_object_type,
       steps: [
         {
@@ -34,9 +34,8 @@ describe("step", () => {
     const wrapper = mount(Step, {
       global: {
         plugins: [vuetify],
-        provide: { stepper_tree },
       },
-      props: { step_index: 0 },
+      props: { step_index: 0, stepper_tree },
     });
     expect(wrapper.exists()).toBe(true);
   });
