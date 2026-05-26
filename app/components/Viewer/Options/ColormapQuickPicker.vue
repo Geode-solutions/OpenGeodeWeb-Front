@@ -67,13 +67,13 @@ async function onQuickColormapSelect(preset) {
 <template>
   <div
     style="position: absolute; width: 1px; height: 1px; pointer-events: none"
-    :style="{ left: `${x}px`, top: `${y}px` }"
+    :style="{ left: `${x}px`, top: `${y - 150}px` }"
     id="quickColormapActivator"
   ></div>
   <v-menu
     v-model="show"
     activator="#quickColormapActivator"
-    location="end"
+    location="top center"
     :close-on-content-click="false"
   >
     <ColorMapList
