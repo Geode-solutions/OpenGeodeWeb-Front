@@ -39,15 +39,9 @@ async function onQuickColormapSelect(preset) {
   }
 
   async function trySet(setterFunction) {
-    try {
-      await setterFunction?.(targetId, newMap);
-    } catch {
-      // Ignore if the object doesn't have this component type (e.g. Cells on a Surface)
-    }
+    await setterFunction?.(targetId, newMap);
   }
 
-  // Set for all possible mesh components and attributes directly
-  // We await all of them so that the remoteRender occurs AFTER the backend has updated the VTK state.
   await Promise.all([
     trySet(dataStyleStore.setMeshPolygonsVertexAttributeColorMap),
     trySet(dataStyleStore.setMeshPolygonsPolygonAttributeColorMap),
