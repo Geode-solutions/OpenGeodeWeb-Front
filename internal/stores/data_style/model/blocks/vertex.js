@@ -24,9 +24,9 @@ export function useModelBlocksVertexAttributeStyle() {
   }
 
   function modelBlocksVertexAttributeStoredConfig(modelId, blockId, name) {
-    const attr = modelBlocksVertexAttribute(modelId, blockId);
-    if (name && attr.storedConfigs && name in attr.storedConfigs) {
-      return attr.storedConfigs[name];
+    const attribute = modelBlocksVertexAttribute(modelId, blockId);
+    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
+      return attribute.storedConfigs[name];
     }
     return {
       minimum: undefined,

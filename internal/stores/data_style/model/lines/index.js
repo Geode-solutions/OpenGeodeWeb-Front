@@ -44,15 +44,15 @@ export function useModelLinesStyle() {
         }
         colorGroups[color_key].lines_ids.push(line_id);
       } else {
-        const attrKey = `${color_mode}_attribute`;
-        const attrStyle = style[attrKey] || {};
-        const { name } = attrStyle;
+        const attributeTypeKey = `${color_mode}_attribute`;
+        const attributeStyle = style[attributeTypeKey] || {};
+        const { name } = attributeStyle;
         if (name) {
-          const storedConfig = (attrStyle.storedConfigs && attrStyle.storedConfigs[name]) || {};
+          const storedConfig = (attributeStyle.storedConfigs && attributeStyle.storedConfigs[name]) || {};
           const { minimum, maximum, colorMap } = storedConfig;
-          const attr_key = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
-          if (!attributeGroups[attr_key]) {
-            attributeGroups[attr_key] = {
+          const attributeGroupKey = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
+          if (!attributeGroups[attributeGroupKey]) {
+            attributeGroups[attributeGroupKey] = {
               color_mode,
               name,
               minimum,
@@ -61,7 +61,7 @@ export function useModelLinesStyle() {
               lines_ids: [],
             };
           }
-          attributeGroups[attr_key].lines_ids.push(line_id);
+          attributeGroups[attributeGroupKey].lines_ids.push(line_id);
         }
       }
     }

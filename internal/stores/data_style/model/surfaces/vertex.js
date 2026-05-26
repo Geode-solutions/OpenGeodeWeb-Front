@@ -24,9 +24,9 @@ export function useModelSurfacesVertexAttributeStyle() {
   }
 
   function modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name) {
-    const attr = modelSurfacesVertexAttribute(modelId, surfaceId);
-    if (name && attr.storedConfigs && name in attr.storedConfigs) {
-      return attr.storedConfigs[name];
+    const attribute = modelSurfacesVertexAttribute(modelId, surfaceId);
+    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
+      return attribute.storedConfigs[name];
     }
     return {
       minimum: undefined,

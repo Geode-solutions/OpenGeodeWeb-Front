@@ -24,9 +24,9 @@ export function useModelLinesEdgeAttributeStyle() {
   }
 
   function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name) {
-    const attr = modelLinesEdgeAttribute(modelId, lineId);
-    if (name && attr.storedConfigs && name in attr.storedConfigs) {
-      return attr.storedConfigs[name];
+    const attribute = modelLinesEdgeAttribute(modelId, lineId);
+    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
+      return attribute.storedConfigs[name];
     }
     return {
       minimum: undefined,

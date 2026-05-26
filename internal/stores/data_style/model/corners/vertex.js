@@ -24,9 +24,9 @@ export function useModelCornersVertexAttributeStyle() {
   }
 
   function modelCornersVertexAttributeStoredConfig(modelId, cornerId, name) {
-    const attr = modelCornersVertexAttribute(modelId, cornerId);
-    if (name && attr.storedConfigs && name in attr.storedConfigs) {
-      return attr.storedConfigs[name];
+    const attribute = modelCornersVertexAttribute(modelId, cornerId);
+    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
+      return attribute.storedConfigs[name];
     }
     return {
       minimum: undefined,

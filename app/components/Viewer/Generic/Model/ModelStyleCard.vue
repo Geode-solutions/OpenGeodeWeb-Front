@@ -35,7 +35,12 @@ const selection = computed(() => dataStyleStore.visibleMeshComponents(modelId.va
 const componentType = ref(undefined);
 
 watch(
-  () => [modelId.value, componentId.value, itemProps.meta_data.viewer_type, itemProps.meta_data.modelComponentType],
+  () => [
+    modelId.value,
+    componentId.value,
+    itemProps.meta_data.viewer_type,
+    itemProps.meta_data.modelComponentType,
+  ],
   async () => {
     componentType.value = undefined;
     if (itemProps.meta_data.viewer_type === "model_component_type") {
@@ -44,12 +49,16 @@ watch(
       const currentModelId = modelId.value;
       const currentCompId = componentId.value;
       const type = await dataStore.meshComponentType(currentModelId, currentCompId);
-      if (modelId.value === currentModelId && componentId.value === currentCompId && itemProps.meta_data.viewer_type !== "model_component_type") {
+      if (
+        modelId.value === currentModelId &&
+        componentId.value === currentCompId &&
+        itemProps.meta_data.viewer_type !== "model_component_type"
+      ) {
         componentType.value = type;
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const targetComponentIds = ref([]);
@@ -66,7 +75,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const modelVisibility = computed({

@@ -5,33 +5,33 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
 function getAttributeFunctionName(type, attrType, action) {
-  let typePlural = "Blocks";
+  let componentTypePlural = "Blocks";
   if (type === "Corner") {
-    typePlural = "Corners";
+    componentTypePlural = "Corners";
   } else if (type === "Line") {
-    typePlural = "Lines";
+    componentTypePlural = "Lines";
   } else if (type === "Surface") {
-    typePlural = "Surfaces";
+    componentTypePlural = "Surfaces";
   }
-  const attrCapitalized = attrType.charAt(0).toUpperCase() + attrType.slice(1);
+  const attributeTypeCapitalized = attrType.charAt(0).toUpperCase() + attrType.slice(1);
 
   if (action === "get_name") {
-    return `model${typePlural}${attrCapitalized}AttributeName`;
+    return `model${componentTypePlural}${attributeTypeCapitalized}AttributeName`;
   }
   if (action === "set_name") {
-    return `setModel${typePlural}${attrCapitalized}AttributeName`;
+    return `setModel${componentTypePlural}${attributeTypeCapitalized}AttributeName`;
   }
   if (action === "get_range") {
-    return `model${typePlural}${attrCapitalized}AttributeRange`;
+    return `model${componentTypePlural}${attributeTypeCapitalized}AttributeRange`;
   }
   if (action === "set_range") {
-    return `setModel${typePlural}${attrCapitalized}AttributeRange`;
+    return `setModel${componentTypePlural}${attributeTypeCapitalized}AttributeRange`;
   }
   if (action === "get_colormap") {
-    return `model${typePlural}${attrCapitalized}AttributeColorMap`;
+    return `model${componentTypePlural}${attributeTypeCapitalized}AttributeColorMap`;
   }
   if (action === "set_colormap") {
-    return `setModel${typePlural}${attrCapitalized}AttributeColorMap`;
+    return `setModel${componentTypePlural}${attributeTypeCapitalized}AttributeColorMap`;
   }
 }
 

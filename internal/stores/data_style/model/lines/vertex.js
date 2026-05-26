@@ -24,9 +24,9 @@ export function useModelLinesVertexAttributeStyle() {
   }
 
   function modelLinesVertexAttributeStoredConfig(modelId, lineId, name) {
-    const attr = modelLinesVertexAttribute(modelId, lineId);
-    if (name && attr.storedConfigs && name in attr.storedConfigs) {
-      return attr.storedConfigs[name];
+    const attribute = modelLinesVertexAttribute(modelId, lineId);
+    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
+      return attribute.storedConfigs[name];
     }
     return {
       minimum: undefined,

@@ -24,9 +24,9 @@ export function useModelBlocksPolyhedronAttributeStyle() {
   }
 
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name) {
-    const attr = modelBlocksPolyhedronAttribute(modelId, blockId);
-    if (name && attr.storedConfigs && name in attr.storedConfigs) {
-      return attr.storedConfigs[name];
+    const attribute = modelBlocksPolyhedronAttribute(modelId, blockId);
+    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
+      return attribute.storedConfigs[name];
     }
     return {
       minimum: undefined,

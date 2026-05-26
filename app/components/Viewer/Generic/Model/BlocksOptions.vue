@@ -33,7 +33,7 @@ const componentVisibility = computed({
   },
 });
 
-// Color / Color Mode
+// Color
 const modelComponentTypeColor = computed({
   get: () => dataStyleStore.getModelComponentTypeColor(modelId, "Block"),
   set: async (color) => {

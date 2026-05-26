@@ -24,9 +24,9 @@ export function useModelSurfacesPolygonAttributeStyle() {
   }
 
   function modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name) {
-    const attr = modelSurfacesPolygonAttribute(modelId, surfaceId);
-    if (name && attr.storedConfigs && name in attr.storedConfigs) {
-      return attr.storedConfigs[name];
+    const attribute = modelSurfacesPolygonAttribute(modelId, surfaceId);
+    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
+      return attribute.storedConfigs[name];
     }
     return {
       minimum: undefined,
