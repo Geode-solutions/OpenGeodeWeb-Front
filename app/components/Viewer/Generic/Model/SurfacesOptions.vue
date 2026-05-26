@@ -274,8 +274,7 @@ const polygonSchema = computed(
             v-model:polygon_attribute_range="typePolygonAttrRange"
             v-model:polygon_attribute_color_map="typePolygonAttrColorMap"
             :capabilities="capabilities"
-            :vertexSchema="vertexSchema"
-            :polygonSchema="polygonSchema"
+            :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
             :allowRandom="true"
           />
         </v-col>
@@ -298,8 +297,7 @@ const polygonSchema = computed(
             v-model:polygon_attribute_range="compPolygonAttrRange"
             v-model:polygon_attribute_color_map="compPolygonAttrColorMap"
             :capabilities="capabilities"
-            :vertexSchema="vertexSchema"
-            :polygonSchema="polygonSchema"
+            :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
             :allowRandom="true"
           />
         </v-col>

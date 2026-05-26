@@ -262,8 +262,7 @@ const edgeSchema = computed(
             v-model:edge_attribute_range="typeEdgeAttrRange"
             v-model:edge_attribute_color_map="typeEdgeAttrColorMap"
             :capabilities="capabilities"
-            :vertexSchema="vertexSchema"
-            :edgeSchema="edgeSchema"
+            :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
             :allowRandom="true"
           />
         </v-col>
@@ -286,8 +285,7 @@ const edgeSchema = computed(
             v-model:edge_attribute_range="compEdgeAttrRange"
             v-model:edge_attribute_color_map="compEdgeAttrColorMap"
             :capabilities="capabilities"
-            :vertexSchema="vertexSchema"
-            :edgeSchema="edgeSchema"
+            :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
             :allowRandom="true"
           />
         </v-col>

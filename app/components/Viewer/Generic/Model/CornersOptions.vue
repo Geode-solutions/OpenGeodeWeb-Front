@@ -183,7 +183,7 @@ const vertexSchema = computed(
             v-model:vertex_attribute_range="typeVertexAttrRange"
             v-model:vertex_attribute_color_map="typeVertexAttrColorMap"
             :capabilities="capabilities"
-            :vertexSchema="vertexSchema"
+            :schemas="{ vertex: vertexSchema }"
             :allowRandom="true"
           />
         </v-col>
@@ -203,7 +203,7 @@ const vertexSchema = computed(
             v-model:vertex_attribute_range="compVertexAttrRange"
             v-model:vertex_attribute_color_map="compVertexAttrColorMap"
             :capabilities="capabilities"
-            :vertexSchema="vertexSchema"
+            :schemas="{ vertex: vertexSchema }"
             :allowRandom="true"
           />
         </v-col>

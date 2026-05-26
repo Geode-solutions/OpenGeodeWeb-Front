@@ -278,8 +278,7 @@ const polyhedronSchema = computed(
             v-model:polyhedron_attribute_range="typePolyhedronAttrRange"
             v-model:polyhedron_attribute_color_map="typePolyhedronAttrColorMap"
             :capabilities="capabilities"
-            :vertexSchema="vertexSchema"
-            :polyhedronSchema="polyhedronSchema"
+            :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
             :allowRandom="true"
           />
         </v-col>
@@ -302,8 +301,7 @@ const polyhedronSchema = computed(
             v-model:polyhedron_attribute_range="compPolyhedronAttrRange"
             v-model:polyhedron_attribute_color_map="compPolyhedronAttrColorMap"
             :capabilities="capabilities"
-            :vertexSchema="vertexSchema"
-            :polyhedronSchema="polyhedronSchema"
+            :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
             :allowRandom="true"
           />
         </v-col>

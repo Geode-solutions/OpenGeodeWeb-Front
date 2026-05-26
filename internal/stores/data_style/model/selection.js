@@ -51,13 +51,13 @@ function useModelSelection(modelId, dataStyleState) {
   const allComponents = ref([]);
 
   if (modelId) {
-    database.model_components
-      .where("id")
-      .equals(modelId)
-      .toArray()
-      .then((components) => {
-        allComponents.value = components;
-      });
+    (async () => {
+      try {
+        allComponents.value = await database.model_components.where("id").equals(modelId).toArray();
+      } catch (error) {
+        console.error("Error fetching model components:", error);
+      }
+    })();
   }
 
   return computed(() => {

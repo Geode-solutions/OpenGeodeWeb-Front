@@ -33,12 +33,8 @@ const {
   id,
   componentId,
   capabilities,
-  vertexSchema,
-  edgeSchema,
-  cellSchema,
-  polygonSchema,
-  polyhedronSchema,
-  allowRandom,
+  schemas = {},
+  allowRandom = false,
 } = defineProps({
   id: { type: String, required: true },
   componentId: { type: String, default: undefined },
@@ -46,31 +42,21 @@ const {
     type: Object,
     default: () => ({}),
   },
-  vertexSchema: {
+  schemas: {
     type: Object,
-    default: () => back_schemas.opengeodeweb_back.vertex_attribute_names,
-  },
-  edgeSchema: {
-    type: Object,
-    default: () => back_schemas.opengeodeweb_back.edge_attribute_names,
-  },
-  cellSchema: {
-    type: Object,
-    default: () => back_schemas.opengeodeweb_back.cell_attribute_names,
-  },
-  polygonSchema: {
-    type: Object,
-    default: () => back_schemas.opengeodeweb_back.polygon_attribute_names,
-  },
-  polyhedronSchema: {
-    type: Object,
-    default: () => back_schemas.opengeodeweb_back.polyhedron_attribute_names,
+    default: () => ({}),
   },
   allowRandom: {
     type: Boolean,
     default: false,
   },
 });
+
+const vertexSchema = computed(() => schemas.vertex || back_schemas.opengeodeweb_back.vertex_attribute_names);
+const edgeSchema = computed(() => schemas.edge || back_schemas.opengeodeweb_back.edge_attribute_names);
+const cellSchema = computed(() => schemas.cell || back_schemas.opengeodeweb_back.cell_attribute_names);
+const polygonSchema = computed(() => schemas.polygon || back_schemas.opengeodeweb_back.polygon_attribute_names);
+const polyhedronSchema = computed(() => schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names);
 
 function isAvailable(key) {
   if (capabilities[key] && capabilities[key].available === false) {

@@ -55,10 +55,10 @@ function getSharedState() {
   function updateComponentStyleCache(id_model, id_component, values) {
     const key = `${id_model}_${id_component}`;
     const current = componentStyles.value[key];
-    if (!current) {
-      componentStyles.value[key] = merge({ id_model, id_component }, values);
-    } else {
+    if (current) {
       merge(current, values);
+    } else {
+      componentStyles.value[key] = merge({ id_model, id_component }, values);
     }
   }
 
@@ -67,10 +67,10 @@ function getSharedState() {
     for (const { id_component, values } of updates) {
       const key = `${id_model}_${id_component}`;
       const current = newVal[key];
-      if (!current) {
-        newVal[key] = merge({ id_model, id_component }, values);
-      } else {
+      if (current) {
         newVal[key] = merge({}, current, values);
+      } else {
+        newVal[key] = merge({ id_model, id_component }, values);
       }
     }
     componentStyles.value = newVal;
@@ -81,10 +81,10 @@ function getSharedState() {
     for (const id_component of id_components) {
       const key = `${id_model}_${id_component}`;
       const current = newVal[key];
-      if (!current) {
-        newVal[key] = merge({ id_model, id_component }, values);
-      } else {
+      if (current) {
         newVal[key] = merge({}, current, values);
+      } else {
+        newVal[key] = merge({ id_model, id_component }, values);
       }
     }
     componentStyles.value = newVal;
