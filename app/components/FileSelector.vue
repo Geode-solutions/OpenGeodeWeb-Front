@@ -64,7 +64,7 @@ await get_allowed_files();
       accept,
       files: internal_files,
       auto_upload: internal_auto_upload,
-      show_overlay,
+      showOverlay: show_overlay,
     }"
     @files_uploaded="files_uploaded_event"
   />

@@ -5,6 +5,7 @@ import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwi
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 import BlocksOptions from "./BlocksOptions.vue";
 import CornersOptions from "./CornersOptions.vue";
@@ -14,6 +15,15 @@ import SurfacesOptions from "./SurfacesOptions.vue";
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const dataStore = useDataStore();
+const treeviewStore = useTreeviewStore();
+
+function getBatchComponentIds(currentId) {
+  const { activeItems } = treeviewStore;
+  if (activeItems.includes(currentId) && activeItems.length > 1) {
+    return activeItems;
+  }
+  return [currentId];
+}
 
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },

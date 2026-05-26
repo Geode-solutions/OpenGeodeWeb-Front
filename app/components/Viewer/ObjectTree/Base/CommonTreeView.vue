@@ -5,10 +5,11 @@ import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
 import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
 
-const { items, opened, selected, scrollTop, options } = defineProps({
+const { items, opened, selected, active, scrollTop, options } = defineProps({
   items: { type: Array, required: true },
   opened: { type: Array, required: false, default: () => [] },
   selected: { type: Array, required: false, default: () => [] },
+  active: { type: Array, required: false, default: () => [] },
   scrollTop: { type: Number, required: false, default: 0 },
   options: { type: Object, required: false, default: () => ({}) },
 });
@@ -18,6 +19,7 @@ const treeWrapper = ref(undefined);
 const emit = defineEmits([
   "update:opened",
   "update:selected",
+  "update:active",
   "click:item",
   "update:scrollTop",
   "hover:enter",
@@ -37,6 +39,7 @@ const {
     items,
     opened,
     selected,
+    active,
     ...options,
   })),
   emit,
@@ -49,11 +52,48 @@ const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex } = useTreeS
   actualItemProps,
 );
 
-function handleItemClick(item, index) {
+const lastActiveIndex = ref(-1);
+
+function handleItemClick(item, index, event) {
   if (index !== undefined) {
     focusedIndex.value = index;
   }
+
+  if (event && (event.ctrlKey || event.metaKey || event.shiftKey)) {
+    const newActive = new Set(active);
+    const id = item.raw[actualItemProps.value.value];
+
+    if (event.shiftKey && lastActiveIndex.value !== -1 && index !== undefined) {
+      const start = Math.min(lastActiveIndex.value, index);
+      const end = Math.max(lastActiveIndex.value, index);
+      for (let i = start; i <= end; i += 1) {
+        const rowItem = displayItems.value[i];
+        if (rowItem && rowItem.isLeaf) {
+          newActive.add(rowItem.raw[actualItemProps.value.value]);
+        }
+      }
+    } else {
+      if (newActive.has(id)) {
+        newActive.delete(id);
+      } else {
+        newActive.add(id);
+      }
+      if (index !== undefined) {
+        lastActiveIndex.value = index;
+      }
+    }
+    emit("update:active", [...newActive]);
+    return;
+  }
+
+  // Normal click
   if (item.isLeaf) {
+    const newActive = [item.raw[actualItemProps.value.value]];
+    emit("update:active", newActive);
+    if (index !== undefined) {
+      lastActiveIndex.value = index;
+    }
+
     toggleSelect(item.raw);
     emit("click:item", item.raw);
   } else {
@@ -104,13 +144,17 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
         <v-list-item
           :class="[
             'tree-row-wrapper',
-            { 'leaf-row': item.isLeaf, 'is-focused': focusedIndex === index },
+            {
+              'leaf-row': item.isLeaf,
+              'is-focused': focusedIndex === index,
+              'is-active': item.isActive,
+            },
           ]"
           class="pa-0"
           tabindex="-1"
           @mousedown.prevent
           @click="
-            handleItemClick(item, index);
+            handleItemClick(item, index, $event);
             treeWrapper.focus();
           "
           @mouseenter="emit('hover:enter', { item })"
@@ -176,7 +220,11 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
   box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
-.tree-row-wrapper:hover:not(.is-focused) {
+.tree-row-wrapper.is-active {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.tree-row-wrapper:hover:not(.is-focused):not(.is-active) {
   background-color: rgba(0, 0, 0, 0.04) !important;
 }
 

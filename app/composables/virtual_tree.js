@@ -17,6 +17,7 @@ export function useVirtualTree(propsIn, emit) {
 
   const openedSet = computed(() => new Set(props.value.opened));
   const selectedSet = computed(() => new Set(props.value.selected));
+  const activeSet = computed(() => new Set(props.value.active || []));
 
   function toggleOpen(item) {
     const id = item[actualItemProps.value.value];
@@ -106,6 +107,7 @@ export function useVirtualTree(propsIn, emit) {
       const hasChildren = children && children.length > 0;
 
       const isOpen = openedSet.value.has(id);
+      const isActive = activeSet.value.has(id);
 
       if (lowerSearch) {
         const matches = customFilter
@@ -125,6 +127,7 @@ export function useVirtualTree(propsIn, emit) {
             id,
             depth,
             isOpen,
+            isActive,
             isLeaf: false,
           });
           if (isOpen) {
@@ -142,6 +145,7 @@ export function useVirtualTree(propsIn, emit) {
         id,
         depth,
         isOpen,
+        isActive,
         isLeaf: !hasChildren,
       });
 
