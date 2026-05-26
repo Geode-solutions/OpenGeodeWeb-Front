@@ -31,22 +31,12 @@ export function useModelCommonStyle() {
   }
 
   function mutateComponentStyles(id_model, id_components, values) {
-    for (const id_component of id_components) {
-      dataStyleState.updateComponentStyleCache(id_model, id_component, values);
-    }
+    dataStyleState.bulkUpdateComponentStylesCache(id_model, id_components, values);
     return database.transaction("rw", model_component_datastyle_db, async () => {
-      const all_styles = await model_component_datastyle_db
-        .where("id_model")
-        .equals(id_model)
-        .toArray();
-
-      const style_map = {};
-      for (const style of all_styles) {
-        style_map[style.id_component] = style;
-      }
-
-      const updates = id_components.map((id_component) => {
-        const style = style_map[id_component] || { id_model, id_component };
+      const keys = id_components.map((id_component) => [id_model, id_component]);
+      const existing = await model_component_datastyle_db.bulkGet(keys);
+      const updates = id_components.map((id_component, index) => {
+        const style = existing[index] || { id_model, id_component };
         merge(style, values);
         return toRaw(style);
       });
@@ -56,19 +46,12 @@ export function useModelCommonStyle() {
   }
 
   function bulkMutateComponentStylesPerComponent(id_model, component_updates) {
-    for (const { id_component, values } of component_updates) {
-      dataStyleState.updateComponentStyleCache(id_model, id_component, values);
-    }
+    dataStyleState.bulkUpdateComponentStyleCache(id_model, component_updates);
     return database.transaction("rw", model_component_datastyle_db, async () => {
-      const component_ids = new Set(component_updates.map((update) => update.id_component));
-      const all_styles = await model_component_datastyle_db
-        .where("id_model")
-        .equals(id_model)
-        .and((style) => component_ids.has(style.id_component))
-        .toArray();
-      const style_map = Object.fromEntries(all_styles.map((style) => [style.id_component, style]));
-      const updates = component_updates.map(({ id_component, values }) => {
-        const style = style_map[id_component] || { id_model, id_component };
+      const keys = component_updates.map((update) => [id_model, update.id_component]);
+      const existing = await model_component_datastyle_db.bulkGet(keys);
+      const updates = component_updates.map(({ id_component, values }, index) => {
+        const style = existing[index] || { id_model, id_component };
         merge(style, values);
         return toRaw(style);
       });

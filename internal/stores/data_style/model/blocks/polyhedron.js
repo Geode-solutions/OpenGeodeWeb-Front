@@ -52,28 +52,6 @@ export function useModelBlocksPolyhedronAttributeStyle() {
       return;
     }
 
-    const updates = blockIds.map((blockId) => {
-      const current = modelBlocksPolyhedronAttribute(modelId, blockId);
-      const nameUpdate = { name };
-      if (!(name in current.storedConfigs)) {
-        nameUpdate.storedConfigs = {
-          [name]: {
-            minimum: undefined,
-            maximum: undefined,
-            colorMap: undefined,
-          },
-        };
-      }
-      const updated = merge({}, current, nameUpdate);
-      return {
-        id_component: blockId,
-        values: {
-          polyhedron_attribute: updated,
-        },
-      };
-    });
-    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     if (!viewer_ids?.length) {
       return;
@@ -81,7 +59,32 @@ export function useModelBlocksPolyhedronAttributeStyle() {
 
     return viewerStore.request(
       schema.name,
-      { id: modelId, block_ids: viewer_ids, name }
+      { id: modelId, block_ids: viewer_ids, name },
+      {
+        response_function: async () => {
+          const updates = blockIds.map((blockId) => {
+            const current = modelBlocksPolyhedronAttribute(modelId, blockId);
+            const nameUpdate = { name };
+            if (!(name in current.storedConfigs)) {
+              nameUpdate.storedConfigs = {
+                [name]: {
+                  minimum: undefined,
+                  maximum: undefined,
+                  colorMap: undefined,
+                },
+              };
+            }
+            const updated = merge({}, current, nameUpdate);
+            return {
+              id_component: blockId,
+              values: {
+                polyhedron_attribute: updated,
+              },
+            };
+          });
+          await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+        },
+      },
     );
   }
 
@@ -91,6 +94,37 @@ export function useModelBlocksPolyhedronAttributeStyle() {
     }
 
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
+    const colorMap = modelBlocksPolyhedronAttributeColorMap(modelId, blockIds[0]);
+    const points = getRGBPointsFromPreset(colorMap);
+
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
+      if (!viewer_ids?.length) {
+        return;
+      }
+      return viewerStore.request(
+        schema.color_map,
+        { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
+        {
+          response_function: async () => {
+            const updates = blockIds.map((blockId) => {
+              const current = modelBlocksPolyhedronAttribute(modelId, blockId);
+              const updated = merge({}, current, {
+                storedConfigs: { [name]: { minimum, maximum } },
+              });
+              return {
+                id_component: blockId,
+                values: {
+                  polyhedron_attribute: updated,
+                },
+              };
+            });
+            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+          },
+        },
+      );
+    }
+
     const updates = blockIds.map((blockId) => {
       const current = modelBlocksPolyhedronAttribute(modelId, blockId);
       const updated = merge({}, current, {
@@ -103,21 +137,7 @@ export function useModelBlocksPolyhedronAttributeStyle() {
         },
       };
     });
-    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-
-    const colorMap = modelBlocksPolyhedronAttributeColorMap(modelId, blockIds[0]);
-    const points = getRGBPointsFromPreset(colorMap);
-
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-      if (!viewer_ids?.length) {
-        return;
-      }
-      return viewerStore.request(
-        schema.color_map,
-        { id: modelId, block_ids: viewer_ids, points, minimum, maximum }
-      );
-    }
+    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
   }
 
   async function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
@@ -126,6 +146,38 @@ export function useModelBlocksPolyhedronAttributeStyle() {
     }
 
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name);
+    const points = getRGBPointsFromPreset(colorMap);
+    const { minimum, maximum } = storedConfig;
+
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
+      if (!viewer_ids?.length) {
+        return;
+      }
+      return viewerStore.request(
+        schema.color_map,
+        { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
+        {
+          response_function: async () => {
+            const updates = blockIds.map((blockId) => {
+              const current = modelBlocksPolyhedronAttribute(modelId, blockId);
+              const updated = merge({}, current, {
+                storedConfigs: { [name]: { colorMap } },
+              });
+              return {
+                id_component: blockId,
+                values: {
+                  polyhedron_attribute: updated,
+                },
+              };
+            });
+            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+          },
+        },
+      );
+    }
+
     const updates = blockIds.map((blockId) => {
       const current = modelBlocksPolyhedronAttribute(modelId, blockId);
       const updated = merge({}, current, {
@@ -138,22 +190,7 @@ export function useModelBlocksPolyhedronAttributeStyle() {
         },
       };
     });
-    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-
-    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name);
-    const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
-
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-      if (!viewer_ids?.length) {
-        return;
-      }
-      return viewerStore.request(
-        schema.color_map,
-        { id: modelId, block_ids: viewer_ids, points, minimum, maximum }
-      );
-    }
+    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
   }
 
   return {

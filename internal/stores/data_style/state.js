@@ -54,10 +54,40 @@ function getSharedState() {
 
   function updateComponentStyleCache(id_model, id_component, values) {
     const key = `${id_model}_${id_component}`;
-    if (!componentStyles.value[key]) {
-      componentStyles.value[key] = { id_model, id_component };
+    const current = componentStyles.value[key];
+    if (!current) {
+      componentStyles.value[key] = merge({ id_model, id_component }, values);
+    } else {
+      merge(current, values);
     }
-    merge(componentStyles.value[key], values);
+  }
+
+  function bulkUpdateComponentStyleCache(id_model, updates) {
+    const newVal = { ...componentStyles.value };
+    for (const { id_component, values } of updates) {
+      const key = `${id_model}_${id_component}`;
+      const current = newVal[key];
+      if (!current) {
+        newVal[key] = merge({ id_model, id_component }, values);
+      } else {
+        newVal[key] = merge({}, current, values);
+      }
+    }
+    componentStyles.value = newVal;
+  }
+
+  function bulkUpdateComponentStylesCache(id_model, id_components, values) {
+    const newVal = { ...componentStyles.value };
+    for (const id_component of id_components) {
+      const key = `${id_model}_${id_component}`;
+      const current = newVal[key];
+      if (!current) {
+        newVal[key] = merge({ id_model, id_component }, values);
+      } else {
+        newVal[key] = merge({}, current, values);
+      }
+    }
+    componentStyles.value = newVal;
   }
 
   function updateModelComponentTypeStyleCache(id_model, type, values) {
@@ -80,6 +110,8 @@ function getSharedState() {
     modelComponentTypeStyles,
     componentStyles,
     updateComponentStyleCache,
+    bulkUpdateComponentStyleCache,
+    bulkUpdateComponentStylesCache,
     updateModelComponentTypeStyleCache,
     updateStyleCache,
   };
@@ -153,6 +185,8 @@ export function useDataStyleState() {
     selectedObjects,
     clear,
     updateComponentStyleCache: state.updateComponentStyleCache,
+    bulkUpdateComponentStyleCache: state.bulkUpdateComponentStyleCache,
+    bulkUpdateComponentStylesCache: state.bulkUpdateComponentStylesCache,
     updateModelComponentTypeStyleCache: state.updateModelComponentTypeStyleCache,
   };
 }

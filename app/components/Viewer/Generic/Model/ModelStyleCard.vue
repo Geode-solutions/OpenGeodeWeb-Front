@@ -24,27 +24,40 @@ const componentId = computed(() => itemProps.meta_data.pickedComponentId);
 const selection = computed(() => dataStyleStore.visibleMeshComponents(modelId.value).value || []);
 const componentType = ref(undefined);
 
-watchEffect(async () => {
-  if (itemProps.meta_data.viewer_type === "model_component_type") {
-    componentType.value = itemProps.meta_data.modelComponentType;
-  } else if (componentId.value && modelId.value) {
-    componentType.value = await dataStore.meshComponentType(modelId.value, componentId.value);
-  } else {
+watch(
+  () => [modelId.value, componentId.value, itemProps.meta_data.viewer_type, itemProps.meta_data.modelComponentType],
+  async () => {
     componentType.value = undefined;
-  }
-});
+    if (itemProps.meta_data.viewer_type === "model_component_type") {
+      componentType.value = itemProps.meta_data.modelComponentType;
+    } else if (componentId.value && modelId.value) {
+      const currentModelId = modelId.value;
+      const currentCompId = componentId.value;
+      const type = await dataStore.meshComponentType(currentModelId, currentCompId);
+      if (modelId.value === currentModelId && componentId.value === currentCompId && itemProps.meta_data.viewer_type !== "model_component_type") {
+        componentType.value = type;
+      }
+    }
+  },
+  { immediate: true }
+);
 
 const targetComponentIds = ref([]);
-watchEffect(async () => {
-  targetComponentIds.value = [];
-  if (componentType.value && modelId.value) {
-    const activeType = componentType.value;
-    const ids = await dataStore.getMeshComponentGeodeIds(modelId.value, activeType);
-    if (componentType.value === activeType) {
-      targetComponentIds.value = ids;
+watch(
+  () => [modelId.value, componentType.value],
+  async () => {
+    targetComponentIds.value = [];
+    if (componentType.value && modelId.value) {
+      const currentModelId = modelId.value;
+      const currentType = componentType.value;
+      const ids = await dataStore.getMeshComponentGeodeIds(currentModelId, currentType);
+      if (modelId.value === currentModelId && componentType.value === currentType) {
+        targetComponentIds.value = ids;
+      }
     }
-  }
-});
+  },
+  { immediate: true }
+);
 
 const modelVisibility = computed({
   get: () => dataStyleStore.modelVisibility(modelId.value),
