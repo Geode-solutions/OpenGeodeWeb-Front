@@ -52,6 +52,28 @@ export function useModelBlocksVertexAttributeStyle() {
       return;
     }
 
+    const updates = blockIds.map((blockId) => {
+      const current = modelBlocksVertexAttribute(modelId, blockId);
+      const nameUpdate = { name };
+      if (!(name in current.storedConfigs)) {
+        nameUpdate.storedConfigs = {
+          [name]: {
+            minimum: undefined,
+            maximum: undefined,
+            colorMap: undefined,
+          },
+        };
+      }
+      const updated = merge({}, current, nameUpdate);
+      return {
+        id_component: blockId,
+        values: {
+          vertex_attribute: updated,
+        },
+      };
+    });
+    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     if (!viewer_ids?.length) {
       return;
@@ -59,32 +81,7 @@ export function useModelBlocksVertexAttributeStyle() {
 
     return viewerStore.request(
       schema.name,
-      { id: modelId, block_ids: viewer_ids, name },
-      {
-        response_function: async () => {
-          const updates = blockIds.map((blockId) => {
-            const current = modelBlocksVertexAttribute(modelId, blockId);
-            const nameUpdate = { name };
-            if (!(name in current.storedConfigs)) {
-              nameUpdate.storedConfigs = {
-                [name]: {
-                  minimum: undefined,
-                  maximum: undefined,
-                  colorMap: undefined,
-                },
-              };
-            }
-            const updated = merge({}, current, nameUpdate);
-            return {
-              id_component: blockId,
-              values: {
-                vertex_attribute: updated,
-              },
-            };
-          });
-          await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-        },
-      },
+      { id: modelId, block_ids: viewer_ids, name }
     );
   }
 
@@ -94,37 +91,6 @@ export function useModelBlocksVertexAttributeStyle() {
     }
 
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
-    const colorMap = modelBlocksVertexAttributeColorMap(modelId, blockIds[0]);
-    const points = getRGBPointsFromPreset(colorMap);
-
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-      if (!viewer_ids?.length) {
-        return;
-      }
-      return viewerStore.request(
-        schema.color_map,
-        { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
-        {
-          response_function: async () => {
-            const updates = blockIds.map((blockId) => {
-              const current = modelBlocksVertexAttribute(modelId, blockId);
-              const updated = merge({}, current, {
-                storedConfigs: { [name]: { minimum, maximum } },
-              });
-              return {
-                id_component: blockId,
-                values: {
-                  vertex_attribute: updated,
-                },
-              };
-            });
-            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-          },
-        },
-      );
-    }
-
     const updates = blockIds.map((blockId) => {
       const current = modelBlocksVertexAttribute(modelId, blockId);
       const updated = merge({}, current, {
@@ -137,18 +103,10 @@ export function useModelBlocksVertexAttributeStyle() {
         },
       };
     });
-    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-  }
+    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
 
-  async function setModelBlocksVertexAttributeColorMap(modelId, blockIds, colorMap) {
-    if (!blockIds?.length) {
-      return;
-    }
-
-    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
-    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name);
+    const colorMap = modelBlocksVertexAttributeColorMap(modelId, blockIds[0]);
     const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
@@ -157,27 +115,17 @@ export function useModelBlocksVertexAttributeStyle() {
       }
       return viewerStore.request(
         schema.color_map,
-        { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
-        {
-          response_function: async () => {
-            const updates = blockIds.map((blockId) => {
-              const current = modelBlocksVertexAttribute(modelId, blockId);
-              const updated = merge({}, current, {
-                storedConfigs: { [name]: { colorMap } },
-              });
-              return {
-                id_component: blockId,
-                values: {
-                  vertex_attribute: updated,
-                },
-              };
-            });
-            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-          },
-        },
+        { id: modelId, block_ids: viewer_ids, points, minimum, maximum }
       );
     }
+  }
 
+  async function setModelBlocksVertexAttributeColorMap(modelId, blockIds, colorMap) {
+    if (!blockIds?.length) {
+      return;
+    }
+
+    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     const updates = blockIds.map((blockId) => {
       const current = modelBlocksVertexAttribute(modelId, blockId);
       const updated = merge({}, current, {
@@ -190,7 +138,22 @@ export function useModelBlocksVertexAttributeStyle() {
         },
       };
     });
-    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+
+    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name);
+    const points = getRGBPointsFromPreset(colorMap);
+    const { minimum, maximum } = storedConfig;
+
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
+      if (!viewer_ids?.length) {
+        return;
+      }
+      return viewerStore.request(
+        schema.color_map,
+        { id: modelId, block_ids: viewer_ids, points, minimum, maximum }
+      );
+    }
   }
 
   return {

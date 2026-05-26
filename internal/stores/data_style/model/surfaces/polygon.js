@@ -52,6 +52,28 @@ export function useModelSurfacesPolygonAttributeStyle() {
       return;
     }
 
+    const updates = surfaceIds.map((surfaceId) => {
+      const current = modelSurfacesPolygonAttribute(modelId, surfaceId);
+      const nameUpdate = { name };
+      if (!(name in current.storedConfigs)) {
+        nameUpdate.storedConfigs = {
+          [name]: {
+            minimum: undefined,
+            maximum: undefined,
+            colorMap: undefined,
+          },
+        };
+      }
+      const updated = merge({}, current, nameUpdate);
+      return {
+        id_component: surfaceId,
+        values: {
+          polygon_attribute: updated,
+        },
+      };
+    });
+    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     if (!viewer_ids?.length) {
       return;
@@ -59,32 +81,7 @@ export function useModelSurfacesPolygonAttributeStyle() {
 
     return viewerStore.request(
       schema.name,
-      { id: modelId, block_ids: viewer_ids, name },
-      {
-        response_function: async () => {
-          const updates = surfaceIds.map((surfaceId) => {
-            const current = modelSurfacesPolygonAttribute(modelId, surfaceId);
-            const nameUpdate = { name };
-            if (!(name in current.storedConfigs)) {
-              nameUpdate.storedConfigs = {
-                [name]: {
-                  minimum: undefined,
-                  maximum: undefined,
-                  colorMap: undefined,
-                },
-              };
-            }
-            const updated = merge({}, current, nameUpdate);
-            return {
-              id_component: surfaceId,
-              values: {
-                polygon_attribute: updated,
-              },
-            };
-          });
-          await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-        },
-      },
+      { id: modelId, block_ids: viewer_ids, name }
     );
   }
 
@@ -94,37 +91,6 @@ export function useModelSurfacesPolygonAttributeStyle() {
     }
 
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
-    const colorMap = modelSurfacesPolygonAttributeColorMap(modelId, surfaceIds[0]);
-    const points = getRGBPointsFromPreset(colorMap);
-
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-      if (!viewer_ids?.length) {
-        return;
-      }
-      return viewerStore.request(
-        schema.color_map,
-        { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
-        {
-          response_function: async () => {
-            const updates = surfaceIds.map((surfaceId) => {
-              const current = modelSurfacesPolygonAttribute(modelId, surfaceId);
-              const updated = merge({}, current, {
-                storedConfigs: { [name]: { minimum, maximum } },
-              });
-              return {
-                id_component: surfaceId,
-                values: {
-                  polygon_attribute: updated,
-                },
-              };
-            });
-            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-          },
-        },
-      );
-    }
-
     const updates = surfaceIds.map((surfaceId) => {
       const current = modelSurfacesPolygonAttribute(modelId, surfaceId);
       const updated = merge({}, current, {
@@ -137,18 +103,10 @@ export function useModelSurfacesPolygonAttributeStyle() {
         },
       };
     });
-    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-  }
+    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
 
-  async function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
-    if (!surfaceIds?.length) {
-      return;
-    }
-
-    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name);
+    const colorMap = modelSurfacesPolygonAttributeColorMap(modelId, surfaceIds[0]);
     const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
@@ -157,27 +115,17 @@ export function useModelSurfacesPolygonAttributeStyle() {
       }
       return viewerStore.request(
         schema.color_map,
-        { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
-        {
-          response_function: async () => {
-            const updates = surfaceIds.map((surfaceId) => {
-              const current = modelSurfacesPolygonAttribute(modelId, surfaceId);
-              const updated = merge({}, current, {
-                storedConfigs: { [name]: { colorMap } },
-              });
-              return {
-                id_component: surfaceId,
-                values: {
-                  polygon_attribute: updated,
-                },
-              };
-            });
-            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-          },
-        },
+        { id: modelId, block_ids: viewer_ids, points, minimum, maximum }
       );
     }
+  }
 
+  async function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
+    if (!surfaceIds?.length) {
+      return;
+    }
+
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const updates = surfaceIds.map((surfaceId) => {
       const current = modelSurfacesPolygonAttribute(modelId, surfaceId);
       const updated = merge({}, current, {
@@ -190,7 +138,22 @@ export function useModelSurfacesPolygonAttributeStyle() {
         },
       };
     });
-    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+    await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name);
+    const points = getRGBPointsFromPreset(colorMap);
+    const { minimum, maximum } = storedConfig;
+
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
+      if (!viewer_ids?.length) {
+        return;
+      }
+      return viewerStore.request(
+        schema.color_map,
+        { id: modelId, block_ids: viewer_ids, points, minimum, maximum }
+      );
+    }
   }
 
   return {
