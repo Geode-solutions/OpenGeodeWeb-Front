@@ -46,7 +46,8 @@ export function useModelCornersStyle() {
         const attributeStyle = style[attributeTypeKey] || {};
         const { name } = attributeStyle;
         if (name) {
-          const storedConfig = (attributeStyle.storedConfigs && attributeStyle.storedConfigs[name]) || {};
+          const storedConfig =
+            (attributeStyle.storedConfigs && attributeStyle.storedConfigs[name]) || {};
           const { minimum, maximum, colorMap } = storedConfig;
           const attributeGroupKey = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
           if (!attributeGroups[attributeGroupKey]) {
