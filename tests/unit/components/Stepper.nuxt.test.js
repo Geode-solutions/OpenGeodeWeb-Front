@@ -1,15 +1,12 @@
-// Third party imports
-import { computed, reactive, ref, shallowRef } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import { describe, expect, test } from "vitest";
-import ResizeObserver from "resize-observer-polyfill";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
-
-// Local imports
-import ObjectSelector from "@ogw_front/components/ObjectSelector";
-import Stepper from "@ogw_front/components/Stepper";
+import { useStepperTree } from "@ogw_front/composables/stepper_tree.js";
 import { vuetify } from "@ogw_tests/utils";
 
-const FIRST_INDEX = 0;
+import ObjectSelector from "@ogw_front/components/ObjectSelector";
+import ResizeObserver from "resize-observer-polyfill";
+import Stepper from "@ogw_front/components/Stepper";
 
 globalThis.ResizeObserver = ResizeObserver;
 
@@ -17,10 +14,8 @@ describe("stepper", () => {
   test("mount", async () => {
     const geode_object_type = ref("BRep");
     const files = ref([]);
-    const stepper_tree = reactive({
-      current_step_index: ref(FIRST_INDEX),
-      geode_object_type,
-      steps: [
+    const stepper_tree = useStepperTree(
+      [
         {
           step_title: "Confirm the data type",
           component: {
@@ -33,12 +28,13 @@ describe("stepper", () => {
           chips: computed(() => [geode_object_type.value].filter((chip) => chip !== "")),
         },
       ],
-    });
+      { geode_object_type },
+    );
     const wrapper = await mountSuspended(Stepper, {
       global: {
         plugins: [vuetify],
-        provide: { stepper_tree },
       },
+      props: { stepper_tree },
     });
     expect(wrapper.exists()).toBe(true);
   });
