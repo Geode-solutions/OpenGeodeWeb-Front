@@ -7,8 +7,8 @@ const LAST_POINT_OFFSET = 4;
 const THREE = 3;
 
 const { max, min } = defineProps({
-  min: { type: Number, required: true },
-  max: { type: Number, required: true },
+  min: { type: Number, required: false },
+  max: { type: Number, required: false },
 });
 
 const selectedPresetName = defineModel("selectedPresetName", { default: "batlow" });

@@ -1,8 +1,12 @@
 <script setup>
 import { useElementSize, useWindowSize } from "@vueuse/core";
 import { Status } from "@ogw_front/utils/status";
-import ViewToolbar from "@ogw_front/components/ViewToolbar";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+
+import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
+import ViewToolbar from "@ogw_front/components/ViewToolbar";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 
@@ -11,19 +15,49 @@ const { viewId } = defineProps({
 });
 
 const viewerStore = useViewerStore();
+const menuStore = useMenuStore();
+const dataStore = useDataStore();
 const viewer = useTemplateRef("viewer");
 const { width, height } = useElementSize(viewer);
 
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-function get_x_y(event) {
-  if (viewerStore.picking_mode.value === true) {
-    const { offsetX, offsetY } = event;
+const quickColormap = reactive({
+  data_id: undefined,
+  show: false,
+  x: 0,
+  y: 0,
+});
+
+async function get_x_y(event) {
+  const { offsetX, offsetY, clientX, clientY } = event;
+  if (viewerStore.picking_mode === true) {
     viewerStore.set_picked_point(offsetX, offsetY);
-    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.get_point_position, {
-      x: offsetX,
-      y: offsetY,
-    });
+    viewerStore.request(
+      viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
+      {
+        x: offsetX,
+        y: offsetY,
+      },
+    );
+  } else {
+    try {
+      const result = await viewerStore.request(
+        viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap,
+        {
+          x: offsetX,
+          y: offsetY,
+        },
+      );
+      if (result && result.data_id) {
+        quickColormap.data_id = result.data_id;
+        quickColormap.x = clientX;
+        quickColormap.y = clientY;
+        quickColormap.show = true;
+      }
+    } catch (error) {
+      console.error("Error picking colormap:", error);
+    }
   }
 }
 
@@ -102,13 +136,25 @@ onMounted(async () => {
 <template>
   <ClientOnly>
     <div style="position: relative; width: 100%; height: 100%">
+      <ColormapQuickPicker
+        v-model:show="quickColormap.show"
+        :x="quickColormap.x"
+        :y="quickColormap.y"
+        :data-id="quickColormap.data_id"
+      />
       <ViewToolbar />
       <slot name="ui"></slot>
       <v-col
         ref="viewer"
-        style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%"
+        style="
+          overflow: hidden;
+          position: relative;
+          z-index: 0;
+          height: 100%;
+          width: 100%;
+        "
         class="pa-0"
-        @click="get_x_y"
+        @pointerup.capture="get_x_y"
         @keydown.esc="viewerStore.toggle_picking_mode(false)"
       />
     </div>
