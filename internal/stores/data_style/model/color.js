@@ -4,45 +4,79 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
-function getAttributeFunctionName(type, attrType, action) {
-  let componentTypePlural = "Blocks";
-  if (type === "Corner") {
-    componentTypePlural = "Corners";
-  } else if (type === "Line") {
-    componentTypePlural = "Lines";
-  } else if (type === "Surface") {
-    componentTypePlural = "Surfaces";
-  }
-  const attributeTypeCapitalized = attrType.charAt(0).toUpperCase() + attrType.slice(1);
-
-  if (action === "get_name") {
-    return `model${componentTypePlural}${attributeTypeCapitalized}AttributeName`;
-  }
-  if (action === "set_name") {
-    return `setModel${componentTypePlural}${attributeTypeCapitalized}AttributeName`;
-  }
-  if (action === "get_range") {
-    return `model${componentTypePlural}${attributeTypeCapitalized}AttributeRange`;
-  }
-  if (action === "set_range") {
-    return `setModel${componentTypePlural}${attributeTypeCapitalized}AttributeRange`;
-  }
-  if (action === "get_colormap") {
-    return `model${componentTypePlural}${attributeTypeCapitalized}AttributeColorMap`;
-  }
-  if (action === "set_colormap") {
-    return `setModel${componentTypePlural}${attributeTypeCapitalized}AttributeColorMap`;
-  }
-}
-
 function useModelColorStyle(componentStyleFunctions) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
 
-  function getComponentAttributeStore(type) {
-    return componentStyleFunctions[type];
-  }
+  const { Surface, Line, Block, Corner } = componentStyleFunctions;
+
+  const ATTRIBUTE_FUNCTIONS = {
+    Surface: {
+      vertex: {
+        getName:     Surface.modelSurfacesVertexAttributeName,
+        setName:     Surface.setModelSurfacesVertexAttributeName,
+        getRange:    Surface.modelSurfacesVertexAttributeRange,
+        setRange:    Surface.setModelSurfacesVertexAttributeRange,
+        getColorMap: Surface.modelSurfacesVertexAttributeColorMap,
+        setColorMap: Surface.setModelSurfacesVertexAttributeColorMap,
+      },
+      polygon: {
+        getName:     Surface.modelSurfacesPolygonAttributeName,
+        setName:     Surface.setModelSurfacesPolygonAttributeName,
+        getRange:    Surface.modelSurfacesPolygonAttributeRange,
+        setRange:    Surface.setModelSurfacesPolygonAttributeRange,
+        getColorMap: Surface.modelSurfacesPolygonAttributeColorMap,
+        setColorMap: Surface.setModelSurfacesPolygonAttributeColorMap,
+      },
+    },
+    Line: {
+      vertex: {
+        getName:     Line.modelLinesVertexAttributeName,
+        setName:     Line.setModelLinesVertexAttributeName,
+        getRange:    Line.modelLinesVertexAttributeRange,
+        setRange:    Line.setModelLinesVertexAttributeRange,
+        getColorMap: Line.modelLinesVertexAttributeColorMap,
+        setColorMap: Line.setModelLinesVertexAttributeColorMap,
+      },
+      edge: {
+        getName:     Line.modelLinesEdgeAttributeName,
+        setName:     Line.setModelLinesEdgeAttributeName,
+        getRange:    Line.modelLinesEdgeAttributeRange,
+        setRange:    Line.setModelLinesEdgeAttributeRange,
+        getColorMap: Line.modelLinesEdgeAttributeColorMap,
+        setColorMap: Line.setModelLinesEdgeAttributeColorMap,
+      },
+    },
+    Block: {
+      vertex: {
+        getName:     Block.modelBlocksVertexAttributeName,
+        setName:     Block.setModelBlocksVertexAttributeName,
+        getRange:    Block.modelBlocksVertexAttributeRange,
+        setRange:    Block.setModelBlocksVertexAttributeRange,
+        getColorMap: Block.modelBlocksVertexAttributeColorMap,
+        setColorMap: Block.setModelBlocksVertexAttributeColorMap,
+      },
+      polyhedron: {
+        getName:     Block.modelBlocksPolyhedronAttributeName,
+        setName:     Block.setModelBlocksPolyhedronAttributeName,
+        getRange:    Block.modelBlocksPolyhedronAttributeRange,
+        setRange:    Block.setModelBlocksPolyhedronAttributeRange,
+        getColorMap: Block.modelBlocksPolyhedronAttributeColorMap,
+        setColorMap: Block.setModelBlocksPolyhedronAttributeColorMap,
+      },
+    },
+    Corner: {
+      vertex: {
+        getName:     Corner.modelCornersVertexAttributeName,
+        setName:     Corner.setModelCornersVertexAttributeName,
+        getRange:    Corner.modelCornersVertexAttributeRange,
+        setRange:    Corner.setModelCornersVertexAttributeRange,
+        getColorMap: Corner.modelCornersVertexAttributeColorMap,
+        setColorMap: Corner.setModelCornersVertexAttributeColorMap,
+      },
+    },
+  };
 
   function getModelComponentColor(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).color;
@@ -99,24 +133,19 @@ function useModelColorStyle(componentStyleFunctions) {
     }
 
     await modelCommonStyle.mutateComponentStyles(modelId, idsForType, { color_mode: mode });
-    const store = getComponentAttributeStore(type);
-    const getNameFn = getAttributeFunctionName(type, mode, "get_name");
-    const setNameFn = getAttributeFunctionName(type, mode, "set_name");
-    const getRangeFn = getAttributeFunctionName(type, mode, "get_range");
-    const setRangeFn = getAttributeFunctionName(type, mode, "set_range");
-    const getColormapFn = getAttributeFunctionName(type, mode, "get_colormap");
-    const setColormapFn = getAttributeFunctionName(type, mode, "set_colormap");
+    const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
+      ATTRIBUTE_FUNCTIONS[type][mode];
 
-    const name = store[getNameFn](modelId, idsForType[0]);
+    const name = getName(modelId, idsForType[0]);
     if (name) {
-      await store[setNameFn](modelId, idsForType, name);
-      const [minimum, maximum] = store[getRangeFn](modelId, idsForType[0]);
+      await setName(modelId, idsForType, name);
+      const [minimum, maximum] = getRange(modelId, idsForType[0]);
       if (minimum !== undefined && maximum !== undefined) {
-        await store[setRangeFn](modelId, idsForType, minimum, maximum);
+        await setRange(modelId, idsForType, minimum, maximum);
       }
-      const colorMap = store[getColormapFn](modelId, idsForType[0]);
+      const colorMap = getColorMap(modelId, idsForType[0]);
       if (colorMap) {
-        await store[setColormapFn](modelId, idsForType, colorMap);
+        await setColorMap(modelId, idsForType, colorMap);
       }
     }
   }
@@ -130,24 +159,19 @@ function useModelColorStyle(componentStyleFunctions) {
     }
 
     const type = await dataStore.meshComponentType(modelId, componentId);
-    const store = getComponentAttributeStore(type);
-    const getNameFn = getAttributeFunctionName(type, mode, "get_name");
-    const setNameFn = getAttributeFunctionName(type, mode, "set_name");
-    const getRangeFn = getAttributeFunctionName(type, mode, "get_range");
-    const setRangeFn = getAttributeFunctionName(type, mode, "set_range");
-    const getColormapFn = getAttributeFunctionName(type, mode, "get_colormap");
-    const setColormapFn = getAttributeFunctionName(type, mode, "set_colormap");
+    const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
+      ATTRIBUTE_FUNCTIONS[type][mode];
 
-    const name = store[getNameFn](modelId, componentId);
+    const name = getName(modelId, componentId);
     if (name) {
-      await store[setNameFn](modelId, [componentId], name);
-      const [minimum, maximum] = store[getRangeFn](modelId, componentId);
+      await setName(modelId, [componentId], name);
+      const [minimum, maximum] = getRange(modelId, componentId);
       if (minimum !== undefined && maximum !== undefined) {
-        await store[setRangeFn](modelId, [componentId], minimum, maximum);
+        await setRange(modelId, [componentId], minimum, maximum);
       }
-      const colorMap = store[getColormapFn](modelId, componentId);
+      const colorMap = getColorMap(modelId, componentId);
       if (colorMap) {
-        await store[setColormapFn](modelId, [componentId], colorMap);
+        await setColorMap(modelId, [componentId], colorMap);
       }
     }
   }

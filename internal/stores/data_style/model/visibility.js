@@ -143,19 +143,11 @@ function useModelVisibilityStyle(componentStyleFunctions) {
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
     const typeIds = componentIds.filter((id) => MESH_TYPES.includes(id));
-    let individualIds = componentIds.filter((id) => !MESH_TYPES.includes(id));
+    const individualIds = componentIds.filter((id) => !MESH_TYPES.includes(id));
 
     const promises = [];
-    if (typeIds.length > 0) {
-      const { componentsMap } = await getModelComponentsMap(modelId);
-      individualIds = individualIds.filter((id) => {
-        const type = componentsMap[id]?.type;
-        return !typeIds.includes(type);
-      });
-
-      for (const typeId of typeIds) {
-        promises.push(setModelComponentTypeVisibility(modelId, typeId, visibility));
-      }
+    for (const typeId of typeIds) {
+      promises.push(setModelComponentTypeVisibility(modelId, typeId, visibility));
     }
 
     if (individualIds.length > 0) {
