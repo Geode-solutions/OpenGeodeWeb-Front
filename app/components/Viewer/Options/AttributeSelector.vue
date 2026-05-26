@@ -57,15 +57,11 @@ function getAttributes() {
   if (componentId !== undefined) {
     params.component_id = componentId;
   }
-  backStore.request(
-    schema,
-    params,
-    {
-      response_function: (response) => {
-        attributes.value = response.attributes;
-      },
+  backStore.request(schema, params, {
+    response_function: (response) => {
+      attributes.value = response.attributes;
     },
-  );
+  });
 }
 
 onMounted(() => {
