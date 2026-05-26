@@ -1,8 +1,9 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
+import { useModelLinesEdgeAttributeStyle } from "./edge";
+import { useModelLinesVertexAttributeStyle } from "./vertex";
 import { useModelLinesVisibility } from "./visibility";
-import { useModelAttributeStyle } from "../attribute";
 
 async function setModelLinesDefaultStyle(_id) {
   // Placeholder
@@ -13,7 +14,8 @@ export function useModelLinesStyle() {
   const modelCommonStyle = useModelLinesCommonStyle();
   const modelVisibilityStyle = useModelLinesVisibility();
   const modelColorStyle = useModelLinesColor();
-  const modelAttributeStyle = useModelAttributeStyle();
+  const modelLinesVertexAttributeStyle = useModelLinesVertexAttributeStyle();
+  const modelLinesEdgeAttributeStyle = useModelLinesEdgeAttributeStyle();
 
   async function applyModelLinesStyle(modelId) {
     const lines_ids = await dataStore.getLinesGeodeIds(modelId);
@@ -44,7 +46,7 @@ export function useModelLinesStyle() {
       } else {
         const attrKey = `${color_mode}_attribute`;
         const attrStyle = style[attrKey] || {};
-        const name = attrStyle.name;
+        const { name } = attrStyle;
         if (name) {
           const storedConfig = (attrStyle.storedConfigs && attrStyle.storedConfigs[name]) || {};
           const { minimum, maximum, colorMap } = storedConfig;
@@ -71,22 +73,32 @@ export function useModelLinesStyle() {
       ...Object.values(colorGroups).map(({ color_mode, color, lines_ids: ids }) =>
         modelColorStyle.setModelLinesColor(modelId, ids, color, color_mode),
       ),
-      ...Object.values(attributeGroups).flatMap(({ color_mode, name, minimum, maximum, colorMap, lines_ids: ids }) => {
-        const list = [
-          modelAttributeStyle.setModelComponentsAttributeName(modelId, ids, color_mode, "Line", name)
-        ];
-        if (minimum !== undefined && maximum !== undefined) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeRange(modelId, ids, color_mode, "Line", minimum, maximum)
-          );
-        }
-        if (colorMap) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeColorMap(modelId, ids, color_mode, "Line", colorMap)
-          );
-        }
-        return list;
-      }),
+      ...Object.values(attributeGroups).flatMap(
+        ({ color_mode, name, minimum, maximum, colorMap, lines_ids: ids }) => {
+          const isVertex = color_mode === "vertex";
+          const attributeStyle = isVertex
+            ? modelLinesVertexAttributeStyle
+            : modelLinesEdgeAttributeStyle;
+          const setAttributeName = isVertex
+            ? attributeStyle.setModelLinesVertexAttributeName
+            : attributeStyle.setModelLinesEdgeAttributeName;
+          const setAttributeRange = isVertex
+            ? attributeStyle.setModelLinesVertexAttributeRange
+            : attributeStyle.setModelLinesEdgeAttributeRange;
+          const setAttributeColorMap = isVertex
+            ? attributeStyle.setModelLinesVertexAttributeColorMap
+            : attributeStyle.setModelLinesEdgeAttributeColorMap;
+
+          const list = [setAttributeName(modelId, ids, name)];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(setAttributeRange(modelId, ids, minimum, maximum));
+          }
+          if (colorMap) {
+            list.push(setAttributeColorMap(modelId, ids, colorMap));
+          }
+          return list;
+        },
+      ),
     ];
 
     return Promise.all(promises);
@@ -98,5 +110,7 @@ export function useModelLinesStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
+    ...modelLinesVertexAttributeStyle,
+    ...modelLinesEdgeAttributeStyle,
   };
 }

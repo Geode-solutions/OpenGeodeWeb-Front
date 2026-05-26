@@ -1,8 +1,8 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersColor } from "./color";
 import { useModelCornersCommonStyle } from "./common";
+import { useModelCornersVertexAttributeStyle } from "./vertex";
 import { useModelCornersVisibility } from "./visibility";
-import { useModelAttributeStyle } from "../attribute";
 
 async function setModelCornersDefaultStyle(_id) {
   // Placeholder
@@ -13,7 +13,7 @@ export function useModelCornersStyle() {
   const modelCommonStyle = useModelCornersCommonStyle();
   const modelVisibilityStyle = useModelCornersVisibility();
   const modelColorStyle = useModelCornersColor();
-  const modelAttributeStyle = useModelAttributeStyle();
+  const modelCornersVertexAttributeStyle = useModelCornersVertexAttributeStyle();
 
   async function applyModelCornersStyle(modelId) {
     const corners_ids = await dataStore.getCornersGeodeIds(modelId);
@@ -44,7 +44,7 @@ export function useModelCornersStyle() {
       } else {
         const attrKey = `${color_mode}_attribute`;
         const attrStyle = style[attrKey] || {};
-        const name = attrStyle.name;
+        const { name } = attrStyle;
         if (name) {
           const storedConfig = (attrStyle.storedConfigs && attrStyle.storedConfigs[name]) || {};
           const { minimum, maximum, colorMap } = storedConfig;
@@ -71,22 +71,23 @@ export function useModelCornersStyle() {
       ...Object.values(colorGroups).map(({ color_mode, color, corners_ids: ids }) =>
         modelColorStyle.setModelCornersColor(modelId, ids, color, color_mode),
       ),
-      ...Object.values(attributeGroups).flatMap(({ color_mode, name, minimum, maximum, colorMap, corners_ids: ids }) => {
-        const list = [
-          modelAttributeStyle.setModelComponentsAttributeName(modelId, ids, color_mode, "Corner", name)
-        ];
-        if (minimum !== undefined && maximum !== undefined) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeRange(modelId, ids, color_mode, "Corner", minimum, maximum)
-          );
-        }
-        if (colorMap) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeColorMap(modelId, ids, color_mode, "Corner", colorMap)
-          );
-        }
-        return list;
-      }),
+      ...Object.values(attributeGroups).flatMap(
+        ({ name, minimum, maximum, colorMap, corners_ids: ids }) => {
+          const attributeStyle = modelCornersVertexAttributeStyle;
+          const setAttributeName = attributeStyle.setModelCornersVertexAttributeName;
+          const setAttributeRange = attributeStyle.setModelCornersVertexAttributeRange;
+          const setAttributeColorMap = attributeStyle.setModelCornersVertexAttributeColorMap;
+
+          const list = [setAttributeName(modelId, ids, name)];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(setAttributeRange(modelId, ids, minimum, maximum));
+          }
+          if (colorMap) {
+            list.push(setAttributeColorMap(modelId, ids, colorMap));
+          }
+          return list;
+        },
+      ),
     ];
 
     return Promise.all(promises);
@@ -98,5 +99,6 @@ export function useModelCornersStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
+    ...modelCornersVertexAttributeStyle,
   };
 }

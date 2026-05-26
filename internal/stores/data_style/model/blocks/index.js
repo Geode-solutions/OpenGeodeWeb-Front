@@ -1,8 +1,9 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
+import { useModelBlocksPolyhedronAttributeStyle } from "./polyhedron";
+import { useModelBlocksVertexAttributeStyle } from "./vertex";
 import { useModelBlocksVisibility } from "./visibility";
-import { useModelAttributeStyle } from "../attribute";
 
 async function setModelBlocksDefaultStyle(_id) {
   // Placeholder
@@ -13,7 +14,8 @@ export function useModelBlocksStyle() {
   const modelCommonStyle = useModelBlocksCommonStyle();
   const modelVisibilityStyle = useModelBlocksVisibility();
   const modelColorStyle = useModelBlocksColor();
-  const modelAttributeStyle = useModelAttributeStyle();
+  const modelBlocksVertexAttributeStyle = useModelBlocksVertexAttributeStyle();
+  const modelBlocksPolyhedronAttributeStyle = useModelBlocksPolyhedronAttributeStyle();
 
   async function applyModelBlocksStyle(modelId) {
     const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
@@ -44,7 +46,7 @@ export function useModelBlocksStyle() {
       } else {
         const attrKey = `${color_mode}_attribute`;
         const attrStyle = style[attrKey] || {};
-        const name = attrStyle.name;
+        const { name } = attrStyle;
         if (name) {
           const storedConfig = (attrStyle.storedConfigs && attrStyle.storedConfigs[name]) || {};
           const { minimum, maximum, colorMap } = storedConfig;
@@ -71,22 +73,32 @@ export function useModelBlocksStyle() {
       ...Object.values(colorGroups).map(({ color_mode, color, blocks_ids: ids }) =>
         modelColorStyle.setModelBlocksColor(modelId, ids, color, color_mode),
       ),
-      ...Object.values(attributeGroups).flatMap(({ color_mode, name, minimum, maximum, colorMap, blocks_ids: ids }) => {
-        const list = [
-          modelAttributeStyle.setModelComponentsAttributeName(modelId, ids, color_mode, "Block", name)
-        ];
-        if (minimum !== undefined && maximum !== undefined) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeRange(modelId, ids, color_mode, "Block", minimum, maximum)
-          );
-        }
-        if (colorMap) {
-          list.push(
-            modelAttributeStyle.setModelComponentsAttributeColorMap(modelId, ids, color_mode, "Block", colorMap)
-          );
-        }
-        return list;
-      }),
+      ...Object.values(attributeGroups).flatMap(
+        ({ color_mode, name, minimum, maximum, colorMap, blocks_ids: ids }) => {
+          const isVertex = color_mode === "vertex";
+          const attributeStyle = isVertex
+            ? modelBlocksVertexAttributeStyle
+            : modelBlocksPolyhedronAttributeStyle;
+          const setAttributeName = isVertex
+            ? attributeStyle.setModelBlocksVertexAttributeName
+            : attributeStyle.setModelBlocksPolyhedronAttributeName;
+          const setAttributeRange = isVertex
+            ? attributeStyle.setModelBlocksVertexAttributeRange
+            : attributeStyle.setModelBlocksPolyhedronAttributeRange;
+          const setAttributeColorMap = isVertex
+            ? attributeStyle.setModelBlocksVertexAttributeColorMap
+            : attributeStyle.setModelBlocksPolyhedronAttributeColorMap;
+
+          const list = [setAttributeName(modelId, ids, name)];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(setAttributeRange(modelId, ids, minimum, maximum));
+          }
+          if (colorMap) {
+            list.push(setAttributeColorMap(modelId, ids, colorMap));
+          }
+          return list;
+        },
+      ),
     ];
 
     return Promise.all(promises);
@@ -98,5 +110,7 @@ export function useModelBlocksStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
+    ...modelBlocksVertexAttributeStyle,
+    ...modelBlocksPolyhedronAttributeStyle,
   };
 }

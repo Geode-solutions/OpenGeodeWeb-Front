@@ -3,13 +3,46 @@ import { dispatchToComponentTypes } from "./visibility";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
-import { useModelAttributeStyle } from "./attribute";
+
+function getAttributeFunctionName(type, attrType, action) {
+  let typePlural = "Blocks";
+  if (type === "Corner") {
+    typePlural = "Corners";
+  } else if (type === "Line") {
+    typePlural = "Lines";
+  } else if (type === "Surface") {
+    typePlural = "Surfaces";
+  }
+  const attrCapitalized = attrType.charAt(0).toUpperCase() + attrType.slice(1);
+
+  if (action === "get_name") {
+    return `model${typePlural}${attrCapitalized}AttributeName`;
+  }
+  if (action === "set_name") {
+    return `setModel${typePlural}${attrCapitalized}AttributeName`;
+  }
+  if (action === "get_range") {
+    return `model${typePlural}${attrCapitalized}AttributeRange`;
+  }
+  if (action === "set_range") {
+    return `setModel${typePlural}${attrCapitalized}AttributeRange`;
+  }
+  if (action === "get_colormap") {
+    return `model${typePlural}${attrCapitalized}AttributeColorMap`;
+  }
+  if (action === "set_colormap") {
+    return `setModel${typePlural}${attrCapitalized}AttributeColorMap`;
+  }
+}
 
 function useModelColorStyle(componentStyleFunctions) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
-  const modelAttributeStyle = useModelAttributeStyle();
+
+  function getComponentAttributeStore(type) {
+    return componentStyleFunctions[type];
+  }
 
   function getModelComponentColor(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).color;
@@ -66,43 +99,24 @@ function useModelColorStyle(componentStyleFunctions) {
     }
 
     await modelCommonStyle.mutateComponentStyles(modelId, idsForType, { color_mode: mode });
-    const name = modelAttributeStyle.modelComponentAttributeName(modelId, idsForType[0], mode);
+    const store = getComponentAttributeStore(type);
+    const getNameFn = getAttributeFunctionName(type, mode, "get_name");
+    const setNameFn = getAttributeFunctionName(type, mode, "set_name");
+    const getRangeFn = getAttributeFunctionName(type, mode, "get_range");
+    const setRangeFn = getAttributeFunctionName(type, mode, "set_range");
+    const getColormapFn = getAttributeFunctionName(type, mode, "get_colormap");
+    const setColormapFn = getAttributeFunctionName(type, mode, "set_colormap");
+
+    const name = store[getNameFn](modelId, idsForType[0]);
     if (name) {
-      await modelAttributeStyle.setModelComponentsAttributeName(
-        modelId,
-        idsForType,
-        mode,
-        type,
-        name,
-      );
-      const [minimum, maximum] = modelAttributeStyle.modelComponentAttributeRange(
-        modelId,
-        idsForType[0],
-        mode,
-      );
+      await store[setNameFn](modelId, idsForType, name);
+      const [minimum, maximum] = store[getRangeFn](modelId, idsForType[0]);
       if (minimum !== undefined && maximum !== undefined) {
-        await modelAttributeStyle.setModelComponentsAttributeRange(
-          modelId,
-          idsForType,
-          mode,
-          type,
-          minimum,
-          maximum,
-        );
+        await store[setRangeFn](modelId, idsForType, minimum, maximum);
       }
-      const colorMap = modelAttributeStyle.modelComponentAttributeColorMap(
-        modelId,
-        idsForType[0],
-        mode,
-      );
+      const colorMap = store[getColormapFn](modelId, idsForType[0]);
       if (colorMap) {
-        await modelAttributeStyle.setModelComponentsAttributeColorMap(
-          modelId,
-          idsForType,
-          mode,
-          type,
-          colorMap,
-        );
+        await store[setColormapFn](modelId, idsForType, colorMap);
       }
     }
   }
@@ -116,43 +130,24 @@ function useModelColorStyle(componentStyleFunctions) {
     }
 
     const type = await dataStore.meshComponentType(modelId, componentId);
-    const name = modelAttributeStyle.modelComponentAttributeName(modelId, componentId, mode);
+    const store = getComponentAttributeStore(type);
+    const getNameFn = getAttributeFunctionName(type, mode, "get_name");
+    const setNameFn = getAttributeFunctionName(type, mode, "set_name");
+    const getRangeFn = getAttributeFunctionName(type, mode, "get_range");
+    const setRangeFn = getAttributeFunctionName(type, mode, "set_range");
+    const getColormapFn = getAttributeFunctionName(type, mode, "get_colormap");
+    const setColormapFn = getAttributeFunctionName(type, mode, "set_colormap");
+
+    const name = store[getNameFn](modelId, componentId);
     if (name) {
-      await modelAttributeStyle.setModelComponentsAttributeName(
-        modelId,
-        [componentId],
-        mode,
-        type,
-        name,
-      );
-      const [minimum, maximum] = modelAttributeStyle.modelComponentAttributeRange(
-        modelId,
-        componentId,
-        mode,
-      );
+      await store[setNameFn](modelId, [componentId], name);
+      const [minimum, maximum] = store[getRangeFn](modelId, componentId);
       if (minimum !== undefined && maximum !== undefined) {
-        await modelAttributeStyle.setModelComponentsAttributeRange(
-          modelId,
-          [componentId],
-          mode,
-          type,
-          minimum,
-          maximum,
-        );
+        await store[setRangeFn](modelId, [componentId], minimum, maximum);
       }
-      const colorMap = modelAttributeStyle.modelComponentAttributeColorMap(
-        modelId,
-        componentId,
-        mode,
-      );
+      const colorMap = store[getColormapFn](modelId, componentId);
       if (colorMap) {
-        await modelAttributeStyle.setModelComponentsAttributeColorMap(
-          modelId,
-          [componentId],
-          mode,
-          type,
-          colorMap,
-        );
+        await store[setColormapFn](modelId, [componentId], colorMap);
       }
     }
   }
@@ -179,7 +174,6 @@ function useModelColorStyle(componentStyleFunctions) {
     setModelComponentTypeColorMode,
     setModelComponentColorMode,
     setModelComponentsColor,
-    ...modelAttributeStyle,
   };
 }
 
