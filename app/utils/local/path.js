@@ -55,7 +55,9 @@ async function lookForLocalExtensionDistPath(rootPath, extentionRepoName, fronte
   if (!fs.existsSync(localExtensionDistPath)) {
     return;
   }
-  console.log(`[extensionFrontendPath] Found existing folder: ${localExtensionDistPath}, deleting it...`);
+  console.log(
+    `[extensionFrontendPath] Found existing folder: ${localExtensionDistPath}, deleting it...`,
+  );
   fs.rmSync(localExtensionDistPath, { recursive: true, force: true });
   const now = new Date();
   fs.utimesSync(path.join(localExtensionPath, "package.json"), now, now);
@@ -77,13 +79,22 @@ async function lookForLocalExtensionDistPath(rootPath, extentionRepoName, fronte
   throw new Error(`Failed to find local extension dist path: ${rebuiltFilePath}`);
 }
 async function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPath, extensionId) {
-  console.log("[extensionFrontendPath]", { unzippedExtensionPath, frontendFile, rootPath, extensionId });
+  console.log("[extensionFrontendPath]", {
+    unzippedExtensionPath,
+    frontendFile,
+    rootPath,
+    extensionId,
+  });
   const extentionRepoName = extensionId
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join("-");
 
-  const localFilePath = await lookForLocalExtensionDistPath(rootPath, extentionRepoName, frontendFile);
+  const localFilePath = await lookForLocalExtensionDistPath(
+    rootPath,
+    extentionRepoName,
+    frontendFile,
+  );
   if (localFilePath) {
     return localFilePath;
   }
