@@ -48,14 +48,13 @@ describe("backStore.request()", () => {
       additionalProperties: false,
     };
     const params = { test: "hello" };
-    expect(() => backStore.request(invalid_schema, params)).toThrow("data/test must be number");
+    expect(() => backStore.request({ schema: invalid_schema, params })).toThrow(
+      "data/test must be number",
+    );
   });
 
   test("invalid params", () => {
-    const params = {};
-    expect(() => backStore.request(schema, params)).toThrow(
-      "data must have required property 'test'",
-    );
+    expect(() => backStore.request({ schema })).toThrow("data must have required property 'test'");
   });
 
   test("request with callbacks", async () => {
@@ -70,7 +69,7 @@ describe("backStore.request()", () => {
       method: schema.methods[FIRST_INDEX],
       handler: () => ({ result: "success" }),
     });
-    await backStore.request(schema, params, callbacks);
+    await backStore.request({ schema, params }, callbacks);
     expect(errorCalled).toBe(false);
   });
 });

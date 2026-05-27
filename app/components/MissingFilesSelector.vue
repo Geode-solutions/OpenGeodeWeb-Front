@@ -28,6 +28,10 @@ function files_uploaded_event(value) {
   emit("increment_step");
 }
 
+function isCsvFile(filename) {
+  return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
+}
+
 async function missing_files() {
   toggle_loading();
   has_missing_files.value = false;
@@ -36,16 +40,15 @@ async function missing_files() {
   const backStore = useBackStore();
 
   const promise_array = filenames.map((filename) => {
-    const isCsvFile =
-      filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
-    if (isCsvFile) {
+    if (isCsvFile(filename)) {
       return Promise.resolve({
         has_missing_files: false,
         mandatory_files: [],
         additional_files: [],
       });
     }
-    return backStore.request(schema, { geode_object_type, filename });
+    const params = { geode_object_type, filename };
+    return backStore.request({ schema, params });
   });
   const values = await Promise.all(promise_array);
   for (const value of values) {
@@ -55,11 +58,7 @@ async function missing_files() {
     mandatory_files.value = [...mandatory_files.value, ...value.mandatory_files];
     additional_files.value = [...additional_files.value, ...value.additional_files];
   }
-  const unconfigured_csvs = files.filter(
-    (file) =>
-      (file.name.toLowerCase().endsWith(".csv") || file.name.toLowerCase().endsWith(".csv.json")) &&
-      !file.isConfigured,
-  );
+  const unconfigured_csvs = files.filter((file) => isCsvFile(file.name) && !file.isConfigured);
   if (unconfigured_csvs.length > 0) {
     has_missing_files.value = true;
     if (accept.value === "") {

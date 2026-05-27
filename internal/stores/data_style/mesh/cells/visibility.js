@@ -6,7 +6,7 @@ import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshCellsVisibilitySchema = viewer_schemas.opengeodeweb_viewer.mesh.cells.visibility;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.cells.visibility;
 
 export function useMeshCellsVisibilityStyle() {
   const viewerStore = useViewerStore();
@@ -16,9 +16,12 @@ export function useMeshCellsVisibilityStyle() {
     return meshCellsCommonStyle.meshCellsStyle(id).visibility;
   }
   function setMeshCellsVisibility(id, visibility) {
+    const params = { id, visibility };
     return viewerStore.request(
-      meshCellsVisibilitySchema,
-      { id, visibility },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility }),
       },

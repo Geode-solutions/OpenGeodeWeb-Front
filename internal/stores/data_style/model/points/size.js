@@ -6,7 +6,7 @@ import { useModelPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points;
+const schema = viewer_schemas.opengeodeweb_viewer.model.points.size;
 
 export function useModelPointsSizeStyle() {
   const viewerStore = useViewerStore();
@@ -17,9 +17,12 @@ export function useModelPointsSizeStyle() {
   }
 
   function setModelPointsSize(id, size) {
+    const params = { id, size };
     return viewerStore.request(
-      model_points_schemas.size,
-      { id, size },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => modelPointsCommonStyle.mutateModelPointsStyle(id, { size }),
       },

@@ -46,9 +46,10 @@ describe("model points", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_points_schemas.visibility;
+      const params = { id, visibility };
       expect(spy).toHaveBeenCalledWith(
-        model_points_schemas.visibility,
-        { id, visibility },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -69,9 +70,10 @@ describe("model points", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_points_schemas.size;
+      const params = { id, size };
       expect(spy).toHaveBeenCalledWith(
-        model_points_schemas.size,
-        { id, size },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },

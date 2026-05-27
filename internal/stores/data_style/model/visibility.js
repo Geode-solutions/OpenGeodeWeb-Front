@@ -128,9 +128,10 @@ function useModelVisibilityStyle(componentStyleFunctions) {
   }
 
   function setModelVisibility(modelId, visibility) {
+    const schema = model_schemas.visibility;
+    const params = { id: modelId, visibility };
     return viewerStore.request(
-      model_schemas.visibility,
-      { id: modelId, visibility },
+      { schema, params },
       {
         response_function: async () => {
           await hybridViewerStore.setVisibility(modelId, visibility);

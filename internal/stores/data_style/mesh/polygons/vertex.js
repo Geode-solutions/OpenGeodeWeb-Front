@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshPolygonsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.polygons.attribute.vertex;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useMeshPolygonsVertexAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
@@ -51,9 +52,10 @@ export function useMeshPolygonsVertexAttributeStyle() {
   }
 
   function setMeshPolygonsVertexAttributeName(id, name) {
+    const schema = meshPolygonsVertexAttributeSchemas.name;
+    const params = { id, name };
     return viewerStore.request(
-      meshPolygonsVertexAttributeSchemas.name,
-      { id, name },
+      { schema, params },
       {
         response_function: () => {
           const updates = { name };
@@ -84,9 +86,10 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const name = meshPolygonsVertexAttributeName(id);
     const points = getRGBPointsFromPreset(meshPolygonsVertexAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshPolygonsVertexAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshPolygonsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             setMeshPolygonsVertexAttributeStoredConfig(id, name, { minimum, maximum }),
@@ -112,9 +115,10 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshPolygonsVertexAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshPolygonsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             setMeshPolygonsVertexAttributeStoredConfig(id, name, { colorMap }),

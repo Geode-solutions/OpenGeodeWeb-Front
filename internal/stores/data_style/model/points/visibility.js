@@ -6,7 +6,7 @@ import { useModelPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const model_points_schemas = viewer_schemas.opengeodeweb_viewer.model.points;
+const schema = viewer_schemas.opengeodeweb_viewer.model.points.visibility;
 
 export function useModelPointsVisibilityStyle() {
   const viewerStore = useViewerStore();
@@ -17,9 +17,9 @@ export function useModelPointsVisibilityStyle() {
   }
 
   function setModelPointsVisibility(id, visibility) {
+    const params = { id, visibility };
     return viewerStore.request(
-      model_points_schemas.visibility,
-      { id, visibility },
+      { schema, params },
       {
         response_function: () =>
           modelPointsCommonStyle.mutateModelPointsStyle(id, {

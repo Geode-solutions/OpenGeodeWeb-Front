@@ -23,7 +23,7 @@ describe("missing files selector", () => {
   backStore.base_url = "/";
 
   test("select file", async () => {
-    backStore.request = vi.fn((schema, params, callbacks) => {
+    backStore.request = vi.fn((request, callbacks) => {
       callbacks?.response_function?.({
         has_missing_files: true,
         mandatory_files: ["fake_file.txt"],
