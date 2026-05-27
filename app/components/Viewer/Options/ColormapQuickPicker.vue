@@ -39,7 +39,11 @@ async function onQuickColormapSelect(preset) {
   }
 
   async function trySet(setterFunction) {
-    await setterFunction?.(targetId, newMap);
+    try {
+      await setterFunction?.(targetId, newMap);
+    } catch {
+      // Ignore if the object doesn't have this component type
+    }
   }
 
   await Promise.all([
@@ -69,6 +73,7 @@ async function onQuickColormapSelect(preset) {
     activator="#quickColormapActivator"
     location="top center"
     :close-on-content-click="false"
+    eager
   >
     <ColorMapList
       :presets="quickColormapPresets"
