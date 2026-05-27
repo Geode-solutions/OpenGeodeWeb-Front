@@ -1,4 +1,3 @@
-// Global variables (shared settings defined locally for model components)
 const points_defaultVisibility = true;
 const points_defaultSize = 10;
 const edges_defaultVisibility = true;
@@ -22,7 +21,6 @@ const DEFAULT_MODEL_COMPONENT_TYPE_COLORS = {
 
 const MESH_TYPES = ["Corner", "Line", "Surface", "Block"];
 
-// Model functions
 function modelCornersDefaultStyle(
   visibility = corners_defaultVisibility,
   color = corners_defaultColor,
