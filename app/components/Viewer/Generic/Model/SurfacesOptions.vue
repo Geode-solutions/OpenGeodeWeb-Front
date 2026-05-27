@@ -174,7 +174,11 @@ const compVertexAttrColorMap = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     if (componentId) {
-      await dataStyleStore.setModelSurfacesVertexAttributeColorMap(modelId, [componentId], newValue);
+      await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
+        modelId,
+        [componentId],
+        newValue,
+      );
       hybridViewerStore.remoteRender();
     }
   },
@@ -209,7 +213,11 @@ const compPolygonAttrColorMap = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     if (componentId) {
-      await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(modelId, [componentId], newValue);
+      await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
+        modelId,
+        [componentId],
+        newValue,
+      );
       hybridViewerStore.remoteRender();
     }
   },
