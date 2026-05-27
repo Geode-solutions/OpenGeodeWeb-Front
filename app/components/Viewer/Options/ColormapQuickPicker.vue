@@ -20,9 +20,7 @@ const current = ref("batlow");
 const quickColormapPresets = computed(() => {
   let currentPreset = undefined;
   for (const category of colormaps) {
-    currentPreset = category.Children.find(
-      (preset) => preset.Name === current.value,
-    );
+    currentPreset = category.Children.find((preset) => preset.Name === current.value);
     if (currentPreset) {
       break;
     }
