@@ -12,6 +12,7 @@ import pTimeout from "p-timeout";
 import { commandExistsSync, waitForReady } from "./scripts.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 import { executablePath } from "./path.js";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const DEFAULT_TIMEOUT_SECONDS = 60;
 const MILLISECONDS_PER_SECOND = 1000;
@@ -34,7 +35,13 @@ async function runScript(
   if (commandExistsSync(execName)) {
     command = execName;
   } else {
-    command = path.join(await executablePath(execPath, execName));
+    try {
+      command = path.join(executablePath(execPath, execName));
+    } catch (error) {
+      const feedbackStore = useFeedbackStore();
+      const errorCode = 404
+      feedbackStore.add_error(errorCode, execPath, execName, error.message);
+    }
   }
   console.log("runScript", command, args);
 

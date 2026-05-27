@@ -27,6 +27,7 @@ function executablePath(execPath, execName) {
     console.log(`[executablePath] Found executable in local path: ${localExecPath}`);
     return localExecPath;
   }
+  throw new Error(`Executable not found: ${execName}`);
 }
 
 function executableName(execName) {
