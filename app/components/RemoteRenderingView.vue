@@ -33,13 +33,10 @@ async function get_x_y(event) {
   const { offsetX, offsetY, clientX, clientY } = event;
   if (viewerStore.picking_mode === true) {
     viewerStore.set_picked_point(offsetX, offsetY);
-    viewerStore.request(
-      viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
-      {
-        x: offsetX,
-        y: offsetY,
-      },
-    );
+    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.get_point_position, {
+      x: offsetX,
+      y: offsetY,
+    });
   } else {
     try {
       const result = await viewerStore.request(
@@ -146,13 +143,7 @@ onMounted(async () => {
       <slot name="ui"></slot>
       <v-col
         ref="viewer"
-        style="
-          overflow: hidden;
-          position: relative;
-          z-index: 0;
-          height: 100%;
-          width: 100%;
-        "
+        style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%"
         class="pa-0"
         @pointerup.capture="get_x_y"
         @keydown.esc="viewerStore.toggle_picking_mode(false)"
