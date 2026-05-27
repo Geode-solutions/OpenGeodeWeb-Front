@@ -140,70 +140,58 @@ const typeEdgeAttrColorMap = computed({
 const compVertexAttrName = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelLinesVertexAttributeName(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelLinesVertexAttributeName(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compVertexAttrRange = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelLinesVertexAttributeRange(
-        modelId,
-        [componentId],
-        newValue[0],
-        newValue[1],
-      );
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelLinesVertexAttributeRange(
+      modelId,
+      [componentId],
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compVertexAttrColorMap = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compEdgeAttrName = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelLinesEdgeAttributeName(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compEdgeAttrRange = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelLinesEdgeAttributeRange(
-        modelId,
-        [componentId],
-        newValue[0],
-        newValue[1],
-      );
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelLinesEdgeAttributeRange(
+      modelId,
+      [componentId],
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compEdgeAttrColorMap = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

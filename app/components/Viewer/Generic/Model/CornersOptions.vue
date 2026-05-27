@@ -111,35 +111,29 @@ const typeVertexAttrColorMap = computed({
 const compVertexAttrName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelCornersVertexAttributeName(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelCornersVertexAttributeName(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compVertexAttrRange = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelCornersVertexAttributeRange(
-        modelId,
-        [componentId],
-        newValue[0],
-        newValue[1],
-      );
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelCornersVertexAttributeRange(
+      modelId,
+      [componentId],
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compVertexAttrColorMap = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

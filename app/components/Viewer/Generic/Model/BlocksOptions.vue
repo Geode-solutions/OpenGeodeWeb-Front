@@ -148,74 +148,62 @@ const typePolyhedronAttrColorMap = computed({
 const compVertexAttrName = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compVertexAttrRange = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelBlocksVertexAttributeRange(
-        modelId,
-        [componentId],
-        newValue[0],
-        newValue[1],
-      );
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelBlocksVertexAttributeRange(
+      modelId,
+      [componentId],
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compVertexAttrColorMap = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compPolyhedronAttrName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [componentId], newValue);
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [componentId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compPolyhedronAttrRange = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
-        modelId,
-        [componentId],
-        newValue[0],
-        newValue[1],
-      );
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
+      modelId,
+      [componentId],
+      newValue[0],
+      newValue[1],
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 
 const compPolyhedronAttrColorMap = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
-    if (componentId) {
-      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
-        modelId,
-        [componentId],
-        newValue,
-      );
-      hybridViewerStore.remoteRender();
-    }
+    await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
+      modelId,
+      [componentId],
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 
