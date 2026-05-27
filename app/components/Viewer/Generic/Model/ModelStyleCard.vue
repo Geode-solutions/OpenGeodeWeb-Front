@@ -5,10 +5,20 @@ import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwi
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const dataStore = useDataStore();
+const treeviewStore = useTreeviewStore();
+
+function getBatchComponentIds(currentId) {
+  const { activeItems } = treeviewStore;
+  if (activeItems.includes(currentId) && activeItems.length > 1) {
+    return activeItems;
+  }
+  return [currentId];
+}
 
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
@@ -40,11 +50,11 @@ const modelVisibility = computed({
 const modelComponentTypeVisibility = computed({
   get: () => selection.value.includes(componentType.value),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentTypeVisibility(
-      modelId.value,
-      componentType.value,
-      newValue,
+    const targetTypes = getBatchComponentIds(componentType.value);
+    const promises = targetTypes.map((type) =>
+      dataStyleStore.setModelComponentTypeVisibility(modelId.value, type, newValue),
     );
+    await Promise.all(promises);
     hybridViewerStore.remoteRender();
   },
 });
@@ -52,7 +62,8 @@ const modelComponentTypeVisibility = computed({
 const componentVisibility = computed({
   get: () => selection.value.includes(componentId.value),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], newValue);
+    const targetIds = getBatchComponentIds(componentId.value);
+    await dataStyleStore.setModelComponentsVisibility(modelId.value, targetIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -68,7 +79,8 @@ const componentColor = computed({
       : undefined,
   set: async (color) => {
     if (componentId.value) {
-      await dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], color);
+      const targetIds = getBatchComponentIds(componentId.value);
+      await dataStyleStore.setModelComponentsColor(modelId.value, targetIds, color);
       hybridViewerStore.remoteRender();
     }
   },
@@ -81,7 +93,11 @@ const modelComponentTypeColor = computed({
       : undefined,
   set: async (color) => {
     if (componentType.value) {
-      await dataStyleStore.setModelComponentTypeColor(modelId.value, componentType.value, color);
+      const targetTypes = getBatchComponentIds(componentType.value);
+      const promises = targetTypes.map((type) =>
+        dataStyleStore.setModelComponentTypeColor(modelId.value, type, color),
+      );
+      await Promise.all(promises);
       hybridViewerStore.remoteRender();
     }
   },
@@ -91,11 +107,11 @@ const modelComponentTypeColorMode = computed({
   get: () => dataStyleStore.getModelComponentTypeColorMode(modelId.value, componentType.value),
   set: async (colorMode) => {
     if (componentType.value) {
-      await dataStyleStore.setModelComponentTypeColorMode(
-        modelId.value,
-        componentType.value,
-        colorMode,
+      const targetTypes = getBatchComponentIds(componentType.value);
+      const promises = targetTypes.map((type) =>
+        dataStyleStore.setModelComponentTypeColorMode(modelId.value, type, colorMode),
       );
+      await Promise.all(promises);
       hybridViewerStore.remoteRender();
     }
   },
@@ -105,7 +121,11 @@ const componentColorMode = computed({
   get: () => dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value),
   set: async (colorMode) => {
     if (componentId.value) {
-      await dataStyleStore.setModelComponentColorMode(modelId.value, componentId.value, colorMode);
+      const targetIds = getBatchComponentIds(componentId.value);
+      const promises = targetIds.map((id) =>
+        dataStyleStore.setModelComponentColorMode(modelId.value, id, colorMode),
+      );
+      await Promise.all(promises);
       hybridViewerStore.remoteRender();
     }
   },
