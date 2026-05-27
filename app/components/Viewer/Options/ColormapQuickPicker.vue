@@ -36,11 +36,7 @@ const current = computed(() => {
 
   for (const { key, getterKey } of componentNames) {
     const activeColoring = style[key]?.coloring?.active;
-    if (
-      ["vertex", "edge", "polygon", "cell", "polyhedron"].includes(
-        activeColoring,
-      )
-    ) {
+    if (["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
       const attributeType = `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
       const getterName = `${getterKey}${attributeType}ColorMap`;
       const getter = dataStyleStore[getterName];
@@ -56,9 +52,7 @@ const current = computed(() => {
   return "batlow";
 });
 
-const quickColormapPresets = computed(() =>
-  getPresetsWithCurrentAtTop(current.value),
-);
+const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(current.value));
 
 async function onQuickColormapSelect(preset) {
   show.value = false;
@@ -84,11 +78,7 @@ async function onQuickColormapSelect(preset) {
 
   for (const { key, setterKey } of componentNames) {
     const activeColoring = style[key]?.coloring?.active;
-    if (
-      ["vertex", "edge", "polygon", "cell", "polyhedron"].includes(
-        activeColoring,
-      )
-    ) {
+    if (["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
       const attributeType = `${activeColoring.charAt(0).toUpperCase() + activeColoring.slice(1)}Attribute`;
       const setterName = `set${setterKey}${attributeType}ColorMap`;
       const setter = dataStyleStore[setterName];
