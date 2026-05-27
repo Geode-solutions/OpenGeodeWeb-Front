@@ -6,10 +6,10 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { modelId, componentId, targetComponentIds } = defineProps({
+const { modelId, surfaceId, targetSurfaceIds } = defineProps({
   modelId: { type: String, required: true },
-  componentId: { type: String, default: undefined },
-  targetComponentIds: { type: Array, required: true },
+  surfaceId: { type: String, default: undefined },
+  targetSurfaceIds: { type: Array, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -25,9 +25,9 @@ const modelComponentTypeVisibility = computed({
 });
 
 const componentVisibility = computed({
-  get: () => dataStyleStore.modelComponentVisibility(modelId, componentId),
+  get: () => dataStyleStore.modelComponentVisibility(modelId, surfaceId),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId, [componentId], newValue);
+    await dataStyleStore.setModelComponentsVisibility(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -42,10 +42,10 @@ const modelComponentTypeColor = computed({
 });
 
 const componentColor = computed({
-  get: () => dataStyleStore.getModelComponentEffectiveColor(modelId, componentId, "Surface"),
+  get: () => dataStyleStore.getModelComponentEffectiveColor(modelId, surfaceId, "Surface"),
   set: async (color) => {
-    if (componentId) {
-      await dataStyleStore.setModelComponentsColor(modelId, [componentId], color);
+    if (surfaceId) {
+      await dataStyleStore.setModelComponentsColor(modelId, [surfaceId], color);
       hybridViewerStore.remoteRender();
     }
   },
@@ -60,10 +60,10 @@ const modelComponentTypeColorMode = computed({
 });
 
 const componentColorMode = computed({
-  get: () => dataStyleStore.getModelComponentColorMode(modelId, componentId),
+  get: () => dataStyleStore.getModelComponentColorMode(modelId, surfaceId),
   set: async (colorMode) => {
-    if (componentId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, componentId, colorMode);
+    if (surfaceId) {
+      await dataStyleStore.setModelComponentColorMode(modelId, surfaceId, colorMode);
       hybridViewerStore.remoteRender();
     }
   },
@@ -71,19 +71,19 @@ const componentColorMode = computed({
 
 // Group Attributes
 const modelComponentTypeVertexAttributeName = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, targetSurfaceIds[0]),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, targetComponentIds, newValue);
+    await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const modelComponentTypeVertexAttributeRange = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, targetSurfaceIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeRange(
       modelId,
-      targetComponentIds,
+      targetSurfaceIds,
       newValue[0],
       newValue[1],
     );
@@ -92,11 +92,11 @@ const modelComponentTypeVertexAttributeRange = computed({
 });
 
 const modelComponentTypeVertexAttributeColorMap = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, targetSurfaceIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
       modelId,
-      targetComponentIds,
+      targetSurfaceIds,
       newValue,
     );
     hybridViewerStore.remoteRender();
@@ -104,23 +104,19 @@ const modelComponentTypeVertexAttributeColorMap = computed({
 });
 
 const modelComponentTypePolygonAttributeName = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, targetSurfaceIds[0]),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeName(
-      modelId,
-      targetComponentIds,
-      newValue,
-    );
+    await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const modelComponentTypePolygonAttributeRange = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, targetSurfaceIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeRange(
       modelId,
-      targetComponentIds,
+      targetSurfaceIds,
       newValue[0],
       newValue[1],
     );
@@ -129,11 +125,11 @@ const modelComponentTypePolygonAttributeRange = computed({
 });
 
 const modelComponentTypePolygonAttributeColorMap = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, targetSurfaceIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
       modelId,
-      targetComponentIds,
+      targetSurfaceIds,
       newValue,
     );
     hybridViewerStore.remoteRender();
@@ -142,19 +138,19 @@ const modelComponentTypePolygonAttributeColorMap = computed({
 
 // Individual Attributes
 const vertexAttributeName = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, componentId),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, surfaceId),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, [componentId], newValue);
+    await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const vertexAttributeRange = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, componentId),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeRange(
       modelId,
-      [componentId],
+      [surfaceId],
       newValue[0],
       newValue[1],
     );
@@ -163,27 +159,27 @@ const vertexAttributeRange = computed({
 });
 
 const vertexAttributeColorMap = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, componentId),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeColorMap(modelId, [componentId], newValue);
+    await dataStyleStore.setModelSurfacesVertexAttributeColorMap(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const polygonAttributeName = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, componentId),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, [componentId], newValue);
+    await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const polygonAttributeRange = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, componentId),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeRange(
       modelId,
-      [componentId],
+      [surfaceId],
       newValue[0],
       newValue[1],
     );
@@ -192,9 +188,9 @@ const polygonAttributeRange = computed({
 });
 
 const polygonAttributeColorMap = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, componentId),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(modelId, [componentId], newValue);
+    await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -221,7 +217,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
-            :componentId="targetComponentIds[0]"
+            :componentId="targetSurfaceIds[0]"
             v-model:coloring_style_key="modelComponentTypeColorMode"
             v-model:color="modelComponentTypeColor"
             v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
@@ -238,13 +234,13 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       </v-row>
     </OptionsSection>
 
-    <OptionsSection v-if="componentId" title="Component Options" class="mt-6">
+    <OptionsSection v-if="surfaceId" title="Component Options" class="mt-6">
       <VisibilitySwitch v-model="componentVisibility" />
       <v-row class="mt-2 pa-0">
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
-            :componentId="componentId"
+            :componentId="surfaceId"
             v-model:coloring_style_key="componentColorMode"
             v-model:color="componentColor"
             v-model:vertex_attribute_name="vertexAttributeName"

@@ -113,8 +113,8 @@ function brepDefaultStyle() {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
+    points: modelPointsDefaultStyle(false),
+    edges: modelEdgesDefaultStyle(false),
   };
 }
 
@@ -124,8 +124,8 @@ function crossSectionDefaultStyle() {
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
+    points: modelPointsDefaultStyle(false),
+    edges: modelEdgesDefaultStyle(false),
   };
 }
 
@@ -136,8 +136,8 @@ function structuralModelDefaultStyle() {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
+    points: modelPointsDefaultStyle(false),
+    edges: modelEdgesDefaultStyle(false),
   };
 }
 
@@ -147,8 +147,8 @@ function sectionDefaultStyle() {
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
+    points: modelPointsDefaultStyle(false),
+    edges: modelEdgesDefaultStyle(false),
   };
 }
 
@@ -158,8 +158,8 @@ function implicitCrossSectionDefaultStyle() {
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
+    points: modelPointsDefaultStyle(false),
+    edges: modelEdgesDefaultStyle(false),
   };
 }
 
@@ -170,8 +170,8 @@ function implicitStructuralModelDefaultStyle() {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
+    points: modelPointsDefaultStyle(false),
+    edges: modelEdgesDefaultStyle(false),
   };
 }
 

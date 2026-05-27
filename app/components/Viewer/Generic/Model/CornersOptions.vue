@@ -6,10 +6,10 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { modelId, componentId, targetComponentIds } = defineProps({
+const { modelId, cornerId, targetCornerIds } = defineProps({
   modelId: { type: String, required: true },
-  componentId: { type: String, default: undefined },
-  targetComponentIds: { type: Array, required: true },
+  cornerId: { type: String, default: undefined },
+  targetCornerIds: { type: Array, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -25,9 +25,9 @@ const modelComponentTypeVisibility = computed({
 });
 
 const componentVisibility = computed({
-  get: () => dataStyleStore.modelComponentVisibility(modelId, componentId),
+  get: () => dataStyleStore.modelComponentVisibility(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId, [componentId], newValue);
+    await dataStyleStore.setModelComponentsVisibility(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -42,10 +42,10 @@ const modelComponentTypeColor = computed({
 });
 
 const componentColor = computed({
-  get: () => dataStyleStore.getModelComponentEffectiveColor(modelId, componentId, "Corner"),
+  get: () => dataStyleStore.getModelComponentEffectiveColor(modelId, cornerId, "Corner"),
   set: async (color) => {
-    if (componentId) {
-      await dataStyleStore.setModelComponentsColor(modelId, [componentId], color);
+    if (cornerId) {
+      await dataStyleStore.setModelComponentsColor(modelId, [cornerId], color);
       hybridViewerStore.remoteRender();
     }
   },
@@ -60,10 +60,10 @@ const modelComponentTypeColorMode = computed({
 });
 
 const componentColorMode = computed({
-  get: () => dataStyleStore.getModelComponentColorMode(modelId, componentId),
+  get: () => dataStyleStore.getModelComponentColorMode(modelId, cornerId),
   set: async (colorMode) => {
-    if (componentId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, componentId, colorMode);
+    if (cornerId) {
+      await dataStyleStore.setModelComponentColorMode(modelId, cornerId, colorMode);
       hybridViewerStore.remoteRender();
     }
   },
@@ -71,19 +71,19 @@ const componentColorMode = computed({
 
 // Group Attributes
 const modelComponentTypeVertexAttributeName = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, targetCornerIds[0]),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetComponentIds, newValue);
+    await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const modelComponentTypeVertexAttributeRange = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, targetCornerIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeRange(
       modelId,
-      targetComponentIds,
+      targetCornerIds,
       newValue[0],
       newValue[1],
     );
@@ -92,32 +92,28 @@ const modelComponentTypeVertexAttributeRange = computed({
 });
 
 const modelComponentTypeVertexAttributeColorMap = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, targetComponentIds[0]),
+  get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, targetCornerIds[0]),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeColorMap(
-      modelId,
-      targetComponentIds,
-      newValue,
-    );
+    await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 // Individual Attributes
 const vertexAttributeName = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, componentId),
+  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeName(modelId, [componentId], newValue);
+    await dataStyleStore.setModelCornersVertexAttributeName(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const vertexAttributeRange = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, componentId),
+  get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, cornerId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeRange(
       modelId,
-      [componentId],
+      [cornerId],
       newValue[0],
       newValue[1],
     );
@@ -126,9 +122,9 @@ const vertexAttributeRange = computed({
 });
 
 const vertexAttributeColorMap = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, componentId),
+  get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, [componentId], newValue);
+    await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -154,7 +150,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
-            :componentId="targetComponentIds[0]"
+            :componentId="targetCornerIds[0]"
             v-model:coloring_style_key="modelComponentTypeColorMode"
             v-model:color="modelComponentTypeColor"
             v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
@@ -168,13 +164,13 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       </v-row>
     </OptionsSection>
 
-    <OptionsSection v-if="componentId" title="Component Options" class="mt-6">
+    <OptionsSection v-if="cornerId" title="Component Options" class="mt-6">
       <VisibilitySwitch v-model="componentVisibility" />
       <v-row class="mt-2 pa-0">
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
-            :componentId="componentId"
+            :componentId="cornerId"
             v-model:coloring_style_key="componentColorMode"
             v-model:color="componentColor"
             v-model:vertex_attribute_name="vertexAttributeName"
