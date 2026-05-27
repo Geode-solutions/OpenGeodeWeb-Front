@@ -205,13 +205,8 @@ const capabilities = {
   polyhedron: { available: false },
 };
 
-const vertexSchema = computed(
-  () => back_schemas.opengeodeweb_back.model_component_vertex_attribute_names,
-);
-
-const edgeSchema = computed(
-  () => back_schemas.opengeodeweb_back.model_component_edge_attribute_names,
-);
+const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
+const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute_names;
 </script>
 
 <template>

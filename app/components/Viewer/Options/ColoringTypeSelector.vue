@@ -33,7 +33,7 @@ const {
   id,
   componentId,
   capabilities,
-  schemas = {},
+  schemas,
   allowRandom = false,
 } = defineProps({
   id: { type: String, required: true },
@@ -52,21 +52,12 @@ const {
   },
 });
 
-const vertexSchema = computed(
-  () => schemas.vertex || back_schemas.opengeodeweb_back.vertex_attribute_names,
-);
-const edgeSchema = computed(
-  () => schemas.edge || back_schemas.opengeodeweb_back.edge_attribute_names,
-);
-const cellSchema = computed(
-  () => schemas.cell || back_schemas.opengeodeweb_back.cell_attribute_names,
-);
-const polygonSchema = computed(
-  () => schemas.polygon || back_schemas.opengeodeweb_back.polygon_attribute_names,
-);
-const polyhedronSchema = computed(
-  () => schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names,
-);
+const vertexSchema = schemas.vertex || back_schemas.opengeodeweb_back.vertex_attribute_names;
+const edgeSchema = schemas.edge || back_schemas.opengeodeweb_back.edge_attribute_names;
+const cellSchema = schemas.cell || back_schemas.opengeodeweb_back.cell_attribute_names;
+const polygonSchema = schemas.polygon || back_schemas.opengeodeweb_back.polygon_attribute_names;
+const polyhedronSchema =
+  schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names;
 
 function isAvailable(key) {
   if (capabilities[key] && capabilities[key].available === false) {
