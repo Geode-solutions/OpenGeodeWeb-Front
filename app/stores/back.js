@@ -109,7 +109,7 @@ export const useBackStore = defineStore("back", {
       this.set_ping();
       return Promise.resolve();
     },
-    request(schema, params = {}, callbacks = {}) {
+    request({ schema, params = {} }, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id);
       const start = Date.now();
 

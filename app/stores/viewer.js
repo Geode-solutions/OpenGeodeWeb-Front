@@ -63,10 +63,9 @@ export const useViewerStore = defineStore(
     }
 
     async function set_picked_point(x, y) {
-      const response = await request(schemas.opengeodeweb_viewer.viewer.get_point_position, {
-        x: Math.round(x),
-        y: Math.round(y),
-      });
+      const schema = schemas.opengeodeweb_viewer.viewer.get_point_position;
+      const params = { x: Math.round(x), y: Math.round(y) };
+      const response = await request({ schema, params });
       const { x: world_x, y: world_y, z: world_z } = response;
       picked_point.value = { x: world_x, y: world_y, z: world_z };
     }
@@ -108,7 +107,9 @@ export const useViewerStore = defineStore(
           });
           connectImageStream(client.value.getConnection().getSession());
           client.value.endBusy();
-          await request(schemas.opengeodeweb_viewer.viewer.reset_visualization, {}, {}, undefined);
+          const schema = schemas.opengeodeweb_viewer.viewer.reset_visualization;
+          const timeout = undefined;
+          await request({ schema, timeout });
           status.value = Status.CONNECTED;
         } catch (error) {
           console.error("ws_connect error", error);
@@ -193,8 +194,7 @@ export const useViewerStore = defineStore(
         return;
       }
       return request(
-        schema,
-        {},
+        { schema },
         {
           response_function: (response) => {
             version.value = response.microservice_version;

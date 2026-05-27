@@ -54,10 +54,7 @@ describe("backStore.request()", () => {
   });
 
   test("invalid params", () => {
-    const params = {};
-    expect(() => backStore.request({ schema, params })).toThrow(
-      "data must have required property 'test'",
-    );
+    expect(() => backStore.request({ schema })).toThrow("data must have required property 'test'");
   });
 
   test("request with callbacks", async () => {
