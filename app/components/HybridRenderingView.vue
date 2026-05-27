@@ -2,11 +2,12 @@
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
 import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip";
 import ViewToolbar from "@ogw_front/components/ViewToolbar";
+
 import { useDataStore } from "@ogw_front/stores/data";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
+import { useQuickColormap } from "@ogw_front/composables/use_quick_colormap";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const DEFAULT_ELEMENT_HEIGHT = 100;
 
@@ -38,12 +39,7 @@ onMounted(async () => {
   }
 });
 
-const quickColormap = reactive({
-  data_id: undefined,
-  show: false,
-  x: 0,
-  y: 0,
-});
+const { pickColormap, quickColormap } = useQuickColormap();
 
 function debounce(func, wait) {
   let timeout = undefined;
@@ -67,23 +63,9 @@ async function handleClick(event) {
     return;
   }
 
-  try {
-    const result = await viewerStore.request(
-      viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap,
-      {
-        x: offsetX,
-        y: offsetY,
-      },
-    );
-    if (result && result.data_id) {
-      quickColormap.data_id = result.data_id;
-      quickColormap.x = clientX;
-      quickColormap.y = clientY;
-      quickColormap.show = true;
-      return;
-    }
-  } catch (error) {
-    console.error("Error in pick_colormap:", error);
+  const picked = await pickColormap(offsetX, offsetY, clientX, clientY);
+  if (picked) {
+    return;
   }
 
   emit("click", event);

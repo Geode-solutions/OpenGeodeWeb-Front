@@ -1,8 +1,10 @@
 <script setup>
 import { useElementSize, useWindowSize } from "@vueuse/core";
+
 import { Status } from "@ogw_front/utils/status";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useMenuStore } from "@ogw_front/stores/menu";
+import { useQuickColormap } from "@ogw_front/composables/use_quick_colormap";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
@@ -22,12 +24,7 @@ const { width, height } = useElementSize(viewer);
 
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-const quickColormap = reactive({
-  data_id: undefined,
-  show: false,
-  x: 0,
-  y: 0,
-});
+const { pickColormap, quickColormap } = useQuickColormap();
 
 async function get_x_y(event) {
   const { offsetX, offsetY, clientX, clientY } = event;
@@ -38,23 +35,7 @@ async function get_x_y(event) {
       y: offsetY,
     });
   } else {
-    try {
-      const result = await viewerStore.request(
-        viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap,
-        {
-          x: offsetX,
-          y: offsetY,
-        },
-      );
-      if (result && result.data_id) {
-        quickColormap.data_id = result.data_id;
-        quickColormap.x = clientX;
-        quickColormap.y = clientY;
-        quickColormap.show = true;
-      }
-    } catch (error) {
-      console.error("Error picking colormap:", error);
-    }
+    await pickColormap(offsetX, offsetY, clientX, clientY);
   }
 }
 
