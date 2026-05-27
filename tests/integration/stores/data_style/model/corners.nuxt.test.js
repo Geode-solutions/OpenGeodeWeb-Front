@@ -101,6 +101,31 @@ describe("model corners", () => {
     });
   });
 
+  describe("corners vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, corner_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(model_corners_schemas.attribute.vertex.name, {
+        id,
+        block_ids: corner_viewer_ids,
+        name: "points",
+      });
+      for (const corner_id of corner_ids) {
+        expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
   describe("corner style", () => {
     test("corners apply style", async () => {
       const dataStyleStore = useDataStyleStore();

@@ -97,6 +97,62 @@ describe("model blocks", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
+  describe("blocks vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(model_blocks_schemas.attribute.vertex.name, {
+        id,
+        block_ids: block_viewer_ids,
+        name: "points",
+      });
+      for (const block_id of block_ids) {
+        expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("blocks polyhedron attribute", () => {
+    test("coloring polyhedron attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelBlocksPolyhedronAttributeName(
+        id,
+        block_ids,
+        "test_attribute",
+      );
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(model_blocks_schemas.attribute.polyhedron.name, {
+        id,
+        block_ids: block_viewer_ids,
+        name: "test_attribute",
+      });
+      for (const block_id of block_ids) {
+        expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
+          "test_attribute",
+        );
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
   describe("blocks style", () => {
     test("blocks apply style", async () => {
       const dataStyleStore = useDataStyleStore();
