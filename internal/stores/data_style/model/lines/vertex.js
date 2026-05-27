@@ -72,10 +72,7 @@ export function useModelLinesVertexAttributeStyle() {
     }
     await mutateModelLinesVertexStyle(modelId, lineIds, updates);
 
-    return viewerStore.request(
-      schema.name,
-      { id: modelId, block_ids: viewer_ids, name },
-    );
+    return viewerStore.request(schema.name, { id: modelId, block_ids: viewer_ids, name });
   }
 
   function modelLinesVertexAttributeRange(modelId, lineId) {

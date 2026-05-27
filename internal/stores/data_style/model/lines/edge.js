@@ -72,10 +72,7 @@ export function useModelLinesEdgeAttributeStyle() {
     }
     await mutateModelLinesEdgeStyle(modelId, lineIds, updates);
 
-    return viewerStore.request(
-      schema.name,
-      { id: modelId, block_ids: viewer_ids, name },
-    );
+    return viewerStore.request(schema.name, { id: modelId, block_ids: viewer_ids, name });
   }
 
   function modelLinesEdgeAttributeRange(modelId, lineId) {

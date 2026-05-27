@@ -72,10 +72,7 @@ export function useModelBlocksVertexAttributeStyle() {
     }
     await mutateModelBlocksVertexStyle(modelId, blockIds, updates);
 
-    return viewerStore.request(
-      schema.name,
-      { id: modelId, block_ids: viewer_ids, name },
-    );
+    return viewerStore.request(schema.name, { id: modelId, block_ids: viewer_ids, name });
   }
 
   function modelBlocksVertexAttributeRange(modelId, blockId) {
