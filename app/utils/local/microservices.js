@@ -35,13 +35,7 @@ async function runScript(
   if (commandExistsSync(execName)) {
     command = execName;
   } else {
-    try {
-      command = path.join(executablePath(execPath, execName));
-    } catch (error) {
-      const feedbackStore = useFeedbackStore();
-      const errorCode = 404;
-      feedbackStore.add_error(errorCode, execPath, execName, error.message);
-    }
+    command = path.join(executablePath(execPath, execName));
   }
   console.log("runScript", command, args);
 
