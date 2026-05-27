@@ -6,11 +6,10 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { modelId, componentId, targetComponentIds, selection } = defineProps({
+const { modelId, componentId, targetComponentIds } = defineProps({
   modelId: { type: String, required: true },
   componentId: { type: String, default: undefined },
   targetComponentIds: { type: Array, required: true },
-  selection: { type: Array, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -18,7 +17,7 @@ const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
 const modelComponentTypeVisibility = computed({
-  get: () => selection.includes("Block"),
+  get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Block"),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(modelId, "Block", newValue);
     hybridViewerStore.remoteRender();
@@ -26,7 +25,7 @@ const modelComponentTypeVisibility = computed({
 });
 
 const componentVisibility = computed({
-  get: () => selection.includes(componentId),
+  get: () => dataStyleStore.modelComponentVisibility(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentsVisibility(modelId, [componentId], newValue);
     hybridViewerStore.remoteRender();
@@ -74,7 +73,7 @@ const componentColorMode = computed({
 });
 
 // Group Attributes
-const typeVertexAttrName = computed({
+const modelComponentTypeVertexAttributeName = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeName(modelId, targetComponentIds, newValue);
@@ -82,7 +81,7 @@ const typeVertexAttrName = computed({
   },
 });
 
-const typeVertexAttrRange = computed({
+const modelComponentTypeVertexAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeRange(
@@ -95,7 +94,7 @@ const typeVertexAttrRange = computed({
   },
 });
 
-const typeVertexAttrColorMap = computed({
+const modelComponentTypeVertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeColorMap(
@@ -107,7 +106,7 @@ const typeVertexAttrColorMap = computed({
   },
 });
 
-const typePolyhedronAttrName = computed({
+const modelComponentTypePolyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(
@@ -119,7 +118,7 @@ const typePolyhedronAttrName = computed({
   },
 });
 
-const typePolyhedronAttrRange = computed({
+const modelComponentTypePolyhedronAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
@@ -132,7 +131,7 @@ const typePolyhedronAttrRange = computed({
   },
 });
 
-const typePolyhedronAttrColorMap = computed({
+const modelComponentTypePolyhedronAttributeColorMap = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
@@ -145,7 +144,7 @@ const typePolyhedronAttrColorMap = computed({
 });
 
 // Individual Attributes
-const compVertexAttrName = computed({
+const vertexAttributeName = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [componentId], newValue);
@@ -153,7 +152,7 @@ const compVertexAttrName = computed({
   },
 });
 
-const compVertexAttrRange = computed({
+const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeRange(
@@ -166,7 +165,7 @@ const compVertexAttrRange = computed({
   },
 });
 
-const compVertexAttrColorMap = computed({
+const vertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, [componentId], newValue);
@@ -174,7 +173,7 @@ const compVertexAttrColorMap = computed({
   },
 });
 
-const compPolyhedronAttrName = computed({
+const polyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [componentId], newValue);
@@ -182,7 +181,7 @@ const compPolyhedronAttrName = computed({
   },
 });
 
-const compPolyhedronAttrRange = computed({
+const polyhedronAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
@@ -195,7 +194,7 @@ const compPolyhedronAttrRange = computed({
   },
 });
 
-const compPolyhedronAttrColorMap = computed({
+const polyhedronAttributeColorMap = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
@@ -232,12 +231,12 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
             :componentId="targetComponentIds[0]"
             v-model:coloring_style_key="modelComponentTypeColorMode"
             v-model:color="modelComponentTypeColor"
-            v-model:vertex_attribute_name="typeVertexAttrName"
-            v-model:vertex_attribute_range="typeVertexAttrRange"
-            v-model:vertex_attribute_color_map="typeVertexAttrColorMap"
-            v-model:polyhedron_attribute_name="typePolyhedronAttrName"
-            v-model:polyhedron_attribute_range="typePolyhedronAttrRange"
-            v-model:polyhedron_attribute_color_map="typePolyhedronAttrColorMap"
+            v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
+            v-model:vertex_attribute_range="modelComponentTypeVertexAttributeRange"
+            v-model:vertex_attribute_color_map="modelComponentTypeVertexAttributeColorMap"
+            v-model:polyhedron_attribute_name="modelComponentTypePolyhedronAttributeName"
+            v-model:polyhedron_attribute_range="modelComponentTypePolyhedronAttributeRange"
+            v-model:polyhedron_attribute_color_map="modelComponentTypePolyhedronAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
             :allowRandom="true"
@@ -255,12 +254,12 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
             :componentId="componentId"
             v-model:coloring_style_key="componentColorMode"
             v-model:color="componentColor"
-            v-model:vertex_attribute_name="compVertexAttrName"
-            v-model:vertex_attribute_range="compVertexAttrRange"
-            v-model:vertex_attribute_color_map="compVertexAttrColorMap"
-            v-model:polyhedron_attribute_name="compPolyhedronAttrName"
-            v-model:polyhedron_attribute_range="compPolyhedronAttrRange"
-            v-model:polyhedron_attribute_color_map="compPolyhedronAttrColorMap"
+            v-model:vertex_attribute_name="vertexAttributeName"
+            v-model:vertex_attribute_range="vertexAttributeRange"
+            v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+            v-model:polyhedron_attribute_name="polyhedronAttributeName"
+            v-model:polyhedron_attribute_range="polyhedronAttributeRange"
+            v-model:polyhedron_attribute_color_map="polyhedronAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
             :allowRandom="true"

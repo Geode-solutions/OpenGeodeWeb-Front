@@ -154,28 +154,24 @@ watch(modelComponentsColorMode, async (colorMode) => {
       :modelId="modelId"
       :componentId="componentId"
       :targetComponentIds="targetComponentIds"
-      :selection="selection"
     />
     <SurfacesOptions
       v-else-if="componentType === 'Surface'"
       :modelId="modelId"
       :componentId="componentId"
       :targetComponentIds="targetComponentIds"
-      :selection="selection"
     />
     <LinesOptions
       v-else-if="componentType === 'Line'"
       :modelId="modelId"
       :componentId="componentId"
       :targetComponentIds="targetComponentIds"
-      :selection="selection"
     />
     <CornersOptions
       v-else-if="componentType === 'Corner'"
       :modelId="modelId"
       :componentId="componentId"
       :targetComponentIds="targetComponentIds"
-      :selection="selection"
     />
   </v-sheet>
 </template>

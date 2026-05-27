@@ -6,11 +6,10 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { modelId, componentId, targetComponentIds, selection } = defineProps({
+const { modelId, componentId, targetComponentIds } = defineProps({
   modelId: { type: String, required: true },
   componentId: { type: String, default: undefined },
   targetComponentIds: { type: Array, required: true },
-  selection: { type: Array, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -18,7 +17,7 @@ const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
 const modelComponentTypeVisibility = computed({
-  get: () => selection.includes("Corner"),
+  get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(modelId, "Corner", newValue);
     hybridViewerStore.remoteRender();
@@ -26,7 +25,7 @@ const modelComponentTypeVisibility = computed({
 });
 
 const componentVisibility = computed({
-  get: () => selection.includes(componentId),
+  get: () => dataStyleStore.modelComponentVisibility(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentsVisibility(modelId, [componentId], newValue);
     hybridViewerStore.remoteRender();
@@ -74,7 +73,7 @@ const componentColorMode = computed({
 });
 
 // Group Attributes
-const typeVertexAttrName = computed({
+const modelComponentTypeVertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetComponentIds, newValue);
@@ -82,7 +81,7 @@ const typeVertexAttrName = computed({
   },
 });
 
-const typeVertexAttrRange = computed({
+const modelComponentTypeVertexAttributeRange = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeRange(
@@ -95,7 +94,7 @@ const typeVertexAttrRange = computed({
   },
 });
 
-const typeVertexAttrColorMap = computed({
+const modelComponentTypeVertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeColorMap(
@@ -108,7 +107,7 @@ const typeVertexAttrColorMap = computed({
 });
 
 // Individual Attributes
-const compVertexAttrName = computed({
+const vertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, [componentId], newValue);
@@ -116,7 +115,7 @@ const compVertexAttrName = computed({
   },
 });
 
-const compVertexAttrRange = computed({
+const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeRange(
@@ -129,7 +128,7 @@ const compVertexAttrRange = computed({
   },
 });
 
-const compVertexAttrColorMap = computed({
+const vertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, [componentId], newValue);
@@ -161,9 +160,9 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
             :componentId="targetComponentIds[0]"
             v-model:coloring_style_key="modelComponentTypeColorMode"
             v-model:color="modelComponentTypeColor"
-            v-model:vertex_attribute_name="typeVertexAttrName"
-            v-model:vertex_attribute_range="typeVertexAttrRange"
-            v-model:vertex_attribute_color_map="typeVertexAttrColorMap"
+            v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
+            v-model:vertex_attribute_range="modelComponentTypeVertexAttributeRange"
+            v-model:vertex_attribute_color_map="modelComponentTypeVertexAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema }"
             :allowRandom="true"
@@ -181,9 +180,9 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
             :componentId="componentId"
             v-model:coloring_style_key="componentColorMode"
             v-model:color="componentColor"
-            v-model:vertex_attribute_name="compVertexAttrName"
-            v-model:vertex_attribute_range="compVertexAttrRange"
-            v-model:vertex_attribute_color_map="compVertexAttrColorMap"
+            v-model:vertex_attribute_name="vertexAttributeName"
+            v-model:vertex_attribute_range="vertexAttributeRange"
+            v-model:vertex_attribute_color_map="vertexAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema }"
             :allowRandom="true"

@@ -1,4 +1,4 @@
-import { MESH_TYPES } from "@ogw_front/utils/default_styles";
+import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database";
 
 function buildSelection(
@@ -9,7 +9,7 @@ function buildSelection(
   dataStyleState,
 ) {
   const componentsByType = Object.fromEntries(
-    MESH_TYPES.map((componentType) => [componentType, []]),
+    MESH_COMPONENT_TYPES.map((componentType) => [componentType, []]),
   );
   for (const component of components) {
     if (componentsByType[component.type]) {
@@ -19,7 +19,7 @@ function buildSelection(
 
   const groupStyles = dataStyleState.styles.value[modelId] || {};
   const selection = [];
-  for (const componentType of MESH_TYPES) {
+  for (const componentType of MESH_COMPONENT_TYPES) {
     const typeComponents = componentsByType[componentType];
     if (typeComponents.length === 0) {
       continue;

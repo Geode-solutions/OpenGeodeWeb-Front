@@ -6,11 +6,10 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { modelId, componentId, targetComponentIds, selection } = defineProps({
+const { modelId, componentId, targetComponentIds } = defineProps({
   modelId: { type: String, required: true },
   componentId: { type: String, default: undefined },
   targetComponentIds: { type: Array, required: true },
-  selection: { type: Array, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -18,7 +17,7 @@ const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
 const modelComponentTypeVisibility = computed({
-  get: () => selection.includes("Line"),
+  get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Line"),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(modelId, "Line", newValue);
     hybridViewerStore.remoteRender();
@@ -26,7 +25,7 @@ const modelComponentTypeVisibility = computed({
 });
 
 const componentVisibility = computed({
-  get: () => selection.includes(componentId),
+  get: () => dataStyleStore.modelComponentVisibility(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentsVisibility(modelId, [componentId], newValue);
     hybridViewerStore.remoteRender();
@@ -74,7 +73,7 @@ const componentColorMode = computed({
 });
 
 // Group Attributes
-const typeVertexAttrName = computed({
+const modelComponentTypeVertexAttributeName = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeName(modelId, targetComponentIds, newValue);
@@ -82,7 +81,7 @@ const typeVertexAttrName = computed({
   },
 });
 
-const typeVertexAttrRange = computed({
+const modelComponentTypeVertexAttributeRange = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeRange(
@@ -95,7 +94,7 @@ const typeVertexAttrRange = computed({
   },
 });
 
-const typeVertexAttrColorMap = computed({
+const modelComponentTypeVertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeColorMap(
@@ -107,7 +106,7 @@ const typeVertexAttrColorMap = computed({
   },
 });
 
-const typeEdgeAttrName = computed({
+const modelComponentTypeEdgeAttributeName = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeName(modelId, targetComponentIds, newValue);
@@ -115,7 +114,7 @@ const typeEdgeAttrName = computed({
   },
 });
 
-const typeEdgeAttrRange = computed({
+const modelComponentTypeEdgeAttributeRange = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeRange(
@@ -128,7 +127,7 @@ const typeEdgeAttrRange = computed({
   },
 });
 
-const typeEdgeAttrColorMap = computed({
+const modelComponentTypeEdgeAttributeColorMap = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, targetComponentIds, newValue);
@@ -137,7 +136,7 @@ const typeEdgeAttrColorMap = computed({
 });
 
 // Individual Attributes
-const compVertexAttrName = computed({
+const vertexAttributeName = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeName(modelId, [componentId], newValue);
@@ -145,7 +144,7 @@ const compVertexAttrName = computed({
   },
 });
 
-const compVertexAttrRange = computed({
+const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeRange(
@@ -158,7 +157,7 @@ const compVertexAttrRange = computed({
   },
 });
 
-const compVertexAttrColorMap = computed({
+const vertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, [componentId], newValue);
@@ -166,7 +165,7 @@ const compVertexAttrColorMap = computed({
   },
 });
 
-const compEdgeAttrName = computed({
+const edgeAttributeName = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeName(modelId, [componentId], newValue);
@@ -174,7 +173,7 @@ const compEdgeAttrName = computed({
   },
 });
 
-const compEdgeAttrRange = computed({
+const edgeAttributeRange = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeRange(
@@ -187,7 +186,7 @@ const compEdgeAttrRange = computed({
   },
 });
 
-const compEdgeAttrColorMap = computed({
+const edgeAttributeColorMap = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, [componentId], newValue);
@@ -220,12 +219,12 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
             :componentId="targetComponentIds[0]"
             v-model:coloring_style_key="modelComponentTypeColorMode"
             v-model:color="modelComponentTypeColor"
-            v-model:vertex_attribute_name="typeVertexAttrName"
-            v-model:vertex_attribute_range="typeVertexAttrRange"
-            v-model:vertex_attribute_color_map="typeVertexAttrColorMap"
-            v-model:edge_attribute_name="typeEdgeAttrName"
-            v-model:edge_attribute_range="typeEdgeAttrRange"
-            v-model:edge_attribute_color_map="typeEdgeAttrColorMap"
+            v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
+            v-model:vertex_attribute_range="modelComponentTypeVertexAttributeRange"
+            v-model:vertex_attribute_color_map="modelComponentTypeVertexAttributeColorMap"
+            v-model:edge_attribute_name="modelComponentTypeEdgeAttributeName"
+            v-model:edge_attribute_range="modelComponentTypeEdgeAttributeRange"
+            v-model:edge_attribute_color_map="modelComponentTypeEdgeAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
             :allowRandom="true"
@@ -243,12 +242,12 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
             :componentId="componentId"
             v-model:coloring_style_key="componentColorMode"
             v-model:color="componentColor"
-            v-model:vertex_attribute_name="compVertexAttrName"
-            v-model:vertex_attribute_range="compVertexAttrRange"
-            v-model:vertex_attribute_color_map="compVertexAttrColorMap"
-            v-model:edge_attribute_name="compEdgeAttrName"
-            v-model:edge_attribute_range="compEdgeAttrRange"
-            v-model:edge_attribute_color_map="compEdgeAttrColorMap"
+            v-model:vertex_attribute_name="vertexAttributeName"
+            v-model:vertex_attribute_range="vertexAttributeRange"
+            v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+            v-model:edge_attribute_name="edgeAttributeName"
+            v-model:edge_attribute_range="edgeAttributeRange"
+            v-model:edge_attribute_color_map="edgeAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
             :allowRandom="true"

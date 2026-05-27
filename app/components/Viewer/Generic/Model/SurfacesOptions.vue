@@ -6,11 +6,10 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { modelId, componentId, targetComponentIds, selection } = defineProps({
+const { modelId, componentId, targetComponentIds } = defineProps({
   modelId: { type: String, required: true },
   componentId: { type: String, default: undefined },
   targetComponentIds: { type: Array, required: true },
-  selection: { type: Array, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -18,7 +17,7 @@ const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
 const modelComponentTypeVisibility = computed({
-  get: () => selection.includes("Surface"),
+  get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Surface"),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(modelId, "Surface", newValue);
     hybridViewerStore.remoteRender();
@@ -26,7 +25,7 @@ const modelComponentTypeVisibility = computed({
 });
 
 const componentVisibility = computed({
-  get: () => selection.includes(componentId),
+  get: () => dataStyleStore.modelComponentVisibility(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentsVisibility(modelId, [componentId], newValue);
     hybridViewerStore.remoteRender();
@@ -74,7 +73,7 @@ const componentColorMode = computed({
 });
 
 // Group Attributes
-const typeVertexAttrName = computed({
+const modelComponentTypeVertexAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, targetComponentIds, newValue);
@@ -82,7 +81,7 @@ const typeVertexAttrName = computed({
   },
 });
 
-const typeVertexAttrRange = computed({
+const modelComponentTypeVertexAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeRange(
@@ -95,7 +94,7 @@ const typeVertexAttrRange = computed({
   },
 });
 
-const typeVertexAttrColorMap = computed({
+const modelComponentTypeVertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
@@ -107,7 +106,7 @@ const typeVertexAttrColorMap = computed({
   },
 });
 
-const typePolygonAttrName = computed({
+const modelComponentTypePolygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeName(
@@ -119,7 +118,7 @@ const typePolygonAttrName = computed({
   },
 });
 
-const typePolygonAttrRange = computed({
+const modelComponentTypePolygonAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeRange(
@@ -132,7 +131,7 @@ const typePolygonAttrRange = computed({
   },
 });
 
-const typePolygonAttrColorMap = computed({
+const modelComponentTypePolygonAttributeColorMap = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
@@ -145,7 +144,7 @@ const typePolygonAttrColorMap = computed({
 });
 
 // Individual Attributes
-const compVertexAttrName = computed({
+const vertexAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, [componentId], newValue);
@@ -153,7 +152,7 @@ const compVertexAttrName = computed({
   },
 });
 
-const compVertexAttrRange = computed({
+const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeRange(
@@ -166,7 +165,7 @@ const compVertexAttrRange = computed({
   },
 });
 
-const compVertexAttrColorMap = computed({
+const vertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeColorMap(modelId, [componentId], newValue);
@@ -174,7 +173,7 @@ const compVertexAttrColorMap = computed({
   },
 });
 
-const compPolygonAttrName = computed({
+const polygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, [componentId], newValue);
@@ -182,7 +181,7 @@ const compPolygonAttrName = computed({
   },
 });
 
-const compPolygonAttrRange = computed({
+const polygonAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeRange(
@@ -195,7 +194,7 @@ const compPolygonAttrRange = computed({
   },
 });
 
-const compPolygonAttrColorMap = computed({
+const polygonAttributeColorMap = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(modelId, [componentId], newValue);
@@ -228,12 +227,12 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
             :componentId="targetComponentIds[0]"
             v-model:coloring_style_key="modelComponentTypeColorMode"
             v-model:color="modelComponentTypeColor"
-            v-model:vertex_attribute_name="typeVertexAttrName"
-            v-model:vertex_attribute_range="typeVertexAttrRange"
-            v-model:vertex_attribute_color_map="typeVertexAttrColorMap"
-            v-model:polygon_attribute_name="typePolygonAttrName"
-            v-model:polygon_attribute_range="typePolygonAttrRange"
-            v-model:polygon_attribute_color_map="typePolygonAttrColorMap"
+            v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
+            v-model:vertex_attribute_range="modelComponentTypeVertexAttributeRange"
+            v-model:vertex_attribute_color_map="modelComponentTypeVertexAttributeColorMap"
+            v-model:polygon_attribute_name="modelComponentTypePolygonAttributeName"
+            v-model:polygon_attribute_range="modelComponentTypePolygonAttributeRange"
+            v-model:polygon_attribute_color_map="modelComponentTypePolygonAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
             :allowRandom="true"
@@ -251,12 +250,12 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
             :componentId="componentId"
             v-model:coloring_style_key="componentColorMode"
             v-model:color="componentColor"
-            v-model:vertex_attribute_name="compVertexAttrName"
-            v-model:vertex_attribute_range="compVertexAttrRange"
-            v-model:vertex_attribute_color_map="compVertexAttrColorMap"
-            v-model:polygon_attribute_name="compPolygonAttrName"
-            v-model:polygon_attribute_range="compPolygonAttrRange"
-            v-model:polygon_attribute_color_map="compPolygonAttrColorMap"
+            v-model:vertex_attribute_name="vertexAttributeName"
+            v-model:vertex_attribute_range="vertexAttributeRange"
+            v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+            v-model:polygon_attribute_name="polygonAttributeName"
+            v-model:polygon_attribute_range="polygonAttributeRange"
+            v-model:polygon_attribute_color_map="polygonAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
             :allowRandom="true"
