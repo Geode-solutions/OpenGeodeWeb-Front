@@ -36,9 +36,12 @@ const current = computed(() => {
 
   for (const { key, getterKey } of componentNames) {
     const activeColoring = style[key]?.coloring?.active;
-    if (["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
-      const attributeType =
-        `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
+    if (
+      ["vertex", "edge", "polygon", "cell", "polyhedron"].includes(
+        activeColoring,
+      )
+    ) {
+      const attributeType = `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
       const getterName = `${getterKey}${attributeType}ColorMap`;
       const getter = dataStyleStore[getterName];
       if (getter) {
@@ -53,7 +56,9 @@ const current = computed(() => {
   return "batlow";
 });
 
-const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(current.value));
+const quickColormapPresets = computed(() =>
+  getPresetsWithCurrentAtTop(current.value),
+);
 
 async function onQuickColormapSelect(preset) {
   show.value = false;
@@ -79,9 +84,12 @@ async function onQuickColormapSelect(preset) {
 
   for (const { key, setterKey } of componentNames) {
     const activeColoring = style[key]?.coloring?.active;
-    if (["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
-      const attributeType =
-        `${activeColoring.charAt(0).toUpperCase() + activeColoring.slice(1)  }Attribute`;
+    if (
+      ["vertex", "edge", "polygon", "cell", "polyhedron"].includes(
+        activeColoring,
+      )
+    ) {
+      const attributeType = `${activeColoring.charAt(0).toUpperCase() + activeColoring.slice(1)}Attribute`;
       const setterName = `set${setterKey}${attributeType}ColorMap`;
       const setter = dataStyleStore[setterName];
       if (setter) {
@@ -97,14 +105,9 @@ async function onQuickColormapSelect(preset) {
 </script>
 
 <template>
-  <div
-    style="position: absolute; width: 1px; height: 1px; pointer-events: none"
-    :style="{ left: `${x}px`, top: `${y - 150}px` }"
-    id="quickColormapActivator"
-  ></div>
   <v-menu
     v-model="show"
-    activator="#quickColormapActivator"
+    :target="[x, y - 80]"
     location="top center"
     :close-on-content-click="false"
     eager
