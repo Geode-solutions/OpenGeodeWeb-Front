@@ -1,6 +1,6 @@
 <script setup>
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
-import { colormaps } from "@ogw_front/utils/colormap";
+import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -15,18 +15,45 @@ const show = defineModel("show", { type: Boolean, default: false });
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const current = ref("batlow");
+const current = computed(() => {
+  const targetId = dataId;
+  if (!targetId) {
+    return "batlow";
+  }
 
-const quickColormapPresets = computed(() => {
-  let currentPreset = undefined;
-  for (const category of colormaps) {
-    currentPreset = category.Children.find((preset) => preset.Name === current.value);
-    if (currentPreset) {
-      break;
+  const style = dataStyleStore.getStyle(targetId);
+  if (!style) {
+    return "batlow";
+  }
+
+  const componentNames = [
+    { getterKey: "meshPoints", key: "points" },
+    { getterKey: "meshEdges", key: "edges" },
+    { getterKey: "meshPolygons", key: "polygons" },
+    { getterKey: "meshCells", key: "cells" },
+    { getterKey: "meshPolyhedra", key: "polyhedra" },
+  ];
+
+  for (const { key, getterKey } of componentNames) {
+    const activeColoring = style[key]?.coloring?.active;
+    if (["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
+      const attributeType =
+        `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
+      const getterName = `${getterKey}${attributeType}ColorMap`;
+      const getter = dataStyleStore[getterName];
+      if (getter) {
+        const colorMap = getter(targetId);
+        if (colorMap) {
+          return colorMap;
+        }
+      }
     }
   }
-  return [currentPreset, ...colormaps].filter(Boolean);
+
+  return "batlow";
 });
+
+const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(current.value));
 
 async function onQuickColormapSelect(preset) {
   show.value = false;
@@ -36,25 +63,34 @@ async function onQuickColormapSelect(preset) {
     return;
   }
 
-  async function trySet(setterFunction) {
-    try {
-      await setterFunction?.(targetId, newMap);
-    } catch {
-      // Ignore if the object doesn't have this component type
+  const style = dataStyleStore.getStyle(targetId);
+  if (!style) {
+    return;
+  }
+
+  const promises = [];
+  const componentNames = [
+    { key: "points", setterKey: "MeshPoints" },
+    { key: "edges", setterKey: "MeshEdges" },
+    { key: "polygons", setterKey: "MeshPolygons" },
+    { key: "cells", setterKey: "MeshCells" },
+    { key: "polyhedra", setterKey: "MeshPolyhedra" },
+  ];
+
+  for (const { key, setterKey } of componentNames) {
+    const activeColoring = style[key]?.coloring?.active;
+    if (["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
+      const attributeType =
+        `${activeColoring.charAt(0).toUpperCase() + activeColoring.slice(1)  }Attribute`;
+      const setterName = `set${setterKey}${attributeType}ColorMap`;
+      const setter = dataStyleStore[setterName];
+      if (setter) {
+        promises.push(setter(targetId, newMap));
+      }
     }
   }
 
-  await Promise.all([
-    trySet(dataStyleStore.setMeshPolygonsVertexAttributeColorMap),
-    trySet(dataStyleStore.setMeshPolygonsPolygonAttributeColorMap),
-    trySet(dataStyleStore.setMeshPointsVertexAttributeColorMap),
-    trySet(dataStyleStore.setMeshEdgesVertexAttributeColorMap),
-    trySet(dataStyleStore.setMeshEdgesEdgeAttributeColorMap),
-    trySet(dataStyleStore.setMeshCellsVertexAttributeColorMap),
-    trySet(dataStyleStore.setMeshCellsCellAttributeColorMap),
-    trySet(dataStyleStore.setMeshPolyhedraVertexAttributeColorMap),
-    trySet(dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap),
-  ]);
+  await Promise.all(promises);
 
   hybridViewerStore.remoteRender();
 }
