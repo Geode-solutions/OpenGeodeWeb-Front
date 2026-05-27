@@ -51,10 +51,6 @@ export function useModelLinesEdgeAttributeStyle() {
   }
 
   async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
-    if (!lineIds?.length) {
-      return;
-    }
-
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = { id: modelId, block_ids: viewer_ids, name };
     if (!validate_schema(schema.name, params).valid) {
@@ -85,10 +81,6 @@ export function useModelLinesEdgeAttributeStyle() {
   }
 
   async function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
-    if (!lineIds?.length) {
-      return;
-    }
-
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum });
 
@@ -110,10 +102,6 @@ export function useModelLinesEdgeAttributeStyle() {
   }
 
   async function setModelLinesEdgeAttributeColorMap(modelId, lineIds, colorMap) {
-    if (!lineIds?.length) {
-      return;
-    }
-
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap });
 

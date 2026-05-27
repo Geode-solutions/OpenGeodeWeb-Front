@@ -42,10 +42,7 @@ const modelComponentTypeColor = computed({
 });
 
 const componentColor = computed({
-  get: () =>
-    componentId
-      ? dataStyleStore.getModelComponentEffectiveColor(modelId, componentId, "Line")
-      : undefined,
+  get: () => dataStyleStore.getModelComponentEffectiveColor(modelId, componentId, "Line"),
   set: async (color) => {
     if (componentId) {
       await dataStyleStore.setModelComponentsColor(modelId, [componentId], color);

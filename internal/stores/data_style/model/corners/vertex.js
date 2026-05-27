@@ -51,10 +51,6 @@ export function useModelCornersVertexAttributeStyle() {
   }
 
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
-    if (!cornerIds?.length) {
-      return;
-    }
-
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = { id: modelId, block_ids: viewer_ids, name };
     if (!validate_schema(schema.name, params).valid) {
@@ -85,10 +81,6 @@ export function useModelCornersVertexAttributeStyle() {
   }
 
   async function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
-    if (!cornerIds?.length) {
-      return;
-    }
-
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, {
       minimum,
@@ -113,10 +105,6 @@ export function useModelCornersVertexAttributeStyle() {
   }
 
   async function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
-    if (!cornerIds?.length) {
-      return;
-    }
-
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, { colorMap });
 

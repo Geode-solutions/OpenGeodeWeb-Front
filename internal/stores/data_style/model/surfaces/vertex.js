@@ -51,10 +51,6 @@ export function useModelSurfacesVertexAttributeStyle() {
   }
 
   async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
-    if (!surfaceIds?.length) {
-      return;
-    }
-
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name };
     if (!validate_schema(schema.name, params).valid) {
@@ -85,10 +81,6 @@ export function useModelSurfacesVertexAttributeStyle() {
   }
 
   async function setModelSurfacesVertexAttributeRange(modelId, surfaceIds, minimum, maximum) {
-    if (!surfaceIds?.length) {
-      return;
-    }
-
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, {
       minimum,
@@ -113,10 +105,6 @@ export function useModelSurfacesVertexAttributeStyle() {
   }
 
   async function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
-    if (!surfaceIds?.length) {
-      return;
-    }
-
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, { colorMap });
 

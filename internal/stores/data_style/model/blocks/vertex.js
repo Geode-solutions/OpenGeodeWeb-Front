@@ -51,10 +51,6 @@ export function useModelBlocksVertexAttributeStyle() {
   }
 
   async function setModelBlocksVertexAttributeName(modelId, blockIds, name) {
-    if (!blockIds?.length) {
-      return;
-    }
-
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name };
     if (!validate_schema(schema.name, params).valid) {
@@ -85,10 +81,6 @@ export function useModelBlocksVertexAttributeStyle() {
   }
 
   async function setModelBlocksVertexAttributeRange(modelId, blockIds, minimum, maximum) {
-    if (!blockIds?.length) {
-      return;
-    }
-
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, {
       minimum,
@@ -113,10 +105,6 @@ export function useModelBlocksVertexAttributeStyle() {
   }
 
   async function setModelBlocksVertexAttributeColorMap(modelId, blockIds, colorMap) {
-    if (!blockIds?.length) {
-      return;
-    }
-
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { colorMap });
 
