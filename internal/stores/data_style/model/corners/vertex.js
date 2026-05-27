@@ -72,10 +72,7 @@ export function useModelCornersVertexAttributeStyle() {
     }
     await mutateModelCornersVertexStyle(modelId, cornerIds, updates);
 
-    return viewerStore.request(
-      schema.name,
-      { id: modelId, block_ids: viewer_ids, name },
-    );
+    return viewerStore.request(schema.name, { id: modelId, block_ids: viewer_ids, name });
   }
 
   function modelCornersVertexAttributeRange(modelId, cornerId) {

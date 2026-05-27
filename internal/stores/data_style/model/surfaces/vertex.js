@@ -72,10 +72,7 @@ export function useModelSurfacesVertexAttributeStyle() {
     }
     await mutateModelSurfacesVertexStyle(modelId, surfaceIds, updates);
 
-    return viewerStore.request(
-      schema.name,
-      { id: modelId, block_ids: viewer_ids, name },
-    );
+    return viewerStore.request(schema.name, { id: modelId, block_ids: viewer_ids, name });
   }
 
   function modelSurfacesVertexAttributeRange(modelId, surfaceId) {

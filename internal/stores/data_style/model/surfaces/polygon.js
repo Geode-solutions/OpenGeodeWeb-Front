@@ -72,10 +72,7 @@ export function useModelSurfacesPolygonAttributeStyle() {
     }
     await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, updates);
 
-    return viewerStore.request(
-      schema.name,
-      { id: modelId, block_ids: viewer_ids, name },
-    );
+    return viewerStore.request(schema.name, { id: modelId, block_ids: viewer_ids, name });
   }
 
   function modelSurfacesPolygonAttributeRange(modelId, surfaceId) {

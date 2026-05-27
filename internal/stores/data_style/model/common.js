@@ -111,10 +111,7 @@ export function useModelCommonStyle() {
 
     await mutateComponentStyles(id, component_ids, { visibility });
 
-    return viewerStore.request(
-      schema,
-      { id, block_ids: viewer_ids, visibility },
-    );
+    return viewerStore.request(schema, { id, block_ids: viewer_ids, visibility });
   }
 
   return {
