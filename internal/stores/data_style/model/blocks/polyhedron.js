@@ -6,7 +6,6 @@ import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import { validate_schema } from "@ogw_front/utils/validate_schema";
 
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.polyhedron;
@@ -52,10 +51,6 @@ export function useModelBlocksPolyhedronAttributeStyle() {
 
   async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
-    if (!validate_schema(schema.name, params).valid) {
-      return;
-    }
 
     const updates = { name };
     const polyhedron = modelBlocksPolyhedronAttribute(modelId, blockIds[0]);
@@ -68,9 +63,11 @@ export function useModelBlocksPolyhedronAttributeStyle() {
         },
       };
     }
-    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, updates);
 
-    return viewerStore.request(schema.name, params);
+    const params = { id: modelId, block_ids: viewer_ids, name };
+    return viewerStore.request(schema.name, params, {
+      response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, updates),
+    });
   }
 
   function modelBlocksPolyhedronAttributeRange(modelId, blockId) {
@@ -82,19 +79,24 @@ export function useModelBlocksPolyhedronAttributeStyle() {
 
   async function setModelBlocksPolyhedronAttributeRange(modelId, blockIds, minimum, maximum) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
-    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, {
-      minimum,
-      maximum,
-    });
-
     const colorMap = modelBlocksPolyhedronAttributeColorMap(modelId, blockIds[0]);
     const points = getRGBPointsFromPreset(colorMap);
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-    const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-    if (validate_schema(schema.color_map, params).valid) {
-      return viewerStore.request(schema.color_map, params);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
+      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
+      return viewerStore.request(schema.color_map, params, {
+        response_function: () =>
+          setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, {
+            minimum,
+            maximum,
+          }),
+      });
     }
+    return setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, {
+      minimum,
+      maximum,
+    });
   }
 
   function modelBlocksPolyhedronAttributeColorMap(modelId, blockId) {
@@ -106,17 +108,19 @@ export function useModelBlocksPolyhedronAttributeStyle() {
 
   async function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
-    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, { colorMap });
-
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-    const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-    if (validate_schema(schema.color_map, params).valid) {
-      return viewerStore.request(schema.color_map, params);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
+      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
+      return viewerStore.request(schema.color_map, params, {
+        response_function: () =>
+          setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, { colorMap }),
+      });
     }
+    return setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, { colorMap });
   }
 
   return {

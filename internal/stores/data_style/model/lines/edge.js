@@ -6,7 +6,6 @@ import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import { validate_schema } from "@ogw_front/utils/validate_schema";
 
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge;
@@ -52,10 +51,6 @@ export function useModelLinesEdgeAttributeStyle() {
 
   async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
-    if (!validate_schema(schema.name, params).valid) {
-      return;
-    }
 
     const updates = { name };
     const edge = modelLinesEdgeAttribute(modelId, lineIds[0]);
@@ -68,9 +63,11 @@ export function useModelLinesEdgeAttributeStyle() {
         },
       };
     }
-    await mutateModelLinesEdgeStyle(modelId, lineIds, updates);
 
-    return viewerStore.request(schema.name, params);
+    const params = { id: modelId, block_ids: viewer_ids, name };
+    return viewerStore.request(schema.name, params, {
+      response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, updates),
+    });
   }
 
   function modelLinesEdgeAttributeRange(modelId, lineId) {
@@ -82,16 +79,18 @@ export function useModelLinesEdgeAttributeStyle() {
 
   async function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
-    await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum });
-
     const colorMap = modelLinesEdgeAttributeColorMap(modelId, lineIds[0]);
     const points = getRGBPointsFromPreset(colorMap);
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-    const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-    if (validate_schema(schema.color_map, params).valid) {
-      return viewerStore.request(schema.color_map, params);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
+      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
+      return viewerStore.request(schema.color_map, params, {
+        response_function: () =>
+          setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum }),
+      });
     }
+    return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum });
   }
 
   function modelLinesEdgeAttributeColorMap(modelId, lineId) {
@@ -103,17 +102,19 @@ export function useModelLinesEdgeAttributeStyle() {
 
   async function setModelLinesEdgeAttributeColorMap(modelId, lineIds, colorMap) {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
-    await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap });
-
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineIds[0], name);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-    const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-    if (validate_schema(schema.color_map, params).valid) {
-      return viewerStore.request(schema.color_map, params);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
+      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
+      return viewerStore.request(schema.color_map, params, {
+        response_function: () =>
+          setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap }),
+      });
     }
+    return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap });
   }
 
   return {

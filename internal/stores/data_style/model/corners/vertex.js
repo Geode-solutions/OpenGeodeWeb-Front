@@ -6,7 +6,6 @@ import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import { validate_schema } from "@ogw_front/utils/validate_schema";
 
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.attribute.vertex;
@@ -52,10 +51,6 @@ export function useModelCornersVertexAttributeStyle() {
 
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
-    if (!validate_schema(schema.name, params).valid) {
-      return;
-    }
 
     const updates = { name };
     const vertex = modelCornersVertexAttribute(modelId, cornerIds[0]);
@@ -68,9 +63,11 @@ export function useModelCornersVertexAttributeStyle() {
         },
       };
     }
-    await mutateModelCornersVertexStyle(modelId, cornerIds, updates);
 
-    return viewerStore.request(schema.name, params);
+    const params = { id: modelId, block_ids: viewer_ids, name };
+    return viewerStore.request(schema.name, params, {
+      response_function: () => mutateModelCornersVertexStyle(modelId, cornerIds, updates),
+    });
   }
 
   function modelCornersVertexAttributeRange(modelId, cornerId) {
@@ -82,19 +79,24 @@ export function useModelCornersVertexAttributeStyle() {
 
   async function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
-    await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, {
-      minimum,
-      maximum,
-    });
-
     const colorMap = modelCornersVertexAttributeColorMap(modelId, cornerIds[0]);
     const points = getRGBPointsFromPreset(colorMap);
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
-    const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-    if (validate_schema(schema.color_map, params).valid) {
-      return viewerStore.request(schema.color_map, params);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
+      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
+      return viewerStore.request(schema.color_map, params, {
+        response_function: () =>
+          setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, {
+            minimum,
+            maximum,
+          }),
+      });
     }
+    return setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, {
+      minimum,
+      maximum,
+    });
   }
 
   function modelCornersVertexAttributeColorMap(modelId, cornerId) {
@@ -106,17 +108,19 @@ export function useModelCornersVertexAttributeStyle() {
 
   async function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
-    await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, { colorMap });
-
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
-    const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-    if (validate_schema(schema.color_map, params).valid) {
-      return viewerStore.request(schema.color_map, params);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
+      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
+      return viewerStore.request(schema.color_map, params, {
+        response_function: () =>
+          setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, { colorMap }),
+      });
     }
+    return setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, { colorMap });
   }
 
   return {

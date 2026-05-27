@@ -86,16 +86,13 @@ export function useMeshCellsCellAttributeStyle() {
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      return viewerStore.request(
-        meshCellsCellAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
-        {
-          response_function: () => setMeshCellsCellAttributeStoredConfig(id, name, { colorMap }),
-        },
-      );
-    }
-    return setMeshCellsCellAttributeStoredConfig(id, name, { colorMap });
+    return viewerStore.request(
+      meshCellsCellAttributeSchemas.color_map,
+      { id, points, minimum, maximum },
+      {
+        response_function: () => setMeshCellsCellAttributeStoredConfig(id, name, { colorMap }),
+      },
+    );
   }
 
   return {

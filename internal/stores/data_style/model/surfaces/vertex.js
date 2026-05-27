@@ -6,7 +6,6 @@ import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelSurfacesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import { validate_schema } from "@ogw_front/utils/validate_schema";
 
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.vertex;
@@ -52,10 +51,6 @@ export function useModelSurfacesVertexAttributeStyle() {
 
   async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
-    if (!validate_schema(schema.name, params).valid) {
-      return;
-    }
 
     const updates = { name };
     const vertex = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
@@ -68,9 +63,11 @@ export function useModelSurfacesVertexAttributeStyle() {
         },
       };
     }
-    await mutateModelSurfacesVertexStyle(modelId, surfaceIds, updates);
 
-    return viewerStore.request(schema.name, params);
+    const params = { id: modelId, block_ids: viewer_ids, name };
+    return viewerStore.request(schema.name, params, {
+      response_function: () => mutateModelSurfacesVertexStyle(modelId, surfaceIds, updates),
+    });
   }
 
   function modelSurfacesVertexAttributeRange(modelId, surfaceId) {
@@ -82,19 +79,24 @@ export function useModelSurfacesVertexAttributeStyle() {
 
   async function setModelSurfacesVertexAttributeRange(modelId, surfaceIds, minimum, maximum) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
-    await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, {
-      minimum,
-      maximum,
-    });
-
     const colorMap = modelSurfacesVertexAttributeColorMap(modelId, surfaceIds[0]);
     const points = getRGBPointsFromPreset(colorMap);
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-    if (validate_schema(schema.color_map, params).valid) {
-      return viewerStore.request(schema.color_map, params);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
+      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
+      return viewerStore.request(schema.color_map, params, {
+        response_function: () =>
+          setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, {
+            minimum,
+            maximum,
+          }),
+      });
     }
+    return setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, {
+      minimum,
+      maximum,
+    });
   }
 
   function modelSurfacesVertexAttributeColorMap(modelId, surfaceId) {
@@ -106,17 +108,19 @@ export function useModelSurfacesVertexAttributeStyle() {
 
   async function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
-    await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, { colorMap });
-
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds[0], name);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-    if (validate_schema(schema.color_map, params).valid) {
-      return viewerStore.request(schema.color_map, params);
+    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
+      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
+      return viewerStore.request(schema.color_map, params, {
+        response_function: () =>
+          setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, { colorMap }),
+      });
     }
+    return setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, { colorMap });
   }
 
   return {
