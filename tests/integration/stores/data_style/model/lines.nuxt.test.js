@@ -51,13 +51,10 @@ describe("model lines", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_lines_schemas.visibility;
+      const params = { id, block_ids: lines_viewer_ids, visibility };
       expect(spy).toHaveBeenCalledWith(
-        model_lines_schemas.visibility,
-        {
-          id,
-          block_ids: lines_viewer_ids,
-          visibility,
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -83,14 +80,10 @@ describe("model lines", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_lines_schemas.color;
+      const params = { id, block_ids: lines_viewer_ids, color, color_mode: "constant" };
       expect(spy).toHaveBeenCalledWith(
-        model_lines_schemas.color,
-        {
-          id,
-          block_ids: lines_viewer_ids,
-          color,
-          color_mode: "constant",
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },

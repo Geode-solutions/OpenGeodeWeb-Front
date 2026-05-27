@@ -9,6 +9,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const meshCellsCellAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useMeshCellsCellAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
@@ -42,9 +43,13 @@ export function useMeshCellsCellAttributeStyle() {
   }
 
   function setMeshCellsCellAttributeName(id, name) {
+    const schema = meshCellsCellAttributeSchemas.name;
+    const params = { id, name };
     return viewerStore.request(
-      meshCellsCellAttributeSchemas.name,
-      { id, name },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name }),
       },
