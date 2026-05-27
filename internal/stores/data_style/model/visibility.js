@@ -1,9 +1,9 @@
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
-import { useModelSelection } from "./selection";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
+import { useModelSelection } from "./selection";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
