@@ -69,6 +69,10 @@ export function useModelCommonStyle() {
       return;
     }
 
+    if (color_mode === "constant" && color !== undefined) {
+      await mutateComponentStyles(id, component_ids, { color });
+    }
+
     const params = { id, block_ids: viewer_ids, color_mode };
     if (color_mode === "constant" && color !== undefined) {
       params.color = color;
@@ -77,7 +81,6 @@ export function useModelCommonStyle() {
     return viewerStore.request(schema, params, {
       response_function: async (colors) => {
         if (color_mode === "constant" && color !== undefined) {
-          await mutateComponentStyles(id, component_ids, { color });
           return;
         }
 
@@ -106,12 +109,11 @@ export function useModelCommonStyle() {
       return;
     }
 
+    await mutateComponentStyles(id, component_ids, { visibility });
+
     return viewerStore.request(
       schema,
       { id, block_ids: viewer_ids, visibility },
-      {
-        response_function: () => mutateComponentStyles(id, component_ids, { visibility }),
-      },
     );
   }
 

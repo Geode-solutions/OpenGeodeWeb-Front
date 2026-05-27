@@ -59,25 +59,22 @@ export function useModelBlocksVertexAttributeStyle() {
       return;
     }
 
+    const updates = { name };
+    const vertex = modelBlocksVertexAttribute(modelId, blockIds[0]);
+    if (!(name in vertex.storedConfigs)) {
+      updates.storedConfigs = {
+        [name]: {
+          minimum: undefined,
+          maximum: undefined,
+          colorMap: undefined,
+        },
+      };
+    }
+    await mutateModelBlocksVertexStyle(modelId, blockIds, updates);
+
     return viewerStore.request(
       schema.name,
       { id: modelId, block_ids: viewer_ids, name },
-      {
-        response_function: () => {
-          const updates = { name };
-          const vertex = modelBlocksVertexAttribute(modelId, blockIds[0]);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateModelBlocksVertexStyle(modelId, blockIds, updates);
-        },
-      },
     );
   }
 

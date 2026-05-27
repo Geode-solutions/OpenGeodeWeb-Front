@@ -59,25 +59,22 @@ export function useModelSurfacesVertexAttributeStyle() {
       return;
     }
 
+    const updates = { name };
+    const vertex = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
+    if (!(name in vertex.storedConfigs)) {
+      updates.storedConfigs = {
+        [name]: {
+          minimum: undefined,
+          maximum: undefined,
+          colorMap: undefined,
+        },
+      };
+    }
+    await mutateModelSurfacesVertexStyle(modelId, surfaceIds, updates);
+
     return viewerStore.request(
       schema.name,
       { id: modelId, block_ids: viewer_ids, name },
-      {
-        response_function: () => {
-          const updates = { name };
-          const vertex = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateModelSurfacesVertexStyle(modelId, surfaceIds, updates);
-        },
-      },
     );
   }
 

@@ -174,19 +174,13 @@ export function useDataStyleState() {
   }
 
   return {
+    ...state,
     getStyle,
     getComponentStyle,
     getModelComponentTypeStyle,
     mutateStyle,
-    styles,
-    componentStyles,
-    modelComponentTypeStyles,
     objectVisibility,
     selectedObjects,
     clear,
-    updateComponentStyleCache: state.updateComponentStyleCache,
-    bulkUpdateComponentStyleCache: state.bulkUpdateComponentStyleCache,
-    bulkUpdateComponentStylesCache: state.bulkUpdateComponentStylesCache,
-    updateModelComponentTypeStyleCache: state.updateModelComponentTypeStyleCache,
   };
 }

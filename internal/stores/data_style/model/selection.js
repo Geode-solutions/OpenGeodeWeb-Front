@@ -47,21 +47,30 @@ function buildSelection(
   return selection;
 }
 
-function useModelSelection(modelId, dataStyleState) {
-  const allComponents = ref([]);
+const selectionCache = new Map();
 
-  if (modelId) {
-    (async () => {
-      try {
-        allComponents.value = await database.model_components.where("id").equals(modelId).toArray();
-      } catch (error) {
-        console.error("Error fetching model components:", error);
-      }
-    })();
+function useModelSelection(modelId, dataStyleState) {
+  if (!modelId) {
+    return computed(() => []);
   }
 
-  return computed(() => {
-    if (!modelId || allComponents.value.length === 0) {
+  const cacheKey = `${modelId}`;
+  if (selectionCache.has(cacheKey)) {
+    return selectionCache.get(cacheKey);
+  }
+
+  const allComponents = ref([]);
+
+  (async () => {
+    try {
+      allComponents.value = await database.model_components.where("id").equals(modelId).toArray();
+    } catch (error) {
+      console.error("Error fetching model components:", error);
+    }
+  })();
+
+  const computedSelection = computed(() => {
+    if (allComponents.value.length === 0) {
       return [];
     }
     return buildSelection(
@@ -72,6 +81,9 @@ function useModelSelection(modelId, dataStyleState) {
       dataStyleState,
     );
   });
+
+  selectionCache.set(cacheKey, computedSelection);
+  return computedSelection;
 }
 
 export { buildSelection, useModelSelection };

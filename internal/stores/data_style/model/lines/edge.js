@@ -59,25 +59,22 @@ export function useModelLinesEdgeAttributeStyle() {
       return;
     }
 
+    const updates = { name };
+    const edge = modelLinesEdgeAttribute(modelId, lineIds[0]);
+    if (!(name in edge.storedConfigs)) {
+      updates.storedConfigs = {
+        [name]: {
+          minimum: undefined,
+          maximum: undefined,
+          colorMap: undefined,
+        },
+      };
+    }
+    await mutateModelLinesEdgeStyle(modelId, lineIds, updates);
+
     return viewerStore.request(
       schema.name,
       { id: modelId, block_ids: viewer_ids, name },
-      {
-        response_function: () => {
-          const updates = { name };
-          const edge = modelLinesEdgeAttribute(modelId, lineIds[0]);
-          if (!(name in edge.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateModelLinesEdgeStyle(modelId, lineIds, updates);
-        },
-      },
     );
   }
 

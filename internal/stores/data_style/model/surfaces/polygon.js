@@ -59,25 +59,22 @@ export function useModelSurfacesPolygonAttributeStyle() {
       return;
     }
 
+    const updates = { name };
+    const polygon = modelSurfacesPolygonAttribute(modelId, surfaceIds[0]);
+    if (!(name in polygon.storedConfigs)) {
+      updates.storedConfigs = {
+        [name]: {
+          minimum: undefined,
+          maximum: undefined,
+          colorMap: undefined,
+        },
+      };
+    }
+    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, updates);
+
     return viewerStore.request(
       schema.name,
       { id: modelId, block_ids: viewer_ids, name },
-      {
-        response_function: () => {
-          const updates = { name };
-          const polygon = modelSurfacesPolygonAttribute(modelId, surfaceIds[0]);
-          if (!(name in polygon.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateModelSurfacesPolygonStyle(modelId, surfaceIds, updates);
-        },
-      },
     );
   }
 

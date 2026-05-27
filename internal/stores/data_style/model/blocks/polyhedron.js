@@ -59,25 +59,22 @@ export function useModelBlocksPolyhedronAttributeStyle() {
       return;
     }
 
+    const updates = { name };
+    const polyhedron = modelBlocksPolyhedronAttribute(modelId, blockIds[0]);
+    if (!(name in polyhedron.storedConfigs)) {
+      updates.storedConfigs = {
+        [name]: {
+          minimum: undefined,
+          maximum: undefined,
+          colorMap: undefined,
+        },
+      };
+    }
+    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, updates);
+
     return viewerStore.request(
       schema.name,
       { id: modelId, block_ids: viewer_ids, name },
-      {
-        response_function: () => {
-          const updates = { name };
-          const polyhedron = modelBlocksPolyhedronAttribute(modelId, blockIds[0]);
-          if (!(name in polyhedron.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateModelBlocksPolyhedronStyle(modelId, blockIds, updates);
-        },
-      },
     );
   }
 
