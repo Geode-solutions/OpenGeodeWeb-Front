@@ -59,7 +59,7 @@ describe("viewer Store", () => {
           const params = {};
           expect(() =>
             viewerStore
-              .request(schema, params, {}, timeout)
+              .request({ schema, params, timeout })
               .rejects.toThrow(`${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`),
           ).toBeDefined();
         },

@@ -10,9 +10,9 @@ const backStore = useBackStore();
 const packages_versions = ref([]);
 
 async function get_packages_versions() {
+  const params = {};
   await backStore.request(
-    schema,
-    {},
+    { schema, params },
     {
       response_function: (response) => {
         packages_versions.value = response.versions;
@@ -37,7 +37,10 @@ await get_packages_versions();
   <v-container>
     This tool uses our Open-Source codes
     <v-tooltip location="end">
-      <span v-for="package_version in packages_versions" :key="package_version.package">
+      <span
+        v-for="package_version in packages_versions"
+        :key="package_version.package"
+      >
         {{ package_version.package }} v{{ package_version.version }}
         <br />
       </span>

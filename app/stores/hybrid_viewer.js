@@ -35,7 +35,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-// oxlint-disable max-lines-per-function max-statements
+// oxlint-disable max-lines-per-function, max-statements
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
   const hybridDb = reactive({});
@@ -183,7 +183,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function remoteRender() {
-    return viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.render;
+    return viewerStore.request({ schema });
   }
 
   const hoverTimeoutRef = ref(undefined);

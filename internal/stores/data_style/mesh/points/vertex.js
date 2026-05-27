@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshPointsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.points.attribute.vertex;
 
+// oxlint-disable-next-line max-lines-per-function
 function useMeshPointsVertexAttributeConfig() {
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
@@ -74,14 +75,16 @@ function useMeshPointsVertexAttributeConfig() {
   };
 }
 
+// oxlint-disable-next-line max-lines-per-function
 function useMeshPointsVertexAttributeActions() {
   const viewerStore = useViewerStore();
   const config = useMeshPointsVertexAttributeConfig();
 
   function setMeshPointsVertexAttributeName(id, name) {
+    const schema = meshPointsVertexAttributeSchemas.name;
+    const params = { id, name };
     return viewerStore.request(
-      meshPointsVertexAttributeSchemas.name,
-      { id, name },
+      { schema, params },
       {
         response_function: () => {
           const updates = { name };
@@ -105,9 +108,10 @@ function useMeshPointsVertexAttributeActions() {
     const name = config.meshPointsVertexAttributeName(id);
     const points = getRGBPointsFromPreset(config.meshPointsVertexAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshPointsVertexAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshPointsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             config.setMeshPointsVertexAttributeStoredConfig(id, name, { minimum, maximum }),
@@ -126,9 +130,10 @@ function useMeshPointsVertexAttributeActions() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshPointsVertexAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshPointsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             config.setMeshPointsVertexAttributeStoredConfig(id, name, { colorMap }),

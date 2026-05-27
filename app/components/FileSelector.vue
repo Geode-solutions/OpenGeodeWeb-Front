@@ -47,8 +47,11 @@ function files_uploaded_event(value) {
 async function get_allowed_files() {
   toggle_loading();
   const backStore = useBackStore();
-  const response = await backStore.request(schema, {});
-  accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
+  const params = {};
+  const response = await backStore.request({ schema, params });
+  accept.value = response.extensions
+    .map((extension) => `.${extension}`)
+    .join(",");
   toggle_loading();
 }
 

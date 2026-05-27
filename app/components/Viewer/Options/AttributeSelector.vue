@@ -44,14 +44,17 @@ const currentAttribute = computed(() =>
 
 function resetRange() {
   if (currentAttribute.value) {
-    range.value = [currentAttribute.value.min_value, currentAttribute.value.max_value];
+    range.value = [
+      currentAttribute.value.min_value,
+      currentAttribute.value.max_value,
+    ];
   }
 }
 
 function getAttributes() {
+  const params = { id };
   backStore.request(
-    schema,
-    { id },
+    { schema, params },
     {
       response_function: (response) => {
         attributes.value = response.attributes;
@@ -77,7 +80,9 @@ watch(
     if (
       name.value &&
       attributes.value.length > 0 &&
-      (range.value === undefined || range.value[0] === undefined || colorMap.value === undefined)
+      (range.value === undefined ||
+        range.value[0] === undefined ||
+        colorMap.value === undefined)
     ) {
       resetRange();
       if (colorMap.value === undefined) {

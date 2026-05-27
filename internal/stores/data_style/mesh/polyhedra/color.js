@@ -6,7 +6,7 @@ import { useMeshPolyhedraCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshPolyhedraColorSchemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.color;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.color;
 
 export function useMeshPolyhedraColorStyle() {
   const viewerStore = useViewerStore();
@@ -16,9 +16,12 @@ export function useMeshPolyhedraColorStyle() {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).color;
   }
   function setMeshPolyhedraColor(id, color) {
+    const params = { id, color };
     return viewerStore.request(
-      meshPolyhedraColorSchemas,
-      { id, color },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () =>
           meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {

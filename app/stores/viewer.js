@@ -20,7 +20,7 @@ const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST;
 
 export const useViewerStore = defineStore(
   "viewer",
-  // oxlint-disable-next-line max-lines-per-function max-statements
+  // oxlint-disable-next-line max-lines-per-function, max-statements
   () => {
     const infraStore = useInfraStore();
     const default_local_port = ref("1234");
@@ -143,12 +143,15 @@ export const useViewerStore = defineStore(
       const params = { COMMAND_VIEWER, NUXT_ROOT_PATH, args };
       console.log("[VIEWER] params", params);
 
-      return appStore.request(schema, params, {
-        response_function: (response) => {
-          console.log(`[VIEWER] Viewer launched on port ${response.port}`);
-          default_local_port.value = response.port;
+      return appStore.request(
+        { schema, params },
+        {
+          response_function: (response) => {
+            console.log(`[VIEWER] Viewer launched on port ${response.port}`);
+            default_local_port.value = response.port;
+          },
         },
-      });
+      );
     }
 
     async function connect() {
@@ -157,7 +160,7 @@ export const useViewerStore = defineStore(
       console.log("[VIEWER] Viewer connected successfully");
     }
 
-    function request(schema, params = {}, callbacks = {}, timeout = request_timeout) {
+    function request({ schema, params = {}, timeout = request_timeout }, callbacks = {}) {
       console.log("[VIEWER] Request:", schema.$id);
       const start = Date.now();
 
@@ -166,7 +169,7 @@ export const useViewerStore = defineStore(
 
       return viewer_call(
         store,
-        { schema, params },
+        { schema, params, timeout },
         {
           ...callbacks,
           response_function: async (response) => {
@@ -182,7 +185,6 @@ export const useViewerStore = defineStore(
             }
           },
         },
-        timeout,
       );
     }
 

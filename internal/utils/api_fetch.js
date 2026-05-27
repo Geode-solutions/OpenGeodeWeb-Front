@@ -6,7 +6,7 @@ const ERROR_400 = 400;
 
 export function api_fetch(
   microservice,
-  { schema, params },
+  { schema, params, headers },
   { request_error_function, response_function, response_error_function, timeout } = {},
 ) {
   const feedbackStore = useFeedbackStore();
@@ -28,6 +28,7 @@ export function api_fetch(
   const method = schema.methods.find((methodItem) => methodItem !== "OPTIONS");
   const request_options = {
     method,
+    headers,
   };
   if (!_.isEmpty(body)) {
     request_options.body = body;

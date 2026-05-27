@@ -69,10 +69,13 @@ export function useOverlappingPicker() {
 
     const result = { id: undefined, viewer_id: undefined };
     let pickedResponse = undefined;
-
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.picked_ids;
+    const params = { x, y, ids };
     await viewerStore.request(
-      viewer_schemas.opengeodeweb_viewer.viewer.picked_ids,
-      { x, y, ids },
+      {
+        schema,
+        params,
+      },
       {
         response_function: (response) => {
           pickedResponse = response;

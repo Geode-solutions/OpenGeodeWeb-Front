@@ -217,13 +217,13 @@ export const useAppStore = defineStore("app", () => {
     );
   }
 
-  function request(schema, params, callbacks = {}) {
+  function request({ schema, params }, callbacks = {}) {
     console.log("[APP] Request:", schema.$id);
 
     const store = useAppStore();
     return api_fetch(
       store,
-      { schema, params },
+      { schema, params, headers: {} },
       {
         ...callbacks,
         response_function: async (response) => {

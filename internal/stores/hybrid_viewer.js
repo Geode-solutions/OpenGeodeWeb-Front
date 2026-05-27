@@ -73,11 +73,15 @@ function computeAverageBrightness(rect, options) {
 function performClickPicking(event, options) {
   const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
   const rect = container.getBoundingClientRect();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+  const params = {
+    x: Math.round(event.clientX - rect.left),
+    y: Math.round(rect.height - (event.clientY - rect.top)),
+  };
   viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
     {
-      x: Math.round(event.clientX - rect.left),
-      y: Math.round(rect.height - (event.clientY - rect.top)),
+      schema,
+      params,
     },
     {
       response_function: ({ x, y, z }) => {
@@ -111,13 +115,17 @@ function performHoverHighlight(event, options) {
     return;
   }
   const rect = container.getBoundingClientRect();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+  const params = {
+    x: Math.round(event.clientX - rect.left),
+    y: Math.round(rect.height - (event.clientY - rect.top)),
+    field_type: hover_highlight_field_type.value,
+    ids: Object.keys(hybridDb),
+  };
   viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.highlight,
     {
-      x: Math.round(event.clientX - rect.left),
-      y: Math.round(rect.height - (event.clientY - rect.top)),
-      field_type: hover_highlight_field_type.value,
-      ids: Object.keys(hybridDb),
+      schema,
+      params,
     },
     {
       response_function: onResponse,
@@ -127,12 +135,14 @@ function performHoverHighlight(event, options) {
 
 function performClearHoverHighlight(options) {
   const { viewerStore, viewer_schemas, hover_highlight_field_type, hybridDb } = options;
-  viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.highlight, {
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.clear_highlight;
+  const params = {
     x: -1,
     y: -1,
     field_type: hover_highlight_field_type.value,
     ids: Object.keys(hybridDb),
-  });
+  };
+  viewerStore.request({ schema, params });
 }
 
 async function performAddItem(id, options) {
@@ -179,10 +189,9 @@ async function performSetZScaling(z_scale, options) {
   }
   renderer.resetCamera();
   genericRenderWindow.getRenderWindow().render();
-  const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling;
-  if (schema) {
-    await viewerStore.request(schema, { z_scale });
-  }
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.set_z_scaling;
+  const params = { z_scale };
+  await viewerStore.request({ schema, params });
   remoteRender();
 }
 

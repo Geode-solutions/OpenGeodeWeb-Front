@@ -27,7 +27,9 @@ function select_geode_object(object_map) {
   if (object_keys.length === 1 && object_map[object_keys[0]].is_loadable > 0) {
     return object_keys[0];
   }
-  const highest_load_score = Math.max(...object_keys.map((key) => object_map[key].is_loadable));
+  const highest_load_score = Math.max(
+    ...object_keys.map((key) => object_map[key].is_loadable),
+  );
   if (highest_load_score <= 0) {
     return undefined;
   }
@@ -38,7 +40,9 @@ function select_geode_object(object_map) {
     return best_score_objects[0];
   }
   const highest_priority = Math.max(
-    ...best_score_objects.map((key) => object_map[key].object_priority ?? -Infinity),
+    ...best_score_objects.map(
+      (key) => object_map[key].object_priority ?? -Infinity,
+    ),
   );
   const best_priority_objects = best_score_objects.filter(
     (key) => object_map[key].object_priority === highest_priority,
@@ -49,16 +53,32 @@ function select_geode_object(object_map) {
   return undefined;
 }
 
+function isCsvFile(filename) {
+  return (
+    filename.toLowerCase().endsWith(".csv") ||
+    filename.toLowerCase().endsWith(".csv.json")
+  );
+}
+
 async function get_allowed_objects() {
   toggle_loading();
   allowed_objects.value = {};
   multiple_files_no_common.value = false;
 
-  const promise_array = filenames.map((filename) => backStore.request(schema, { filename }));
+  const promise_array = filenames.map((filename) => {
+    const params = { filename };
+    return backStore.request({ schema, params });
+  });
   const responses = await Promise.all(promise_array);
-  const allowed_objects_list = responses.map((response) => response.allowed_objects);
-  const all_keys = [...new Set(allowed_objects_list.flatMap((obj) => Object.keys(obj)))];
-  const common_keys = all_keys.filter((key) => allowed_objects_list.every((obj) => key in obj));
+  const allowed_objects_list = responses.map(
+    (response) => response.allowed_objects,
+  );
+  const all_keys = [
+    ...new Set(allowed_objects_list.flatMap((obj) => Object.keys(obj))),
+  ];
+  const common_keys = all_keys.filter((key) =>
+    allowed_objects_list.every((obj) => key in obj),
+  );
 
   if (filenames.length > 1 && all_keys.length > 0 && common_keys.length === 0) {
     multiple_files_no_common.value = true;
@@ -75,10 +95,7 @@ async function get_allowed_objects() {
       final_object[key].object_priority = Math.max(...priorities);
     }
   }
-  const isCsv = filenames.some(
-    (filename) =>
-      filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json"),
-  );
+  const isCsv = filenames.some((filename) => isCsvFile(filename));
   if (isCsv && !final_object["PointSet3D"]) {
     final_object["PointSet3D"] = { is_loadable: 1, object_priority: 100 };
   }
@@ -137,7 +154,8 @@ await get_allowed_objects();
   <v-row v-else-if="multiple_files_no_common" class="pa-5">
     <v-card class="card" variant="tonal" rounded>
       <v-card-text>
-        These files cannot be loaded together because they don't share a common data type.
+        These files cannot be loaded together because they don't share a common
+        data type.
       </v-card-text>
     </v-card>
   </v-row>
@@ -145,7 +163,10 @@ await get_allowed_objects();
     <v-card class="card" variant="tonal" rounded>
       <v-card-text>
         This file format isn't supported! Please check the
-        <a href="https://docs.geode-solutions.com/guides/formats/" target="_blank">
+        <a
+          href="https://docs.geode-solutions.com/guides/formats/"
+          target="_blank"
+        >
           supported file formats documentation</a
         >
         for more information

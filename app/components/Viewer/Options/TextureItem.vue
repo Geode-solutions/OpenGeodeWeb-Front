@@ -25,9 +25,10 @@ onMounted(() => {
 });
 
 function getTextureCoordinates() {
+  const schema = back_schemas.opengeodeweb_back.texture_coordinates;
+  const params = { id };
   backStore.request(
-    back_schemas.opengeodeweb_back.texture_coordinates,
-    { id },
+    { schema, params },
     {
       response_function: (response) => {
         texture_coordinates.value = response.texture_coordinates;
@@ -38,15 +39,13 @@ function getTextureCoordinates() {
 
 async function files_uploaded_event(value) {
   if (value.length > 0) {
+    const schema = back_schemas.opengeodeweb_back.save_viewable_file;
+    const params = {
+      geode_object_type: "RasterImage2D",
+      filename: value[0].name,
+    };
     await backStore.request(
-      back_schemas.opengeodeweb_back.save_viewable_file,
-      {
-        schema: back_schemas.opengeodeweb_back.save_viewable_file,
-        params: {
-          geode_object_type: "RasterImage2D",
-          filename: value[0].name,
-        },
-      },
+      { schema, params },
       {
         response_function: (response) => {
           texture_id.value = response.id;
@@ -100,6 +99,10 @@ watch(texture_id, (value) => {
     </v-col>
   </v-badge>
   <v-col v-if="texture_name == '' || texture_file_name == ''" cols="1">
-    <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
+    <v-icon
+      size="20"
+      icon="mdi-close-circle"
+      v-tooltip:bottom="'Invalid texture'"
+    />
   </v-col>
 </template>

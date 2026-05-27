@@ -51,9 +51,9 @@ export const useBackStore = defineStore("back", {
     },
     ping() {
       const feedbackStore = useFeedbackStore();
+      const schema = back_schemas.opengeodeweb_back.ping;
       return this.request(
-        back_schemas.opengeodeweb_back.ping,
-        {},
+        { schema },
         {
           request_error_function: () => {
             feedbackStore.$patch({ server_error: true });
@@ -94,25 +94,28 @@ export const useBackStore = defineStore("back", {
       const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
 
       console.log("[GEODE] params", params);
-      return appStore.request(schema, params, {
-        response_function: (response) => {
-          console.log(`[GEODE] Back launched on port ${response.port}`);
-          this.default_local_port = response.port;
+      return appStore.request(
+        { schema, params },
+        {
+          response_function: (response) => {
+            console.log(`[GEODE] Back launched on port ${response.port}`);
+            this.default_local_port = response.port;
+          },
         },
-      });
+      );
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...");
       this.set_ping();
       return Promise.resolve();
     },
-    request(schema, params, callbacks = {}) {
+    request(schema, params = {}, callbacks = {}) {
       console.log("[GEODE] Request:", schema.$id);
       const start = Date.now();
 
       return api_fetch(
         this,
-        { schema, params },
+        { schema, params, headers: {} },
         {
           ...callbacks,
           response_function: async (response) => {
@@ -154,8 +157,7 @@ export const useBackStore = defineStore("back", {
         return;
       }
       return this.request(
-        schema,
-        {},
+        { schema },
         {
           response_function: (response) => {
             this.version = response.microservice_version;

@@ -20,10 +20,9 @@ function get_x_y(event) {
   if (viewerStore.picking_mode.value === true) {
     const { offsetX, offsetY } = event;
     viewerStore.set_picked_point(offsetX, offsetY);
-    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.get_point_position, {
-      x: offsetX,
-      y: offsetY,
-    });
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+    const params = { x: offsetX, y: offsetY };
+    viewerStore.request({ schema, params });
   }
 }
 
@@ -106,7 +105,13 @@ onMounted(async () => {
       <slot name="ui"></slot>
       <v-col
         ref="viewer"
-        style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%"
+        style="
+          overflow: hidden;
+          position: relative;
+          z-index: 0;
+          height: 100%;
+          width: 100%;
+        "
         class="pa-0"
         @click="get_x_y"
         @keydown.esc="viewerStore.toggle_picking_mode(false)"
