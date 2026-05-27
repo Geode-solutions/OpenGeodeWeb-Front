@@ -1,22 +1,22 @@
 import {
-  CELLS_DEFAULTCOLOR,
-  CELLS_DEFAULTVISIBILITY,
-  EDGES_DEFAULTCOLOR,
-  EDGES_DEFAULTVISIBILITY,
-  EDGES_DEFAULTWIDTH,
-  POINTS_DEFAULTCOLOR,
-  POINTS_DEFAULTSIZE,
-  POINTS_DEFAULTVISIBILITY,
-  POLYGONS_DEFAULTCOLOR,
-  POLYGONS_DEFAULTVISIBILITY,
-  POLYHEDRA_DEFAULTCOLOR,
-  POLYHEDRA_DEFAULTVISIBILITY,
+  CELLS_DEFAULT_COLOR,
+  CELLS_DEFAULT_VISIBILITY,
+  EDGES_DEFAULT_COLOR,
+  EDGES_DEFAULT_VISIBILITY,
+  EDGES_DEFAULT_WIDTH,
+  POINTS_DEFAULT_COLOR,
+  POINTS_DEFAULT_SIZE,
+  POINTS_DEFAULT_VISIBILITY,
+  POLYGONS_DEFAULT_COLOR,
+  POLYGONS_DEFAULT_VISIBILITY,
+  POLYHEDRA_DEFAULT_COLOR,
+  POLYHEDRA_DEFAULT_VISIBILITY,
 } from "./constants";
 
 function meshPointsDefaultStyle(
-  visibility = POINTS_DEFAULTVISIBILITY,
-  size = POINTS_DEFAULTSIZE,
-  color = POINTS_DEFAULTCOLOR,
+  visibility = POINTS_DEFAULT_VISIBILITY,
+  size = POINTS_DEFAULT_SIZE,
+  color = POINTS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
@@ -33,9 +33,9 @@ function meshPointsDefaultStyle(
 }
 
 function meshEdgesDefaultStyle(
-  visibility = EDGES_DEFAULTVISIBILITY,
-  width = EDGES_DEFAULTWIDTH,
-  color = EDGES_DEFAULTCOLOR,
+  visibility = EDGES_DEFAULT_VISIBILITY,
+  width = EDGES_DEFAULT_WIDTH,
+  color = EDGES_DEFAULT_COLOR,
 ) {
   return {
     visibility,
@@ -55,7 +55,7 @@ function meshEdgesDefaultStyle(
   };
 }
 
-function meshCellsDefaultStyle(visibility = CELLS_DEFAULTVISIBILITY, color = CELLS_DEFAULTCOLOR) {
+function meshCellsDefaultStyle(visibility = CELLS_DEFAULT_VISIBILITY, color = CELLS_DEFAULT_COLOR) {
   return {
     visibility,
     coloring: {
@@ -75,8 +75,8 @@ function meshCellsDefaultStyle(visibility = CELLS_DEFAULTVISIBILITY, color = CEL
 }
 
 function meshPolygonsDefaultStyle(
-  visibility = POLYGONS_DEFAULTVISIBILITY,
-  color = POLYGONS_DEFAULTCOLOR,
+  visibility = POLYGONS_DEFAULT_VISIBILITY,
+  color = POLYGONS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
@@ -97,8 +97,8 @@ function meshPolygonsDefaultStyle(
 }
 
 function meshPolyhedraDefaultStyle(
-  visibility = POLYHEDRA_DEFAULTVISIBILITY,
-  color = POLYHEDRA_DEFAULTCOLOR,
+  visibility = POLYHEDRA_DEFAULT_VISIBILITY,
+  color = POLYHEDRA_DEFAULT_COLOR,
 ) {
   return {
     visibility,

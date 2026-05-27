@@ -18,40 +18,40 @@ function default_styles() {
   return {
     BRep: brepDefaultStyle(),
     CrossSection: crossSectionDefaultStyle(),
-    EdgedCurve2D: edgedCurve_defaultStyle(),
-    EdgedCurve3D: edgedCurve_defaultStyle(),
+    EdgedCurve2D: edgedCurveDefaultStyle(),
+    EdgedCurve3D: edgedCurveDefaultStyle(),
     Graph: {},
-    HybridSolid3D: solid_defaultStyle(),
+    HybridSolid3D: solidDefaultStyle(),
     ImplicitCrossSection: implicitCrossSectionDefaultStyle(),
     ImplicitStructuralModel: implicitStructuralModelDefaultStyle(),
-    LightRegularGrid2D: grid2d_defaultStyle(),
-    LightRegularGrid3D: grid3d_defaultStyle(),
-    PointSet2D: pointSet_defaultStyle(),
-    PointSet3D: pointSet_defaultStyle(),
-    PolygonalSurface2D: surface_defaultStyle(),
-    PolygonalSurface3D: surface_defaultStyle(),
-    PolyhedralSolid3D: solid_defaultStyle(),
+    LightRegularGrid2D: grid2dDefaultStyle(),
+    LightRegularGrid3D: grid3dDefaultStyle(),
+    PointSet2D: pointSetDefaultStyle(),
+    PointSet3D: pointSetDefaultStyle(),
+    PolygonalSurface2D: surfaceDefaultStyle(),
+    PolygonalSurface3D: surfaceDefaultStyle(),
+    PolyhedralSolid3D: solidDefaultStyle(),
     RasterImage2D: {},
     RasterImage3D: {},
-    RegularGrid2D: grid2d_defaultStyle(),
-    RegularGrid3D: grid3d_defaultStyle(),
+    RegularGrid2D: grid2dDefaultStyle(),
+    RegularGrid3D: grid3dDefaultStyle(),
     Section: sectionDefaultStyle(),
     StructuralModel: structuralModelDefaultStyle(),
-    TetrahedralSolid3D: solid_defaultStyle(),
-    TriangulatedSurface2D: surface_defaultStyle(),
-    TriangulatedSurface3D: surface_defaultStyle(),
+    TetrahedralSolid3D: solidDefaultStyle(),
+    TriangulatedSurface2D: surfaceDefaultStyle(),
+    TriangulatedSurface3D: surfaceDefaultStyle(),
     VertexSet: {},
   };
 }
 
-function pointSet_defaultStyle() {
+function pointSetDefaultStyle() {
   return {
     visibility: true,
     points: meshPointsDefaultStyle(),
   };
 }
 
-function edgedCurve_defaultStyle() {
+function edgedCurveDefaultStyle() {
   return {
     visibility: true,
     points: meshPointsDefaultStyle(),
@@ -59,7 +59,7 @@ function edgedCurve_defaultStyle() {
   };
 }
 
-function grid2d_defaultStyle() {
+function grid2dDefaultStyle() {
   return {
     visibility: true,
     points: meshPointsDefaultStyle(false),
@@ -68,7 +68,7 @@ function grid2d_defaultStyle() {
   };
 }
 
-function grid3d_defaultStyle() {
+function grid3dDefaultStyle() {
   return {
     visibility: true,
     points: meshPointsDefaultStyle(false),
@@ -78,7 +78,7 @@ function grid3d_defaultStyle() {
   };
 }
 
-function surface_defaultStyle() {
+function surfaceDefaultStyle() {
   return {
     visibility: true,
     points: meshPointsDefaultStyle(false),
@@ -87,7 +87,7 @@ function surface_defaultStyle() {
   };
 }
 
-function solid_defaultStyle() {
+function solidDefaultStyle() {
   return {
     visibility: true,
     points: meshPointsDefaultStyle(false),

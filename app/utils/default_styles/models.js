@@ -1,21 +1,21 @@
 import {
-  BLOCKS_DEFAULTCOLOR,
-  BLOCKS_DEFAULTVISIBILITY,
-  CORNERS_DEFAULTCOLOR,
-  CORNERS_DEFAULTVISIBILITY,
-  EDGES_DEFAULTVISIBILITY,
-  EDGES_DEFAULTWIDTH,
-  LINES_DEFAULTCOLOR,
-  LINES_DEFAULTVISIBILITY,
-  POINTS_DEFAULTSIZE,
-  POINTS_DEFAULTVISIBILITY,
-  SURFACES_DEFAULTCOLOR,
-  SURFACES_DEFAULTVISIBILITY,
+  BLOCKS_DEFAULT_COLOR,
+  BLOCKS_DEFAULT_VISIBILITY,
+  CORNERS_DEFAULT_COLOR,
+  CORNERS_DEFAULT_VISIBILITY,
+  EDGES_DEFAULT_VISIBILITY,
+  EDGES_DEFAULT_WIDTH,
+  LINES_DEFAULT_COLOR,
+  LINES_DEFAULT_VISIBILITY,
+  POINTS_DEFAULT_SIZE,
+  POINTS_DEFAULT_VISIBILITY,
+  SURFACES_DEFAULT_COLOR,
+  SURFACES_DEFAULT_VISIBILITY,
 } from "./constants";
 
 function modelCornersDefaultStyle(
-  visibility = CORNERS_DEFAULTVISIBILITY,
-  color = CORNERS_DEFAULTCOLOR,
+  visibility = CORNERS_DEFAULT_VISIBILITY,
+  color = CORNERS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
@@ -28,7 +28,10 @@ function modelCornersDefaultStyle(
   };
 }
 
-function modelLinesDefaultStyle(visibility = LINES_DEFAULTVISIBILITY, color = LINES_DEFAULTCOLOR) {
+function modelLinesDefaultStyle(
+  visibility = LINES_DEFAULT_VISIBILITY,
+  color = LINES_DEFAULT_COLOR,
+) {
   return {
     visibility,
     color,
@@ -45,8 +48,8 @@ function modelLinesDefaultStyle(visibility = LINES_DEFAULTVISIBILITY, color = LI
 }
 
 function modelSurfacesDefaultStyle(
-  visibility = SURFACES_DEFAULTVISIBILITY,
-  color = SURFACES_DEFAULTCOLOR,
+  visibility = SURFACES_DEFAULT_VISIBILITY,
+  color = SURFACES_DEFAULT_COLOR,
 ) {
   return {
     visibility,
@@ -64,8 +67,8 @@ function modelSurfacesDefaultStyle(
 }
 
 function modelBlocksDefaultStyle(
-  visibility = BLOCKS_DEFAULTVISIBILITY,
-  color = BLOCKS_DEFAULTCOLOR,
+  visibility = BLOCKS_DEFAULT_VISIBILITY,
+  color = BLOCKS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
@@ -82,11 +85,17 @@ function modelBlocksDefaultStyle(
   };
 }
 
-function modelPointsDefaultStyle(visibility = POINTS_DEFAULTVISIBILITY, size = POINTS_DEFAULTSIZE) {
+function modelPointsDefaultStyle(
+  visibility = POINTS_DEFAULT_VISIBILITY,
+  size = POINTS_DEFAULT_SIZE,
+) {
   return { visibility, size };
 }
 
-function modelEdgesDefaultStyle(visibility = EDGES_DEFAULTVISIBILITY, width = EDGES_DEFAULTWIDTH) {
+function modelEdgesDefaultStyle(
+  visibility = EDGES_DEFAULT_VISIBILITY,
+  width = EDGES_DEFAULT_WIDTH,
+) {
   return { visibility, width };
 }
 
@@ -104,8 +113,8 @@ function brepDefaultStyle() {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULTSIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULTWIDTH),
+    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
+    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
   };
 }
 
@@ -115,8 +124,8 @@ function crossSectionDefaultStyle() {
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULTSIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULTWIDTH),
+    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
+    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
   };
 }
 
@@ -127,8 +136,8 @@ function structuralModelDefaultStyle() {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULTSIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULTWIDTH),
+    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
+    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
   };
 }
 
@@ -138,8 +147,8 @@ function sectionDefaultStyle() {
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULTSIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULTWIDTH),
+    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
+    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
   };
 }
 
@@ -149,8 +158,8 @@ function implicitCrossSectionDefaultStyle() {
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULTSIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULTWIDTH),
+    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
+    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
   };
 }
 
@@ -161,8 +170,8 @@ function implicitStructuralModelDefaultStyle() {
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
     blocks: modelBlocksDefaultStyle(),
-    points: modelPointsDefaultStyle(false, POINTS_DEFAULTSIZE),
-    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULTWIDTH),
+    points: modelPointsDefaultStyle(false, POINTS_DEFAULT_SIZE),
+    edges: modelEdgesDefaultStyle(false, EDGES_DEFAULT_WIDTH),
   };
 }
 
