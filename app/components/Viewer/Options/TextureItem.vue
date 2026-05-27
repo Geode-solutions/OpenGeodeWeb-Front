@@ -99,10 +99,6 @@ watch(texture_id, (value) => {
     </v-col>
   </v-badge>
   <v-col v-if="texture_name == '' || texture_file_name == ''" cols="1">
-    <v-icon
-      size="20"
-      icon="mdi-close-circle"
-      v-tooltip:bottom="'Invalid texture'"
-    />
+    <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
   </v-col>
 </template>

@@ -145,15 +145,8 @@ const camera_options = computed(() => [
 </script>
 
 <template>
-  <v-container
-    :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']"
-    width="auto"
-  >
-    <v-row
-      v-for="camera_option in camera_options"
-      :key="camera_option.icon"
-      dense
-    >
+  <v-container :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']" width="auto">
+    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
       <v-col>
         <v-menu
           v-if="camera_option.menu && !camera_option.action"
@@ -164,9 +157,7 @@ const camera_options = computed(() => [
             <ActionButton
               v-bind="props"
               :icon="
-                typeof camera_option.icon === 'function'
-                  ? camera_option.icon()
-                  : camera_option.icon
+                typeof camera_option.icon === 'function' ? camera_option.icon() : camera_option.icon
               "
               :tooltip="camera_option.tooltip"
               :color="camera_option.color"
@@ -212,10 +203,7 @@ const camera_options = computed(() => [
     @select="hybridViewerStore.setCameraOrientation"
   />
   <Screenshot v-model="take_screenshot" />
-  <CameraManager
-    :show_dialog="show_camera_manager"
-    @close="show_camera_manager = false"
-  />
+  <CameraManager :show_dialog="show_camera_manager" @close="show_camera_manager = false" />
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"

@@ -49,9 +49,7 @@ async function get_allowed_files() {
   const backStore = useBackStore();
   const params = {};
   const response = await backStore.request({ schema, params });
-  accept.value = response.extensions
-    .map((extension) => `.${extension}`)
-    .join(",");
+  accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
   toggle_loading();
 }
 

@@ -13,8 +13,7 @@ const { width } = defineProps({
 });
 
 const output_extensions =
-  viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties
-    .output_extension.enum;
+  viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties.output_extension.enum;
 const filename = ref("");
 const output_extension = ref("png");
 const include_background = ref(true);
@@ -23,8 +22,7 @@ const screenshot_type = ref("file");
 async function takeScreenshot() {
   const viewerStore = useViewerStore();
   const feedbackStore = useFeedbackStore();
-  const current_filename =
-    screenshot_type.value === "file" ? filename.value : "screenshot";
+  const current_filename = screenshot_type.value === "file" ? filename.value : "screenshot";
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot;
   const params = {
     filename: current_filename,
@@ -39,17 +37,12 @@ async function takeScreenshot() {
     {
       response_function: async (response) => {
         if (screenshot_type.value === "file") {
-          fileDownload(
-            response.blob,
-            `${current_filename}.${output_extension.value}`,
-          );
+          fileDownload(response.blob, `${current_filename}.${output_extension.value}`);
           feedbackStore.add_success("Screenshot downloaded");
         } else {
           try {
             const pngBlob = new Blob([response.blob], { type: "image/png" });
-            await navigator.clipboard.write([
-              new ClipboardItem({ "image/png": pngBlob }),
-            ]);
+            await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })]);
             feedbackStore.add_success("Screenshot copied to clipboard");
           } catch (error) {
             feedbackStore.add_error(
@@ -174,9 +167,7 @@ watch(screenshot_type, (value) => {
           variant="outlined"
           size="small"
           class="text-caption text-none"
-          :disabled="
-            (screenshot_type === 'file' && !filename) || !output_extension
-          "
+          :disabled="(screenshot_type === 'file' && !filename) || !output_extension"
           color="white"
           @click="takeScreenshot()"
         >
