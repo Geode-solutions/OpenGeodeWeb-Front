@@ -256,12 +256,15 @@ export const useAppStore = defineStore("app", () => {
       additionalProperties: true,
     };
     const params = { PROJECT };
-    return request(schema, params, {
-      response_function: (response) => {
-        console.log(`[APP] ${response.projectFolderPath} created`);
-        projectFolderPath.value = response.projectFolderPath;
+    return request(
+      { schema, params },
+      {
+        response_function: (response) => {
+          console.log(`[APP] ${response.projectFolderPath} created`);
+          projectFolderPath.value = response.projectFolderPath;
+        },
       },
-    });
+    );
   }
 
   return {
