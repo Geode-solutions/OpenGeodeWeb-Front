@@ -39,7 +39,7 @@ async function runScript(
       command = path.join(executablePath(execPath, execName));
     } catch (error) {
       const feedbackStore = useFeedbackStore();
-      const errorCode = 404
+      const errorCode = 404;
       feedbackStore.add_error(errorCode, execPath, execName, error.message);
     }
   }
