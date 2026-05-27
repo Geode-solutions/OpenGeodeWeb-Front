@@ -50,18 +50,18 @@ function resetRange() {
 }
 
 function getAttributes() {
-  if (schema.required && schema.required.includes("component_id") && componentId === undefined) {
+  if (schema.properties?.component_id && componentId === undefined) {
     return;
   }
-  const params = { id };
-  if (componentId !== undefined) {
-    params.component_id = componentId;
-  }
-  backStore.request(schema, params, {
-    response_function: (response) => {
-      attributes.value = response.attributes;
+  backStore.request(
+    schema,
+    { id, component_id: componentId },
+    {
+      response_function: (response) => {
+        attributes.value = response.attributes;
+      },
     },
-  });
+  );
 }
 
 onMounted(() => {

@@ -192,25 +192,69 @@ function modelCornersDefaultStyle(
   visibility = corners_defaultVisibility,
   color = corners_defaultColor,
 ) {
-  return { visibility, color };
+  return {
+    visibility,
+    color,
+    color_mode: "constant",
+    vertex_attribute: {
+      name: undefined,
+      storedConfigs: {},
+    },
+  };
 }
 
 function modelLinesDefaultStyle(visibility = lines_defaultVisibility, color = lines_defaultColor) {
-  return { visibility, color };
+  return {
+    visibility,
+    color,
+    color_mode: "constant",
+    vertex_attribute: {
+      name: undefined,
+      storedConfigs: {},
+    },
+    edge_attribute: {
+      name: undefined,
+      storedConfigs: {},
+    },
+  };
 }
 
 function modelSurfacesDefaultStyle(
   visibility = surfaces_defaultVisibility,
   color = surfaces_defaultColor,
 ) {
-  return { visibility, color };
+  return {
+    visibility,
+    color,
+    color_mode: "constant",
+    vertex_attribute: {
+      name: undefined,
+      storedConfigs: {},
+    },
+    polygon_attribute: {
+      name: undefined,
+      storedConfigs: {},
+    },
+  };
 }
 
 function modelBlocksDefaultStyle(
   visibility = blocks_defaultVisibility,
   color = blocks_defaultColor,
 ) {
-  return { visibility, color };
+  return {
+    visibility,
+    color,
+    color_mode: "constant",
+    vertex_attribute: {
+      name: undefined,
+      storedConfigs: {},
+    },
+    polyhedron_attribute: {
+      name: undefined,
+      storedConfigs: {},
+    },
+  };
 }
 
 function modelPointsDefaultStyle(visibility = points_defaultVisibility, size = points_defaultSize) {
@@ -220,6 +264,13 @@ function modelPointsDefaultStyle(visibility = points_defaultVisibility, size = p
 function modelEdgesDefaultStyle(visibility = edges_defaultVisibility, width = edges_defaultWidth) {
   return { visibility, width };
 }
+
+const DEFAULT_MODEL_COMPONENT_TYPE_STYLES = {
+  Corner: modelCornersDefaultStyle(),
+  Line: modelLinesDefaultStyle(),
+  Surface: modelSurfacesDefaultStyle(),
+  Block: modelBlocksDefaultStyle(),
+};
 
 function brep_defaultStyle() {
   return {
@@ -324,4 +375,9 @@ function getDefaultStyle(type) {
   return default_styles()[type];
 }
 
-export { getDefaultStyle, DEFAULT_MODEL_COMPONENT_TYPE_COLORS, MESH_TYPES };
+export {
+  getDefaultStyle,
+  DEFAULT_MODEL_COMPONENT_TYPE_COLORS,
+  DEFAULT_MODEL_COMPONENT_TYPE_STYLES,
+  MESH_TYPES,
+};

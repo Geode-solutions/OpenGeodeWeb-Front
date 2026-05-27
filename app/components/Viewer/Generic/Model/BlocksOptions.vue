@@ -75,10 +75,7 @@ const componentColorMode = computed({
 
 // Group Attributes
 const typeVertexAttrName = computed({
-  get: () =>
-    targetComponentIds.length > 0
-      ? dataStyleStore.modelBlocksVertexAttributeName(modelId, targetComponentIds[0])
-      : undefined,
+  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeName(modelId, targetComponentIds, newValue);
     hybridViewerStore.remoteRender();
@@ -86,10 +83,7 @@ const typeVertexAttrName = computed({
 });
 
 const typeVertexAttrRange = computed({
-  get: () =>
-    targetComponentIds.length > 0
-      ? dataStyleStore.modelBlocksVertexAttributeRange(modelId, targetComponentIds[0])
-      : [undefined, undefined],
+  get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeRange(
       modelId,
@@ -102,10 +96,7 @@ const typeVertexAttrRange = computed({
 });
 
 const typeVertexAttrColorMap = computed({
-  get: () =>
-    targetComponentIds.length > 0
-      ? dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, targetComponentIds[0])
-      : undefined,
+  get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeColorMap(
       modelId,
@@ -117,10 +108,7 @@ const typeVertexAttrColorMap = computed({
 });
 
 const typePolyhedronAttrName = computed({
-  get: () =>
-    targetComponentIds.length > 0
-      ? dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetComponentIds[0])
-      : undefined,
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(
       modelId,
@@ -132,10 +120,7 @@ const typePolyhedronAttrName = computed({
 });
 
 const typePolyhedronAttrRange = computed({
-  get: () =>
-    targetComponentIds.length > 0
-      ? dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, targetComponentIds[0])
-      : [undefined, undefined],
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
       modelId,
@@ -148,10 +133,7 @@ const typePolyhedronAttrRange = computed({
 });
 
 const typePolyhedronAttrColorMap = computed({
-  get: () =>
-    targetComponentIds.length > 0
-      ? dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, targetComponentIds[0])
-      : undefined,
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, targetComponentIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
       modelId,
@@ -164,80 +146,76 @@ const typePolyhedronAttrColorMap = computed({
 
 // Individual Attributes
 const compVertexAttrName = computed({
-  get: () =>
-    componentId ? dataStyleStore.modelBlocksVertexAttributeName(modelId, componentId) : undefined,
+  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, componentId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [componentId], newValue);
-    hybridViewerStore.remoteRender();
+    if (componentId) {
+      await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [componentId], newValue);
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
 const compVertexAttrRange = computed({
-  get: () =>
-    componentId
-      ? dataStyleStore.modelBlocksVertexAttributeRange(modelId, componentId)
-      : [undefined, undefined],
+  get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, componentId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeRange(
-      modelId,
-      [componentId],
-      newValue[0],
-      newValue[1],
-    );
-    hybridViewerStore.remoteRender();
+    if (componentId) {
+      await dataStyleStore.setModelBlocksVertexAttributeRange(
+        modelId,
+        [componentId],
+        newValue[0],
+        newValue[1],
+      );
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
 const compVertexAttrColorMap = computed({
-  get: () =>
-    componentId
-      ? dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, componentId)
-      : undefined,
+  get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, [componentId], newValue);
-    hybridViewerStore.remoteRender();
+    if (componentId) {
+      await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, [componentId], newValue);
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
 const compPolyhedronAttrName = computed({
-  get: () =>
-    componentId
-      ? dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, componentId)
-      : undefined,
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, componentId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [componentId], newValue);
-    hybridViewerStore.remoteRender();
+    if (componentId) {
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [componentId], newValue);
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
 const compPolyhedronAttrRange = computed({
-  get: () =>
-    componentId
-      ? dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, componentId)
-      : [undefined, undefined],
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, componentId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
-      modelId,
-      [componentId],
-      newValue[0],
-      newValue[1],
-    );
-    hybridViewerStore.remoteRender();
+    if (componentId) {
+      await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
+        modelId,
+        [componentId],
+        newValue[0],
+        newValue[1],
+      );
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
 const compPolyhedronAttrColorMap = computed({
-  get: () =>
-    componentId
-      ? dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, componentId)
-      : undefined,
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, componentId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
-      modelId,
-      [componentId],
-      newValue,
-    );
-    hybridViewerStore.remoteRender();
+    if (componentId) {
+      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
+        modelId,
+        [componentId],
+        newValue,
+      );
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 

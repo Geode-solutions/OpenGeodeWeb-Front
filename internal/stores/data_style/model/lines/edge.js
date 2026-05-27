@@ -1,50 +1,52 @@
-import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
-import merge from "lodash/merge";
-import { useDataStore } from "@ogw_front/stores/data";
-import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
-import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
-import { useViewerStore } from "@ogw_front/stores/viewer";
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
+// Local imports
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelLinesCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+
+// Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge;
 
 export function useModelLinesEdgeAttributeStyle() {
   const dataStore = useDataStore();
-  const dataStyleState = useDataStyleState();
-  const modelCommonStyle = useModelCommonStyle();
+  const modelLinesCommonStyle = useModelLinesCommonStyle();
   const viewerStore = useViewerStore();
 
   function modelLinesEdgeAttribute(modelId, lineId) {
-    const style = dataStyleState.getComponentStyle(modelId, lineId);
-    return style.edge_attribute || { name: undefined, storedConfigs: {} };
+    return modelLinesCommonStyle.modelLineStyle(modelId, lineId).edge_attribute;
+  }
+
+  function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name) {
+    const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
+    if (name in storedConfigs) {
+      return storedConfigs[name];
+    }
+    return setModelLinesEdgeAttributeStoredConfig(modelId, [lineId], name, {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    });
+  }
+
+  function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
+    return modelLinesCommonStyle.mutateModelLinesStyle(modelId, lineIds, {
+      edge_attribute: values,
+    });
+  }
+
+  function setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, config) {
+    return mutateModelLinesEdgeStyle(modelId, lineIds, {
+      storedConfigs: {
+        [name]: config,
+      },
+    });
   }
 
   function modelLinesEdgeAttributeName(modelId, lineId) {
     return modelLinesEdgeAttribute(modelId, lineId).name;
-  }
-
-  function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name) {
-    const attribute = modelLinesEdgeAttribute(modelId, lineId);
-    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
-      return attribute.storedConfigs[name];
-    }
-    return {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
-    };
-  }
-
-  function modelLinesEdgeAttributeRange(modelId, lineId) {
-    const name = modelLinesEdgeAttributeName(modelId, lineId);
-    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name);
-    return [storedConfig.minimum, storedConfig.maximum];
-  }
-
-  function modelLinesEdgeAttributeColorMap(modelId, lineId) {
-    const name = modelLinesEdgeAttributeName(modelId, lineId);
-    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name);
-    return storedConfig.colorMap;
   }
 
   async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
@@ -61,31 +63,29 @@ export function useModelLinesEdgeAttributeStyle() {
       schema.name,
       { id: modelId, block_ids: viewer_ids, name },
       {
-        response_function: async () => {
-          const updates = lineIds.map((lineId) => {
-            const current = modelLinesEdgeAttribute(modelId, lineId);
-            const nameUpdate = { name };
-            if (!(name in current.storedConfigs)) {
-              nameUpdate.storedConfigs = {
-                [name]: {
-                  minimum: undefined,
-                  maximum: undefined,
-                  colorMap: undefined,
-                },
-              };
-            }
-            const updated = merge({}, current, nameUpdate);
-            return {
-              id_component: lineId,
-              values: {
-                edge_attribute: updated,
+        response_function: () => {
+          const updates = { name };
+          const edge = modelLinesEdgeAttribute(modelId, lineIds[0]);
+          if (!(name in edge.storedConfigs)) {
+            updates.storedConfigs = {
+              [name]: {
+                minimum: undefined,
+                maximum: undefined,
+                colorMap: undefined,
               },
             };
-          });
-          await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+          }
+          return mutateModelLinesEdgeStyle(modelId, lineIds, updates);
         },
       },
     );
+  }
+
+  function modelLinesEdgeAttributeRange(modelId, lineId) {
+    const name = modelLinesEdgeAttributeName(modelId, lineId);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name);
+    const { minimum, maximum } = storedConfig;
+    return [minimum, maximum];
   }
 
   async function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
@@ -106,38 +106,20 @@ export function useModelLinesEdgeAttributeStyle() {
         schema.color_map,
         { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
         {
-          response_function: async () => {
-            const updates = lineIds.map((lineId) => {
-              const current = modelLinesEdgeAttribute(modelId, lineId);
-              const updated = merge({}, current, {
-                storedConfigs: { [name]: { minimum, maximum } },
-              });
-              return {
-                id_component: lineId,
-                values: {
-                  edge_attribute: updated,
-                },
-              };
-            });
-            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-          },
+          response_function: () =>
+            setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum }),
         },
       );
     }
 
-    const updates = lineIds.map((lineId) => {
-      const current = modelLinesEdgeAttribute(modelId, lineId);
-      const updated = merge({}, current, {
-        storedConfigs: { [name]: { minimum, maximum } },
-      });
-      return {
-        id_component: lineId,
-        values: {
-          edge_attribute: updated,
-        },
-      };
-    });
-    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+    return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum });
+  }
+
+  function modelLinesEdgeAttributeColorMap(modelId, lineId) {
+    const name = modelLinesEdgeAttributeName(modelId, lineId);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name);
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   async function setModelLinesEdgeAttributeColorMap(modelId, lineIds, colorMap) {
@@ -159,44 +141,20 @@ export function useModelLinesEdgeAttributeStyle() {
         schema.color_map,
         { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
         {
-          response_function: async () => {
-            const updates = lineIds.map((lineId) => {
-              const current = modelLinesEdgeAttribute(modelId, lineId);
-              const updated = merge({}, current, {
-                storedConfigs: { [name]: { colorMap } },
-              });
-              return {
-                id_component: lineId,
-                values: {
-                  edge_attribute: updated,
-                },
-              };
-            });
-            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-          },
+          response_function: () =>
+            setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap }),
         },
       );
     }
 
-    const updates = lineIds.map((lineId) => {
-      const current = modelLinesEdgeAttribute(modelId, lineId);
-      const updated = merge({}, current, {
-        storedConfigs: { [name]: { colorMap } },
-      });
-      return {
-        id_component: lineId,
-        values: {
-          edge_attribute: updated,
-        },
-      };
-    });
-    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+    return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap });
   }
 
   return {
     modelLinesEdgeAttributeName,
     modelLinesEdgeAttributeRange,
     modelLinesEdgeAttributeColorMap,
+    modelLinesEdgeAttributeStoredConfig,
     setModelLinesEdgeAttributeName,
     setModelLinesEdgeAttributeRange,
     setModelLinesEdgeAttributeColorMap,

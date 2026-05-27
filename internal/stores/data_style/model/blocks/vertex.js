@@ -1,50 +1,52 @@
-import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
-import merge from "lodash/merge";
-import { useDataStore } from "@ogw_front/stores/data";
-import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
-import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
-import { useViewerStore } from "@ogw_front/stores/viewer";
+// Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
+// Local imports
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useModelBlocksCommonStyle } from "./common";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+
+// Local constantsz
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.vertex;
 
 export function useModelBlocksVertexAttributeStyle() {
   const dataStore = useDataStore();
-  const dataStyleState = useDataStyleState();
-  const modelCommonStyle = useModelCommonStyle();
+  const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const viewerStore = useViewerStore();
 
   function modelBlocksVertexAttribute(modelId, blockId) {
-    const style = dataStyleState.getComponentStyle(modelId, blockId);
-    return style.vertex_attribute || { name: undefined, storedConfigs: {} };
+    return modelBlocksCommonStyle.modelBlockStyle(modelId, blockId).vertex_attribute;
+  }
+
+  function modelBlocksVertexAttributeStoredConfig(modelId, blockId, name) {
+    const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
+    if (name in storedConfigs) {
+      return storedConfigs[name];
+    }
+    return setModelBlocksVertexAttributeStoredConfig(modelId, [blockId], name, {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    });
+  }
+
+  function mutateModelBlocksVertexStyle(modelId, blockIds, values) {
+    return modelBlocksCommonStyle.mutateModelBlocksStyle(modelId, blockIds, {
+      vertex_attribute: values,
+    });
+  }
+
+  function setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, config) {
+    return mutateModelBlocksVertexStyle(modelId, blockIds, {
+      storedConfigs: {
+        [name]: config,
+      },
+    });
   }
 
   function modelBlocksVertexAttributeName(modelId, blockId) {
     return modelBlocksVertexAttribute(modelId, blockId).name;
-  }
-
-  function modelBlocksVertexAttributeStoredConfig(modelId, blockId, name) {
-    const attribute = modelBlocksVertexAttribute(modelId, blockId);
-    if (name && attribute.storedConfigs && name in attribute.storedConfigs) {
-      return attribute.storedConfigs[name];
-    }
-    return {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
-    };
-  }
-
-  function modelBlocksVertexAttributeRange(modelId, blockId) {
-    const name = modelBlocksVertexAttributeName(modelId, blockId);
-    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name);
-    return [storedConfig.minimum, storedConfig.maximum];
-  }
-
-  function modelBlocksVertexAttributeColorMap(modelId, blockId) {
-    const name = modelBlocksVertexAttributeName(modelId, blockId);
-    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name);
-    return storedConfig.colorMap;
   }
 
   async function setModelBlocksVertexAttributeName(modelId, blockIds, name) {
@@ -61,31 +63,29 @@ export function useModelBlocksVertexAttributeStyle() {
       schema.name,
       { id: modelId, block_ids: viewer_ids, name },
       {
-        response_function: async () => {
-          const updates = blockIds.map((blockId) => {
-            const current = modelBlocksVertexAttribute(modelId, blockId);
-            const nameUpdate = { name };
-            if (!(name in current.storedConfigs)) {
-              nameUpdate.storedConfigs = {
-                [name]: {
-                  minimum: undefined,
-                  maximum: undefined,
-                  colorMap: undefined,
-                },
-              };
-            }
-            const updated = merge({}, current, nameUpdate);
-            return {
-              id_component: blockId,
-              values: {
-                vertex_attribute: updated,
+        response_function: () => {
+          const updates = { name };
+          const vertex = modelBlocksVertexAttribute(modelId, blockIds[0]);
+          if (!(name in vertex.storedConfigs)) {
+            updates.storedConfigs = {
+              [name]: {
+                minimum: undefined,
+                maximum: undefined,
+                colorMap: undefined,
               },
             };
-          });
-          await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+          }
+          return mutateModelBlocksVertexStyle(modelId, blockIds, updates);
         },
       },
     );
+  }
+
+  function modelBlocksVertexAttributeRange(modelId, blockId) {
+    const name = modelBlocksVertexAttributeName(modelId, blockId);
+    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name);
+    const { minimum, maximum } = storedConfig;
+    return [minimum, maximum];
   }
 
   async function setModelBlocksVertexAttributeRange(modelId, blockIds, minimum, maximum) {
@@ -106,38 +106,23 @@ export function useModelBlocksVertexAttributeStyle() {
         schema.color_map,
         { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
         {
-          response_function: async () => {
-            const updates = blockIds.map((blockId) => {
-              const current = modelBlocksVertexAttribute(modelId, blockId);
-              const updated = merge({}, current, {
-                storedConfigs: { [name]: { minimum, maximum } },
-              });
-              return {
-                id_component: blockId,
-                values: {
-                  vertex_attribute: updated,
-                },
-              };
-            });
-            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-          },
+          response_function: () =>
+            setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, {
+              minimum,
+              maximum,
+            }),
         },
       );
     }
 
-    const updates = blockIds.map((blockId) => {
-      const current = modelBlocksVertexAttribute(modelId, blockId);
-      const updated = merge({}, current, {
-        storedConfigs: { [name]: { minimum, maximum } },
-      });
-      return {
-        id_component: blockId,
-        values: {
-          vertex_attribute: updated,
-        },
-      };
-    });
-    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+    return setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { minimum, maximum });
+  }
+
+  function modelBlocksVertexAttributeColorMap(modelId, blockId) {
+    const name = modelBlocksVertexAttributeName(modelId, blockId);
+    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name);
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   async function setModelBlocksVertexAttributeColorMap(modelId, blockIds, colorMap) {
@@ -159,44 +144,20 @@ export function useModelBlocksVertexAttributeStyle() {
         schema.color_map,
         { id: modelId, block_ids: viewer_ids, points, minimum, maximum },
         {
-          response_function: async () => {
-            const updates = blockIds.map((blockId) => {
-              const current = modelBlocksVertexAttribute(modelId, blockId);
-              const updated = merge({}, current, {
-                storedConfigs: { [name]: { colorMap } },
-              });
-              return {
-                id_component: blockId,
-                values: {
-                  vertex_attribute: updated,
-                },
-              };
-            });
-            await modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
-          },
+          response_function: () =>
+            setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { colorMap }),
         },
       );
     }
 
-    const updates = blockIds.map((blockId) => {
-      const current = modelBlocksVertexAttribute(modelId, blockId);
-      const updated = merge({}, current, {
-        storedConfigs: { [name]: { colorMap } },
-      });
-      return {
-        id_component: blockId,
-        values: {
-          vertex_attribute: updated,
-        },
-      };
-    });
-    return modelCommonStyle.bulkMutateComponentStylesPerComponent(modelId, updates);
+    return setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { colorMap });
   }
 
   return {
     modelBlocksVertexAttributeName,
     modelBlocksVertexAttributeRange,
     modelBlocksVertexAttributeColorMap,
+    modelBlocksVertexAttributeStoredConfig,
     setModelBlocksVertexAttributeName,
     setModelBlocksVertexAttributeRange,
     setModelBlocksVertexAttributeColorMap,
