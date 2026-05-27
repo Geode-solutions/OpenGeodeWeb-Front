@@ -10,8 +10,8 @@ import pTimeout from "p-timeout";
 
 // Local imports
 import { commandExistsSync, waitForReady } from "./scripts.js";
-import { executableName, executablePath } from "./path.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
+import { executablePath } from "./path.js";
 
 const DEFAULT_TIMEOUT_SECONDS = 60;
 const MILLISECONDS_PER_SECOND = 1000;
@@ -24,8 +24,8 @@ function getAvailablePort() {
 }
 
 async function runScript(
-  execName,
   execPath,
+  execName,
   args,
   expectedResponse,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
@@ -34,7 +34,7 @@ async function runScript(
   if (commandExistsSync(execName)) {
     command = execName;
   } else {
-    command = path.join(executablePath(execPath), executableName(execName));
+    command = path.join(await executablePath(execPath, execName));
   }
   console.log("runScript", command, args);
 
@@ -82,8 +82,8 @@ async function runBack(execName, execPath, args = {}) {
   if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
     backArgs.push("--debug");
   }
-  console.log("runBack", execName, execPath, backArgs);
-  await runScript(execName, execPath, backArgs, "Serving Flask app");
+  console.log("runBack", execPath, execName, backArgs);
+  await runScript(execPath, execName, backArgs, "Serving Flask app");
   return port;
 }
 
@@ -98,8 +98,8 @@ async function runViewer(execName, execPath, args = {}) {
     `--data_folder_path ${projectFolderPath}`,
     `--timeout ${0}`,
   ];
-  console.log("runViewer", execName, execPath, viewerArgs);
-  await runScript(execName, execPath, viewerArgs, "Starting factory");
+  console.log("runViewer", execPath, execName, viewerArgs);
+  await runScript(execPath, execName, viewerArgs, "Starting factory");
   return port;
 }
 
