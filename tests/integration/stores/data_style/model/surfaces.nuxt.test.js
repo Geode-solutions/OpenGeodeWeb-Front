@@ -106,11 +106,13 @@ describe("model surfaces", () => {
       await result;
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
-        model_surfaces_schemas.attribute.vertex.name,
         {
-          id,
-          block_ids: surface_viewer_ids,
-          name: "points",
+          schema: model_surfaces_schemas.attribute.vertex.name,
+          params: {
+            id,
+            block_ids: surface_viewer_ids,
+            name: "points",
+          },
         },
         {
           response_function: expect.any(Function),
@@ -141,11 +143,13 @@ describe("model surfaces", () => {
       await result;
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
-        model_surfaces_schemas.attribute.polygon.name,
         {
-          id,
-          block_ids: surface_viewer_ids,
-          name: "test_attribute",
+          schema: model_surfaces_schemas.attribute.polygon.name,
+          params: {
+            id,
+            block_ids: surface_viewer_ids,
+            name: "test_attribute",
+          },
         },
         {
           response_function: expect.any(Function),

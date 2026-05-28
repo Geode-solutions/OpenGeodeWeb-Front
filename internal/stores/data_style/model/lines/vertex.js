@@ -65,9 +65,12 @@ export function useModelLinesVertexAttributeStyle() {
     }
 
     const params = { id: modelId, block_ids: viewer_ids, name };
-    return viewerStore.request(schema.name, params, {
-      response_function: () => mutateModelLinesVertexStyle(modelId, lineIds, updates),
-    });
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () => mutateModelLinesVertexStyle(modelId, lineIds, updates),
+      },
+    );
   }
 
   function modelLinesVertexAttributeRange(modelId, lineId) {
@@ -85,10 +88,13 @@ export function useModelLinesVertexAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum }),
+        },
+      );
     }
     return setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum });
   }
@@ -109,10 +115,13 @@ export function useModelLinesVertexAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, { colorMap }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, { colorMap }),
+        },
+      );
     }
     return setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, { colorMap });
   }

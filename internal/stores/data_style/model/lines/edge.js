@@ -65,9 +65,12 @@ export function useModelLinesEdgeAttributeStyle() {
     }
 
     const params = { id: modelId, block_ids: viewer_ids, name };
-    return viewerStore.request(schema.name, params, {
-      response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, updates),
-    });
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, updates),
+      },
+    );
   }
 
   function modelLinesEdgeAttributeRange(modelId, lineId) {
@@ -85,10 +88,13 @@ export function useModelLinesEdgeAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum }),
+        },
+      );
     }
     return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum });
   }
@@ -109,10 +115,13 @@ export function useModelLinesEdgeAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap }),
+        },
+      );
     }
     return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap });
   }

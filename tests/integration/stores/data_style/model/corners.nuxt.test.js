@@ -108,11 +108,13 @@ describe("model corners", () => {
       await result;
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
-        model_corners_schemas.attribute.vertex.name,
         {
-          id,
-          block_ids: corner_viewer_ids,
-          name: "points",
+          schema: model_corners_schemas.attribute.vertex.name,
+          params: {
+            id,
+            block_ids: corner_viewer_ids,
+            name: "points",
+          },
         },
         {
           response_function: expect.any(Function),

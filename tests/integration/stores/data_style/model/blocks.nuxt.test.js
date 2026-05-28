@@ -104,11 +104,13 @@ describe("model blocks", () => {
       await result;
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
-        model_blocks_schemas.attribute.vertex.name,
         {
-          id,
-          block_ids: block_viewer_ids,
-          name: "points",
+          schema: model_blocks_schemas.attribute.vertex.name,
+          params: {
+            id,
+            block_ids: block_viewer_ids,
+            name: "points",
+          },
         },
         {
           response_function: expect.any(Function),
@@ -139,11 +141,13 @@ describe("model blocks", () => {
       await result;
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
-        model_blocks_schemas.attribute.polyhedron.name,
         {
-          id,
-          block_ids: block_viewer_ids,
-          name: "test_attribute",
+          schema: model_blocks_schemas.attribute.polyhedron.name,
+          params: {
+            id,
+            block_ids: block_viewer_ids,
+            name: "test_attribute",
+          },
         },
         {
           response_function: expect.any(Function),

@@ -108,11 +108,13 @@ describe("model lines", () => {
       await result;
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
-        model_lines_schemas.attribute.vertex.name,
         {
-          id,
-          block_ids: lines_viewer_ids,
-          name: "points",
+          schema: model_lines_schemas.attribute.vertex.name,
+          params: {
+            id,
+            block_ids: lines_viewer_ids,
+            name: "points",
+          },
         },
         {
           response_function: expect.any(Function),
@@ -139,11 +141,13 @@ describe("model lines", () => {
       await result;
       await sleep(SLEEP_MS);
       expect(spy).toHaveBeenCalledWith(
-        model_lines_schemas.attribute.edge.name,
         {
-          id,
-          block_ids: lines_viewer_ids,
-          name: "test_attribute",
+          schema: model_lines_schemas.attribute.edge.name,
+          params: {
+            id,
+            block_ids: lines_viewer_ids,
+            name: "test_attribute",
+          },
         },
         {
           response_function: expect.any(Function),

@@ -65,9 +65,12 @@ export function useModelBlocksPolyhedronAttributeStyle() {
     }
 
     const params = { id: modelId, block_ids: viewer_ids, name };
-    return viewerStore.request(schema.name, params, {
-      response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, updates),
-    });
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, updates),
+      },
+    );
   }
 
   function modelBlocksPolyhedronAttributeRange(modelId, blockId) {
@@ -85,13 +88,16 @@ export function useModelBlocksPolyhedronAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, {
-            minimum,
-            maximum,
-          }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, {
+              minimum,
+              maximum,
+            }),
+        },
+      );
     }
     return setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, {
       minimum,
@@ -115,10 +121,13 @@ export function useModelBlocksPolyhedronAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, { colorMap }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, { colorMap }),
+        },
+      );
     }
     return setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, { colorMap });
   }

@@ -65,9 +65,12 @@ export function useModelBlocksVertexAttributeStyle() {
     }
 
     const params = { id: modelId, block_ids: viewer_ids, name };
-    return viewerStore.request(schema.name, params, {
-      response_function: () => mutateModelBlocksVertexStyle(modelId, blockIds, updates),
-    });
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () => mutateModelBlocksVertexStyle(modelId, blockIds, updates),
+      },
+    );
   }
 
   function modelBlocksVertexAttributeRange(modelId, blockId) {
@@ -85,10 +88,13 @@ export function useModelBlocksVertexAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { minimum, maximum }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { minimum, maximum }),
+        },
+      );
     }
     return setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { minimum, maximum });
   }
@@ -109,10 +115,13 @@ export function useModelBlocksVertexAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { colorMap }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { colorMap }),
+        },
+      );
     }
     return setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { colorMap });
   }

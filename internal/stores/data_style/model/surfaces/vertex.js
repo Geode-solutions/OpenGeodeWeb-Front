@@ -65,9 +65,12 @@ export function useModelSurfacesVertexAttributeStyle() {
     }
 
     const params = { id: modelId, block_ids: viewer_ids, name };
-    return viewerStore.request(schema.name, params, {
-      response_function: () => mutateModelSurfacesVertexStyle(modelId, surfaceIds, updates),
-    });
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () => mutateModelSurfacesVertexStyle(modelId, surfaceIds, updates),
+      },
+    );
   }
 
   function modelSurfacesVertexAttributeRange(modelId, surfaceId) {
@@ -85,13 +88,16 @@ export function useModelSurfacesVertexAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, {
-            minimum,
-            maximum,
-          }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, {
+              minimum,
+              maximum,
+            }),
+        },
+      );
     }
     return setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, {
       minimum,
@@ -115,10 +121,13 @@ export function useModelSurfacesVertexAttributeStyle() {
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(schema.color_map, params, {
-        response_function: () =>
-          setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, { colorMap }),
-      });
+      return viewerStore.request(
+        { schema: schema.color_map, params },
+        {
+          response_function: () =>
+            setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, { colorMap }),
+        },
+      );
     }
     return setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, { colorMap });
   }
