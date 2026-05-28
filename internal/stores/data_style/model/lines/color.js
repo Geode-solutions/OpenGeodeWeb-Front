@@ -16,5 +16,14 @@ export function useModelLinesColor() {
     return modelCommonStyle.setModelTypeColor(modelId, lines_ids, color, schema, color_mode);
   }
 
-  return { setModelLinesColor, modelLineColor };
+  function modelLineColorMode(id, line_id) {
+    const mode = modelLinesCommonStyle.modelLineStyle(id, line_id).color_mode || "constant";
+    return mode === "constant" ? "color" : mode;
+  }
+
+  function setModelLineColorMode(modelId, line_id, color_mode) {
+    return modelCommonStyle.setModelComponentColorMode(modelId, line_id, color_mode);
+  }
+
+  return { setModelLinesColor, modelLineColor, modelLineColorMode, setModelLineColorMode };
 }

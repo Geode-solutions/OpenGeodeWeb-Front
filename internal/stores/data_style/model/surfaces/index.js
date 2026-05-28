@@ -1,6 +1,8 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelSurfacesColor } from "./color";
 import { useModelSurfacesCommonStyle } from "./common";
+import { useModelSurfacesPolygonAttribute } from "./polygon";
+import { useModelSurfacesVertexAttribute } from "./vertex";
 import { useModelSurfacesVisibility } from "./visibility";
 
 async function setModelSurfacesDefaultStyle(_id) {
@@ -12,6 +14,8 @@ export function useModelSurfacesStyle() {
   const modelCommonStyle = useModelSurfacesCommonStyle();
   const modelVisibilityStyle = useModelSurfacesVisibility();
   const modelColorStyle = useModelSurfacesColor();
+  const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
+  const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
   async function applyModelSurfacesStyle(modelId) {
     const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
@@ -21,6 +25,7 @@ export function useModelSurfacesStyle() {
 
     const visibilityGroups = {};
     const colorGroups = {};
+    const attributeGroups = {};
 
     for (const surfaces_id of surfaces_ids) {
       const style = modelCommonStyle.modelSurfaceStyle(modelId, surfaces_id);
@@ -32,11 +37,34 @@ export function useModelSurfacesStyle() {
       visibilityGroups[visibility].push(surfaces_id);
 
       const color_mode = style.color_mode || "constant";
-      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[color_key]) {
-        colorGroups[color_key] = { color_mode, color: style.color, surfaces_ids: [] };
+      if (color_mode === "constant" || color_mode === "random") {
+        const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+        if (!colorGroups[color_key]) {
+          colorGroups[color_key] = { color_mode, color: style.color, surfaces_ids: [] };
+        }
+        colorGroups[color_key].surfaces_ids.push(surfaces_id);
+      } else {
+        const attributeTypeKey = `${color_mode}_attribute`;
+        const attributeStyle = style[attributeTypeKey] || {};
+        const { name } = attributeStyle;
+        if (name) {
+          const storedConfig =
+            (attributeStyle.storedConfigs && attributeStyle.storedConfigs[name]) || {};
+          const { minimum, maximum, colorMap } = storedConfig;
+          const attributeGroupKey = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
+          if (!attributeGroups[attributeGroupKey]) {
+            attributeGroups[attributeGroupKey] = {
+              color_mode,
+              name,
+              minimum,
+              maximum,
+              colorMap,
+              surfaces_ids: [],
+            };
+          }
+          attributeGroups[attributeGroupKey].surfaces_ids.push(surfaces_id);
+        }
       }
-      colorGroups[color_key].surfaces_ids.push(surfaces_id);
     }
 
     const promises = [
@@ -45,6 +73,32 @@ export function useModelSurfacesStyle() {
       ),
       ...Object.values(colorGroups).map(({ color_mode, color, surfaces_ids: ids }) =>
         modelColorStyle.setModelSurfacesColor(modelId, ids, color, color_mode),
+      ),
+      ...Object.values(attributeGroups).flatMap(
+        ({ color_mode, name, minimum, maximum, colorMap, surfaces_ids: ids }) => {
+          const isVertex = color_mode === "vertex";
+          const attributeStyle = isVertex
+            ? modelSurfacesVertexAttribute
+            : modelSurfacesPolygonAttribute;
+          const setAttributeName = isVertex
+            ? attributeStyle.setModelSurfacesVertexAttributeName
+            : attributeStyle.setModelSurfacesPolygonAttributeName;
+          const setAttributeRange = isVertex
+            ? attributeStyle.setModelSurfacesVertexAttributeRange
+            : attributeStyle.setModelSurfacesPolygonAttributeRange;
+          const setAttributeColorMap = isVertex
+            ? attributeStyle.setModelSurfacesVertexAttributeColorMap
+            : attributeStyle.setModelSurfacesPolygonAttributeColorMap;
+
+          const list = [setAttributeName(modelId, ids, name)];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(setAttributeRange(modelId, ids, minimum, maximum));
+          }
+          if (colorMap) {
+            list.push(setAttributeColorMap(modelId, ids, colorMap));
+          }
+          return list;
+        },
       ),
     ];
 
@@ -57,5 +111,7 @@ export function useModelSurfacesStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
+    ...modelSurfacesVertexAttribute,
+    ...modelSurfacesPolygonAttribute,
   };
 }

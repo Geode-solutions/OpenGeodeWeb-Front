@@ -1,11 +1,15 @@
-import { MESH_TYPES } from "@ogw_front/utils/default_styles";
+import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database";
-import { liveQuery } from "dexie";
-import { useObservable } from "@vueuse/rxjs";
 
-function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyleState) {
+function buildSelection(
+  modelId,
+  components,
+  componentStyles,
+  modelComponentTypeStyles,
+  dataStyleState,
+) {
   const componentsByType = Object.fromEntries(
-    MESH_TYPES.map((componentType) => [componentType, []]),
+    MESH_COMPONENT_TYPES.map((componentType) => [componentType, []]),
   );
   for (const component of components) {
     if (componentsByType[component.type]) {
@@ -15,19 +19,21 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
 
   const groupStyles = dataStyleState.getStyle(modelId);
   const selection = [];
-  for (const componentType of MESH_TYPES) {
+  for (const componentType of MESH_COMPONENT_TYPES) {
     const typeComponents = componentsByType[componentType];
     if (typeComponents.length === 0) {
       continue;
     }
 
     const typeKey = `${componentType.toLowerCase()}s`;
-    const typeStyle = typeStylesMap[componentType];
+    const typeStyleKey = `${modelId}_${componentType}`;
+    const typeStyle = modelComponentTypeStyles.value[typeStyleKey];
     const defaultVisibility = typeStyle?.visibility ?? groupStyles[typeKey]?.visibility ?? true;
 
     let allVisible = true;
     for (const component of typeComponents) {
-      const isVisible = stylesMap[component.geode_id]?.visibility ?? defaultVisibility;
+      const styleKey = `${modelId}_${component.geode_id}`;
+      const isVisible = componentStyles.value[styleKey]?.visibility ?? defaultVisibility;
       if (isVisible) {
         selection.push(component.geode_id);
       } else {
@@ -41,28 +47,43 @@ function buildSelection(modelId, components, stylesMap, typeStylesMap, dataStyle
   return selection;
 }
 
+const selectionCache = new Map();
+
 function useModelSelection(modelId, dataStyleState) {
-  return useObservable(
-    liveQuery(async () => {
-      if (!modelId) {
-        return [];
-      }
-      const [allComponents, componentStyles, typeStyles] = await Promise.all([
-        database.model_components.where("id").equals(modelId).toArray(),
-        database.model_component_datastyle.where("id_model").equals(modelId).toArray(),
-        database.model_component_type_datastyle.where("id_model").equals(modelId).toArray(),
-      ]);
-      if (allComponents.length === 0) {
-        return [];
-      }
-      const stylesMap = Object.fromEntries(
-        componentStyles.map((style) => [style.id_component, style]),
-      );
-      const stylesByTypeMap = Object.fromEntries(typeStyles.map((style) => [style.type, style]));
-      return buildSelection(modelId, allComponents, stylesMap, stylesByTypeMap, dataStyleState);
-    }),
-    { initialValue: [] },
-  );
+  if (!modelId) {
+    return computed(() => []);
+  }
+
+  const cacheKey = `${modelId}`;
+  if (selectionCache.has(cacheKey)) {
+    return selectionCache.get(cacheKey);
+  }
+
+  const allComponents = ref([]);
+
+  (async () => {
+    try {
+      allComponents.value = await database.model_components.where("id").equals(modelId).toArray();
+    } catch (error) {
+      console.error("Error fetching model components:", error);
+    }
+  })();
+
+  const computedSelection = computed(() => {
+    if (allComponents.value.length === 0) {
+      return [];
+    }
+    return buildSelection(
+      modelId,
+      allComponents.value,
+      dataStyleState.componentStyles,
+      dataStyleState.modelComponentTypeStyles,
+      dataStyleState,
+    );
+  });
+
+  selectionCache.set(cacheKey, computedSelection);
+  return computedSelection;
 }
 
 export { buildSelection, useModelSelection };
