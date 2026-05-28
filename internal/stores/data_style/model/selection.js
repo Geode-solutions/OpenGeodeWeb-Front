@@ -17,7 +17,7 @@ function buildSelection(
     }
   }
 
-  const groupStyles = dataStyleState.styles.value[modelId] || {};
+  const groupStyles = dataStyleState.getStyle(modelId);
   const selection = [];
   for (const componentType of MESH_COMPONENT_TYPES) {
     const typeComponents = componentsByType[componentType];

@@ -117,10 +117,70 @@ function meshPolyhedraDefaultStyle(
   };
 }
 
+function pointSetDefaultStyle() {
+  return {
+    visibility: true,
+    points: meshPointsDefaultStyle(),
+  };
+}
+
+function edgedCurveDefaultStyle() {
+  return {
+    visibility: true,
+    points: meshPointsDefaultStyle(),
+    edges: meshEdgesDefaultStyle(),
+  };
+}
+
+function grid2dDefaultStyle() {
+  return {
+    visibility: true,
+    points: meshPointsDefaultStyle(false),
+    edges: meshEdgesDefaultStyle(false),
+    cells: meshCellsDefaultStyle(),
+  };
+}
+
+function grid3dDefaultStyle() {
+  return {
+    visibility: true,
+    points: meshPointsDefaultStyle(false),
+    edges: meshEdgesDefaultStyle(false),
+    cells: meshCellsDefaultStyle(),
+    polyhedra: meshPolyhedraDefaultStyle(),
+  };
+}
+
+function surfaceDefaultStyle() {
+  return {
+    visibility: true,
+    points: meshPointsDefaultStyle(false),
+    edges: meshEdgesDefaultStyle(false),
+    polygons: meshPolygonsDefaultStyle(),
+  };
+}
+
+function solidDefaultStyle() {
+  return {
+    visibility: true,
+    points: meshPointsDefaultStyle(false),
+    edges: meshEdgesDefaultStyle(false),
+    polygons: meshPolygonsDefaultStyle(),
+    polyhedra: meshPolyhedraDefaultStyle(),
+  };
+}
+
 export {
   meshPointsDefaultStyle,
   meshEdgesDefaultStyle,
   meshCellsDefaultStyle,
   meshPolygonsDefaultStyle,
   meshPolyhedraDefaultStyle,
+  pointSetDefaultStyle,
+  edgedCurveDefaultStyle,
+  grid2dDefaultStyle,
+  grid3dDefaultStyle,
+  surfaceDefaultStyle,
+  solidDefaultStyle,
 };
+

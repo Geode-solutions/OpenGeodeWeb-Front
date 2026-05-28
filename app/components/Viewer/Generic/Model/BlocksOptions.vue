@@ -16,7 +16,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
-const modelComponentTypeVisibility = computed({
+const blocksVisibility = computed({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Block"),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(modelId, "Block", newValue);
@@ -24,34 +24,34 @@ const modelComponentTypeVisibility = computed({
   },
 });
 
-const componentVisibility = computed({
-  get: () => dataStyleStore.modelComponentVisibility(modelId, blockId),
+const blockVisibility = computed({
+  get: () => dataStyleStore.modelBlockVisibility(modelId, blockId),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId, [blockId], newValue);
+    await dataStyleStore.setModelBlocksVisibility(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 // Color
-const modelComponentTypeColor = computed({
-  get: () => dataStyleStore.getModelComponentTypeColor(modelId, "Block"),
+const blocksColor = computed({
+  get: () => dataStyleStore.modelBlocksStyle(modelId).color,
   set: async (color) => {
     await dataStyleStore.setModelComponentTypeColor(modelId, "Block", color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const componentColor = computed({
-  get: () => dataStyleStore.getModelComponentEffectiveColor(modelId, blockId, "Block"),
+const blockColor = computed({
+  get: () => dataStyleStore.modelBlockStyle(modelId, blockId).color,
   set: async (color) => {
     if (blockId) {
-      await dataStyleStore.setModelComponentsColor(modelId, [blockId], color);
+      await dataStyleStore.setModelBlocksColor(modelId, [blockId], color);
       hybridViewerStore.remoteRender();
     }
   },
 });
 
-const modelComponentTypeColorMode = computed({
+const blocksColorMode = computed({
   get: () => dataStyleStore.getModelComponentTypeColorMode(modelId, "Block"),
   set: async (colorMode) => {
     await dataStyleStore.setModelComponentTypeColorMode(modelId, "Block", colorMode);
@@ -59,7 +59,7 @@ const modelComponentTypeColorMode = computed({
   },
 });
 
-const componentColorMode = computed({
+const blockColorMode = computed({
   get: () => dataStyleStore.getModelComponentColorMode(modelId, blockId),
   set: async (colorMode) => {
     if (blockId) {
@@ -70,7 +70,7 @@ const componentColorMode = computed({
 });
 
 // Group Attributes
-const modelComponentTypeVertexAttributeName = computed({
+const blocksVertexAttributeName = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeName(modelId, targetBlockIds, newValue);
@@ -78,7 +78,7 @@ const modelComponentTypeVertexAttributeName = computed({
   },
 });
 
-const modelComponentTypeVertexAttributeRange = computed({
+const blocksVertexAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeRange(
@@ -91,7 +91,7 @@ const modelComponentTypeVertexAttributeRange = computed({
   },
 });
 
-const modelComponentTypeVertexAttributeColorMap = computed({
+const blocksVertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, targetBlockIds, newValue);
@@ -99,7 +99,7 @@ const modelComponentTypeVertexAttributeColorMap = computed({
   },
 });
 
-const modelComponentTypePolyhedronAttributeName = computed({
+const blocksPolyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, targetBlockIds, newValue);
@@ -107,7 +107,7 @@ const modelComponentTypePolyhedronAttributeName = computed({
   },
 });
 
-const modelComponentTypePolyhedronAttributeRange = computed({
+const blocksPolyhedronAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
@@ -120,7 +120,7 @@ const modelComponentTypePolyhedronAttributeRange = computed({
   },
 });
 
-const modelComponentTypePolyhedronAttributeColorMap = computed({
+const blocksPolyhedronAttributeColorMap = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
@@ -208,20 +208,20 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
 <template>
   <div>
     <OptionsSection title="Blocks Options" class="mt-6">
-      <VisibilitySwitch v-model="modelComponentTypeVisibility" />
+      <VisibilitySwitch v-model="blocksVisibility" />
       <v-row class="mt-2 pa-0">
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
             :componentId="targetBlockIds[0]"
-            v-model:coloring_style_key="modelComponentTypeColorMode"
-            v-model:color="modelComponentTypeColor"
-            v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
-            v-model:vertex_attribute_range="modelComponentTypeVertexAttributeRange"
-            v-model:vertex_attribute_color_map="modelComponentTypeVertexAttributeColorMap"
-            v-model:polyhedron_attribute_name="modelComponentTypePolyhedronAttributeName"
-            v-model:polyhedron_attribute_range="modelComponentTypePolyhedronAttributeRange"
-            v-model:polyhedron_attribute_color_map="modelComponentTypePolyhedronAttributeColorMap"
+            v-model:coloring_style_key="blocksColorMode"
+            v-model:color="blocksColor"
+            v-model:vertex_attribute_name="blocksVertexAttributeName"
+            v-model:vertex_attribute_range="blocksVertexAttributeRange"
+            v-model:vertex_attribute_color_map="blocksVertexAttributeColorMap"
+            v-model:polyhedron_attribute_name="blocksPolyhedronAttributeName"
+            v-model:polyhedron_attribute_range="blocksPolyhedronAttributeRange"
+            v-model:polyhedron_attribute_color_map="blocksPolyhedronAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
             :allowRandom="true"
@@ -231,14 +231,14 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
     </OptionsSection>
 
     <OptionsSection v-if="blockId" title="Component Options" class="mt-6">
-      <VisibilitySwitch v-model="componentVisibility" />
+      <VisibilitySwitch v-model="blockVisibility" />
       <v-row class="mt-2 pa-0">
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
             :componentId="blockId"
-            v-model:coloring_style_key="componentColorMode"
-            v-model:color="componentColor"
+            v-model:coloring_style_key="blockColorMode"
+            v-model:color="blockColor"
             v-model:vertex_attribute_name="vertexAttributeName"
             v-model:vertex_attribute_range="vertexAttributeRange"
             v-model:vertex_attribute_color_map="vertexAttributeColorMap"

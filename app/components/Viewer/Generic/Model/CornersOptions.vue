@@ -16,7 +16,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
-const modelComponentTypeVisibility = computed({
+const cornersVisibility = computed({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(modelId, "Corner", newValue);
@@ -24,34 +24,34 @@ const modelComponentTypeVisibility = computed({
   },
 });
 
-const componentVisibility = computed({
-  get: () => dataStyleStore.modelComponentVisibility(modelId, cornerId),
+const cornerVisibility = computed({
+  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId, [cornerId], newValue);
+    await dataStyleStore.setModelCornersVisibility(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 // Color
-const modelComponentTypeColor = computed({
-  get: () => dataStyleStore.getModelComponentTypeColor(modelId, "Corner"),
+const cornersColor = computed({
+  get: () => dataStyleStore.modelCornersStyle(modelId).color,
   set: async (color) => {
     await dataStyleStore.setModelComponentTypeColor(modelId, "Corner", color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const componentColor = computed({
-  get: () => dataStyleStore.getModelComponentEffectiveColor(modelId, cornerId, "Corner"),
+const cornerColor = computed({
+  get: () => dataStyleStore.modelCornerStyle(modelId, cornerId).color,
   set: async (color) => {
     if (cornerId) {
-      await dataStyleStore.setModelComponentsColor(modelId, [cornerId], color);
+      await dataStyleStore.setModelCornersColor(modelId, [cornerId], color);
       hybridViewerStore.remoteRender();
     }
   },
 });
 
-const modelComponentTypeColorMode = computed({
+const cornersColorMode = computed({
   get: () => dataStyleStore.getModelComponentTypeColorMode(modelId, "Corner"),
   set: async (colorMode) => {
     await dataStyleStore.setModelComponentTypeColorMode(modelId, "Corner", colorMode);
@@ -59,7 +59,7 @@ const modelComponentTypeColorMode = computed({
   },
 });
 
-const componentColorMode = computed({
+const cornerColorMode = computed({
   get: () => dataStyleStore.getModelComponentColorMode(modelId, cornerId),
   set: async (colorMode) => {
     if (cornerId) {
@@ -70,7 +70,7 @@ const componentColorMode = computed({
 });
 
 // Group Attributes
-const modelComponentTypeVertexAttributeName = computed({
+const cornersVertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, targetCornerIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue);
@@ -78,7 +78,7 @@ const modelComponentTypeVertexAttributeName = computed({
   },
 });
 
-const modelComponentTypeVertexAttributeRange = computed({
+const cornersVertexAttributeRange = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, targetCornerIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeRange(
@@ -91,7 +91,7 @@ const modelComponentTypeVertexAttributeRange = computed({
   },
 });
 
-const modelComponentTypeVertexAttributeColorMap = computed({
+const cornersVertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, targetCornerIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, targetCornerIds, newValue);
@@ -145,17 +145,17 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
 <template>
   <div>
     <OptionsSection title="Corners Options" class="mt-6">
-      <VisibilitySwitch v-model="modelComponentTypeVisibility" />
+      <VisibilitySwitch v-model="cornersVisibility" />
       <v-row class="mt-2 pa-0">
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
             :componentId="targetCornerIds[0]"
-            v-model:coloring_style_key="modelComponentTypeColorMode"
-            v-model:color="modelComponentTypeColor"
-            v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
-            v-model:vertex_attribute_range="modelComponentTypeVertexAttributeRange"
-            v-model:vertex_attribute_color_map="modelComponentTypeVertexAttributeColorMap"
+            v-model:coloring_style_key="cornersColorMode"
+            v-model:color="cornersColor"
+            v-model:vertex_attribute_name="cornersVertexAttributeName"
+            v-model:vertex_attribute_range="cornersVertexAttributeRange"
+            v-model:vertex_attribute_color_map="cornersVertexAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema }"
             :allowRandom="true"
@@ -165,14 +165,14 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
     </OptionsSection>
 
     <OptionsSection v-if="cornerId" title="Component Options" class="mt-6">
-      <VisibilitySwitch v-model="componentVisibility" />
+      <VisibilitySwitch v-model="cornerVisibility" />
       <v-row class="mt-2 pa-0">
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
             :componentId="cornerId"
-            v-model:coloring_style_key="componentColorMode"
-            v-model:color="componentColor"
+            v-model:coloring_style_key="cornerColorMode"
+            v-model:color="cornerColor"
             v-model:vertex_attribute_name="vertexAttributeName"
             v-model:vertex_attribute_range="vertexAttributeRange"
             v-model:vertex_attribute_color_map="vertexAttributeColorMap"

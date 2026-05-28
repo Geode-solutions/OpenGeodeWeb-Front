@@ -1,7 +1,7 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersColor } from "./color";
 import { useModelCornersCommonStyle } from "./common";
-import { useModelCornersVertexAttributeStyle } from "./vertex";
+import { useModelCornersVertexAttribute } from "./vertex";
 import { useModelCornersVisibility } from "./visibility";
 
 async function setModelCornersDefaultStyle(_id) {
@@ -13,7 +13,7 @@ export function useModelCornersStyle() {
   const modelCommonStyle = useModelCornersCommonStyle();
   const modelVisibilityStyle = useModelCornersVisibility();
   const modelColorStyle = useModelCornersColor();
-  const modelCornersVertexAttributeStyle = useModelCornersVertexAttributeStyle();
+  const modelCornersVertexAttribute = useModelCornersVertexAttribute();
 
   async function applyModelCornersStyle(modelId) {
     const corners_ids = await dataStore.getCornersGeodeIds(modelId);
@@ -74,10 +74,10 @@ export function useModelCornersStyle() {
       ),
       ...Object.values(attributeGroups).flatMap(
         ({ name, minimum, maximum, colorMap, corners_ids: ids }) => {
-          const attributeStyle = modelCornersVertexAttributeStyle;
-          const setAttributeName = attributeStyle.setModelCornersVertexAttributeName;
-          const setAttributeRange = attributeStyle.setModelCornersVertexAttributeRange;
-          const setAttributeColorMap = attributeStyle.setModelCornersVertexAttributeColorMap;
+          const attribute = modelCornersVertexAttribute;
+          const setAttributeName = attribute.setModelCornersVertexAttributeName;
+          const setAttributeRange = attribute.setModelCornersVertexAttributeRange;
+          const setAttributeColorMap = attribute.setModelCornersVertexAttributeColorMap;
 
           const list = [setAttributeName(modelId, ids, name)];
           if (minimum !== undefined && maximum !== undefined) {
@@ -100,6 +100,6 @@ export function useModelCornersStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
-    ...modelCornersVertexAttributeStyle,
+    ...modelCornersVertexAttribute,
   };
 }

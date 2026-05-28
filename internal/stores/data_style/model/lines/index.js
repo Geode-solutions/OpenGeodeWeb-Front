@@ -1,8 +1,8 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
-import { useModelLinesEdgeAttributeStyle } from "./edge";
-import { useModelLinesVertexAttributeStyle } from "./vertex";
+import { useModelLinesEdgeAttribute } from "./edge";
+import { useModelLinesVertexAttribute } from "./vertex";
 import { useModelLinesVisibility } from "./visibility";
 
 async function setModelLinesDefaultStyle(_id) {
@@ -14,8 +14,8 @@ export function useModelLinesStyle() {
   const modelCommonStyle = useModelLinesCommonStyle();
   const modelVisibilityStyle = useModelLinesVisibility();
   const modelColorStyle = useModelLinesColor();
-  const modelLinesVertexAttributeStyle = useModelLinesVertexAttributeStyle();
-  const modelLinesEdgeAttributeStyle = useModelLinesEdgeAttributeStyle();
+  const modelLinesVertexAttribute = useModelLinesVertexAttribute();
+  const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
   async function applyModelLinesStyle(modelId) {
     const lines_ids = await dataStore.getLinesGeodeIds(modelId);
@@ -78,8 +78,8 @@ export function useModelLinesStyle() {
         ({ color_mode, name, minimum, maximum, colorMap, lines_ids: ids }) => {
           const isVertex = color_mode === "vertex";
           const attributeStyle = isVertex
-            ? modelLinesVertexAttributeStyle
-            : modelLinesEdgeAttributeStyle;
+            ? modelLinesVertexAttribute
+            : modelLinesEdgeAttribute;
           const setAttributeName = isVertex
             ? attributeStyle.setModelLinesVertexAttributeName
             : attributeStyle.setModelLinesEdgeAttributeName;
@@ -111,7 +111,7 @@ export function useModelLinesStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
-    ...modelLinesVertexAttributeStyle,
-    ...modelLinesEdgeAttributeStyle,
+    ...modelLinesVertexAttribute,
+    ...modelLinesEdgeAttribute,
   };
 }

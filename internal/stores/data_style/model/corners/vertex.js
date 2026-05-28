@@ -10,7 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.attribute.vertex;
 
-export function useModelCornersVertexAttributeStyle() {
+export function useModelCornersVertexAttribute() {
   const dataStore = useDataStore();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
   const viewerStore = useViewerStore();

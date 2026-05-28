@@ -1,8 +1,8 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelSurfacesColor } from "./color";
 import { useModelSurfacesCommonStyle } from "./common";
-import { useModelSurfacesPolygonAttributeStyle } from "./polygon";
-import { useModelSurfacesVertexAttributeStyle } from "./vertex";
+import { useModelSurfacesPolygonAttribute } from "./polygon";
+import { useModelSurfacesVertexAttribute } from "./vertex";
 import { useModelSurfacesVisibility } from "./visibility";
 
 async function setModelSurfacesDefaultStyle(_id) {
@@ -14,8 +14,8 @@ export function useModelSurfacesStyle() {
   const modelCommonStyle = useModelSurfacesCommonStyle();
   const modelVisibilityStyle = useModelSurfacesVisibility();
   const modelColorStyle = useModelSurfacesColor();
-  const modelSurfacesVertexAttributeStyle = useModelSurfacesVertexAttributeStyle();
-  const modelSurfacesPolygonAttributeStyle = useModelSurfacesPolygonAttributeStyle();
+  const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
+  const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
   async function applyModelSurfacesStyle(modelId) {
     const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
@@ -78,8 +78,8 @@ export function useModelSurfacesStyle() {
         ({ color_mode, name, minimum, maximum, colorMap, surfaces_ids: ids }) => {
           const isVertex = color_mode === "vertex";
           const attributeStyle = isVertex
-            ? modelSurfacesVertexAttributeStyle
-            : modelSurfacesPolygonAttributeStyle;
+            ? modelSurfacesVertexAttribute
+            : modelSurfacesPolygonAttribute;
           const setAttributeName = isVertex
             ? attributeStyle.setModelSurfacesVertexAttributeName
             : attributeStyle.setModelSurfacesPolygonAttributeName;
@@ -111,7 +111,7 @@ export function useModelSurfacesStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
-    ...modelSurfacesVertexAttributeStyle,
-    ...modelSurfacesPolygonAttributeStyle,
+    ...modelSurfacesVertexAttribute,
+    ...modelSurfacesPolygonAttribute,
   };
 }

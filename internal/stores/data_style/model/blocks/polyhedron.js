@@ -10,7 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.polyhedron;
 
-export function useModelBlocksPolyhedronAttributeStyle() {
+export function useModelBlocksPolyhedronAttribute() {
   const dataStore = useDataStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const viewerStore = useViewerStore();

@@ -16,7 +16,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
-const modelComponentTypeVisibility = computed({
+const linesVisibility = computed({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Line"),
   set: async (newValue) => {
     await dataStyleStore.setModelComponentTypeVisibility(modelId, "Line", newValue);
@@ -24,34 +24,34 @@ const modelComponentTypeVisibility = computed({
   },
 });
 
-const componentVisibility = computed({
-  get: () => dataStyleStore.modelComponentVisibility(modelId, lineId),
+const lineVisibility = computed({
+  get: () => dataStyleStore.modelLineVisibility(modelId, lineId),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId, [lineId], newValue);
+    await dataStyleStore.setModelLinesVisibility(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 // Color
-const modelComponentTypeColor = computed({
-  get: () => dataStyleStore.getModelComponentTypeColor(modelId, "Line"),
+const linesColor = computed({
+  get: () => dataStyleStore.modelLinesStyle(modelId).color,
   set: async (color) => {
     await dataStyleStore.setModelComponentTypeColor(modelId, "Line", color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const componentColor = computed({
-  get: () => dataStyleStore.getModelComponentEffectiveColor(modelId, lineId, "Line"),
+const lineColor = computed({
+  get: () => dataStyleStore.modelLineStyle(modelId, lineId).color,
   set: async (color) => {
     if (lineId) {
-      await dataStyleStore.setModelComponentsColor(modelId, [lineId], color);
+      await dataStyleStore.setModelLinesColor(modelId, [lineId], color);
       hybridViewerStore.remoteRender();
     }
   },
 });
 
-const modelComponentTypeColorMode = computed({
+const linesColorMode = computed({
   get: () => dataStyleStore.getModelComponentTypeColorMode(modelId, "Line"),
   set: async (colorMode) => {
     await dataStyleStore.setModelComponentTypeColorMode(modelId, "Line", colorMode);
@@ -59,7 +59,7 @@ const modelComponentTypeColorMode = computed({
   },
 });
 
-const componentColorMode = computed({
+const lineColorMode = computed({
   get: () => dataStyleStore.getModelComponentColorMode(modelId, lineId),
   set: async (colorMode) => {
     if (lineId) {
@@ -70,7 +70,7 @@ const componentColorMode = computed({
 });
 
 // Group Attributes
-const modelComponentTypeVertexAttributeName = computed({
+const linesVertexAttributeName = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, targetLineIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeName(modelId, targetLineIds, newValue);
@@ -78,7 +78,7 @@ const modelComponentTypeVertexAttributeName = computed({
   },
 });
 
-const modelComponentTypeVertexAttributeRange = computed({
+const linesVertexAttributeRange = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, targetLineIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeRange(
@@ -91,7 +91,7 @@ const modelComponentTypeVertexAttributeRange = computed({
   },
 });
 
-const modelComponentTypeVertexAttributeColorMap = computed({
+const linesVertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId, targetLineIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, targetLineIds, newValue);
@@ -99,7 +99,7 @@ const modelComponentTypeVertexAttributeColorMap = computed({
   },
 });
 
-const modelComponentTypeEdgeAttributeName = computed({
+const linesEdgeAttributeName = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, targetLineIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeName(modelId, targetLineIds, newValue);
@@ -107,7 +107,7 @@ const modelComponentTypeEdgeAttributeName = computed({
   },
 });
 
-const modelComponentTypeEdgeAttributeRange = computed({
+const linesEdgeAttributeRange = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, targetLineIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeRange(
@@ -120,7 +120,7 @@ const modelComponentTypeEdgeAttributeRange = computed({
   },
 });
 
-const modelComponentTypeEdgeAttributeColorMap = computed({
+const linesEdgeAttributeColorMap = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, targetLineIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, targetLineIds, newValue);
@@ -204,20 +204,20 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
 <template>
   <div>
     <OptionsSection title="Lines Options" class="mt-6">
-      <VisibilitySwitch v-model="modelComponentTypeVisibility" />
+      <VisibilitySwitch v-model="linesVisibility" />
       <v-row class="mt-2 pa-0">
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
             :componentId="targetLineIds[0]"
-            v-model:coloring_style_key="modelComponentTypeColorMode"
-            v-model:color="modelComponentTypeColor"
-            v-model:vertex_attribute_name="modelComponentTypeVertexAttributeName"
-            v-model:vertex_attribute_range="modelComponentTypeVertexAttributeRange"
-            v-model:vertex_attribute_color_map="modelComponentTypeVertexAttributeColorMap"
-            v-model:edge_attribute_name="modelComponentTypeEdgeAttributeName"
-            v-model:edge_attribute_range="modelComponentTypeEdgeAttributeRange"
-            v-model:edge_attribute_color_map="modelComponentTypeEdgeAttributeColorMap"
+            v-model:coloring_style_key="linesColorMode"
+            v-model:color="linesColor"
+            v-model:vertex_attribute_name="linesVertexAttributeName"
+            v-model:vertex_attribute_range="linesVertexAttributeRange"
+            v-model:vertex_attribute_color_map="linesVertexAttributeColorMap"
+            v-model:edge_attribute_name="linesEdgeAttributeName"
+            v-model:edge_attribute_range="linesEdgeAttributeRange"
+            v-model:edge_attribute_color_map="linesEdgeAttributeColorMap"
             :capabilities="capabilities"
             :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
             :allowRandom="true"
@@ -227,14 +227,14 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
     </OptionsSection>
 
     <OptionsSection v-if="lineId" title="Component Options" class="mt-6">
-      <VisibilitySwitch v-model="componentVisibility" />
+      <VisibilitySwitch v-model="lineVisibility" />
       <v-row class="mt-2 pa-0">
         <v-col class="pa-0">
           <ViewerOptionsColoringTypeSelector
             :id="modelId"
             :componentId="lineId"
-            v-model:coloring_style_key="componentColorMode"
-            v-model:color="componentColor"
+            v-model:coloring_style_key="lineColorMode"
+            v-model:color="lineColor"
             v-model:vertex_attribute_name="vertexAttributeName"
             v-model:vertex_attribute_range="vertexAttributeRange"
             v-model:vertex_attribute_color_map="vertexAttributeColorMap"

@@ -1,8 +1,8 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
-import { useModelBlocksPolyhedronAttributeStyle } from "./polyhedron";
-import { useModelBlocksVertexAttributeStyle } from "./vertex";
+import { useModelBlocksPolyhedronAttribute } from "./polyhedron";
+import { useModelBlocksVertexAttribute } from "./vertex";
 import { useModelBlocksVisibility } from "./visibility";
 
 async function setModelBlocksDefaultStyle(_id) {
@@ -14,8 +14,8 @@ export function useModelBlocksStyle() {
   const modelCommonStyle = useModelBlocksCommonStyle();
   const modelVisibilityStyle = useModelBlocksVisibility();
   const modelColorStyle = useModelBlocksColor();
-  const modelBlocksVertexAttributeStyle = useModelBlocksVertexAttributeStyle();
-  const modelBlocksPolyhedronAttributeStyle = useModelBlocksPolyhedronAttributeStyle();
+  const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
+  const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
 
   async function applyModelBlocksStyle(modelId) {
     const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
@@ -78,8 +78,8 @@ export function useModelBlocksStyle() {
         ({ color_mode, name, minimum, maximum, colorMap, blocks_ids: ids }) => {
           const isVertex = color_mode === "vertex";
           const attributeStyle = isVertex
-            ? modelBlocksVertexAttributeStyle
-            : modelBlocksPolyhedronAttributeStyle;
+            ? modelBlocksVertexAttribute
+            : modelBlocksPolyhedronAttribute;
           const setAttributeName = isVertex
             ? attributeStyle.setModelBlocksVertexAttributeName
             : attributeStyle.setModelBlocksPolyhedronAttributeName;
@@ -111,7 +111,7 @@ export function useModelBlocksStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
-    ...modelBlocksVertexAttributeStyle,
-    ...modelBlocksPolyhedronAttributeStyle,
+    ...modelBlocksVertexAttribute,
+    ...modelBlocksPolyhedronAttribute,
   };
 }
