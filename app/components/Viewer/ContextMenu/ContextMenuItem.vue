@@ -254,4 +254,40 @@ function toggleOptions() {
 .options-left {
   right: 60px;
 }
+
+:deep(.v-field) {
+  min-height: 30px !important;
+  height: 30px !important;
+  border-radius: 6px !important;
+}
+
+:deep(.v-field__input) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  min-height: 30px !important;
+  height: 30px !important;
+  font-size: 0.95rem !important;
+  align-items: center;
+}
+
+:deep(.v-field__append-inner) {
+  align-items: center;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  height: 30px !important;
+}
+
+:deep(.v-field__append-inner .v-icon) {
+  font-size: 16px !important;
+}
+
+:deep(.v-field-label) {
+  font-size: 0.75rem !important;
+  top: 6px !important;
+}
+
+:deep(.v-field-label--floating) {
+  top: -8px !important;
+  font-size: 0.7rem !important;
+}
 </style>
