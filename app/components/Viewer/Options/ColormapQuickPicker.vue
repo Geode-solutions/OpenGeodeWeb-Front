@@ -15,6 +15,14 @@ const show = defineModel("show", { type: Boolean, default: false });
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
+const componentNames = [
+  { getterKey: "meshPoints", setterKey: "MeshPoints", key: "points" },
+  { getterKey: "meshEdges", setterKey: "MeshEdges", key: "edges" },
+  { getterKey: "meshPolygons", setterKey: "MeshPolygons", key: "polygons" },
+  { getterKey: "meshCells", setterKey: "MeshCells", key: "cells" },
+  { getterKey: "meshPolyhedra", setterKey: "MeshPolyhedra", key: "polyhedra" },
+];
+
 const current = computed(() => {
   const targetId = dataId;
   if (!targetId) {
@@ -26,26 +34,27 @@ const current = computed(() => {
     return "batlow";
   }
 
-  const componentNames = [
-    { getterKey: "meshPoints", key: "points" },
-    { getterKey: "meshEdges", key: "edges" },
-    { getterKey: "meshPolygons", key: "polygons" },
-    { getterKey: "meshCells", key: "cells" },
-    { getterKey: "meshPolyhedra", key: "polyhedra" },
-  ];
-
   for (const { key, getterKey } of componentNames) {
-    const activeColoring = style[key]?.coloring?.active;
-    if (["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
-      const attributeType = `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
-      const getterName = `${getterKey}${attributeType}ColorMap`;
-      const getter = dataStyleStore[getterName];
-      if (getter) {
-        const colorMap = getter(targetId);
-        if (colorMap) {
-          return colorMap;
-        }
-      }
+    if (!style[key] || !style[key].coloring) {
+      continue;
+    }
+    
+    const activeColoring = style[key].coloring.active;
+    if (!["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
+      continue;
+    }
+    
+    const attributeType = `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
+    const getterName = `${getterKey}${attributeType}ColorMap`;
+    const getter = dataStyleStore[getterName];
+    
+    if (!getter) {
+      continue;
+    }
+    
+    const colorMap = getter(targetId);
+    if (colorMap) {
+      return colorMap;
     }
   }
 
@@ -68,23 +77,23 @@ async function onQuickColormapSelect(preset) {
   }
 
   const promises = [];
-  const componentNames = [
-    { key: "points", setterKey: "MeshPoints" },
-    { key: "edges", setterKey: "MeshEdges" },
-    { key: "polygons", setterKey: "MeshPolygons" },
-    { key: "cells", setterKey: "MeshCells" },
-    { key: "polyhedra", setterKey: "MeshPolyhedra" },
-  ];
 
   for (const { key, setterKey } of componentNames) {
-    const activeColoring = style[key]?.coloring?.active;
-    if (["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
-      const attributeType = `${activeColoring.charAt(0).toUpperCase() + activeColoring.slice(1)}Attribute`;
-      const setterName = `set${setterKey}${attributeType}ColorMap`;
-      const setter = dataStyleStore[setterName];
-      if (setter) {
-        promises.push(setter(targetId, newMap));
-      }
+    if (!style[key] || !style[key].coloring) {
+      continue;
+    }
+    
+    const activeColoring = style[key].coloring.active;
+    if (!["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
+      continue;
+    }
+    
+    const attributeType = `${activeColoring.charAt(0).toUpperCase() + activeColoring.slice(1)}Attribute`;
+    const setterName = `set${setterKey}${attributeType}ColorMap`;
+    const setter = dataStyleStore[setterName];
+    
+    if (setter) {
+      promises.push(setter(targetId, newMap));
     }
   }
 
