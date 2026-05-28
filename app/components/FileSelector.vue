@@ -47,7 +47,7 @@ function files_uploaded_event(value) {
 async function get_allowed_files() {
   toggle_loading();
   const backStore = useBackStore();
-  const response = await backStore.request(schema, {});
+  const response = await backStore.request({ schema });
   accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
   toggle_loading();
 }
@@ -64,7 +64,7 @@ await get_allowed_files();
       accept,
       files: internal_files,
       auto_upload: internal_auto_upload,
-      show_overlay,
+      showOverlay: show_overlay,
     }"
     @files_uploaded="files_uploaded_event"
   />

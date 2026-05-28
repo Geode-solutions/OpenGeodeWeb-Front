@@ -2,6 +2,7 @@
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
+// oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
 
@@ -217,13 +218,13 @@ export const useAppStore = defineStore("app", () => {
     );
   }
 
-  function request(schema, params, callbacks = {}) {
+  function request({ schema, params }, callbacks = {}) {
     console.log("[APP] Request:", schema.$id);
 
     const store = useAppStore();
     return api_fetch(
       store,
-      { schema, params },
+      { schema, params, headers: {} },
       {
         ...callbacks,
         response_function: async (response) => {
@@ -256,12 +257,15 @@ export const useAppStore = defineStore("app", () => {
       additionalProperties: true,
     };
     const params = { PROJECT };
-    return request(schema, params, {
-      response_function: (response) => {
-        console.log(`[APP] ${response.projectFolderPath} created`);
-        projectFolderPath.value = response.projectFolderPath;
+    return request(
+      { schema, params },
+      {
+        response_function: (response) => {
+          console.log(`[APP] ${response.projectFolderPath} created`);
+          projectFolderPath.value = response.projectFolderPath;
+        },
       },
-    });
+    );
   }
 
   return {

@@ -16,5 +16,10 @@ export function useModelBlocksColor() {
     return modelCommonStyle.setModelTypeColor(modelId, blocks_ids, color, schema, color_mode);
   }
 
-  return { setModelBlocksColor, modelBlockColor };
+  function modelBlockColorMode(id, block_id) {
+    const mode = modelBlocksCommonStyle.modelBlockStyle(id, block_id).color_mode || "constant";
+    return mode === "constant" ? "color" : mode;
+  }
+
+  return { setModelBlocksColor, modelBlockColor, modelBlockColorMode };
 }

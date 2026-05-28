@@ -56,12 +56,15 @@ export default defineEventHandler(async (event) => {
             statusMessage: "Invalid extension file: missing backend executable",
           });
         }
-        const frontendFilePath = extensionFrontendPath(
+
+        const frontendFilePath = await extensionFrontendPath(
           unzippedExtensionPath,
           frontendFile,
           path.resolve(),
           id,
         );
+
+        console.log("runExtensions", { frontendFilePath });
         const frontendContent = await fs.promises.readFile(frontendFilePath, "utf8");
 
         const backendExecutablePath = path.join(unzippedExtensionPath, backendExecutable);

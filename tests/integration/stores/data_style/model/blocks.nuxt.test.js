@@ -50,13 +50,10 @@ describe("model blocks", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_blocks_schemas.visibility;
+      const params = { id, block_ids: block_viewer_ids, visibility };
       expect(spy).toHaveBeenCalledWith(
-        model_blocks_schemas.visibility,
-        {
-          id,
-          block_ids: block_viewer_ids,
-          visibility,
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -79,14 +76,10 @@ describe("model blocks", () => {
       const spy = vi.spyOn(viewerStore, "request");
       await dataStyleStore.setModelBlocksColor(id, block_ids, color);
       await sleep(SLEEP_MS);
+      const schema = model_blocks_schemas.color;
+      const params = { id, block_ids: block_viewer_ids, color, color_mode: "constant" };
       expect(spy).toHaveBeenCalledWith(
-        model_blocks_schemas.color,
-        {
-          id,
-          block_ids: block_viewer_ids,
-          color,
-          color_mode: "constant",
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -97,6 +90,78 @@ describe("model blocks", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
+  describe("blocks vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_blocks_schemas.attribute.vertex.name,
+          params: {
+            id,
+            block_ids: block_viewer_ids,
+            name: "points",
+          },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      for (const block_id of block_ids) {
+        expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("blocks polyhedron attribute", () => {
+    test("coloring polyhedron attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelBlocksPolyhedronAttributeName(
+        id,
+        block_ids,
+        "test_attribute",
+      );
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_blocks_schemas.attribute.polyhedron.name,
+          params: {
+            id,
+            block_ids: block_viewer_ids,
+            name: "test_attribute",
+          },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      for (const block_id of block_ids) {
+        expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
+          "test_attribute",
+        );
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
   describe("blocks style", () => {
     test("blocks apply style", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -104,6 +169,52 @@ describe("model blocks", () => {
       const result = dataStyleStore.applyModelBlocksStyle(id);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("block component active coloring", () => {
+    test("coloring color", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      const coloringName = "color";
+      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, [block_id], "points");
+      const coloringName = "vertex";
+      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring polyhedron", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(id, [block_id], "test_attribute");
+      const coloringName = "polyhedron";
+      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });

@@ -1,6 +1,8 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
+import { useModelLinesEdgeAttribute } from "./edge";
+import { useModelLinesVertexAttribute } from "./vertex";
 import { useModelLinesVisibility } from "./visibility";
 
 async function setModelLinesDefaultStyle(_id) {
@@ -12,6 +14,8 @@ export function useModelLinesStyle() {
   const modelCommonStyle = useModelLinesCommonStyle();
   const modelVisibilityStyle = useModelLinesVisibility();
   const modelColorStyle = useModelLinesColor();
+  const modelLinesVertexAttribute = useModelLinesVertexAttribute();
+  const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
   async function applyModelLinesStyle(modelId) {
     const lines_ids = await dataStore.getLinesGeodeIds(modelId);
@@ -21,6 +25,7 @@ export function useModelLinesStyle() {
 
     const visibilityGroups = {};
     const colorGroups = {};
+    const attributeGroups = {};
 
     for (const line_id of lines_ids) {
       const style = modelCommonStyle.modelLineStyle(modelId, line_id);
@@ -32,11 +37,34 @@ export function useModelLinesStyle() {
       visibilityGroups[visibility].push(line_id);
 
       const color_mode = style.color_mode || "constant";
-      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[color_key]) {
-        colorGroups[color_key] = { color_mode, color: style.color, lines_ids: [] };
+      if (color_mode === "constant" || color_mode === "random") {
+        const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+        if (!colorGroups[color_key]) {
+          colorGroups[color_key] = { color_mode, color: style.color, lines_ids: [] };
+        }
+        colorGroups[color_key].lines_ids.push(line_id);
+      } else {
+        const attributeTypeKey = `${color_mode}_attribute`;
+        const attributeStyle = style[attributeTypeKey] || {};
+        const { name } = attributeStyle;
+        if (name) {
+          const storedConfig =
+            (attributeStyle.storedConfigs && attributeStyle.storedConfigs[name]) || {};
+          const { minimum, maximum, colorMap } = storedConfig;
+          const attributeGroupKey = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
+          if (!attributeGroups[attributeGroupKey]) {
+            attributeGroups[attributeGroupKey] = {
+              color_mode,
+              name,
+              minimum,
+              maximum,
+              colorMap,
+              lines_ids: [],
+            };
+          }
+          attributeGroups[attributeGroupKey].lines_ids.push(line_id);
+        }
       }
-      colorGroups[color_key].lines_ids.push(line_id);
     }
 
     const promises = [
@@ -45,6 +73,30 @@ export function useModelLinesStyle() {
       ),
       ...Object.values(colorGroups).map(({ color_mode, color, lines_ids: ids }) =>
         modelColorStyle.setModelLinesColor(modelId, ids, color, color_mode),
+      ),
+      ...Object.values(attributeGroups).flatMap(
+        ({ color_mode, name, minimum, maximum, colorMap, lines_ids: ids }) => {
+          const isVertex = color_mode === "vertex";
+          const attributeStyle = isVertex ? modelLinesVertexAttribute : modelLinesEdgeAttribute;
+          const setAttributeName = isVertex
+            ? attributeStyle.setModelLinesVertexAttributeName
+            : attributeStyle.setModelLinesEdgeAttributeName;
+          const setAttributeRange = isVertex
+            ? attributeStyle.setModelLinesVertexAttributeRange
+            : attributeStyle.setModelLinesEdgeAttributeRange;
+          const setAttributeColorMap = isVertex
+            ? attributeStyle.setModelLinesVertexAttributeColorMap
+            : attributeStyle.setModelLinesEdgeAttributeColorMap;
+
+          const list = [setAttributeName(modelId, ids, name)];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(setAttributeRange(modelId, ids, minimum, maximum));
+          }
+          if (colorMap) {
+            list.push(setAttributeColorMap(modelId, ids, colorMap));
+          }
+          return list;
+        },
       ),
     ];
 
@@ -57,5 +109,7 @@ export function useModelLinesStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
+    ...modelLinesVertexAttribute,
+    ...modelLinesEdgeAttribute,
   };
 }

@@ -9,6 +9,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshEdgesVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.vertex;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useMeshEdgesVertexAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
@@ -53,9 +54,10 @@ export function useMeshEdgesVertexAttributeStyle() {
     return meshEdgesVertexAttribute(id).name;
   }
   function setMeshEdgesVertexAttributeName(id, name) {
+    const schema = meshEdgesVertexAttributeSchemas.name;
+    const params = { id, name };
     return viewerStore.request(
-      meshEdgesVertexAttributeSchemas.name,
-      { id, name },
+      { schema, params },
       {
         response_function: () => {
           const updates = { name };
@@ -85,9 +87,10 @@ export function useMeshEdgesVertexAttributeStyle() {
     const name = meshEdgesVertexAttributeName(id);
     const points = getRGBPointsFromPreset(meshEdgesVertexAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshEdgesVertexAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshEdgesVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             setMeshEdgesVertexAttributeStoredConfig(id, name, { minimum, maximum }),
@@ -112,9 +115,10 @@ export function useMeshEdgesVertexAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshEdgesVertexAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshEdgesVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () => setMeshEdgesVertexAttributeStoredConfig(id, name, { colorMap }),
         },

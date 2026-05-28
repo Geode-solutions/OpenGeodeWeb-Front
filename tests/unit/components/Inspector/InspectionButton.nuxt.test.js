@@ -31,7 +31,7 @@ describe("inspector inspection button", () => {
         },
       ],
     };
-    backStore.request = vi.fn((_schema, _params, callbacks) => {
+    backStore.request = vi.fn((request, callbacks) => {
       callbacks?.response_function?.({ inspection_result });
       return Promise.resolve({ inspection_result });
     });

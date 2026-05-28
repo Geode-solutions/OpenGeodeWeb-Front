@@ -6,7 +6,7 @@ import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshCellsColorSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.color;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.cells.color;
 
 export function useMeshCellsColorStyle() {
   const viewerStore = useViewerStore();
@@ -16,9 +16,12 @@ export function useMeshCellsColorStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).color;
   }
   function setMeshCellsColor(id, color) {
+    const params = { id, color };
     return viewerStore.request(
-      meshCellsColorSchemas,
-      { id, color },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () =>
           meshCellsCommonStyle.mutateMeshCellsColoring(id, {

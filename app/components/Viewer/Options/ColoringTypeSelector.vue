@@ -29,13 +29,35 @@ const polyhedron_attribute_name = defineModel("polyhedron_attribute_name");
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range");
 const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map");
 
-const { id, capabilities } = defineProps({
+const {
+  id,
+  componentId,
+  capabilities,
+  schemas,
+  allowRandom = false,
+} = defineProps({
   id: { type: String, required: true },
+  componentId: { type: String, default: undefined },
   capabilities: {
     type: Object,
     default: () => ({}),
   },
+  schemas: {
+    type: Object,
+    default: () => ({}),
+  },
+  allowRandom: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const vertexSchema = schemas.vertex || back_schemas.opengeodeweb_back.vertex_attribute_names;
+const edgeSchema = schemas.edge || back_schemas.opengeodeweb_back.edge_attribute_names;
+const cellSchema = schemas.cell || back_schemas.opengeodeweb_back.cell_attribute_names;
+const polygonSchema = schemas.polygon || back_schemas.opengeodeweb_back.polygon_attribute_names;
+const polyhedronSchema =
+  schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names;
 
 function isAvailable(key) {
   if (capabilities[key] && capabilities[key].available === false) {
@@ -75,6 +97,7 @@ const has_polyhedra = computed(
 );
 
 const color_dict = { name: "Color", value: "color" };
+const random_dict = { name: "Random color", value: "random" };
 const textures_dict = { name: "Textures", value: "textures" };
 const vertex_dict = { name: "Vertex attribute", value: "vertex" };
 const edge_dict = { name: "Edge attribute", value: "edge" };
@@ -88,6 +111,9 @@ const coloring_styles = computed(() => {
   const array = [];
   if (has_color.value) {
     array.push(color_dict);
+    if (allowRandom) {
+      array.push(random_dict);
+    }
   }
   if (has_textures.value) {
     array.push(textures_dict);
@@ -114,14 +140,25 @@ const coloring_styles = computed(() => {
   return { labels, values };
 });
 
-const coloring_style_label = ref(
-  coloring_styles.value.labels[coloring_styles.value.values.indexOf(coloring_style_key.value)],
-);
+const coloring_style_label = ref("");
 
 watch(coloring_style_label, (value) => {
-  coloring_style_key.value =
-    coloring_styles.value.values[coloring_styles.value.labels.indexOf(value)];
+  const index = coloring_styles.value.labels.indexOf(value);
+  if (index !== -1) {
+    coloring_style_key.value = coloring_styles.value.values[index];
+  }
 });
+
+watch(
+  coloring_style_key,
+  (value) => {
+    const index = coloring_styles.value.values.indexOf(value);
+    if (index !== -1) {
+      coloring_style_label.value = coloring_styles.value.labels[index];
+    }
+  },
+  { immediate: true },
+);
 </script>
 <template>
   <v-row justify="center" align="center">
@@ -154,7 +191,8 @@ watch(coloring_style_label, (value) => {
               v-model:range="vertex_attribute_range"
               v-model:colorMap="vertex_attribute_color_map"
               :id="id"
-              :schema="back_schemas.opengeodeweb_back.vertex_attribute_names"
+              :componentId="componentId"
+              :schema="vertexSchema"
             />
           </template>
           <template v-if="coloring_style_key === edge_dict['value'] && hasColorMap('edge')">
@@ -163,7 +201,8 @@ watch(coloring_style_label, (value) => {
               v-model:range="edge_attribute_range"
               v-model:colorMap="edge_attribute_color_map"
               :id="id"
-              :schema="back_schemas.opengeodeweb_back.edge_attribute_names"
+              :componentId="componentId"
+              :schema="edgeSchema"
             />
           </template>
           <template v-if="coloring_style_key === cell_dict['value'] && hasColorMap('cell')">
@@ -172,7 +211,8 @@ watch(coloring_style_label, (value) => {
               v-model:range="cell_attribute_range"
               v-model:colorMap="cell_attribute_color_map"
               :id="id"
-              :schema="back_schemas.opengeodeweb_back.cell_attribute_names"
+              :componentId="componentId"
+              :schema="cellSchema"
             />
           </template>
           <template v-if="coloring_style_key === polygon_dict['value'] && hasColorMap('polygon')">
@@ -181,7 +221,8 @@ watch(coloring_style_label, (value) => {
               v-model:range="polygon_attribute_range"
               v-model:colorMap="polygon_attribute_color_map"
               :id="id"
-              :schema="back_schemas.opengeodeweb_back.polygon_attribute_names"
+              :componentId="componentId"
+              :schema="polygonSchema"
             />
           </template>
           <template
@@ -192,7 +233,8 @@ watch(coloring_style_label, (value) => {
               v-model:range="polyhedron_attribute_range"
               v-model:colorMap="polyhedron_attribute_color_map"
               :id="id"
-              :schema="back_schemas.opengeodeweb_back.polyhedron_attribute_names"
+              :componentId="componentId"
+              :schema="polyhedronSchema"
             />
           </template>
         </v-col>

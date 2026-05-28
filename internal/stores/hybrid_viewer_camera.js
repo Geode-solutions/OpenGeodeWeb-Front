@@ -140,10 +140,9 @@ async function performFocusCameraOnObject(id, options) {
 
   let bounds = [];
   if (block_ids.length > 0) {
-    bounds = await viewerStore.request(viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds, {
-      id,
-      block_ids,
-    });
+    const schema = viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds;
+    const params = { id, block_ids };
+    bounds = await viewerStore.request({ schema, params });
   } else {
     bounds = hybridDb[id].actor.getBounds();
   }
@@ -168,9 +167,13 @@ function performSyncRemoteCamera(options) {
     options;
   const camera = genericRenderWindow.getRenderer().getActiveCamera();
   const options_camera = getCameraOptions(camera);
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.update_camera;
+  const params = { camera_options: options_camera };
   viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
-    { camera_options: options_camera },
+    {
+      schema,
+      params,
+    },
     {
       response_function: () => {
         remoteRender();

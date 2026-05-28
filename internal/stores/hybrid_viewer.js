@@ -1,19 +1,9 @@
+import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./hybrid_viewer_constants";
 import { centerCameraOnPosition } from "./hybrid_viewer_camera";
 
-const RGB_MAX = 255;
-const BACKGROUND_GREY_VALUE = 180;
-const ACTOR_DARK_VALUE = 20;
-
-const bgVal = BACKGROUND_GREY_VALUE / RGB_MAX;
-const BACKGROUND_COLOR = [bgVal, bgVal, bgVal];
-const actVal = ACTOR_DARK_VALUE / RGB_MAX;
-const ACTOR_COLOR = [actVal, actVal, actVal];
-const HOVER_THROTTLE_MS = 50,
-  HOVER_TIMEOUT_MS = 500,
-  WHEEL_TIME_OUT_MS = 600;
-const RGBA_CHANNELS = 4,
-  SAMPLE_SIZE = 10,
-  TOTAL_CHANNELS = 400;
+const RGBA_CHANNELS = 4;
+const SAMPLE_SIZE = 10;
+const TOTAL_CHANNELS = 400;
 
 function mapRect(rect, latestImage, canvasRect) {
   const scaleX = latestImage.width / canvasRect.width;
@@ -73,11 +63,15 @@ function computeAverageBrightness(rect, options) {
 function performClickPicking(event, options) {
   const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
   const rect = container.getBoundingClientRect();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+  const params = {
+    x: Math.round(event.clientX - rect.left),
+    y: Math.round(rect.height - (event.clientY - rect.top)),
+  };
   viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.get_point_position,
     {
-      x: Math.round(event.clientX - rect.left),
-      y: Math.round(rect.height - (event.clientY - rect.top)),
+      schema,
+      params,
     },
     {
       response_function: ({ x, y, z }) => {
@@ -111,13 +105,17 @@ function performHoverHighlight(event, options) {
     return;
   }
   const rect = container.getBoundingClientRect();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+  const params = {
+    x: Math.round(event.clientX - rect.left),
+    y: Math.round(rect.height - (event.clientY - rect.top)),
+    field_type: hover_highlight_field_type.value,
+    ids: Object.keys(hybridDb),
+  };
   viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.highlight,
     {
-      x: Math.round(event.clientX - rect.left),
-      y: Math.round(rect.height - (event.clientY - rect.top)),
-      field_type: hover_highlight_field_type.value,
-      ids: Object.keys(hybridDb),
+      schema,
+      params,
     },
     {
       response_function: onResponse,
@@ -127,12 +125,14 @@ function performHoverHighlight(event, options) {
 
 function performClearHoverHighlight(options) {
   const { viewerStore, viewer_schemas, hover_highlight_field_type, hybridDb } = options;
-  viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.highlight, {
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.clear_highlight;
+  const params = {
     x: -1,
     y: -1,
     field_type: hover_highlight_field_type.value,
     ids: Object.keys(hybridDb),
-  });
+  };
+  viewerStore.request({ schema, params });
 }
 
 async function performAddItem(id, options) {
@@ -179,10 +179,9 @@ async function performSetZScaling(z_scale, options) {
   }
   renderer.resetCamera();
   genericRenderWindow.getRenderWindow().render();
-  const schema = viewer_schemas?.opengeodeweb_viewer?.viewer?.set_z_scaling;
-  if (schema) {
-    await viewerStore.request(schema, { z_scale });
-  }
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.set_z_scaling;
+  const params = { z_scale };
+  await viewerStore.request({ schema, params });
   remoteRender();
 }
 
@@ -223,10 +222,10 @@ function performSetContainer(options) {
   useMousePressed({
     target: container,
     onPressed: (event) => {
-      if (event.button !== 0) {
+      if (event.button !== 0 && event.button !== 1) {
         return;
       }
-      if (is_picking.value) {
+      if (event.button === 0 && is_picking.value) {
         clickPickingCallback(event, {
           container: container.value.$el,
           viewerStore,
@@ -308,11 +307,6 @@ function performClear(options) {
 }
 
 export {
-  BACKGROUND_COLOR,
-  ACTOR_COLOR,
-  WHEEL_TIME_OUT_MS,
-  HOVER_THROTTLE_MS,
-  HOVER_TIMEOUT_MS,
   computeAverageBrightness,
   performAddItem,
   performClearHoverHighlight,

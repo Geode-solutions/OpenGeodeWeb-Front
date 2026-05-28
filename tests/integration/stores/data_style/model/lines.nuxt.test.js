@@ -51,13 +51,10 @@ describe("model lines", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_lines_schemas.visibility;
+      const params = { id, block_ids: lines_viewer_ids, visibility };
       expect(spy).toHaveBeenCalledWith(
-        model_lines_schemas.visibility,
-        {
-          id,
-          block_ids: lines_viewer_ids,
-          visibility,
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -83,14 +80,10 @@ describe("model lines", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_lines_schemas.color;
+      const params = { id, block_ids: lines_viewer_ids, color, color_mode: "constant" };
       expect(spy).toHaveBeenCalledWith(
-        model_lines_schemas.color,
-        {
-          id,
-          block_ids: lines_viewer_ids,
-          color,
-          color_mode: "constant",
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -101,6 +94,72 @@ describe("model lines", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
+  describe("lines vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points");
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_lines_schemas.attribute.vertex.name,
+          params: {
+            id,
+            block_ids: lines_viewer_ids,
+            name: "points",
+          },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      for (const line_id of line_ids) {
+        expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("points");
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("lines edge attribute", () => {
+    test("coloring edge attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "test_attribute");
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_lines_schemas.attribute.edge.name,
+          params: {
+            id,
+            block_ids: lines_viewer_ids,
+            name: "test_attribute",
+          },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      for (const line_id of line_ids) {
+        expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("test_attribute");
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
   describe("lines style", () => {
     test("lines apply style", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -108,6 +167,52 @@ describe("model lines", () => {
       const result = dataStyleStore.applyModelLinesStyle(id);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("line component active coloring", () => {
+    test("coloring color", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      const coloringName = "color";
+      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesVertexAttributeName(id, [line_id], "points");
+      const coloringName = "vertex";
+      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring edge", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesEdgeAttributeName(id, [line_id], "test_attribute");
+      const coloringName = "edge";
+      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });

@@ -17,6 +17,7 @@ const backStore = useBackStore();
 const loading = ref(false);
 const allowed_objects = ref({});
 const toggle_loading = useToggle(loading);
+const multiple_files_no_common = ref(false);
 
 function select_geode_object(object_map) {
   const object_keys = Object.keys(object_map);
@@ -48,15 +49,28 @@ function select_geode_object(object_map) {
   return undefined;
 }
 
+function isCsvFile(filename) {
+  return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
+}
+
 async function get_allowed_objects() {
   toggle_loading();
   allowed_objects.value = {};
+  multiple_files_no_common.value = false;
 
-  const promise_array = filenames.map((filename) => backStore.request(schema, { filename }));
+  const promise_array = filenames.map((filename) => {
+    const params = { filename };
+    return backStore.request({ schema, params });
+  });
   const responses = await Promise.all(promise_array);
   const allowed_objects_list = responses.map((response) => response.allowed_objects);
   const all_keys = [...new Set(allowed_objects_list.flatMap((obj) => Object.keys(obj)))];
   const common_keys = all_keys.filter((key) => allowed_objects_list.every((obj) => key in obj));
+
+  if (filenames.length > 1 && all_keys.length > 0 && common_keys.length === 0) {
+    multiple_files_no_common.value = true;
+  }
+
   const final_object = {};
   for (const key of common_keys) {
     const load_scores = allowed_objects_list.map((obj) => obj[key].is_loadable);
@@ -68,10 +82,7 @@ async function get_allowed_objects() {
       final_object[key].object_priority = Math.max(...priorities);
     }
   }
-  const isCsv = filenames.some(
-    (filename) =>
-      filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json"),
-  );
+  const isCsv = filenames.some((filename) => isCsvFile(filename));
   if (isCsv && !final_object["PointSet3D"]) {
     final_object["PointSet3D"] = { is_loadable: 1, object_priority: 100 };
   }
@@ -126,6 +137,13 @@ await get_allowed_objects();
         </template>
       </v-tooltip>
     </v-col>
+  </v-row>
+  <v-row v-else-if="multiple_files_no_common" class="pa-5">
+    <v-card class="card" variant="tonal" rounded>
+      <v-card-text>
+        These files cannot be loaded together because they don't share a common data type.
+      </v-card-text>
+    </v-card>
   </v-row>
   <v-row v-else class="pa-5">
     <v-card class="card" variant="tonal" rounded>

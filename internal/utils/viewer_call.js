@@ -6,8 +6,8 @@ const ERROR_400 = 400;
 
 export function viewer_call(
   microservice,
-  { schema, params = {} },
-  { request_error_function, response_function, response_error_function, timeout } = {},
+  { schema, params = {}, timeout },
+  { request_error_function, response_function, response_error_function } = {},
 ) {
   const feedbackStore = useFeedbackStore();
 

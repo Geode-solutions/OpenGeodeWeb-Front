@@ -50,13 +50,10 @@ describe("model corners", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_corners_schemas.visibility;
+      const params = { id, block_ids: corner_viewer_ids, visibility };
       expect(spy).toHaveBeenCalledWith(
-        model_corners_schemas.visibility,
-        {
-          id,
-          block_ids: corner_viewer_ids,
-          visibility,
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -82,20 +79,49 @@ describe("model corners", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_corners_schemas.color;
+      const params = { id, block_ids: corner_viewer_ids, color, color_mode: "constant" };
       expect(spy).toHaveBeenCalledWith(
-        model_corners_schemas.color,
-        {
-          id,
-          block_ids: corner_viewer_ids,
-          color,
-          color_mode: "constant",
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
       );
       for (const corner_id of corner_ids) {
         expect(dataStyleStore.modelCornerColor(id, corner_id)).toStrictEqual(color);
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("corners vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, corner_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_corners_schemas.attribute.vertex.name,
+          params: {
+            id,
+            block_ids: corner_viewer_ids,
+            name: "points",
+          },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      for (const corner_id of corner_ids) {
+        expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
@@ -108,6 +134,37 @@ describe("model corners", () => {
       const result = dataStyleStore.applyModelCornersStyle(id);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("corner component active coloring", () => {
+    test("coloring color", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const [corner_id] = corner_ids;
+      const coloringName = "color";
+      const result = dataStyleStore.setModelComponentColorMode(id, corner_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelCornerColorMode(id, corner_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const [corner_id] = corner_ids;
+      await dataStyleStore.setModelCornersVertexAttributeName(id, [corner_id], "points");
+      const coloringName = "vertex";
+      const result = dataStyleStore.setModelComponentColorMode(id, corner_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelCornerColorMode(id, corner_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });

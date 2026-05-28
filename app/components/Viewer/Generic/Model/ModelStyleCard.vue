@@ -5,10 +5,25 @@ import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwi
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
+
+import BlocksOptions from "./BlocksOptions.vue";
+import CornersOptions from "./CornersOptions.vue";
+import LinesOptions from "./LinesOptions.vue";
+import SurfacesOptions from "./SurfacesOptions.vue";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const dataStore = useDataStore();
+const treeviewStore = useTreeviewStore();
+
+function getBatchComponentIds(currentId) {
+  const { activeItems } = treeviewStore;
+  if (activeItems.includes(currentId) && activeItems.length > 1) {
+    return activeItems;
+  }
+  return [currentId];
+}
 
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
@@ -16,18 +31,52 @@ const { itemProps } = defineProps({
 
 const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
 const componentId = computed(() => itemProps.meta_data.pickedComponentId);
-const selection = dataStyleStore.visibleMeshComponents(modelId.value);
+const selection = computed(() => dataStyleStore.visibleMeshComponents(modelId.value).value || []);
 const componentType = ref(undefined);
 
-watchEffect(async () => {
-  if (itemProps.meta_data.viewer_type === "model_component_type") {
-    componentType.value = itemProps.meta_data.modelComponentType;
-  } else if (componentId.value && modelId.value) {
-    componentType.value = await dataStore.meshComponentType(modelId.value, componentId.value);
-  } else {
+watch(
+  () => [
+    modelId.value,
+    componentId.value,
+    itemProps.meta_data.viewer_type,
+    itemProps.meta_data.modelComponentType,
+  ],
+  async () => {
     componentType.value = undefined;
-  }
-});
+    if (itemProps.meta_data.viewer_type === "model_component_type") {
+      componentType.value = itemProps.meta_data.modelComponentType;
+    } else if (componentId.value && modelId.value) {
+      const currentModelId = modelId.value;
+      const currentCompId = componentId.value;
+      const type = await dataStore.meshComponentType(currentModelId, currentCompId);
+      if (
+        modelId.value === currentModelId &&
+        componentId.value === currentCompId &&
+        itemProps.meta_data.viewer_type !== "model_component_type"
+      ) {
+        componentType.value = type;
+      }
+    }
+  },
+  { immediate: true },
+);
+
+const targetComponentIds = ref([]);
+watch(
+  () => [modelId.value, componentType.value],
+  async () => {
+    targetComponentIds.value = [];
+    if (componentType.value && modelId.value) {
+      const currentModelId = modelId.value;
+      const currentType = componentType.value;
+      const ids = await dataStore.getMeshComponentGeodeIds(currentModelId, currentType);
+      if (modelId.value === currentModelId && componentType.value === currentType) {
+        targetComponentIds.value = ids;
+      }
+    }
+  },
+  { immediate: true },
+);
 
 const modelVisibility = computed({
   get: () => dataStyleStore.modelVisibility(modelId.value),
@@ -37,88 +86,10 @@ const modelVisibility = computed({
   },
 });
 
-const modelComponentTypeVisibility = computed({
-  get: () => selection.value.includes(componentType.value),
-  set: async (newValue) => {
-    await dataStyleStore.setModelComponentTypeVisibility(
-      modelId.value,
-      componentType.value,
-      newValue,
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const componentVisibility = computed({
-  get: () => selection.value.includes(componentId.value),
-  set: async (newValue) => {
-    await dataStyleStore.setModelComponentsVisibility(modelId.value, [componentId.value], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const componentColor = computed({
-  get: () =>
-    componentId.value
-      ? dataStyleStore.getModelComponentEffectiveColor(
-          modelId.value,
-          componentId.value,
-          componentType.value,
-        )
-      : undefined,
-  set: async (color) => {
-    if (componentId.value) {
-      await dataStyleStore.setModelComponentsColor(modelId.value, [componentId.value], color);
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-const modelComponentTypeColor = computed({
-  get: () =>
-    componentType.value
-      ? dataStyleStore.getModelComponentTypeColor(modelId.value, componentType.value)
-      : undefined,
-  set: async (color) => {
-    if (componentType.value) {
-      await dataStyleStore.setModelComponentTypeColor(modelId.value, componentType.value, color);
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-const modelComponentTypeColorMode = computed({
-  get: () => dataStyleStore.getModelComponentTypeColorMode(modelId.value, componentType.value),
-  set: async (colorMode) => {
-    if (componentType.value) {
-      await dataStyleStore.setModelComponentTypeColorMode(
-        modelId.value,
-        componentType.value,
-        colorMode,
-      );
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-const componentColorMode = computed({
-  get: () => dataStyleStore.getModelComponentColorMode(modelId.value, componentId.value),
-  set: async (colorMode) => {
-    if (componentId.value) {
-      await dataStyleStore.setModelComponentColorMode(modelId.value, componentId.value, colorMode);
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
 const colorModes = [
   { title: "Constant", value: "constant" },
   { title: "Random", value: "random" },
 ];
-
-const modelComponentTypeLabel = computed(() =>
-  componentType.value ? `${componentType.value}s Options` : "",
-);
 
 const modelComponentsColorMode = ref("constant");
 
@@ -178,41 +149,30 @@ watch(modelComponentsColorMode, async (colorMode) => {
       </template>
     </OptionsSection>
 
-    <OptionsSection v-if="componentType" :title="modelComponentTypeLabel" class="mt-6">
-      <VisibilitySwitch v-model="modelComponentTypeVisibility" />
-      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
-      <v-select
-        v-model="modelComponentTypeColorMode"
-        :items="colorModes"
-        density="compact"
-        hide-details
-        class="mb-3"
-        variant="outlined"
-      />
-
-      <template v-if="modelComponentTypeColorMode === 'constant'">
-        <v-label class="text-caption mb-1">Color</v-label>
-        <ViewerOptionsColorPicker v-model="modelComponentTypeColor" />
-      </template>
-    </OptionsSection>
-
-    <OptionsSection v-if="componentId" title="Component Options" class="mt-6">
-      <VisibilitySwitch v-model="componentVisibility" />
-      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
-      <v-select
-        v-model="componentColorMode"
-        :items="colorModes"
-        density="compact"
-        hide-details
-        class="mb-3"
-        variant="outlined"
-      />
-
-      <template v-if="componentColorMode === 'constant'">
-        <v-label class="text-caption mb-1">Color</v-label>
-        <ViewerOptionsColorPicker v-model="componentColor" />
-      </template>
-    </OptionsSection>
+    <BlocksOptions
+      v-if="componentType === 'Block'"
+      :modelId="modelId"
+      :blockId="componentId"
+      :targetBlockIds="targetComponentIds"
+    />
+    <SurfacesOptions
+      v-else-if="componentType === 'Surface'"
+      :modelId="modelId"
+      :surfaceId="componentId"
+      :targetSurfaceIds="targetComponentIds"
+    />
+    <LinesOptions
+      v-else-if="componentType === 'Line'"
+      :modelId="modelId"
+      :lineId="componentId"
+      :targetLineIds="targetComponentIds"
+    />
+    <CornersOptions
+      v-else-if="componentType === 'Corner'"
+      :modelId="modelId"
+      :cornerId="componentId"
+      :targetCornerIds="targetComponentIds"
+    />
   </v-sheet>
 </template>
 

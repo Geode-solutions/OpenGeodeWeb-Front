@@ -38,9 +38,10 @@ describe("mesh polygons", () => {
       const result = dataStyleStore.setMeshPolygonsVisibility(id, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_polygons_schemas.visibility;
+      const params = { id, visibility };
       expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.visibility,
-        { id, visibility },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -59,9 +60,10 @@ describe("mesh polygons", () => {
       const result = dataStyleStore.setMeshPolygonsColor(id, color);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_polygons_schemas.color;
+      const params = { id, color };
       expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.color,
-        { id, color },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -79,9 +81,10 @@ describe("mesh polygons", () => {
       const result = dataStyleStore.setMeshPolygonsVertexAttributeName(id, vertex_attribute.name);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_polygons_schemas.attribute.vertex.name;
+      const params = { id, ...vertex_attribute };
       expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.attribute.vertex.name,
-        { id, ...vertex_attribute },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -99,9 +102,10 @@ describe("mesh polygons", () => {
       const result = dataStyleStore.setMeshPolygonsPolygonAttributeName(id, polygon_attribute.name);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_polygons_schemas.attribute.polygon.name;
+      const params = { id, ...polygon_attribute };
       expect(spy).toHaveBeenCalledWith(
-        mesh_polygons_schemas.attribute.polygon.name,
-        { id, ...polygon_attribute },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },

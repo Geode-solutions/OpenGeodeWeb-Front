@@ -35,6 +35,17 @@ export const useFeedbackStore = defineStore("feedback", {
         this.delete_feedback(feedbackId);
       }, this.feedbacks_timeout_miliseconds);
     },
+    async add_warning(description) {
+      const feedbackId = uuidv4();
+      await this.feedbacks.push({
+        id: feedbackId,
+        type: "warning",
+        description,
+      });
+      setTimeout(() => {
+        this.delete_feedback(feedbackId);
+      }, this.feedbacks_timeout_miliseconds);
+    },
     delete_feedback(feedbackId) {
       this.feedbacks = this.feedbacks.filter((feedback) => feedback.id !== feedbackId);
     },

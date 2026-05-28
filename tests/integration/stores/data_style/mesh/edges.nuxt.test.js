@@ -38,9 +38,10 @@ describe("mesh edges", () => {
       const result = dataStyleStore.setMeshEdgesVisibility(id, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_edges_schemas.visibility;
+      const params = { id, visibility };
       expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.visibility,
-        { id, visibility },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -57,9 +58,10 @@ describe("mesh edges", () => {
       const result = dataStyleStore.setMeshEdgesColor(id, color);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_edges_schemas.color;
+      const params = { id, color };
       expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.color,
-        { id, color },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -74,9 +76,10 @@ describe("mesh edges", () => {
 
       const spy = vi.spyOn(viewerStore, "request");
       await dataStyleStore.setMeshEdgesVertexAttributeName(id, vertex_attribute.name);
+      const schema = mesh_edges_schemas.attribute.vertex.name;
+      const params = { id, ...vertex_attribute };
       expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.attribute.vertex.name,
-        { id, ...vertex_attribute },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -91,9 +94,10 @@ describe("mesh edges", () => {
 
       const spy = vi.spyOn(viewerStore, "request");
       await dataStyleStore.setMeshEdgesEdgeAttributeName(id, edge_attribute.name);
+      const schema = mesh_edges_schemas.attribute.edge.name;
+      const params = { id, ...edge_attribute };
       expect(spy).toHaveBeenCalledWith(
-        mesh_edges_schemas.attribute.edge.name,
-        { id, ...edge_attribute },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
