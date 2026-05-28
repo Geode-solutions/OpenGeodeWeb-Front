@@ -12,13 +12,9 @@ export function useQuickColormap() {
 
   async function pickColormap(offsetX, offsetY, clientX, clientY) {
     try {
-      const result = await viewerStore.request(
-        viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap,
-        {
-          x: offsetX,
-          y: offsetY,
-        },
-      );
+      const schema = viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap;
+      const params = { x: offsetX, y: offsetY };
+      const result = await viewerStore.request({ schema, params });
       if (result && result.data_id) {
         quickColormap.data_id = result.data_id;
         quickColormap.x = clientX;
