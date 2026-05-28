@@ -37,13 +37,36 @@ watch(pressed, (value) => {
 </script>
 
 <template>
-  <v-color-picker
-    ref="colorPickerRef"
-    v-model="vuetifyColor"
-    flat
-    canvas-height="100"
-    hide-inputs
-    width="100%"
-    mode="rgba"
-  />
+  <div class="color-picker-container">
+    <v-color-picker
+      ref="colorPickerRef"
+      v-model="vuetifyColor"
+      flat
+      canvas-height="75"
+      hide-inputs
+      width="220"
+      mode="rgba"
+    />
+  </div>
 </template>
+
+<style scoped>
+.color-picker-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+:deep(.v-color-picker__controls) {
+  padding: 8px !important;
+}
+
+:deep(.v-color-picker__dot) {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+:deep(.v-color-picker__preview) {
+  margin-bottom: 0 !important;
+}
+</style>

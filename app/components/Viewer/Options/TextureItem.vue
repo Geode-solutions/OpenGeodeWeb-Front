@@ -71,12 +71,13 @@ watch(texture_id, (value) => {
 </style>
 
 <template>
-  <v-col cols="7" class="pa-1 ml-3">
+  <v-col cols="8" class="pa-1">
     <v-select
       v-model="texture_name"
       :items="texture_coordinates"
       label="Select a texture"
       density="compact"
+      hide-details
     />
   </v-col>
   <v-badge

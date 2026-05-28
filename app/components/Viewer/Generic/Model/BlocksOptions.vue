@@ -207,50 +207,42 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
 
 <template>
   <div>
-    <OptionsSection title="Blocks Options" class="mt-6">
+    <OptionsSection title="Blocks Options" class="mt-4">
       <VisibilitySwitch v-model="blocksVisibility" />
-      <v-row class="mt-2 pa-0">
-        <v-col class="pa-0">
-          <ViewerOptionsColoringTypeSelector
-            :id="modelId"
-            :componentId="targetBlockIds[0]"
-            v-model:coloring_style_key="blocksColorMode"
-            v-model:color="blocksColor"
-            v-model:vertex_attribute_name="blocksVertexAttributeName"
-            v-model:vertex_attribute_range="blocksVertexAttributeRange"
-            v-model:vertex_attribute_color_map="blocksVertexAttributeColorMap"
-            v-model:polyhedron_attribute_name="blocksPolyhedronAttributeName"
-            v-model:polyhedron_attribute_range="blocksPolyhedronAttributeRange"
-            v-model:polyhedron_attribute_color_map="blocksPolyhedronAttributeColorMap"
-            :capabilities="capabilities"
-            :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
-            :allowRandom="true"
-          />
-        </v-col>
-      </v-row>
+      <ViewerOptionsColoringTypeSelector
+        :id="modelId"
+        :componentId="targetBlockIds[0]"
+        v-model:coloring_style_key="blocksColorMode"
+        v-model:color="blocksColor"
+        v-model:vertex_attribute_name="blocksVertexAttributeName"
+        v-model:vertex_attribute_range="blocksVertexAttributeRange"
+        v-model:vertex_attribute_color_map="blocksVertexAttributeColorMap"
+        v-model:polyhedron_attribute_name="blocksPolyhedronAttributeName"
+        v-model:polyhedron_attribute_range="blocksPolyhedronAttributeRange"
+        v-model:polyhedron_attribute_color_map="blocksPolyhedronAttributeColorMap"
+        :capabilities="capabilities"
+        :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
+        :allowRandom="true"
+      />
     </OptionsSection>
 
-    <OptionsSection v-if="blockId" title="Component Options" class="mt-6">
+    <OptionsSection v-if="blockId" title="Component Options" class="mt-4">
       <VisibilitySwitch v-model="blockVisibility" />
-      <v-row class="mt-2 pa-0">
-        <v-col class="pa-0">
-          <ViewerOptionsColoringTypeSelector
-            :id="modelId"
-            :componentId="blockId"
-            v-model:coloring_style_key="blockColorMode"
-            v-model:color="blockColor"
-            v-model:vertex_attribute_name="vertexAttributeName"
-            v-model:vertex_attribute_range="vertexAttributeRange"
-            v-model:vertex_attribute_color_map="vertexAttributeColorMap"
-            v-model:polyhedron_attribute_name="polyhedronAttributeName"
-            v-model:polyhedron_attribute_range="polyhedronAttributeRange"
-            v-model:polyhedron_attribute_color_map="polyhedronAttributeColorMap"
-            :capabilities="capabilities"
-            :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
-            :allowRandom="true"
-          />
-        </v-col>
-      </v-row>
+      <ViewerOptionsColoringTypeSelector
+        :id="modelId"
+        :componentId="blockId"
+        v-model:coloring_style_key="blockColorMode"
+        v-model:color="blockColor"
+        v-model:vertex_attribute_name="vertexAttributeName"
+        v-model:vertex_attribute_range="vertexAttributeRange"
+        v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+        v-model:polyhedron_attribute_name="polyhedronAttributeName"
+        v-model:polyhedron_attribute_range="polyhedronAttributeRange"
+        v-model:polyhedron_attribute_color_map="polyhedronAttributeColorMap"
+        :capabilities="capabilities"
+        :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
+        :allowRandom="true"
+      />
     </OptionsSection>
   </div>
 </template>

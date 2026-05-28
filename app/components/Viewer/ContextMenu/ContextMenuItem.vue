@@ -5,7 +5,7 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTheme } from "vuetify";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const CARD_WIDTH = 320;
+const CARD_WIDTH = 300;
 const CARD_HEIGHT = 500;
 const MARGIN = 60;
 const RADIUS = 80;
@@ -170,8 +170,8 @@ function toggleOptions() {
         class="elevation-24"
         style="overflow: hidden; display: flex; flex-direction: column"
       >
-        <v-card-title>{{ tooltip }}</v-card-title>
-        <v-card-text class="pa-5" style="overflow-y: auto; flex: 1; min-height: 0">
+        <v-card-title class="text-subtitle-1 pt-3 pb-1 px-3 font-weight-bold">{{ tooltip }}</v-card-title>
+        <v-card-text class="pa-3" style="overflow-y: auto; flex: 1; min-height: 0">
           <slot name="options" />
         </v-card-text>
       </GlassCard>

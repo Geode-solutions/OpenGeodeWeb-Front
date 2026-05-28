@@ -1,5 +1,6 @@
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.color;
@@ -22,7 +23,8 @@ export function useModelBlocksColor() {
   }
 
   function setModelBlockColorMode(modelId, block_id, color_mode) {
-    return modelCommonStyle.setModelComponentColorMode(modelId, block_id, color_mode);
+    const dataStyleStore = useDataStyleStore();
+    return dataStyleStore.setModelComponentColorMode(modelId, block_id, color_mode);
   }
 
   return { setModelBlocksColor, modelBlockColor, modelBlockColorMode, setModelBlockColorMode };

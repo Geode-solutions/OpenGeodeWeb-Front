@@ -11,8 +11,8 @@ const colorMap = defineModel("colorMap", { type: String });
 <template>
   <div class="attribute-colorbar mt-3">
     <ColorMapPicker v-model:selected-preset-name="colorMap" :min="minimum" :max="maximum" />
-    <v-row dense align="center" class="mt-2">
-      <v-col cols="5">
+    <v-row dense align="center" class="mt-2" no-gutters>
+      <v-col cols="5" class="pe-1">
         <v-text-field
           :model-value="minimum"
           @update:model-value="(value) => (minimum = Number(value))"
@@ -33,7 +33,7 @@ const colorMap = defineModel("colorMap", { type: String });
           v-tooltip="'Reset range'"
         />
       </v-col>
-      <v-col cols="5">
+      <v-col cols="5" class="ps-1">
         <v-text-field
           :model-value="maximum"
           @update:model-value="(value) => (maximum = Number(value))"

@@ -144,44 +144,36 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
 
 <template>
   <div>
-    <OptionsSection title="Corners Options" class="mt-6">
+    <OptionsSection title="Corners Options" class="mt-4">
       <VisibilitySwitch v-model="cornersVisibility" />
-      <v-row class="mt-2 pa-0">
-        <v-col class="pa-0">
-          <ViewerOptionsColoringTypeSelector
-            :id="modelId"
-            :componentId="targetCornerIds[0]"
-            v-model:coloring_style_key="cornersColorMode"
-            v-model:color="cornersColor"
-            v-model:vertex_attribute_name="cornersVertexAttributeName"
-            v-model:vertex_attribute_range="cornersVertexAttributeRange"
-            v-model:vertex_attribute_color_map="cornersVertexAttributeColorMap"
-            :capabilities="capabilities"
-            :schemas="{ vertex: vertexSchema }"
-            :allowRandom="true"
-          />
-        </v-col>
-      </v-row>
+      <ViewerOptionsColoringTypeSelector
+        :id="modelId"
+        :componentId="targetCornerIds[0]"
+        v-model:coloring_style_key="cornersColorMode"
+        v-model:color="cornersColor"
+        v-model:vertex_attribute_name="cornersVertexAttributeName"
+        v-model:vertex_attribute_range="cornersVertexAttributeRange"
+        v-model:vertex_attribute_color_map="cornersVertexAttributeColorMap"
+        :capabilities="capabilities"
+        :schemas="{ vertex: vertexSchema }"
+        :allowRandom="true"
+      />
     </OptionsSection>
 
-    <OptionsSection v-if="cornerId" title="Component Options" class="mt-6">
+    <OptionsSection v-if="cornerId" title="Component Options" class="mt-4">
       <VisibilitySwitch v-model="cornerVisibility" />
-      <v-row class="mt-2 pa-0">
-        <v-col class="pa-0">
-          <ViewerOptionsColoringTypeSelector
-            :id="modelId"
-            :componentId="cornerId"
-            v-model:coloring_style_key="cornerColorMode"
-            v-model:color="cornerColor"
-            v-model:vertex_attribute_name="vertexAttributeName"
-            v-model:vertex_attribute_range="vertexAttributeRange"
-            v-model:vertex_attribute_color_map="vertexAttributeColorMap"
-            :capabilities="capabilities"
-            :schemas="{ vertex: vertexSchema }"
-            :allowRandom="true"
-          />
-        </v-col>
-      </v-row>
+      <ViewerOptionsColoringTypeSelector
+        :id="modelId"
+        :componentId="cornerId"
+        v-model:coloring_style_key="cornerColorMode"
+        v-model:color="cornerColor"
+        v-model:vertex_attribute_name="vertexAttributeName"
+        v-model:vertex_attribute_range="vertexAttributeRange"
+        v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+        :capabilities="capabilities"
+        :schemas="{ vertex: vertexSchema }"
+        :allowRandom="true"
+      />
     </OptionsSection>
   </div>
 </template>
