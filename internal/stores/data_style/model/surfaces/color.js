@@ -22,7 +22,6 @@ export function useModelSurfacesColor() {
     return mode === "constant" ? "color" : mode;
   }
 
-
   return {
     setModelSurfacesColor,
     modelSurfaceColor,
