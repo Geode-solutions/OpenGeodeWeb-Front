@@ -211,7 +211,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
 
 <template>
   <div>
-    <OptionsSection title="Surfaces Options" class="mt-4">
+    <OptionsSection title="Surfaces Options" class="mt-6">
       <VisibilitySwitch v-model="surfacesVisibility" />
       <ViewerOptionsColoringTypeSelector
         :id="modelId"
@@ -230,7 +230,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       />
     </OptionsSection>
 
-    <OptionsSection v-if="surfaceId" title="Component Options" class="mt-4">
+    <OptionsSection v-if="surfaceId" title="Component Options" class="mt-6">
       <VisibilitySwitch v-model="surfaceVisibility" />
       <ViewerOptionsColoringTypeSelector
         :id="modelId"

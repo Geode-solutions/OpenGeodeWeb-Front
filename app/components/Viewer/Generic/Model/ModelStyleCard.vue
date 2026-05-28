@@ -132,8 +132,8 @@ watch(modelComponentsColorMode, async (colorMode) => {
       <VisibilitySwitch v-model="modelVisibility" />
     </OptionsSection>
 
-    <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
-      <v-label class="text-caption mb-1 mt-1">Color Mode</v-label>
+    <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-6">
+      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
       <v-select
         v-model="modelComponentsColorMode"
         :items="colorModes"
