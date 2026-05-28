@@ -114,11 +114,17 @@ describe("model corners", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(model_corners_schemas.attribute.vertex.name, {
-        id,
-        block_ids: corner_viewer_ids,
-        name: "points",
-      });
+      expect(spy).toHaveBeenCalledWith(
+        model_corners_schemas.attribute.vertex.name,
+        {
+          id,
+          block_ids: corner_viewer_ids,
+          name: "points",
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
       for (const corner_id of corner_ids) {
         expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
       }

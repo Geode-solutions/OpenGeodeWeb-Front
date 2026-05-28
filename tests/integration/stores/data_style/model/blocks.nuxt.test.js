@@ -110,11 +110,17 @@ describe("model blocks", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(model_blocks_schemas.attribute.vertex.name, {
-        id,
-        block_ids: block_viewer_ids,
-        name: "points",
-      });
+      expect(spy).toHaveBeenCalledWith(
+        model_blocks_schemas.attribute.vertex.name,
+        {
+          id,
+          block_ids: block_viewer_ids,
+          name: "points",
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
       for (const block_id of block_ids) {
         expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
       }
@@ -139,11 +145,17 @@ describe("model blocks", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(model_blocks_schemas.attribute.polyhedron.name, {
-        id,
-        block_ids: block_viewer_ids,
-        name: "test_attribute",
-      });
+      expect(spy).toHaveBeenCalledWith(
+        model_blocks_schemas.attribute.polyhedron.name,
+        {
+          id,
+          block_ids: block_viewer_ids,
+          name: "test_attribute",
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
       for (const block_id of block_ids) {
         expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
           "test_attribute",

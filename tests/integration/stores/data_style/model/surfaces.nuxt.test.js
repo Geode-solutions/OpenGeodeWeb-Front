@@ -112,11 +112,17 @@ describe("model surfaces", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(model_surfaces_schemas.attribute.vertex.name, {
-        id,
-        block_ids: surface_viewer_ids,
-        name: "points",
-      });
+      expect(spy).toHaveBeenCalledWith(
+        model_surfaces_schemas.attribute.vertex.name,
+        {
+          id,
+          block_ids: surface_viewer_ids,
+          name: "points",
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
       for (const surface_id of surface_ids) {
         expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
       }
@@ -141,11 +147,17 @@ describe("model surfaces", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(model_surfaces_schemas.attribute.polygon.name, {
-        id,
-        block_ids: surface_viewer_ids,
-        name: "test_attribute",
-      });
+      expect(spy).toHaveBeenCalledWith(
+        model_surfaces_schemas.attribute.polygon.name,
+        {
+          id,
+          block_ids: surface_viewer_ids,
+          name: "test_attribute",
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
       for (const surface_id of surface_ids) {
         expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
           "test_attribute",

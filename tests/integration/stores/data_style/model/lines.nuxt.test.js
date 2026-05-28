@@ -114,11 +114,17 @@ describe("model lines", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(model_lines_schemas.attribute.vertex.name, {
-        id,
-        block_ids: lines_viewer_ids,
-        name: "points",
-      });
+      expect(spy).toHaveBeenCalledWith(
+        model_lines_schemas.attribute.vertex.name,
+        {
+          id,
+          block_ids: lines_viewer_ids,
+          name: "points",
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
       for (const line_id of line_ids) {
         expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("points");
       }
@@ -139,11 +145,17 @@ describe("model lines", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(model_lines_schemas.attribute.edge.name, {
-        id,
-        block_ids: lines_viewer_ids,
-        name: "test_attribute",
-      });
+      expect(spy).toHaveBeenCalledWith(
+        model_lines_schemas.attribute.edge.name,
+        {
+          id,
+          block_ids: lines_viewer_ids,
+          name: "test_attribute",
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
       for (const line_id of line_ids) {
         expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("test_attribute");
       }
