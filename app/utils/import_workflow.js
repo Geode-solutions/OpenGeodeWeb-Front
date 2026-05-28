@@ -53,7 +53,7 @@ async function importItem(item) {
     feedbackStore.add_warning(`Pointset "${item.name}" is empty`);
   }
 
-  const registerTask = dataStore.registerObject(item.id);
+  const registerTask = dataStore.registerObject(item.id, item.name);
   const addDataTask = dataStore.addItem(item);
   const addDataComponentsTask =
     item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();

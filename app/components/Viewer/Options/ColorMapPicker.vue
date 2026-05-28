@@ -1,10 +1,7 @@
 <script setup>
-import { colormaps, getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { drawCanvasForPreset, getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import ColorMapList from "./ColorMapList.vue";
-import { newInstance } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
-
-const LAST_POINT_OFFSET = 4;
-const THREE = 3;
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 
 const { max, min } = defineProps({
   min: { type: Number, required: true },
@@ -16,58 +13,10 @@ const selectedPresetName = defineModel("selectedPresetName", { default: "batlow"
 const menuOpen = ref(false);
 const lutCanvas = ref();
 
-const presets = computed(() => {
-  let currentPreset = undefined;
-  for (const category of colormaps) {
-    currentPreset = category.Children.find((preset) => preset.Name === selectedPresetName.value);
-    if (currentPreset) {
-      break;
-    }
-  }
-  return [currentPreset, ...colormaps].filter(Boolean);
-});
+const presets = computed(() => getPresetsWithCurrentAtTop(selectedPresetName.value));
 
 function drawLutCanvas() {
-  if (!lutCanvas.value) {
-    return;
-  }
-  const rgbPoints = getRGBPointsFromPreset(selectedPresetName.value);
-  if (!rgbPoints || rgbPoints.length === 0) {
-    return;
-  }
-
-  const canvas = lutCanvas.value;
-  const ctx = canvas.getContext("2d");
-  const { height, width } = canvas;
-
-  const lut = newInstance();
-
-  for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {
-    lut.addRGBPoint(
-      rgbPoints[pointIdx],
-      rgbPoints[pointIdx + 1],
-      rgbPoints[pointIdx + 2],
-      rgbPoints[pointIdx + THREE],
-    );
-  }
-
-  const table = lut.getUint8Table(rgbPoints[0], rgbPoints.at(-LAST_POINT_OFFSET), width, true);
-  const imageData = ctx.createImageData(width, height);
-
-  for (let xCoord = 0; xCoord < width; xCoord += 1) {
-    const red = table[xCoord * 4];
-    const green = table[xCoord * 4 + 1];
-    const blue = table[xCoord * 4 + 2];
-    const alpha = table[xCoord * 4 + THREE];
-    for (let yCoord = 0; yCoord < height; yCoord += 1) {
-      const pixelIdx = (yCoord * width + xCoord) * 4;
-      imageData.data[pixelIdx] = red;
-      imageData.data[pixelIdx + 1] = green;
-      imageData.data[pixelIdx + 2] = blue;
-      imageData.data[pixelIdx + THREE] = alpha;
-    }
-  }
-  ctx.putImageData(imageData, 0, 0);
+  drawCanvasForPreset(selectedPresetName.value, lutCanvas.value);
 }
 
 function onSelectPreset(preset) {
@@ -82,19 +31,19 @@ watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas);
 <template>
   <v-menu v-model="menuOpen" :close-on-content-click="false" location="bottom">
     <template #activator="{ props: menuProps }">
-      <v-card
+      <GlassCard
         v-bind="menuProps"
-        theme="dark"
-        variant="outlined"
+        variant="ui"
+        padding="pa-2"
         rounded="sm"
-        class="pa-2 blur-picker d-flex flex-column"
+        class="d-flex flex-column"
         style="gap: 4px; cursor: pointer"
       >
         <span class="text-caption text-white font-weight-medium">
           {{ selectedPresetName }}
         </span>
         <canvas ref="lutCanvas" width="200" height="18" class="w-100 rounded-xs border-thin" />
-      </v-card>
+      </GlassCard>
     </template>
 
     <ColorMapList
@@ -106,18 +55,6 @@ watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas);
 </template>
 
 <style scoped>
-.blur-picker {
-  background-color: rgba(40, 40, 40, 0.7) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  transition: background-color 0.2s;
-}
-
-.blur-picker {
-  background-color: rgba(60, 60, 60, 0.9) !important;
-}
-
 .border-thin {
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
