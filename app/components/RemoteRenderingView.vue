@@ -30,10 +30,9 @@ async function get_x_y(event) {
   const { offsetX, offsetY, clientX, clientY } = event;
   if (viewerStore.picking_mode === true) {
     viewerStore.set_picked_point(offsetX, offsetY);
-    viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.get_point_position, {
-      x: offsetX,
-      y: offsetY,
-    });
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+    const params = { x: offsetX, y: offsetY };
+    viewerStore.request({ schema, params });
   } else {
     await pickColormap(offsetX, offsetY, clientX, clientY);
   }

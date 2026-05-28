@@ -96,7 +96,7 @@ function runExtensions() {
     additionalProperties: false,
   };
 
-  return appStore.request(schema, params);
+  return appStore.request({ schema, params });
 }
 
 export {

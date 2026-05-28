@@ -6,7 +6,7 @@ import { useMeshPolygonsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshPolygonsVisibilitySchema = viewer_schemas.opengeodeweb_viewer.mesh.polygons.visibility;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.polygons.visibility;
 
 export function useMeshPolygonsVisibilityStyle() {
   const viewerStore = useViewerStore();
@@ -16,9 +16,12 @@ export function useMeshPolygonsVisibilityStyle() {
     return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility;
   }
   function setMeshPolygonsVisibility(id, visibility) {
+    const params = { id, visibility };
     return viewerStore.request(
-      meshPolygonsVisibilitySchema,
-      { id, visibility },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () =>
           meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {

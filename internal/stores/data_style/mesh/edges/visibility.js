@@ -5,7 +5,7 @@ import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshEdgesVisibilitySchema = viewer_schemas.opengeodeweb_viewer.mesh.edges.visibility;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.edges.visibility;
 
 export function useMeshEdgesVisibilityStyle() {
   const viewerStore = useViewerStore();
@@ -15,9 +15,12 @@ export function useMeshEdgesVisibilityStyle() {
     return meshEdgesCommonStyle.meshEdgesStyle(id).visibility;
   }
   function setMeshEdgesVisibility(id, visibility) {
+    const params = { id, visibility };
     return viewerStore.request(
-      meshEdgesVisibilitySchema,
-      { id, visibility },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { visibility }),
       },

@@ -31,25 +31,28 @@ export const useCloudStore = defineStore("cloud", {
       console.log("[CLOUD] params", params);
       const appStore = useAppStore();
       const feedbackStore = useFeedbackStore();
-      return appStore.request(schema, params, {
-        request_error_function: () => {
-          feedbackStore.$patch({ server_error: true });
-          this.status = Status.NOT_CONNECTED;
+      return appStore.request(
+        { schema, params },
+        {
+          request_error_function: () => {
+            feedbackStore.$patch({ server_error: true });
+            this.status = Status.NOT_CONNECTED;
+          },
+          response_function: (response) => {
+            feedbackStore.$patch({ server_error: false });
+            console.log(`[CLOUD] Cloud launched on ${response.url}`);
+            this.status = Status.CONNECTED;
+            const infraStore = useInfraStore();
+            infraStore.$patch({
+              domain_name: response.url,
+            });
+          },
+          response_error_function: () => {
+            feedbackStore.$patch({ server_error: true });
+            this.status = Status.NOT_CONNECTED;
+          },
         },
-        response_function: (response) => {
-          feedbackStore.$patch({ server_error: false });
-          console.log(`[CLOUD] Cloud launched on ${response.url}`);
-          this.status = Status.CONNECTED;
-          const infraStore = useInfraStore();
-          infraStore.$patch({
-            domain_name: response.url,
-          });
-        },
-        response_error_function: () => {
-          feedbackStore.$patch({ server_error: true });
-          this.status = Status.NOT_CONNECTED;
-        },
-      });
+      );
     },
     connect() {
       console.log("[CLOUD] Cloud connected");

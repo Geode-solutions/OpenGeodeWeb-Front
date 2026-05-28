@@ -29,9 +29,13 @@ export function useMeshStyle() {
     return dataStyleState.getStyle(id).visibility;
   }
   function setMeshVisibility(id, visibility) {
+    const schema = meshSchemas.visibility;
+    const params = { id, visibility };
     return viewerStore.request(
-      meshSchemas.visibility,
-      { id, visibility },
+      {
+        schema,
+        params,
+      },
       {
         response_function: async () => {
           await hybridViewerStore.setVisibility(id, visibility);
@@ -46,9 +50,13 @@ export function useMeshStyle() {
   }
 
   function setMeshColor(id, color) {
+    const schema = meshSchemas.color;
+    const params = { id, color };
     return viewerStore.request(
-      meshSchemas.color,
-      { id, color },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => dataStyleState.mutateStyle(id, { color }),
       },

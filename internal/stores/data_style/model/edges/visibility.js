@@ -5,7 +5,7 @@ import { useModelEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges;
+const schema = viewer_schemas.opengeodeweb_viewer.model.edges.visibility;
 
 export function useModelEdgesVisibilityStyle() {
   const viewerStore = useViewerStore();
@@ -16,9 +16,9 @@ export function useModelEdgesVisibilityStyle() {
   }
 
   function setModelEdgesVisibility(id, visibility) {
+    const params = { id, visibility };
     return viewerStore.request(
-      model_edges_schemas.visibility,
-      { id, visibility },
+      { schema, params },
       {
         response_function: () => modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility }),
       },

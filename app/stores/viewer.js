@@ -20,7 +20,7 @@ const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST;
 
 export const useViewerStore = defineStore(
   "viewer",
-  // oxlint-disable-next-line max-lines-per-function max-statements
+  // oxlint-disable-next-line max-lines-per-function, max-statements
   () => {
     const infraStore = useInfraStore();
     const default_local_port = ref("1234");
@@ -63,10 +63,9 @@ export const useViewerStore = defineStore(
     }
 
     async function set_picked_point(x, y) {
-      const response = await request(schemas.opengeodeweb_viewer.viewer.get_point_position, {
-        x: Math.round(x),
-        y: Math.round(y),
-      });
+      const schema = schemas.opengeodeweb_viewer.viewer.get_point_position;
+      const params = { x: Math.round(x), y: Math.round(y) };
+      const response = await request({ schema, params });
       const { x: world_x, y: world_y, z: world_z } = response;
       picked_point.value = { x: world_x, y: world_y, z: world_z };
     }
@@ -108,7 +107,9 @@ export const useViewerStore = defineStore(
           });
           connectImageStream(client.value.getConnection().getSession());
           client.value.endBusy();
-          await request(schemas.opengeodeweb_viewer.viewer.reset_visualization, {}, {}, undefined);
+          const schema = schemas.opengeodeweb_viewer.viewer.reset_visualization;
+          const timeout = undefined;
+          await request({ schema, timeout });
           status.value = Status.CONNECTED;
         } catch (error) {
           console.error("ws_connect error", error);
@@ -143,12 +144,15 @@ export const useViewerStore = defineStore(
       const params = { COMMAND_VIEWER, NUXT_ROOT_PATH, args };
       console.log("[VIEWER] params", params);
 
-      return appStore.request(schema, params, {
-        response_function: (response) => {
-          console.log(`[VIEWER] Viewer launched on port ${response.port}`);
-          default_local_port.value = response.port;
+      return appStore.request(
+        { schema, params },
+        {
+          response_function: (response) => {
+            console.log(`[VIEWER] Viewer launched on port ${response.port}`);
+            default_local_port.value = response.port;
+          },
         },
-      });
+      );
     }
 
     async function connect() {
@@ -157,7 +161,7 @@ export const useViewerStore = defineStore(
       console.log("[VIEWER] Viewer connected successfully");
     }
 
-    function request(schema, params = {}, callbacks = {}, timeout = request_timeout) {
+    function request({ schema, params = {}, timeout = request_timeout }, callbacks = {}) {
       console.log("[VIEWER] Request:", schema.$id);
       const start = Date.now();
 
@@ -166,7 +170,7 @@ export const useViewerStore = defineStore(
 
       return viewer_call(
         store,
-        { schema, params },
+        { schema, params, timeout },
         {
           ...callbacks,
           response_function: async (response) => {
@@ -182,7 +186,6 @@ export const useViewerStore = defineStore(
             }
           },
         },
-        timeout,
       );
     }
 
@@ -191,8 +194,7 @@ export const useViewerStore = defineStore(
         return;
       }
       return request(
-        schema,
-        {},
+        { schema },
         {
           response_function: (response) => {
             version.value = response.microservice_version;

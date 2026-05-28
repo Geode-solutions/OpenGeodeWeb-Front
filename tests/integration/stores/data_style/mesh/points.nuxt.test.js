@@ -37,9 +37,10 @@ describe("mesh points", () => {
       const result = dataStyleStore.setMeshPointsVisibility(id, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_points_schemas.visibility;
+      const params = { id, visibility };
       expect(spy).toHaveBeenCalledWith(
-        mesh_points_schemas.visibility,
-        { id, visibility },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -58,9 +59,10 @@ describe("mesh points", () => {
       const result = dataStyleStore.setMeshPointsColor(id, color);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_points_schemas.color;
+      const params = { id, color };
       expect(spy).toHaveBeenCalledWith(
-        mesh_points_schemas.color,
-        { id, color },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -104,9 +106,10 @@ describe("mesh points", () => {
       const result = dataStyleStore.setMeshPointsSize(id, size);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_points_schemas.size;
+      const params = { id, size };
       expect(spy).toHaveBeenCalledWith(
-        mesh_points_schemas.size,
-        { id, size },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -123,9 +126,10 @@ describe("mesh points", () => {
 
       const spy = vi.spyOn(viewerStore, "request");
       await dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name);
+      const schema = mesh_points_schemas.attribute.vertex.name;
+      const params = { id, ...vertex_attribute };
       expect(spy).toHaveBeenCalledWith(
-        mesh_points_schemas.attribute.vertex.name,
-        { id, ...vertex_attribute },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },

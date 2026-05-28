@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshPolyhedraPolyhedronAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.attribute.polyhedron;
 
+// oxlint-disable-next-line max-lines-per-function
 function useMeshPolyhedraPolyhedronAttributeConfig() {
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
@@ -74,14 +75,19 @@ function useMeshPolyhedraPolyhedronAttributeConfig() {
   };
 }
 
+// oxlint-disable-next-line max-lines-per-function
 function useMeshPolyhedraPolyhedronAttributeActions() {
   const viewerStore = useViewerStore();
   const config = useMeshPolyhedraPolyhedronAttributeConfig();
 
   function setMeshPolyhedraPolyhedronAttributeName(id, name) {
+    const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
+    const params = { id, name };
     return viewerStore.request(
-      meshPolyhedraPolyhedronAttributeSchemas.name,
-      { id, name },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => {
           const updates = { name };
@@ -105,9 +111,10 @@ function useMeshPolyhedraPolyhedronAttributeActions() {
     const name = config.meshPolyhedraPolyhedronAttributeName(id);
     const points = getRGBPointsFromPreset(config.meshPolyhedraPolyhedronAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshPolyhedraPolyhedronAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshPolyhedraPolyhedronAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { minimum, maximum }),
@@ -126,9 +133,10 @@ function useMeshPolyhedraPolyhedronAttributeActions() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshPolyhedraPolyhedronAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshPolyhedraPolyhedronAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { colorMap }),

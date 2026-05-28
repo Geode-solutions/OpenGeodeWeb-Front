@@ -118,9 +118,13 @@ const camera_options = computed(() => [
     icon: "mdi-ruler-square",
     color: grid_scale.value ? "primary" : undefined,
     action: () => {
+      const schema = schemas.opengeodeweb_viewer.viewer.grid_scale;
+      const params = { visibility: !grid_scale.value };
       viewerStore.request(
-        schemas.opengeodeweb_viewer.viewer.grid_scale,
-        { visibility: !grid_scale.value },
+        {
+          schema,
+          params,
+        },
         {
           response_function: () => {
             grid_scale.value = !grid_scale.value;
