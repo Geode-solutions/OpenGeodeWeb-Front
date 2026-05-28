@@ -184,9 +184,28 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     });
   }
 
+  let renderPromise = undefined;
+  let renderPending = false;
+
   function remoteRender() {
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.render;
-    return viewerStore.request({ schema });
+    if (renderPromise) {
+      renderPending = true;
+      return renderPromise;
+    }
+
+    renderPromise = (async () => {
+      try {
+        const schema = viewer_schemas.opengeodeweb_viewer.viewer.render;
+        await viewerStore.request({ schema });
+      } finally {
+        renderPromise = undefined;
+        if (renderPending) {
+          renderPending = false;
+          await remoteRender();
+        }
+      }
+    })();
+    return renderPromise;
   }
 
   const hoverTimeoutRef = ref(undefined);

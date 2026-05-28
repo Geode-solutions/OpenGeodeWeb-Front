@@ -92,6 +92,78 @@ describe("model surfaces", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
+  describe("surfaces vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, surface_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_surfaces_schemas.attribute.vertex.name,
+          params: {
+            id,
+            block_ids: surface_viewer_ids,
+            name: "points",
+          },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      for (const surface_id of surface_ids) {
+        expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("surfaces polygon attribute", () => {
+    test("coloring polygon attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, surface_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelSurfacesPolygonAttributeName(
+        id,
+        surface_ids,
+        "test_attribute",
+      );
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema: model_surfaces_schemas.attribute.polygon.name,
+          params: {
+            id,
+            block_ids: surface_viewer_ids,
+            name: "test_attribute",
+          },
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      for (const surface_id of surface_ids) {
+        expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
+          "test_attribute",
+        );
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
   describe("surfaces style", () => {
     test("surfaces apply style", async () => {
       const dataStyleStore = useDataStyleStore();
