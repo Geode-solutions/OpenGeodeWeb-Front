@@ -172,4 +172,50 @@ describe("model blocks", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
+
+  describe("block component active coloring", () => {
+    test("coloring color", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      const coloringName = "color";
+      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, [block_id], "points");
+      const coloringName = "vertex";
+      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring polyhedron", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(id, [block_id], "test_attribute");
+      const coloringName = "polyhedron";
+      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 });

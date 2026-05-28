@@ -174,4 +174,50 @@ describe("model surfaces", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
+
+  describe("surface component active coloring", () => {
+    test("coloring color", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      const coloringName = "color";
+      const result = dataStyleStore.setModelComponentColorMode(id, surface_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelSurfaceColorMode(id, surface_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesVertexAttributeName(id, [surface_id], "points");
+      const coloringName = "vertex";
+      const result = dataStyleStore.setModelComponentColorMode(id, surface_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelSurfaceColorMode(id, surface_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring polygon", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesPolygonAttributeName(id, [surface_id], "test_attribute");
+      const coloringName = "polygon";
+      const result = dataStyleStore.setModelComponentColorMode(id, surface_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelSurfaceColorMode(id, surface_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 });
