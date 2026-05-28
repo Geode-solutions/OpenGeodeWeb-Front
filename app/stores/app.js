@@ -2,6 +2,7 @@
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
+// oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
 
