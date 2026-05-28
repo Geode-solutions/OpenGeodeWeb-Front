@@ -170,7 +170,9 @@ function toggleOptions() {
         class="elevation-24"
         style="overflow: hidden; display: flex; flex-direction: column"
       >
-        <v-card-title class="text-subtitle-1 pt-3 pb-1 px-3 font-weight-bold">{{ tooltip }}</v-card-title>
+        <v-card-title class="text-subtitle-1 pt-3 pb-1 px-3 font-weight-bold">{{
+          tooltip
+        }}</v-card-title>
         <v-card-text class="pa-3" style="overflow-y: auto; flex: 1; min-height: 0">
           <slot name="options" />
         </v-card-text>
