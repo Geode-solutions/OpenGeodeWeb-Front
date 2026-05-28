@@ -38,11 +38,14 @@ function get_selected_crs(crs_code) {
 async function get_crs_table() {
   const params = { geode_object_type };
   toggle_loading();
-  await backStore.request(schema, params, {
-    response_function: (response) => {
-      crs_list.value = response.crs_list;
+  await backStore.request(
+    { schema, params },
+    {
+      response_function: (response) => {
+        crs_list.value = response.crs_list;
+      },
     },
-  });
+  );
   toggle_loading();
 }
 

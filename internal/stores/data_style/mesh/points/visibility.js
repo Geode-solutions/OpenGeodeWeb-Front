@@ -6,7 +6,7 @@ import { useMeshPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshPointsVisibilitySchema = viewer_schemas.opengeodeweb_viewer.mesh.points.visibility;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.visibility;
 
 export function useMeshPointsVisibilityStyle() {
   const viewerStore = useViewerStore();
@@ -16,9 +16,12 @@ export function useMeshPointsVisibilityStyle() {
     return meshPointsCommonStyle.meshPointsStyle(id).visibility;
   }
   function setMeshPointsVisibility(id, visibility) {
+    const params = { id, visibility };
     return viewerStore.request(
-      meshPointsVisibilitySchema,
-      { id, visibility },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => meshPointsCommonStyle.mutateMeshPointsStyle(id, { visibility }),
       },

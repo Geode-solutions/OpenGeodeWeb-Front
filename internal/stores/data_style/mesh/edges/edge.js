@@ -9,6 +9,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const meshEdgesEdgeAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.edge;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useMeshEdgesEdgeAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
@@ -54,9 +55,13 @@ export function useMeshEdgesEdgeAttributeStyle() {
   }
 
   function setMeshEdgesEdgeAttributeName(id, name) {
+    const schema = meshEdgesEdgeAttributeSchemas.name;
+    const params = { id, name };
     return viewerStore.request(
-      meshEdgesEdgeAttributeSchemas.name,
-      { id, name },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => {
           const updates = { name };
@@ -87,9 +92,10 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const name = meshEdgesEdgeAttributeName(id);
     const points = getRGBPointsFromPreset(meshEdgesEdgeAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshEdgesEdgeAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshEdgesEdgeAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             setMeshEdgesEdgeAttributeStoredConfig(id, name, { minimum, maximum }),
@@ -115,9 +121,10 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshEdgesEdgeAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshEdgesEdgeAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () => setMeshEdgesEdgeAttributeStoredConfig(id, name, { colorMap }),
         },

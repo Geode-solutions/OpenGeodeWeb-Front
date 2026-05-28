@@ -78,25 +78,29 @@ export function useModelCommonStyle() {
       params.color = color;
     }
 
-    return viewerStore.request(schema, params, {
-      response_function: async (colors) => {
-        if (color_mode === "constant" && color !== undefined) {
-          return;
-        }
+    return viewerStore.request(
+      { schema, params },
+      {
+        response_function: async (colors) => {
+          if (color_mode === "constant" && color !== undefined) {
+            await mutateComponentStyles(id, component_ids, { color });
+            return;
+          }
 
-        if (!colors?.length) {
-          return;
-        }
+          if (!colors?.length) {
+            return;
+          }
 
-        await bulkMutateComponentStylesPerComponent(
-          id,
-          colors.map(({ geode_id, color: color_value }) => ({
-            id_component: geode_id,
-            values: { color: color_value },
-          })),
-        );
+          await bulkMutateComponentStylesPerComponent(
+            id,
+            colors.map(({ geode_id, color: color_value }) => ({
+              id_component: geode_id,
+              values: { color: color_value },
+            })),
+          );
+        },
       },
-    });
+    );
   }
 
   async function setModelTypeVisibility(id, component_ids, visibility, schema) {
@@ -108,10 +112,9 @@ export function useModelCommonStyle() {
     if (!viewer_ids?.length) {
       return;
     }
-
+    const params = { id, block_ids: viewer_ids, visibility };
     return viewerStore.request(
-      schema,
-      { id, block_ids: viewer_ids, visibility },
+      { schema, params },
       {
         response_function: () => mutateComponentStyles(id, component_ids, { visibility }),
       },

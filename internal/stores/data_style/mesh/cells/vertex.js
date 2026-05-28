@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshCellsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useMeshCellsVertexAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
@@ -51,9 +52,10 @@ export function useMeshCellsVertexAttributeStyle() {
   }
 
   function setMeshCellsVertexAttributeName(id, name) {
+    const schema = meshCellsVertexAttributeSchemas.name;
+    const params = { id, name };
     return viewerStore.request(
-      meshCellsVertexAttributeSchemas.name,
-      { id, name },
+      { schema, params },
       {
         response_function: () => {
           const updates = { name };
@@ -84,9 +86,10 @@ export function useMeshCellsVertexAttributeStyle() {
     const name = meshCellsVertexAttributeName(id);
     const points = getRGBPointsFromPreset(meshCellsVertexAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshCellsVertexAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshCellsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () =>
             setMeshCellsVertexAttributeStoredConfig(id, name, { minimum, maximum }),
@@ -112,9 +115,10 @@ export function useMeshCellsVertexAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshCellsVertexAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshCellsVertexAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        { schema, params },
         {
           response_function: () => setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap }),
         },

@@ -50,13 +50,10 @@ describe("model blocks", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_blocks_schemas.visibility;
+      const params = { id, block_ids: block_viewer_ids, visibility };
       expect(spy).toHaveBeenCalledWith(
-        model_blocks_schemas.visibility,
-        {
-          id,
-          block_ids: block_viewer_ids,
-          visibility,
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -79,14 +76,10 @@ describe("model blocks", () => {
       const spy = vi.spyOn(viewerStore, "request");
       await dataStyleStore.setModelBlocksColor(id, block_ids, color);
       await sleep(SLEEP_MS);
+      const schema = model_blocks_schemas.color;
+      const params = { id, block_ids: block_viewer_ids, color, color_mode: "constant" };
       expect(spy).toHaveBeenCalledWith(
-        model_blocks_schemas.color,
-        {
-          id,
-          block_ids: block_viewer_ids,
-          color,
-          color_mode: "constant",
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },

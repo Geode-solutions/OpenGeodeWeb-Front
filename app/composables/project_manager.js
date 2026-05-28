@@ -43,12 +43,9 @@ async function importProject(file) {
   if (client && client.getConnection && client.getConnection().getSession) {
     await client.getConnection().getSession().call("opengeodeweb_viewer.release_database", [{}]);
   }
-
-  await viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization,
-    {},
-    undefined,
-  );
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;
+  const timeout = undefined;
+  await viewerStore.request({ schema, timeout });
 
   treeviewStore.clear();
   dataStore.clear();

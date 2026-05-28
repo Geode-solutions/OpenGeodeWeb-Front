@@ -2,6 +2,16 @@ import {
   ACTOR_COLOR,
   BACKGROUND_COLOR,
   WHEEL_TIME_OUT_MS,
+} from "@ogw_internal/stores/hybrid_viewer_constants";
+import {
+  applySnapshot,
+  getCameraOptions,
+  performCameraOrientation,
+  performFocusCameraOnObject,
+  performSetCamera,
+  performSyncRemoteCamera,
+} from "@ogw_internal/stores/hybrid_viewer_camera";
+import {
   computeAverageBrightness,
   performAddItem,
   performClear,
@@ -12,14 +22,6 @@ import {
   performSetVisibility,
   performSetZScaling,
 } from "@ogw_internal/stores/hybrid_viewer";
-import {
-  applySnapshot,
-  getCameraOptions,
-  performCameraOrientation,
-  performFocusCameraOnObject,
-  performSetCamera,
-  performSyncRemoteCamera,
-} from "@ogw_internal/stores/hybrid_viewer_camera";
 import {
   createClearHoverData,
   createHoverHighlight,
@@ -35,7 +37,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-// oxlint-disable max-lines-per-function max-statements
+// oxlint-disable max-lines-per-function, max-statements
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const dataStore = useDataStore();
   const hybridDb = reactive({});
@@ -193,7 +195,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
     renderPromise = (async () => {
       try {
-        await viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.render);
+        const schema = viewer_schemas.opengeodeweb_viewer.viewer.render;
+        await viewerStore.request({ schema });
       } finally {
         renderPromise = undefined;
         if (renderPending) {

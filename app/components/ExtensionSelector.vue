@@ -22,10 +22,8 @@ async function get_output_file_extensions() {
   const backStore = useBackStore();
   const values = await Promise.all(
     filenames.map(async (filename) => {
-      const response = await backStore.request(schema, {
-        geode_object_type,
-        filename,
-      });
+      const params = { geode_object_type, filename };
+      const response = await backStore.request({ schema, params });
       return response.geode_objects_and_output_extensions;
     }),
   );

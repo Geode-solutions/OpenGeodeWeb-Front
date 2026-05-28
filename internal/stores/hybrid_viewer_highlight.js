@@ -1,5 +1,6 @@
-import { HOVER_THROTTLE_MS, HOVER_TIMEOUT_MS, performHoverHighlight } from "./hybrid_viewer";
+import { HOVER_THROTTLE_MS, HOVER_TIMEOUT_MS } from "./hybrid_viewer_constants";
 import { database } from "@ogw_internal/database/database.js";
+import { performHoverHighlight } from "./hybrid_viewer";
 
 function createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId) {
   return function clearHoverData() {

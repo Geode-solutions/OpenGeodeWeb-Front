@@ -23,12 +23,16 @@ async function takeScreenshot() {
   const viewerStore = useViewerStore();
   const feedbackStore = useFeedbackStore();
   const current_filename = screenshot_type.value === "file" ? filename.value : "screenshot";
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot;
+  const params = {
+    filename: current_filename,
+    output_extension: output_extension.value,
+    include_background: include_background.value,
+  };
   await viewerStore.request(
-    viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot,
     {
-      filename: current_filename,
-      output_extension: output_extension.value,
-      include_background: include_background.value,
+      schema,
+      params,
     },
     {
       response_function: async (response) => {

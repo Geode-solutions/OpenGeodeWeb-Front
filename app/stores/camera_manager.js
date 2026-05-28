@@ -32,9 +32,9 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
   async function restoreCameraPosition(id) {
     const position = await camera_positions_db.get(id);
     if (position) {
-      await viewerStore.request(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, {
-        camera_options: position.camera_options,
-      });
+      const schema = viewer_schemas.opengeodeweb_viewer.viewer.update_camera;
+      const params = { camera_options: position.camera_options };
+      await viewerStore.request({ schema, params });
     }
   }
 

@@ -40,9 +40,10 @@ describe("mesh cells", () => {
       const result = dataStyleStore.setMeshCellsVisibility(id, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_cells_schemas.visibility;
+      const params = { id, visibility };
       expect(spy).toHaveBeenCalledWith(
-        mesh_cells_schemas.visibility,
-        { id, visibility },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -61,9 +62,10 @@ describe("mesh cells", () => {
       const result = dataStyleStore.setMeshCellsColor(id, color);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_cells_schemas.color;
+      const params = { id, color };
       expect(spy).toHaveBeenCalledWith(
-        mesh_cells_schemas.color,
-        { id, color },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -81,9 +83,10 @@ describe("mesh cells", () => {
       const result = dataStyleStore.setMeshCellsVertexAttributeName(id, vertex_attribute.name);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_cells_schemas.attribute.vertex.name;
+      const params = { id, ...vertex_attribute };
       expect(spy).toHaveBeenCalledWith(
-        mesh_cells_schemas.attribute.vertex.name,
-        { id, ...vertex_attribute },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -101,9 +104,10 @@ describe("mesh cells", () => {
       const result = dataStyleStore.setMeshCellsCellAttributeName(id, cell_attribute.name);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_cells_schemas.attribute.cell.name;
+      const params = { id, ...cell_attribute };
       expect(spy).toHaveBeenCalledWith(
-        mesh_cells_schemas.attribute.cell.name,
-        { id, ...cell_attribute },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },

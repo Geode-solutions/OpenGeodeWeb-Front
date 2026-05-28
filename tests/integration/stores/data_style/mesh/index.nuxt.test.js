@@ -36,9 +36,10 @@ describe("mesh", () => {
       const result = dataStyleStore.setMeshVisibility(id, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_schemas.visibility;
+      const params = { id, visibility };
       expect(spy).toHaveBeenCalledWith(
-        mesh_schemas.visibility,
-        { id, visibility },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },

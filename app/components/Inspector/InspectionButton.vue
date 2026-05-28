@@ -20,14 +20,17 @@ async function get_inspection_results() {
   };
   const backStore = useBackStore();
 
-  await backStore.request(schema, params, {
-    response_function: (response) => {
-      emit("update_values", {
-        inspection_result: [response.inspection_result],
-      });
-      emit("increment_step");
+  await backStore.request(
+    { schema, params },
+    {
+      response_function: (response) => {
+        emit("update_values", {
+          inspection_result: [response.inspection_result],
+        });
+        emit("increment_step");
+      },
     },
-  });
+  );
   toggle_loading();
 }
 </script>

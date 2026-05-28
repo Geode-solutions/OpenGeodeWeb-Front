@@ -53,9 +53,12 @@ function getAttributes() {
   if (schema.properties?.component_id && componentId === undefined) {
     return;
   }
+  const params = { id };
+  if (componentId !== undefined) {
+    params.component_id = componentId;
+  }
   backStore.request(
-    schema,
-    { id, component_id: componentId },
+    { schema, params },
     {
       response_function: (response) => {
         attributes.value = response.attributes;

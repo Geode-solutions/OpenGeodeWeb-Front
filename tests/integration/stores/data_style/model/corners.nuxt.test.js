@@ -50,13 +50,10 @@ describe("model corners", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_corners_schemas.visibility;
+      const params = { id, block_ids: corner_viewer_ids, visibility };
       expect(spy).toHaveBeenCalledWith(
-        model_corners_schemas.visibility,
-        {
-          id,
-          block_ids: corner_viewer_ids,
-          visibility,
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -82,14 +79,10 @@ describe("model corners", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
+      const schema = model_corners_schemas.color;
+      const params = { id, block_ids: corner_viewer_ids, color, color_mode: "constant" };
       expect(spy).toHaveBeenCalledWith(
-        model_corners_schemas.color,
-        {
-          id,
-          block_ids: corner_viewer_ids,
-          color,
-          color_mode: "constant",
-        },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },

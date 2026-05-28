@@ -41,7 +41,7 @@ export function useHoverhighlight() {
         ...(type === "model" && { block_ids }),
       };
       try {
-        await viewerStore.request(schema, params);
+        await viewerStore.request({ schema, params });
       } catch (error) {
         console.error(`Highlight failed for ${type} ${id}:`, error);
       }
@@ -67,7 +67,7 @@ export function useHoverhighlight() {
         ...(currentType === "model" && { block_ids: [] }),
       };
       try {
-        viewerStore.request(schema, params);
+        viewerStore.request({ schema, params });
       } catch (error) {
         console.error(`Unhighlight failed for ${currentType} ${id}:`, error);
       }
