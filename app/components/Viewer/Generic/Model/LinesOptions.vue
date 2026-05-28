@@ -60,10 +60,10 @@ const linesColorMode = computed({
 });
 
 const lineColorMode = computed({
-  get: () => dataStyleStore.getModelComponentColorMode(modelId, lineId),
+  get: () => dataStyleStore.modelLineColorMode(modelId, lineId),
   set: async (colorMode) => {
     if (lineId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, lineId, colorMode);
+      await dataStyleStore.setModelLineColorMode(modelId, lineId, colorMode);
       hybridViewerStore.remoteRender();
     }
   },

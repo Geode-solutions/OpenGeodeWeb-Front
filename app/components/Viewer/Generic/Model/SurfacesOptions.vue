@@ -60,10 +60,10 @@ const surfacesColorMode = computed({
 });
 
 const surfaceColorMode = computed({
-  get: () => dataStyleStore.getModelComponentColorMode(modelId, surfaceId),
+  get: () => dataStyleStore.modelSurfaceColorMode(modelId, surfaceId),
   set: async (colorMode) => {
     if (surfaceId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, surfaceId, colorMode);
+      await dataStyleStore.setModelSurfaceColorMode(modelId, surfaceId, colorMode);
       hybridViewerStore.remoteRender();
     }
   },

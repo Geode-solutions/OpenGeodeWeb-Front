@@ -60,10 +60,10 @@ const cornersColorMode = computed({
 });
 
 const cornerColorMode = computed({
-  get: () => dataStyleStore.getModelComponentColorMode(modelId, cornerId),
+  get: () => dataStyleStore.modelCornerColorMode(modelId, cornerId),
   set: async (colorMode) => {
     if (cornerId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, cornerId, colorMode);
+      await dataStyleStore.setModelCornerColorMode(modelId, cornerId, colorMode);
       hybridViewerStore.remoteRender();
     }
   },
