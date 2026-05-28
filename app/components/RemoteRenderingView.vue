@@ -105,7 +105,8 @@ onMounted(async () => {
       <slot name="ui"></slot>
       <v-col
         ref="viewer"
-        style="overflow: hidden; position: relative; height: 100%; width: 100%" z-index="0"
+        style="overflow: hidden; position: relative; height: 100%; width: 100%"
+        z-index="0"
         class="pa-0"
         @click="get_x_y"
         @keydown.esc="viewerStore.toggle_picking_mode(false)"

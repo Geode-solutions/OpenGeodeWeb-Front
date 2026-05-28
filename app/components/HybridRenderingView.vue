@@ -12,8 +12,7 @@ const container = useTemplateRef("viewer");
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
 
-const { width: elementWidth, height: elementHeight } =
-  useElementSize(container);
+const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
 const debouncedResize = debounce(() => {
@@ -59,17 +58,10 @@ async function handleClick(event) {
 
 <template>
   <ClientOnly>
-    <div
-      data-testid="hybridViewer"
-      class="fill-height"
-      style="position: relative; height: 100%"
-    >
+    <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ViewToolbar />
       <slot name="ui"></slot>
-      <HybridViewerTooltip
-        :container-width="elementWidth"
-        :container-height="elementHeight"
-      />
+      <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />
       <v-col
         class="pa-0"
         ref="viewer"
