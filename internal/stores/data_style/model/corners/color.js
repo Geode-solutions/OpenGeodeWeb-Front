@@ -22,10 +22,5 @@ export function useModelCornersColor() {
     return mode === "constant" ? "color" : mode;
   }
 
-  function setModelCornerColorMode(modelId, corner_id, color_mode) {
-    const dataStyleStore = useDataStyleStore();
-    return dataStyleStore.setModelComponentColorMode(modelId, corner_id, color_mode);
-  }
-
-  return { setModelCornersColor, modelCornerColor, modelCornerColorMode, setModelCornerColorMode };
+  return { setModelCornersColor, modelCornerColor, modelCornerColorMode };
 }

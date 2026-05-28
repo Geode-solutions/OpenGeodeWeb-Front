@@ -22,10 +22,5 @@ export function useModelBlocksColor() {
     return mode === "constant" ? "color" : mode;
   }
 
-  function setModelBlockColorMode(modelId, block_id, color_mode) {
-    const dataStyleStore = useDataStyleStore();
-    return dataStyleStore.setModelComponentColorMode(modelId, block_id, color_mode);
-  }
-
-  return { setModelBlocksColor, modelBlockColor, modelBlockColorMode, setModelBlockColorMode };
+  return { setModelBlocksColor, modelBlockColor, modelBlockColorMode };
 }
