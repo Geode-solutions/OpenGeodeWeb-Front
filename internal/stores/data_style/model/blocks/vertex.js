@@ -92,7 +92,10 @@ export function useModelBlocksVertexAttributeStyle() {
         { schema: schema.color_map, params },
         {
           response_function: () =>
-            setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, { minimum, maximum }),
+            setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, {
+              minimum,
+              maximum,
+            }),
         },
       );
     }
