@@ -77,9 +77,7 @@ export function useModelLinesStyle() {
       ...Object.values(attributeGroups).flatMap(
         ({ color_mode, name, minimum, maximum, colorMap, lines_ids: ids }) => {
           const isVertex = color_mode === "vertex";
-          const attributeStyle = isVertex
-            ? modelLinesVertexAttribute
-            : modelLinesEdgeAttribute;
+          const attributeStyle = isVertex ? modelLinesVertexAttribute : modelLinesEdgeAttribute;
           const setAttributeName = isVertex
             ? attributeStyle.setModelLinesVertexAttributeName
             : attributeStyle.setModelLinesEdgeAttributeName;
