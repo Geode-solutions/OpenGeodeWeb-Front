@@ -74,7 +74,7 @@ function onCenterClick(event) {
     icon
     variant="outlined"
     class="central-selector-btn elevation-6"
-    style="width: 52px; height: 52px; z-index: 5"
+    style="width: 52px; height: 52px;" z-index="1"
     :style="computedItemStyles"
     @mousedown="onMouseDown"
     @mouseup="onMouseUp"

@@ -178,7 +178,7 @@ const formattedId = computed(() => {
   bottom: 110px; /* Positions it beautifully above the circular menu */
   left: 50%;
   transform: translateX(-50%);
-  z-index: 100;
+  z-index: 3;
   pointer-events: auto;
 }
 </style>

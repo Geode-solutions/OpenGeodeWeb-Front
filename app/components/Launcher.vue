@@ -31,7 +31,7 @@ if (infraStore.app_mode !== appMode.CLOUD) {
         class="align"
         cols="12"
         align-self="center"
-        style="z-index: 1000"
+        z-index="4"
       >
         <Recaptcha :button_color="'secondary'" />
       </v-col>

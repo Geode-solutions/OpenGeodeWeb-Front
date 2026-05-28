@@ -12,7 +12,7 @@ function reload() {
   <v-banner
     v-if="feedbackStore.server_error"
     elevation="2"
-    style="background-color: grey; z-index: 9999"
+    style="background-color: grey; z-index: 4;"
     position="fixed"
   >
     <v-row>

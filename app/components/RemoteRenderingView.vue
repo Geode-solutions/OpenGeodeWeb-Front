@@ -105,7 +105,7 @@ onMounted(async () => {
       <slot name="ui"></slot>
       <v-col
         ref="viewer"
-        style="overflow: hidden; position: relative; z-index: 0; height: 100%; width: 100%"
+        style="overflow: hidden; position: relative; height: 100%; width: 100%" z-index="0"
         class="pa-0"
         @click="get_x_y"
         @keydown.esc="viewerStore.toggle_picking_mode(false)"
@@ -117,7 +117,7 @@ onMounted(async () => {
 <style scoped>
 .list {
   position: absolute;
-  z-index: 2;
+  z-index: 1;
   left: 0;
   top: 0;
   background-color: transparent;
