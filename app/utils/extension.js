@@ -96,7 +96,13 @@ function runExtensions() {
     additionalProperties: false,
   };
 
-  return appStore.request({ schema, params });
+  return appStore.request({ schema, params }, {
+    response_function: (response) => {
+      const { extensionsArray } = response;
+      console.log("[ExtensionManager] Extensions run:", extensionsArray.map((ext) => ext.name));
+    }
+  }
+  );
 }
 
 export {
