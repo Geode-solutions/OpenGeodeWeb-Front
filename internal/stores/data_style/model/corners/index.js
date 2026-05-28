@@ -1,6 +1,7 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersColor } from "./color";
 import { useModelCornersCommonStyle } from "./common";
+import { useModelCornersVertexAttribute } from "./vertex";
 import { useModelCornersVisibility } from "./visibility";
 
 async function setModelCornersDefaultStyle(_id) {
@@ -12,6 +13,7 @@ export function useModelCornersStyle() {
   const modelCommonStyle = useModelCornersCommonStyle();
   const modelVisibilityStyle = useModelCornersVisibility();
   const modelColorStyle = useModelCornersColor();
+  const modelCornersVertexAttribute = useModelCornersVertexAttribute();
 
   async function applyModelCornersStyle(modelId) {
     const corners_ids = await dataStore.getCornersGeodeIds(modelId);
@@ -21,6 +23,7 @@ export function useModelCornersStyle() {
 
     const visibilityGroups = {};
     const colorGroups = {};
+    const attributeGroups = {};
 
     for (const corner_id of corners_ids) {
       const style = modelCommonStyle.modelCornerStyle(modelId, corner_id);
@@ -32,11 +35,34 @@ export function useModelCornersStyle() {
       visibilityGroups[visibility].push(corner_id);
 
       const color_mode = style.color_mode || "constant";
-      const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
-      if (!colorGroups[color_key]) {
-        colorGroups[color_key] = { color_mode, color: style.color, corners_ids: [] };
+      if (color_mode === "constant" || color_mode === "random") {
+        const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+        if (!colorGroups[color_key]) {
+          colorGroups[color_key] = { color_mode, color: style.color, corners_ids: [] };
+        }
+        colorGroups[color_key].corners_ids.push(corner_id);
+      } else {
+        const attributeTypeKey = `${color_mode}_attribute`;
+        const attributeStyle = style[attributeTypeKey] || {};
+        const { name } = attributeStyle;
+        if (name) {
+          const storedConfig =
+            (attributeStyle.storedConfigs && attributeStyle.storedConfigs[name]) || {};
+          const { minimum, maximum, colorMap } = storedConfig;
+          const attributeGroupKey = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
+          if (!attributeGroups[attributeGroupKey]) {
+            attributeGroups[attributeGroupKey] = {
+              color_mode,
+              name,
+              minimum,
+              maximum,
+              colorMap,
+              corners_ids: [],
+            };
+          }
+          attributeGroups[attributeGroupKey].corners_ids.push(corner_id);
+        }
       }
-      colorGroups[color_key].corners_ids.push(corner_id);
     }
 
     const promises = [
@@ -45,6 +71,23 @@ export function useModelCornersStyle() {
       ),
       ...Object.values(colorGroups).map(({ color_mode, color, corners_ids: ids }) =>
         modelColorStyle.setModelCornersColor(modelId, ids, color, color_mode),
+      ),
+      ...Object.values(attributeGroups).flatMap(
+        ({ name, minimum, maximum, colorMap, corners_ids: ids }) => {
+          const attribute = modelCornersVertexAttribute;
+          const setAttributeName = attribute.setModelCornersVertexAttributeName;
+          const setAttributeRange = attribute.setModelCornersVertexAttributeRange;
+          const setAttributeColorMap = attribute.setModelCornersVertexAttributeColorMap;
+
+          const list = [setAttributeName(modelId, ids, name)];
+          if (minimum !== undefined && maximum !== undefined) {
+            list.push(setAttributeRange(modelId, ids, minimum, maximum));
+          }
+          if (colorMap) {
+            list.push(setAttributeColorMap(modelId, ids, colorMap));
+          }
+          return list;
+        },
       ),
     ];
 
@@ -57,5 +100,6 @@ export function useModelCornersStyle() {
     ...modelCommonStyle,
     ...modelVisibilityStyle,
     ...modelColorStyle,
+    ...modelCornersVertexAttribute,
   };
 }
