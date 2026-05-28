@@ -74,7 +74,7 @@ async function handleClick(event) {
 </template>
 
 <style scoped>
-img {
+:deep(img) {
   pointer-events: none;
 }
 .picking-cursor {
