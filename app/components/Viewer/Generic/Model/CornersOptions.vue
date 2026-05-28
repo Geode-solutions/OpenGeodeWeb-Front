@@ -34,7 +34,7 @@ const cornerVisibility = computed({
 
 // Color
 const cornersColor = computed({
-  get: () => dataStyleStore.modelCornersStyle(modelId).color,
+  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Corner"),
   set: async (color) => {
     await dataStyleStore.setModelComponentTypeColor(modelId, "Corner", color);
     hybridViewerStore.remoteRender();
@@ -42,7 +42,7 @@ const cornersColor = computed({
 });
 
 const cornerColor = computed({
-  get: () => dataStyleStore.modelCornerStyle(modelId, cornerId).color,
+  get: () => dataStyleStore.modelCornerColor(modelId, cornerId),
   set: async (color) => {
     if (cornerId) {
       await dataStyleStore.setModelCornersColor(modelId, [cornerId], color);

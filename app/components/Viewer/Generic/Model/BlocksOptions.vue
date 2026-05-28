@@ -34,7 +34,7 @@ const blockVisibility = computed({
 
 // Color
 const blocksColor = computed({
-  get: () => dataStyleStore.modelBlocksStyle(modelId).color,
+  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Block"),
   set: async (color) => {
     await dataStyleStore.setModelComponentTypeColor(modelId, "Block", color);
     hybridViewerStore.remoteRender();
@@ -42,7 +42,7 @@ const blocksColor = computed({
 });
 
 const blockColor = computed({
-  get: () => dataStyleStore.modelBlockStyle(modelId, blockId).color,
+  get: () => dataStyleStore.modelBlockColor(modelId, blockId),
   set: async (color) => {
     if (blockId) {
       await dataStyleStore.setModelBlocksColor(modelId, [blockId], color);

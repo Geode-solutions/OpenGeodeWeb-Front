@@ -34,7 +34,7 @@ const lineVisibility = computed({
 
 // Color
 const linesColor = computed({
-  get: () => dataStyleStore.modelLinesStyle(modelId).color,
+  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Line"),
   set: async (color) => {
     await dataStyleStore.setModelComponentTypeColor(modelId, "Line", color);
     hybridViewerStore.remoteRender();
@@ -42,7 +42,7 @@ const linesColor = computed({
 });
 
 const lineColor = computed({
-  get: () => dataStyleStore.modelLineStyle(modelId, lineId).color,
+  get: () => dataStyleStore.modelLineColor(modelId, lineId),
   set: async (color) => {
     if (lineId) {
       await dataStyleStore.setModelLinesColor(modelId, [lineId], color);

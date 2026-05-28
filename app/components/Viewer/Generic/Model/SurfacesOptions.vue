@@ -34,7 +34,7 @@ const surfaceVisibility = computed({
 
 // Color
 const surfacesColor = computed({
-  get: () => dataStyleStore.modelSurfacesStyle(modelId).color,
+  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Surface"),
   set: async (color) => {
     await dataStyleStore.setModelComponentTypeColor(modelId, "Surface", color);
     hybridViewerStore.remoteRender();
@@ -42,7 +42,7 @@ const surfacesColor = computed({
 });
 
 const surfaceColor = computed({
-  get: () => dataStyleStore.modelSurfaceStyle(modelId, surfaceId).color,
+  get: () => dataStyleStore.modelSurfaceColor(modelId, surfaceId),
   set: async (color) => {
     if (surfaceId) {
       await dataStyleStore.setModelSurfacesColor(modelId, [surfaceId], color);

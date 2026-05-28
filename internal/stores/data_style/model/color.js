@@ -87,7 +87,7 @@ function useModelColorStyle(componentStyleFunctions) {
     if (individualColor !== undefined) {
       return individualColor;
     }
-    return getModelComponentTypeColor(modelId, type);
+    return modelComponentTypeColor(modelId, type);
   }
 
   function getModelComponentColorMode(modelId, componentId) {
@@ -95,7 +95,7 @@ function useModelColorStyle(componentStyleFunctions) {
     return mode === "constant" ? "color" : mode;
   }
 
-  function getModelComponentTypeColor(modelId, type) {
+  function modelComponentTypeColor(modelId, type) {
     return (
       dataStyleState.getModelComponentTypeStyle(modelId, type).color ||
       DEFAULT_MODEL_COMPONENT_TYPE_COLORS[type]
@@ -192,7 +192,7 @@ function useModelColorStyle(componentStyleFunctions) {
     getModelComponentColor,
     getModelComponentEffectiveColor,
     getModelComponentColorMode,
-    getModelComponentTypeColor,
+    modelComponentTypeColor,
     getModelComponentTypeColorMode,
     setModelComponentTypeColor,
     setModelComponentTypeColorMode,
