@@ -6,7 +6,7 @@ import { useMeshPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshPointsColorSchemas = viewer_schemas.opengeodeweb_viewer.mesh.points.color;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.color;
 
 export function useMeshPointsColorStyle() {
   const viewerStore = useViewerStore();
@@ -16,9 +16,12 @@ export function useMeshPointsColorStyle() {
     return meshPointsCommonStyle.meshPointsColoring(id).color;
   }
   function setMeshPointsColor(id, color) {
+    const params = { id, color };
     return viewerStore.request(
-      meshPointsColorSchemas,
-      { id, color },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () =>
           meshPointsCommonStyle.mutateMeshPointsColoring(id, {

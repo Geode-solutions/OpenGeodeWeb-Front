@@ -45,7 +45,6 @@ export default defineConfig({
           include: ["tests/integration/**/*.test.js"],
           globals: true,
           environment: "nuxt",
-          fileParallelism: false,
           testTimeout: TIMEOUTS.integration,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
           server: {

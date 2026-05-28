@@ -49,9 +49,9 @@ function resetRange() {
 }
 
 function getAttributes() {
+  const params = { id };
   backStore.request(
-    schema,
-    { id },
+    { schema, params },
     {
       response_function: (response) => {
         attributes.value = response.attributes;

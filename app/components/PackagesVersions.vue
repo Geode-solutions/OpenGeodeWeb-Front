@@ -11,8 +11,7 @@ const packages_versions = ref([]);
 
 async function get_packages_versions() {
   await backStore.request(
-    schema,
-    {},
+    { schema },
     {
       response_function: (response) => {
         packages_versions.value = response.versions;

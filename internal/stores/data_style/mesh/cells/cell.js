@@ -9,6 +9,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const meshCellsCellAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useMeshCellsCellAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
@@ -42,9 +43,13 @@ export function useMeshCellsCellAttributeStyle() {
   }
 
   function setMeshCellsCellAttributeName(id, name) {
+    const schema = meshCellsCellAttributeSchemas.name;
+    const params = { id, name };
     return viewerStore.request(
-      meshCellsCellAttributeSchemas.name,
-      { id, name },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name }),
       },
@@ -62,9 +67,13 @@ export function useMeshCellsCellAttributeStyle() {
     const name = meshCellsCellAttributeName(id);
     const points = getRGBPointsFromPreset(meshCellsCellAttributeColorMap(id));
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshCellsCellAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshCellsCellAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        {
+          schema,
+          params,
+        },
         {
           response_function: () =>
             setMeshCellsCellAttributeStoredConfig(id, name, { minimum, maximum }),
@@ -87,9 +96,13 @@ export function useMeshCellsCellAttributeStyle() {
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
+      const schema = meshCellsCellAttributeSchemas.color_map;
+      const params = { id, points, minimum, maximum };
       return viewerStore.request(
-        meshCellsCellAttributeSchemas.color_map,
-        { id, points, minimum, maximum },
+        {
+          schema,
+          params,
+        },
         {
           response_function: () => setMeshCellsCellAttributeStoredConfig(id, name, { colorMap }),
         },

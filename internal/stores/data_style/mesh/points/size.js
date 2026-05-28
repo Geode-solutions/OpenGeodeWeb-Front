@@ -6,7 +6,7 @@ import { useMeshPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshPointsSizeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.points.size;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.size;
 
 export function useMeshPointsSizeStyle() {
   const viewerStore = useViewerStore();
@@ -16,9 +16,12 @@ export function useMeshPointsSizeStyle() {
     return meshPointsCommonStyle.meshPointsStyle(id).size;
   }
   function setMeshPointsSize(id, size) {
+    const params = { id, size };
     return viewerStore.request(
-      meshPointsSizeSchemas,
-      { id, size },
+      {
+        schema,
+        params,
+      },
       {
         response_function: () => meshPointsCommonStyle.mutateMeshPointsStyle(id, { size }),
       },

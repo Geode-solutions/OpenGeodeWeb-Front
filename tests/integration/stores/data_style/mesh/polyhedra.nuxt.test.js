@@ -38,9 +38,10 @@ describe("mesh polyhedra", () => {
       const result = dataStyleStore.setMeshPolyhedraVisibility(id, visibility);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_polyhedra_schemas.visibility;
+      const params = { id, visibility };
       expect(spy).toHaveBeenCalledWith(
-        mesh_polyhedra_schemas.visibility,
-        { id, visibility },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -57,9 +58,10 @@ describe("mesh polyhedra", () => {
       const result = dataStyleStore.setMeshPolyhedraColor(id, color);
       expect(result).toBeInstanceOf(Promise);
       await result;
+      const schema = mesh_polyhedra_schemas.color;
+      const params = { id, color };
       expect(spy).toHaveBeenCalledWith(
-        mesh_polyhedra_schemas.color,
-        { id, color },
+        { schema, params },
         {
           response_function: expect.any(Function),
         },
@@ -110,9 +112,10 @@ describe("mesh polyhedra", () => {
 
     const spy = vi.spyOn(viewerStore, "request");
     await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, vertex_attribute.name);
+    const schema = mesh_polyhedra_schemas.attribute.vertex.name;
+    const params = { id, ...vertex_attribute };
     expect(spy).toHaveBeenCalledWith(
-      mesh_polyhedra_schemas.attribute.vertex.name,
-      { id, ...vertex_attribute },
+      { schema, params },
       {
         response_function: expect.any(Function),
       },
@@ -127,9 +130,10 @@ describe("mesh polyhedra", () => {
 
     const spy = vi.spyOn(viewerStore, "request");
     await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, polyhedron_attribute.name);
+    const schema = mesh_polyhedra_schemas.attribute.polyhedron.name;
+    const params = { id, ...polyhedron_attribute };
     expect(spy).toHaveBeenCalledWith(
-      mesh_polyhedra_schemas.attribute.polyhedron.name,
-      { id, ...polyhedron_attribute },
+      { schema, params },
       {
         response_function: expect.any(Function),
       },
