@@ -1,6 +1,5 @@
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelCornersCommonStyle } from "./common";
-import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.color;
