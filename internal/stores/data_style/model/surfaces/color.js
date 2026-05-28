@@ -22,14 +22,9 @@ export function useModelSurfacesColor() {
     return mode === "constant" ? "color" : mode;
   }
 
-  function setModelSurfaceColorMode(modelId, surface_id, color_mode) {
-    return modelCommonStyle.setModelComponentColorMode(modelId, surface_id, color_mode);
-  }
-
   return {
     setModelSurfacesColor,
     modelSurfaceColor,
     modelSurfaceColorMode,
-    setModelSurfaceColorMode,
   };
 }
