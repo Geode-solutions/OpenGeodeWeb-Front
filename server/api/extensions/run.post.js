@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
 
         const backendExecutablePath = path.join(unzippedExtensionPath, backendExecutable);
         fs.chmodSync(backendExecutablePath, "755");
-        const port = await runBack(backendExecutable, backendExecutablePath, {
+        const port = await runBack(backendExecutable, unzippedExtensionPath, {
           projectFolderPath,
         });
         await addMicroserviceMetadatas(projectFolderPath, {
