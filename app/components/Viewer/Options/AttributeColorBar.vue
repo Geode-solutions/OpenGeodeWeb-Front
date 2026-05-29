@@ -14,6 +14,7 @@ const colorMap = defineModel("colorMap", { type: String });
     <v-row dense align="center" class="mt-2">
       <v-col cols="5">
         <v-text-field
+          data-testid="attributeMinInput"
           :model-value="minimum"
           @update:model-value="(value) => (minimum = Number(value))"
           label="Min"
@@ -35,6 +36,7 @@ const colorMap = defineModel("colorMap", { type: String });
       </v-col>
       <v-col cols="5">
         <v-text-field
+          data-testid="attributeMaxInput"
           :model-value="maximum"
           @update:model-value="(value) => (maximum = Number(value))"
           label="Max"

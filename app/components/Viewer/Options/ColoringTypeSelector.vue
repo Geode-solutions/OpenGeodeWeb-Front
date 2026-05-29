@@ -170,6 +170,7 @@ watch(
         </v-col>
         <v-col>
           <v-select
+            data-testid="coloringStyleSelector"
             v-model="coloring_style_label"
             :items="coloring_styles.labels"
             label="Select a coloring style"

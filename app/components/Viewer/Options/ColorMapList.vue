@@ -102,6 +102,7 @@ watch(filteredPresets, drawAllCanvases);
     />
 
     <v-list
+      data-testid="colorMapList"
       density="compact"
       max-height="350"
       bg-color="transparent"
