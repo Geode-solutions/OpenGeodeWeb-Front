@@ -63,7 +63,7 @@ const blockColorMode = computed({
   get: () => dataStyleStore.modelBlockColorMode(modelId, blockId),
   set: async (colorMode) => {
     if (blockId) {
-      await dataStyleStore.setModelBlockColorMode(modelId, blockId, colorMode);
+      await dataStyleStore.setModelComponentColorMode(modelId, blockId, colorMode);
       hybridViewerStore.remoteRender();
     }
   },
