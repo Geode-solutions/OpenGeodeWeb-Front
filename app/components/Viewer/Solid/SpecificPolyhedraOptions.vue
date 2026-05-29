@@ -111,7 +111,10 @@ const polyhedron_attribute_color_map = computed({
     :btn_image="SolidPolyhedra"
   >
     <template #options>
-      <ViewerOptionsVisibilitySwitch data-testid="meshPolyhedraVisibilitySwitch" v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch
+        data-testid="meshPolyhedraVisibilitySwitch"
+        v-model="visibility"
+      />
       <template v-if="visibility">
         <ViewerOptionsColoringTypeSelector
           :id="id"
