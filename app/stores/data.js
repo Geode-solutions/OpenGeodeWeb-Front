@@ -73,9 +73,9 @@ export const useDataStore = defineStore("data", () => {
     return component?.type;
   }
 
-  async function registerObject(id) {
+  async function registerObject(id, name) {
     const schema = viewer_generic_schemas.register;
-    const params = { id };
+    const params = { id, name };
     return await viewerStore.request({ schema, params });
   }
 
