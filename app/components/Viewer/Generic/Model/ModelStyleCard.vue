@@ -132,7 +132,7 @@ watch(modelComponentsColorMode, async (colorMode) => {
       <VisibilitySwitch v-model="modelVisibility" />
     </OptionsSection>
 
-    <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-6">
+    <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
       <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
       <v-select
         v-model="modelComponentsColorMode"
@@ -178,7 +178,7 @@ watch(modelComponentsColorMode, async (colorMode) => {
 
 <style scoped>
 .model-style-card {
-  padding-top: 20px;
+  padding-top: 12px;
   overflow-x: hidden;
 }
 

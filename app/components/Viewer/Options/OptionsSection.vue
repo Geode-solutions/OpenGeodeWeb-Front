@@ -14,7 +14,7 @@ const isCollapsed = ref(false);
         mdi-chevron-down
       </v-icon>
     </div>
-    <v-container v-show="!isCollapsed" class="pa-0 pt-1 pb-1">
+    <v-container v-show="!isCollapsed" class="pa-0">
       <slot />
     </v-container>
   </div>
@@ -25,7 +25,7 @@ const isCollapsed = ref(false);
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  padding: 12px 8px 12px 8px;
+  padding: 8px 4px 6px 4px;
 }
 
 .section-badge {
