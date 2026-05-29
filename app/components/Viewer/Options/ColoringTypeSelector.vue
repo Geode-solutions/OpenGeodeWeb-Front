@@ -224,9 +224,7 @@ watch(
           :schema="polygonSchema"
         />
       </template>
-      <template
-        v-if="coloring_style_key === polyhedron_dict['value'] && hasColorMap('polyhedron')"
-      >
+      <template v-if="coloring_style_key === polyhedron_dict['value'] && hasColorMap('polyhedron')">
         <ViewerOptionsAttributeSelector
           v-model:name="polyhedron_attribute_name"
           v-model:range="polyhedron_attribute_range"
