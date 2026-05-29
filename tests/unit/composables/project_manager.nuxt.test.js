@@ -210,7 +210,7 @@ function verifyStoreImports() {
 function verifyDataManagement() {
   expect(dataStyleStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.dataStyle);
   expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalledWith();
-  expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123");
+  expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123", "My Data");
   expect(dataStoreMock.addItem).toHaveBeenCalledWith(snapshotMock.data.items[0]);
   expect(treeviewStoreMock.addItem).toHaveBeenCalledWith("PointSet2D", "My Data", "abc123", "mesh");
 }
