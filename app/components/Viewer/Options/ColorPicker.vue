@@ -41,9 +41,25 @@ watch(pressed, (value) => {
     ref="colorPickerRef"
     v-model="vuetifyColor"
     flat
-    canvas-height="100"
+    canvas-height="75"
     hide-inputs
-    width="100%"
+    width="220"
     mode="rgba"
+    class="mx-auto"
   />
 </template>
+
+<style scoped>
+:deep(.v-color-picker__controls) {
+  padding: 8px !important;
+}
+
+:deep(.v-color-picker__dot) {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+:deep(.v-color-picker__preview) {
+  margin-bottom: 0 !important;
+}
+</style>
