@@ -92,13 +92,18 @@ function runExtensions() {
     additionalProperties: false,
   };
 
-  return appStore.request({ schema, params }, {
-    response_function: (response) => {
-      console.log("[ExtensionManager] Extensions run:", response);
-      const { extensionsArray } = response;
-      console.log("[ExtensionManager] Extensions run:", extensionsArray.map((ext) => ext.name));
-    }
-  }
+  return appStore.request(
+    { schema, params },
+    {
+      response_function: (response) => {
+        console.log("[ExtensionManager] Extensions run:", response);
+        const { extensionsArray } = response;
+        console.log(
+          "[ExtensionManager] Extensions run:",
+          extensionsArray.map((ext) => ext.name),
+        );
+      },
+    },
   );
 }
 
