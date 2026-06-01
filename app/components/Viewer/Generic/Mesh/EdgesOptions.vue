@@ -68,19 +68,13 @@ const color = computed({
     <template #options>
       <ViewerOptionsVisibilitySwitch data-testid="meshEdgesVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
-        <v-row class="pa-0" align="center">
-          <v-divider />
-          <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="size" />
-        </v-row>
-        <v-row>
-          <v-col>
-            <ViewerOptionsColoringTypeSelector
-              :id="id"
-              v-model:coloring_style_key="coloring_style_key"
-              v-model:color="color"
-            />
-          </v-col>
-        </v-row>
+        <v-divider class="my-2" />
+        <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="size" />
+        <ViewerOptionsColoringTypeSelector
+          :id="id"
+          v-model:coloring_style_key="coloring_style_key"
+          v-model:color="color"
+        />
       </template>
     </template>
   </ViewerContextMenuItem>

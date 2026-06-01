@@ -98,23 +98,17 @@ const vertex_attribute_color_map = computed({
         v-model="visibility"
       />
       <template v-if="visibility">
-        <v-row class="pa-0" align="center">
-          <v-divider />
-          <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
-        </v-row>
-        <v-row>
-          <v-col>
-            <ViewerOptionsColoringTypeSelector
-              :id="id"
-              v-model:coloring_style_key="coloring_style_key"
-              v-model:color="color"
-              v-model:vertex_attribute_name="vertex_attribute_name"
-              v-model:vertex_attribute_range="vertex_attribute_range"
-              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-              :capabilities="{ vertex: { available: false } }"
-            />
-          </v-col>
-        </v-row>
+        <v-divider class="my-2" />
+        <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
+        <ViewerOptionsColoringTypeSelector
+          :id="id"
+          v-model:coloring_style_key="coloring_style_key"
+          v-model:color="color"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_range="vertex_attribute_range"
+          v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+          :capabilities="{ vertex: { available: false } }"
+        />
       </template>
     </template>
   </ViewerContextMenuItem>
