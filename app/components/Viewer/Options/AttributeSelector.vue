@@ -110,6 +110,7 @@ watch(name, (newName, oldName) => {
     item-value="attribute_name"
     density="compact"
     label="Select an attribute"
+    hide-details
   />
   <ViewerOptionsAttributeColorBar
     v-if="name"
