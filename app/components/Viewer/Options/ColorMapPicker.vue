@@ -32,6 +32,7 @@ watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas);
   <v-menu v-model="menuOpen" :close-on-content-click="false" location="bottom">
     <template #activator="{ props: menuProps }">
       <GlassCard
+        data-testid="colorMapPicker"
         v-bind="menuProps"
         variant="ui"
         padding="pa-2"

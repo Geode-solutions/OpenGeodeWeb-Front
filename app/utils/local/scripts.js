@@ -27,7 +27,7 @@ async function waitNuxt(nuxtProcess) {
   for await (const [data] of on(nuxtProcess.stdout, "data")) {
     const output = data.toString();
     console.log("Nuxt:", output);
-    const portMatch = output.match(/Listening on http:\/\/\[::\]:(\d+)/u);
+    const portMatch = output.match(/Listening on http:\/\/\[::\]:(?<port>\d+)/u);
     if (portMatch) {
       const [, nuxtPort] = portMatch;
 
