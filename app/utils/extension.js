@@ -24,7 +24,7 @@ async function registerRunningExtensions() {
         type: "application/javascript",
       });
       const blobUrl = URL.createObjectURL(blob);
-      const extensionModule = await appStore.loadExtension(blobUrl, undefined, port);
+      const extensionModule = await appStore.loadExtension(blobUrl, port);
       console.log("[ExtensionManager] Extension loaded:", id);
 
       const storeFactory = extensionModule.metadata.store;

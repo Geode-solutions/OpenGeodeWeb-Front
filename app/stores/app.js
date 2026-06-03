@@ -88,7 +88,7 @@ export const useAppStore = defineStore("app", () => {
     return loadedExtensions.value.get(id);
   }
 
-  async function loadExtension(path, backendPath = undefined, port = undefined) {
+  async function loadExtension(path, port, backendPath = undefined) {
     try {
       let finalURL = path;
 
