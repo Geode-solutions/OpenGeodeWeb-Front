@@ -103,12 +103,14 @@ watch(name, (newName, oldName) => {
 
 <template>
   <v-select
+    data-testid="attributeSelector"
     v-model="name"
     :items="attributes.map((attribute) => attribute.attribute_name)"
     item-title="attribute_name"
     item-value="attribute_name"
     density="compact"
     label="Select an attribute"
+    hide-details
   />
   <ViewerOptionsAttributeColorBar
     v-if="name"

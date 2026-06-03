@@ -95,28 +95,17 @@ const vertex_attribute_color_map = computed({
         v-model="visibility"
       />
       <template v-if="visibility">
-        <v-row class="pa-0" align="center">
-          <v-divider />
-          <v-col cols="auto" justify="center">
-            <v-icon size="30" icon="mdi-ruler" v-tooltip:left="'Size'" />
-          </v-col>
-          <v-col justify="center">
-            <v-slider v-model="size" hide-details min="0" max="20" step="2" />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <ViewerOptionsColoringTypeSelector
-              :id="id"
-              v-model:coloring_style_key="coloring_style_key"
-              v-model:color="color"
-              v-model:vertex_attribute_name="vertex_attribute_name"
-              v-model:vertex_attribute_range="vertex_attribute_range"
-              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-              :vertex_has_colormap="true"
-            />
-          </v-col>
-        </v-row>
+        <v-divider class="my-2" />
+        <ViewerOptionsSizeSlider v-model="size" />
+        <ViewerOptionsColoringTypeSelector
+          :id="id"
+          v-model:coloring_style_key="coloring_style_key"
+          v-model:color="color"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_range="vertex_attribute_range"
+          v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+          :vertex_has_colormap="true"
+        />
       </template>
     </template>
   </ViewerContextMenuItem>

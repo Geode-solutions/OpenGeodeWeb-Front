@@ -5,7 +5,7 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTheme } from "vuetify";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const CARD_WIDTH = 320;
+const CARD_WIDTH = 300;
 const CARD_HEIGHT = 500;
 const MARGIN = 60;
 const RADIUS = 80;
@@ -170,8 +170,10 @@ function toggleOptions() {
         class="elevation-24"
         style="overflow: hidden; display: flex; flex-direction: column"
       >
-        <v-card-title>{{ tooltip }}</v-card-title>
-        <v-card-text class="pa-5" style="overflow-y: auto; flex: 1; min-height: 0">
+        <v-card-title class="text-subtitle-1 pt-3 pb-0 px-3 font-weight-bold">{{
+          tooltip
+        }}</v-card-title>
+        <v-card-text class="px-3 pb-3 pt-1" style="overflow-y: auto; flex: 1; min-height: 0">
           <slot name="options" />
         </v-card-text>
       </GlassCard>
@@ -251,5 +253,41 @@ function toggleOptions() {
 
 .options-left {
   right: 60px;
+}
+
+:deep(.v-field) {
+  min-height: 30px !important;
+  height: 30px !important;
+  border-radius: 6px !important;
+}
+
+:deep(.v-field__input) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  min-height: 30px !important;
+  height: 30px !important;
+  font-size: 0.95rem !important;
+  align-items: center;
+}
+
+:deep(.v-field__append-inner) {
+  align-items: center;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  height: 30px !important;
+}
+
+:deep(.v-field__append-inner .v-icon) {
+  font-size: 16px !important;
+}
+
+:deep(.v-field-label) {
+  font-size: 0.75rem !important;
+  top: 6px !important;
+}
+
+:deep(.v-field-label--floating) {
+  top: -8px !important;
+  font-size: 0.7rem !important;
 }
 </style>

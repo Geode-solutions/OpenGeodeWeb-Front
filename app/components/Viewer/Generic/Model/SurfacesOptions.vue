@@ -63,7 +63,7 @@ const surfaceColorMode = computed({
   get: () => dataStyleStore.modelSurfaceColorMode(modelId, surfaceId),
   set: async (colorMode) => {
     if (surfaceId) {
-      await dataStyleStore.setModelSurfaceColorMode(modelId, surfaceId, colorMode);
+      await dataStyleStore.setModelComponentColorMode(modelId, surfaceId, colorMode);
       hybridViewerStore.remoteRender();
     }
   },
@@ -210,51 +210,41 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
 </script>
 
 <template>
-  <div>
-    <OptionsSection title="Surfaces Options" class="mt-6">
-      <VisibilitySwitch v-model="surfacesVisibility" />
-      <v-row class="mt-2 pa-0">
-        <v-col class="pa-0">
-          <ViewerOptionsColoringTypeSelector
-            :id="modelId"
-            :componentId="targetSurfaceIds[0]"
-            v-model:coloring_style_key="surfacesColorMode"
-            v-model:color="surfacesColor"
-            v-model:vertex_attribute_name="surfacesVertexAttributeName"
-            v-model:vertex_attribute_range="surfacesVertexAttributeRange"
-            v-model:vertex_attribute_color_map="surfacesVertexAttributeColorMap"
-            v-model:polygon_attribute_name="surfacesPolygonAttributeName"
-            v-model:polygon_attribute_range="surfacesPolygonAttributeRange"
-            v-model:polygon_attribute_color_map="surfacesPolygonAttributeColorMap"
-            :capabilities="capabilities"
-            :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
-            :allowRandom="true"
-          />
-        </v-col>
-      </v-row>
-    </OptionsSection>
+  <OptionsSection title="Surfaces Options" class="mt-4">
+    <VisibilitySwitch v-model="surfacesVisibility" />
+    <ViewerOptionsColoringTypeSelector
+      :id="modelId"
+      :componentId="targetSurfaceIds[0]"
+      v-model:coloring_style_key="surfacesColorMode"
+      v-model:color="surfacesColor"
+      v-model:vertex_attribute_name="surfacesVertexAttributeName"
+      v-model:vertex_attribute_range="surfacesVertexAttributeRange"
+      v-model:vertex_attribute_color_map="surfacesVertexAttributeColorMap"
+      v-model:polygon_attribute_name="surfacesPolygonAttributeName"
+      v-model:polygon_attribute_range="surfacesPolygonAttributeRange"
+      v-model:polygon_attribute_color_map="surfacesPolygonAttributeColorMap"
+      :capabilities="capabilities"
+      :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
+      :allowRandom="true"
+    />
+  </OptionsSection>
 
-    <OptionsSection v-if="surfaceId" title="Component Options" class="mt-6">
-      <VisibilitySwitch v-model="surfaceVisibility" />
-      <v-row class="mt-2 pa-0">
-        <v-col class="pa-0">
-          <ViewerOptionsColoringTypeSelector
-            :id="modelId"
-            :componentId="surfaceId"
-            v-model:coloring_style_key="surfaceColorMode"
-            v-model:color="surfaceColor"
-            v-model:vertex_attribute_name="vertexAttributeName"
-            v-model:vertex_attribute_range="vertexAttributeRange"
-            v-model:vertex_attribute_color_map="vertexAttributeColorMap"
-            v-model:polygon_attribute_name="polygonAttributeName"
-            v-model:polygon_attribute_range="polygonAttributeRange"
-            v-model:polygon_attribute_color_map="polygonAttributeColorMap"
-            :capabilities="capabilities"
-            :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
-            :allowRandom="true"
-          />
-        </v-col>
-      </v-row>
-    </OptionsSection>
-  </div>
+  <OptionsSection v-if="surfaceId" title="Component Options" class="mt-4">
+    <VisibilitySwitch v-model="surfaceVisibility" />
+    <ViewerOptionsColoringTypeSelector
+      :id="modelId"
+      :componentId="surfaceId"
+      v-model:coloring_style_key="surfaceColorMode"
+      v-model:color="surfaceColor"
+      v-model:vertex_attribute_name="vertexAttributeName"
+      v-model:vertex_attribute_range="vertexAttributeRange"
+      v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+      v-model:polygon_attribute_name="polygonAttributeName"
+      v-model:polygon_attribute_range="polygonAttributeRange"
+      v-model:polygon_attribute_color_map="polygonAttributeColorMap"
+      :capabilities="capabilities"
+      :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
+      :allowRandom="true"
+    />
+  </OptionsSection>
 </template>

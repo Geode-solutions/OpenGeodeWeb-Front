@@ -21,9 +21,5 @@ export function useModelLinesColor() {
     return mode === "constant" ? "color" : mode;
   }
 
-  function setModelLineColorMode(modelId, line_id, color_mode) {
-    return modelCommonStyle.setModelComponentColorMode(modelId, line_id, color_mode);
-  }
-
-  return { setModelLinesColor, modelLineColor, modelLineColorMode, setModelLineColorMode };
+  return { setModelLinesColor, modelLineColor, modelLineColorMode };
 }

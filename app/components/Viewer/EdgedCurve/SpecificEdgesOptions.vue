@@ -112,6 +112,7 @@ const edge_attribute_color_map = computed({
 </script>
 <template>
   <ViewerContextMenuItem
+    data-testid="meshEdgesMenu"
     :itemProps="itemProps"
     :btn_image="EdgedCurveEdges"
     tooltip="Edges options"
@@ -119,25 +120,19 @@ const edge_attribute_color_map = computed({
     <template #options>
       <ViewerOptionsVisibilitySwitch data-testid="meshEdgesVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
-        <v-row class="pa-0" align="center">
-          <v-divider />
-          <ViewerOptionsWidthSlider v-model="width" />
-        </v-row>
-        <v-row>
-          <v-col>
-            <ViewerOptionsColoringTypeSelector
-              :id="id"
-              v-model:coloring_style_key="coloring_style_key"
-              v-model:color="color"
-              v-model:vertex_attribute_name="vertex_attribute_name"
-              v-model:vertex_attribute_range="vertex_attribute_range"
-              v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-              v-model:edge_attribute_name="edge_attribute_name"
-              v-model:edge_attribute_range="edge_attribute_range"
-              v-model:edge_attribute_color_map="edge_attribute_color_map"
-            />
-          </v-col>
-        </v-row>
+        <v-divider class="my-2" />
+        <ViewerOptionsWidthSlider v-model="width" />
+        <ViewerOptionsColoringTypeSelector
+          :id="id"
+          v-model:coloring_style_key="coloring_style_key"
+          v-model:color="color"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_range="vertex_attribute_range"
+          v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+          v-model:edge_attribute_name="edge_attribute_name"
+          v-model:edge_attribute_range="edge_attribute_range"
+          v-model:edge_attribute_color_map="edge_attribute_color_map"
+        />
       </template>
     </template>
   </ViewerContextMenuItem>

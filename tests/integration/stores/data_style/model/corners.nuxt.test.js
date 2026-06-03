@@ -137,4 +137,35 @@ describe("model corners", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
+
+  describe("corner component active coloring", () => {
+    test("coloring color", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const [corner_id] = corner_ids;
+      const coloringName = "color";
+      const result = dataStyleStore.setModelComponentColorMode(id, corner_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelCornerColorMode(id, corner_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const [corner_id] = corner_ids;
+      await dataStyleStore.setModelCornersVertexAttributeName(id, [corner_id], "points");
+      const coloringName = "vertex";
+      const result = dataStyleStore.setModelComponentColorMode(id, corner_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelCornerColorMode(id, corner_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 });
