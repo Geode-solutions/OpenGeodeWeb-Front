@@ -76,8 +76,6 @@ async function lookForLocalExtensionDistPath(rootPath, extentionRepoName, fronte
     // oxlint-disable-next-line no-await-in-loop
     await setTimeout(MILLISECONDS_PER_RETRY);
   }
-
-  throw new Error(`Failed to find local extension dist path: ${rebuiltFilePath}`);
 }
 async function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPath, extensionId) {
   console.log("[extensionFrontendPath]", {
