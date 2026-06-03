@@ -141,4 +141,16 @@ onMounted(async () => {
   background-color: transparent;
   border-radius: 16px;
 }
+
+:deep(img) {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
 </style>
