@@ -161,85 +161,80 @@ watch(
 );
 </script>
 <template>
-  <v-row justify="center" align="center">
-    <v-divider />
+  <v-divider class="my-2 mx-2" />
+  <v-row justify="center" align="center" no-gutters class="px-2">
+    <v-col cols="auto" class="mr-2">
+      <v-icon size="18" icon="mdi-format-color-fill" v-tooltip:left="'Coloring'" />
+    </v-col>
     <v-col>
-      <v-row justify="center" align="center">
-        <v-col cols="auto">
-          <v-icon size="30" icon="mdi-format-color-fill" v-tooltip:left="'Coloring'" />
-        </v-col>
-        <v-col>
-          <v-select
-            v-model="coloring_style_label"
-            :items="coloring_styles.labels"
-            label="Select a coloring style"
-            density="compact"
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-spacer />
-        <v-col cols="10">
-          <template v-if="coloring_style_key === color_dict['value']">
-            <ViewerOptionsColorPicker v-model="color" />
-          </template>
-          <template v-if="coloring_style_key === textures_dict['value']">
-            <ViewerOptionsTexturesSelector v-model="textures" :id="id" />
-          </template>
-          <template v-if="coloring_style_key === vertex_dict['value'] && hasColorMap('vertex')">
-            <ViewerOptionsAttributeSelector
-              v-model:name="vertex_attribute_name"
-              v-model:range="vertex_attribute_range"
-              v-model:colorMap="vertex_attribute_color_map"
-              :id="id"
-              :componentId="componentId"
-              :schema="vertexSchema"
-            />
-          </template>
-          <template v-if="coloring_style_key === edge_dict['value'] && hasColorMap('edge')">
-            <ViewerOptionsAttributeSelector
-              v-model:name="edge_attribute_name"
-              v-model:range="edge_attribute_range"
-              v-model:colorMap="edge_attribute_color_map"
-              :id="id"
-              :componentId="componentId"
-              :schema="edgeSchema"
-            />
-          </template>
-          <template v-if="coloring_style_key === cell_dict['value'] && hasColorMap('cell')">
-            <ViewerOptionsAttributeSelector
-              v-model:name="cell_attribute_name"
-              v-model:range="cell_attribute_range"
-              v-model:colorMap="cell_attribute_color_map"
-              :id="id"
-              :componentId="componentId"
-              :schema="cellSchema"
-            />
-          </template>
-          <template v-if="coloring_style_key === polygon_dict['value'] && hasColorMap('polygon')">
-            <ViewerOptionsAttributeSelector
-              v-model:name="polygon_attribute_name"
-              v-model:range="polygon_attribute_range"
-              v-model:colorMap="polygon_attribute_color_map"
-              :id="id"
-              :componentId="componentId"
-              :schema="polygonSchema"
-            />
-          </template>
-          <template
-            v-if="coloring_style_key === polyhedron_dict['value'] && hasColorMap('polyhedron')"
-          >
-            <ViewerOptionsAttributeSelector
-              v-model:name="polyhedron_attribute_name"
-              v-model:range="polyhedron_attribute_range"
-              v-model:colorMap="polyhedron_attribute_color_map"
-              :id="id"
-              :componentId="componentId"
-              :schema="polyhedronSchema"
-            />
-          </template>
-        </v-col>
-      </v-row>
+      <v-select
+        data-testid="coloringStyleSelector"
+        v-model="coloring_style_label"
+        :items="coloring_styles.labels"
+        label="Select a coloring style"
+        density="compact"
+        hide-details
+      />
+    </v-col>
+  </v-row>
+  <v-row class="mt-3 px-2" no-gutters>
+    <v-col cols="12" class="ps-7 pe-1">
+      <template v-if="coloring_style_key === color_dict['value']">
+        <ViewerOptionsColorPicker v-model="color" />
+      </template>
+      <template v-if="coloring_style_key === textures_dict['value']">
+        <ViewerOptionsTexturesSelector v-model="textures" :id="id" />
+      </template>
+      <template v-if="coloring_style_key === vertex_dict['value'] && hasColorMap('vertex')">
+        <ViewerOptionsAttributeSelector
+          v-model:name="vertex_attribute_name"
+          v-model:range="vertex_attribute_range"
+          v-model:colorMap="vertex_attribute_color_map"
+          :id="id"
+          :componentId="componentId"
+          :schema="vertexSchema"
+        />
+      </template>
+      <template v-if="coloring_style_key === edge_dict['value'] && hasColorMap('edge')">
+        <ViewerOptionsAttributeSelector
+          v-model:name="edge_attribute_name"
+          v-model:range="edge_attribute_range"
+          v-model:colorMap="edge_attribute_color_map"
+          :id="id"
+          :componentId="componentId"
+          :schema="edgeSchema"
+        />
+      </template>
+      <template v-if="coloring_style_key === cell_dict['value'] && hasColorMap('cell')">
+        <ViewerOptionsAttributeSelector
+          v-model:name="cell_attribute_name"
+          v-model:range="cell_attribute_range"
+          v-model:colorMap="cell_attribute_color_map"
+          :id="id"
+          :componentId="componentId"
+          :schema="cellSchema"
+        />
+      </template>
+      <template v-if="coloring_style_key === polygon_dict['value'] && hasColorMap('polygon')">
+        <ViewerOptionsAttributeSelector
+          v-model:name="polygon_attribute_name"
+          v-model:range="polygon_attribute_range"
+          v-model:colorMap="polygon_attribute_color_map"
+          :id="id"
+          :componentId="componentId"
+          :schema="polygonSchema"
+        />
+      </template>
+      <template v-if="coloring_style_key === polyhedron_dict['value'] && hasColorMap('polyhedron')">
+        <ViewerOptionsAttributeSelector
+          v-model:name="polyhedron_attribute_name"
+          v-model:range="polyhedron_attribute_range"
+          v-model:colorMap="polyhedron_attribute_color_map"
+          :id="id"
+          :componentId="componentId"
+          :schema="polyhedronSchema"
+        />
+      </template>
     </v-col>
   </v-row>
 </template>

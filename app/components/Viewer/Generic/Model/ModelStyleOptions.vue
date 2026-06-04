@@ -10,6 +10,7 @@ const { itemProps } = defineProps({
 
 <template>
   <ViewerContextMenuItem
+    data-testid="modelStyleMenu"
     :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Style options"

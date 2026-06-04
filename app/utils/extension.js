@@ -24,19 +24,15 @@ async function registerRunningExtensions() {
         type: "application/javascript",
       });
       const blobUrl = URL.createObjectURL(blob);
-      const extensionModule = await appStore.loadExtension(blobUrl);
+      const extensionModule = await appStore.loadExtension(blobUrl, port);
       console.log("[ExtensionManager] Extension loaded:", id);
 
-      if (extensionModule.metadata?.store) {
-        const storeFactory = extensionModule.metadata.store;
-        const store = storeFactory();
-        store.$patch((state) => {
-          state.default_local_port = port;
-        });
-        appStore.registerStore(store);
-        console.log("[ExtensionManager] Store registered:", store.$id);
-        infraStore.register_microservice(store);
-      }
+      const storeFactory = extensionModule.metadata.store;
+      const store = storeFactory();
+      appStore.registerStore(store);
+      console.log("[ExtensionManager] Store registered:", store.$id);
+      infraStore.register_microservice(store);
+
       return {
         name,
         version,

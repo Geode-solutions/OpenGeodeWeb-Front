@@ -2,6 +2,7 @@
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
+// oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
 
@@ -87,7 +88,7 @@ export const useAppStore = defineStore("app", () => {
     return loadedExtensions.value.get(id);
   }
 
-  async function loadExtension(path, backendPath = undefined) {
+  async function loadExtension(path, port, backendPath = undefined) {
     try {
       let finalURL = path;
 
@@ -103,6 +104,8 @@ export const useAppStore = defineStore("app", () => {
       }
       // oxlint-disable-next-line no-inline-comments
       const extensionModule = await import(/* @vite-ignore */ finalURL);
+      const store = extensionModule.metadata.store();
+      store.$patch({ default_local_port: port });
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL);

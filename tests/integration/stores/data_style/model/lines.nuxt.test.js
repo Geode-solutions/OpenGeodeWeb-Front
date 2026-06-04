@@ -170,4 +170,50 @@ describe("model lines", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });
+
+  describe("line component active coloring", () => {
+    test("coloring color", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      const coloringName = "color";
+      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesVertexAttributeName(id, [line_id], "points");
+      const coloringName = "vertex";
+      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring edge", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesEdgeAttributeName(id, [line_id], "test_attribute");
+      const coloringName = "edge";
+      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
 });

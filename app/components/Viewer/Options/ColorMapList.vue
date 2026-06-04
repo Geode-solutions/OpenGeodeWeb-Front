@@ -1,9 +1,7 @@
 <script setup>
-import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
-import { newInstance as vtkColorTransferFunction } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
+import GlassCard from "@ogw_front/components/GlassCard.vue";
+import { drawCanvasForPreset } from "@ogw_front/utils/colormap";
 
-const LAST_POINT_OFFSET = 4;
-const THREE = 3;
 const CHUNK_SIZE = 5;
 
 const { presets, selectedPresetName } = defineProps({
@@ -46,43 +44,6 @@ const filteredPresets = computed(() => {
   return result;
 });
 
-function drawPresetCanvas(presetName, canvas) {
-  if (!canvas) {
-    return;
-  }
-  const rgbPoints = getRGBPointsFromPreset(presetName);
-  if (!rgbPoints || rgbPoints.length === 0) {
-    return;
-  }
-  const ctx = canvas.getContext("2d");
-  const { height, width } = canvas;
-  const lut = vtkColorTransferFunction();
-  for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {
-    lut.addRGBPoint(
-      rgbPoints[pointIdx],
-      rgbPoints[pointIdx + 1],
-      rgbPoints[pointIdx + 2],
-      rgbPoints[pointIdx + THREE],
-    );
-  }
-  const table = lut.getUint8Table(rgbPoints[0], rgbPoints.at(-LAST_POINT_OFFSET), width, true);
-  const imageData = ctx.createImageData(width, height);
-  for (let xCoord = 0; xCoord < width; xCoord += 1) {
-    const alpha = table[xCoord * 4 + THREE],
-      blue = table[xCoord * 4 + 2],
-      green = table[xCoord * 4 + 1],
-      red = table[xCoord * 4];
-    for (let yCoord = 0; yCoord < height; yCoord += 1) {
-      const pixelIdx = (yCoord * width + xCoord) * 4;
-      imageData.data[pixelIdx] = red;
-      imageData.data[pixelIdx + 1] = green;
-      imageData.data[pixelIdx + 2] = blue;
-      imageData.data[pixelIdx + THREE] = alpha;
-    }
-  }
-  ctx.putImageData(imageData, 0, 0);
-}
-
 function processChunk(entries, index, jobId) {
   if (jobId !== renderJobId.value || index >= entries.length) {
     if (jobId === renderJobId.value) {
@@ -94,7 +55,7 @@ function processChunk(entries, index, jobId) {
   const end = Math.min(index + CHUNK_SIZE, entries.length);
   for (let i = index; i < end; i += 1) {
     const [unusedKey, refValue] = entries[i];
-    drawPresetCanvas(refValue.presetName, refValue.element);
+    drawCanvasForPreset(refValue.presetName, refValue.element);
   }
   const ZERO = 0;
   setTimeout(() => processChunk(entries, end, jobId), ZERO);
@@ -115,13 +76,7 @@ watch(filteredPresets, drawAllCanvases);
 </script>
 
 <template>
-  <v-card
-    width="320"
-    class="pa-3 blur-card overflow-hidden"
-    theme="dark"
-    variant="outlined"
-    rounded="lg"
-  >
+  <GlassCard width="320" variant="panel" padding="pa-3" rounded="lg" class="overflow-hidden">
     <v-overlay
       v-model="loading"
       contained
@@ -147,6 +102,7 @@ watch(filteredPresets, drawAllCanvases);
     />
 
     <v-list
+      data-testid="colorMapList"
       density="compact"
       max-height="350"
       bg-color="transparent"
@@ -199,17 +155,10 @@ watch(filteredPresets, drawAllCanvases);
         </v-list-item>
       </template>
     </v-list>
-  </v-card>
+  </GlassCard>
 </template>
 
 <style scoped>
-.blur-card {
-  background-color: rgba(35, 35, 35, 0.8) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
 .border-thin {
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }

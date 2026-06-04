@@ -1,8 +1,14 @@
 <script setup>
 import { useElementSize, useWindowSize } from "@vueuse/core";
+
 import { Status } from "@ogw_front/utils/status";
-import ViewToolbar from "@ogw_front/components/ViewToolbar";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useMenuStore } from "@ogw_front/stores/menu";
+import { useQuickColormap } from "@ogw_front/composables/use_quick_colormap";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+
+import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
+import ViewToolbar from "@ogw_front/components/ViewToolbar";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 
@@ -11,18 +17,24 @@ const { viewId } = defineProps({
 });
 
 const viewerStore = useViewerStore();
+const menuStore = useMenuStore();
+const dataStore = useDataStore();
 const viewer = useTemplateRef("viewer");
 const { width, height } = useElementSize(viewer);
 
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-function get_x_y(event) {
-  if (viewerStore.picking_mode.value === true) {
-    const { offsetX, offsetY } = event;
+const { pickColormap, quickColormap } = useQuickColormap();
+
+async function get_x_y(event) {
+  const { offsetX, offsetY, clientX, clientY } = event;
+  if (viewerStore.picking_mode === true) {
     viewerStore.set_picked_point(offsetX, offsetY);
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
     const params = { x: offsetX, y: offsetY };
     viewerStore.request({ schema, params });
+  } else {
+    await pickColormap(offsetX, offsetY, clientX, clientY);
   }
 }
 
@@ -101,6 +113,12 @@ onMounted(async () => {
 <template>
   <ClientOnly>
     <div style="position: relative; width: 100%; height: 100%">
+      <ColormapQuickPicker
+        v-model:show="quickColormap.show"
+        :x="quickColormap.x"
+        :y="quickColormap.y"
+        :data-id="quickColormap.data_id"
+      />
       <ViewToolbar />
       <slot name="ui"></slot>
       <v-col
@@ -108,7 +126,7 @@ onMounted(async () => {
         style="overflow: hidden; position: relative; height: 100%; width: 100%"
         z-index="0"
         class="pa-0"
-        @click="get_x_y"
+        @pointerup.capture="get_x_y"
         @keydown.esc="viewerStore.toggle_picking_mode(false)"
       />
     </div>
@@ -123,5 +141,17 @@ onMounted(async () => {
   top: 0;
   background-color: transparent;
   border-radius: 16px;
+}
+
+:deep(img) {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 </style>

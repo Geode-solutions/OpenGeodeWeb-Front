@@ -63,7 +63,7 @@ const lineColorMode = computed({
   get: () => dataStyleStore.modelLineColorMode(modelId, lineId),
   set: async (colorMode) => {
     if (lineId) {
-      await dataStyleStore.setModelLineColorMode(modelId, lineId, colorMode);
+      await dataStyleStore.setModelComponentColorMode(modelId, lineId, colorMode);
       hybridViewerStore.remoteRender();
     }
   },
@@ -202,51 +202,41 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
 </script>
 
 <template>
-  <div>
-    <OptionsSection title="Lines Options" class="mt-6">
-      <VisibilitySwitch v-model="linesVisibility" />
-      <v-row class="mt-2 pa-0">
-        <v-col class="pa-0">
-          <ViewerOptionsColoringTypeSelector
-            :id="modelId"
-            :componentId="targetLineIds[0]"
-            v-model:coloring_style_key="linesColorMode"
-            v-model:color="linesColor"
-            v-model:vertex_attribute_name="linesVertexAttributeName"
-            v-model:vertex_attribute_range="linesVertexAttributeRange"
-            v-model:vertex_attribute_color_map="linesVertexAttributeColorMap"
-            v-model:edge_attribute_name="linesEdgeAttributeName"
-            v-model:edge_attribute_range="linesEdgeAttributeRange"
-            v-model:edge_attribute_color_map="linesEdgeAttributeColorMap"
-            :capabilities="capabilities"
-            :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
-            :allowRandom="true"
-          />
-        </v-col>
-      </v-row>
-    </OptionsSection>
+  <OptionsSection title="Lines Options" class="mt-4">
+    <VisibilitySwitch v-model="linesVisibility" />
+    <ViewerOptionsColoringTypeSelector
+      :id="modelId"
+      :componentId="targetLineIds[0]"
+      v-model:coloring_style_key="linesColorMode"
+      v-model:color="linesColor"
+      v-model:vertex_attribute_name="linesVertexAttributeName"
+      v-model:vertex_attribute_range="linesVertexAttributeRange"
+      v-model:vertex_attribute_color_map="linesVertexAttributeColorMap"
+      v-model:edge_attribute_name="linesEdgeAttributeName"
+      v-model:edge_attribute_range="linesEdgeAttributeRange"
+      v-model:edge_attribute_color_map="linesEdgeAttributeColorMap"
+      :capabilities="capabilities"
+      :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
+      :allowRandom="true"
+    />
+  </OptionsSection>
 
-    <OptionsSection v-if="lineId" title="Component Options" class="mt-6">
-      <VisibilitySwitch v-model="lineVisibility" />
-      <v-row class="mt-2 pa-0">
-        <v-col class="pa-0">
-          <ViewerOptionsColoringTypeSelector
-            :id="modelId"
-            :componentId="lineId"
-            v-model:coloring_style_key="lineColorMode"
-            v-model:color="lineColor"
-            v-model:vertex_attribute_name="vertexAttributeName"
-            v-model:vertex_attribute_range="vertexAttributeRange"
-            v-model:vertex_attribute_color_map="vertexAttributeColorMap"
-            v-model:edge_attribute_name="edgeAttributeName"
-            v-model:edge_attribute_range="edgeAttributeRange"
-            v-model:edge_attribute_color_map="edgeAttributeColorMap"
-            :capabilities="capabilities"
-            :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
-            :allowRandom="true"
-          />
-        </v-col>
-      </v-row>
-    </OptionsSection>
-  </div>
+  <OptionsSection v-if="lineId" title="Component Options" class="mt-4">
+    <VisibilitySwitch v-model="lineVisibility" />
+    <ViewerOptionsColoringTypeSelector
+      :id="modelId"
+      :componentId="lineId"
+      v-model:coloring_style_key="lineColorMode"
+      v-model:color="lineColor"
+      v-model:vertex_attribute_name="vertexAttributeName"
+      v-model:vertex_attribute_range="vertexAttributeRange"
+      v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+      v-model:edge_attribute_name="edgeAttributeName"
+      v-model:edge_attribute_range="edgeAttributeRange"
+      v-model:edge_attribute_color_map="edgeAttributeColorMap"
+      :capabilities="capabilities"
+      :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
+      :allowRandom="true"
+    />
+  </OptionsSection>
 </template>
