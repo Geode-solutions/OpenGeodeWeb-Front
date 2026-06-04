@@ -7,7 +7,6 @@ import _ from "lodash";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-
 async function importExtensionFile(file) {
   await uploadExtension(file);
   return registerRunningExtensions();
