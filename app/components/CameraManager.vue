@@ -21,7 +21,8 @@ const { show_dialog, width } = defineProps({
     variant="panel"
     padding="pa-0"
     class="position-absolute elevation-24"
-    style="z-index: 2; top: 90px; right: 55px"
+    style="top: 90px; right: 55px"
+    z-index="1"
   >
     <v-card-text class="pa-0">
       <Saver />
