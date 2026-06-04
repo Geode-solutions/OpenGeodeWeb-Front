@@ -30,6 +30,14 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Microservice registered:", store_name);
       }
     },
+    unregister_microservice(store) {
+      const store_name = store.$id;
+      console.log("[INFRA] Unregistering microservice:", store_name);
+      this.microservices = this.microservices.filter(
+        (microservice) => microservice.$id !== store_name,
+      );
+      console.log("[INFRA] Microservice unregistered:", store_name);
+    },
     create_backend(name, email, launch) {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
       console.log(

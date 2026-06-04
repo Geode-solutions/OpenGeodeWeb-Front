@@ -155,51 +155,51 @@ export const useAppStore = defineStore("app", () => {
     return [...loadedExtensions.value.values()];
   }
 
-  function unloadExtension(id) {
-    const extensionData = getExtension(id);
+  function unloadExtension(extensionId) {
+    const extensionData = getExtension(extensionId);
     if (!extensionData) {
       return false;
     }
     if (extensionData.module && typeof extensionData.module.uninstall === "function") {
       try {
         extensionData.module.uninstall(extensionAPI.value);
-        console.log(`[AppStore] Extension uninstall called: ${id}`);
+        console.log(`[AppStore] Extension uninstall called: ${extensionId}`);
       } catch (error) {
-        console.error(`[AppStore] Error calling uninstall for ${id}:`, error);
+        console.error(`[AppStore] Error calling uninstall for ${extensionId}:`, error);
       }
     }
 
     if (extensionAPI.value && typeof extensionAPI.value.unregisterToolsByExtension === "function") {
-      extensionAPI.value.unregisterToolsByExtension(id);
+      extensionAPI.value.unregisterToolsByExtension(extensionId);
     }
 
-    loadedExtensions.value.delete(id);
-    console.log(`[AppStore] Extension unloaded: ${id}`);
+    loadedExtensions.value.delete(extensionId);
+    console.log(`[AppStore] Extension unloaded: ${extensionId}`);
     return true;
   }
 
-  function toggleExtension(id) {
-    const extensionData = getExtension(id);
+  function toggleExtension(extensionId) {
+    const extensionData = getExtension(extensionId);
     if (!extensionData) {
       return false;
     }
     extensionData.enabled = !extensionData.enabled;
-    console.log(`[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${id}`);
+    console.log(`[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${extensionId}`);
     return extensionData.enabled;
   }
 
-  function setExtensionEnabled(id, enabled) {
-    const extensionData = getExtension(id);
+  function setExtensionEnabled(extensionId, enabled) {
+    const extensionData = getExtension(extensionId);
     if (!extensionData) {
       return false;
     }
     extensionData.enabled = enabled;
-    console.log(`[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${id}`);
+    console.log(`[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${extensionId}`);
     return true;
   }
 
-  function getExtensionEnabled(id) {
-    return getExtension(id)?.enabled ?? false;
+  function getExtensionEnabled(extensionId) {
+    return getExtension(extensionId)?.enabled ?? false;
   }
 
   function upload(file, callbacks = {}) {

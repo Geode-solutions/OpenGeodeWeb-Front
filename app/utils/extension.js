@@ -1,4 +1,5 @@
 // Node.js imports
+import path from "node:path";
 
 // Third party imports
 import _ from "lodash";
@@ -6,6 +7,10 @@ import _ from "lodash";
 // Local imports
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
+
+function extensionFolderPath(projectFolderPath, extensionID) {
+  return path.join(projectFolderPath, "extensions", extensionID);
+}
 
 async function importExtensionFile(file) {
   await uploadExtension(file);
@@ -95,10 +100,34 @@ function runExtensions() {
   return appStore.request({ schema, params });
 }
 
+function killExtension(extensionId) {
+  const appStore = useAppStore();
+  const { projectFolderPath } = appStore;
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const params = { extensionId, projectFolderPath, projectName };
+
+  const schema = {
+    $id: "/api/extensions/kill",
+    methods: ["POST"],
+    type: "object",
+    properties: {
+      extensionId: { type: "string" },
+      projectFolderPath: { type: "string" },
+      projectName: { type: "string" },
+    },
+    required: ["extensionId", "projectFolderPath", "projectName"],
+    additionalProperties: false,
+  };
+
+  return appStore.request({ schema, params });
+}
+
 export {
+  extensionFolderPath,
   importExtensionFile,
   unloadExtension,
   uploadExtension,
   registerRunningExtensions,
   runExtensions,
+  killExtension,
 };

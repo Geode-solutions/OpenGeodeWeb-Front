@@ -14,10 +14,9 @@ import {
   executableName,
   extensionFrontendPath,
 } from "@geode/opengeodeweb-front/app/utils/local/path.js";
+import { extensionFolderPath } from "@geode/opengeodeweb-front/app/utils/extension.js";
 import { extensionsConf } from "@geode/opengeodeweb-front/app/utils/config.js";
 import { unzipFile } from "@geode/opengeodeweb-front/app/utils/server.js";
-
-const CODE_200 = 200;
 
 export default defineEventHandler(async (event) => {
   try {
@@ -30,7 +29,7 @@ export default defineEventHandler(async (event) => {
         const extensionPath = extensionsConfig[extensionID].path;
         const unzippedExtensionPath = await unzipFile(
           extensionPath,
-          path.join(projectFolderPath, "extensions", extensionID),
+          extensionFolderPath(projectFolderPath, extensionID),
         );
         const metadataPath = path.join(unzippedExtensionPath, "metadata.json");
         const metadataContent = await fs.promises.readFile(metadataPath, "utf8");
@@ -95,7 +94,7 @@ export default defineEventHandler(async (event) => {
     );
 
     return {
-      statusCode: CODE_200,
+      statusCode: 200,
       extensionsArray,
     };
   } catch (error) {
