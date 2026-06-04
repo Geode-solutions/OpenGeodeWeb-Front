@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
         const extensionPath = extensionsConfig[extensionID].path;
         const unzippedExtensionPath = await unzipFile(
           extensionPath,
-          path.join(projectFolderPath, "extensions"),
+          path.join(projectFolderPath, "extensions", extensionID),
         );
         const metadataPath = path.join(unzippedExtensionPath, "metadata.json");
         const metadataContent = await fs.promises.readFile(metadataPath, "utf8");
