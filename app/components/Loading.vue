@@ -61,8 +61,8 @@ onUnmounted(() => {
           height: 100vh;
           background: rgba(0, 0, 0, 0.45);
           backdrop-filter: blur(10px);
-          z-index: 2400;
           pointer-events: auto;
+          z-index: 3;
         "
       >
         <div
@@ -73,7 +73,7 @@ onUnmounted(() => {
             background-size: 40px 40px;
             background-position: center;
             pointer-events: none;
-            z-index: -1;
+            z-index: 0;
           "
         />
 

@@ -135,7 +135,7 @@ defineExpose({ get_viewer_id });
   top: 20px;
   left: 0;
   pointer-events: none;
-  z-index: 100;
+  z-index: 3;
 }
 
 @keyframes pulse-ring {

@@ -62,7 +62,7 @@ function close() {
 
 <style scoped>
 .tool-panel {
-  z-index: 2;
+  z-index: 1;
   top: 90px;
   right: 55px;
 }
