@@ -184,7 +184,9 @@ export const useAppStore = defineStore("app", () => {
       return false;
     }
     extensionData.enabled = !extensionData.enabled;
-    console.log(`[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${extensionId}`);
+    console.log(
+      `[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${extensionId}`,
+    );
     return extensionData.enabled;
   }
 
