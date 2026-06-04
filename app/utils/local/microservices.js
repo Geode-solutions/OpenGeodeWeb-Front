@@ -121,5 +121,4 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   );
 }
 
-
 export { addMicroserviceMetadatas, getAvailablePort, runBack, runViewer };

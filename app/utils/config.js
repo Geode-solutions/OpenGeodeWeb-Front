@@ -1,6 +1,6 @@
 // Node.js imports
 import path from "node:path";
-import { unlink } from 'node:fs';
+import { unlink } from "node:fs";
 
 // Third party imports
 import Conf from "conf";
@@ -44,8 +44,6 @@ async function removeExtensionFromConf(projectName, extensionID) {
   });
   projectConfig.delete(`extensions.${extensionID}`);
   console.log(`${extensionID} was deleted from ${projectName} config`);
-
-
 }
 
 function extensionPathFromConf(projectName, extensionID) {
@@ -59,5 +57,5 @@ export {
   extensionsConf,
   addExtensionToConf,
   removeExtensionFromConf,
-  extensionPathFromConf
+  extensionPathFromConf,
 };
