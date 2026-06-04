@@ -4,8 +4,9 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { extensionFolderPath, killMicroservice } from "@geode/opengeodeweb-front/app/utils/extension.js";
 import { deleteFolderRecursive } from "@geode/opengeodeweb-front/app/utils/local/cleanup.js";
+import { extensionFolderPath } from "@geode/opengeodeweb-front/app/utils/path.js";
+import { killMicroservice } from "@geode/opengeodeweb-front/app/utils/extension.js";
 import { removeExtensionFromConf } from "@geode/opengeodeweb-front/app/utils/config.js";
 
 export default defineEventHandler(async (event) => {

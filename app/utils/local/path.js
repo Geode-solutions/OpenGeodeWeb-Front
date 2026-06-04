@@ -49,6 +49,10 @@ function generateProjectFolderPath(projectName) {
   return path.join(os.tmpdir(), projectName.replaceAll("/", "_"), uuidv4());
 }
 
+function extensionFolderPath(projectFolderPath, extensionID) {
+  return path.join(projectFolderPath, "extensions", extensionID);
+}
+
 async function lookForLocalExtensionDistPath(rootPath, extentionRepoName, frontendFile) {
   const localExtensionPath = path.join(rootPath, "..", extentionRepoName);
   const localExtensionDistPath = path.join(localExtensionPath, "dist");
@@ -108,6 +112,7 @@ async function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPa
 export {
   createPath,
   extensionFrontendPath,
+  extensionFolderPath,
   executablePath,
   executableName,
   generateProjectFolderPath,

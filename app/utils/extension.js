@@ -1,5 +1,4 @@
 // Node.js imports
-import path from "node:path";
 
 // Third party imports
 import _ from "lodash";
@@ -8,9 +7,6 @@ import _ from "lodash";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-function extensionFolderPath(projectFolderPath, extensionID) {
-  return path.join(projectFolderPath, "extensions", extensionID);
-}
 
 async function importExtensionFile(file) {
   await uploadExtension(file);
@@ -123,7 +119,6 @@ function killExtension(extensionId) {
 }
 
 export {
-  extensionFolderPath,
   importExtensionFile,
   unloadExtension,
   uploadExtension,
