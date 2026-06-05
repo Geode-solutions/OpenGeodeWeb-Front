@@ -102,6 +102,8 @@ function killExtension(extensionId) {
   const { PROJECT: projectName } = useRuntimeConfig().public;
   const params = { extensionId, projectFolderPath, projectName };
 
+  console.log(`[AppStore] Killing extension: ${extensionId}`, { params });
+
   const schema = {
     $id: "/api/extensions/kill",
     methods: ["POST"],

@@ -38,14 +38,9 @@ function killHttpMicroservice(microservice) {
   console.log("killHttpMicroservice", { ...microservice });
   const failMessage = `Failed to kill ${microservice.name}`;
   async function do_kill() {
-    try {
-      await fetch(microservice.url, {
-        method: microservice.method,
-      });
-      throw new Error(failMessage);
-    } catch (error) {
-      console.log(`${microservice.name} closed`, error);
-    }
+    await $fetch(microservice.url, {
+      method: microservice.method,
+    });
   }
   return pTimeout(do_kill(), {
     milliseconds: 5000,
@@ -103,20 +98,27 @@ function killWebsocketMicroservice(microservice) {
   });
 }
 
-function killMicroservice(microservice) {
+async function killMicroservice(microservice, microservices) {
   if (microservice.type === "back") {
-    return killHttpMicroservice(microservice);
+    await killHttpMicroservice(microservice);
+  } else if (microservice.type === "viewer") {
+    await killWebsocketMicroservice(microservice);
+  } else {
+    throw new Error(`Unknown microservice type: ${microservice.type}`);
   }
-  if (microservice.type === "viewer") {
-    return killWebsocketMicroservice(microservice);
+
+  if (microservices) {
+    const index = microservices.indexOf(microservice);
+    if (index !== -1) {
+      microservices.splice(index, 1);
+    }
   }
-  throw new Error(`Unknown microservice type: ${microservice.type}`);
 }
 
 function killMicroservices(microservices) {
   console.log("killMicroservices", { microservices });
   return Promise.all(
-    microservices.map(async (microservice) => await killMicroservice(microservice)),
+    microservices.map((microservice) => killMicroservice(microservice, microservices)),
   );
 }
 
@@ -142,8 +144,12 @@ async function cleanupBackend(projectFolderPath) {
   await deleteFolderRecursive(projectFolderPath);
 }
 
+function getMicroserviceByName(microservices, name) {
+  return microservices.find((microservice) => microservice.name === name);
+}
+
 function microservicesMetadatasPath(projectFolderPath) {
   return path.join(projectFolderPath, "microservices.json");
 }
 
-export { cleanupBackend, microservicesMetadatasPath, projectMicroservices };
+export { cleanupBackend, deleteFolderRecursive, killMicroservice, microservicesMetadatasPath, projectMicroservices, getMicroserviceByName };
