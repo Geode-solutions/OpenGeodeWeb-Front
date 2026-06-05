@@ -152,4 +152,11 @@ function microservicesMetadatasPath(projectFolderPath) {
   return path.join(projectFolderPath, "microservices.json");
 }
 
-export { cleanupBackend, deleteFolderRecursive, killMicroservice, microservicesMetadatasPath, projectMicroservices, getMicroserviceByName };
+export {
+  cleanupBackend,
+  deleteFolderRecursive,
+  killMicroservice,
+  microservicesMetadatasPath,
+  projectMicroservices,
+  getMicroserviceByName,
+};
