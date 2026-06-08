@@ -95,10 +95,35 @@ function runExtensions() {
   return appStore.request({ schema, params });
 }
 
+function killExtension(extensionId) {
+  const appStore = useAppStore();
+  const { projectFolderPath } = appStore;
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const params = { extensionId, projectFolderPath, projectName };
+
+  console.log(`[AppStore] Killing extension: ${extensionId}`, { params });
+
+  const schema = {
+    $id: "/api/extensions/kill",
+    methods: ["POST"],
+    type: "object",
+    properties: {
+      extensionId: { type: "string" },
+      projectFolderPath: { type: "string" },
+      projectName: { type: "string" },
+    },
+    required: ["extensionId", "projectFolderPath", "projectName"],
+    additionalProperties: false,
+  };
+
+  return appStore.request({ schema, params });
+}
+
 export {
   importExtensionFile,
   unloadExtension,
   uploadExtension,
   registerRunningExtensions,
   runExtensions,
+  killExtension,
 };
