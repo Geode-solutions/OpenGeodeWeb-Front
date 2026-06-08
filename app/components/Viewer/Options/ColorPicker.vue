@@ -39,6 +39,7 @@ watch(pressed, (value) => {
 <template>
   <v-color-picker
     ref="colorPickerRef"
+    data-testid="colorPicker"
     v-model="vuetifyColor"
     flat
     canvas-height="75"
