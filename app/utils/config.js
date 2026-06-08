@@ -1,5 +1,6 @@
 // Node.js imports
 import path from "node:path";
+import { unlink } from "node:fs";
 
 // Third party imports
 import Conf from "conf";
@@ -31,9 +32,30 @@ function addExtensionToConf(projectName, { extensionID, extensionPath }) {
   projectConfig.set(`extensions.${extensionID}.path`, extensionPath);
 }
 
+async function removeExtensionFromConf(projectName, extensionID) {
+  const projectConfig = projectConf(projectName);
+  const extensionArchivePath = extensionPathFromConf(projectName, extensionID);
+
+  await unlink(extensionArchivePath, (error) => {
+    if (error) {
+      throw error;
+    }
+    console.log(`${extensionArchivePath} was deleted`);
+  });
+  projectConfig.delete(`extensions.${extensionID}`);
+  console.log(`${extensionID} was deleted from ${projectName} config`);
+}
+
 function extensionPathFromConf(projectName, extensionID) {
   const projectConfig = projectConf(projectName);
   return projectConfig.get(`extensions.${extensionID}.path`);
 }
 
-export { confFolderPath, projectConf, extensionsConf, addExtensionToConf, extensionPathFromConf };
+export {
+  confFolderPath,
+  projectConf,
+  extensionsConf,
+  addExtensionToConf,
+  removeExtensionFromConf,
+  extensionPathFromConf,
+};
