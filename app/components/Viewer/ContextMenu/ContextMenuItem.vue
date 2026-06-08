@@ -244,7 +244,7 @@ function toggleOptions() {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 1001;
+  z-index: 4;
 }
 
 .options-right {

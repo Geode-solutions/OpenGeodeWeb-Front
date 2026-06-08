@@ -304,7 +304,7 @@ function onVerticalResizeStart(event, index) {
 <style scoped>
 .treeview-layout {
   position: absolute;
-  z-index: 2;
+  z-index: 1;
   left: 0;
   top: 0;
   height: calc(100vh - 100px);
@@ -414,7 +414,7 @@ function onVerticalResizeStart(event, index) {
   position: relative;
   cursor: ns-resize;
   background-color: transparent;
-  z-index: 5;
+  z-index: 1;
 }
 
 .v-split-resizer::after {
@@ -442,7 +442,7 @@ function onVerticalResizeStart(event, index) {
   width: 8px;
   height: 100%;
   cursor: ew-resize;
-  z-index: 10;
+  z-index: 2;
 }
 
 .total-resizer:hover {

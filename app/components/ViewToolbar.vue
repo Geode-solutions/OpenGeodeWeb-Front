@@ -215,7 +215,7 @@ const camera_options = computed(() => [
 <style module>
 .floatToolbar {
   position: absolute;
-  z-index: 2;
+  z-index: 1;
   right: 20px;
   top: 20px;
   background-color: rgba(0, 0, 0, 0);

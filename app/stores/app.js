@@ -88,7 +88,7 @@ export const useAppStore = defineStore("app", () => {
     return loadedExtensions.value.get(id);
   }
 
-  async function loadExtension(path, backendPath = undefined) {
+  async function loadExtension(path, port, backendPath = undefined) {
     try {
       let finalURL = path;
 
@@ -104,6 +104,8 @@ export const useAppStore = defineStore("app", () => {
       }
       // oxlint-disable-next-line no-inline-comments
       const extensionModule = await import(/* @vite-ignore */ finalURL);
+      const store = extensionModule.metadata.store();
+      store.$patch({ default_local_port: port });
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL);
