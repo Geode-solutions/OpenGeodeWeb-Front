@@ -2,7 +2,7 @@
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
-import { killExtension } from "@geode/opengeodeweb-front/app/utils/extension.js";
+import { killExtension } from "@ogw_front/app/utils/extension.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
