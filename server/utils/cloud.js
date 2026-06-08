@@ -44,7 +44,7 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
   const resources = {
     limits: {
       cpu: "1000m",
-      memory: "512Mi",
+      memory: "1Gi",
     },
   };
   const volumeMounts = {
