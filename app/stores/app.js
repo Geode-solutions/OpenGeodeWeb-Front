@@ -2,6 +2,9 @@
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
+import { killExtension } from "@ogw_front/utils/extension.js";
+import { useInfraStore } from "@ogw_front/stores/infra";
+
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
@@ -155,51 +158,41 @@ export const useAppStore = defineStore("app", () => {
     return [...loadedExtensions.value.values()];
   }
 
-  function unloadExtension(id) {
-    const extensionData = getExtension(id);
-    if (!extensionData) {
-      return false;
-    }
-    if (extensionData.module && typeof extensionData.module.uninstall === "function") {
-      try {
-        extensionData.module.uninstall(extensionAPI.value);
-        console.log(`[AppStore] Extension uninstall called: ${id}`);
-      } catch (error) {
-        console.error(`[AppStore] Error calling uninstall for ${id}:`, error);
-      }
-    }
+  async function unloadExtension(extensionId) {
+    console.log(`[AppStore] Unloading extension: ${extensionId}`);
+    const infraStore = useInfraStore();
+    await infraStore.unregister_microservice(extensionId);
+    await killExtension(extensionId);
 
-    if (extensionAPI.value && typeof extensionAPI.value.unregisterToolsByExtension === "function") {
-      extensionAPI.value.unregisterToolsByExtension(id);
-    }
-
-    loadedExtensions.value.delete(id);
-    console.log(`[AppStore] Extension unloaded: ${id}`);
+    loadedExtensions.value.delete(extensionId);
+    console.log(`[AppStore] Extension unloaded: ${extensionId}`);
     return true;
   }
 
-  function toggleExtension(id) {
-    const extensionData = getExtension(id);
+  function toggleExtension(extensionId) {
+    const extensionData = getExtension(extensionId);
     if (!extensionData) {
       return false;
     }
     extensionData.enabled = !extensionData.enabled;
-    console.log(`[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${id}`);
+    console.log(
+      `[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${extensionId}`,
+    );
     return extensionData.enabled;
   }
 
-  function setExtensionEnabled(id, enabled) {
-    const extensionData = getExtension(id);
+  function setExtensionEnabled(extensionId, enabled) {
+    const extensionData = getExtension(extensionId);
     if (!extensionData) {
       return false;
     }
     extensionData.enabled = enabled;
-    console.log(`[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${id}`);
+    console.log(`[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${extensionId}`);
     return true;
   }
 
-  function getExtensionEnabled(id) {
-    return getExtension(id)?.enabled ?? false;
+  function getExtensionEnabled(extensionId) {
+    return getExtension(extensionId)?.enabled ?? false;
   }
 
   function upload(file, callbacks = {}) {
