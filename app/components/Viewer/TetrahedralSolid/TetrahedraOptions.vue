@@ -10,7 +10,7 @@ const { itemProps } = defineProps({
 <template>
   <ViewerGenericMeshPolyhedraOptions
     :itemProps="itemProps"
-    :btn_image="TetrahedralSolidTetrahedra"
+    :btnImage="TetrahedralSolidTetrahedra"
     tooltip="Tetrahedra options"
   />
 </template>

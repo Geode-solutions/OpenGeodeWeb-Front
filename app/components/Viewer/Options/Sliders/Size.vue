@@ -1,7 +1,7 @@
 <script setup>
 import Slider from "./Slider";
 
-const size = defineModel();
+const size = defineModel({ type: Number });
 </script>
 
 <template>

@@ -8,5 +8,5 @@ const { itemProps } = defineProps({
 </script>
 
 <template>
-  <ViewerGenericMeshEdgesOptions :itemProps="itemProps" :btn_image="Grid2D_Edges" />
+  <ViewerGenericMeshEdgesOptions :itemProps="itemProps" :btnImage="Grid2D_Edges" />
 </template>

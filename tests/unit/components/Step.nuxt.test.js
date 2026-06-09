@@ -35,7 +35,7 @@ describe("step", () => {
       global: {
         plugins: [vuetify],
       },
-      props: { step_index: 0, stepper_tree },
+      props: { stepIndex: 0, stepperTree: stepper_tree },
     });
     expect(wrapper.exists()).toBe(true);
   });

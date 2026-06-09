@@ -1,7 +1,7 @@
 <script setup>
 // oxlint-disable id-length
 const colorPickerRef = useTemplateRef("colorPickerRef");
-const model = defineModel();
+const model = defineModel({ type: Object });
 const { pressed } = useMousePressed({ target: colorPickerRef });
 
 const vuetifyColor = ref({
@@ -39,6 +39,7 @@ watch(pressed, (value) => {
 <template>
   <v-color-picker
     ref="colorPickerRef"
+    data-testid="colorPicker"
     v-model="vuetifyColor"
     flat
     canvas-height="75"

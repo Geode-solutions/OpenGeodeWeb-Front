@@ -43,7 +43,7 @@ const size = computed({
     data-testid="modelPointsMenu"
     :itemProps="itemProps"
     tooltip="Points options"
-    :btn_image="SurfacePoints"
+    :btnImage="SurfacePoints"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch

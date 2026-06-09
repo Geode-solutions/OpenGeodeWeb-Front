@@ -116,7 +116,7 @@ const polygon_attribute_color_map = computed({
     data-testid="meshPolygonsMenu"
     :itemProps="itemProps"
     :tooltip="tooltip"
-    :btn_image="PolygonalSurfacePolygons"
+    :btnImage="PolygonalSurfacePolygons"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch
