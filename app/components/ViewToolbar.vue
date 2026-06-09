@@ -32,6 +32,7 @@ async function handleZScalingClose() {
 
 const camera_options = computed(() => [
   {
+    testId: "resetCameraButton",
     tooltip: "Reset camera",
     icon: "mdi-cube-scan",
     action: () => {
@@ -39,6 +40,7 @@ const camera_options = computed(() => [
     },
   },
   {
+    testId: "centerOnClickButton",
     tooltip: "Center on click",
     icon: "mdi-crosshairs-question",
     color: hybridViewerStore.is_picking ? "primary" : undefined,
@@ -47,6 +49,7 @@ const camera_options = computed(() => [
     },
   },
   {
+    testId: "highlightOnHoverButton",
     tooltip: "Highlight on hover",
     icon: "mdi-cursor-default-click",
     color: hybridViewerStore.is_hover_highlight ? "primary" : undefined,
@@ -92,6 +95,7 @@ const camera_options = computed(() => [
     ],
   },
   {
+    testId: "cameraOrientationButton",
     tooltip: "Camera orientation",
     icon: "mdi-rotate-3d",
     action: () => {
@@ -99,6 +103,7 @@ const camera_options = computed(() => [
     },
   },
   {
+    testId: "cameraManagerButton",
     tooltip: "Manage camera positions",
     icon: CameraBookmarkIcon,
     iconSize: 34,
@@ -107,6 +112,7 @@ const camera_options = computed(() => [
     },
   },
   {
+    testId: "screenshotButton",
     tooltip: "Take a screenshot",
     icon: "mdi-camera",
     action: () => {
@@ -114,6 +120,7 @@ const camera_options = computed(() => [
     },
   },
   {
+    testId: "gridScaleButton",
     tooltip: "Toggle grid scale",
     icon: "mdi-ruler-square",
     color: grid_scale.value ? "primary" : undefined,
@@ -135,6 +142,7 @@ const camera_options = computed(() => [
     },
   },
   {
+    testId: "zScalingButton",
     tooltip: "Z Scaling Control",
     icon: "mdi-sort",
     action: () => {
@@ -146,7 +154,7 @@ const camera_options = computed(() => [
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']" width="auto">
-    <v-row v-for="camera_option in camera_options" :key="camera_option.icon" dense>
+    <v-row v-for="camera_option in camera_options" :key="camera_option.testId" dense>
       <v-col>
         <v-menu
           v-if="camera_option.menu && !camera_option.action"
@@ -156,6 +164,7 @@ const camera_options = computed(() => [
           <template #activator="{ props }">
             <ActionButton
               v-bind="props"
+              :data-testid="camera_option.testId"
               :icon="
                 typeof camera_option.icon === 'function' ? camera_option.icon() : camera_option.icon
               "
@@ -187,6 +196,7 @@ const camera_options = computed(() => [
         </v-menu>
         <ActionButton
           v-else
+          :data-testid="camera_option.testId"
           :icon="camera_option.icon"
           :tooltip="camera_option.tooltip"
           :color="camera_option.color"

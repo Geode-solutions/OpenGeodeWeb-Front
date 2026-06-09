@@ -29,6 +29,7 @@ function handleUpdate(val) {
     @update:model-value="handleUpdate"
   >
     <GlassCard
+      data-testid="overlappingObjectsPicker"
       variant="panel"
       padding="pa-0"
       rounded="lg"
