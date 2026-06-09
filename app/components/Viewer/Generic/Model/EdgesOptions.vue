@@ -33,7 +33,7 @@ const visibility = computed({
     data-testid="modelEdgesMenu"
     :itemProps="itemProps"
     tooltip="Edges options"
-    :btn_image="SurfaceEdges"
+    :btnImage="SurfaceEdges"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch

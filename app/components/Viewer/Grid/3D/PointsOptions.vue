@@ -8,5 +8,5 @@ const { itemProps } = defineProps({
 </script>
 
 <template>
-  <ViewerGenericMeshPointsOptions :itemProps="itemProps" :btn_image="Grid3D_Points" />
+  <ViewerGenericMeshPointsOptions :itemProps="itemProps" :btnImage="Grid3D_Points" />
 </template>
