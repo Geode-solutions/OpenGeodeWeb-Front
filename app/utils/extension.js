@@ -24,19 +24,15 @@ async function registerRunningExtensions() {
         type: "application/javascript",
       });
       const blobUrl = URL.createObjectURL(blob);
-      const extensionModule = await appStore.loadExtension(blobUrl);
+      const extensionModule = await appStore.loadExtension(blobUrl, port);
       console.log("[ExtensionManager] Extension loaded:", id);
 
-      if (extensionModule.metadata?.store) {
-        const storeFactory = extensionModule.metadata.store;
-        const store = storeFactory();
-        store.$patch((state) => {
-          state.default_local_port = port;
-        });
-        appStore.registerStore(store);
-        console.log("[ExtensionManager] Store registered:", store.$id);
-        infraStore.register_microservice(store);
-      }
+      const storeFactory = extensionModule.metadata.store;
+      const store = storeFactory();
+      appStore.registerStore(store);
+      console.log("[ExtensionManager] Store registered:", store.$id);
+      infraStore.register_microservice(store);
+
       return {
         name,
         version,
@@ -99,10 +95,35 @@ function runExtensions() {
   return appStore.request({ schema, params });
 }
 
+function killExtension(extensionId) {
+  const appStore = useAppStore();
+  const { projectFolderPath } = appStore;
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const params = { extensionId, projectFolderPath, projectName };
+
+  console.log(`[AppStore] Killing extension: ${extensionId}`, { params });
+
+  const schema = {
+    $id: "/api/extensions/kill",
+    methods: ["POST"],
+    type: "object",
+    properties: {
+      extensionId: { type: "string" },
+      projectFolderPath: { type: "string" },
+      projectName: { type: "string" },
+    },
+    required: ["extensionId", "projectFolderPath", "projectName"],
+    additionalProperties: false,
+  };
+
+  return appStore.request({ schema, params });
+}
+
 export {
   importExtensionFile,
   unloadExtension,
   uploadExtension,
   registerRunningExtensions,
   runExtensions,
+  killExtension,
 };

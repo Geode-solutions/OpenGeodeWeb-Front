@@ -10,11 +10,13 @@ import {
   addMicroserviceMetadatas,
   runBack,
 } from "@geode/opengeodeweb-front/app/utils/local/microservices.js";
-import { extensionFrontendPath } from "@geode/opengeodeweb-front/app/utils/local/path.js";
+import {
+  executableName,
+  extensionFolderPath,
+  extensionFrontendPath,
+} from "@geode/opengeodeweb-front/app/utils/local/path.js";
 import { extensionsConf } from "@geode/opengeodeweb-front/app/utils/config.js";
 import { unzipFile } from "@geode/opengeodeweb-front/app/utils/server.js";
-
-const CODE_200 = 200;
 
 export default defineEventHandler(async (event) => {
   try {
@@ -27,7 +29,7 @@ export default defineEventHandler(async (event) => {
         const extensionPath = extensionsConfig[extensionID].path;
         const unzippedExtensionPath = await unzipFile(
           extensionPath,
-          path.join(projectFolderPath, "extensions"),
+          extensionFolderPath(projectFolderPath, extensionID),
         );
         const metadataPath = path.join(unzippedExtensionPath, "metadata.json");
         const metadataContent = await fs.promises.readFile(metadataPath, "utf8");
@@ -67,9 +69,13 @@ export default defineEventHandler(async (event) => {
         console.log("runExtensions", { frontendFilePath });
         const frontendContent = await fs.promises.readFile(frontendFilePath, "utf8");
 
-        const backendExecutablePath = path.join(unzippedExtensionPath, backendExecutable);
+        const backendExecutablePath = path.join(
+          unzippedExtensionPath,
+          executableName(backendExecutable),
+        );
+        console.log("runExtensions", { backendExecutablePath });
         fs.chmodSync(backendExecutablePath, "755");
-        const port = await runBack(backendExecutable, backendExecutablePath, {
+        const port = await runBack(backendExecutable, unzippedExtensionPath, {
           projectFolderPath,
         });
         await addMicroserviceMetadatas(projectFolderPath, {
@@ -88,7 +94,7 @@ export default defineEventHandler(async (event) => {
     );
 
     return {
-      statusCode: CODE_200,
+      statusCode: 200,
       extensionsArray,
     };
   } catch (error) {

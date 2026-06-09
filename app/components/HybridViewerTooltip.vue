@@ -181,7 +181,7 @@ function formatAttributeValue(val) {
 .floating-tooltip {
   position: absolute;
   pointer-events: none;
-  z-index: 10000;
+  z-index: 4;
   min-width: 200px;
   max-width: 450px;
   transition: opacity 0.15s ease;

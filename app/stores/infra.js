@@ -30,6 +30,13 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Microservice registered:", store_name);
       }
     },
+    unregister_microservice(microserviceId) {
+      console.log("[INFRA] Unregistering microservice:", microserviceId);
+      this.microservices = this.microservices.filter(
+        (microservice) => microservice.$id !== microserviceId,
+      );
+      console.log("[INFRA] Microservice unregistered:", microserviceId);
+    },
     create_backend(name, email, launch) {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
       console.log(
@@ -77,6 +84,7 @@ export const useInfraStore = defineStore("infra", {
 
       await Promise.all(
         this.microservices.map(async (store) => {
+          console.log("[INFRA] Connecting to microservice:", store.$id);
           await store.connect();
           console.log("[INFRA] Microservice connected:", store.$id);
         }),

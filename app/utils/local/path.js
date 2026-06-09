@@ -49,6 +49,10 @@ function generateProjectFolderPath(projectName) {
   return path.join(os.tmpdir(), projectName.replaceAll("/", "_"), uuidv4());
 }
 
+function extensionFolderPath(projectFolderPath, extensionID) {
+  return path.join(projectFolderPath, "extensions", extensionID);
+}
+
 async function lookForLocalExtensionDistPath(rootPath, extentionRepoName, frontendFile) {
   const localExtensionPath = path.join(rootPath, "..", extentionRepoName);
   const localExtensionDistPath = path.join(localExtensionPath, "dist");
@@ -76,8 +80,6 @@ async function lookForLocalExtensionDistPath(rootPath, extentionRepoName, fronte
     // oxlint-disable-next-line no-await-in-loop
     await setTimeout(MILLISECONDS_PER_RETRY);
   }
-
-  throw new Error(`Failed to find local extension dist path: ${rebuiltFilePath}`);
 }
 async function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPath, extensionId) {
   console.log("[extensionFrontendPath]", {
@@ -110,6 +112,7 @@ async function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPa
 export {
   createPath,
   extensionFrontendPath,
+  extensionFolderPath,
   executablePath,
   executableName,
   generateProjectFolderPath,

@@ -129,7 +129,7 @@ const polyhedron_attribute_color_map = computed({
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
           :capabilities="{
-            vertex: { available: true, hasColorMap: false },
+            vertex: { available: true, hasColorMap: true },
             polyhedron: { available: true, hasColorMap: true },
           }"
         />

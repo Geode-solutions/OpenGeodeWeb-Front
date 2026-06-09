@@ -37,7 +37,7 @@ const emit = defineEmits(["toggle-open", "toggle-select"]);
   border-bottom: 2px solid rgba(0, 0, 0, 0.05);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  z-index: 20;
+  z-index: 2;
 }
 
 .sticky-tree-header:hover {

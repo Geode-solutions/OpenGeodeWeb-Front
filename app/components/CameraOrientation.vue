@@ -172,7 +172,8 @@ watch(hoveredFace, (newFace, oldFace) => {
     v-model="show"
     title="Camera Orientations"
     :width="width"
-    style="z-index: 2; top: 90px; right: 55px"
+    style="top: 90px; right: 55px"
+    z-index="1"
   >
     <div
       class="pa-0 overflow-hidden position-relative"

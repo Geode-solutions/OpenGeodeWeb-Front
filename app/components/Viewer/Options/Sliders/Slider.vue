@@ -8,11 +8,11 @@ const { tooltip } = defineProps({
 </script>
 
 <template>
-  <v-row align="center">
-    <v-col cols="auto" justify="center">
-      <v-icon size="30" icon="mdi-ruler" v-tooltip:left="tooltip" />
+  <v-row align="center" no-gutters class="px-2">
+    <v-col cols="auto" class="mr-2">
+      <v-icon size="18" icon="mdi-ruler" v-tooltip:left="tooltip" />
     </v-col>
-    <v-col justify="center">
+    <v-col>
       <BasicSlider v-model="model" />
     </v-col>
   </v-row>
