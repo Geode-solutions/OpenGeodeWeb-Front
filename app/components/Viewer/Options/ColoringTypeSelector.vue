@@ -27,7 +27,9 @@ const polygon_attribute_color_map = defineModel("polygon_attribute_color_map", {
 
 const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", { type: String });
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range", { type: Array });
-const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map", { type: String });
+const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map", {
+  type: String,
+});
 
 const {
   id,
