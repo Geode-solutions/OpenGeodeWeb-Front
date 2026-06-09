@@ -2,10 +2,10 @@
 import Step from "@ogw_front/components/Step";
 
 const emit = defineEmits(["reset_values", "close"]);
-const { stepper_tree } = defineProps({
-  stepper_tree: { type: Object, required: true },
+const { stepperTree } = defineProps({
+  stepperTree: { type: Object, required: true },
 });
-const { state } = stepper_tree;
+const { state } = stepperTree;
 const { steps, current_step_index } = toRefs(state);
 </script>
 
@@ -30,8 +30,8 @@ const { steps, current_step_index } = toRefs(state);
     <Step
       v-for="(step, index) in steps"
       :key="index"
-      :step_index="index"
-      :stepper_tree="stepper_tree"
+      :stepIndex="index"
+      :stepperTree="stepperTree"
       @reset_values="emit('reset_values')"
     />
   </v-stepper-vertical>

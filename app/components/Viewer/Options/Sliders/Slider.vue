@@ -1,7 +1,7 @@
 <script setup>
 import BasicSlider from "@ogw_front/components/Basic/Slider";
 
-const model = defineModel();
+const model = defineModel({ type: Number });
 const { tooltip } = defineProps({
   tooltip: { type: String, required: true },
 });

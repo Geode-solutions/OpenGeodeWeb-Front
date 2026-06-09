@@ -7,8 +7,8 @@ import { useBackStore } from "@ogw_front/stores/back";
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
-const { geode_object_type, filenames } = defineProps({
-  geode_object_type: { type: String, required: true },
+const { geodeObjectType, filenames } = defineProps({
+  geodeObjectType: { type: String, required: true },
   filenames: { type: Array, required: true },
 });
 const geode_objects_and_output_extensions = ref({});
@@ -22,7 +22,7 @@ async function get_output_file_extensions() {
   const backStore = useBackStore();
   const values = await Promise.all(
     filenames.map(async (filename) => {
-      const params = { geode_object_type, filename };
+      const params = { geode_object_type: geodeObjectType, filename };
       const response = await backStore.request({ schema, params });
       return response.geode_objects_and_output_extensions;
     }),

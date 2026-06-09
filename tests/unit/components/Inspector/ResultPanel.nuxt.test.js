@@ -20,15 +20,15 @@ describe("inspector result panel", () => {
       global: {
         plugins: [vuetify],
       },
-      props: { inspection_result },
+      props: { inspectionResult: inspection_result },
     });
 
     expect(wrapper.exists()).toBe(true);
-    expect(wrapper.componentVM.inspection_result).toStrictEqual(inspection_result);
+    expect(wrapper.componentVM.inspectionResult).toStrictEqual(inspection_result);
 
     const child_result_panel_wrapper = await wrapper.findComponent(InspectorResultPanel);
     expect(child_result_panel_wrapper.exists()).toBe(true);
-    expect(child_result_panel_wrapper.componentVM.inspection_result).toStrictEqual(
+    expect(child_result_panel_wrapper.componentVM.inspectionResult).toStrictEqual(
       inspection_result[0].children,
     );
   });
@@ -44,13 +44,13 @@ describe("inspector result panel", () => {
       global: {
         plugins: [vuetify],
       },
-      props: { inspection_result },
+      props: { inspectionResult: inspection_result },
     });
 
     expect(wrapper.exists()).toBe(true);
 
     console.log({ wrapper });
 
-    expect(wrapper.componentVM.inspection_result).toStrictEqual(inspection_result);
+    expect(wrapper.componentVM.inspectionResult).toStrictEqual(inspection_result);
   });
 });

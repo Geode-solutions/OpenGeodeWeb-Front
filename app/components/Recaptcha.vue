@@ -1,13 +1,13 @@
 <script setup>
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-const { button_label, button_color, color } = defineProps({
-  button_label: {
+const { buttonLabel, buttonColor, color } = defineProps({
+  buttonLabel: {
     type: String,
     required: false,
     default: "Load the app",
   },
-  button_color: {
+  buttonColor: {
     type: String,
     required: false,
     default: "white",
@@ -69,7 +69,7 @@ function submit() {
   </VRow>
   <VRow align="center" justify="center">
     <VCol cols="auto" class="d-flex justify-center align-center">
-      <VBtn class="load-btn" :text="button_label" :color="color || button_color" @click="submit" />
+      <VBtn class="load-btn" :text="buttonLabel" :color="color || buttonColor" @click="submit" />
     </VCol>
   </VRow>
 </template>

@@ -5,8 +5,8 @@ import { useBackStore } from "@ogw_front/stores/back";
 const schema = schemas.opengeodeweb_back.inspect_file;
 
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
-const { geode_object_type, filename } = defineProps({
-  geode_object_type: { type: String, required: true },
+const { geodeObjectType, filename } = defineProps({
+  geodeObjectType: { type: String, required: true },
   filename: { type: String, required: true },
 });
 const loading = ref(false);
@@ -15,7 +15,7 @@ const toggle_loading = useToggle(loading);
 async function get_inspection_results() {
   toggle_loading();
   const params = {
-    geode_object_type,
+    geode_object_type: geodeObjectType,
     filename,
   };
   const backStore = useBackStore();

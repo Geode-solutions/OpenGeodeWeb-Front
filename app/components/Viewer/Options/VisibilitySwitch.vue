@@ -1,7 +1,7 @@
 <script setup>
 import BasicSwitch from "@ogw_front/components/Basic/Switch";
 
-const visibility = defineModel();
+const visibility = defineModel({ type: Boolean });
 </script>
 
 <template>

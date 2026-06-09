@@ -1,7 +1,7 @@
 <script setup>
 import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem";
 
-const textures = defineModel();
+const textures = defineModel({ type: Array });
 
 const { id } = defineProps({
   id: { type: String, required: true },

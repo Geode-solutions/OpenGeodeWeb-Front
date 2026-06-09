@@ -34,7 +34,7 @@ describe("file selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { multiple: false, auto_upload: false },
+      props: { multiple: false, autoUpload: false },
     });
 
     const file_uploader = wrapper.findComponent(FileUploader);
@@ -46,7 +46,7 @@ describe("file selector", () => {
 
     const v_file_input = file_uploader.find('input[type="file"]');
     const files = [new File(["fake_file"], "fake_file.txt")];
-    const auto_upload = false;
+    const autoUpload = false;
     Object.defineProperty(v_file_input.element, "files", {
       value: files,
       writable: true,
@@ -61,7 +61,7 @@ describe("file selector", () => {
     expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
     expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
       files,
-      auto_upload,
+      autoUpload,
     });
   });
 
@@ -87,7 +87,7 @@ describe("file selector", () => {
         props: {
           multiple: false,
           files,
-          auto_upload: true,
+          autoUpload: true,
         },
       });
 
@@ -97,7 +97,7 @@ describe("file selector", () => {
       expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
       expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
         files,
-        auto_upload: false,
+        autoUpload: false,
       });
     });
 
@@ -109,7 +109,7 @@ describe("file selector", () => {
         props: {
           multiple: false,
           files,
-          auto_upload: false,
+          autoUpload: false,
         },
       });
 

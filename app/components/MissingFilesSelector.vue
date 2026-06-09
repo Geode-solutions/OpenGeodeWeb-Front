@@ -9,9 +9,9 @@ const schema = schemas.opengeodeweb_back.missing_files;
 
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
-const { multiple, geode_object_type, filenames, files } = defineProps({
+const { multiple, geodeObjectType, filenames, files } = defineProps({
   multiple: { type: Boolean, required: true },
-  geode_object_type: { type: String, required: true },
+  geodeObjectType: { type: String, required: true },
   filenames: { type: Array, required: true },
   files: { type: Array, required: false, default: () => [] },
 });
@@ -47,7 +47,7 @@ async function missing_files() {
         additional_files: [],
       });
     }
-    const params = { geode_object_type, filename };
+    const params = { geode_object_type: geodeObjectType, filename };
     return backStore.request({ schema, params });
   });
   const values = await Promise.all(promise_array);
@@ -99,7 +99,7 @@ await missing_files();
     <v-row>
       <v-col cols="12">
         <FileUploader
-          v-bind="{ multiple, accept, files, auto_upload: false }"
+          v-bind="{ multiple, accept, files, autoUpload: false }"
           @files_uploaded="files_uploaded_event"
         />
       </v-col>

@@ -6,18 +6,18 @@ function truncate(text, maxLength) {
   return text;
 }
 
-const { step_index, stepper_tree } = defineProps({
-  step_index: { type: Number, required: true },
-  stepper_tree: { type: Object, required: true },
+const { stepIndex, stepperTree } = defineProps({
+  stepIndex: { type: Number, required: true },
+  stepperTree: { type: Object, required: true },
 });
 
 const emit = defineEmits(["reset_values"]);
 
-const { state, increment_step, decrement_step, update_values } = stepper_tree;
+const { state, increment_step, decrement_step, update_values } = stepperTree;
 const { current_step_index, steps } = toRefs(state);
 
 const sortedChips = computed(() => {
-  const chips = steps.value[step_index]?.chips || [];
+  const chips = steps.value[stepIndex]?.chips || [];
   return chips.toSorted((chipA, chipB) =>
     chipA.localeCompare(chipB, undefined, {
       numeric: true,
@@ -29,8 +29,8 @@ const sortedChips = computed(() => {
 
 <template>
   <v-stepper-vertical-item
-    :value="step_index + 1"
-    :editable="step_index < current_step_index"
+    :value="stepIndex + 1"
+    :editable="stepIndex < current_step_index"
     color="primary"
     hide-actions
   >
@@ -39,13 +39,13 @@ const sortedChips = computed(() => {
         <p
           tag="h3"
           class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
-          :class="current_step_index === step_index ? 'text-primary' : 'text-grey-darken-1'"
+          :class="current_step_index === stepIndex ? 'text-primary' : 'text-grey-darken-1'"
         >
-          {{ steps[step_index].step_title }}
+          {{ steps[stepIndex].step_title }}
         </p>
 
         <v-sheet
-          v-if="sortedChips.length && current_step_index >= step_index"
+          v-if="sortedChips.length && current_step_index >= stepIndex"
           color="transparent"
           class="d-flex flex-wrap mt-2"
         >
@@ -67,10 +67,10 @@ const sortedChips = computed(() => {
       <v-divider class="mb-6 opacity-10" />
 
       <component
-        v-if="step_index === current_step_index"
-        :key="step_index"
-        :is="steps[step_index].component.component_name"
-        v-bind="steps[step_index].component.component_options"
+        v-if="stepIndex === current_step_index"
+        :key="stepIndex"
+        :is="steps[stepIndex].component.component_name"
+        v-bind="steps[stepIndex].component.component_options"
         @increment_step="increment_step"
         @decrement_step="decrement_step"
         @update_values="update_values"

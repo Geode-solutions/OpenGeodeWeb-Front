@@ -4,30 +4,30 @@ import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/Color
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
-const coloring_style_key = defineModel("coloring_style_key");
+const coloring_style_key = defineModel("coloring_style_key", { type: String });
 
-const color = defineModel("color");
-const textures = defineModel("textures");
+const color = defineModel("color", { type: Object });
+const textures = defineModel("textures", { type: Array });
 
-const vertex_attribute_name = defineModel("vertex_attribute_name");
-const vertex_attribute_range = defineModel("vertex_attribute_range");
-const vertex_attribute_color_map = defineModel("vertex_attribute_color_map");
+const vertex_attribute_name = defineModel("vertex_attribute_name", { type: String });
+const vertex_attribute_range = defineModel("vertex_attribute_range", { type: Array });
+const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", { type: String });
 
-const edge_attribute_name = defineModel("edge_attribute_name");
-const edge_attribute_range = defineModel("edge_attribute_range");
-const edge_attribute_color_map = defineModel("edge_attribute_color_map");
+const edge_attribute_name = defineModel("edge_attribute_name", { type: String });
+const edge_attribute_range = defineModel("edge_attribute_range", { type: Array });
+const edge_attribute_color_map = defineModel("edge_attribute_color_map", { type: String });
 
-const cell_attribute_name = defineModel("cell_attribute_name");
-const cell_attribute_range = defineModel("cell_attribute_range");
-const cell_attribute_color_map = defineModel("cell_attribute_color_map");
+const cell_attribute_name = defineModel("cell_attribute_name", { type: String });
+const cell_attribute_range = defineModel("cell_attribute_range", { type: Array });
+const cell_attribute_color_map = defineModel("cell_attribute_color_map", { type: String });
 
-const polygon_attribute_name = defineModel("polygon_attribute_name");
-const polygon_attribute_range = defineModel("polygon_attribute_range");
-const polygon_attribute_color_map = defineModel("polygon_attribute_color_map");
+const polygon_attribute_name = defineModel("polygon_attribute_name", { type: String });
+const polygon_attribute_range = defineModel("polygon_attribute_range", { type: Array });
+const polygon_attribute_color_map = defineModel("polygon_attribute_color_map", { type: String });
 
-const polyhedron_attribute_name = defineModel("polyhedron_attribute_name");
-const polyhedron_attribute_range = defineModel("polyhedron_attribute_range");
-const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map");
+const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", { type: String });
+const polyhedron_attribute_range = defineModel("polyhedron_attribute_range", { type: Array });
+const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map", { type: String });
 
 const {
   id,

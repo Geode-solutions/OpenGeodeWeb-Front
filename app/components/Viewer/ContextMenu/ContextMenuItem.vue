@@ -15,11 +15,11 @@ const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
 
-const { index, itemProps, tooltip, btn_image } = defineProps({
+const { index, itemProps, tooltip, btnImage } = defineProps({
   index: { type: Number, required: true },
   itemProps: { type: Object, required: true },
   tooltip: { type: String, required: true },
-  btn_image: { type: String, required: true },
+  btnImage: { type: String, required: true },
 });
 
 const buttonCoords = computed(() => {
@@ -141,7 +141,7 @@ function toggleOptions() {
           :style="computedItemStyles"
         >
           <v-img
-            :src="btn_image"
+            :src="btnImage"
             height="28"
             width="28"
             style="pointer-events: none; object-fit: contain"

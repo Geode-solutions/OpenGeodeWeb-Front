@@ -7,8 +7,8 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 
 const infraStore = useInfraStore();
 
-const { versions_schema, appName } = defineProps({
-  versions_schema: { type: Object, required: true },
+const { versionsSchema, appName } = defineProps({
+  versionsSchema: { type: Object, required: true },
   appName: { type: String, required: true },
 });
 </script>
@@ -26,7 +26,7 @@ const { versions_schema, appName } = defineProps({
           <Stepper />
         </v-col>
         <v-col>
-          <PackagesVersions :schema="versions_schema" />
+          <PackagesVersions :schema="versionsSchema" />
         </v-col>
       </template>
     </v-row>

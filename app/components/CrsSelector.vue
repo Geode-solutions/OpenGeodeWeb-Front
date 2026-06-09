@@ -6,9 +6,9 @@ const schema = schemas.opengeodeweb_back.geographic_coordinate_systems;
 
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
-const { geode_object_type, key_to_update } = defineProps({
-  geode_object_type: { type: String, required: true },
-  key_to_update: { type: String, required: true },
+const { geodeObjectType, keyToUpdate } = defineProps({
+  geodeObjectType: { type: String, required: true },
+  keyToUpdate: { type: String, required: true },
 });
 
 const search = ref("");
@@ -21,7 +21,7 @@ const backStore = useBackStore();
 watch(selected_crs, (new_value) => {
   const crs = get_selected_crs(new_value[0]);
   const keys_values_object = {
-    [key_to_update]: crs,
+    [keyToUpdate]: crs,
   };
   emit("update_values", keys_values_object);
   emit("increment_step");
@@ -36,7 +36,7 @@ function get_selected_crs(crs_code) {
 }
 
 async function get_crs_table() {
-  const params = { geode_object_type };
+  const params = { geode_object_type: geodeObjectType };
   toggle_loading();
   await backStore.request(
     { schema, params },
