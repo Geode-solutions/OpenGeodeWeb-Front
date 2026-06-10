@@ -46,6 +46,7 @@ function apply() {
             v-model.number="zScale"
             type="number"
             label="Z Scale Value"
+            data-testid="zScaleInput"
             variant="outlined"
             density="compact"
             hide-details
