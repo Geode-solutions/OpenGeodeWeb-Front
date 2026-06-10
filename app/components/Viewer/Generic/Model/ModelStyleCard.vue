@@ -91,38 +91,35 @@ const colorModes = [
   { title: "Random", value: "random" },
 ];
 
-const modelComponentsColorMode = ref("constant");
-
-const modelComponentsColor = computed({
-  get: () => {
-    if (selection.value.length > 0) {
-      return dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]);
-    }
-    return { red: 255, green: 255, blue: 255 };
-  },
-  set: async (color) => {
-    if (selection.value.length > 0) {
-      await dataStyleStore.setModelComponentsColor(
-        modelId.value,
-        selection.value,
-        color,
-        modelComponentsColorMode.value,
-      );
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-watch(modelComponentsColorMode, async (colorMode) => {
-  if (colorMode === "random" && selection.value.length > 0) {
+const modelComponentsColorMode = computed({
+  get: () => dataStyleStore.getStyle(modelId.value).color_mode || "constant",
+  set: async (colorMode) => {
+    await dataStyleStore.mutateStyle(modelId.value, { color_mode: colorMode });
     await dataStyleStore.setModelComponentsColor(
       modelId.value,
       selection.value,
-      undefined,
+      colorMode === "random" ? undefined : modelComponentsColor.value,
       colorMode,
     );
     hybridViewerStore.remoteRender();
-  }
+  },
+});
+
+const modelComponentsColor = computed({
+  get: () =>
+    dataStyleStore.getStyle(modelId.value).color ||
+    dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]) ||
+    { red: 255, green: 255, blue: 255 },
+  set: async (color) => {
+    await dataStyleStore.mutateStyle(modelId.value, { color });
+    await dataStyleStore.setModelComponentsColor(
+      modelId.value,
+      selection.value,
+      color,
+      modelComponentsColorMode.value,
+    );
+    hybridViewerStore.remoteRender();
+  },
 });
 </script>
 

@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -56,6 +57,34 @@ describe("model", () => {
       );
       expect(dataStyleStore.modelVisibility(id)).toBe(visibility);
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("model color inheritance", () => {
+    test("inheritance workflow model > surfaces > surface", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+
+      const red = { red: 255, green: 0, blue: 0, alpha: 1 };
+      const green = { red: 0, green: 255, blue: 0, alpha: 1 };
+      const blue = { red: 0, green: 0, blue: 255, alpha: 1 };
+
+      await dataStyleStore.mutateStyle(id, { color: red, color_mode: "constant" });
+      await dataStyleStore.setModelComponentsColor(id, surface_ids, red);
+      await sleep(SLEEP_MS);
+
+      await dataStyleStore.setModelComponentTypeColor(id, "Surface", green);
+      await sleep(SLEEP_MS);
+
+      await dataStyleStore.setModelSurfacesColor(id, [surface_id], blue);
+      await sleep(SLEEP_MS);
+
+      expect(dataStyleStore.getStyle(id).color).toStrictEqual(red);
+      expect(dataStyleStore.modelComponentTypeColor(id, "Surface")).toStrictEqual(green);
+      expect(dataStyleStore.modelSurfaceColor(id, surface_id)).toStrictEqual(blue);
     });
   });
 });
