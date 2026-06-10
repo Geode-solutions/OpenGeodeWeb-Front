@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL_COMPONENT_TYPE_COLORS } from "@ogw_front/utils/default_styles";
+import { DEFAULT_MODEL_COMPONENT_TYPE_COLORS, MODEL_DEFAULT_COLOR, MODEL_DEFAULT_COLOR_MODE } from "@ogw_front/utils/default_styles";
 import { dispatchToComponentTypes } from "./visibility";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -188,7 +188,17 @@ function useModelColorStyle(componentStyleFunctions) {
     );
   }
 
+  function getModelColor(modelId) {
+    return dataStyleState.getStyle(modelId).color ?? MODEL_DEFAULT_COLOR;
+  }
+
+  function getModelColorMode(modelId) {
+    return dataStyleState.getStyle(modelId).color_mode ?? MODEL_DEFAULT_COLOR_MODE;
+  }
+
   return {
+    getModelColor,
+    getModelColorMode,
     getModelComponentColor,
     getModelComponentEffectiveColor,
     getModelComponentColorMode,
