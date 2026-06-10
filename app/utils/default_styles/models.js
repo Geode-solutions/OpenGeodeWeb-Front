@@ -17,72 +17,80 @@ import {
 
 function modelCornersDefaultStyle(
   visibility = CORNERS_DEFAULT_VISIBILITY,
-  color = CORNERS_DEFAULT_COLOR,
+  constant = CORNERS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
-    color,
-    color_mode: "constant",
-    vertex_attribute: {
-      name: undefined,
-      storedConfigs: {},
+    coloring: {
+      active: "constant",
+      constant,
+      vertex: {
+        name: undefined,
+        storedConfigs: {},
+      },
     },
   };
 }
 
 function modelLinesDefaultStyle(
   visibility = LINES_DEFAULT_VISIBILITY,
-  color = LINES_DEFAULT_COLOR,
+  constant = LINES_DEFAULT_COLOR,
 ) {
   return {
     visibility,
-    color,
-    color_mode: "constant",
-    vertex_attribute: {
-      name: undefined,
-      storedConfigs: {},
-    },
-    edge_attribute: {
-      name: undefined,
-      storedConfigs: {},
+    coloring: {
+      active: "constant",
+      constant,
+      vertex: {
+        name: undefined,
+        storedConfigs: {},
+      },
+      edge_attribute: {
+        name: undefined,
+        storedConfigs: {},
+      },
     },
   };
 }
 
 function modelSurfacesDefaultStyle(
   visibility = SURFACES_DEFAULT_VISIBILITY,
-  color = SURFACES_DEFAULT_COLOR,
+  constant = SURFACES_DEFAULT_COLOR,
 ) {
   return {
     visibility,
-    color,
-    color_mode: "constant",
-    vertex_attribute: {
-      name: undefined,
-      storedConfigs: {},
-    },
-    polygon_attribute: {
-      name: undefined,
-      storedConfigs: {},
+    coloring: {
+      active: "constant",
+      constant,
+      vertex: {
+        name: undefined,
+        storedConfigs: {},
+      },
+      polygon_attribute: {
+        name: undefined,
+        storedConfigs: {},
+      },
     },
   };
 }
 
 function modelBlocksDefaultStyle(
   visibility = BLOCKS_DEFAULT_VISIBILITY,
-  color = BLOCKS_DEFAULT_COLOR,
+  constant = BLOCKS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
-    color,
-    color_mode: "constant",
-    vertex_attribute: {
-      name: undefined,
-      storedConfigs: {},
-    },
-    polyhedron_attribute: {
-      name: undefined,
-      storedConfigs: {},
+    coloring: {
+      active: "constant",
+      constant,
+      vertex: {
+        name: undefined,
+        storedConfigs: {},
+      },
+      polyhedron_attribute: {
+        name: undefined,
+        storedConfigs: {},
+      },
     },
   };
 }
@@ -111,8 +119,10 @@ const DEFAULT_MODEL_COMPONENT_TYPE_STYLES = {
 function brepDefaultStyle() {
   return {
     visibility: true,
-    color: MODEL_DEFAULT_COLOR,
-    color_mode: MODEL_DEFAULT_COLOR_MODE,
+    coloring: {
+      active: MODEL_DEFAULT_COLOR_MODE,
+      constant: MODEL_DEFAULT_COLOR,
+    },
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -125,8 +135,10 @@ function brepDefaultStyle() {
 function crossSectionDefaultStyle() {
   return {
     visibility: true,
-    color: MODEL_DEFAULT_COLOR,
-    color_mode: MODEL_DEFAULT_COLOR_MODE,
+    coloring: {
+      active: MODEL_DEFAULT_COLOR_MODE,
+      constant: MODEL_DEFAULT_COLOR,
+    },
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -138,8 +150,10 @@ function crossSectionDefaultStyle() {
 function structuralModelDefaultStyle() {
   return {
     visibility: true,
-    color: MODEL_DEFAULT_COLOR,
-    color_mode: MODEL_DEFAULT_COLOR_MODE,
+    coloring: {
+      active: MODEL_DEFAULT_COLOR_MODE,
+      constant: MODEL_DEFAULT_COLOR,
+    },
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -152,8 +166,10 @@ function structuralModelDefaultStyle() {
 function sectionDefaultStyle() {
   return {
     visibility: true,
-    color: MODEL_DEFAULT_COLOR,
-    color_mode: MODEL_DEFAULT_COLOR_MODE,
+    coloring: {
+      active: MODEL_DEFAULT_COLOR_MODE,
+      constant: MODEL_DEFAULT_COLOR,
+    },
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -165,8 +181,10 @@ function sectionDefaultStyle() {
 function implicitCrossSectionDefaultStyle() {
   return {
     visibility: true,
-    color: MODEL_DEFAULT_COLOR,
-    color_mode: MODEL_DEFAULT_COLOR_MODE,
+    coloring: {
+      active: MODEL_DEFAULT_COLOR_MODE,
+      constant: MODEL_DEFAULT_COLOR,
+    },
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -178,8 +196,10 @@ function implicitCrossSectionDefaultStyle() {
 function implicitStructuralModelDefaultStyle() {
   return {
     visibility: true,
-    color: MODEL_DEFAULT_COLOR,
-    color_mode: MODEL_DEFAULT_COLOR_MODE,
+    coloring: {
+      active: MODEL_DEFAULT_COLOR_MODE,
+      constant: MODEL_DEFAULT_COLOR,
+    },
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),

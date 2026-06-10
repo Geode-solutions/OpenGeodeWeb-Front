@@ -127,7 +127,7 @@ const modelComponentsColor = computed({
     </OptionsSection>
 
     <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
-      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
+      <v-label class="text-caption mb-1 mt-2">Select coloring style</v-label>
       <v-select
         v-model="modelComponentsColorMode"
         :items="colorModes"
@@ -138,7 +138,7 @@ const modelComponentsColor = computed({
       />
 
       <template v-if="modelComponentsColorMode === 'constant'">
-        <v-label class="text-caption mb-1">Color</v-label>
+        <v-label class="text-caption mb-1">Constant</v-label>
         <ViewerOptionsColorPicker v-model="modelComponentsColor" />
       </template>
     </OptionsSection>
