@@ -1,4 +1,5 @@
 <script setup>
+import { MODEL_DEFAULT_COLOR, MODEL_DEFAULT_COLOR_MODE } from "@ogw_front/utils/default_styles";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -92,7 +93,7 @@ const colorModes = [
 ];
 
 const modelComponentsColorMode = computed({
-  get: () => dataStyleStore.getStyle(modelId.value).color_mode || "constant",
+  get: () => dataStyleStore.getStyle(modelId.value).color_mode ?? MODEL_DEFAULT_COLOR_MODE,
   set: async (colorMode) => {
     await dataStyleStore.mutateStyle(modelId.value, { color_mode: colorMode });
     await dataStyleStore.setModelComponentsColor(
@@ -106,13 +107,7 @@ const modelComponentsColorMode = computed({
 });
 
 const modelComponentsColor = computed({
-  get: () =>
-    dataStyleStore.getStyle(modelId.value).color ||
-    dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]) || {
-      red: 255,
-      green: 255,
-      blue: 255,
-    },
+  get: () => dataStyleStore.getStyle(modelId.value).color ?? MODEL_DEFAULT_COLOR,
   set: async (color) => {
     await dataStyleStore.mutateStyle(modelId.value, { color });
     await dataStyleStore.setModelComponentsColor(

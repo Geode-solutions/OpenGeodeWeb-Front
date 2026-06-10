@@ -7,6 +7,8 @@ import {
   EDGES_DEFAULT_WIDTH,
   LINES_DEFAULT_COLOR,
   LINES_DEFAULT_VISIBILITY,
+  MODEL_DEFAULT_COLOR,
+  MODEL_DEFAULT_COLOR_MODE,
   POINTS_DEFAULT_SIZE,
   POINTS_DEFAULT_VISIBILITY,
   SURFACES_DEFAULT_COLOR,
@@ -109,6 +111,8 @@ const DEFAULT_MODEL_COMPONENT_TYPE_STYLES = {
 function brepDefaultStyle() {
   return {
     visibility: true,
+    color: MODEL_DEFAULT_COLOR,
+    color_mode: MODEL_DEFAULT_COLOR_MODE,
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -121,6 +125,8 @@ function brepDefaultStyle() {
 function crossSectionDefaultStyle() {
   return {
     visibility: true,
+    color: MODEL_DEFAULT_COLOR,
+    color_mode: MODEL_DEFAULT_COLOR_MODE,
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -132,6 +138,8 @@ function crossSectionDefaultStyle() {
 function structuralModelDefaultStyle() {
   return {
     visibility: true,
+    color: MODEL_DEFAULT_COLOR,
+    color_mode: MODEL_DEFAULT_COLOR_MODE,
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -144,6 +152,8 @@ function structuralModelDefaultStyle() {
 function sectionDefaultStyle() {
   return {
     visibility: true,
+    color: MODEL_DEFAULT_COLOR,
+    color_mode: MODEL_DEFAULT_COLOR_MODE,
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -155,6 +165,8 @@ function sectionDefaultStyle() {
 function implicitCrossSectionDefaultStyle() {
   return {
     visibility: true,
+    color: MODEL_DEFAULT_COLOR,
+    color_mode: MODEL_DEFAULT_COLOR_MODE,
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),
@@ -166,6 +178,8 @@ function implicitCrossSectionDefaultStyle() {
 function implicitStructuralModelDefaultStyle() {
   return {
     visibility: true,
+    color: MODEL_DEFAULT_COLOR,
+    color_mode: MODEL_DEFAULT_COLOR_MODE,
     corners: modelCornersDefaultStyle(),
     lines: modelLinesDefaultStyle(),
     surfaces: modelSurfacesDefaultStyle(),

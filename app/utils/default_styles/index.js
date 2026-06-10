@@ -50,5 +50,5 @@ function getDefaultStyle(type) {
 }
 
 export { DEFAULT_MODEL_COMPONENT_TYPE_STYLES } from "./models";
-export { MESH_COMPONENT_TYPES, DEFAULT_MODEL_COMPONENT_TYPE_COLORS } from "./constants";
+export { MESH_COMPONENT_TYPES, DEFAULT_MODEL_COMPONENT_TYPE_COLORS, MODEL_DEFAULT_COLOR, MODEL_DEFAULT_COLOR_MODE } from "./constants";
 export { getDefaultStyle };
