@@ -108,8 +108,11 @@ const modelComponentsColorMode = computed({
 const modelComponentsColor = computed({
   get: () =>
     dataStyleStore.getStyle(modelId.value).color ||
-    dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]) ||
-    { red: 255, green: 255, blue: 255 },
+    dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]) || {
+      red: 255,
+      green: 255,
+      blue: 255,
+    },
   set: async (color) => {
     await dataStyleStore.mutateStyle(modelId.value, { color });
     await dataStyleStore.setModelComponentsColor(
