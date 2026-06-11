@@ -46,6 +46,7 @@ function close() {
           </v-btn>
           <v-btn
             v-if="actionLabel"
+            data-testid="toolPanelActionButton"
             variant="outlined"
             size="small"
             color="white"
