@@ -6,13 +6,10 @@ const backStore = useBackStore();
 
 const name = defineModel("name", {
   type: String,
-  set(value) {
-    if (value === null || value === undefined) {
-      return name.value;
-    }
-    return value;
-  },
+  default: undefined,
+  set: (value) => value ?? name.value,
 });
+
 const range = defineModel("range", { type: Array });
 const colorMap = defineModel("colorMap", { type: String });
 
