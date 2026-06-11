@@ -16,26 +16,24 @@ export function useModelSurfacesPolygonAttribute() {
   const viewerStore = useViewerStore();
 
   function modelSurfacesPolygonAttribute(modelId, surfaceId) {
-    return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surfaceId).coloring.polygon;
+    return modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId).polygon;
   }
 
   function modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name) {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
-    if (name && storedConfigs && name in storedConfigs) {
+    if (name in storedConfigs) {
       return storedConfigs[name];
     }
-    return {
+    return setModelSurfacesPolygonAttributeStoredConfig(modelId, [surfaceId], name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    };
+    });
   }
 
   function mutateModelSurfacesPolygonStyle(modelId, surfaceIds, values) {
-    return modelSurfacesCommonStyle.mutateModelSurfacesStyle(modelId, surfaceIds, {
-      coloring: {
-        polygon: values,
-      },
+    return modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
+      polygon: values,
     });
   }
 
@@ -53,24 +51,11 @@ export function useModelSurfacesPolygonAttribute() {
 
   async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-
-    const updates = { name };
-    const polygon = modelSurfacesPolygonAttribute(modelId, surfaceIds[0]);
-    if (!(name in polygon.storedConfigs)) {
-      updates.storedConfigs = {
-        [name]: {
-          minimum: undefined,
-          maximum: undefined,
-          colorMap: undefined,
-        },
-      };
-    }
-
     const params = { id: modelId, block_ids: viewer_ids, name };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelSurfacesPolygonStyle(modelId, surfaceIds, updates),
+        response_function: () => mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name }),
       },
     );
   }

@@ -16,26 +16,24 @@ export function useModelCornersVertexAttribute() {
   const viewerStore = useViewerStore();
 
   function modelCornersVertexAttribute(modelId, cornerId) {
-    return modelCornersCommonStyle.modelCornerStyle(modelId, cornerId).coloring.vertex;
+    return modelCornersCommonStyle.modelCornerColoring(modelId, cornerId).vertex;
   }
 
   function modelCornersVertexAttributeStoredConfig(modelId, cornerId, name) {
     const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
-    if (name && storedConfigs && name in storedConfigs) {
+    if (name in storedConfigs) {
       return storedConfigs[name];
     }
-    return {
+    return setModelCornersVertexAttributeStoredConfig(modelId, [cornerId], name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    };
+    });
   }
 
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
-    return modelCornersCommonStyle.mutateModelCornersStyle(modelId, cornerIds, {
-      coloring: {
-        vertex: values,
-      },
+    return modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
+      vertex: values,
     });
   }
 
@@ -53,24 +51,11 @@ export function useModelCornersVertexAttribute() {
 
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
-
-    const updates = { name };
-    const vertex = modelCornersVertexAttribute(modelId, cornerIds[0]);
-    if (!(name in vertex.storedConfigs)) {
-      updates.storedConfigs = {
-        [name]: {
-          minimum: undefined,
-          maximum: undefined,
-          colorMap: undefined,
-        },
-      };
-    }
-
     const params = { id: modelId, block_ids: viewer_ids, name };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelCornersVertexStyle(modelId, cornerIds, updates),
+        response_function: () => mutateModelCornersVertexStyle(modelId, cornerIds, { name }),
       },
     );
   }

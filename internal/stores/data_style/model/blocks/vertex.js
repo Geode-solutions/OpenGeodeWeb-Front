@@ -16,26 +16,24 @@ export function useModelBlocksVertexAttribute() {
   const viewerStore = useViewerStore();
 
   function modelBlocksVertexAttribute(modelId, blockId) {
-    return modelBlocksCommonStyle.modelBlockStyle(modelId, blockId).coloring.vertex;
+    return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).vertex;
   }
 
   function modelBlocksVertexAttributeStoredConfig(modelId, blockId, name) {
     const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
-    if (name && storedConfigs && name in storedConfigs) {
+    if (name in storedConfigs) {
       return storedConfigs[name];
     }
-    return {
+    return setModelBlocksVertexAttributeStoredConfig(modelId, [blockId], name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    };
+    });
   }
 
   function mutateModelBlocksVertexStyle(modelId, blockIds, values) {
-    return modelBlocksCommonStyle.mutateModelBlocksStyle(modelId, blockIds, {
-      coloring: {
-        vertex: values,
-      },
+    return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
+      vertex: values,
     });
   }
 
@@ -53,24 +51,11 @@ export function useModelBlocksVertexAttribute() {
 
   async function setModelBlocksVertexAttributeName(modelId, blockIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-
-    const updates = { name };
-    const vertex = modelBlocksVertexAttribute(modelId, blockIds[0]);
-    if (!(name in vertex.storedConfigs)) {
-      updates.storedConfigs = {
-        [name]: {
-          minimum: undefined,
-          maximum: undefined,
-          colorMap: undefined,
-        },
-      };
-    }
-
     const params = { id: modelId, block_ids: viewer_ids, name };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelBlocksVertexStyle(modelId, blockIds, updates),
+        response_function: () => mutateModelBlocksVertexStyle(modelId, blockIds, { name }),
       },
     );
   }
