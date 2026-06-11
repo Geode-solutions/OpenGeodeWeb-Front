@@ -4,7 +4,7 @@ import { flushPromises } from "@vue/test-utils";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { runFunctionWhenMicroservicesConnected } from "@ogw_front/composables/runFunctionWhenMicroservicesConnected";
+import { runFunctionWhenMicroservicesConnected } from "@ogw_front/composables/run_function_when_microservices_connected";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
