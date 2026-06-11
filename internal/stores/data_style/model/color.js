@@ -182,7 +182,12 @@ function useModelColorStyle(componentStyleFunctions) {
     }
   }
 
-  async function setModelComponentsColor(modelId, componentIds, color, activeColoring = "constant") {
+  async function setModelComponentsColor(
+    modelId,
+    componentIds,
+    color,
+    activeColoring = "constant",
+  ) {
     await modelCommonStyle.mutateComponentStyles(modelId, componentIds, {
       coloring: {
         constant: color,
