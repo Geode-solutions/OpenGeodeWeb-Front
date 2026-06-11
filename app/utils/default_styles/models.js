@@ -1,16 +1,20 @@
 import {
+  BLOCKS_DEFAULT_ACTIVE_COLORING,
   BLOCKS_DEFAULT_COLOR,
   BLOCKS_DEFAULT_VISIBILITY,
+  CORNERS_DEFAULT_ACTIVE_COLORING,
   CORNERS_DEFAULT_COLOR,
   CORNERS_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_WIDTH,
+  LINES_DEFAULT_ACTIVE_COLORING,
   LINES_DEFAULT_COLOR,
   LINES_DEFAULT_VISIBILITY,
   MODEL_DEFAULT_ACTIVE_COLORING,
   MODEL_DEFAULT_COLOR,
   POINTS_DEFAULT_SIZE,
   POINTS_DEFAULT_VISIBILITY,
+  SURFACES_DEFAULT_ACTIVE_COLORING,
   SURFACES_DEFAULT_COLOR,
   SURFACES_DEFAULT_VISIBILITY,
 } from "./constants";
@@ -22,7 +26,7 @@ function modelCornersDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: MODEL_DEFAULT_ACTIVE_COLORING,
+      active: CORNERS_DEFAULT_ACTIVE_COLORING,
       constant,
       vertex: {
         name: undefined,
@@ -39,7 +43,7 @@ function modelLinesDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: MODEL_DEFAULT_ACTIVE_COLORING,
+      active: LINES_DEFAULT_ACTIVE_COLORING,
       constant,
       vertex: {
         name: undefined,
@@ -60,7 +64,7 @@ function modelSurfacesDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: MODEL_DEFAULT_ACTIVE_COLORING,
+      active: SURFACES_DEFAULT_ACTIVE_COLORING,
       constant,
       vertex: {
         name: undefined,
@@ -81,7 +85,7 @@ function modelBlocksDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: MODEL_DEFAULT_ACTIVE_COLORING,
+      active: BLOCKS_DEFAULT_ACTIVE_COLORING,
       constant,
       vertex: {
         name: undefined,
