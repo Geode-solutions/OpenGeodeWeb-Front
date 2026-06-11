@@ -129,7 +129,7 @@ watch(modelComponentsColorMode, async (colorMode) => {
 <template>
   <v-sheet class="model-style-card" color="transparent">
     <OptionsSection title="Model Options">
-      <VisibilitySwitch v-model="modelVisibility" />
+      <VisibilitySwitch data-testid="modelStyleVisibilitySwitch" v-model="modelVisibility" />
     </OptionsSection>
 
     <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">

@@ -65,7 +65,7 @@ function meshCellsDefaultStyle(visibility = CELLS_DEFAULT_VISIBILITY, color = CE
         storedConfigs: {},
       },
       color,
-      textures: undefined,
+      textures: [],
       vertex: {
         name: undefined,
         storedConfigs: {},
@@ -83,7 +83,7 @@ function meshPolygonsDefaultStyle(
     coloring: {
       active: "color",
       color,
-      textures: undefined,
+      textures: [],
       polygon: {
         name: undefined,
         storedConfigs: {},

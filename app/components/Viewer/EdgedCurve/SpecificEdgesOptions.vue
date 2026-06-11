@@ -121,7 +121,7 @@ const edge_attribute_color_map = computed({
       <ViewerOptionsVisibilitySwitch data-testid="meshEdgesVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
         <v-divider class="my-2" />
-        <ViewerOptionsWidthSlider v-model="width" />
+        <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="width" />
         <ViewerOptionsColoringTypeSelector
           :id="id"
           v-model:coloring_style_key="coloring_style_key"

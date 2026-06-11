@@ -207,7 +207,7 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
 
 <template>
   <OptionsSection title="Blocks Options" class="mt-4">
-    <VisibilitySwitch v-model="blocksVisibility" />
+    <VisibilitySwitch data-testid="modelBlocksVisibilitySwitch" v-model="blocksVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="targetBlockIds[0]"
