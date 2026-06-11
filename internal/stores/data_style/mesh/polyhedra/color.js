@@ -13,7 +13,7 @@ export function useMeshPolyhedraColorStyle() {
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
   function meshPolyhedraColor(id) {
-    return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).color;
+    return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).constant;
   }
   function setMeshPolyhedraColor(id, color) {
     const params = { id, color };
@@ -25,7 +25,7 @@ export function useMeshPolyhedraColorStyle() {
       {
         response_function: () =>
           meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
-            color,
+            constant: color,
           }),
       },
     );
