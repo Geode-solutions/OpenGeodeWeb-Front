@@ -83,8 +83,8 @@ export default defineEventHandler(async (event) => {
       const metadata = JSON.parse(metadataJson);
       const { id } = metadata;
       await addExtensionToConf(projectName, {
-        extensionID: id,
-        extensionPath: file,
+        extensionId: id,
+        extensionPath: file
       });
     }),
   );

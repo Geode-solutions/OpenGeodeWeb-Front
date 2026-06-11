@@ -4,7 +4,7 @@ import { flushPromises } from "@vue/test-utils";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { run_function_when_microservices_connected } from "@ogw_front/composables/run_function_when_microservices_connected";
+import { runFunctionWhenMicroservicesConnected } from "@ogw_front/composables/runFunctionWhenMicroservicesConnected";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
@@ -40,7 +40,7 @@ describe("when_microservices_connected_run_function", () => {
 
   test("microservices not connected", () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method");
-    run_function_when_microservices_connected(dumb_obj.dumb_method);
+    runFunctionWhenMicroservicesConnected(dumb_obj.dumb_method);
     backStore.$patch({ status: Status.NOT_CONNECTED });
     viewerStore.$patch({ status: Status.NOT_CONNECTED });
     expect(spy).not.toHaveBeenCalled();
@@ -48,7 +48,7 @@ describe("when_microservices_connected_run_function", () => {
 
   test("microservices connected", async () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method");
-    run_function_when_microservices_connected(dumb_obj.dumb_method);
+    runFunctionWhenMicroservicesConnected(dumb_obj.dumb_method);
     backStore.$patch({ status: Status.CONNECTED });
     viewerStore.$patch({ status: Status.CONNECTED });
     await flushPromises();

@@ -27,14 +27,14 @@ function extensionsConf(projectName) {
   return extensionsConfig;
 }
 
-function addExtensionToConf(projectName, { extensionID, extensionPath }) {
+function addExtensionToConf(projectName, { extensionId, extensionPath }) {
   const projectConfig = projectConf(projectName);
-  projectConfig.set(`extensions.${extensionID}.path`, extensionPath);
+  projectConfig.set(`extensions.${extensionId}.path`, extensionPath);
 }
 
-async function removeExtensionFromConf(projectName, extensionID) {
+async function removeExtensionFromConf(projectName, extensionId) {
   const projectConfig = projectConf(projectName);
-  const extensionArchivePath = extensionPathFromConf(projectName, extensionID);
+  const extensionArchivePath = extensionPathFromConf(projectName, extensionId);
 
   await unlink(extensionArchivePath, (error) => {
     if (error) {
@@ -42,13 +42,13 @@ async function removeExtensionFromConf(projectName, extensionID) {
     }
     console.log(`${extensionArchivePath} was deleted`);
   });
-  projectConfig.delete(`extensions.${extensionID}`);
-  console.log(`${extensionID} was deleted from ${projectName} config`);
+  projectConfig.delete(`extensions.${extensionId}`);
+  console.log(`${extensionId} was deleted from ${projectName} config`);
 }
 
-function extensionPathFromConf(projectName, extensionID) {
+function extensionPathFromConf(projectName, extensionId) {
   const projectConfig = projectConf(projectName);
-  return projectConfig.get(`extensions.${extensionID}.path`);
+  return projectConfig.get(`extensions.${extensionId}.path`);
 }
 
 export {
