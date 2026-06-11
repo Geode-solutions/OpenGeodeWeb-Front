@@ -22,7 +22,7 @@ function modelCornersDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: "constant",
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant,
       vertex: {
         name: undefined,
@@ -39,7 +39,7 @@ function modelLinesDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: "constant",
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant,
       vertex: {
         name: undefined,
@@ -60,7 +60,7 @@ function modelSurfacesDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: "constant",
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant,
       vertex: {
         name: undefined,
@@ -81,7 +81,7 @@ function modelBlocksDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: "constant",
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant,
       vertex: {
         name: undefined,
