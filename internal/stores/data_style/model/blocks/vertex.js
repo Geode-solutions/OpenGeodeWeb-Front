@@ -16,7 +16,7 @@ export function useModelBlocksVertexAttribute() {
   const viewerStore = useViewerStore();
 
   function modelBlocksVertexAttribute(modelId, blockId) {
-    return modelBlocksCommonStyle.modelBlockStyle(modelId, blockId).vertex_attribute;
+    return modelBlocksCommonStyle.modelBlockStyle(modelId, blockId).coloring.vertex;
   }
 
   function modelBlocksVertexAttributeStoredConfig(modelId, blockId, name) {
@@ -33,7 +33,9 @@ export function useModelBlocksVertexAttribute() {
 
   function mutateModelBlocksVertexStyle(modelId, blockIds, values) {
     return modelBlocksCommonStyle.mutateModelBlocksStyle(modelId, blockIds, {
-      vertex_attribute: values,
+      coloring: {
+        vertex: values,
+      },
     });
   }
 

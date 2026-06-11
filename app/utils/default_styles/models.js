@@ -45,7 +45,7 @@ function modelLinesDefaultStyle(
         name: undefined,
         storedConfigs: {},
       },
-      edge_attribute: {
+      edge: {
         name: undefined,
         storedConfigs: {},
       },
@@ -66,7 +66,7 @@ function modelSurfacesDefaultStyle(
         name: undefined,
         storedConfigs: {},
       },
-      polygon_attribute: {
+      polygon: {
         name: undefined,
         storedConfigs: {},
       },
@@ -87,7 +87,7 @@ function modelBlocksDefaultStyle(
         name: undefined,
         storedConfigs: {},
       },
-      polyhedron_attribute: {
+      polyhedron: {
         name: undefined,
         storedConfigs: {},
       },

@@ -31,7 +31,7 @@ export function useMeshCellsStyle() {
       coloring: { active: type },
     });
     console.log(setMeshCellsActiveColoring.name, { id }, type);
-    if (type === "color") {
+    if (type === "constant") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
     }
     if (type === "textures") {

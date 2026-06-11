@@ -16,7 +16,7 @@ export function useModelSurfacesVertexAttribute() {
   const viewerStore = useViewerStore();
 
   function modelSurfacesVertexAttribute(modelId, surfaceId) {
-    return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surfaceId).vertex_attribute;
+    return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surfaceId).coloring.vertex;
   }
 
   function modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name) {
@@ -33,7 +33,9 @@ export function useModelSurfacesVertexAttribute() {
 
   function mutateModelSurfacesVertexStyle(modelId, surfaceIds, values) {
     return modelSurfacesCommonStyle.mutateModelSurfacesStyle(modelId, surfaceIds, {
-      vertex_attribute: values,
+      coloring: {
+        vertex: values,
+      },
     });
   }
 

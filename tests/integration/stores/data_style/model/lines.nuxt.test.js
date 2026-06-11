@@ -178,7 +178,7 @@ describe("model lines", () => {
       const dataStore = useDataStore();
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const [line_id] = line_ids;
-      const coloringName = "color";
+      const coloringName = "constant";
       const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;

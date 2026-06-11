@@ -16,7 +16,7 @@ export function useModelLinesVertexAttribute() {
   const viewerStore = useViewerStore();
 
   function modelLinesVertexAttribute(modelId, lineId) {
-    return modelLinesCommonStyle.modelLineStyle(modelId, lineId).vertex_attribute;
+    return modelLinesCommonStyle.modelLineStyle(modelId, lineId).coloring.vertex;
   }
 
   function modelLinesVertexAttributeStoredConfig(modelId, lineId, name) {
@@ -33,7 +33,9 @@ export function useModelLinesVertexAttribute() {
 
   function mutateModelLinesVertexStyle(modelId, lineIds, values) {
     return modelLinesCommonStyle.mutateModelLinesStyle(modelId, lineIds, {
-      vertex_attribute: values,
+      coloring: {
+        vertex: values,
+      },
     });
   }
 

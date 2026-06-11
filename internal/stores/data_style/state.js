@@ -157,12 +157,12 @@ export function useDataStyleState() {
 
   function getComponentStyle(id_model, id_component) {
     const key = `${id_model}_${id_component}`;
-    return componentStyles.value[key] || {};
+    return componentStyles.value[key] || { coloring: {} };
   }
 
   function getModelComponentTypeStyle(id_model, type) {
     const key = `${id_model}_${type}`;
-    return modelComponentTypeStyles.value[key] || {};
+    return modelComponentTypeStyles.value[key] || { coloring: {} };
   }
 
   function clear() {

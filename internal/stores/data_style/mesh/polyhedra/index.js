@@ -30,7 +30,7 @@ export function useMeshPolyhedraStyle() {
       coloring: { active: type },
     });
     console.log(setMeshPolyhedraActiveColoring.name, { id }, type);
-    if (type === "color") {
+    if (type === "constant") {
       return meshPolyhedraColorStyle.setMeshPolyhedraColor(
         id,
         meshPolyhedraColorStyle.meshPolyhedraColor(id),

@@ -70,7 +70,11 @@ export function useModelCommonStyle() {
     }
 
     if (color_mode === "constant" && color !== undefined) {
-      await mutateComponentStyles(id, component_ids, { color });
+      await mutateComponentStyles(id, component_ids, {
+        coloring: {
+          constant: color,
+        },
+      });
     }
 
     const params = { id, block_ids: viewer_ids, color_mode };
@@ -83,7 +87,11 @@ export function useModelCommonStyle() {
       {
         response_function: async (colors) => {
           if (color_mode === "constant" && color !== undefined) {
-            await mutateComponentStyles(id, component_ids, { color });
+            await mutateComponentStyles(id, component_ids, {
+              coloring: {
+                constant: color,
+              },
+            });
             return;
           }
 
@@ -95,7 +103,11 @@ export function useModelCommonStyle() {
             id,
             colors.map(({ geode_id, color: color_value }) => ({
               id_component: geode_id,
-              values: { color: color_value },
+              values: {
+                coloring: {
+                  constant: color_value,
+                },
+              },
             })),
           );
         },

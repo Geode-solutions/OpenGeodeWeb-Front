@@ -9,7 +9,7 @@ export function useModelSurfacesColor() {
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
 
   function modelSurfaceColor(id, surface_id) {
-    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color;
+    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring.constant;
   }
 
   function setModelSurfacesColor(modelId, surfaces_ids, color, color_mode = "constant") {
@@ -17,9 +17,7 @@ export function useModelSurfacesColor() {
   }
 
   function modelSurfaceColorMode(id, surface_id) {
-    const mode =
-      modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).color_mode || "constant";
-    return mode === "constant" ? "color" : mode;
+    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring.active;
   }
 
   return {

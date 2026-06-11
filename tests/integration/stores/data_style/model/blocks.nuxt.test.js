@@ -180,7 +180,7 @@ describe("model blocks", () => {
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
       const [block_id] = block_ids;
-      const coloringName = "color";
+      const coloringName = "constant";
       const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;

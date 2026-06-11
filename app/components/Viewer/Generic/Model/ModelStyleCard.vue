@@ -1,6 +1,6 @@
 <script setup>
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
-import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -86,15 +86,12 @@ const modelVisibility = computed({
   },
 });
 
-const colorModes = [
-  { title: "Constant", value: "constant" },
-  { title: "Random", value: "random" },
-];
-
 const modelComponentsColorMode = computed({
   get: () => dataStyleStore.getModelColorMode(modelId.value),
   set: async (colorMode) => {
-    await dataStyleStore.mutateStyle(modelId.value, { color_mode: colorMode });
+    await dataStyleStore.mutateStyle(modelId.value, {
+      coloring: { active: colorMode },
+    });
     await dataStyleStore.setModelComponentsColor(
       modelId.value,
       selection.value,
@@ -108,7 +105,9 @@ const modelComponentsColorMode = computed({
 const modelComponentsColor = computed({
   get: () => dataStyleStore.getModelColor(modelId.value),
   set: async (color) => {
-    await dataStyleStore.mutateStyle(modelId.value, { color });
+    await dataStyleStore.mutateStyle(modelId.value, {
+      coloring: { constant: color },
+    });
     await dataStyleStore.setModelComponentsColor(
       modelId.value,
       selection.value,
@@ -127,20 +126,13 @@ const modelComponentsColor = computed({
     </OptionsSection>
 
     <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
-      <v-label class="text-caption mb-1 mt-2">Select coloring style</v-label>
-      <v-select
-        v-model="modelComponentsColorMode"
-        :items="colorModes"
-        density="compact"
-        hide-details
-        class="mb-3"
-        variant="outlined"
+      <ViewerOptionsColoringTypeSelector
+        :id="modelId"
+        v-model:coloring_style_key="modelComponentsColorMode"
+        v-model:color="modelComponentsColor"
+        :capabilities="{ color: { available: true } }"
+        :allowRandom="true"
       />
-
-      <template v-if="modelComponentsColorMode === 'constant'">
-        <v-label class="text-caption mb-1">Constant</v-label>
-        <ViewerOptionsColorPicker v-model="modelComponentsColor" />
-      </template>
     </OptionsSection>
 
     <BlocksOptions

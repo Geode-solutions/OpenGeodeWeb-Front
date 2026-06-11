@@ -30,7 +30,7 @@ export function useMeshEdgesStyle() {
     await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
       coloring: { active: type },
     });
-    if (type === "color") {
+    if (type === "constant") {
       return meshEdgesColorStyle.setMeshEdgesColor(id, meshEdgesColorStyle.meshEdgesColor(id));
     }
     if (type === "vertex") {

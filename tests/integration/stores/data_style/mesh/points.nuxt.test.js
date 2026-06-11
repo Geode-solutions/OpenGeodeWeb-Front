@@ -76,7 +76,7 @@ describe("mesh points", () => {
     test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringName = "color";
+      const coloringName = "constant";
       const result = dataStyleStore.setMeshPointsActiveColoring(id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;

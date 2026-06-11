@@ -73,7 +73,7 @@ describe("mesh polyhedra", () => {
     test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringName = "color";
+      const coloringName = "constant";
       const result = dataStyleStore.setMeshPolyhedraActiveColoring(id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;

@@ -29,7 +29,7 @@ function useMeshPolygonsColoringStyle() {
     await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
       coloring: { active: type },
     });
-    if (type === "color") {
+    if (type === "constant") {
       return meshPolygonsColorStyle.setMeshPolygonsColor(
         id,
         meshPolygonsColorStyle.meshPolygonsColor(id),

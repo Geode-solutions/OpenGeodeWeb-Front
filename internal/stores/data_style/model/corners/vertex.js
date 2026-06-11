@@ -16,7 +16,7 @@ export function useModelCornersVertexAttribute() {
   const viewerStore = useViewerStore();
 
   function modelCornersVertexAttribute(modelId, cornerId) {
-    return modelCornersCommonStyle.modelCornerStyle(modelId, cornerId).vertex_attribute;
+    return modelCornersCommonStyle.modelCornerStyle(modelId, cornerId).coloring.vertex;
   }
 
   function modelCornersVertexAttributeStoredConfig(modelId, cornerId, name) {
@@ -33,7 +33,9 @@ export function useModelCornersVertexAttribute() {
 
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
     return modelCornersCommonStyle.mutateModelCornersStyle(modelId, cornerIds, {
-      vertex_attribute: values,
+      coloring: {
+        vertex: values,
+      },
     });
   }
 

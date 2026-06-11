@@ -9,7 +9,7 @@ export function useModelBlocksColor() {
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
 
   function modelBlockColor(id, block_id) {
-    return modelBlocksCommonStyle.modelBlockStyle(id, block_id).color;
+    return modelBlocksCommonStyle.modelBlockStyle(id, block_id).coloring.constant;
   }
 
   function setModelBlocksColor(modelId, blocks_ids, color, color_mode = "constant") {
@@ -17,8 +17,7 @@ export function useModelBlocksColor() {
   }
 
   function modelBlockColorMode(id, block_id) {
-    const mode = modelBlocksCommonStyle.modelBlockStyle(id, block_id).color_mode || "constant";
-    return mode === "constant" ? "color" : mode;
+    return modelBlocksCommonStyle.modelBlockStyle(id, block_id).coloring.active;
   }
 
   return { setModelBlocksColor, modelBlockColor, modelBlockColorMode };

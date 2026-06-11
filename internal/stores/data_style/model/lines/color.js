@@ -9,7 +9,7 @@ export function useModelLinesColor() {
   const modelLinesCommonStyle = useModelLinesCommonStyle();
 
   function modelLineColor(id, line_id) {
-    return modelLinesCommonStyle.modelLineStyle(id, line_id).color;
+    return modelLinesCommonStyle.modelLineStyle(id, line_id).coloring.constant;
   }
 
   function setModelLinesColor(modelId, lines_ids, color, color_mode = "constant") {
@@ -17,8 +17,7 @@ export function useModelLinesColor() {
   }
 
   function modelLineColorMode(id, line_id) {
-    const mode = modelLinesCommonStyle.modelLineStyle(id, line_id).color_mode || "constant";
-    return mode === "constant" ? "color" : mode;
+    return modelLinesCommonStyle.modelLineStyle(id, line_id).coloring.active;
   }
 
   return { setModelLinesColor, modelLineColor, modelLineColorMode };

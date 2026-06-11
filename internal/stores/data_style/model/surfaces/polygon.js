@@ -16,7 +16,7 @@ export function useModelSurfacesPolygonAttribute() {
   const viewerStore = useViewerStore();
 
   function modelSurfacesPolygonAttribute(modelId, surfaceId) {
-    return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surfaceId).polygon_attribute;
+    return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surfaceId).coloring.polygon;
   }
 
   function modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name) {
@@ -33,7 +33,9 @@ export function useModelSurfacesPolygonAttribute() {
 
   function mutateModelSurfacesPolygonStyle(modelId, surfaceIds, values) {
     return modelSurfacesCommonStyle.mutateModelSurfacesStyle(modelId, surfaceIds, {
-      polygon_attribute: values,
+      coloring: {
+        polygon: values,
+      },
     });
   }
 

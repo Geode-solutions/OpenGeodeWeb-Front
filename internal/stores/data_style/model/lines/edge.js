@@ -16,7 +16,7 @@ export function useModelLinesEdgeAttribute() {
   const viewerStore = useViewerStore();
 
   function modelLinesEdgeAttribute(modelId, lineId) {
-    return modelLinesCommonStyle.modelLineStyle(modelId, lineId).edge_attribute;
+    return modelLinesCommonStyle.modelLineStyle(modelId, lineId).coloring.edge;
   }
 
   function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name) {
@@ -33,7 +33,9 @@ export function useModelLinesEdgeAttribute() {
 
   function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
     return modelLinesCommonStyle.mutateModelLinesStyle(modelId, lineIds, {
-      edge_attribute: values,
+      coloring: {
+        edge: values,
+      },
     });
   }
 

@@ -145,7 +145,7 @@ describe("model corners", () => {
       const dataStore = useDataStore();
       const corner_ids = await dataStore.getCornersGeodeIds(id);
       const [corner_id] = corner_ids;
-      const coloringName = "color";
+      const coloringName = "constant";
       const result = dataStyleStore.setModelComponentColorMode(id, corner_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;

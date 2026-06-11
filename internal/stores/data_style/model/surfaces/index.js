@@ -36,20 +36,19 @@ export function useModelSurfacesStyle() {
       }
       visibilityGroups[visibility].push(surfaces_id);
 
-      const color_mode = style.color_mode || "constant";
+      const color_mode = style.coloring.active;
       if (color_mode === "constant" || color_mode === "random") {
-        const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+        const color = style.coloring.constant;
+        const color_key = color_mode === "random" ? "random" : JSON.stringify(color);
         if (!colorGroups[color_key]) {
-          colorGroups[color_key] = { color_mode, color: style.color, surfaces_ids: [] };
+          colorGroups[color_key] = { color_mode, color, surfaces_ids: [] };
         }
         colorGroups[color_key].surfaces_ids.push(surfaces_id);
       } else {
-        const attributeTypeKey = `${color_mode}_attribute`;
-        const attributeStyle = style[attributeTypeKey] || {};
+        const attributeStyle = style.coloring[color_mode];
         const { name } = attributeStyle;
         if (name) {
-          const storedConfig =
-            (attributeStyle.storedConfigs && attributeStyle.storedConfigs[name]) || {};
+          const storedConfig = attributeStyle.storedConfigs[name] || {};
           const { minimum, maximum, colorMap } = storedConfig;
           const attributeGroupKey = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
           if (!attributeGroups[attributeGroupKey]) {

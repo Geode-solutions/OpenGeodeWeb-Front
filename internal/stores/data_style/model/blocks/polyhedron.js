@@ -16,7 +16,7 @@ export function useModelBlocksPolyhedronAttribute() {
   const viewerStore = useViewerStore();
 
   function modelBlocksPolyhedronAttribute(modelId, blockId) {
-    return modelBlocksCommonStyle.modelBlockStyle(modelId, blockId).polyhedron_attribute;
+    return modelBlocksCommonStyle.modelBlockStyle(modelId, blockId).coloring.polyhedron;
   }
 
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name) {
@@ -33,7 +33,9 @@ export function useModelBlocksPolyhedronAttribute() {
 
   function mutateModelBlocksPolyhedronStyle(modelId, blockIds, values) {
     return modelBlocksCommonStyle.mutateModelBlocksStyle(modelId, blockIds, {
-      polyhedron_attribute: values,
+      coloring: {
+        polyhedron: values,
+      },
     });
   }
 

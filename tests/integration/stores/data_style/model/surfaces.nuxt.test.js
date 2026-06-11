@@ -182,7 +182,7 @@ describe("model surfaces", () => {
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
       const [surface_id] = surface_ids;
-      const coloringName = "color";
+      const coloringName = "constant";
       const result = dataStyleStore.setModelComponentColorMode(id, surface_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;

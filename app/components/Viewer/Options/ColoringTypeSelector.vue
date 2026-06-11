@@ -98,8 +98,8 @@ const has_polyhedra = computed(
     hasColorMap("polyhedron"),
 );
 
-const color_dict = { name: "Color", value: "color" };
-const random_dict = { name: "Random color", value: "random" };
+const color_dict = { name: "Constant", value: "constant" };
+const random_dict = { name: "Random", value: "random" };
 const textures_dict = { name: "Textures", value: "textures" };
 const vertex_dict = { name: "Vertex attribute", value: "vertex" };
 const edge_dict = { name: "Edge attribute", value: "edge" };
@@ -173,7 +173,7 @@ watch(
         data-testid="coloringStyleSelector"
         v-model="coloring_style_label"
         :items="coloring_styles.labels"
-        label="Select a coloring style"
+        label="Select coloring style"
         density="compact"
         hide-details
       />

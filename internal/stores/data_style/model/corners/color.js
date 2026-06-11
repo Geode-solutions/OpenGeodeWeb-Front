@@ -9,7 +9,7 @@ export function useModelCornersColor() {
   const modelCornersCommonStyle = useModelCornersCommonStyle();
 
   function modelCornerColor(id, corner_id) {
-    return modelCornersCommonStyle.modelCornerStyle(id, corner_id).color;
+    return modelCornersCommonStyle.modelCornerStyle(id, corner_id).coloring.constant;
   }
 
   function setModelCornersColor(modelId, corners_ids, color, color_mode = "constant") {
@@ -17,8 +17,7 @@ export function useModelCornersColor() {
   }
 
   function modelCornerColorMode(id, corner_id) {
-    const mode = modelCornersCommonStyle.modelCornerStyle(id, corner_id).color_mode || "constant";
-    return mode === "constant" ? "color" : mode;
+    return modelCornersCommonStyle.modelCornerStyle(id, corner_id).coloring.active;
   }
 
   return { setModelCornersColor, modelCornerColor, modelCornerColorMode };
