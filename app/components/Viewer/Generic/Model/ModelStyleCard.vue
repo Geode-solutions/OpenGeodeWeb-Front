@@ -88,15 +88,15 @@ const modelVisibility = computed({
 
 const modelComponentsActiveColoring = computed({
   get: () => dataStyleStore.getModelActiveColoring(modelId.value),
-  set: async (activeColoring) => {
+  set: async (coloringType) => {
     await dataStyleStore.mutateStyle(modelId.value, {
-      coloring: { active: activeColoring },
+      coloring: { active: coloringType },
     });
     await dataStyleStore.setModelComponentsColor(
       modelId.value,
       selection.value,
-      activeColoring === "random" ? undefined : modelComponentsColor.value,
-      activeColoring,
+      coloringType === "random" ? undefined : modelComponentsColor.value,
+      coloringType,
     );
     hybridViewerStore.remoteRender();
   },

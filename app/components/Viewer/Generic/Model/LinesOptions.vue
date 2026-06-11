@@ -51,16 +51,16 @@ const lineColor = computed({
 
 const linesActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Line"),
-  set: async (activeColoring) => {
-    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Line", activeColoring);
+  set: async (coloringType) => {
+    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Line", coloringType);
     hybridViewerStore.remoteRender();
   },
 });
 
 const lineActiveColoring = computed({
   get: () => dataStyleStore.modelLineActiveColoring(modelId, lineId),
-  set: async (activeColoring) => {
-    await dataStyleStore.setModelLinesActiveColoring(modelId, [lineId], activeColoring);
+  set: async (coloringType) => {
+    await dataStyleStore.setModelLinesActiveColoring(modelId, [lineId], coloringType);
     hybridViewerStore.remoteRender();
   },
 });

@@ -51,16 +51,16 @@ const cornerColor = computed({
 
 const cornersActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner"),
-  set: async (activeColoring) => {
-    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Corner", activeColoring);
+  set: async (coloringType) => {
+    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Corner", coloringType);
     hybridViewerStore.remoteRender();
   },
 });
 
 const cornerActiveColoring = computed({
   get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId),
-  set: async (activeColoring) => {
-    await dataStyleStore.setModelCornersActiveColoring(modelId, [cornerId], activeColoring);
+  set: async (coloringType) => {
+    await dataStyleStore.setModelCornersActiveColoring(modelId, [cornerId], coloringType);
     hybridViewerStore.remoteRender();
   },
 });

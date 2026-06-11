@@ -51,16 +51,16 @@ const blockColor = computed({
 
 const blocksActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Block"),
-  set: async (activeColoring) => {
-    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Block", activeColoring);
+  set: async (coloringType) => {
+    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Block", coloringType);
     hybridViewerStore.remoteRender();
   },
 });
 
 const blockActiveColoring = computed({
   get: () => dataStyleStore.modelBlockActiveColoring(modelId, blockId),
-  set: async (activeColoring) => {
-    await dataStyleStore.setModelBlocksActiveColoring(modelId, [blockId], activeColoring);
+  set: async (coloringType) => {
+    await dataStyleStore.setModelBlocksActiveColoring(modelId, [blockId], coloringType);
     hybridViewerStore.remoteRender();
   },
 });
