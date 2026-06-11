@@ -86,17 +86,17 @@ const modelVisibility = computed({
   },
 });
 
-const modelComponentsColorMode = computed({
-  get: () => dataStyleStore.getModelColorMode(modelId.value),
-  set: async (colorMode) => {
+const modelComponentsActiveColoring = computed({
+  get: () => dataStyleStore.getModelActiveColoring(modelId.value),
+  set: async (activeColoring) => {
     await dataStyleStore.mutateStyle(modelId.value, {
-      coloring: { active: colorMode },
+      coloring: { active: activeColoring },
     });
     await dataStyleStore.setModelComponentsColor(
       modelId.value,
       selection.value,
-      colorMode === "random" ? undefined : modelComponentsColor.value,
-      colorMode,
+      activeColoring === "random" ? undefined : modelComponentsColor.value,
+      activeColoring,
     );
     hybridViewerStore.remoteRender();
   },
@@ -112,7 +112,7 @@ const modelComponentsColor = computed({
       modelId.value,
       selection.value,
       color,
-      modelComponentsColorMode.value,
+      modelComponentsActiveColoring.value,
     );
     hybridViewerStore.remoteRender();
   },
@@ -128,7 +128,7 @@ const modelComponentsColor = computed({
     <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
       <ViewerOptionsColoringTypeSelector
         :id="modelId"
-        v-model:coloring_style_key="modelComponentsColorMode"
+        v-model:coloring_style_key="modelComponentsActiveColoring"
         v-model:color="modelComponentsColor"
         :capabilities="{ color: { available: true } }"
         :allowRandom="true"

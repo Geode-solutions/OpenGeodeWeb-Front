@@ -16,13 +16,13 @@ export function useModelSurfacesColor() {
     return modelCommonStyle.setModelTypeColor(modelId, surfaces_ids, color, schema, color_mode);
   }
 
-  function modelSurfaceColorMode(id, surface_id) {
+  function modelSurfaceActiveColoring(id, surface_id) {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring.active;
   }
 
   return {
     setModelSurfacesColor,
     modelSurfaceColor,
-    modelSurfaceColorMode,
+    modelSurfaceActiveColoring,
   };
 }

@@ -51,19 +51,19 @@ const surfaceColor = computed({
   },
 });
 
-const surfacesColorMode = computed({
-  get: () => dataStyleStore.getModelComponentTypeColorMode(modelId, "Surface"),
-  set: async (colorMode) => {
-    await dataStyleStore.setModelComponentTypeColorMode(modelId, "Surface", colorMode);
+const surfacesActiveColoring = computed({
+  get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Surface"),
+  set: async (activeColoring) => {
+    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Surface", activeColoring);
     hybridViewerStore.remoteRender();
   },
 });
 
-const surfaceColorMode = computed({
-  get: () => dataStyleStore.modelSurfaceColorMode(modelId, surfaceId),
-  set: async (colorMode) => {
+const surfaceActiveColoring = computed({
+  get: () => dataStyleStore.modelSurfaceActiveColoring(modelId, surfaceId),
+  set: async (activeColoring) => {
     if (surfaceId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, surfaceId, colorMode);
+      await dataStyleStore.setModelComponentActiveColoring(modelId, surfaceId, activeColoring);
       hybridViewerStore.remoteRender();
     }
   },
@@ -215,7 +215,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="targetSurfaceIds[0]"
-      v-model:coloring_style_key="surfacesColorMode"
+      v-model:coloring_style_key="surfacesActiveColoring"
       v-model:color="surfacesColor"
       v-model:vertex_attribute_name="surfacesVertexAttributeName"
       v-model:vertex_attribute_range="surfacesVertexAttributeRange"
@@ -234,7 +234,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="surfaceId"
-      v-model:coloring_style_key="surfaceColorMode"
+      v-model:coloring_style_key="surfaceActiveColoring"
       v-model:color="surfaceColor"
       v-model:vertex_attribute_name="vertexAttributeName"
       v-model:vertex_attribute_range="vertexAttributeRange"

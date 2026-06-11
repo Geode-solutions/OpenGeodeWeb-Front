@@ -183,10 +183,10 @@ describe("model surfaces", () => {
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
       const [surface_id] = surface_ids;
       const coloringName = "constant";
-      const result = dataStyleStore.setModelComponentColorMode(id, surface_id, coloringName);
+      const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelSurfaceColorMode(id, surface_id)).toBe(coloringName);
+      expect(dataStyleStore.modelSurfaceActiveColoring(id, surface_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
@@ -198,10 +198,10 @@ describe("model surfaces", () => {
       const [surface_id] = surface_ids;
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, [surface_id], "points");
       const coloringName = "vertex";
-      const result = dataStyleStore.setModelComponentColorMode(id, surface_id, coloringName);
+      const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelSurfaceColorMode(id, surface_id)).toBe(coloringName);
+      expect(dataStyleStore.modelSurfaceActiveColoring(id, surface_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
@@ -213,10 +213,10 @@ describe("model surfaces", () => {
       const [surface_id] = surface_ids;
       await dataStyleStore.setModelSurfacesPolygonAttributeName(id, [surface_id], "test_attribute");
       const coloringName = "polygon";
-      const result = dataStyleStore.setModelComponentColorMode(id, surface_id, coloringName);
+      const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelSurfaceColorMode(id, surface_id)).toBe(coloringName);
+      expect(dataStyleStore.modelSurfaceActiveColoring(id, surface_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });

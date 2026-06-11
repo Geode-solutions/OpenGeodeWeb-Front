@@ -51,19 +51,19 @@ const cornerColor = computed({
   },
 });
 
-const cornersColorMode = computed({
-  get: () => dataStyleStore.getModelComponentTypeColorMode(modelId, "Corner"),
-  set: async (colorMode) => {
-    await dataStyleStore.setModelComponentTypeColorMode(modelId, "Corner", colorMode);
+const cornersActiveColoring = computed({
+  get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner"),
+  set: async (activeColoring) => {
+    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Corner", activeColoring);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornerColorMode = computed({
-  get: () => dataStyleStore.modelCornerColorMode(modelId, cornerId),
-  set: async (colorMode) => {
+const cornerActiveColoring = computed({
+  get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId),
+  set: async (activeColoring) => {
     if (cornerId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, cornerId, colorMode);
+      await dataStyleStore.setModelComponentActiveColoring(modelId, cornerId, activeColoring);
       hybridViewerStore.remoteRender();
     }
   },
@@ -148,7 +148,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="targetCornerIds[0]"
-      v-model:coloring_style_key="cornersColorMode"
+      v-model:coloring_style_key="cornersActiveColoring"
       v-model:color="cornersColor"
       v-model:vertex_attribute_name="cornersVertexAttributeName"
       v-model:vertex_attribute_range="cornersVertexAttributeRange"
@@ -164,7 +164,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="cornerId"
-      v-model:coloring_style_key="cornerColorMode"
+      v-model:coloring_style_key="cornerActiveColoring"
       v-model:color="cornerColor"
       v-model:vertex_attribute_name="vertexAttributeName"
       v-model:vertex_attribute_range="vertexAttributeRange"

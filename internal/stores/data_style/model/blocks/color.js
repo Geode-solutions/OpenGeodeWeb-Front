@@ -16,9 +16,9 @@ export function useModelBlocksColor() {
     return modelCommonStyle.setModelTypeColor(modelId, blocks_ids, color, schema, color_mode);
   }
 
-  function modelBlockColorMode(id, block_id) {
+  function modelBlockActiveColoring(id, block_id) {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).coloring.active;
   }
 
-  return { setModelBlocksColor, modelBlockColor, modelBlockColorMode };
+  return { setModelBlocksColor, modelBlockColor, modelBlockActiveColoring };
 }

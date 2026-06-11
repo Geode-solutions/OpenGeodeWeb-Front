@@ -89,7 +89,7 @@ function useModelColorStyle(componentStyleFunctions) {
     return modelComponentTypeColor(modelId, type);
   }
 
-  function getModelComponentColorMode(modelId, componentId) {
+  function getModelComponentActiveColoring(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).coloring.active;
   }
 
@@ -100,7 +100,7 @@ function useModelColorStyle(componentStyleFunctions) {
     );
   }
 
-  function getModelComponentTypeColorMode(modelId, type) {
+  function getModelComponentTypeActiveColoring(modelId, type) {
     return (
       dataStyleState.getModelComponentTypeStyle(modelId, type).coloring.active ||
       dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.active
@@ -121,7 +121,7 @@ function useModelColorStyle(componentStyleFunctions) {
     await setModelComponentsColor(modelId, idsForType, color);
   }
 
-  async function setModelComponentTypeColorMode(modelId, type, color_mode) {
+  async function setModelComponentTypeActiveColoring(modelId, type, color_mode) {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
       coloring: { active: color_mode },
     });
@@ -155,7 +155,7 @@ function useModelColorStyle(componentStyleFunctions) {
     }
   }
 
-  async function setModelComponentColorMode(modelId, componentId, color_mode) {
+  async function setModelComponentActiveColoring(modelId, componentId, color_mode) {
     await modelCommonStyle.mutateComponentStyle(modelId, componentId, {
       coloring: { active: color_mode },
     });
@@ -203,21 +203,21 @@ function useModelColorStyle(componentStyleFunctions) {
     return dataStyleState.getStyle(modelId).coloring.constant;
   }
 
-  function getModelColorMode(modelId) {
+  function getModelActiveColoring(modelId) {
     return dataStyleState.getStyle(modelId).coloring.active;
   }
 
   return {
     getModelColor,
-    getModelColorMode,
+    getModelActiveColoring,
     getModelComponentColor,
     getModelComponentEffectiveColor,
-    getModelComponentColorMode,
+    getModelComponentActiveColoring,
     modelComponentTypeColor,
-    getModelComponentTypeColorMode,
+    getModelComponentTypeActiveColoring,
     setModelComponentTypeColor,
-    setModelComponentTypeColorMode,
-    setModelComponentColorMode,
+    setModelComponentTypeActiveColoring,
+    setModelComponentActiveColoring,
     setModelComponentsColor,
   };
 }

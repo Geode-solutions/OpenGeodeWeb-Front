@@ -16,9 +16,9 @@ export function useModelCornersColor() {
     return modelCommonStyle.setModelTypeColor(modelId, corners_ids, color, schema, color_mode);
   }
 
-  function modelCornerColorMode(id, corner_id) {
+  function modelCornerActiveColoring(id, corner_id) {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).coloring.active;
   }
 
-  return { setModelCornersColor, modelCornerColor, modelCornerColorMode };
+  return { setModelCornersColor, modelCornerColor, modelCornerActiveColoring };
 }

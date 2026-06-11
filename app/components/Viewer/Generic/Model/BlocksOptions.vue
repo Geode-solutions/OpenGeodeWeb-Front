@@ -51,19 +51,19 @@ const blockColor = computed({
   },
 });
 
-const blocksColorMode = computed({
-  get: () => dataStyleStore.getModelComponentTypeColorMode(modelId, "Block"),
-  set: async (colorMode) => {
-    await dataStyleStore.setModelComponentTypeColorMode(modelId, "Block", colorMode);
+const blocksActiveColoring = computed({
+  get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Block"),
+  set: async (activeColoring) => {
+    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Block", activeColoring);
     hybridViewerStore.remoteRender();
   },
 });
 
-const blockColorMode = computed({
-  get: () => dataStyleStore.modelBlockColorMode(modelId, blockId),
-  set: async (colorMode) => {
+const blockActiveColoring = computed({
+  get: () => dataStyleStore.modelBlockActiveColoring(modelId, blockId),
+  set: async (activeColoring) => {
     if (blockId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, blockId, colorMode);
+      await dataStyleStore.setModelComponentActiveColoring(modelId, blockId, activeColoring);
       hybridViewerStore.remoteRender();
     }
   },
@@ -211,7 +211,7 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="targetBlockIds[0]"
-      v-model:coloring_style_key="blocksColorMode"
+      v-model:coloring_style_key="blocksActiveColoring"
       v-model:color="blocksColor"
       v-model:vertex_attribute_name="blocksVertexAttributeName"
       v-model:vertex_attribute_range="blocksVertexAttributeRange"
@@ -230,7 +230,7 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="blockId"
-      v-model:coloring_style_key="blockColorMode"
+      v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"
       v-model:vertex_attribute_name="vertexAttributeName"
       v-model:vertex_attribute_range="vertexAttributeRange"
