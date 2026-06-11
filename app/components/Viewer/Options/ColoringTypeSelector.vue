@@ -170,7 +170,7 @@ watch(
     if (!(key in names) || names[key]) {
       coloring_style_key.value = key;
     }
-  }
+  },
 );
 
 watch(
