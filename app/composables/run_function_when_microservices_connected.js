@@ -7,11 +7,14 @@ export function runFunctionWhenMicroservicesConnected(functionToRun) {
   if (microservices_connected.value) {
     functionToRun();
   }
-  watch(microservices_connected, (value) => {
-    if (value) {
-      console.log("watch microservices_connected", value);
-      functionToRun();
-    }
-  }, { once: true });
-
+  watch(
+    microservices_connected,
+    (value) => {
+      if (value) {
+        console.log("watch microservices_connected", value);
+        functionToRun();
+      }
+    },
+    { once: true },
+  );
 }

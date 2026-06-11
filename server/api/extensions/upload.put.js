@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
       const { id } = metadata;
       await addExtensionToConf(projectName, {
         extensionId: id,
-        extensionPath: file
+        extensionPath: file,
       });
     }),
   );
