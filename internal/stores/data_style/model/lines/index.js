@@ -36,33 +36,36 @@ export function useModelLinesStyle() {
       }
       visibilityGroups[visibility].push(line_id);
 
-      const color_mode = style.coloring.active;
-      if (color_mode === "constant" || color_mode === "random") {
-        const color = style.coloring.constant;
-        const color_key = color_mode === "random" ? "random" : JSON.stringify(color);
+      const coloring = modelColorStyle.modelLineColoring(modelId, line_id);
+      const activeColoring = coloring.active;
+      if (activeColoring === "constant") {
+        const color = coloring.constant;
+        const color_key = JSON.stringify(color);
         if (!colorGroups[color_key]) {
-          colorGroups[color_key] = { color_mode, color, lines_ids: [] };
+          colorGroups[color_key] = { activeColoring, color, lines_ids: [] };
         }
         colorGroups[color_key].lines_ids.push(line_id);
-      } else {
-        const attributeStyle = style.coloring[color_mode];
-        const { name } = attributeStyle;
-        if (name) {
-          const storedConfig = attributeStyle.storedConfigs[name] || {};
-          const { minimum, maximum, colorMap } = storedConfig;
-          const attributeGroupKey = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
-          if (!attributeGroups[attributeGroupKey]) {
-            attributeGroups[attributeGroupKey] = {
-              color_mode,
-              name,
-              minimum,
-              maximum,
-              colorMap,
-              lines_ids: [],
-            };
-          }
-          attributeGroups[attributeGroupKey].lines_ids.push(line_id);
+      } else if (activeColoring === "random") {
+        if (!colorGroups["random"]) {
+          colorGroups["random"] = { activeColoring, color: undefined, lines_ids: [] };
         }
+        colorGroups["random"].lines_ids.push(line_id);
+      } else {
+        const attributeStyle = coloring[activeColoring];
+        const { name } = attributeStyle;
+        const { minimum, maximum, colorMap } = attributeStyle.storedConfigs[name];
+        const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
+        if (!attributeGroups[attributeGroupKey]) {
+          attributeGroups[attributeGroupKey] = {
+            activeColoring,
+            name,
+            minimum,
+            maximum,
+            colorMap,
+            lines_ids: [],
+          };
+        }
+        attributeGroups[attributeGroupKey].lines_ids.push(line_id);
       }
     }
 
@@ -70,12 +73,12 @@ export function useModelLinesStyle() {
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
         modelVisibilityStyle.setModelLinesVisibility(modelId, ids, visibility === "true"),
       ),
-      ...Object.values(colorGroups).map(({ color_mode, color, lines_ids: ids }) =>
-        modelColorStyle.setModelLinesColor(modelId, ids, color, color_mode),
+      ...Object.values(colorGroups).map(({ activeColoring, color, lines_ids: ids }) =>
+        modelColorStyle.setModelLinesColor(modelId, ids, color, activeColoring),
       ),
       ...Object.values(attributeGroups).flatMap(
-        ({ color_mode, name, minimum, maximum, colorMap, lines_ids: ids }) => {
-          const isVertex = color_mode === "vertex";
+        ({ activeColoring, name, minimum, maximum, colorMap, lines_ids: ids }) => {
+          const isVertex = activeColoring === "vertex";
           const attributeStyle = isVertex ? modelLinesVertexAttribute : modelLinesEdgeAttribute;
           const setAttributeName = isVertex
             ? attributeStyle.setModelLinesVertexAttributeName

@@ -60,7 +60,7 @@ const blocksActiveColoring = computed({
 const blockActiveColoring = computed({
   get: () => dataStyleStore.modelBlockActiveColoring(modelId, blockId),
   set: async (activeColoring) => {
-    await dataStyleStore.setModelComponentActiveColoring(modelId, blockId, activeColoring);
+    await dataStyleStore.setModelBlocksActiveColoring(modelId, [blockId], activeColoring);
     hybridViewerStore.remoteRender();
   },
 });

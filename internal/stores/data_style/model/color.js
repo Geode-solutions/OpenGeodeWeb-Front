@@ -121,25 +121,25 @@ function useModelColorStyle(componentStyleFunctions) {
     await setModelComponentsColor(modelId, idsForType, color);
   }
 
-  async function setModelComponentTypeActiveColoring(modelId, type, color_mode) {
+  async function setModelComponentTypeActiveColoring(modelId, type, activeColoring) {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
-      coloring: { active: color_mode },
+      coloring: { active: activeColoring },
     });
     const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
     if (idsForType.length === 0) {
       return;
     }
 
-    if (color_mode === "random" || color_mode === "constant") {
-      await setModelComponentsColor(modelId, idsForType, undefined, color_mode);
+    if (activeColoring === "random" || activeColoring === "constant") {
+      await setModelComponentsColor(modelId, idsForType, undefined, activeColoring);
       return;
     }
 
     await modelCommonStyle.mutateComponentStyles(modelId, idsForType, {
-      coloring: { active: color_mode },
+      coloring: { active: activeColoring },
     });
     const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
-      ATTRIBUTE_FUNCTIONS[type][color_mode];
+      ATTRIBUTE_FUNCTIONS[type][activeColoring];
 
     const name = getName(modelId, idsForType[0]);
     if (name) {
@@ -155,18 +155,18 @@ function useModelColorStyle(componentStyleFunctions) {
     }
   }
 
-  async function setModelComponentActiveColoring(modelId, componentId, color_mode) {
+  async function setModelComponentActiveColoring(modelId, componentId, activeColoring) {
     await modelCommonStyle.mutateComponentStyle(modelId, componentId, {
-      coloring: { active: color_mode },
+      coloring: { active: activeColoring },
     });
-    if (color_mode === "random" || color_mode === "constant") {
-      await setModelComponentsColor(modelId, [componentId], undefined, color_mode);
+    if (activeColoring === "random" || activeColoring === "constant") {
+      await setModelComponentsColor(modelId, [componentId], undefined, activeColoring);
       return;
     }
 
     const type = await dataStore.meshComponentType(modelId, componentId);
     const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
-      ATTRIBUTE_FUNCTIONS[type][color_mode];
+      ATTRIBUTE_FUNCTIONS[type][activeColoring];
 
     const name = getName(modelId, componentId);
     if (name) {
@@ -182,11 +182,11 @@ function useModelColorStyle(componentStyleFunctions) {
     }
   }
 
-  async function setModelComponentsColor(modelId, componentIds, color, color_mode = "constant") {
+  async function setModelComponentsColor(modelId, componentIds, color, activeColoring = "constant") {
     await modelCommonStyle.mutateComponentStyles(modelId, componentIds, {
       coloring: {
         constant: color,
-        active: color_mode,
+        active: activeColoring,
       },
     });
     return await dispatchToComponentTypes(
@@ -195,7 +195,7 @@ function useModelColorStyle(componentStyleFunctions) {
       "Color",
       { componentStyleFunctions },
       color,
-      color_mode,
+      activeColoring,
     );
   }
 

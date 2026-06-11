@@ -36,21 +36,12 @@ function useMeshPolygonsColoringStyle() {
       );
     } else if (type === "textures") {
       const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id);
-      if (textures === undefined) {
-        return;
-      }
       return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures);
     } else if (type === "vertex") {
       const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name);
     } else if (type === "polygon") {
       const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name);
     }
     throw new Error(`Unknown mesh polygons coloring type: ${type}`);

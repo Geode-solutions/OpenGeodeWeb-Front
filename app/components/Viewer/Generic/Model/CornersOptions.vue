@@ -60,7 +60,7 @@ const cornersActiveColoring = computed({
 const cornerActiveColoring = computed({
   get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId),
   set: async (activeColoring) => {
-    await dataStyleStore.setModelComponentActiveColoring(modelId, cornerId, activeColoring);
+    await dataStyleStore.setModelCornersActiveColoring(modelId, [cornerId], activeColoring);
     hybridViewerStore.remoteRender();
   },
 });

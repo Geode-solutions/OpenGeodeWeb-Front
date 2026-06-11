@@ -1,5 +1,5 @@
 // Mesh
-const MESH_DEFAULT_COLOR_MODE = "constant";
+const MESH_DEFAULT_ACTIVE_COLORING = "constant";
 const POINTS_DEFAULT_VISIBILITY = true;
 const POINTS_DEFAULT_SIZE = 10;
 const POINTS_DEFAULT_COLOR = { red: 20, green: 20, blue: 20, alpha: 1 };
@@ -15,7 +15,7 @@ const POLYHEDRA_DEFAULT_COLOR = { red: 255, green: 255, blue: 255, alpha: 1 };
 
 // Model
 const MODEL_DEFAULT_COLOR = { red: 255, green: 255, blue: 255, alpha: 1 };
-const MODEL_DEFAULT_COLOR_MODE = "constant";
+const MODEL_DEFAULT_ACTIVE_COLORING = "constant";
 
 const CORNERS_DEFAULT_VISIBILITY = true;
 const CORNERS_DEFAULT_COLOR = { red: 20, green: 20, blue: 20, alpha: 1 };
@@ -59,6 +59,6 @@ export {
   MESH_COMPONENT_TYPES,
   DEFAULT_MODEL_COMPONENT_TYPE_COLORS,
   MODEL_DEFAULT_COLOR,
-  MESH_DEFAULT_COLOR_MODE,
-  MODEL_DEFAULT_COLOR_MODE,
+  MESH_DEFAULT_ACTIVE_COLORING,
+  MODEL_DEFAULT_ACTIVE_COLORING,
 };

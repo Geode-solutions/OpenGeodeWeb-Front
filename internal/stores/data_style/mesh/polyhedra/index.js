@@ -38,16 +38,10 @@ export function useMeshPolyhedraStyle() {
     }
     if (type === "vertex") {
       const name = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name);
     }
     if (type === "polyhedron") {
       const name = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(
         id,
         name,

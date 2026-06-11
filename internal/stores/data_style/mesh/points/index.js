@@ -30,9 +30,6 @@ function useMeshPointsColoringStyle() {
       return meshPointsColorStyle.setMeshPointsColor(id, meshPointsColorStyle.meshPointsColor(id));
     } else if (type === "vertex") {
       const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
     }
     throw new Error(`Unknown mesh points coloring type: ${type}`);

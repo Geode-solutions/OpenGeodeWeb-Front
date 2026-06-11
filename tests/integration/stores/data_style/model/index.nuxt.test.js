@@ -72,7 +72,9 @@ describe("model", () => {
       const green = { red: 0, green: 255, blue: 0, alpha: 1 };
       const blue = { red: 0, green: 0, blue: 255, alpha: 1 };
 
-      await dataStyleStore.mutateStyle(id, { color: red, color_mode: "constant" });
+      await dataStyleStore.mutateStyle(id, {
+        coloring: { constant: red, active: "constant" },
+      });
       await dataStyleStore.setModelComponentsColor(id, surface_ids, red);
       await sleep(SLEEP_MS);
 
@@ -82,7 +84,7 @@ describe("model", () => {
       await dataStyleStore.setModelSurfacesColor(id, [surface_id], blue);
       await sleep(SLEEP_MS);
 
-      expect(dataStyleStore.getStyle(id).color).toStrictEqual(red);
+      expect(dataStyleStore.getModelColor(id)).toStrictEqual(red);
       expect(dataStyleStore.modelComponentTypeColor(id, "Surface")).toStrictEqual(green);
       expect(dataStyleStore.modelSurfaceColor(id, surface_id)).toStrictEqual(blue);
     });

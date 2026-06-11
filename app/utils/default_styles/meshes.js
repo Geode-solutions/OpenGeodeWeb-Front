@@ -4,7 +4,7 @@ import {
   EDGES_DEFAULT_COLOR,
   EDGES_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_WIDTH,
-  MESH_DEFAULT_COLOR_MODE,
+  MESH_DEFAULT_ACTIVE_COLORING,
   POINTS_DEFAULT_COLOR,
   POINTS_DEFAULT_SIZE,
   POINTS_DEFAULT_VISIBILITY,
@@ -22,7 +22,7 @@ function meshPointsDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: MESH_DEFAULT_COLOR_MODE,
+      active: MESH_DEFAULT_ACTIVE_COLORING,
       color,
       vertex: {
         name: undefined,
@@ -41,7 +41,7 @@ function meshEdgesDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: MESH_DEFAULT_COLOR_MODE,
+      active: MESH_DEFAULT_ACTIVE_COLORING,
       color,
       edge: {
         name: undefined,
@@ -60,7 +60,7 @@ function meshCellsDefaultStyle(visibility = CELLS_DEFAULT_VISIBILITY, color = CE
   return {
     visibility,
     coloring: {
-      active: MESH_DEFAULT_COLOR_MODE,
+      active: MESH_DEFAULT_ACTIVE_COLORING,
       cell: {
         name: undefined,
         storedConfigs: {},
@@ -82,7 +82,7 @@ function meshPolygonsDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: MESH_DEFAULT_COLOR_MODE,
+      active: MESH_DEFAULT_ACTIVE_COLORING,
       color,
       textures: undefined,
       polygon: {
@@ -104,7 +104,7 @@ function meshPolyhedraDefaultStyle(
   return {
     visibility,
     coloring: {
-      active: MESH_DEFAULT_COLOR_MODE,
+      active: MESH_DEFAULT_ACTIVE_COLORING,
       color,
       polyhedron: {
         name: undefined,

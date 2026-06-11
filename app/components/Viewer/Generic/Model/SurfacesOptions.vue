@@ -60,7 +60,7 @@ const surfacesActiveColoring = computed({
 const surfaceActiveColoring = computed({
   get: () => dataStyleStore.modelSurfaceActiveColoring(modelId, surfaceId),
   set: async (activeColoring) => {
-    await dataStyleStore.setModelComponentActiveColoring(modelId, surfaceId, activeColoring);
+    await dataStyleStore.setModelSurfacesActiveColoring(modelId, [surfaceId], activeColoring);
     hybridViewerStore.remoteRender();
   },
 });

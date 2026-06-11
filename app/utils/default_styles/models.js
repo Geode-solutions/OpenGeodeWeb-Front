@@ -7,8 +7,8 @@ import {
   EDGES_DEFAULT_WIDTH,
   LINES_DEFAULT_COLOR,
   LINES_DEFAULT_VISIBILITY,
+  MODEL_DEFAULT_ACTIVE_COLORING,
   MODEL_DEFAULT_COLOR,
-  MODEL_DEFAULT_COLOR_MODE,
   POINTS_DEFAULT_SIZE,
   POINTS_DEFAULT_VISIBILITY,
   SURFACES_DEFAULT_COLOR,
@@ -120,7 +120,7 @@ function brepDefaultStyle() {
   return {
     visibility: true,
     coloring: {
-      active: MODEL_DEFAULT_COLOR_MODE,
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant: MODEL_DEFAULT_COLOR,
     },
     corners: modelCornersDefaultStyle(),
@@ -136,7 +136,7 @@ function crossSectionDefaultStyle() {
   return {
     visibility: true,
     coloring: {
-      active: MODEL_DEFAULT_COLOR_MODE,
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant: MODEL_DEFAULT_COLOR,
     },
     corners: modelCornersDefaultStyle(),
@@ -151,7 +151,7 @@ function structuralModelDefaultStyle() {
   return {
     visibility: true,
     coloring: {
-      active: MODEL_DEFAULT_COLOR_MODE,
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant: MODEL_DEFAULT_COLOR,
     },
     corners: modelCornersDefaultStyle(),
@@ -167,7 +167,7 @@ function sectionDefaultStyle() {
   return {
     visibility: true,
     coloring: {
-      active: MODEL_DEFAULT_COLOR_MODE,
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant: MODEL_DEFAULT_COLOR,
     },
     corners: modelCornersDefaultStyle(),
@@ -182,7 +182,7 @@ function implicitCrossSectionDefaultStyle() {
   return {
     visibility: true,
     coloring: {
-      active: MODEL_DEFAULT_COLOR_MODE,
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant: MODEL_DEFAULT_COLOR,
     },
     corners: modelCornersDefaultStyle(),
@@ -197,7 +197,7 @@ function implicitStructuralModelDefaultStyle() {
   return {
     visibility: true,
     coloring: {
-      active: MODEL_DEFAULT_COLOR_MODE,
+      active: MODEL_DEFAULT_ACTIVE_COLORING,
       constant: MODEL_DEFAULT_COLOR,
     },
     corners: modelCornersDefaultStyle(),

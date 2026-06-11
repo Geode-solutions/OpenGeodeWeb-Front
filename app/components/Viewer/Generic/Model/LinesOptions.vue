@@ -60,7 +60,7 @@ const linesActiveColoring = computed({
 const lineActiveColoring = computed({
   get: () => dataStyleStore.modelLineActiveColoring(modelId, lineId),
   set: async (activeColoring) => {
-    await dataStyleStore.setModelComponentActiveColoring(modelId, lineId, activeColoring);
+    await dataStyleStore.setModelLinesActiveColoring(modelId, [lineId], activeColoring);
     hybridViewerStore.remoteRender();
   },
 });
