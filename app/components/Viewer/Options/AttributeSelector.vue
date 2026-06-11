@@ -4,7 +4,15 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const backStore = useBackStore();
 
-const name = defineModel("name", { type: String });
+const name = defineModel("name", {
+  type: String,
+  set(value) {
+    if (value === null || value === undefined) {
+      return name.value;
+    }
+    return value;
+  },
+});
 const range = defineModel("range", { type: Array });
 const colorMap = defineModel("colorMap", { type: String });
 

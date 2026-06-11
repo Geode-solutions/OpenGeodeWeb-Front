@@ -17,13 +17,13 @@ import {
 function meshPointsDefaultStyle(
   visibility = POINTS_DEFAULT_VISIBILITY,
   size = POINTS_DEFAULT_SIZE,
-  color = POINTS_DEFAULT_COLOR,
+  constant = POINTS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
-      color,
+      constant,
       vertex: {
         name: undefined,
         storedConfigs: {},
@@ -36,13 +36,13 @@ function meshPointsDefaultStyle(
 function meshEdgesDefaultStyle(
   visibility = EDGES_DEFAULT_VISIBILITY,
   width = EDGES_DEFAULT_WIDTH,
-  color = EDGES_DEFAULT_COLOR,
+  constant = EDGES_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
-      color,
+      constant,
       edge: {
         name: undefined,
         storedConfigs: {},
@@ -56,7 +56,10 @@ function meshEdgesDefaultStyle(
   };
 }
 
-function meshCellsDefaultStyle(visibility = CELLS_DEFAULT_VISIBILITY, color = CELLS_DEFAULT_COLOR) {
+function meshCellsDefaultStyle(
+  visibility = CELLS_DEFAULT_VISIBILITY,
+  constant = CELLS_DEFAULT_COLOR,
+) {
   return {
     visibility,
     coloring: {
@@ -65,7 +68,7 @@ function meshCellsDefaultStyle(visibility = CELLS_DEFAULT_VISIBILITY, color = CE
         name: undefined,
         storedConfigs: {},
       },
-      color,
+      constant,
       textures: undefined,
       vertex: {
         name: undefined,
@@ -77,13 +80,13 @@ function meshCellsDefaultStyle(visibility = CELLS_DEFAULT_VISIBILITY, color = CE
 
 function meshPolygonsDefaultStyle(
   visibility = POLYGONS_DEFAULT_VISIBILITY,
-  color = POLYGONS_DEFAULT_COLOR,
+  constant = POLYGONS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
-      color,
+      constant,
       textures: undefined,
       polygon: {
         name: undefined,
@@ -99,13 +102,13 @@ function meshPolygonsDefaultStyle(
 
 function meshPolyhedraDefaultStyle(
   visibility = POLYHEDRA_DEFAULT_VISIBILITY,
-  color = POLYHEDRA_DEFAULT_COLOR,
+  constant = POLYHEDRA_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
-      color,
+      constant,
       polyhedron: {
         name: undefined,
         storedConfigs: {},
