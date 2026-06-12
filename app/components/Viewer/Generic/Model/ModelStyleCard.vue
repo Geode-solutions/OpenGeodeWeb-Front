@@ -122,7 +122,7 @@ const modelComponentsColor = computed({
 <template>
   <v-sheet class="model-style-card" color="transparent">
     <OptionsSection title="Model Options">
-      <VisibilitySwitch v-model="modelVisibility" />
+      <VisibilitySwitch data-testid="modelVisibilitySwitch" v-model="modelVisibility" />
     </OptionsSection>
 
     <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
