@@ -19,8 +19,7 @@ const viewerStore = useViewerStore();
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
-const { width: elementWidth, height: elementHeight } =
-  useElementSize(container);
+const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
 const debouncedResize = debounce(() => {
@@ -75,11 +74,7 @@ async function handleClick(event) {
 
 <template>
   <ClientOnly>
-    <div
-      data-testid="hybridViewer"
-      class="fill-height"
-      style="position: relative; height: 100%"
-    >
+    <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ColormapQuickPicker
         v-model:show="quickColormap.show"
         :x="quickColormap.x"
@@ -88,10 +83,7 @@ async function handleClick(event) {
       />
       <ViewToolbar />
       <slot name="ui"></slot>
-      <HybridViewerTooltip
-        :container-width="elementWidth"
-        :container-height="elementHeight"
-      />
+      <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />
       <v-col
         class="pa-0"
         ref="viewer"
