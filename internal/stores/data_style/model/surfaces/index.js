@@ -37,9 +37,9 @@ export function useModelSurfacesStyle() {
       visibilityGroups[visibility].push(surfaces_id);
 
       const coloring = modelColorStyle.modelSurfaceColoring(modelId, surfaces_id);
-      const activeColoring = coloring.active;
+      const activeColoring = modelColorStyle.modelSurfaceActiveColoring(modelId, surfaces_id);
       if (activeColoring === "constant") {
-        const color = coloring.constant;
+        const color = modelColorStyle.modelSurfaceColor(modelId, surfaces_id);
         const color_key = JSON.stringify(color);
         if (!colorGroups[color_key]) {
           colorGroups[color_key] = { activeColoring, color, surfaces_ids: [] };

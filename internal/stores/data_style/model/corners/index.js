@@ -35,9 +35,9 @@ export function useModelCornersStyle() {
       visibilityGroups[visibility].push(corner_id);
 
       const coloring = modelColorStyle.modelCornerColoring(modelId, corner_id);
-      const activeColoring = coloring.active;
+      const activeColoring = modelColorStyle.modelCornerActiveColoring(modelId, corner_id);
       if (activeColoring === "constant") {
-        const color = coloring.constant;
+        const color = modelColorStyle.modelCornerColor(modelId, corner_id);
         const color_key = JSON.stringify(color);
         if (!colorGroups[color_key]) {
           colorGroups[color_key] = { activeColoring, color, corners_ids: [] };

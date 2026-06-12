@@ -37,9 +37,9 @@ export function useModelBlocksStyle() {
       visibilityGroups[visibility].push(block_id);
 
       const coloring = modelColorStyle.modelBlockColoring(modelId, block_id);
-      const activeColoring = coloring.active;
+      const activeColoring = modelColorStyle.modelBlockActiveColoring(modelId, block_id);
       if (activeColoring === "constant") {
-        const color = coloring.constant;
+        const color = modelColorStyle.modelBlockColor(modelId, block_id);
         const color_key = JSON.stringify(color);
         if (!colorGroups[color_key]) {
           colorGroups[color_key] = { activeColoring, color, blocks_ids: [] };

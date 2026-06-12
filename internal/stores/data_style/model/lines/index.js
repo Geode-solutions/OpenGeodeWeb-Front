@@ -37,9 +37,9 @@ export function useModelLinesStyle() {
       visibilityGroups[visibility].push(line_id);
 
       const coloring = modelColorStyle.modelLineColoring(modelId, line_id);
-      const activeColoring = coloring.active;
+      const activeColoring = modelColorStyle.modelLineActiveColoring(modelId, line_id);
       if (activeColoring === "constant") {
-        const color = coloring.constant;
+        const color = modelColorStyle.modelLineColor(modelId, line_id);
         const color_key = JSON.stringify(color);
         if (!colorGroups[color_key]) {
           colorGroups[color_key] = { activeColoring, color, lines_ids: [] };
