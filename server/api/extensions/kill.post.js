@@ -27,8 +27,8 @@ export default defineEventHandler(async (event) => {
     }
 
     await removeExtensionFromConf(projectName, extensionId);
-    await deleteFolderRecursive(extensionFolderPath(projectFolderPath, extensionId));
     await killMicroservice(microservice, microservices);
+    await deleteFolderRecursive(extensionFolderPath(projectFolderPath, extensionId));
 
     return {
       statusCode: 200,
