@@ -69,16 +69,13 @@ export function useModelCommonStyle() {
       return;
     }
 
+    const params = { id, block_ids: viewer_ids, color_mode: activeColoring };
     if (activeColoring === "constant") {
       await mutateComponentStyles(id, component_ids, {
         coloring: {
           constant: color,
         },
       });
-    }
-
-    const params = { id, block_ids: viewer_ids, color_mode: activeColoring };
-    if (activeColoring === "constant") {
       params.color = color;
     }
 
