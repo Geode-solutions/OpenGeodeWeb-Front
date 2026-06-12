@@ -27,6 +27,7 @@ async function saveCurrentPosition() {
           v-model="newPositionName"
           label="Position Name"
           placeholder="e.g. Front View"
+          data-testid="cameraPositionNameInput"
           density="compact"
           variant="outlined"
           hide-details
@@ -39,6 +40,7 @@ async function saveCurrentPosition() {
           variant="elevated"
           block
           size="small"
+          data-testid="saveCameraPositionButton"
           :disabled="!newPositionName"
           @click="saveCurrentPosition"
           height="32"

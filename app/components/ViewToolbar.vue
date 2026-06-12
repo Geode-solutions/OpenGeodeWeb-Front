@@ -180,6 +180,7 @@ const camera_options = computed(() => [
                 <ActionButton
                   :icon="item.icon"
                   :tooltip="item.title"
+                  :data-testid="camera_option.testId + item.title"
                   :color="
                     hybridViewerStore.is_hover_highlight &&
                     hybridViewerStore.hover_highlight_field_type ===

@@ -54,6 +54,7 @@ async function saveRename() {
           color="success"
           size="x-small"
           class="mr-1"
+          :data-testid="'restoreCameraPositionButton_' + position.name"
           @click="restorePosition(position.id)"
         >
           <v-icon size="14">mdi-play</v-icon>
