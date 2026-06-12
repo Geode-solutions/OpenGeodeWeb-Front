@@ -72,20 +72,13 @@ export function useDataMesh() {
   }
 
   async function fetchAllMeshComponents(modelId) {
-    const componentTitles = {
-      Corner: "Corners",
-      Line: "Lines",
-      Surface: "Surfaces",
-      Block: "Blocks",
-    };
     const components = await getAllMeshComponents(modelId);
     const byType = {};
     for (const component of components) {
-      const pluralCategory = componentTitles[component.category] || component.category;
-      if (!byType[pluralCategory]) {
-        byType[pluralCategory] = [];
+      if (!byType[component.category]) {
+        byType[component.category] = [];
       }
-      byType[pluralCategory].push(component);
+      byType[component.category].push(component);
     }
     return byType;
   }
