@@ -32,12 +32,12 @@ describe("file uploader", () => {
   const files = [new File(["fake_file"], "fake_file.txt")];
 
   describe("upload file", () => {
-    test("prop auto_upload false", async () => {
+    test("prop autoUpload false", async () => {
       const wrapper = await mountSuspended(FileUploader, {
         global: {
           plugins: [vuetify, pinia],
         },
-        props: { multiple: false, accept: "*.txt", auto_upload: false },
+        props: { multiple: false, accept: "*.txt", autoUpload: false },
       });
 
       const v_file_input = wrapper.find('input[type="file"]');
@@ -55,12 +55,12 @@ describe("file uploader", () => {
       expect(wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX]).toStrictEqual(files);
     });
 
-    test(`prop auto_upload true`, async () => {
+    test(`prop autoUpload true`, async () => {
       const wrapper = await mountSuspended(FileUploader, {
         global: {
           plugins: [vuetify, pinia],
         },
-        props: { multiple: false, accept: "*.txt", files, auto_upload: true },
+        props: { multiple: false, accept: "*.txt", files, autoUpload: true },
       });
       await flushPromises();
       expect(wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX]).toStrictEqual(files);

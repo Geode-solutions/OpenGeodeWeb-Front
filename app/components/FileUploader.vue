@@ -6,11 +6,11 @@ import DragAndDrop from "@ogw_front/components/DragAndDrop";
 
 const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"]);
 
-const { multiple, accept, files, auto_upload, showOverlay, mini } = defineProps({
+const { multiple, accept, files, autoUpload, showOverlay, mini } = defineProps({
   multiple: { type: Boolean, default: false },
   accept: { type: String, default: "" },
   files: { type: Array, default: () => [] },
-  auto_upload: { type: Boolean, default: true },
+  autoUpload: { type: Boolean, default: true },
   showOverlay: { type: Boolean, default: false },
   mini: { type: Boolean, default: false },
 });
@@ -94,7 +94,7 @@ watch(
 
     const allConfigured = newFiles.every((file) => !isCsv(file) || file.isConfigured);
 
-    if (auto_upload && allConfigured) {
+    if (autoUpload && allConfigured) {
       await upload_files();
     }
   },
@@ -103,7 +103,7 @@ watch(
 
 if (files.length > 0) {
   internal_files.value = files;
-  if (auto_upload) {
+  if (autoUpload) {
     upload_files();
   }
 }
@@ -216,7 +216,7 @@ watch(
     </v-sheet>
   </v-card-text>
 
-  <v-card-actions v-if="!auto_upload && internal_files.length" class="mt-8 pa-0">
+  <v-card-actions v-if="!autoUpload && internal_files.length" class="mt-8 pa-0">
     <v-btn
       color="primary"
       variant="flat"

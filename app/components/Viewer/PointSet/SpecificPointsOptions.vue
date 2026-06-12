@@ -87,7 +87,7 @@ const vertex_attribute_color_map = computed({
   <ViewerContextMenuItem
     data-testid="meshPointsMenu"
     :itemProps="itemProps"
-    :btn_image="PointSetPoints"
+    :btnImage="PointSetPoints"
     tooltip="Points options"
   >
     <template #options>

@@ -16,24 +16,24 @@ export function useModelBlocksPolyhedronAttribute() {
   const viewerStore = useViewerStore();
 
   function modelBlocksPolyhedronAttribute(modelId, blockId) {
-    return modelBlocksCommonStyle.modelBlockStyle(modelId, blockId).polyhedron_attribute;
+    return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).polyhedron;
   }
 
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
-    if (name && storedConfigs && name in storedConfigs) {
+    if (name in storedConfigs) {
       return storedConfigs[name];
     }
-    return {
+    return setModelBlocksPolyhedronAttributeStoredConfig(modelId, [blockId], name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    };
+    });
   }
 
   function mutateModelBlocksPolyhedronStyle(modelId, blockIds, values) {
-    return modelBlocksCommonStyle.mutateModelBlocksStyle(modelId, blockIds, {
-      polyhedron_attribute: values,
+    return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
+      polyhedron: values,
     });
   }
 
@@ -51,24 +51,11 @@ export function useModelBlocksPolyhedronAttribute() {
 
   async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-
-    const updates = { name };
-    const polyhedron = modelBlocksPolyhedronAttribute(modelId, blockIds[0]);
-    if (!(name in polyhedron.storedConfigs)) {
-      updates.storedConfigs = {
-        [name]: {
-          minimum: undefined,
-          maximum: undefined,
-          colorMap: undefined,
-        },
-      };
-    }
-
     const params = { id: modelId, block_ids: viewer_ids, name };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, updates),
+        response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name }),
       },
     );
   }

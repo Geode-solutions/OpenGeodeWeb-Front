@@ -10,7 +10,7 @@ const { itemProps } = defineProps({
 <template>
   <ViewerGenericMeshPolygonsOptions
     :itemProps="itemProps"
-    :btn_image="Grid3D_Facets"
+    :btnImage="Grid3D_Facets"
     tooltip="Facets options"
   />
 </template>

@@ -1,7 +1,7 @@
 <script setup>
 // oxlint-disable id-length
 const colorPickerRef = useTemplateRef("colorPickerRef");
-const model = defineModel();
+const model = defineModel({ type: Object });
 const { pressed } = useMousePressed({ target: colorPickerRef });
 
 const vuetifyColor = ref({

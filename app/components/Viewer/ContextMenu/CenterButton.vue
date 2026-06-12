@@ -71,6 +71,7 @@ function onCenterClick(event) {
 
 <template>
   <v-btn
+    data-testid="circularMenuCenterButton"
     icon
     variant="outlined"
     data-testid="circularMenuCenterButton"

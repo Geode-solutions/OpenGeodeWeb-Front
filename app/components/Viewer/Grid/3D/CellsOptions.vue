@@ -10,7 +10,7 @@ const { itemProps } = defineProps({
 <template>
   <ViewerGenericMeshCellsOptions
     :itemProps="itemProps"
-    :btn_image="Grid3DCells"
+    :btnImage="Grid3DCells"
     tooltip="Cells options"
   />
 </template>

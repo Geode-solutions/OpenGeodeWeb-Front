@@ -8,5 +8,5 @@ const { itemProps } = defineProps({
 </script>
 
 <template>
-  <ViewerGenericMeshPolygonsOptions :itemProps="itemProps" :btn_image="SolidFacets" />
+  <ViewerGenericMeshPolygonsOptions :itemProps="itemProps" :btnImage="SolidFacets" />
 </template>

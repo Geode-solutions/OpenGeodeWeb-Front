@@ -30,21 +30,15 @@ export function useMeshEdgesStyle() {
     await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
       coloring: { active: type },
     });
-    if (type === "color") {
+    if (type === "constant") {
       return meshEdgesColorStyle.setMeshEdgesColor(id, meshEdgesColorStyle.meshEdgesColor(id));
     }
     if (type === "vertex") {
       const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name);
     }
     if (type === "edge") {
       const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name);
     }
     throw new Error(`Unknown mesh edges coloring type: ${type}`);

@@ -9,15 +9,15 @@ const schema = schemas.opengeodeweb_back.allowed_files;
 
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
-const { multiple, files, auto_upload, show_overlay } = defineProps({
+const { multiple, files, autoUpload, showOverlay } = defineProps({
   multiple: { type: Boolean, required: true },
   files: { type: Array, default: () => [] },
-  auto_upload: { type: Boolean, default: true },
-  show_overlay: { type: Boolean, default: true },
+  autoUpload: { type: Boolean, default: true },
+  showOverlay: { type: Boolean, default: true },
 });
 
 const internal_files = ref(files);
-const internal_auto_upload = ref(auto_upload);
+const internal_auto_upload = ref(autoUpload);
 const accept = ref("");
 const loading = ref(false);
 
@@ -29,7 +29,7 @@ watch(
 );
 
 watch(
-  () => auto_upload,
+  () => autoUpload,
   (val) => {
     internal_auto_upload.value = val;
   },
@@ -39,7 +39,7 @@ const toggle_loading = useToggle(loading);
 
 function files_uploaded_event(value) {
   if (value.length > 0) {
-    emit("update_values", { files: value, auto_upload: false });
+    emit("update_values", { files: value, autoUpload: false });
     emit("increment_step");
   }
 }
@@ -63,8 +63,8 @@ await get_allowed_files();
       multiple,
       accept,
       files: internal_files,
-      auto_upload: internal_auto_upload,
-      showOverlay: show_overlay,
+      autoUpload: internal_auto_upload,
+      showOverlay: showOverlay,
     }"
     @files_uploaded="files_uploaded_event"
   />

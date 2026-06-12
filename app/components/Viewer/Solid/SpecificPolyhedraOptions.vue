@@ -108,7 +108,7 @@ const polyhedron_attribute_color_map = computed({
     data-testid="meshPolyhedraMenu"
     :itemProps="itemProps"
     :tooltip="tooltip"
-    :btn_image="SolidPolyhedra"
+    :btnImage="SolidPolyhedra"
   >
     <template #options>
       <ViewerOptionsVisibilitySwitch

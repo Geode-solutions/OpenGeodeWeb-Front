@@ -7,17 +7,17 @@ const emit = defineEmits(["update_value"]);
 
 const { id } = defineProps({
   id: { type: String, required: true },
-  texture_id: { type: String, required: true },
-  texture_name: { type: String, required: true },
+  textureId: { type: String, required: true },
+  textureName: { type: String, required: true },
 });
 
-const texture_name = ref("");
-texture_name.value = texture_name;
+const textureName = ref("");
+textureName.value = textureName;
 
-const texture_id = ref("");
-texture_id.value = texture_id;
+const textureId = ref("");
+textureId.value = textureId;
 
-const texture_coordinates = ref([]);
+const textureCoordinates = ref([]);
 const backStore = useBackStore();
 
 onMounted(() => {
@@ -31,7 +31,7 @@ function getTextureCoordinates() {
     { schema, params },
     {
       response_function: (response) => {
-        texture_coordinates.value = response.texture_coordinates;
+        textureCoordinates.value = response.texture_coordinates;
       },
     },
   );
@@ -48,18 +48,18 @@ async function files_uploaded_event(value) {
       { schema, params },
       {
         response_function: (response) => {
-          texture_id.value = response.id;
+          textureId.value = response.id;
         },
       },
     );
   }
 }
 
-watch(texture_name, (value) => {
+watch(textureName, (value) => {
   emit("update_value", { key: "texture_name", value });
 });
 
-watch(texture_id, (value) => {
+watch(textureId, (value) => {
   emit("update_value", { key: "id", value });
 });
 </script>
@@ -73,8 +73,8 @@ watch(texture_id, (value) => {
 <template>
   <v-col cols="8" class="pa-1">
     <v-select
-      v-model="texture_name"
-      :items="texture_coordinates"
+      v-model="textureName"
+      :items="textureCoordinates"
       label="Select a texture"
       density="compact"
       hide-details
@@ -92,14 +92,14 @@ watch(texture_id, (value) => {
       <FileUploader
         @files_uploaded="files_uploaded_event($event, index)"
         :accept="['image/png', 'image/jpeg', 'image/bmp']"
-        :auto_upload="true"
+        :autoUpload="true"
         :multiple="true"
         :mini="true"
         class="mt-2"
       />
     </v-col>
   </v-badge>
-  <v-col v-if="texture_name == '' || texture_file_name == ''" cols="1">
+  <v-col v-if="textureName == '' || texture_file_name == ''" cols="1">
     <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
   </v-col>
 </template>

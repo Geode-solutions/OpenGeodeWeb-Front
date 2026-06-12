@@ -40,7 +40,7 @@ describe("crs selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { geode_object_type: "BRep", key_to_update },
+      props: { geodeObjectType: "BRep", keyToUpdate: key_to_update },
     });
     const td_wrapper = await wrapper.find("td");
     await wrapper.vm.$nextTick();

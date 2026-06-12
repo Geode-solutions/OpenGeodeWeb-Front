@@ -10,6 +10,6 @@ const { itemProps } = defineProps({
 <template>
   <ViewerGenericMeshPointsOptions
     :itemProps="itemProps"
-    :btn_image="TriangulatedSurfaceEdgesPoints"
+    :btnImage="TriangulatedSurfaceEdgesPoints"
   />
 </template>

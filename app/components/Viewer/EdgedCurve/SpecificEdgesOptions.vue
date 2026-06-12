@@ -114,7 +114,7 @@ const edge_attribute_color_map = computed({
   <ViewerContextMenuItem
     data-testid="meshEdgesMenu"
     :itemProps="itemProps"
-    :btn_image="EdgedCurveEdges"
+    :btnImage="EdgedCurveEdges"
     tooltip="Edges options"
   >
     <template #options>

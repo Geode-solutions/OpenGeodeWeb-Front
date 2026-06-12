@@ -14,7 +14,7 @@ const { itemProps } = defineProps({
     :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Style options"
-    :btn_image="ModelColor"
+    :btnImage="ModelColor"
   >
     <template #options>
       <ModelStyleCard :itemProps="itemProps" />

@@ -12,9 +12,9 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-const { itemProps, btn_image, tooltip } = defineProps({
+const { itemProps, btnImage, tooltip } = defineProps({
   itemProps: { type: Object, required: true },
-  btn_image: { type: String, required: true },
+  btnImage: { type: String, required: true },
   tooltip: { type: String, required: false, default: "Points options" },
 });
 
@@ -90,7 +90,7 @@ const vertex_attribute_color_map = computed({
     data-testid="meshPointsMenu"
     :itemProps="itemProps"
     :tooltip="tooltip"
-    :btn_image="btn_image"
+    :btnImage="btnImage"
   >
     <template #options>
       <v-row class="pa-1">

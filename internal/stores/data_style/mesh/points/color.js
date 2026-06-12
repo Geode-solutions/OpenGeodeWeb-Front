@@ -13,7 +13,7 @@ export function useMeshPointsColorStyle() {
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
   function meshPointsColor(id) {
-    return meshPointsCommonStyle.meshPointsColoring(id).color;
+    return meshPointsCommonStyle.meshPointsColoring(id).constant;
   }
   function setMeshPointsColor(id, color) {
     const params = { id, color };
@@ -25,7 +25,7 @@ export function useMeshPointsColorStyle() {
       {
         response_function: () =>
           meshPointsCommonStyle.mutateMeshPointsColoring(id, {
-            color,
+            constant: color,
           }),
       },
     );

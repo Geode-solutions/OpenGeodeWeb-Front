@@ -8,7 +8,7 @@ const { max, min } = defineProps({
   max: { type: Number, required: true },
 });
 
-const selectedPresetName = defineModel("selectedPresetName", { default: "batlow" });
+const selectedPresetName = defineModel("selectedPresetName", { type: String, default: "batlow" });
 
 const menuOpen = ref(false);
 const lutCanvas = ref();

@@ -44,28 +44,24 @@ const linesColor = computed({
 const lineColor = computed({
   get: () => dataStyleStore.modelLineColor(modelId, lineId),
   set: async (color) => {
-    if (lineId) {
-      await dataStyleStore.setModelLinesColor(modelId, [lineId], color);
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-const linesColorMode = computed({
-  get: () => dataStyleStore.getModelComponentTypeColorMode(modelId, "Line"),
-  set: async (colorMode) => {
-    await dataStyleStore.setModelComponentTypeColorMode(modelId, "Line", colorMode);
+    await dataStyleStore.setModelLinesColor(modelId, [lineId], color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const lineColorMode = computed({
-  get: () => dataStyleStore.modelLineColorMode(modelId, lineId),
-  set: async (colorMode) => {
-    if (lineId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, lineId, colorMode);
-      hybridViewerStore.remoteRender();
-    }
+const linesActiveColoring = computed({
+  get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Line"),
+  set: async (coloringType) => {
+    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Line", coloringType);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const lineActiveColoring = computed({
+  get: () => dataStyleStore.modelLineActiveColoring(modelId, lineId),
+  set: async (coloringType) => {
+    await dataStyleStore.setModelLinesActiveColoring(modelId, [lineId], coloringType);
+    hybridViewerStore.remoteRender();
   },
 });
 
@@ -207,7 +203,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="targetLineIds[0]"
-      v-model:coloring_style_key="linesColorMode"
+      v-model:coloring_style_key="linesActiveColoring"
       v-model:color="linesColor"
       v-model:vertex_attribute_name="linesVertexAttributeName"
       v-model:vertex_attribute_range="linesVertexAttributeRange"
@@ -226,7 +222,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="lineId"
-      v-model:coloring_style_key="lineColorMode"
+      v-model:coloring_style_key="lineActiveColoring"
       v-model:color="lineColor"
       v-model:vertex_attribute_name="vertexAttributeName"
       v-model:vertex_attribute_range="vertexAttributeRange"

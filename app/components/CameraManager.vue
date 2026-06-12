@@ -5,15 +5,15 @@ import Saver from "@ogw_front/components/CameraManager/Saver";
 
 const emit = defineEmits(["close"]);
 
-const { show_dialog, width } = defineProps({
-  show_dialog: { type: Boolean, required: true },
+const { showDialog, width } = defineProps({
+  showDialog: { type: Boolean, required: true },
   width: { type: Number, required: false, default: 260 },
 });
 </script>
 
 <template>
   <GlassCard
-    v-if="show_dialog"
+    v-if="showDialog"
     @click.stop
     title="Camera Positions"
     :width="width"
@@ -21,8 +21,7 @@ const { show_dialog, width } = defineProps({
     variant="panel"
     padding="pa-0"
     class="position-absolute elevation-24"
-    style="top: 90px; right: 55px"
-    z-index="1"
+    style="top: 90px; right: 55px; z-index: 1"
   >
     <v-card-text class="pa-0">
       <Saver />
