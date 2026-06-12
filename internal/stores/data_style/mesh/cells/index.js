@@ -31,28 +31,19 @@ export function useMeshCellsStyle() {
       coloring: { active: type },
     });
     console.log(setMeshCellsActiveColoring.name, { id }, type);
-    if (type === "color") {
+    if (type === "constant") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
     }
     if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id);
-      if (textures === undefined) {
-        return;
-      }
       return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
     }
     if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name);
     }
     if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);

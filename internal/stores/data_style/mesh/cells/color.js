@@ -13,7 +13,7 @@ export function useMeshCellsColorStyle() {
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
   function meshCellsColor(id) {
-    return meshCellsCommonStyle.meshCellsColoring(id).color;
+    return meshCellsCommonStyle.meshCellsColoring(id).constant;
   }
   function setMeshCellsColor(id, color) {
     const params = { id, color };
@@ -25,7 +25,7 @@ export function useMeshCellsColorStyle() {
       {
         response_function: () =>
           meshCellsCommonStyle.mutateMeshCellsColoring(id, {
-            color,
+            constant: color,
           }),
       },
     );

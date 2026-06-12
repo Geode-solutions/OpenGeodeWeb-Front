@@ -16,18 +16,27 @@ export function useModelSurfacesCommonStyle() {
     return merge({}, groupStyle, individualStyle);
   }
 
-  function mutateModelSurfacesStyle(id, surfaces_ids, values) {
-    return modelCommonStyle.mutateComponentStyles(id, surfaces_ids, values);
+  function modelSurfaceColoring(id, surface_id) {
+    return modelSurfaceStyle(id, surface_id).coloring;
   }
 
-  function mutateModelSurfaceStyle(id, surface_id, values) {
-    return modelCommonStyle.mutateComponentStyle(id, surface_id, values);
+  function mutateModelSurfacesColoring(id, surfaces_ids, values) {
+    return modelCommonStyle.mutateComponentStyles(id, surfaces_ids, {
+      coloring: values,
+    });
+  }
+
+  function mutateModelSurfaceColoring(id, surface_id, values) {
+    return modelCommonStyle.mutateComponentStyle(id, surface_id, {
+      coloring: values,
+    });
   }
 
   return {
     modelSurfacesStyle,
     modelSurfaceStyle,
-    mutateModelSurfacesStyle,
-    mutateModelSurfaceStyle,
+    modelSurfaceColoring,
+    mutateModelSurfacesColoring,
+    mutateModelSurfaceColoring,
   };
 }

@@ -16,24 +16,24 @@ export function useModelLinesEdgeAttribute() {
   const viewerStore = useViewerStore();
 
   function modelLinesEdgeAttribute(modelId, lineId) {
-    return modelLinesCommonStyle.modelLineStyle(modelId, lineId).edge_attribute;
+    return modelLinesCommonStyle.modelLineColoring(modelId, lineId).edge;
   }
 
   function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name) {
     const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
-    if (name && storedConfigs && name in storedConfigs) {
+    if (name in storedConfigs) {
       return storedConfigs[name];
     }
-    return {
+    return setModelLinesEdgeAttributeStoredConfig(modelId, [lineId], name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    };
+    });
   }
 
   function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
-    return modelLinesCommonStyle.mutateModelLinesStyle(modelId, lineIds, {
-      edge_attribute: values,
+    return modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
+      edge: values,
     });
   }
 
@@ -51,24 +51,11 @@ export function useModelLinesEdgeAttribute() {
 
   async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-
-    const updates = { name };
-    const edge = modelLinesEdgeAttribute(modelId, lineIds[0]);
-    if (!(name in edge.storedConfigs)) {
-      updates.storedConfigs = {
-        [name]: {
-          minimum: undefined,
-          maximum: undefined,
-          colorMap: undefined,
-        },
-      };
-    }
-
     const params = { id: modelId, block_ids: viewer_ids, name };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, updates),
+        response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, { name }),
       },
     );
   }

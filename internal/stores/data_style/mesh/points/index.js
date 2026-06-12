@@ -26,13 +26,10 @@ function useMeshPointsColoringStyle() {
     await meshPointsCommonStyle.mutateMeshPointsStyle(id, {
       coloring: { active: type },
     });
-    if (type === "color") {
+    if (type === "constant") {
       return meshPointsColorStyle.setMeshPointsColor(id, meshPointsColorStyle.meshPointsColor(id));
     } else if (type === "vertex") {
       const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
     }
     throw new Error(`Unknown mesh points coloring type: ${type}`);
