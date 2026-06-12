@@ -33,7 +33,6 @@ async function waitNuxt(nuxtProcess) {
 
   for await (const [data] of on(nuxtProcess.stdout, "data")) {
     const output = data.toString();
-    // Only log briefly or selectively to avoid spam, but we want to see errors.
     console.log("Nuxt STDOUT:", output.trim());
     const portMatch = output.match(/Listening on http:\/\/\[::\]:(?<port>\d+)/u);
     if (portMatch) {
