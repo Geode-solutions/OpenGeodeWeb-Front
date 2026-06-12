@@ -96,6 +96,7 @@ watch(screenshot_type, (value) => {
               value="file"
               prepend-icon="mdi-file-download-outline"
               size="small"
+              data-testid="screenshotFileButton"
               class="text-caption text-none"
             >
               File
@@ -104,6 +105,7 @@ watch(screenshot_type, (value) => {
               value="clipboard"
               prepend-icon="mdi-content-copy"
               size="small"
+              data-testid="screenshotClipboardButton"
               class="text-caption text-none"
             >
               Clipboard
@@ -119,6 +121,7 @@ watch(screenshot_type, (value) => {
             label="File name"
             variant="outlined"
             density="compact"
+            data-testid="screenshotFileNameInput"
             hide-details
             class="text-caption"
           ></v-text-field>
@@ -130,6 +133,7 @@ watch(screenshot_type, (value) => {
             label="Extension"
             variant="outlined"
             density="compact"
+            data-testid="screenshotExtensionSelect"
             hide-details
             required
             class="text-caption"
@@ -143,6 +147,7 @@ watch(screenshot_type, (value) => {
             v-model="include_background"
             :disabled="screenshot_type === 'file' && output_extension !== 'png'"
             label="Include background"
+            data-testid="screenshotIncludeBackgroundSwitch"
             density="compact"
             hide-details
             inset
@@ -158,6 +163,7 @@ watch(screenshot_type, (value) => {
           variant="text"
           size="small"
           color="white"
+          data-testid="screenshotCancelButton"
           class="text-caption text-none"
           @click="show = false"
         >
@@ -167,6 +173,7 @@ watch(screenshot_type, (value) => {
           variant="outlined"
           size="small"
           class="text-caption text-none"
+          data-testid="screenshotActionButton"
           :disabled="(screenshot_type === 'file' && !filename) || !output_extension"
           color="white"
           @click="takeScreenshot()"
