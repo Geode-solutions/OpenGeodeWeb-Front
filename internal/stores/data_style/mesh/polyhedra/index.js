@@ -30,7 +30,7 @@ export function useMeshPolyhedraStyle() {
       coloring: { active: type },
     });
     console.log(setMeshPolyhedraActiveColoring.name, { id }, type);
-    if (type === "color") {
+    if (type === "constant") {
       return meshPolyhedraColorStyle.setMeshPolyhedraColor(
         id,
         meshPolyhedraColorStyle.meshPolyhedraColor(id),
@@ -38,16 +38,10 @@ export function useMeshPolyhedraStyle() {
     }
     if (type === "vertex") {
       const name = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name);
     }
     if (type === "polyhedron") {
       const name = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       return meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(
         id,
         name,

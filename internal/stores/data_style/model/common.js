@@ -59,7 +59,7 @@ export function useModelCommonStyle() {
     });
   }
 
-  async function setModelTypeColor(id, component_ids, color, schema, color_mode = "constant") {
+  async function setModelTypeColor(id, component_ids, color, schema, activeColoring = "constant") {
     if (!component_ids?.length) {
       return;
     }
@@ -69,12 +69,13 @@ export function useModelCommonStyle() {
       return;
     }
 
-    if (color_mode === "constant" && color !== undefined) {
-      await mutateComponentStyles(id, component_ids, { color });
-    }
-
-    const params = { id, block_ids: viewer_ids, color_mode };
-    if (color_mode === "constant" && color !== undefined) {
+    const params = { id, block_ids: viewer_ids, color_mode: activeColoring };
+    if (activeColoring === "constant") {
+      await mutateComponentStyles(id, component_ids, {
+        coloring: {
+          constant: color,
+        },
+      });
       params.color = color;
     }
 
@@ -82,8 +83,12 @@ export function useModelCommonStyle() {
       { schema, params },
       {
         response_function: async (colors) => {
-          if (color_mode === "constant" && color !== undefined) {
-            await mutateComponentStyles(id, component_ids, { color });
+          if (activeColoring === "constant") {
+            await mutateComponentStyles(id, component_ids, {
+              coloring: {
+                constant: color,
+              },
+            });
             return;
           }
 
@@ -95,7 +100,11 @@ export function useModelCommonStyle() {
             id,
             colors.map(({ geode_id, color: color_value }) => ({
               id_component: geode_id,
-              values: { color: color_value },
+              values: {
+                coloring: {
+                  constant: color_value,
+                },
+              },
             })),
           );
         },

@@ -178,11 +178,11 @@ describe("model lines", () => {
       const dataStore = useDataStore();
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const [line_id] = line_ids;
-      const coloringName = "color";
-      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      const coloringName = "constant";
+      const result = dataStyleStore.setModelComponentActiveColoring(id, line_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
+      expect(dataStyleStore.modelLineActiveColoring(id, line_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
@@ -194,10 +194,10 @@ describe("model lines", () => {
       const [line_id] = line_ids;
       await dataStyleStore.setModelLinesVertexAttributeName(id, [line_id], "points");
       const coloringName = "vertex";
-      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      const result = dataStyleStore.setModelComponentActiveColoring(id, line_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
+      expect(dataStyleStore.modelLineActiveColoring(id, line_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
@@ -209,10 +209,10 @@ describe("model lines", () => {
       const [line_id] = line_ids;
       await dataStyleStore.setModelLinesEdgeAttributeName(id, [line_id], "test_attribute");
       const coloringName = "edge";
-      const result = dataStyleStore.setModelComponentColorMode(id, line_id, coloringName);
+      const result = dataStyleStore.setModelComponentActiveColoring(id, line_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelLineColorMode(id, line_id)).toBe(coloringName);
+      expect(dataStyleStore.modelLineActiveColoring(id, line_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });

@@ -1,6 +1,6 @@
 <script setup>
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
-import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -86,43 +86,36 @@ const modelVisibility = computed({
   },
 });
 
-const colorModes = [
-  { title: "Constant", value: "constant" },
-  { title: "Random", value: "random" },
-];
-
-const modelComponentsColorMode = ref("constant");
-
-const modelComponentsColor = computed({
-  get: () => {
-    if (selection.value.length > 0) {
-      return dataStyleStore.getModelComponentColor(modelId.value, selection.value[0]);
-    }
-    return { red: 255, green: 255, blue: 255 };
-  },
-  set: async (color) => {
-    if (selection.value.length > 0) {
-      await dataStyleStore.setModelComponentsColor(
-        modelId.value,
-        selection.value,
-        color,
-        modelComponentsColorMode.value,
-      );
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-watch(modelComponentsColorMode, async (colorMode) => {
-  if (colorMode === "random" && selection.value.length > 0) {
+const modelComponentsActiveColoring = computed({
+  get: () => dataStyleStore.getModelActiveColoring(modelId.value),
+  set: async (coloringType) => {
+    await dataStyleStore.mutateStyle(modelId.value, {
+      coloring: { active: coloringType },
+    });
     await dataStyleStore.setModelComponentsColor(
       modelId.value,
       selection.value,
-      undefined,
-      colorMode,
+      modelComponentsColor.value,
+      coloringType,
     );
     hybridViewerStore.remoteRender();
-  }
+  },
+});
+
+const modelComponentsColor = computed({
+  get: () => dataStyleStore.getModelColor(modelId.value),
+  set: async (color) => {
+    await dataStyleStore.mutateStyle(modelId.value, {
+      coloring: { constant: color },
+    });
+    await dataStyleStore.setModelComponentsColor(
+      modelId.value,
+      selection.value,
+      color,
+      modelComponentsActiveColoring.value,
+    );
+    hybridViewerStore.remoteRender();
+  },
 });
 </script>
 
@@ -133,20 +126,13 @@ watch(modelComponentsColorMode, async (colorMode) => {
     </OptionsSection>
 
     <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
-      <v-label class="text-caption mb-1 mt-2">Color Mode</v-label>
-      <v-select
-        v-model="modelComponentsColorMode"
-        :items="colorModes"
-        density="compact"
-        hide-details
-        class="mb-3"
-        variant="outlined"
+      <ViewerOptionsColoringTypeSelector
+        :id="modelId"
+        v-model:coloring_style_key="modelComponentsActiveColoring"
+        v-model:color="modelComponentsColor"
+        :capabilities="{ color: { available: true } }"
+        :allowRandom="true"
       />
-
-      <template v-if="modelComponentsColorMode === 'constant'">
-        <v-label class="text-caption mb-1">Color</v-label>
-        <ViewerOptionsColorPicker v-model="modelComponentsColor" />
-      </template>
     </OptionsSection>
 
     <BlocksOptions
