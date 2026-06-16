@@ -5,7 +5,11 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const emit = defineEmits(["update_value"]);
 
-const { id, textureId: propTextureId, textureName: propTextureName } = defineProps({
+const {
+  id,
+  textureId: propTextureId,
+  textureName: propTextureName,
+} = defineProps({
   id: { type: String, required: true },
   textureId: { type: String, required: true },
   textureName: { type: String, required: true },
