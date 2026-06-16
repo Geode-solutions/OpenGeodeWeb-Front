@@ -38,6 +38,7 @@ const { showDialog, width } = defineProps({
         size="small"
         color="white"
         class="text-caption text-none"
+        data-testid="closeCameraManagerButton"
         @click="emit('close')"
         >Close</v-btn
       >
