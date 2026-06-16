@@ -11,7 +11,7 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const { id, viewId } = defineProps({
   id: { type: String, required: true },
-  viewId: { type: String, required: false },
+  viewId: { type: String, required: false, default: undefined },
 });
 const actualViewId = viewId || id;
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
