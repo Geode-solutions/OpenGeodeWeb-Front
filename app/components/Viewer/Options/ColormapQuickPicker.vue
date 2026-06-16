@@ -5,7 +5,7 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const { dataId, x, y } = defineProps({
-  dataId: { required: false, type: String },
+  dataId: { required: false, type: String, default: undefined },
   x: { required: true, type: Number },
   y: { required: true, type: Number },
 });

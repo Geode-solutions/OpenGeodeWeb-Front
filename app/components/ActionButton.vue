@@ -5,7 +5,7 @@ const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize 
   tooltip: { type: String, required: true },
   color: { type: String, default: undefined },
   size: { type: [String, Number], default: undefined },
-  variant: { type: String },
+  variant: { type: String, default: undefined },
   density: { type: String, default: "comfortable" },
   tooltipLocation: { type: String, default: "left" },
   iconSize: { type: [String, Number], default: DEFAULT_ICON_SIZE },
