@@ -95,14 +95,7 @@ watch(textureId, (value) => {
       hide-details
     />
   </v-col>
-  <v-badge
-    :model-value="textureId !== ''"
-    color="white"
-    floating
-    dot
-    offset-x="10"
-    offset-y="10"
-  >
+  <v-badge :model-value="textureId !== ''" color="white" floating dot offset-x="10" offset-y="10">
     <v-col cols="1" class="ma-1" justify="center" align="center">
       <FileUploader
         @files_uploaded="files_uploaded_event($event, index)"
