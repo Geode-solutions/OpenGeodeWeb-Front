@@ -8,6 +8,9 @@ import { WebSocket } from "ws";
 import pTimeout from "p-timeout";
 import { rimraf } from "rimraf";
 
+// Local imports
+import { removeMicroserviceMetadatas } from "./microservices.js";
+
 const MAX_DELETE_FOLDER_RETRIES = 5;
 
 async function deleteFolderRecursive(folderPath) {
@@ -99,6 +102,7 @@ function killWebsocketMicroservice(microservice) {
 }
 
 async function killMicroservice(microservice, microservices) {
+  console.log("killMicroservice", { microservice, microservices});
   if (microservice.type === "back") {
     await killHttpMicroservice(microservice);
   } else if (microservice.type === "viewer") {
@@ -106,13 +110,11 @@ async function killMicroservice(microservice, microservices) {
   } else {
     throw new Error(`Unknown microservice type: ${microservice.type}`);
   }
-
+  console.log(`Killed microservice: ${microservice.name}`);
   if (microservices) {
-    const index = microservices.indexOf(microservice);
-    if (index !== -1) {
-      microservices.splice(index, 1);
-    }
+    removeMicroserviceMetadatas(microservice);
   }
+  console.log("End killMicroservice", { microservices });
 }
 
 function killMicroservices(microservices) {

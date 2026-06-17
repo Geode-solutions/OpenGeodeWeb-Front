@@ -121,4 +121,17 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   );
 }
 
-export { addMicroserviceMetadatas, getAvailablePort, runBack, runViewer };
+function removeMicroserviceMetadatas(microservice) {
+  const microservices = projectMicroservices(microservice.projectFolderPath);
+  const index = microservices.indexOf(microservice);
+  if (index !== -1) {
+    microservices.splice(index, 1);
+    fs.writeFileSync(
+      microservicesMetadatasPath(microservice.projectFolderPath),
+      JSON.stringify({ microservices }, undefined, 2),
+    );
+  }
+
+}
+
+export { addMicroserviceMetadatas, removeMicroserviceMetadatas, getAvailablePort, runBack, runViewer };

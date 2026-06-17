@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
 
     await removeExtensionFromConf(projectName, extensionId);
     await killMicroservice(microservice, microservices);
+    console.log("After killMicroservice from kill.post", { microservices });
     await deleteFolderRecursive(extensionFolderPath(projectFolderPath, extensionId));
 
     return {
