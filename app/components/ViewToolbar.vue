@@ -183,7 +183,6 @@ const camera_options = computed(() => [
                   :data-testid="item.testId"
                   :icon="item.icon"
                   :tooltip="item.title"
-                  :data-testid="item.testId"
                   :color="
                     hybridViewerStore.is_hover_highlight &&
                     hybridViewerStore.hover_highlight_field_type ===

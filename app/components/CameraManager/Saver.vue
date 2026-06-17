@@ -32,7 +32,6 @@ async function saveCurrentPosition() {
           variant="outlined"
           hide-details
           class="mb-2 text-caption"
-          data-testid="cameraPositionNameInput"
         ></v-text-field>
       </v-col>
       <v-col cols="12" class="d-flex align-center">
@@ -46,7 +45,6 @@ async function saveCurrentPosition() {
           @click="saveCurrentPosition"
           height="32"
           class="text-caption font-weight-bold"
-          data-testid="saveCameraPositionButton"
         >
           Save
         </v-btn>
