@@ -111,6 +111,7 @@ defineExpose({ get_viewer_id });
       class="picking-message-container d-flex justify-center w-100 pa-4"
     >
       <v-chip
+        data-testid="hoverHighlightChip"
         color="primary"
         elevation="8"
         size="large"

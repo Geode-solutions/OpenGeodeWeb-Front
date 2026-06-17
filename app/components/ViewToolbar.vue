@@ -62,6 +62,7 @@ const camera_options = computed(() => [
     menu: [
       {
         title: "Cells",
+        testId: "highlightOnHoverCellsButton",
         icon: "mdi-select-all",
         action: () => {
           if (
@@ -78,6 +79,7 @@ const camera_options = computed(() => [
       },
       {
         title: "Points",
+        testId: "highlightOnHoverPointsButton",
         icon: "mdi-select-drag",
         action: () => {
           if (
@@ -178,6 +180,7 @@ const camera_options = computed(() => [
             <v-row dense>
               <v-col v-for="item in camera_option.menu" :key="item.title">
                 <ActionButton
+                  :data-testid="item.testId"
                   :icon="item.icon"
                   :tooltip="item.title"
                   :color="

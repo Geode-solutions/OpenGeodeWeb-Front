@@ -69,7 +69,7 @@ function meshCellsDefaultStyle(
         storedConfigs: {},
       },
       constant,
-      textures: undefined,
+      textures: null,
       vertex: {
         name: undefined,
         storedConfigs: {},
@@ -87,7 +87,7 @@ function meshPolygonsDefaultStyle(
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
       constant,
-      textures: undefined,
+      textures: null,
       polygon: {
         name: undefined,
         storedConfigs: {},

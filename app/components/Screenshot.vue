@@ -101,6 +101,7 @@ watch(screenshot_type, (value) => {
               File
             </v-btn>
             <v-btn
+              data-testid="screenshotClipboardButton"
               value="clipboard"
               prepend-icon="mdi-content-copy"
               size="small"
@@ -115,6 +116,7 @@ watch(screenshot_type, (value) => {
       <v-row dense v-if="screenshot_type === 'file'">
         <v-col cols="12" class="py-1">
           <v-text-field
+            data-testid="screenshotFileNameInput"
             v-model="filename"
             label="File name"
             variant="outlined"
@@ -140,6 +142,7 @@ watch(screenshot_type, (value) => {
       <v-row dense>
         <v-col cols="12" class="py-1">
           <v-switch
+            data-testid="screenshotIncludeBackgroundSwitch"
             v-model="include_background"
             :disabled="screenshot_type === 'file' && output_extension !== 'png'"
             label="Include background"
@@ -164,6 +167,7 @@ watch(screenshot_type, (value) => {
           Cancel
         </v-btn>
         <v-btn
+          data-testid="screenshotActionButton"
           variant="outlined"
           size="small"
           class="text-caption text-none"

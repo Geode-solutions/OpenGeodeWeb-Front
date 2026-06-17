@@ -11,11 +11,8 @@ const { id } = defineProps({
   textureName: { type: String, required: true },
 });
 
-const textureName = ref("");
-textureName.value = textureName;
-
-const textureId = ref("");
-textureId.value = textureId;
+const internalTextureName = ref(textureName);
+const internalTextureId = ref(textureId);
 
 const textureCoordinates = ref([]);
 const backStore = useBackStore();
@@ -48,18 +45,18 @@ async function files_uploaded_event(value) {
       { schema, params },
       {
         response_function: (response) => {
-          textureId.value = response.id;
+          internalTextureId.value = response.id;
         },
       },
     );
   }
 }
 
-watch(textureName, (value) => {
+watch(internalTextureName, (value) => {
   emit("update_value", { key: "texture_name", value });
 });
 
-watch(textureId, (value) => {
+watch(internalTextureId, (value) => {
   emit("update_value", { key: "id", value });
 });
 </script>
@@ -73,7 +70,7 @@ watch(textureId, (value) => {
 <template>
   <v-col cols="8" class="pa-1">
     <v-select
-      v-model="textureName"
+      v-model="internalTextureName"
       :items="textureCoordinates"
       label="Select a texture"
       density="compact"
@@ -81,7 +78,7 @@ watch(textureId, (value) => {
     />
   </v-col>
   <v-badge
-    :model-value="texture_file_name != ''"
+    :model-value="internalTextureId !== ''"
     color="white"
     floating
     dot
@@ -99,7 +96,7 @@ watch(textureId, (value) => {
       />
     </v-col>
   </v-badge>
-  <v-col v-if="textureName == '' || texture_file_name == ''" cols="1">
+  <v-col v-if="internalTextureName === '' || internalTextureId === ''" cols="1">
     <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
   </v-col>
 </template>

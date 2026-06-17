@@ -13,6 +13,7 @@ const { modelId, cornerId, targetCornerIds } = defineProps({
 });
 
 const dataStyleStore = useDataStyleStore();
+console.log("CornersOptions setup!");
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility

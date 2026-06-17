@@ -15,6 +15,7 @@ const { buttonLabel, buttonColor, color } = defineProps({
   color: {
     type: String,
     required: false,
+    default: undefined,
   },
 });
 
