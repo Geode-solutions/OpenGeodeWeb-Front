@@ -118,7 +118,6 @@ defineExpose({ get_viewer_id });
         size="large"
         variant="flat"
         class="pick-pulse"
-        data-testid="hoverHighlightChip"
         style="pointer-events: auto"
         @click="stopHoverHighlight"
       >
