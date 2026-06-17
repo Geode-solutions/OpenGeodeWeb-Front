@@ -95,6 +95,7 @@ defineExpose({ get_viewer_id });
         variant="flat"
         prepend-icon="mdi-crosshairs-gps"
         class="pick-pulse"
+        data-testid="pickingActiveChip"
         style="pointer-events: auto"
         @click="viewerStore.toggle_picking_mode(false)"
       >
@@ -117,6 +118,7 @@ defineExpose({ get_viewer_id });
         size="large"
         variant="flat"
         class="pick-pulse"
+        data-testid="hoverHighlightChip"
         style="pointer-events: auto"
         @click="stopHoverHighlight"
       >

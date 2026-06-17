@@ -5,14 +5,32 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const emit = defineEmits(["update_value"]);
 
-const { id } = defineProps({
+const {
+  id,
+  textureId: propTextureId,
+  textureName: propTextureName,
+} = defineProps({
   id: { type: String, required: true },
   textureId: { type: String, required: true },
   textureName: { type: String, required: true },
 });
 
-const internalTextureName = ref(textureName);
-const internalTextureId = ref(textureId);
+const textureName = ref(propTextureName);
+const textureId = ref(propTextureId);
+
+watch(
+  () => propTextureName,
+  (newVal) => {
+    textureName.value = newVal;
+  },
+);
+
+watch(
+  () => propTextureId,
+  (newVal) => {
+    textureId.value = newVal;
+  },
+);
 
 const textureCoordinates = ref([]);
 const backStore = useBackStore();
@@ -45,18 +63,18 @@ async function files_uploaded_event(value) {
       { schema, params },
       {
         response_function: (response) => {
-          internalTextureId.value = response.id;
+          textureId.value = response.id;
         },
       },
     );
   }
 }
 
-watch(internalTextureName, (value) => {
+watch(textureName, (value) => {
   emit("update_value", { key: "texture_name", value });
 });
 
-watch(internalTextureId, (value) => {
+watch(textureId, (value) => {
   emit("update_value", { key: "id", value });
 });
 </script>
@@ -70,7 +88,7 @@ watch(internalTextureId, (value) => {
 <template>
   <v-col cols="8" class="pa-1">
     <v-select
-      v-model="internalTextureName"
+      v-model="textureName"
       :items="textureCoordinates"
       label="Select a texture"
       density="compact"
@@ -78,7 +96,7 @@ watch(internalTextureId, (value) => {
     />
   </v-col>
   <v-badge
-    :model-value="internalTextureId !== ''"
+    :model-value="textureId !== ''"
     color="white"
     floating
     dot
@@ -96,7 +114,7 @@ watch(internalTextureId, (value) => {
       />
     </v-col>
   </v-badge>
-  <v-col v-if="internalTextureName === '' || internalTextureId === ''" cols="1">
+  <v-col v-if="textureName === '' || textureId === ''" cols="1">
     <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
   </v-col>
 </template>
