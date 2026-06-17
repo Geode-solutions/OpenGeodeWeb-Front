@@ -64,7 +64,6 @@ const camera_options = computed(() => [
         title: "Cells",
         testId: "highlightOnHoverCellsButton",
         icon: "mdi-select-all",
-        testId: "highlightOnHoverCellsButton",
         action: () => {
           if (
             hybridViewerStore.is_hover_highlight &&
@@ -82,7 +81,6 @@ const camera_options = computed(() => [
         title: "Points",
         testId: "highlightOnHoverPointsButton",
         icon: "mdi-select-drag",
-        testId: "highlightOnHoverPointsButton",
         action: () => {
           if (
             hybridViewerStore.is_hover_highlight &&
