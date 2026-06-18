@@ -41,7 +41,10 @@ function useMeshPolygonsColoringStyle() {
     }
     if (type === "vertex") {
       const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
-      const { colorMap } = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeStoredConfig(id, name);
+      const { colorMap } = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeStoredConfig(
+        id,
+        name,
+      );
       return Promise.all([
         meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name),
         meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeColorMap(id, colorMap),
@@ -49,7 +52,8 @@ function useMeshPolygonsColoringStyle() {
     }
     if (type === "polygon") {
       const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
-      const { colorMap } = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeStoredConfig(id, name);
+      const { colorMap } =
+        meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeStoredConfig(id, name);
       return Promise.all([
         meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name),
         meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeColorMap(id, colorMap),

@@ -31,7 +31,10 @@ function useMeshPointsColoringStyle() {
     }
     if (type === "vertex") {
       const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
-      const { colorMap } = meshPointsVertexAttributeStyle.meshPointsVertexAttributeStoredConfig(id, name);
+      const { colorMap } = meshPointsVertexAttributeStyle.meshPointsVertexAttributeStoredConfig(
+        id,
+        name,
+      );
       return Promise.all([
         meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name),
         meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeColorMap(id, colorMap),

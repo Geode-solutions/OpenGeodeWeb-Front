@@ -40,7 +40,10 @@ export function useMeshCellsStyle() {
     }
     if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
-      const { colorMap } = meshCellsVertexAttributeStyle.meshCellsVertexAttributeStoredConfig(id, name);
+      const { colorMap } = meshCellsVertexAttributeStyle.meshCellsVertexAttributeStoredConfig(
+        id,
+        name,
+      );
       return Promise.all([
         meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name),
         meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeColorMap(id, colorMap),

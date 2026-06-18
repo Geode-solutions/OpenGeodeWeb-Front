@@ -35,7 +35,10 @@ export function useMeshEdgesStyle() {
     }
     if (type === "vertex") {
       const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
-      const { colorMap } = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeStoredConfig(id, name);
+      const { colorMap } = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeStoredConfig(
+        id,
+        name,
+      );
       return Promise.all([
         meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name),
         meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeColorMap(id, colorMap),
