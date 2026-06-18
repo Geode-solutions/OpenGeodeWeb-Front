@@ -92,12 +92,17 @@ export const useBackStore = defineStore("back", {
         additionalProperties: true,
       };
       const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
-
+      const start = Date.now()
+      console.log("[GEODE] PERF test begin launch", start)
       console.log("[GEODE] params", params);
       return appStore.request(
         { schema, params },
         {
           response_function: (response) => {
+            const end = Date.now()
+            console.log("[GEODE] PERF test end launch", end)
+            console.log("[GEODE] PERF test diff", end - start)
+
             console.log(`[GEODE] Back launched on port ${response.port}`);
             this.default_local_port = response.port;
           },
