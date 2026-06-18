@@ -74,19 +74,14 @@ async function importProject(file) {
   }
 
   await treeviewStore.importStores(snapshot.treeview || {});
+  await dataStore.importStores(snapshot.data || {});
   await hybridViewerStore.initHybridViewer();
-  await hybridViewerStore.importStores(snapshot.hybridViewer || {});
 
   const items = snapshot?.data?.items || [];
-
   await importWorkflowFromSnapshot(items);
   await hybridViewerStore.importStores(snapshot.hybridViewer || {});
-  {
-    await dataStyleStore.importStores(snapshot.dataStyle || {});
-  }
-  {
-    await dataStyleStore.applyAllStylesFromState();
-  }
+  await dataStyleStore.importStores(snapshot.dataStyle || {});
+  await dataStyleStore.applyAllStylesFromState();
 
   treeviewStore.finalizeImportSelection();
   treeviewStore.isImporting = false;

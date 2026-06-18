@@ -104,6 +104,7 @@ const dataStoreMock = {
   clear: vi.fn(),
   registerObject: vi.fn().mockResolvedValue(),
   addItem: vi.fn().mockResolvedValue(),
+  importStores: vi.fn().mockResolvedValue(),
 };
 const dataStyleStoreMock = {
   importStores: vi.fn().mockResolvedValue(),
@@ -202,6 +203,7 @@ function verifyViewerCalls() {
 
 function verifyStoreImports() {
   expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.treeview);
+  expect(dataStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.data);
   expect(hybridViewerStoreMock.initHybridViewer).toHaveBeenCalledWith();
   expect(hybridViewerStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.hybridViewer);
   expect(hybridViewerStoreMock.setZScaling).toHaveBeenCalledWith(Z_SCALE);
