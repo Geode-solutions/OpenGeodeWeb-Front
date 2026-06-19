@@ -61,7 +61,7 @@ function waitForReady(child, expectedResponse, signal) {
       reject(
         new Error(
           `[${child.name}] exited with code ${code} before becoming ready.` +
-          (recentOutput ? `\nRecent output:\n${recentOutput}` : ""),
+            (recentOutput ? `\nRecent output:\n${recentOutput}` : ""),
         ),
       );
     };
@@ -76,7 +76,7 @@ function waitForReady(child, expectedResponse, signal) {
     child.once("error", onError);
     child.once("close", onClose);
     if (signal) signal.addEventListener("abort", onAbort, { once: true });
-  })
+  });
 }
 
 async function waitNuxt(nuxtProcess) {
