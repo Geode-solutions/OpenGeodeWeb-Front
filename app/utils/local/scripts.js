@@ -26,7 +26,7 @@ function waitForReady(child, expectedResponse, signal) {
     let recentOutput = "";
     function recordOutput(line) {
       recentOutput = (recentOutput + line + "\n").slice(-MAX_ERROR_BUFFER_BYTES);
-    };
+    }
 
     function cleanup() {
       readlineStdout.removeAllListeners();
@@ -35,8 +35,10 @@ function waitForReady(child, expectedResponse, signal) {
       readlineStderr.close();
       child.removeListener("error", onError);
       child.removeListener("close", onClose);
-      if (signal) { signal.removeEventListener("abort", onAbort); }
-    };
+      if (signal) {
+        signal.removeEventListener("abort", onAbort);
+      }
+    }
 
     const onLine = (line) => {
       console.log(`[${child.name}] ${line}`);
@@ -50,12 +52,12 @@ function waitForReady(child, expectedResponse, signal) {
     function onErrLine(line) {
       console.log(`[${child.name}] ${line}`);
       recordOutput(line);
-    };
+    }
 
     function onError(err) {
       cleanup();
       reject(err);
-    };
+    }
 
     function onClose(code) {
       console.log(`[${child.name}] exited with code ${code}`);
@@ -63,22 +65,24 @@ function waitForReady(child, expectedResponse, signal) {
       reject(
         new Error(
           `[${child.name}] exited with code ${code} before becoming ready.` +
-          (recentOutput ? `\nRecent output:\n${recentOutput}` : ""),
+            (recentOutput ? `\nRecent output:\n${recentOutput}` : ""),
         ),
       );
-    };
+    }
 
     function onAbort() {
       cleanup();
       reject(new Error(`[${child.name}] timed out waiting for "${expectedResponse}"`));
-    };
+    }
 
     readlineStdout.on("line", onLine);
     readlineStderr.on("line", onErrLine);
     child.once("error", onError);
     child.once("close", onClose);
-    if (signal) { signal.addEventListener("abort", onAbort, { once: true }); }
-  })
+    if (signal) {
+      signal.addEventListener("abort", onAbort, { once: true });
+    }
+  });
 }
 
 async function waitNuxt(nuxtProcess) {
