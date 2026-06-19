@@ -28,7 +28,7 @@ const CLIPPING_RANGE1 = 0.1;
 const CLIPPING_RANGE2 = 1000;
 const CLIPPING_RANGE = [CLIPPING_RANGE1, CLIPPING_RANGE2];
 const POINT_SIZE = 2;
-const VIEWER_CALL_COUNT = 2;
+const VIEWER_CALL_COUNT = 1;
 
 // Snapshot
 const snapshotMock = {
