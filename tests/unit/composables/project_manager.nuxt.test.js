@@ -112,6 +112,10 @@ const dataStyleStoreMock = {
   addDataStyle: vi.fn().mockResolvedValue(),
   applyDefaultStyle: vi.fn().mockResolvedValue(),
 };
+const feedbackStoreMock = {
+  add_success: vi.fn(),
+  add_error: vi.fn(),
+};
 
 const viewer_call_mock_fn = vi.fn().mockResolvedValue();
 
@@ -177,6 +181,9 @@ vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
 vi.mock(import("@ogw_front/stores/back"), () => ({
   useBackStore: () => backStoreMock,
 }));
+vi.mock(import("@ogw_front/stores/feedback"), () => ({
+  useFeedbackStore: () => feedbackStoreMock,
+}));
 vi.mock(import("@ogw_front/stores/app"), () => ({
   useAppStore: () => ({
     exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
@@ -222,6 +229,7 @@ function verifyRemaining() {
   expect(dataStyleStoreMock.addDataStyle).toHaveBeenCalledWith("abc123", "PointSet2D");
   expect(dataStyleStoreMock.applyDefaultStyle).toHaveBeenCalledWith("abc123");
   expect(hybridViewerStoreMock.remoteRender).toHaveBeenCalledWith();
+  expect(feedbackStoreMock.add_success).toHaveBeenCalledWith("Project imported successfully");
 }
 
 describe("projectManager composable (compact)", () => {
@@ -233,6 +241,7 @@ describe("projectManager composable (compact)", () => {
       dataStoreMock,
       dataStyleStoreMock,
       hybridViewerStoreMock,
+      feedbackStoreMock,
     ];
     for (const store of storesList) {
       const values = Object.values(store);
@@ -251,6 +260,7 @@ describe("projectManager composable (compact)", () => {
     await exportProject();
 
     expect(fileDownload).toHaveBeenCalledWith({ snapshot: snapshotMock }, "project.vease");
+    expect(feedbackStoreMock.add_success).toHaveBeenCalledWith("Project exported successfully");
   });
 
   test("importProjectFile with snapshot - Viewer and Stores", async () => {

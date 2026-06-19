@@ -198,12 +198,8 @@ export const useDataStore = defineStore("data", () => {
 
   async function importStores(snapshot) {
     await clear();
-    if (snapshot.modelComponents) {
-      await model_components_db.bulkPut(snapshot.modelComponents);
-    }
-    if (snapshot.modelComponentsRelations) {
-      await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
-    }
+    await model_components_db.bulkPut(snapshot.modelComponents);
+    await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
   }
 
   async function clear() {
