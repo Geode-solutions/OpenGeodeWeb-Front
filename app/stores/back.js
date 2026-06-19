@@ -92,6 +92,7 @@ export const useBackStore = defineStore("back", {
         additionalProperties: true,
       };
       const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
+
       console.log("[GEODE] params", params);
       return appStore.request(
         { schema, params },
