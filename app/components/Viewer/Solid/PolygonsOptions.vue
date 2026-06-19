@@ -8,9 +8,9 @@ const { itemProps } = defineProps({
 </script>
 
 <template>
-  <ViewerGenericMeshPolygonsOptions 
-    :itemProps="itemProps" 
-    :btnImage="SolidFacets" 
+  <ViewerGenericMeshPolygonsOptions
+    :itemProps="itemProps"
+    :btnImage="SolidFacets"
     :capabilities="{ textures: { available: false } }"
   />
 </template>
