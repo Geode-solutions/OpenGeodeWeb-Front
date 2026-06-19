@@ -63,7 +63,11 @@ const originalIndex = computed(() => {
   }
   return Math.floor(Number(originalId));
 });
-const RESERVED_ATTRIBUTE_KEYS = new Set(["coordinates", "vtkOriginalCellIds", "vtkOriginalPointIds"]);
+const RESERVED_ATTRIBUTE_KEYS = new Set([
+  "coordinates",
+  "vtkOriginalCellIds",
+  "vtkOriginalPointIds",
+]);
 
 const hasOtherAttributes = computed(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
@@ -74,10 +78,12 @@ const hasOtherAttributes = computed(() => {
 
 const sortedAttributes = computed(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
-  return Object.entries(attributes)
-    .filter(([key]) => !RESERVED_ATTRIBUTE_KEYS.has(key))
-    // oxlint-disable-next-line unicorn/no-array-sort
-    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
+  return (
+    Object.entries(attributes)
+      .filter(([key]) => !RESERVED_ATTRIBUTE_KEYS.has(key))
+      // oxlint-disable-next-line unicorn/no-array-sort
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+  );
 });
 
 function capitalize(val) {
