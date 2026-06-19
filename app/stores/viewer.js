@@ -143,16 +143,10 @@ export const useViewerStore = defineStore(
 
       const params = { COMMAND_VIEWER, NUXT_ROOT_PATH, args };
       console.log("[VIEWER] params", params);
-      const start = Date.now()
-      console.log("[VIEWER] PERF test begin launch", start)
       return appStore.request(
         { schema, params },
         {
           response_function: (response) => {
-            const end = Date.now()
-            console.log("[VIEWER] PERF end launch", end)
-            console.log("[VIEWER] PERF test diff", end - start)
-
             console.log(`[VIEWER] Viewer launched on port ${response.port}`);
             default_local_port.value = response.port;
           },
