@@ -8,7 +8,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { getPort } from "get-port-please";
 import pTimeout from "p-timeout";
 
-// Local imports 
+// Local imports
 import { commandExistsSync, waitForReady } from "./scripts.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 import { executablePath } from "./path.js";

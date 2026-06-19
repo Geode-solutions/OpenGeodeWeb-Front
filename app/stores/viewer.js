@@ -143,6 +143,7 @@ export const useViewerStore = defineStore(
 
       const params = { COMMAND_VIEWER, NUXT_ROOT_PATH, args };
       console.log("[VIEWER] params", params);
+
       return appStore.request(
         { schema, params },
         {
