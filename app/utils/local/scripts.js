@@ -6,12 +6,14 @@ import readline from "node:readline";
 
 import { appMode } from "./app_mode.js";
 
-const MAX_ERROR_BUFFER_BYTES = 64 * 1024;
+const BYTES_PER_KIBIBYTE = 1024;
+const MAX_ERROR_BUFFER_KIBIBYTES = 64;
+const MAX_ERROR_BUFFER_BYTES = MAX_ERROR_BUFFER_KIBIBYTES * BYTES_PER_KIBIBYTE;
 
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || "";
-  return envPath.split(path.delimiter).some((dir) => {
-    const filePath = path.join(dir, execName);
+  return envPath.split(path.delimiter).some((directory) => {
+    const filePath = path.join(directory, execName);
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
   });
 }
@@ -22,18 +24,18 @@ function waitForReady(child, expectedResponse, signal) {
     const readlineStderr = readline.createInterface({ input: child.stderr });
 
     let recentOutput = "";
-    const recordOutput = (line) => {
+    function recordOutput(line) {
       recentOutput = (recentOutput + line + "\n").slice(-MAX_ERROR_BUFFER_BYTES);
     };
 
-    const cleanup = () => {
+    function cleanup() {
       readlineStdout.removeAllListeners();
       readlineStdout.close();
       readlineStderr.removeAllListeners();
       readlineStderr.close();
       child.removeListener("error", onError);
       child.removeListener("close", onClose);
-      if (signal) signal.removeEventListener("abort", onAbort);
+      if (signal) { signal.removeEventListener("abort", onAbort); }
     };
 
     const onLine = (line) => {
@@ -45,17 +47,17 @@ function waitForReady(child, expectedResponse, signal) {
       }
     };
 
-    const onErrLine = (line) => {
+    function onErrLine(line) {
       console.log(`[${child.name}] ${line}`);
       recordOutput(line);
     };
 
-    const onError = (err) => {
+    function onError(err) {
       cleanup();
       reject(err);
     };
 
-    const onClose = (code) => {
+    function onClose(code) {
       console.log(`[${child.name}] exited with code ${code}`);
       cleanup();
       reject(
@@ -66,7 +68,7 @@ function waitForReady(child, expectedResponse, signal) {
       );
     };
 
-    const onAbort = () => {
+    function onAbort() {
       cleanup();
       reject(new Error(`[${child.name}] timed out waiting for "${expectedResponse}"`));
     };
@@ -75,7 +77,7 @@ function waitForReady(child, expectedResponse, signal) {
     readlineStderr.on("line", onErrLine);
     child.once("error", onError);
     child.once("close", onClose);
-    if (signal) signal.addEventListener("abort", onAbort, { once: true });
+    if (signal) { signal.addEventListener("abort", onAbort, { once: true }); }
   })
 }
 

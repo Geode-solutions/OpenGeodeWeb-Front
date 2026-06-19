@@ -15,7 +15,9 @@ import { executablePath } from "./path.js";
 
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 30;
-const MAX_ERROR_BUFFER_BYTES = 64 * 1024;
+const BYTES_PER_KIBIBYTE = 1024;
+const MAX_ERROR_BUFFER_KIBIBYTES = 64;
+const MAX_ERROR_BUFFER_BYTES = MAX_ERROR_BUFFER_KIBIBYTES * BYTES_PER_KIBIBYTE;
 
 function getAvailablePort() {
   return getPort({
