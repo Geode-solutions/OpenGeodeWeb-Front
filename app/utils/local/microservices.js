@@ -27,9 +27,7 @@ function getAvailablePort() {
 }
 
 function resolveCommand(execPath, execName) {
-  const command = commandExistsSync(execName)
-    ? execName
-    : executablePath(execPath, execName);
+  const command = commandExistsSync(execName) ? execName : executablePath(execPath, execName);
   return command;
 }
 
@@ -54,10 +52,7 @@ async function runScript(
   });
 
   const controller = new AbortController();
-  const timer = setTimeout(
-    () => controller.abort(),
-    timeoutSeconds * MILLISECONDS_PER_SECOND,
-  );
+  const timer = setTimeout(() => controller.abort(), timeoutSeconds * MILLISECONDS_PER_SECOND);
   if (typeof timer.unref === "function") timer.unref();
 
   try {
@@ -82,11 +77,16 @@ async function runBack(execName, execPath, args = {}) {
   }
   const port = await getAvailablePort();
   const backArgs = [
-    "--port", String(port),
-    "--data_folder_path", projectFolderPath,
-    "--upload_folder_path", uploadFolderPath,
-    "--allowed_origin", "http://localhost:*",
-    "--timeout", "0",
+    "--port",
+    String(port),
+    "--data_folder_path",
+    projectFolderPath,
+    "--upload_folder_path",
+    uploadFolderPath,
+    "--allowed_origin",
+    "http://localhost:*",
+    "--timeout",
+    "0",
   ];
   if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
     backArgs.push("--debug");
@@ -103,9 +103,12 @@ async function runViewer(execName, execPath, args = {}) {
   }
   const port = await getAvailablePort();
   const viewerArgs = [
-    "--port", String(port),
-    "--data_folder_path", projectFolderPath,
-    "--timeout", "0",
+    "--port",
+    String(port),
+    "--data_folder_path",
+    projectFolderPath,
+    "--timeout",
+    "0",
   ];
   console.log("runViewer", execPath, execName, viewerArgs);
   await runScript(execPath, execName, viewerArgs, "Starting factory");
