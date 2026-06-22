@@ -49,7 +49,9 @@ async function runScript(
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutSeconds * MILLISECONDS_PER_SECOND);
-  if (typeof timer.unref === "function") { timer.unref(); }
+  if (typeof timer.unref === "function") {
+    timer.unref();
+  }
 
   try {
     const result = await waitForReady(child, expectedResponse, controller.signal);

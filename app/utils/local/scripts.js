@@ -26,7 +26,7 @@ function waitForReady(child, expectedResponse, signal) {
 
     let recentOutput = "";
     function recordOutput(line) {
-      recentOutput = (`${recentOutput} ${line} \n`).slice(-MAX_ERROR_BUFFER_BYTES);
+      recentOutput = `${recentOutput} ${line} \n`.slice(-MAX_ERROR_BUFFER_BYTES);
     }
 
     function cleanup() {
@@ -48,7 +48,7 @@ function waitForReady(child, expectedResponse, signal) {
         cleanup();
         resolve(child);
       }
-    };
+    }
 
     function onErrLine(line) {
       console.log(`[${child.name}] ${line}`);
@@ -65,7 +65,8 @@ function waitForReady(child, expectedResponse, signal) {
       cleanup();
       reject(
         new Error(
-          `[${child.name}] exited with code ${code} before becoming ready.${recentOutput ? `\nRecent output:\n${recentOutput}` : ""
+          `[${child.name}] exited with code ${code} before becoming ready.${
+            recentOutput ? `\nRecent output:\n${recentOutput}` : ""
           }`,
         ),
       );
