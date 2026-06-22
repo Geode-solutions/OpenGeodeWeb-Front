@@ -19,13 +19,14 @@ function commandExistsSync(execName) {
 }
 
 function waitForReady(child, expectedResponse, signal) {
+  // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
     const readlineStdout = readline.createInterface({ input: child.stdout });
     const readlineStderr = readline.createInterface({ input: child.stderr });
 
     let recentOutput = "";
     function recordOutput(line) {
-      recentOutput = (recentOutput + line + "\n").slice(-MAX_ERROR_BUFFER_BYTES);
+      recentOutput = (`${recentOutput} ${line} \n`).slice(-MAX_ERROR_BUFFER_BYTES);
     }
 
     function cleanup() {
@@ -40,7 +41,7 @@ function waitForReady(child, expectedResponse, signal) {
       }
     }
 
-    const onLine = (line) => {
+    function onLine(line) {
       console.log(`[${child.name}] ${line}`);
       recordOutput(line);
       if (line.includes(expectedResponse)) {
@@ -64,8 +65,8 @@ function waitForReady(child, expectedResponse, signal) {
       cleanup();
       reject(
         new Error(
-          `[${child.name}] exited with code ${code} before becoming ready.` +
-            (recentOutput ? `\nRecent output:\n${recentOutput}` : ""),
+          `[${child.name}] exited with code ${code} before becoming ready.${recentOutput ? `\nRecent output:\n${recentOutput}` : ""
+          }`,
         ),
       );
     }

@@ -6,7 +6,6 @@ import path from "node:path";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
 import { getPort } from "get-port-please";
-import pTimeout from "p-timeout";
 
 // Local imports
 import { commandExistsSync, waitForReady } from "./scripts.js";
@@ -15,9 +14,6 @@ import { executablePath } from "./path.js";
 
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 30;
-const BYTES_PER_KIBIBYTE = 1024;
-const MAX_ERROR_BUFFER_KIBIBYTES = 64;
-const MAX_ERROR_BUFFER_BYTES = MAX_ERROR_BUFFER_KIBIBYTES * BYTES_PER_KIBIBYTE;
 
 function getAvailablePort() {
   return getPort({
@@ -53,7 +49,7 @@ async function runScript(
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutSeconds * MILLISECONDS_PER_SECOND);
-  if (typeof timer.unref === "function") timer.unref();
+  if (typeof timer.unref === "function") { timer.unref(); }
 
   try {
     const result = await waitForReady(child, expectedResponse, controller.signal);
