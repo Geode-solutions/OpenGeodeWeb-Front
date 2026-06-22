@@ -191,7 +191,7 @@ function formatAttributeValue(val) {
   pointer-events: none;
   z-index: 4;
   min-width: 200px;
-  max-width: 450px;
+  max-width: max-content;
   transition: opacity 0.15s ease;
 }
 .font-mono {
@@ -205,10 +205,12 @@ function formatAttributeValue(val) {
 .tooltip-label {
   color: #bdbdbd;
   font-weight: bold;
+  white-space: nowrap;
 }
 .tooltip-value {
   color: #a7ffeb;
   font-weight: 500;
+  white-space: nowrap;
 }
 .tooltip-value-dim {
   color: #eeeeee;
