@@ -62,8 +62,8 @@ const camera_options = computed(() => [
     menu: [
       {
         title: "Cells",
-        icon: "mdi-select-all",
         testId: "highlightOnHoverCellsButton",
+        icon: "mdi-select-all",
         action: () => {
           if (
             hybridViewerStore.is_hover_highlight &&
@@ -79,8 +79,8 @@ const camera_options = computed(() => [
       },
       {
         title: "Points",
-        icon: "mdi-select-drag",
         testId: "highlightOnHoverPointsButton",
+        icon: "mdi-select-drag",
         action: () => {
           if (
             hybridViewerStore.is_hover_highlight &&
@@ -180,9 +180,9 @@ const camera_options = computed(() => [
             <v-row dense>
               <v-col v-for="item in camera_option.menu" :key="item.title">
                 <ActionButton
+                  :data-testid="item.testId"
                   :icon="item.icon"
                   :tooltip="item.title"
-                  :data-testid="item.testId"
                   :color="
                     hybridViewerStore.is_hover_highlight &&
                     hybridViewerStore.hover_highlight_field_type ===

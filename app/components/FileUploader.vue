@@ -129,9 +129,9 @@ watch(
     />
     <DragAndDrop
       ref="dragAndDropRef"
-      class="d-none"
       :multiple
       :accept
+      :inline="false"
       @files-selected="processSelectedFiles"
     />
   </template>

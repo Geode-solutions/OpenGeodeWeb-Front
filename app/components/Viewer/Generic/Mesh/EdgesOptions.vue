@@ -66,7 +66,14 @@ const color = computed({
     :btnImage="btnImage"
   >
     <template #options>
-      <ViewerOptionsVisibilitySwitch data-testid="meshEdgesVisibilitySwitch" v-model="visibility" />
+      <v-row>
+        <v-col>
+          <ViewerOptionsVisibilitySwitch
+            data-testid="meshEdgesVisibilitySwitch"
+            v-model="visibility"
+          />
+        </v-col>
+      </v-row>
       <template v-if="visibility">
         <v-divider class="my-2" />
         <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="size" />
