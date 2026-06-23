@@ -55,7 +55,18 @@ export function useModelBlocksVertexAttribute() {
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelBlocksVertexStyle(modelId, blockIds, { name }),
+        response_function: (response) => {
+          mutateModelBlocksVertexStyle(modelId, blockIds, { name });
+          for (let i = 0; i < blockIds.length; i++) {
+            const blockId = blockIds[i];
+            const blockRange = response?.[viewer_ids[i]] || {};
+            setModelBlocksVertexAttributeStoredConfig(modelId, [blockId], name, {
+              minimum: blockRange.minimum,
+              maximum: blockRange.maximum,
+            });
+            setModelBlocksVertexAttributeColorMap(modelId, [blockId], "batlow");
+          }
+        },
       },
     );
   }

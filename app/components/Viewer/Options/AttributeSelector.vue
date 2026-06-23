@@ -98,12 +98,6 @@ watch(
     }
   },
 );
-
-watch(name, (newName, oldName) => {
-  if (newName !== oldName) {
-    resetRange();
-  }
-});
 </script>
 
 <template>

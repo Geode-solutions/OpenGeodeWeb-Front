@@ -51,7 +51,14 @@ export function useMeshCellsCellAttributeStyle() {
         params,
       },
       {
-        response_function: () => meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name }),
+        response_function: (response) => {
+          meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name });
+          setMeshCellsCellAttributeStoredConfig(id, name, {
+            minimum: response.minimum,
+            maximum: response.maximum,
+          });
+          setMeshCellsCellAttributeColorMap(id, "batlow");
+        },
       },
     );
   }

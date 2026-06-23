@@ -57,19 +57,13 @@ export function useMeshCellsVertexAttributeStyle() {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => {
-          const updates = { name };
-          const vertex = meshCellsVertexAttribute(id);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateMeshCellsVertexStyle(id, updates);
+        response_function: (response) => {
+          mutateMeshCellsVertexStyle(id, { name });
+          setMeshCellsVertexAttributeStoredConfig(id, name, {
+            minimum: response.minimum,
+            maximum: response.maximum,
+          });
+          setMeshCellsVertexAttributeColorMap(id, "batlow");
         },
       },
     );

@@ -89,19 +89,13 @@ function useMeshPolyhedraVertexAttributeActions() {
         params,
       },
       {
-        response_function: () => {
-          const updates = { name };
-          const vertex = config.meshPolyhedraVertexAttribute(id);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return config.mutateMeshPolyhedraVertexStyle(id, updates);
+        response_function: (response) => {
+          config.mutateMeshPolyhedraVertexStyle(id, { name });
+          config.setMeshPolyhedraVertexAttributeStoredConfig(id, name, {
+            minimum: response.minimum,
+            maximum: response.maximum,
+          });
+          setMeshPolyhedraVertexAttributeColorMap(id, "batlow");
         },
       },
     );

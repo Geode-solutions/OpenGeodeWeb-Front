@@ -55,7 +55,18 @@ export function useModelSurfacesPolygonAttribute() {
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name }),
+        response_function: (response) => {
+          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name });
+          for (let i = 0; i < surfaceIds.length; i++) {
+            const surfaceId = surfaceIds[i];
+            const blockRange = response?.[viewer_ids[i]] || {};
+            setModelSurfacesPolygonAttributeStoredConfig(modelId, [surfaceId], name, {
+              minimum: blockRange.minimum,
+              maximum: blockRange.maximum,
+            });
+            setModelSurfacesPolygonAttributeColorMap(modelId, [surfaceId], "batlow");
+          }
+        },
       },
     );
   }

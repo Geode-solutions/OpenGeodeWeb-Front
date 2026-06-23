@@ -57,19 +57,13 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => {
-          const updates = { name };
-          const polygon = meshPolygonsPolygonAttribute(id);
-          if (!(name in polygon.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateMeshPolygonsPolygonStyle(id, updates);
+        response_function: (response) => {
+          mutateMeshPolygonsPolygonStyle(id, { name });
+          setMeshPolygonsPolygonAttributeStoredConfig(id, name, {
+            minimum: response.minimum,
+            maximum: response.maximum,
+          });
+          setMeshPolygonsPolygonAttributeColorMap(id, "batlow");
         },
       },
     );

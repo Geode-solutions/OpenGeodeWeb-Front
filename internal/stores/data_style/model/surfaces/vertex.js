@@ -55,7 +55,18 @@ export function useModelSurfacesVertexAttribute() {
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name }),
+        response_function: (response) => {
+          mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name });
+          for (let i = 0; i < surfaceIds.length; i++) {
+            const surfaceId = surfaceIds[i];
+            const blockRange = response?.[viewer_ids[i]] || {};
+            setModelSurfacesVertexAttributeStoredConfig(modelId, [surfaceId], name, {
+              minimum: blockRange.minimum,
+              maximum: blockRange.maximum,
+            });
+            setModelSurfacesVertexAttributeColorMap(modelId, [surfaceId], "batlow");
+          }
+        },
       },
     );
   }

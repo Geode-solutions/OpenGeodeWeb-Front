@@ -57,19 +57,13 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => {
-          const updates = { name };
-          const vertex = meshPolygonsVertexAttribute(id);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateMeshPolygonsVertexStyle(id, updates);
+        response_function: (response) => {
+          mutateMeshPolygonsVertexStyle(id, { name });
+          setMeshPolygonsVertexAttributeStoredConfig(id, name, {
+            minimum: response.minimum,
+            maximum: response.maximum,
+          });
+          setMeshPolygonsVertexAttributeColorMap(id, "batlow");
         },
       },
     );

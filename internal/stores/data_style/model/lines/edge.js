@@ -55,7 +55,18 @@ export function useModelLinesEdgeAttribute() {
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, { name }),
+        response_function: (response) => {
+          mutateModelLinesEdgeStyle(modelId, lineIds, { name });
+          for (let i = 0; i < lineIds.length; i++) {
+            const lineId = lineIds[i];
+            const blockRange = response?.[viewer_ids[i]] || {};
+            setModelLinesEdgeAttributeStoredConfig(modelId, [lineId], name, {
+              minimum: blockRange.minimum,
+              maximum: blockRange.maximum,
+            });
+            setModelLinesEdgeAttributeColorMap(modelId, [lineId], "batlow");
+          }
+        },
       },
     );
   }

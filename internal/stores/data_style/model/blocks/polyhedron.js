@@ -55,7 +55,18 @@ export function useModelBlocksPolyhedronAttribute() {
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name }),
+        response_function: (response) => {
+          mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name });
+          for (let i = 0; i < blockIds.length; i++) {
+            const blockId = blockIds[i];
+            const blockRange = response?.[viewer_ids[i]] || {};
+            setModelBlocksPolyhedronAttributeStoredConfig(modelId, [blockId], name, {
+              minimum: blockRange.minimum,
+              maximum: blockRange.maximum,
+            });
+            setModelBlocksPolyhedronAttributeColorMap(modelId, [blockId], "batlow");
+          }
+        },
       },
     );
   }

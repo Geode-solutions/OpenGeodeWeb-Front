@@ -60,19 +60,13 @@ export function useMeshEdgesVertexAttributeStyle() {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => {
-          const updates = { name };
-          const vertex = meshEdgesVertexAttribute(id);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateMeshEdgesVertexStyle(id, updates);
+        response_function: (response) => {
+          mutateMeshEdgesVertexStyle(id, { name });
+          setMeshEdgesVertexAttributeStoredConfig(id, name, {
+            minimum: response.minimum,
+            maximum: response.maximum,
+          });
+          setMeshEdgesVertexAttributeColorMap(id, "batlow");
         },
       },
     );

@@ -55,7 +55,18 @@ export function useModelCornersVertexAttribute() {
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelCornersVertexStyle(modelId, cornerIds, { name }),
+        response_function: (response) => {
+          mutateModelCornersVertexStyle(modelId, cornerIds, { name });
+          for (let i = 0; i < cornerIds.length; i++) {
+            const cornerId = cornerIds[i];
+            const blockRange = response?.[viewer_ids[i]] || {};
+            setModelCornersVertexAttributeStoredConfig(modelId, [cornerId], name, {
+              minimum: blockRange.minimum,
+              maximum: blockRange.maximum,
+            });
+            setModelCornersVertexAttributeColorMap(modelId, [cornerId], "batlow");
+          }
+        },
       },
     );
   }

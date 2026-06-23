@@ -63,19 +63,13 @@ export function useMeshEdgesEdgeAttributeStyle() {
         params,
       },
       {
-        response_function: () => {
-          const updates = { name };
-          const edge = meshEdgesEdgeAttribute(id);
-          if (!(name in edge.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return mutateMeshEdgesEdgeStyle(id, updates);
+        response_function: (response) => {
+          mutateMeshEdgesEdgeStyle(id, { name });
+          setMeshEdgesEdgeAttributeStoredConfig(id, name, {
+            minimum: response.minimum,
+            maximum: response.maximum,
+          });
+          setMeshEdgesEdgeAttributeColorMap(id, "batlow");
         },
       },
     );
