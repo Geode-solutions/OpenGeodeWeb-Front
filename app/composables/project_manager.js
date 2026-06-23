@@ -76,14 +76,14 @@ async function importProject(file) {
     await client2.getConnection().getSession().call("opengeodeweb_viewer.import_project", [{}]);
   }
 
-  await treeviewStore.importStores(snapshot.treeview || {});
+  await treeviewStore.importStores(snapshot.treeview);
   await dataStore.importStores(snapshot.data);
   await hybridViewerStore.initHybridViewer();
 
   const items = snapshot?.data?.items || [];
   await importWorkflowFromSnapshot(items);
-  await hybridViewerStore.importStores(snapshot.hybridViewer || {});
-  await dataStyleStore.importStores(snapshot.dataStyle || {});
+  await hybridViewerStore.importStores(snapshot.hybridViewer);
+  await dataStyleStore.importStores(snapshot.dataStyle);
   await dataStyleStore.applyAllStylesFromState();
 
   treeviewStore.finalizeImportSelection();
