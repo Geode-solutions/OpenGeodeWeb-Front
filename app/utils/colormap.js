@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/prefer-export-from
 import colormaps from "@ogw_front/assets/colormaps.json";
 
 import { newInstance as vtkColorTransferFunction } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
