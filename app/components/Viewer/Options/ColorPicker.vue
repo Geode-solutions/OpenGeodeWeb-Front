@@ -72,8 +72,4 @@ watch(pressed, (value) => {
 :deep(.v-color-picker__preview) {
   margin-bottom: 0 !important;
 }
-
-:deep(.v-color-picker-preview__eye-dropper) {
-  display: none !important;
-}
 </style>
