@@ -99,22 +99,13 @@ watch(
             </v-list>
           </v-menu>
           <ActionButton
-            v-if="!isCollapsed"
-            tooltip="Collapse All"
-            icon="mdi-collapse-all-outline"
+            data-testid="CollapseOrExpandAll"
+            :tooltip="isCollapsed ? 'Expand All' : 'Collapse All'"
+            :icon="isCollapsed ? 'mdi-expand-all-outline' : 'mdi-collapse-all-outline'"
             variant="text"
             color="black"
             tooltipLocation="bottom"
-            @click="emit('collapse-all')"
-          />
-          <ActionButton
-            v-else
-            tooltip="Expand All"
-            icon="mdi-expand-all-outline"
-            variant="text"
-            color="black"
-            tooltipLocation="bottom"
-            @click="emit('expand-all')"
+            @click="isCollapsed ? emit('expand-all') : emit('collapse-all')"
           />
         </div>
       </div>
