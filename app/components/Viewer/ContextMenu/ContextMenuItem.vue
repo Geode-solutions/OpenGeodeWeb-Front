@@ -107,10 +107,7 @@ const optionsStyle = computed(() => {
   } else if (absoluteButtonY + height / 2 > menuStore.containerHeight - margin) {
     offsetY = menuStore.containerHeight - margin - (absoluteButtonY + height / 2);
   }
-  return {
-    top: `${Math.round(offsetY - height / 2)}px`,
-    transform: "translateY(0)",
-  };
+  return { top: `calc(50% + ${offsetY}px)` };
 });
 
 const optionsClass = computed(() => {
