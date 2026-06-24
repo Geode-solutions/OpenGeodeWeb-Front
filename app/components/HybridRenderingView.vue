@@ -95,10 +95,13 @@ async function handleClick(event) {
   </ClientOnly>
 </template>
 
-<style scoped>
-:deep(img) {
-  pointer-events: none;
+<style>
+[data-testid="hybridViewer"] img {
+  pointer-events: none !important;
 }
+</style>
+
+<style scoped>
 .picking-cursor {
   cursor: crosshair !important;
 }

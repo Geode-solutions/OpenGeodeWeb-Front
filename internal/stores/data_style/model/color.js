@@ -78,7 +78,7 @@ function useModelColorStyle(componentStyleFunctions) {
   };
 
   function getModelComponentColor(modelId, componentId) {
-    return dataStyleState.getComponentStyle(modelId, componentId).coloring.constant;
+    return dataStyleState.getComponentStyle(modelId, componentId).coloring?.constant;
   }
 
   function getModelComponentEffectiveColor(modelId, componentId, type) {
@@ -90,19 +90,19 @@ function useModelColorStyle(componentStyleFunctions) {
   }
 
   function getModelComponentActiveColoring(modelId, componentId) {
-    return dataStyleState.getComponentStyle(modelId, componentId).coloring.active;
+    return dataStyleState.getComponentStyle(modelId, componentId).coloring?.active;
   }
 
   function modelComponentTypeColor(modelId, type) {
     return (
-      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring.constant ||
+      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.constant ||
       dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.constant
     );
   }
 
   function getModelComponentTypeActiveColoring(modelId, type) {
     return (
-      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring.active ||
+      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.active ||
       dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.active
     );
   }

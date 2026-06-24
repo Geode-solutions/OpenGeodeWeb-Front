@@ -207,7 +207,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
 
 <template>
   <OptionsSection title="Surfaces Options" class="mt-4">
-    <VisibilitySwitch v-model="surfacesVisibility" />
+    <VisibilitySwitch data-testid="modelSurfacesVisibilitySwitch" v-model="surfacesVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="targetSurfaceIds[0]"
