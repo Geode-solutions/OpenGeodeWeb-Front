@@ -69,7 +69,8 @@ function meshCellsDefaultStyle(
         storedConfigs: {},
       },
       constant,
-      textures: undefined,
+      // oxlint-disable-next-line unicorn/no-null
+      textures: null,
       vertex: {
         name: undefined,
         storedConfigs: {},
@@ -87,7 +88,8 @@ function meshPolygonsDefaultStyle(
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
       constant,
-      textures: undefined,
+      // oxlint-disable-next-line unicorn/no-null
+      textures: null,
       polygon: {
         name: undefined,
         storedConfigs: {},

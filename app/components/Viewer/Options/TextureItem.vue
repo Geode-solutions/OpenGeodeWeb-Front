@@ -95,19 +95,19 @@ watch(textureId, (value) => {
       hide-details
     />
   </v-col>
-  <v-badge :model-value="textureId != ''" color="white" floating dot offset-x="10" offset-y="10">
-    <v-col cols="1" class="ma-1" justify="center" align="center">
+  <v-col cols="1" class="ma-1 d-flex justify-center align-center">
+    <v-badge :model-value="textureId !== ''" color="white" floating dot offset-x="10" offset-y="10">
       <FileUploader
-        @files_uploaded="files_uploaded_event($event, index)"
+        @files_uploaded="files_uploaded_event($event)"
         :accept="['image/png', 'image/jpeg', 'image/bmp']"
         :autoUpload="true"
         :multiple="true"
         :mini="true"
         class="mt-2"
       />
-    </v-col>
-  </v-badge>
-  <v-col v-if="textureName == '' || textureId == ''" cols="1">
+    </v-badge>
+  </v-col>
+  <v-col v-if="textureName === '' || textureId === ''" cols="1">
     <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
   </v-col>
 </template>

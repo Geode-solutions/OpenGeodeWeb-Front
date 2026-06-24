@@ -63,11 +63,26 @@ const originalIndex = computed(() => {
   }
   return Math.floor(Number(originalId));
 });
+const RESERVED_ATTRIBUTE_KEYS = new Set([
+  "coordinates",
+  "vtkOriginalCellIds",
+  "vtkOriginalPointIds",
+]);
 
 const hasOtherAttributes = computed(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   return Object.keys(attributes).some(
     (key) => key !== "vtkOriginalCellIds" && key !== "vtkOriginalPointIds",
+  );
+});
+
+const sortedAttributes = computed(() => {
+  const attributes = hybridViewerStore.hoverData?.attributes || {};
+  return (
+    Object.entries(attributes)
+      .filter(([key]) => !RESERVED_ATTRIBUTE_KEYS.has(key))
+      // oxlint-disable-next-line unicorn/no-array-sort
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
   );
 });
 
@@ -156,15 +171,8 @@ function formatAttributeValue(val) {
               {{ Number(hybridViewerStore.hoverData.attributes.coordinates[2]).toFixed(3) }} ]
             </span>
           </v-col>
-          <template v-for="(val, name) in hybridViewerStore.hoverData.attributes" :key="name">
-            <v-col
-              v-if="
-                name !== 'coordinates' &&
-                name !== 'vtkOriginalCellIds' &&
-                name !== 'vtkOriginalPointIds'
-              "
-              class="d-flex justify-space-between ga-3"
-            >
+          <template v-for="[name, val] in sortedAttributes" :key="name">
+            <v-col class="d-flex justify-space-between ga-3">
               <span class="tooltip-label">{{ capitalize(name) }}:</span>
               <span class="tooltip-value font-mono">
                 {{ formatAttributeValue(val) }}
@@ -183,7 +191,7 @@ function formatAttributeValue(val) {
   pointer-events: none;
   z-index: 4;
   min-width: 200px;
-  max-width: 450px;
+  max-width: max-content;
   transition: opacity 0.15s ease;
 }
 .font-mono {
@@ -197,10 +205,12 @@ function formatAttributeValue(val) {
 .tooltip-label {
   color: #bdbdbd;
   font-weight: bold;
+  white-space: nowrap;
 }
 .tooltip-value {
   color: #a7ffeb;
   font-weight: 500;
+  white-space: nowrap;
 }
 .tooltip-value-dim {
   color: #eeeeee;
