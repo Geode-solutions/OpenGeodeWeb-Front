@@ -52,6 +52,7 @@ watch(pressed, (value) => {
     flat
     canvas-height="75"
     hide-inputs
+    hide-eye-dropper
     width="220"
     mode="rgba"
     class="mx-auto"
@@ -70,5 +71,9 @@ watch(pressed, (value) => {
 
 :deep(.v-color-picker__preview) {
   margin-bottom: 0 !important;
+}
+
+:deep(.v-color-picker-preview__eye-dropper) {
+  display: none !important;
 }
 </style>
