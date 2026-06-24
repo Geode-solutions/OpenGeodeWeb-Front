@@ -24,26 +24,18 @@ async function waitForReady(child, expectedResponse) {
 }
 
 async function waitNuxt(nuxtProcess) {
-  nuxtProcess.stderr.on("data", (data) => {
-    console.log("Nuxt STDERR:", data.toString().trim());
-  });
-  nuxtProcess.on("close", (code) => {
-    console.log(`Nuxt process closed with code ${code}`);
-  });
-
   for await (const [data] of on(nuxtProcess.stdout, "data")) {
     const output = data.toString();
-    console.log("Nuxt STDOUT:", output.trim());
+    console.log("Nuxt:", output);
     const portMatch = output.match(/Listening on http:\/\/\[::\]:(?<port>\d+)/u);
     if (portMatch) {
-      console.log("Nuxt listening on port", portMatch.groups.port);
-      nuxtProcess.stdout.on("data", (newData) => {
-        console.log("Nuxt STDOUT:", newData.toString().trim());
-      });
-      return portMatch.groups.port;
+      const [, nuxtPort] = portMatch;
+
+      console.log("Nuxt listening on port", nuxtPort);
+      return nuxtPort;
     }
   }
-  throw new Error("Nuxt process closed");
+  throw new Error("Nuxt process closed without accepting connections");
 }
 
 async function runBrowser(scriptName) {
