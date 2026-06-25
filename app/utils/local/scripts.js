@@ -77,7 +77,8 @@ function waitForReady(child, expectedResponse, signal) {
       cleanup();
       reject(
         new Error(
-          `[${child.name}] exited with code ${code} before becoming ready.${recentOutput ? `\nRecent output:\n${recentOutput}` : ""
+          `[${child.name}] exited with code ${code} before becoming ready.${
+            recentOutput ? `\nRecent output:\n${recentOutput}` : ""
           }`,
         ),
       );
