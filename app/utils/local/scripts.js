@@ -133,4 +133,4 @@ async function runBrowser(scriptName) {
   return await waitNuxt(nuxtProcess);
 }
 
-export { commandExistsSync, getAvailablePort, runBrowser, waitForReady, };
+export { commandExistsSync, getAvailablePort, runBrowser, waitForReady };
