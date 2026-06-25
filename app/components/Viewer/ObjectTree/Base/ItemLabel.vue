@@ -1,5 +1,8 @@
 <script setup>
 import { middleTruncate } from "@ogw_front/utils/string";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
+
+const feedbackStore = useFeedbackStore();
 
 const { item, isLeaf } = defineProps({
   item: { type: Object, required: true },
@@ -47,11 +50,22 @@ const tooltipDisabled = computed(() => {
   }
   return actualItem.value.children && actualItem.value.children.length > 0;
 });
+
+async function copyToClipboard(text, label) {
+  await navigator.clipboard.writeText(text);
+  feedbackStore.add_success(`${label} copied to clipboard`);
+}
 </script>
 
 <template>
   <div ref="label-container" class="tree-item-label-container w-100">
-    <v-tooltip :disabled="tooltipDisabled" location="right" open-delay="400">
+    <v-tooltip
+      :disabled="tooltipDisabled"
+      location="right"
+      open-delay="400"
+      close-delay="100"
+      interactive
+    >
       <template #activator="{ props: tooltipProps }">
         <span
           v-bind="tooltipProps"
@@ -66,14 +80,32 @@ const tooltipDisabled = computed(() => {
       </template>
 
       <div class="d-flex flex-column ga-1">
-        <span class="text-caption">
-          <strong class="text-white">ID:</strong> {{ actualItem.id }}
+        <span class="text-caption d-flex align-center">
+          <strong class="text-white mr-1">ID:</strong>
+          <span>{{ actualItem.id }}</span>
+          <v-btn
+            icon="mdi-content-copy"
+            variant="text"
+            size="x-small"
+            density="compact"
+            class="ml-1 text-white"
+            @click.stop="copyToClipboard(actualItem.id, 'ID')"
+          />
         </span>
-        <span v-if="actualItem.title" class="text-caption">
-          <strong class="text-white">Name:</strong> {{ actualItem.title }}
+        <span v-if="actualItem.title" class="text-caption d-flex align-center">
+          <strong class="text-white mr-1">Name:</strong>
+          <span>{{ actualItem.title }}</span>
+          <v-btn
+            icon="mdi-content-copy"
+            variant="text"
+            size="x-small"
+            density="compact"
+            class="ml-1 text-white"
+            @click.stop="copyToClipboard(actualItem.title, 'Name')"
+          />
         </span>
-        <span class="text-caption">
-          <strong class="text-white">Status:</strong>
+        <span class="text-caption d-flex align-center">
+          <strong class="text-white mr-1">Status:</strong>
           <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
         </span>
       </div>
