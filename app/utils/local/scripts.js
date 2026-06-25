@@ -5,6 +5,9 @@ import { on } from "node:events";
 import path from "node:path";
 import readline from "node:readline";
 
+// Third party imports
+import { getPort } from "get-port-please";
+
 // Local imports
 import { appMode } from "./app_mode.js";
 
