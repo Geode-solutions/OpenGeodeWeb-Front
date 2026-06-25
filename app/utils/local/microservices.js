@@ -5,22 +5,16 @@ import path from "node:path";
 
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
-import { getPort } from "get-port-please";
 
 // Local imports
-import { commandExistsSync, waitForReady } from "./scripts.js";
+import { commandExistsSync, getAvailablePort, waitForReady } from "./scripts.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 import { executablePath } from "./path.js";
 
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 30;
 
-function getAvailablePort() {
-  return getPort({
-    host: "localhost",
-    random: true,
-  });
-}
+
 
 function resolveCommand(execPath, execName) {
   const command = commandExistsSync(execName) ? execName : executablePath(execPath, execName);
@@ -131,4 +125,4 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   );
 }
 
-export { addMicroserviceMetadatas, getAvailablePort, runBack, runViewer };
+export { addMicroserviceMetadatas, runBack, runViewer };

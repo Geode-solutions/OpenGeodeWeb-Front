@@ -5,11 +5,21 @@ import { on } from "node:events";
 import path from "node:path";
 import readline from "node:readline";
 
+// Local imports
 import { appMode } from "./app_mode.js";
+
 
 const BYTES_PER_KIBIBYTE = 1024;
 const MAX_ERROR_BUFFER_KIBIBYTES = 64;
 const MAX_ERROR_BUFFER_BYTES = MAX_ERROR_BUFFER_KIBIBYTES * BYTES_PER_KIBIBYTE;
+
+
+function getAvailablePort() {
+  return getPort({
+    host: "localhost",
+    random: true,
+  });
+}
 
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || "";
@@ -66,8 +76,7 @@ function waitForReady(child, expectedResponse, signal) {
       cleanup();
       reject(
         new Error(
-          `[${child.name}] exited with code ${code} before becoming ready.${
-            recentOutput ? `\nRecent output:\n${recentOutput}` : ""
+          `[${child.name}] exited with code ${code} before becoming ready.${recentOutput ? `\nRecent output:\n${recentOutput}` : ""
           }`,
         ),
       );
@@ -114,11 +123,14 @@ async function waitNuxt(nuxtProcess) {
 async function runBrowser(scriptName) {
   process.env.MODE = appMode.BROWSER;
 
+  const port = getAvailablePort()
+
   const nuxtProcess = child_process.spawn("npm", ["run", scriptName], {
     shell: true,
     FORCE_COLOR: true,
+    PORT: port,
   });
   return await waitNuxt(nuxtProcess);
 }
 
-export { runBrowser, waitForReady, commandExistsSync };
+export { commandExistsSync, getAvailablePort, runBrowser, waitForReady, };
