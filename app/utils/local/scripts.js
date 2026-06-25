@@ -77,8 +77,7 @@ function waitForReady(child, expectedResponse, signal) {
       cleanup();
       reject(
         new Error(
-          `[${child.name}] exited with code ${code} before becoming ready.${
-            recentOutput ? `\nRecent output:\n${recentOutput}` : ""
+          `[${child.name}] exited with code ${code} before becoming ready.${recentOutput ? `\nRecent output:\n${recentOutput}` : ""
           }`,
         ),
       );
@@ -125,7 +124,7 @@ async function waitNuxt(nuxtProcess) {
 async function runBrowser(scriptName) {
   process.env.MODE = appMode.BROWSER;
 
-  const port = getAvailablePort();
+  const port = await getAvailablePort();
 
   const nuxtProcess = child_process.spawn("npm", ["run", scriptName], {
     shell: true,
