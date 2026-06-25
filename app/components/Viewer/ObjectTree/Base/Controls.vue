@@ -32,7 +32,6 @@ watch(
         :class="{ 'is-expanded': showSearch }"
       >
         <ActionButton
-          data-testid="searchObjectsButton"
           :tooltip="showSearch ? 'Hide search' : 'Show search'"
           icon="mdi-magnify"
           tooltipLocation="bottom"
@@ -44,7 +43,6 @@ watch(
         <v-expand-x-transition>
           <div v-if="showSearch" class="flex-grow-1 ms-1 text-no-wrap overflow-hidden">
             <SearchBar
-              data-testid="searchObjectsInput"
               :model-value="search"
               placeholder="Search objects..."
               color="black"
@@ -69,7 +67,6 @@ watch(
             />
           </v-fade-transition>
           <ActionButton
-            data-testid="sortObjectsButton"
             :tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
             :icon="
               sortType === 'name' ? 'mdi-sort-alphabetical-ascending' : 'mdi-sort-numeric-ascending'
@@ -82,7 +79,6 @@ watch(
           <v-menu :close-on-content-click="false">
             <template #activator="{ props: menuProps }">
               <ActionButton
-                data-testid="filterObjectsButton"
                 tooltip="Filter options"
                 icon="mdi-filter-variant"
                 variant="text"
@@ -98,30 +94,18 @@ watch(
                   :label="category_id"
                   hide-details
                   density="compact"
-                  :data-testid="'filterCheckbox-' + category_id"
                 />
               </v-list-item>
             </v-list>
           </v-menu>
           <ActionButton
-            v-if="!isCollapsed"
-            data-testid="collapseAllObjectsButton"
-            tooltip="Collapse All"
-            icon="mdi-collapse-all-outline"
+            data-testid="CollapseOrExpandAll"
+            :tooltip="isCollapsed ? 'Expand All' : 'Collapse All'"
+            :icon="isCollapsed ? 'mdi-expand-all-outline' : 'mdi-collapse-all-outline'"
             variant="text"
             color="black"
             tooltipLocation="bottom"
-            @click="emit('collapse-all')"
-          />
-          <ActionButton
-            v-else
-            data-testid="expandAllObjectsButton"
-            tooltip="Expand All"
-            icon="mdi-expand-all-outline"
-            variant="text"
-            color="black"
-            tooltipLocation="bottom"
-            @click="emit('expand-all')"
+            @click="isCollapsed ? emit('expand-all') : emit('collapse-all')"
           />
         </div>
       </div>
