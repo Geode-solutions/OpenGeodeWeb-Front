@@ -14,8 +14,6 @@ import { executablePath } from "./path.js";
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 30;
 
-
-
 function resolveCommand(execPath, execName) {
   const command = commandExistsSync(execName) ? execName : executablePath(execPath, execName);
   return command;
