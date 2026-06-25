@@ -100,6 +100,7 @@ watch(
           </v-menu>
           <ActionButton
             v-if="!isCollapsed"
+            data-testid="collapseAllObjectsButton"
             tooltip="Collapse All"
             icon="mdi-collapse-all-outline"
             variant="text"
@@ -109,6 +110,7 @@ watch(
           />
           <ActionButton
             v-else
+            data-testid="expandAllObjectsButton"
             tooltip="Expand All"
             icon="mdi-expand-all-outline"
             variant="text"
