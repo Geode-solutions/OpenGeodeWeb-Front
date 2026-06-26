@@ -41,9 +41,14 @@ function killHttpMicroservice(microservice) {
   console.log("killHttpMicroservice", { ...microservice });
   const failMessage = `Failed to kill ${microservice.name}`;
   async function do_kill() {
-    await fetch(microservice.url, {
-      method: microservice.method,
-    });
+    try {
+      const fetchFunc = typeof $fetch === "undefined" ? fetch : $fetch;
+      await fetchFunc(microservice.url, {
+        method: microservice.method,
+      });
+    } catch (error) {
+      console.log(`Expected error during kill of ${microservice.name}:`, error.message);
+    }
   }
   return pTimeout(do_kill(), {
     milliseconds: 5000,

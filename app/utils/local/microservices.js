@@ -5,22 +5,18 @@ import path from "node:path";
 
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
-import { getPort } from "get-port-please";
-import pTimeout from "p-timeout";
 
 // Local imports
-import { commandExistsSync, waitForReady } from "./scripts.js";
+import { commandExistsSync, getAvailablePort, waitForReady } from "./scripts.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 import { executablePath } from "./path.js";
 
-const DEFAULT_TIMEOUT_SECONDS = 60;
 const MILLISECONDS_PER_SECOND = 1000;
+const DEFAULT_TIMEOUT_SECONDS = 30;
 
-function getAvailablePort() {
-  return getPort({
-    host: "localhost",
-    random: true,
-  });
+function resolveCommand(execPath, execName) {
+  const command = commandExistsSync(execName) ? execName : executablePath(execPath, execName);
+  return command;
 }
 
 async function runScript(
@@ -30,33 +26,31 @@ async function runScript(
   expectedResponse,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
-  let command = "";
-  if (commandExistsSync(execName)) {
-    command = execName;
-  } else {
-    command = path.join(executablePath(execPath, execName));
-  }
+  const command = resolveCommand(execPath, execName);
   console.log("runScript", command, args);
 
-  const child = child_process.spawn(process.platform === "win32" ? command : `"${command}"`, args, {
-    encoding: "utf8",
-    shell: true,
+  const child = child_process.spawn(command, args, {
+    stdio: ["ignore", "pipe", "pipe"],
   });
-  child.stdout.on("data", (data) => console.log(`[${execName}] ${data.toString()}`));
-  child.stderr.on("data", (data) => console.log(`[${execName}] ${data.toString()}`));
 
-  child.on("close", (code) => console.log(`[${execName}] exited with code ${code}`));
-  child.on("kill", () => {
-    console.log(`[${execName}] process killed`);
-  });
   child.name = command.replace(/^.*[\\/]/u, "");
 
+  child.on("spawn", () => {
+    console.log(`[${child.name}] spawned, pid=${child.pid}`);
+  });
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutSeconds * MILLISECONDS_PER_SECOND);
+  if (typeof timer.unref === "function") {
+    timer.unref();
+  }
+
   try {
-    return await pTimeout(waitForReady(child, expectedResponse), {
-      milliseconds: timeoutSeconds * MILLISECONDS_PER_SECOND,
-      message: `Timed out after ${timeoutSeconds} seconds`,
-    });
+    const result = await waitForReady(child, expectedResponse, controller.signal);
+    clearTimeout(timer);
+    return result;
   } catch (error) {
+    clearTimeout(timer);
     child.kill();
     throw error;
   }
@@ -73,11 +67,16 @@ async function runBack(execName, execPath, args = {}) {
   }
   const port = await getAvailablePort();
   const backArgs = [
-    `--port ${port}`,
-    `--data_folder_path ${projectFolderPath}`,
-    `--upload_folder_path ${uploadFolderPath}`,
-    `--allowed_origin http://localhost:*`,
-    `--timeout ${0}`,
+    "--port",
+    String(port),
+    "--data_folder_path",
+    projectFolderPath,
+    "--upload_folder_path",
+    uploadFolderPath,
+    "--allowed_origin",
+    "http://localhost:*",
+    "--timeout",
+    "0",
   ];
   if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
     backArgs.push("--debug");
@@ -94,9 +93,12 @@ async function runViewer(execName, execPath, args = {}) {
   }
   const port = await getAvailablePort();
   const viewerArgs = [
-    `--port ${port}`,
-    `--data_folder_path ${projectFolderPath}`,
-    `--timeout ${0}`,
+    "--port",
+    String(port),
+    "--data_folder_path",
+    projectFolderPath,
+    "--timeout",
+    "0",
   ];
   console.log("runViewer", execPath, execName, viewerArgs);
   await runScript(execPath, execName, viewerArgs, "Starting factory");

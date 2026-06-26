@@ -199,7 +199,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
 
 <template>
   <OptionsSection title="Lines Options" class="mt-4">
-    <VisibilitySwitch v-model="linesVisibility" />
+    <VisibilitySwitch data-testid="modelLinesVisibilitySwitch" v-model="linesVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="targetLineIds[0]"

@@ -205,6 +205,7 @@ function onVerticalResizeStart(event, index) {
       :style="activityBarAdaptiveStyles"
     >
       <v-btn
+        data-testid="toggleObjectsButton"
         icon="mdi-file-tree-outline"
         variant="text"
         :color="mainView ? 'primary' : 'black'"
