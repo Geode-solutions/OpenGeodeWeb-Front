@@ -102,7 +102,7 @@ function killWebsocketMicroservice(microservice) {
 }
 
 async function killMicroservice(microservice, microservices) {
-  console.log("killMicroservice", { microservice, microservices});
+  console.log("killMicroservice", { microservice, microservices });
   if (microservice.type === "back") {
     await killHttpMicroservice(microservice);
   } else if (microservice.type === "viewer") {
@@ -137,6 +137,7 @@ function projectMicroservices(projectFolderPath) {
 }
 
 async function cleanupBackend(projectFolderPath) {
+  console.log("cleanupBackend", { projectFolderPath });
   if (!fs.existsSync(projectFolderPath)) {
     console.log(`Folder ${projectFolderPath} does not exist. Skipping cleanup.`);
     return;
