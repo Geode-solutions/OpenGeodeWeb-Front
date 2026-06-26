@@ -37,6 +37,7 @@ function byteLength(str) {
   return encoder.encode(str).byteLength;
 }
 
+// oxlint-disable-next-line max-lines-per-function
 function waitForReady(child, expectedResponse, signal) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
@@ -45,11 +46,11 @@ function waitForReady(child, expectedResponse, signal) {
 
     let recentOutput = "";
 
-    function recordOutput(line) {
+    function recordOutput(lineOutput) {
       const safeLine =
-        byteLength(line) > MAX_ERROR_BUFFER_BYTES / 2
-          ? line.slice(0, MAX_ERROR_BUFFER_BYTES / 2) + "…[truncated]"
-          : line;
+        byteLength(lineOutput) > MAX_ERROR_BUFFER_BYTES / 2
+          ? `${lineOutput.slice(0, MAX_ERROR_BUFFER_BYTES / 2)}…[truncated]`
+          : lineOutput;
 
       recentOutput = `${recentOutput} ${safeLine}\n`;
 
@@ -73,14 +74,14 @@ function waitForReady(child, expectedResponse, signal) {
       }
     }
 
-    function onLine(line) {
-      console.log(`[${child.name}] ${line}`);
-      recordOutput(line);
-      if (line.includes(expectedResponse)) {
+    function onLine(lineOutput) {
+      console.log(`[${child.name}] ${lineOutput}`);
+      recordOutput(lineOutput);
+      if (lineOutput.includes(expectedResponse)) {
         cleanup();
-        readlineStdout.on("line", (l) => console.log(`[${child.name}] ${l}`));
-        readlineStderr.on("line", (l) => console.log(`[${child.name}] ${l}`));
-        child.once("close", (code) => console.log(`[${child.name}] exited with code ${code}`));
+        readlineStdout.on("line", (line) => {console.log(`[${child.name}] ${line}`)});
+        readlineStderr.on("line", (line) => {console.log(`[${child.name}] ${line}`)});
+        child.once("close", (code) => {console.log(`[${child.name}] exited with code ${code}`)});
         resolve(child);
       }
     }
