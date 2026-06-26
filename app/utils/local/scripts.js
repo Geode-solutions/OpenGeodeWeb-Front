@@ -78,9 +78,15 @@ function waitForReady(child, expectedResponse, signal) {
       recordOutput(lineOutput);
       if (lineOutput.includes(expectedResponse)) {
         cleanup();
-        readlineStdout.on("line", (line) => {console.log(`[${child.name}] ${line}`)});
-        readlineStderr.on("line", (line) => {console.log(`[${child.name}] ${line}`)});
-        child.once("close", (code) => {console.log(`[${child.name}] exited with code ${code}`)});
+        readlineStdout.on("line", (line) => {
+          console.log(`[${child.name}] ${line}`);
+        });
+        readlineStderr.on("line", (line) => {
+          console.log(`[${child.name}] ${line}`);
+        });
+        child.once("close", (code) => {
+          console.log(`[${child.name}] exited with code ${code}`);
+        });
         resolve(child);
       }
     }
