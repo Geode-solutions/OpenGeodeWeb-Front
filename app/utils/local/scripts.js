@@ -57,7 +57,6 @@ function waitForReady(child, expectedResponse, signal) {
       console.log(`[${child.name}] ${line}`);
       recordOutput(line);
       if (line.includes(expectedResponse)) {
-        cleanup();
         resolve(child);
       }
     }
