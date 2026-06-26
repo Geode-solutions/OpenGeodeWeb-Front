@@ -30,6 +30,13 @@ function commandExistsSync(execName) {
   });
 }
 
+
+const encoder = new TextEncoder();
+
+function byteLength(str) {
+  return encoder.encode(str).byteLength;
+}
+
 function waitForReady(child, expectedResponse, signal) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
@@ -37,15 +44,28 @@ function waitForReady(child, expectedResponse, signal) {
     const readlineStderr = readline.createInterface({ input: child.stderr });
 
     let recentOutput = "";
+
     function recordOutput(line) {
-      recentOutput = `${recentOutput} ${line} \n`.slice(-MAX_ERROR_BUFFER_BYTES);
+      const safeLine =
+        byteLength(line) > MAX_ERROR_BUFFER_BYTES / 2
+          ? line.slice(0, MAX_ERROR_BUFFER_BYTES / 2) + "…[truncated]"
+          : line;
+
+      recentOutput = `${recentOutput} ${safeLine}\n`;
+
+      while (byteLength(recentOutput) > MAX_ERROR_BUFFER_BYTES) {
+        const newline = recentOutput.indexOf("\n");
+        if (newline === -1) {
+          recentOutput = "";
+          break;
+        }
+        recentOutput = recentOutput.slice(newline + 1);
+      }
     }
 
     function cleanup() {
-      readlineStdout.removeAllListeners();
-      readlineStdout.close();
-      readlineStderr.removeAllListeners();
-      readlineStderr.close();
+      readlineStdout.removeListener("line", onLine);
+      readlineStderr.removeListener("line", onErrLine);
       child.removeListener("error", onError);
       child.removeListener("close", onClose);
       if (signal) {
@@ -58,6 +78,9 @@ function waitForReady(child, expectedResponse, signal) {
       recordOutput(line);
       if (line.includes(expectedResponse)) {
         cleanup();
+        readlineStdout.on("line", (l) => console.log(`[${child.name}] ${l}`));
+        readlineStderr.on("line", (l) => console.log(`[${child.name}] ${l}`));
+        child.once("close", (code) => console.log(`[${child.name}] exited with code ${code}`));
         resolve(child);
       }
     }
@@ -77,8 +100,7 @@ function waitForReady(child, expectedResponse, signal) {
       cleanup();
       reject(
         new Error(
-          `[${child.name}] exited with code ${code} before becoming ready.${
-            recentOutput ? `\nRecent output:\n${recentOutput}` : ""
+          `[${child.name}] exited with code ${code} before becoming ready.${recentOutput ? `\nRecent output:\n${recentOutput}` : ""
           }`,
         ),
       );
