@@ -52,6 +52,7 @@ watch(pressed, (value) => {
     flat
     canvas-height="75"
     hide-inputs
+    hide-eye-dropper
     width="220"
     mode="rgba"
     class="mx-auto"

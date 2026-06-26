@@ -35,11 +35,22 @@ export function useMeshEdgesStyle() {
     }
     if (type === "vertex") {
       const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
-      return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name);
+      const { colorMap } = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeStoredConfig(
+        id,
+        name,
+      );
+      return Promise.all([
+        meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name),
+        meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeColorMap(id, colorMap),
+      ]);
     }
     if (type === "edge") {
       const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
-      return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name);
+      const { colorMap } = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeStoredConfig(id, name);
+      return Promise.all([
+        meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name),
+        meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeColorMap(id, colorMap),
+      ]);
     }
     throw new Error(`Unknown mesh edges coloring type: ${type}`);
   }

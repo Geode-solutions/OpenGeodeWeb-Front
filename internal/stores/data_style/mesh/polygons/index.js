@@ -34,15 +34,30 @@ function useMeshPolygonsColoringStyle() {
         id,
         meshPolygonsColorStyle.meshPolygonsColor(id),
       );
-    } else if (type === "textures") {
+    }
+    if (type === "textures") {
       const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id);
       return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures);
-    } else if (type === "vertex") {
+    }
+    if (type === "vertex") {
       const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
-      return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name);
-    } else if (type === "polygon") {
+      const { colorMap } = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeStoredConfig(
+        id,
+        name,
+      );
+      return Promise.all([
+        meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name),
+        meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeColorMap(id, colorMap),
+      ]);
+    }
+    if (type === "polygon") {
       const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
-      return meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name);
+      const { colorMap } =
+        meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeStoredConfig(id, name);
+      return Promise.all([
+        meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name),
+        meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeColorMap(id, colorMap),
+      ]);
     }
     throw new Error(`Unknown mesh polygons coloring type: ${type}`);
   }
