@@ -30,6 +30,13 @@ function commandExistsSync(execName) {
   });
 }
 
+const encoder = new TextEncoder();
+
+function byteLength(str) {
+  return encoder.encode(str).byteLength;
+}
+
+// oxlint-disable-next-line max-lines-per-function
 function waitForReady(child, expectedResponse, signal) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
@@ -37,15 +44,28 @@ function waitForReady(child, expectedResponse, signal) {
     const readlineStderr = readline.createInterface({ input: child.stderr });
 
     let recentOutput = "";
-    function recordOutput(line) {
-      recentOutput = `${recentOutput} ${line} \n`.slice(-MAX_ERROR_BUFFER_BYTES);
+
+    function recordOutput(lineOutput) {
+      const safeLine =
+        byteLength(lineOutput) > MAX_ERROR_BUFFER_BYTES / 2
+          ? `${lineOutput.slice(0, MAX_ERROR_BUFFER_BYTES / 2)}…[truncated]`
+          : lineOutput;
+
+      recentOutput = `${recentOutput} ${safeLine}\n`;
+
+      while (byteLength(recentOutput) > MAX_ERROR_BUFFER_BYTES) {
+        const newline = recentOutput.indexOf("\n");
+        if (newline === -1) {
+          recentOutput = "";
+          break;
+        }
+        recentOutput = recentOutput.slice(newline + 1);
+      }
     }
 
     function cleanup() {
-      readlineStdout.removeAllListeners();
-      readlineStdout.close();
-      readlineStderr.removeAllListeners();
-      readlineStderr.close();
+      readlineStdout.removeListener("line", onLine);
+      readlineStderr.removeListener("line", onErrLine);
       child.removeListener("error", onError);
       child.removeListener("close", onClose);
       if (signal) {
@@ -53,11 +73,20 @@ function waitForReady(child, expectedResponse, signal) {
       }
     }
 
-    function onLine(line) {
-      console.log(`[${child.name}] ${line}`);
-      recordOutput(line);
-      if (line.includes(expectedResponse)) {
+    function onLine(lineOutput) {
+      console.log(`[${child.name}] ${lineOutput}`);
+      recordOutput(lineOutput);
+      if (lineOutput.includes(expectedResponse)) {
         cleanup();
+        readlineStdout.on("line", (line) => {
+          console.log(`[${child.name}] ${line}`);
+        });
+        readlineStderr.on("line", (line) => {
+          console.log(`[${child.name}] ${line}`);
+        });
+        child.once("close", (code) => {
+          console.log(`[${child.name}] exited with code ${code}`);
+        });
         resolve(child);
       }
     }
