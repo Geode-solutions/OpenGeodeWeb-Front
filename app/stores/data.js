@@ -191,15 +191,21 @@ export const useDataStore = defineStore("data", () => {
 
   async function exportStores() {
     const items = await data_db.toArray();
-    return { items };
+    const modelComponents = await model_components_db.toArray();
+    const modelComponentsRelations = await model_components_relation_db.toArray();
+    return { items, modelComponents, modelComponentsRelations };
   }
 
-  async function importStores(_snapshot) {
+  async function importStores(snapshot) {
     await clear();
+    await model_components_db.bulkPut(snapshot.modelComponents);
+    await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
   }
 
   async function clear() {
     await data_db.clear();
+    await model_components_db.clear();
+    await model_components_relation_db.clear();
   }
 
   return {
