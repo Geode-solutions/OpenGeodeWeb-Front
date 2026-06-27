@@ -3,24 +3,129 @@ import child_process from "node:child_process";
 import fs from "node:fs";
 import { on } from "node:events";
 import path from "node:path";
+import readline from "node:readline";
 
+// Third party imports
+import { getPort } from "get-port-please";
+
+// Local imports
 import { appMode } from "./app_mode.js";
+
+const BYTES_PER_KIBIBYTE = 1024;
+const MAX_ERROR_BUFFER_KIBIBYTES = 64;
+const MAX_ERROR_BUFFER_BYTES = MAX_ERROR_BUFFER_KIBIBYTES * BYTES_PER_KIBIBYTE;
+
+function getAvailablePort() {
+  return getPort({
+    host: "localhost",
+    random: true,
+  });
+}
 
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || "";
-  return envPath.split(path.delimiter).some((dir) => {
-    const filePath = path.join(dir, execName);
+  return envPath.split(path.delimiter).some((directory) => {
+    const filePath = path.join(directory, execName);
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
   });
 }
 
-async function waitForReady(child, expectedResponse) {
-  for await (const [data] of on(child.stdout, "data")) {
-    if (data.toString().includes(expectedResponse)) {
-      return child;
+const encoder = new TextEncoder();
+
+function byteLength(str) {
+  return encoder.encode(str).byteLength;
+}
+
+// oxlint-disable-next-line max-lines-per-function
+function waitForReady(child, expectedResponse, signal) {
+  // oxlint-disable-next-line promise/avoid-new
+  return new Promise((resolve, reject) => {
+    const readlineStdout = readline.createInterface({ input: child.stdout });
+    const readlineStderr = readline.createInterface({ input: child.stderr });
+
+    let recentOutput = "";
+
+    function recordOutput(lineOutput) {
+      const safeLine =
+        byteLength(lineOutput) > MAX_ERROR_BUFFER_BYTES / 2
+          ? `${lineOutput.slice(0, MAX_ERROR_BUFFER_BYTES / 2)}…[truncated]`
+          : lineOutput;
+
+      recentOutput = `${recentOutput} ${safeLine}\n`;
+
+      while (byteLength(recentOutput) > MAX_ERROR_BUFFER_BYTES) {
+        const newline = recentOutput.indexOf("\n");
+        if (newline === -1) {
+          recentOutput = "";
+          break;
+        }
+        recentOutput = recentOutput.slice(newline + 1);
+      }
     }
-  }
-  throw new Error("Process closed before signal");
+
+    function cleanup() {
+      readlineStdout.removeListener("line", onLine);
+      readlineStderr.removeListener("line", onErrLine);
+      child.removeListener("error", onError);
+      child.removeListener("close", onClose);
+      if (signal) {
+        signal.removeEventListener("abort", onAbort);
+      }
+    }
+
+    function onLine(lineOutput) {
+      console.log(`[${child.name}] ${lineOutput}`);
+      recordOutput(lineOutput);
+      if (lineOutput.includes(expectedResponse)) {
+        cleanup();
+        readlineStdout.on("line", (line) => {
+          console.log(`[${child.name}] ${line}`);
+        });
+        readlineStderr.on("line", (line) => {
+          console.log(`[${child.name}] ${line}`);
+        });
+        child.once("close", (code) => {
+          console.log(`[${child.name}] exited with code ${code}`);
+        });
+        resolve(child);
+      }
+    }
+
+    function onErrLine(line) {
+      console.log(`[${child.name}] ${line}`);
+      recordOutput(line);
+    }
+
+    function onError(err) {
+      cleanup();
+      reject(err);
+    }
+
+    function onClose(code) {
+      console.log(`[${child.name}] exited with code ${code}`);
+      cleanup();
+      reject(
+        new Error(
+          `[${child.name}] exited with code ${code} before becoming ready.${
+            recentOutput ? `\nRecent output:\n${recentOutput}` : ""
+          }`,
+        ),
+      );
+    }
+
+    function onAbort() {
+      cleanup();
+      reject(new Error(`[${child.name}] timed out waiting for "${expectedResponse}"`));
+    }
+
+    readlineStdout.on("line", onLine);
+    readlineStderr.on("line", onErrLine);
+    child.once("error", onError);
+    child.once("close", onClose);
+    if (signal) {
+      signal.addEventListener("abort", onAbort, { once: true });
+    }
+  });
 }
 
 async function waitNuxt(nuxtProcess) {
@@ -49,11 +154,17 @@ async function waitNuxt(nuxtProcess) {
 async function runBrowser(scriptName) {
   process.env.MODE = appMode.BROWSER;
 
+  const port = await getAvailablePort();
+
   const nuxtProcess = child_process.spawn("npm", ["run", scriptName], {
     shell: true,
     FORCE_COLOR: true,
+    env: {
+      ...process.env,
+      PORT: port,
+    },
   });
   return await waitNuxt(nuxtProcess);
 }
 
-export { runBrowser, waitForReady, commandExistsSync };
+export { commandExistsSync, getAvailablePort, runBrowser, waitForReady };

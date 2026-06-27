@@ -58,7 +58,11 @@ async function copyToClipboard(text, label) {
 </script>
 
 <template>
-  <div ref="label-container" class="tree-item-label-container w-100">
+  <div
+    ref="label-container"
+    :data-testid="'treeRow-' + actualItem.id"
+    class="tree-item-label-container w-100"
+  >
     <v-tooltip
       :disabled="tooltipDisabled"
       location="right"
