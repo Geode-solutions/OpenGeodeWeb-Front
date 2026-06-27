@@ -28,7 +28,7 @@ const CLIPPING_RANGE1 = 0.1;
 const CLIPPING_RANGE2 = 1000;
 const CLIPPING_RANGE = [CLIPPING_RANGE1, CLIPPING_RANGE2];
 const POINT_SIZE = 2;
-const VIEWER_CALL_COUNT = 2;
+const VIEWER_CALL_COUNT = 1;
 
 // Snapshot
 const snapshotMock = {
@@ -104,12 +104,17 @@ const dataStoreMock = {
   clear: vi.fn(),
   registerObject: vi.fn().mockResolvedValue(),
   addItem: vi.fn().mockResolvedValue(),
+  importStores: vi.fn().mockResolvedValue(),
 };
 const dataStyleStoreMock = {
   importStores: vi.fn().mockResolvedValue(),
   applyAllStylesFromState: vi.fn().mockResolvedValue(),
   addDataStyle: vi.fn().mockResolvedValue(),
   applyDefaultStyle: vi.fn().mockResolvedValue(),
+};
+const feedbackStoreMock = {
+  add_success: vi.fn(),
+  add_error: vi.fn(),
 };
 
 const viewer_call_mock_fn = vi.fn().mockResolvedValue();
@@ -176,6 +181,9 @@ vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
 vi.mock(import("@ogw_front/stores/back"), () => ({
   useBackStore: () => backStoreMock,
 }));
+vi.mock(import("@ogw_front/stores/feedback"), () => ({
+  useFeedbackStore: () => feedbackStoreMock,
+}));
 vi.mock(import("@ogw_front/stores/app"), () => ({
   useAppStore: () => ({
     exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
@@ -202,6 +210,7 @@ function verifyViewerCalls() {
 
 function verifyStoreImports() {
   expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.treeview);
+  expect(dataStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.data);
   expect(hybridViewerStoreMock.initHybridViewer).toHaveBeenCalledWith();
   expect(hybridViewerStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.hybridViewer);
   expect(hybridViewerStoreMock.setZScaling).toHaveBeenCalledWith(Z_SCALE);
@@ -220,6 +229,7 @@ function verifyRemaining() {
   expect(dataStyleStoreMock.addDataStyle).toHaveBeenCalledWith("abc123", "PointSet2D");
   expect(dataStyleStoreMock.applyDefaultStyle).toHaveBeenCalledWith("abc123");
   expect(hybridViewerStoreMock.remoteRender).toHaveBeenCalledWith();
+  expect(feedbackStoreMock.add_success).toHaveBeenCalledWith("Project imported successfully");
 }
 
 describe("projectManager composable (compact)", () => {
@@ -231,6 +241,7 @@ describe("projectManager composable (compact)", () => {
       dataStoreMock,
       dataStyleStoreMock,
       hybridViewerStoreMock,
+      feedbackStoreMock,
     ];
     for (const store of storesList) {
       const values = Object.values(store);
@@ -249,6 +260,7 @@ describe("projectManager composable (compact)", () => {
     await exportProject();
 
     expect(fileDownload).toHaveBeenCalledWith({ snapshot: snapshotMock }, "project.vease");
+    expect(feedbackStoreMock.add_success).toHaveBeenCalledWith("Project exported successfully");
   });
 
   test("importProjectFile with snapshot - Viewer and Stores", async () => {

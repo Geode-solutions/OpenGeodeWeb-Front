@@ -40,11 +40,22 @@ export function useMeshCellsStyle() {
     }
     if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
-      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name);
+      const { colorMap } = meshCellsVertexAttributeStyle.meshCellsVertexAttributeStoredConfig(
+        id,
+        name,
+      );
+      return Promise.all([
+        meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name),
+        meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeColorMap(id, colorMap),
+      ]);
     }
     if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
-      return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
+      const { colorMap } = meshCellsCellAttributeStyle.meshCellsCellAttributeStoredConfig(id, name);
+      return Promise.all([
+        meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name),
+        meshCellsCellAttributeStyle.setMeshCellsCellAttributeColorMap(id, colorMap),
+      ]);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }

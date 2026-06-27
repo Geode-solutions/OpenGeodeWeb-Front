@@ -28,9 +28,17 @@ function useMeshPointsColoringStyle() {
     });
     if (type === "constant") {
       return meshPointsColorStyle.setMeshPointsColor(id, meshPointsColorStyle.meshPointsColor(id));
-    } else if (type === "vertex") {
+    }
+    if (type === "vertex") {
       const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
-      return meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name);
+      const { colorMap } = meshPointsVertexAttributeStyle.meshPointsVertexAttributeStoredConfig(
+        id,
+        name,
+      );
+      return Promise.all([
+        meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name),
+        meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeColorMap(id, colorMap),
+      ]);
     }
     throw new Error(`Unknown mesh points coloring type: ${type}`);
   }

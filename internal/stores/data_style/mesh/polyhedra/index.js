@@ -38,14 +38,27 @@ export function useMeshPolyhedraStyle() {
     }
     if (type === "vertex") {
       const name = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
-      return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name);
+      const { colorMap } =
+        meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeStoredConfig(id, name);
+      return Promise.all([
+        meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name),
+        meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeColorMap(id, colorMap),
+      ]);
     }
     if (type === "polyhedron") {
       const name = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
-      return meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(
-        id,
-        name,
-      );
+      const { colorMap } =
+        meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeStoredConfig(
+          id,
+          name,
+        );
+      return Promise.all([
+        meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(id, name),
+        meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeColorMap(
+          id,
+          colorMap,
+        ),
+      ]);
     }
     throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
   }
