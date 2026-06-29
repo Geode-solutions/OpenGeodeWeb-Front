@@ -1,7 +1,6 @@
 // Node imports
 import child_process from "node:child_process";
 import fs from "node:fs";
-import path from "node:path";
 
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
