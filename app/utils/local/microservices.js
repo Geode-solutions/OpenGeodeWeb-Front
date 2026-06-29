@@ -1,6 +1,7 @@
 // Node imports
 import child_process from "node:child_process";
 import fs from "node:fs";
+import path from "node:path";
 
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
@@ -60,12 +61,18 @@ async function runBack(execName, execPath, args = {}) {
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
+  let { uploadFolderPath } = args;
+  if (!uploadFolderPath) {
+    uploadFolderPath = path.join(projectFolderPath, "uploads");
+  }
   const port = await getAvailablePort();
   const backArgs = [
     "--port",
     String(port),
     "--project_folder_path",
     projectFolderPath,
+    "--upload_folder_path",
+    uploadFolderPath,
     "--allowed_origin",
     "http://localhost:*",
     "--timeout",
