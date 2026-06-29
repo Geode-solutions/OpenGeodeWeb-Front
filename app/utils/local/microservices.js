@@ -61,18 +61,12 @@ async function runBack(execName, execPath, args = {}) {
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
-  let { uploadFolderPath } = args;
-  if (!uploadFolderPath) {
-    uploadFolderPath = path.join(projectFolderPath, "uploads");
-  }
   const port = await getAvailablePort();
   const backArgs = [
     "--port",
     String(port),
-    "--data_folder_path",
+    "--project_folder_path",
     projectFolderPath,
-    "--upload_folder_path",
-    uploadFolderPath,
     "--allowed_origin",
     "http://localhost:*",
     "--timeout",
@@ -95,7 +89,7 @@ async function runViewer(execName, execPath, args = {}) {
   const viewerArgs = [
     "--port",
     String(port),
-    "--data_folder_path",
+    "--project_folder_path",
     projectFolderPath,
     "--timeout",
     "0",
