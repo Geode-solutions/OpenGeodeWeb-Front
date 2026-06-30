@@ -9,25 +9,31 @@ import { v4 as uuidv4 } from "uuid";
 
 // Local imports
 import { appMode } from "./app_mode.js";
+import { commandExistsSync } from "./scripts.js";
 
 function executablePath(execPath, execName) {
+  const osExecutableName = executableName(execName)
   const resourcesPath = process.env.RESOURCES_PATH;
   const mode = process.env.MODE;
   const nodeEnv = process.env.NODE_ENV;
   console.log("[executablePath]", { execPath, execName, mode, nodeEnv, resourcesPath });
   if (mode === appMode.DESKTOP && nodeEnv === "production") {
-    const execPathInResources = path.join(resourcesPath, executableName(execName));
+    const execPathInResources = path.join(resourcesPath, osExecutableName);
     if (fs.existsSync(execPathInResources)) {
       console.log(`[executablePath] Found executable in resources path: ${execPathInResources}`);
       return execPathInResources;
     }
   }
-  const localExecPath = path.join(execPath, executableName(execName));
+  const localExecPath = path.join(execPath, osExecutableName);
   if (fs.existsSync(localExecPath)) {
     console.log(`[executablePath] Found executable in local path: ${localExecPath}`);
     return localExecPath;
   }
-  throw new Error(`Executable not found: ${execName}`);
+  if (commandExistsSync(osExecutableName)) {
+    console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
+    return osExecutableName;
+  }
+  throw new Error(`Executable not found: ${osExecutableName}`);
 }
 
 function executableName(execName) {
