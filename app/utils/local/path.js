@@ -12,7 +12,7 @@ import { appMode } from "./app_mode.js";
 import { commandExistsSync } from "./scripts.js";
 
 function executablePath(execPath, execName) {
-  const osExecutableName = executableName(execName)
+  const osExecutableName = executableName(execName);
   const resourcesPath = process.env.RESOURCES_PATH;
   const mode = process.env.MODE;
   const nodeEnv = process.env.NODE_ENV;
