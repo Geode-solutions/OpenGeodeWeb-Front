@@ -20,7 +20,7 @@ async function artifactImage(registry, parent, repo) {
     name,
   });
   const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/github`;
-  const digest = response.data.version.split("/").pop();
+  const digest = response.project.version.split("/").pop();
   const image = `${artifactRegistry}/${repo}@${digest}`;
   console.log("Found image for", repo, image);
   return image;
@@ -48,8 +48,8 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
     },
   };
   const volumeMounts = {
-    name: "data",
-    mountPath: "/data",
+    name: "project",
+    mountPath: "/project",
   };
   return {
     parent,
@@ -63,7 +63,7 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
       template: {
         volumes: [
           {
-            name: "data",
+            name: "project",
             emptyDir: {
               medium: "MEMORY",
             },
