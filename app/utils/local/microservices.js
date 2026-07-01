@@ -7,17 +7,12 @@ import path from "node:path";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
 
 // Local imports
-import { commandExistsSync, getAvailablePort, waitForReady } from "./scripts.js";
+import { getAvailablePort, waitForReady } from "./scripts.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 import { executablePath } from "./path.js";
 
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 30;
-
-function resolveCommand(execPath, execName) {
-  const command = commandExistsSync(execName) ? execName : executablePath(execPath, execName);
-  return command;
-}
 
 async function runScript(
   execPath,
@@ -26,7 +21,7 @@ async function runScript(
   expectedResponse,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ) {
-  const command = resolveCommand(execPath, execName);
+  const command = executablePath(execPath, execName);
   console.log("runScript", command, args);
 
   const child = child_process.spawn(command, args, {
@@ -69,7 +64,7 @@ async function runBack(execName, execPath, args = {}) {
   const backArgs = [
     "--port",
     String(port),
-    "--data_folder_path",
+    "--project_folder_path",
     projectFolderPath,
     "--upload_folder_path",
     uploadFolderPath,
@@ -95,7 +90,7 @@ async function runViewer(execName, execPath, args = {}) {
   const viewerArgs = [
     "--port",
     String(port),
-    "--data_folder_path",
+    "--project_folder_path",
     projectFolderPath,
     "--timeout",
     "0",
