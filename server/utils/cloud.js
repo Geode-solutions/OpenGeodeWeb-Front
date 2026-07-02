@@ -20,7 +20,7 @@ async function artifactImage(registry, parent, repo) {
     name,
   });
   console.log({ response });
-  const digest = response.project.version.split("/").pop();
+  const digest = response.data.version.split("/").pop();
   const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/github`;
   const image = `${artifactRegistry}/${repo}@${digest}`;
   console.log("Found image for", repo, image);
