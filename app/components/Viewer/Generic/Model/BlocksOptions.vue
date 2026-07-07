@@ -72,7 +72,12 @@ const blocksVertexAttributeName = computed({
     item: dataStyleStore.modelBlocksVertexAttributeValue(modelId, targetBlockIds[0]).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, targetBlockIds, newValue.name, newValue.item);
+    await dataStyleStore.setModelBlocksVertexAttributeName(
+      modelId,
+      targetBlockIds,
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -104,7 +109,12 @@ const blocksPolyhedronAttributeName = computed({
     item: dataStyleStore.modelBlocksPolyhedronAttributeValue(modelId, targetBlockIds[0]).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, targetBlockIds, newValue.name, newValue.item);
+    await dataStyleStore.setModelBlocksPolyhedronAttributeName(
+      modelId,
+      targetBlockIds,
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -141,7 +151,12 @@ const vertexAttributeName = computed({
     item: dataStyleStore.modelBlocksVertexAttributeValue(modelId, blockId).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [blockId], newValue.name, newValue.item);
+    await dataStyleStore.setModelBlocksVertexAttributeName(
+      modelId,
+      [blockId],
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -173,7 +188,12 @@ const polyhedronAttributeName = computed({
     item: dataStyleStore.modelBlocksPolyhedronAttributeValue(modelId, blockId).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [blockId], newValue.name, newValue.item);
+    await dataStyleStore.setModelBlocksPolyhedronAttributeName(
+      modelId,
+      [blockId],
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });

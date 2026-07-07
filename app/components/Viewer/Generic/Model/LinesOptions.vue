@@ -72,7 +72,12 @@ const linesVertexAttributeName = computed({
     item: dataStyleStore.modelLinesVertexAttributeValue(modelId, targetLineIds[0]).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeName(modelId, targetLineIds, newValue.name, newValue.item);
+    await dataStyleStore.setModelLinesVertexAttributeName(
+      modelId,
+      targetLineIds,
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -104,7 +109,12 @@ const linesEdgeAttributeName = computed({
     item: dataStyleStore.modelLinesEdgeAttributeValue(modelId, targetLineIds[0]).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, targetLineIds, newValue.name, newValue.item);
+    await dataStyleStore.setModelLinesEdgeAttributeName(
+      modelId,
+      targetLineIds,
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -137,7 +147,12 @@ const vertexAttributeName = computed({
     item: dataStyleStore.modelLinesVertexAttributeValue(modelId, lineId).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeName(modelId, [lineId], newValue.name, newValue.item);
+    await dataStyleStore.setModelLinesVertexAttributeName(
+      modelId,
+      [lineId],
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -169,7 +184,12 @@ const edgeAttributeName = computed({
     item: dataStyleStore.modelLinesEdgeAttributeValue(modelId, lineId).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, [lineId], newValue.name, newValue.item);
+    await dataStyleStore.setModelLinesEdgeAttributeName(
+      modelId,
+      [lineId],
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });

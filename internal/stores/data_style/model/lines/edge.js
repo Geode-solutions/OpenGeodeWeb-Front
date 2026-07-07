@@ -56,7 +56,7 @@ export function useModelLinesEdgeAttribute() {
 
   async function setModelLinesEdgeAttributeName(modelId, lineIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-    const params = { id: modelId, block_ids: viewer_ids, name , item};
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {

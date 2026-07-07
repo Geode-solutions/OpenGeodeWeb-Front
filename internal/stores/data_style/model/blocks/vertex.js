@@ -56,7 +56,7 @@ export function useModelBlocksVertexAttribute() {
 
   async function setModelBlocksVertexAttributeName(modelId, blockIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-    const params = { id: modelId, block_ids: viewer_ids, name , item};
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {

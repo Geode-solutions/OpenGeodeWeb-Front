@@ -56,11 +56,12 @@ export function useModelBlocksPolyhedronAttribute() {
 
   async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-    const params = { id: modelId, block_ids: viewer_ids, name , item};
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item }),
+        response_function: () =>
+          mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item }),
       },
     );
   }

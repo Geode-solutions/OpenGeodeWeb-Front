@@ -56,7 +56,7 @@ export function useModelCornersVertexAttribute() {
 
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
-    const params = { id: modelId, block_ids: viewer_ids, name , item};
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {

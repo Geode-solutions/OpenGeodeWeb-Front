@@ -72,7 +72,12 @@ const surfacesVertexAttributeName = computed({
     item: dataStyleStore.modelSurfacesVertexAttributeValue(modelId, targetSurfaceIds[0]).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, targetSurfaceIds, newValue.name, newValue.item);
+    await dataStyleStore.setModelSurfacesVertexAttributeName(
+      modelId,
+      targetSurfaceIds,
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -108,7 +113,12 @@ const surfacesPolygonAttributeName = computed({
     item: dataStyleStore.modelSurfacesPolygonAttributeValue(modelId, targetSurfaceIds[0]).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, targetSurfaceIds, newValue.name, newValue.item);
+    await dataStyleStore.setModelSurfacesPolygonAttributeName(
+      modelId,
+      targetSurfaceIds,
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -145,7 +155,12 @@ const vertexAttributeName = computed({
     item: dataStyleStore.modelSurfacesVertexAttributeValue(modelId, surfaceId).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, [surfaceId], newValue.name, newValue.item);
+    await dataStyleStore.setModelSurfacesVertexAttributeName(
+      modelId,
+      [surfaceId],
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -177,7 +192,12 @@ const polygonAttributeName = computed({
     item: dataStyleStore.modelSurfacesPolygonAttributeValue(modelId, surfaceId).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, [surfaceId], newValue.name, newValue.item);
+    await dataStyleStore.setModelSurfacesPolygonAttributeName(
+      modelId,
+      [surfaceId],
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });

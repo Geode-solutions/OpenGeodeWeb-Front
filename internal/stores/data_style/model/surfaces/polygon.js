@@ -56,11 +56,12 @@ export function useModelSurfacesPolygonAttribute() {
 
   async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name , item};
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item }),
+        response_function: () =>
+          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item }),
       },
     );
   }

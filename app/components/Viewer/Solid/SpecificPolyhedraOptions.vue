@@ -83,7 +83,11 @@ const polyhedron_attribute_name = computed({
   }),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue.name, newValue.item),
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
+        targetId,
+        newValue.name,
+        newValue.item,
+      ),
     );
     hybridViewerStore.remoteRender();
   },

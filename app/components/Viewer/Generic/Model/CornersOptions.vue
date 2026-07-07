@@ -73,7 +73,12 @@ const cornersVertexAttributeName = computed({
     item: dataStyleStore.modelCornersVertexAttributeValue(modelId, targetCornerIds[0]).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue.name, newValue.item);
+    await dataStyleStore.setModelCornersVertexAttributeName(
+      modelId,
+      targetCornerIds,
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -106,7 +111,12 @@ const vertexAttributeName = computed({
     item: dataStyleStore.modelCornersVertexAttributeValue(modelId, cornerId).item,
   }),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeName(modelId, [cornerId], newValue.name, newValue.item);
+    await dataStyleStore.setModelCornersVertexAttributeName(
+      modelId,
+      [cornerId],
+      newValue.name,
+      newValue.item,
+    );
     hybridViewerStore.remoteRender();
   },
 });
