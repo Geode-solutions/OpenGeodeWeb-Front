@@ -42,16 +42,21 @@ export function useMeshCellsCellAttributeStyle() {
     return meshCellsCellAttribute(id).name;
   }
 
-  function setMeshCellsCellAttributeName(id, name) {
+  function meshCellsCellAttributeValue(id) {
+    const attr = meshCellsCellAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  function setMeshCellsCellAttributeName(id, name, item = 0) {
     const schema = meshCellsCellAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: () => meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name }),
+        response_function: () => meshCellsCommonStyle.mutateMeshCellsCellStyle(id, { name, item }),
       },
     );
   }
@@ -113,6 +118,7 @@ export function useMeshCellsCellAttributeStyle() {
 
   return {
     meshCellsCellAttributeName,
+    meshCellsCellAttributeValue,
     meshCellsCellAttributeRange,
     meshCellsCellAttributeColorMap,
     meshCellsCellAttributeStoredConfig,

@@ -13,8 +13,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const mesh_cells_schemas = viewer_schemas.opengeodeweb_viewer.mesh.cells;
 const file_name = "test.og_rgd2d";
 const geode_object = "RegularGrid2D";
-const vertex_attribute = { name: "points" };
-const cell_attribute = { name: "RGB_data" };
+const vertex_attribute = { name: "points", item: 0 };
+const cell_attribute = { name: "RGB_data", item: 0 };
 
 let id = "",
   projectFolderPath = "";

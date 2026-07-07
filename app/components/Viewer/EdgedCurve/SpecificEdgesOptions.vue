@@ -56,10 +56,13 @@ const color = computed({
   },
 });
 const vertex_attribute_name = computed({
-  get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
+  get: () => ({
+    name: dataStyleStore.meshEdgesVertexAttributeName(id.value),
+    item: dataStyleStore.meshEdgesVertexAttributeValue(id.value).item,
+  }),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue),
+      dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue.name, newValue.item),
     );
     hybridViewerStore.remoteRender();
   },
@@ -83,10 +86,13 @@ const vertex_attribute_color_map = computed({
   },
 });
 const edge_attribute_name = computed({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
+  get: () => ({
+    name: dataStyleStore.meshEdgesEdgeAttributeName(id.value),
+    item: dataStyleStore.meshEdgesEdgeAttributeValue(id.value).item,
+  }),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue),
+      dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue.name, newValue.item),
     );
     hybridViewerStore.remoteRender();
   },

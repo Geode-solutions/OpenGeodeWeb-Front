@@ -49,13 +49,18 @@ export function useModelCornersVertexAttribute() {
     return modelCornersVertexAttribute(modelId, cornerId).name;
   }
 
-  async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
+  function modelCornersVertexAttributeValue(id) {
+    const attr = modelCornersVertexAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  async function setModelCornersVertexAttributeName(modelId, cornerIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
+    const params = { id: modelId, block_ids: viewer_ids, name , item};
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelCornersVertexStyle(modelId, cornerIds, { name }),
+        response_function: () => mutateModelCornersVertexStyle(modelId, cornerIds, { name, item }),
       },
     );
   }
@@ -121,6 +126,7 @@ export function useModelCornersVertexAttribute() {
 
   return {
     modelCornersVertexAttributeName,
+    modelCornersVertexAttributeValue,
     modelCornersVertexAttributeRange,
     modelCornersVertexAttributeColorMap,
     modelCornersVertexAttributeStoredConfig,

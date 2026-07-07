@@ -49,13 +49,18 @@ export function useModelBlocksPolyhedronAttribute() {
     return modelBlocksPolyhedronAttribute(modelId, blockId).name;
   }
 
-  async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
+  function modelBlocksPolyhedronAttributeValue(id) {
+    const attr = modelBlocksPolyhedronAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
+    const params = { id: modelId, block_ids: viewer_ids, name , item};
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name }),
+        response_function: () => mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item }),
       },
     );
   }
@@ -121,6 +126,7 @@ export function useModelBlocksPolyhedronAttribute() {
 
   return {
     modelBlocksPolyhedronAttributeName,
+    modelBlocksPolyhedronAttributeValue,
     modelBlocksPolyhedronAttributeRange,
     modelBlocksPolyhedronAttributeColorMap,
     modelBlocksPolyhedronAttributeStoredConfig,

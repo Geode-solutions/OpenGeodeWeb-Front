@@ -67,9 +67,12 @@ const lineActiveColoring = computed({
 
 // Group Attributes
 const linesVertexAttributeName = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, targetLineIds[0]),
+  get: () => ({
+    name: dataStyleStore.modelLinesVertexAttributeName(modelId, targetLineIds[0]),
+    item: dataStyleStore.modelLinesVertexAttributeValue(modelId, targetLineIds[0]).item,
+  }),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeName(modelId, targetLineIds, newValue);
+    await dataStyleStore.setModelLinesVertexAttributeName(modelId, targetLineIds, newValue.name, newValue.item);
     hybridViewerStore.remoteRender();
   },
 });
@@ -96,9 +99,12 @@ const linesVertexAttributeColorMap = computed({
 });
 
 const linesEdgeAttributeName = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, targetLineIds[0]),
+  get: () => ({
+    name: dataStyleStore.modelLinesEdgeAttributeName(modelId, targetLineIds[0]),
+    item: dataStyleStore.modelLinesEdgeAttributeValue(modelId, targetLineIds[0]).item,
+  }),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, targetLineIds, newValue);
+    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, targetLineIds, newValue.name, newValue.item);
     hybridViewerStore.remoteRender();
   },
 });
@@ -126,9 +132,12 @@ const linesEdgeAttributeColorMap = computed({
 
 // Individual Attributes
 const vertexAttributeName = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, lineId),
+  get: () => ({
+    name: dataStyleStore.modelLinesVertexAttributeName(modelId, lineId),
+    item: dataStyleStore.modelLinesVertexAttributeValue(modelId, lineId).item,
+  }),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeName(modelId, [lineId], newValue);
+    await dataStyleStore.setModelLinesVertexAttributeName(modelId, [lineId], newValue.name, newValue.item);
     hybridViewerStore.remoteRender();
   },
 });
@@ -155,9 +164,12 @@ const vertexAttributeColorMap = computed({
 });
 
 const edgeAttributeName = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, lineId),
+  get: () => ({
+    name: dataStyleStore.modelLinesEdgeAttributeName(modelId, lineId),
+    item: dataStyleStore.modelLinesEdgeAttributeValue(modelId, lineId).item,
+  }),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, [lineId], newValue);
+    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, [lineId], newValue.name, newValue.item);
     hybridViewerStore.remoteRender();
   },
 });

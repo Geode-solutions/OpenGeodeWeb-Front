@@ -49,13 +49,18 @@ export function useModelLinesVertexAttribute() {
     return modelLinesVertexAttribute(modelId, lineId).name;
   }
 
-  async function setModelLinesVertexAttributeName(modelId, lineIds, name) {
+  function modelLinesVertexAttributeValue(id) {
+    const attr = modelLinesVertexAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  async function setModelLinesVertexAttributeName(modelId, lineIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
+    const params = { id: modelId, block_ids: viewer_ids, name , item};
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelLinesVertexStyle(modelId, lineIds, { name }),
+        response_function: () => mutateModelLinesVertexStyle(modelId, lineIds, { name, item }),
       },
     );
   }
@@ -115,6 +120,7 @@ export function useModelLinesVertexAttribute() {
 
   return {
     modelLinesVertexAttributeName,
+    modelLinesVertexAttributeValue,
     modelLinesVertexAttributeRange,
     modelLinesVertexAttributeColorMap,
     modelLinesVertexAttributeStoredConfig,

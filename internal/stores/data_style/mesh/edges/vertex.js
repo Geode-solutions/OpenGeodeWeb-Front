@@ -54,14 +54,19 @@ export function useMeshEdgesVertexAttributeStyle() {
   function meshEdgesVertexAttributeName(id) {
     return meshEdgesVertexAttribute(id).name;
   }
-  function setMeshEdgesVertexAttributeName(id, name) {
+
+  function meshEdgesVertexAttributeValue(id) {
+    const attr = meshEdgesVertexAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+  function setMeshEdgesVertexAttributeName(id, name, item = 0) {
     const schema = meshEdgesVertexAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
         response_function: () => {
-          const updates = { name };
+          const updates = { name, item };
           const vertex = meshEdgesVertexAttribute(id);
           if (!(name in vertex.storedConfigs)) {
             updates.storedConfigs = {
@@ -130,6 +135,7 @@ export function useMeshEdgesVertexAttributeStyle() {
 
   return {
     meshEdgesVertexAttributeName,
+    meshEdgesVertexAttributeValue,
     meshEdgesVertexAttributeRange,
     meshEdgesVertexAttributeColorMap,
     meshEdgesVertexAttributeStoredConfig,

@@ -49,13 +49,18 @@ export function useModelSurfacesVertexAttribute() {
     return modelSurfacesVertexAttribute(modelId, surfaceId).name;
   }
 
-  async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
+  function modelSurfacesVertexAttributeValue(id) {
+    const attr = modelSurfacesVertexAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
+    const params = { id: modelId, block_ids: viewer_ids, name , item};
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name }),
+        response_function: () => mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item }),
       },
     );
   }
@@ -121,6 +126,7 @@ export function useModelSurfacesVertexAttribute() {
 
   return {
     modelSurfacesVertexAttributeName,
+    modelSurfacesVertexAttributeValue,
     modelSurfacesVertexAttributeRange,
     modelSurfacesVertexAttributeColorMap,
     modelSurfacesVertexAttributeStoredConfig,

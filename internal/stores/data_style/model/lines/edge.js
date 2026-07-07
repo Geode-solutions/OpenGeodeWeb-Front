@@ -49,13 +49,18 @@ export function useModelLinesEdgeAttribute() {
     return modelLinesEdgeAttribute(modelId, lineId).name;
   }
 
-  async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
+  function modelLinesEdgeAttributeValue(id) {
+    const attr = modelLinesEdgeAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  async function setModelLinesEdgeAttributeName(modelId, lineIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
+    const params = { id: modelId, block_ids: viewer_ids, name , item};
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, { name }),
+        response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, { name, item }),
       },
     );
   }
@@ -115,6 +120,7 @@ export function useModelLinesEdgeAttribute() {
 
   return {
     modelLinesEdgeAttributeName,
+    modelLinesEdgeAttributeValue,
     modelLinesEdgeAttributeRange,
     modelLinesEdgeAttributeColorMap,
     modelLinesEdgeAttributeStoredConfig,

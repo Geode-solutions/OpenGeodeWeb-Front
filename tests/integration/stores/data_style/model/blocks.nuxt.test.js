@@ -110,6 +110,7 @@ describe("model blocks", () => {
             id,
             block_ids: block_viewer_ids,
             name: "points",
+            item: 0,
           },
         },
         {
@@ -147,6 +148,7 @@ describe("model blocks", () => {
             id,
             block_ids: block_viewer_ids,
             name: "test_attribute",
+            item: 0,
           },
         },
         {

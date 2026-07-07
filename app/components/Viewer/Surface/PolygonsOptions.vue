@@ -56,10 +56,13 @@ const textures = computed({
   },
 });
 const vertex_attribute_name = computed({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
+  get: () => ({
+    name: dataStyleStore.meshPolygonsVertexAttributeName(id.value),
+    item: dataStyleStore.meshPolygonsVertexAttributeValue(id.value).item,
+  }),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue),
+      dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue.name, newValue.item),
     );
     hybridViewerStore.remoteRender();
   },
@@ -83,10 +86,13 @@ const vertex_attribute_color_map = computed({
   },
 });
 const polygon_attribute_name = computed({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
+  get: () => ({
+    name: dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
+    item: dataStyleStore.meshPolygonsPolygonAttributeValue(id.value).item,
+  }),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue),
+      dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue.name, newValue.item),
     );
     hybridViewerStore.remoteRender();
   },

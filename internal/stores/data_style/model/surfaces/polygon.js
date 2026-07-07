@@ -49,13 +49,18 @@ export function useModelSurfacesPolygonAttribute() {
     return modelSurfacesPolygonAttribute(modelId, surfaceId).name;
   }
 
-  async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
+  function modelSurfacesPolygonAttributeValue(id) {
+    const attr = modelSurfacesPolygonAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name, item = 0) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
+    const params = { id: modelId, block_ids: viewer_ids, name , item};
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name }),
+        response_function: () => mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item }),
       },
     );
   }
@@ -121,6 +126,7 @@ export function useModelSurfacesPolygonAttribute() {
 
   return {
     modelSurfacesPolygonAttributeName,
+    modelSurfacesPolygonAttributeValue,
     modelSurfacesPolygonAttributeRange,
     modelSurfacesPolygonAttributeColorMap,
     modelSurfacesPolygonAttributeStoredConfig,

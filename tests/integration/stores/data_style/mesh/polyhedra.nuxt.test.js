@@ -13,8 +13,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const mesh_polyhedra_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra;
 const file_name = "test.vtu";
 const geode_object = "HybridSolid3D";
-const vertex_attribute = { name: "toto_on_vertices" };
-const polyhedron_attribute = { name: "toto_on_polyhedra" };
+const vertex_attribute = { name: "toto_on_vertices", item: 0 };
+const polyhedron_attribute = { name: "toto_on_polyhedra", item: 0 };
 
 let id = "",
   projectFolderPath = "";

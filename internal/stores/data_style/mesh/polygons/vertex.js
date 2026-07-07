@@ -51,14 +51,19 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return meshPolygonsVertexAttribute(id).name;
   }
 
-  function setMeshPolygonsVertexAttributeName(id, name) {
+  function meshPolygonsVertexAttributeValue(id) {
+    const attr = meshPolygonsVertexAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  function setMeshPolygonsVertexAttributeName(id, name, item = 0) {
     const schema = meshPolygonsVertexAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
         response_function: () => {
-          const updates = { name };
+          const updates = { name, item };
           const vertex = meshPolygonsVertexAttribute(id);
           if (!(name in vertex.storedConfigs)) {
             updates.storedConfigs = {
@@ -130,6 +135,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
 
   return {
     meshPolygonsVertexAttributeName,
+    meshPolygonsVertexAttributeValue,
     meshPolygonsVertexAttributeRange,
     meshPolygonsVertexAttributeColorMap,
     meshPolygonsVertexAttributeStoredConfig,

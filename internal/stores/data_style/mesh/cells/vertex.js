@@ -51,14 +51,19 @@ export function useMeshCellsVertexAttributeStyle() {
     return meshCellsVertexAttribute(id).name;
   }
 
-  function setMeshCellsVertexAttributeName(id, name) {
+  function meshCellsVertexAttributeValue(id) {
+    const attr = meshCellsVertexAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  function setMeshCellsVertexAttributeName(id, name, item = 0) {
     const schema = meshCellsVertexAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
         response_function: () => {
-          const updates = { name };
+          const updates = { name, item };
           const vertex = meshCellsVertexAttribute(id);
           if (!(name in vertex.storedConfigs)) {
             updates.storedConfigs = {
@@ -129,6 +134,7 @@ export function useMeshCellsVertexAttributeStyle() {
 
   return {
     meshCellsVertexAttributeName,
+    meshCellsVertexAttributeValue,
     meshCellsVertexAttributeRange,
     meshCellsVertexAttributeColorMap,
     meshCellsVertexAttributeStoredConfig,

@@ -54,9 +54,14 @@ export function useMeshEdgesEdgeAttributeStyle() {
     return meshEdgesEdgeAttribute(id).name;
   }
 
-  function setMeshEdgesEdgeAttributeName(id, name) {
+  function meshEdgesEdgeAttributeValue(id) {
+    const attr = meshEdgesEdgeAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  function setMeshEdgesEdgeAttributeName(id, name, item = 0) {
     const schema = meshEdgesEdgeAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       {
         schema,
@@ -64,7 +69,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
       },
       {
         response_function: () => {
-          const updates = { name };
+          const updates = { name, item };
           const edge = meshEdgesEdgeAttribute(id);
           if (!(name in edge.storedConfigs)) {
             updates.storedConfigs = {
@@ -135,6 +140,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
 
   return {
     meshEdgesEdgeAttributeName,
+    meshEdgesEdgeAttributeValue,
     meshEdgesEdgeAttributeRange,
     meshEdgesEdgeAttributeColorMap,
     meshEdgesEdgeAttributeStoredConfig,

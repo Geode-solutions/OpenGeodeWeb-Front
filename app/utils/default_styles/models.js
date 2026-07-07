@@ -30,6 +30,7 @@ function modelCornersDefaultStyle(
       constant,
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },
@@ -47,10 +48,12 @@ function modelLinesDefaultStyle(
       constant,
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
       edge: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },
@@ -68,10 +71,12 @@ function modelSurfacesDefaultStyle(
       constant,
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
       polygon: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },
@@ -89,10 +94,12 @@ function modelBlocksDefaultStyle(
       constant,
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
       polyhedron: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },

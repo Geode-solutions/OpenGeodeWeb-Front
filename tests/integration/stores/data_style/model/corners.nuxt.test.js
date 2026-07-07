@@ -114,6 +114,7 @@ describe("model corners", () => {
             id,
             block_ids: corner_viewer_ids,
             name: "points",
+            item: 0,
           },
         },
         {

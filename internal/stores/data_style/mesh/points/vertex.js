@@ -50,6 +50,11 @@ function useMeshPointsVertexAttributeConfig() {
     return meshPointsVertexAttribute(id).name;
   }
 
+  function meshPointsVertexAttributeValue(id) {
+    const attr = meshPointsVertexAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
   function meshPointsVertexAttributeRange(id) {
     const name = meshPointsVertexAttributeName(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name);
@@ -70,6 +75,7 @@ function useMeshPointsVertexAttributeConfig() {
     setMeshPointsVertexAttributeStoredConfig,
     mutateMeshPointsVertexStyle,
     meshPointsVertexAttributeName,
+    meshPointsVertexAttributeValue,
     meshPointsVertexAttributeRange,
     meshPointsVertexAttributeColorMap,
   };
@@ -80,14 +86,14 @@ function useMeshPointsVertexAttributeActions() {
   const viewerStore = useViewerStore();
   const config = useMeshPointsVertexAttributeConfig();
 
-  function setMeshPointsVertexAttributeName(id, name) {
+  function setMeshPointsVertexAttributeName(id, name, item = 0) {
     const schema = meshPointsVertexAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
         response_function: () => {
-          const updates = { name };
+          const updates = { name, item };
           const vertex = config.meshPointsVertexAttribute(id);
           if (!(name in vertex.storedConfigs)) {
             updates.storedConfigs = {

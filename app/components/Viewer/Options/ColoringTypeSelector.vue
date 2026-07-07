@@ -9,23 +9,23 @@ const coloring_style_key = defineModel("coloring_style_key", { type: String });
 const color = defineModel("color", { type: Object });
 const textures = defineModel("textures", { type: Array });
 
-const vertex_attribute_name = defineModel("vertex_attribute_name", { type: String });
+const vertex_attribute_name = defineModel("vertex_attribute_name", { type: Object });
 const vertex_attribute_range = defineModel("vertex_attribute_range", { type: Array });
 const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", { type: String });
 
-const edge_attribute_name = defineModel("edge_attribute_name", { type: String });
+const edge_attribute_name = defineModel("edge_attribute_name", { type: Object });
 const edge_attribute_range = defineModel("edge_attribute_range", { type: Array });
 const edge_attribute_color_map = defineModel("edge_attribute_color_map", { type: String });
 
-const cell_attribute_name = defineModel("cell_attribute_name", { type: String });
+const cell_attribute_name = defineModel("cell_attribute_name", { type: Object });
 const cell_attribute_range = defineModel("cell_attribute_range", { type: Array });
 const cell_attribute_color_map = defineModel("cell_attribute_color_map", { type: String });
 
-const polygon_attribute_name = defineModel("polygon_attribute_name", { type: String });
+const polygon_attribute_name = defineModel("polygon_attribute_name", { type: Object });
 const polygon_attribute_range = defineModel("polygon_attribute_range", { type: Array });
 const polygon_attribute_color_map = defineModel("polygon_attribute_color_map", { type: String });
 
-const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", { type: String });
+const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", { type: Object });
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range", { type: Array });
 const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map", {
   type: String,
@@ -161,11 +161,13 @@ watch(
   () => {
     const key = active_key.value;
     const names = {
-      vertex: vertex_attribute_name.value,
-      edge: edge_attribute_name.value,
-      cell: cell_attribute_name.value,
-      polygon: polygon_attribute_name.value,
-      polyhedron: polyhedron_attribute_name.value,
+      vertex: vertex_attribute_name.value ? vertex_attribute_name.value.name : undefined,
+      edge: edge_attribute_name.value ? edge_attribute_name.value.name : undefined,
+      cell: cell_attribute_name.value ? cell_attribute_name.value.name : undefined,
+      polygon: polygon_attribute_name.value ? polygon_attribute_name.value.name : undefined,
+      polyhedron: polyhedron_attribute_name.value
+        ? polyhedron_attribute_name.value.name
+        : undefined,
     };
     if (!(key in names) || names[key]) {
       coloring_style_key.value = key;
@@ -211,7 +213,7 @@ watch(
       </template>
       <template v-if="active_key === vertex_dict['value'] && hasColorMap('vertex')">
         <ViewerOptionsAttributeSelector
-          v-model:name="vertex_attribute_name"
+          v-model:attribute="vertex_attribute_name"
           v-model:range="vertex_attribute_range"
           v-model:colorMap="vertex_attribute_color_map"
           :id="id"
@@ -221,7 +223,7 @@ watch(
       </template>
       <template v-if="active_key === edge_dict['value'] && hasColorMap('edge')">
         <ViewerOptionsAttributeSelector
-          v-model:name="edge_attribute_name"
+          v-model:attribute="edge_attribute_name"
           v-model:range="edge_attribute_range"
           v-model:colorMap="edge_attribute_color_map"
           :id="id"
@@ -231,7 +233,7 @@ watch(
       </template>
       <template v-if="active_key === cell_dict['value'] && hasColorMap('cell')">
         <ViewerOptionsAttributeSelector
-          v-model:name="cell_attribute_name"
+          v-model:attribute="cell_attribute_name"
           v-model:range="cell_attribute_range"
           v-model:colorMap="cell_attribute_color_map"
           :id="id"
@@ -241,7 +243,7 @@ watch(
       </template>
       <template v-if="active_key === polygon_dict['value'] && hasColorMap('polygon')">
         <ViewerOptionsAttributeSelector
-          v-model:name="polygon_attribute_name"
+          v-model:attribute="polygon_attribute_name"
           v-model:range="polygon_attribute_range"
           v-model:colorMap="polygon_attribute_color_map"
           :id="id"
@@ -251,7 +253,7 @@ watch(
       </template>
       <template v-if="active_key === polyhedron_dict['value'] && hasColorMap('polyhedron')">
         <ViewerOptionsAttributeSelector
-          v-model:name="polyhedron_attribute_name"
+          v-model:attribute="polyhedron_attribute_name"
           v-model:range="polyhedron_attribute_range"
           v-model:colorMap="polyhedron_attribute_color_map"
           :id="id"

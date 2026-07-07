@@ -114,6 +114,7 @@ describe("model lines", () => {
             id,
             block_ids: lines_viewer_ids,
             name: "points",
+            item: 0,
           },
         },
         {
@@ -147,6 +148,7 @@ describe("model lines", () => {
             id,
             block_ids: lines_viewer_ids,
             name: "test_attribute",
+            item: 0,
           },
         },
         {

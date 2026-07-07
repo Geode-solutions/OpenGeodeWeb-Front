@@ -50,6 +50,11 @@ function useMeshPolyhedraVertexAttributeConfig() {
     return meshPolyhedraVertexAttribute(id).name;
   }
 
+  function meshPolyhedraVertexAttributeValue(id) {
+    const attr = meshPolyhedraVertexAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
   function meshPolyhedraVertexAttributeRange(id) {
     const name = meshPolyhedraVertexAttributeName(id);
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name);
@@ -70,6 +75,7 @@ function useMeshPolyhedraVertexAttributeConfig() {
     setMeshPolyhedraVertexAttributeStoredConfig,
     mutateMeshPolyhedraVertexStyle,
     meshPolyhedraVertexAttributeName,
+    meshPolyhedraVertexAttributeValue,
     meshPolyhedraVertexAttributeRange,
     meshPolyhedraVertexAttributeColorMap,
   };
@@ -80,9 +86,9 @@ function useMeshPolyhedraVertexAttributeActions() {
   const viewerStore = useViewerStore();
   const config = useMeshPolyhedraVertexAttributeConfig();
 
-  function setMeshPolyhedraVertexAttributeName(id, name) {
+  function setMeshPolyhedraVertexAttributeName(id, name, item = 0) {
     const schema = meshPolyhedraVertexAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       {
         schema,
@@ -90,7 +96,7 @@ function useMeshPolyhedraVertexAttributeActions() {
       },
       {
         response_function: () => {
-          const updates = { name };
+          const updates = { name, item };
           const vertex = config.meshPolyhedraVertexAttribute(id);
           if (!(name in vertex.storedConfigs)) {
             updates.storedConfigs = {

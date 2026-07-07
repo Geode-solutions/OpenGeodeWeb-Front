@@ -51,14 +51,19 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     return meshPolygonsPolygonAttribute(id).name;
   }
 
-  function setMeshPolygonsPolygonAttributeName(id, name) {
+  function meshPolygonsPolygonAttributeValue(id) {
+    const attr = meshPolygonsPolygonAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
+  function setMeshPolygonsPolygonAttributeName(id, name, item = 0) {
     const schema = meshPolygonsPolygonAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
         response_function: () => {
-          const updates = { name };
+          const updates = { name, item };
           const polygon = meshPolygonsPolygonAttribute(id);
           if (!(name in polygon.storedConfigs)) {
             updates.storedConfigs = {
@@ -130,6 +135,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
 
   return {
     meshPolygonsPolygonAttributeName,
+    meshPolygonsPolygonAttributeValue,
     meshPolygonsPolygonAttributeRange,
     meshPolygonsPolygonAttributeColorMap,
     meshPolygonsPolygonAttributeStoredConfig,

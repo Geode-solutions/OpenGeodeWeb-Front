@@ -112,6 +112,7 @@ describe("model surfaces", () => {
             id,
             block_ids: surface_viewer_ids,
             name: "points",
+            item: 0,
           },
         },
         {
@@ -149,6 +150,7 @@ describe("model surfaces", () => {
             id,
             block_ids: surface_viewer_ids,
             name: "test_attribute",
+            item: 0,
           },
         },
         {

@@ -13,8 +13,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons;
 const file_name = "test.og_psf3d";
 const geode_object = "PolygonalSurface3D";
-const vertex_attribute = { name: "points" };
-const polygon_attribute = { name: "test_attribute" };
+const vertex_attribute = { name: "points", item: 0 };
+const polygon_attribute = { name: "test_attribute", item: 0 };
 
 let id = "",
   projectFolderPath = "";

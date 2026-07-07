@@ -13,7 +13,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points;
 const file_name = "test.og_edc2d";
 const geode_object = "EdgedCurve2D";
-const vertex_attribute = { name: "points" };
+const vertex_attribute = { name: "points", item: 0 };
 
 let id = "",
   projectFolderPath = "";

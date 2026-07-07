@@ -13,8 +13,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const mesh_edges_schemas = viewer_schemas.opengeodeweb_viewer.mesh.edges;
 const file_name = "test.og_edc3d";
 const geode_object = "EdgedCurve3D";
-const vertex_attribute = { name: "vertex_attribute" };
-const edge_attribute = { name: "edge_attribute" };
+const vertex_attribute = { name: "vertex_attribute", item: 0 };
+const edge_attribute = { name: "edge_attribute", item: 0 };
 
 let id = "",
   projectFolderPath = "";

@@ -50,6 +50,11 @@ function useMeshPolyhedraPolyhedronAttributeConfig() {
     return meshPolyhedraPolyhedronAttribute(id).name;
   }
 
+  function meshPolyhedraPolyhedronAttributeValue(id) {
+    const attr = meshPolyhedraPolyhedronAttribute(id);
+    return { name: attr.name, item: attr.item };
+  }
+
   function meshPolyhedraPolyhedronAttributeRange(id) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name);
@@ -70,6 +75,7 @@ function useMeshPolyhedraPolyhedronAttributeConfig() {
     setMeshPolyhedraPolyhedronAttributeStoredConfig,
     mutateMeshPolyhedraPolyhedronStyle,
     meshPolyhedraPolyhedronAttributeName,
+    meshPolyhedraPolyhedronAttributeValue,
     meshPolyhedraPolyhedronAttributeRange,
     meshPolyhedraPolyhedronAttributeColorMap,
   };
@@ -80,9 +86,9 @@ function useMeshPolyhedraPolyhedronAttributeActions() {
   const viewerStore = useViewerStore();
   const config = useMeshPolyhedraPolyhedronAttributeConfig();
 
-  function setMeshPolyhedraPolyhedronAttributeName(id, name) {
+  function setMeshPolyhedraPolyhedronAttributeName(id, name, item = 0) {
     const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
-    const params = { id, name };
+    const params = { id, name, item };
     return viewerStore.request(
       {
         schema,
@@ -90,7 +96,7 @@ function useMeshPolyhedraPolyhedronAttributeActions() {
       },
       {
         response_function: () => {
-          const updates = { name };
+          const updates = { name, item };
           const polyhedron = config.meshPolyhedraPolyhedronAttribute(id);
           if (!(name in polyhedron.storedConfigs)) {
             updates.storedConfigs = {

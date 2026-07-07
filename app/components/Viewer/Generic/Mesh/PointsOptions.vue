@@ -57,10 +57,13 @@ const color = computed({
   },
 });
 const vertex_attribute_name = computed({
-  get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
+  get: () => ({
+    name: dataStyleStore.meshPointsVertexAttributeName(id.value),
+    item: dataStyleStore.meshPointsVertexAttributeValue(id.value).item,
+  }),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue),
+      dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue.name, newValue.item),
     );
     hybridViewerStore.remoteRender();
   },

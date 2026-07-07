@@ -56,10 +56,13 @@ const textures = computed({
   },
 });
 const vertex_attribute_name = computed({
-  get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
+  get: () => ({
+    name: dataStyleStore.meshCellsVertexAttributeName(id.value),
+    item: dataStyleStore.meshCellsVertexAttributeValue(id.value).item,
+  }),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue),
+      dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue.name, newValue.item),
     );
     hybridViewerStore.remoteRender();
   },
@@ -83,10 +86,13 @@ const vertex_attribute_color_map = computed({
   },
 });
 const cell_attribute_name = computed({
-  get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
+  get: () => ({
+    name: dataStyleStore.meshCellsCellAttributeName(id.value),
+    item: dataStyleStore.meshCellsCellAttributeValue(id.value).item,
+  }),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue),
+      dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue.name, newValue.item),
     );
     hybridViewerStore.remoteRender();
   },

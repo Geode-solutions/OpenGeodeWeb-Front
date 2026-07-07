@@ -26,6 +26,7 @@ function meshPointsDefaultStyle(
       constant,
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },
@@ -45,10 +46,12 @@ function meshEdgesDefaultStyle(
       constant,
       edge: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },
@@ -66,6 +69,7 @@ function meshCellsDefaultStyle(
       active: MESH_DEFAULT_ACTIVE_COLORING,
       cell: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
       constant,
@@ -73,6 +77,7 @@ function meshCellsDefaultStyle(
       textures: null,
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },
@@ -92,10 +97,12 @@ function meshPolygonsDefaultStyle(
       textures: null,
       polygon: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },
@@ -113,10 +120,12 @@ function meshPolyhedraDefaultStyle(
       constant,
       polyhedron: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
       vertex: {
         name: undefined,
+        item: 0,
         storedConfigs: {},
       },
     },
