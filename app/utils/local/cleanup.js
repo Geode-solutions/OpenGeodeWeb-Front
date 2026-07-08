@@ -32,7 +32,9 @@ async function deleteFolderRecursive(folderPath) {
       console.log("Retrying delete folder");
     }
   }
-  throw new Error(`Failed to delete folder ${folderPath} after ${MAX_DELETE_FOLDER_RETRIES} retries`);
+  throw new Error(
+    `Failed to delete folder ${folderPath} after ${MAX_DELETE_FOLDER_RETRIES} retries`,
+  );
 }
 
 function killHttpMicroservice(microservice) {
@@ -118,10 +120,11 @@ async function killMicroservices(microservices) {
   const results = await Promise.allSettled(
     microservices.map((microservice) => killMicroservice(microservice)),
   );
- const killed = microservices.filter((_, index) => results[index].status === "fulfilled");for (let i = 0; i < killed.length; i += 1) {
-  const microservice = microservices[i];
-  microservices.splice(microservices.indexOf(microservice), 1);
-}
+  const killed = microservices.filter((_, index) => results[index].status === "fulfilled");
+  for (let i = 0; i < killed.length; i += 1) {
+    const microservice = microservices[i];
+    microservices.splice(microservices.indexOf(microservice), 1);
+  }
 }
 
 function projectMicroservices(projectFolderPath) {
