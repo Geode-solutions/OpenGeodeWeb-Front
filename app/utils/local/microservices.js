@@ -68,7 +68,7 @@ async function runBack(execName, execPath, args = {}) {
     projectFolderPath,
     "--upload_folder_path",
     uploadFolderPath,
-    "--allowed_origin",
+    "--allowed_origins",
     "http://localhost:*",
     "--timeout",
     "0",
