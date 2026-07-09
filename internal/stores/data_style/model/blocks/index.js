@@ -36,34 +36,36 @@ export function useModelBlocksStyle() {
       }
       visibilityGroups[visibility].push(block_id);
 
-      const color_mode = style.color_mode || "constant";
-      if (color_mode === "constant" || color_mode === "random") {
-        const color_key = color_mode === "random" ? "random" : JSON.stringify(style.color);
+      const coloring = modelColorStyle.modelBlockColoring(modelId, block_id);
+      const activeColoring = modelColorStyle.modelBlockActiveColoring(modelId, block_id);
+      if (activeColoring === "constant") {
+        const color = modelColorStyle.modelBlockColor(modelId, block_id);
+        const color_key = JSON.stringify(color);
         if (!colorGroups[color_key]) {
-          colorGroups[color_key] = { color_mode, color: style.color, blocks_ids: [] };
+          colorGroups[color_key] = { activeColoring, color, blocks_ids: [] };
         }
         colorGroups[color_key].blocks_ids.push(block_id);
-      } else {
-        const attributeTypeKey = `${color_mode}_attribute`;
-        const attributeStyle = style[attributeTypeKey] || {};
-        const { name } = attributeStyle;
-        if (name) {
-          const storedConfig =
-            (attributeStyle.storedConfigs && attributeStyle.storedConfigs[name]) || {};
-          const { minimum, maximum, colorMap } = storedConfig;
-          const attributeGroupKey = `${color_mode}_${name}_${colorMap}_${minimum}_${maximum}`;
-          if (!attributeGroups[attributeGroupKey]) {
-            attributeGroups[attributeGroupKey] = {
-              color_mode,
-              name,
-              minimum,
-              maximum,
-              colorMap,
-              blocks_ids: [],
-            };
-          }
-          attributeGroups[attributeGroupKey].blocks_ids.push(block_id);
+      } else if (activeColoring === "random") {
+        if (!colorGroups["random"]) {
+          colorGroups["random"] = { activeColoring, color: undefined, blocks_ids: [] };
         }
+        colorGroups["random"].blocks_ids.push(block_id);
+      } else {
+        const attributeStyle = coloring[activeColoring];
+        const { name } = attributeStyle;
+        const { minimum, maximum, colorMap } = attributeStyle.storedConfigs[name];
+        const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
+        if (!attributeGroups[attributeGroupKey]) {
+          attributeGroups[attributeGroupKey] = {
+            activeColoring,
+            name,
+            minimum,
+            maximum,
+            colorMap,
+            blocks_ids: [],
+          };
+        }
+        attributeGroups[attributeGroupKey].blocks_ids.push(block_id);
       }
     }
 
@@ -71,12 +73,12 @@ export function useModelBlocksStyle() {
       ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
         modelVisibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
       ),
-      ...Object.values(colorGroups).map(({ color_mode, color, blocks_ids: ids }) =>
-        modelColorStyle.setModelBlocksColor(modelId, ids, color, color_mode),
+      ...Object.values(colorGroups).map(({ activeColoring, color, blocks_ids: ids }) =>
+        modelColorStyle.setModelBlocksColor(modelId, ids, color, activeColoring),
       ),
       ...Object.values(attributeGroups).flatMap(
-        ({ color_mode, name, minimum, maximum, colorMap, blocks_ids: ids }) => {
-          const isVertex = color_mode === "vertex";
+        ({ activeColoring, name, minimum, maximum, colorMap, blocks_ids: ids }) => {
+          const isVertex = activeColoring === "vertex";
           const attributeStyle = isVertex
             ? modelBlocksVertexAttribute
             : modelBlocksPolyhedronAttribute;

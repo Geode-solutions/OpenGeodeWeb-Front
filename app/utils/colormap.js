@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/prefer-export-from
 import colormaps from "@ogw_front/assets/colormaps.json";
 
 import { newInstance as vtkColorTransferFunction } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
@@ -58,10 +59,6 @@ function drawCanvasForPreset(presetName, canvas) {
   ctx.putImageData(imageData, 0, 0);
 }
 
-export {
-  drawCanvasForPreset,
-  getRGBPointsFromPreset,
-  getPresetByName,
-  getPresetsWithCurrentAtTop,
-  colormaps,
-};
+export { drawCanvasForPreset, getRGBPointsFromPreset, getPresetByName, getPresetsWithCurrentAtTop };
+
+export { default as colormaps } from "@ogw_front/assets/colormaps.json";

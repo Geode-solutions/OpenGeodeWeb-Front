@@ -13,7 +13,7 @@ export function useMeshEdgesColorStyle() {
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
   function meshEdgesColor(id) {
-    return meshEdgesCommonStyle.meshEdgesColoring(id).color;
+    return meshEdgesCommonStyle.meshEdgesColoring(id).constant;
   }
   function setMeshEdgesColor(id, color) {
     const params = { id, color };
@@ -25,7 +25,7 @@ export function useMeshEdgesColorStyle() {
       {
         response_function: () =>
           meshEdgesCommonStyle.mutateMeshEdgesColoring(id, {
-            color,
+            constant: color,
           }),
       },
     );

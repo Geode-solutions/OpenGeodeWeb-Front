@@ -30,7 +30,7 @@ export function useMeshPolyhedraStyle() {
       coloring: { active: type },
     });
     console.log(setMeshPolyhedraActiveColoring.name, { id }, type);
-    if (type === "color") {
+    if (type === "constant") {
       return meshPolyhedraColorStyle.setMeshPolyhedraColor(
         id,
         meshPolyhedraColorStyle.meshPolyhedraColor(id),
@@ -38,20 +38,27 @@ export function useMeshPolyhedraStyle() {
     }
     if (type === "vertex") {
       const name = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
-      return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name);
+      const { colorMap } =
+        meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeStoredConfig(id, name);
+      return Promise.all([
+        meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name),
+        meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeColorMap(id, colorMap),
+      ]);
     }
     if (type === "polyhedron") {
       const name = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
-      return meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(
-        id,
-        name,
-      );
+      const { colorMap } =
+        meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeStoredConfig(
+          id,
+          name,
+        );
+      return Promise.all([
+        meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(id, name),
+        meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeColorMap(
+          id,
+          colorMap,
+        ),
+      ]);
     }
     throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
   }

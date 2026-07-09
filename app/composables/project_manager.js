@@ -8,6 +8,7 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -16,6 +17,7 @@ async function exportProject() {
   console.log("[export triggered]");
   const appStore = useAppStore();
   const backStore = useBackStore();
+  const feedbackStore = useFeedbackStore();
   const snapshot = await appStore.exportStores();
   const schema = back_schemas.opengeodeweb_back.export_project;
   const defaultName = "project.vease";
@@ -26,6 +28,7 @@ async function exportProject() {
     body: { snapshot, filename: defaultName },
   });
   fileDownload(result, defaultName);
+  feedbackStore.add_success("Project exported successfully");
   return { result };
 }
 
@@ -73,23 +76,20 @@ async function importProject(file) {
     await client2.getConnection().getSession().call("opengeodeweb_viewer.import_project", [{}]);
   }
 
-  await treeviewStore.importStores(snapshot.treeview || {});
+  await treeviewStore.importStores(snapshot.treeview);
+  await dataStore.importStores(snapshot.data);
   await hybridViewerStore.initHybridViewer();
-  await hybridViewerStore.importStores(snapshot.hybridViewer || {});
 
   const items = snapshot?.data?.items || [];
-
   await importWorkflowFromSnapshot(items);
-  await hybridViewerStore.importStores(snapshot.hybridViewer || {});
-  {
-    await dataStyleStore.importStores(snapshot.dataStyle || {});
-  }
-  {
-    await dataStyleStore.applyAllStylesFromState();
-  }
+  await hybridViewerStore.importStores(snapshot.hybridViewer);
+  await dataStyleStore.importStores(snapshot.dataStyle);
+  await dataStyleStore.applyAllStylesFromState();
 
   treeviewStore.finalizeImportSelection();
   treeviewStore.isImporting = false;
+  const feedbackStore = useFeedbackStore();
+  feedbackStore.add_success("Project imported successfully");
 }
 
 export { exportProject, importProject };

@@ -13,7 +13,7 @@ export function useMeshPolygonsColorStyle() {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
   function meshPolygonsColor(id) {
-    return meshPolygonsCommonStyle.meshPolygonsColoring(id).color;
+    return meshPolygonsCommonStyle.meshPolygonsColoring(id).constant;
   }
   function setMeshPolygonsColor(id, color) {
     const params = { id, color };
@@ -25,7 +25,7 @@ export function useMeshPolygonsColorStyle() {
       {
         response_function: () =>
           meshPolygonsCommonStyle.mutateMeshPolygonsColoring(id, {
-            color,
+            constant: color,
           }),
       },
     );

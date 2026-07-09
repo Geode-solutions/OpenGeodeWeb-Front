@@ -23,7 +23,7 @@ function calc_margin(index) {
     transition="slide-x-reverse-transition"
     max-width="200px"
     height="20px"
-    timeout="10000"
+    timeout="-1"
     z-index="4"
   >
     <v-row dense class="flex-nowrap">

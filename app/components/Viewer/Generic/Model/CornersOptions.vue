@@ -13,6 +13,7 @@ const { modelId, cornerId, targetCornerIds } = defineProps({
 });
 
 const dataStyleStore = useDataStyleStore();
+console.log("CornersOptions setup!");
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
@@ -44,28 +45,24 @@ const cornersColor = computed({
 const cornerColor = computed({
   get: () => dataStyleStore.modelCornerColor(modelId, cornerId),
   set: async (color) => {
-    if (cornerId) {
-      await dataStyleStore.setModelCornersColor(modelId, [cornerId], color);
-      hybridViewerStore.remoteRender();
-    }
-  },
-});
-
-const cornersColorMode = computed({
-  get: () => dataStyleStore.getModelComponentTypeColorMode(modelId, "Corner"),
-  set: async (colorMode) => {
-    await dataStyleStore.setModelComponentTypeColorMode(modelId, "Corner", colorMode);
+    await dataStyleStore.setModelCornersColor(modelId, [cornerId], color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornerColorMode = computed({
-  get: () => dataStyleStore.modelCornerColorMode(modelId, cornerId),
-  set: async (colorMode) => {
-    if (cornerId) {
-      await dataStyleStore.setModelComponentColorMode(modelId, cornerId, colorMode);
-      hybridViewerStore.remoteRender();
-    }
+const cornersActiveColoring = computed({
+  get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner"),
+  set: async (coloringType) => {
+    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Corner", coloringType);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const cornerActiveColoring = computed({
+  get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId),
+  set: async (coloringType) => {
+    await dataStyleStore.setModelCornersActiveColoring(modelId, [cornerId], coloringType);
+    hybridViewerStore.remoteRender();
   },
 });
 
@@ -144,11 +141,11 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
 
 <template>
   <OptionsSection title="Corners Options" class="mt-4">
-    <VisibilitySwitch v-model="cornersVisibility" />
+    <VisibilitySwitch data-testid="modelCornersVisibilitySwitch" v-model="cornersVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="targetCornerIds[0]"
-      v-model:coloring_style_key="cornersColorMode"
+      v-model:coloring_style_key="cornersActiveColoring"
       v-model:color="cornersColor"
       v-model:vertex_attribute_name="cornersVertexAttributeName"
       v-model:vertex_attribute_range="cornersVertexAttributeRange"
@@ -164,7 +161,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentId="cornerId"
-      v-model:coloring_style_key="cornerColorMode"
+      v-model:coloring_style_key="cornerActiveColoring"
       v-model:color="cornerColor"
       v-model:vertex_attribute_name="vertexAttributeName"
       v-model:vertex_attribute_range="vertexAttributeRange"

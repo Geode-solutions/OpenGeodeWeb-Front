@@ -28,7 +28,7 @@ export function useHoverhighlight() {
       }
 
       block_ids = (Array.isArray(block_ids) ? block_ids : [])
-        .map((blockId) => Number.parseInt(blockId, 10))
+        .map((blockId) => Math.trunc(Number(blockId)))
         .filter((blockId) => !Number.isNaN(blockId));
 
       if (currentId !== id) {

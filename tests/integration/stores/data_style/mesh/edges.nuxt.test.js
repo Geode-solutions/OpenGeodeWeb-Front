@@ -109,7 +109,7 @@ describe("mesh edges", () => {
     test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringName = "color";
+      const coloringName = "constant";
       const result = dataStyleStore.setMeshEdgesActiveColoring(id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;

@@ -180,11 +180,11 @@ describe("model blocks", () => {
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
       const [block_id] = block_ids;
-      const coloringName = "color";
-      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      const coloringName = "constant";
+      const result = dataStyleStore.setModelComponentActiveColoring(id, block_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
+      expect(dataStyleStore.modelBlockActiveColoring(id, block_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
@@ -196,10 +196,10 @@ describe("model blocks", () => {
       const [block_id] = block_ids;
       await dataStyleStore.setModelBlocksVertexAttributeName(id, [block_id], "points");
       const coloringName = "vertex";
-      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      const result = dataStyleStore.setModelComponentActiveColoring(id, block_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
+      expect(dataStyleStore.modelBlockActiveColoring(id, block_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
@@ -211,10 +211,10 @@ describe("model blocks", () => {
       const [block_id] = block_ids;
       await dataStyleStore.setModelBlocksPolyhedronAttributeName(id, [block_id], "test_attribute");
       const coloringName = "polyhedron";
-      const result = dataStyleStore.setModelComponentColorMode(id, block_id, coloringName);
+      const result = dataStyleStore.setModelComponentActiveColoring(id, block_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      expect(dataStyleStore.modelBlockColorMode(id, block_id)).toBe(coloringName);
+      expect(dataStyleStore.modelBlockActiveColoring(id, block_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });

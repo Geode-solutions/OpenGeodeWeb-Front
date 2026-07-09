@@ -14,6 +14,14 @@ const vuetifyColor = ref({
 watch(
   model,
   (newValue) => {
+    const hasChanged =
+      newValue.red !== vuetifyColor.value.r ||
+      newValue.green !== vuetifyColor.value.g ||
+      newValue.blue !== vuetifyColor.value.b ||
+      newValue.alpha !== vuetifyColor.value.a;
+    if (!hasChanged) {
+      return;
+    }
     vuetifyColor.value = {
       r: newValue.red,
       g: newValue.green,
@@ -44,6 +52,7 @@ watch(pressed, (value) => {
     flat
     canvas-height="75"
     hide-inputs
+    hide-eye-dropper
     width="220"
     mode="rgba"
     class="mx-auto"

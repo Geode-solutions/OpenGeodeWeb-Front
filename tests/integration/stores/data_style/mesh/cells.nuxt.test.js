@@ -121,7 +121,7 @@ describe("mesh cells", () => {
     test("coloring color", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      const coloringName = "color";
+      const coloringName = "constant";
       const result = dataStyleStore.setMeshCellsActiveColoring(id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;

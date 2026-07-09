@@ -16,24 +16,24 @@ export function useModelSurfacesVertexAttribute() {
   const viewerStore = useViewerStore();
 
   function modelSurfacesVertexAttribute(modelId, surfaceId) {
-    return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surfaceId).vertex_attribute;
+    return modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId).vertex;
   }
 
   function modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name) {
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceId);
-    if (name && storedConfigs && name in storedConfigs) {
+    if (name in storedConfigs) {
       return storedConfigs[name];
     }
-    return {
+    return setModelSurfacesVertexAttributeStoredConfig(modelId, [surfaceId], name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    };
+    });
   }
 
   function mutateModelSurfacesVertexStyle(modelId, surfaceIds, values) {
-    return modelSurfacesCommonStyle.mutateModelSurfacesStyle(modelId, surfaceIds, {
-      vertex_attribute: values,
+    return modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
+      vertex: values,
     });
   }
 
@@ -51,24 +51,11 @@ export function useModelSurfacesVertexAttribute() {
 
   async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-
-    const updates = { name };
-    const vertex = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
-    if (!(name in vertex.storedConfigs)) {
-      updates.storedConfigs = {
-        [name]: {
-          minimum: undefined,
-          maximum: undefined,
-          colorMap: undefined,
-        },
-      };
-    }
-
     const params = { id: modelId, block_ids: viewer_ids, name };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelSurfacesVertexStyle(modelId, surfaceIds, updates),
+        response_function: () => mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name }),
       },
     );
   }

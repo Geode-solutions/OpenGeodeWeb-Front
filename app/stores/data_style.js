@@ -13,7 +13,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStore = useDataStore();
   const data_style_db = database.data_style;
   const model_component_type_datastyle_db = database.model_component_type_datastyle;
-  const component_datastyle_db = database.component_datastyle;
+  const component_datastyle_db = database.model_component_datastyle;
 
   async function addDataStyle(id, geode_object) {
     await data_style_db.put(structuredClone({ id, ...getDefaultStyle(geode_object) }));
@@ -47,9 +47,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   function exportStores() {
     return {
-      styles: dataStyleState.styles,
-      componentStyles: dataStyleState.componentStyles,
-      modelComponentTypeStyles: dataStyleState.modelComponentTypeStyles,
+      styles: dataStyleState.styles.value,
+      componentStyles: dataStyleState.componentStyles.value,
+      modelComponentTypeStyles: dataStyleState.modelComponentTypeStyles.value,
     };
   }
 

@@ -31,29 +31,31 @@ export function useMeshCellsStyle() {
       coloring: { active: type },
     });
     console.log(setMeshCellsActiveColoring.name, { id }, type);
-    if (type === "color") {
+    if (type === "constant") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
     }
     if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id);
-      if (textures === undefined) {
-        return;
-      }
       return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
     }
     if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
-      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name);
+      const { colorMap } = meshCellsVertexAttributeStyle.meshCellsVertexAttributeStoredConfig(
+        id,
+        name,
+      );
+      return Promise.all([
+        meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name),
+        meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeColorMap(id, colorMap),
+      ]);
     }
     if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
-      return meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name);
+      const { colorMap } = meshCellsCellAttributeStyle.meshCellsCellAttributeStoredConfig(id, name);
+      return Promise.all([
+        meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name),
+        meshCellsCellAttributeStyle.setMeshCellsCellAttributeColorMap(id, colorMap),
+      ]);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }

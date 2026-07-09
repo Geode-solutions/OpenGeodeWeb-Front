@@ -32,15 +32,22 @@ async function deleteFolderRecursive(folderPath) {
       console.log("Retrying delete folder");
     }
   }
+  throw new Error(
+    `Failed to delete folder ${folderPath} after ${MAX_DELETE_FOLDER_RETRIES} retries`,
+  );
 }
 
 function killHttpMicroservice(microservice) {
   console.log("killHttpMicroservice", { ...microservice });
   const failMessage = `Failed to kill ${microservice.name}`;
   async function do_kill() {
-    await $fetch(microservice.url, {
-      method: microservice.method,
-    });
+    try {
+      await fetch(microservice.url, {
+        method: microservice.method,
+      });
+    } catch (error) {
+      console.log(`Expected error during kill of ${microservice.name}:`, error.message);
+    }
   }
   return pTimeout(do_kill(), {
     milliseconds: 5000,
@@ -98,7 +105,7 @@ function killWebsocketMicroservice(microservice) {
   });
 }
 
-async function killMicroservice(microservice, microservices) {
+async function killMicroservice(microservice) {
   if (microservice.type === "back") {
     await killHttpMicroservice(microservice);
   } else if (microservice.type === "viewer") {
@@ -106,20 +113,18 @@ async function killMicroservice(microservice, microservices) {
   } else {
     throw new Error(`Unknown microservice type: ${microservice.type}`);
   }
-
-  if (microservices) {
-    const index = microservices.indexOf(microservice);
-    if (index !== -1) {
-      microservices.splice(index, 1);
-    }
-  }
 }
 
-function killMicroservices(microservices) {
+async function killMicroservices(microservices) {
   console.log("killMicroservices", { microservices });
-  return Promise.all(
-    microservices.map((microservice) => killMicroservice(microservice, microservices)),
+  const results = await Promise.allSettled(
+    microservices.map((microservice) => killMicroservice(microservice)),
   );
+  const killed = microservices.filter((_, index) => results[index].status === "fulfilled");
+  for (let i = 0; i < killed.length; i += 1) {
+    const microservice = microservices[i];
+    microservices.splice(microservices.indexOf(microservice), 1);
+  }
 }
 
 function projectMicroservices(projectFolderPath) {

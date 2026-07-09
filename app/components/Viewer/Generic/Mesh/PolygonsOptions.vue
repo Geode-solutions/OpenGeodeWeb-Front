@@ -11,10 +11,11 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-const { itemProps, btnImage, tooltip } = defineProps({
+const { itemProps, btnImage, tooltip, capabilities } = defineProps({
   itemProps: { type: Object, required: true },
   btnImage: { type: String, required: true },
   tooltip: { type: String, required: false, default: "Polygons options" },
+  capabilities: { type: Object, default: () => ({}) },
 });
 
 const id = toRef(() => itemProps.id);
@@ -70,11 +71,13 @@ const textures = computed({
         v-model="visibility"
       />
       <template v-if="visibility">
+        <v-divider />
         <ViewerOptionsColoringTypeSelector
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
+          :capabilities="capabilities"
         />
       </template>
     </template>

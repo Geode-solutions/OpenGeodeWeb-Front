@@ -16,24 +16,24 @@ export function useModelLinesVertexAttribute() {
   const viewerStore = useViewerStore();
 
   function modelLinesVertexAttribute(modelId, lineId) {
-    return modelLinesCommonStyle.modelLineStyle(modelId, lineId).vertex_attribute;
+    return modelLinesCommonStyle.modelLineColoring(modelId, lineId).vertex;
   }
 
   function modelLinesVertexAttributeStoredConfig(modelId, lineId, name) {
     const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
-    if (name && storedConfigs && name in storedConfigs) {
+    if (name in storedConfigs) {
       return storedConfigs[name];
     }
-    return {
+    return setModelLinesVertexAttributeStoredConfig(modelId, [lineId], name, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    };
+    });
   }
 
   function mutateModelLinesVertexStyle(modelId, lineIds, values) {
-    return modelLinesCommonStyle.mutateModelLinesStyle(modelId, lineIds, {
-      vertex_attribute: values,
+    return modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
+      vertex: values,
     });
   }
 
@@ -51,24 +51,11 @@ export function useModelLinesVertexAttribute() {
 
   async function setModelLinesVertexAttributeName(modelId, lineIds, name) {
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-
-    const updates = { name };
-    const vertex = modelLinesVertexAttribute(modelId, lineIds[0]);
-    if (!(name in vertex.storedConfigs)) {
-      updates.storedConfigs = {
-        [name]: {
-          minimum: undefined,
-          maximum: undefined,
-          colorMap: undefined,
-        },
-      };
-    }
-
     const params = { id: modelId, block_ids: viewer_ids, name };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () => mutateModelLinesVertexStyle(modelId, lineIds, updates),
+        response_function: () => mutateModelLinesVertexStyle(modelId, lineIds, { name }),
       },
     );
   }

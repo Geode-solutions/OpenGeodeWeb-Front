@@ -16,18 +16,27 @@ export function useModelBlocksCommonStyle() {
     return merge({}, groupStyle, individualStyle);
   }
 
-  function mutateModelBlocksStyle(id, blocks_ids, values) {
-    return modelCommonStyle.mutateComponentStyles(id, blocks_ids, values);
+  function modelBlockColoring(id, block_id) {
+    return modelBlockStyle(id, block_id).coloring;
   }
 
-  function mutateModelBlockStyle(id, block_id, values) {
-    return modelCommonStyle.mutateComponentStyle(id, block_id, values);
+  function mutateModelBlocksColoring(id, blocks_ids, values) {
+    return modelCommonStyle.mutateComponentStyles(id, blocks_ids, {
+      coloring: values,
+    });
+  }
+
+  function mutateModelBlockColoring(id, block_id, values) {
+    return modelCommonStyle.mutateComponentStyle(id, block_id, {
+      coloring: values,
+    });
   }
 
   return {
     modelBlocksStyle,
     modelBlockStyle,
-    mutateModelBlocksStyle,
-    mutateModelBlockStyle,
+    modelBlockColoring,
+    mutateModelBlocksColoring,
+    mutateModelBlockColoring,
   };
 }
