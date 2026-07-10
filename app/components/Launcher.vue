@@ -5,10 +5,11 @@ import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-const { logo, appName, isUserAuthenticated } = defineProps({
+const { logo, appName, isUserAuthenticated, email } = defineProps({
   logo: { type: String, required: false, default: "" },
   appName: { type: String, required: true },
   isUserAuthenticated: { type: Boolean, default: false },
+  email: { type: String, default: undefined },
 });
 
 const infraStore = useInfraStore();
@@ -17,12 +18,13 @@ if (infraStore.app_mode !== appMode.CLOUD) {
 }
 
 function submit() {
-  return infraStore.create_backend(email.value);
+  return infraStore.create_backend(email);
 }
 </script>
 
 <template>
   <VContainer class="justify">
+    {{ isUserAuthenticated }}
     <VRow align-content="center" align="center" justify="center">
       <VCol v-if="!isUserAuthenticated" cols="12" align-self="center">
         <slot name="auth" />

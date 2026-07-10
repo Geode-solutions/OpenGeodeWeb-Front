@@ -18,7 +18,7 @@ export const useCloudStore = defineStore("cloud", {
         properties: {
           email: { type: "string" },
         },
-        required: ["name", "email", "launch"],
+        required: ["email"],
         additionalProperties: true,
       };
       const params = { email };
