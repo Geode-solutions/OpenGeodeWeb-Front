@@ -44,14 +44,14 @@ const rangeMax = computed({
 });
 
 const selectedAttributeName = computed({
-  get: () => attribute.value?.name,
+  get: () => (attribute.value ? attribute.value.name : undefined),
   set: (val) => {
     attribute.value = { name: val, item: 0 };
   },
 });
 
 const selectedComponent = computed({
-  get: () => attribute.value?.item ?? 0,
+  get: () => (attribute.value ? attribute.value.item : 0),
   set: (val) => {
     attribute.value = { name: selectedAttributeName.value, item: val };
   },
@@ -73,7 +73,7 @@ const currentAttribute = computed(() =>
 
 function resetRange() {
   if (currentAttribute.value) {
-    const comp = attribute.value?.item ?? 0;
+    const comp = attribute.value ? attribute.value.item : 0;
     range.value = [
       currentAttribute.value.min_values[comp],
       currentAttribute.value.max_values[comp],
