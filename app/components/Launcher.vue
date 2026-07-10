@@ -5,10 +5,10 @@ import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-const { logo, appName, authenticated } = defineProps({
+const { logo, appName, isUserAuthenticated } = defineProps({
   logo: { type: String, required: false, default: "" },
   appName: { type: String, required: true },
-  authenticated: { type: Boolean, default: false },
+  isUserAuthenticated: { type: Boolean, default: false },
 });
 
 const infraStore = useInfraStore();
@@ -24,8 +24,7 @@ function submit() {
 <template>
   <VContainer class="justify">
     <VRow align-content="center" align="center" justify="center">
-      {{ authenticated }}
-      <VCol v-if="!authenticated" cols="12" align-self="center">
+      <VCol v-if="!isUserAuthenticated" cols="12" align-self="center">
         <slot name="auth" />
       </VCol>
       <VCol
