@@ -44,14 +44,14 @@ const rangeMax = computed({
 });
 
 const selectedAttributeName = computed({
-  get: () => (attribute.value ? attribute.value.name : undefined),
+  get: () => attribute.value?.name,
   set: (val) => {
     attribute.value = { name: val, item: 0 };
   },
 });
 
 const selectedComponent = computed({
-  get: () => (attribute.value ? attribute.value.item : 0),
+  get: () => attribute.value?.item ?? 0,
   set: (val) => {
     attribute.value = { name: selectedAttributeName.value, item: val };
   },
@@ -62,7 +62,7 @@ const componentItems = computed(() => {
     return [];
   }
   return Array.from({ length: currentAttribute.value.nb_items }, (_, index) => ({
-    title: `Component ${index}`,
+    title: `Item ${index}`,
     value: index,
   }));
 });
@@ -73,7 +73,7 @@ const currentAttribute = computed(() =>
 
 function resetRange() {
   if (currentAttribute.value) {
-    const comp = attribute.value ? attribute.value.item : 0;
+    const comp = attribute.value?.item ?? 0;
     range.value = [
       currentAttribute.value.min_values[comp],
       currentAttribute.value.max_values[comp],
@@ -149,7 +149,7 @@ watch([selectedAttributeName, selectedComponent], () => {
     item-title="title"
     item-value="value"
     density="compact"
-    label="Select a component"
+    label="Select an item"
     class="mt-3"
     hide-details
   />
