@@ -161,11 +161,11 @@ watch(
   () => {
     const key = active_key.value;
     const names = {
-      vertex: vertex_attribute_name.value?.name,
-      edge: edge_attribute_name.value?.name,
-      cell: cell_attribute_name.value?.name,
-      polygon: polygon_attribute_name.value?.name,
-      polyhedron: polyhedron_attribute_name.value?.name,
+      vertex: vertex_attribute_name.value.name,
+      edge: edge_attribute_name.value.name,
+      cell: cell_attribute_name.value.name,
+      polygon: polygon_attribute_name.value.name,
+      polyhedron: polyhedron_attribute_name.value.name,
     };
     if (!(key in names) || names[key]) {
       coloring_style_key.value = key;
