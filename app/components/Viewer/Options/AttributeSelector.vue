@@ -62,7 +62,7 @@ const componentItems = computed(() => {
     return [];
   }
   return Array.from({ length: currentAttribute.value.nb_items }, (_, index) => ({
-    title: `Item ${index}`,
+    title: `Item ${index + 1}`,
     value: index,
   }));
 });
