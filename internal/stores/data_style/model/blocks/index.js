@@ -52,8 +52,9 @@ export function useModelBlocksStyle() {
         colorGroups["random"].blocks_ids.push(block_id);
       } else {
         const attributeStyle = coloring[activeColoring];
-        const { name } = attributeStyle;
-        const { minimum, maximum, colorMap } = attributeStyle.storedConfigs[name];
+        const { name, item } = attributeStyle;
+        const storedConfig = attributeStyle.storedConfigs[name]?.[item] ?? {};
+        const { minimum, maximum, colorMap } = storedConfig;
         const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
         if (!attributeGroups[attributeGroupKey]) {
           attributeGroups[attributeGroupKey] = {

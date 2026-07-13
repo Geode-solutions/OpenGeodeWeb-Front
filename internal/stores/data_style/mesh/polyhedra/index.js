@@ -37,20 +37,21 @@ export function useMeshPolyhedraStyle() {
       );
     }
     if (type === "vertex") {
-      const name = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
+      const { name, item } = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeValue(id);
       const { colorMap } =
-        meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeStoredConfig(id, name);
+        meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeStoredConfig(id, name, item);
       return Promise.all([
         meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name),
         meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeColorMap(id, colorMap),
       ]);
     }
     if (type === "polyhedron") {
-      const name = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
+      const { name, item } = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeValue(id);
       const { colorMap } =
         meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeStoredConfig(
           id,
           name,
+          item,
         );
       return Promise.all([
         meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(id, name),

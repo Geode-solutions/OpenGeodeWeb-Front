@@ -15,6 +15,8 @@ const file_name = "test.og_rgd2d";
 const geode_object = "RegularGrid2D";
 const vertex_attribute = { name: "points", item: 0 };
 const cell_attribute = { name: "RGB_data", item: 0 };
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 let id = "",
   projectFolderPath = "";
@@ -94,6 +96,44 @@ describe("mesh cells", () => {
       expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshCellsVertexAttributeName(id, "points");
+      await dataStyleStore.setMeshCellsVertexAttributeName(id, "points", 2);
+      expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe("points");
+      expect(dataStyleStore.meshCellsVertexAttributeValue(id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshCellsVertexAttributeRange(id, MINIMUM_RANGE, MAXIMUM_RANGE);
+      await dataStyleStore.setMeshCellsVertexAttributeColorMap(id, "discrete:budaS");
+      expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshCellsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+    });
+
+    test("stored configs 3 - select polygon_arround_vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshCellsVertexAttributeName(id, "polygon_arround_vertex", 0);
+      expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe("polygon_arround_vertex");
+      expect(dataStyleStore.meshCellsVertexAttributeValue(id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshCellsVertexAttributeName(id, "points", 0);
+      expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe("points");
+      expect(dataStyleStore.meshCellsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshCellsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+    });
   });
 
   describe("cells cell attribute", () => {
@@ -114,6 +154,44 @@ describe("mesh cells", () => {
       );
       expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe(cell_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute RGB_data and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshCellsCellAttributeName(id, "RGB_data");
+      await dataStyleStore.setMeshCellsCellAttributeName(id, "RGB_data", 2);
+      expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe("RGB_data");
+      expect(dataStyleStore.meshCellsCellAttributeValue(id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshCellsCellAttributeRange(id, MINIMUM_RANGE, MAXIMUM_RANGE);
+      await dataStyleStore.setMeshCellsCellAttributeColorMap(id, "discrete:budaS");
+      expect(dataStyleStore.meshCellsCellAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshCellsCellAttributeColorMap(id)).toBe("discrete:budaS");
+    });
+
+    test("stored configs 3 - select dummy_attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshCellsCellAttributeName(id, "dummy_attribute", 0);
+      expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe("dummy_attribute");
+      expect(dataStyleStore.meshCellsCellAttributeValue(id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to RGB_data and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshCellsCellAttributeName(id, "RGB_data", 0);
+      expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe("RGB_data");
+      expect(dataStyleStore.meshCellsCellAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshCellsCellAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshCellsCellAttributeColorMap(id)).toBe("discrete:budaS");
     });
   });
 

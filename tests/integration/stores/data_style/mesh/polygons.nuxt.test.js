@@ -15,6 +15,8 @@ const file_name = "test.og_psf3d";
 const geode_object = "PolygonalSurface3D";
 const vertex_attribute = { name: "points", item: 0 };
 const polygon_attribute = { name: "test_attribute", item: 0 };
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 let id = "",
   projectFolderPath = "";
@@ -92,6 +94,44 @@ describe("mesh polygons", () => {
       expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "points");
+      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "points", 2);
+      expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe("points");
+      expect(dataStyleStore.meshPolygonsVertexAttributeValue(id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolygonsVertexAttributeRange(id, MINIMUM_RANGE, MAXIMUM_RANGE);
+      await dataStyleStore.setMeshPolygonsVertexAttributeColorMap(id, "discrete:budaS");
+      expect(dataStyleStore.meshPolygonsVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPolygonsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+    });
+
+    test("stored configs 3 - select polygon_arround_vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "polygon_arround_vertex", 0);
+      expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe("polygon_arround_vertex");
+      expect(dataStyleStore.meshPolygonsVertexAttributeValue(id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "points", 0);
+      expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe("points");
+      expect(dataStyleStore.meshPolygonsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolygonsVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPolygonsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+    });
   });
 
   describe("polygons polygon attribute", () => {
@@ -112,6 +152,44 @@ describe("mesh polygons", () => {
       );
       expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe(polygon_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute test_attribute and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "test_attribute");
+      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "test_attribute", 2);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe("test_attribute");
+      expect(dataStyleStore.meshPolygonsPolygonAttributeValue(id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolygonsPolygonAttributeRange(id, MINIMUM_RANGE, MAXIMUM_RANGE);
+      await dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(id, "discrete:budaS");
+      expect(dataStyleStore.meshPolygonsPolygonAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeColorMap(id)).toBe("discrete:budaS");
+    });
+
+    test("stored configs 3 - select dummy_attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "dummy_attribute", 0);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe("dummy_attribute");
+      expect(dataStyleStore.meshPolygonsPolygonAttributeValue(id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to test_attribute and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "test_attribute", 0);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe("test_attribute");
+      expect(dataStyleStore.meshPolygonsPolygonAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeColorMap(id)).toBe("discrete:budaS");
     });
   });
 

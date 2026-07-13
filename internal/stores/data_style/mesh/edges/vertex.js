@@ -25,9 +25,14 @@ export function useMeshEdgesVertexAttributeStyle() {
 
   function meshEdgesVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshEdgesVertexAttribute(id);
-    if (name in storedConfigs) {
+    if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function mutateMeshEdgesVertexStyle(id, values) {

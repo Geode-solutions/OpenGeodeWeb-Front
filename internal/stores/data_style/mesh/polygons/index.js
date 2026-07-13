@@ -40,10 +40,11 @@ function useMeshPolygonsColoringStyle() {
       return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures);
     }
     if (type === "vertex") {
-      const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
+      const { name, item } = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeValue(id);
       const { colorMap } = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeStoredConfig(
         id,
         name,
+        item,
       );
       return Promise.all([
         meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name),
@@ -51,9 +52,9 @@ function useMeshPolygonsColoringStyle() {
       ]);
     }
     if (type === "polygon") {
-      const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
+      const { name, item } = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeValue(id);
       const { colorMap } =
-        meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeStoredConfig(id, name);
+        meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeStoredConfig(id, name, item);
       return Promise.all([
         meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name),
         meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeColorMap(id, colorMap),

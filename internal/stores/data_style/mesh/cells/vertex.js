@@ -21,9 +21,14 @@ export function useMeshCellsVertexAttributeStyle() {
 
   function meshCellsVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshCellsVertexAttribute(id);
-    if (name in storedConfigs) {
+    if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function mutateMeshCellsVertexStyle(id, values) {

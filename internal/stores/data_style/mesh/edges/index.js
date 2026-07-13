@@ -34,10 +34,11 @@ export function useMeshEdgesStyle() {
       return meshEdgesColorStyle.setMeshEdgesColor(id, meshEdgesColorStyle.meshEdgesColor(id));
     }
     if (type === "vertex") {
-      const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
+      const { name, item } = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeValue(id);
       const { colorMap } = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeStoredConfig(
         id,
         name,
+        item,
       );
       return Promise.all([
         meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name),
@@ -45,8 +46,12 @@ export function useMeshEdgesStyle() {
       ]);
     }
     if (type === "edge") {
-      const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
-      const { colorMap } = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeStoredConfig(id, name);
+      const { name, item } = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeValue(id);
+      const { colorMap } = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeStoredConfig(
+        id,
+        name,
+        item,
+      );
       return Promise.all([
         meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name),
         meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeColorMap(id, colorMap),

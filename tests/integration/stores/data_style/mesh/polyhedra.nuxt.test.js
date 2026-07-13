@@ -15,6 +15,8 @@ const file_name = "test.vtu";
 const geode_object = "HybridSolid3D";
 const vertex_attribute = { name: "toto_on_vertices", item: 0 };
 const polyhedron_attribute = { name: "toto_on_polyhedra", item: 0 };
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 let id = "",
   projectFolderPath = "";
@@ -106,40 +108,126 @@ describe("mesh polyhedra", () => {
     });
   });
 
-  test("polyhedra vertex attribute", async () => {
-    const dataStyleStore = useDataStyleStore();
-    const viewerStore = useViewerStore();
+  describe("polyhedra vertex attribute", () => {
+    test("coloring vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
 
-    const spy = vi.spyOn(viewerStore, "request");
-    await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, vertex_attribute.name);
-    const schema = mesh_polyhedra_schemas.attribute.vertex.name;
-    const params = { id, ...vertex_attribute };
-    expect(spy).toHaveBeenCalledWith(
-      { schema, params },
-      {
-        response_function: expect.any(Function),
-      },
-    );
-    expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe(vertex_attribute.name);
-    expect(viewerStore.status).toBe(Status.CONNECTED);
+      const spy = vi.spyOn(viewerStore, "request");
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, vertex_attribute.name);
+      const schema = mesh_polyhedra_schemas.attribute.vertex.name;
+      const params = { id, ...vertex_attribute };
+      expect(spy).toHaveBeenCalledWith(
+        { schema, params },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe(vertex_attribute.name);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "points");
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "points", 2);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe("points");
+      expect(dataStyleStore.meshPolyhedraVertexAttributeValue(id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolyhedraVertexAttributeRange(id, MINIMUM_RANGE, MAXIMUM_RANGE);
+      await dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(id, "discrete:budaS");
+      expect(dataStyleStore.meshPolyhedraVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeColorMap(id)).toBe("discrete:budaS");
+    });
+
+    test("stored configs 3 - select polyhedra_around_vertex", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "polyhedra_around_vertex", 0);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe("polyhedra_around_vertex");
+      expect(dataStyleStore.meshPolyhedraVertexAttributeValue(id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "points", 0);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe("points");
+      expect(dataStyleStore.meshPolyhedraVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeColorMap(id)).toBe("discrete:budaS");
+    });
   });
 
-  test("polyhedra polyhedron attribute", async () => {
-    const dataStyleStore = useDataStyleStore();
-    const viewerStore = useViewerStore();
+  describe("polyhedra polyhedron attribute", () => {
+    test("polyhedra polyhedron attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
 
-    const spy = vi.spyOn(viewerStore, "request");
-    await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, polyhedron_attribute.name);
-    const schema = mesh_polyhedra_schemas.attribute.polyhedron.name;
-    const params = { id, ...polyhedron_attribute };
-    expect(spy).toHaveBeenCalledWith(
-      { schema, params },
-      {
-        response_function: expect.any(Function),
-      },
-    );
-    expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe(polyhedron_attribute.name);
-    expect(viewerStore.status).toBe(Status.CONNECTED);
+      const spy = vi.spyOn(viewerStore, "request");
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, polyhedron_attribute.name);
+      const schema = mesh_polyhedra_schemas.attribute.polyhedron.name;
+      const params = { id, ...polyhedron_attribute };
+      expect(spy).toHaveBeenCalledWith(
+        { schema, params },
+        {
+          response_function: expect.any(Function),
+        },
+      );
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe(
+        polyhedron_attribute.name,
+      );
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute tetrahedron_vertices and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_vertices");
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_vertices", 2);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe("tetrahedron_vertices");
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeValue(id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(
+        id,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(id, "discrete:budaS");
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id)).toBe("discrete:budaS");
+    });
+
+    test("stored configs 3 - select tetrahedron_adjacents", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_adjacents", 0);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe("tetrahedron_adjacents");
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeValue(id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to tetrahedron_vertices and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_vertices", 0);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe("tetrahedron_vertices");
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id)).toBe("discrete:budaS");
+    });
   });
 
   test("polyhedra apply default style", async () => {

@@ -14,6 +14,8 @@ const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points;
 const file_name = "test.og_edc2d";
 const geode_object = "EdgedCurve2D";
 const vertex_attribute = { name: "points", item: 0 };
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 let id = "",
   projectFolderPath = "";
@@ -136,6 +138,43 @@ describe("mesh points", () => {
       );
       expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, "points", 2);
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe("points");
+      expect(dataStyleStore.meshPointsVertexAttributeValue(id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPointsVertexAttributeRange(id, MINIMUM_RANGE, MAXIMUM_RANGE);
+      await dataStyleStore.setMeshPointsVertexAttributeColorMap(id, "discrete:budaS");
+      expect(dataStyleStore.meshPointsVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPointsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+    });
+
+    test("stored configs 3 - select unique_vertices", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, "unique_vertices", 0);
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe("unique_vertices");
+      expect(dataStyleStore.meshPointsVertexAttributeValue(id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, "points", 0);
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe("points");
+      expect(dataStyleStore.meshPointsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPointsVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.meshPointsVertexAttributeColorMap(id)).toBe("discrete:budaS");
     });
   });
 

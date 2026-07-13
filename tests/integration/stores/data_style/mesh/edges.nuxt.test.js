@@ -15,6 +15,8 @@ const file_name = "test.og_edc3d";
 const geode_object = "EdgedCurve3D";
 const vertex_attribute = { name: "vertex_attribute", item: 0 };
 const edge_attribute = { name: "edge_attribute", item: 0 };
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 let id = "",
   projectFolderPath = "";
@@ -70,40 +72,120 @@ describe("mesh edges", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
-    test("edges vertex attribute", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
+    describe("edges vertex attribute", () => {
+      test("coloring vertex attribute", async () => {
+        const dataStyleStore = useDataStyleStore();
+        const viewerStore = useViewerStore();
 
-      const spy = vi.spyOn(viewerStore, "request");
-      await dataStyleStore.setMeshEdgesVertexAttributeName(id, vertex_attribute.name);
-      const schema = mesh_edges_schemas.attribute.vertex.name;
-      const params = { id, ...vertex_attribute };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
-      expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe(vertex_attribute.name);
-      expect(viewerStore.status).toBe(Status.CONNECTED);
+        const spy = vi.spyOn(viewerStore, "request");
+        await dataStyleStore.setMeshEdgesVertexAttributeName(id, vertex_attribute.name);
+        const schema = mesh_edges_schemas.attribute.vertex.name;
+        const params = { id, ...vertex_attribute };
+        expect(spy).toHaveBeenCalledWith(
+          { schema, params },
+          {
+            response_function: expect.any(Function),
+          },
+        );
+        expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe(vertex_attribute.name);
+        expect(viewerStore.status).toBe(Status.CONNECTED);
+      });
+
+      test("stored configs 1 - select attribute points and item 2", async () => {
+        const dataStyleStore = useDataStyleStore();
+        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "points");
+        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "points", 2);
+        expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe("points");
+        expect(dataStyleStore.meshEdgesVertexAttributeValue(id).item).toBe(2);
+      });
+
+      test("stored configs 2 - set range and colormap", async () => {
+        const dataStyleStore = useDataStyleStore();
+        await dataStyleStore.setMeshEdgesVertexAttributeRange(id, MINIMUM_RANGE, MAXIMUM_RANGE);
+        await dataStyleStore.setMeshEdgesVertexAttributeColorMap(id, "discrete:budaS");
+        expect(dataStyleStore.meshEdgesVertexAttributeRange(id)).toStrictEqual([
+          MINIMUM_RANGE,
+          MAXIMUM_RANGE,
+        ]);
+        expect(dataStyleStore.meshEdgesVertexAttributeColorMap(id)).toBe("discrete:budaS");
+      });
+
+      test("stored configs 3 - select edges_around_vertex", async () => {
+        const dataStyleStore = useDataStyleStore();
+        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "edges_around_vertex", 0);
+        expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe("edges_around_vertex");
+        expect(dataStyleStore.meshEdgesVertexAttributeValue(id).item).toBe(0);
+      });
+
+      test("stored configs 4 - switch back to points and verify restoration", async () => {
+        const dataStyleStore = useDataStyleStore();
+        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "points", 0);
+        expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe("points");
+        expect(dataStyleStore.meshEdgesVertexAttributeValue(id).item).toBe(2);
+        expect(dataStyleStore.meshEdgesVertexAttributeRange(id)).toStrictEqual([
+          MINIMUM_RANGE,
+          MAXIMUM_RANGE,
+        ]);
+        expect(dataStyleStore.meshEdgesVertexAttributeColorMap(id)).toBe("discrete:budaS");
+      });
     });
 
-    test("edges edge attribute", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
+    describe("edges edge attribute", () => {
+      test("coloring edge attribute", async () => {
+        const dataStyleStore = useDataStyleStore();
+        const viewerStore = useViewerStore();
 
-      const spy = vi.spyOn(viewerStore, "request");
-      await dataStyleStore.setMeshEdgesEdgeAttributeName(id, edge_attribute.name);
-      const schema = mesh_edges_schemas.attribute.edge.name;
-      const params = { id, ...edge_attribute };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
-      expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe(edge_attribute.name);
-      expect(viewerStore.status).toBe(Status.CONNECTED);
+        const spy = vi.spyOn(viewerStore, "request");
+        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, edge_attribute.name);
+        const schema = mesh_edges_schemas.attribute.edge.name;
+        const params = { id, ...edge_attribute };
+        expect(spy).toHaveBeenCalledWith(
+          { schema, params },
+          {
+            response_function: expect.any(Function),
+          },
+        );
+        expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe(edge_attribute.name);
+        expect(viewerStore.status).toBe(Status.CONNECTED);
+      });
+
+      test("stored configs 1 - select attribute edges and item 2", async () => {
+        const dataStyleStore = useDataStyleStore();
+        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "edges");
+        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "edges", 2);
+        expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe("edges");
+        expect(dataStyleStore.meshEdgesEdgeAttributeValue(id).item).toBe(2);
+      });
+
+      test("stored configs 2 - set range and colormap", async () => {
+        const dataStyleStore = useDataStyleStore();
+        await dataStyleStore.setMeshEdgesEdgeAttributeRange(id, MINIMUM_RANGE, MAXIMUM_RANGE);
+        await dataStyleStore.setMeshEdgesEdgeAttributeColorMap(id, "discrete:budaS");
+        expect(dataStyleStore.meshEdgesEdgeAttributeRange(id)).toStrictEqual([
+          MINIMUM_RANGE,
+          MAXIMUM_RANGE,
+        ]);
+        expect(dataStyleStore.meshEdgesEdgeAttributeColorMap(id)).toBe("discrete:budaS");
+      });
+
+      test("stored configs 3 - select cycle_id", async () => {
+        const dataStyleStore = useDataStyleStore();
+        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "cycle_id", 0);
+        expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe("cycle_id");
+        expect(dataStyleStore.meshEdgesEdgeAttributeValue(id).item).toBe(0);
+      });
+
+      test("stored configs 4 - switch back to edges and verify restoration", async () => {
+        const dataStyleStore = useDataStyleStore();
+        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "edges", 0);
+        expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe("edges");
+        expect(dataStyleStore.meshEdgesEdgeAttributeValue(id).item).toBe(2);
+        expect(dataStyleStore.meshEdgesEdgeAttributeRange(id)).toStrictEqual([
+          MINIMUM_RANGE,
+          MAXIMUM_RANGE,
+        ]);
+        expect(dataStyleStore.meshEdgesEdgeAttributeColorMap(id)).toBe("discrete:budaS");
+      });
     });
 
     test("coloring color", async () => {

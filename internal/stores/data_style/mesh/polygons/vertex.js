@@ -21,9 +21,14 @@ export function useMeshPolygonsVertexAttributeStyle() {
 
   function meshPolygonsVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPolygonsVertexAttribute(id);
-    if (name in storedConfigs) {
+    if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function mutateMeshPolygonsVertexStyle(id, values) {

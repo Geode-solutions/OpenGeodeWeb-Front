@@ -29,9 +29,14 @@ export function useMeshPolyhedraVertexAttributeStyle() {
 
   function meshPolyhedraVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPolyhedraVertexAttribute(id);
-    if (name in storedConfigs) {
+    if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function meshPolyhedraVertexAttributeLastItem(id, name) {

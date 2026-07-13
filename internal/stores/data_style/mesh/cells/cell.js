@@ -20,9 +20,14 @@ export function useMeshCellsCellAttributeStyle() {
 
   function meshCellsCellAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshCellsCellAttribute(id);
-    if (name in storedConfigs) {
+    if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function setMeshCellsCellAttributeStoredConfig(id, name, item, config) {

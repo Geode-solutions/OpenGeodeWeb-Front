@@ -29,9 +29,14 @@ export function useMeshPointsVertexAttributeStyle() {
 
   function meshPointsVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPointsVertexAttribute(id);
-    if (name in storedConfigs) {
+    if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function meshPointsVertexAttributeLastItem(id, name) {

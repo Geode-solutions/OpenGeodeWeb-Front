@@ -29,9 +29,14 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
 
   function meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    if (name in storedConfigs) {
+    if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function meshPolyhedraPolyhedronAttributeLastItem(id, name) {

@@ -24,9 +24,14 @@ export function useMeshEdgesEdgeAttributeStyle() {
 
   function meshEdgesEdgeAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
-    if (name in storedConfigs) {
+    if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function mutateMeshEdgesEdgeStyle(id, values) {
