@@ -73,7 +73,7 @@ async function importItem(item) {
         return dataStyleStore.applyDefaultStyle(item.id);
       }
       return undefined;
-    }
+    },
   );
   await Promise.all([
     registerTask,

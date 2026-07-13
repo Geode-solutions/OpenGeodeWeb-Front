@@ -15,7 +15,9 @@ export const useAppStore = defineStore("app", () => {
       globalComponents.value.set(extensionId, new Map());
     }
     globalComponents.value.get(extensionId).set(componentId, component);
-    console.log(`[AppStore] Registered global component ${componentId} for extension ${extensionId}`);
+    console.log(
+      `[AppStore] Registered global component ${componentId} for extension ${extensionId}`,
+    );
   }
 
   function unregisterGlobalComponent(extensionId, componentId) {
