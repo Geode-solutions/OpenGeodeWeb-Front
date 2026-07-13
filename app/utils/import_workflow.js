@@ -62,13 +62,18 @@ async function importItem(item) {
   treeviewStore.addItem(item.geode_object_type, item.name, item.id, item.viewer_type);
   const addDataStyleTask = dataStyleStore.addDataStyle(item.id, item.geode_object_type);
   const addViewerTask = addDataTask.then(() => {
-    if (item.nb_vertices === 0) {
+    if (item.nb_vertices === 0 || item.viewable_file === "") {
       return;
     }
     return hybridViewerStore.addItem(item.id);
   });
   const applyStyleTask = Promise.all([registerTask, addDataComponentsTask, addDataStyleTask]).then(
-    () => dataStyleStore.applyDefaultStyle(item.id),
+    () => {
+      if (item.viewable_file !== "") {
+        return dataStyleStore.applyDefaultStyle(item.id);
+      }
+      return undefined;
+    }
   );
   await Promise.all([
     registerTask,
