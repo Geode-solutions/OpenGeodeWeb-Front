@@ -19,16 +19,11 @@ export function useMeshCellsVertexAttributeStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).vertex;
   }
 
-  function meshCellsVertexAttributeStoredConfig(id, name) {
+  function meshCellsVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshCellsVertexAttribute(id);
     if (name in storedConfigs) {
-      return storedConfigs[name];
+      return storedConfigs[name][item];
     }
-    return setMeshCellsVertexAttributeStoredConfig(id, name, {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
-    });
   }
 
   function mutateMeshCellsVertexStyle(id, values) {
@@ -39,10 +34,21 @@ export function useMeshCellsVertexAttributeStyle() {
     });
   }
 
-  function setMeshCellsVertexAttributeStoredConfig(id, name, config) {
+  function meshCellsVertexAttributeLastItem(id, name) {
+    const { storedConfigs } = meshCellsVertexAttribute(id);
+    if (name in storedConfigs) {
+      return storedConfigs[name].lastItem ?? 0;
+    }
+    return 0;
+  }
+
+  function setMeshCellsVertexAttributeStoredConfig(id, name, item, config) {
     return mutateMeshCellsVertexStyle(id, {
       storedConfigs: {
-        [name]: config,
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
       },
     });
   }
@@ -56,40 +62,41 @@ export function useMeshCellsVertexAttributeStyle() {
     return { name: attr.name, item: attr.item };
   }
 
-  function setMeshCellsVertexAttributeName(id, name, item = 0) {
+  function setMeshCellsVertexAttributeName(id, name, item) {
+    const currentName = meshCellsVertexAttributeName(id);
+    const targetItem = currentName === name ? item : meshCellsVertexAttributeLastItem(id, name);
     const schema = meshCellsVertexAttributeSchemas.name;
-    const params = { id, name, item };
+    const params = { id, name, item: targetItem };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => {
-          const updates = { name, item };
-          const vertex = meshCellsVertexAttribute(id);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
+        response_function: () =>
+          mutateMeshCellsVertexStyle(id, {
+            name,
+            item: targetItem,
+            storedConfigs: {
               [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
+                lastItem: targetItem,
               },
-            };
-          }
-          return mutateMeshCellsVertexStyle(id, updates);
-        },
+            },
+          }),
       },
     );
   }
 
   function meshCellsVertexAttributeRange(id) {
-    const name = meshCellsVertexAttributeName(id);
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name);
-    const { minimum, maximum } = storedConfig;
-    return [minimum, maximum];
+    const { name, item } = meshCellsVertexAttributeValue(id);
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
+    if (storedConfig === undefined) {
+      return [undefined, undefined];
+    }
+    return [storedConfig.minimum, storedConfig.maximum];
   }
 
   function setMeshCellsVertexAttributeRange(id, minimum, maximum) {
-    const name = meshCellsVertexAttributeName(id);
-    const points = getRGBPointsFromPreset(meshCellsVertexAttributeColorMap(id));
+    const { name, item } = meshCellsVertexAttributeValue(id);
+    const colorMap = meshCellsVertexAttributeColorMap(id);
+    const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshCellsVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
@@ -97,39 +104,40 @@ export function useMeshCellsVertexAttributeStyle() {
         { schema, params },
         {
           response_function: () =>
-            setMeshCellsVertexAttributeStoredConfig(id, name, { minimum, maximum }),
+            setMeshCellsVertexAttributeStoredConfig(id, name, item, { minimum, maximum }),
         },
       );
     }
-    return setMeshCellsVertexAttributeStoredConfig(id, name, {
-      minimum,
-      maximum,
-    });
+    return setMeshCellsVertexAttributeStoredConfig(id, name, item, { minimum, maximum });
   }
 
   function meshCellsVertexAttributeColorMap(id) {
-    const name = meshCellsVertexAttributeName(id);
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name);
-    const { colorMap } = storedConfig;
-    return colorMap;
+    const { name, item } = meshCellsVertexAttributeValue(id);
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
+    if (storedConfig === undefined) {
+      return;
+    }
+    return storedConfig.colorMap;
   }
 
   function setMeshCellsVertexAttributeColorMap(id, colorMap) {
-    const name = meshCellsVertexAttributeName(id);
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name);
+    const { name, item } = meshCellsVertexAttributeValue(id);
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
+    const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
+    const maximum = storedConfig === undefined ? undefined : storedConfig.maximum;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshCellsVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
       return viewerStore.request(
         { schema, params },
         {
-          response_function: () => setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap }),
+          response_function: () =>
+            setMeshCellsVertexAttributeStoredConfig(id, name, item, { colorMap }),
         },
       );
     }
-    return setMeshCellsVertexAttributeStoredConfig(id, name, { colorMap });
+    return setMeshCellsVertexAttributeStoredConfig(id, name, item, { colorMap });
   }
 
   return {

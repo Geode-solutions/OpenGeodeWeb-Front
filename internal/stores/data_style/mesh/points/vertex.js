@@ -11,7 +11,8 @@ const meshPointsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.points.attribute.vertex;
 
 // oxlint-disable-next-line max-lines-per-function
-function useMeshPointsVertexAttributeConfig() {
+export function useMeshPointsVertexAttributeStyle() {
+  const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
   function meshPointsVertexAttribute(id) {
@@ -26,23 +27,29 @@ function useMeshPointsVertexAttributeConfig() {
     });
   }
 
-  function setMeshPointsVertexAttributeStoredConfig(id, name, config) {
-    return mutateMeshPointsVertexStyle(id, {
-      storedConfigs: {
-        [name]: config,
-      },
-    });
-  }
-
-  function meshPointsVertexAttributeStoredConfig(id, name) {
+  function meshPointsVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPointsVertexAttribute(id);
     if (name in storedConfigs) {
-      return storedConfigs[name];
+      return storedConfigs[name][item];
     }
-    return setMeshPointsVertexAttributeStoredConfig(id, name, {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
+  }
+
+  function meshPointsVertexAttributeLastItem(id, name) {
+    const { storedConfigs } = meshPointsVertexAttribute(id);
+    if (name in storedConfigs) {
+      return storedConfigs[name].lastItem ?? 0;
+    }
+    return 0;
+  }
+
+  function setMeshPointsVertexAttributeStoredConfig(id, name, item, config) {
+    return mutateMeshPointsVertexStyle(id, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
     });
   }
 
@@ -55,64 +62,41 @@ function useMeshPointsVertexAttributeConfig() {
     return { name: attr.name, item: attr.item };
   }
 
-  function meshPointsVertexAttributeRange(id) {
-    const name = meshPointsVertexAttributeName(id);
-    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name);
-    const { minimum, maximum } = storedConfig;
-    return [minimum, maximum];
-  }
-
-  function meshPointsVertexAttributeColorMap(id) {
-    const name = meshPointsVertexAttributeName(id);
-    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name);
-    const { colorMap } = storedConfig;
-    return colorMap;
-  }
-
-  return {
-    meshPointsVertexAttribute,
-    meshPointsVertexAttributeStoredConfig,
-    setMeshPointsVertexAttributeStoredConfig,
-    mutateMeshPointsVertexStyle,
-    meshPointsVertexAttributeName,
-    meshPointsVertexAttributeValue,
-    meshPointsVertexAttributeRange,
-    meshPointsVertexAttributeColorMap,
-  };
-}
-
-// oxlint-disable-next-line max-lines-per-function
-function useMeshPointsVertexAttributeActions() {
-  const viewerStore = useViewerStore();
-  const config = useMeshPointsVertexAttributeConfig();
-
-  function setMeshPointsVertexAttributeName(id, name, item = 0) {
+  function setMeshPointsVertexAttributeName(id, name, item) {
+    const currentName = meshPointsVertexAttributeName(id);
+    const targetItem = currentName === name ? item : meshPointsVertexAttributeLastItem(id, name);
     const schema = meshPointsVertexAttributeSchemas.name;
-    const params = { id, name, item };
+    const params = { id, name, item: targetItem };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => {
-          const updates = { name, item };
-          const vertex = config.meshPointsVertexAttribute(id);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
+        response_function: () =>
+          mutateMeshPointsVertexStyle(id, {
+            name,
+            item: targetItem,
+            storedConfigs: {
               [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
+                lastItem: targetItem,
               },
-            };
-          }
-          return config.mutateMeshPointsVertexStyle(id, updates);
-        },
+            },
+          }),
       },
     );
   }
 
+  function meshPointsVertexAttributeRange(id) {
+    const { name, item } = meshPointsVertexAttributeValue(id);
+    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
+    if (storedConfig === undefined) {
+      return [undefined, undefined];
+    }
+    return [storedConfig.minimum, storedConfig.maximum];
+  }
+
   function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
-    const name = config.meshPointsVertexAttributeName(id);
-    const points = getRGBPointsFromPreset(config.meshPointsVertexAttributeColorMap(id));
+    const { name, item } = meshPointsVertexAttributeValue(id);
+    const colorMap = meshPointsVertexAttributeColorMap(id);
+    const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPointsVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
@@ -120,21 +104,28 @@ function useMeshPointsVertexAttributeActions() {
         { schema, params },
         {
           response_function: () =>
-            config.setMeshPointsVertexAttributeStoredConfig(id, name, { minimum, maximum }),
+            setMeshPointsVertexAttributeStoredConfig(id, name, item, { minimum, maximum }),
         },
       );
     }
-    return config.setMeshPointsVertexAttributeStoredConfig(id, name, {
-      minimum,
-      maximum,
-    });
+    return setMeshPointsVertexAttributeStoredConfig(id, name, item, { minimum, maximum });
+  }
+
+  function meshPointsVertexAttributeColorMap(id) {
+    const { name, item } = meshPointsVertexAttributeValue(id);
+    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
+    if (storedConfig === undefined) {
+      return;
+    }
+    return storedConfig.colorMap;
   }
 
   function setMeshPointsVertexAttributeColorMap(id, colorMap) {
-    const name = config.meshPointsVertexAttributeName(id);
-    const storedConfig = config.meshPointsVertexAttributeStoredConfig(id, name);
+    const { name, item } = meshPointsVertexAttributeValue(id);
+    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
+    const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
+    const maximum = storedConfig === undefined ? undefined : storedConfig.maximum;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPointsVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
@@ -142,26 +133,21 @@ function useMeshPointsVertexAttributeActions() {
         { schema, params },
         {
           response_function: () =>
-            config.setMeshPointsVertexAttributeStoredConfig(id, name, { colorMap }),
+            setMeshPointsVertexAttributeStoredConfig(id, name, item, { colorMap }),
         },
       );
     }
-    return config.setMeshPointsVertexAttributeStoredConfig(id, name, { colorMap });
+    return setMeshPointsVertexAttributeStoredConfig(id, name, item, { colorMap });
   }
 
   return {
+    meshPointsVertexAttributeName,
+    meshPointsVertexAttributeValue,
+    meshPointsVertexAttributeRange,
+    meshPointsVertexAttributeColorMap,
+    meshPointsVertexAttributeStoredConfig,
     setMeshPointsVertexAttributeName,
     setMeshPointsVertexAttributeRange,
     setMeshPointsVertexAttributeColorMap,
-  };
-}
-
-export function useMeshPointsVertexAttributeStyle() {
-  const config = useMeshPointsVertexAttributeConfig();
-  const actions = useMeshPointsVertexAttributeActions();
-
-  return {
-    ...config,
-    ...actions,
   };
 }

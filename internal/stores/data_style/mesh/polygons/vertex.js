@@ -19,16 +19,11 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).vertex;
   }
 
-  function meshPolygonsVertexAttributeStoredConfig(id, name) {
+  function meshPolygonsVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPolygonsVertexAttribute(id);
     if (name in storedConfigs) {
-      return storedConfigs[name];
+      return storedConfigs[name][item];
     }
-    return setMeshPolygonsVertexAttributeStoredConfig(id, name, {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
-    });
   }
 
   function mutateMeshPolygonsVertexStyle(id, values) {
@@ -39,10 +34,21 @@ export function useMeshPolygonsVertexAttributeStyle() {
     });
   }
 
-  function setMeshPolygonsVertexAttributeStoredConfig(id, name, config) {
+  function meshPolygonsVertexAttributeLastItem(id, name) {
+    const { storedConfigs } = meshPolygonsVertexAttribute(id);
+    if (name in storedConfigs) {
+      return storedConfigs[name].lastItem ?? 0;
+    }
+    return 0;
+  }
+
+  function setMeshPolygonsVertexAttributeStoredConfig(id, name, item, config) {
     return mutateMeshPolygonsVertexStyle(id, {
       storedConfigs: {
-        [name]: config,
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
       },
     });
   }
@@ -56,40 +62,41 @@ export function useMeshPolygonsVertexAttributeStyle() {
     return { name: attr.name, item: attr.item };
   }
 
-  function setMeshPolygonsVertexAttributeName(id, name, item = 0) {
+  function setMeshPolygonsVertexAttributeName(id, name, item) {
+    const currentName = meshPolygonsVertexAttributeName(id);
+    const targetItem = currentName === name ? item : meshPolygonsVertexAttributeLastItem(id, name);
     const schema = meshPolygonsVertexAttributeSchemas.name;
-    const params = { id, name, item };
+    const params = { id, name, item: targetItem };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => {
-          const updates = { name, item };
-          const vertex = meshPolygonsVertexAttribute(id);
-          if (!(name in vertex.storedConfigs)) {
-            updates.storedConfigs = {
+        response_function: () =>
+          mutateMeshPolygonsVertexStyle(id, {
+            name,
+            item: targetItem,
+            storedConfigs: {
               [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
+                lastItem: targetItem,
               },
-            };
-          }
-          return mutateMeshPolygonsVertexStyle(id, updates);
-        },
+            },
+          }),
       },
     );
   }
 
   function meshPolygonsVertexAttributeRange(id) {
-    const name = meshPolygonsVertexAttributeName(id);
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name);
-    const { minimum, maximum } = storedConfig;
-    return [minimum, maximum];
+    const { name, item } = meshPolygonsVertexAttributeValue(id);
+    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
+    if (storedConfig === undefined) {
+      return [undefined, undefined];
+    }
+    return [storedConfig.minimum, storedConfig.maximum];
   }
 
   function setMeshPolygonsVertexAttributeRange(id, minimum, maximum) {
-    const name = meshPolygonsVertexAttributeName(id);
-    const points = getRGBPointsFromPreset(meshPolygonsVertexAttributeColorMap(id));
+    const { name, item } = meshPolygonsVertexAttributeValue(id);
+    const colorMap = meshPolygonsVertexAttributeColorMap(id);
+    const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolygonsVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
@@ -97,28 +104,28 @@ export function useMeshPolygonsVertexAttributeStyle() {
         { schema, params },
         {
           response_function: () =>
-            setMeshPolygonsVertexAttributeStoredConfig(id, name, { minimum, maximum }),
+            setMeshPolygonsVertexAttributeStoredConfig(id, name, item, { minimum, maximum }),
         },
       );
     }
-    return setMeshPolygonsVertexAttributeStoredConfig(id, name, {
-      minimum,
-      maximum,
-    });
+    return setMeshPolygonsVertexAttributeStoredConfig(id, name, item, { minimum, maximum });
   }
 
   function meshPolygonsVertexAttributeColorMap(id) {
-    const name = meshPolygonsVertexAttributeName(id);
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name);
-    const { colorMap } = storedConfig;
-    return colorMap;
+    const { name, item } = meshPolygonsVertexAttributeValue(id);
+    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
+    if (storedConfig === undefined) {
+      return;
+    }
+    return storedConfig.colorMap;
   }
 
   function setMeshPolygonsVertexAttributeColorMap(id, colorMap) {
-    const name = meshPolygonsVertexAttributeName(id);
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name);
+    const { name, item } = meshPolygonsVertexAttributeValue(id);
+    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
+    const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
+    const maximum = storedConfig === undefined ? undefined : storedConfig.maximum;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolygonsVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
@@ -126,11 +133,11 @@ export function useMeshPolygonsVertexAttributeStyle() {
         { schema, params },
         {
           response_function: () =>
-            setMeshPolygonsVertexAttributeStoredConfig(id, name, { colorMap }),
+            setMeshPolygonsVertexAttributeStoredConfig(id, name, item, { colorMap }),
         },
       );
     }
-    return setMeshPolygonsVertexAttributeStoredConfig(id, name, { colorMap });
+    return setMeshPolygonsVertexAttributeStoredConfig(id, name, item, { colorMap });
   }
 
   return {
