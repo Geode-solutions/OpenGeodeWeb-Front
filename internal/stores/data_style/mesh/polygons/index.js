@@ -52,7 +52,8 @@ function useMeshPolygonsColoringStyle() {
       ]);
     }
     if (type === "polygon") {
-      const { name, item } = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeValue(id);
+      const { name, item } =
+        meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeValue(id);
       const { colorMap } =
         meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeStoredConfig(id, name, item);
       return Promise.all([
