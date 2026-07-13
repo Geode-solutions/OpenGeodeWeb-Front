@@ -5,11 +5,11 @@ import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-const { logo, appName, isUserAuthenticated, email } = defineProps({
-  logo: { type: String, required: false, default: "" },
+const { appName, email, isUserAuthenticated, logo } = defineProps({
   appName: { type: String, required: true },
-  isUserAuthenticated: { type: Boolean, default: false },
   email: { type: String, default: undefined },
+  isUserAuthenticated: { type: Boolean, default: false },
+  logo: { type: String, required: false, default: "" },
 });
 
 const infraStore = useInfraStore();
@@ -24,19 +24,18 @@ function submit() {
 
 <template>
   <VContainer class="justify">
-    {{ isUserAuthenticated }}
     <VRow align-content="center" align="center" justify="center">
-      <VCol v-if="!isUserAuthenticated" cols="12" align-self="center">
+      <VCol cols="12" align-self="center">
         <slot name="auth" />
       </VCol>
       <VCol
-        v-else-if="infraStore.status === Status.NOT_CREATED"
+        v-if="isUserAuthenticated && infraStore.status === Status.NOT_CREATED"
         class="d-flex justify-center align-center"
         cols="12"
         align-self="center"
         z-index="4"
       >
-        <VBtn class="load-btn" text="Load the app" color="white" @click="submit" />
+        <VBtn class="load-btn" text="Load the app" size="x-large" color="white" @click="submit" />
       </VCol>
       <VCol v-else-if="infraStore.status === Status.CREATING">
         <Loading :logo="logo" :app-name="appName" />
