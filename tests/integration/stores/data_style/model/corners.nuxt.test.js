@@ -145,14 +145,21 @@ describe("model corners", () => {
       const dataStore = useDataStore();
       const corner_ids = await dataStore.getCornersGeodeIds(id);
       const [corner_id] = corner_ids;
-      await dataStyleStore.setModelCornersVertexAttributeRange(id, corner_ids, MINIMUM_RANGE, MAXIMUM_RANGE);
+      await dataStyleStore.setModelCornersVertexAttributeRange(
+        id,
+        corner_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
       await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "discrete:budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelCornersVertexAttributeRange(id, corner_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe("discrete:budaS");
+      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe(
+        "discrete:budaS",
+      );
     });
 
     test("stored configs 3 - select unique_vertices", async () => {
@@ -177,7 +184,9 @@ describe("model corners", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe("discrete:budaS");
+      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe(
+        "discrete:budaS",
+      );
     });
   });
 
