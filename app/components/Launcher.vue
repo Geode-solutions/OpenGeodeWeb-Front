@@ -36,6 +36,7 @@ function cloudCreateBackend() {
         z-index="4"
       >
         <VBtn
+          data-testid="loadAppButton"
           class="load-btn"
           text="Load the app"
           size="x-large"
