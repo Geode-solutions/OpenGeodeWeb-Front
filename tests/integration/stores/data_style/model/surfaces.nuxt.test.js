@@ -1,3 +1,4 @@
+// oxlint-disable max-lines
 // Third party imports
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
@@ -15,6 +16,8 @@ const model_surfaces_schemas = viewer_schemas.opengeodeweb_viewer.model.surfaces
 const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 function sleep(milliseconds) {
   // oxlint-disable-next-line promise/avoid-new
@@ -124,6 +127,72 @@ describe("model surfaces", () => {
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
+      await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points", 2);
+      expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
+      expect(dataStyleStore.modelSurfacesVertexAttributeValue(id, surface_id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesVertexAttributeRange(
+        id,
+        surface_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
+        id,
+        surface_ids,
+        "discrete:budaS",
+      );
+      await sleep(SLEEP_MS);
+      expect(dataStyleStore.modelSurfacesVertexAttributeRange(id, surface_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe(
+        "discrete:budaS",
+      );
+    });
+
+    test("stored configs 3 - select unique_vertices", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "unique_vertices");
+      expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe(
+        "unique_vertices",
+      );
+      expect(dataStyleStore.modelSurfacesVertexAttributeValue(id, surface_id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points", 0);
+      expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
+      expect(dataStyleStore.modelSurfacesVertexAttributeValue(id, surface_id).item).toBe(2);
+      expect(dataStyleStore.modelSurfacesVertexAttributeRange(id, surface_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe(
+        "discrete:budaS",
+      );
+    });
   });
 
   describe("surfaces polygon attribute", () => {
@@ -163,6 +232,94 @@ describe("model surfaces", () => {
         );
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute triangle_vertices and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesPolygonAttributeName(
+        id,
+        surface_ids,
+        "triangle_vertices",
+      );
+      await dataStyleStore.setModelSurfacesPolygonAttributeName(
+        id,
+        surface_ids,
+        "triangle_vertices",
+        2,
+      );
+      expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
+        "triangle_vertices",
+      );
+      expect(dataStyleStore.modelSurfacesPolygonAttributeValue(id, surface_id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesPolygonAttributeRange(
+        id,
+        surface_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
+        id,
+        surface_ids,
+        "discrete:budaS",
+      );
+      await sleep(SLEEP_MS);
+      expect(dataStyleStore.modelSurfacesPolygonAttributeRange(id, surface_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe(
+        "discrete:budaS",
+      );
+    });
+
+    test("stored configs 3 - select triangle_adjacents", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesPolygonAttributeName(
+        id,
+        surface_ids,
+        "triangle_adjacents",
+      );
+      expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
+        "triangle_adjacents",
+      );
+      expect(dataStyleStore.modelSurfacesPolygonAttributeValue(id, surface_id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to triangle_vertices and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
+      const [surface_id] = surface_ids;
+      await dataStyleStore.setModelSurfacesPolygonAttributeName(
+        id,
+        surface_ids,
+        "triangle_vertices",
+        0,
+      );
+      expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
+        "triangle_vertices",
+      );
+      expect(dataStyleStore.modelSurfacesPolygonAttributeValue(id, surface_id).item).toBe(2);
+      expect(dataStyleStore.modelSurfacesPolygonAttributeRange(id, surface_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe(
+        "discrete:budaS",
+      );
     });
   });
 

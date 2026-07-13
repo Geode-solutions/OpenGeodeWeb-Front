@@ -15,6 +15,8 @@ const model_corners_schemas = viewer_schemas.opengeodeweb_viewer.model.corners;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 function sleep(milliseconds) {
   // oxlint-disable-next-line promise/avoid-new
@@ -125,6 +127,57 @@ describe("model corners", () => {
         expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const [corner_id] = corner_ids;
+      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
+      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points", 2);
+      expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
+      expect(dataStyleStore.modelCornersVertexAttributeValue(id, corner_id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const [corner_id] = corner_ids;
+      await dataStyleStore.setModelCornersVertexAttributeRange(id, corner_ids, MINIMUM_RANGE, MAXIMUM_RANGE);
+      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "discrete:budaS");
+      await sleep(SLEEP_MS);
+      expect(dataStyleStore.modelCornersVertexAttributeRange(id, corner_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe("discrete:budaS");
+    });
+
+    test("stored configs 3 - select unique_vertices", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const [corner_id] = corner_ids;
+      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "unique_vertices");
+      expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("unique_vertices");
+      expect(dataStyleStore.modelCornersVertexAttributeValue(id, corner_id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const [corner_id] = corner_ids;
+      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points", 0);
+      expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
+      expect(dataStyleStore.modelCornersVertexAttributeValue(id, corner_id).item).toBe(2);
+      expect(dataStyleStore.modelCornersVertexAttributeRange(id, corner_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe("discrete:budaS");
     });
   });
 

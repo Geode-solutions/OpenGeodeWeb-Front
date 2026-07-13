@@ -1,3 +1,4 @@
+// oxlint-disable max-lines
 // Third party imports
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
@@ -15,6 +16,8 @@ const model_blocks_schemas = viewer_schemas.opengeodeweb_viewer.model.blocks;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 function sleep(milliseconds) {
   // oxlint-disable-next-line promise/avoid-new
@@ -122,6 +125,66 @@ describe("model blocks", () => {
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points", 2);
+      expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
+      expect(dataStyleStore.modelBlocksVertexAttributeValue(id, block_id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksVertexAttributeRange(
+        id,
+        block_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelBlocksVertexAttributeColorMap(id, block_ids, "discrete:budaS");
+      await sleep(SLEEP_MS);
+      expect(dataStyleStore.modelBlocksVertexAttributeRange(id, block_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelBlocksVertexAttributeColorMap(id, block_id)).toBe(
+        "discrete:budaS",
+      );
+    });
+
+    test("stored configs 3 - select unique_vertices", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "unique_vertices");
+      expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("unique_vertices");
+      expect(dataStyleStore.modelBlocksVertexAttributeValue(id, block_id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points", 0);
+      expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
+      expect(dataStyleStore.modelBlocksVertexAttributeValue(id, block_id).item).toBe(2);
+      expect(dataStyleStore.modelBlocksVertexAttributeRange(id, block_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelBlocksVertexAttributeColorMap(id, block_id)).toBe(
+        "discrete:budaS",
+      );
+    });
   });
 
   describe("blocks polyhedron attribute", () => {
@@ -161,6 +224,93 @@ describe("model blocks", () => {
         );
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute tetrahedron_vertices and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(
+        id,
+        block_ids,
+        "tetrahedron_vertices",
+      );
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(
+        id,
+        block_ids,
+        "tetrahedron_vertices",
+        2,
+      );
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
+        "tetrahedron_vertices",
+      );
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeValue(id, block_id).item).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
+        id,
+        block_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
+        id,
+        block_ids,
+        "discrete:budaS",
+      );
+      await sleep(SLEEP_MS);
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeRange(id, block_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeColorMap(id, block_id)).toBe(
+        "discrete:budaS",
+      );
+    });
+
+    test("stored configs 3 - select tetrahedron_adjacents", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(
+        id,
+        block_ids,
+        "tetrahedron_adjacents",
+      );
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
+        "tetrahedron_adjacents",
+      );
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeValue(id, block_id).item).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to tetrahedron_vertices and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const [block_id] = block_ids;
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(
+        id,
+        block_ids,
+        "tetrahedron_vertices",
+      );
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
+        "tetrahedron_vertices",
+      );
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeValue(id, block_id).item).toBe(2);
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeRange(id, block_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeColorMap(id, block_id)).toBe(
+        "discrete:budaS",
+      );
     });
   });
 
