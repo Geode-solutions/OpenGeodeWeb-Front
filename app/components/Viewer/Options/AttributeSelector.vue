@@ -144,6 +144,7 @@ watch([selectedAttributeName, selectedComponent], () => {
   />
   <v-select
     v-if="currentAttribute && currentAttribute.nb_items > 1"
+    data-testid="itemSelector"
     v-model="selectedComponent"
     :items="componentItems"
     item-title="title"
