@@ -17,7 +17,7 @@ if (infraStore.app_mode !== appMode.CLOUD) {
   infraStore.create_backend();
 }
 
-function submit() {
+function cloudCreateBackend() {
   return infraStore.create_backend(email);
 }
 </script>
@@ -35,7 +35,13 @@ function submit() {
         align-self="center"
         z-index="4"
       >
-        <VBtn class="load-btn" text="Load the app" size="x-large" color="white" @click="submit" />
+        <VBtn
+          class="load-btn"
+          text="Load the app"
+          size="x-large"
+          color="white"
+          @click="cloudCreateBackend"
+        />
       </VCol>
       <VCol v-else-if="infraStore.status === Status.CREATING">
         <Loading :logo="logo" :app-name="appName" />
