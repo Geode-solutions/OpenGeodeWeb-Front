@@ -70,11 +70,7 @@ const cornerActiveColoring = computed({
 const cornersVertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, targetCornerIds[0]),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeName(
-      modelId,
-      targetCornerIds,
-      newValue,
-    );
+    await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -82,11 +78,7 @@ const cornersVertexAttributeName = computed({
 const cornersVertexAttributeItem = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, targetCornerIds[0]),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeItem(
-      modelId,
-      targetCornerIds,
-      newValue,
-    );
+    await dataStyleStore.setModelCornersVertexAttributeItem(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -130,11 +122,7 @@ const cornersVertexAttributeColorMap = computed({
 const vertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeName(
-      modelId,
-      [cornerId],
-      newValue,
-    );
+    await dataStyleStore.setModelCornersVertexAttributeName(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -142,11 +130,7 @@ const vertexAttributeName = computed({
 const vertexAttributeItem = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeItem(
-      modelId,
-      [cornerId],
-      newValue,
-    );
+    await dataStyleStore.setModelCornersVertexAttributeItem(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });

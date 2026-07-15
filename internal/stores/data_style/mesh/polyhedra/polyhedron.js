@@ -67,8 +67,7 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   }
 
   function setMeshPolyhedraPolyhedronAttributeName(id, name) {
-    const targetItem =
-      meshPolyhedraPolyhedronAttributeLastItem(id, name);
+    const targetItem = meshPolyhedraPolyhedronAttributeLastItem(id, name);
     const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
