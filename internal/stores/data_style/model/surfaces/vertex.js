@@ -112,7 +112,7 @@ export function useModelSurfacesVertexAttribute() {
     );
   }
 
-  function setModelSurfacesVertexAttribute(modelId, surfaceIds, { name, item }) {
+  function setModelSurfacesVertexAttribute(modelId, surfaceIds, name, item) {
     const currentName = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     if (name !== currentName) {
       return setModelSurfacesVertexAttributeName(modelId, surfaceIds, name);

@@ -123,7 +123,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
     );
   }
 
-  function setMeshEdgesEdgeAttribute(id, { name, item }) {
+  function setMeshEdgesEdgeAttribute(id, name, item) {
     const currentName = meshEdgesEdgeAttributeName(id);
     if (name !== currentName) {
       return setMeshEdgesEdgeAttributeName(id, name);

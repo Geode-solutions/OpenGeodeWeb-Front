@@ -114,7 +114,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
     );
   }
 
-  function setMeshPolygonsVertexAttribute(id, { name, item }) {
+  function setMeshPolygonsVertexAttribute(id, name, item) {
     const currentName = meshPolygonsVertexAttributeName(id);
     if (name !== currentName) {
       return setMeshPolygonsVertexAttributeName(id, name);

@@ -112,7 +112,7 @@ export function useModelLinesVertexAttribute() {
     );
   }
 
-  function setModelLinesVertexAttribute(modelId, lineIds, { name, item }) {
+  function setModelLinesVertexAttribute(modelId, lineIds, name, item) {
     const currentName = modelLinesVertexAttributeName(modelId, lineIds[0]);
     if (name !== currentName) {
       return setModelLinesVertexAttributeName(modelId, lineIds, name);

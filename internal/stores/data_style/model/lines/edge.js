@@ -112,7 +112,7 @@ export function useModelLinesEdgeAttribute() {
     );
   }
 
-  function setModelLinesEdgeAttribute(modelId, lineIds, { name, item }) {
+  function setModelLinesEdgeAttribute(modelId, lineIds, name, item) {
     const currentName = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     if (name !== currentName) {
       return setModelLinesEdgeAttributeName(modelId, lineIds, name);

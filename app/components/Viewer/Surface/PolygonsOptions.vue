@@ -55,14 +55,20 @@ const textures = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_value = computed({
-  get: () => ({
-    name: dataStyleStore.meshPolygonsVertexAttributeName(id.value),
-    item: dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
-  }),
+const vertex_attribute_name = computed({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsVertexAttribute(targetId, newValue),
+      dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -85,14 +91,20 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_value = computed({
-  get: () => ({
-    name: dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
-    item: dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
-  }),
+const polygon_attribute_name = computed({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsPolygonAttribute(targetId, newValue),
+      dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const polygon_attribute_item = computed({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -135,10 +147,12 @@ const polygon_attribute_color_map = computed({
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
-          v-model:vertex_attribute_name="vertex_attribute_value"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:polygon_attribute_name="polygon_attribute_value"
+          v-model:polygon_attribute_name="polygon_attribute_name"
+          v-model:polygon_attribute_item="polygon_attribute_item"
           v-model:polygon_attribute_range="polygon_attribute_range"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
         />

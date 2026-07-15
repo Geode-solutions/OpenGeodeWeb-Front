@@ -111,7 +111,7 @@ export function useMeshCellsCellAttributeStyle() {
     );
   }
 
-  function setMeshCellsCellAttribute(id, { name, item }) {
+  function setMeshCellsCellAttribute(id, name, item) {
     const currentName = meshCellsCellAttributeName(id);
     if (name !== currentName) {
       return setMeshCellsCellAttributeName(id, name);

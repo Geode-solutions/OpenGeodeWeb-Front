@@ -120,7 +120,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     );
   }
 
-  function setMeshPolyhedraVertexAttribute(id, { name, item }) {
+  function setMeshPolyhedraVertexAttribute(id, name, item) {
     const currentName = meshPolyhedraVertexAttributeName(id);
     if (name !== currentName) {
       return setMeshPolyhedraVertexAttributeName(id, name);

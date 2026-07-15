@@ -112,7 +112,7 @@ export function useModelCornersVertexAttribute() {
     );
   }
 
-  function setModelCornersVertexAttribute(modelId, cornerIds, { name, item }) {
+  function setModelCornersVertexAttribute(modelId, cornerIds, name, item) {
     const currentName = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     if (name !== currentName) {
       return setModelCornersVertexAttributeName(modelId, cornerIds, name);

@@ -55,14 +55,20 @@ const color = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_value = computed({
-  get: () => ({
-    name: dataStyleStore.meshEdgesVertexAttributeName(id.value),
-    item: dataStyleStore.meshEdgesVertexAttributeItem(id.value),
-  }),
+const vertex_attribute_name = computed({
+  get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesVertexAttribute(targetId, newValue),
+      dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshEdgesVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesVertexAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -85,14 +91,20 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_value = computed({
-  get: () => ({
-    name: dataStyleStore.meshEdgesEdgeAttributeName(id.value),
-    item: dataStyleStore.meshEdgesEdgeAttributeItem(id.value),
-  }),
+const edge_attribute_name = computed({
+  get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesEdgeAttribute(targetId, newValue),
+      dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const edge_attribute_item = computed({
+  get: () => dataStyleStore.meshEdgesEdgeAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesEdgeAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -132,10 +144,12 @@ const edge_attribute_color_map = computed({
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
-          v-model:vertex_attribute_name="vertex_attribute_value"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:edge_attribute_name="edge_attribute_value"
+          v-model:edge_attribute_name="edge_attribute_name"
+          v-model:edge_attribute_item="edge_attribute_item"
           v-model:edge_attribute_range="edge_attribute_range"
           v-model:edge_attribute_color_map="edge_attribute_color_map"
         />

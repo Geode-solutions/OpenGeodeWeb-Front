@@ -112,7 +112,7 @@ export function useModelBlocksPolyhedronAttribute() {
     );
   }
 
-  function setModelBlocksPolyhedronAttribute(modelId, blockIds, { name, item }) {
+  function setModelBlocksPolyhedronAttribute(modelId, blockIds, name, item) {
     const currentName = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     if (name !== currentName) {
       return setModelBlocksPolyhedronAttributeName(modelId, blockIds, name);

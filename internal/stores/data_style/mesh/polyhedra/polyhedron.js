@@ -120,7 +120,7 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     );
   }
 
-  function setMeshPolyhedraPolyhedronAttribute(id, { name, item }) {
+  function setMeshPolyhedraPolyhedronAttribute(id, name, item) {
     const currentName = meshPolyhedraPolyhedronAttributeName(id);
     if (name !== currentName) {
       return setMeshPolyhedraPolyhedronAttributeName(id, name);

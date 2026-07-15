@@ -55,14 +55,20 @@ const color = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_value = computed({
-  get: () => ({
-    name: dataStyleStore.meshPointsVertexAttributeName(id.value),
-    item: dataStyleStore.meshPointsVertexAttributeItem(id.value),
-  }),
+const vertex_attribute_name = computed({
+  get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPointsVertexAttribute(targetId, newValue),
+      dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshPointsVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPointsVertexAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -105,7 +111,8 @@ const vertex_attribute_color_map = computed({
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
-          v-model:vertex_attribute_name="vertex_attribute_value"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           :vertex_has_colormap="true"

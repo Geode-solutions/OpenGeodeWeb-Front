@@ -112,7 +112,7 @@ export function useModelBlocksVertexAttribute() {
     );
   }
 
-  function setModelBlocksVertexAttribute(modelId, blockIds, { name, item }) {
+  function setModelBlocksVertexAttribute(modelId, blockIds, name, item) {
     const currentName = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     if (name !== currentName) {
       return setModelBlocksVertexAttributeName(modelId, blockIds, name);

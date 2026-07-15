@@ -114,7 +114,7 @@ export function useMeshCellsVertexAttributeStyle() {
     );
   }
 
-  function setMeshCellsVertexAttribute(id, { name, item }) {
+  function setMeshCellsVertexAttribute(id, name, item) {
     const currentName = meshCellsVertexAttributeName(id);
     if (name !== currentName) {
       return setMeshCellsVertexAttributeName(id, name);

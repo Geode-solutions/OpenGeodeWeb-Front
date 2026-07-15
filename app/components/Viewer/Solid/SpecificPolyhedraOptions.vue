@@ -55,14 +55,11 @@ const vertex_attribute_name = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_value = computed({
-  get: () => ({
-    name: dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
-    item: dataStyleStore.meshPolyhedraVertexAttributeItem(id.value),
-  }),
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshPolyhedraVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraVertexAttribute(targetId, newValue),
+      dataStyleStore.setMeshPolyhedraVertexAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -85,14 +82,20 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_value = computed({
-  get: () => ({
-    name: dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
-    item: dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id.value),
-  }),
+const polyhedron_attribute_name = computed({
+  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttribute(targetId, newValue),
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const polyhedron_attribute_item = computed({
+  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -135,10 +138,12 @@ const polyhedron_attribute_color_map = computed({
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
-          v-model:vertex_attribute_name="vertex_attribute_value"
+          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:polyhedron_attribute_name="polyhedron_attribute_value"
+          v-model:polyhedron_attribute_name="polyhedron_attribute_name"
+          v-model:polyhedron_attribute_item="polyhedron_attribute_item"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
         />

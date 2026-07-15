@@ -112,7 +112,7 @@ export function useModelSurfacesPolygonAttribute() {
     );
   }
 
-  function setModelSurfacesPolygonAttribute(modelId, surfaceIds, { name, item }) {
+  function setModelSurfacesPolygonAttribute(modelId, surfaceIds, name, item) {
     const currentName = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     if (name !== currentName) {
       return setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name);

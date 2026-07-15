@@ -114,7 +114,7 @@ export function useMeshPointsVertexAttributeStyle() {
     );
   }
 
-  function setMeshPointsVertexAttribute(id, { name, item }) {
+  function setMeshPointsVertexAttribute(id, name, item) {
     const currentName = meshPointsVertexAttributeName(id);
     if (name !== currentName) {
       return setMeshPointsVertexAttributeName(id, name);

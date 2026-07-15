@@ -118,7 +118,7 @@ export function useMeshEdgesVertexAttributeStyle() {
     );
   }
 
-  function setMeshEdgesVertexAttribute(id, { name, item }) {
+  function setMeshEdgesVertexAttribute(id, name, item) {
     const currentName = meshEdgesVertexAttributeName(id);
     if (name !== currentName) {
       return setMeshEdgesVertexAttributeName(id, name);

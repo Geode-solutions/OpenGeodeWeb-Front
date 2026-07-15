@@ -66,13 +66,18 @@ const blockActiveColoring = computed({
 });
 
 // Group Attributes
-const blocksVertexAttributeValue = computed({
-  get: () => ({
-    name: dataStyleStore.modelBlocksVertexAttributeName(modelId, targetBlockIds[0]),
-    item: dataStyleStore.modelBlocksVertexAttributeItem(modelId, targetBlockIds[0]),
-  }),
+const blocksVertexAttributeName = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, targetBlockIds[0]),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttribute(modelId, targetBlockIds, newValue);
+    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, targetBlockIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const blocksVertexAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, targetBlockIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -98,13 +103,18 @@ const blocksVertexAttributeColorMap = computed({
   },
 });
 
-const blocksPolyhedronAttributeValue = computed({
-  get: () => ({
-    name: dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
-    item: dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, targetBlockIds[0]),
-  }),
+const blocksPolyhedronAttributeName = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttribute(modelId, targetBlockIds, newValue);
+    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, targetBlockIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const blocksPolyhedronAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, targetBlockIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -135,13 +145,18 @@ const blocksPolyhedronAttributeColorMap = computed({
 });
 
 // Individual Attributes
-const vertexAttributeValue = computed({
-  get: () => ({
-    name: dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
-    item: dataStyleStore.modelBlocksVertexAttributeItem(modelId, blockId),
-  }),
+const vertexAttributeName = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttribute(modelId, [blockId], newValue);
+    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [blockId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, blockId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -167,13 +182,18 @@ const vertexAttributeColorMap = computed({
   },
 });
 
-const polyhedronAttributeValue = computed({
-  get: () => ({
-    name: dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
-    item: dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
-  }),
+const polyhedronAttributeName = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttribute(modelId, [blockId], newValue);
+    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [blockId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const polyhedronAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -221,10 +241,12 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
       :componentId="targetBlockIds[0]"
       v-model:coloring_style_key="blocksActiveColoring"
       v-model:color="blocksColor"
-      v-model:vertex_attribute_name="blocksVertexAttributeValue"
+      v-model:vertex_attribute_name="blocksVertexAttributeName"
+      v-model:vertex_attribute_item="blocksVertexAttributeItem"
       v-model:vertex_attribute_range="blocksVertexAttributeRange"
       v-model:vertex_attribute_color_map="blocksVertexAttributeColorMap"
-      v-model:polyhedron_attribute_name="blocksPolyhedronAttributeValue"
+      v-model:polyhedron_attribute_name="blocksPolyhedronAttributeName"
+      v-model:polyhedron_attribute_item="blocksPolyhedronAttributeItem"
       v-model:polyhedron_attribute_range="blocksPolyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="blocksPolyhedronAttributeColorMap"
       :capabilities="capabilities"
@@ -240,10 +262,12 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
       :componentId="blockId"
       v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"
-      v-model:vertex_attribute_name="vertexAttributeValue"
+      v-model:vertex_attribute_name="vertexAttributeName"
+      v-model:vertex_attribute_item="vertexAttributeItem"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
-      v-model:polyhedron_attribute_name="polyhedronAttributeValue"
+      v-model:polyhedron_attribute_name="polyhedronAttributeName"
+      v-model:polyhedron_attribute_item="polyhedronAttributeItem"
       v-model:polyhedron_attribute_range="polyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="polyhedronAttributeColorMap"
       :capabilities="capabilities"
