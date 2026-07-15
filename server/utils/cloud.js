@@ -62,7 +62,7 @@ function requestConfig(parent, routerImage, backImage, viewerImage, email, proje
       invokerIamDisabled: true,
       labels: {
         user: sanitizeLabelValue(email),
-        project: sanitizeLabelValue(projectId)
+        project: sanitizeLabelValue(projectId),
       },
       scaling: {
         scalingMode: "MANUAL",
@@ -71,7 +71,7 @@ function requestConfig(parent, routerImage, backImage, viewerImage, email, proje
       template: {
         labels: {
           user: sanitizeLabelValue(email),
-          project: sanitizeLabelValue(projectId)
+          project: sanitizeLabelValue(projectId),
         },
         volumes: [
           {
