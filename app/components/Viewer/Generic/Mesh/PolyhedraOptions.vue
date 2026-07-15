@@ -47,15 +47,34 @@ const color = computed({
   },
 });
 const vertex_attribute_name = computed({
-  get: () => ({
-    name: dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
-    item: dataStyleStore.meshPolyhedraVertexAttributeValue(id.value).item,
-  }),
+  get: () => dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue.name, newValue.item),
+      dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshPolyhedraVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolyhedraVertexAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_value = computed({
+  get: () => ({
+    name: vertex_attribute_name.value,
+    item: vertex_attribute_item.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== vertex_attribute_name.value) {
+      vertex_attribute_name.value = newValue.name;
+    } else if (newValue.item !== vertex_attribute_item.value) {
+      vertex_attribute_item.value = newValue.item;
+    }
   },
 });
 const vertex_attribute_range = computed({
@@ -77,19 +96,34 @@ const vertex_attribute_color_map = computed({
   },
 });
 const polyhedron_attribute_name = computed({
-  get: () => ({
-    name: dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
-    item: dataStyleStore.meshPolyhedraPolyhedronAttributeValue(id.value).item,
-  }),
+  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
-        targetId,
-        newValue.name,
-        newValue.item,
-      ),
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
+  },
+});
+const polyhedron_attribute_item = computed({
+  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const polyhedron_attribute_value = computed({
+  get: () => ({
+    name: polyhedron_attribute_name.value,
+    item: polyhedron_attribute_item.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== polyhedron_attribute_name.value) {
+      polyhedron_attribute_name.value = newValue.name;
+    } else if (newValue.item !== polyhedron_attribute_item.value) {
+      polyhedron_attribute_item.value = newValue.item;
+    }
   },
 });
 const polyhedron_attribute_range = computed({
@@ -132,10 +166,10 @@ const polyhedron_attribute_color_map = computed({
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
-          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_name="vertex_attribute_value"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:polyhedron_attribute_name="polyhedron_attribute_name"
+          v-model:polyhedron_attribute_name="polyhedron_attribute_value"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
           :capabilities="{

@@ -62,15 +62,13 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     return meshPolyhedraPolyhedronAttribute(id).name;
   }
 
-  function meshPolyhedraPolyhedronAttributeValue(id) {
-    const attr = meshPolyhedraPolyhedronAttribute(id);
-    return { name: attr.name, item: attr.item };
+  function meshPolyhedraPolyhedronAttributeItem(id) {
+    return meshPolyhedraPolyhedronAttribute(id).item;
   }
 
-  function setMeshPolyhedraPolyhedronAttributeName(id, name, item) {
-    const currentName = meshPolyhedraPolyhedronAttributeName(id);
+  function setMeshPolyhedraPolyhedronAttributeName(id, name) {
     const targetItem =
-      currentName === name ? item : meshPolyhedraPolyhedronAttributeLastItem(id, name);
+      meshPolyhedraPolyhedronAttributeLastItem(id, name);
     const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -93,8 +91,32 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     );
   }
 
+  function setMeshPolyhedraPolyhedronAttributeItem(id, item) {
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
+    const params = { id, name, item };
+    return viewerStore.request(
+      {
+        schema,
+        params,
+      },
+      {
+        response_function: () =>
+          mutateMeshPolyhedraPolyhedronStyle(id, {
+            item,
+            storedConfigs: {
+              [name]: {
+                lastItem: item,
+              },
+            },
+          }),
+      },
+    );
+  }
+
   function meshPolyhedraPolyhedronAttributeRange(id) {
-    const { name, item } = meshPolyhedraPolyhedronAttributeValue(id);
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     if (storedConfig === undefined) {
       return [undefined, undefined];
@@ -103,7 +125,8 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   }
 
   function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
-    const { name, item } = meshPolyhedraPolyhedronAttributeValue(id);
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
     const colorMap = meshPolyhedraPolyhedronAttributeColorMap(id);
     const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
@@ -121,7 +144,8 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   }
 
   function meshPolyhedraPolyhedronAttributeColorMap(id) {
-    const { name, item } = meshPolyhedraPolyhedronAttributeValue(id);
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     if (storedConfig === undefined) {
       return;
@@ -130,7 +154,8 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   }
 
   function setMeshPolyhedraPolyhedronAttributeColorMap(id, colorMap) {
-    const { name, item } = meshPolyhedraPolyhedronAttributeValue(id);
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
@@ -151,11 +176,12 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
 
   return {
     meshPolyhedraPolyhedronAttributeName,
-    meshPolyhedraPolyhedronAttributeValue,
+    meshPolyhedraPolyhedronAttributeItem,
     meshPolyhedraPolyhedronAttributeRange,
     meshPolyhedraPolyhedronAttributeColorMap,
     meshPolyhedraPolyhedronAttributeStoredConfig,
     setMeshPolyhedraPolyhedronAttributeName,
+    setMeshPolyhedraPolyhedronAttributeItem,
     setMeshPolyhedraPolyhedronAttributeRange,
     setMeshPolyhedraPolyhedronAttributeColorMap,
   };

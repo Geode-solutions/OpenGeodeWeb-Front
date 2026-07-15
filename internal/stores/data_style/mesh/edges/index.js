@@ -34,7 +34,8 @@ export function useMeshEdgesStyle() {
       return meshEdgesColorStyle.setMeshEdgesColor(id, meshEdgesColorStyle.meshEdgesColor(id));
     }
     if (type === "vertex") {
-      const { name, item } = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeValue(id);
+      const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
+      const item = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeItem(id);
       const { colorMap } = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeStoredConfig(
         id,
         name,
@@ -46,7 +47,8 @@ export function useMeshEdgesStyle() {
       ]);
     }
     if (type === "edge") {
-      const { name, item } = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeValue(id);
+      const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
+      const item = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeItem(id);
       const { colorMap } = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeStoredConfig(
         id,
         name,

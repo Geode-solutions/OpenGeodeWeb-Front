@@ -135,9 +135,9 @@ describe("model corners", () => {
       const corner_ids = await dataStore.getCornersGeodeIds(id);
       const [corner_id] = corner_ids;
       await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
-      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points", 2);
+      await dataStyleStore.setModelCornersVertexAttributeItem(id, corner_ids, 2);
       expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
-      expect(dataStyleStore.modelCornersVertexAttributeValue(id, corner_id).item).toBe(2);
+      expect(dataStyleStore.modelCornersVertexAttributeItem(id, corner_id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -168,8 +168,9 @@ describe("model corners", () => {
       const corner_ids = await dataStore.getCornersGeodeIds(id);
       const [corner_id] = corner_ids;
       await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "unique_vertices");
+      await dataStyleStore.setModelCornersVertexAttributeItem(id, corner_ids, 0);
       expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("unique_vertices");
-      expect(dataStyleStore.modelCornersVertexAttributeValue(id, corner_id).item).toBe(0);
+      expect(dataStyleStore.modelCornersVertexAttributeItem(id, corner_id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
@@ -177,9 +178,9 @@ describe("model corners", () => {
       const dataStore = useDataStore();
       const corner_ids = await dataStore.getCornersGeodeIds(id);
       const [corner_id] = corner_ids;
-      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points", 0);
+      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
       expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
-      expect(dataStyleStore.modelCornersVertexAttributeValue(id, corner_id).item).toBe(2);
+      expect(dataStyleStore.modelCornersVertexAttributeItem(id, corner_id)).toBe(2);
       expect(dataStyleStore.modelCornersVertexAttributeRange(id, corner_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,

@@ -132,9 +132,9 @@ describe("model blocks", () => {
       const block_ids = await dataStore.getBlocksGeodeIds(id);
       const [block_id] = block_ids;
       await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
-      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points", 2);
+      await dataStyleStore.setModelBlocksVertexAttributeItem(id, block_ids, 2);
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
-      expect(dataStyleStore.modelBlocksVertexAttributeValue(id, block_id).item).toBe(2);
+      expect(dataStyleStore.modelBlocksVertexAttributeItem(id, block_id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -165,8 +165,9 @@ describe("model blocks", () => {
       const block_ids = await dataStore.getBlocksGeodeIds(id);
       const [block_id] = block_ids;
       await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "unique_vertices");
+      await dataStyleStore.setModelBlocksVertexAttributeItem(id, block_ids, 0);
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("unique_vertices");
-      expect(dataStyleStore.modelBlocksVertexAttributeValue(id, block_id).item).toBe(0);
+      expect(dataStyleStore.modelBlocksVertexAttributeItem(id, block_id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
@@ -174,9 +175,9 @@ describe("model blocks", () => {
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
       const [block_id] = block_ids;
-      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points", 0);
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
-      expect(dataStyleStore.modelBlocksVertexAttributeValue(id, block_id).item).toBe(2);
+      expect(dataStyleStore.modelBlocksVertexAttributeItem(id, block_id)).toBe(2);
       expect(dataStyleStore.modelBlocksVertexAttributeRange(id, block_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
@@ -236,16 +237,11 @@ describe("model blocks", () => {
         block_ids,
         "tetrahedron_vertices",
       );
-      await dataStyleStore.setModelBlocksPolyhedronAttributeName(
-        id,
-        block_ids,
-        "tetrahedron_vertices",
-        2,
-      );
+      await dataStyleStore.setModelBlocksPolyhedronAttributeItem(id, block_ids, 2);
       expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
         "tetrahedron_vertices",
       );
-      expect(dataStyleStore.modelBlocksPolyhedronAttributeValue(id, block_id).item).toBe(2);
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeItem(id, block_id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -284,10 +280,11 @@ describe("model blocks", () => {
         block_ids,
         "tetrahedron_adjacents",
       );
+      await dataStyleStore.setModelBlocksPolyhedronAttributeItem(id, block_ids, 0);
       expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
         "tetrahedron_adjacents",
       );
-      expect(dataStyleStore.modelBlocksPolyhedronAttributeValue(id, block_id).item).toBe(0);
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeItem(id, block_id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to tetrahedron_vertices and verify restoration", async () => {
@@ -303,7 +300,7 @@ describe("model blocks", () => {
       expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
         "tetrahedron_vertices",
       );
-      expect(dataStyleStore.modelBlocksPolyhedronAttributeValue(id, block_id).item).toBe(2);
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeItem(id, block_id)).toBe(2);
       expect(dataStyleStore.modelBlocksPolyhedronAttributeRange(id, block_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,

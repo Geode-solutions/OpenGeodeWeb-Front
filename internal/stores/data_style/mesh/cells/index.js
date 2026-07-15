@@ -39,7 +39,8 @@ export function useMeshCellsStyle() {
       return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
     }
     if (type === "vertex") {
-      const { name, item } = meshCellsVertexAttributeStyle.meshCellsVertexAttributeValue(id);
+      const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
+      const item = meshCellsVertexAttributeStyle.meshCellsVertexAttributeItem(id);
       const { colorMap } = meshCellsVertexAttributeStyle.meshCellsVertexAttributeStoredConfig(
         id,
         name,
@@ -51,7 +52,8 @@ export function useMeshCellsStyle() {
       ]);
     }
     if (type === "cell") {
-      const { name, item } = meshCellsCellAttributeStyle.meshCellsCellAttributeValue(id);
+      const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
+      const item = meshCellsCellAttributeStyle.meshCellsCellAttributeItem(id);
       const { colorMap } = meshCellsCellAttributeStyle.meshCellsCellAttributeStoredConfig(
         id,
         name,

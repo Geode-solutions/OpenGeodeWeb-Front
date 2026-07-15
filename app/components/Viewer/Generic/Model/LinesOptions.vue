@@ -67,18 +67,40 @@ const lineActiveColoring = computed({
 
 // Group Attributes
 const linesVertexAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelLinesVertexAttributeName(modelId, targetLineIds[0]),
-    item: dataStyleStore.modelLinesVertexAttributeValue(modelId, targetLineIds[0]).item,
-  }),
+  get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, targetLineIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeName(
       modelId,
       targetLineIds,
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const linesVertexAttributeItem = computed({
+  get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId, targetLineIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesVertexAttributeItem(
+      modelId,
+      targetLineIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const linesVertexAttributeValue = computed({
+  get: () => ({
+    name: linesVertexAttributeName.value,
+    item: linesVertexAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== linesVertexAttributeName.value) {
+      linesVertexAttributeName.value = newValue.name;
+    } else if (newValue.item !== linesVertexAttributeItem.value) {
+      linesVertexAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -104,18 +126,40 @@ const linesVertexAttributeColorMap = computed({
 });
 
 const linesEdgeAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelLinesEdgeAttributeName(modelId, targetLineIds[0]),
-    item: dataStyleStore.modelLinesEdgeAttributeValue(modelId, targetLineIds[0]).item,
-  }),
+  get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, targetLineIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeName(
       modelId,
       targetLineIds,
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const linesEdgeAttributeItem = computed({
+  get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId, targetLineIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesEdgeAttributeItem(
+      modelId,
+      targetLineIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const linesEdgeAttributeValue = computed({
+  get: () => ({
+    name: linesEdgeAttributeName.value,
+    item: linesEdgeAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== linesEdgeAttributeName.value) {
+      linesEdgeAttributeName.value = newValue.name;
+    } else if (newValue.item !== linesEdgeAttributeItem.value) {
+      linesEdgeAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -142,18 +186,40 @@ const linesEdgeAttributeColorMap = computed({
 
 // Individual Attributes
 const vertexAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelLinesVertexAttributeName(modelId, lineId),
-    item: dataStyleStore.modelLinesVertexAttributeValue(modelId, lineId).item,
-  }),
+  get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, lineId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeName(
       modelId,
       [lineId],
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeItem = computed({
+  get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId, lineId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesVertexAttributeItem(
+      modelId,
+      [lineId],
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeValue = computed({
+  get: () => ({
+    name: vertexAttributeName.value,
+    item: vertexAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== vertexAttributeName.value) {
+      vertexAttributeName.value = newValue.name;
+    } else if (newValue.item !== vertexAttributeItem.value) {
+      vertexAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -179,18 +245,40 @@ const vertexAttributeColorMap = computed({
 });
 
 const edgeAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelLinesEdgeAttributeName(modelId, lineId),
-    item: dataStyleStore.modelLinesEdgeAttributeValue(modelId, lineId).item,
-  }),
+  get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, lineId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeName(
       modelId,
       [lineId],
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const edgeAttributeItem = computed({
+  get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId, lineId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesEdgeAttributeItem(
+      modelId,
+      [lineId],
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const edgeAttributeValue = computed({
+  get: () => ({
+    name: edgeAttributeName.value,
+    item: edgeAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== edgeAttributeName.value) {
+      edgeAttributeName.value = newValue.name;
+    } else if (newValue.item !== edgeAttributeItem.value) {
+      edgeAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -237,10 +325,10 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
       :componentId="targetLineIds[0]"
       v-model:coloring_style_key="linesActiveColoring"
       v-model:color="linesColor"
-      v-model:vertex_attribute_name="linesVertexAttributeName"
+      v-model:vertex_attribute_name="linesVertexAttributeValue"
       v-model:vertex_attribute_range="linesVertexAttributeRange"
       v-model:vertex_attribute_color_map="linesVertexAttributeColorMap"
-      v-model:edge_attribute_name="linesEdgeAttributeName"
+      v-model:edge_attribute_name="linesEdgeAttributeValue"
       v-model:edge_attribute_range="linesEdgeAttributeRange"
       v-model:edge_attribute_color_map="linesEdgeAttributeColorMap"
       :capabilities="capabilities"
@@ -256,10 +344,10 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
       :componentId="lineId"
       v-model:coloring_style_key="lineActiveColoring"
       v-model:color="lineColor"
-      v-model:vertex_attribute_name="vertexAttributeName"
+      v-model:vertex_attribute_name="vertexAttributeValue"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
-      v-model:edge_attribute_name="edgeAttributeName"
+      v-model:edge_attribute_name="edgeAttributeValue"
       v-model:edge_attribute_range="edgeAttributeRange"
       v-model:edge_attribute_color_map="edgeAttributeColorMap"
       :capabilities="capabilities"

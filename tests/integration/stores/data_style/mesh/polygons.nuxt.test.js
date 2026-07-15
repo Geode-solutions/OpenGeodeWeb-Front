@@ -98,9 +98,9 @@ describe("mesh polygons", () => {
     test("stored configs 1 - select attribute points and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "points");
-      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "points", 2);
+      await dataStyleStore.setMeshPolygonsVertexAttributeItem(id, 2);
       expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe("points");
-      expect(dataStyleStore.meshPolygonsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolygonsVertexAttributeItem(id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -116,16 +116,17 @@ describe("mesh polygons", () => {
 
     test("stored configs 3 - select polygon_arround_vertex", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "polygon_arround_vertex", 0);
+      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "polygon_arround_vertex");
+      await dataStyleStore.setMeshPolygonsVertexAttributeItem(id, 0);
       expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe("polygon_arround_vertex");
-      expect(dataStyleStore.meshPolygonsVertexAttributeValue(id).item).toBe(0);
+      expect(dataStyleStore.meshPolygonsVertexAttributeItem(id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "points", 0);
+      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, "points");
       expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe("points");
-      expect(dataStyleStore.meshPolygonsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolygonsVertexAttributeItem(id)).toBe(2);
       expect(dataStyleStore.meshPolygonsVertexAttributeRange(id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
@@ -157,9 +158,9 @@ describe("mesh polygons", () => {
     test("stored configs 1 - select attribute test_attribute and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "test_attribute");
-      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "test_attribute", 2);
+      await dataStyleStore.setMeshPolygonsPolygonAttributeItem(id, 2);
       expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe("test_attribute");
-      expect(dataStyleStore.meshPolygonsPolygonAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeItem(id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -175,16 +176,17 @@ describe("mesh polygons", () => {
 
     test("stored configs 3 - select dummy_attribute", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "dummy_attribute", 0);
+      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "dummy_attribute");
+      await dataStyleStore.setMeshPolygonsPolygonAttributeItem(id, 0);
       expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe("dummy_attribute");
-      expect(dataStyleStore.meshPolygonsPolygonAttributeValue(id).item).toBe(0);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeItem(id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to test_attribute and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "test_attribute", 0);
+      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "test_attribute");
       expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe("test_attribute");
-      expect(dataStyleStore.meshPolygonsPolygonAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolygonsPolygonAttributeItem(id)).toBe(2);
       expect(dataStyleStore.meshPolygonsPolygonAttributeRange(id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,

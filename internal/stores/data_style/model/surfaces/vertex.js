@@ -55,17 +55,12 @@ export function useModelSurfacesVertexAttribute() {
     return modelSurfacesVertexAttribute(modelId, surfaceId).name;
   }
 
-  function modelSurfacesVertexAttributeValue(modelId, surfaceId) {
-    const attr = modelSurfacesVertexAttribute(modelId, surfaceId);
-    return { name: attr.name, item: attr.item };
+  function modelSurfacesVertexAttributeItem(modelId, surfaceId) {
+    return modelSurfacesVertexAttribute(modelId, surfaceId).item;
   }
 
-  async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name, item) {
-    const currentName = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
-    const targetItem =
-      currentName === name
-        ? item
-        : modelSurfacesVertexAttributeLastItem(modelId, surfaceIds[0], name);
+  async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
+    const targetItem = modelSurfacesVertexAttributeLastItem(modelId, surfaceIds[0], name);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -85,8 +80,29 @@ export function useModelSurfacesVertexAttribute() {
     );
   }
 
+  async function setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item) {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () =>
+          mutateModelSurfacesVertexStyle(modelId, surfaceIds, {
+            item,
+            storedConfigs: {
+              [name]: {
+                lastItem: item,
+              },
+            },
+          }),
+      },
+    );
+  }
+
   function modelSurfacesVertexAttributeRange(modelId, surfaceId) {
-    const { name, item } = modelSurfacesVertexAttributeValue(modelId, surfaceId);
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
     if (storedConfig === undefined) {
       return [undefined, undefined];
@@ -95,7 +111,8 @@ export function useModelSurfacesVertexAttribute() {
   }
 
   async function setModelSurfacesVertexAttributeRange(modelId, surfaceIds, minimum, maximum) {
-    const { name, item } = modelSurfacesVertexAttributeValue(modelId, surfaceIds[0]);
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
     const colorMap = modelSurfacesVertexAttributeColorMap(modelId, surfaceIds[0]);
     const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
 
@@ -120,7 +137,8 @@ export function useModelSurfacesVertexAttribute() {
   }
 
   function modelSurfacesVertexAttributeColorMap(modelId, surfaceId) {
-    const { name, item } = modelSurfacesVertexAttributeValue(modelId, surfaceId);
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
     if (storedConfig === undefined) {
       return;
@@ -129,7 +147,8 @@ export function useModelSurfacesVertexAttribute() {
   }
 
   async function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
-    const { name, item } = modelSurfacesVertexAttributeValue(modelId, surfaceIds[0]);
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(
       modelId,
       surfaceIds[0],
@@ -160,11 +179,12 @@ export function useModelSurfacesVertexAttribute() {
 
   return {
     modelSurfacesVertexAttributeName,
-    modelSurfacesVertexAttributeValue,
+    modelSurfacesVertexAttributeItem,
     modelSurfacesVertexAttributeRange,
     modelSurfacesVertexAttributeColorMap,
     modelSurfacesVertexAttributeStoredConfig,
     setModelSurfacesVertexAttributeName,
+    setModelSurfacesVertexAttributeItem,
     setModelSurfacesVertexAttributeRange,
     setModelSurfacesVertexAttributeColorMap,
   };

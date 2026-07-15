@@ -130,9 +130,9 @@ describe("mesh polyhedra", () => {
     test("stored configs 1 - select attribute points and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "points");
-      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "points", 2);
+      await dataStyleStore.setMeshPolyhedraVertexAttributeItem(id, 2);
       expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe("points");
-      expect(dataStyleStore.meshPolyhedraVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeItem(id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -148,16 +148,17 @@ describe("mesh polyhedra", () => {
 
     test("stored configs 3 - select polyhedra_around_vertex", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "polyhedra_around_vertex", 0);
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "polyhedra_around_vertex");
+      await dataStyleStore.setMeshPolyhedraVertexAttributeItem(id, 0);
       expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe("polyhedra_around_vertex");
-      expect(dataStyleStore.meshPolyhedraVertexAttributeValue(id).item).toBe(0);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeItem(id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "points", 0);
+      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, "points");
       expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe("points");
-      expect(dataStyleStore.meshPolyhedraVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolyhedraVertexAttributeItem(id)).toBe(2);
       expect(dataStyleStore.meshPolyhedraVertexAttributeRange(id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
@@ -190,9 +191,9 @@ describe("mesh polyhedra", () => {
     test("stored configs 1 - select attribute tetrahedron_vertices and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_vertices");
-      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_vertices", 2);
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(id, 2);
       expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe("tetrahedron_vertices");
-      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -212,16 +213,17 @@ describe("mesh polyhedra", () => {
 
     test("stored configs 3 - select tetrahedron_adjacents", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_adjacents", 0);
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_adjacents");
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(id, 0);
       expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe("tetrahedron_adjacents");
-      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeValue(id).item).toBe(0);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to tetrahedron_vertices and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_vertices", 0);
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, "tetrahedron_vertices");
       expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe("tetrahedron_vertices");
-      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id)).toBe(2);
       expect(dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,

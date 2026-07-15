@@ -55,15 +55,12 @@ export function useModelLinesEdgeAttribute() {
     return modelLinesEdgeAttribute(modelId, lineId).name;
   }
 
-  function modelLinesEdgeAttributeValue(modelId, lineId) {
-    const attr = modelLinesEdgeAttribute(modelId, lineId);
-    return { name: attr.name, item: attr.item };
+  function modelLinesEdgeAttributeItem(modelId, lineId) {
+    return modelLinesEdgeAttribute(modelId, lineId).item;
   }
 
-  async function setModelLinesEdgeAttributeName(modelId, lineIds, name, item) {
-    const currentName = modelLinesEdgeAttributeName(modelId, lineIds[0]);
-    const targetItem =
-      currentName === name ? item : modelLinesEdgeAttributeLastItem(modelId, lineIds[0], name);
+  async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
+    const targetItem = modelLinesEdgeAttributeLastItem(modelId, lineIds[0], name);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -83,8 +80,29 @@ export function useModelLinesEdgeAttribute() {
     );
   }
 
+  async function setModelLinesEdgeAttributeItem(modelId, lineIds, item) {
+    const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () =>
+          mutateModelLinesEdgeStyle(modelId, lineIds, {
+            item,
+            storedConfigs: {
+              [name]: {
+                lastItem: item,
+              },
+            },
+          }),
+      },
+    );
+  }
+
   function modelLinesEdgeAttributeRange(modelId, lineId) {
-    const { name, item } = modelLinesEdgeAttributeValue(modelId, lineId);
+    const name = modelLinesEdgeAttributeName(modelId, lineId);
+    const item = modelLinesEdgeAttributeItem(modelId, lineId);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
     if (storedConfig === undefined) {
       return [undefined, undefined];
@@ -93,7 +111,8 @@ export function useModelLinesEdgeAttribute() {
   }
 
   async function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
-    const { name, item } = modelLinesEdgeAttributeValue(modelId, lineIds[0]);
+    const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
     const colorMap = modelLinesEdgeAttributeColorMap(modelId, lineIds[0]);
     const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
 
@@ -118,7 +137,8 @@ export function useModelLinesEdgeAttribute() {
   }
 
   function modelLinesEdgeAttributeColorMap(modelId, lineId) {
-    const { name, item } = modelLinesEdgeAttributeValue(modelId, lineId);
+    const name = modelLinesEdgeAttributeName(modelId, lineId);
+    const item = modelLinesEdgeAttributeItem(modelId, lineId);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
     if (storedConfig === undefined) {
       return;
@@ -127,7 +147,8 @@ export function useModelLinesEdgeAttribute() {
   }
 
   async function setModelLinesEdgeAttributeColorMap(modelId, lineIds, colorMap) {
-    const { name, item } = modelLinesEdgeAttributeValue(modelId, lineIds[0]);
+    const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineIds[0], name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
@@ -149,11 +170,12 @@ export function useModelLinesEdgeAttribute() {
 
   return {
     modelLinesEdgeAttributeName,
-    modelLinesEdgeAttributeValue,
+    modelLinesEdgeAttributeItem,
     modelLinesEdgeAttributeRange,
     modelLinesEdgeAttributeColorMap,
     modelLinesEdgeAttributeStoredConfig,
     setModelLinesEdgeAttributeName,
+    setModelLinesEdgeAttributeItem,
     setModelLinesEdgeAttributeRange,
     setModelLinesEdgeAttributeColorMap,
   };

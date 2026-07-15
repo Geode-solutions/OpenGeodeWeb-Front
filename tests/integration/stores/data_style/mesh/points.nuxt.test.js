@@ -142,9 +142,10 @@ describe("mesh points", () => {
 
     test("stored configs 1 - select attribute points and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPointsVertexAttributeName(id, "points", 2);
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, "points");
+      await dataStyleStore.setMeshPointsVertexAttributeItem(id, 2);
       expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe("points");
-      expect(dataStyleStore.meshPointsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPointsVertexAttributeItem(id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -160,16 +161,17 @@ describe("mesh points", () => {
 
     test("stored configs 3 - select unique_vertices", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPointsVertexAttributeName(id, "unique_vertices", 0);
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, "unique_vertices");
+      await dataStyleStore.setMeshPointsVertexAttributeItem(id, 0);
       expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe("unique_vertices");
-      expect(dataStyleStore.meshPointsVertexAttributeValue(id).item).toBe(0);
+      expect(dataStyleStore.meshPointsVertexAttributeItem(id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPointsVertexAttributeName(id, "points", 0);
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, "points");
       expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe("points");
-      expect(dataStyleStore.meshPointsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshPointsVertexAttributeItem(id)).toBe(2);
       expect(dataStyleStore.meshPointsVertexAttributeRange(id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,

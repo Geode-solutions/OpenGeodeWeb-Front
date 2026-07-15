@@ -66,14 +66,12 @@ export function useMeshEdgesVertexAttributeStyle() {
     return meshEdgesVertexAttribute(id).name;
   }
 
-  function meshEdgesVertexAttributeValue(id) {
-    const attr = meshEdgesVertexAttribute(id);
-    return { name: attr.name, item: attr.item };
+  function meshEdgesVertexAttributeItem(id) {
+    return meshEdgesVertexAttribute(id).item;
   }
 
-  function setMeshEdgesVertexAttributeName(id, name, item) {
-    const currentName = meshEdgesVertexAttributeName(id);
-    const targetItem = currentName === name ? item : meshEdgesVertexAttributeLastItem(id, name);
+  function setMeshEdgesVertexAttributeName(id, name) {
+    const targetItem = meshEdgesVertexAttributeLastItem(id, name);
     const schema = meshEdgesVertexAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -93,8 +91,29 @@ export function useMeshEdgesVertexAttributeStyle() {
     );
   }
 
+  function setMeshEdgesVertexAttributeItem(id, item) {
+    const name = meshEdgesVertexAttributeName(id);
+    const schema = meshEdgesVertexAttributeSchemas.name;
+    const params = { id, name, item };
+    return viewerStore.request(
+      { schema, params },
+      {
+        response_function: () =>
+          mutateMeshEdgesVertexStyle(id, {
+            item,
+            storedConfigs: {
+              [name]: {
+                lastItem: item,
+              },
+            },
+          }),
+      },
+    );
+  }
+
   function meshEdgesVertexAttributeRange(id) {
-    const { name, item } = meshEdgesVertexAttributeValue(id);
+    const name = meshEdgesVertexAttributeName(id);
+    const item = meshEdgesVertexAttributeItem(id);
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     if (storedConfig === undefined) {
       return [undefined, undefined];
@@ -103,7 +122,8 @@ export function useMeshEdgesVertexAttributeStyle() {
   }
 
   function setMeshEdgesVertexAttributeRange(id, minimum, maximum) {
-    const { name, item } = meshEdgesVertexAttributeValue(id);
+    const name = meshEdgesVertexAttributeName(id);
+    const item = meshEdgesVertexAttributeItem(id);
     const colorMap = meshEdgesVertexAttributeColorMap(id);
     const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
@@ -121,7 +141,8 @@ export function useMeshEdgesVertexAttributeStyle() {
   }
 
   function meshEdgesVertexAttributeColorMap(id) {
-    const { name, item } = meshEdgesVertexAttributeValue(id);
+    const name = meshEdgesVertexAttributeName(id);
+    const item = meshEdgesVertexAttributeItem(id);
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     if (storedConfig === undefined) {
       return;
@@ -130,7 +151,8 @@ export function useMeshEdgesVertexAttributeStyle() {
   }
 
   function setMeshEdgesVertexAttributeColorMap(id, colorMap) {
-    const { name, item } = meshEdgesVertexAttributeValue(id);
+    const name = meshEdgesVertexAttributeName(id);
+    const item = meshEdgesVertexAttributeItem(id);
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
@@ -151,11 +173,12 @@ export function useMeshEdgesVertexAttributeStyle() {
 
   return {
     meshEdgesVertexAttributeName,
-    meshEdgesVertexAttributeValue,
+    meshEdgesVertexAttributeItem,
     meshEdgesVertexAttributeRange,
     meshEdgesVertexAttributeColorMap,
     meshEdgesVertexAttributeStoredConfig,
     setMeshEdgesVertexAttributeName,
+    setMeshEdgesVertexAttributeItem,
     setMeshEdgesVertexAttributeRange,
     setMeshEdgesVertexAttributeColorMap,
   };

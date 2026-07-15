@@ -68,18 +68,40 @@ const cornerActiveColoring = computed({
 
 // Group Attributes
 const cornersVertexAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelCornersVertexAttributeName(modelId, targetCornerIds[0]),
-    item: dataStyleStore.modelCornersVertexAttributeValue(modelId, targetCornerIds[0]).item,
-  }),
+  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, targetCornerIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeName(
       modelId,
       targetCornerIds,
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const cornersVertexAttributeItem = computed({
+  get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, targetCornerIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelCornersVertexAttributeItem(
+      modelId,
+      targetCornerIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const cornersVertexAttributeValue = computed({
+  get: () => ({
+    name: cornersVertexAttributeName.value,
+    item: cornersVertexAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== cornersVertexAttributeName.value) {
+      cornersVertexAttributeName.value = newValue.name;
+    } else if (newValue.item !== cornersVertexAttributeItem.value) {
+      cornersVertexAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -106,18 +128,40 @@ const cornersVertexAttributeColorMap = computed({
 
 // Individual Attributes
 const vertexAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
-    item: dataStyleStore.modelCornersVertexAttributeValue(modelId, cornerId).item,
-  }),
+  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeName(
       modelId,
       [cornerId],
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeItem = computed({
+  get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelCornersVertexAttributeItem(
+      modelId,
+      [cornerId],
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeValue = computed({
+  get: () => ({
+    name: vertexAttributeName.value,
+    item: vertexAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== vertexAttributeName.value) {
+      vertexAttributeName.value = newValue.name;
+    } else if (newValue.item !== vertexAttributeItem.value) {
+      vertexAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -163,7 +207,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       :componentId="targetCornerIds[0]"
       v-model:coloring_style_key="cornersActiveColoring"
       v-model:color="cornersColor"
-      v-model:vertex_attribute_name="cornersVertexAttributeName"
+      v-model:vertex_attribute_name="cornersVertexAttributeValue"
       v-model:vertex_attribute_range="cornersVertexAttributeRange"
       v-model:vertex_attribute_color_map="cornersVertexAttributeColorMap"
       :capabilities="capabilities"
@@ -179,7 +223,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       :componentId="cornerId"
       v-model:coloring_style_key="cornerActiveColoring"
       v-model:color="cornerColor"
-      v-model:vertex_attribute_name="vertexAttributeName"
+      v-model:vertex_attribute_name="vertexAttributeValue"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
       :capabilities="capabilities"

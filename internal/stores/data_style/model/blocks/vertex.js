@@ -55,15 +55,12 @@ export function useModelBlocksVertexAttribute() {
     return modelBlocksVertexAttribute(modelId, blockId).name;
   }
 
-  function modelBlocksVertexAttributeValue(modelId, blockId) {
-    const attr = modelBlocksVertexAttribute(modelId, blockId);
-    return { name: attr.name, item: attr.item };
+  function modelBlocksVertexAttributeItem(modelId, blockId) {
+    return modelBlocksVertexAttribute(modelId, blockId).item;
   }
 
-  async function setModelBlocksVertexAttributeName(modelId, blockIds, name, item) {
-    const currentName = modelBlocksVertexAttributeName(modelId, blockIds[0]);
-    const targetItem =
-      currentName === name ? item : modelBlocksVertexAttributeLastItem(modelId, blockIds[0], name);
+  async function setModelBlocksVertexAttributeName(modelId, blockIds, name) {
+    const targetItem = modelBlocksVertexAttributeLastItem(modelId, blockIds[0], name);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -83,8 +80,29 @@ export function useModelBlocksVertexAttribute() {
     );
   }
 
+  async function setModelBlocksVertexAttributeItem(modelId, blockIds, item) {
+    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () =>
+          mutateModelBlocksVertexStyle(modelId, blockIds, {
+            item,
+            storedConfigs: {
+              [name]: {
+                lastItem: item,
+              },
+            },
+          }),
+      },
+    );
+  }
+
   function modelBlocksVertexAttributeRange(modelId, blockId) {
-    const { name, item } = modelBlocksVertexAttributeValue(modelId, blockId);
+    const name = modelBlocksVertexAttributeName(modelId, blockId);
+    const item = modelBlocksVertexAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
     if (storedConfig === undefined) {
       return [undefined, undefined];
@@ -93,7 +111,8 @@ export function useModelBlocksVertexAttribute() {
   }
 
   async function setModelBlocksVertexAttributeRange(modelId, blockIds, minimum, maximum) {
-    const { name, item } = modelBlocksVertexAttributeValue(modelId, blockIds[0]);
+    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
     const colorMap = modelBlocksVertexAttributeColorMap(modelId, blockIds[0]);
     const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
 
@@ -118,7 +137,8 @@ export function useModelBlocksVertexAttribute() {
   }
 
   function modelBlocksVertexAttributeColorMap(modelId, blockId) {
-    const { name, item } = modelBlocksVertexAttributeValue(modelId, blockId);
+    const name = modelBlocksVertexAttributeName(modelId, blockId);
+    const item = modelBlocksVertexAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
     if (storedConfig === undefined) {
       return;
@@ -127,7 +147,8 @@ export function useModelBlocksVertexAttribute() {
   }
 
   async function setModelBlocksVertexAttributeColorMap(modelId, blockIds, colorMap) {
-    const { name, item } = modelBlocksVertexAttributeValue(modelId, blockIds[0]);
+    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
@@ -149,11 +170,12 @@ export function useModelBlocksVertexAttribute() {
 
   return {
     modelBlocksVertexAttributeName,
-    modelBlocksVertexAttributeValue,
+    modelBlocksVertexAttributeItem,
     modelBlocksVertexAttributeRange,
     modelBlocksVertexAttributeColorMap,
     modelBlocksVertexAttributeStoredConfig,
     setModelBlocksVertexAttributeName,
+    setModelBlocksVertexAttributeItem,
     setModelBlocksVertexAttributeRange,
     setModelBlocksVertexAttributeColorMap,
   };

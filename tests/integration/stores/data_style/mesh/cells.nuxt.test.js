@@ -100,9 +100,9 @@ describe("mesh cells", () => {
     test("stored configs 1 - select attribute points and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshCellsVertexAttributeName(id, "points");
-      await dataStyleStore.setMeshCellsVertexAttributeName(id, "points", 2);
+      await dataStyleStore.setMeshCellsVertexAttributeItem(id, 2);
       expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe("points");
-      expect(dataStyleStore.meshCellsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -118,16 +118,17 @@ describe("mesh cells", () => {
 
     test("stored configs 3 - select polygon_arround_vertex", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshCellsVertexAttributeName(id, "polygon_arround_vertex", 0);
+      await dataStyleStore.setMeshCellsVertexAttributeName(id, "polygon_arround_vertex");
+      await dataStyleStore.setMeshCellsVertexAttributeItem(id, 0);
       expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe("polygon_arround_vertex");
-      expect(dataStyleStore.meshCellsVertexAttributeValue(id).item).toBe(0);
+      expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshCellsVertexAttributeName(id, "points", 0);
+      await dataStyleStore.setMeshCellsVertexAttributeName(id, "points");
       expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe("points");
-      expect(dataStyleStore.meshCellsVertexAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(2);
       expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
@@ -159,9 +160,9 @@ describe("mesh cells", () => {
     test("stored configs 1 - select attribute RGB_data and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshCellsCellAttributeName(id, "RGB_data");
-      await dataStyleStore.setMeshCellsCellAttributeName(id, "RGB_data", 2);
+      await dataStyleStore.setMeshCellsCellAttributeItem(id, 2);
       expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe("RGB_data");
-      expect(dataStyleStore.meshCellsCellAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshCellsCellAttributeItem(id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -177,16 +178,17 @@ describe("mesh cells", () => {
 
     test("stored configs 3 - select dummy_attribute", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshCellsCellAttributeName(id, "dummy_attribute", 0);
+      await dataStyleStore.setMeshCellsCellAttributeName(id, "dummy_attribute");
+      await dataStyleStore.setMeshCellsCellAttributeItem(id, 0);
       expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe("dummy_attribute");
-      expect(dataStyleStore.meshCellsCellAttributeValue(id).item).toBe(0);
+      expect(dataStyleStore.meshCellsCellAttributeItem(id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to RGB_data and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshCellsCellAttributeName(id, "RGB_data", 0);
+      await dataStyleStore.setMeshCellsCellAttributeName(id, "RGB_data");
       expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe("RGB_data");
-      expect(dataStyleStore.meshCellsCellAttributeValue(id).item).toBe(2);
+      expect(dataStyleStore.meshCellsCellAttributeItem(id)).toBe(2);
       expect(dataStyleStore.meshCellsCellAttributeRange(id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,

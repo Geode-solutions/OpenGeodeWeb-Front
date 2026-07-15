@@ -55,15 +55,12 @@ export function useModelLinesVertexAttribute() {
     return modelLinesVertexAttribute(modelId, lineId).name;
   }
 
-  function modelLinesVertexAttributeValue(modelId, lineId) {
-    const attr = modelLinesVertexAttribute(modelId, lineId);
-    return { name: attr.name, item: attr.item };
+  function modelLinesVertexAttributeItem(modelId, lineId) {
+    return modelLinesVertexAttribute(modelId, lineId).item;
   }
 
-  async function setModelLinesVertexAttributeName(modelId, lineIds, name, item) {
-    const currentName = modelLinesVertexAttributeName(modelId, lineIds[0]);
-    const targetItem =
-      currentName === name ? item : modelLinesVertexAttributeLastItem(modelId, lineIds[0], name);
+  async function setModelLinesVertexAttributeName(modelId, lineIds, name) {
+    const targetItem = modelLinesVertexAttributeLastItem(modelId, lineIds[0], name);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -83,8 +80,29 @@ export function useModelLinesVertexAttribute() {
     );
   }
 
+  async function setModelLinesVertexAttributeItem(modelId, lineIds, item) {
+    const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () =>
+          mutateModelLinesVertexStyle(modelId, lineIds, {
+            item,
+            storedConfigs: {
+              [name]: {
+                lastItem: item,
+              },
+            },
+          }),
+      },
+    );
+  }
+
   function modelLinesVertexAttributeRange(modelId, lineId) {
-    const { name, item } = modelLinesVertexAttributeValue(modelId, lineId);
+    const name = modelLinesVertexAttributeName(modelId, lineId);
+    const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     if (storedConfig === undefined) {
       return [undefined, undefined];
@@ -93,7 +111,8 @@ export function useModelLinesVertexAttribute() {
   }
 
   async function setModelLinesVertexAttributeRange(modelId, lineIds, minimum, maximum) {
-    const { name, item } = modelLinesVertexAttributeValue(modelId, lineIds[0]);
+    const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
+    const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     const colorMap = modelLinesVertexAttributeColorMap(modelId, lineIds[0]);
     const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
 
@@ -118,7 +137,8 @@ export function useModelLinesVertexAttribute() {
   }
 
   function modelLinesVertexAttributeColorMap(modelId, lineId) {
-    const { name, item } = modelLinesVertexAttributeValue(modelId, lineId);
+    const name = modelLinesVertexAttributeName(modelId, lineId);
+    const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     if (storedConfig === undefined) {
       return;
@@ -127,7 +147,8 @@ export function useModelLinesVertexAttribute() {
   }
 
   async function setModelLinesVertexAttributeColorMap(modelId, lineIds, colorMap) {
-    const { name, item } = modelLinesVertexAttributeValue(modelId, lineIds[0]);
+    const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
+    const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
@@ -149,11 +170,12 @@ export function useModelLinesVertexAttribute() {
 
   return {
     modelLinesVertexAttributeName,
-    modelLinesVertexAttributeValue,
+    modelLinesVertexAttributeItem,
     modelLinesVertexAttributeRange,
     modelLinesVertexAttributeColorMap,
     modelLinesVertexAttributeStoredConfig,
     setModelLinesVertexAttributeName,
+    setModelLinesVertexAttributeItem,
     setModelLinesVertexAttributeRange,
     setModelLinesVertexAttributeColorMap,
   };

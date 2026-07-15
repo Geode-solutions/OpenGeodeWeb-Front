@@ -55,17 +55,12 @@ export function useModelSurfacesPolygonAttribute() {
     return modelSurfacesPolygonAttribute(modelId, surfaceId).name;
   }
 
-  function modelSurfacesPolygonAttributeValue(modelId, surfaceId) {
-    const attr = modelSurfacesPolygonAttribute(modelId, surfaceId);
-    return { name: attr.name, item: attr.item };
+  function modelSurfacesPolygonAttributeItem(modelId, surfaceId) {
+    return modelSurfacesPolygonAttribute(modelId, surfaceId).item;
   }
 
-  async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name, item) {
-    const currentName = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
-    const targetItem =
-      currentName === name
-        ? item
-        : modelSurfacesPolygonAttributeLastItem(modelId, surfaceIds[0], name);
+  async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
+    const targetItem = modelSurfacesPolygonAttributeLastItem(modelId, surfaceIds[0], name);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -85,8 +80,29 @@ export function useModelSurfacesPolygonAttribute() {
     );
   }
 
+  async function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () =>
+          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
+            item,
+            storedConfigs: {
+              [name]: {
+                lastItem: item,
+              },
+            },
+          }),
+      },
+    );
+  }
+
   function modelSurfacesPolygonAttributeRange(modelId, surfaceId) {
-    const { name, item } = modelSurfacesPolygonAttributeValue(modelId, surfaceId);
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
     if (storedConfig === undefined) {
       return [undefined, undefined];
@@ -95,7 +111,8 @@ export function useModelSurfacesPolygonAttribute() {
   }
 
   async function setModelSurfacesPolygonAttributeRange(modelId, surfaceIds, minimum, maximum) {
-    const { name, item } = modelSurfacesPolygonAttributeValue(modelId, surfaceIds[0]);
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
     const colorMap = modelSurfacesPolygonAttributeColorMap(modelId, surfaceIds[0]);
     const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
 
@@ -120,7 +137,8 @@ export function useModelSurfacesPolygonAttribute() {
   }
 
   function modelSurfacesPolygonAttributeColorMap(modelId, surfaceId) {
-    const { name, item } = modelSurfacesPolygonAttributeValue(modelId, surfaceId);
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
     if (storedConfig === undefined) {
       return;
@@ -129,7 +147,8 @@ export function useModelSurfacesPolygonAttribute() {
   }
 
   async function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
-    const { name, item } = modelSurfacesPolygonAttributeValue(modelId, surfaceIds[0]);
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
       modelId,
       surfaceIds[0],
@@ -160,11 +179,12 @@ export function useModelSurfacesPolygonAttribute() {
 
   return {
     modelSurfacesPolygonAttributeName,
-    modelSurfacesPolygonAttributeValue,
+    modelSurfacesPolygonAttributeItem,
     modelSurfacesPolygonAttributeRange,
     modelSurfacesPolygonAttributeColorMap,
     modelSurfacesPolygonAttributeStoredConfig,
     setModelSurfacesPolygonAttributeName,
+    setModelSurfacesPolygonAttributeItem,
     setModelSurfacesPolygonAttributeRange,
     setModelSurfacesPolygonAttributeColorMap,
   };

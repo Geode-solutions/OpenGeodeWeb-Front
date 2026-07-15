@@ -67,18 +67,40 @@ const blockActiveColoring = computed({
 
 // Group Attributes
 const blocksVertexAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelBlocksVertexAttributeName(modelId, targetBlockIds[0]),
-    item: dataStyleStore.modelBlocksVertexAttributeValue(modelId, targetBlockIds[0]).item,
-  }),
+  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeName(
       modelId,
       targetBlockIds,
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const blocksVertexAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, targetBlockIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttributeItem(
+      modelId,
+      targetBlockIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const blocksVertexAttributeValue = computed({
+  get: () => ({
+    name: blocksVertexAttributeName.value,
+    item: blocksVertexAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== blocksVertexAttributeName.value) {
+      blocksVertexAttributeName.value = newValue.name;
+    } else if (newValue.item !== blocksVertexAttributeItem.value) {
+      blocksVertexAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -104,18 +126,40 @@ const blocksVertexAttributeColorMap = computed({
 });
 
 const blocksPolyhedronAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
-    item: dataStyleStore.modelBlocksPolyhedronAttributeValue(modelId, targetBlockIds[0]).item,
-  }),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(
       modelId,
       targetBlockIds,
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const blocksPolyhedronAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, targetBlockIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(
+      modelId,
+      targetBlockIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const blocksPolyhedronAttributeValue = computed({
+  get: () => ({
+    name: blocksPolyhedronAttributeName.value,
+    item: blocksPolyhedronAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== blocksPolyhedronAttributeName.value) {
+      blocksPolyhedronAttributeName.value = newValue.name;
+    } else if (newValue.item !== blocksPolyhedronAttributeItem.value) {
+      blocksPolyhedronAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -146,18 +190,40 @@ const blocksPolyhedronAttributeColorMap = computed({
 
 // Individual Attributes
 const vertexAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
-    item: dataStyleStore.modelBlocksVertexAttributeValue(modelId, blockId).item,
-  }),
+  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeName(
       modelId,
       [blockId],
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, blockId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttributeItem(
+      modelId,
+      [blockId],
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeValue = computed({
+  get: () => ({
+    name: vertexAttributeName.value,
+    item: vertexAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== vertexAttributeName.value) {
+      vertexAttributeName.value = newValue.name;
+    } else if (newValue.item !== vertexAttributeItem.value) {
+      vertexAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -183,18 +249,40 @@ const vertexAttributeColorMap = computed({
 });
 
 const polyhedronAttributeName = computed({
-  get: () => ({
-    name: dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
-    item: dataStyleStore.modelBlocksPolyhedronAttributeValue(modelId, blockId).item,
-  }),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(
       modelId,
       [blockId],
-      newValue.name,
-      newValue.item,
+      newValue,
     );
     hybridViewerStore.remoteRender();
+  },
+});
+
+const polyhedronAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(
+      modelId,
+      [blockId],
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const polyhedronAttributeValue = computed({
+  get: () => ({
+    name: polyhedronAttributeName.value,
+    item: polyhedronAttributeItem.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== polyhedronAttributeName.value) {
+      polyhedronAttributeName.value = newValue.name;
+    } else if (newValue.item !== polyhedronAttributeItem.value) {
+      polyhedronAttributeItem.value = newValue.item;
+    }
   },
 });
 
@@ -241,10 +329,10 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
       :componentId="targetBlockIds[0]"
       v-model:coloring_style_key="blocksActiveColoring"
       v-model:color="blocksColor"
-      v-model:vertex_attribute_name="blocksVertexAttributeName"
+      v-model:vertex_attribute_name="blocksVertexAttributeValue"
       v-model:vertex_attribute_range="blocksVertexAttributeRange"
       v-model:vertex_attribute_color_map="blocksVertexAttributeColorMap"
-      v-model:polyhedron_attribute_name="blocksPolyhedronAttributeName"
+      v-model:polyhedron_attribute_name="blocksPolyhedronAttributeValue"
       v-model:polyhedron_attribute_range="blocksPolyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="blocksPolyhedronAttributeColorMap"
       :capabilities="capabilities"
@@ -260,10 +348,10 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
       :componentId="blockId"
       v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"
-      v-model:vertex_attribute_name="vertexAttributeName"
+      v-model:vertex_attribute_name="vertexAttributeValue"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
-      v-model:polyhedron_attribute_name="polyhedronAttributeName"
+      v-model:polyhedron_attribute_name="polyhedronAttributeValue"
       v-model:polyhedron_attribute_range="polyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="polyhedronAttributeColorMap"
       :capabilities="capabilities"

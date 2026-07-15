@@ -55,17 +55,12 @@ export function useModelBlocksPolyhedronAttribute() {
     return modelBlocksPolyhedronAttribute(modelId, blockId).name;
   }
 
-  function modelBlocksPolyhedronAttributeValue(modelId, blockId) {
-    const attr = modelBlocksPolyhedronAttribute(modelId, blockId);
-    return { name: attr.name, item: attr.item };
+  function modelBlocksPolyhedronAttributeItem(modelId, blockId) {
+    return modelBlocksPolyhedronAttribute(modelId, blockId).item;
   }
 
-  async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name, item) {
-    const currentName = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
-    const targetItem =
-      currentName === name
-        ? item
-        : modelBlocksPolyhedronAttributeLastItem(modelId, blockIds[0], name);
+  async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
+    const targetItem = modelBlocksPolyhedronAttributeLastItem(modelId, blockIds[0], name);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -85,8 +80,29 @@ export function useModelBlocksPolyhedronAttribute() {
     );
   }
 
+  async function setModelBlocksPolyhedronAttributeItem(modelId, blockIds, item) {
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
+    return viewerStore.request(
+      { schema: schema.name, params },
+      {
+        response_function: () =>
+          mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+            item,
+            storedConfigs: {
+              [name]: {
+                lastItem: item,
+              },
+            },
+          }),
+      },
+    );
+  }
+
   function modelBlocksPolyhedronAttributeRange(modelId, blockId) {
-    const { name, item } = modelBlocksPolyhedronAttributeValue(modelId, blockId);
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
     if (storedConfig === undefined) {
       return [undefined, undefined];
@@ -95,7 +111,8 @@ export function useModelBlocksPolyhedronAttribute() {
   }
 
   async function setModelBlocksPolyhedronAttributeRange(modelId, blockIds, minimum, maximum) {
-    const { name, item } = modelBlocksPolyhedronAttributeValue(modelId, blockIds[0]);
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     const colorMap = modelBlocksPolyhedronAttributeColorMap(modelId, blockIds[0]);
     const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
 
@@ -120,7 +137,8 @@ export function useModelBlocksPolyhedronAttribute() {
   }
 
   function modelBlocksPolyhedronAttributeColorMap(modelId, blockId) {
-    const { name, item } = modelBlocksPolyhedronAttributeValue(modelId, blockId);
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
     if (storedConfig === undefined) {
       return;
@@ -129,7 +147,8 @@ export function useModelBlocksPolyhedronAttribute() {
   }
 
   async function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
-    const { name, item } = modelBlocksPolyhedronAttributeValue(modelId, blockIds[0]);
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(
       modelId,
       blockIds[0],
@@ -160,11 +179,12 @@ export function useModelBlocksPolyhedronAttribute() {
 
   return {
     modelBlocksPolyhedronAttributeName,
-    modelBlocksPolyhedronAttributeValue,
+    modelBlocksPolyhedronAttributeItem,
     modelBlocksPolyhedronAttributeRange,
     modelBlocksPolyhedronAttributeColorMap,
     modelBlocksPolyhedronAttributeStoredConfig,
     setModelBlocksPolyhedronAttributeName,
+    setModelBlocksPolyhedronAttributeItem,
     setModelBlocksPolyhedronAttributeRange,
     setModelBlocksPolyhedronAttributeColorMap,
   };

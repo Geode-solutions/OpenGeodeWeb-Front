@@ -56,15 +56,34 @@ const color = computed({
   },
 });
 const vertex_attribute_name = computed({
-  get: () => ({
-    name: dataStyleStore.meshEdgesVertexAttributeName(id.value),
-    item: dataStyleStore.meshEdgesVertexAttributeValue(id.value).item,
-  }),
+  get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue.name, newValue.item),
+      dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshEdgesVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesVertexAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_value = computed({
+  get: () => ({
+    name: vertex_attribute_name.value,
+    item: vertex_attribute_item.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== vertex_attribute_name.value) {
+      vertex_attribute_name.value = newValue.name;
+    } else if (newValue.item !== vertex_attribute_item.value) {
+      vertex_attribute_item.value = newValue.item;
+    }
   },
 });
 const vertex_attribute_range = computed({
@@ -86,15 +105,34 @@ const vertex_attribute_color_map = computed({
   },
 });
 const edge_attribute_name = computed({
-  get: () => ({
-    name: dataStyleStore.meshEdgesEdgeAttributeName(id.value),
-    item: dataStyleStore.meshEdgesEdgeAttributeValue(id.value).item,
-  }),
+  get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue.name, newValue.item),
+      dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
+  },
+});
+const edge_attribute_item = computed({
+  get: () => dataStyleStore.meshEdgesEdgeAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesEdgeAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const edge_attribute_value = computed({
+  get: () => ({
+    name: edge_attribute_name.value,
+    item: edge_attribute_item.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== edge_attribute_name.value) {
+      edge_attribute_name.value = newValue.name;
+    } else if (newValue.item !== edge_attribute_item.value) {
+      edge_attribute_item.value = newValue.item;
+    }
   },
 });
 const edge_attribute_range = computed({
@@ -132,10 +170,10 @@ const edge_attribute_color_map = computed({
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
-          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_name="vertex_attribute_value"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:edge_attribute_name="edge_attribute_name"
+          v-model:edge_attribute_name="edge_attribute_value"
           v-model:edge_attribute_range="edge_attribute_range"
           v-model:edge_attribute_color_map="edge_attribute_color_map"
         />

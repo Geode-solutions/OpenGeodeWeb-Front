@@ -94,9 +94,9 @@ describe("mesh edges", () => {
       test("stored configs 1 - select attribute points and item 2", async () => {
         const dataStyleStore = useDataStyleStore();
         await dataStyleStore.setMeshEdgesVertexAttributeName(id, "points");
-        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "points", 2);
+        await dataStyleStore.setMeshEdgesVertexAttributeItem(id, 2);
         expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe("points");
-        expect(dataStyleStore.meshEdgesVertexAttributeValue(id).item).toBe(2);
+        expect(dataStyleStore.meshEdgesVertexAttributeItem(id)).toBe(2);
       });
 
       test("stored configs 2 - set range and colormap", async () => {
@@ -112,16 +112,17 @@ describe("mesh edges", () => {
 
       test("stored configs 3 - select edges_around_vertex", async () => {
         const dataStyleStore = useDataStyleStore();
-        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "edges_around_vertex", 0);
+        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "edges_around_vertex");
+        await dataStyleStore.setMeshEdgesVertexAttributeItem(id, 0);
         expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe("edges_around_vertex");
-        expect(dataStyleStore.meshEdgesVertexAttributeValue(id).item).toBe(0);
+        expect(dataStyleStore.meshEdgesVertexAttributeItem(id)).toBe(0);
       });
 
       test("stored configs 4 - switch back to points and verify restoration", async () => {
         const dataStyleStore = useDataStyleStore();
-        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "points", 0);
+        await dataStyleStore.setMeshEdgesVertexAttributeName(id, "points");
         expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe("points");
-        expect(dataStyleStore.meshEdgesVertexAttributeValue(id).item).toBe(2);
+        expect(dataStyleStore.meshEdgesVertexAttributeItem(id)).toBe(2);
         expect(dataStyleStore.meshEdgesVertexAttributeRange(id)).toStrictEqual([
           MINIMUM_RANGE,
           MAXIMUM_RANGE,
@@ -152,9 +153,9 @@ describe("mesh edges", () => {
       test("stored configs 1 - select attribute edges and item 2", async () => {
         const dataStyleStore = useDataStyleStore();
         await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "edges");
-        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "edges", 2);
+        await dataStyleStore.setMeshEdgesEdgeAttributeItem(id, 2);
         expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe("edges");
-        expect(dataStyleStore.meshEdgesEdgeAttributeValue(id).item).toBe(2);
+        expect(dataStyleStore.meshEdgesEdgeAttributeItem(id)).toBe(2);
       });
 
       test("stored configs 2 - set range and colormap", async () => {
@@ -170,16 +171,17 @@ describe("mesh edges", () => {
 
       test("stored configs 3 - select cycle_id", async () => {
         const dataStyleStore = useDataStyleStore();
-        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "cycle_id", 0);
+        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "cycle_id");
+        await dataStyleStore.setMeshEdgesEdgeAttributeItem(id, 0);
         expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe("cycle_id");
-        expect(dataStyleStore.meshEdgesEdgeAttributeValue(id).item).toBe(0);
+        expect(dataStyleStore.meshEdgesEdgeAttributeItem(id)).toBe(0);
       });
 
       test("stored configs 4 - switch back to edges and verify restoration", async () => {
         const dataStyleStore = useDataStyleStore();
-        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "edges", 0);
+        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, "edges");
         expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe("edges");
-        expect(dataStyleStore.meshEdgesEdgeAttributeValue(id).item).toBe(2);
+        expect(dataStyleStore.meshEdgesEdgeAttributeItem(id)).toBe(2);
         expect(dataStyleStore.meshEdgesEdgeAttributeRange(id)).toStrictEqual([
           MINIMUM_RANGE,
           MAXIMUM_RANGE,

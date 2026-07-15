@@ -56,15 +56,34 @@ const textures = computed({
   },
 });
 const vertex_attribute_name = computed({
-  get: () => ({
-    name: dataStyleStore.meshCellsVertexAttributeName(id.value),
-    item: dataStyleStore.meshCellsVertexAttributeValue(id.value).item,
-  }),
+  get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue.name, newValue.item),
+      dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_value = computed({
+  get: () => ({
+    name: vertex_attribute_name.value,
+    item: vertex_attribute_item.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== vertex_attribute_name.value) {
+      vertex_attribute_name.value = newValue.name;
+    } else if (newValue.item !== vertex_attribute_item.value) {
+      vertex_attribute_item.value = newValue.item;
+    }
   },
 });
 const vertex_attribute_range = computed({
@@ -86,15 +105,34 @@ const vertex_attribute_color_map = computed({
   },
 });
 const cell_attribute_name = computed({
-  get: () => ({
-    name: dataStyleStore.meshCellsCellAttributeName(id.value),
-    item: dataStyleStore.meshCellsCellAttributeValue(id.value).item,
-  }),
+  get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue.name, newValue.item),
+      dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
+  },
+});
+const cell_attribute_item = computed({
+  get: () => dataStyleStore.meshCellsCellAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsCellAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const cell_attribute_value = computed({
+  get: () => ({
+    name: cell_attribute_name.value,
+    item: cell_attribute_item.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== cell_attribute_name.value) {
+      cell_attribute_name.value = newValue.name;
+    } else if (newValue.item !== cell_attribute_item.value) {
+      cell_attribute_item.value = newValue.item;
+    }
   },
 });
 const cell_attribute_range = computed({
@@ -133,10 +171,10 @@ const cell_attribute_color_map = computed({
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
-          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_name="vertex_attribute_value"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:cell_attribute_name="cell_attribute_name"
+          v-model:cell_attribute_name="cell_attribute_value"
           v-model:cell_attribute_range="cell_attribute_range"
           v-model:cell_attribute_color_map="cell_attribute_color_map"
         />

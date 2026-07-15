@@ -1,3 +1,4 @@
+// oxlint-disable max-lines
 // Third party imports
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
@@ -135,9 +136,9 @@ describe("model lines", () => {
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const [line_id] = line_ids;
       await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points");
-      await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points", 2);
+      await dataStyleStore.setModelLinesVertexAttributeItem(id, line_ids, 2);
       expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("points");
-      expect(dataStyleStore.modelLinesVertexAttributeValue(id, line_id).item).toBe(2);
+      expect(dataStyleStore.modelLinesVertexAttributeItem(id, line_id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -166,8 +167,9 @@ describe("model lines", () => {
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const [line_id] = line_ids;
       await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "unique_vertices");
+      await dataStyleStore.setModelLinesVertexAttributeItem(id, line_ids, 0);
       expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("unique_vertices");
-      expect(dataStyleStore.modelLinesVertexAttributeValue(id, line_id).item).toBe(0);
+      expect(dataStyleStore.modelLinesVertexAttributeItem(id, line_id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
@@ -175,9 +177,9 @@ describe("model lines", () => {
       const dataStore = useDataStore();
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const [line_id] = line_ids;
-      await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points", 0);
+      await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points");
       expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("points");
-      expect(dataStyleStore.modelLinesVertexAttributeValue(id, line_id).item).toBe(2);
+      expect(dataStyleStore.modelLinesVertexAttributeItem(id, line_id)).toBe(2);
       expect(dataStyleStore.modelLinesVertexAttributeRange(id, line_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
@@ -225,9 +227,9 @@ describe("model lines", () => {
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const [line_id] = line_ids;
       await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "edges");
-      await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "edges", 2);
+      await dataStyleStore.setModelLinesEdgeAttributeItem(id, line_ids, 2);
       expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("edges");
-      expect(dataStyleStore.modelLinesEdgeAttributeValue(id, line_id).item).toBe(2);
+      expect(dataStyleStore.modelLinesEdgeAttributeItem(id, line_id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -256,8 +258,9 @@ describe("model lines", () => {
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const [line_id] = line_ids;
       await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "dummy_attribute");
+      await dataStyleStore.setModelLinesEdgeAttributeItem(id, line_ids, 0);
       expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("dummy_attribute");
-      expect(dataStyleStore.modelLinesEdgeAttributeValue(id, line_id).item).toBe(0);
+      expect(dataStyleStore.modelLinesEdgeAttributeItem(id, line_id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to edges and verify restoration", async () => {
@@ -265,9 +268,9 @@ describe("model lines", () => {
       const dataStore = useDataStore();
       const line_ids = await dataStore.getLinesGeodeIds(id);
       const [line_id] = line_ids;
-      await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "edges", 0);
+      await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "edges");
       expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("edges");
-      expect(dataStyleStore.modelLinesEdgeAttributeValue(id, line_id).item).toBe(2);
+      expect(dataStyleStore.modelLinesEdgeAttributeItem(id, line_id)).toBe(2);
       expect(dataStyleStore.modelLinesEdgeAttributeRange(id, line_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,

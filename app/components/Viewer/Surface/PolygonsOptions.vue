@@ -56,15 +56,34 @@ const textures = computed({
   },
 });
 const vertex_attribute_name = computed({
-  get: () => ({
-    name: dataStyleStore.meshPolygonsVertexAttributeName(id.value),
-    item: dataStyleStore.meshPolygonsVertexAttributeValue(id.value).item,
-  }),
+  get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue.name, newValue.item),
+      dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_value = computed({
+  get: () => ({
+    name: vertex_attribute_name.value,
+    item: vertex_attribute_item.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== vertex_attribute_name.value) {
+      vertex_attribute_name.value = newValue.name;
+    } else if (newValue.item !== vertex_attribute_item.value) {
+      vertex_attribute_item.value = newValue.item;
+    }
   },
 });
 const vertex_attribute_range = computed({
@@ -86,15 +105,34 @@ const vertex_attribute_color_map = computed({
   },
 });
 const polygon_attribute_name = computed({
-  get: () => ({
-    name: dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
-    item: dataStyleStore.meshPolygonsPolygonAttributeValue(id.value).item,
-  }),
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue.name, newValue.item),
+      dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
+  },
+});
+const polygon_attribute_item = computed({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const polygon_attribute_value = computed({
+  get: () => ({
+    name: polygon_attribute_name.value,
+    item: polygon_attribute_item.value,
+  }),
+  set: (newValue) => {
+    if (newValue.name !== polygon_attribute_name.value) {
+      polygon_attribute_name.value = newValue.name;
+    } else if (newValue.item !== polygon_attribute_item.value) {
+      polygon_attribute_item.value = newValue.item;
+    }
   },
 });
 const polygon_attribute_range = computed({
@@ -135,10 +173,10 @@ const polygon_attribute_color_map = computed({
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:textures="textures"
-          v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_name="vertex_attribute_value"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:polygon_attribute_name="polygon_attribute_name"
+          v-model:polygon_attribute_name="polygon_attribute_value"
           v-model:polygon_attribute_range="polygon_attribute_range"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
         />

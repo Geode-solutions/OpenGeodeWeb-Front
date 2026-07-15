@@ -134,9 +134,9 @@ describe("model surfaces", () => {
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
       const [surface_id] = surface_ids;
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
-      await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points", 2);
+      await dataStyleStore.setModelSurfacesVertexAttributeItem(id, surface_ids, 2);
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
-      expect(dataStyleStore.modelSurfacesVertexAttributeValue(id, surface_id).item).toBe(2);
+      expect(dataStyleStore.modelSurfacesVertexAttributeItem(id, surface_id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -171,10 +171,11 @@ describe("model surfaces", () => {
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
       const [surface_id] = surface_ids;
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "unique_vertices");
+      await dataStyleStore.setModelSurfacesVertexAttributeItem(id, surface_ids, 0);
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe(
         "unique_vertices",
       );
-      expect(dataStyleStore.modelSurfacesVertexAttributeValue(id, surface_id).item).toBe(0);
+      expect(dataStyleStore.modelSurfacesVertexAttributeItem(id, surface_id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
@@ -182,9 +183,9 @@ describe("model surfaces", () => {
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
       const [surface_id] = surface_ids;
-      await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points", 0);
+      await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
-      expect(dataStyleStore.modelSurfacesVertexAttributeValue(id, surface_id).item).toBe(2);
+      expect(dataStyleStore.modelSurfacesVertexAttributeItem(id, surface_id)).toBe(2);
       expect(dataStyleStore.modelSurfacesVertexAttributeRange(id, surface_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
@@ -244,16 +245,11 @@ describe("model surfaces", () => {
         surface_ids,
         "triangle_vertices",
       );
-      await dataStyleStore.setModelSurfacesPolygonAttributeName(
-        id,
-        surface_ids,
-        "triangle_vertices",
-        2,
-      );
+      await dataStyleStore.setModelSurfacesPolygonAttributeItem(id, surface_ids, 2);
       expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
         "triangle_vertices",
       );
-      expect(dataStyleStore.modelSurfacesPolygonAttributeValue(id, surface_id).item).toBe(2);
+      expect(dataStyleStore.modelSurfacesPolygonAttributeItem(id, surface_id)).toBe(2);
     });
 
     test("stored configs 2 - set range and colormap", async () => {
@@ -292,10 +288,11 @@ describe("model surfaces", () => {
         surface_ids,
         "triangle_adjacents",
       );
+      await dataStyleStore.setModelSurfacesPolygonAttributeItem(id, surface_ids, 0);
       expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
         "triangle_adjacents",
       );
-      expect(dataStyleStore.modelSurfacesPolygonAttributeValue(id, surface_id).item).toBe(0);
+      expect(dataStyleStore.modelSurfacesPolygonAttributeItem(id, surface_id)).toBe(0);
     });
 
     test("stored configs 4 - switch back to triangle_vertices and verify restoration", async () => {
@@ -307,12 +304,11 @@ describe("model surfaces", () => {
         id,
         surface_ids,
         "triangle_vertices",
-        0,
       );
       expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
         "triangle_vertices",
       );
-      expect(dataStyleStore.modelSurfacesPolygonAttributeValue(id, surface_id).item).toBe(2);
+      expect(dataStyleStore.modelSurfacesPolygonAttributeItem(id, surface_id)).toBe(2);
       expect(dataStyleStore.modelSurfacesPolygonAttributeRange(id, surface_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
