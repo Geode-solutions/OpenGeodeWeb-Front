@@ -15,9 +15,11 @@ function triggerHorizonStackModal(rawItem) {
   console.log("Triggering Horizon Stack modal for item:", rawItem);
   globalThis.dispatchEvent(new CustomEvent("open-horizon-stack-modal", { detail: rawItem }));
 }
+const isHorizonStack = computed(() => item.raw.geode_object_type === "HorizonStack3D");
+const showEyeButton = computed(() => !isHorizonStack.value && item.raw.title !== "HorizonStack3D");
 
 function handleRowClick(event) {
-  if (item.raw.geode_object_type === "HorizonStack3D") {
+  if (isHorizonStack.value) {
     if (!item.isLeaf) {
       return;
     }
@@ -47,41 +49,37 @@ function handleRowClick(event) {
       />
       <div v-else class="icon-placeholder" />
 
-      <v-btn
-        v-if="
-          selection.selectable && item.raw.geode_object_type === 'HorizonStack3D' && item.isLeaf
-        "
-        icon="mdi-layers-triple"
-        variant="text"
-        density="compact"
-        color="black"
-        class="flex-shrink-0"
-        style="z-index: 4"
-        @click.stop="triggerHorizonStackModal(item.raw)"
-        @mousedown.stop
-      />
-      <v-btn
-        v-else-if="
-          selection.selectable &&
-          item.raw.title !== 'HorizonStack3D' &&
-          item.raw.geode_object_type !== 'HorizonStack3D'
-        "
-        :icon="
-          getIndeterminate(item.raw)
-            ? 'mdi-eye-minus-outline'
-            : isSelected(item.raw)
-              ? 'mdi-eye'
-              : 'mdi-eye-off-outline'
-        "
-        variant="text"
-        density="compact"
-        color="black"
-        class="flex-shrink-0"
-        @click.stop="$emit('toggle-select', item.raw)"
-        @mousedown.stop
-        @mouseenter="$emit('hover-eye-enter', item.raw)"
-        @mouseleave="$emit('hover-eye-leave', item.raw)"
-      />
+      <template v-if="selection.selectable">
+        <v-btn
+          v-if="isHorizonStack && item.isLeaf"
+          icon="mdi-layers-triple"
+          variant="text"
+          density="compact"
+          color="black"
+          class="flex-shrink-0"
+          style="z-index: 4"
+          @click.stop="triggerHorizonStackModal(item.raw)"
+          @mousedown.stop
+        />
+        <v-btn
+          v-else-if="showEyeButton"
+          :icon="
+            getIndeterminate(item.raw)
+              ? 'mdi-eye-minus-outline'
+              : isSelected(item.raw)
+                ? 'mdi-eye'
+                : 'mdi-eye-off-outline'
+          "
+          variant="text"
+          density="compact"
+          color="black"
+          class="flex-shrink-0"
+          @click.stop="$emit('toggle-select', item.raw)"
+          @mousedown.stop
+          @mouseenter="$emit('hover-eye-enter', item.raw)"
+          @mouseleave="$emit('hover-eye-leave', item.raw)"
+        />
+      </template>
     </div>
 
     <div class="tree-title flex-grow-1 overflow-hidden d-flex align-center ms-1 pt-1">
