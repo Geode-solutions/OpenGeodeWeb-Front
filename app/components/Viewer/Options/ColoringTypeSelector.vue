@@ -188,61 +188,6 @@ watch(
   },
   { immediate: true },
 );
-
-const vertex_attribute = computed({
-  get: () => ({
-    name: vertex_attribute_name.value,
-    item: vertex_attribute_item.value,
-  }),
-  set: (newValue) => {
-    vertex_attribute_name.value = newValue ? newValue.name : undefined;
-    vertex_attribute_item.value = newValue ? newValue.item : 0;
-  },
-});
-
-const edge_attribute = computed({
-  get: () => ({
-    name: edge_attribute_name.value,
-    item: edge_attribute_item.value,
-  }),
-  set: (newValue) => {
-    edge_attribute_name.value = newValue ? newValue.name : undefined;
-    edge_attribute_item.value = newValue ? newValue.item : 0;
-  },
-});
-
-const cell_attribute = computed({
-  get: () => ({
-    name: cell_attribute_name.value,
-    item: cell_attribute_item.value,
-  }),
-  set: (newValue) => {
-    cell_attribute_name.value = newValue ? newValue.name : undefined;
-    cell_attribute_item.value = newValue ? newValue.item : 0;
-  },
-});
-
-const polygon_attribute = computed({
-  get: () => ({
-    name: polygon_attribute_name.value,
-    item: polygon_attribute_item.value,
-  }),
-  set: (newValue) => {
-    polygon_attribute_name.value = newValue ? newValue.name : undefined;
-    polygon_attribute_item.value = newValue ? newValue.item : 0;
-  },
-});
-
-const polyhedron_attribute = computed({
-  get: () => ({
-    name: polyhedron_attribute_name.value,
-    item: polyhedron_attribute_item.value,
-  }),
-  set: (newValue) => {
-    polyhedron_attribute_name.value = newValue ? newValue.name : undefined;
-    polyhedron_attribute_item.value = newValue ? newValue.item : 0;
-  },
-});
 </script>
 <template>
   <v-divider class="my-2 mx-2" />
@@ -271,7 +216,8 @@ const polyhedron_attribute = computed({
       </template>
       <template v-if="active_key === vertex_dict['value'] && hasColorMap('vertex')">
         <ViewerOptionsAttributeSelector
-          v-model:attribute="vertex_attribute"
+          v-model:attributeName="vertex_attribute_name"
+          v-model:attributeItem="vertex_attribute_item"
           v-model:range="vertex_attribute_range"
           v-model:colorMap="vertex_attribute_color_map"
           :id="id"
@@ -281,7 +227,8 @@ const polyhedron_attribute = computed({
       </template>
       <template v-if="active_key === edge_dict['value'] && hasColorMap('edge')">
         <ViewerOptionsAttributeSelector
-          v-model:attribute="edge_attribute"
+          v-model:attributeName="edge_attribute_name"
+          v-model:attributeItem="edge_attribute_item"
           v-model:range="edge_attribute_range"
           v-model:colorMap="edge_attribute_color_map"
           :id="id"
@@ -291,7 +238,8 @@ const polyhedron_attribute = computed({
       </template>
       <template v-if="active_key === cell_dict['value'] && hasColorMap('cell')">
         <ViewerOptionsAttributeSelector
-          v-model:attribute="cell_attribute"
+          v-model:attributeName="cell_attribute_name"
+          v-model:attributeItem="cell_attribute_item"
           v-model:range="cell_attribute_range"
           v-model:colorMap="cell_attribute_color_map"
           :id="id"
@@ -301,7 +249,8 @@ const polyhedron_attribute = computed({
       </template>
       <template v-if="active_key === polygon_dict['value'] && hasColorMap('polygon')">
         <ViewerOptionsAttributeSelector
-          v-model:attribute="polygon_attribute"
+          v-model:attributeName="polygon_attribute_name"
+          v-model:attributeItem="polygon_attribute_item"
           v-model:range="polygon_attribute_range"
           v-model:colorMap="polygon_attribute_color_map"
           :id="id"
@@ -311,7 +260,8 @@ const polyhedron_attribute = computed({
       </template>
       <template v-if="active_key === polyhedron_dict['value'] && hasColorMap('polyhedron')">
         <ViewerOptionsAttributeSelector
-          v-model:attribute="polyhedron_attribute"
+          v-model:attributeName="polyhedron_attribute_name"
+          v-model:attributeItem="polyhedron_attribute_item"
           v-model:range="polyhedron_attribute_range"
           v-model:colorMap="polyhedron_attribute_color_map"
           :id="id"

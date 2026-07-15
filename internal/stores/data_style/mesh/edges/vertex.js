@@ -25,28 +25,26 @@ export function useMeshEdgesVertexAttributeStyle() {
 
   function meshEdgesVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshEdgesVertexAttribute(id);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
-      nameStoredConfigs.lastItem = targetItem;
-      if (targetItem in nameStoredConfigs) {
-        return {
-          ...nameStoredConfigs[targetItem],
-          item: targetItem,
-        };
-      }
+    if (!(name in storedConfigs)) {
       return {
         minimum: undefined,
         maximum: undefined,
         colorMap: undefined,
-        item: targetItem,
+        item: 0,
+      };
+    }
+    const nameStoredConfigs = storedConfigs[name];
+    if (item in nameStoredConfigs) {
+      return {
+        ...nameStoredConfigs[item],
+        item,
       };
     }
     return {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-      item: 0,
+      item,
     };
   }
 
@@ -78,22 +76,23 @@ export function useMeshEdgesVertexAttributeStyle() {
   }
 
   function setMeshEdgesVertexAttributeName(id, name) {
-    const targetItem = meshEdgesVertexAttributeStoredConfig(id, name).item;
+    const { storedConfigs } = meshEdgesVertexAttribute(id);
+    let targetItem = 0;
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      targetItem = nameStoredConfigs.lastItem ?? 0;
+      existingConfig = nameStoredConfigs[targetItem] ?? {};
+    }
     const schema = meshEdgesVertexAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () =>
-          mutateMeshEdgesVertexStyle(id, {
-            name,
-            item: targetItem,
-            storedConfigs: {
-              [name]: {
-                lastItem: targetItem,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshEdgesVertexStyle(id, { name, item: targetItem });
+          return setMeshEdgesVertexAttributeStoredConfig(id, name, targetItem, existingConfig);
+        },
       },
     );
   }

@@ -26,27 +26,15 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
-      nameStoredConfigs.lastItem = targetItem;
-      if (targetItem in nameStoredConfigs) {
-        return {
-          ...nameStoredConfigs[targetItem],
-          item: targetItem,
-        };
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
       }
-      return {
-        minimum: undefined,
-        maximum: undefined,
-        colorMap: undefined,
-        item: targetItem,
-      };
     }
-    return {
+    return setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-      item: 0,
-    };
+    });
   }
 
   function mutateMeshEdgesEdgeStyle(id, values) {
@@ -77,7 +65,14 @@ export function useMeshEdgesEdgeAttributeStyle() {
   }
 
   function setMeshEdgesEdgeAttributeName(id, name) {
-    const targetItem = meshEdgesEdgeAttributeStoredConfig(id, name).item;
+    const { storedConfigs } = meshEdgesEdgeAttribute(id);
+    let targetItem = 0;
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      targetItem = nameStoredConfigs.lastItem ?? 0;
+      existingConfig = nameStoredConfigs[targetItem] ?? {};
+    }
     const schema = meshEdgesEdgeAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -86,22 +81,21 @@ export function useMeshEdgesEdgeAttributeStyle() {
         params,
       },
       {
-        response_function: () =>
-          mutateMeshEdgesEdgeStyle(id, {
-            name,
-            item: targetItem,
-            storedConfigs: {
-              [name]: {
-                lastItem: targetItem,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshEdgesEdgeStyle(id, { name, item: targetItem });
+          return setMeshEdgesEdgeAttributeStoredConfig(id, name, targetItem, existingConfig);
+        },
       },
     );
   }
 
   function setMeshEdgesEdgeAttributeItem(id, item) {
     const name = meshEdgesEdgeAttributeName(id);
+    const { storedConfigs } = meshEdgesEdgeAttribute(id);
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      existingConfig = storedConfigs[name][item] ?? {};
+    }
     const schema = meshEdgesEdgeAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
@@ -110,15 +104,10 @@ export function useMeshEdgesEdgeAttributeStyle() {
         params,
       },
       {
-        response_function: () =>
-          mutateMeshEdgesEdgeStyle(id, {
-            item,
-            storedConfigs: {
-              [name]: {
-                lastItem: item,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshEdgesEdgeStyle(id, { item });
+          return setMeshEdgesEdgeAttributeStoredConfig(id, name, item, existingConfig);
+        },
       },
     );
   }

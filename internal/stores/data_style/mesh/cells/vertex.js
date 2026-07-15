@@ -23,27 +23,15 @@ export function useMeshCellsVertexAttributeStyle() {
     const { storedConfigs } = meshCellsVertexAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
-      nameStoredConfigs.lastItem = targetItem;
-      if (targetItem in nameStoredConfigs) {
-        return {
-          ...nameStoredConfigs[targetItem],
-          item: targetItem,
-        };
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
       }
-      return {
-        minimum: undefined,
-        maximum: undefined,
-        colorMap: undefined,
-        item: targetItem,
-      };
     }
-    return {
+    return setMeshCellsVertexAttributeStoredConfig(id, name, item, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-      item: 0,
-    };
+    });
   }
 
   function mutateMeshCellsVertexStyle(id, values) {
@@ -74,42 +62,43 @@ export function useMeshCellsVertexAttributeStyle() {
   }
 
   function setMeshCellsVertexAttributeName(id, name) {
-    const targetItem = meshCellsVertexAttributeStoredConfig(id, name).item;
+    const { storedConfigs } = meshCellsVertexAttribute(id);
+    let targetItem = 0;
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      targetItem = nameStoredConfigs.lastItem ?? 0;
+      existingConfig = nameStoredConfigs[targetItem] ?? {};
+    }
     const schema = meshCellsVertexAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () =>
-          mutateMeshCellsVertexStyle(id, {
-            name,
-            item: targetItem,
-            storedConfigs: {
-              [name]: {
-                lastItem: targetItem,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshCellsVertexStyle(id, { name, item: targetItem });
+          return setMeshCellsVertexAttributeStoredConfig(id, name, targetItem, existingConfig);
+        },
       },
     );
   }
 
   function setMeshCellsVertexAttributeItem(id, item) {
     const name = meshCellsVertexAttributeName(id);
+    const { storedConfigs } = meshCellsVertexAttribute(id);
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      existingConfig = storedConfigs[name][item] ?? {};
+    }
     const schema = meshCellsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () =>
-          mutateMeshCellsVertexStyle(id, {
-            item,
-            storedConfigs: {
-              [name]: {
-                lastItem: item,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshCellsVertexStyle(id, { item });
+          return setMeshCellsVertexAttributeStoredConfig(id, name, item, existingConfig);
+        },
       },
     );
   }

@@ -4,11 +4,8 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const backStore = useBackStore();
 
-const attribute = defineModel("attribute", {
-  type: Object,
-  default: undefined,
-});
-
+const attributeName = defineModel("attributeName", { type: String });
+const attributeItem = defineModel("attributeItem", { type: Number });
 const range = defineModel("range", { type: Array });
 const colorMap = defineModel("colorMap", { type: String });
 
@@ -43,19 +40,9 @@ const rangeMax = computed({
   },
 });
 
-const selectedAttributeName = computed({
-  get: () => (attribute.value ? attribute.value.name : undefined),
-  set: (val) => {
-    attribute.value = { name: val, item: 0 };
-  },
-});
-
-const selectedComponent = computed({
-  get: () => (attribute.value ? attribute.value.item : 0),
-  set: (val) => {
-    attribute.value = { name: selectedAttributeName.value, item: val };
-  },
-});
+const currentAttribute = computed(() =>
+  attributes.value.find((attr) => attr.attribute_name === attributeName.value),
+);
 
 const componentItems = computed(() => {
   if (!currentAttribute.value) {
@@ -67,13 +54,9 @@ const componentItems = computed(() => {
   }));
 });
 
-const currentAttribute = computed(() =>
-  attributes.value.find((attr) => attr.attribute_name === selectedAttributeName.value),
-);
-
 function resetRange() {
   if (currentAttribute.value) {
-    const comp = attribute.value ? attribute.value.item : 0;
+    const comp = attributeItem.value ?? 0;
     range.value = [
       currentAttribute.value.min_values[comp],
       currentAttribute.value.max_values[comp],
@@ -111,10 +94,10 @@ watch(
 );
 
 watch(
-  () => [selectedAttributeName.value, attributes.value],
+  () => [attributeName.value, attributes.value],
   () => {
     if (
-      selectedAttributeName.value &&
+      attributeName.value &&
       attributes.value.length > 0 &&
       (range.value === undefined || range.value[0] === undefined || colorMap.value === undefined)
     ) {
@@ -126,7 +109,7 @@ watch(
   },
 );
 
-watch([selectedAttributeName, selectedComponent], () => {
+watch([attributeName, attributeItem], () => {
   resetRange();
 });
 </script>
@@ -134,7 +117,7 @@ watch([selectedAttributeName, selectedComponent], () => {
 <template>
   <v-select
     data-testid="attributeSelector"
-    v-model="selectedAttributeName"
+    v-model="attributeName"
     :items="attributes.map((attribute) => attribute.attribute_name)"
     item-title="attribute_name"
     item-value="attribute_name"
@@ -145,7 +128,7 @@ watch([selectedAttributeName, selectedComponent], () => {
   <v-select
     v-if="currentAttribute && currentAttribute.nb_items > 1"
     data-testid="itemSelector"
-    v-model="selectedComponent"
+    v-model="attributeItem"
     :items="componentItems"
     item-title="title"
     item-value="value"
@@ -155,7 +138,7 @@ watch([selectedAttributeName, selectedComponent], () => {
     hide-details
   />
   <ViewerOptionsAttributeColorBar
-    v-if="selectedAttributeName"
+    v-if="attributeName"
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="colorMap"

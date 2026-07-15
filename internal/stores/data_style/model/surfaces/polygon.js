@@ -23,27 +23,15 @@ export function useModelSurfacesPolygonAttribute() {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
-      nameStoredConfigs.lastItem = targetItem;
-      if (targetItem in nameStoredConfigs) {
-        return {
-          ...nameStoredConfigs[targetItem],
-          item: targetItem,
-        };
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
       }
-      return {
-        minimum: undefined,
-        maximum: undefined,
-        colorMap: undefined,
-        item: targetItem,
-      };
     }
-    return {
+    return setModelSurfacesPolygonAttributeStoredConfig(modelId, [surfaceId], name, item, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-      item: 0,
-    };
+    });
   }
 
   function mutateModelSurfacesPolygonStyle(modelId, surfaceIds, values) {
@@ -72,42 +60,55 @@ export function useModelSurfacesPolygonAttribute() {
   }
 
   async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
-    const targetItem = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name).item;
+    const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceIds[0]);
+    let targetItem = 0;
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      targetItem = nameStoredConfigs.lastItem ?? 0;
+      existingConfig = nameStoredConfigs[targetItem] ?? {};
+    }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () =>
-          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
+        response_function: () => {
+          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item: targetItem });
+          return setModelSurfacesPolygonAttributeStoredConfig(
+            modelId,
+            surfaceIds,
             name,
-            item: targetItem,
-            storedConfigs: {
-              [name]: {
-                lastItem: targetItem,
-              },
-            },
-          }),
+            targetItem,
+            existingConfig,
+          );
+        },
       },
     );
   }
 
   async function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceIds[0]);
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      existingConfig = storedConfigs[name][item] ?? {};
+    }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () =>
-          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
+        response_function: () => {
+          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { item });
+          return setModelSurfacesPolygonAttributeStoredConfig(
+            modelId,
+            surfaceIds,
+            name,
             item,
-            storedConfigs: {
-              [name]: {
-                lastItem: item,
-              },
-            },
-          }),
+            existingConfig,
+          );
+        },
       },
     );
   }

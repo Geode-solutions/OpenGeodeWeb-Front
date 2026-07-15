@@ -23,27 +23,15 @@ export function useModelCornersVertexAttribute() {
     const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
-      nameStoredConfigs.lastItem = targetItem;
-      if (targetItem in nameStoredConfigs) {
-        return {
-          ...nameStoredConfigs[targetItem],
-          item: targetItem,
-        };
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
       }
-      return {
-        minimum: undefined,
-        maximum: undefined,
-        colorMap: undefined,
-        item: targetItem,
-      };
     }
-    return {
+    return setModelCornersVertexAttributeStoredConfig(modelId, [cornerId], name, item, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-      item: 0,
-    };
+    });
   }
 
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
@@ -72,42 +60,55 @@ export function useModelCornersVertexAttribute() {
   }
 
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
-    const targetItem = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name).item;
+    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerIds[0]);
+    let targetItem = 0;
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      targetItem = nameStoredConfigs.lastItem ?? 0;
+      existingConfig = nameStoredConfigs[targetItem] ?? {};
+    }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () =>
-          mutateModelCornersVertexStyle(modelId, cornerIds, {
+        response_function: () => {
+          mutateModelCornersVertexStyle(modelId, cornerIds, { name, item: targetItem });
+          return setModelCornersVertexAttributeStoredConfig(
+            modelId,
+            cornerIds,
             name,
-            item: targetItem,
-            storedConfigs: {
-              [name]: {
-                lastItem: targetItem,
-              },
-            },
-          }),
+            targetItem,
+            existingConfig,
+          );
+        },
       },
     );
   }
 
   async function setModelCornersVertexAttributeItem(modelId, cornerIds, item) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
+    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerIds[0]);
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      existingConfig = storedConfigs[name][item] ?? {};
+    }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () =>
-          mutateModelCornersVertexStyle(modelId, cornerIds, {
+        response_function: () => {
+          mutateModelCornersVertexStyle(modelId, cornerIds, { item });
+          return setModelCornersVertexAttributeStoredConfig(
+            modelId,
+            cornerIds,
+            name,
             item,
-            storedConfigs: {
-              [name]: {
-                lastItem: item,
-              },
-            },
-          }),
+            existingConfig,
+          );
+        },
       },
     );
   }

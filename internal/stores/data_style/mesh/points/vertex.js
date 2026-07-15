@@ -31,27 +31,15 @@ export function useMeshPointsVertexAttributeStyle() {
     const { storedConfigs } = meshPointsVertexAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
-      nameStoredConfigs.lastItem = targetItem;
-      if (targetItem in nameStoredConfigs) {
-        return {
-          ...nameStoredConfigs[targetItem],
-          item: targetItem,
-        };
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
       }
-      return {
-        minimum: undefined,
-        maximum: undefined,
-        colorMap: undefined,
-        item: targetItem,
-      };
     }
-    return {
+    return setMeshPointsVertexAttributeStoredConfig(id, name, item, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-      item: 0,
-    };
+    });
   }
 
   function setMeshPointsVertexAttributeStoredConfig(id, name, item, config) {
@@ -74,42 +62,43 @@ export function useMeshPointsVertexAttributeStyle() {
   }
 
   function setMeshPointsVertexAttributeName(id, name) {
-    const targetItem = meshPointsVertexAttributeStoredConfig(id, name).item;
+    const { storedConfigs } = meshPointsVertexAttribute(id);
+    let targetItem = 0;
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      targetItem = nameStoredConfigs.lastItem ?? 0;
+      existingConfig = nameStoredConfigs[targetItem] ?? {};
+    }
     const schema = meshPointsVertexAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () =>
-          mutateMeshPointsVertexStyle(id, {
-            name,
-            item: targetItem,
-            storedConfigs: {
-              [name]: {
-                lastItem: targetItem,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshPointsVertexStyle(id, { name, item: targetItem });
+          return setMeshPointsVertexAttributeStoredConfig(id, name, targetItem, existingConfig);
+        },
       },
     );
   }
 
   function setMeshPointsVertexAttributeItem(id, item) {
     const name = meshPointsVertexAttributeName(id);
+    const { storedConfigs } = meshPointsVertexAttribute(id);
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      existingConfig = storedConfigs[name][item] ?? {};
+    }
     const schema = meshPointsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () =>
-          mutateMeshPointsVertexStyle(id, {
-            item,
-            storedConfigs: {
-              [name]: {
-                lastItem: item,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshPointsVertexStyle(id, { item });
+          return setMeshPointsVertexAttributeStoredConfig(id, name, item, existingConfig);
+        },
       },
     );
   }

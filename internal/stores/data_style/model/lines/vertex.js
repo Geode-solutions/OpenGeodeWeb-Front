@@ -23,27 +23,15 @@ export function useModelLinesVertexAttribute() {
     const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
-      nameStoredConfigs.lastItem = targetItem;
-      if (targetItem in nameStoredConfigs) {
-        return {
-          ...nameStoredConfigs[targetItem],
-          item: targetItem,
-        };
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
       }
-      return {
-        minimum: undefined,
-        maximum: undefined,
-        colorMap: undefined,
-        item: targetItem,
-      };
     }
-    return {
+    return setModelLinesVertexAttributeStoredConfig(modelId, [lineId], name, item, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-      item: 0,
-    };
+    });
   }
 
   function mutateModelLinesVertexStyle(modelId, lineIds, values) {
@@ -72,42 +60,55 @@ export function useModelLinesVertexAttribute() {
   }
 
   async function setModelLinesVertexAttributeName(modelId, lineIds, name) {
-    const targetItem = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name).item;
+    const { storedConfigs } = modelLinesVertexAttribute(modelId, lineIds[0]);
+    let targetItem = 0;
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      targetItem = nameStoredConfigs.lastItem ?? 0;
+      existingConfig = nameStoredConfigs[targetItem] ?? {};
+    }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () =>
-          mutateModelLinesVertexStyle(modelId, lineIds, {
+        response_function: () => {
+          mutateModelLinesVertexStyle(modelId, lineIds, { name, item: targetItem });
+          return setModelLinesVertexAttributeStoredConfig(
+            modelId,
+            lineIds,
             name,
-            item: targetItem,
-            storedConfigs: {
-              [name]: {
-                lastItem: targetItem,
-              },
-            },
-          }),
+            targetItem,
+            existingConfig,
+          );
+        },
       },
     );
   }
 
   async function setModelLinesVertexAttributeItem(modelId, lineIds, item) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
+    const { storedConfigs } = modelLinesVertexAttribute(modelId, lineIds[0]);
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      existingConfig = storedConfigs[name][item] ?? {};
+    }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {
-        response_function: () =>
-          mutateModelLinesVertexStyle(modelId, lineIds, {
+        response_function: () => {
+          mutateModelLinesVertexStyle(modelId, lineIds, { item });
+          return setModelLinesVertexAttributeStoredConfig(
+            modelId,
+            lineIds,
+            name,
             item,
-            storedConfigs: {
-              [name]: {
-                lastItem: item,
-              },
-            },
-          }),
+            existingConfig,
+          );
+        },
       },
     );
   }

@@ -23,27 +23,15 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const { storedConfigs } = meshPolygonsVertexAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
-      nameStoredConfigs.lastItem = targetItem;
-      if (targetItem in nameStoredConfigs) {
-        return {
-          ...nameStoredConfigs[targetItem],
-          item: targetItem,
-        };
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
       }
-      return {
-        minimum: undefined,
-        maximum: undefined,
-        colorMap: undefined,
-        item: targetItem,
-      };
     }
-    return {
+    return setMeshPolygonsVertexAttributeStoredConfig(id, name, item, {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-      item: 0,
-    };
+    });
   }
 
   function mutateMeshPolygonsVertexStyle(id, values) {
@@ -74,42 +62,43 @@ export function useMeshPolygonsVertexAttributeStyle() {
   }
 
   function setMeshPolygonsVertexAttributeName(id, name) {
-    const targetItem = meshPolygonsVertexAttributeStoredConfig(id, name).item;
+    const { storedConfigs } = meshPolygonsVertexAttribute(id);
+    let targetItem = 0;
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      targetItem = nameStoredConfigs.lastItem ?? 0;
+      existingConfig = nameStoredConfigs[targetItem] ?? {};
+    }
     const schema = meshPolygonsVertexAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () =>
-          mutateMeshPolygonsVertexStyle(id, {
-            name,
-            item: targetItem,
-            storedConfigs: {
-              [name]: {
-                lastItem: targetItem,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshPolygonsVertexStyle(id, { name, item: targetItem });
+          return setMeshPolygonsVertexAttributeStoredConfig(id, name, targetItem, existingConfig);
+        },
       },
     );
   }
 
   function setMeshPolygonsVertexAttributeItem(id, item) {
     const name = meshPolygonsVertexAttributeName(id);
+    const { storedConfigs } = meshPolygonsVertexAttribute(id);
+    let existingConfig = {};
+    if (name in storedConfigs) {
+      existingConfig = storedConfigs[name][item] ?? {};
+    }
     const schema = meshPolygonsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () =>
-          mutateMeshPolygonsVertexStyle(id, {
-            item,
-            storedConfigs: {
-              [name]: {
-                lastItem: item,
-              },
-            },
-          }),
+        response_function: () => {
+          mutateMeshPolygonsVertexStyle(id, { item });
+          return setMeshPolygonsVertexAttributeStoredConfig(id, name, item, existingConfig);
+        },
       },
     );
   }
