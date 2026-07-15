@@ -19,11 +19,9 @@ function triggerHorizonStackModal(rawItem) {
 function handleRowClick(event) {
   if (item.raw.geode_object_type === "HorizonStack3D") {
     if (!item.isLeaf) {
-      // It's the category node (folder), let it propagate to CommonTreeView to toggle collapse
       return;
     }
 
-    // It's the actual Horizon Stack object, prevent selection and open modal
     event.stopPropagation();
     event.preventDefault();
     triggerHorizonStackModal(item.raw);
@@ -49,7 +47,6 @@ function handleRowClick(event) {
       />
       <div v-else class="icon-placeholder" />
 
-      <!-- Special behavior for HorizonStack3D -->
       <v-btn
         v-if="
           selection.selectable && item.raw.geode_object_type === 'HorizonStack3D' && item.isLeaf
@@ -63,7 +60,6 @@ function handleRowClick(event) {
         @click.stop="triggerHorizonStackModal(item.raw)"
         @mousedown.stop
       />
-      <!-- Default visibility toggle behavior -->
       <v-btn
         v-else-if="
           selection.selectable &&
