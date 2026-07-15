@@ -5,11 +5,6 @@ import { google } from "googleapis";
 
 // Local imports
 
-function checkRecaptchaParams(name, email, launch) {
-  console.log("check_recaptcha_params", { name, email, launch });
-  return name === "" && email === "" && launch === false;
-}
-
 async function artifactImage(registry, parent, repo) {
   const branch = process.env.NETLIFY_BRANCH;
   const [_, projectId] = parent.split("/");
@@ -110,4 +105,4 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
   };
 }
 
-export { checkRecaptchaParams, artifactImages, requestConfig };
+export { artifactImages, requestConfig };
