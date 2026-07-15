@@ -135,33 +135,14 @@ const blocksPolyhedronAttributeColorMap = computed({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed({
-  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const vertexAttributeItem = computed({
-  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, blockId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const vertexAttributeValue = computed({
   get: () => ({
-    name: vertexAttributeName.value,
-    item: vertexAttributeItem.value,
+    name: dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
+    item: dataStyleStore.modelBlocksVertexAttributeItem(modelId, blockId),
   }),
-  set: (newValue) => {
-    if (newValue.name !== vertexAttributeName.value) {
-      vertexAttributeName.value = newValue.name;
-    } else if (newValue.item !== vertexAttributeItem.value) {
-      vertexAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttribute(modelId, [blockId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
@@ -186,33 +167,14 @@ const vertexAttributeColorMap = computed({
   },
 });
 
-const polyhedronAttributeName = computed({
-  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const polyhedronAttributeItem = computed({
-  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const polyhedronAttributeValue = computed({
   get: () => ({
-    name: polyhedronAttributeName.value,
-    item: polyhedronAttributeItem.value,
+    name: dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
+    item: dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
   }),
-  set: (newValue) => {
-    if (newValue.name !== polyhedronAttributeName.value) {
-      polyhedronAttributeName.value = newValue.name;
-    } else if (newValue.item !== polyhedronAttributeItem.value) {
-      polyhedronAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttribute(modelId, [blockId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

@@ -85,35 +85,16 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_name = computed({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
-const edge_attribute_item = computed({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeItem(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeItem(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
 const edge_attribute_value = computed({
   get: () => ({
-    name: edge_attribute_name.value,
-    item: edge_attribute_item.value,
+    name: dataStyleStore.meshEdgesEdgeAttributeName(id.value),
+    item: dataStyleStore.meshEdgesEdgeAttributeItem(id.value),
   }),
-  set: (newValue) => {
-    if (newValue.name !== edge_attribute_name.value) {
-      edge_attribute_name.value = newValue.name;
-    } else if (newValue.item !== edge_attribute_item.value) {
-      edge_attribute_item.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshEdgesEdgeAttribute(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_range = computed({

@@ -100,33 +100,14 @@ const cornersVertexAttributeColorMap = computed({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeName(modelId, [cornerId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const vertexAttributeItem = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeItem(modelId, [cornerId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const vertexAttributeValue = computed({
   get: () => ({
-    name: vertexAttributeName.value,
-    item: vertexAttributeItem.value,
+    name: dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
+    item: dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
   }),
-  set: (newValue) => {
-    if (newValue.name !== vertexAttributeName.value) {
-      vertexAttributeName.value = newValue.name;
-    } else if (newValue.item !== vertexAttributeItem.value) {
-      vertexAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelCornersVertexAttribute(modelId, [cornerId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

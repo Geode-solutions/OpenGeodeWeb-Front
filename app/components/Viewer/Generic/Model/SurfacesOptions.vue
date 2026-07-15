@@ -139,33 +139,14 @@ const surfacesPolygonAttributeColorMap = computed({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, surfaceId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, [surfaceId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const vertexAttributeItem = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, surfaceId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, [surfaceId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const vertexAttributeValue = computed({
   get: () => ({
-    name: vertexAttributeName.value,
-    item: vertexAttributeItem.value,
+    name: dataStyleStore.modelSurfacesVertexAttributeName(modelId, surfaceId),
+    item: dataStyleStore.modelSurfacesVertexAttributeItem(modelId, surfaceId),
   }),
-  set: (newValue) => {
-    if (newValue.name !== vertexAttributeName.value) {
-      vertexAttributeName.value = newValue.name;
-    } else if (newValue.item !== vertexAttributeItem.value) {
-      vertexAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesVertexAttribute(modelId, [surfaceId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
@@ -190,33 +171,14 @@ const vertexAttributeColorMap = computed({
   },
 });
 
-const polygonAttributeName = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, [surfaceId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const polygonAttributeItem = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, surfaceId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, [surfaceId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const polygonAttributeValue = computed({
   get: () => ({
-    name: polygonAttributeName.value,
-    item: polygonAttributeItem.value,
+    name: dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
+    item: dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, surfaceId),
   }),
-  set: (newValue) => {
-    if (newValue.name !== polygonAttributeName.value) {
-      polygonAttributeName.value = newValue.name;
-    } else if (newValue.item !== polygonAttributeItem.value) {
-      polygonAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesPolygonAttribute(modelId, [surfaceId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

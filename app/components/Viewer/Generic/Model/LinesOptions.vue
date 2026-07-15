@@ -131,33 +131,14 @@ const linesEdgeAttributeColorMap = computed({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, lineId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeName(modelId, [lineId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const vertexAttributeItem = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId, lineId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeItem(modelId, [lineId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const vertexAttributeValue = computed({
   get: () => ({
-    name: vertexAttributeName.value,
-    item: vertexAttributeItem.value,
+    name: dataStyleStore.modelLinesVertexAttributeName(modelId, lineId),
+    item: dataStyleStore.modelLinesVertexAttributeItem(modelId, lineId),
   }),
-  set: (newValue) => {
-    if (newValue.name !== vertexAttributeName.value) {
-      vertexAttributeName.value = newValue.name;
-    } else if (newValue.item !== vertexAttributeItem.value) {
-      vertexAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesVertexAttribute(modelId, [lineId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
@@ -182,33 +163,14 @@ const vertexAttributeColorMap = computed({
   },
 });
 
-const edgeAttributeName = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, lineId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, [lineId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const edgeAttributeItem = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId, lineId),
-  set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeItem(modelId, [lineId], newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const edgeAttributeValue = computed({
   get: () => ({
-    name: edgeAttributeName.value,
-    item: edgeAttributeItem.value,
+    name: dataStyleStore.modelLinesEdgeAttributeName(modelId, lineId),
+    item: dataStyleStore.modelLinesEdgeAttributeItem(modelId, lineId),
   }),
-  set: (newValue) => {
-    if (newValue.name !== edgeAttributeName.value) {
-      edgeAttributeName.value = newValue.name;
-    } else if (newValue.item !== edgeAttributeItem.value) {
-      edgeAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesEdgeAttribute(modelId, [lineId], newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
