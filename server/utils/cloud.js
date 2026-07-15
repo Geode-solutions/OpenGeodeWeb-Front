@@ -36,7 +36,6 @@ function artifactImages(parent, authClient) {
 }
 
 function sanitizeEmail(email) {
-  // GCP label values: lowercase letters, digits, underscores, hyphens only; max 63 chars.
   const maxEmailLength = 63;
   return email
     .toLowerCase()
