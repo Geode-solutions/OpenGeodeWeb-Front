@@ -35,8 +35,17 @@ function artifactImages(parent, authClient) {
   ]);
 }
 
+function sanitizeEmail(email) {
+  // GCP label values: lowercase letters, digits, underscores, hyphens only; max 63 chars.
+  const maxEmailLength = 63;
+  return email
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9_-]/gu, "_")
+    .slice(0, maxEmailLength);
+}
+
 // oxlint-disable-next-line max-lines-per-function
-function requestConfig(parent, routerImage, backImage, viewerImage) {
+function requestConfig(parent, routerImage, backImage, viewerImage, email) {
   const resources = {
     limits: {
       cpu: "1000m",
@@ -52,11 +61,17 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
     service: {
       ingress: "INGRESS_TRAFFIC_ALL",
       invokerIamDisabled: true,
+      labels: {
+        user: sanitizeEmail(email),
+      },
       scaling: {
         scalingMode: "MANUAL",
         manualInstanceCount: 1,
       },
       template: {
+        labels: {
+          user: sanitizeEmail(email),
+        },
         volumes: [
           {
             name: "project",
