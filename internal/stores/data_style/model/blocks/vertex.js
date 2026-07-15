@@ -22,22 +22,24 @@ export function useModelBlocksVertexAttribute() {
   function modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item) {
     const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
     if (name in storedConfigs) {
-      return storedConfigs[name][item];
+      const nameStoredConfigs = storedConfigs[name];
+      nameStoredConfigs.lastItem = item;
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
+      }
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+      item: 0,
+    };
   }
 
   function mutateModelBlocksVertexStyle(modelId, blockIds, values) {
     return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
       vertex: values,
     });
-  }
-
-  function modelBlocksVertexAttributeLastItem(modelId, blockId, name) {
-    const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
-    if (name in storedConfigs) {
-      return storedConfigs[name].lastItem ?? 0;
-    }
-    return 0;
   }
 
   function setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, config) {
@@ -60,7 +62,8 @@ export function useModelBlocksVertexAttribute() {
   }
 
   async function setModelBlocksVertexAttributeName(modelId, blockIds, name) {
-    const targetItem = modelBlocksVertexAttributeLastItem(modelId, blockIds[0], name);
+    const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockIds[0]);
+    const targetItem = storedConfigs[name].lastItem;
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(

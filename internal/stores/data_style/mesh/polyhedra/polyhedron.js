@@ -29,22 +29,19 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
 
   function meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    if (name in storedConfigs && item in storedConfigs[name]) {
-      return storedConfigs[name][item];
+    if (name in storedConfigs) {
+      const nameStoredConfigs = storedConfigs[name];
+      nameStoredConfigs.lastItem = item;
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
+      }
     }
     return {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      item: 0,
     };
-  }
-
-  function meshPolyhedraPolyhedronAttributeLastItem(id, name) {
-    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    if (name in storedConfigs) {
-      return storedConfigs[name].lastItem ?? 0;
-    }
-    return 0;
   }
 
   function setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, config) {
@@ -67,7 +64,8 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   }
 
   function setMeshPolyhedraPolyhedronAttributeName(id, name) {
-    const targetItem = meshPolyhedraPolyhedronAttributeLastItem(id, name);
+    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
+    const targetItem = storedConfigs[name].lastItem;
     const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(

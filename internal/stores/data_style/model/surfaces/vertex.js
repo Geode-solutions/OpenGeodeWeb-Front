@@ -22,22 +22,24 @@ export function useModelSurfacesVertexAttribute() {
   function modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item) {
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceId);
     if (name in storedConfigs) {
-      return storedConfigs[name][item];
+      const nameStoredConfigs = storedConfigs[name];
+      nameStoredConfigs.lastItem = item;
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
+      }
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+      item: 0,
+    };
   }
 
   function mutateModelSurfacesVertexStyle(modelId, surfaceIds, values) {
     return modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
       vertex: values,
     });
-  }
-
-  function modelSurfacesVertexAttributeLastItem(modelId, surfaceId, name) {
-    const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceId);
-    if (name in storedConfigs) {
-      return storedConfigs[name].lastItem ?? 0;
-    }
-    return 0;
   }
 
   function setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, config) {
@@ -60,7 +62,8 @@ export function useModelSurfacesVertexAttribute() {
   }
 
   async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
-    const targetItem = modelSurfacesVertexAttributeLastItem(modelId, surfaceIds[0], name);
+    const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
+    const targetItem = storedConfigs[name].lastItem;
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(

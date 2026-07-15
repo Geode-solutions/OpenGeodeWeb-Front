@@ -22,22 +22,24 @@ export function useModelCornersVertexAttribute() {
   function modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item) {
     const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
     if (name in storedConfigs) {
-      return storedConfigs[name][item];
+      const nameStoredConfigs = storedConfigs[name];
+      nameStoredConfigs.lastItem = item;
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
+      }
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+      item: 0,
+    };
   }
 
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
     return modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
       vertex: values,
     });
-  }
-
-  function modelCornersVertexAttributeLastItem(modelId, cornerId, name) {
-    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
-    if (name in storedConfigs) {
-      return storedConfigs[name].lastItem ?? 0;
-    }
-    return 0;
   }
 
   function setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, config) {
@@ -60,7 +62,8 @@ export function useModelCornersVertexAttribute() {
   }
 
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
-    const targetItem = modelCornersVertexAttributeLastItem(modelId, cornerIds[0], name);
+    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerIds[0]);
+    const targetItem = storedConfigs[name].lastItem;
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(

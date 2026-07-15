@@ -22,22 +22,24 @@ export function useModelBlocksPolyhedronAttribute() {
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
     if (name in storedConfigs) {
-      return storedConfigs[name][item];
+      const nameStoredConfigs = storedConfigs[name];
+      nameStoredConfigs.lastItem = item;
+      if (item in nameStoredConfigs) {
+        return nameStoredConfigs[item];
+      }
     }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+      item: 0,
+    };
   }
 
   function mutateModelBlocksPolyhedronStyle(modelId, blockIds, values) {
     return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
       polyhedron: values,
     });
-  }
-
-  function modelBlocksPolyhedronAttributeLastItem(modelId, blockId, name) {
-    const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
-    if (name in storedConfigs) {
-      return storedConfigs[name].lastItem ?? 0;
-    }
-    return 0;
   }
 
   function setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, config) {
@@ -60,7 +62,8 @@ export function useModelBlocksPolyhedronAttribute() {
   }
 
   async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
-    const targetItem = modelBlocksPolyhedronAttributeLastItem(modelId, blockIds[0], name);
+    const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockIds[0]);
+    const targetItem = storedConfigs[name].lastItem;
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
