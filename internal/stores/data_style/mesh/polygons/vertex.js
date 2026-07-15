@@ -23,10 +23,20 @@ export function useMeshPolygonsVertexAttributeStyle() {
     const { storedConfigs } = meshPolygonsVertexAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -64,8 +74,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
   }
 
   function setMeshPolygonsVertexAttributeName(id, name) {
-    const { storedConfigs } = meshPolygonsVertexAttribute(id);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = meshPolygonsVertexAttributeStoredConfig(id, name).item;
     const schema = meshPolygonsVertexAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -103,6 +112,18 @@ export function useMeshPolygonsVertexAttributeStyle() {
           }),
       },
     );
+  }
+
+  function setMeshPolygonsVertexAttribute(id, { name, item }) {
+    const currentName = meshPolygonsVertexAttributeName(id);
+    if (name !== currentName) {
+      return setMeshPolygonsVertexAttributeName(id, name);
+    }
+    const currentItem = meshPolygonsVertexAttributeItem(id);
+    if (item !== currentItem) {
+      return setMeshPolygonsVertexAttributeItem(id, item);
+    }
+    return Promise.resolve();
   }
 
   function meshPolygonsVertexAttributeRange(id) {
@@ -173,6 +194,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
     meshPolygonsVertexAttributeStoredConfig,
     setMeshPolygonsVertexAttributeName,
     setMeshPolygonsVertexAttributeItem,
+    setMeshPolygonsVertexAttribute,
     setMeshPolygonsVertexAttributeRange,
     setMeshPolygonsVertexAttributeColorMap,
   };

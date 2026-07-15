@@ -55,35 +55,16 @@ const textures = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_name = computed({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
-const vertex_attribute_item = computed({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
 const vertex_attribute_value = computed({
   get: () => ({
-    name: vertex_attribute_name.value,
-    item: vertex_attribute_item.value,
+    name: dataStyleStore.meshPolygonsVertexAttributeName(id.value),
+    item: dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
   }),
-  set: (newValue) => {
-    if (newValue.name !== vertex_attribute_name.value) {
-      vertex_attribute_name.value = newValue.name;
-    } else if (newValue.item !== vertex_attribute_item.value) {
-      vertex_attribute_item.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttribute(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_range = computed({
@@ -104,35 +85,16 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_name = computed({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
-const polygon_attribute_item = computed({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
 const polygon_attribute_value = computed({
   get: () => ({
-    name: polygon_attribute_name.value,
-    item: polygon_attribute_item.value,
+    name: dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
+    item: dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
   }),
-  set: (newValue) => {
-    if (newValue.name !== polygon_attribute_name.value) {
-      polygon_attribute_name.value = newValue.name;
-    } else if (newValue.item !== polygon_attribute_item.value) {
-      polygon_attribute_item.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttribute(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 const polygon_attribute_range = computed({

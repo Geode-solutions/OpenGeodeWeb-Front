@@ -27,10 +27,20 @@ export function useMeshEdgesVertexAttributeStyle() {
     const { storedConfigs } = meshEdgesVertexAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -68,8 +78,7 @@ export function useMeshEdgesVertexAttributeStyle() {
   }
 
   function setMeshEdgesVertexAttributeName(id, name) {
-    const { storedConfigs } = meshEdgesVertexAttribute(id);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = meshEdgesVertexAttributeStoredConfig(id, name).item;
     const schema = meshEdgesVertexAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -107,6 +116,18 @@ export function useMeshEdgesVertexAttributeStyle() {
           }),
       },
     );
+  }
+
+  function setMeshEdgesVertexAttribute(id, { name, item }) {
+    const currentName = meshEdgesVertexAttributeName(id);
+    if (name !== currentName) {
+      return setMeshEdgesVertexAttributeName(id, name);
+    }
+    const currentItem = meshEdgesVertexAttributeItem(id);
+    if (item !== currentItem) {
+      return setMeshEdgesVertexAttributeItem(id, item);
+    }
+    return Promise.resolve();
   }
 
   function meshEdgesVertexAttributeRange(id) {
@@ -177,6 +198,7 @@ export function useMeshEdgesVertexAttributeStyle() {
     meshEdgesVertexAttributeStoredConfig,
     setMeshEdgesVertexAttributeName,
     setMeshEdgesVertexAttributeItem,
+    setMeshEdgesVertexAttribute,
     setMeshEdgesVertexAttributeRange,
     setMeshEdgesVertexAttributeColorMap,
   };

@@ -23,10 +23,20 @@ export function useModelLinesEdgeAttribute() {
     const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -62,8 +72,7 @@ export function useModelLinesEdgeAttribute() {
   }
 
   async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
-    const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineIds[0]);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = modelLinesEdgeAttributeStoredConfig(modelId, lineIds[0], name).item;
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -101,6 +110,18 @@ export function useModelLinesEdgeAttribute() {
           }),
       },
     );
+  }
+
+  function setModelLinesEdgeAttribute(modelId, lineIds, { name, item }) {
+    const currentName = modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    if (name !== currentName) {
+      return setModelLinesEdgeAttributeName(modelId, lineIds, name);
+    }
+    const currentItem = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
+    if (item !== currentItem) {
+      return setModelLinesEdgeAttributeItem(modelId, lineIds, item);
+    }
+    return Promise.resolve();
   }
 
   function modelLinesEdgeAttributeRange(modelId, lineId) {
@@ -179,6 +200,7 @@ export function useModelLinesEdgeAttribute() {
     modelLinesEdgeAttributeStoredConfig,
     setModelLinesEdgeAttributeName,
     setModelLinesEdgeAttributeItem,
+    setModelLinesEdgeAttribute,
     setModelLinesEdgeAttributeRange,
     setModelLinesEdgeAttributeColorMap,
   };

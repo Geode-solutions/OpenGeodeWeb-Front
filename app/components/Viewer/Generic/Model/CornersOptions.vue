@@ -67,33 +67,14 @@ const cornerActiveColoring = computed({
 });
 
 // Group Attributes
-const cornersVertexAttributeName = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, targetCornerIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const cornersVertexAttributeItem = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, targetCornerIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeItem(modelId, targetCornerIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const cornersVertexAttributeValue = computed({
   get: () => ({
-    name: cornersVertexAttributeName.value,
-    item: cornersVertexAttributeItem.value,
+    name: dataStyleStore.modelCornersVertexAttributeName(modelId, targetCornerIds[0]),
+    item: dataStyleStore.modelCornersVertexAttributeItem(modelId, targetCornerIds[0]),
   }),
-  set: (newValue) => {
-    if (newValue.name !== cornersVertexAttributeName.value) {
-      cornersVertexAttributeName.value = newValue.name;
-    } else if (newValue.item !== cornersVertexAttributeItem.value) {
-      cornersVertexAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelCornersVertexAttribute(modelId, targetCornerIds, newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

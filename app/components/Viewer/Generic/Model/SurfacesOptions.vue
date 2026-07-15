@@ -66,33 +66,14 @@ const surfaceActiveColoring = computed({
 });
 
 // Group Attributes
-const surfacesVertexAttributeName = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, targetSurfaceIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, targetSurfaceIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const surfacesVertexAttributeItem = computed({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, targetSurfaceIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, targetSurfaceIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const surfacesVertexAttributeValue = computed({
   get: () => ({
-    name: surfacesVertexAttributeName.value,
-    item: surfacesVertexAttributeItem.value,
+    name: dataStyleStore.modelSurfacesVertexAttributeName(modelId, targetSurfaceIds[0]),
+    item: dataStyleStore.modelSurfacesVertexAttributeItem(modelId, targetSurfaceIds[0]),
   }),
-  set: (newValue) => {
-    if (newValue.name !== surfacesVertexAttributeName.value) {
-      surfacesVertexAttributeName.value = newValue.name;
-    } else if (newValue.item !== surfacesVertexAttributeItem.value) {
-      surfacesVertexAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesVertexAttribute(modelId, targetSurfaceIds, newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
@@ -121,33 +102,14 @@ const surfacesVertexAttributeColorMap = computed({
   },
 });
 
-const surfacesPolygonAttributeName = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, targetSurfaceIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, targetSurfaceIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const surfacesPolygonAttributeItem = computed({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const surfacesPolygonAttributeValue = computed({
   get: () => ({
-    name: surfacesPolygonAttributeName.value,
-    item: surfacesPolygonAttributeItem.value,
+    name: dataStyleStore.modelSurfacesPolygonAttributeName(modelId, targetSurfaceIds[0]),
+    item: dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds[0]),
   }),
-  set: (newValue) => {
-    if (newValue.name !== surfacesPolygonAttributeName.value) {
-      surfacesPolygonAttributeName.value = newValue.name;
-    } else if (newValue.item !== surfacesPolygonAttributeItem.value) {
-      surfacesPolygonAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesPolygonAttribute(modelId, targetSurfaceIds, newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

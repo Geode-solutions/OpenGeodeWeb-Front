@@ -23,10 +23,20 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const { storedConfigs } = meshPolygonsPolygonAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -64,8 +74,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   }
 
   function setMeshPolygonsPolygonAttributeName(id, name) {
-    const { storedConfigs } = meshPolygonsPolygonAttribute(id);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = meshPolygonsPolygonAttributeStoredConfig(id, name).item;
     const schema = meshPolygonsPolygonAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -103,6 +112,18 @@ export function useMeshPolygonsPolygonAttributeStyle() {
           }),
       },
     );
+  }
+
+  function setMeshPolygonsPolygonAttribute(id, { name, item }) {
+    const currentName = meshPolygonsPolygonAttributeName(id);
+    if (name !== currentName) {
+      return setMeshPolygonsPolygonAttributeName(id, name);
+    }
+    const currentItem = meshPolygonsPolygonAttributeItem(id);
+    if (item !== currentItem) {
+      return setMeshPolygonsPolygonAttributeItem(id, item);
+    }
+    return Promise.resolve();
   }
 
   function meshPolygonsPolygonAttributeRange(id) {
@@ -173,6 +194,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     meshPolygonsPolygonAttributeStoredConfig,
     setMeshPolygonsPolygonAttributeName,
     setMeshPolygonsPolygonAttributeItem,
+    setMeshPolygonsPolygonAttribute,
     setMeshPolygonsPolygonAttributeRange,
     setMeshPolygonsPolygonAttributeColorMap,
   };

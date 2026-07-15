@@ -23,10 +23,20 @@ export function useModelSurfacesPolygonAttribute() {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -62,8 +72,7 @@ export function useModelSurfacesPolygonAttribute() {
   }
 
   async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
-    const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceIds[0]);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name).item;
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -101,6 +110,18 @@ export function useModelSurfacesPolygonAttribute() {
           }),
       },
     );
+  }
+
+  function setModelSurfacesPolygonAttribute(modelId, surfaceIds, { name, item }) {
+    const currentName = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    if (name !== currentName) {
+      return setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name);
+    }
+    const currentItem = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
+    if (item !== currentItem) {
+      return setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item);
+    }
+    return Promise.resolve();
   }
 
   function modelSurfacesPolygonAttributeRange(modelId, surfaceId) {
@@ -188,6 +209,7 @@ export function useModelSurfacesPolygonAttribute() {
     modelSurfacesPolygonAttributeStoredConfig,
     setModelSurfacesPolygonAttributeName,
     setModelSurfacesPolygonAttributeItem,
+    setModelSurfacesPolygonAttribute,
     setModelSurfacesPolygonAttributeRange,
     setModelSurfacesPolygonAttributeColorMap,
   };

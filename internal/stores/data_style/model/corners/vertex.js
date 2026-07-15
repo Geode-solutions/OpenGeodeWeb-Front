@@ -23,10 +23,20 @@ export function useModelCornersVertexAttribute() {
     const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -62,8 +72,7 @@ export function useModelCornersVertexAttribute() {
   }
 
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
-    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerIds[0]);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name).item;
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
     return viewerStore.request(
@@ -101,6 +110,18 @@ export function useModelCornersVertexAttribute() {
           }),
       },
     );
+  }
+
+  function setModelCornersVertexAttribute(modelId, cornerIds, { name, item }) {
+    const currentName = modelCornersVertexAttributeName(modelId, cornerIds[0]);
+    if (name !== currentName) {
+      return setModelCornersVertexAttributeName(modelId, cornerIds, name);
+    }
+    const currentItem = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
+    if (item !== currentItem) {
+      return setModelCornersVertexAttributeItem(modelId, cornerIds, item);
+    }
+    return Promise.resolve();
   }
 
   function modelCornersVertexAttributeRange(modelId, cornerId) {
@@ -181,6 +202,7 @@ export function useModelCornersVertexAttribute() {
     modelCornersVertexAttributeStoredConfig,
     setModelCornersVertexAttributeName,
     setModelCornersVertexAttributeItem,
+    setModelCornersVertexAttribute,
     setModelCornersVertexAttributeRange,
     setModelCornersVertexAttributeColorMap,
   };

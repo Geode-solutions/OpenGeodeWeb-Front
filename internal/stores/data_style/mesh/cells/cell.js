@@ -22,10 +22,20 @@ export function useMeshCellsCellAttributeStyle() {
     const { storedConfigs } = meshCellsCellAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -55,8 +65,7 @@ export function useMeshCellsCellAttributeStyle() {
   }
 
   function setMeshCellsCellAttributeName(id, name) {
-    const { storedConfigs } = meshCellsCellAttribute(id);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = meshCellsCellAttributeStoredConfig(id, name).item;
     const schema = meshCellsCellAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -100,6 +109,18 @@ export function useMeshCellsCellAttributeStyle() {
           }),
       },
     );
+  }
+
+  function setMeshCellsCellAttribute(id, { name, item }) {
+    const currentName = meshCellsCellAttributeName(id);
+    if (name !== currentName) {
+      return setMeshCellsCellAttributeName(id, name);
+    }
+    const currentItem = meshCellsCellAttributeItem(id);
+    if (item !== currentItem) {
+      return setMeshCellsCellAttributeItem(id, item);
+    }
+    return Promise.resolve();
   }
 
   function meshCellsCellAttributeRange(id) {
@@ -173,6 +194,7 @@ export function useMeshCellsCellAttributeStyle() {
     meshCellsCellAttributeStoredConfig,
     setMeshCellsCellAttributeName,
     setMeshCellsCellAttributeItem,
+    setMeshCellsCellAttribute,
     setMeshCellsCellAttributeRange,
     setMeshCellsCellAttributeColorMap,
   };

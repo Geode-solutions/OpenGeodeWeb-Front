@@ -66,33 +66,14 @@ const lineActiveColoring = computed({
 });
 
 // Group Attributes
-const linesVertexAttributeName = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, targetLineIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeName(modelId, targetLineIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const linesVertexAttributeItem = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId, targetLineIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeItem(modelId, targetLineIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const linesVertexAttributeValue = computed({
   get: () => ({
-    name: linesVertexAttributeName.value,
-    item: linesVertexAttributeItem.value,
+    name: dataStyleStore.modelLinesVertexAttributeName(modelId, targetLineIds[0]),
+    item: dataStyleStore.modelLinesVertexAttributeItem(modelId, targetLineIds[0]),
   }),
-  set: (newValue) => {
-    if (newValue.name !== linesVertexAttributeName.value) {
-      linesVertexAttributeName.value = newValue.name;
-    } else if (newValue.item !== linesVertexAttributeItem.value) {
-      linesVertexAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesVertexAttribute(modelId, targetLineIds, newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
@@ -117,33 +98,14 @@ const linesVertexAttributeColorMap = computed({
   },
 });
 
-const linesEdgeAttributeName = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, targetLineIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, targetLineIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const linesEdgeAttributeItem = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId, targetLineIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeItem(modelId, targetLineIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const linesEdgeAttributeValue = computed({
   get: () => ({
-    name: linesEdgeAttributeName.value,
-    item: linesEdgeAttributeItem.value,
+    name: dataStyleStore.modelLinesEdgeAttributeName(modelId, targetLineIds[0]),
+    item: dataStyleStore.modelLinesEdgeAttributeItem(modelId, targetLineIds[0]),
   }),
-  set: (newValue) => {
-    if (newValue.name !== linesEdgeAttributeName.value) {
-      linesEdgeAttributeName.value = newValue.name;
-    } else if (newValue.item !== linesEdgeAttributeItem.value) {
-      linesEdgeAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesEdgeAttribute(modelId, targetLineIds, newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

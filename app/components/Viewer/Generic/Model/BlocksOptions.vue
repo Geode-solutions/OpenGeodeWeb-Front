@@ -66,33 +66,14 @@ const blockActiveColoring = computed({
 });
 
 // Group Attributes
-const blocksVertexAttributeName = computed({
-  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, targetBlockIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, targetBlockIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const blocksVertexAttributeItem = computed({
-  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, targetBlockIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, targetBlockIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const blocksVertexAttributeValue = computed({
   get: () => ({
-    name: blocksVertexAttributeName.value,
-    item: blocksVertexAttributeItem.value,
+    name: dataStyleStore.modelBlocksVertexAttributeName(modelId, targetBlockIds[0]),
+    item: dataStyleStore.modelBlocksVertexAttributeItem(modelId, targetBlockIds[0]),
   }),
-  set: (newValue) => {
-    if (newValue.name !== blocksVertexAttributeName.value) {
-      blocksVertexAttributeName.value = newValue.name;
-    } else if (newValue.item !== blocksVertexAttributeItem.value) {
-      blocksVertexAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttribute(modelId, targetBlockIds, newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 
@@ -117,33 +98,14 @@ const blocksVertexAttributeColorMap = computed({
   },
 });
 
-const blocksPolyhedronAttributeName = computed({
-  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, targetBlockIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const blocksPolyhedronAttributeItem = computed({
-  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, targetBlockIds[0]),
-  set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, targetBlockIds, newValue);
-    hybridViewerStore.remoteRender();
-  },
-});
-
 const blocksPolyhedronAttributeValue = computed({
   get: () => ({
-    name: blocksPolyhedronAttributeName.value,
-    item: blocksPolyhedronAttributeItem.value,
+    name: dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
+    item: dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, targetBlockIds[0]),
   }),
-  set: (newValue) => {
-    if (newValue.name !== blocksPolyhedronAttributeName.value) {
-      blocksPolyhedronAttributeName.value = newValue.name;
-    } else if (newValue.item !== blocksPolyhedronAttributeItem.value) {
-      blocksPolyhedronAttributeItem.value = newValue.item;
-    }
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttribute(modelId, targetBlockIds, newValue);
+    hybridViewerStore.remoteRender();
   },
 });
 

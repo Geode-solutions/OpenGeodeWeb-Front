@@ -31,10 +31,20 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -64,8 +74,7 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   }
 
   function setMeshPolyhedraPolyhedronAttributeName(id, name) {
-    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = meshPolyhedraPolyhedronAttributeStoredConfig(id, name).item;
     const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -109,6 +118,18 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
           }),
       },
     );
+  }
+
+  function setMeshPolyhedraPolyhedronAttribute(id, { name, item }) {
+    const currentName = meshPolyhedraPolyhedronAttributeName(id);
+    if (name !== currentName) {
+      return setMeshPolyhedraPolyhedronAttributeName(id, name);
+    }
+    const currentItem = meshPolyhedraPolyhedronAttributeItem(id);
+    if (item !== currentItem) {
+      return setMeshPolyhedraPolyhedronAttributeItem(id, item);
+    }
+    return Promise.resolve();
   }
 
   function meshPolyhedraPolyhedronAttributeRange(id) {
@@ -179,6 +200,7 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     meshPolyhedraPolyhedronAttributeStoredConfig,
     setMeshPolyhedraPolyhedronAttributeName,
     setMeshPolyhedraPolyhedronAttributeItem,
+    setMeshPolyhedraPolyhedronAttribute,
     setMeshPolyhedraPolyhedronAttributeRange,
     setMeshPolyhedraPolyhedronAttributeColorMap,
   };

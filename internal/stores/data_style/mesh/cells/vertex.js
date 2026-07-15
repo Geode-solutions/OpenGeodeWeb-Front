@@ -23,10 +23,20 @@ export function useMeshCellsVertexAttributeStyle() {
     const { storedConfigs } = meshCellsVertexAttribute(id);
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      nameStoredConfigs.lastItem = item;
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
+      const targetItem = item === undefined ? (nameStoredConfigs.lastItem ?? 0) : item;
+      nameStoredConfigs.lastItem = targetItem;
+      if (targetItem in nameStoredConfigs) {
+        return {
+          ...nameStoredConfigs[targetItem],
+          item: targetItem,
+        };
       }
+      return {
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+        item: targetItem,
+      };
     }
     return {
       minimum: undefined,
@@ -64,8 +74,7 @@ export function useMeshCellsVertexAttributeStyle() {
   }
 
   function setMeshCellsVertexAttributeName(id, name) {
-    const { storedConfigs } = meshCellsVertexAttribute(id);
-    const targetItem = storedConfigs[name].lastItem;
+    const targetItem = meshCellsVertexAttributeStoredConfig(id, name).item;
     const schema = meshCellsVertexAttributeSchemas.name;
     const params = { id, name, item: targetItem };
     return viewerStore.request(
@@ -103,6 +112,18 @@ export function useMeshCellsVertexAttributeStyle() {
           }),
       },
     );
+  }
+
+  function setMeshCellsVertexAttribute(id, { name, item }) {
+    const currentName = meshCellsVertexAttributeName(id);
+    if (name !== currentName) {
+      return setMeshCellsVertexAttributeName(id, name);
+    }
+    const currentItem = meshCellsVertexAttributeItem(id);
+    if (item !== currentItem) {
+      return setMeshCellsVertexAttributeItem(id, item);
+    }
+    return Promise.resolve();
   }
 
   function meshCellsVertexAttributeRange(id) {
@@ -173,6 +194,7 @@ export function useMeshCellsVertexAttributeStyle() {
     meshCellsVertexAttributeStoredConfig,
     setMeshCellsVertexAttributeName,
     setMeshCellsVertexAttributeItem,
+    setMeshCellsVertexAttribute,
     setMeshCellsVertexAttributeRange,
     setMeshCellsVertexAttributeColorMap,
   };
