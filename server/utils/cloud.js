@@ -35,16 +35,16 @@ function artifactImages(parent, authClient) {
   ]);
 }
 
-function sanitizeEmail(email) {
-  const maxEmailLength = 63;
-  return email
+function sanitizeLabelValue(label) {
+  const maxLabelLength = 63;
+  return label
     .toLowerCase()
     .replaceAll(/[^a-z0-9_-]/gu, "_")
-    .slice(0, maxEmailLength);
+    .slice(0, maxLabelLength);
 }
 
 // oxlint-disable-next-line max-lines-per-function
-function requestConfig(parent, routerImage, backImage, viewerImage, email) {
+function requestConfig(parent, routerImage, backImage, viewerImage, email, projectId) {
   const resources = {
     limits: {
       cpu: "1000m",
@@ -61,7 +61,8 @@ function requestConfig(parent, routerImage, backImage, viewerImage, email) {
       ingress: "INGRESS_TRAFFIC_ALL",
       invokerIamDisabled: true,
       labels: {
-        user: sanitizeEmail(email),
+        user: sanitizeLabelValue(email),
+        project: sanitizeLabelValue(projectId)
       },
       scaling: {
         scalingMode: "MANUAL",
@@ -69,7 +70,8 @@ function requestConfig(parent, routerImage, backImage, viewerImage, email) {
       },
       template: {
         labels: {
-          user: sanitizeEmail(email),
+          user: sanitizeLabelValue(email),
+          project: sanitizeLabelValue(projectId)
         },
         volumes: [
           {
