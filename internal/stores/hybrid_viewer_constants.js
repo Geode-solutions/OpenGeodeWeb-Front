@@ -8,7 +8,7 @@ const actVal = ACTOR_DARK_VALUE / RGB_MAX;
 const ACTOR_COLOR = [actVal, actVal, actVal];
 const HOVER_TIMEOUT_MS = 500;
 const WHEEL_TIME_OUT_MS = 600;
-const HOVER_DEBOUNCE_MS = 120;
+const HOVER_DEBOUNCE_MS = 50;
 
 export {
   ACTOR_COLOR,
