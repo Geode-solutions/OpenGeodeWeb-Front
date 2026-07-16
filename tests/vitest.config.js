@@ -10,9 +10,10 @@ const TIMEOUTS = {
   unit: 5000,
   integration: 15_000,
 };
+const CI_WORKERS = 2;
 
 const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY;
-const maxWorkers = process.env.CI ? 2 : 1;
+const maxWorkers = process.env.CI ? CI_WORKERS : 3;
 
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
