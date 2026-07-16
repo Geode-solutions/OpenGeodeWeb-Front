@@ -63,7 +63,12 @@ export function useModelBlocksPolyhedronAttribute() {
     if (name in storedConfigs) {
       item = storedConfigs[name].lastItem ?? 0;
     }
-    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name, item);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(
+      modelId,
+      blockIds[0],
+      name,
+      item,
+    );
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
@@ -85,7 +90,12 @@ export function useModelBlocksPolyhedronAttribute() {
 
   async function setModelBlocksPolyhedronAttributeItem(modelId, blockIds, item) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
-    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name, item);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(
+      modelId,
+      blockIds[0],
+      name,
+      item,
+    );
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(

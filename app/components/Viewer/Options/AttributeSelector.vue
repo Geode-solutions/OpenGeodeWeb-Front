@@ -99,7 +99,9 @@ watch(
     if (
       attributeName.value &&
       attributes.value.length > 0 &&
-      (attributeRange.value === undefined || attributeRange.value[0] === undefined || attributeColorMap.value === undefined)
+      (attributeRange.value === undefined ||
+        attributeRange.value[0] === undefined ||
+        attributeColorMap.value === undefined)
     ) {
       resetRange();
       if (attributeColorMap.value === undefined) {

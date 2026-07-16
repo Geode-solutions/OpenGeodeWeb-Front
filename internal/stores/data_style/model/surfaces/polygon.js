@@ -63,7 +63,12 @@ export function useModelSurfacesPolygonAttribute() {
     if (name in storedConfigs) {
       item = storedConfigs[name].lastItem ?? 0;
     }
-    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
+      modelId,
+      surfaceIds[0],
+      name,
+      item,
+    );
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
@@ -85,7 +90,12 @@ export function useModelSurfacesPolygonAttribute() {
 
   async function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
+      modelId,
+      surfaceIds[0],
+      name,
+      item,
+    );
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
