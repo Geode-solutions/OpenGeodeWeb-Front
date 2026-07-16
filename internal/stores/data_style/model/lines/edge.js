@@ -72,13 +72,7 @@ export function useModelLinesEdgeAttribute() {
       {
         response_function: () => {
           mutateModelLinesEdgeStyle(modelId, lineIds, { name, item });
-          return setModelLinesEdgeAttributeStoredConfig(
-            modelId,
-            lineIds,
-            name,
-            item,
-            storedConfig,
-          );
+          return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, storedConfig);
         },
       },
     );
@@ -98,13 +92,7 @@ export function useModelLinesEdgeAttribute() {
       {
         response_function: () => {
           mutateModelLinesEdgeStyle(modelId, lineIds, { item });
-          return setModelLinesEdgeAttributeStoredConfig(
-            modelId,
-            lineIds,
-            name,
-            item,
-            storedConfig,
-          );
+          return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, storedConfig);
         },
       },
     );
