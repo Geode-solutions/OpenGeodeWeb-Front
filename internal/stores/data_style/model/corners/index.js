@@ -51,13 +51,12 @@ export function useModelCornersStyle() {
       } else {
         const attributeStyle = coloring[activeColoring];
         const { name, item } = attributeStyle;
-        const storedConfig =
-          modelCornersVertexAttribute.modelCornersVertexAttributeStoredConfig(
-            modelId,
-            corner_id,
-            name,
-            item,
-          );
+        const storedConfig = modelCornersVertexAttribute.modelCornersVertexAttributeStoredConfig(
+          modelId,
+          corner_id,
+          name,
+          item,
+        );
         const { minimum, maximum, colorMap } = storedConfig;
         const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
         if (!attributeGroups[attributeGroupKey]) {
