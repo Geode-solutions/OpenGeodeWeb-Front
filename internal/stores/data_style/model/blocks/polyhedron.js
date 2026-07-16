@@ -32,11 +32,8 @@ export function useModelBlocksPolyhedronAttribute() {
 
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setModelBlocksPolyhedronAttributeStoredConfig(modelId, [blockId], name, item, {
       minimum: undefined,

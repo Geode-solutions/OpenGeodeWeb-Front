@@ -25,11 +25,8 @@ export function useMeshEdgesVertexAttributeStyle() {
 
   function meshEdgesVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshEdgesVertexAttribute(id);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
       minimum: undefined,
@@ -146,6 +143,7 @@ export function useMeshEdgesVertexAttributeStyle() {
     return setMeshEdgesVertexAttributeStoredConfig(id, name, item, { minimum, maximum });
   }
 
+  // oxlint-disable-next-line duplicate-exports
   function meshEdgesVertexAttributeColorMap(id) {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);

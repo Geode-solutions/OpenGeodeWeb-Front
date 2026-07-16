@@ -32,11 +32,8 @@ export function useModelBlocksVertexAttribute() {
 
   function modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item) {
     const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setModelBlocksVertexAttributeStoredConfig(modelId, [blockId], name, item, {
       minimum: undefined,
@@ -159,6 +156,7 @@ export function useModelBlocksVertexAttribute() {
     });
   }
 
+  // oxlint-disable-next-line duplicate-exports
   function modelBlocksVertexAttributeColorMap(modelId, blockId) {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);

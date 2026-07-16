@@ -21,11 +21,8 @@ export function useMeshPolyhedraVertexAttributeStyle() {
 
   function meshPolyhedraVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPolyhedraVertexAttribute(id);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, {
       minimum: undefined,
@@ -53,6 +50,7 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     });
   }
 
+  // oxlint-disable-next-line duplicate-exports
   function meshPolyhedraVertexAttributeName(id) {
     return meshPolyhedraVertexAttribute(id).name;
   }

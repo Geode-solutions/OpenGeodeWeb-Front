@@ -32,11 +32,8 @@ export function useModelLinesEdgeAttribute() {
 
   function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item) {
     const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setModelLinesEdgeAttributeStoredConfig(modelId, [lineId], name, item, {
       minimum: undefined,
@@ -75,7 +72,13 @@ export function useModelLinesEdgeAttribute() {
       {
         response_function: () => {
           mutateModelLinesEdgeStyle(modelId, lineIds, { name, item });
-          return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, storedConfig);
+          return setModelLinesEdgeAttributeStoredConfig(
+            modelId,
+            lineIds,
+            name,
+            item,
+            storedConfig,
+          );
         },
       },
     );
@@ -95,7 +98,13 @@ export function useModelLinesEdgeAttribute() {
       {
         response_function: () => {
           mutateModelLinesEdgeStyle(modelId, lineIds, { item });
-          return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, storedConfig);
+          return setModelLinesEdgeAttributeStoredConfig(
+            modelId,
+            lineIds,
+            name,
+            item,
+            storedConfig,
+          );
         },
       },
     );

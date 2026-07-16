@@ -32,11 +32,8 @@ export function useModelLinesVertexAttribute() {
 
   function modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item) {
     const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setModelLinesVertexAttributeStoredConfig(modelId, [lineId], name, item, {
       minimum: undefined,

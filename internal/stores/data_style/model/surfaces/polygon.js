@@ -32,11 +32,8 @@ export function useModelSurfacesPolygonAttribute() {
 
   function modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item) {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setModelSurfacesPolygonAttributeStoredConfig(modelId, [surfaceId], name, item, {
       minimum: undefined,

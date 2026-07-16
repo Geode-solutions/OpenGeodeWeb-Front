@@ -21,11 +21,8 @@ export function useMeshPolygonsPolygonAttributeStyle() {
 
   function meshPolygonsPolygonAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPolygonsPolygonAttribute(id);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
       minimum: undefined,

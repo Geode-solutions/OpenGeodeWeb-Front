@@ -32,11 +32,8 @@ export function useModelCornersVertexAttribute() {
 
   function modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item) {
     const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setModelCornersVertexAttributeStoredConfig(modelId, [cornerId], name, item, {
       minimum: undefined,
@@ -55,6 +52,7 @@ export function useModelCornersVertexAttribute() {
     return modelCornersVertexAttribute(modelId, cornerId).name;
   }
 
+  // oxlint-disable-next-line duplicate-exports
   function modelCornersVertexAttributeItem(modelId, cornerId) {
     return modelCornersVertexAttribute(modelId, cornerId).item;
   }

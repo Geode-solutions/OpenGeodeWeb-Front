@@ -21,11 +21,8 @@ export function useMeshPolygonsVertexAttributeStyle() {
 
   function meshPolygonsVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPolygonsVertexAttribute(id);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setMeshPolygonsVertexAttributeStoredConfig(id, name, item, {
       minimum: undefined,

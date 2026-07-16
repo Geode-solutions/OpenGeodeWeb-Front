@@ -30,6 +30,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
     });
   }
 
+  // oxlint-disable-next-line duplicate-exports
   function setMeshEdgesEdgeAttributeStoredConfig(id, name, item, config) {
     return mutateMeshEdgesEdgeStyle(id, {
       storedConfigs: {
@@ -43,11 +44,8 @@ export function useMeshEdgesEdgeAttributeStyle() {
 
   function meshEdgesEdgeAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
       minimum: undefined,

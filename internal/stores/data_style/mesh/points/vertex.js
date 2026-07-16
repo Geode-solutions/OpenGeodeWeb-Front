@@ -21,11 +21,8 @@ export function useMeshPointsVertexAttributeStyle() {
 
   function meshPointsVertexAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshPointsVertexAttribute(id);
-    if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      if (item in nameStoredConfigs) {
-        return nameStoredConfigs[item];
-      }
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
     return setMeshPointsVertexAttributeStoredConfig(id, name, item, {
       minimum: undefined,
