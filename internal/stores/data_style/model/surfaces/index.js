@@ -8,7 +8,6 @@ import { useModelSurfacesVisibility } from "./visibility";
 async function setModelSurfacesDefaultStyle(_id) {
   // Placeholder
 }
-
 export function useModelSurfacesStyle() {
   const dataStore = useDataStore();
   const modelCommonStyle = useModelSurfacesCommonStyle();
@@ -53,7 +52,20 @@ export function useModelSurfacesStyle() {
       } else {
         const attributeStyle = coloring[activeColoring];
         const { name, item } = attributeStyle;
-        const storedConfig = attributeStyle.storedConfigs[name]?.[item] ?? {};
+        const isVertex = activeColoring === "vertex";
+        const storedConfig = isVertex
+          ? modelSurfacesVertexAttribute.modelSurfacesVertexAttributeStoredConfig(
+              modelId,
+              surfaces_id,
+              name,
+              item,
+            )
+          : modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeStoredConfig(
+              modelId,
+              surfaces_id,
+              name,
+              item,
+            );
         const { minimum, maximum, colorMap } = storedConfig;
         const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
         if (!attributeGroups[attributeGroupKey]) {

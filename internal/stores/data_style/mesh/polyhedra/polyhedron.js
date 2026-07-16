@@ -57,15 +57,23 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
   }
 
   function meshPolyhedraPolyhedronAttributeItem(id) {
-    return meshPolyhedraPolyhedronAttribute(id).item;
+    const polyhedronAttribute = meshPolyhedraPolyhedronAttribute(id);
+    return (
+      polyhedronAttribute.item ??
+      meshPolyhedraPolyhedronAttributeLastItem(id, polyhedronAttribute.name)
+    );
+  }
+
+  function meshPolyhedraPolyhedronAttributeLastItem(id, name) {
+    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
+    if (!(name in storedConfigs)) {
+      return 0;
+    }
+    return storedConfigs[name].lastItem;
   }
 
   function setMeshPolyhedraPolyhedronAttributeName(id, name) {
-    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    let item = 0;
-    if (name in storedConfigs) {
-      item = storedConfigs[name].lastItem ?? 0;
-    }
+    const item = meshPolyhedraPolyhedronAttributeLastItem(id, name);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
     const params = { id, name, item };
@@ -126,18 +134,20 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const colorMap = meshPolyhedraPolyhedronAttributeColorMap(id);
     const points = getRGBPointsFromPreset(colorMap);
+    function storeConfig() {
+      return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { minimum, maximum });
+    }
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolyhedraPolyhedronAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
       return viewerStore.request(
         { schema, params },
         {
-          response_function: () =>
-            setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { minimum, maximum }),
+          response_function: storeConfig,
         },
       );
     }
-    return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { minimum, maximum });
+    return storeConfig();
   }
 
   function meshPolyhedraPolyhedronAttributeColorMap(id) {
@@ -154,18 +164,20 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
+    function storeConfig() {
+      return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { colorMap });
+    }
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolyhedraPolyhedronAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
       return viewerStore.request(
         { schema, params },
         {
-          response_function: () =>
-            setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { colorMap }),
+          response_function: storeConfig,
         },
       );
     }
-    return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { colorMap });
+    return storeConfig();
   }
 
   return {

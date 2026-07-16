@@ -55,17 +55,24 @@ export function useModelCornersVertexAttribute() {
     return modelCornersVertexAttribute(modelId, cornerId).name;
   }
 
-  // oxlint-disable-next-line duplicate-exports
   function modelCornersVertexAttributeItem(modelId, cornerId) {
-    return modelCornersVertexAttribute(modelId, cornerId).item;
+    const vertexAttribute = modelCornersVertexAttribute(modelId, cornerId);
+    return (
+      vertexAttribute.item ??
+      modelCornersVertexAttributeLastItem(modelId, cornerId, vertexAttribute.name)
+    );
+  }
+
+  function modelCornersVertexAttributeLastItem(modelId, cornerId, name) {
+    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
+    if (!(name in storedConfigs)) {
+      return 0;
+    }
+    return storedConfigs[name].lastItem;
   }
 
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
-    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerIds[0]);
-    let item = 0;
-    if (name in storedConfigs) {
-      item = storedConfigs[name].lastItem ?? 0;
-    }
+    const item = modelCornersVertexAttributeLastItem(modelId, cornerIds[0], name);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
@@ -132,25 +139,23 @@ export function useModelCornersVertexAttribute() {
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
     const colorMap = modelCornersVertexAttributeColorMap(modelId, cornerIds[0]);
     const points = getRGBPointsFromPreset(colorMap);
-
+    function storeConfig() {
+      return setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
+        minimum,
+        maximum,
+      });
+    }
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
       return viewerStore.request(
         { schema: schema.color_map, params },
         {
-          response_function: () =>
-            setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
-              minimum,
-              maximum,
-            }),
+          response_function: storeConfig,
         },
       );
     }
-    return setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
-      minimum,
-      maximum,
-    });
+    return storeConfig();
   }
 
   function modelCornersVertexAttributeColorMap(modelId, cornerId) {
@@ -167,21 +172,22 @@ export function useModelCornersVertexAttribute() {
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
-
+    function storeConfig() {
+      return setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
+        colorMap,
+      });
+    }
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
       return viewerStore.request(
         { schema: schema.color_map, params },
         {
-          response_function: () =>
-            setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
-              colorMap,
-            }),
+          response_function: storeConfig,
         },
       );
     }
-    return setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { colorMap });
+    return storeConfig();
   }
 
   return {

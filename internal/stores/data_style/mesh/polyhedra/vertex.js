@@ -57,15 +57,20 @@ export function useMeshPolyhedraVertexAttributeStyle() {
   }
 
   function meshPolyhedraVertexAttributeItem(id) {
-    return meshPolyhedraVertexAttribute(id).item;
+    const vertexAttribute = meshPolyhedraVertexAttribute(id);
+    return vertexAttribute.item ?? meshPolyhedraVertexAttributeLastItem(id, vertexAttribute.name);
+  }
+
+  function meshPolyhedraVertexAttributeLastItem(id, name) {
+    const { storedConfigs } = meshPolyhedraVertexAttribute(id);
+    if (!(name in storedConfigs)) {
+      return 0;
+    }
+    return storedConfigs[name].lastItem;
   }
 
   function setMeshPolyhedraVertexAttributeName(id, name) {
-    const { storedConfigs } = meshPolyhedraVertexAttribute(id);
-    let item = 0;
-    if (name in storedConfigs) {
-      item = storedConfigs[name].lastItem ?? 0;
-    }
+    const item = meshPolyhedraVertexAttributeLastItem(id, name);
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name, item);
     const schema = meshPolyhedraVertexAttributeSchemas.name;
     const params = { id, name, item };
@@ -126,18 +131,20 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const item = meshPolyhedraVertexAttributeItem(id);
     const colorMap = meshPolyhedraVertexAttributeColorMap(id);
     const points = getRGBPointsFromPreset(colorMap);
+    function storeConfig() {
+      return setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, { minimum, maximum });
+    }
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolyhedraVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
       return viewerStore.request(
         { schema, params },
         {
-          response_function: () =>
-            setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, { minimum, maximum }),
+          response_function: storeConfig,
         },
       );
     }
-    return setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, { minimum, maximum });
+    return storeConfig();
   }
 
   function meshPolyhedraVertexAttributeColorMap(id) {
@@ -154,18 +161,20 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
+    function storeConfig() {
+      return setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, { colorMap });
+    }
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolyhedraVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
       return viewerStore.request(
         { schema, params },
         {
-          response_function: () =>
-            setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, { colorMap }),
+          response_function: storeConfig,
         },
       );
     }
-    return setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, { colorMap });
+    return storeConfig();
   }
 
   return {

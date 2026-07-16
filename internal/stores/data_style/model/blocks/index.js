@@ -53,7 +53,20 @@ export function useModelBlocksStyle() {
       } else {
         const attributeStyle = coloring[activeColoring];
         const { name, item } = attributeStyle;
-        const storedConfig = attributeStyle.storedConfigs[name]?.[item] ?? {};
+        const isVertex = activeColoring === "vertex";
+        const storedConfig = isVertex
+          ? modelBlocksVertexAttribute.modelBlocksVertexAttributeStoredConfig(
+              modelId,
+              block_id,
+              name,
+              item,
+            )
+          : modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeStoredConfig(
+              modelId,
+              block_id,
+              name,
+              item,
+            );
         const { minimum, maximum, colorMap } = storedConfig;
         const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
         if (!attributeGroups[attributeGroupKey]) {

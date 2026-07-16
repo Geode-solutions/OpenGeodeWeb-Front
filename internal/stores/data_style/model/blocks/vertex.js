@@ -56,15 +56,23 @@ export function useModelBlocksVertexAttribute() {
   }
 
   function modelBlocksVertexAttributeItem(modelId, blockId) {
-    return modelBlocksVertexAttribute(modelId, blockId).item;
+    const vertexAttribute = modelBlocksVertexAttribute(modelId, blockId);
+    return (
+      vertexAttribute.item ??
+      modelBlocksVertexAttributeLastItem(modelId, blockId, vertexAttribute.name)
+    );
+  }
+
+  function modelBlocksVertexAttributeLastItem(modelId, blockId, name) {
+    const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
+    if (!(name in storedConfigs)) {
+      return 0;
+    }
+    return storedConfigs[name].lastItem;
   }
 
   async function setModelBlocksVertexAttributeName(modelId, blockIds, name) {
-    const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockIds[0]);
-    let item = 0;
-    if (name in storedConfigs) {
-      item = storedConfigs[name].lastItem ?? 0;
-    }
+    const item = modelBlocksVertexAttributeLastItem(modelId, blockIds[0], name);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name, item);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
@@ -131,28 +139,25 @@ export function useModelBlocksVertexAttribute() {
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
     const colorMap = modelBlocksVertexAttributeColorMap(modelId, blockIds[0]);
     const points = getRGBPointsFromPreset(colorMap);
-
+    function storeConfig() {
+      return setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
+        minimum,
+        maximum,
+      });
+    }
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
       return viewerStore.request(
         { schema: schema.color_map, params },
         {
-          response_function: () =>
-            setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
-              minimum,
-              maximum,
-            }),
+          response_function: storeConfig,
         },
       );
     }
-    return setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
-      minimum,
-      maximum,
-    });
+    return storeConfig();
   }
 
-  // oxlint-disable-next-line duplicate-exports
   function modelBlocksVertexAttributeColorMap(modelId, blockId) {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);
@@ -167,19 +172,20 @@ export function useModelBlocksVertexAttribute() {
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name, item);
     const points = getRGBPointsFromPreset(colorMap);
     const { minimum, maximum } = storedConfig;
-
+    function storeConfig() {
+      return setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, { colorMap });
+    }
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
       const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
       return viewerStore.request(
         { schema: schema.color_map, params },
         {
-          response_function: () =>
-            setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, { colorMap }),
+          response_function: storeConfig,
         },
       );
     }
-    return setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, { colorMap });
+    return storeConfig();
   }
 
   return {
