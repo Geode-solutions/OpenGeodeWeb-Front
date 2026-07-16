@@ -24,11 +24,13 @@ export function useMeshPolygonsVertexAttributeStyle() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setMeshPolygonsVertexAttributeStoredConfig(id, name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setMeshPolygonsVertexAttributeStoredConfig(id, name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateMeshPolygonsVertexStyle(id, values) {
@@ -103,7 +105,6 @@ export function useMeshPolygonsVertexAttributeStyle() {
     if (item !== currentItem) {
       return setMeshPolygonsVertexAttributeItem(id, item);
     }
-    return Promise.resolve();
   }
 
   function meshPolygonsVertexAttributeRange(id) {

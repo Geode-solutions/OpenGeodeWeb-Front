@@ -27,11 +27,13 @@ export function useMeshEdgesEdgeAttributeStyle() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setMeshEdgesEdgeAttributeStoredConfig(id, name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateMeshEdgesEdgeStyle(id, values) {
@@ -112,7 +114,6 @@ export function useMeshEdgesEdgeAttributeStyle() {
     if (item !== currentItem) {
       return setMeshEdgesEdgeAttributeItem(id, item);
     }
-    return Promise.resolve();
   }
 
   function meshEdgesEdgeAttributeRange(id) {

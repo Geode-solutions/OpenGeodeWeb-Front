@@ -25,11 +25,13 @@ export function useModelSurfacesVertexAttribute() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setModelSurfacesVertexAttributeStoredConfig(modelId, [surfaceId], name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setModelSurfacesVertexAttributeStoredConfig(modelId, [surfaceId], name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateModelSurfacesVertexStyle(modelId, surfaceIds, values) {
@@ -124,7 +126,6 @@ export function useModelSurfacesVertexAttribute() {
     if (item !== currentItem) {
       return setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item);
     }
-    return Promise.resolve();
   }
 
   function modelSurfacesVertexAttributeRange(modelId, surfaceId) {

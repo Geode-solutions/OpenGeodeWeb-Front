@@ -25,11 +25,13 @@ export function useModelLinesVertexAttribute() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setModelLinesVertexAttributeStoredConfig(modelId, [lineId], name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setModelLinesVertexAttributeStoredConfig(modelId, [lineId], name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateModelLinesVertexStyle(modelId, lineIds, values) {
@@ -114,7 +116,6 @@ export function useModelLinesVertexAttribute() {
     if (item !== currentItem) {
       return setModelLinesVertexAttributeItem(modelId, lineIds, item);
     }
-    return Promise.resolve();
   }
 
   function modelLinesVertexAttributeRange(modelId, lineId) {

@@ -24,11 +24,13 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateMeshPolyhedraVertexStyle(id, values) {
@@ -109,7 +111,6 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     if (item !== currentItem) {
       return setMeshPolyhedraVertexAttributeItem(id, item);
     }
-    return Promise.resolve();
   }
 
   function meshPolyhedraVertexAttributeRange(id) {

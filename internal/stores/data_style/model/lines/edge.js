@@ -25,11 +25,13 @@ export function useModelLinesEdgeAttribute() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setModelLinesEdgeAttributeStoredConfig(modelId, [lineId], name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setModelLinesEdgeAttributeStoredConfig(modelId, [lineId], name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
@@ -102,7 +104,6 @@ export function useModelLinesEdgeAttribute() {
     if (item !== currentItem) {
       return setModelLinesEdgeAttributeItem(modelId, lineIds, item);
     }
-    return Promise.resolve();
   }
 
   function modelLinesEdgeAttributeRange(modelId, lineId) {

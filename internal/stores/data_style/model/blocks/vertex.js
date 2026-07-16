@@ -25,11 +25,13 @@ export function useModelBlocksVertexAttribute() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setModelBlocksVertexAttributeStoredConfig(modelId, [blockId], name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setModelBlocksVertexAttributeStoredConfig(modelId, [blockId], name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateModelBlocksVertexStyle(modelId, blockIds, values) {
@@ -114,7 +116,6 @@ export function useModelBlocksVertexAttribute() {
     if (item !== currentItem) {
       return setModelBlocksVertexAttributeItem(modelId, blockIds, item);
     }
-    return Promise.resolve();
   }
 
   function modelBlocksVertexAttributeRange(modelId, blockId) {

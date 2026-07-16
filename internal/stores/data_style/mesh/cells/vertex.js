@@ -24,11 +24,13 @@ export function useMeshCellsVertexAttributeStyle() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setMeshCellsVertexAttributeStoredConfig(id, name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setMeshCellsVertexAttributeStoredConfig(id, name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateMeshCellsVertexStyle(id, values) {
@@ -103,7 +105,6 @@ export function useMeshCellsVertexAttributeStyle() {
     if (item !== currentItem) {
       return setMeshCellsVertexAttributeItem(id, item);
     }
-    return Promise.resolve();
   }
 
   function meshCellsVertexAttributeRange(id) {

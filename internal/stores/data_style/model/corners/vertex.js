@@ -25,11 +25,13 @@ export function useModelCornersVertexAttribute() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setModelCornersVertexAttributeStoredConfig(modelId, [cornerId], name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setModelCornersVertexAttributeStoredConfig(modelId, [cornerId], name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
@@ -115,7 +117,6 @@ export function useModelCornersVertexAttribute() {
     if (item !== currentItem) {
       return setModelCornersVertexAttributeItem(modelId, cornerIds, item);
     }
-    return Promise.resolve();
   }
 
   function modelCornersVertexAttributeRange(modelId, cornerId) {

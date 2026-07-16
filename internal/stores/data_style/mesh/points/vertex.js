@@ -24,11 +24,13 @@ export function useMeshPointsVertexAttributeStyle() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setMeshPointsVertexAttributeStoredConfig(id, name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setMeshPointsVertexAttributeStoredConfig(id, name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateMeshPointsVertexStyle(id, values) {
@@ -103,7 +105,6 @@ export function useMeshPointsVertexAttributeStyle() {
     if (item !== currentItem) {
       return setMeshPointsVertexAttributeItem(id, item);
     }
-    return Promise.resolve();
   }
 
   function meshPointsVertexAttributeRange(id) {

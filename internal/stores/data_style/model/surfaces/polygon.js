@@ -25,11 +25,13 @@ export function useModelSurfacesPolygonAttribute() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setModelSurfacesPolygonAttributeStoredConfig(modelId, [surfaceId], name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setModelSurfacesPolygonAttributeStoredConfig(modelId, [surfaceId], name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateModelSurfacesPolygonStyle(modelId, surfaceIds, values) {
@@ -124,7 +126,6 @@ export function useModelSurfacesPolygonAttribute() {
     if (item !== currentItem) {
       return setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item);
     }
-    return Promise.resolve();
   }
 
   function modelSurfacesPolygonAttributeRange(modelId, surfaceId) {

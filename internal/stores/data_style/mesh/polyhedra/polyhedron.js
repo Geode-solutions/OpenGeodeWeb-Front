@@ -24,11 +24,13 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateMeshPolyhedraPolyhedronStyle(id, values) {
@@ -109,7 +111,6 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     if (item !== currentItem) {
       return setMeshPolyhedraPolyhedronAttributeItem(id, item);
     }
-    return Promise.resolve();
   }
 
   function meshPolyhedraPolyhedronAttributeRange(id) {

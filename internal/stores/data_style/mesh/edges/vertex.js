@@ -28,11 +28,13 @@ export function useMeshEdgesVertexAttributeStyle() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setMeshEdgesVertexAttributeStoredConfig(id, name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function mutateMeshEdgesVertexStyle(id, values) {
@@ -107,7 +109,6 @@ export function useMeshEdgesVertexAttributeStyle() {
     if (item !== currentItem) {
       return setMeshEdgesVertexAttributeItem(id, item);
     }
-    return Promise.resolve();
   }
 
   function meshEdgesVertexAttributeRange(id) {

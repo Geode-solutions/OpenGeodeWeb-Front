@@ -23,11 +23,13 @@ export function useMeshCellsCellAttributeStyle() {
     if (name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    return setMeshCellsCellAttributeStoredConfig(id, name, item, {
+    const defaultConfig = {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
+    setMeshCellsCellAttributeStoredConfig(id, name, item, defaultConfig);
+    return defaultConfig;
   }
 
   function setMeshCellsCellAttributeStoredConfig(id, name, item, config) {
@@ -100,7 +102,6 @@ export function useMeshCellsCellAttributeStyle() {
     if (item !== currentItem) {
       return setMeshCellsCellAttributeItem(id, item);
     }
-    return Promise.resolve();
   }
 
   function meshCellsCellAttributeRange(id) {
