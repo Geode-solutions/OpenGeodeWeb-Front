@@ -50,7 +50,6 @@ export function useMeshPolyhedraVertexAttributeStyle() {
     });
   }
 
-  // oxlint-disable-next-line duplicate-exports
   function meshPolyhedraVertexAttributeName(id) {
     return meshPolyhedraVertexAttribute(id).name;
   }

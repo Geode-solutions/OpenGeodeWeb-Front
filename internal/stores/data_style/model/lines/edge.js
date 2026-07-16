@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useModelLinesEdgeAttribute() {
   const dataStore = useDataStore();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
@@ -17,17 +18,6 @@ export function useModelLinesEdgeAttribute() {
 
   function modelLinesEdgeAttribute(modelId, lineId) {
     return modelLinesCommonStyle.modelLineColoring(modelId, lineId).edge;
-  }
-
-  function setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, config) {
-    return mutateModelLinesEdgeStyle(modelId, lineIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
   }
 
   function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item) {
@@ -45,6 +35,17 @@ export function useModelLinesEdgeAttribute() {
   function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
     return modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
       edge: values,
+    });
+  }
+
+  function setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, config) {
+    return mutateModelLinesEdgeStyle(modelId, lineIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
     });
   }
 

@@ -120,7 +120,6 @@ export function useMeshPointsVertexAttributeStyle() {
     return [minimum, maximum];
   }
 
-  // oxlint-disable-next-line duplicate-exports
   function setMeshPointsVertexAttributeRange(id, minimum, maximum) {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);

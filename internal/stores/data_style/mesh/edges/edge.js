@@ -22,26 +22,6 @@ export function useMeshEdgesEdgeAttributeStyle() {
     return meshEdgesColoring(id).edge;
   }
 
-  function mutateMeshEdgesEdgeStyle(id, values) {
-    return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
-      coloring: {
-        edge: values,
-      },
-    });
-  }
-
-  // oxlint-disable-next-line duplicate-exports
-  function setMeshEdgesEdgeAttributeStoredConfig(id, name, item, config) {
-    return mutateMeshEdgesEdgeStyle(id, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
-  }
-
   function meshEdgesEdgeAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
     if (name in storedConfigs && item in storedConfigs[name]) {
@@ -51,6 +31,25 @@ export function useMeshEdgesEdgeAttributeStyle() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+    });
+  }
+
+  function mutateMeshEdgesEdgeStyle(id, values) {
+    return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
+      coloring: {
+        edge: values,
+      },
+    });
+  }
+
+  function setMeshEdgesEdgeAttributeStoredConfig(id, name, item, config) {
+    return mutateMeshEdgesEdgeStyle(id, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
     });
   }
 

@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.polyhedron;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useModelBlocksPolyhedronAttribute() {
   const dataStore = useDataStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
@@ -17,17 +18,6 @@ export function useModelBlocksPolyhedronAttribute() {
 
   function modelBlocksPolyhedronAttribute(modelId, blockId) {
     return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).polyhedron;
-  }
-
-  function setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, config) {
-    return mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
   }
 
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item) {
@@ -45,6 +35,17 @@ export function useModelBlocksPolyhedronAttribute() {
   function mutateModelBlocksPolyhedronStyle(modelId, blockIds, values) {
     return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
       polyhedron: values,
+    });
+  }
+
+  function setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, config) {
+    return mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
     });
   }
 

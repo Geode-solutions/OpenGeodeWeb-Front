@@ -19,6 +19,18 @@ export function useMeshCellsVertexAttributeStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).vertex;
   }
 
+  function meshCellsVertexAttributeStoredConfig(id, name, item) {
+    const { storedConfigs } = meshCellsVertexAttribute(id);
+    if (name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
+    }
+    return setMeshCellsVertexAttributeStoredConfig(id, name, item, {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    });
+  }
+
   function mutateMeshCellsVertexStyle(id, values) {
     return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: {
@@ -35,18 +47,6 @@ export function useMeshCellsVertexAttributeStyle() {
           [item]: config,
         },
       },
-    });
-  }
-
-  function meshCellsVertexAttributeStoredConfig(id, name, item) {
-    const { storedConfigs } = meshCellsVertexAttribute(id);
-    if (name in storedConfigs && item in storedConfigs[name]) {
-      return storedConfigs[name][item];
-    }
-    return setMeshCellsVertexAttributeStoredConfig(id, name, item, {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
     });
   }
 

@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.polygon;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useModelSurfacesPolygonAttribute() {
   const dataStore = useDataStore();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
@@ -17,17 +18,6 @@ export function useModelSurfacesPolygonAttribute() {
 
   function modelSurfacesPolygonAttribute(modelId, surfaceId) {
     return modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId).polygon;
-  }
-
-  function setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, config) {
-    return mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
   }
 
   function modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item) {
@@ -45,6 +35,17 @@ export function useModelSurfacesPolygonAttribute() {
   function mutateModelSurfacesPolygonStyle(modelId, surfaceIds, values) {
     return modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
       polygon: values,
+    });
+  }
+
+  function setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, config) {
+    return mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
     });
   }
 

@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.vertex;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useModelBlocksVertexAttribute() {
   const dataStore = useDataStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
@@ -17,17 +18,6 @@ export function useModelBlocksVertexAttribute() {
 
   function modelBlocksVertexAttribute(modelId, blockId) {
     return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).vertex;
-  }
-
-  function setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, config) {
-    return mutateModelBlocksVertexStyle(modelId, blockIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
   }
 
   function modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item) {
@@ -45,6 +35,17 @@ export function useModelBlocksVertexAttribute() {
   function mutateModelBlocksVertexStyle(modelId, blockIds, values) {
     return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
       vertex: values,
+    });
+  }
+
+  function setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, config) {
+    return mutateModelBlocksVertexStyle(modelId, blockIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
     });
   }
 

@@ -18,17 +18,6 @@ export function useMeshCellsCellAttributeStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).cell;
   }
 
-  function setMeshCellsCellAttributeStoredConfig(id, name, item, config) {
-    return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
-  }
-
   function meshCellsCellAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshCellsCellAttribute(id);
     if (name in storedConfigs && item in storedConfigs[name]) {
@@ -38,6 +27,17 @@ export function useMeshCellsCellAttributeStyle() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+    });
+  }
+
+  function setMeshCellsCellAttributeStoredConfig(id, name, item, config) {
+    return meshCellsCommonStyle.mutateMeshCellsCellStyle(id, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
     });
   }
 

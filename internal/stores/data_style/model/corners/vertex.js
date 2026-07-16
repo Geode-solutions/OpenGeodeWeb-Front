@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.attribute.vertex;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useModelCornersVertexAttribute() {
   const dataStore = useDataStore();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
@@ -17,17 +18,6 @@ export function useModelCornersVertexAttribute() {
 
   function modelCornersVertexAttribute(modelId, cornerId) {
     return modelCornersCommonStyle.modelCornerColoring(modelId, cornerId).vertex;
-  }
-
-  function setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, config) {
-    return mutateModelCornersVertexStyle(modelId, cornerIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
   }
 
   function modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item) {
@@ -45,6 +35,17 @@ export function useModelCornersVertexAttribute() {
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
     return modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
       vertex: values,
+    });
+  }
+
+  function setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, config) {
+    return mutateModelCornersVertexStyle(modelId, cornerIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
     });
   }
 
