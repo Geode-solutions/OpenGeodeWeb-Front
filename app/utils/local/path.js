@@ -24,10 +24,15 @@ function executablePath(execPath, execName) {
       return execPathInResources;
     }
   }
-  const localExecPath = path.join(execPath, osExecutableName);
-  if (fs.existsSync(localExecPath)) {
-    console.log(`[executablePath] Found executable in local path: ${localExecPath}`);
-    return localExecPath;
+  const localOneFileExecPath = path.join(execPath, osExecutableName);
+  if (fs.existsSync(localOneFileExecPath) && fs.statSync(localOneFileExecPath).isFile()) {
+    console.log(`[executablePath] Found executable in local path: ${localOneFileExecPath}`);
+    return localOneFileExecPath;
+  }
+  const localOneDirExecPath = path.join(execPath, execName, osExecutableName);
+  if (fs.existsSync(localOneDirExecPath)) {
+    console.log(`[executablePath] Found executable in local path: ${localOneDirExecPath}`);
+    return localOneDirExecPath;
   }
   if (commandExistsSync(osExecutableName)) {
     console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
