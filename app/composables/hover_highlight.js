@@ -20,6 +20,13 @@ export function useHoverhighlight() {
       currentId = id;
       currentType = type;
 
+      const { useDataStore } = await import("@ogw_front/stores/data");
+      const dataStore = useDataStore();
+      const value = await dataStore.item(id);
+      if (value?.binary_light_viewable === "not_viewable") {
+        return;
+      }
+
       let block_ids = [];
       if (typeof block_ids_provider === "function") {
         block_ids = await block_ids_provider();

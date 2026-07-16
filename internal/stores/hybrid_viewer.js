@@ -148,8 +148,11 @@ async function performAddItem(id, options) {
   if (!genericRenderWindow) {
     return;
   }
-  const reader = vtkXMLPolyDataReader(),
-    value = await dataStore.item(id);
+  const value = await dataStore.item(id);
+  if (value.binary_light_viewable === "not_viewable") {
+    return;
+  }
+  const reader = vtkXMLPolyDataReader();
   await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
   const actor = vtkActor(),
     mapper = vtkMapper(),
@@ -158,6 +161,9 @@ async function performAddItem(id, options) {
   actor.getProperty().setColor(actorColor);
   actor.setMapper(mapper);
   const renderer = genericRenderWindow.getRenderer();
+  if (hybridDb[id] && hybridDb[id].actor) {
+    renderer.removeActor(hybridDb[id].actor);
+  }
   const isFirst = renderer.getActors().length === 0;
   renderer.addActor(actor);
   if (isFirst) {
