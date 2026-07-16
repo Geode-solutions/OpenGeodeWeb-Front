@@ -61,12 +61,10 @@ export function useMeshPointsVertexAttributeStyle() {
   function setMeshPointsVertexAttributeName(id, name) {
     const { storedConfigs } = meshPointsVertexAttribute(id);
     let item = 0;
-    let storedConfig = {};
     if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      item = nameStoredConfigs.lastItem ?? 0;
-      storedConfig = nameStoredConfigs[item] ?? {};
+      item = storedConfigs[name].lastItem ?? 0;
     }
+    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
     const schema = meshPointsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
@@ -82,11 +80,7 @@ export function useMeshPointsVertexAttributeStyle() {
 
   function setMeshPointsVertexAttributeItem(id, item) {
     const name = meshPointsVertexAttributeName(id);
-    const { storedConfigs } = meshPointsVertexAttribute(id);
-    let storedConfig = {};
-    if (name in storedConfigs) {
-      storedConfig = storedConfigs[name][item] ?? {};
-    }
+    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
     const schema = meshPointsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(

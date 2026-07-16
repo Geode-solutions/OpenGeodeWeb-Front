@@ -61,12 +61,10 @@ export function useMeshPolygonsVertexAttributeStyle() {
   function setMeshPolygonsVertexAttributeName(id, name) {
     const { storedConfigs } = meshPolygonsVertexAttribute(id);
     let item = 0;
-    let storedConfig = {};
     if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      item = nameStoredConfigs.lastItem ?? 0;
-      storedConfig = nameStoredConfigs[item] ?? {};
+      item = storedConfigs[name].lastItem ?? 0;
     }
+    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
     const schema = meshPolygonsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
@@ -82,11 +80,7 @@ export function useMeshPolygonsVertexAttributeStyle() {
 
   function setMeshPolygonsVertexAttributeItem(id, item) {
     const name = meshPolygonsVertexAttributeName(id);
-    const { storedConfigs } = meshPolygonsVertexAttribute(id);
-    let storedConfig = {};
-    if (name in storedConfigs) {
-      storedConfig = storedConfigs[name][item] ?? {};
-    }
+    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
     const schema = meshPolygonsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(

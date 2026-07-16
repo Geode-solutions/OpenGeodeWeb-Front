@@ -64,12 +64,10 @@ export function useMeshEdgesEdgeAttributeStyle() {
   function setMeshEdgesEdgeAttributeName(id, name) {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
     let item = 0;
-    let storedConfig = {};
     if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      item = nameStoredConfigs.lastItem ?? 0;
-      storedConfig = nameStoredConfigs[item] ?? {};
+      item = storedConfigs[name].lastItem ?? 0;
     }
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
     const schema = meshEdgesEdgeAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
@@ -88,11 +86,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
 
   function setMeshEdgesEdgeAttributeItem(id, item) {
     const name = meshEdgesEdgeAttributeName(id);
-    const { storedConfigs } = meshEdgesEdgeAttribute(id);
-    let storedConfig = {};
-    if (name in storedConfigs) {
-      storedConfig = storedConfigs[name][item] ?? {};
-    }
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
     const schema = meshEdgesEdgeAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(

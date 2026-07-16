@@ -6,8 +6,8 @@ const backStore = useBackStore();
 
 const attributeName = defineModel("attributeName", { type: String });
 const attributeItem = defineModel("attributeItem", { type: Number });
-const range = defineModel("range", { type: Array });
-const colorMap = defineModel("colorMap", { type: String });
+const attributeRange = defineModel("attributeRange", { type: Array });
+const attributeColorMap = defineModel("attributeColorMap", { type: String });
 
 const { id, componentId, schema } = defineProps({
   id: { type: String, required: true },
@@ -18,25 +18,25 @@ const { id, componentId, schema } = defineProps({
 const attributes = ref([]);
 
 const rangeMin = computed({
-  get: () => (range.value ? range.value[0] : undefined),
+  get: () => (attributeRange.value ? attributeRange.value[0] : undefined),
   set: (val) => {
-    const currentMax = range.value ? range.value[1] : undefined;
+    const currentMax = attributeRange.value ? attributeRange.value[1] : undefined;
     let newMin = val;
     if (currentMax !== undefined && val > currentMax) {
       newMin = currentMax;
     }
-    range.value = [newMin, currentMax];
+    attributeRange.value = [newMin, currentMax];
   },
 });
 const rangeMax = computed({
-  get: () => (range.value ? range.value[1] : undefined),
+  get: () => (attributeRange.value ? attributeRange.value[1] : undefined),
   set: (val) => {
-    const currentMin = range.value ? range.value[0] : undefined;
+    const currentMin = attributeRange.value ? attributeRange.value[0] : undefined;
     let newMax = val;
     if (currentMin !== undefined && val < currentMin) {
       newMax = currentMin;
     }
-    range.value = [currentMin, newMax];
+    attributeRange.value = [currentMin, newMax];
   },
 });
 
@@ -57,7 +57,7 @@ const componentItems = computed(() => {
 function resetRange() {
   if (currentAttribute.value) {
     const comp = attributeItem.value ?? 0;
-    range.value = [
+    attributeRange.value = [
       currentAttribute.value.min_values[comp],
       currentAttribute.value.max_values[comp],
     ];
@@ -99,11 +99,11 @@ watch(
     if (
       attributeName.value &&
       attributes.value.length > 0 &&
-      (range.value === undefined || range.value[0] === undefined || colorMap.value === undefined)
+      (attributeRange.value === undefined || attributeRange.value[0] === undefined || attributeColorMap.value === undefined)
     ) {
       resetRange();
-      if (colorMap.value === undefined) {
-        colorMap.value = "batlow";
+      if (attributeColorMap.value === undefined) {
+        attributeColorMap.value = "batlow";
       }
     }
   },
@@ -141,7 +141,7 @@ watch([attributeName, attributeItem], () => {
     v-if="attributeName"
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
-    v-model:colorMap="colorMap"
+    v-model:colorMap="attributeColorMap"
     @reset="resetRange"
   />
 </template>

@@ -61,12 +61,10 @@ export function useMeshCellsVertexAttributeStyle() {
   function setMeshCellsVertexAttributeName(id, name) {
     const { storedConfigs } = meshCellsVertexAttribute(id);
     let item = 0;
-    let storedConfig = {};
     if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      item = nameStoredConfigs.lastItem ?? 0;
-      storedConfig = nameStoredConfigs[item] ?? {};
+      item = storedConfigs[name].lastItem ?? 0;
     }
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
     const schema = meshCellsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
@@ -82,11 +80,7 @@ export function useMeshCellsVertexAttributeStyle() {
 
   function setMeshCellsVertexAttributeItem(id, item) {
     const name = meshCellsVertexAttributeName(id);
-    const { storedConfigs } = meshCellsVertexAttribute(id);
-    let storedConfig = {};
-    if (name in storedConfigs) {
-      storedConfig = storedConfigs[name][item] ?? {};
-    }
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
     const schema = meshCellsVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(

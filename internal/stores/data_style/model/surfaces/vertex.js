@@ -60,12 +60,10 @@ export function useModelSurfacesVertexAttribute() {
   async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
     let item = 0;
-    let storedConfig = {};
     if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      item = nameStoredConfigs.lastItem ?? 0;
-      storedConfig = nameStoredConfigs[item] ?? {};
+      item = storedConfigs[name].lastItem ?? 0;
     }
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds[0], name, item);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
@@ -87,11 +85,7 @@ export function useModelSurfacesVertexAttribute() {
 
   async function setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
-    const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
-    let storedConfig = {};
-    if (name in storedConfigs) {
-      storedConfig = storedConfigs[name][item] ?? {};
-    }
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds[0], name, item);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(

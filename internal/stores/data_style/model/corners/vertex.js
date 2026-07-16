@@ -61,12 +61,10 @@ export function useModelCornersVertexAttribute() {
   async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
     const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerIds[0]);
     let item = 0;
-    let storedConfig = {};
     if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      item = nameStoredConfigs.lastItem ?? 0;
-      storedConfig = nameStoredConfigs[item] ?? {};
+      item = storedConfigs[name].lastItem ?? 0;
     }
+    const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
@@ -88,11 +86,7 @@ export function useModelCornersVertexAttribute() {
 
   async function setModelCornersVertexAttributeItem(modelId, cornerIds, item) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
-    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerIds[0]);
-    let storedConfig = {};
-    if (name in storedConfigs) {
-      storedConfig = storedConfigs[name][item] ?? {};
-    }
+    const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(

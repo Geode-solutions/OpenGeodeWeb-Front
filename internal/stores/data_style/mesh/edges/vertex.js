@@ -65,12 +65,10 @@ export function useMeshEdgesVertexAttributeStyle() {
   function setMeshEdgesVertexAttributeName(id, name) {
     const { storedConfigs } = meshEdgesVertexAttribute(id);
     let item = 0;
-    let storedConfig = {};
     if (name in storedConfigs) {
-      const nameStoredConfigs = storedConfigs[name];
-      item = nameStoredConfigs.lastItem ?? 0;
-      storedConfig = nameStoredConfigs[item] ?? {};
+      item = storedConfigs[name].lastItem ?? 0;
     }
+    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     const schema = meshEdgesVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
@@ -86,11 +84,7 @@ export function useMeshEdgesVertexAttributeStyle() {
 
   function setMeshEdgesVertexAttributeItem(id, item) {
     const name = meshEdgesVertexAttributeName(id);
-    const { storedConfigs } = meshEdgesVertexAttribute(id);
-    let storedConfig = {};
-    if (name in storedConfigs) {
-      storedConfig = storedConfigs[name][item] ?? {};
-    }
+    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     const schema = meshEdgesVertexAttributeSchemas.name;
     const params = { id, name, item };
     return viewerStore.request(
