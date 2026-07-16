@@ -35,8 +35,16 @@ function artifactImages(parent, authClient) {
   ]);
 }
 
+function sanitizeLabelValue(label) {
+  const maxLabelLength = 63;
+  return label
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9_-]/gu, "_")
+    .slice(0, maxLabelLength);
+}
+
 // oxlint-disable-next-line max-lines-per-function
-function requestConfig(parent, routerImage, backImage, viewerImage) {
+function requestConfig(parent, routerImage, backImage, viewerImage, email, projectId) {
   const resources = {
     limits: {
       cpu: "1000m",
@@ -52,11 +60,19 @@ function requestConfig(parent, routerImage, backImage, viewerImage) {
     service: {
       ingress: "INGRESS_TRAFFIC_ALL",
       invokerIamDisabled: true,
+      labels: {
+        user: sanitizeLabelValue(email),
+        project: sanitizeLabelValue(projectId),
+      },
       scaling: {
         scalingMode: "MANUAL",
         manualInstanceCount: 1,
       },
       template: {
+        labels: {
+          user: sanitizeLabelValue(email),
+          project: sanitizeLabelValue(projectId),
+        },
         volumes: [
           {
             name: "project",

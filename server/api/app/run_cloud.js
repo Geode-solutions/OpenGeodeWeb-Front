@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     });
     const authClient = await auth.getClient();
     const [routerImage, backImage, viewerImage] = await artifactImages(parent, authClient);
-    const request = requestConfig(parent, routerImage, backImage, viewerImage);
+    const request = requestConfig(parent, routerImage, backImage, viewerImage, email);
     console.log({ request });
     const runClient = new ServicesClient({ authClient });
     const [operation] = await runClient.createService(request);
