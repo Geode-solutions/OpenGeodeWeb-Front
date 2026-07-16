@@ -10,8 +10,10 @@ const TIMEOUTS = {
   unit: 5000,
   integration: 15_000,
 };
+const CI_WORKERS = 2;
 
 const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY;
+const maxWorkers = process.env.CI ? CI_WORKERS : 3;
 
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
@@ -45,6 +47,7 @@ export default defineConfig({
           include: ["tests/integration/**/*.test.js"],
           globals: true,
           environment: "nuxt",
+          maxWorkers,
           testTimeout: TIMEOUTS.integration,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
           server: {
