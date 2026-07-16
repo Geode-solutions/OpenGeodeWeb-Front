@@ -19,6 +19,17 @@ export function useModelBlocksPolyhedronAttribute() {
     return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).polyhedron;
   }
 
+  function setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, config) {
+    return mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
+    });
+  }
+
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
     if (name in storedConfigs) {
@@ -40,17 +51,6 @@ export function useModelBlocksPolyhedronAttribute() {
     });
   }
 
-  function setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, config) {
-    return mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
-  }
-
   function modelBlocksPolyhedronAttributeName(modelId, blockId) {
     return modelBlocksPolyhedronAttribute(modelId, blockId).name;
   }
@@ -61,26 +61,26 @@ export function useModelBlocksPolyhedronAttribute() {
 
   async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockIds[0]);
-    let targetItem = 0;
-    let existingConfig = {};
+    let item = 0;
+    let storedConfig = {};
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      targetItem = nameStoredConfigs.lastItem ?? 0;
-      existingConfig = nameStoredConfigs[targetItem] ?? {};
+      item = nameStoredConfigs.lastItem ?? 0;
+      storedConfig = nameStoredConfigs[item] ?? {};
     }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-    const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {
         response_function: () => {
-          mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item: targetItem });
+          mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item });
           return setModelBlocksPolyhedronAttributeStoredConfig(
             modelId,
             blockIds,
             name,
-            targetItem,
-            existingConfig,
+            item,
+            storedConfig,
           );
         },
       },
@@ -90,9 +90,9 @@ export function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttributeItem(modelId, blockIds, item) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockIds[0]);
-    let existingConfig = {};
+    let storedConfig = {};
     if (name in storedConfigs) {
-      existingConfig = storedConfigs[name][item] ?? {};
+      storedConfig = storedConfigs[name][item] ?? {};
     }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
@@ -106,7 +106,7 @@ export function useModelBlocksPolyhedronAttribute() {
             blockIds,
             name,
             item,
-            existingConfig,
+            storedConfig,
           );
         },
       },
@@ -129,17 +129,16 @@ export function useModelBlocksPolyhedronAttribute() {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
-    if (storedConfig === undefined) {
-      return [undefined, undefined];
-    }
-    return [storedConfig.minimum, storedConfig.maximum];
+    const minimum = storedConfig ? storedConfig.minimum : undefined;
+    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    return [minimum, maximum];
   }
 
   async function setModelBlocksPolyhedronAttributeRange(modelId, blockIds, minimum, maximum) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     const colorMap = modelBlocksPolyhedronAttributeColorMap(modelId, blockIds[0]);
-    const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap);
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
@@ -165,10 +164,7 @@ export function useModelBlocksPolyhedronAttribute() {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
-    if (storedConfig === undefined) {
-      return;
-    }
-    return storedConfig.colorMap;
+    return storedConfig ? storedConfig.colorMap : undefined;
   }
 
   async function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
@@ -181,8 +177,8 @@ export function useModelBlocksPolyhedronAttribute() {
       item,
     );
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
-    const maximum = storedConfig === undefined ? undefined : storedConfig.maximum;
+    const minimum = storedConfig ? storedConfig.minimum : undefined;
+    const maximum = storedConfig ? storedConfig.maximum : undefined;
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);

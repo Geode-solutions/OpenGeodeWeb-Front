@@ -19,6 +19,17 @@ export function useModelSurfacesVertexAttribute() {
     return modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId).vertex;
   }
 
+  function setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, config) {
+    return mutateModelSurfacesVertexStyle(modelId, surfaceIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
+    });
+  }
+
   function modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item) {
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceId);
     if (name in storedConfigs) {
@@ -40,17 +51,6 @@ export function useModelSurfacesVertexAttribute() {
     });
   }
 
-  function setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, config) {
-    return mutateModelSurfacesVertexStyle(modelId, surfaceIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
-  }
-
   function modelSurfacesVertexAttributeName(modelId, surfaceId) {
     return modelSurfacesVertexAttribute(modelId, surfaceId).name;
   }
@@ -61,26 +61,26 @@ export function useModelSurfacesVertexAttribute() {
 
   async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
-    let targetItem = 0;
-    let existingConfig = {};
+    let item = 0;
+    let storedConfig = {};
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      targetItem = nameStoredConfigs.lastItem ?? 0;
-      existingConfig = nameStoredConfigs[targetItem] ?? {};
+      item = nameStoredConfigs.lastItem ?? 0;
+      storedConfig = nameStoredConfigs[item] ?? {};
     }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name, item: targetItem };
+    const params = { id: modelId, block_ids: viewer_ids, name, item };
     return viewerStore.request(
       { schema: schema.name, params },
       {
         response_function: () => {
-          mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item: targetItem });
+          mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });
           return setModelSurfacesVertexAttributeStoredConfig(
             modelId,
             surfaceIds,
             name,
-            targetItem,
-            existingConfig,
+            item,
+            storedConfig,
           );
         },
       },
@@ -90,9 +90,9 @@ export function useModelSurfacesVertexAttribute() {
   async function setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceIds[0]);
-    let existingConfig = {};
+    let storedConfig = {};
     if (name in storedConfigs) {
-      existingConfig = storedConfigs[name][item] ?? {};
+      storedConfig = storedConfigs[name][item] ?? {};
     }
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = { id: modelId, block_ids: viewer_ids, name, item };
@@ -106,7 +106,7 @@ export function useModelSurfacesVertexAttribute() {
             surfaceIds,
             name,
             item,
-            existingConfig,
+            storedConfig,
           );
         },
       },
@@ -129,17 +129,16 @@ export function useModelSurfacesVertexAttribute() {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
-    if (storedConfig === undefined) {
-      return [undefined, undefined];
-    }
-    return [storedConfig.minimum, storedConfig.maximum];
+    const minimum = storedConfig ? storedConfig.minimum : undefined;
+    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    return [minimum, maximum];
   }
 
   async function setModelSurfacesVertexAttributeRange(modelId, surfaceIds, minimum, maximum) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
     const colorMap = modelSurfacesVertexAttributeColorMap(modelId, surfaceIds[0]);
-    const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap);
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
@@ -165,10 +164,7 @@ export function useModelSurfacesVertexAttribute() {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
-    if (storedConfig === undefined) {
-      return;
-    }
-    return storedConfig.colorMap;
+    return storedConfig ? storedConfig.colorMap : undefined;
   }
 
   async function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
@@ -181,8 +177,8 @@ export function useModelSurfacesVertexAttribute() {
       item,
     );
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
-    const maximum = storedConfig === undefined ? undefined : storedConfig.maximum;
+    const minimum = storedConfig ? storedConfig.minimum : undefined;
+    const maximum = storedConfig ? storedConfig.maximum : undefined;
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);

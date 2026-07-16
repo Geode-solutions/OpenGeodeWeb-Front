@@ -63,21 +63,21 @@ export function useMeshPolygonsPolygonAttributeStyle() {
 
   function setMeshPolygonsPolygonAttributeName(id, name) {
     const { storedConfigs } = meshPolygonsPolygonAttribute(id);
-    let targetItem = 0;
-    let existingConfig = {};
+    let item = 0;
+    let storedConfig = {};
     if (name in storedConfigs) {
       const nameStoredConfigs = storedConfigs[name];
-      targetItem = nameStoredConfigs.lastItem ?? 0;
-      existingConfig = nameStoredConfigs[targetItem] ?? {};
+      item = nameStoredConfigs.lastItem ?? 0;
+      storedConfig = nameStoredConfigs[item] ?? {};
     }
     const schema = meshPolygonsPolygonAttributeSchemas.name;
-    const params = { id, name, item: targetItem };
+    const params = { id, name, item };
     return viewerStore.request(
       { schema, params },
       {
         response_function: () => {
-          mutateMeshPolygonsPolygonStyle(id, { name, item: targetItem });
-          return setMeshPolygonsPolygonAttributeStoredConfig(id, name, targetItem, existingConfig);
+          mutateMeshPolygonsPolygonStyle(id, { name, item });
+          return setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, storedConfig);
         },
       },
     );
@@ -86,9 +86,9 @@ export function useMeshPolygonsPolygonAttributeStyle() {
   function setMeshPolygonsPolygonAttributeItem(id, item) {
     const name = meshPolygonsPolygonAttributeName(id);
     const { storedConfigs } = meshPolygonsPolygonAttribute(id);
-    let existingConfig = {};
+    let storedConfig = {};
     if (name in storedConfigs) {
-      existingConfig = storedConfigs[name][item] ?? {};
+      storedConfig = storedConfigs[name][item] ?? {};
     }
     const schema = meshPolygonsPolygonAttributeSchemas.name;
     const params = { id, name, item };
@@ -97,7 +97,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
       {
         response_function: () => {
           mutateMeshPolygonsPolygonStyle(id, { item });
-          return setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, existingConfig);
+          return setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, storedConfig);
         },
       },
     );
@@ -119,17 +119,16 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
-    if (storedConfig === undefined) {
-      return [undefined, undefined];
-    }
-    return [storedConfig.minimum, storedConfig.maximum];
+    const minimum = storedConfig ? storedConfig.minimum : undefined;
+    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    return [minimum, maximum];
   }
 
   function setMeshPolygonsPolygonAttributeRange(id, minimum, maximum) {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
     const colorMap = meshPolygonsPolygonAttributeColorMap(id);
-    const points = colorMap === undefined ? [] : getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap);
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolygonsPolygonAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
@@ -148,10 +147,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
-    if (storedConfig === undefined) {
-      return;
-    }
-    return storedConfig.colorMap;
+    return storedConfig ? storedConfig.colorMap : undefined;
   }
 
   function setMeshPolygonsPolygonAttributeColorMap(id, colorMap) {
@@ -159,8 +155,8 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig === undefined ? undefined : storedConfig.minimum;
-    const maximum = storedConfig === undefined ? undefined : storedConfig.maximum;
+    const minimum = storedConfig ? storedConfig.minimum : undefined;
+    const maximum = storedConfig ? storedConfig.maximum : undefined;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolygonsPolygonAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };
