@@ -128,8 +128,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -156,7 +155,8 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   function setMeshEdgesEdgeAttributeColorMap(id, colorMap) {
@@ -164,8 +164,7 @@ export function useMeshEdgesEdgeAttributeStyle() {
     const item = meshEdgesEdgeAttributeItem(id);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshEdgesEdgeAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };

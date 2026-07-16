@@ -129,8 +129,7 @@ export function useModelBlocksVertexAttribute() {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -164,7 +163,8 @@ export function useModelBlocksVertexAttribute() {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   async function setModelBlocksVertexAttributeColorMap(modelId, blockIds, colorMap) {
@@ -172,8 +172,7 @@ export function useModelBlocksVertexAttribute() {
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);

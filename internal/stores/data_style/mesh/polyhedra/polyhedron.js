@@ -125,8 +125,7 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -153,7 +152,8 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   function setMeshPolyhedraPolyhedronAttributeColorMap(id, colorMap) {
@@ -161,8 +161,7 @@ export function useMeshPolyhedraPolyhedronAttributeStyle() {
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolyhedraPolyhedronAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };

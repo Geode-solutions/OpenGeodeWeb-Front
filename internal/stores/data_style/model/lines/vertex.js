@@ -129,8 +129,7 @@ export function useModelLinesVertexAttribute() {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -164,7 +163,8 @@ export function useModelLinesVertexAttribute() {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   async function setModelLinesVertexAttributeColorMap(modelId, lineIds, colorMap) {
@@ -172,8 +172,7 @@ export function useModelLinesVertexAttribute() {
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);

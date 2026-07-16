@@ -119,8 +119,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -147,7 +146,8 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   function setMeshPolygonsPolygonAttributeColorMap(id, colorMap) {
@@ -155,8 +155,7 @@ export function useMeshPolygonsPolygonAttributeStyle() {
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPolygonsPolygonAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };

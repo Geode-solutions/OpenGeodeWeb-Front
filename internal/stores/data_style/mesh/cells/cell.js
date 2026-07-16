@@ -116,8 +116,7 @@ export function useMeshCellsCellAttributeStyle() {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -144,7 +143,8 @@ export function useMeshCellsCellAttributeStyle() {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   function setMeshCellsCellAttributeColorMap(id, colorMap) {
@@ -152,8 +152,7 @@ export function useMeshCellsCellAttributeStyle() {
     const item = meshCellsCellAttributeItem(id);
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshCellsCellAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };

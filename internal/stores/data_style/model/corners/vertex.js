@@ -129,8 +129,7 @@ export function useModelCornersVertexAttribute() {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -164,7 +163,8 @@ export function useModelCornersVertexAttribute() {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   async function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
@@ -172,8 +172,7 @@ export function useModelCornersVertexAttribute() {
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);

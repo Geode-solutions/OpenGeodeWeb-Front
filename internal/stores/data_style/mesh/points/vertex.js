@@ -119,8 +119,7 @@ export function useMeshPointsVertexAttributeStyle() {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -148,7 +147,8 @@ export function useMeshPointsVertexAttributeStyle() {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   function setMeshPointsVertexAttributeColorMap(id, colorMap) {
@@ -156,8 +156,7 @@ export function useMeshPointsVertexAttributeStyle() {
     const item = meshPointsVertexAttributeItem(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const schema = meshPointsVertexAttributeSchemas.color_map;
       const params = { id, points, minimum, maximum };

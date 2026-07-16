@@ -129,8 +129,7 @@ export function useModelBlocksPolyhedronAttribute() {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
@@ -164,7 +163,8 @@ export function useModelBlocksPolyhedronAttribute() {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
-    return storedConfig ? storedConfig.colorMap : undefined;
+    const { colorMap } = storedConfig;
+    return colorMap;
   }
 
   async function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
@@ -177,8 +177,7 @@ export function useModelBlocksPolyhedronAttribute() {
       item,
     );
     const points = getRGBPointsFromPreset(colorMap);
-    const minimum = storedConfig ? storedConfig.minimum : undefined;
-    const maximum = storedConfig ? storedConfig.maximum : undefined;
+    const { minimum, maximum } = storedConfig;
 
     if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
       const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
