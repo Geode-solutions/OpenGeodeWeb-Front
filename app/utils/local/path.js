@@ -11,36 +11,49 @@ import { v4 as uuidv4 } from "uuid";
 import { appMode } from "./app_mode.js";
 import { commandExistsSync } from "./scripts.js";
 
+
+function findExecutableInDir(baseDir, execName, osExecutableName, shouldThrow) {
+  const oneFilePath = path.join(baseDir, osExecutableName);
+  if (fs.existsSync(oneFilePath) && fs.statSync(oneFilePath).isFile()) {
+    console.log(`[executablePath] Found OneFile executable: ${oneFilePath}`);
+    return oneFilePath;
+  }
+
+  const oneDirPath = path.join(baseDir, execName, osExecutableName);
+  if (fs.existsSync(oneDirPath) && fs.statSync(oneDirPath).isFile()) {
+    console.log(`[executablePath] Found OneDir executable: ${oneDirPath}`);
+    return oneDirPath;
+  }
+
+  if (shouldThrow) {
+    throw new Error(
+      `Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`
+    );
+  }
+
+  return null;
+}
+
 function executablePath(execPath, execName) {
   const osExecutableName = executableName(execName);
   const resourcesPath = process.env.RESOURCES_PATH;
   const mode = process.env.MODE;
   const nodeEnv = process.env.NODE_ENV;
+
   console.log("[executablePath]", { execPath, execName, mode, nodeEnv, resourcesPath });
+
   if (mode === appMode.DESKTOP && nodeEnv === "production") {
-    const execPathInResources = path.join(resourcesPath, execName, osExecutableName);
-    if (fs.existsSync(execPathInResources)) {
-      console.log(`[executablePath] Found executable in resources path: ${execPathInResources}`);
-      return execPathInResources;
-    }
-    else {
-      throw new Error(`Executable not found in resources path: ${execPathInResources}`);
-    }
+    return findExecutableInDir(resourcesPath, execName, osExecutableName, true);
   }
-  const localOneFileExecPath = path.join(execPath, osExecutableName);
-  if (fs.existsSync(localOneFileExecPath) && fs.statSync(localOneFileExecPath).isFile()) {
-    console.log(`[executablePath] Found executable in local path: ${localOneFileExecPath}`);
-    return localOneFileExecPath;
-  }
-  const localOneDirExecPath = path.join(execPath, execName, osExecutableName);
-  if (fs.existsSync(localOneDirExecPath)) {
-    console.log(`[executablePath] Found executable in local path: ${localOneDirExecPath}`);
-    return localOneDirExecPath;
-  }
+
+  const found = findExecutableInDir(execPath, execName, osExecutableName, false);
+  if (found) { return found; }
+
   if (commandExistsSync(osExecutableName)) {
     console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
     return osExecutableName;
   }
+
   throw new Error(`Executable not found: ${osExecutableName}`);
 }
 
