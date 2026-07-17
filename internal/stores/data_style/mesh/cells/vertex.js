@@ -10,9 +10,15 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshCellsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
 
-function assertMeshCellsVertexAttributeColorConfig({ minimum, maximum, colorMap }) {
-  if (minimum === undefined || maximum === undefined || colorMap === undefined) {
-    throw new Error("Must provide minimum, maximum, and colormap");
+function assertMeshCellsVertexAttributeColorConfig({ name, item, minimum, maximum, colorMap }) {
+  if (
+    name === undefined ||
+    item === undefined ||
+    minimum === undefined ||
+    maximum === undefined ||
+    colorMap === undefined
+  ) {
+    throw new Error("Must provide name, item, minimum, maximum, and colormap");
   }
 }
 
@@ -91,13 +97,32 @@ function useMeshCellsVertexAttributeStyle() {
     return colorMap;
   }
 
-  function setMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
-    assertMeshCellsVertexAttributeColorConfig({ minimum, maximum, colorMap });
+  function setMeshCellsVertexAttribute(id, params = {}) {
+    const name = params.name ?? meshCellsVertexAttributeName(id);
+    const item =
+      params.item ??
+      (params.name === undefined
+        ? meshCellsVertexAttributeItem(id)
+        : meshCellsVertexAttributeLastItem(id, params.name));
+    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
+    let minimum = params.minimum ?? storedConfig.minimum;
+    let maximum = params.maximum ?? storedConfig.maximum;
+    let colorMap = params.colorMap ?? storedConfig.colorMap;
+    if (minimum === undefined) {
+      minimum = 0;
+    }
+    if (maximum === undefined) {
+      maximum = 1;
+    }
+    if (colorMap === undefined) {
+      colorMap = "batlow";
+    }
+    assertMeshCellsVertexAttributeColorConfig({ name, item, minimum, maximum, colorMap });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsVertexAttributeSchemas.attribute;
-    const params = { id, name, item, points, minimum, maximum };
+    const rpcParams = { id, name, item, points, minimum, maximum };
     return viewerStore.request(
-      { schema, params },
+      { schema, params: rpcParams },
       {
         response_function: () => {
           mutateMeshCellsVertexStyle(id, { name, item });

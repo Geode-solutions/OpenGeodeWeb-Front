@@ -43,25 +43,7 @@ export function useMeshCellsStyle() {
       if (name === undefined) {
         return;
       }
-      const item = meshCellsVertexAttributeStyle.meshCellsVertexAttributeItem(id);
-      let [minimum, maximum] = meshCellsVertexAttributeStyle.meshCellsVertexAttributeRange(id);
-      let colorMap = meshCellsVertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
-      if (minimum === undefined) {
-        minimum = 0;
-      }
-      if (maximum === undefined) {
-        maximum = 1;
-      }
-      if (colorMap === undefined) {
-        colorMap = "batlow";
-      }
-      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttribute(id, {
-        name,
-        item,
-        minimum,
-        maximum,
-        colorMap,
-      });
+      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttribute(id, { name });
     }
     if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
