@@ -59,7 +59,11 @@ const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
     const item = dataStyleStore.meshCellsVertexAttributeLastItem(id.value, newValue);
-    let { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(id.value, newValue, item);
+    let { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(
+      id.value,
+      newValue,
+      item,
+    );
     if (minimum === undefined) {
       minimum = 0;
     }
@@ -70,7 +74,13 @@ const vertex_attribute_name = computed({
       colorMap = "batlow";
     }
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, { name: newValue, item, minimum, maximum, colorMap }),
+      dataStyleStore.setMeshCellsVertexAttribute(targetId, {
+        name: newValue,
+        item,
+        minimum,
+        maximum,
+        colorMap,
+      }),
     );
     hybridViewerStore.remoteRender();
   },
@@ -79,7 +89,11 @@ const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
   set: async (newValue) => {
     const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
-    let { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(id.value, name, newValue);
+    let { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(
+      id.value,
+      name,
+      newValue,
+    );
     if (minimum === undefined) {
       minimum = 0;
     }
@@ -90,7 +104,13 @@ const vertex_attribute_item = computed({
       colorMap = "batlow";
     }
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, { name, item: newValue, minimum, maximum, colorMap }),
+      dataStyleStore.setMeshCellsVertexAttribute(targetId, {
+        name,
+        item: newValue,
+        minimum,
+        maximum,
+        colorMap,
+      }),
     );
     hybridViewerStore.remoteRender();
   },
@@ -105,7 +125,13 @@ const vertex_attribute_range = computed({
       colorMap = "batlow";
     }
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, { name, item, minimum: newValue[0], maximum: newValue[1], colorMap }),
+      dataStyleStore.setMeshCellsVertexAttribute(targetId, {
+        name,
+        item,
+        minimum: newValue[0],
+        maximum: newValue[1],
+        colorMap,
+      }),
     );
     hybridViewerStore.remoteRender();
   },
@@ -123,7 +149,13 @@ const vertex_attribute_color_map = computed({
       maximum = 1;
     }
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, { name, item, minimum, maximum, colorMap: newValue }),
+      dataStyleStore.setMeshCellsVertexAttribute(targetId, {
+        name,
+        item,
+        minimum,
+        maximum,
+        colorMap: newValue,
+      }),
     );
     hybridViewerStore.remoteRender();
   },
