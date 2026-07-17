@@ -40,16 +40,7 @@ export function useMeshCellsStyle() {
     }
     if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
-      const item = meshCellsVertexAttributeStyle.meshCellsVertexAttributeItem(id);
-      const { colorMap } = meshCellsVertexAttributeStyle.meshCellsVertexAttributeStoredConfig(
-        id,
-        name,
-        item,
-      );
-      return Promise.all([
-        meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name),
-        meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeColorMap(id, colorMap),
-      ]);
+      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name);
     }
     if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
