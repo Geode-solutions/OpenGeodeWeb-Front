@@ -79,55 +79,77 @@ describe("mesh cells", () => {
   });
 
   describe("cells vertex attribute", () => {
-    test("coloring vertex attribute - no request sent when colormap/range undefined", () => {
+    test("coloring vertex attribute - fail fast on missing parameters", () => {
       const dataStyleStore = useDataStyleStore();
-      const vertex_attribute = { name: "points", item: 0 };
-      const result = dataStyleStore.setMeshCellsVertexAttributeName(id, vertex_attribute.name);
-      expect(result).toBeUndefined();
-      expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe(vertex_attribute.name);
+      expect(() =>
+        dataStyleStore.setMeshCellsVertexAttribute(id, {
+          name: "points",
+          item: 0,
+          minimum: undefined,
+          maximum: undefined,
+          colorMap: undefined,
+        }),
+      ).toThrow("Must provide minimum, maximum, and colormap");
     });
 
-    test("stored configs 1 - select attribute points and item 2", () => {
-      const dataStyleStore = useDataStyleStore();
-      const vertex_attribute = { name: "points", item: 2 };
-      dataStyleStore.setMeshCellsVertexAttributeName(id, vertex_attribute.name);
-      dataStyleStore.setMeshCellsVertexAttributeItem(id, vertex_attribute.item);
-      expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe(vertex_attribute.name);
-      expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(vertex_attribute.item);
-    });
-
-    test("stored configs 2 - set range then colormap triggers unified attribute RPC", async () => {
+    test("coloring vertex attribute - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const spy = vi.spyOn(viewerStore, "request");
-      await dataStyleStore.setMeshCellsVertexAttributeRange(id, range[0], range[1]);
-      const result = dataStyleStore.setMeshCellsVertexAttributeColorMap(id, "budaS");
+      const vertex_attribute = { name: "points", item: 2 };
+      const colorMap = "budaS";
+      const result = dataStyleStore.setMeshCellsVertexAttribute(id, {
+        name: vertex_attribute.name,
+        item: vertex_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap,
+      });
       expect(result).toBeInstanceOf(Promise);
       await result;
       const schema = mesh_cells_schemas.attribute.vertex.attribute;
       const name = dataStyleStore.meshCellsVertexAttributeName(id);
       const item = dataStyleStore.meshCellsVertexAttributeItem(id);
-      const [minimum, maximum] = dataStyleStore.meshCellsVertexAttributeRange(id);
-      expect(spy).toHaveBeenCalledWith({
-        schema,
-        params: expect.objectContaining({ id, name, item, minimum, maximum }),
-      });
+      expect(spy).toHaveBeenCalledWith(
+        {
+          schema,
+          params: expect.objectContaining({ id, name, item, minimum: range[0], maximum: range[1] }),
+        },
+        {
+          response_function: expect.any(Function),
+        },
+      );
       expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshCellsVertexAttributeColorMap(id)).toBe("budaS");
+      expect(dataStyleStore.meshCellsVertexAttributeColorMap(id)).toBe(colorMap);
     });
 
-    test("stored configs 3 - select polygon_arround_vertex", () => {
+    test("stored configs - select polygon_arround_vertex", async () => {
       const dataStyleStore = useDataStyleStore();
-      dataStyleStore.setMeshCellsVertexAttributeName(id, "polygon_arround_vertex");
-      dataStyleStore.setMeshCellsVertexAttributeItem(id, 0);
+      const result = dataStyleStore.setMeshCellsVertexAttribute(id, {
+        name: "polygon_arround_vertex",
+        item: 0,
+        minimum: 0,
+        maximum: 10,
+        colorMap: "batlow",
+      });
+      expect(result).toBeInstanceOf(Promise);
+      await result;
       expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe("polygon_arround_vertex");
       expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(0);
+      expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([0, 10]);
+      expect(dataStyleStore.meshCellsVertexAttributeColorMap(id)).toBe("batlow");
     });
 
-    test("stored configs 4 - switch back to points and verify state restoration", async () => {
+    test("stored configs - switch back to points and verify state restoration", async () => {
       const dataStyleStore = useDataStyleStore();
       const vertex_attribute = { name: "points", item: 2 };
-      const result = dataStyleStore.setMeshCellsVertexAttributeName(id, vertex_attribute.name);
+      const result = dataStyleStore.setMeshCellsVertexAttribute(id, {
+        name: vertex_attribute.name,
+        item: vertex_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "budaS",
+      });
       expect(result).toBeInstanceOf(Promise);
       await result;
       expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe(vertex_attribute.name);
@@ -209,7 +231,13 @@ describe("mesh cells", () => {
     test("coloring vertex", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      dataStyleStore.setMeshCellsVertexAttributeName(id, default_vertex_attribute.name);
+      await dataStyleStore.setMeshCellsVertexAttribute(id, {
+        name: default_vertex_attribute.name,
+        item: default_vertex_attribute.item,
+        minimum: default_vertex_attribute.range[0],
+        maximum: default_vertex_attribute.range[1],
+        colorMap: "batlow",
+      });
       const coloringName = "vertex";
       const result = dataStyleStore.setMeshCellsActiveColoring(id, coloringName);
       expect(result).toBeInstanceOf(Promise);
