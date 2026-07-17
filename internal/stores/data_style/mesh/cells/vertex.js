@@ -10,8 +10,18 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshCellsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
 
+function isMeshCellsVertexAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
+}
+
 // oxlint-disable-next-line max-lines-per-function
-export function useMeshCellsVertexAttributeStyle() {
+function useMeshCellsVertexAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
@@ -85,14 +95,6 @@ export function useMeshCellsVertexAttributeStyle() {
     return colorMap;
   }
 
-  function updateMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
-    if (minimum !== undefined && maximum !== undefined && colorMap !== undefined) {
-      return setMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap });
-    }
-    mutateMeshCellsVertexStyle(id, { name, item });
-    setMeshCellsVertexAttributeStoredConfig(id, name, item, { minimum, maximum, colorMap });
-  }
-
   function setMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsVertexAttributeSchemas.attribute;
@@ -116,7 +118,8 @@ export function useMeshCellsVertexAttributeStyle() {
     meshCellsVertexAttributeColorMap,
     meshCellsVertexAttributeStoredConfig,
     meshCellsVertexAttributeLastItem,
-    updateMeshCellsVertexAttribute,
     setMeshCellsVertexAttribute,
   };
 }
+
+export { isMeshCellsVertexAttributeValid, useMeshCellsVertexAttributeStyle };

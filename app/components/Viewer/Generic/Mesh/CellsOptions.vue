@@ -3,6 +3,7 @@ import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/Cont
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
+import { isMeshCellsVertexAttributeValid } from "@ogw_internal/stores/data_style/mesh/cells/vertex";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -18,6 +19,26 @@ const { itemProps, btnImage, tooltip } = defineProps({
 });
 
 const id = toRef(() => itemProps.id);
+
+function createVertexAttribute(overrides = {}) {
+  return {
+    name: vertex_attribute_name.value,
+    item: vertex_attribute_item.value,
+    minimum: vertex_attribute_range.value[0],
+    maximum: vertex_attribute_range.value[1],
+    colorMap: vertex_attribute_color_map.value,
+    ...overrides,
+  };
+}
+
+async function applyVertexAttributeStyle(vertex_attribute) {
+  if (isMeshCellsVertexAttributeValid(vertex_attribute)) {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttribute(targetId, vertex_attribute),
+    );
+    hybridViewerStore.remoteRender();
+  }
+}
 
 const visibility = computed({
   get: () => dataStyleStore.meshCellsVisibility(id.value),
@@ -57,81 +78,22 @@ const textures = computed({
 });
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
-  set: async (newValue) => {
-    const item = dataStyleStore.meshCellsVertexAttributeLastItem(id.value, newValue);
-    const { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(
-      id.value,
-      newValue,
-      item,
-    );
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.updateMeshCellsVertexAttribute(targetId, {
-        name: newValue,
-        item,
-        minimum,
-        maximum,
-        colorMap,
-      }),
-    );
-    hybridViewerStore.remoteRender();
-  },
+  set: (newValue) => applyVertexAttributeStyle(createVertexAttribute({ name: newValue })),
 });
 const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
-  set: async (newValue) => {
-    const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
-    const { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(
-      id.value,
-      name,
-      newValue,
-    );
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.updateMeshCellsVertexAttribute(targetId, {
-        name,
-        item: newValue,
-        minimum,
-        maximum,
-        colorMap,
-      }),
-    );
-    hybridViewerStore.remoteRender();
-  },
+  set: (newValue) => applyVertexAttributeStyle(createVertexAttribute({ item: newValue })),
 });
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
-  set: async (newValue) => {
-    const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
-    const item = dataStyleStore.meshCellsVertexAttributeItem(id.value);
-    const colorMap = dataStyleStore.meshCellsVertexAttributeColorMap(id.value);
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.updateMeshCellsVertexAttribute(targetId, {
-        name,
-        item,
-        minimum: newValue[0],
-        maximum: newValue[1],
-        colorMap,
-      }),
-    );
-    hybridViewerStore.remoteRender();
-  },
+  set: (newValue) =>
+    applyVertexAttributeStyle(
+      createVertexAttribute({ minimum: newValue[0], maximum: newValue[1] }),
+    ),
 });
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
-  set: async (newValue) => {
-    const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
-    const item = dataStyleStore.meshCellsVertexAttributeItem(id.value);
-    const [minimum, maximum] = dataStyleStore.meshCellsVertexAttributeRange(id.value);
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.updateMeshCellsVertexAttribute(targetId, {
-        name,
-        item,
-        minimum,
-        maximum,
-        colorMap: newValue,
-      }),
-    );
-    hybridViewerStore.remoteRender();
-  },
+  set: (newValue) => applyVertexAttributeStyle(createVertexAttribute({ colorMap: newValue })),
 });
 const cell_attribute_name = computed({
   get: () => dataStyleStore.meshCellsCellAttributeName(id.value),

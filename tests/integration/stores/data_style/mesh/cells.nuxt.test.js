@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { isMeshCellsVertexAttributeValid } from "@ogw_internal/stores/data_style/mesh/cells/vertex";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -80,15 +81,15 @@ describe("mesh cells", () => {
 
   describe("cells vertex attribute", () => {
     test("coloring vertex attribute - guard on missing parameters", () => {
-      const dataStyleStore = useDataStyleStore();
-      const result = dataStyleStore.updateMeshCellsVertexAttribute(id, {
-        name: "points",
-        item: 0,
-        minimum: undefined,
-        maximum: undefined,
-        colorMap: undefined,
-      });
-      expect(result).toBeUndefined();
+      expect(
+        isMeshCellsVertexAttributeValid({
+          name: "points",
+          item: 0,
+          minimum: undefined,
+          maximum: undefined,
+          colorMap: undefined,
+        }),
+      ).toBe(false);
     });
 
     test("coloring vertex attribute - set range and colormap", async () => {

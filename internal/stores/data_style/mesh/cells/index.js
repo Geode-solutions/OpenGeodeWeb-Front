@@ -1,11 +1,11 @@
 // Third party imports
 
 // Local imports
+import { isMeshCellsVertexAttributeValid, useMeshCellsVertexAttributeStyle } from "./vertex";
 import { useMeshCellsCellAttributeStyle } from "./cell";
 import { useMeshCellsColorStyle } from "./color";
 import { useMeshCellsCommonStyle } from "./common";
 import { useMeshCellsTexturesStyle } from "./textures";
-import { useMeshCellsVertexAttributeStyle } from "./vertex";
 import { useMeshCellsVisibilityStyle } from "./visibility";
 
 // Local constants
@@ -46,13 +46,10 @@ export function useMeshCellsStyle() {
       const item = meshCellsVertexAttributeStyle.meshCellsVertexAttributeItem(id);
       const [minimum, maximum] = meshCellsVertexAttributeStyle.meshCellsVertexAttributeRange(id);
       const colorMap = meshCellsVertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
-      return meshCellsVertexAttributeStyle.updateMeshCellsVertexAttribute(id, {
-        name,
-        item,
-        minimum,
-        maximum,
-        colorMap,
-      });
+      const vertex_attribute = { name, item, minimum, maximum, colorMap };
+      if (isMeshCellsVertexAttributeValid(vertex_attribute)) {
+        return meshCellsVertexAttributeStyle.setMeshCellsVertexAttribute(id, vertex_attribute);
+      }
     }
     if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
