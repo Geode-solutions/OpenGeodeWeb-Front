@@ -136,7 +136,7 @@ describe("mesh cells", () => {
       await result;
       expect(dataStyleStore.meshCellsVertexAttributeName(id)).toBe("polygon_arround_vertex");
       expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(0);
-      expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([0, 10]);
+      expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([0, MINIMUM_RANGE]);
       expect(dataStyleStore.meshCellsVertexAttributeColorMap(id)).toBe("batlow");
     });
 
