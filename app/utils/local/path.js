@@ -22,8 +22,7 @@ function executablePath(execPath, execName) {
     if (fs.existsSync(execPathInResources)) {
       console.log(`[executablePath] Found executable in resources path: ${execPathInResources}`);
       return execPathInResources;
-    }
-    else {
+    } else {
       throw new Error(`Executable not found in resources path: ${execPathInResources}`);
     }
   }
