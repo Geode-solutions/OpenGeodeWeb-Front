@@ -59,7 +59,16 @@ const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
     const item = dataStyleStore.meshCellsVertexAttributeLastItem(id.value, newValue);
-    const { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(id.value, newValue, item);
+    let { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(id.value, newValue, item);
+    if (minimum === undefined) {
+      minimum = 0;
+    }
+    if (maximum === undefined) {
+      maximum = 1;
+    }
+    if (colorMap === undefined) {
+      colorMap = "batlow";
+    }
     await applyBatchStyle(id.value, (targetId) =>
       dataStyleStore.setMeshCellsVertexAttribute(targetId, { name: newValue, item, minimum, maximum, colorMap }),
     );
@@ -70,7 +79,16 @@ const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
   set: async (newValue) => {
     const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
-    const { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(id.value, name, newValue);
+    let { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(id.value, name, newValue);
+    if (minimum === undefined) {
+      minimum = 0;
+    }
+    if (maximum === undefined) {
+      maximum = 1;
+    }
+    if (colorMap === undefined) {
+      colorMap = "batlow";
+    }
     await applyBatchStyle(id.value, (targetId) =>
       dataStyleStore.setMeshCellsVertexAttribute(targetId, { name, item: newValue, minimum, maximum, colorMap }),
     );
@@ -82,7 +100,10 @@ const vertex_attribute_range = computed({
   set: async (newValue) => {
     const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
     const item = dataStyleStore.meshCellsVertexAttributeItem(id.value);
-    const colorMap = dataStyleStore.meshCellsVertexAttributeColorMap(id.value);
+    let colorMap = dataStyleStore.meshCellsVertexAttributeColorMap(id.value);
+    if (colorMap === undefined) {
+      colorMap = "batlow";
+    }
     await applyBatchStyle(id.value, (targetId) =>
       dataStyleStore.setMeshCellsVertexAttribute(targetId, { name, item, minimum: newValue[0], maximum: newValue[1], colorMap }),
     );
@@ -94,7 +115,13 @@ const vertex_attribute_color_map = computed({
   set: async (newValue) => {
     const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
     const item = dataStyleStore.meshCellsVertexAttributeItem(id.value);
-    const [minimum, maximum] = dataStyleStore.meshCellsVertexAttributeRange(id.value);
+    let [minimum, maximum] = dataStyleStore.meshCellsVertexAttributeRange(id.value);
+    if (minimum === undefined) {
+      minimum = 0;
+    }
+    if (maximum === undefined) {
+      maximum = 1;
+    }
     await applyBatchStyle(id.value, (targetId) =>
       dataStyleStore.setMeshCellsVertexAttribute(targetId, { name, item, minimum, maximum, colorMap: newValue }),
     );

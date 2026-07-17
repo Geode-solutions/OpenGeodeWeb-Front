@@ -40,9 +40,21 @@ export function useMeshCellsStyle() {
     }
     if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
+      if (name === undefined) {
+        return;
+      }
       const item = meshCellsVertexAttributeStyle.meshCellsVertexAttributeItem(id);
-      const [minimum, maximum] = meshCellsVertexAttributeStyle.meshCellsVertexAttributeRange(id);
-      const colorMap = meshCellsVertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
+      let [minimum, maximum] = meshCellsVertexAttributeStyle.meshCellsVertexAttributeRange(id);
+      let colorMap = meshCellsVertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
+      if (minimum === undefined) {
+        minimum = 0;
+      }
+      if (maximum === undefined) {
+        maximum = 1;
+      }
+      if (colorMap === undefined) {
+        colorMap = "batlow";
+      }
       return meshCellsVertexAttributeStyle.setMeshCellsVertexAttribute(id, {
         name,
         item,
