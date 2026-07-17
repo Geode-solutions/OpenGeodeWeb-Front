@@ -18,10 +18,13 @@ function executablePath(execPath, execName) {
   const nodeEnv = process.env.NODE_ENV;
   console.log("[executablePath]", { execPath, execName, mode, nodeEnv, resourcesPath });
   if (mode === appMode.DESKTOP && nodeEnv === "production") {
-    const execPathInResources = path.join(resourcesPath, osExecutableName);
+    const execPathInResources = path.join(resourcesPath, execName, osExecutableName);
     if (fs.existsSync(execPathInResources)) {
       console.log(`[executablePath] Found executable in resources path: ${execPathInResources}`);
       return execPathInResources;
+    }
+    else {
+      throw new Error(`Executable not found in resources path: ${execPathInResources}`);
     }
   }
   const localOneFileExecPath = path.join(execPath, osExecutableName);
