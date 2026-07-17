@@ -26,7 +26,6 @@ function findExecutableInDir(baseDir, execName, osExecutableName) {
   console.log(`[executablePath] Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`);
   return undefined;
 }
-
 function executablePath(execPath, execName) {
   const osExecutableName = executableName(execName);
   const resourcesPath = process.env.RESOURCES_PATH;
@@ -35,14 +34,20 @@ function executablePath(execPath, execName) {
 
   console.log("[executablePath]", { execPath, execName, mode, nodeEnv, resourcesPath });
 
-  if (mode === appMode.DESKTOP && nodeEnv === "production") {
-    return findExecutableInDir(resourcesPath, execName, osExecutableName);
-  }
-  const found = findExecutableInDir(execPath, execName, osExecutableName);
-  if (found) {
-    return found;
+  const foundAtExecPath = findExecutableInDir(execPath, execName, osExecutableName);
+  if (foundAtExecPath) {
+    return foundAtExecPath;
   }
 
+  if (mode === appMode.DESKTOP && nodeEnv === "production") {
+    const foundInResources = findExecutableInDir(resourcesPath, execName, osExecutableName);
+    if (foundInResources) {
+      return foundInResources;
+    }
+    throw new Error(
+      `Executable not found in execPath (${execPath}) or resourcesPath (${resourcesPath}): ${osExecutableName}`,
+    );
+  }
 
   if (commandExistsSync(osExecutableName)) {
     console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
