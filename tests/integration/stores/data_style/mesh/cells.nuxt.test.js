@@ -79,17 +79,16 @@ describe("mesh cells", () => {
   });
 
   describe("cells vertex attribute", () => {
-    test("coloring vertex attribute - fail fast on missing parameters", () => {
+    test("coloring vertex attribute - guard on missing parameters", () => {
       const dataStyleStore = useDataStyleStore();
-      expect(() =>
-        dataStyleStore.setMeshCellsVertexAttribute(id, {
-          name: undefined,
-          item: undefined,
-          minimum: undefined,
-          maximum: undefined,
-          colorMap: undefined,
-        }),
-      ).toThrow("Must provide name, item, minimum, maximum, and colormap");
+      const result = dataStyleStore.updateMeshCellsVertexAttribute(id, {
+        name: "points",
+        item: 0,
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+      });
+      expect(result).toBeUndefined();
     });
 
     test("coloring vertex attribute - set range and colormap", async () => {

@@ -10,20 +10,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshCellsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
 
-function assertMeshCellsVertexAttributeColorConfig({ name, item, minimum, maximum, colorMap }) {
-  if (
-    name === undefined ||
-    item === undefined ||
-    minimum === undefined ||
-    maximum === undefined ||
-    colorMap === undefined
-  ) {
-    throw new Error("Must provide name, item, minimum, maximum, and colormap");
-  }
-}
-
 // oxlint-disable-next-line max-lines-per-function
-function useMeshCellsVertexAttributeStyle() {
+export function useMeshCellsVertexAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
@@ -97,18 +85,15 @@ function useMeshCellsVertexAttributeStyle() {
     return colorMap;
   }
 
-  function setMeshCellsVertexAttribute(
-    id,
-    {
-      name = meshCellsVertexAttributeName(id),
-      item = meshCellsVertexAttributeLastItem(id, name),
-      minimum = meshCellsVertexAttributeStoredConfig(id, name, item).minimum ?? 0,
-      maximum = meshCellsVertexAttributeStoredConfig(id, name, item).maximum ?? 1,
-      colorMap = meshCellsVertexAttributeStoredConfig(id, name, item).colorMap ?? "batlow",
-    } = {},
-  ) {
-    assertMeshCellsVertexAttributeColorConfig({ name, item, minimum, maximum, colorMap });
+  function updateMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
+    if (minimum !== undefined && maximum !== undefined && colorMap !== undefined) {
+      return setMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap });
+    }
+    mutateMeshCellsVertexStyle(id, { name, item });
+    setMeshCellsVertexAttributeStoredConfig(id, name, item, { minimum, maximum, colorMap });
+  }
 
+  function setMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsVertexAttributeSchemas.attribute;
     const params = { id, name, item, points, minimum, maximum };
@@ -131,8 +116,7 @@ function useMeshCellsVertexAttributeStyle() {
     meshCellsVertexAttributeColorMap,
     meshCellsVertexAttributeStoredConfig,
     meshCellsVertexAttributeLastItem,
+    updateMeshCellsVertexAttribute,
     setMeshCellsVertexAttribute,
   };
 }
-
-export { assertMeshCellsVertexAttributeColorConfig, useMeshCellsVertexAttributeStyle };

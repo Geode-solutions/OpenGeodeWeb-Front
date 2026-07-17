@@ -43,7 +43,16 @@ export function useMeshCellsStyle() {
       if (name === undefined) {
         return;
       }
-      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttribute(id, { name });
+      const item = meshCellsVertexAttributeStyle.meshCellsVertexAttributeItem(id);
+      const [minimum, maximum] = meshCellsVertexAttributeStyle.meshCellsVertexAttributeRange(id);
+      const colorMap = meshCellsVertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
+      return meshCellsVertexAttributeStyle.updateMeshCellsVertexAttribute(id, {
+        name,
+        item,
+        minimum,
+        maximum,
+        colorMap,
+      });
     }
     if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);

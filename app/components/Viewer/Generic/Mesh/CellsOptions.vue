@@ -58,8 +58,20 @@ const textures = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
+    const item = dataStyleStore.meshCellsVertexAttributeLastItem(id.value, newValue);
+    const { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(
+      id.value,
+      newValue,
+      item,
+    );
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, { name: newValue }),
+      dataStyleStore.updateMeshCellsVertexAttribute(targetId, {
+        name: newValue,
+        item,
+        minimum,
+        maximum,
+        colorMap,
+      }),
     );
     hybridViewerStore.remoteRender();
   },
@@ -67,8 +79,20 @@ const vertex_attribute_name = computed({
 const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
   set: async (newValue) => {
+    const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
+    const { minimum, maximum, colorMap } = dataStyleStore.meshCellsVertexAttributeStoredConfig(
+      id.value,
+      name,
+      newValue,
+    );
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, { item: newValue }),
+      dataStyleStore.updateMeshCellsVertexAttribute(targetId, {
+        name,
+        item: newValue,
+        minimum,
+        maximum,
+        colorMap,
+      }),
     );
     hybridViewerStore.remoteRender();
   },
@@ -76,10 +100,16 @@ const vertex_attribute_item = computed({
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
   set: async (newValue) => {
+    const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
+    const item = dataStyleStore.meshCellsVertexAttributeItem(id.value);
+    const colorMap = dataStyleStore.meshCellsVertexAttributeColorMap(id.value);
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, {
+      dataStyleStore.updateMeshCellsVertexAttribute(targetId, {
+        name,
+        item,
         minimum: newValue[0],
         maximum: newValue[1],
+        colorMap,
       }),
     );
     hybridViewerStore.remoteRender();
@@ -88,8 +118,15 @@ const vertex_attribute_range = computed({
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
+    const name = dataStyleStore.meshCellsVertexAttributeName(id.value);
+    const item = dataStyleStore.meshCellsVertexAttributeItem(id.value);
+    const [minimum, maximum] = dataStyleStore.meshCellsVertexAttributeRange(id.value);
     await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, {
+      dataStyleStore.updateMeshCellsVertexAttribute(targetId, {
+        name,
+        item,
+        minimum,
+        maximum,
         colorMap: newValue,
       }),
     );
