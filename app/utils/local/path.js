@@ -31,7 +31,7 @@ function findExecutableInDir(baseDir, execName, osExecutableName, shouldThrow) {
     );
   }
 
-  return null;
+  return undefined;
 }
 
 function executablePath(execPath, execName) {
