@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from "uuid";
 import { appMode } from "./app_mode.js";
 import { commandExistsSync } from "./scripts.js";
 
-
 function findExecutableInDir(baseDir, execName, osExecutableName, shouldThrow) {
   const oneFilePath = path.join(baseDir, osExecutableName);
   if (fs.existsSync(oneFilePath) && fs.statSync(oneFilePath).isFile()) {
@@ -26,9 +25,7 @@ function findExecutableInDir(baseDir, execName, osExecutableName, shouldThrow) {
   }
 
   if (shouldThrow) {
-    throw new Error(
-      `Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`
-    );
+    throw new Error(`Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`);
   }
 
   return null;
@@ -47,7 +44,9 @@ function executablePath(execPath, execName) {
   }
 
   const found = findExecutableInDir(execPath, execName, osExecutableName, false);
-  if (found) { return found; }
+  if (found) {
+    return found;
+  }
 
   if (commandExistsSync(osExecutableName)) {
     console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
