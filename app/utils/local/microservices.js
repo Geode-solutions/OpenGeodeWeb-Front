@@ -12,7 +12,7 @@ import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 import { executablePath } from "./path.js";
 
 const MILLISECONDS_PER_SECOND = 1000;
-const DEFAULT_TIMEOUT_SECONDS = 120;
+const DEFAULT_TIMEOUT_SECONDS = 45;
 
 async function runScript(
   execPath,

@@ -1,4 +1,4 @@
-import { HOVER_THROTTLE_MS, HOVER_TIMEOUT_MS } from "./hybrid_viewer_constants";
+import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./hybrid_viewer_constants";
 import { database } from "@ogw_internal/database/database.js";
 import { performHoverHighlight } from "./hybrid_viewer";
 
@@ -28,7 +28,7 @@ function createHoverHighlight(options) {
     clearHoverData,
   } = options;
 
-  return useThrottleFn((event) => {
+  return useDebounceFn((event) => {
     const containerElement = genericRenderWindow.value?.getContainer();
     let relativeMousePosition = { x: 0, y: 0 };
     if (containerElement) {
@@ -108,7 +108,7 @@ function createHoverHighlight(options) {
         }, HOVER_TIMEOUT_MS);
       },
     });
-  }, HOVER_THROTTLE_MS);
+  }, HOVER_DEBOUNCE_MS);
 }
 
 export { createClearHoverData, createHoverHighlight };

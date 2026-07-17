@@ -6,17 +6,12 @@ import { GoogleAuth } from "google-auth-library";
 import { ServicesClient } from "@google-cloud/run";
 
 // Local imports
-import { artifactImages, checkRecaptchaParams, requestConfig } from "@ogw_server/utils/cloud";
+import { artifactImages, requestConfig } from "@ogw_server/utils/cloud";
 
 export default defineEventHandler(async (event) => {
   try {
-    const { name, email, launch } = await readBody(event);
-    if (!checkRecaptchaParams(name, email, launch)) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ message: "INTERNAL_ERROR" }),
-      };
-    }
+    const { email } = await readBody(event);
+    console.log("[RUN CLOUD] Received request to create backend for email:", email);
     const credentials = JSON.parse(process.env.GOOGLE_CLOUD_KEY);
     const location = "europe-west9";
     const projectId = process.env.GOOGLE_CLOUD_PROJECT;
@@ -28,7 +23,7 @@ export default defineEventHandler(async (event) => {
     });
     const authClient = await auth.getClient();
     const [routerImage, backImage, viewerImage] = await artifactImages(parent, authClient);
-    const request = requestConfig(parent, routerImage, backImage, viewerImage);
+    const request = requestConfig(parent, routerImage, backImage, viewerImage, email);
     console.log({ request });
     const runClient = new ServicesClient({ authClient });
     const [operation] = await runClient.createService(request);
