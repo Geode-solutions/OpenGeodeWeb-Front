@@ -97,32 +97,24 @@ function useMeshCellsVertexAttributeStyle() {
     return colorMap;
   }
 
-  function setMeshCellsVertexAttribute(id, params = {}) {
-    const name = params.name ?? meshCellsVertexAttributeName(id);
-    const item =
-      params.item ??
-      (params.name === undefined
-        ? meshCellsVertexAttributeItem(id)
-        : meshCellsVertexAttributeLastItem(id, params.name));
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
-    let minimum = params.minimum ?? storedConfig.minimum;
-    let maximum = params.maximum ?? storedConfig.maximum;
-    let colorMap = params.colorMap ?? storedConfig.colorMap;
-    if (minimum === undefined) {
-      minimum = 0;
-    }
-    if (maximum === undefined) {
-      maximum = 1;
-    }
-    if (colorMap === undefined) {
-      colorMap = "batlow";
-    }
+  function setMeshCellsVertexAttribute(
+    id,
+    {
+      name = meshCellsVertexAttributeName(id),
+      item = meshCellsVertexAttributeLastItem(id, name),
+      minimum = meshCellsVertexAttributeStoredConfig(id, name, item).minimum ?? 0,
+      maximum = meshCellsVertexAttributeStoredConfig(id, name, item).maximum ?? 1,
+      colorMap = meshCellsVertexAttributeStoredConfig(id, name, item).colorMap ?? "batlow",
+    } = {},
+  ) {
     assertMeshCellsVertexAttributeColorConfig({ name, item, minimum, maximum, colorMap });
+
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsVertexAttributeSchemas.attribute;
-    const rpcParams = { id, name, item, points, minimum, maximum };
+    const params = { id, name, item, points, minimum, maximum };
+
     return viewerStore.request(
-      { schema, params: rpcParams },
+      { schema, params },
       {
         response_function: () => {
           mutateMeshCellsVertexStyle(id, { name, item });
