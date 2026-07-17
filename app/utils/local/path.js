@@ -23,7 +23,9 @@ function findExecutableInDir(baseDir, execName, osExecutableName) {
     console.log(`[executablePath] Found OneDir executable: ${oneDirPath}`);
     return oneDirPath;
   }
-  console.log(`[executablePath] Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`);
+  console.log(
+    `[executablePath] Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`,
+  );
   return undefined;
 }
 function executablePath(execPath, execName) {
