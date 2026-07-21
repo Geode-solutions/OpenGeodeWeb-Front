@@ -7,6 +7,8 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+import { setBackPort } from "../../server/utils/microservice-registry"
+
 const MILLISECONDS_IN_SECOND = 1000;
 const DEFAULT_PING_INTERVAL_SECONDS = 10;
 
@@ -100,6 +102,11 @@ export const useBackStore = defineStore("back", {
           response_function: (response) => {
             console.log(`[GEODE] Back launched on port ${response.port}`);
             this.default_local_port = response.port;
+            useRuntimeConfig().PORT_BACK = response.port;
+            setBackPort(response.port);
+            console.log(`[GEODE] Updated PORT_BACK to ${useRuntimeConfig().public.PORT_BACK}`);
+            console.log(`[GEODE] Updated PORT_BACK to ${useRuntimeConfig()}`);
+
           },
         },
       );
