@@ -7,8 +7,7 @@ import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshEdgesEdgeAttributeSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.edge;
+const meshEdgesEdgeAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.edge;
 
 function isMeshEdgesEdgeAttributeValid({ name, item, minimum, maximum, colorMap }) {
   return (

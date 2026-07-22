@@ -7,8 +7,7 @@ import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshCellsCellAttributeSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
+const meshCellsCellAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
 
 function isMeshCellsCellAttributeValid({ name, item, minimum, maximum, colorMap }) {
   return (
