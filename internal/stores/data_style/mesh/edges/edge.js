@@ -149,8 +149,6 @@ function useMeshEdgesEdgeAttributeStyle() {
     meshEdgesEdgeAttributeItem,
     meshEdgesEdgeAttributeRange,
     meshEdgesEdgeAttributeColorMap,
-    meshEdgesEdgeAttributeStoredConfig,
-    meshEdgesEdgeAttributeLastItem,
     setMeshEdgesEdgeAttribute,
     setMeshEdgesEdgeAttributeName,
     setMeshEdgesEdgeAttributeItem,

@@ -150,8 +150,6 @@ function useMeshPolygonsPolygonAttributeStyle() {
     meshPolygonsPolygonAttributeItem,
     meshPolygonsPolygonAttributeRange,
     meshPolygonsPolygonAttributeColorMap,
-    meshPolygonsPolygonAttributeStoredConfig,
-    meshPolygonsPolygonAttributeLastItem,
     setMeshPolygonsPolygonAttribute,
     setMeshPolygonsPolygonAttributeName,
     setMeshPolygonsPolygonAttributeItem,

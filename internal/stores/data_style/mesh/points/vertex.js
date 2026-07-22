@@ -146,8 +146,6 @@ function useMeshPointsVertexAttributeStyle() {
     meshPointsVertexAttributeItem,
     meshPointsVertexAttributeRange,
     meshPointsVertexAttributeColorMap,
-    meshPointsVertexAttributeStoredConfig,
-    meshPointsVertexAttributeLastItem,
     setMeshPointsVertexAttribute,
     setMeshPointsVertexAttributeName,
     setMeshPointsVertexAttributeItem,
