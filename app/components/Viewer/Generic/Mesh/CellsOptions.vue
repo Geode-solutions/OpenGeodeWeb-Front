@@ -3,7 +3,6 @@ import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/Cont
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
-import { isMeshCellsVertexAttributeValid } from "@ogw_internal/stores/data_style/mesh/cells/vertex";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -19,26 +18,6 @@ const { itemProps, btnImage, tooltip } = defineProps({
 });
 
 const id = toRef(() => itemProps.id);
-
-const vertex_attribute = computed(() => {
-  const range = dataStyleStore.meshCellsVertexAttributeRange(id.value);
-  return {
-    name: dataStyleStore.meshCellsVertexAttributeName(id.value),
-    item: dataStyleStore.meshCellsVertexAttributeItem(id.value),
-    minimum: range[0],
-    maximum: range[1],
-    colorMap: dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
-  };
-});
-
-async function applyVertexAttributeStyle(attribute) {
-  if (isMeshCellsVertexAttributeValid(attribute)) {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshCellsVertexAttribute(targetId, attribute),
-    );
-    hybridViewerStore.remoteRender();
-  }
-}
 
 const visibility = computed({
   get: () => dataStyleStore.meshCellsVisibility(id.value),
@@ -76,32 +55,41 @@ const textures = computed({
     hybridViewerStore.remoteRender();
   },
 });
+
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshCellsVertexAttributeName(id.value, newValue);
-    applyVertexAttributeStyle(vertex_attribute.value);
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshCellsVertexAttributeItem(id.value, newValue);
-    applyVertexAttributeStyle(vertex_attribute.value);
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshCellsVertexAttributeRange(id.value, newValue[0], newValue[1]);
-    applyVertexAttributeStyle(vertex_attribute.value);
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeRange(targetId, newValue[0], newValue[1]),
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshCellsVertexAttributeColorMap(id.value, newValue);
-    applyVertexAttributeStyle(vertex_attribute.value);
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeColorMap(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
   },
 });
 const cell_attribute_name = computed({
