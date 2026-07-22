@@ -12,8 +12,8 @@ export default defineNuxtConfig({
     public: {
       COMMAND_BACK: "opengeodeweb-back",
       COMMAND_VIEWER: "opengeodeweb-viewer",
-      PORT_BACK: undefined,
-      PORT_VIEWER: undefined,
+      BACK_BASE_URL: undefined,
+      VIEWER_BASE_URL: undefined,
       NUXT_ROOT_PATH: __dirname,
       MODE: process.env.MODE || "CLOUD",
       PROJECT: package_json.name,
