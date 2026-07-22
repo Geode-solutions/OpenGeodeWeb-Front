@@ -52,7 +52,7 @@ async function get_allowed_files() {
   toggle_loading();
 }
 
-//oxlint-disable-next-line no-top-level-await
+// oxlint-disable-next-line no-top-level-await
 await get_allowed_files();
 </script>
 

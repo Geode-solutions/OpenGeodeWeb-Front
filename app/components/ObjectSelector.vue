@@ -101,7 +101,7 @@ function set_geode_object(geode_object_type) {
     emit("increment_step");
   }
 }
-//oxlint-disable-next-line no-top-level-await
+// oxlint-disable-next-line no-top-level-await
 await get_allowed_objects();
 </script>
 

@@ -56,7 +56,7 @@ class Database extends BaseDatabase {
     }
   }
 }
-//oxlint-disable-next-line no-top-level-await
+// oxlint-disable-next-line no-top-level-await
 await Dexie.delete("Database");
 const databaseContainer = { instance: new Database() };
 databaseContainer.instance.clear();
