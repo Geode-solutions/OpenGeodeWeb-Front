@@ -16,6 +16,7 @@ const file_name = "test.og_rgd2d";
 const geode_object = "RegularGrid2D";
 const MINIMUM_RANGE = 10;
 const MAXIMUM_RANGE = 20;
+const ALTERNATE_RANGE_MAX = 100;
 const range = [MINIMUM_RANGE, MAXIMUM_RANGE];
 const default_vertex_attribute = { name: "points", item: 0, range };
 const default_cell_attribute = { name: "RGB_data", item: 0, range };
@@ -110,17 +111,76 @@ describe("mesh cells", () => {
       const schema = mesh_cells_schemas.attribute.vertex.attribute;
       const name = dataStyleStore.meshCellsVertexAttributeName(id);
       const item = dataStyleStore.meshCellsVertexAttributeItem(id);
-      expect(spy).toHaveBeenCalledWith(
-        {
-          schema,
-          params: expect.objectContaining({ id, name, item, minimum: range[0], maximum: range[1] }),
-        },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      expect(spy).toHaveBeenCalledWith({
+        schema,
+        params: expect.objectContaining({ id, name, item, minimum: range[0], maximum: range[1] }),
+      });
       expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual(range);
       expect(dataStyleStore.meshCellsVertexAttributeColorMap(id)).toBe(colorMap);
+    });
+
+    test("coloring vertex attribute - item switching", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const spy = vi.spyOn(viewerStore, "request");
+      const schema = mesh_cells_schemas.attribute.vertex.attribute;
+
+      await dataStyleStore.setMeshCellsVertexAttribute(id, {
+        name: "points",
+        item: 0,
+        minimum: 0,
+        maximum: MAXIMUM_RANGE,
+        colorMap: "batlow",
+      });
+      dataStyleStore.setMeshCellsVertexAttributeColorMap(id, "oleron");
+      dataStyleStore.setMeshCellsVertexAttributeRange(id, MINIMUM_RANGE, ALTERNATE_RANGE_MAX);
+      await dataStyleStore.setMeshCellsVertexAttribute(id, {
+        name: "points",
+        item: 0,
+        minimum: MINIMUM_RANGE,
+        maximum: ALTERNATE_RANGE_MAX,
+        colorMap: "oleron",
+      });
+
+      dataStyleStore.setMeshCellsVertexAttributeItem(id, 1);
+      await dataStyleStore.setMeshCellsVertexAttribute(id, {
+        name: "points",
+        item: 1,
+        minimum: 0,
+        maximum: MAXIMUM_RANGE,
+        colorMap: "berlin",
+      });
+      expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(1);
+      expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([0, MAXIMUM_RANGE]);
+      expect(spy).toHaveBeenCalledWith({
+        schema,
+        params: expect.objectContaining({
+          id,
+          name: "points",
+          item: 1,
+          minimum: 0,
+          maximum: MAXIMUM_RANGE,
+        }),
+      });
+    });
+
+    test("stored configs - restore previous item config", async () => {
+      const dataStyleStore = useDataStyleStore();
+      dataStyleStore.setMeshCellsVertexAttributeItem(id, 0);
+      const storedConfig0 = dataStyleStore.meshCellsVertexAttributeStoredConfig(id, "points", 0);
+      await dataStyleStore.setMeshCellsVertexAttribute(id, {
+        name: "points",
+        item: 0,
+        minimum: storedConfig0.minimum,
+        maximum: storedConfig0.maximum,
+        colorMap: storedConfig0.colorMap,
+      });
+      expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(0);
+      expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([
+        MINIMUM_RANGE,
+        ALTERNATE_RANGE_MAX,
+      ]);
+      expect(dataStyleStore.meshCellsVertexAttributeColorMap(id)).toBe("oleron");
     });
 
     test("stored configs - select polygon_arround_vertex", async () => {
@@ -129,7 +189,7 @@ describe("mesh cells", () => {
         name: "polygon_arround_vertex",
         item: 0,
         minimum: 0,
-        maximum: 10,
+        maximum: MINIMUM_RANGE,
         colorMap: "batlow",
       });
       expect(result).toBeInstanceOf(Promise);

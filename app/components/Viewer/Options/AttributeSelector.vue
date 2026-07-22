@@ -93,26 +93,13 @@ watch(
   },
 );
 
-watch(
-  () => [attributeName.value, attributes.value],
-  () => {
-    if (
-      attributeName.value &&
-      attributes.value.length > 0 &&
-      (attributeRange.value === undefined ||
-        attributeRange.value[0] === undefined ||
-        attributeColorMap.value === undefined)
-    ) {
-      resetRange();
-      if (attributeColorMap.value === undefined) {
-        attributeColorMap.value = "batlow";
-      }
-    }
-  },
-);
-
 watch([attributeName, attributeItem], () => {
-  resetRange();
+  if (attributeColorMap.value === undefined) {
+    attributeColorMap.value = "batlow";
+  }
+  if (!attributeRange.value || attributeRange.value[0] === undefined) {
+    resetRange();
+  }
 });
 </script>
 

@@ -20,23 +20,25 @@ const { itemProps, btnImage, tooltip } = defineProps({
 
 const id = toRef(() => itemProps.id);
 
-const vertex_attribute = computed({
-  get: () => ({
-    name: vertex_attribute_name.value,
-    item: vertex_attribute_item.value,
-    minimum: vertex_attribute_range.value[0],
-    maximum: vertex_attribute_range.value[1],
-    colorMap: vertex_attribute_color_map.value,
-  }),
-  set: async (newValue) => {
-    if (isMeshCellsVertexAttributeValid(newValue)) {
-      await applyBatchStyle(id.value, (targetId) =>
-        dataStyleStore.setMeshCellsVertexAttribute(targetId, newValue),
-      );
-      hybridViewerStore.remoteRender();
-    }
-  },
+const vertex_attribute = computed(() => {
+  const range = dataStyleStore.meshCellsVertexAttributeRange(id.value);
+  return {
+    name: dataStyleStore.meshCellsVertexAttributeName(id.value),
+    item: dataStyleStore.meshCellsVertexAttributeItem(id.value),
+    minimum: range[0],
+    maximum: range[1],
+    colorMap: dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
+  };
 });
+
+async function applyVertexAttributeStyle(attribute) {
+  if (isMeshCellsVertexAttributeValid(attribute)) {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttribute(targetId, attribute),
+    );
+    hybridViewerStore.remoteRender();
+  }
+}
 
 const visibility = computed({
   get: () => dataStyleStore.meshCellsVisibility(id.value),
@@ -76,30 +78,30 @@ const textures = computed({
 });
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
-  set: (newValue) => {
-    vertex_attribute.value = { ...vertex_attribute.value, name: newValue };
+  set: async (newValue) => {
+    await dataStyleStore.setMeshCellsVertexAttributeName(id.value, newValue);
+    applyVertexAttributeStyle(vertex_attribute.value);
   },
 });
 const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
-  set: (newValue) => {
-    vertex_attribute.value = { ...vertex_attribute.value, item: newValue };
+  set: async (newValue) => {
+    await dataStyleStore.setMeshCellsVertexAttributeItem(id.value, newValue);
+    applyVertexAttributeStyle(vertex_attribute.value);
   },
 });
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
-  set: (newValue) => {
-    vertex_attribute.value = {
-      ...vertex_attribute.value,
-      minimum: newValue[0],
-      maximum: newValue[1],
-    };
+  set: async (newValue) => {
+    await dataStyleStore.setMeshCellsVertexAttributeRange(id.value, newValue[0], newValue[1]);
+    applyVertexAttributeStyle(vertex_attribute.value);
   },
 });
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
-  set: (newValue) => {
-    vertex_attribute.value = { ...vertex_attribute.value, colorMap: newValue };
+  set: async (newValue) => {
+    await dataStyleStore.setMeshCellsVertexAttributeColorMap(id.value, newValue);
+    applyVertexAttributeStyle(vertex_attribute.value);
   },
 });
 const cell_attribute_name = computed({

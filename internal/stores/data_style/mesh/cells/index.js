@@ -33,25 +33,20 @@ export function useMeshCellsStyle() {
     console.log(setMeshCellsActiveColoring.name, { id }, type);
     if (type === "constant") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
-    }
-    if (type === "textures") {
+    } else if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id);
       return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
-    }
-    if (type === "vertex") {
+    } else if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
-      if (name === undefined) {
-        return;
-      }
       const item = meshCellsVertexAttributeStyle.meshCellsVertexAttributeItem(id);
       const [minimum, maximum] = meshCellsVertexAttributeStyle.meshCellsVertexAttributeRange(id);
       const colorMap = meshCellsVertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
       const vertex_attribute = { name, item, minimum, maximum, colorMap };
-      if (isMeshCellsVertexAttributeValid(vertex_attribute)) {
-        return meshCellsVertexAttributeStyle.setMeshCellsVertexAttribute(id, vertex_attribute);
+      if (!isMeshCellsVertexAttributeValid(vertex_attribute)) {
+        return;
       }
-    }
-    if (type === "cell") {
+      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttribute(id, vertex_attribute);
+    } else if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
       const item = meshCellsCellAttributeStyle.meshCellsCellAttributeItem(id);
       const { colorMap } = meshCellsCellAttributeStyle.meshCellsCellAttributeStoredConfig(
