@@ -72,6 +72,7 @@ async function missing_files() {
   toggle_loading();
 }
 
+// oxlint-disable-next-line no-top-level-await
 await missing_files();
 </script>
 
