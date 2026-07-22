@@ -60,6 +60,7 @@ const headers = [
   { title: "Name", align: "end", key: "name" },
 ];
 
+//oxlint disable-next-line no-top-level-await
 await get_crs_table();
 </script>
 

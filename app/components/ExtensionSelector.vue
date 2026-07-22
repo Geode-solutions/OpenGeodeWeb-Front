@@ -54,6 +54,7 @@ function update_values(output_geode_object, output_extension) {
   }
 }
 
+//oxlint disable-next-line no-top-level-await
 await get_output_file_extensions();
 </script>
 
