@@ -79,16 +79,25 @@ describe("mesh edges", () => {
         const viewerStore = useViewerStore();
 
         const spy = vi.spyOn(viewerStore, "request");
-        const vertex_attribute = { name: "vertex_attribute", item: 0 };
-        await dataStyleStore.setMeshEdgesVertexAttributeName(id, vertex_attribute.name);
-        const schema = mesh_edges_schemas.attribute.vertex.name;
-        const params = { id, name: vertex_attribute.name, item: vertex_attribute.item };
-        expect(spy).toHaveBeenCalledWith(
-          { schema, params },
-          {
-            response_function: expect.any(Function),
-          },
-        );
+        const vertex_attribute = {
+          name: default_vertex_attribute.name,
+          item: default_vertex_attribute.item,
+          minimum: range[0],
+          maximum: range[1],
+          colorMap: "batlow",
+        };
+        await dataStyleStore.setMeshEdgesVertexAttribute(id, vertex_attribute);
+        const schema = mesh_edges_schemas.attribute.vertex.attribute;
+        const points = getRGBPointsFromPreset(vertex_attribute.colorMap);
+        const params = {
+          id,
+          name: vertex_attribute.name,
+          item: vertex_attribute.item,
+          points,
+          minimum: vertex_attribute.minimum,
+          maximum: vertex_attribute.maximum,
+        };
+        expect(spy).toHaveBeenCalledWith({ schema, params });
         expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe(vertex_attribute.name);
         expect(viewerStore.status).toBe(Status.CONNECTED);
       });
@@ -105,9 +114,9 @@ describe("mesh edges", () => {
       test("stored configs 2 - set range and colormap", async () => {
         const dataStyleStore = useDataStyleStore();
         await dataStyleStore.setMeshEdgesVertexAttributeRange(id, range[0], range[1]);
-        await dataStyleStore.setMeshEdgesVertexAttributeColorMap(id, "discrete:budaS");
+        await dataStyleStore.setMeshEdgesVertexAttributeColorMap(id, "budaS");
         expect(dataStyleStore.meshEdgesVertexAttributeRange(id)).toStrictEqual(range);
-        expect(dataStyleStore.meshEdgesVertexAttributeColorMap(id)).toBe("discrete:budaS");
+        expect(dataStyleStore.meshEdgesVertexAttributeColorMap(id)).toBe("budaS");
       });
 
       test("stored configs 3 - select edges_around_vertex", async () => {
@@ -125,7 +134,7 @@ describe("mesh edges", () => {
         expect(dataStyleStore.meshEdgesVertexAttributeName(id)).toBe(vertex_attribute.name);
         expect(dataStyleStore.meshEdgesVertexAttributeItem(id)).toBe(vertex_attribute.item);
         expect(dataStyleStore.meshEdgesVertexAttributeRange(id)).toStrictEqual(range);
-        expect(dataStyleStore.meshEdgesVertexAttributeColorMap(id)).toBe("discrete:budaS");
+        expect(dataStyleStore.meshEdgesVertexAttributeColorMap(id)).toBe("budaS");
       });
     });
 
@@ -135,16 +144,25 @@ describe("mesh edges", () => {
         const viewerStore = useViewerStore();
 
         const spy = vi.spyOn(viewerStore, "request");
-        const edge_attribute = { name: "edge_attribute", item: 0 };
-        await dataStyleStore.setMeshEdgesEdgeAttributeName(id, edge_attribute.name);
-        const schema = mesh_edges_schemas.attribute.edge.name;
-        const params = { id, name: edge_attribute.name, item: edge_attribute.item };
-        expect(spy).toHaveBeenCalledWith(
-          { schema, params },
-          {
-            response_function: expect.any(Function),
-          },
-        );
+        const edge_attribute = {
+          name: default_edge_attribute.name,
+          item: default_edge_attribute.item,
+          minimum: range[0],
+          maximum: range[1],
+          colorMap: "batlow",
+        };
+        await dataStyleStore.setMeshEdgesEdgeAttribute(id, edge_attribute);
+        const schema = mesh_edges_schemas.attribute.edge.attribute;
+        const points = getRGBPointsFromPreset(edge_attribute.colorMap);
+        const params = {
+          id,
+          name: edge_attribute.name,
+          item: edge_attribute.item,
+          points,
+          minimum: edge_attribute.minimum,
+          maximum: edge_attribute.maximum,
+        };
+        expect(spy).toHaveBeenCalledWith({ schema, params });
         expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe(edge_attribute.name);
         expect(viewerStore.status).toBe(Status.CONNECTED);
       });
@@ -161,9 +179,9 @@ describe("mesh edges", () => {
       test("stored configs 2 - set range and colormap", async () => {
         const dataStyleStore = useDataStyleStore();
         await dataStyleStore.setMeshEdgesEdgeAttributeRange(id, range[0], range[1]);
-        await dataStyleStore.setMeshEdgesEdgeAttributeColorMap(id, "discrete:budaS");
+        await dataStyleStore.setMeshEdgesEdgeAttributeColorMap(id, "budaS");
         expect(dataStyleStore.meshEdgesEdgeAttributeRange(id)).toStrictEqual(range);
-        expect(dataStyleStore.meshEdgesEdgeAttributeColorMap(id)).toBe("discrete:budaS");
+        expect(dataStyleStore.meshEdgesEdgeAttributeColorMap(id)).toBe("budaS");
       });
 
       test("stored configs 3 - select cycle_id", async () => {
@@ -181,7 +199,7 @@ describe("mesh edges", () => {
         expect(dataStyleStore.meshEdgesEdgeAttributeName(id)).toBe(edge_attribute.name);
         expect(dataStyleStore.meshEdgesEdgeAttributeItem(id)).toBe(edge_attribute.item);
         expect(dataStyleStore.meshEdgesEdgeAttributeRange(id)).toStrictEqual(range);
-        expect(dataStyleStore.meshEdgesEdgeAttributeColorMap(id)).toBe("discrete:budaS");
+        expect(dataStyleStore.meshEdgesEdgeAttributeColorMap(id)).toBe("budaS");
       });
     });
 

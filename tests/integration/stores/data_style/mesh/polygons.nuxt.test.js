@@ -81,18 +81,27 @@ describe("mesh polygons", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const spy = vi.spyOn(viewerStore, "request");
-      const vertex_attribute = { name: "points", item: 0 };
-      const result = dataStyleStore.setMeshPolygonsVertexAttributeName(id, vertex_attribute.name);
+      const vertex_attribute = {
+        name: default_vertex_attribute.name,
+        item: default_vertex_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "batlow",
+      };
+      const result = dataStyleStore.setMeshPolygonsVertexAttribute(id, vertex_attribute);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      const schema = mesh_polygons_schemas.attribute.vertex.name;
-      const params = { id, name: vertex_attribute.name, item: vertex_attribute.item };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      const schema = mesh_polygons_schemas.attribute.vertex.attribute;
+      const points = getRGBPointsFromPreset(vertex_attribute.colorMap);
+      const params = {
+        id,
+        name: vertex_attribute.name,
+        item: vertex_attribute.item,
+        points,
+        minimum: vertex_attribute.minimum,
+        maximum: vertex_attribute.maximum,
+      };
+      expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
@@ -109,9 +118,9 @@ describe("mesh polygons", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPolygonsVertexAttributeRange(id, range[0], range[1]);
-      await dataStyleStore.setMeshPolygonsVertexAttributeColorMap(id, "discrete:budaS");
+      await dataStyleStore.setMeshPolygonsVertexAttributeColorMap(id, "budaS");
       expect(dataStyleStore.meshPolygonsVertexAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolygonsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPolygonsVertexAttributeColorMap(id)).toBe("budaS");
     });
 
     test("stored configs 3 - select polygon_arround_vertex", async () => {
@@ -129,7 +138,7 @@ describe("mesh polygons", () => {
       expect(dataStyleStore.meshPolygonsVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(dataStyleStore.meshPolygonsVertexAttributeItem(id)).toBe(vertex_attribute.item);
       expect(dataStyleStore.meshPolygonsVertexAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolygonsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPolygonsVertexAttributeColorMap(id)).toBe("budaS");
     });
   });
 
@@ -138,18 +147,27 @@ describe("mesh polygons", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const spy = vi.spyOn(viewerStore, "request");
-      const polygon_attribute = { name: "test_attribute", item: 0 };
-      const result = dataStyleStore.setMeshPolygonsPolygonAttributeName(id, polygon_attribute.name);
+      const polygon_attribute = {
+        name: default_polygon_attribute.name,
+        item: default_polygon_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "batlow",
+      };
+      const result = dataStyleStore.setMeshPolygonsPolygonAttribute(id, polygon_attribute);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      const schema = mesh_polygons_schemas.attribute.polygon.name;
-      const params = { id, name: polygon_attribute.name, item: polygon_attribute.item };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      const schema = mesh_polygons_schemas.attribute.polygon.attribute;
+      const points = getRGBPointsFromPreset(polygon_attribute.colorMap);
+      const params = {
+        id,
+        name: polygon_attribute.name,
+        item: polygon_attribute.item,
+        points,
+        minimum: polygon_attribute.minimum,
+        maximum: polygon_attribute.maximum,
+      };
+      expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe(polygon_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
@@ -166,9 +184,9 @@ describe("mesh polygons", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPolygonsPolygonAttributeRange(id, range[0], range[1]);
-      await dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(id, "discrete:budaS");
+      await dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(id, "budaS");
       expect(dataStyleStore.meshPolygonsPolygonAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPolygonsPolygonAttributeColorMap(id)).toBe("budaS");
     });
 
     test("stored configs 3 - select dummy_attribute", async () => {
@@ -186,7 +204,7 @@ describe("mesh polygons", () => {
       expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe(polygon_attribute.name);
       expect(dataStyleStore.meshPolygonsPolygonAttributeItem(id)).toBe(polygon_attribute.item);
       expect(dataStyleStore.meshPolygonsPolygonAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPolygonsPolygonAttributeColorMap(id)).toBe("budaS");
     });
   });
 

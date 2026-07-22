@@ -1,11 +1,14 @@
 // Third party imports
 
 // Local imports
+import {
+  isMeshPolygonsPolygonAttributeValid,
+  useMeshPolygonsPolygonAttributeStyle,
+} from "./polygon";
+import { isMeshPolygonsVertexAttributeValid, useMeshPolygonsVertexAttributeStyle } from "./vertex";
 import { useMeshPolygonsColorStyle } from "./color";
 import { useMeshPolygonsCommonStyle } from "./common";
-import { useMeshPolygonsPolygonAttributeStyle } from "./polygon";
 import { useMeshPolygonsTexturesStyle } from "./textures";
-import { useMeshPolygonsVertexAttributeStyle } from "./vertex";
 import { useMeshPolygonsVisibilityStyle } from "./visibility";
 
 // Local constants
@@ -42,25 +45,29 @@ function useMeshPolygonsColoringStyle() {
     if (type === "vertex") {
       const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
       const item = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeItem(id);
-      const { colorMap } = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeStoredConfig(
-        id,
-        name,
-        item,
-      );
-      return Promise.all([
-        meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeName(id, name),
-        meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttributeColorMap(id, colorMap),
-      ]);
+      const [minimum, maximum] =
+        meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeRange(id);
+      const colorMap = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeColorMap(id);
+      const vertex_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshPolygonsVertexAttributeValid(vertex_attribute)) {
+        return;
+      }
+      return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttribute(id, vertex_attribute);
     }
     if (type === "polygon") {
       const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
       const item = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeItem(id);
-      const { colorMap } =
-        meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeStoredConfig(id, name, item);
-      return Promise.all([
-        meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeName(id, name),
-        meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttributeColorMap(id, colorMap),
-      ]);
+      const [minimum, maximum] =
+        meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeRange(id);
+      const colorMap = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeColorMap(id);
+      const polygon_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshPolygonsPolygonAttributeValid(polygon_attribute)) {
+        return;
+      }
+      return meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttribute(
+        id,
+        polygon_attribute,
+      );
     }
     throw new Error(`Unknown mesh polygons coloring type: ${type}`);
   }

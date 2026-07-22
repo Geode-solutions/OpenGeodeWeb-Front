@@ -118,16 +118,25 @@ describe("mesh polyhedra", () => {
       const viewerStore = useViewerStore();
 
       const spy = vi.spyOn(viewerStore, "request");
-      const vertex_attribute = { name: "toto_on_vertices", item: 0 };
-      await dataStyleStore.setMeshPolyhedraVertexAttributeName(id, vertex_attribute.name);
-      const schema = mesh_polyhedra_schemas.attribute.vertex.name;
-      const params = { id, name: vertex_attribute.name, item: vertex_attribute.item };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      const vertex_attribute = {
+        name: default_vertex_attribute.name,
+        item: default_vertex_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "batlow",
+      };
+      await dataStyleStore.setMeshPolyhedraVertexAttribute(id, vertex_attribute);
+      const schema = mesh_polyhedra_schemas.attribute.vertex.attribute;
+      const points = getRGBPointsFromPreset(vertex_attribute.colorMap);
+      const params = {
+        id,
+        name: vertex_attribute.name,
+        item: vertex_attribute.item,
+        points,
+        minimum: vertex_attribute.minimum,
+        maximum: vertex_attribute.maximum,
+      };
+      expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
@@ -144,9 +153,9 @@ describe("mesh polyhedra", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPolyhedraVertexAttributeRange(id, range[0], range[1]);
-      await dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(id, "discrete:budaS");
+      await dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(id, "budaS");
       expect(dataStyleStore.meshPolyhedraVertexAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolyhedraVertexAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPolyhedraVertexAttributeColorMap(id)).toBe("budaS");
     });
 
     test("stored configs 3 - select polyhedra_around_vertex", async () => {
@@ -164,7 +173,7 @@ describe("mesh polyhedra", () => {
       expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(dataStyleStore.meshPolyhedraVertexAttributeItem(id)).toBe(vertex_attribute.item);
       expect(dataStyleStore.meshPolyhedraVertexAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolyhedraVertexAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPolyhedraVertexAttributeColorMap(id)).toBe("budaS");
     });
   });
 
@@ -174,16 +183,25 @@ describe("mesh polyhedra", () => {
       const viewerStore = useViewerStore();
 
       const spy = vi.spyOn(viewerStore, "request");
-      const polyhedron_attribute = { name: "toto_on_polyhedra", item: 0 };
-      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(id, polyhedron_attribute.name);
-      const schema = mesh_polyhedra_schemas.attribute.polyhedron.name;
-      const params = { id, name: polyhedron_attribute.name, item: polyhedron_attribute.item };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      const polyhedron_attribute = {
+        name: default_polyhedron_attribute.name,
+        item: default_polyhedron_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "batlow",
+      };
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttribute(id, polyhedron_attribute);
+      const schema = mesh_polyhedra_schemas.attribute.polyhedron.attribute;
+      const points = getRGBPointsFromPreset(polyhedron_attribute.colorMap);
+      const params = {
+        id,
+        name: polyhedron_attribute.name,
+        item: polyhedron_attribute.item,
+        points,
+        minimum: polyhedron_attribute.minimum,
+        maximum: polyhedron_attribute.maximum,
+      };
+      expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe(
         polyhedron_attribute.name,
       );
@@ -206,9 +224,9 @@ describe("mesh polyhedra", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(id, range[0], range[1]);
-      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(id, "discrete:budaS");
+      await dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(id, "budaS");
       expect(dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id)).toBe("budaS");
     });
 
     test("stored configs 3 - select tetrahedron_adjacents", async () => {
@@ -230,7 +248,7 @@ describe("mesh polyhedra", () => {
         polyhedron_attribute.item,
       );
       expect(dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id)).toBe("budaS");
     });
   });
 

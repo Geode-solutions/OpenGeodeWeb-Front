@@ -1,8 +1,8 @@
 // Third party imports
 
 // Local imports
+import { isMeshCellsCellAttributeValid, useMeshCellsCellAttributeStyle } from "./cell";
 import { isMeshCellsVertexAttributeValid, useMeshCellsVertexAttributeStyle } from "./vertex";
-import { useMeshCellsCellAttributeStyle } from "./cell";
 import { useMeshCellsColorStyle } from "./color";
 import { useMeshCellsCommonStyle } from "./common";
 import { useMeshCellsTexturesStyle } from "./textures";
@@ -30,7 +30,6 @@ export function useMeshCellsStyle() {
     await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: { active: type },
     });
-    console.log(setMeshCellsActiveColoring.name, { id }, type);
     if (type === "constant") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
     } else if (type === "textures") {
@@ -49,15 +48,13 @@ export function useMeshCellsStyle() {
     } else if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
       const item = meshCellsCellAttributeStyle.meshCellsCellAttributeItem(id);
-      const { colorMap } = meshCellsCellAttributeStyle.meshCellsCellAttributeStoredConfig(
-        id,
-        name,
-        item,
-      );
-      return Promise.all([
-        meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name),
-        meshCellsCellAttributeStyle.setMeshCellsCellAttributeColorMap(id, colorMap),
-      ]);
+      const [minimum, maximum] = meshCellsCellAttributeStyle.meshCellsCellAttributeRange(id);
+      const colorMap = meshCellsCellAttributeStyle.meshCellsCellAttributeColorMap(id);
+      const cell_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshCellsCellAttributeValid(cell_attribute)) {
+        return;
+      }
+      return meshCellsCellAttributeStyle.setMeshCellsCellAttribute(id, cell_attribute);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }

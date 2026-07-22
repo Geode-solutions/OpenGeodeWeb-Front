@@ -224,18 +224,27 @@ describe("mesh cells", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const spy = vi.spyOn(viewerStore, "request");
-      const cell_attribute = { name: "RGB_data", item: 0 };
-      const result = dataStyleStore.setMeshCellsCellAttributeName(id, cell_attribute.name);
+      const cell_attribute = {
+        name: default_cell_attribute.name,
+        item: default_cell_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "batlow",
+      };
+      const result = dataStyleStore.setMeshCellsCellAttribute(id, cell_attribute);
       expect(result).toBeInstanceOf(Promise);
       await result;
-      const schema = mesh_cells_schemas.attribute.cell.name;
-      const params = { id, name: cell_attribute.name, item: cell_attribute.item };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      const schema = mesh_cells_schemas.attribute.cell.attribute;
+      const points = getRGBPointsFromPreset(cell_attribute.colorMap);
+      const params = {
+        id,
+        name: cell_attribute.name,
+        item: cell_attribute.item,
+        points,
+        minimum: cell_attribute.minimum,
+        maximum: cell_attribute.maximum,
+      };
+      expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe(cell_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });

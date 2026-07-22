@@ -1,11 +1,16 @@
 // Third party imports
 
 // Local imports
-
+import {
+  isMeshPolyhedraPolyhedronAttributeValid,
+  useMeshPolyhedraPolyhedronAttributeStyle,
+} from "./polyhedron";
+import {
+  isMeshPolyhedraVertexAttributeValid,
+  useMeshPolyhedraVertexAttributeStyle,
+} from "./vertex";
 import { useMeshPolyhedraColorStyle } from "./color";
 import { useMeshPolyhedraCommonStyle } from "./common";
-import { useMeshPolyhedraPolyhedronAttributeStyle } from "./polyhedron";
-import { useMeshPolyhedraVertexAttributeStyle } from "./vertex";
 import { useMeshPolyhedraVisibilityStyle } from "./visibility";
 
 // Local constants
@@ -29,7 +34,6 @@ export function useMeshPolyhedraStyle() {
     await meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
       coloring: { active: type },
     });
-    console.log(setMeshPolyhedraActiveColoring.name, { id }, type);
     if (type === "constant") {
       return meshPolyhedraColorStyle.setMeshPolyhedraColor(
         id,
@@ -39,29 +43,33 @@ export function useMeshPolyhedraStyle() {
     if (type === "vertex") {
       const name = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
       const item = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeItem(id);
-      const { colorMap } =
-        meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeStoredConfig(id, name, item);
-      return Promise.all([
-        meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeName(id, name),
-        meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttributeColorMap(id, colorMap),
-      ]);
+      const [minimum, maximum] =
+        meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeRange(id);
+      const colorMap = meshPolyhedraVertexAttributeStyle.meshPolyhedraVertexAttributeColorMap(id);
+      const vertex_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshPolyhedraVertexAttributeValid(vertex_attribute)) {
+        return;
+      }
+      return meshPolyhedraVertexAttributeStyle.setMeshPolyhedraVertexAttribute(
+        id,
+        vertex_attribute,
+      );
     }
     if (type === "polyhedron") {
       const name = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
       const item = meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeItem(id);
-      const { colorMap } =
-        meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeStoredConfig(
-          id,
-          name,
-          item,
-        );
-      return Promise.all([
-        meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeName(id, name),
-        meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttributeColorMap(
-          id,
-          colorMap,
-        ),
-      ]);
+      const [minimum, maximum] =
+        meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeRange(id);
+      const colorMap =
+        meshPolyhedraPolyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeColorMap(id);
+      const polyhedron_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshPolyhedraPolyhedronAttributeValid(polyhedron_attribute)) {
+        return;
+      }
+      return meshPolyhedraPolyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttribute(
+        id,
+        polyhedron_attribute,
+      );
     }
     throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
   }

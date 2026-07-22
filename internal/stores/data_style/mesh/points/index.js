@@ -1,10 +1,10 @@
 // Third party imports
 
 // Local imports
+import { isMeshPointsVertexAttributeValid, useMeshPointsVertexAttributeStyle } from "./vertex";
 import { useMeshPointsColorStyle } from "./color";
 import { useMeshPointsCommonStyle } from "./common";
 import { useMeshPointsSizeStyle } from "./size";
-import { useMeshPointsVertexAttributeStyle } from "./vertex";
 import { useMeshPointsVisibilityStyle } from "./visibility";
 
 // Local constants
@@ -32,15 +32,13 @@ function useMeshPointsColoringStyle() {
     if (type === "vertex") {
       const name = meshPointsVertexAttributeStyle.meshPointsVertexAttributeName(id);
       const item = meshPointsVertexAttributeStyle.meshPointsVertexAttributeItem(id);
-      const { colorMap } = meshPointsVertexAttributeStyle.meshPointsVertexAttributeStoredConfig(
-        id,
-        name,
-        item,
-      );
-      return Promise.all([
-        meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeName(id, name),
-        meshPointsVertexAttributeStyle.setMeshPointsVertexAttributeColorMap(id, colorMap),
-      ]);
+      const [minimum, maximum] = meshPointsVertexAttributeStyle.meshPointsVertexAttributeRange(id);
+      const colorMap = meshPointsVertexAttributeStyle.meshPointsVertexAttributeColorMap(id);
+      const vertex_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshPointsVertexAttributeValid(vertex_attribute)) {
+        return;
+      }
+      return meshPointsVertexAttributeStyle.setMeshPointsVertexAttribute(id, vertex_attribute);
     }
     throw new Error(`Unknown mesh points coloring type: ${type}`);
   }

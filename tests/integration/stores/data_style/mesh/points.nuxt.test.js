@@ -128,16 +128,25 @@ describe("mesh points", () => {
       const viewerStore = useViewerStore();
 
       const spy = vi.spyOn(viewerStore, "request");
-      const vertex_attribute = { name: "points", item: 0 };
-      await dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name);
-      const schema = mesh_points_schemas.attribute.vertex.name;
-      const params = { id, name: vertex_attribute.name, item: vertex_attribute.item };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      const vertex_attribute = {
+        name: default_vertex_attribute.name,
+        item: default_vertex_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "batlow",
+      };
+      await dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute);
+      const schema = mesh_points_schemas.attribute.vertex.attribute;
+      const points = getRGBPointsFromPreset(vertex_attribute.colorMap);
+      const params = {
+        id,
+        name: vertex_attribute.name,
+        item: vertex_attribute.item,
+        points,
+        minimum: vertex_attribute.minimum,
+        maximum: vertex_attribute.maximum,
+      };
+      expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
@@ -154,9 +163,9 @@ describe("mesh points", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshPointsVertexAttributeRange(id, range[0], range[1]);
-      await dataStyleStore.setMeshPointsVertexAttributeColorMap(id, "discrete:budaS");
+      await dataStyleStore.setMeshPointsVertexAttributeColorMap(id, "budaS");
       expect(dataStyleStore.meshPointsVertexAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPointsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPointsVertexAttributeColorMap(id)).toBe("budaS");
     });
 
     test("stored configs 3 - select unique_vertices", async () => {
@@ -174,7 +183,7 @@ describe("mesh points", () => {
       expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(dataStyleStore.meshPointsVertexAttributeItem(id)).toBe(vertex_attribute.item);
       expect(dataStyleStore.meshPointsVertexAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPointsVertexAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshPointsVertexAttributeColorMap(id)).toBe("budaS");
     });
   });
 

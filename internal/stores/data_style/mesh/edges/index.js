@@ -1,10 +1,10 @@
 // Third party imports
 
 // Local imports
+import { isMeshEdgesEdgeAttributeValid, useMeshEdgesEdgeAttributeStyle } from "./edge";
+import { isMeshEdgesVertexAttributeValid, useMeshEdgesVertexAttributeStyle } from "./vertex";
 import { useMeshEdgesColorStyle } from "./color";
 import { useMeshEdgesCommonStyle } from "./common";
-import { useMeshEdgesEdgeAttributeStyle } from "./edge";
-import { useMeshEdgesVertexAttributeStyle } from "./vertex";
 import { useMeshEdgesVisibilityStyle } from "./visibility";
 import { useMeshEdgesWidthStyle } from "./width";
 
@@ -13,14 +13,14 @@ import { useMeshEdgesWidthStyle } from "./width";
 export function useMeshEdgesStyle() {
   const meshEdgesVisibility = useMeshEdgesVisibilityStyle();
   const meshEdgesColorStyle = useMeshEdgesColorStyle();
-
-  function meshEdgesColoring(id) {
-    return meshEdgesCommonStyle.meshEdgesColoring(id);
-  }
   const meshEdgesWidthStyle = useMeshEdgesWidthStyle();
   const meshEdgesVertexAttributeStyle = useMeshEdgesVertexAttributeStyle();
   const meshEdgesEdgeAttributeStyle = useMeshEdgesEdgeAttributeStyle();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
+
+  function meshEdgesColoring(id) {
+    return meshEdgesCommonStyle.meshEdgesColoring(id);
+  }
 
   function meshEdgesActiveColoring(id) {
     return meshEdgesColoring(id).active;
@@ -36,28 +36,24 @@ export function useMeshEdgesStyle() {
     if (type === "vertex") {
       const name = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeName(id);
       const item = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeItem(id);
-      const { colorMap } = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeStoredConfig(
-        id,
-        name,
-        item,
-      );
-      return Promise.all([
-        meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeName(id, name),
-        meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttributeColorMap(id, colorMap),
-      ]);
+      const [minimum, maximum] = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeRange(id);
+      const colorMap = meshEdgesVertexAttributeStyle.meshEdgesVertexAttributeColorMap(id);
+      const vertex_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshEdgesVertexAttributeValid(vertex_attribute)) {
+        return;
+      }
+      return meshEdgesVertexAttributeStyle.setMeshEdgesVertexAttribute(id, vertex_attribute);
     }
     if (type === "edge") {
       const name = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeName(id);
       const item = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeItem(id);
-      const { colorMap } = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeStoredConfig(
-        id,
-        name,
-        item,
-      );
-      return Promise.all([
-        meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeName(id, name),
-        meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttributeColorMap(id, colorMap),
-      ]);
+      const [minimum, maximum] = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeRange(id);
+      const colorMap = meshEdgesEdgeAttributeStyle.meshEdgesEdgeAttributeColorMap(id);
+      const edge_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshEdgesEdgeAttributeValid(edge_attribute)) {
+        return;
+      }
+      return meshEdgesEdgeAttributeStyle.setMeshEdgesEdgeAttribute(id, edge_attribute);
     }
     throw new Error(`Unknown mesh edges coloring type: ${type}`);
   }

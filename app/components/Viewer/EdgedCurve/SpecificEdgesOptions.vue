@@ -128,6 +128,7 @@ const edge_attribute_color_map = computed({
   },
 });
 </script>
+
 <template>
   <ViewerContextMenuItem
     data-testid="meshEdgesMenu"
