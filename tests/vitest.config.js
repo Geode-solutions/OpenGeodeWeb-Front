@@ -25,7 +25,7 @@ export default defineConfig({
   test: {
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
-      //oxlint disable-next-line no-top-level-await
+      //oxlint-disable-next-line no-top-level-await
       await defineVitestProject({
         test: {
           name: "unit",
@@ -42,7 +42,7 @@ export default defineConfig({
           retry: globalRetry,
         },
       }),
-      //oxlint disable-next-line no-top-level-await
+      //oxlint-disable-next-line no-top-level-await
       await defineVitestProject({
         test: {
           name: "integration",
