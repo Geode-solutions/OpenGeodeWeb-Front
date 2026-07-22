@@ -36,6 +36,7 @@ function artifactImages(parent, authClient) {
 }
 
 function sanitizeLabelValue(label) {
+  console.log("label", label);
   const maxLabelLength = 63;
   return label
     .toLowerCase()
