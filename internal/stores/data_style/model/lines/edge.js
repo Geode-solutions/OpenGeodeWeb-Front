@@ -124,7 +124,10 @@ function useModelLinesEdgeAttribute() {
   async function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
-    await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, { minimum, maximum });
+    await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, {
+      minimum,
+      maximum,
+    });
     return applyEdgeAttribute(modelId, lineIds);
   }
 

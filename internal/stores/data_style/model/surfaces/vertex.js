@@ -141,7 +141,9 @@ function useModelSurfacesVertexAttribute() {
   async function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
-    await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
+    await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      colorMap,
+    });
     return applyVertexAttribute(modelId, surfaceIds);
   }
 

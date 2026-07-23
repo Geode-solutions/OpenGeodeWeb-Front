@@ -125,7 +125,10 @@ function useModelLinesVertexAttribute() {
   async function setModelLinesVertexAttributeRange(modelId, lineIds, minimum, maximum) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
-    await setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, { minimum, maximum });
+    await setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
+      minimum,
+      maximum,
+    });
     return applyVertexAttribute(modelId, lineIds);
   }
 

@@ -125,7 +125,10 @@ function useModelBlocksVertexAttribute() {
   async function setModelBlocksVertexAttributeRange(modelId, blockIds, minimum, maximum) {
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
-    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, { minimum, maximum });
+    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
+      minimum,
+      maximum,
+    });
     return applyVertexAttribute(modelId, blockIds);
   }
 

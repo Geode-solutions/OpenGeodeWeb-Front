@@ -141,7 +141,9 @@ function useModelSurfacesPolygonAttribute() {
   async function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
+    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      colorMap,
+    });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 

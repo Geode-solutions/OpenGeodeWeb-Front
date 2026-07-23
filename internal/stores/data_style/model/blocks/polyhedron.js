@@ -141,7 +141,9 @@ function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
-    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, { colorMap });
+    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+      colorMap,
+    });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
 
