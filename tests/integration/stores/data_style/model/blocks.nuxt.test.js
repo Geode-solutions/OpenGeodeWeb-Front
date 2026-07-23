@@ -94,7 +94,24 @@ describe("model blocks", () => {
     });
   });
   describe("blocks vertex attribute", () => {
-    test("coloring vertex attribute", async () => {
+    test("coloring vertex attribute — no request until range+colormap set", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
+      await sleep(SLEEP_MS);
+      // No request sent yet since minimum/maximum/colorMap are still undefined
+      expect(spy).not.toHaveBeenCalled();
+      for (const block_id of block_ids) {
+        expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex attribute — request sent when all params defined", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
@@ -102,27 +119,27 @@ describe("model blocks", () => {
       const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
-      const result = dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
-      expect(result).toBeInstanceOf(Promise);
-      await result;
-      await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_blocks_schemas.attribute.vertex.name,
-          params: {
-            id,
-            block_ids: block_viewer_ids,
-            name: "points",
-            item: 0,
-          },
-        },
-        {
-          response_function: expect.any(Function),
-        },
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
+      await dataStyleStore.setModelBlocksVertexAttributeRange(
+        id,
+        block_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
       );
-      for (const block_id of block_ids) {
-        expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
-      }
+      await dataStyleStore.setModelBlocksVertexAttributeColorMap(id, block_ids, "discrete:budaS");
+      await sleep(SLEEP_MS);
+      const [lastCall] = spy.mock.calls.slice(-1);
+      expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.vertex.attribute);
+      expect(lastCall[0].params).toStrictEqual(
+        expect.objectContaining({
+          id,
+          block_ids: block_viewer_ids,
+          name: "points",
+          item: 0,
+          minimum: MINIMUM_RANGE,
+          maximum: MAXIMUM_RANGE,
+        }),
+      );
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
@@ -189,12 +206,11 @@ describe("model blocks", () => {
   });
 
   describe("blocks polyhedron attribute", () => {
-    test("coloring polyhedron attribute", async () => {
+    test("coloring polyhedron attribute — no request until range+colormap set", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       const result = dataStyleStore.setModelBlocksPolyhedronAttributeName(
@@ -205,25 +221,49 @@ describe("model blocks", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_blocks_schemas.attribute.polyhedron.name,
-          params: {
-            id,
-            block_ids: block_viewer_ids,
-            name: "test_attribute",
-            item: 0,
-          },
-        },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      // No request sent yet since minimum/maximum/colorMap are still undefined
+      expect(spy).not.toHaveBeenCalled();
       for (const block_id of block_ids) {
         expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
           "test_attribute",
         );
       }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring polyhedron attribute — request sent when all params defined", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(id, block_ids, "test_attribute");
+      await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
+        id,
+        block_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
+        id,
+        block_ids,
+        "discrete:budaS",
+      );
+      await sleep(SLEEP_MS);
+      const [lastCall] = spy.mock.calls.slice(-1);
+      expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.polyhedron.attribute);
+      expect(lastCall[0].params).toStrictEqual(
+        expect.objectContaining({
+          id,
+          block_ids: block_viewer_ids,
+          name: "test_attribute",
+          item: 0,
+          minimum: MINIMUM_RANGE,
+          maximum: MAXIMUM_RANGE,
+        }),
+      );
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 

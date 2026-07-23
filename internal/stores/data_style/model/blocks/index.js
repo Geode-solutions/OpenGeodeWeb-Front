@@ -73,6 +73,7 @@ export function useModelBlocksStyle() {
           attributeGroups[attributeGroupKey] = {
             activeColoring,
             name,
+            item,
             minimum,
             maximum,
             colorMap,
@@ -90,30 +91,13 @@ export function useModelBlocksStyle() {
       ...Object.values(colorGroups).map(({ activeColoring, color, blocks_ids: ids }) =>
         modelColorStyle.setModelBlocksColor(modelId, ids, color, activeColoring),
       ),
-      ...Object.values(attributeGroups).flatMap(
-        ({ activeColoring, name, minimum, maximum, colorMap, blocks_ids: ids }) => {
+      ...Object.values(attributeGroups).map(
+        ({ activeColoring, name, item, minimum, maximum, colorMap, blocks_ids: ids }) => {
           const isVertex = activeColoring === "vertex";
-          const attributeStyle = isVertex
-            ? modelBlocksVertexAttribute
-            : modelBlocksPolyhedronAttribute;
-          const setAttributeName = isVertex
-            ? attributeStyle.setModelBlocksVertexAttributeName
-            : attributeStyle.setModelBlocksPolyhedronAttributeName;
-          const setAttributeRange = isVertex
-            ? attributeStyle.setModelBlocksVertexAttributeRange
-            : attributeStyle.setModelBlocksPolyhedronAttributeRange;
-          const setAttributeColorMap = isVertex
-            ? attributeStyle.setModelBlocksVertexAttributeColorMap
-            : attributeStyle.setModelBlocksPolyhedronAttributeColorMap;
-
-          const list = [setAttributeName(modelId, ids, name)];
-          if (minimum !== undefined && maximum !== undefined) {
-            list.push(setAttributeRange(modelId, ids, minimum, maximum));
-          }
-          if (colorMap) {
-            list.push(setAttributeColorMap(modelId, ids, colorMap));
-          }
-          return list;
+          const setAttributeAttribute = isVertex
+            ? modelBlocksVertexAttribute.setModelBlocksVertexAttribute
+            : modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute;
+          return setAttributeAttribute(modelId, ids, { name, item, minimum, maximum, colorMap });
         },
       ),
     ];
