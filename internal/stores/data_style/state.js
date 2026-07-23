@@ -1,4 +1,3 @@
-import { ref } from "vue";
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 import merge from "lodash/merge";
@@ -58,7 +57,10 @@ function getSharedState() {
     if (existingStyle) {
       merge(existingStyle, styleValues);
     } else {
-      componentStyles.value[cacheKey] = merge({ id_model: modelId, id_component: componentId }, styleValues);
+      componentStyles.value[cacheKey] = merge(
+        { id_model: modelId, id_component: componentId },
+        styleValues,
+      );
     }
   }
 
@@ -70,7 +72,10 @@ function getSharedState() {
       if (existingStyle) {
         updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues);
       } else {
-        updatedComponentStyles[cacheKey] = merge({ id_model: modelId, id_component: componentId }, styleValues);
+        updatedComponentStyles[cacheKey] = merge(
+          { id_model: modelId, id_component: componentId },
+          styleValues,
+        );
       }
     }
     componentStyles.value = updatedComponentStyles;
@@ -84,7 +89,10 @@ function getSharedState() {
       if (existingStyle) {
         updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues);
       } else {
-        updatedComponentStyles[cacheKey] = merge({ id_model: modelId, id_component: componentId }, styleValues);
+        updatedComponentStyles[cacheKey] = merge(
+          { id_model: modelId, id_component: componentId },
+          styleValues,
+        );
       }
     }
     componentStyles.value = updatedComponentStyles;
