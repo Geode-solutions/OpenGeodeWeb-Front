@@ -117,31 +117,31 @@ function useModelSurfacesVertexAttribute() {
     return Promise.resolve();
   }
 
-  function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
+  async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
     const item = modelSurfacesVertexAttributeLastItem(modelId, surfaceIds[0], name);
-    mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });
+    await mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });
     return applyVertexAttribute(modelId, surfaceIds);
   }
 
-  function setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item) {
-    mutateModelSurfacesVertexStyle(modelId, surfaceIds, { item });
+  async function setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item) {
+    await mutateModelSurfacesVertexStyle(modelId, surfaceIds, { item });
     return applyVertexAttribute(modelId, surfaceIds);
   }
 
-  function setModelSurfacesVertexAttributeRange(modelId, surfaceIds, minimum, maximum) {
+  async function setModelSurfacesVertexAttributeRange(modelId, surfaceIds, minimum, maximum) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
-    setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
+    await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
       minimum,
       maximum,
     });
     return applyVertexAttribute(modelId, surfaceIds);
   }
 
-  function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
+  async function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
-    setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
+    await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
     return applyVertexAttribute(modelId, surfaceIds);
   }
 

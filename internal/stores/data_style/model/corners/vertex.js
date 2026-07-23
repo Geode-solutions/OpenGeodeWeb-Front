@@ -111,31 +111,31 @@ function useModelCornersVertexAttribute() {
     return Promise.resolve();
   }
 
-  function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
+  async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
     const item = modelCornersVertexAttributeLastItem(modelId, cornerIds[0], name);
-    mutateModelCornersVertexStyle(modelId, cornerIds, { name, item });
+    await mutateModelCornersVertexStyle(modelId, cornerIds, { name, item });
     return applyVertexAttribute(modelId, cornerIds);
   }
 
-  function setModelCornersVertexAttributeItem(modelId, cornerIds, item) {
-    mutateModelCornersVertexStyle(modelId, cornerIds, { item });
+  async function setModelCornersVertexAttributeItem(modelId, cornerIds, item) {
+    await mutateModelCornersVertexStyle(modelId, cornerIds, { item });
     return applyVertexAttribute(modelId, cornerIds);
   }
 
-  function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
+  async function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
-    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
+    await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
       minimum,
       maximum,
     });
     return applyVertexAttribute(modelId, cornerIds);
   }
 
-  function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
+  async function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
-    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { colorMap });
+    await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { colorMap });
     return applyVertexAttribute(modelId, cornerIds);
   }
 

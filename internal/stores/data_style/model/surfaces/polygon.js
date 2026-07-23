@@ -117,31 +117,31 @@ function useModelSurfacesPolygonAttribute() {
     return Promise.resolve();
   }
 
-  function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
+  async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
     const item = modelSurfacesPolygonAttributeLastItem(modelId, surfaceIds[0], name);
-    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
+    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 
-  function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
-    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { item });
+  async function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
+    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { item });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 
-  function setModelSurfacesPolygonAttributeRange(modelId, surfaceIds, minimum, maximum) {
+  async function setModelSurfacesPolygonAttributeRange(modelId, surfaceIds, minimum, maximum) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
       minimum,
       maximum,
     });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 
-  function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
+  async function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
+    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 

@@ -79,9 +79,9 @@ function useMeshCellsCellAttributeStyle() {
     return meshCellsCellAttribute(id).name;
   }
 
-  function setMeshCellsCellAttributeName(id, name) {
+  async function setMeshCellsCellAttributeName(id, name) {
     const item = meshCellsCellAttributeLastItem(id, name);
-    mutateMeshCellsCellStyle(id, { name, item });
+    await mutateMeshCellsCellStyle(id, { name, item });
     return applyCellAttribute(id);
   }
 
@@ -90,8 +90,8 @@ function useMeshCellsCellAttributeStyle() {
     return item ?? meshCellsCellAttributeLastItem(id, name);
   }
 
-  function setMeshCellsCellAttributeItem(id, item) {
-    mutateMeshCellsCellStyle(id, { item });
+  async function setMeshCellsCellAttributeItem(id, item) {
+    await mutateMeshCellsCellStyle(id, { item });
     return applyCellAttribute(id);
   }
 
@@ -110,10 +110,10 @@ function useMeshCellsCellAttributeStyle() {
     return [storedConfig.minimum, storedConfig.maximum];
   }
 
-  function setMeshCellsCellAttributeRange(id, minimum, maximum) {
+  async function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
-    setMeshCellsCellAttributeStoredConfig(id, name, item, { minimum, maximum });
+    await setMeshCellsCellAttributeStoredConfig(id, name, item, { minimum, maximum });
     return applyCellAttribute(id);
   }
 
@@ -124,10 +124,10 @@ function useMeshCellsCellAttributeStyle() {
     return storedConfig.colorMap;
   }
 
-  function setMeshCellsCellAttributeColorMap(id, colorMap) {
+  async function setMeshCellsCellAttributeColorMap(id, colorMap) {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
-    setMeshCellsCellAttributeStoredConfig(id, name, item, { colorMap });
+    await setMeshCellsCellAttributeStoredConfig(id, name, item, { colorMap });
     return applyCellAttribute(id);
   }
 
