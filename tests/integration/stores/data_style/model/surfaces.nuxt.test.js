@@ -230,7 +230,7 @@ describe("model surfaces", () => {
       await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
         id,
         surface_ids,
-        "discrete:budaS",
+        "budaS",
       );
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
@@ -273,7 +273,7 @@ describe("model surfaces", () => {
       await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
         id,
         surface_ids,
-        "discrete:budaS",
+        "budaS",
       );
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelSurfacesVertexAttributeRange(id, surface_id)).toStrictEqual([
@@ -281,7 +281,7 @@ describe("model surfaces", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe(
-        "discrete:budaS",
+        "budaS",
       );
     });
 
@@ -311,7 +311,7 @@ describe("model surfaces", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe(
-        "discrete:budaS",
+        "budaS",
       );
     });
   });
@@ -453,7 +453,7 @@ describe("model surfaces", () => {
       await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
         id,
         surface_ids,
-        "discrete:budaS",
+        "budaS",
       );
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
@@ -502,7 +502,7 @@ describe("model surfaces", () => {
       await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
         id,
         surface_ids,
-        "discrete:budaS",
+        "budaS",
       );
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelSurfacesPolygonAttributeRange(id, surface_id)).toStrictEqual([
@@ -510,7 +510,7 @@ describe("model surfaces", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe(
-        "discrete:budaS",
+        "budaS",
       );
     });
 
@@ -550,7 +550,7 @@ describe("model surfaces", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe(
-        "discrete:budaS",
+        "budaS",
       );
     });
   });

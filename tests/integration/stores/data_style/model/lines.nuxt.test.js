@@ -132,7 +132,7 @@ describe("model lines", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelLinesVertexAttributeColorMap(id, line_ids, "discrete:budaS");
+      await dataStyleStore.setModelLinesVertexAttributeColorMap(id, line_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
       expect(lastCall[0].schema).toStrictEqual(model_lines_schemas.attribute.vertex.attribute);
@@ -171,13 +171,13 @@ describe("model lines", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelLinesVertexAttributeColorMap(id, line_ids, "discrete:budaS");
+      await dataStyleStore.setModelLinesVertexAttributeColorMap(id, line_ids, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelLinesVertexAttributeRange(id, line_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelLinesVertexAttributeColorMap(id, line_id)).toBe("discrete:budaS");
+      expect(dataStyleStore.modelLinesVertexAttributeColorMap(id, line_id)).toBe("budaS");
     });
 
     test("stored configs 3 - select unique_vertices", async () => {
@@ -203,7 +203,7 @@ describe("model lines", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelLinesVertexAttributeColorMap(id, line_id)).toBe("discrete:budaS");
+      expect(dataStyleStore.modelLinesVertexAttributeColorMap(id, line_id)).toBe("budaS");
     });
   });
 
@@ -242,7 +242,7 @@ describe("model lines", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelLinesEdgeAttributeColorMap(id, line_ids, "discrete:budaS");
+      await dataStyleStore.setModelLinesEdgeAttributeColorMap(id, line_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
       expect(lastCall[0].schema).toStrictEqual(model_lines_schemas.attribute.edge.attribute);
@@ -281,13 +281,13 @@ describe("model lines", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelLinesEdgeAttributeColorMap(id, line_ids, "discrete:budaS");
+      await dataStyleStore.setModelLinesEdgeAttributeColorMap(id, line_ids, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelLinesEdgeAttributeRange(id, line_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelLinesEdgeAttributeColorMap(id, line_id)).toBe("discrete:budaS");
+      expect(dataStyleStore.modelLinesEdgeAttributeColorMap(id, line_id)).toBe("budaS");
     });
 
     test("stored configs 3 - select dummy_attribute", async () => {
@@ -313,7 +313,7 @@ describe("model lines", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelLinesEdgeAttributeColorMap(id, line_id)).toBe("discrete:budaS");
+      expect(dataStyleStore.modelLinesEdgeAttributeColorMap(id, line_id)).toBe("budaS");
     });
   });
 

@@ -263,9 +263,9 @@ describe("mesh cells", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       await dataStyleStore.setMeshCellsCellAttributeRange(id, range[0], range[1]);
-      await dataStyleStore.setMeshCellsCellAttributeColorMap(id, "discrete:budaS");
+      await dataStyleStore.setMeshCellsCellAttributeColorMap(id, "budaS");
       expect(dataStyleStore.meshCellsCellAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshCellsCellAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshCellsCellAttributeColorMap(id)).toBe("budaS");
     });
 
     test("stored configs 3 - select dummy_attribute", async () => {
@@ -283,7 +283,7 @@ describe("mesh cells", () => {
       expect(dataStyleStore.meshCellsCellAttributeName(id)).toBe(cell_attribute.name);
       expect(dataStyleStore.meshCellsCellAttributeItem(id)).toBe(cell_attribute.item);
       expect(dataStyleStore.meshCellsCellAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshCellsCellAttributeColorMap(id)).toBe("discrete:budaS");
+      expect(dataStyleStore.meshCellsCellAttributeColorMap(id)).toBe("budaS");
     });
   });
 

@@ -131,7 +131,7 @@ describe("model corners", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "discrete:budaS");
+      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
       expect(lastCall[0].schema).toStrictEqual(model_corners_schemas.attribute.vertex.attribute);
@@ -170,14 +170,14 @@ describe("model corners", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "discrete:budaS");
+      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelCornersVertexAttributeRange(id, corner_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe(
-        "discrete:budaS",
+        "budaS",
       );
     });
 
@@ -205,7 +205,7 @@ describe("model corners", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe(
-        "discrete:budaS",
+        "budaS",
       );
     });
   });
