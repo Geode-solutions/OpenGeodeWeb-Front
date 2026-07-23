@@ -97,7 +97,26 @@ describe("model corners", () => {
   });
 
   describe("corners vertex attribute", () => {
-    test("coloring vertex attribute", async () => {
+    test("coloring vertex attribute — no request until range+colormap set", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      // No request sent yet since minimum/maximum/colorMap are still undefined
+      expect(spy).not.toHaveBeenCalled();
+      for (const corner_id of corner_ids) {
+        expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring vertex attribute — request sent when all params defined", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
@@ -105,27 +124,27 @@ describe("model corners", () => {
       const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, corner_ids);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
-      const result = dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
-      expect(result).toBeInstanceOf(Promise);
-      await result;
-      await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_corners_schemas.attribute.vertex.name,
-          params: {
-            id,
-            block_ids: corner_viewer_ids,
-            name: "points",
-            item: 0,
-          },
-        },
-        {
-          response_function: expect.any(Function),
-        },
+      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
+      await dataStyleStore.setModelCornersVertexAttributeRange(
+        id,
+        corner_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
       );
-      for (const corner_id of corner_ids) {
-        expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
-      }
+      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "discrete:budaS");
+      await sleep(SLEEP_MS);
+      const [lastCall] = spy.mock.calls.slice(-1);
+      expect(lastCall[0].schema).toStrictEqual(model_corners_schemas.attribute.vertex.attribute);
+      expect(lastCall[0].params).toStrictEqual(
+        expect.objectContaining({
+          id,
+          block_ids: corner_viewer_ids,
+          name: "points",
+          item: 0,
+          minimum: MINIMUM_RANGE,
+          maximum: MAXIMUM_RANGE,
+        }),
+      );
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 

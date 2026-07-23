@@ -8,10 +8,21 @@ import { useModelSurfacesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.vertex;
+const attributeSchema =
+  viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.vertex.attribute;
+
+function isModelSurfacesVertexAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
+}
 
 // oxlint-disable-next-line max-lines-per-function
-export function useModelSurfacesVertexAttribute() {
+function useModelSurfacesVertexAttribute() {
   const dataStore = useDataStore();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   const viewerStore = useViewerStore();
@@ -22,16 +33,14 @@ export function useModelSurfacesVertexAttribute() {
 
   function modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item) {
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceId);
-    if (name in storedConfigs && item in storedConfigs[name]) {
+    if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    const defaultConfig = {
+    return {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
     };
-    setModelSurfacesVertexAttributeStoredConfig(modelId, [surfaceId], name, item, defaultConfig);
-    return defaultConfig;
   }
 
   function mutateModelSurfacesVertexStyle(modelId, surfaceIds, values) {
@@ -71,71 +80,6 @@ export function useModelSurfacesVertexAttribute() {
     return storedConfigs[name].lastItem;
   }
 
-  async function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
-    const item = modelSurfacesVertexAttributeLastItem(modelId, surfaceIds[0], name);
-    const storedConfig = modelSurfacesVertexAttributeStoredConfig(
-      modelId,
-      surfaceIds[0],
-      name,
-      item,
-    );
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name, item };
-    return viewerStore.request(
-      { schema: schema.name, params },
-      {
-        response_function: () => {
-          mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });
-          return setModelSurfacesVertexAttributeStoredConfig(
-            modelId,
-            surfaceIds,
-            name,
-            item,
-            storedConfig,
-          );
-        },
-      },
-    );
-  }
-
-  async function setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item) {
-    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesVertexAttributeStoredConfig(
-      modelId,
-      surfaceIds[0],
-      name,
-      item,
-    );
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name, item };
-    return viewerStore.request(
-      { schema: schema.name, params },
-      {
-        response_function: () => {
-          mutateModelSurfacesVertexStyle(modelId, surfaceIds, { item });
-          return setModelSurfacesVertexAttributeStoredConfig(
-            modelId,
-            surfaceIds,
-            name,
-            item,
-            storedConfig,
-          );
-        },
-      },
-    );
-  }
-
-  function setModelSurfacesVertexAttribute(modelId, surfaceIds, name, item) {
-    const currentName = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
-    if (name !== currentName) {
-      return setModelSurfacesVertexAttributeName(modelId, surfaceIds, name);
-    }
-    const currentItem = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
-    if (item !== currentItem) {
-      return setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item);
-    }
-  }
-
   function modelSurfacesVertexAttributeRange(modelId, surfaceId) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
@@ -144,39 +88,14 @@ export function useModelSurfacesVertexAttribute() {
     return [minimum, maximum];
   }
 
-  async function setModelSurfacesVertexAttributeRange(modelId, surfaceIds, minimum, maximum) {
-    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
-    const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
-    const colorMap = modelSurfacesVertexAttributeColorMap(modelId, surfaceIds[0]);
-    const points = getRGBPointsFromPreset(colorMap);
-    function storeConfig() {
-      return setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
-        minimum,
-        maximum,
-      });
-    }
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(
-        { schema: schema.color_map, params },
-        {
-          response_function: storeConfig,
-        },
-      );
-    }
-    return storeConfig();
-  }
-
   function modelSurfacesVertexAttributeColorMap(modelId, surfaceId) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
-    const { colorMap } = storedConfig;
-    return colorMap;
+    return storedConfig.colorMap;
   }
 
-  async function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
+  function applyVertexAttribute(modelId, surfaceIds) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(
@@ -185,24 +104,69 @@ export function useModelSurfacesVertexAttribute() {
       name,
       item,
     );
+    const attribute = {
+      name,
+      item,
+      minimum: storedConfig.minimum,
+      maximum: storedConfig.maximum,
+      colorMap: storedConfig.colorMap,
+    };
+    if (isModelSurfacesVertexAttributeValid(attribute)) {
+      return setModelSurfacesVertexAttribute(modelId, surfaceIds, attribute);
+    }
+  }
+
+  function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {
+    const item = modelSurfacesVertexAttributeLastItem(modelId, surfaceIds[0], name);
+    mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });
+    return applyVertexAttribute(modelId, surfaceIds);
+  }
+
+  function setModelSurfacesVertexAttributeItem(modelId, surfaceIds, item) {
+    mutateModelSurfacesVertexStyle(modelId, surfaceIds, { item });
+    return applyVertexAttribute(modelId, surfaceIds);
+  }
+
+  function setModelSurfacesVertexAttributeRange(modelId, surfaceIds, minimum, maximum) {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
+    setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      minimum,
+      maximum,
+    });
+    return applyVertexAttribute(modelId, surfaceIds);
+  }
+
+  function setModelSurfacesVertexAttributeColorMap(modelId, surfaceIds, colorMap) {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
+    setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
+    return applyVertexAttribute(modelId, surfaceIds);
+  }
+
+  async function setModelSurfacesVertexAttribute(
+    modelId,
+    surfaceIds,
+    { name, item, minimum, maximum, colorMap },
+  ) {
+    mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });
+    setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      minimum,
+      maximum,
+      colorMap,
+    });
     const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
-    function storeConfig() {
-      return setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
-        colorMap,
-      });
-    }
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(
-        { schema: schema.color_map, params },
-        {
-          response_function: storeConfig,
-        },
-      );
-    }
-    return storeConfig();
+    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
+    const params = {
+      id: modelId,
+      block_ids: surface_viewer_ids,
+      name,
+      item,
+      points,
+      minimum,
+      maximum,
+    };
+    return viewerStore.request({ schema: attributeSchema, params });
   }
 
   return {
@@ -211,10 +175,12 @@ export function useModelSurfacesVertexAttribute() {
     modelSurfacesVertexAttributeRange,
     modelSurfacesVertexAttributeColorMap,
     modelSurfacesVertexAttributeStoredConfig,
+    setModelSurfacesVertexAttribute,
     setModelSurfacesVertexAttributeName,
     setModelSurfacesVertexAttributeItem,
-    setModelSurfacesVertexAttribute,
     setModelSurfacesVertexAttributeRange,
     setModelSurfacesVertexAttributeColorMap,
   };
 }
+
+export { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute };

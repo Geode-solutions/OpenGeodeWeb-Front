@@ -8,10 +8,21 @@ import { useModelSurfacesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.polygon;
+const attributeSchema =
+  viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.polygon.attribute;
+
+function isModelSurfacesPolygonAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
+}
 
 // oxlint-disable-next-line max-lines-per-function
-export function useModelSurfacesPolygonAttribute() {
+function useModelSurfacesPolygonAttribute() {
   const dataStore = useDataStore();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   const viewerStore = useViewerStore();
@@ -22,16 +33,14 @@ export function useModelSurfacesPolygonAttribute() {
 
   function modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item) {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
-    if (name in storedConfigs && item in storedConfigs[name]) {
+    if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    const defaultConfig = {
+    return {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
     };
-    setModelSurfacesPolygonAttributeStoredConfig(modelId, [surfaceId], name, item, defaultConfig);
-    return defaultConfig;
   }
 
   function mutateModelSurfacesPolygonStyle(modelId, surfaceIds, values) {
@@ -71,71 +80,6 @@ export function useModelSurfacesPolygonAttribute() {
     return storedConfigs[name].lastItem;
   }
 
-  async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
-    const item = modelSurfacesPolygonAttributeLastItem(modelId, surfaceIds[0], name);
-    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
-      modelId,
-      surfaceIds[0],
-      name,
-      item,
-    );
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name, item };
-    return viewerStore.request(
-      { schema: schema.name, params },
-      {
-        response_function: () => {
-          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
-          return setModelSurfacesPolygonAttributeStoredConfig(
-            modelId,
-            surfaceIds,
-            name,
-            item,
-            storedConfig,
-          );
-        },
-      },
-    );
-  }
-
-  async function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
-    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
-      modelId,
-      surfaceIds[0],
-      name,
-      item,
-    );
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = { id: modelId, block_ids: viewer_ids, name, item };
-    return viewerStore.request(
-      { schema: schema.name, params },
-      {
-        response_function: () => {
-          mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { item });
-          return setModelSurfacesPolygonAttributeStoredConfig(
-            modelId,
-            surfaceIds,
-            name,
-            item,
-            storedConfig,
-          );
-        },
-      },
-    );
-  }
-
-  function setModelSurfacesPolygonAttribute(modelId, surfaceIds, name, item) {
-    const currentName = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
-    if (name !== currentName) {
-      return setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name);
-    }
-    const currentItem = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    if (item !== currentItem) {
-      return setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item);
-    }
-  }
-
   function modelSurfacesPolygonAttributeRange(modelId, surfaceId) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
@@ -144,39 +88,14 @@ export function useModelSurfacesPolygonAttribute() {
     return [minimum, maximum];
   }
 
-  async function setModelSurfacesPolygonAttributeRange(modelId, surfaceIds, minimum, maximum) {
-    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
-    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    const colorMap = modelSurfacesPolygonAttributeColorMap(modelId, surfaceIds[0]);
-    const points = getRGBPointsFromPreset(colorMap);
-    function storeConfig() {
-      return setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
-        minimum,
-        maximum,
-      });
-    }
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(
-        { schema: schema.color_map, params },
-        {
-          response_function: storeConfig,
-        },
-      );
-    }
-    return storeConfig();
-  }
-
   function modelSurfacesPolygonAttributeColorMap(modelId, surfaceId) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
-    const { colorMap } = storedConfig;
-    return colorMap;
+    return storedConfig.colorMap;
   }
 
-  async function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
+  function applyPolygonAttribute(modelId, surfaceIds) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
@@ -185,24 +104,69 @@ export function useModelSurfacesPolygonAttribute() {
       name,
       item,
     );
+    const attribute = {
+      name,
+      item,
+      minimum: storedConfig.minimum,
+      maximum: storedConfig.maximum,
+      colorMap: storedConfig.colorMap,
+    };
+    if (isModelSurfacesPolygonAttributeValid(attribute)) {
+      return setModelSurfacesPolygonAttribute(modelId, surfaceIds, attribute);
+    }
+  }
+
+  function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
+    const item = modelSurfacesPolygonAttributeLastItem(modelId, surfaceIds[0], name);
+    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
+    return applyPolygonAttribute(modelId, surfaceIds);
+  }
+
+  function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
+    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { item });
+    return applyPolygonAttribute(modelId, surfaceIds);
+  }
+
+  function setModelSurfacesPolygonAttributeRange(modelId, surfaceIds, minimum, maximum) {
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
+    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      minimum,
+      maximum,
+    });
+    return applyPolygonAttribute(modelId, surfaceIds);
+  }
+
+  function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
+    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
+    return applyPolygonAttribute(modelId, surfaceIds);
+  }
+
+  async function setModelSurfacesPolygonAttribute(
+    modelId,
+    surfaceIds,
+    { name, item, minimum, maximum, colorMap },
+  ) {
+    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
+    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      minimum,
+      maximum,
+      colorMap,
+    });
     const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
-    function storeConfig() {
-      return setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
-        colorMap,
-      });
-    }
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(
-        { schema: schema.color_map, params },
-        {
-          response_function: storeConfig,
-        },
-      );
-    }
-    return storeConfig();
+    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
+    const params = {
+      id: modelId,
+      block_ids: surface_viewer_ids,
+      name,
+      item,
+      points,
+      minimum,
+      maximum,
+    };
+    return viewerStore.request({ schema: attributeSchema, params });
   }
 
   return {
@@ -211,10 +175,12 @@ export function useModelSurfacesPolygonAttribute() {
     modelSurfacesPolygonAttributeRange,
     modelSurfacesPolygonAttributeColorMap,
     modelSurfacesPolygonAttributeStoredConfig,
+    setModelSurfacesPolygonAttribute,
     setModelSurfacesPolygonAttributeName,
     setModelSurfacesPolygonAttributeItem,
-    setModelSurfacesPolygonAttribute,
     setModelSurfacesPolygonAttributeRange,
     setModelSurfacesPolygonAttributeColorMap,
   };
 }
+
+export { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute };

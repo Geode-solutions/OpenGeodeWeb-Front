@@ -1,8 +1,8 @@
+import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
+import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelSurfacesColor } from "./color";
 import { useModelSurfacesCommonStyle } from "./common";
-import { useModelSurfacesPolygonAttribute } from "./polygon";
-import { useModelSurfacesVertexAttribute } from "./vertex";
 import { useModelSurfacesVisibility } from "./visibility";
 
 async function setModelSurfacesDefaultStyle(_id) {
@@ -16,108 +16,163 @@ export function useModelSurfacesStyle() {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
-  async function applyModelSurfacesStyle(modelId) {
-    const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
-    if (!surfaces_ids?.length) {
-      return;
-    }
-
+  function applyModelSurfacesVisibilityStyle(modelId, surfaces_ids) {
     const visibilityGroups = {};
-    const colorGroups = {};
-    const attributeGroups = {};
-
     for (const surfaces_id of surfaces_ids) {
       const style = modelCommonStyle.modelSurfaceStyle(modelId, surfaces_id);
-
       const visibility = String(style.visibility);
       if (!visibilityGroups[visibility]) {
         visibilityGroups[visibility] = [];
       }
       visibilityGroups[visibility].push(surfaces_id);
-
-      const coloring = modelColorStyle.modelSurfaceColoring(modelId, surfaces_id);
-      const activeColoring = modelColorStyle.modelSurfaceActiveColoring(modelId, surfaces_id);
-      if (activeColoring === "constant") {
-        const color = modelColorStyle.modelSurfaceColor(modelId, surfaces_id);
-        const color_key = JSON.stringify(color);
-        if (!colorGroups[color_key]) {
-          colorGroups[color_key] = { activeColoring, color, surfaces_ids: [] };
-        }
-        colorGroups[color_key].surfaces_ids.push(surfaces_id);
-      } else if (activeColoring === "random") {
-        if (!colorGroups["random"]) {
-          colorGroups["random"] = { activeColoring, color: undefined, surfaces_ids: [] };
-        }
-        colorGroups["random"].surfaces_ids.push(surfaces_id);
-      } else {
-        const attributeStyle = coloring[activeColoring];
-        const { name, item } = attributeStyle;
-        const isVertex = activeColoring === "vertex";
-        const storedConfig = isVertex
-          ? modelSurfacesVertexAttribute.modelSurfacesVertexAttributeStoredConfig(
-              modelId,
-              surfaces_id,
-              name,
-              item,
-            )
-          : modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeStoredConfig(
-              modelId,
-              surfaces_id,
-              name,
-              item,
-            );
-        const { minimum, maximum, colorMap } = storedConfig;
-        const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
-        if (!attributeGroups[attributeGroupKey]) {
-          attributeGroups[attributeGroupKey] = {
-            activeColoring,
-            name,
-            minimum,
-            maximum,
-            colorMap,
-            surfaces_ids: [],
-          };
-        }
-        attributeGroups[attributeGroupKey].surfaces_ids.push(surfaces_id);
-      }
     }
-
-    const promises = [
-      ...Object.entries(visibilityGroups).map(([visibility, ids]) =>
+    return Promise.all(
+      Object.entries(visibilityGroups).map(([visibility, ids]) =>
         modelVisibilityStyle.setModelSurfacesVisibility(modelId, ids, visibility === "true"),
       ),
-      ...Object.values(colorGroups).map(({ activeColoring, color, surfaces_ids: ids }) =>
-        modelColorStyle.setModelSurfacesColor(modelId, ids, color, activeColoring),
-      ),
-      ...Object.values(attributeGroups).flatMap(
-        ({ activeColoring, name, minimum, maximum, colorMap, surfaces_ids: ids }) => {
-          const isVertex = activeColoring === "vertex";
-          const attributeStyle = isVertex
-            ? modelSurfacesVertexAttribute
-            : modelSurfacesPolygonAttribute;
-          const setAttributeName = isVertex
-            ? attributeStyle.setModelSurfacesVertexAttributeName
-            : attributeStyle.setModelSurfacesPolygonAttributeName;
-          const setAttributeRange = isVertex
-            ? attributeStyle.setModelSurfacesVertexAttributeRange
-            : attributeStyle.setModelSurfacesPolygonAttributeRange;
-          const setAttributeColorMap = isVertex
-            ? attributeStyle.setModelSurfacesVertexAttributeColorMap
-            : attributeStyle.setModelSurfacesPolygonAttributeColorMap;
+    );
+  }
 
-          const list = [setAttributeName(modelId, ids, name)];
-          if (minimum !== undefined && maximum !== undefined) {
-            list.push(setAttributeRange(modelId, ids, minimum, maximum));
-          }
-          if (colorMap) {
-            list.push(setAttributeColorMap(modelId, ids, colorMap));
-          }
-          return list;
-        },
-      ),
-    ];
+  function applyModelSurfacesColoringStyle(modelId, surfaces_ids) {
+    const activeColoringGroups = {};
+    for (const surfaces_id of surfaces_ids) {
+      const activeColoring = modelColorStyle.modelSurfaceActiveColoring(modelId, surfaces_id);
+      if (!activeColoringGroups[activeColoring]) {
+        activeColoringGroups[activeColoring] = [];
+      }
+      activeColoringGroups[activeColoring].push(surfaces_id);
+    }
 
-    return Promise.all(promises);
+    const coloringPromises = [];
+
+    for (const [type, type_surfaces_ids] of Object.entries(activeColoringGroups)) {
+      if (type === "constant") {
+        const colorGroups = {};
+        for (const surfaces_id of type_surfaces_ids) {
+          const color = modelColorStyle.modelSurfaceColor(modelId, surfaces_id);
+          const color_key = JSON.stringify(color);
+          if (!colorGroups[color_key]) {
+            colorGroups[color_key] = { color, surfaces_ids: [] };
+          }
+          colorGroups[color_key].surfaces_ids.push(surfaces_id);
+        }
+        coloringPromises.push(
+          ...Object.values(colorGroups).map(({ color, surfaces_ids: ids }) =>
+            modelColorStyle.setModelSurfacesColor(modelId, ids, color, "constant"),
+          ),
+        );
+      } else if (type === "random") {
+        coloringPromises.push(
+          modelColorStyle.setModelSurfacesColor(modelId, type_surfaces_ids, undefined, "random"),
+        );
+      } else if (type === "vertex") {
+        const vertexGroups = {};
+        for (const surfaces_id of type_surfaces_ids) {
+          const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
+            modelId,
+            surfaces_id,
+          );
+          const item = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeItem(
+            modelId,
+            surfaces_id,
+          );
+          const [minimum, maximum] = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeRange(
+            modelId,
+            surfaces_id,
+          );
+          const colorMap = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeColorMap(
+            modelId,
+            surfaces_id,
+          );
+          const attribute = { name, item, minimum, maximum, colorMap };
+          if (!isModelSurfacesVertexAttributeValid(attribute)) {
+            continue;
+          }
+          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          if (!vertexGroups[key]) {
+            vertexGroups[key] = {
+              name,
+              item,
+              minimum,
+              maximum,
+              colorMap,
+              surfaces_ids: [],
+            };
+          }
+          vertexGroups[key].surfaces_ids.push(surfaces_id);
+        }
+        coloringPromises.push(
+          ...Object.values(vertexGroups).map(
+            ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
+              modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(modelId, ids, {
+                name,
+                item,
+                minimum,
+                maximum,
+                colorMap,
+              }),
+          ),
+        );
+      } else if (type === "polygon") {
+        const polygonGroups = {};
+        for (const surfaces_id of type_surfaces_ids) {
+          const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
+            modelId,
+            surfaces_id,
+          );
+          const item = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeItem(
+            modelId,
+            surfaces_id,
+          );
+          const [minimum, maximum] =
+            modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeRange(modelId, surfaces_id);
+          const colorMap = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeColorMap(
+            modelId,
+            surfaces_id,
+          );
+          const attribute = { name, item, minimum, maximum, colorMap };
+          if (!isModelSurfacesPolygonAttributeValid(attribute)) {
+            continue;
+          }
+          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          if (!polygonGroups[key]) {
+            polygonGroups[key] = {
+              name,
+              item,
+              minimum,
+              maximum,
+              colorMap,
+              surfaces_ids: [],
+            };
+          }
+          polygonGroups[key].surfaces_ids.push(surfaces_id);
+        }
+        coloringPromises.push(
+          ...Object.values(polygonGroups).map(
+            ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
+              modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(modelId, ids, {
+                name,
+                item,
+                minimum,
+                maximum,
+                colorMap,
+              }),
+          ),
+        );
+      }
+    }
+    return Promise.all(coloringPromises);
+  }
+
+  async function applyModelSurfacesStyle(modelId) {
+    const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
+    if (surfaces_ids.length === 0) {
+      return;
+    }
+    return Promise.all([
+      applyModelSurfacesVisibilityStyle(modelId, surfaces_ids),
+      applyModelSurfacesColoringStyle(modelId, surfaces_ids),
+    ]);
   }
 
   return {
