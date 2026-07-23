@@ -111,31 +111,28 @@ function useModelLinesVertexAttribute() {
     return Promise.resolve();
   }
 
-  async function setModelLinesVertexAttributeName(modelId, lineIds, name) {
+  function setModelLinesVertexAttributeName(modelId, lineIds, name) {
     const item = modelLinesVertexAttributeLastItem(modelId, lineIds[0], name);
-    await mutateModelLinesVertexStyle(modelId, lineIds, { name, item });
+    mutateModelLinesVertexStyle(modelId, lineIds, { name, item });
     return applyVertexAttribute(modelId, lineIds);
   }
 
-  async function setModelLinesVertexAttributeItem(modelId, lineIds, item) {
-    await mutateModelLinesVertexStyle(modelId, lineIds, { item });
+  function setModelLinesVertexAttributeItem(modelId, lineIds, item) {
+    mutateModelLinesVertexStyle(modelId, lineIds, { item });
     return applyVertexAttribute(modelId, lineIds);
   }
 
-  async function setModelLinesVertexAttributeRange(modelId, lineIds, minimum, maximum) {
+  function setModelLinesVertexAttributeRange(modelId, lineIds, minimum, maximum) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
-    await setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
-      minimum,
-      maximum,
-    });
+    setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, { minimum, maximum });
     return applyVertexAttribute(modelId, lineIds);
   }
 
-  async function setModelLinesVertexAttributeColorMap(modelId, lineIds, colorMap) {
+  function setModelLinesVertexAttributeColorMap(modelId, lineIds, colorMap) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
-    await setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, { colorMap });
+    setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, { colorMap });
     return applyVertexAttribute(modelId, lineIds);
   }
 

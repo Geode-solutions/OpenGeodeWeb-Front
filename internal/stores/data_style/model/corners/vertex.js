@@ -111,31 +111,28 @@ function useModelCornersVertexAttribute() {
     return Promise.resolve();
   }
 
-  async function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
+  function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
     const item = modelCornersVertexAttributeLastItem(modelId, cornerIds[0], name);
-    await mutateModelCornersVertexStyle(modelId, cornerIds, { name, item });
+    mutateModelCornersVertexStyle(modelId, cornerIds, { name, item });
     return applyVertexAttribute(modelId, cornerIds);
   }
 
-  async function setModelCornersVertexAttributeItem(modelId, cornerIds, item) {
-    await mutateModelCornersVertexStyle(modelId, cornerIds, { item });
+  function setModelCornersVertexAttributeItem(modelId, cornerIds, item) {
+    mutateModelCornersVertexStyle(modelId, cornerIds, { item });
     return applyVertexAttribute(modelId, cornerIds);
   }
 
-  async function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
+  function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
-    await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
-      minimum,
-      maximum,
-    });
+    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { minimum, maximum });
     return applyVertexAttribute(modelId, cornerIds);
   }
 
-  async function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
+  function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
-    await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { colorMap });
+    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { colorMap });
     return applyVertexAttribute(modelId, cornerIds);
   }
 

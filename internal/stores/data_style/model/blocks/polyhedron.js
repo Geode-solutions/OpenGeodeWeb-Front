@@ -117,33 +117,31 @@ function useModelBlocksPolyhedronAttribute() {
     return Promise.resolve();
   }
 
-  async function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
+  function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
     const item = modelBlocksPolyhedronAttributeLastItem(modelId, blockIds[0], name);
-    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item });
+    mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
 
-  async function setModelBlocksPolyhedronAttributeItem(modelId, blockIds, item) {
-    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, { item });
+  function setModelBlocksPolyhedronAttributeItem(modelId, blockIds, item) {
+    mutateModelBlocksPolyhedronStyle(modelId, blockIds, { item });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
 
-  async function setModelBlocksPolyhedronAttributeRange(modelId, blockIds, minimum, maximum) {
+  function setModelBlocksPolyhedronAttributeRange(modelId, blockIds, minimum, maximum) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
-    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
       minimum,
       maximum,
     });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
 
-  async function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
+  function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
-    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
-      colorMap,
-    });
+    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, { colorMap });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
 

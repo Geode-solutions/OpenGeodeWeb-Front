@@ -117,33 +117,31 @@ function useModelSurfacesPolygonAttribute() {
     return Promise.resolve();
   }
 
-  async function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
+  function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {
     const item = modelSurfacesPolygonAttributeLastItem(modelId, surfaceIds[0], name);
-    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
+    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 
-  async function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
-    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { item });
+  function setModelSurfacesPolygonAttributeItem(modelId, surfaceIds, item) {
+    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { item });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 
-  async function setModelSurfacesPolygonAttributeRange(modelId, surfaceIds, minimum, maximum) {
+  function setModelSurfacesPolygonAttributeRange(modelId, surfaceIds, minimum, maximum) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
       minimum,
       maximum,
     });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 
-  async function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
+  function setModelSurfacesPolygonAttributeColorMap(modelId, surfaceIds, colorMap) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
-      colorMap,
-    });
+    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
 

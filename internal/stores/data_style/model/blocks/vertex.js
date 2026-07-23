@@ -111,31 +111,28 @@ function useModelBlocksVertexAttribute() {
     return Promise.resolve();
   }
 
-  async function setModelBlocksVertexAttributeName(modelId, blockIds, name) {
+  function setModelBlocksVertexAttributeName(modelId, blockIds, name) {
     const item = modelBlocksVertexAttributeLastItem(modelId, blockIds[0], name);
-    await mutateModelBlocksVertexStyle(modelId, blockIds, { name, item });
+    mutateModelBlocksVertexStyle(modelId, blockIds, { name, item });
     return applyVertexAttribute(modelId, blockIds);
   }
 
-  async function setModelBlocksVertexAttributeItem(modelId, blockIds, item) {
-    await mutateModelBlocksVertexStyle(modelId, blockIds, { item });
+  function setModelBlocksVertexAttributeItem(modelId, blockIds, item) {
+    mutateModelBlocksVertexStyle(modelId, blockIds, { item });
     return applyVertexAttribute(modelId, blockIds);
   }
 
-  async function setModelBlocksVertexAttributeRange(modelId, blockIds, minimum, maximum) {
+  function setModelBlocksVertexAttributeRange(modelId, blockIds, minimum, maximum) {
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
-    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
-      minimum,
-      maximum,
-    });
+    setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, { minimum, maximum });
     return applyVertexAttribute(modelId, blockIds);
   }
 
-  async function setModelBlocksVertexAttributeColorMap(modelId, blockIds, colorMap) {
+  function setModelBlocksVertexAttributeColorMap(modelId, blockIds, colorMap) {
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
-    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, { colorMap });
+    setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, { colorMap });
     return applyVertexAttribute(modelId, blockIds);
   }
 

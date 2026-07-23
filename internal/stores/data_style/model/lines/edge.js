@@ -110,31 +110,28 @@ function useModelLinesEdgeAttribute() {
     return Promise.resolve();
   }
 
-  async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
+  function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
     const item = modelLinesEdgeAttributeLastItem(modelId, lineIds[0], name);
-    await mutateModelLinesEdgeStyle(modelId, lineIds, { name, item });
+    mutateModelLinesEdgeStyle(modelId, lineIds, { name, item });
     return applyEdgeAttribute(modelId, lineIds);
   }
 
-  async function setModelLinesEdgeAttributeItem(modelId, lineIds, item) {
-    await mutateModelLinesEdgeStyle(modelId, lineIds, { item });
+  function setModelLinesEdgeAttributeItem(modelId, lineIds, item) {
+    mutateModelLinesEdgeStyle(modelId, lineIds, { item });
     return applyEdgeAttribute(modelId, lineIds);
   }
 
-  async function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
+  function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
-    await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, {
-      minimum,
-      maximum,
-    });
+    setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, { minimum, maximum });
     return applyEdgeAttribute(modelId, lineIds);
   }
 
-  async function setModelLinesEdgeAttributeColorMap(modelId, lineIds, colorMap) {
+  function setModelLinesEdgeAttributeColorMap(modelId, lineIds, colorMap) {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
-    await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, { colorMap });
+    setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, { colorMap });
     return applyEdgeAttribute(modelId, lineIds);
   }
 
