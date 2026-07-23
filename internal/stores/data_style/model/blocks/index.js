@@ -28,7 +28,8 @@ export function useModelBlocksStyle() {
 
     const visibilityGroups = {};
     const colorGroups = {};
-    const attributeGroups = {};
+    const vertexGroups = {};
+    const polyhedronGroups = {};
 
     for (const block_id of blocks_ids) {
       const style = modelCommonStyle.modelBlockStyle(modelId, block_id);
@@ -53,40 +54,23 @@ export function useModelBlocksStyle() {
           colorGroups["random"] = { activeColoring, color: undefined, blocks_ids: [] };
         }
         colorGroups["random"].blocks_ids.push(block_id);
-      } else {
-        const attributeStyle = coloring[activeColoring];
+      } else if (activeColoring === "vertex") {
+        const attributeStyle = coloring.vertex;
         const { name, item } = attributeStyle;
-        const setAttribute =
-          activeColoring === "vertex"
-            ? modelBlocksVertexAttribute.setModelBlocksVertexAttribute
-            : modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute;
-        const storedConfig =
-          activeColoring === "vertex"
-            ? modelBlocksVertexAttribute.modelBlocksVertexAttributeStoredConfig(
-                modelId,
-                block_id,
-                name,
-                item,
-              )
-            : modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeStoredConfig(
-                modelId,
-                block_id,
-                name,
-                item,
-              );
+        const storedConfig = modelBlocksVertexAttribute.modelBlocksVertexAttributeStoredConfig(
+          modelId,
+          block_id,
+          name,
+          item,
+        );
         const { minimum, maximum, colorMap } = storedConfig;
         const attribute = { name, item, minimum, maximum, colorMap };
-        const isValid =
-          activeColoring === "vertex"
-            ? isModelBlocksVertexAttributeValid(attribute)
-            : isModelBlocksPolyhedronAttributeValid(attribute);
-        if (!isValid) {
+        if (!isModelBlocksVertexAttributeValid(attribute)) {
           continue;
         }
-        const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
-        if (!attributeGroups[attributeGroupKey]) {
-          attributeGroups[attributeGroupKey] = {
-            setAttribute,
+        const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+        if (!vertexGroups[key]) {
+          vertexGroups[key] = {
             name,
             item,
             minimum,
@@ -95,7 +79,34 @@ export function useModelBlocksStyle() {
             blocks_ids: [],
           };
         }
-        attributeGroups[attributeGroupKey].blocks_ids.push(block_id);
+        vertexGroups[key].blocks_ids.push(block_id);
+      } else if (activeColoring === "polyhedron") {
+        const attributeStyle = coloring.polyhedron;
+        const { name, item } = attributeStyle;
+        const storedConfig =
+          modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeStoredConfig(
+            modelId,
+            block_id,
+            name,
+            item,
+          );
+        const { minimum, maximum, colorMap } = storedConfig;
+        const attribute = { name, item, minimum, maximum, colorMap };
+        if (!isModelBlocksPolyhedronAttributeValid(attribute)) {
+          continue;
+        }
+        const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+        if (!polyhedronGroups[key]) {
+          polyhedronGroups[key] = {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            blocks_ids: [],
+          };
+        }
+        polyhedronGroups[key].blocks_ids.push(block_id);
       }
     }
 
@@ -106,9 +117,25 @@ export function useModelBlocksStyle() {
       ...Object.values(colorGroups).map(({ activeColoring, color, blocks_ids: ids }) =>
         modelColorStyle.setModelBlocksColor(modelId, ids, color, activeColoring),
       ),
-      ...Object.values(attributeGroups).map(
-        ({ setAttribute, name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
-          setAttribute(modelId, ids, { name, item, minimum, maximum, colorMap }),
+      ...Object.values(vertexGroups).map(
+        ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
+          modelBlocksVertexAttribute.setModelBlocksVertexAttribute(modelId, ids, {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+          }),
+      ),
+      ...Object.values(polyhedronGroups).map(
+        ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
+          modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(modelId, ids, {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+          }),
       ),
     ];
 
