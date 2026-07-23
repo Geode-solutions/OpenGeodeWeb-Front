@@ -20,9 +20,9 @@ export function useModelCommonStyle() {
     return model_component_datastyle_db.put(structuredClone(toRaw(entry)));
   }
 
-  function mutateModelComponentTypeStyle(id_model, type, values) {
+  async function mutateModelComponentTypeStyle(id_model, type, values) {
     dataStyleState.updateModelComponentTypeStyleCache(id_model, type, values);
-    return database.transaction("rw", model_component_type_datastyle_db, async () => {
+    await database.transaction("rw", model_component_type_datastyle_db, async () => {
       const key = [id_model, type];
       const entry = (await model_component_type_datastyle_db.get(key)) || { id_model, type };
       merge(entry, values);
@@ -30,9 +30,9 @@ export function useModelCommonStyle() {
     });
   }
 
-  function mutateComponentStyles(id_model, id_components, values) {
+  async function mutateComponentStyles(id_model, id_components, values) {
     dataStyleState.bulkUpdateComponentStylesCache(id_model, id_components, values);
-    return database.transaction("rw", model_component_datastyle_db, async () => {
+    await database.transaction("rw", model_component_datastyle_db, async () => {
       const keys = id_components.map((id_component) => [id_model, id_component]);
       const existing = await model_component_datastyle_db.bulkGet(keys);
       const updates = id_components.map((id_component, index) => {
@@ -45,9 +45,9 @@ export function useModelCommonStyle() {
     });
   }
 
-  function bulkMutateComponentStylesPerComponent(id_model, component_updates) {
+  async function bulkMutateComponentStylesPerComponent(id_model, component_updates) {
     dataStyleState.bulkUpdateComponentStyleCache(id_model, component_updates);
-    return database.transaction("rw", model_component_datastyle_db, async () => {
+    await database.transaction("rw", model_component_datastyle_db, async () => {
       const keys = component_updates.map((update) => [id_model, update.id_component]);
       const existing = await model_component_datastyle_db.bulkGet(keys);
       const updates = component_updates.map(({ id_component, values }, index) => {
