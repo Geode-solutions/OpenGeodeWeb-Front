@@ -74,6 +74,14 @@ const blocksVertexAttributeName = computed({
   },
 });
 
+const blocksVertexAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, targetBlockIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, targetBlockIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const blocksVertexAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, targetBlockIds[0]),
   set: async (newValue) => {
@@ -99,6 +107,14 @@ const blocksPolyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, targetBlockIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const blocksPolyhedronAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, targetBlockIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -137,6 +153,14 @@ const vertexAttributeName = computed({
   },
 });
 
+const vertexAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, blockId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, [blockId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, blockId),
   set: async (newValue) => {
@@ -162,6 +186,14 @@ const polyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [blockId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const polyhedronAttributeItem = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -210,9 +242,11 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
       v-model:coloring_style_key="blocksActiveColoring"
       v-model:color="blocksColor"
       v-model:vertex_attribute_name="blocksVertexAttributeName"
+      v-model:vertex_attribute_item="blocksVertexAttributeItem"
       v-model:vertex_attribute_range="blocksVertexAttributeRange"
       v-model:vertex_attribute_color_map="blocksVertexAttributeColorMap"
       v-model:polyhedron_attribute_name="blocksPolyhedronAttributeName"
+      v-model:polyhedron_attribute_item="blocksPolyhedronAttributeItem"
       v-model:polyhedron_attribute_range="blocksPolyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="blocksPolyhedronAttributeColorMap"
       :capabilities="capabilities"
@@ -229,9 +263,11 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
       v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"
       v-model:vertex_attribute_name="vertexAttributeName"
+      v-model:vertex_attribute_item="vertexAttributeItem"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
       v-model:polyhedron_attribute_name="polyhedronAttributeName"
+      v-model:polyhedron_attribute_item="polyhedronAttributeItem"
       v-model:polyhedron_attribute_range="polyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="polyhedronAttributeColorMap"
       :capabilities="capabilities"

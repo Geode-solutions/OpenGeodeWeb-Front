@@ -1,6 +1,9 @@
+import {
+  isModelBlocksPolyhedronAttributeValid,
+  useModelBlocksPolyhedronAttribute,
+} from "./polyhedron";
+import { isModelBlocksVertexAttributeValid, useModelBlocksVertexAttribute } from "./vertex";
 import { useModelBlocksCommonStyle } from "./common";
-import { useModelBlocksPolyhedronAttribute } from "./polyhedron";
-import { useModelBlocksVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -42,55 +45,51 @@ export function useModelBlocksColor() {
         modelId,
         blocks_ids[0],
       );
-      await modelBlocksVertexAttribute.setModelBlocksVertexAttributeName(modelId, blocks_ids, name);
-      const [min, max] = modelBlocksVertexAttribute.modelBlocksVertexAttributeRange(
+      const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(
         modelId,
         blocks_ids[0],
       );
-      await modelBlocksVertexAttribute.setModelBlocksVertexAttributeRange(
+      const [minimum, maximum] = modelBlocksVertexAttribute.modelBlocksVertexAttributeRange(
         modelId,
-        blocks_ids,
-        min,
-        max,
+        blocks_ids[0],
       );
       const colorMap = modelBlocksVertexAttribute.modelBlocksVertexAttributeColorMap(
         modelId,
         blocks_ids[0],
       );
-      await modelBlocksVertexAttribute.setModelBlocksVertexAttributeColorMap(
-        modelId,
-        blocks_ids,
-        colorMap,
-      );
+      const attribute = { name, item, minimum, maximum, colorMap };
+      if (isModelBlocksVertexAttributeValid(attribute)) {
+        return modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
+          modelId,
+          blocks_ids,
+          attribute,
+        );
+      }
     } else if (activeColoring === "polyhedron") {
       const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
         modelId,
         blocks_ids[0],
       );
-      await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttributeName(
-        modelId,
-        blocks_ids,
-        name,
-      );
-      const [min, max] = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeRange(
+      const item = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeItem(
         modelId,
         blocks_ids[0],
       );
-      await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttributeRange(
+      const [minimum, maximum] = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeRange(
         modelId,
-        blocks_ids,
-        min,
-        max,
+        blocks_ids[0],
       );
       const colorMap = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeColorMap(
         modelId,
         blocks_ids[0],
       );
-      await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttributeColorMap(
-        modelId,
-        blocks_ids,
-        colorMap,
-      );
+      const attribute = { name, item, minimum, maximum, colorMap };
+      if (isModelBlocksPolyhedronAttributeValid(attribute)) {
+        return modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
+          modelId,
+          blocks_ids,
+          attribute,
+        );
+      }
     }
   }
 

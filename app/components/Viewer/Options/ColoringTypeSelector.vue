@@ -10,34 +10,33 @@ const color = defineModel("color", { type: Object });
 const textures = defineModel("textures", { type: Array });
 
 const vertex_attribute_name = defineModel("vertex_attribute_name", { type: String });
+const vertex_attribute_item = defineModel("vertex_attribute_item", { type: Number });
 const vertex_attribute_range = defineModel("vertex_attribute_range", { type: Array });
 const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", { type: String });
 
 const edge_attribute_name = defineModel("edge_attribute_name", { type: String });
+const edge_attribute_item = defineModel("edge_attribute_item", { type: Number });
 const edge_attribute_range = defineModel("edge_attribute_range", { type: Array });
 const edge_attribute_color_map = defineModel("edge_attribute_color_map", { type: String });
 
 const cell_attribute_name = defineModel("cell_attribute_name", { type: String });
+const cell_attribute_item = defineModel("cell_attribute_item", { type: Number });
 const cell_attribute_range = defineModel("cell_attribute_range", { type: Array });
 const cell_attribute_color_map = defineModel("cell_attribute_color_map", { type: String });
 
 const polygon_attribute_name = defineModel("polygon_attribute_name", { type: String });
+const polygon_attribute_item = defineModel("polygon_attribute_item", { type: Number });
 const polygon_attribute_range = defineModel("polygon_attribute_range", { type: Array });
 const polygon_attribute_color_map = defineModel("polygon_attribute_color_map", { type: String });
 
 const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", { type: String });
+const polyhedron_attribute_item = defineModel("polyhedron_attribute_item", { type: Number });
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range", { type: Array });
 const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map", {
   type: String,
 });
 
-const {
-  id,
-  componentId,
-  capabilities,
-  schemas,
-  allowRandom = false,
-} = defineProps({
+const { id, componentId, capabilities, schemas, allowRandom } = defineProps({
   id: { type: String, required: true },
   componentId: { type: String, default: undefined },
   capabilities: {
@@ -211,9 +210,10 @@ watch(
       </template>
       <template v-if="active_key === vertex_dict['value'] && hasColorMap('vertex')">
         <ViewerOptionsAttributeSelector
-          v-model:name="vertex_attribute_name"
-          v-model:range="vertex_attribute_range"
-          v-model:colorMap="vertex_attribute_color_map"
+          v-model:attributeName="vertex_attribute_name"
+          v-model:attributeItem="vertex_attribute_item"
+          v-model:attributeRange="vertex_attribute_range"
+          v-model:attributeColorMap="vertex_attribute_color_map"
           :id="id"
           :componentId="componentId"
           :schema="vertexSchema"
@@ -221,9 +221,10 @@ watch(
       </template>
       <template v-if="active_key === edge_dict['value'] && hasColorMap('edge')">
         <ViewerOptionsAttributeSelector
-          v-model:name="edge_attribute_name"
-          v-model:range="edge_attribute_range"
-          v-model:colorMap="edge_attribute_color_map"
+          v-model:attributeName="edge_attribute_name"
+          v-model:attributeItem="edge_attribute_item"
+          v-model:attributeRange="edge_attribute_range"
+          v-model:attributeColorMap="edge_attribute_color_map"
           :id="id"
           :componentId="componentId"
           :schema="edgeSchema"
@@ -231,9 +232,10 @@ watch(
       </template>
       <template v-if="active_key === cell_dict['value'] && hasColorMap('cell')">
         <ViewerOptionsAttributeSelector
-          v-model:name="cell_attribute_name"
-          v-model:range="cell_attribute_range"
-          v-model:colorMap="cell_attribute_color_map"
+          v-model:attributeName="cell_attribute_name"
+          v-model:attributeItem="cell_attribute_item"
+          v-model:attributeRange="cell_attribute_range"
+          v-model:attributeColorMap="cell_attribute_color_map"
           :id="id"
           :componentId="componentId"
           :schema="cellSchema"
@@ -241,9 +243,10 @@ watch(
       </template>
       <template v-if="active_key === polygon_dict['value'] && hasColorMap('polygon')">
         <ViewerOptionsAttributeSelector
-          v-model:name="polygon_attribute_name"
-          v-model:range="polygon_attribute_range"
-          v-model:colorMap="polygon_attribute_color_map"
+          v-model:attributeName="polygon_attribute_name"
+          v-model:attributeItem="polygon_attribute_item"
+          v-model:attributeRange="polygon_attribute_range"
+          v-model:attributeColorMap="polygon_attribute_color_map"
           :id="id"
           :componentId="componentId"
           :schema="polygonSchema"
@@ -251,9 +254,10 @@ watch(
       </template>
       <template v-if="active_key === polyhedron_dict['value'] && hasColorMap('polyhedron')">
         <ViewerOptionsAttributeSelector
-          v-model:name="polyhedron_attribute_name"
-          v-model:range="polyhedron_attribute_range"
-          v-model:colorMap="polyhedron_attribute_color_map"
+          v-model:attributeName="polyhedron_attribute_name"
+          v-model:attributeItem="polyhedron_attribute_item"
+          v-model:attributeRange="polyhedron_attribute_range"
+          v-model:attributeColorMap="polyhedron_attribute_color_map"
           :id="id"
           :componentId="componentId"
           :schema="polyhedronSchema"

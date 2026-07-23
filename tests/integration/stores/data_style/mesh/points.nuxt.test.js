@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -13,7 +14,10 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points;
 const file_name = "test.og_edc2d";
 const geode_object = "EdgedCurve2D";
-const vertex_attribute = { name: "points" };
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
+const range = [MINIMUM_RANGE, MAXIMUM_RANGE];
+const default_vertex_attribute = { name: "points", item: 0, range };
 
 let id = "",
   projectFolderPath = "";
@@ -87,7 +91,7 @@ describe("mesh points", () => {
     test("coloring vertex", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
-      await dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name);
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, default_vertex_attribute.name);
       const coloringName = "vertex";
       const result = dataStyleStore.setMeshPointsActiveColoring(id, coloringName);
       expect(result).toBeInstanceOf(Promise);
@@ -125,17 +129,62 @@ describe("mesh points", () => {
       const viewerStore = useViewerStore();
 
       const spy = vi.spyOn(viewerStore, "request");
-      await dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name);
-      const schema = mesh_points_schemas.attribute.vertex.name;
-      const params = { id, ...vertex_attribute };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      const vertex_attribute = {
+        name: default_vertex_attribute.name,
+        item: default_vertex_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "batlow",
+      };
+      await dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute);
+      const schema = mesh_points_schemas.attribute.vertex.attribute;
+      const points = getRGBPointsFromPreset(vertex_attribute.colorMap);
+      const params = {
+        id,
+        name: vertex_attribute.name,
+        item: vertex_attribute.item,
+        points,
+        minimum: vertex_attribute.minimum,
+        maximum: vertex_attribute.maximum,
+      };
+      expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(vertex_attribute.name);
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const vertex_attribute = { name: "points", item: 2 };
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name);
+      await dataStyleStore.setMeshPointsVertexAttributeItem(id, vertex_attribute.item);
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(vertex_attribute.name);
+      expect(dataStyleStore.meshPointsVertexAttributeItem(id)).toBe(vertex_attribute.item);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPointsVertexAttributeRange(id, range[0], range[1]);
+      await dataStyleStore.setMeshPointsVertexAttributeColorMap(id, "budaS");
+      expect(dataStyleStore.meshPointsVertexAttributeRange(id)).toStrictEqual(range);
+      expect(dataStyleStore.meshPointsVertexAttributeColorMap(id)).toBe("budaS");
+    });
+
+    test("stored configs 3 - select unique_vertices", async () => {
+      const dataStyleStore = useDataStyleStore();
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, "unique_vertices");
+      await dataStyleStore.setMeshPointsVertexAttributeItem(id, 0);
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe("unique_vertices");
+      expect(dataStyleStore.meshPointsVertexAttributeItem(id)).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const vertex_attribute = { name: "points", item: 2 };
+      await dataStyleStore.setMeshPointsVertexAttributeName(id, vertex_attribute.name);
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(vertex_attribute.name);
+      expect(dataStyleStore.meshPointsVertexAttributeItem(id)).toBe(vertex_attribute.item);
+      expect(dataStyleStore.meshPointsVertexAttributeRange(id)).toStrictEqual(range);
+      expect(dataStyleStore.meshPointsVertexAttributeColorMap(id)).toBe("budaS");
     });
   });
 

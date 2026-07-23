@@ -1,7 +1,7 @@
+import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
+import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelSurfacesCommonStyle } from "./common";
-import { useModelSurfacesPolygonAttribute } from "./polygon";
-import { useModelSurfacesVertexAttribute } from "./vertex";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
@@ -42,59 +42,51 @@ export function useModelSurfacesColor() {
         modelId,
         surfaces_ids[0],
       );
-      await modelSurfacesVertexAttribute.setModelSurfacesVertexAttributeName(
-        modelId,
-        surfaces_ids,
-        name,
-      );
-      const [min, max] = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeRange(
+      const item = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeItem(
         modelId,
         surfaces_ids[0],
       );
-      await modelSurfacesVertexAttribute.setModelSurfacesVertexAttributeRange(
+      const [minimum, maximum] = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeRange(
         modelId,
-        surfaces_ids,
-        min,
-        max,
+        surfaces_ids[0],
       );
       const colorMap = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeColorMap(
         modelId,
         surfaces_ids[0],
       );
-      await modelSurfacesVertexAttribute.setModelSurfacesVertexAttributeColorMap(
-        modelId,
-        surfaces_ids,
-        colorMap,
-      );
+      const attribute = { name, item, minimum, maximum, colorMap };
+      if (isModelSurfacesVertexAttributeValid(attribute)) {
+        return modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
+          modelId,
+          surfaces_ids,
+          attribute,
+        );
+      }
     } else if (activeColoring === "polygon") {
       const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
         modelId,
         surfaces_ids[0],
       );
-      await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttributeName(
-        modelId,
-        surfaces_ids,
-        name,
-      );
-      const [min, max] = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeRange(
+      const item = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeItem(
         modelId,
         surfaces_ids[0],
       );
-      await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttributeRange(
+      const [minimum, maximum] = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeRange(
         modelId,
-        surfaces_ids,
-        min,
-        max,
+        surfaces_ids[0],
       );
       const colorMap = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeColorMap(
         modelId,
         surfaces_ids[0],
       );
-      await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttributeColorMap(
-        modelId,
-        surfaces_ids,
-        colorMap,
-      );
+      const attribute = { name, item, minimum, maximum, colorMap };
+      if (isModelSurfacesPolygonAttributeValid(attribute)) {
+        return modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
+          modelId,
+          surfaces_ids,
+          attribute,
+        );
+      }
     }
   }
 
