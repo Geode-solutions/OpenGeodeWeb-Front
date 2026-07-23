@@ -45,7 +45,7 @@ function sanitizeLabelValue(label) {
 }
 
 // oxlint-disable-next-line max-lines-per-function
-function requestConfig(parent, routerImage, backImage, viewerImage, email, projectId) {
+function requestConfig(parent, routerImage, backImage, viewerImage, email, projectName) {
   const resources = {
     limits: {
       cpu: "1000m",
@@ -63,7 +63,7 @@ function requestConfig(parent, routerImage, backImage, viewerImage, email, proje
       invokerIamDisabled: true,
       labels: {
         user: sanitizeLabelValue(email),
-        project: sanitizeLabelValue(projectId),
+        project: sanitizeLabelValue(projectName),
       },
       scaling: {
         scalingMode: "MANUAL",
