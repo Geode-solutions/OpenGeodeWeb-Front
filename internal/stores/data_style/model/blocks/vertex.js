@@ -108,6 +108,7 @@ function useModelBlocksVertexAttribute() {
     if (isModelBlocksVertexAttributeValid(attribute)) {
       return setModelBlocksVertexAttribute(modelId, blockIds, attribute);
     }
+    return Promise.resolve();
   }
 
   function setModelBlocksVertexAttributeName(modelId, blockIds, name) {

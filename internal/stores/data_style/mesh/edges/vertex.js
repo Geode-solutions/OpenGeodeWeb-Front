@@ -150,6 +150,7 @@ function useMeshEdgesVertexAttributeStyle() {
     meshEdgesVertexAttributeItem,
     meshEdgesVertexAttributeRange,
     meshEdgesVertexAttributeColorMap,
+    meshEdgesVertexAttributeStoredConfig,
     setMeshEdgesVertexAttribute,
     setMeshEdgesVertexAttributeName,
     setMeshEdgesVertexAttributeItem,

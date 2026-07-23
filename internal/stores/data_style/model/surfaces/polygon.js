@@ -114,6 +114,7 @@ function useModelSurfacesPolygonAttribute() {
     if (isModelSurfacesPolygonAttributeValid(attribute)) {
       return setModelSurfacesPolygonAttribute(modelId, surfaceIds, attribute);
     }
+    return Promise.resolve();
   }
 
   function setModelSurfacesPolygonAttributeName(modelId, surfaceIds, name) {

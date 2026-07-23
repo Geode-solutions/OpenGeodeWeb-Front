@@ -1,3 +1,4 @@
+// oxlint-disable max-lines
 // Third party imports
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
@@ -6,6 +7,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { isMeshCellsVertexAttributeValid } from "@ogw_internal/stores/data_style/mesh/cells/vertex";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";

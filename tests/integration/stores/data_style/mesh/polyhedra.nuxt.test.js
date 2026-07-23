@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 

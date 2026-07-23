@@ -114,6 +114,7 @@ function useModelSurfacesVertexAttribute() {
     if (isModelSurfacesVertexAttributeValid(attribute)) {
       return setModelSurfacesVertexAttribute(modelId, surfaceIds, attribute);
     }
+    return Promise.resolve();
   }
 
   function setModelSurfacesVertexAttributeName(modelId, surfaceIds, name) {

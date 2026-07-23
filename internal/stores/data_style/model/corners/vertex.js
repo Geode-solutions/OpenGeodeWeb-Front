@@ -108,6 +108,7 @@ function useModelCornersVertexAttribute() {
     if (isModelCornersVertexAttributeValid(attribute)) {
       return setModelCornersVertexAttribute(modelId, cornerIds, attribute);
     }
+    return Promise.resolve();
   }
 
   function setModelCornersVertexAttributeName(modelId, cornerIds, name) {

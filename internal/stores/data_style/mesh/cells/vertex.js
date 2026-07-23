@@ -146,6 +146,7 @@ function useMeshCellsVertexAttributeStyle() {
     meshCellsVertexAttributeItem,
     meshCellsVertexAttributeRange,
     meshCellsVertexAttributeColorMap,
+    meshCellsVertexAttributeStoredConfig,
     setMeshCellsVertexAttribute,
     setMeshCellsVertexAttributeName,
     setMeshCellsVertexAttributeItem,

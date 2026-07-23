@@ -108,6 +108,7 @@ function useModelLinesVertexAttribute() {
     if (isModelLinesVertexAttributeValid(attribute)) {
       return setModelLinesVertexAttribute(modelId, lineIds, attribute);
     }
+    return Promise.resolve();
   }
 
   function setModelLinesVertexAttributeName(modelId, lineIds, name) {

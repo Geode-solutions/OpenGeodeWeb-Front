@@ -150,6 +150,7 @@ function useMeshPolyhedraVertexAttributeStyle() {
     meshPolyhedraVertexAttributeItem,
     meshPolyhedraVertexAttributeRange,
     meshPolyhedraVertexAttributeColorMap,
+    meshPolyhedraVertexAttributeStoredConfig,
     setMeshPolyhedraVertexAttribute,
     setMeshPolyhedraVertexAttributeName,
     setMeshPolyhedraVertexAttributeItem,

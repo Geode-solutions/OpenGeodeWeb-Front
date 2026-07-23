@@ -1,6 +1,6 @@
+import { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelCornersCommonStyle } from "./common";
-import { useModelCornersVertexAttribute } from "./vertex";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.color;
@@ -40,30 +40,26 @@ export function useModelCornersColor() {
         modelId,
         corners_ids[0],
       );
-      await modelCornersVertexAttribute.setModelCornersVertexAttributeName(
-        modelId,
-        corners_ids,
-        name,
-      );
-      const [min, max] = modelCornersVertexAttribute.modelCornersVertexAttributeRange(
+      const item = modelCornersVertexAttribute.modelCornersVertexAttributeItem(
         modelId,
         corners_ids[0],
       );
-      await modelCornersVertexAttribute.setModelCornersVertexAttributeRange(
+      const [minimum, maximum] = modelCornersVertexAttribute.modelCornersVertexAttributeRange(
         modelId,
-        corners_ids,
-        min,
-        max,
+        corners_ids[0],
       );
       const colorMap = modelCornersVertexAttribute.modelCornersVertexAttributeColorMap(
         modelId,
         corners_ids[0],
       );
-      await modelCornersVertexAttribute.setModelCornersVertexAttributeColorMap(
-        modelId,
-        corners_ids,
-        colorMap,
-      );
+      const attribute = { name, item, minimum, maximum, colorMap };
+      if (isModelCornersVertexAttributeValid(attribute)) {
+        return modelCornersVertexAttribute.setModelCornersVertexAttribute(
+          modelId,
+          corners_ids,
+          attribute,
+        );
+      }
     }
   }
 

@@ -114,6 +114,7 @@ function useModelBlocksPolyhedronAttribute() {
     if (isModelBlocksPolyhedronAttributeValid(attribute)) {
       return setModelBlocksPolyhedronAttribute(modelId, blockIds, attribute);
     }
+    return Promise.resolve();
   }
 
   function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {

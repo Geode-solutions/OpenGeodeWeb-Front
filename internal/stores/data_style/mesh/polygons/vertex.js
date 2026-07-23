@@ -150,6 +150,7 @@ function useMeshPolygonsVertexAttributeStyle() {
     meshPolygonsVertexAttributeItem,
     meshPolygonsVertexAttributeRange,
     meshPolygonsVertexAttributeColorMap,
+    meshPolygonsVertexAttributeStoredConfig,
     setMeshPolygonsVertexAttribute,
     setMeshPolygonsVertexAttributeName,
     setMeshPolygonsVertexAttributeItem,

@@ -107,6 +107,7 @@ function useModelLinesEdgeAttribute() {
     if (isModelLinesEdgeAttributeValid(attribute)) {
       return setModelLinesEdgeAttribute(modelId, lineIds, attribute);
     }
+    return Promise.resolve();
   }
 
   function setModelLinesEdgeAttributeName(modelId, lineIds, name) {

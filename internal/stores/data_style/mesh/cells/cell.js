@@ -145,6 +145,7 @@ function useMeshCellsCellAttributeStyle() {
     meshCellsCellAttributeItem,
     meshCellsCellAttributeRange,
     meshCellsCellAttributeColorMap,
+    meshCellsCellAttributeStoredConfig,
     setMeshCellsCellAttribute,
     setMeshCellsCellAttributeName,
     setMeshCellsCellAttributeItem,
