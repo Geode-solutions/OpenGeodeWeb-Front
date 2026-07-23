@@ -125,7 +125,10 @@ function useModelCornersVertexAttribute() {
   function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
-    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { minimum, maximum });
+    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
+      minimum,
+      maximum,
+    });
     return applyVertexAttribute(modelId, cornerIds);
   }
 
