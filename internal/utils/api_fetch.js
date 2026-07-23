@@ -67,7 +67,7 @@ export function api_fetch(
     });
   }
 
-  if (timeout !== undefined && timeout > 0) {
+  if (timeout > 0) {
     return pTimeout(performCall(), {
       milliseconds: timeout,
       message: `${schema.$id}: Timed out after ${timeout}ms`,
