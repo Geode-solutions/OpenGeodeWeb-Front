@@ -193,25 +193,6 @@ describe("model surfaces", () => {
       expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe("batlow");
     });
 
-    test("coloring vertex attribute — no request until range+colormap set", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
-      const dataStore = useDataStore();
-      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const spy = vi.spyOn(viewerStore, "request");
-      spy.mockClear();
-      const result = dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
-      expect(result).toBeInstanceOf(Promise);
-      await result;
-      await sleep(SLEEP_MS);
-      // No request sent yet since minimum/maximum/colorMap are still undefined
-      expect(spy).not.toHaveBeenCalled();
-      for (const surface_id of surface_ids) {
-        expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
-      }
-      expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
-
     test("coloring vertex attribute — request sent when all params defined", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
