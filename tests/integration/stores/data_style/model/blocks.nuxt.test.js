@@ -171,9 +171,7 @@ describe("model blocks", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelBlocksVertexAttributeColorMap(id, block_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelBlocksVertexAttributeColorMap(id, block_id)).toBe("budaS");
     });
 
     test("stored configs 3 - select unique_vertices", async () => {
@@ -199,9 +197,7 @@ describe("model blocks", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelBlocksVertexAttributeColorMap(id, block_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelBlocksVertexAttributeColorMap(id, block_id)).toBe("budaS");
     });
   });
 
@@ -246,11 +242,7 @@ describe("model blocks", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
-        id,
-        block_ids,
-        "budaS",
-      );
+      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(id, block_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
       expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.polyhedron.attribute);
@@ -295,19 +287,13 @@ describe("model blocks", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
-        id,
-        block_ids,
-        "budaS",
-      );
+      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(id, block_ids, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelBlocksPolyhedronAttributeRange(id, block_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelBlocksPolyhedronAttributeColorMap(id, block_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeColorMap(id, block_id)).toBe("budaS");
     });
 
     test("stored configs 3 - select tetrahedron_adjacents", async () => {
@@ -345,9 +331,7 @@ describe("model blocks", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelBlocksPolyhedronAttributeColorMap(id, block_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelBlocksPolyhedronAttributeColorMap(id, block_id)).toBe("budaS");
     });
   });
 

@@ -227,11 +227,7 @@ describe("model surfaces", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
-        id,
-        surface_ids,
-        "budaS",
-      );
+      await dataStyleStore.setModelSurfacesVertexAttributeColorMap(id, surface_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
       expect(lastCall[0].schema).toStrictEqual(model_surfaces_schemas.attribute.vertex.attribute);
@@ -270,19 +266,13 @@ describe("model surfaces", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
-        id,
-        surface_ids,
-        "budaS",
-      );
+      await dataStyleStore.setModelSurfacesVertexAttributeColorMap(id, surface_ids, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelSurfacesVertexAttributeRange(id, surface_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe("budaS");
     });
 
     test("stored configs 3 - select unique_vertices", async () => {
@@ -310,9 +300,7 @@ describe("model surfaces", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe("budaS");
     });
   });
 
@@ -450,11 +438,7 @@ describe("model surfaces", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
-        id,
-        surface_ids,
-        "budaS",
-      );
+      await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(id, surface_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
       expect(lastCall[0].schema).toStrictEqual(model_surfaces_schemas.attribute.polygon.attribute);
@@ -499,19 +483,13 @@ describe("model surfaces", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
-        id,
-        surface_ids,
-        "budaS",
-      );
+      await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(id, surface_ids, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelSurfacesPolygonAttributeRange(id, surface_id)).toStrictEqual([
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe("budaS");
     });
 
     test("stored configs 3 - select triangle_adjacents", async () => {
@@ -549,9 +527,7 @@ describe("model surfaces", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe("budaS");
     });
   });
 

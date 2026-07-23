@@ -176,9 +176,7 @@ describe("model corners", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe("budaS");
     });
 
     test("stored configs 3 - select unique_vertices", async () => {
@@ -204,9 +202,7 @@ describe("model corners", () => {
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       ]);
-      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe(
-        "budaS",
-      );
+      expect(dataStyleStore.modelCornersVertexAttributeColorMap(id, corner_id)).toBe("budaS");
     });
   });
 
