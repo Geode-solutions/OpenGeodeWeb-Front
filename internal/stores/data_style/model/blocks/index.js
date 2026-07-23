@@ -1,8 +1,11 @@
+import {
+  isModelBlocksPolyhedronAttributeValid,
+  useModelBlocksPolyhedronAttribute,
+} from "./polyhedron";
+import { isModelBlocksVertexAttributeValid, useModelBlocksVertexAttribute } from "./vertex";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
-import { useModelBlocksPolyhedronAttribute } from "./polyhedron";
-import { useModelBlocksVertexAttribute } from "./vertex";
 import { useModelBlocksVisibility } from "./visibility";
 
 async function setModelBlocksDefaultStyle(_id) {
@@ -19,7 +22,7 @@ export function useModelBlocksStyle() {
 
   async function applyModelBlocksStyle(modelId) {
     const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
-    if (!blocks_ids?.length) {
+    if (blocks_ids.length === 0) {
       return;
     }
 
@@ -53,25 +56,37 @@ export function useModelBlocksStyle() {
       } else {
         const attributeStyle = coloring[activeColoring];
         const { name, item } = attributeStyle;
-        const isVertex = activeColoring === "vertex";
-        const storedConfig = isVertex
-          ? modelBlocksVertexAttribute.modelBlocksVertexAttributeStoredConfig(
-              modelId,
-              block_id,
-              name,
-              item,
-            )
-          : modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeStoredConfig(
-              modelId,
-              block_id,
-              name,
-              item,
-            );
+        const setAttribute =
+          activeColoring === "vertex"
+            ? modelBlocksVertexAttribute.setModelBlocksVertexAttribute
+            : modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute;
+        const storedConfig =
+          activeColoring === "vertex"
+            ? modelBlocksVertexAttribute.modelBlocksVertexAttributeStoredConfig(
+                modelId,
+                block_id,
+                name,
+                item,
+              )
+            : modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeStoredConfig(
+                modelId,
+                block_id,
+                name,
+                item,
+              );
         const { minimum, maximum, colorMap } = storedConfig;
+        const attribute = { name, item, minimum, maximum, colorMap };
+        const isValid =
+          activeColoring === "vertex"
+            ? isModelBlocksVertexAttributeValid(attribute)
+            : isModelBlocksPolyhedronAttributeValid(attribute);
+        if (!isValid) {
+          continue;
+        }
         const attributeGroupKey = `${activeColoring}_${name}_${colorMap}_${minimum}_${maximum}`;
         if (!attributeGroups[attributeGroupKey]) {
           attributeGroups[attributeGroupKey] = {
-            activeColoring,
+            setAttribute,
             name,
             item,
             minimum,
@@ -92,13 +107,8 @@ export function useModelBlocksStyle() {
         modelColorStyle.setModelBlocksColor(modelId, ids, color, activeColoring),
       ),
       ...Object.values(attributeGroups).map(
-        ({ activeColoring, name, item, minimum, maximum, colorMap, blocks_ids: ids }) => {
-          const isVertex = activeColoring === "vertex";
-          const setAttributeAttribute = isVertex
-            ? modelBlocksVertexAttribute.setModelBlocksVertexAttribute
-            : modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute;
-          return setAttributeAttribute(modelId, ids, { name, item, minimum, maximum, colorMap });
-        },
+        ({ setAttribute, name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
+          setAttribute(modelId, ids, { name, item, minimum, maximum, colorMap }),
       ),
     ];
 
