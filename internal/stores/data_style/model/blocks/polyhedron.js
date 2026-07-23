@@ -22,7 +22,7 @@ function isModelBlocksPolyhedronAttributeValid({ name, item, minimum, maximum, c
 }
 
 // oxlint-disable-next-line max-lines-per-function
-export function useModelBlocksPolyhedronAttribute() {
+function useModelBlocksPolyhedronAttribute() {
   const dataStore = useDataStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const viewerStore = useViewerStore();
@@ -33,16 +33,14 @@ export function useModelBlocksPolyhedronAttribute() {
 
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
-    if (name in storedConfigs && item in storedConfigs[name]) {
+    if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
-    const defaultConfig = {
+    return {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
     };
-    setModelBlocksPolyhedronAttributeStoredConfig(modelId, [blockId], name, item, defaultConfig);
-    return defaultConfig;
   }
 
   function mutateModelBlocksPolyhedronStyle(modelId, blockIds, values) {
@@ -184,3 +182,5 @@ export function useModelBlocksPolyhedronAttribute() {
     setModelBlocksPolyhedronAttributeColorMap,
   };
 }
+
+export { isModelBlocksPolyhedronAttributeValid, useModelBlocksPolyhedronAttribute };
