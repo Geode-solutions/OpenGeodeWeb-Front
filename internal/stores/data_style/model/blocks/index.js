@@ -30,8 +30,10 @@ export function useModelBlocksStyle() {
       }
       visibilityGroups[visibility].push(block_id);
     }
-    return Object.entries(visibilityGroups).map(([visibility, ids]) =>
-      modelVisibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
+    return Promise.all(
+      Object.entries(visibilityGroups).map(([visibility, ids]) =>
+        modelVisibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
+      ),
     );
   }
 
@@ -44,7 +46,9 @@ export function useModelBlocksStyle() {
       }
       activeColoringGroups[activeColoring].push(block_id);
     }
-    const promises = [];
+
+    const coloringPromises = [];
+
     for (const [type, type_blocks_ids] of Object.entries(activeColoringGroups)) {
       if (type === "constant") {
         const colorGroups = {};
@@ -56,11 +60,13 @@ export function useModelBlocksStyle() {
           }
           colorGroups[color_key].blocks_ids.push(block_id);
         }
-        for (const { color, blocks_ids: ids } of Object.values(colorGroups)) {
-          promises.push(modelColorStyle.setModelBlocksColor(modelId, ids, color, "constant"));
-        }
+        coloringPromises.push(
+          ...Object.values(colorGroups).map(({ color, blocks_ids: ids }) =>
+            modelColorStyle.setModelBlocksColor(modelId, ids, color, "constant"),
+          ),
+        );
       } else if (type === "random") {
-        promises.push(
+        coloringPromises.push(
           modelColorStyle.setModelBlocksColor(modelId, type_blocks_ids, undefined, "random"),
         );
       } else if (type === "vertex") {
@@ -93,19 +99,18 @@ export function useModelBlocksStyle() {
           }
           vertexGroups[key].blocks_ids.push(block_id);
         }
-        for (const { name, item, minimum, maximum, colorMap, blocks_ids: ids } of Object.values(
-          vertexGroups,
-        )) {
-          promises.push(
-            modelBlocksVertexAttribute.setModelBlocksVertexAttribute(modelId, ids, {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-            }),
-          );
-        }
+        coloringPromises.push(
+          ...Object.values(vertexGroups).map(
+            ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
+              modelBlocksVertexAttribute.setModelBlocksVertexAttribute(modelId, ids, {
+                name,
+                item,
+                minimum,
+                maximum,
+                colorMap,
+              }),
+          ),
+        );
       } else if (type === "polyhedron") {
         const polyhedronGroups = {};
         for (const block_id of type_blocks_ids) {
@@ -140,22 +145,22 @@ export function useModelBlocksStyle() {
           }
           polyhedronGroups[key].blocks_ids.push(block_id);
         }
-        for (const { name, item, minimum, maximum, colorMap, blocks_ids: ids } of Object.values(
-          polyhedronGroups,
-        )) {
-          promises.push(
-            modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(modelId, ids, {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-            }),
-          );
-        }
+        coloringPromises.push(
+          ...Object.values(polyhedronGroups).map(
+            ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
+              modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(modelId, ids, {
+                name,
+                item,
+                minimum,
+                maximum,
+                colorMap,
+              }),
+          ),
+        );
       }
     }
-    return promises;
+
+    return Promise.all(coloringPromises);
   }
 
   async function applyModelBlocksStyle(modelId) {
@@ -165,8 +170,8 @@ export function useModelBlocksStyle() {
     }
 
     return Promise.all([
-      ...applyModelBlocksVisibilityStyle(modelId, blocks_ids),
-      ...applyModelBlocksColoringStyle(modelId, blocks_ids),
+      applyModelBlocksVisibilityStyle(modelId, blocks_ids),
+      applyModelBlocksColoringStyle(modelId, blocks_ids),
     ]);
   }
 
