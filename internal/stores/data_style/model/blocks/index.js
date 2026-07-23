@@ -40,7 +40,6 @@ export function useModelBlocksStyle() {
       }
       visibilityGroups[visibility].push(block_id);
 
-      const coloring = modelColorStyle.modelBlockColoring(modelId, block_id);
       const activeColoring = modelColorStyle.modelBlockActiveColoring(modelId, block_id);
       if (activeColoring === "constant") {
         const color = modelColorStyle.modelBlockColor(modelId, block_id);
@@ -55,15 +54,16 @@ export function useModelBlocksStyle() {
         }
         colorGroups["random"].blocks_ids.push(block_id);
       } else if (activeColoring === "vertex") {
-        const attributeStyle = coloring.vertex;
-        const { name, item } = attributeStyle;
-        const storedConfig = modelBlocksVertexAttribute.modelBlocksVertexAttributeStoredConfig(
+        const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, block_id);
+        const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(modelId, block_id);
+        const [minimum, maximum] = modelBlocksVertexAttribute.modelBlocksVertexAttributeRange(
           modelId,
           block_id,
-          name,
-          item,
         );
-        const { minimum, maximum, colorMap } = storedConfig;
+        const colorMap = modelBlocksVertexAttribute.modelBlocksVertexAttributeColorMap(
+          modelId,
+          block_id,
+        );
         const attribute = { name, item, minimum, maximum, colorMap };
         if (!isModelBlocksVertexAttributeValid(attribute)) {
           continue;
@@ -81,16 +81,20 @@ export function useModelBlocksStyle() {
         }
         vertexGroups[key].blocks_ids.push(block_id);
       } else if (activeColoring === "polyhedron") {
-        const attributeStyle = coloring.polyhedron;
-        const { name, item } = attributeStyle;
-        const storedConfig =
-          modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeStoredConfig(
-            modelId,
-            block_id,
-            name,
-            item,
-          );
-        const { minimum, maximum, colorMap } = storedConfig;
+        const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
+          modelId,
+          block_id,
+        );
+        const item = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeItem(
+          modelId,
+          block_id,
+        );
+        const [minimum, maximum] =
+          modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeRange(modelId, block_id);
+        const colorMap = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeColorMap(
+          modelId,
+          block_id,
+        );
         const attribute = { name, item, minimum, maximum, colorMap };
         if (!isModelBlocksPolyhedronAttributeValid(attribute)) {
           continue;
