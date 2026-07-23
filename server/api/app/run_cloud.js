@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
     const credentials = JSON.parse(process.env.GOOGLE_CLOUD_KEY);
     const location = "europe-west9";
     const projectId = process.env.GOOGLE_CLOUD_PROJECT;
+    const projectName = process.env.PROJECT;
     const parent = `projects/${projectId}/locations/${location}`;
     console.log({ parent });
     const auth = new GoogleAuth({
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
     });
     const authClient = await auth.getClient();
     const [routerImage, backImage, viewerImage] = await artifactImages(parent, authClient);
-    const request = requestConfig(parent, routerImage, backImage, viewerImage, email, projectId);
+    const request = requestConfig(parent, routerImage, backImage, viewerImage, email, projectName);
     console.log({ request });
     const runClient = new ServicesClient({ authClient });
     const [operation] = await runClient.createService(request);
