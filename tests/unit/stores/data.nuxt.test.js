@@ -28,14 +28,32 @@ describe("useDataStore - collections", () => {
     await dataStore.addComponents({
       id: modelId,
       mesh_components: [
-        { geode_id: "mesh_corner", name: "Corner 1", type: "Corner", viewer_id: 1, is_active: true },
-        { geode_id: "mesh_surface", name: "Surface 1", type: "Surface", viewer_id: 2, is_active: true },
+        {
+          geode_id: "mesh_corner",
+          name: "Corner 1",
+          type: "Corner",
+          viewer_id: 1,
+          is_active: true,
+        },
+        {
+          geode_id: "mesh_surface",
+          name: "Surface 1",
+          type: "Surface",
+          viewer_id: 2,
+          is_active: true,
+        },
       ],
       collection_components: [
         // Standard collection type
         { geode_id: "fault1", name: "Fault 1", type: "Fault", viewer_id: 3, is_active: true },
         // Custom collection type (not previously hardcoded)
-        { geode_id: "custom1", name: "Custom 1", type: "MyCustomCollection", viewer_id: 4, is_active: true },
+        {
+          geode_id: "custom1",
+          name: "Custom 1",
+          type: "MyCustomCollection",
+          viewer_id: 4,
+          is_active: true,
+        },
       ],
     });
 
