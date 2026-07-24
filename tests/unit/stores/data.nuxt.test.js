@@ -73,7 +73,13 @@ describe("useDataStore - collections", () => {
     // 4. Verify getAllCollectionComponents returns both Fault and MyCustomCollection
     const allCollections = await dataStore.getAllCollectionComponents(modelId);
     expect(allCollections).toStrictEqual([
-      { id: "custom1", title: "Custom 1", category: "MyCustomCollection", viewer_id: 4, is_active: true },
+      {
+        id: "custom1",
+        title: "Custom 1",
+        category: "MyCustomCollection",
+        viewer_id: 4,
+        is_active: true,
+      },
       { id: "fault1", title: "Fault 1", category: "Fault", viewer_id: 3, is_active: true },
     ]);
 
