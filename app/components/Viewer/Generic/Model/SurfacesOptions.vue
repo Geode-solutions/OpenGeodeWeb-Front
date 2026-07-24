@@ -19,7 +19,7 @@ const hybridViewerStore = useHybridViewerStore();
 const surfacesVisibility = computed({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Surface"),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentTypeVisibility(modelId, "Surface", newValue);
+    await dataStyleStore.setModelSurfacesVisibility(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -36,7 +36,7 @@ const surfaceVisibility = computed({
 const surfacesColor = computed({
   get: () => dataStyleStore.modelComponentTypeColor(modelId, "Surface"),
   set: async (color) => {
-    await dataStyleStore.setModelComponentTypeColor(modelId, "Surface", color);
+    await dataStyleStore.setModelSurfacesColor(modelId, targetSurfaceIds, color);
     hybridViewerStore.remoteRender();
   },
 });
@@ -52,7 +52,7 @@ const surfaceColor = computed({
 const surfacesActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Surface"),
   set: async (coloringType) => {
-    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Surface", coloringType);
+    await dataStyleStore.setModelSurfacesActiveColoring(modelId, targetSurfaceIds, coloringType);
     hybridViewerStore.remoteRender();
   },
 });

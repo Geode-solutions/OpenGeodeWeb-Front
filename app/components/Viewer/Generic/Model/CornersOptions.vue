@@ -13,14 +13,13 @@ const { modelId, cornerId, targetCornerIds } = defineProps({
 });
 
 const dataStyleStore = useDataStyleStore();
-console.log("CornersOptions setup!");
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
 const cornersVisibility = computed({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentTypeVisibility(modelId, "Corner", newValue);
+    await dataStyleStore.setModelCornersVisibility(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -37,7 +36,7 @@ const cornerVisibility = computed({
 const cornersColor = computed({
   get: () => dataStyleStore.modelComponentTypeColor(modelId, "Corner"),
   set: async (color) => {
-    await dataStyleStore.setModelComponentTypeColor(modelId, "Corner", color);
+    await dataStyleStore.setModelCornersColor(modelId, targetCornerIds, color);
     hybridViewerStore.remoteRender();
   },
 });
@@ -53,7 +52,7 @@ const cornerColor = computed({
 const cornersActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner"),
   set: async (coloringType) => {
-    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Corner", coloringType);
+    await dataStyleStore.setModelCornersActiveColoring(modelId, targetCornerIds, coloringType);
     hybridViewerStore.remoteRender();
   },
 });
