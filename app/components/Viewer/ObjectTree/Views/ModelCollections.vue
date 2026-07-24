@@ -127,10 +127,10 @@ function expandAll() {
 }
 
 function extractIds(node) {
-  if (node.children && node.children.length > 0) {
+  if (node.children !== undefined && node.children !== null) {
     return node.children.flatMap((child) => extractIds(child));
   }
-  if (node.viewer_id !== undefined && node.viewer_id !== null) {
+  if (node.viewer_id !== undefined && node.viewer_id !== null && !Number.isNaN(node.viewer_id)) {
     return [node.viewer_id];
   }
   return [];
@@ -187,7 +187,7 @@ function getLeafViewerIds(item) {
 
       <template #append="{ item }">
         <v-btn
-          v-if="item.category || (item.children && item.children.length > 0)"
+          v-if="getLeafViewerIds(item).length > 0"
           icon="mdi-target"
           size="medium"
           variant="text"
