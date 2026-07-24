@@ -15,8 +15,14 @@ function triggerHorizonStackModal(rawItem) {
   globalThis.dispatchEvent(new CustomEvent("open-horizon-stack-modal", { detail: rawItem }));
 }
 const isHorizonStack = computed(() => item.raw.geode_object_type === "HorizonStack3D");
-const isViewable = computed(() => item.raw.is_viewable === true || (item.raw.is_viewable === undefined && item.raw.binary_light_viewable !== "not_viewable"));
-const showEyeButton = computed(() => !isHorizonStack.value && item.raw.title !== "HorizonStack3D" && isViewable.value);
+const isViewable = computed(
+  () =>
+    item.raw.is_viewable === true ||
+    (item.raw.is_viewable === undefined && item.raw.binary_light_viewable !== "not_viewable"),
+);
+const showEyeButton = computed(
+  () => !isHorizonStack.value && item.raw.title !== "HorizonStack3D" && isViewable.value,
+);
 
 function handleRowClick(event) {
   if (isHorizonStack.value) {
