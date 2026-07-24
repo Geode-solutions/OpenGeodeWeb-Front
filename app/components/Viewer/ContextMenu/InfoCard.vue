@@ -22,80 +22,52 @@ const TRUNCATE_END_CHARS = 7;
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
-const componentName = ref("");
+const componentItem = ref(undefined);
 
 watch(
   () => menuStore.current_meta_data,
   async (newMeta) => {
-    componentName.value = "";
+    componentItem.value = undefined;
     if (!newMeta) {
       return;
     }
-
-    if (newMeta.viewer_type === "model_component" && newMeta.modelId && newMeta.pickedComponentId) {
-      try {
-        const comp = await dataStore.getComponentByViewerId(
-          newMeta.modelId,
-          newMeta.pickedComponentId,
-        );
-        if (comp && comp.name) {
-          componentName.value = comp.name;
-        } else {
-          componentName.value = newMeta.pickedComponentId;
-        }
-      } catch {
-        componentName.value = newMeta.pickedComponentId;
-      }
+    const modelId = newMeta.modelId || newMeta.id;
+    if (newMeta.pickedComponentId && modelId) {
+      const components = await dataStore.getAllMeshComponents(modelId);
+      componentItem.value = components.find((comp) => comp.id === newMeta.pickedComponentId);
     }
   },
   { immediate: true },
 );
 
-const cleanName = computed(() => {
-  const meta = menuStore.current_meta_data;
-  if (!meta) {
-    return "Unnamed Object";
-  }
-  if (componentName.value) {
-    return componentName.value;
-  }
-  return meta.name || "Unnamed Object";
-});
+const displayTitle = computed(() =>
+  middleTruncate(metaData.name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS),
+);
 
-const displayTitle = computed(() => {
-  const name = cleanName.value;
-  if (!name) {
-    return "";
-  }
-  return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
-});
+const displayComponentTitle = computed(() =>
+  middleTruncate(
+    componentItem.value.title,
+    TRUNCATE_MAX_LENGTH,
+    TRUNCATE_START_CHARS,
+    TRUNCATE_END_CHARS,
+  ),
+);
 
-const copied = ref(false);
+const copiedId = ref("");
 async function copyId(targetId) {
-  if (!targetId) {
-    return;
-  }
-  try {
-    await navigator.clipboard.writeText(targetId);
-    copied.value = true;
-    setTimeout(() => {
-      copied.value = false;
-    }, COPIED_TIMEOUT);
-  } catch (error) {
-    console.error("Failed to copy ID:", error);
-  }
+  await navigator.clipboard.writeText(targetId);
+  copiedId.value = targetId;
+  setTimeout(() => {
+    copiedId.value = "";
+  }, COPIED_TIMEOUT);
 }
 
-const formattedId = computed(() => {
-  const metaId = metaData?.id;
-  if (!metaId) {
-    return "";
+function formattedId(targetId) {
+  if (targetId.length <= MAX_SHORT_ID_LENGTH) {
+    return targetId;
   }
-  if (metaId.length <= MAX_SHORT_ID_LENGTH) {
-    return metaId;
-  }
-  return `${metaId.slice(0, ID_SLICE_START)}...${metaId.slice(metaId.length - ID_SLICE_END_OFFSET)}`;
-});
+  return `${targetId.slice(0, ID_SLICE_START)}...${targetId.slice(targetId.length - ID_SLICE_END_OFFSET)}`;
+}
 </script>
 
 <template>
@@ -129,15 +101,50 @@ const formattedId = computed(() => {
             @click.stop="copyId(metaData.id)"
           >
             <span class="id-text">
-              {{ copied ? "COPIED!" : formattedId }}
+              {{ copiedId === metaData.id ? "COPIED!" : formattedId(metaData.id) }}
             </span>
             <v-icon
-              :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+              :icon="copiedId === metaData.id ? 'mdi-check' : 'mdi-content-copy'"
               size="10"
-              :color="copied ? 'success' : 'white'"
+              :color="copiedId === metaData.id ? 'success' : 'white'"
               class="ml-1"
             />
           </v-col>
+
+          <template v-if="componentItem">
+            <v-divider class="w-100 my-2" opacity="0.2" />
+            <v-col
+              class="text-subtitle-2 font-weight-bold text-truncate text-white w-100 pa-0"
+              cols="auto"
+              style="line-height: 1.3"
+            >
+              {{ displayComponentTitle }}
+            </v-col>
+            <v-col
+              class="text-caption font-weight-black text-uppercase text-secondary pa-0"
+              style="font-size: 0.68rem; line-height: 1.2"
+            >
+              {{ componentItem.category }}
+            </v-col>
+            <v-col
+              class="id-badge-container mt-1 d-inline-flex align-center px-2 py-0.5"
+              @click.stop="copyId(componentItem.id)"
+            >
+              <span class="id-text">
+                {{
+                  copiedId === componentItem.id
+                    ? "COPIED!"
+                    : formattedId(componentItem.id)
+                }}
+              </span>
+              <v-icon
+                :icon="copiedId === componentItem.id ? 'mdi-check' : 'mdi-content-copy'"
+                size="10"
+                :color="copiedId === componentItem.id ? 'success' : 'white'"
+                class="ml-1"
+              />
+            </v-col>
+          </template>
         </v-row>
       </GlassCard>
     </v-sheet>
