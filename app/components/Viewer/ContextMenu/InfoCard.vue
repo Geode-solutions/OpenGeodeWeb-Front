@@ -22,11 +22,13 @@ const TRUNCATE_END_CHARS = 7;
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
+const componentName = ref("");
 const componentItem = ref(undefined);
 
 watch(
   () => menuStore.current_meta_data,
   async (newMeta) => {
+    componentName.value = "";
     componentItem.value = undefined;
     if (!newMeta) {
       return;
@@ -35,7 +37,11 @@ watch(
     const modelId = newMeta.modelId || newMeta.id;
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
-      componentItem.value = components.find((comp) => comp.id === newMeta.pickedComponentId);
+      const comp = components.find((c) => c.id === newMeta.pickedComponentId);
+      if (comp) {
+        componentName.value = comp.title;
+        componentItem.value = comp;
+      }
     }
   },
   { immediate: true },
@@ -45,6 +51,9 @@ const cleanName = computed(() => {
   const meta = menuStore.current_meta_data;
   if (!meta) {
     return "Unnamed Object";
+  }
+  if (componentName.value && meta.viewer_type === "model_component") {
+    return componentName.value;
   }
   return meta.name || "Unnamed Object";
 });
@@ -69,31 +78,33 @@ const displayComponentTitle = computed(() => {
   );
 });
 
-const copiedId = ref("");
+const copied = ref(false);
 async function copyId(targetId) {
   if (!targetId) {
     return;
   }
   try {
     await navigator.clipboard.writeText(targetId);
-    copiedId.value = targetId;
+    copied.value = true;
     setTimeout(() => {
-      copiedId.value = "";
+      copied.value = false;
     }, COPIED_TIMEOUT);
   } catch (error) {
     console.error("Failed to copy ID:", error);
   }
 }
 
-function formattedId(targetId) {
-  if (!targetId) {
+function formatId(id) {
+  if (!id) {
     return "";
   }
-  if (targetId.length <= MAX_SHORT_ID_LENGTH) {
-    return targetId;
+  if (id.length <= MAX_SHORT_ID_LENGTH) {
+    return id;
   }
-  return `${targetId.slice(0, ID_SLICE_START)}...${targetId.slice(targetId.length - ID_SLICE_END_OFFSET)}`;
+  return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
 }
+
+const formattedId = computed(() => formatId(metaData?.id));
 </script>
 
 <template>
@@ -127,12 +138,12 @@ function formattedId(targetId) {
             @click.stop="copyId(metaData.id)"
           >
             <span class="id-text">
-              {{ copiedId === metaData.id ? "COPIED!" : formattedId(metaData.id) }}
+              {{ copied ? "COPIED!" : formattedId }}
             </span>
             <v-icon
-              :icon="copiedId === metaData.id ? 'mdi-check' : 'mdi-content-copy'"
+              :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
               size="10"
-              :color="copiedId === metaData.id ? 'success' : 'white'"
+              :color="copied ? 'success' : 'white'"
               class="ml-1"
             />
           </v-col>
@@ -157,16 +168,12 @@ function formattedId(targetId) {
               @click.stop="copyId(componentItem.id)"
             >
               <span class="id-text">
-                {{
-                  copiedId === componentItem.id
-                    ? "COPIED!"
-                    : formattedId(componentItem.id)
-                }}
+                {{ formatId(componentItem.id) }}
               </span>
               <v-icon
-                :icon="copiedId === componentItem.id ? 'mdi-check' : 'mdi-content-copy'"
+                icon="mdi-content-copy"
                 size="10"
-                :color="copiedId === componentItem.id ? 'success' : 'white'"
+                color="white"
                 class="ml-1"
               />
             </v-col>
