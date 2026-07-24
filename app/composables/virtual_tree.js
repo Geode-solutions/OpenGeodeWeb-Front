@@ -33,7 +33,7 @@ export function useVirtualTree(propsIn, emit) {
 
   function getLeafChildrenIds(item, ids = []) {
     const children = item[actualItemProps.value.children];
-    if (children && children.length > 0) {
+    if (children !== undefined && children !== null) {
       for (const child of children) {
         getLeafChildrenIds(child, ids);
       }
