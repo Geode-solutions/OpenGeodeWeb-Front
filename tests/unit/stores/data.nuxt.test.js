@@ -54,31 +54,50 @@ describe("useDataStore - collections", () => {
 
     // 4. Verify getAllCollectionComponents returns both Fault and MyCustomCollection
     const allCollections = await dataStore.getAllCollectionComponents(modelId);
-    expect(allCollections).toHaveLength(2);
-    expect(allCollections).toStrictEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: "fault1", category: "Fault" }),
-        expect.objectContaining({ id: "custom1", category: "MyCustomCollection" }),
-      ]),
-    );
+    expect(allCollections).toStrictEqual([
+      { id: "custom1", title: "Custom 1", category: "MyCustomCollection", viewer_id: 4, is_active: true },
+      { id: "fault1", title: "Fault 1", category: "Fault", viewer_id: 3, is_active: true },
+    ]);
 
     // 5. Verify formatedCollectionComponents groups them and pluralizes the titles
     const formatted = await dataStore.formatedCollectionComponents(modelId);
-    expect(formatted).toHaveLength(2);
-
-    const faultGroup = formatted.find((group) => group.id === "Fault");
-    expect(faultGroup).toBeDefined();
-    expect(faultGroup.title).toBe("Faults");
-    expect(faultGroup.children).toHaveLength(1);
-    expect(faultGroup.children[0].id).toBe("fault1");
-    expect(faultGroup.children[0].children).toHaveLength(1);
-    expect(faultGroup.children[0].children[0].id).toBe("mesh_surface");
-
-    const customGroup = formatted.find((group) => group.id === "MyCustomCollection");
-    expect(customGroup).toBeDefined();
-    expect(customGroup.title).toBe("MyCustomCollections");
-    expect(customGroup.children).toHaveLength(1);
-    expect(customGroup.children[0].id).toBe("custom1");
-    expect(customGroup.children[0].children).toHaveLength(0);
+    expect(formatted).toStrictEqual([
+      {
+        id: "MyCustomCollection",
+        title: "MyCustomCollections",
+        children: [
+          {
+            id: "custom1",
+            title: "Custom 1",
+            category: "MyCustomCollection",
+            viewer_id: 4,
+            is_active: true,
+            children: [],
+          },
+        ],
+      },
+      {
+        id: "Fault",
+        title: "Faults",
+        children: [
+          {
+            id: "fault1",
+            title: "Fault 1",
+            category: "Fault",
+            viewer_id: 3,
+            is_active: true,
+            children: [
+              {
+                id: "mesh_surface",
+                title: "Surface 1",
+                category: "Surface",
+                viewer_id: 2,
+                is_active: true,
+              },
+            ],
+          },
+        ],
+      },
+    ]);
   });
 });
