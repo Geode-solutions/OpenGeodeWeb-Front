@@ -31,6 +31,7 @@ watch(
     if (!newMeta) {
       return;
     }
+
     const modelId = newMeta.modelId || newMeta.id;
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
@@ -40,29 +41,54 @@ watch(
   { immediate: true },
 );
 
-const displayTitle = computed(() =>
-  middleTruncate(metaData.name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS),
-);
+const cleanName = computed(() => {
+  const meta = menuStore.current_meta_data;
+  if (!meta) {
+    return "Unnamed Object";
+  }
+  return meta.name || "Unnamed Object";
+});
 
-const displayComponentTitle = computed(() =>
-  middleTruncate(
+const displayTitle = computed(() => {
+  const name = cleanName.value;
+  if (!name) {
+    return "";
+  }
+  return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
+});
+
+const displayComponentTitle = computed(() => {
+  if (!componentItem.value) {
+    return "";
+  }
+  return middleTruncate(
     componentItem.value.title,
     TRUNCATE_MAX_LENGTH,
     TRUNCATE_START_CHARS,
     TRUNCATE_END_CHARS,
-  ),
-);
+  );
+});
 
 const copiedId = ref("");
 async function copyId(targetId) {
-  await navigator.clipboard.writeText(targetId);
-  copiedId.value = targetId;
-  setTimeout(() => {
-    copiedId.value = "";
-  }, COPIED_TIMEOUT);
+  if (!targetId) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(targetId);
+    copiedId.value = targetId;
+    setTimeout(() => {
+      copiedId.value = "";
+    }, COPIED_TIMEOUT);
+  } catch (error) {
+    console.error("Failed to copy ID:", error);
+  }
 }
 
 function formattedId(targetId) {
+  if (!targetId) {
+    return "";
+  }
   if (targetId.length <= MAX_SHORT_ID_LENGTH) {
     return targetId;
   }
