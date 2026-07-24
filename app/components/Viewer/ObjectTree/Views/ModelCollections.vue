@@ -127,7 +127,7 @@ function expandAll() {
 }
 
 function extractIds(node) {
-  if (node.children !== undefined && node.children !== null) {
+  if (node.children) {
     return node.children.flatMap((child) => extractIds(child));
   }
   if (node.viewer_id !== undefined && node.viewer_id !== null && !Number.isNaN(node.viewer_id)) {

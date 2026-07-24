@@ -1,7 +1,15 @@
+import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database.js";
 import { liveQuery } from "dexie";
 import { useDataMesh } from "./mesh.js";
 import { useObservable } from "@vueuse/rxjs";
+
+function pluralize(type) {
+  if (type.endsWith("y")) {
+    return `${type.slice(0, -1)}ies`;
+  }
+  return `${type}s`;
+}
 
 export function useDataCollections() {
   const model_components_db = database.model_components;
@@ -12,11 +20,7 @@ export function useDataCollections() {
     const count = await model_components_db
       .where("id")
       .equals(modelId)
-      .and((component) =>
-        ["Horizon", "Fault", "FaultBlock", "StratigraphicUnit", "ModelBoundary"].includes(
-          component.type,
-        ),
-      )
+      .and((component) => !MESH_COMPONENT_TYPES.includes(component.type))
       .count();
     return count > 0;
   }
@@ -24,11 +28,7 @@ export function useDataCollections() {
   async function getAllCollectionComponents(modelId) {
     const items = await model_components_db.where("id").equals(modelId).toArray();
     return items
-      .filter((component) =>
-        ["Horizon", "Fault", "FaultBlock", "StratigraphicUnit", "ModelBoundary"].includes(
-          component.type,
-        ),
-      )
+      .filter((component) => !MESH_COMPONENT_TYPES.includes(component.type))
       .map((component) => ({
         id: component.geode_id,
         title: component.name,
@@ -68,19 +68,13 @@ export function useDataCollections() {
 
   async function formatedCollectionComponents(modelId) {
     const byType = await fetchAllCollectionComponents(modelId);
-    const collectionTitles = {
-      Horizon: "Horizons",
-      Fault: "Faults",
-      FaultBlock: "FaultBlocks",
-      StratigraphicUnit: "StratigraphicUnits",
-      ModelBoundary: "ModelBoundaries",
-    };
+    const collectionTypes = Object.keys(byType);
 
-    return Object.keys(collectionTitles)
+    return collectionTypes
       .filter((type) => byType[type] && byType[type].length > 0)
       .map((type) => ({
         id: type,
-        title: collectionTitles[type],
+        title: pluralize(type),
         children: byType[type],
       }));
   }
