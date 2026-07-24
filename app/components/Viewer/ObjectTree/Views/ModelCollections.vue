@@ -130,7 +130,7 @@ function extractIds(node) {
   if (node.children) {
     return node.children.flatMap((child) => extractIds(child));
   }
-  if (node.viewer_id !== undefined && node.viewer_id !== null && !Number.isNaN(node.viewer_id)) {
+  if (Number.isInteger(node.viewer_id)) {
     return [node.viewer_id];
   }
   return [];
