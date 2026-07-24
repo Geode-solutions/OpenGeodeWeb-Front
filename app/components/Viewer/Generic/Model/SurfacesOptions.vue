@@ -74,6 +74,14 @@ const surfacesVertexAttributeName = computed({
   },
 });
 
+const surfacesVertexAttributeItem = computed({
+  get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, targetSurfaceIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, targetSurfaceIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const surfacesVertexAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, targetSurfaceIds[0]),
   set: async (newValue) => {
@@ -103,6 +111,14 @@ const surfacesPolygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, targetSurfaceIds[0]),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, targetSurfaceIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const surfacesPolygonAttributeItem = computed({
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds[0]),
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -141,6 +157,14 @@ const vertexAttributeName = computed({
   },
 });
 
+const vertexAttributeItem = computed({
+  get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, surfaceId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, [surfaceId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
@@ -166,6 +190,14 @@ const polygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, [surfaceId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const polygonAttributeItem = computed({
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, surfaceId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -214,9 +246,11 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:coloring_style_key="surfacesActiveColoring"
       v-model:color="surfacesColor"
       v-model:vertex_attribute_name="surfacesVertexAttributeName"
+      v-model:vertex_attribute_item="surfacesVertexAttributeItem"
       v-model:vertex_attribute_range="surfacesVertexAttributeRange"
       v-model:vertex_attribute_color_map="surfacesVertexAttributeColorMap"
       v-model:polygon_attribute_name="surfacesPolygonAttributeName"
+      v-model:polygon_attribute_item="surfacesPolygonAttributeItem"
       v-model:polygon_attribute_range="surfacesPolygonAttributeRange"
       v-model:polygon_attribute_color_map="surfacesPolygonAttributeColorMap"
       :capabilities="capabilities"
@@ -233,9 +267,11 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:coloring_style_key="surfaceActiveColoring"
       v-model:color="surfaceColor"
       v-model:vertex_attribute_name="vertexAttributeName"
+      v-model:vertex_attribute_item="vertexAttributeItem"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
       v-model:polygon_attribute_name="polygonAttributeName"
+      v-model:polygon_attribute_item="polygonAttributeItem"
       v-model:polygon_attribute_range="polygonAttributeRange"
       v-model:polygon_attribute_color_map="polygonAttributeColorMap"
       :capabilities="capabilities"

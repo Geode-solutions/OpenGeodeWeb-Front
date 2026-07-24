@@ -55,6 +55,15 @@ const vertex_attribute_name = computed({
     hybridViewerStore.remoteRender();
   },
 });
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshPolyhedraVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolyhedraVertexAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
   set: async (newValue) => {
@@ -78,6 +87,15 @@ const polyhedron_attribute_name = computed({
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
       dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const polyhedron_attribute_item = computed({
+  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -123,9 +141,11 @@ const polyhedron_attribute_color_map = computed({
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:polyhedron_attribute_name="polyhedron_attribute_name"
+          v-model:polyhedron_attribute_item="polyhedron_attribute_item"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
           :capabilities="{

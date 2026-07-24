@@ -55,11 +55,21 @@ const textures = computed({
     hybridViewerStore.remoteRender();
   },
 });
+
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
       dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsVertexAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -87,6 +97,15 @@ const cell_attribute_name = computed({
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
       dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const cell_attribute_item = computed({
+  get: () => dataStyleStore.meshCellsCellAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshCellsCellAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -128,9 +147,11 @@ const cell_attribute_color_map = computed({
           v-model:color="color"
           v-model:textures="textures"
           v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:cell_attribute_name="cell_attribute_name"
+          v-model:cell_attribute_item="cell_attribute_item"
           v-model:cell_attribute_range="cell_attribute_range"
           v-model:cell_attribute_color_map="cell_attribute_color_map"
         />

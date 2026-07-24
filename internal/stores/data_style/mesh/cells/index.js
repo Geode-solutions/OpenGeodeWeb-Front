@@ -1,11 +1,11 @@
 // Third party imports
 
 // Local imports
-import { useMeshCellsCellAttributeStyle } from "./cell";
+import { isMeshCellsCellAttributeValid, useMeshCellsCellAttributeStyle } from "./cell";
+import { isMeshCellsVertexAttributeValid, useMeshCellsVertexAttributeStyle } from "./vertex";
 import { useMeshCellsColorStyle } from "./color";
 import { useMeshCellsCommonStyle } from "./common";
 import { useMeshCellsTexturesStyle } from "./textures";
-import { useMeshCellsVertexAttributeStyle } from "./vertex";
 import { useMeshCellsVisibilityStyle } from "./visibility";
 
 // Local constants
@@ -30,32 +30,31 @@ export function useMeshCellsStyle() {
     await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: { active: type },
     });
-    console.log(setMeshCellsActiveColoring.name, { id }, type);
     if (type === "constant") {
       return meshCellsColorStyle.setMeshCellsColor(id, meshCellsColorStyle.meshCellsColor(id));
-    }
-    if (type === "textures") {
+    } else if (type === "textures") {
       const textures = meshCellsTexturesStore.meshCellsTextures(id);
       return meshCellsTexturesStore.setMeshCellsTextures(id, textures);
-    }
-    if (type === "vertex") {
+    } else if (type === "vertex") {
       const name = meshCellsVertexAttributeStyle.meshCellsVertexAttributeName(id);
-      const { colorMap } = meshCellsVertexAttributeStyle.meshCellsVertexAttributeStoredConfig(
-        id,
-        name,
-      );
-      return Promise.all([
-        meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeName(id, name),
-        meshCellsVertexAttributeStyle.setMeshCellsVertexAttributeColorMap(id, colorMap),
-      ]);
-    }
-    if (type === "cell") {
+      const item = meshCellsVertexAttributeStyle.meshCellsVertexAttributeItem(id);
+      const [minimum, maximum] = meshCellsVertexAttributeStyle.meshCellsVertexAttributeRange(id);
+      const colorMap = meshCellsVertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
+      const vertex_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshCellsVertexAttributeValid(vertex_attribute)) {
+        return;
+      }
+      return meshCellsVertexAttributeStyle.setMeshCellsVertexAttribute(id, vertex_attribute);
+    } else if (type === "cell") {
       const name = meshCellsCellAttributeStyle.meshCellsCellAttributeName(id);
-      const { colorMap } = meshCellsCellAttributeStyle.meshCellsCellAttributeStoredConfig(id, name);
-      return Promise.all([
-        meshCellsCellAttributeStyle.setMeshCellsCellAttributeName(id, name),
-        meshCellsCellAttributeStyle.setMeshCellsCellAttributeColorMap(id, colorMap),
-      ]);
+      const item = meshCellsCellAttributeStyle.meshCellsCellAttributeItem(id);
+      const [minimum, maximum] = meshCellsCellAttributeStyle.meshCellsCellAttributeRange(id);
+      const colorMap = meshCellsCellAttributeStyle.meshCellsCellAttributeColorMap(id);
+      const cell_attribute = { name, item, minimum, maximum, colorMap };
+      if (!isMeshCellsCellAttributeValid(cell_attribute)) {
+        return;
+      }
+      return meshCellsCellAttributeStyle.setMeshCellsCellAttribute(id, cell_attribute);
     }
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }

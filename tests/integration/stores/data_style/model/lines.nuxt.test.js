@@ -1,3 +1,4 @@
+// oxlint-disable max-lines
 // Third party imports
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
@@ -15,6 +16,8 @@ const model_lines_schemas = viewer_schemas.opengeodeweb_viewer.model.lines;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
+const MINIMUM_RANGE = 10;
+const MAXIMUM_RANGE = 20;
 
 function sleep(milliseconds) {
   // oxlint-disable-next-line promise/avoid-new
@@ -95,40 +98,26 @@ describe("model lines", () => {
     });
   });
   describe("lines vertex attribute", () => {
-    test("coloring vertex attribute", async () => {
+    test("coloring vertex attribute — no request until range+colormap set", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const line_ids = await dataStore.getLinesGeodeIds(id);
-      const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       const result = dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points");
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_lines_schemas.attribute.vertex.name,
-          params: {
-            id,
-            block_ids: lines_viewer_ids,
-            name: "points",
-          },
-        },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      // No request sent yet since minimum/maximum/colorMap are still undefined
+      expect(spy).not.toHaveBeenCalled();
       for (const line_id of line_ids) {
         expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("points");
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
-  });
 
-  describe("lines edge attribute", () => {
-    test("coloring edge attribute", async () => {
+    test("coloring vertex attribute — request sent when all params defined", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
@@ -136,27 +125,195 @@ describe("model lines", () => {
       const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
+      await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points");
+      await dataStyleStore.setModelLinesVertexAttributeRange(
+        id,
+        line_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelLinesVertexAttributeColorMap(id, line_ids, "budaS");
+      await sleep(SLEEP_MS);
+      const [lastCall] = spy.mock.calls.slice(-1);
+      expect(lastCall[0].schema).toStrictEqual(model_lines_schemas.attribute.vertex.attribute);
+      expect(lastCall[0].params).toStrictEqual(
+        expect.objectContaining({
+          id,
+          block_ids: lines_viewer_ids,
+          name: "points",
+          item: 0,
+          minimum: MINIMUM_RANGE,
+          maximum: MAXIMUM_RANGE,
+        }),
+      );
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute points and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points");
+      await dataStyleStore.setModelLinesVertexAttributeItem(id, line_ids, 2);
+      expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("points");
+      expect(dataStyleStore.modelLinesVertexAttributeItem(id, line_id)).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesVertexAttributeRange(
+        id,
+        line_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelLinesVertexAttributeColorMap(id, line_ids, "budaS");
+      await sleep(SLEEP_MS);
+      expect(dataStyleStore.modelLinesVertexAttributeRange(id, line_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelLinesVertexAttributeColorMap(id, line_id)).toBe("budaS");
+    });
+
+    test("stored configs 3 - select unique_vertices", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "unique_vertices");
+      await dataStyleStore.setModelLinesVertexAttributeItem(id, line_ids, 0);
+      expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("unique_vertices");
+      expect(dataStyleStore.modelLinesVertexAttributeItem(id, line_id)).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to points and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesVertexAttributeName(id, line_ids, "points");
+      expect(dataStyleStore.modelLinesVertexAttributeName(id, line_id)).toBe("points");
+      expect(dataStyleStore.modelLinesVertexAttributeItem(id, line_id)).toBe(2);
+      expect(dataStyleStore.modelLinesVertexAttributeRange(id, line_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelLinesVertexAttributeColorMap(id, line_id)).toBe("budaS");
+    });
+  });
+
+  describe("lines edge attribute", () => {
+    test("coloring edge attribute — no request until range+colormap set", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
       const result = dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "test_attribute");
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
-      expect(spy).toHaveBeenCalledWith(
-        {
-          schema: model_lines_schemas.attribute.edge.name,
-          params: {
-            id,
-            block_ids: lines_viewer_ids,
-            name: "test_attribute",
-          },
-        },
-        {
-          response_function: expect.any(Function),
-        },
-      );
+      // No request sent yet since minimum/maximum/colorMap are still undefined
+      expect(spy).not.toHaveBeenCalled();
       for (const line_id of line_ids) {
         expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("test_attribute");
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("coloring edge attribute — request sent when all params defined", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const lines_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "test_attribute");
+      await dataStyleStore.setModelLinesEdgeAttributeRange(
+        id,
+        line_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelLinesEdgeAttributeColorMap(id, line_ids, "budaS");
+      await sleep(SLEEP_MS);
+      const [lastCall] = spy.mock.calls.slice(-1);
+      expect(lastCall[0].schema).toStrictEqual(model_lines_schemas.attribute.edge.attribute);
+      expect(lastCall[0].params).toStrictEqual(
+        expect.objectContaining({
+          id,
+          block_ids: lines_viewer_ids,
+          name: "test_attribute",
+          item: 0,
+          minimum: MINIMUM_RANGE,
+          maximum: MAXIMUM_RANGE,
+        }),
+      );
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
+    test("stored configs 1 - select attribute edges and item 2", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "edges");
+      await dataStyleStore.setModelLinesEdgeAttributeItem(id, line_ids, 2);
+      expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("edges");
+      expect(dataStyleStore.modelLinesEdgeAttributeItem(id, line_id)).toBe(2);
+    });
+
+    test("stored configs 2 - set range and colormap", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesEdgeAttributeRange(
+        id,
+        line_ids,
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      );
+      await dataStyleStore.setModelLinesEdgeAttributeColorMap(id, line_ids, "budaS");
+      await sleep(SLEEP_MS);
+      expect(dataStyleStore.modelLinesEdgeAttributeRange(id, line_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelLinesEdgeAttributeColorMap(id, line_id)).toBe("budaS");
+    });
+
+    test("stored configs 3 - select dummy_attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "dummy_attribute");
+      await dataStyleStore.setModelLinesEdgeAttributeItem(id, line_ids, 0);
+      expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("dummy_attribute");
+      expect(dataStyleStore.modelLinesEdgeAttributeItem(id, line_id)).toBe(0);
+    });
+
+    test("stored configs 4 - switch back to edges and verify restoration", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const dataStore = useDataStore();
+      const line_ids = await dataStore.getLinesGeodeIds(id);
+      const [line_id] = line_ids;
+      await dataStyleStore.setModelLinesEdgeAttributeName(id, line_ids, "edges");
+      expect(dataStyleStore.modelLinesEdgeAttributeName(id, line_id)).toBe("edges");
+      expect(dataStyleStore.modelLinesEdgeAttributeItem(id, line_id)).toBe(2);
+      expect(dataStyleStore.modelLinesEdgeAttributeRange(id, line_id)).toStrictEqual([
+        MINIMUM_RANGE,
+        MAXIMUM_RANGE,
+      ]);
+      expect(dataStyleStore.modelLinesEdgeAttributeColorMap(id, line_id)).toBe("budaS");
     });
   });
 
