@@ -37,7 +37,7 @@ watch(
     const modelId = newMeta.modelId || newMeta.id;
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
-      const comp = components.find((c) => c.id === newMeta.pickedComponentId);
+      const comp = components.find((component) => component.id === newMeta.pickedComponentId);
       if (comp) {
         componentName.value = comp.title;
         componentItem.value = comp;
