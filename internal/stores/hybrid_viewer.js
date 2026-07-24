@@ -8,12 +8,7 @@ const TOTAL_CHANNELS = 400;
 function mapRect(rect, latestImage, canvasRect) {
   const scaleX = latestImage.width / canvasRect.width;
   const scaleY = latestImage.height / canvasRect.height;
-  return {
-    relX: (rect.x - canvasRect.left) * scaleX,
-    relY: (rect.y - canvasRect.top) * scaleY,
-    relW: rect.width * scaleX,
-    relH: rect.height * scaleY,
-  };
+  return { relX: (rect.x - canvasRect.left) * scaleX, relY: (rect.y - canvasRect.top) * scaleY, relW: rect.width * scaleX, relH: rect.height * scaleY };
 }
 
 function computeAverageBrightness(rect, options) {
@@ -64,10 +59,7 @@ function performClickPicking(event, options) {
   const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
   const rect = container.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-  const params = {
-    x: Math.round(event.clientX - rect.left),
-    y: Math.round(rect.height - (event.clientY - rect.top)),
-  };
+  const params = { x: Math.round(event.clientX - rect.left), y: Math.round(rect.height - (event.clientY - rect.top)) };
   viewerStore.request(
     {
       schema,
@@ -106,12 +98,7 @@ function performHoverHighlight(event, options) {
   }
   const rect = container.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
-  const params = {
-    x: Math.round(event.clientX - rect.left),
-    y: Math.round(rect.height - (event.clientY - rect.top)),
-    field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridDb),
-  };
+  const params = { x: Math.round(event.clientX - rect.left), y: Math.round(rect.height - (event.clientY - rect.top)), field_type: hover_highlight_field_type.value, ids: Object.keys(hybridDb) };
   viewerStore.request(
     {
       schema,
@@ -126,12 +113,7 @@ function performHoverHighlight(event, options) {
 function performClearHoverHighlight(options) {
   const { viewerStore, viewer_schemas, hover_highlight_field_type, hybridDb } = options;
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
-  const params = {
-    x: -1,
-    y: -1,
-    field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridDb),
-  };
+  const params = { x: -1, y: -1, field_type: hover_highlight_field_type.value, ids: Object.keys(hybridDb) };
   viewerStore.request({ schema, params });
 }
 
