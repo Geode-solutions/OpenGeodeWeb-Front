@@ -170,12 +170,7 @@ const formattedId = computed(() => formatId(metaData?.id));
               <span class="id-text">
                 {{ formatId(componentItem.id) }}
               </span>
-              <v-icon
-                icon="mdi-content-copy"
-                size="10"
-                color="white"
-                class="ml-1"
-              />
+              <v-icon icon="mdi-content-copy" size="10" color="white" class="ml-1" />
             </v-col>
           </template>
         </v-row>
