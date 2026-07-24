@@ -1,3 +1,4 @@
+import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -5,6 +6,7 @@ const HOVER_DELAY = 200;
 
 export function useHoverhighlight() {
   const viewerStore = useViewerStore();
+  const dataStore = useDataStore();
   let timer = undefined;
   let currentId = undefined;
   let currentType = undefined;
@@ -20,10 +22,12 @@ export function useHoverhighlight() {
       currentId = id;
       currentType = type;
 
-      const { useDataStore } = await import("@ogw_front/stores/data");
-      const dataStore = useDataStore();
       const value = await dataStore.item(id);
-      if (value?.binary_light_viewable === "not_viewable") {
+      if (
+        value &&
+        (value.is_viewable === false ||
+          (value.is_viewable === undefined && value.binary_light_viewable === "not_viewable"))
+      ) {
         return;
       }
 

@@ -21,7 +21,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function setVisibility(id, visibility) {
     const item = await dataStore.item(id);
-    if (item.binary_light_viewable === "not_viewable") {
+    if (
+      item &&
+      (item.is_viewable === false ||
+        (item.is_viewable === undefined && item.binary_light_viewable === "not_viewable"))
+    ) {
       return dataStyleState.mutateStyle(id, { visibility });
     }
 
@@ -38,7 +42,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyDefaultStyle(id) {
     const item = await dataStore.item(id);
-    if (item.binary_light_viewable === "not_viewable") {
+    if (
+      item &&
+      (item.is_viewable === false ||
+        (item.is_viewable === undefined && item.binary_light_viewable === "not_viewable"))
+    ) {
       return;
     }
 
@@ -89,7 +97,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const ids = Object.keys(dataStyleState.styles.value);
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id);
-      if (meta.binary_light_viewable === "not_viewable") {
+      if (
+        meta &&
+        (meta.is_viewable === false ||
+          (meta.is_viewable === undefined && meta.binary_light_viewable === "not_viewable"))
+      ) {
         return;
       }
       const viewerType = meta.viewer_type;

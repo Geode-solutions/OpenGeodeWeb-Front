@@ -94,6 +94,7 @@ export const useDataStore = defineStore("data", () => {
       visible: true,
       created_at: new Date().toISOString(),
       binary_light_viewable: new_item.binary_light_viewable,
+      is_viewable: new_item.is_viewable,
     };
     return data_db.put(itemData);
   }
