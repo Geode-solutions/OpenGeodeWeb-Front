@@ -19,7 +19,7 @@ const hybridViewerStore = useHybridViewerStore();
 const blocksVisibility = computed({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Block"),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentTypeVisibility(modelId, "Block", newValue);
+    await dataStyleStore.setModelBlocksVisibility(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -36,7 +36,7 @@ const blockVisibility = computed({
 const blocksColor = computed({
   get: () => dataStyleStore.modelComponentTypeColor(modelId, "Block"),
   set: async (color) => {
-    await dataStyleStore.setModelComponentTypeColor(modelId, "Block", color);
+    await dataStyleStore.setModelBlocksColor(modelId, targetBlockIds, color);
     hybridViewerStore.remoteRender();
   },
 });
@@ -52,7 +52,7 @@ const blockColor = computed({
 const blocksActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Block"),
   set: async (coloringType) => {
-    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Block", coloringType);
+    await dataStyleStore.setModelBlocksActiveColoring(modelId, targetBlockIds, coloringType);
     hybridViewerStore.remoteRender();
   },
 });
