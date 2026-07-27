@@ -195,8 +195,17 @@ export const useAppStore = defineStore("app", () => {
     return getExtension(extensionId)?.enabled ?? false;
   }
 
-  function upload(file, callbacks = {}) {
+  function uploadExtension(file, callbacks = {}) {
     const route = "/api/extensions/upload";
+    const schema = {
+      $id: "/api/extensions/upload",
+      methods: ["POST"],
+      type: "object",
+      properties: { PROJECT: { type: "string" } },
+      required: ["PROJECT"],
+      additionalProperties: true,
+    };
+    const params = { PROJECT };
     const store = useAppStore();
     return upload_file(
       store,
@@ -219,7 +228,7 @@ export const useAppStore = defineStore("app", () => {
     const store = useAppStore();
     return api_fetch(
       store,
-      { schema, params, headers: {} },
+      { schema, params },
       {
         ...callbacks,
         response_function: async (response) => {
@@ -263,6 +272,8 @@ export const useAppStore = defineStore("app", () => {
     );
   }
 
+
+
   return {
     stores,
     registerStore,
@@ -280,7 +291,7 @@ export const useAppStore = defineStore("app", () => {
     setExtensionEnabled,
     getExtensionEnabled,
     request,
-    upload,
+    uploadExtension,
     projectFolderPath,
     createProjectFolder,
     start_request,

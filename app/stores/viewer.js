@@ -14,9 +14,6 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
-import { setViewerPort } from "../../server/utils/microservice-registry"
-
-
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_REQUEST = 10;
 const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST;
@@ -153,8 +150,6 @@ export const useViewerStore = defineStore(
           response_function: (response) => {
             console.log(`[VIEWER] Viewer launched on port ${response.port}`);
             default_local_port.value = response.port;
-            useRuntimeConfig().PORT_VIEWER = response.port;
-            setViewerPort(response.port);
           },
         },
       );
