@@ -267,4 +267,3 @@ export {
   performSetVisibility,
   performClear,
 };
-
