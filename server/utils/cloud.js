@@ -36,7 +36,6 @@ function sanitizeLabelValue(label) {
     .slice(0, maxLabelLength);
 }
 
-// oxlint-disable-next-line max-lines-per-function
 function requestConfig(parent, image, email, projectName) {
   const resources = {
     limits: {
@@ -62,7 +61,7 @@ function requestConfig(parent, image, email, projectName) {
         labels,
         containers: [
           {
-            image: image,
+            image,
             ports: [
               {
                 containerPort: 80,
