@@ -39,7 +39,7 @@ function sanitizeLabelValue(label) {
 function requestConfig(parent, image, email, projectName) {
   const resources = {
     limits: {
-      cpu: "3000m",
+      cpu: "2000m",
       memory: "3Gi",
     },
   };
