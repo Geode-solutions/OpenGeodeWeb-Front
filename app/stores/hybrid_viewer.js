@@ -12,7 +12,10 @@ import {
   performSyncRemoteCamera,
 } from "@ogw_internal/stores/hybrid_viewer_camera";
 import {
-  computeAverageBrightness,
+  createClearHoverData,
+  createHoverHighlight,
+} from "@ogw_internal/stores/hybrid_viewer_highlight";
+import {
   performAddItem,
   performClear,
   performClearHoverHighlight,
@@ -22,10 +25,7 @@ import {
   performSetVisibility,
   performSetZScaling,
 } from "@ogw_internal/stores/hybrid_viewer";
-import {
-  createClearHoverData,
-  createHoverHighlight,
-} from "@ogw_internal/stores/hybrid_viewer_highlight";
+import { computeAverageBrightness } from "@ogw_internal/stores/hybrid_viewer_brightness";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
