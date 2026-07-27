@@ -83,7 +83,7 @@ const Section_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
 const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
-const ModelComponent_menu = [ModelStyleOptions];
+const ModelComponent_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
 const menusData = {
   mesh: {
