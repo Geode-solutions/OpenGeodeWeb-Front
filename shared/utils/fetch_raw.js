@@ -2,19 +2,18 @@ import _ from "lodash";
 import pTimeout from "p-timeout";
 
 function fetchRaw(
-  { schema, params = {}, baseURL, headers, max_retry, timeout, expectEvent = false },
+  { route, method, params = {}, baseURL, headers, max_retry, timeout, expectEvent = false },
   { onRequestError, onResponse, onResponseError } = {},
 ) {
-  const body = params;
   if (expectEvent) { headers["Accept"] = "text/event-stream" }
-  const method = schema.methods.find((method) => method !== "OPTIONS");
+
   const request_options = { method, headers };
 
-  if (!_.isEmpty(body)) { request_options.body = body }
+  if (!_.isEmpty(params)) { request_options.body = params }
   if (max_retry) { request_options.max_retry = max_retry }
 
   function doFetch() {
-    return $fetch(schema.$id, {
+    return $fetch(route, {
       baseURL,
       ...request_options,
       onRequestError({ error }) {

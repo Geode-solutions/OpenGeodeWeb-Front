@@ -223,8 +223,6 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function request({ schema, params }, callbacks = {}) {
-    console.log("[APP] Request:", schema.$id);
-
     const store = useAppStore();
     return api_fetch(
       store,
@@ -232,7 +230,6 @@ export const useAppStore = defineStore("app", () => {
       {
         ...callbacks,
         response_function: async (response) => {
-          console.log("[APP] Request completed:", schema.$id);
           if (callbacks.response_function) {
             await callbacks.response_function(response);
           }

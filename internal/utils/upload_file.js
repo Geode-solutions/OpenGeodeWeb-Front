@@ -1,12 +1,12 @@
-import { performFetch } from "@ogw_shared/utils/perform_fetch";
+import { fetchSchema } from "@ogw_shared/utils/fetch_schema.js";
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
-async function upload_file(
+function upload_file(
   microservice,
   { schema, file },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  console.log("[UPLOAD_FILE] Uploading file", { route, file });
+  console.log("[UPLOAD_FILE] Uploading file", { schema, file });
   const feedbackStore = useFeedbackStore();
 
   if (!(file instanceof File)) {
@@ -18,8 +18,13 @@ async function upload_file(
 
   microservice.start_request();
 
-  return performFetch(
-    { route: schema.$id, method: "PUT", base_url: microservice.base_url, params },
+  return fetchSchema(
+    {
+      route: schema.$id,
+      method: schema.methods.find((method) => method !== "OPTIONS"),
+      params,
+      baseURL: microservice.base_url,
+    },
     {
       onRequestError(error) {
         microservice.stop_request();

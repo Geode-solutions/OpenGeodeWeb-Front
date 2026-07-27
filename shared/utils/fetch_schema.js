@@ -1,29 +1,32 @@
-import { validate_schema } from "@ogw_front/utils/validate_schema";
+// Third party imports
+import { validate_schema } from "@geode/opengeodeweb-front/app/utils/validate_schema.js";
 
+// Local imports
 import { fetchRaw } from "./fetch_raw.js";
 
 const ERROR_400 = 400;
 
-export function fetchSchema(
-  { schema, baseURL, params, headers, timeout },
+function fetchSchema(
+  { schema, params = {}, baseURL, headers, timeout },
   { onRequestError, onResponse, onResponseError, onValidationError } = {},
 ) {
-  const validationBody = params || {};
-  const { valid, error: schema_error } = validate_schema(schema, validationBody);
+  console.log("fetchSchema", { schema, baseURL, params, headers, timeout });
+  const { valid, error: schema_error } = validate_schema(schema, params);
 
   if (!valid) {
     if (process.env.NODE_ENV !== "production") {
       console.log("Bad request", schema_error, schema, params);
     }
     if (onValidationError) {
-      onValidationError({ status: ERROR_400, error: schema_error });
+      onValidationError({ code: ERROR_400, name: "Bad request", error: schema_error });
     }
     throw new Error(`${schema.$id}: ${schema_error}`);
   }
 
   return fetchRaw(
     {
-      schema,
+      route: schema.$id,
+      method: schema.methods.find((method) => method !== "OPTIONS"),
       params,
       baseURL,
       headers,
@@ -33,3 +36,5 @@ export function fetchSchema(
     { onRequestError, onResponse, onResponseError },
   );
 }
+
+export { fetchSchema };

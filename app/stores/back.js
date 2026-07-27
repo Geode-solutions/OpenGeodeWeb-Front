@@ -110,22 +110,12 @@ export const useBackStore = defineStore("back", {
       return Promise.resolve();
     },
     request({ schema, params = {} }, callbacks = {}) {
-      console.log("[GEODE] Request:", schema.$id);
-      const start = Date.now();
-
       return api_fetch(
         this,
         { schema, params, headers: {} },
         {
           ...callbacks,
           response_function: async (response) => {
-            console.log(
-              "[GEODE] Request completed:",
-              schema.$id,
-              "in",
-              (Date.now() - start) / MILLISECONDS_IN_SECOND,
-              "s",
-            );
             if (callbacks.response_function) {
               await callbacks.response_function(response);
             }

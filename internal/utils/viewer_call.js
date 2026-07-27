@@ -1,4 +1,5 @@
 import pTimeout from "p-timeout";
+import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { validate_schema } from "@ogw_front/utils/validate_schema";
 
@@ -28,9 +29,10 @@ export function viewer_call(
       return;
     }
     microservice.start_request();
-
+    const requestStart = startRequestLog(microservice, schema);
     try {
       const value = await client.getConnection().getSession().call(schema.$id, [params]);
+      endRequestLog(microservice, schema, requestStart);
       if (response_function) {
         await response_function(value);
       }
@@ -49,7 +51,7 @@ export function viewer_call(
     }
   }
 
-  if (timeout !== undefined && timeout > 0) {
+  if (timeout > 0) {
     return pTimeout(performCall(), {
       milliseconds: timeout,
       message: `${schema.$id}: Timed out after ${timeout}ms`,

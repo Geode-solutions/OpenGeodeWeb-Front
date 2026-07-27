@@ -1,37 +1,21 @@
-import { fetchRaw } from "@ogw_shared/utils/fetch_raw";
+import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
+import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import { validate_schema } from "@ogw_front/utils/validate_schema";
-
-const ERROR_400 = 400;
 
 export function api_fetch(
   microservice,
-  { schema, params, headers },
+  { schema, params = {}, headers },
   { request_error_function, response_function, response_error_function, timeout } = {},
 ) {
   const feedbackStore = useFeedbackStore();
-
-  const body = params || {};
-  const { valid, error: schema_error } = validate_schema(schema, body);
-
-  if (!valid) {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Bad request", schema_error, schema, params);
-    }
-    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", schema_error);
-    throw new Error(`${schema.$id}: ${schema_error}`);
-  }
-
   microservice.start_request();
 
-  const method = schema.methods.find((methodItem) => methodItem !== "OPTIONS");
-
-  return fetchRaw(
+  const requestStartingTime = startRequestLog(microservice, schema);
+  return fetchSchema(
     {
-      route: schema.$id,
-      method,
+      schema,
       baseURL: microservice.base_url,
-      params: body,
+      params,
       headers,
       max_retry: schema.max_retry,
       timeout,
@@ -45,6 +29,7 @@ export function api_fetch(
         }
       },
       onResponse(data) {
+        endRequestLog(microservice, schema, requestStartingTime);
         microservice.stop_request();
         if (response_function) {
           response_function(data);
@@ -56,6 +41,10 @@ export function api_fetch(
         if (response_error_function) {
           response_error_function(response);
         }
+      },
+      onValidationError(code, route, name, error) {
+        microservice.stop_request();
+        feedbackStore.add_error(code, route, name, error);
       },
     },
   );
