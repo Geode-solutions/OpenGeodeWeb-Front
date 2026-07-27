@@ -44,24 +44,22 @@ function requestConfig(parent, image, email, projectName) {
       memory: "1Gi",
     },
   };
+  const labels = {
+    user: sanitizeLabelValue(email),
+    project: sanitizeLabelValue(projectName),
+  };
   return {
     parent,
     service: {
       ingress: "INGRESS_TRAFFIC_ALL",
       invokerIamDisabled: true,
-      labels: {
-        user: sanitizeLabelValue(email),
-        project: sanitizeLabelValue(projectName),
-      },
+      labels,
       scaling: {
         scalingMode: "MANUAL",
         manualInstanceCount: 1,
       },
       template: {
-        labels: {
-          user: sanitizeLabelValue(email),
-          project: sanitizeLabelValue(projectId),
-        },
+        labels,
         containers: [
           {
             image: image,
