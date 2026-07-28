@@ -79,7 +79,7 @@ const itemsForTreeView = computed(() => {
   for (const category of filteredCategories.value) {
     result.push({
       ...category,
-      children: sortAndFormatItems(componentsCache.value?.[category.id], sortType.value),
+      children: sortAndFormatItems(componentsCache.value[category.id], sortType.value),
     });
   }
   return result;
@@ -87,12 +87,16 @@ const itemsForTreeView = computed(() => {
 
 function showContextMenu(event, item) {
   const actualItem = item.raw || item;
+  const typeId = actualItem.category || actualItem.id;
+  const typeItem = itemsForTreeView.value.find((type) => type.id === typeId);
+  const targetComponentIds = typeItem ? typeItem.children.map((child) => child.id) : undefined;
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : id,
     context_type: actualItem.category ? "model_component" : "model_component_type",
     modelId: id,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
+    targetComponentIds,
   });
 }
 
@@ -108,7 +112,7 @@ function handleHoverEnter({ item, immediate = false }) {
     () =>
       actualItem.category
         ? [actualItem.viewer_id]
-        : actualItem.children?.map((child) => child.viewer_id) || [],
+        : actualItem.children.map((child) => child.viewer_id),
     "model",
     immediate,
   );
