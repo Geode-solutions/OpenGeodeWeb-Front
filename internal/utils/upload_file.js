@@ -1,4 +1,5 @@
 import { fetchSchema } from "@ogw_shared/utils/fetch_schema.js";
+import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
 function upload_file(
@@ -18,7 +19,7 @@ function upload_file(
 
   microservice.start_request();
 
-  return fetchSchema(
+  return fetchRaw(
     {
       route: schema.$id,
       method: schema.methods.find((method) => method !== "OPTIONS"),
