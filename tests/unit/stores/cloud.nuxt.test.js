@@ -38,7 +38,7 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        registerEndpoint("/api/app/run_cloud", {
+        registerEndpoint("/api/serverless/run_cloud", {
           method: "POST",
           handler: postFakeCall,
         });
@@ -58,7 +58,7 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        registerEndpoint("/api/app/run_cloud", {
+        registerEndpoint("/api/serverless/run_cloud", {
           method: "POST",
           handler: postFakeCall,
         });
