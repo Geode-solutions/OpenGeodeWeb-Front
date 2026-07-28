@@ -64,6 +64,15 @@ const vertex_attribute_name = computed({
     hybridViewerStore.remoteRender();
   },
 });
+const vertex_attribute_item = computed({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
   set: async (newValue) => {
@@ -87,6 +96,15 @@ const polygon_attribute_name = computed({
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId) =>
       dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const polygon_attribute_item = computed({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -130,9 +148,11 @@ const polygon_attribute_color_map = computed({
           v-model:color="color"
           v-model:textures="textures"
           v-model:vertex_attribute_name="vertex_attribute_name"
+          v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:polygon_attribute_name="polygon_attribute_name"
+          v-model:polygon_attribute_item="polygon_attribute_item"
           v-model:polygon_attribute_range="polygon_attribute_range"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
         />

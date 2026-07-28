@@ -23,28 +23,24 @@ const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
 const componentName = ref("");
+const componentItem = ref(undefined);
 
 watch(
   () => menuStore.current_meta_data,
   async (newMeta) => {
     componentName.value = "";
+    componentItem.value = undefined;
     if (!newMeta) {
       return;
     }
 
-    if (newMeta.viewer_type === "model_component" && newMeta.modelId && newMeta.pickedComponentId) {
-      try {
-        const comp = await dataStore.getComponentByViewerId(
-          newMeta.modelId,
-          newMeta.pickedComponentId,
-        );
-        if (comp && comp.name) {
-          componentName.value = comp.name;
-        } else {
-          componentName.value = newMeta.pickedComponentId;
-        }
-      } catch {
-        componentName.value = newMeta.pickedComponentId;
+    const modelId = newMeta.modelId || newMeta.id;
+    if (newMeta.pickedComponentId && modelId) {
+      const components = await dataStore.getAllMeshComponents(modelId);
+      const comp = components.find((component) => component.id === newMeta.pickedComponentId);
+      if (comp) {
+        componentName.value = comp.title;
+        componentItem.value = comp;
       }
     }
   },
@@ -56,7 +52,7 @@ const cleanName = computed(() => {
   if (!meta) {
     return "Unnamed Object";
   }
-  if (componentName.value) {
+  if (componentName.value && meta.viewer_type === "model_component") {
     return componentName.value;
   }
   return meta.name || "Unnamed Object";
@@ -68,6 +64,18 @@ const displayTitle = computed(() => {
     return "";
   }
   return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
+});
+
+const displayComponentTitle = computed(() => {
+  if (!componentItem.value) {
+    return "";
+  }
+  return middleTruncate(
+    componentItem.value.title,
+    TRUNCATE_MAX_LENGTH,
+    TRUNCATE_START_CHARS,
+    TRUNCATE_END_CHARS,
+  );
 });
 
 const copied = ref(false);
@@ -86,16 +94,17 @@ async function copyId(targetId) {
   }
 }
 
-const formattedId = computed(() => {
-  const metaId = metaData?.id;
-  if (!metaId) {
+function formatId(id) {
+  if (!id) {
     return "";
   }
-  if (metaId.length <= MAX_SHORT_ID_LENGTH) {
-    return metaId;
+  if (id.length <= MAX_SHORT_ID_LENGTH) {
+    return id;
   }
-  return `${metaId.slice(0, ID_SLICE_START)}...${metaId.slice(metaId.length - ID_SLICE_END_OFFSET)}`;
-});
+  return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
+}
+
+const formattedId = computed(() => formatId(metaData?.id));
 </script>
 
 <template>
@@ -138,6 +147,32 @@ const formattedId = computed(() => {
               class="ml-1"
             />
           </v-col>
+
+          <template v-if="componentItem">
+            <v-divider class="w-100 my-2" opacity="0.2" />
+            <v-col
+              class="text-subtitle-2 font-weight-bold text-truncate text-white w-100 pa-0"
+              cols="auto"
+              style="line-height: 1.3"
+            >
+              {{ displayComponentTitle }}
+            </v-col>
+            <v-col
+              class="text-caption font-weight-black text-uppercase text-secondary pa-0"
+              style="font-size: 0.68rem; line-height: 1.2"
+            >
+              {{ componentItem.category }}
+            </v-col>
+            <v-col
+              class="id-badge-container mt-1 d-inline-flex align-center px-2 py-0.5"
+              @click.stop="copyId(componentItem.id)"
+            >
+              <span class="id-text">
+                {{ formatId(componentItem.id) }}
+              </span>
+              <v-icon icon="mdi-content-copy" size="10" color="white" class="ml-1" />
+            </v-col>
+          </template>
         </v-row>
       </GlassCard>
     </v-sheet>

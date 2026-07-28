@@ -10,105 +10,114 @@ function getSharedState() {
     return sharedState;
   }
 
-  const data_style_db = database.data_style;
-  const model_component_datastyle_db = database.model_component_datastyle;
-  const model_component_type_datastyle_db = database.model_component_type_datastyle;
+  const dataStyleTable = database.data_style;
+  const modelComponentDataStyleTable = database.model_component_datastyle;
+  const modelComponentTypeDataStyleTable = database.model_component_type_datastyle;
 
   const styles = useObservable(
     liveQuery(async () => {
-      const allStyles = await data_style_db.toArray();
-      const accumulator = {};
-      for (const style of allStyles) {
-        accumulator[style.id] = style;
+      const objectStyles = await dataStyleTable.toArray();
+      const stylesByObjectId = {};
+      for (const objectStyle of objectStyles) {
+        stylesByObjectId[objectStyle.id] = objectStyle;
       }
-      return accumulator;
+      return stylesByObjectId;
     }),
     { initialValue: {} },
   );
 
-  const modelComponentTypeStyles = useObservable(
-    liveQuery(async () => {
-      const all = await model_component_type_datastyle_db.toArray();
-      const accumulator = {};
-      for (const style of all) {
-        const key = `${style.id_model}_${style.type}`;
-        accumulator[key] = style;
-      }
-      return accumulator;
-    }),
-    { initialValue: {} },
-  );
+  const modelComponentTypeStyles = ref({});
+  const componentStyles = ref({});
 
-  const componentStyles = useObservable(
-    liveQuery(async () => {
-      const all = await model_component_datastyle_db.toArray();
-      const accumulator = {};
-      for (const style of all) {
-        const key = `${style.id_model}_${style.id_component}`;
-        accumulator[key] = style;
-      }
-      return accumulator;
-    }),
-    { initialValue: {} },
-  );
+  async function loadFromDatabase() {
+    const [fetchedTypeStyles, fetchedComponentStyles] = await Promise.all([
+      modelComponentTypeDataStyleTable.toArray(),
+      modelComponentDataStyleTable.toArray(),
+    ]);
+    const typeStylesMap = {};
+    for (const typeStyle of fetchedTypeStyles) {
+      const cacheKey = `${typeStyle.id_model}_${typeStyle.type}`;
+      typeStylesMap[cacheKey] = typeStyle;
+    }
+    modelComponentTypeStyles.value = typeStylesMap;
 
-  function updateComponentStyleCache(id_model, id_component, values) {
-    const key = `${id_model}_${id_component}`;
-    const current = componentStyles.value[key];
-    if (current) {
-      merge(current, values);
+    const componentStylesMap = {};
+    for (const componentStyle of fetchedComponentStyles) {
+      const cacheKey = `${componentStyle.id_model}_${componentStyle.id_component}`;
+      componentStylesMap[cacheKey] = componentStyle;
+    }
+    componentStyles.value = componentStylesMap;
+  }
+
+  loadFromDatabase();
+
+  function updateComponentStyleCache(modelId, componentId, styleValues) {
+    const cacheKey = `${modelId}_${componentId}`;
+    const existingStyle = componentStyles.value[cacheKey];
+    if (existingStyle) {
+      merge(existingStyle, styleValues);
     } else {
-      componentStyles.value[key] = merge({ id_model, id_component }, values);
+      componentStyles.value[cacheKey] = merge(
+        { id_model: modelId, id_component: componentId },
+        styleValues,
+      );
     }
   }
 
-  function bulkUpdateComponentStyleCache(id_model, updates) {
-    const newVal = { ...componentStyles.value };
-    for (const { id_component, values } of updates) {
-      const key = `${id_model}_${id_component}`;
-      const current = newVal[key];
-      if (current) {
-        newVal[key] = merge({}, current, values);
+  function bulkUpdateComponentStyleCache(modelId, componentStyleUpdates) {
+    const updatedComponentStyles = { ...componentStyles.value };
+    for (const { id_component: componentId, values: styleValues } of componentStyleUpdates) {
+      const cacheKey = `${modelId}_${componentId}`;
+      const existingStyle = updatedComponentStyles[cacheKey];
+      if (existingStyle) {
+        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues);
       } else {
-        newVal[key] = merge({ id_model, id_component }, values);
+        updatedComponentStyles[cacheKey] = merge(
+          { id_model: modelId, id_component: componentId },
+          styleValues,
+        );
       }
     }
-    componentStyles.value = newVal;
+    componentStyles.value = updatedComponentStyles;
   }
 
-  function bulkUpdateComponentStylesCache(id_model, id_components, values) {
-    const newVal = { ...componentStyles.value };
-    for (const id_component of id_components) {
-      const key = `${id_model}_${id_component}`;
-      const current = newVal[key];
-      if (current) {
-        newVal[key] = merge({}, current, values);
+  function bulkUpdateComponentStylesCache(modelId, componentIds, styleValues) {
+    const updatedComponentStyles = { ...componentStyles.value };
+    for (const componentId of componentIds) {
+      const cacheKey = `${modelId}_${componentId}`;
+      const existingStyle = updatedComponentStyles[cacheKey];
+      if (existingStyle) {
+        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues);
       } else {
-        newVal[key] = merge({ id_model, id_component }, values);
+        updatedComponentStyles[cacheKey] = merge(
+          { id_model: modelId, id_component: componentId },
+          styleValues,
+        );
       }
     }
-    componentStyles.value = newVal;
+    componentStyles.value = updatedComponentStyles;
   }
 
-  function updateModelComponentTypeStyleCache(id_model, type, values) {
-    const key = `${id_model}_${type}`;
-    if (!modelComponentTypeStyles.value[key]) {
-      modelComponentTypeStyles.value[key] = { id_model, type };
+  function updateModelComponentTypeStyleCache(modelId, componentType, styleValues) {
+    const cacheKey = `${modelId}_${componentType}`;
+    if (!modelComponentTypeStyles.value[cacheKey]) {
+      modelComponentTypeStyles.value[cacheKey] = { id_model: modelId, type: componentType };
     }
-    merge(modelComponentTypeStyles.value[key], values);
+    merge(modelComponentTypeStyles.value[cacheKey], styleValues);
   }
 
-  function updateStyleCache(id, values) {
-    if (!styles.value[id]) {
-      styles.value[id] = { id };
+  function updateStyleCache(objectId, styleValues) {
+    if (!styles.value[objectId]) {
+      styles.value[objectId] = { id: objectId };
     }
-    merge(styles.value[id], values);
+    merge(styles.value[objectId], styleValues);
   }
 
   sharedState = {
     styles,
     modelComponentTypeStyles,
     componentStyles,
+    loadFromDatabase,
     updateComponentStyleCache,
     bulkUpdateComponentStyleCache,
     bulkUpdateComponentStylesCache,
@@ -120,57 +129,59 @@ function getSharedState() {
 }
 
 export function useDataStyleState() {
-  const data_style_db = database.data_style;
-  const model_component_datastyle_db = database.model_component_datastyle;
-  const model_component_type_datastyle_db = database.model_component_type_datastyle;
+  const dataStyleTable = database.data_style;
+  const modelComponentDataStyleTable = database.model_component_datastyle;
+  const modelComponentTypeDataStyleTable = database.model_component_type_datastyle;
 
   const state = getSharedState();
   const { styles, modelComponentTypeStyles, componentStyles } = state;
 
-  const objectVisibility = computed(() => (id) => {
-    if (styles.value[id]) {
-      return styles.value[id].visibility;
+  const objectVisibility = computed(() => (objectId) => {
+    if (styles.value[objectId]) {
+      return styles.value[objectId].visibility;
     }
     return false;
   });
 
   const selectedObjects = computed(() => {
-    const selection = [];
-    for (const [id, value] of Object.entries(styles.value)) {
-      if (value.visibility === true) {
-        selection.push(id);
+    const visibleObjectIds = [];
+    for (const [objectId, objectStyle] of Object.entries(styles.value)) {
+      if (objectStyle.visibility === true) {
+        visibleObjectIds.push(objectId);
       }
     }
-    return selection;
+    return visibleObjectIds;
   });
 
-  function getStyle(id) {
-    return { ...toRaw(styles.value[id]) };
+  function getStyle(objectId) {
+    return { ...toRaw(styles.value[objectId]) };
   }
 
-  function mutateStyle(id, values) {
-    state.updateStyleCache(id, values);
-    const style = getStyle(id);
-    merge(style, values);
-    return data_style_db.put(structuredClone({ id, ...toRaw(style) }));
+  function mutateStyle(objectId, styleValues) {
+    state.updateStyleCache(objectId, styleValues);
+    const currentStyle = getStyle(objectId);
+    merge(currentStyle, styleValues);
+    return dataStyleTable.put(structuredClone({ id: objectId, ...toRaw(currentStyle) }));
   }
 
-  function getComponentStyle(id_model, id_component) {
-    const key = `${id_model}_${id_component}`;
-    return merge({ coloring: {} }, componentStyles.value[key]);
+  function getComponentStyle(modelId, componentId) {
+    const cacheKey = `${modelId}_${componentId}`;
+    return merge({ coloring: {} }, componentStyles.value[cacheKey]);
   }
 
-  function getModelComponentTypeStyle(id_model, type) {
-    const key = `${id_model}_${type}`;
-    return merge({ coloring: {} }, modelComponentTypeStyles.value[key]);
+  function getModelComponentTypeStyle(modelId, componentType) {
+    const cacheKey = `${modelId}_${componentType}`;
+    return merge({ coloring: {} }, modelComponentTypeStyles.value[cacheKey]);
   }
 
-  function clear() {
-    return Promise.all([
-      data_style_db.clear(),
-      model_component_datastyle_db.clear(),
-      model_component_type_datastyle_db.clear(),
+  async function clear() {
+    await Promise.all([
+      dataStyleTable.clear(),
+      modelComponentDataStyleTable.clear(),
+      modelComponentTypeDataStyleTable.clear(),
     ]);
+    modelComponentTypeStyles.value = {};
+    componentStyles.value = {};
   }
 
   return {

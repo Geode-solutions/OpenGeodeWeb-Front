@@ -13,6 +13,7 @@ import { executablePath } from "./path.js";
 
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
+const MAX_PORT_RETRIES = 1;
 
 async function runScript(
   execPath,
@@ -51,7 +52,11 @@ async function runScript(
   }
 }
 
-async function runBack(execName, execPath, args = {}) {
+function isPortInUseError(errorMessage) {
+  return /EADDRINUSE|address already in use|port already in use/iu.test(errorMessage);
+}
+
+async function runBack(execName, execPath, args = {}, attempts = 0) {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
@@ -60,44 +65,68 @@ async function runBack(execName, execPath, args = {}) {
   if (!uploadFolderPath) {
     uploadFolderPath = path.join(projectFolderPath, "uploads");
   }
-  const port = await getAvailablePort();
-  const backArgs = [
-    "--port",
-    String(port),
-    "--project_folder_path",
-    projectFolderPath,
-    "--upload_folder_path",
-    uploadFolderPath,
-    "--allowed_origins",
-    "http://localhost:*",
-    "--timeout",
-    "0",
-  ];
-  if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
-    backArgs.push("--debug");
+  try {
+    const port = await getAvailablePort();
+    const backArgs = [
+      "--port",
+      String(port),
+      "--project_folder_path",
+      projectFolderPath,
+      "--upload_folder_path",
+      uploadFolderPath,
+      "--allowed_origins",
+      "http://localhost:*",
+      "--timeout",
+      "0",
+    ];
+    if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
+      backArgs.push("--debug");
+    }
+    console.log("runBack", execPath, execName, backArgs);
+    await runScript(execPath, execName, backArgs, "Serving Flask app");
+    return port;
+  } catch (error) {
+    if (!isPortInUseError(error)) {
+      console.log("runBack error", error);
+      throw error;
+    }
+    if (attempts <= MAX_PORT_RETRIES) {
+      console.log("Retrying runBack on conflicting port", port);
+      const port = await runBack(execName, execPath, args, attempts + 1);
+      return port;
+    }
   }
-  console.log("runBack", execPath, execName, backArgs);
-  await runScript(execPath, execName, backArgs, "Serving Flask app");
-  return port;
 }
 
-async function runViewer(execName, execPath, args = {}) {
+async function runViewer(execName, execPath, args = {}, attempts = 0) {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
-  const port = await getAvailablePort();
-  const viewerArgs = [
-    "--port",
-    String(port),
-    "--project_folder_path",
-    projectFolderPath,
-    "--timeout",
-    "0",
-  ];
-  console.log("runViewer", execPath, execName, viewerArgs);
-  await runScript(execPath, execName, viewerArgs, "Starting factory");
-  return port;
+  try {
+    const port = await getAvailablePort();
+    const viewerArgs = [
+      "--port",
+      String(port),
+      "--project_folder_path",
+      projectFolderPath,
+      "--timeout",
+      "0",
+    ];
+    console.log("runViewer", execPath, execName, viewerArgs);
+    await runScript(execPath, execName, viewerArgs, "Starting factory");
+    return port;
+  } catch (error) {
+    if (!isPortInUseError(error)) {
+      console.log("runBack error", error);
+      throw error;
+    }
+    if (attempts <= MAX_PORT_RETRIES) {
+      console.log("Retrying runViewer on conflicting port", port);
+      const port = await runViewer(execName, execPath, args, attempts + 1);
+      return port;
+    }
+  }
 }
 
 function addMicroserviceMetadatas(projectFolderPath, serviceObj) {

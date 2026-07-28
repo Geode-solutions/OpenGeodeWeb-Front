@@ -10,12 +10,39 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const meshPolyhedraPolyhedronAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.attribute.polyhedron;
 
+function isMeshPolyhedraPolyhedronAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
+}
+
 // oxlint-disable-next-line max-lines-per-function
-function useMeshPolyhedraPolyhedronAttributeConfig() {
+function useMeshPolyhedraPolyhedronAttributeStyle() {
+  const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
+  function meshPolyhedraColoring(id) {
+    return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).coloring;
+  }
+
   function meshPolyhedraPolyhedronAttribute(id) {
-    return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).polyhedron;
+    return meshPolyhedraColoring(id).polyhedron;
+  }
+
+  function meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item) {
+    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
+    if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
+    }
+    return {
+      minimum: undefined,
+      maximum: undefined,
+      colorMap: undefined,
+    };
   }
 
   function mutateMeshPolyhedraPolyhedronStyle(id, values) {
@@ -26,139 +53,110 @@ function useMeshPolyhedraPolyhedronAttributeConfig() {
     });
   }
 
-  function setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, config) {
+  function setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, config) {
     return mutateMeshPolyhedraPolyhedronStyle(id, {
       storedConfigs: {
-        [name]: config,
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
       },
     });
   }
 
-  function meshPolyhedraPolyhedronAttributeStoredConfig(id, name) {
-    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    if (name in storedConfigs) {
-      return storedConfigs[name];
+  function applyPolyhedronAttribute(id) {
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
+    const attribute = {
+      name,
+      item,
+      minimum: storedConfig.minimum,
+      maximum: storedConfig.maximum,
+      colorMap: storedConfig.colorMap,
+    };
+    if (isMeshPolyhedraPolyhedronAttributeValid(attribute)) {
+      return setMeshPolyhedraPolyhedronAttribute(id, attribute);
     }
-    return setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
-    });
   }
 
   function meshPolyhedraPolyhedronAttributeName(id) {
     return meshPolyhedraPolyhedronAttribute(id).name;
   }
 
+  function setMeshPolyhedraPolyhedronAttributeName(id, name) {
+    const item = meshPolyhedraPolyhedronAttributeLastItem(id, name);
+    mutateMeshPolyhedraPolyhedronStyle(id, { name, item });
+    return applyPolyhedronAttribute(id);
+  }
+
+  function meshPolyhedraPolyhedronAttributeItem(id) {
+    const { item, name } = meshPolyhedraPolyhedronAttribute(id);
+    return item ?? meshPolyhedraPolyhedronAttributeLastItem(id, name);
+  }
+
+  function setMeshPolyhedraPolyhedronAttributeItem(id, item) {
+    mutateMeshPolyhedraPolyhedronStyle(id, { item });
+    return applyPolyhedronAttribute(id);
+  }
+
+  function meshPolyhedraPolyhedronAttributeLastItem(id, name) {
+    const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
+    if (storedConfigs && name in storedConfigs) {
+      return storedConfigs[name].lastItem;
+    }
+    return 0;
+  }
+
   function meshPolyhedraPolyhedronAttributeRange(id) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
-    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name);
-    const { minimum, maximum } = storedConfig;
-    return [minimum, maximum];
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
+    return [storedConfig.minimum, storedConfig.maximum];
+  }
+
+  function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { minimum, maximum });
+    return applyPolyhedronAttribute(id);
   }
 
   function meshPolyhedraPolyhedronAttributeColorMap(id) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
-    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name);
-    const { colorMap } = storedConfig;
-    return colorMap;
-  }
-
-  return {
-    meshPolyhedraPolyhedronAttribute,
-    meshPolyhedraPolyhedronAttributeStoredConfig,
-    setMeshPolyhedraPolyhedronAttributeStoredConfig,
-    mutateMeshPolyhedraPolyhedronStyle,
-    meshPolyhedraPolyhedronAttributeName,
-    meshPolyhedraPolyhedronAttributeRange,
-    meshPolyhedraPolyhedronAttributeColorMap,
-  };
-}
-
-// oxlint-disable-next-line max-lines-per-function
-function useMeshPolyhedraPolyhedronAttributeActions() {
-  const viewerStore = useViewerStore();
-  const config = useMeshPolyhedraPolyhedronAttributeConfig();
-
-  function setMeshPolyhedraPolyhedronAttributeName(id, name) {
-    const schema = meshPolyhedraPolyhedronAttributeSchemas.name;
-    const params = { id, name };
-    return viewerStore.request(
-      {
-        schema,
-        params,
-      },
-      {
-        response_function: () => {
-          const updates = { name };
-          const polyhedron = config.meshPolyhedraPolyhedronAttribute(id);
-          if (!(name in polyhedron.storedConfigs)) {
-            updates.storedConfigs = {
-              [name]: {
-                minimum: undefined,
-                maximum: undefined,
-                colorMap: undefined,
-              },
-            };
-          }
-          return config.mutateMeshPolyhedraPolyhedronStyle(id, updates);
-        },
-      },
-    );
-  }
-
-  function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
-    const name = config.meshPolyhedraPolyhedronAttributeName(id);
-    const points = getRGBPointsFromPreset(config.meshPolyhedraPolyhedronAttributeColorMap(id));
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const schema = meshPolyhedraPolyhedronAttributeSchemas.color_map;
-      const params = { id, points, minimum, maximum };
-      return viewerStore.request(
-        { schema, params },
-        {
-          response_function: () =>
-            config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { minimum, maximum }),
-        },
-      );
-    }
-    return config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, {
-      minimum,
-      maximum,
-    });
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
+    return storedConfig.colorMap;
   }
 
   function setMeshPolyhedraPolyhedronAttributeColorMap(id, colorMap) {
-    const name = config.meshPolyhedraPolyhedronAttributeName(id);
-    const storedConfig = config.meshPolyhedraPolyhedronAttributeStoredConfig(id, name);
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { colorMap });
+    return applyPolyhedronAttribute(id);
+  }
+
+  function setMeshPolyhedraPolyhedronAttribute(id, { name, item, minimum, maximum, colorMap }) {
+    mutateMeshPolyhedraPolyhedronStyle(id, { name, item });
+    setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, { minimum, maximum, colorMap });
     const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const schema = meshPolyhedraPolyhedronAttributeSchemas.color_map;
-      const params = { id, points, minimum, maximum };
-      return viewerStore.request(
-        { schema, params },
-        {
-          response_function: () =>
-            config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { colorMap }),
-        },
-      );
-    }
-    return config.setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, { colorMap });
+    const schema = meshPolyhedraPolyhedronAttributeSchemas.attribute;
+    const params = { id, name, item, points, minimum, maximum };
+    return viewerStore.request({ schema, params });
   }
 
   return {
+    meshPolyhedraPolyhedronAttributeName,
+    meshPolyhedraPolyhedronAttributeItem,
+    meshPolyhedraPolyhedronAttributeRange,
+    meshPolyhedraPolyhedronAttributeColorMap,
+    meshPolyhedraPolyhedronAttributeStoredConfig,
+    setMeshPolyhedraPolyhedronAttribute,
     setMeshPolyhedraPolyhedronAttributeName,
+    setMeshPolyhedraPolyhedronAttributeItem,
     setMeshPolyhedraPolyhedronAttributeRange,
     setMeshPolyhedraPolyhedronAttributeColorMap,
   };
 }
 
-export function useMeshPolyhedraPolyhedronAttributeStyle() {
-  const config = useMeshPolyhedraPolyhedronAttributeConfig();
-  const actions = useMeshPolyhedraPolyhedronAttributeActions();
-
-  return {
-    ...config,
-    ...actions,
-  };
-}
+export { isMeshPolyhedraPolyhedronAttributeValid, useMeshPolyhedraPolyhedronAttributeStyle };

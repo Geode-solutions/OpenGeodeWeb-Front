@@ -8,9 +8,20 @@ import { useModelLinesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const schema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge;
+const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge.attribute;
 
-export function useModelLinesEdgeAttribute() {
+function isModelLinesEdgeAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
+}
+
+// oxlint-disable-next-line max-lines-per-function
+function useModelLinesEdgeAttribute() {
   const dataStore = useDataStore();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
   const viewerStore = useViewerStore();
@@ -19,16 +30,16 @@ export function useModelLinesEdgeAttribute() {
     return modelLinesCommonStyle.modelLineColoring(modelId, lineId).edge;
   }
 
-  function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name) {
+  function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item) {
     const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
-    if (name in storedConfigs) {
-      return storedConfigs[name];
+    if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
+      return storedConfigs[name][item];
     }
-    return setModelLinesEdgeAttributeStoredConfig(modelId, [lineId], name, {
+    return {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
-    });
+    };
   }
 
   function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
@@ -37,10 +48,13 @@ export function useModelLinesEdgeAttribute() {
     });
   }
 
-  function setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, config) {
+  function setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, config) {
     return mutateModelLinesEdgeStyle(modelId, lineIds, {
       storedConfigs: {
-        [name]: config,
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
       },
     });
   }
@@ -49,77 +63,115 @@ export function useModelLinesEdgeAttribute() {
     return modelLinesEdgeAttribute(modelId, lineId).name;
   }
 
-  async function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-    const params = { id: modelId, block_ids: viewer_ids, name };
-    return viewerStore.request(
-      { schema: schema.name, params },
-      {
-        response_function: () => mutateModelLinesEdgeStyle(modelId, lineIds, { name }),
-      },
+  function modelLinesEdgeAttributeItem(modelId, lineId) {
+    const edgeAttribute = modelLinesEdgeAttribute(modelId, lineId);
+    return (
+      edgeAttribute.item ?? modelLinesEdgeAttributeLastItem(modelId, lineId, edgeAttribute.name)
     );
+  }
+
+  function modelLinesEdgeAttributeLastItem(modelId, lineId, name) {
+    const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
+    if (!(name in storedConfigs)) {
+      return 0;
+    }
+    return storedConfigs[name].lastItem;
   }
 
   function modelLinesEdgeAttributeRange(modelId, lineId) {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
-    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name);
+    const item = modelLinesEdgeAttributeItem(modelId, lineId);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
 
-  async function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
-    const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
-    const colorMap = modelLinesEdgeAttributeColorMap(modelId, lineIds[0]);
-    const points = getRGBPointsFromPreset(colorMap);
-
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(
-        { schema: schema.color_map, params },
-        {
-          response_function: () =>
-            setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum }),
-        },
-      );
-    }
-    return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { minimum, maximum });
-  }
-
   function modelLinesEdgeAttributeColorMap(modelId, lineId) {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
-    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name);
-    const { colorMap } = storedConfig;
-    return colorMap;
+    const item = modelLinesEdgeAttributeItem(modelId, lineId);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
+    return storedConfig.colorMap;
   }
 
-  async function setModelLinesEdgeAttributeColorMap(modelId, lineIds, colorMap) {
+  function applyEdgeAttribute(modelId, lineIds) {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
-    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineIds[0], name);
-    const points = getRGBPointsFromPreset(colorMap);
-    const { minimum, maximum } = storedConfig;
-
-    if (points.length > 0 && minimum !== undefined && maximum !== undefined) {
-      const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-      const params = { id: modelId, block_ids: viewer_ids, points, minimum, maximum };
-      return viewerStore.request(
-        { schema: schema.color_map, params },
-        {
-          response_function: () =>
-            setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap }),
-        },
-      );
+    const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineIds[0], name, item);
+    const attribute = {
+      name,
+      item,
+      minimum: storedConfig.minimum,
+      maximum: storedConfig.maximum,
+      colorMap: storedConfig.colorMap,
+    };
+    if (isModelLinesEdgeAttributeValid(attribute)) {
+      return setModelLinesEdgeAttribute(modelId, lineIds, attribute);
     }
-    return setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, { colorMap });
+    return Promise.resolve();
+  }
+
+  function setModelLinesEdgeAttributeName(modelId, lineIds, name) {
+    const item = modelLinesEdgeAttributeLastItem(modelId, lineIds[0], name);
+    mutateModelLinesEdgeStyle(modelId, lineIds, { name, item });
+    return applyEdgeAttribute(modelId, lineIds);
+  }
+
+  function setModelLinesEdgeAttributeItem(modelId, lineIds, item) {
+    mutateModelLinesEdgeStyle(modelId, lineIds, { item });
+    return applyEdgeAttribute(modelId, lineIds);
+  }
+
+  function setModelLinesEdgeAttributeRange(modelId, lineIds, minimum, maximum) {
+    const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
+    setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, { minimum, maximum });
+    return applyEdgeAttribute(modelId, lineIds);
+  }
+
+  function setModelLinesEdgeAttributeColorMap(modelId, lineIds, colorMap) {
+    const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
+    setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, { colorMap });
+    return applyEdgeAttribute(modelId, lineIds);
+  }
+
+  async function setModelLinesEdgeAttribute(
+    modelId,
+    lineIds,
+    { name, item, minimum, maximum, colorMap },
+  ) {
+    mutateModelLinesEdgeStyle(modelId, lineIds, { name, item });
+    setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, {
+      minimum,
+      maximum,
+      colorMap,
+    });
+    const points = getRGBPointsFromPreset(colorMap);
+    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
+    const params = {
+      id: modelId,
+      block_ids: line_viewer_ids,
+      name,
+      item,
+      points,
+      minimum,
+      maximum,
+    };
+    return viewerStore.request({ schema: attributeSchema, params });
   }
 
   return {
     modelLinesEdgeAttributeName,
+    modelLinesEdgeAttributeItem,
     modelLinesEdgeAttributeRange,
     modelLinesEdgeAttributeColorMap,
     modelLinesEdgeAttributeStoredConfig,
+    setModelLinesEdgeAttribute,
     setModelLinesEdgeAttributeName,
+    setModelLinesEdgeAttributeItem,
     setModelLinesEdgeAttributeRange,
     setModelLinesEdgeAttributeColorMap,
   };
 }
+
+export { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute };
