@@ -3,6 +3,7 @@ import ActionButton from "@ogw_front/components/ActionButton";
 import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
 import CameraManager from "@ogw_front/components/CameraManager";
 import CameraOrientation from "@ogw_front/components/CameraOrientation";
+import ClippingPlanes from "@ogw_front/components/ClippingPlanes";
 import Screenshot from "@ogw_front/components/Screenshot";
 import ZScaling from "@ogw_front/components/ZScaling";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -15,6 +16,7 @@ const take_screenshot = ref(false);
 const show_camera_manager = ref(false);
 const showCameraOrientation = ref(false);
 const showZScaling = ref(false);
+const showClippingPlanes = ref(false);
 const grid_scale = ref(false);
 const zScale = ref(hybridViewerStore.zScale);
 
@@ -151,6 +153,15 @@ const camera_options = computed(() => [
       showZScaling.value = !showZScaling.value;
     },
   },
+  {
+    testId: "clippingPlanesButton",
+    tooltip: "Clipping Planes",
+    icon: "mdi-content-cut",
+    color: showClippingPlanes.value ? "primary" : undefined,
+    action: () => {
+      showClippingPlanes.value = !showClippingPlanes.value;
+    },
+  },
 ]);
 </script>
 
@@ -223,6 +234,7 @@ const camera_options = computed(() => [
     :width="260"
     @apply="handleZScalingClose"
   />
+  <ClippingPlanes v-model:show="showClippingPlanes" />
 </template>
 
 <style module>
