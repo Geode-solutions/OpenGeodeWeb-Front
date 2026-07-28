@@ -79,6 +79,7 @@ watch(filteredPresets, drawAllCanvases);
   <GlassCard width="320" variant="panel" padding="pa-3" rounded="lg" class="overflow-hidden">
     <v-overlay
       v-model="loading"
+      data-testid="colorMapListLoading"
       contained
       persistent
       class="align-center justify-center"
@@ -87,9 +88,9 @@ watch(filteredPresets, drawAllCanvases);
     >
       <v-progress-circular indeterminate color="primary" />
     </v-overlay>
-
     <v-text-field
       v-model="filterText"
+      data-testid="colorMapListFilter"
       placeholder="Search presets..."
       density="compact"
       hide-details
