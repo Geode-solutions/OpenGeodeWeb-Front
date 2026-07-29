@@ -78,7 +78,7 @@ watch(filteredPresets, drawAllCanvases);
 <template>
   <GlassCard width="320" variant="panel" padding="pa-3" rounded="lg" class="overflow-hidden">
     <v-overlay
-      v-model="loading"
+      v-if="loading"
       data-testid="colorMapListLoading"
       contained
       persistent
