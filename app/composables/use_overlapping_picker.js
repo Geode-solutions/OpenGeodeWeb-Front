@@ -64,20 +64,22 @@ export function useOverlappingPicker() {
   }
 
   async function get_viewer_id({ x, y, containerWidth, containerHeight, containerRect }) {
-    const activeIds = new Set(dataItems.value.map((item) => item.id));
-    const ids = Object.keys(dataStyleStore.styles).filter((styleId) => {
-      if (!activeIds.has(styleId)) {
-        return false;
-      }
-      if (!dataStyleStore.objectVisibility(styleId)) {
-        return false;
-      }
-      const item = dataItems.value.find((i) => i.id === styleId);
-      if (item && item.binary_light_viewable === "not_viewable") {
-        return false;
-      }
-      return true;
-    });
+    const activeIds = new Set(dataItems.value.map((i) => i.id));
+    const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
+      (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId),
+    );
+
+    const viewableChecks = await Promise.all(
+      visibleStyleIds.map(async (styleId) => {
+        try {
+          const dataItem = await dataStore.item(styleId);
+          return dataStore.isItemViewable(dataItem) ? styleId : undefined;
+        } catch {
+          return undefined;
+        }
+      }),
+    );
+    const ids = viewableChecks.filter(Boolean);
 
     const result = { id: undefined, viewer_id: undefined };
     let pickedResponse = undefined;

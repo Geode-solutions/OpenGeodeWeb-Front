@@ -89,11 +89,7 @@ async function performAddItem(id, options) {
     return;
   }
   const value = await dataStore.item(id);
-  if (
-    value &&
-    (value.is_viewable === false ||
-      (value.is_viewable === undefined && value.binary_light_viewable === "not_viewable"))
-  ) {
+  if (value && !dataStore.isItemViewable(value)) {
     return;
   }
   const reader = vtkXMLPolyDataReader();

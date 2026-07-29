@@ -1,4 +1,8 @@
 <script setup>
+import { useDataStore } from "@ogw_front/stores/data";
+
+const dataStore = useDataStore();
+
 const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({
   item: { type: Object, required: true },
   itemProps: { type: Object, required: true },
@@ -15,11 +19,7 @@ function triggerHorizonStackModal(rawItem) {
   globalThis.dispatchEvent(new CustomEvent("open-horizon-stack-modal", { detail: rawItem }));
 }
 const isHorizonStack = computed(() => item.raw.geode_object_type === "HorizonStack3D");
-const isViewable = computed(
-  () =>
-    item.raw.is_viewable === true ||
-    (item.raw.is_viewable === undefined && item.raw.binary_light_viewable !== "not_viewable"),
-);
+const isViewable = computed(() => dataStore.isItemViewable(item.raw));
 const showEyeButton = computed(
   () => !isHorizonStack.value && item.raw.title !== "HorizonStack3D" && isViewable.value,
 );
