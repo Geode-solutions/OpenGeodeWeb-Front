@@ -63,9 +63,13 @@ watch(
 
 const targetComponentIds = ref([]);
 watch(
-  () => [modelId.value, componentType.value],
+  () => [modelId.value, componentType.value, itemProps.meta_data.targetComponentIds],
   async () => {
     targetComponentIds.value = [];
+    if (itemProps.meta_data.targetComponentIds) {
+      targetComponentIds.value = itemProps.meta_data.targetComponentIds;
+      return;
+    }
     if (componentType.value && modelId.value) {
       const currentModelId = modelId.value;
       const currentType = componentType.value;

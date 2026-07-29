@@ -133,7 +133,7 @@ export const useViewerStore = defineStore(
 
       const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = {
-        $id: "/api/app/run_viewer",
+        $id: "/api/local/run_viewer",
         methods: ["POST"],
         type: "object",
         properties: { COMMAND_VIEWER: { type: "string" }, NUXT_ROOT_PATH: { type: "string" } },

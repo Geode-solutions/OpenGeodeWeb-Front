@@ -81,7 +81,7 @@ function runExtensions() {
   const params = { projectFolderPath, projectName };
 
   const schema = {
-    $id: "/api/extensions/run",
+    $id: "/api/microservice/extensions/run",
     methods: ["POST"],
     type: "object",
     properties: {
@@ -104,7 +104,7 @@ function killExtension(extensionId) {
   console.log(`[AppStore] Killing extension: ${extensionId}`, { params });
 
   const schema = {
-    $id: "/api/extensions/kill",
+    $id: "/api/microservice/extensions/kill",
     methods: ["POST"],
     type: "object",
     properties: {

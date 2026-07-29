@@ -19,7 +19,7 @@ const hybridViewerStore = useHybridViewerStore();
 const linesVisibility = computed({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Line"),
   set: async (newValue) => {
-    await dataStyleStore.setModelComponentTypeVisibility(modelId, "Line", newValue);
+    await dataStyleStore.setModelLinesVisibility(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -36,7 +36,7 @@ const lineVisibility = computed({
 const linesColor = computed({
   get: () => dataStyleStore.modelComponentTypeColor(modelId, "Line"),
   set: async (color) => {
-    await dataStyleStore.setModelComponentTypeColor(modelId, "Line", color);
+    await dataStyleStore.setModelLinesColor(modelId, targetLineIds, color);
     hybridViewerStore.remoteRender();
   },
 });
@@ -52,7 +52,7 @@ const lineColor = computed({
 const linesActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Line"),
   set: async (coloringType) => {
-    await dataStyleStore.setModelComponentTypeActiveColoring(modelId, "Line", coloringType);
+    await dataStyleStore.setModelLinesActiveColoring(modelId, targetLineIds, coloringType);
     hybridViewerStore.remoteRender();
   },
 });
