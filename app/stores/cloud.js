@@ -12,7 +12,7 @@ export const useCloudStore = defineStore("cloud", {
       this.status = Status.CONNECTING;
       console.log("[CLOUD] Launching cloud backend...");
       const schema = {
-        $id: "/api/app/run_cloud",
+        $id: "/api/serverless/run_cloud",
         methods: ["POST"],
         type: "object",
         properties: {

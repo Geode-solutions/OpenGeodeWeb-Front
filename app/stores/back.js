@@ -81,7 +81,7 @@ export const useBackStore = defineStore("back", {
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = {
-        $id: "/api/app/run_back",
+        $id: "/api/local/run_back",
         methods: ["POST"],
         type: "object",
         properties: {
