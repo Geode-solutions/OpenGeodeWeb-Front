@@ -42,6 +42,8 @@ function requestConfig(parent, image, email, projectName) {
       cpu: "2000m",
       memory: "3Gi",
     },
+    cpuIdle: false,
+    startup_cpu_boost: true,
   };
   const labels = {
     user: sanitizeLabelValue(email),
@@ -59,6 +61,7 @@ function requestConfig(parent, image, email, projectName) {
       },
       template: {
         labels,
+        timeout: { seconds: 3600 },
         containers: [
           {
             image,
