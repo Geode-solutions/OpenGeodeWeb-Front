@@ -5,8 +5,12 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-import vtkImplicitPlaneWidget from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
-import vtkWidgetManager from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
+import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+
+const AXIS_SCALE = 0.45;
+const SIZE_RATIO = 0.1;
+const DEBOUNCE_DELAY = 200;
 
 const show = defineModel("show", { type: Boolean, default: false });
 const dataStore = useDataStore();
@@ -32,27 +36,27 @@ function getSceneBounds() {
   const actors = Object.values(hybridViewerStore.hybridDb)
     .map((entry) => entry.actor)
     .filter(Boolean);
-  if (!actors.length) return [-1, 1, -1, 1, -1, 1];
-
-  return actors.reduce(
-    (acc, actor) => {
-      const bounds = actor.getBounds();
-      return [
-        Math.min(acc[0], bounds[0]),
-        Math.max(acc[1], bounds[1]),
-        Math.min(acc[2], bounds[2]),
-        Math.max(acc[3], bounds[3]),
-        Math.min(acc[4], bounds[4]),
-        Math.max(acc[5], bounds[5]),
-      ];
-    },
-    [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity],
-  );
+  if (actors.length === 0) {
+    return [-1, 1, -1, 1, -1, 1];
+  }
+  let combinedBounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
+  for (const actor of actors) {
+    const bounds = actor.getBounds();
+    combinedBounds = [
+      Math.min(combinedBounds[0], bounds[0]),
+      Math.max(combinedBounds[1], bounds[1]),
+      Math.min(combinedBounds[2], bounds[2]),
+      Math.max(combinedBounds[3], bounds[3]),
+      Math.min(combinedBounds[4], bounds[4]),
+      Math.max(combinedBounds[5], bounds[5]),
+    ];
+  }
+  return combinedBounds;
 }
 
 function getSceneCenter() {
-  const b = getSceneBounds();
-  return [0, 2, 4].map((i) => Number(((b[i] + b[i + 1]) / 2).toFixed(4)));
+  const bounds = getSceneBounds();
+  return [0, 2, 4].map((i) => Number(((bounds[i] + bounds[i + 1]) / 2).toFixed(4)));
 }
 
 function initLocalWidget(container) {
@@ -69,13 +73,13 @@ function initLocalWidget(container) {
   canvas.style.background = "transparent";
   localRenderWindow.resize();
 
-  widgetManager = vtkWidgetManager.newInstance();
+  widgetManager = vtkWidgetManager();
   widgetManager.setRenderer(localRenderWindow.getRenderer());
 
-  planeWidget = vtkImplicitPlaneWidget.newInstance();
+  planeWidget = vtkImplicitPlaneWidget();
   const handle = widgetManager.addWidget(planeWidget);
-  handle.setAxisScale(0.45);
-  handle.setHandleSizeRatio(0.1);
+  handle.setAxisScale(AXIS_SCALE);
+  handle.setHandleSizeRatio(SIZE_RATIO);
   handle.placeWidget(getSceneBounds());
 
   if (planes.value[0].origin.every((val) => val === 0)) {
@@ -100,13 +104,17 @@ function initLocalWidget(container) {
 }
 
 watch(widgetContainer, (container) => {
-  if (container) initLocalWidget(container);
+  if (container) {
+    initLocalWidget(container);
+  }
 });
 
 watch(
   planes,
   () => {
-    if (fromWidget || !planeWidget) return;
+    if (fromWidget || !planeWidget) {
+      return;
+    }
     const widgetState = planeWidget.getWidgetState();
     widgetState.setOrigin(planes.value[0].origin);
     widgetState.setNormal(planes.value[0].normal);
@@ -121,7 +129,9 @@ onBeforeUnmount(() => {
 });
 
 function syncLocalCamera() {
-  if (!localRenderWindow) return;
+  if (!localRenderWindow) {
+    return;
+  }
   const renderer = localRenderWindow.getRenderer();
   applyCameraOptions(renderer.getActiveCamera(), hybridViewerStore.camera_options);
   renderer.resetCamera();
@@ -139,22 +149,26 @@ function removePlane(index) {
 }
 
 function flipNormal(plane) {
-  plane.normal = plane.normal.map((n) => -n);
+  plane.normal = plane.normal.map((normal) => -normal);
 }
 
-const debouncedApply = useDebounceFn(() => applyClippingPlanes(), 200);
+const debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
 
 watch(
   [show, targetAllVisible, selectedDatasetIds, allItems],
   ([visible]) => {
-    if (visible) debouncedApply();
+    if (visible) {
+      debouncedApply();
+    }
   },
   { immediate: true },
 );
 
 async function applyClippingPlanes() {
   const allIds = allItems.value.map((item) => item.id);
-  if (!allIds.length) return;
+  if (allIds.length === 0) {
+    return;
+  }
 
   const targetIds = targetAllVisible.value ? allIds : selectedDatasetIds.value;
   const untargetedIds = allIds.filter((id) => !targetIds.includes(id));
@@ -163,10 +177,10 @@ async function applyClippingPlanes() {
     normal: plane.normal.map(Number),
   }));
 
-  if (targetIds.length) {
+  if (targetIds.length > 0) {
     await hybridViewerStore.setClippingPlanes(targetIds, planesData);
   }
-  if (untargetedIds.length) {
+  if (untargetedIds.length > 0) {
     await hybridViewerStore.setClippingPlanes(untargetedIds, []);
   }
 }
@@ -187,7 +201,7 @@ async function resetClippingPlanes() {
 
 async function removeClippingPlanes() {
   const allIds = allItems.value.map((item) => item.id);
-  if (allIds.length) {
+  if (allIds.length > 0) {
     await hybridViewerStore.setClippingPlanes(allIds, []);
   }
 }
