@@ -30,6 +30,7 @@ export default defineNuxtConfig({
     "@ogw_tests": path.resolve(__dirname, "tests"),
     "@ogw_shared": path.resolve(__dirname, "shared"),
     "@ogw_server": path.resolve(__dirname, "server"),
+    "@geode/opengeodeweb-front/shared": path.resolve(__dirname, "shared"),
   },
 
   // ** Global CSS
