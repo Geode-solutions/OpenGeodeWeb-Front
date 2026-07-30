@@ -9,9 +9,9 @@ import {
   getMicroserviceByName,
   killMicroservice,
   projectMicroservices,
-} from "@ogw_front/utils/local/cleanup.js";
-import { extensionFolderPath } from "@ogw_shared/path.js";
-import { removeExtensionFromConf } from "@ogw_front/utils/config.js";
+} from "@geode/opengeodeweb-front/server/utils/cleanup.js";
+import { extensionFolderPath } from "@geode/opengeodeweb-front/shared/path.js";
+import { removeExtensionFromConf } from "@geode/opengeodeweb-front/server/utils/config.js";
 
 export default defineEventHandler(async (event) => {
   try {

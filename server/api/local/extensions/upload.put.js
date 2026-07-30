@@ -8,7 +8,10 @@ import { createError, defineEventHandler, getRequestHeaders, getRequestWebStream
 import busboy from "busboy";
 
 // Local imports
-import { registerExtensionFile, targetExtensionFilePath } from "@ogw_server/utils/config.js";
+import {
+  registerExtensionFile,
+  targetExtensionFilePath,
+} from "@geode/opengeodeweb-front/server/utils/config.js";
 
 const CODE_201 = 201;
 const FILE_SIZE_LIMIT = 107_374_182;
@@ -61,6 +64,6 @@ export default defineEventHandler(async (event) => {
   if (savedFiles.length === 0) {
     throw createError({ statusCode: 400, message: "No file received" });
   }
-  await Promise.all(savedFiles.map(async (file) => await registerExtensionFile(file)));
+  await Promise.all(savedFiles.map(async (file) => await registerExtensionFile(projectName, file)));
   return { statusCode: CODE_201 };
 });

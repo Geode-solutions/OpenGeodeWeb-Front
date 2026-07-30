@@ -22,7 +22,7 @@ function confFolderPath(projectName) {
 
 function targetExtensionFilePath(projectName, filename) {
   const safeFilename = sanitize(filename);
-  const targetPath = path.join(configFolderPath(projectName), safeFilename);
+  const targetPath = path.join(confFolderPath(projectName), safeFilename);
   return targetPath;
 }
 
@@ -59,7 +59,7 @@ function extensionPathFromConf(projectName, extensionId) {
   return projectConfig.get(`extensions.${extensionId}.path`);
 }
 
-async function registerExtensionFile(file) {
+async function registerExtensionFile(projectName, file) {
   const StreamZipAsync = StreamZip.async;
   const zip = new StreamZipAsync({
     file,

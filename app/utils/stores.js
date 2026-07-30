@@ -1,5 +1,5 @@
 import { useInfraStore } from "@ogw_front/stores/infra";
-import { appMode } from "@ogw_front/utils/local/app_mode";
+import { appMode } from "@ogw_shared/app_mode";
 
 function isCloudMode() {
   const infraStore = useInfraStore();
@@ -8,26 +8,25 @@ function isCloudMode() {
 
 function getRestApiProtocol() {
   const protocol = isCloudMode() ? "https" : "http";
-  return protocol
+  return protocol;
 }
 function getRestApiPort(defaultLocalPort) {
   const port = isCloudMode() ? "443" : defaultLocalPort;
-  return port
+  return port;
 }
 function getWebsocketApiProtocol() {
   const protocol = isCloudMode() ? "wss" : "ws";
-  return protocol
+  return protocol;
 }
 function getWebsocketApiPort(defaultLocalPort) {
   const port = isCloudMode() ? "443" : defaultLocalPort;
-  return port
+  return port;
 }
-
 
 export {
   isCloudMode,
   getRestApiPort,
   getRestApiProtocol,
   getWebsocketApiProtocol,
-  getWebsocketApiPort
-}
+  getWebsocketApiPort,
+};

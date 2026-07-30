@@ -5,7 +5,10 @@ import { promises as fs } from "node:fs";
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { registerExtensionFile, targetExtensionFilePath } from "@ogw_server/utils/config.js";
+import {
+  registerExtensionFile,
+  targetExtensionFilePath,
+} from "@geode/opengeodeweb-front/server/utils/config.js";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -15,7 +18,7 @@ export default defineEventHandler(async (event) => {
     const fileBuffer = await fetch(url).then((file) => file.arrayBuffer());
     const filePath = targetExtensionFilePath(projectName, extensionFileName);
     await fs.writeFile(filePath, Buffer.from(fileBuffer));
-    await registerExtensionFile(filePath);
+    await registerExtensionFile(projectName, filePath);
     return {
       statusCode: 200,
     };

@@ -81,7 +81,8 @@ async function uploadExtension(file) {
 
 function downloadExtension({ url, extensionFileName }) {
   const appStore = useAppStore();
-  const params = { projectFolderPath, projectName, url, extensionFileName };
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const params = { projectName, url, extensionFileName };
 
   const schema = {
     $id: "/api/microservice/extensions/download",
@@ -89,11 +90,10 @@ function downloadExtension({ url, extensionFileName }) {
     type: "object",
     properties: {
       extensionFileName: { type: "string" },
-      projectFolderPath: { type: "string" },
       projectName: { type: "string" },
       url: { type: "string" },
     },
-    required: ["projectFolderPath", "projectName"],
+    required: ["extensionFileName", "projectName", "url"],
     additionalProperties: false,
   };
 
