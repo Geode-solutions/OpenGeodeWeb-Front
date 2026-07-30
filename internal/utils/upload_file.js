@@ -1,4 +1,3 @@
-import { fetchSchema } from "@ogw_shared/utils/fetch_schema.js";
 import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
@@ -18,10 +17,11 @@ function upload_file(
   params.append("file", file);
 
   microservice.start_request();
+  const route = schema.$id;
 
   return fetchRaw(
     {
-      route: schema.$id,
+      route,
       method: schema.methods.find((method) => method !== "OPTIONS"),
       params,
       baseURL: microservice.base_url,

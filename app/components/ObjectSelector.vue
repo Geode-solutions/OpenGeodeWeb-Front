@@ -53,7 +53,7 @@ function isCsvFile(filename) {
   return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
 }
 
-async function get_allowed_objects() {
+async function getAllowedObjects() {
   toggle_loading();
   allowed_objects.value = {};
   multiple_files_no_common.value = false;
@@ -90,19 +90,19 @@ async function get_allowed_objects() {
   allowed_objects.value = final_object;
   const selected_object = select_geode_object(final_object);
   if (selected_object) {
-    set_geode_object(selected_object);
+    setGeodeObject(selected_object);
   }
   toggle_loading();
 }
 
-function set_geode_object(geode_object_type) {
+function setGeodeObject(geode_object_type) {
   if (geode_object_type) {
     emit("update_values", { geode_object_type });
     emit("increment_step");
   }
 }
 // oxlint-disable-next-line no-top-level-await
-await get_allowed_objects();
+await getAllowedObjects();
 </script>
 
 <template>
@@ -124,7 +124,7 @@ await get_allowed_objects();
               class="card ma-2"
               hover
               rounded
-              @click="set_geode_object(key)"
+              @click="setGeodeObject(key)"
               :disabled="!value['is_loadable']"
               :elevation="value['is_loadable'] ? 5 : 3"
             >

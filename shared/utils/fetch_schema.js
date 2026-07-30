@@ -7,7 +7,7 @@ import { fetchRaw } from "./fetch_raw.js";
 const ERROR_400 = 400;
 
 function fetchSchema(
-  { schema, params = {}, baseURL, headers, timeout },
+  { schema, params = {}, baseURL, headers, timeout, expectEvent = false },
   { onRequestError, onResponse, onResponseError, onValidationError } = {},
 ) {
   console.log("fetchSchema", { schema, baseURL, params, headers, timeout });
@@ -32,6 +32,7 @@ function fetchSchema(
       headers,
       max_retry: schema.max_retry,
       timeout,
+      expectEvent,
     },
     { onRequestError, onResponse, onResponseError },
   );

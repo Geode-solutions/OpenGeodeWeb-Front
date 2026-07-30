@@ -7,7 +7,6 @@ import { useBackStore } from "@ogw_front/stores/back";
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
 const backStore = useBackStore();
-const schema = schemas.opengeodeweb_back.allowed_files;
 
 const { multiple, files, autoUpload, showOverlay } = defineProps({
   multiple: { type: Boolean, required: true },
@@ -47,11 +46,12 @@ function files_uploaded_event(value) {
 }
 
 function getAllowedFiles() {
+  const schema = schemas.opengeodeweb_back.allowed_files;
   return backStore.request(
     { schema },
     {
       response_function: (response) => {
-        accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
+        accept.value = response.extensions.map((extension) => `.${extension}`).join(", ");
       },
     },
   );

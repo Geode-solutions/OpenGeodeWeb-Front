@@ -1,11 +1,16 @@
 import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
-import { appMode } from "@ogw_front/utils/local/app_mode";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useInfraStore } from "@ogw_front/stores/infra";
+
+import {
+  isCloudMode,
+  getRestApiProtocol,
+  getRestApiPort
+} from "@ogw_front/utils/stores";
 
 const MILLISECONDS_IN_SECOND = 1000;
 const DEFAULT_PING_INTERVAL_SECONDS = 10;
@@ -19,24 +24,18 @@ export const useBackStore = defineStore("back", {
   }),
   getters: {
     protocol() {
-      if (useInfraStore().app_mode === appMode.CLOUD) {
-        return "https";
-      }
-      return "http";
+      return getRestApiProtocol()
     },
     port() {
-      if (useInfraStore().app_mode === appMode.CLOUD) {
-        return "443";
-      }
-      return this.default_local_port;
+      return getRestApiPort(this.default_local_port)
     },
     base_url() {
       const infraStore = useInfraStore();
-      let geode_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`;
-      if (infraStore.app_mode === appMode.CLOUD) {
-        geode_url += `/geode`;
+      let back_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`;
+      if (isCloudMode()) {
+        back_url += `/geode`;
       }
-      return geode_url;
+      return back_url;
     },
     is_busy() {
       return this.request_counter > 0;
@@ -134,7 +133,6 @@ export const useBackStore = defineStore("back", {
         {
           ...callbacks,
           response_function: async (response) => {
-            console.log("[GEODE] Request completed:", route);
             if (callbacks.response_function) {
               await callbacks.response_function(response);
             }
