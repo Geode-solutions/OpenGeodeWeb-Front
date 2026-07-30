@@ -16,7 +16,7 @@ import {
   extensionFrontendPath,
 } from "@geode/opengeodeweb-front/server/utils/path.js";
 import { extensionsConf } from "@geode/opengeodeweb-front/server/utils/config.js";
-import { unzipFile } from "@geode/opengeodeweb-front/app/utils/server.js";
+import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.js";
 
 export default defineEventHandler(async (event) => {
   try {

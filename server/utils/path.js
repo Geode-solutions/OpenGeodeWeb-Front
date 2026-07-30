@@ -8,7 +8,7 @@ import { setTimeout } from "node:timers/promises";
 import { v4 as uuidv4 } from "uuid";
 
 // Local imports
-import { appMode } from "@geode/opengeodeweb-front/shared/app_mode.js";
+import { appMode } from "#shared/app_mode.js";
 import { commandExistsSync } from "./scripts.js";
 
 function findExecutableInDir(baseDir, execName, osExecutableName) {

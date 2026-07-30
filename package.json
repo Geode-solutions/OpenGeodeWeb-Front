@@ -18,6 +18,9 @@
   },
   "type": "module",
   "main": "./nuxt.config.js",
+  "imports": {
+    "#shared/*": "./shared/*"
+  },
   "publishConfig": {
     "access": "public"
   },

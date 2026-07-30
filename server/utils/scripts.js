@@ -9,7 +9,7 @@ import readline from "node:readline";
 import { getPort } from "get-port-please";
 
 // Local imports
-import { appMode } from "@geode/opengeodeweb-front/shared/app_mode.js";
+import { appMode } from "#shared/app_mode.js";
 
 const BYTES_PER_KIBIBYTE = 1024;
 const MAX_ERROR_BUFFER_KIBIBYTES = 64;
