@@ -31,19 +31,29 @@ const widgetContainer = useTemplateRef("widgetContainer");
 let localRenderWindow = undefined;
 let widgetManager = undefined;
 let planeWidget = undefined;
+let widgetHandle = undefined;
 let fromWidget = false;
 let maxDistance = 0;
 let isLimitingCameraZoom = false;
 
 function getSceneBounds() {
-  const actors = Object.values(hybridViewerStore.hybridDb)
-    .map((entry) => entry.actor)
-    .filter(Boolean);
-  if (actors.length === 0) {
+  const targetIds = targetAllVisible.value
+    ? allItems.value.map((item) => item.id)
+    : selectedDatasetIds.value;
+
+  const actors = targetIds.map((id) => hybridViewerStore.hybridDb[id]?.actor).filter(Boolean);
+  const activeActors =
+    actors.length > 0
+      ? actors
+      : Object.values(hybridViewerStore.hybridDb)
+          .map((entry) => entry.actor)
+          .filter(Boolean);
+
+  if (activeActors.length === 0) {
     return [-1, 1, -1, 1, -1, 1];
   }
   let combinedBounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
-  for (const actor of actors) {
+  for (const actor of activeActors) {
     const bounds = actor.getBounds();
     combinedBounds = [
       Math.min(combinedBounds[0], bounds[0]),
@@ -58,20 +68,38 @@ function getSceneBounds() {
 }
 
 function getSceneCenter() {
-  const bounds = getSceneBounds();
-  return [0, 2, 4].map((i) => Number(((bounds[i] + bounds[i + 1]) / 2).toFixed(4)));
+  const [xmin, xmax, ymin, ymax, zmin, zmax] = getSceneBounds();
+  return [
+    Number(((xmin + xmax) / 2).toFixed(4)),
+    Number(((ymin + ymax) / 2).toFixed(4)),
+    Number(((zmin + zmax) / 2).toFixed(4)),
+  ];
 }
 
-function isArrayDiff(arrA, arrB) {
-  return arrA.some((val, idx) => Math.abs(val - arrB[idx]) > CHANGE_THRESHOLD);
+function getCubicBounds() {
+  const [xmin, xmax, ymin, ymax, zmin, zmax] = getSceneBounds();
+  const center = [(xmin + xmax) / 2, (ymin + ymax) / 2, (zmin + zmax) / 2];
+  const halfExtent = Math.max(xmax - xmin, ymax - ymin, zmax - zmin) / 2;
+
+  return [
+    center[0] - halfExtent,
+    center[0] + halfExtent,
+    center[1] - halfExtent,
+    center[1] + halfExtent,
+    center[2] - halfExtent,
+    center[2] + halfExtent,
+  ];
 }
 
 function hasPlaneChanged(origin, normal, currentOrigin, currentNormal) {
-  return isArrayDiff(origin, currentOrigin) || isArrayDiff(normal, currentNormal);
+  return (
+    origin.some((val, idx) => Math.abs(val - currentOrigin[idx]) > CHANGE_THRESHOLD) ||
+    normal.some((val, idx) => Math.abs(val - currentNormal[idx]) > CHANGE_THRESHOLD)
+  );
 }
 
 function limitCameraZoomOut(camera) {
-  if (isLimitingCameraZoom || maxDistance <= 0) {
+  if (maxDistance <= 0 || isLimitingCameraZoom) {
     return;
   }
   const currentDist = camera.getDistance();
@@ -93,39 +121,7 @@ function limitCameraZoomOut(camera) {
   isLimitingCameraZoom = false;
 }
 
-function initLocalWidget(container) {
-  container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
-
-  localRenderWindow = vtkGenericRenderWindow({
-    background: [0, 0, 0, 0],
-    listenWindowResize: false,
-  });
-  localRenderWindow.setContainer(container);
-
-  const camera = localRenderWindow.getRenderer().getActiveCamera();
-  camera.onModified(() => limitCameraZoomOut(camera));
-
-  const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
-  Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
-  localRenderWindow.resize();
-
-  widgetManager = vtkWidgetManager();
-  widgetManager.setRenderer(localRenderWindow.getRenderer());
-
-  planeWidget = vtkImplicitPlaneWidget();
-  const handle = widgetManager.addWidget(planeWidget);
-  handle.setAxisScale(AXIS_SCALE);
-  handle.setHandleSizeRatio(SIZE_RATIO);
-  handle.placeWidget(getSceneBounds());
-
-  if (planes.value[0].origin.every((val) => val === 0)) {
-    planes.value[0].origin = getSceneCenter();
-  }
-
-  const widgetState = planeWidget.getWidgetState();
-  widgetState.setOrigin(planes.value[0].origin);
-  widgetState.setNormal(planes.value[0].normal);
-
+function setupWidgetStateEvents(widgetState) {
   widgetState.onModified(() => {
     const origin = widgetState.getOrigin().map((val) => Number(val.toFixed(4)));
     const normal = widgetState.getNormal().map((val) => Number(val.toFixed(4)));
@@ -139,13 +135,41 @@ function initLocalWidget(container) {
     fromWidget = false;
     debouncedApply();
   });
+}
 
+function initLocalWidget(container) {
+  container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  localRenderWindow = vtkGenericRenderWindow({
+    background: [0, 0, 0, 0],
+    listenWindowResize: false,
+  });
+  localRenderWindow.setContainer(container);
+  const camera = localRenderWindow.getRenderer().getActiveCamera();
+  camera.onModified(() => limitCameraZoomOut(camera));
+  const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
+  Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
+  localRenderWindow.resize();
+  widgetManager = vtkWidgetManager();
+  widgetManager.setRenderer(localRenderWindow.getRenderer());
+  planeWidget = vtkImplicitPlaneWidget();
+  widgetHandle = widgetManager.addWidget(planeWidget);
+  widgetHandle.setAxisScale(AXIS_SCALE);
+  widgetHandle.setHandleSizeRatio(SIZE_RATIO);
+  widgetHandle.placeWidget(getCubicBounds());
+  if (planes.value[0].origin.every((val) => val === 0)) {
+    planes.value[0].origin = getSceneCenter();
+  }
+  const widgetState = planeWidget.getWidgetState();
+  widgetState.setOrigin(planes.value[0].origin);
+  widgetState.setNormal(planes.value[0].normal);
+  setupWidgetStateEvents(widgetState);
   syncLocalCamera();
 }
 
 watch(widgetContainer, (container) => {
   if (container) {
-    initLocalWidget(container);
+    const domElement = container.$el || container;
+    initLocalWidget(domElement);
   }
 });
 
@@ -194,12 +218,23 @@ function flipNormal(plane) {
   plane.normal = plane.normal.map((normal) => -normal);
 }
 
+function updateWidgetPlacement() {
+  if (!widgetHandle || !localRenderWindow) {
+    return;
+  }
+  widgetHandle.placeWidget(getCubicBounds());
+  widgetHandle.setAxisScale(AXIS_SCALE);
+  widgetHandle.setHandleSizeRatio(SIZE_RATIO);
+  syncLocalCamera();
+}
+
 const debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
 
 watch(
   [show, targetAllVisible, selectedDatasetIds, allItems],
   ([visible]) => {
     if (visible) {
+      updateWidgetPlacement();
       debouncedApply();
     }
   },
@@ -276,10 +311,11 @@ function close() {
     </template>
 
     <v-card-text v-if="isExpanded" class="pa-3 max-panel-height overflow-y-auto">
-      <div
+      <v-sheet
         ref="widgetContainer"
+        height="180"
+        color="transparent"
         class="rounded-lg mb-3 overflow-hidden"
-        style="height: 180px; background: transparent"
       />
       <v-switch
         v-model="targetAllVisible"
@@ -306,10 +342,12 @@ function close() {
 
       <v-divider class="my-2" />
 
-      <div class="d-flex align-center justify-space-between mb-2">
-        <span class="text-caption font-weight-bold">Planes ({{ planes.length }})</span>
-        <v-btn size="x-small" variant="tonal" color="primary" icon="mdi-plus" @click="addPlane" />
-      </div>
+      <v-row align="center" justify="space-between" no-gutters class="mb-2">
+        <v-col class="text-caption font-weight-bold">Planes ({{ planes.length }})</v-col>
+        <v-col cols="auto">
+          <v-btn size="x-small" variant="tonal" color="primary" icon="mdi-plus" @click="addPlane" />
+        </v-col>
+      </v-row>
 
       <v-card
         v-for="(plane, idx) in planes"
@@ -317,18 +355,22 @@ function close() {
         variant="outlined"
         class="pa-2 mb-3 rounded-lg border-opacity-25"
       >
-        <div class="d-flex align-center justify-space-between mb-1">
-          <span class="text-caption font-weight-medium">Plane #{{ idx + 1 }}</span>
-          <v-btn
-            icon="mdi-trash-can-outline"
-            size="x-small"
-            variant="text"
-            color="error"
-            @click="removePlane(idx)"
-          />
-        </div>
+        <v-row align="center" justify="space-between" no-gutters class="mb-1">
+          <v-col class="text-caption font-weight-medium">Plane #{{ idx + 1 }}</v-col>
+          <v-col cols="auto">
+            <v-btn
+              icon="mdi-trash-can-outline"
+              size="x-small"
+              variant="text"
+              color="error"
+              @click="removePlane(idx)"
+            />
+          </v-col>
+        </v-row>
 
-        <div class="text-caption text-medium-emphasis mb-1">Origin [X, Y, Z]</div>
+        <v-row no-gutters class="mb-1">
+          <v-col class="text-caption text-medium-emphasis">Origin [X, Y, Z]</v-col>
+        </v-row>
         <v-row dense class="mb-2">
           <v-col v-for="axis in 3" :key="'orig-' + axis" cols="4">
             <v-text-field
@@ -343,19 +385,21 @@ function close() {
           </v-col>
         </v-row>
 
-        <div class="d-flex align-center justify-space-between mb-1">
-          <span class="text-caption text-medium-emphasis">Normal [X, Y, Z]</span>
-          <v-btn
-            size="x-small"
-            variant="text"
-            color="primary"
-            prepend-icon="mdi-swap-horizontal"
-            class="text-none text-caption px-1"
-            @click="flipNormal(plane)"
-          >
-            Invert Normal
-          </v-btn>
-        </div>
+        <v-row align="center" justify="space-between" no-gutters class="mb-1">
+          <v-col class="text-caption text-medium-emphasis">Normal [X, Y, Z]</v-col>
+          <v-col cols="auto">
+            <v-btn
+              size="x-small"
+              variant="text"
+              color="primary"
+              prepend-icon="mdi-swap-horizontal"
+              class="text-none text-caption px-1"
+              @click="flipNormal(plane)"
+            >
+              Invert Normal
+            </v-btn>
+          </v-col>
+        </v-row>
         <v-row dense>
           <v-col v-for="axis in 3" :key="'norm-' + axis" cols="4">
             <v-text-field
