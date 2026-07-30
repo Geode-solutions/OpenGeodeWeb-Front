@@ -18,10 +18,7 @@ function isItemViewable(item) {
   if (item.is_viewable !== undefined) {
     return Boolean(item.is_viewable);
   }
-  return (
-    item.binary_light_viewable !== undefined &&
-    item.binary_light_viewable !== "not_viewable"
-  );
+  return item.binary_light_viewable !== undefined && item.binary_light_viewable !== "not_viewable";
 }
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -108,10 +105,7 @@ export const useDataStore = defineStore("data", () => {
       created_at: new Date().toISOString(),
       is_viewable: new_item.is_viewable,
     };
-    if (
-      new_item.binary_light_viewable !== undefined &&
-      new_item.binary_light_viewable !== null
-    ) {
+    if (new_item.binary_light_viewable !== undefined && new_item.binary_light_viewable !== null) {
       itemData.binary_light_viewable = new_item.binary_light_viewable;
     }
     return data_db.put(itemData);
