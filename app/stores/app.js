@@ -3,11 +3,32 @@ import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
 import { killExtension } from "@ogw_front/utils/extension.js";
+import { isCloudMode, getRestApiProtocol, getRestApiPort } from "@ogw_front/utils/stores.js";
+import { Status } from "@ogw_front/utils/status";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
+  const infraStore = useInfraStore();
+  const default_local_port = ref("3000");
+  const status = ref(Status.NOT_CONNECTED);
+
+  const protocol = computed(() => {
+    return getRestApiProtocol()
+  });
+
+  const port = computed(() => {
+    return getRestApiPort(default_local_port.value)
+  });
+
+  const base_url = computed(() => {
+    let app_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
+    if (isCloudMode()) {
+      app_url += `/server`;
+    }
+    return app_url;
+  });
 
   function registerStore(store) {
     const isAlreadyRegistered = stores.some((registeredStore) => registeredStore.$id === store.$id);
@@ -239,6 +260,7 @@ export const useAppStore = defineStore("app", () => {
   function stop_request() {
     request_counter.value -= 1;
   }
+  const is_busy = computed(() => request_counter.value > 0);
 
   const projectFolderPath = ref("");
   function createProjectFolder() {
@@ -265,6 +287,13 @@ export const useAppStore = defineStore("app", () => {
 
   return {
     stores,
+    default_local_port,
+    request_counter,
+    status,
+    protocol,
+    port,
+    base_url,
+    is_busy,
     registerStore,
     exportStores,
     importStores,
@@ -285,5 +314,6 @@ export const useAppStore = defineStore("app", () => {
     createProjectFolder,
     start_request,
     stop_request,
+
   };
 });
