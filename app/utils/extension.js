@@ -7,7 +7,7 @@ import StreamZip from "node-stream-zip";
 // Local imports
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
-import { addExtensionToConf } from "@geode/opengeodeweb-front/app/utils/config.js";
+import { addExtensionToConf } from "@ogw_front/utils/config.js";
 
 async function importExtensionFile(file) {
   await uploadExtension(file);
