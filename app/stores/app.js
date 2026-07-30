@@ -4,6 +4,7 @@ import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
 import { killExtension } from "@ogw_front/utils/extension.js";
 import { isCloudMode, getRestApiProtocol, getRestApiPort } from "@ogw_front/utils/stores.js";
+import { Status } from "@ogw_front/utils/status";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -11,6 +12,7 @@ export const useAppStore = defineStore("app", () => {
   const stores = [];
   const infraStore = useInfraStore();
   const default_local_port = ref("3000");
+  const status = ref(Status.NOT_CONNECTED);
 
   const protocol = computed(() => {
     return getRestApiProtocol()
@@ -258,6 +260,7 @@ export const useAppStore = defineStore("app", () => {
   function stop_request() {
     request_counter.value -= 1;
   }
+  const is_busy = computed(() => request_counter.value > 0);
 
   const projectFolderPath = ref("");
   function createProjectFolder() {

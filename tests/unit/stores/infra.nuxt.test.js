@@ -291,7 +291,7 @@ describe("infra store", () => {
 
       infraStore.app_mode = appMode.CLOUD;
       const url = "test.com";
-      registerEndpoint("/api/app/run_cloud", {
+      registerEndpoint("https://localhost:443/server/api/app/run_cloud", {
         method: "POST",
         handler: () => ({ url }),
       });

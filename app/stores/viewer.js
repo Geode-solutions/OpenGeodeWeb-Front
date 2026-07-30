@@ -9,7 +9,6 @@ import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/local/app_mode";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
