@@ -10,19 +10,19 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
-  const infraStore = useInfraStore();
   const default_local_port = ref("3000");
   const status = ref(Status.NOT_CONNECTED);
 
   const protocol = computed(() => {
-    return getRestApiProtocol()
+    return getRestApiProtocol();
   });
 
   const port = computed(() => {
-    return getRestApiPort(default_local_port.value)
+    return getRestApiPort(default_local_port.value);
   });
 
   const base_url = computed(() => {
+    const infraStore = useInfraStore();
     let app_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
     if (isCloudMode()) {
       app_url += `/server`;
@@ -314,6 +314,5 @@ export const useAppStore = defineStore("app", () => {
     createProjectFolder,
     start_request,
     stop_request,
-
   };
 });
