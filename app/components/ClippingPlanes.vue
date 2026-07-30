@@ -17,7 +17,6 @@ const show = defineModel("show", { type: Boolean, default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const isExpanded = ref(true);
 const targetAllVisible = ref(true);
 const selectedDatasetIds = ref([]);
 const planes = ref([{ origin: [0, 0, 0], normal: [1, 0, 0] }]);
@@ -137,7 +136,20 @@ function setupWidgetStateEvents(widgetState) {
   });
 }
 
+function cleanupLocalWidget() {
+  maxDistance = 0;
+  isLimitingCameraZoom = false;
+  if (localRenderWindow) {
+    localRenderWindow.delete();
+    localRenderWindow = undefined;
+    widgetManager = undefined;
+    planeWidget = undefined;
+    widgetHandle = undefined;
+  }
+}
+
 function initLocalWidget(container) {
+  cleanupLocalWidget();
   container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
   localRenderWindow = vtkGenericRenderWindow({
     background: [0, 0, 0, 0],
@@ -155,12 +167,12 @@ function initLocalWidget(container) {
   widgetHandle = widgetManager.addWidget(planeWidget);
   widgetHandle.setAxisScale(AXIS_SCALE);
   widgetHandle.setHandleSizeRatio(SIZE_RATIO);
-  widgetHandle.placeWidget(getCubicBounds());
-  if (planes.value[0].origin.every((val) => val === 0)) {
-    planes.value[0].origin = getSceneCenter();
-  }
+  const bounds = getCubicBounds();
+  widgetHandle.placeWidget(bounds);
+  const center = getSceneCenter();
+  planes.value[0].origin = center;
   const widgetState = planeWidget.getWidgetState();
-  widgetState.setOrigin(planes.value[0].origin);
+  widgetState.setOrigin(center);
   widgetState.setNormal(planes.value[0].normal);
   setupWidgetStateEvents(widgetState);
   syncLocalCamera();
@@ -189,7 +201,7 @@ watch(
 );
 
 onBeforeUnmount(() => {
-  localRenderWindow?.delete();
+  cleanupLocalWidget();
 });
 
 function syncLocalCamera() {
@@ -222,9 +234,16 @@ function updateWidgetPlacement() {
   if (!widgetHandle || !localRenderWindow) {
     return;
   }
-  widgetHandle.placeWidget(getCubicBounds());
+  maxDistance = 0;
+  const bounds = getCubicBounds();
+  widgetHandle.placeWidget(bounds);
   widgetHandle.setAxisScale(AXIS_SCALE);
   widgetHandle.setHandleSizeRatio(SIZE_RATIO);
+  const center = getSceneCenter();
+  planes.value[0].origin = center;
+  if (planeWidget) {
+    planeWidget.getWidgetState().setOrigin(center);
+  }
   syncLocalCamera();
 }
 
@@ -282,15 +301,11 @@ async function removeClippingPlanes() {
     await hybridViewerStore.setClippingPlanes(allIds, []);
   }
 }
-
-function close() {
-  show.value = false;
-}
 </script>
 
 <template>
   <ToolPanel v-model="show" title="Clipping Planes" :width="360" :click-outside="false">
-    <v-card-text v-if="isExpanded" class="pa-3 max-panel-height overflow-y-auto">
+    <v-card-text class="pa-3 max-panel-height overflow-y-auto">
       <v-sheet
         ref="widgetContainer"
         height="180"
@@ -397,7 +412,7 @@ function close() {
     </v-card-text>
 
     <template #actions>
-      <v-card-actions v-if="isExpanded" class="justify-space-between px-3 pb-3 pt-0">
+      <v-card-actions class="justify-space-between px-3 pb-3 pt-0">
         <v-btn
           variant="text"
           size="small"
