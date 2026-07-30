@@ -18,7 +18,10 @@ function isItemViewable(item) {
   if (item.is_viewable !== undefined) {
     return Boolean(item.is_viewable);
   }
-  return item.binary_light_viewable !== undefined && item.binary_light_viewable !== "not_viewable";
+  if (item.binary_light_viewable !== undefined) {
+    return item.binary_light_viewable !== "not_viewable";
+  }
+  return true;
 }
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
