@@ -1,11 +1,9 @@
 // Node.js imports
 
 // Third party imports
-import StreamZip from "node-stream-zip";
 import _ from "lodash";
 
 // Local imports
-import { addExtensionToConf } from "@ogw_front/utils/config.js";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
@@ -47,21 +45,6 @@ async function registerRunningExtensions() {
       };
     }),
   );
-}
-
-async function registerExtensionFile(file) {
-  const StreamZipAsync = StreamZip.async;
-  const zip = new StreamZipAsync({
-    file,
-    storeEntries: true,
-  });
-  const metadataJson = await zip.entryData("metadata.json");
-  const metadata = JSON.parse(metadataJson);
-  const { id } = metadata;
-  addExtensionToConf(projectName, {
-    extensionId: id,
-    extensionPath: file,
-  });
 }
 
 async function unloadExtension(extensionId) {
@@ -166,7 +149,6 @@ export {
   importExtensionFile,
   importExtensionURL,
   killExtension,
-  registerExtensionFile,
   registerRunningExtensions,
   runExtensions,
   unloadExtension,

@@ -9,7 +9,7 @@ import { afterAll, beforeAll, expect, vi } from "vitest";
 
 // Local imports
 import { addMicroserviceMetadatas, runBack, runViewer } from "@ogw_front/utils/local/microservices";
-import { createPath, generateProjectFolderPath } from "@ogw_front/utils/local/path";
+import { createPath, generateProjectFolderPath } from "@ogw_shared/path";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_front/utils/local/app_mode";
 import { importFile } from "@ogw_front/utils/import_workflow";

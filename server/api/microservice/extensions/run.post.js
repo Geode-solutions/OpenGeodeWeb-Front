@@ -6,17 +6,10 @@ import path from "node:path";
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import {
-  addMicroserviceMetadatas,
-  runBack,
-} from "@geode/opengeodeweb-front/app/utils/local/microservices.js";
-import {
-  executableName,
-  extensionFolderPath,
-  extensionFrontendPath,
-} from "@geode/opengeodeweb-front/app/utils/local/path.js";
-import { extensionsConf } from "@geode/opengeodeweb-front/app/utils/config.js";
-import { unzipFile } from "@geode/opengeodeweb-front/app/utils/server.js";
+import { addMicroserviceMetadatas, runBack } from "@ogw_front/utils/local/microservices.js";
+import { executableName, extensionFolderPath, extensionFrontendPath } from "@ogw_shared/path.js";
+import { extensionsConf } from "@ogw_front/utils/config.js";
+import { unzipFile } from "@ogw_front/utils/server.js";
 
 export default defineEventHandler(async (event) => {
   try {

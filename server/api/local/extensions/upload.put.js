@@ -8,8 +8,7 @@ import { createError, defineEventHandler, getRequestHeaders, getRequestWebStream
 import busboy from "busboy";
 
 // Local imports
-import { registerExtensionFile } from "@geode/opengeodeweb-front/app/utils/extension.js";
-import { targetExtensionFilePath } from "@geode/opengeodeweb-front/app/utils/config.js";
+import { registerExtensionFile, targetExtensionFilePath } from "@ogw_server/utils/config.js";
 
 const CODE_201 = 201;
 const FILE_SIZE_LIMIT = 107_374_182;

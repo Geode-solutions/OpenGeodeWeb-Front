@@ -5,8 +5,7 @@ import { promises as fs } from "node:fs";
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { registerExtensionFile } from "@geode/opengeodeweb-front/app/utils/extension.js";
-import { targetExtensionFilePath } from "@geode/opengeodeweb-front/app/utils/config.js";
+import { registerExtensionFile, targetExtensionFilePath } from "@ogw_server/utils/config.js";
 
 export default defineEventHandler(async (event) => {
   try {
