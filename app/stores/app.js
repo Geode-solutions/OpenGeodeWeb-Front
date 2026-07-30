@@ -15,11 +15,11 @@ export const useAppStore = defineStore("app", () => {
   const status = ref(Status.NOT_CONNECTED);
 
   const protocol = computed(() => {
-    return getRestApiProtocol()
+    return getRestApiProtocol();
   });
 
   const port = computed(() => {
-    return getRestApiPort(default_local_port.value)
+    return getRestApiPort(default_local_port.value);
   });
 
   const base_url = computed(() => {
@@ -314,6 +314,5 @@ export const useAppStore = defineStore("app", () => {
     createProjectFolder,
     start_request,
     stop_request,
-
   };
 });
