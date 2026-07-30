@@ -45,16 +45,12 @@ function files_uploaded_event(value) {
   }
 }
 
-function getAllowedFiles() {
+async function getAllowedFiles() {
+  toggleLoading();
   const schema = schemas.opengeodeweb_back.allowed_files;
-  return backStore.request(
-    { schema },
-    {
-      response_function: (response) => {
-        accept.value = response.extensions.map((extension) => `.${extension}`).join(", ");
-      },
-    },
-  );
+  const response = await backStore.request({ schema });
+  accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
+  toggleLoading();
 }
 
 // oxlint-disable-next-line no-top-level-await

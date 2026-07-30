@@ -4,7 +4,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 export function api_fetch(
   microservice,
-  { schema, params = {}, headers },
+  { schema, params = {}, headers = {} },
   { request_error_function, response_function, response_error_function, timeout } = {},
 ) {
   const feedbackStore = useFeedbackStore();
