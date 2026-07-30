@@ -22,6 +22,8 @@ export default defineNuxtConfig({
     scan: false,
   },
 
+  ssr: false,
+
   alias: {
     "@ogw_front": path.resolve(__dirname, "app"),
     "@ogw_internal": path.resolve(__dirname, "internal"),
