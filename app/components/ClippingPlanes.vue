@@ -1,5 +1,5 @@
 <script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+import ToolPanel from "@ogw_front/components/ToolPanel";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer_camera";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
@@ -289,27 +289,7 @@ function close() {
 </script>
 
 <template>
-  <GlassCard
-    v-if="show"
-    title="Clipping Planes"
-    :width="360"
-    variant="panel"
-    padding="pa-0"
-    class="position-absolute rounded-xl elevation-24 clipping-planes-panel"
-  >
-    <template #header-actions>
-      <v-btn
-        icon="mdi-chevron-down"
-        variant="text"
-        density="compact"
-        size="small"
-        class="mr-1"
-        :style="{ transform: isExpanded ? 'rotate(0deg)' : 'rotate(180deg)' }"
-        @click="isExpanded = !isExpanded"
-      />
-      <v-btn icon="mdi-close" variant="text" density="compact" size="small" @click="close" />
-    </template>
-
+  <ToolPanel v-model="show" title="Clipping Planes" :width="360" :click-outside="false">
     <v-card-text v-if="isExpanded" class="pa-3 max-panel-height overflow-y-auto">
       <v-sheet
         ref="widgetContainer"
@@ -438,16 +418,10 @@ function close() {
         </v-btn>
       </v-card-actions>
     </template>
-  </GlassCard>
+  </ToolPanel>
 </template>
 
 <style scoped>
-.clipping-planes-panel {
-  z-index: 2;
-  bottom: 20px;
-  right: 65px;
-}
-
 .max-panel-height {
   max-height: 520px;
 }
