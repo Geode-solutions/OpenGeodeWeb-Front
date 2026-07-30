@@ -196,7 +196,7 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function upload(file, callbacks = {}) {
-    const route = "/api/extensions/upload";
+    const route = "/api/microservice/extensions/upload";
     const store = useAppStore();
     return upload_file(
       store,
@@ -244,7 +244,7 @@ export const useAppStore = defineStore("app", () => {
   function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = {
-      $id: "/api/app/project_folder_path",
+      $id: "/api/local/project_folder_path",
       methods: ["POST"],
       type: "object",
       properties: { PROJECT: { type: "string" } },

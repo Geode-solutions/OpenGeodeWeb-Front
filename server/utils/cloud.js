@@ -5,11 +5,16 @@ import { google } from "googleapis";
 
 // Local imports
 
-async function artifactImage(registry, parent, repo) {
+async function artifactImage(parent, authClient) {
+  const projectName = process.env.PROJECT;
+  const registry = google.artifactregistry({
+    version: "v1",
+    auth: authClient,
+  });
   const branch = process.env.NETLIFY_BRANCH;
   const [_, projectId] = parent.split("/");
   const repository = `${parent}/repositories/github/packages/`;
-  const name = `${repository}${repo}/tags/${branch}`;
+  const name = `${repository}${projectName}/tags/${branch}`;
   console.log({ name });
   const response = await registry.projects.locations.repositories.packages.tags.get({
     name,
@@ -17,22 +22,9 @@ async function artifactImage(registry, parent, repo) {
   console.log({ response });
   const digest = response.data.version.split("/").pop();
   const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/github`;
-  const image = `${artifactRegistry}/${repo}@${digest}`;
-  console.log("Found image for", repo, image);
+  const image = `${artifactRegistry}/${projectName}@${digest}`;
+  console.log("Found image for", projectName, image);
   return image;
-}
-
-function artifactImages(parent, authClient) {
-  const projectName = process.env.PROJECT;
-  const registry = google.artifactregistry({
-    version: "v1",
-    auth: authClient,
-  });
-  return Promise.all([
-    artifactImage(registry, parent, "opengeodeweb-router"),
-    artifactImage(registry, parent, `${projectName}-back`),
-    artifactImage(registry, parent, `${projectName}-viewer`),
-  ]);
 }
 
 function sanitizeLabelValue(label) {
@@ -44,47 +36,35 @@ function sanitizeLabelValue(label) {
     .slice(0, maxLabelLength);
 }
 
-// oxlint-disable-next-line max-lines-per-function
-function requestConfig(parent, routerImage, backImage, viewerImage, email, projectName) {
+function requestConfig(parent, image, email, projectName) {
   const resources = {
     limits: {
-      cpu: "1000m",
-      memory: "1Gi",
+      cpu: "2000m",
+      memory: "3Gi",
     },
+    cpuIdle: false,
+    startup_cpu_boost: true,
   };
-  const volumeMounts = {
-    name: "project",
-    mountPath: "/project",
+  const labels = {
+    user: sanitizeLabelValue(email),
+    project: sanitizeLabelValue(projectName),
   };
   return {
     parent,
     service: {
       ingress: "INGRESS_TRAFFIC_ALL",
       invokerIamDisabled: true,
-      labels: {
-        user: sanitizeLabelValue(email),
-        project: sanitizeLabelValue(projectName),
-      },
+      labels,
       scaling: {
         scalingMode: "MANUAL",
         manualInstanceCount: 1,
       },
       template: {
-        labels: {
-          user: sanitizeLabelValue(email),
-          project: sanitizeLabelValue(projectId),
-        },
-        volumes: [
-          {
-            name: "project",
-            emptyDir: {
-              medium: "MEMORY",
-            },
-          },
-        ],
+        labels,
+        timeout: { seconds: 3600 },
         containers: [
           {
-            image: routerImage,
+            image,
             ports: [
               {
                 containerPort: 80,
@@ -106,20 +86,10 @@ function requestConfig(parent, routerImage, backImage, viewerImage, email, proje
               failureThreshold: 30,
             },
           },
-          {
-            image: backImage,
-            resources,
-            volumeMounts: [volumeMounts],
-          },
-          {
-            image: viewerImage,
-            resources,
-            volumeMounts: [volumeMounts],
-          },
         ],
       },
     },
   };
 }
 
-export { artifactImages, requestConfig };
+export { artifactImage, requestConfig };

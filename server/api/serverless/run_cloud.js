@@ -6,7 +6,7 @@ import { GoogleAuth } from "google-auth-library";
 import { ServicesClient } from "@google-cloud/run";
 
 // Local imports
-import { artifactImages, requestConfig } from "@ogw_server/utils/cloud";
+import { artifactImage, requestConfig } from "@ogw_server/utils/cloud";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
       scopes: ["https://www.googleapis.com/auth/cloud-platform"],
     });
     const authClient = await auth.getClient();
-    const [routerImage, backImage, viewerImage] = await artifactImages(parent, authClient);
-    const request = requestConfig(parent, routerImage, backImage, viewerImage, email, projectName);
+    const image = await artifactImage(parent, authClient);
+    const request = requestConfig(parent, image, email, projectName);
     console.log({ request });
     const runClient = new ServicesClient({ authClient });
     const [operation] = await runClient.createService(request);
