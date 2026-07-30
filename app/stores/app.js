@@ -1,10 +1,9 @@
 // Local imports
-import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
-import { upload_file } from "@ogw_internal/utils/upload_file.js";
-
-import { killExtension } from "@ogw_front/utils/extension.js";
-import { isCloudMode, getRestApiProtocol, getRestApiPort } from "@ogw_front/utils/stores.js";
+import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
+import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
+import { killExtension } from "@ogw_front/utils/extension.js";
+import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -13,13 +12,9 @@ export const useAppStore = defineStore("app", () => {
   const default_local_port = ref("3000");
   const status = ref(Status.NOT_CONNECTED);
 
-  const protocol = computed(() => {
-    return getRestApiProtocol();
-  });
+  const protocol = computed(() => getRestApiProtocol());
 
-  const port = computed(() => {
-    return getRestApiPort(default_local_port.value);
-  });
+  const port = computed(() => getRestApiPort(default_local_port.value));
 
   const base_url = computed(() => {
     const infraStore = useInfraStore();
@@ -112,7 +107,7 @@ export const useAppStore = defineStore("app", () => {
     return loadedExtensions.value.get(id);
   }
 
-  async function loadExtension(path, port, backendPath = undefined) {
+  async function loadExtension(path, extensionPort, backendPath = undefined) {
     try {
       let finalURL = path;
 
@@ -129,7 +124,7 @@ export const useAppStore = defineStore("app", () => {
       // oxlint-disable-next-line no-inline-comments
       const extensionModule = await import(/* @vite-ignore */ finalURL);
       const store = extensionModule.metadata.store();
-      store.$patch({ default_local_port: port });
+      store.$patch({ default_local_port: extensionPort });
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL);

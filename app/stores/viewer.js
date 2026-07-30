@@ -8,15 +8,15 @@ import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
+import {
+  getWebsocketApiPort,
+  getWebsocketApiProtocol,
+  isCloudMode,
+} from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
-import {
-  isCloudMode,
-  getWebsocketApiProtocol,
-  getWebsocketApiPort,
-} from "@ogw_front/utils/stores.js";
 
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_REQUEST = 10;
@@ -37,13 +37,9 @@ export const useViewerStore = defineStore(
     const version = ref("0.0.0");
     const busy = ref(0);
 
-    const protocol = computed(() => {
-      return getWebsocketApiProtocol();
-    });
+    const protocol = computed(() => getWebsocketApiProtocol());
 
-    const port = computed(() => {
-      return getWebsocketApiPort(default_local_port.value);
-    });
+    const port = computed(() => getWebsocketApiPort(default_local_port.value));
 
     const base_url = computed(() => {
       let viewer_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;

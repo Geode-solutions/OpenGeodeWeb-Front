@@ -1,10 +1,10 @@
 // Node.js imports
 import path from "node:path";
-import StreamZip from "node-stream-zip";
 import { unlink } from "node:fs";
 
 // Third party imports
 import Conf from "conf";
+import StreamZip from "node-stream-zip";
 import sanitize from "sanitize-filename";
 
 // Local imports

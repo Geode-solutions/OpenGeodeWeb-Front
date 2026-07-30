@@ -1,5 +1,5 @@
-import { useInfraStore } from "@ogw_front/stores/infra";
 import { appMode } from "@ogw_shared/app_mode";
+import { useInfraStore } from "@ogw_front/stores/infra";
 
 function isCloudMode() {
   const infraStore = useInfraStore();
