@@ -35,7 +35,7 @@ let fromWidget = false;
 let maxDistance = 0;
 let isLimitingCameraZoom = false;
 
-function getSceneBounds() {
+function getSceneBoundsInfo() {
   const targetIds = targetAllVisible.value
     ? allItems.value.map((item) => item.id)
     : selectedDatasetIds.value;
@@ -49,38 +49,33 @@ function getSceneBounds() {
           .filter(Boolean);
 
   if (activeActors.length === 0) {
-    return [-1, 1, -1, 1, -1, 1];
+    return {
+      center: [0, 0, 0],
+      cubicBounds: [-1, 1, -1, 1, -1, 1],
+    };
   }
-  let combinedBounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
+
+  let bounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
   for (const actor of activeActors) {
-    const bounds = actor.getBounds();
-    combinedBounds = [
-      Math.min(combinedBounds[0], bounds[0]),
-      Math.max(combinedBounds[1], bounds[1]),
-      Math.min(combinedBounds[2], bounds[2]),
-      Math.max(combinedBounds[3], bounds[3]),
-      Math.min(combinedBounds[4], bounds[4]),
-      Math.max(combinedBounds[5], bounds[5]),
+    const actorBounds = actor.getBounds();
+    bounds = [
+      Math.min(bounds[0], actorBounds[0]),
+      Math.max(bounds[1], actorBounds[1]),
+      Math.min(bounds[2], actorBounds[2]),
+      Math.max(bounds[3], actorBounds[3]),
+      Math.min(bounds[4], actorBounds[4]),
+      Math.max(bounds[5], actorBounds[5]),
     ];
   }
-  return combinedBounds;
-}
 
-function getSceneCenter() {
-  const [xmin, xmax, ymin, ymax, zmin, zmax] = getSceneBounds();
-  return [
+  const [xmin, xmax, ymin, ymax, zmin, zmax] = bounds;
+  const center = [
     Number(((xmin + xmax) / 2).toFixed(4)),
     Number(((ymin + ymax) / 2).toFixed(4)),
     Number(((zmin + zmax) / 2).toFixed(4)),
   ];
-}
-
-function getCubicBounds() {
-  const [xmin, xmax, ymin, ymax, zmin, zmax] = getSceneBounds();
-  const center = [(xmin + xmax) / 2, (ymin + ymax) / 2, (zmin + zmax) / 2];
   const halfExtent = Math.max(xmax - xmin, ymax - ymin, zmax - zmin) / 2;
-
-  return [
+  const cubicBounds = [
     center[0] - halfExtent,
     center[0] + halfExtent,
     center[1] - halfExtent,
@@ -88,6 +83,12 @@ function getCubicBounds() {
     center[2] - halfExtent,
     center[2] + halfExtent,
   ];
+
+  return { center, cubicBounds };
+}
+
+function getSceneCenter() {
+  return getSceneBoundsInfo().center;
 }
 
 function hasPlaneChanged(origin, normal, currentOrigin, currentNormal) {
@@ -158,24 +159,17 @@ function initLocalWidget(container) {
   localRenderWindow.setContainer(container);
   const camera = localRenderWindow.getRenderer().getActiveCamera();
   camera.onModified(() => limitCameraZoomOut(camera));
+
   const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
   Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
   localRenderWindow.resize();
+
   widgetManager = vtkWidgetManager();
   widgetManager.setRenderer(localRenderWindow.getRenderer());
   planeWidget = vtkImplicitPlaneWidget();
   widgetHandle = widgetManager.addWidget(planeWidget);
-  widgetHandle.setAxisScale(AXIS_SCALE);
-  widgetHandle.setHandleSizeRatio(SIZE_RATIO);
-  const bounds = getCubicBounds();
-  widgetHandle.placeWidget(bounds);
-  const center = getSceneCenter();
-  planes.value[0].origin = center;
-  const widgetState = planeWidget.getWidgetState();
-  widgetState.setOrigin(center);
-  widgetState.setNormal(planes.value[0].normal);
-  setupWidgetStateEvents(widgetState);
-  syncLocalCamera();
+  updateWidgetPlacement();
+  setupWidgetStateEvents(planeWidget.getWidgetState());
 }
 
 watch(widgetContainer, (container) => {
@@ -235,15 +229,12 @@ function updateWidgetPlacement() {
     return;
   }
   maxDistance = 0;
-  const bounds = getCubicBounds();
-  widgetHandle.placeWidget(bounds);
+  const { center, cubicBounds } = getSceneBoundsInfo();
+  widgetHandle.placeWidget(cubicBounds);
   widgetHandle.setAxisScale(AXIS_SCALE);
   widgetHandle.setHandleSizeRatio(SIZE_RATIO);
-  const center = getSceneCenter();
   planes.value[0].origin = center;
-  if (planeWidget) {
-    planeWidget.getWidgetState().setOrigin(center);
-  }
+  planeWidget?.getWidgetState().setOrigin(center);
   syncLocalCamera();
 }
 
@@ -283,14 +274,9 @@ async function applyClippingPlanes() {
 
 async function resetClippingPlanes() {
   fromWidget = true;
-  const center = getSceneCenter();
-  planes.value = [{ origin: center, normal: [1, 0, 0] }];
-  if (planeWidget) {
-    const widgetState = planeWidget.getWidgetState();
-    widgetState.setOrigin(center);
-    widgetState.setNormal([1, 0, 0]);
-    localRenderWindow.getRenderWindow().render();
-  }
+  planes.value[0].normal = [1, 0, 0];
+  planeWidget?.getWidgetState().setNormal([1, 0, 0]);
+  updateWidgetPlacement();
   fromWidget = false;
   await applyClippingPlanes();
 }
