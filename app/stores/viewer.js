@@ -39,14 +39,8 @@ export const useViewerStore = defineStore(
     const version = ref("0.0.0");
     const busy = ref(0);
 
-    const protocol = computed(() => {
-      return getWebsocketApiProtocol()
-    });
-
-    const port = computed(() => {
-      return getWebsocketApiPort(default_local_port.value)
-    });
-
+    const protocol = computed(() => getWebsocketApiProtocol());
+    const port = computed(() => getWebsocketApiPort(default_local_port.value));
     const base_url = computed(() => {
       let viewer_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
       if (isCloudMode()) {

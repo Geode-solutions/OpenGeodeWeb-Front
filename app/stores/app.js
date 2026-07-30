@@ -13,13 +13,9 @@ export const useAppStore = defineStore("app", () => {
   const infraStore = useInfraStore();
   const default_local_port = ref("3000");
 
-  const protocol = computed(() => {
-    return getRestApiProtocol()
-  });
+  const protocol = computed(() => getRestApiProtocol());
 
-  const port = computed(() => {
-    return getRestApiPort(default_local_port.value)
-  });
+  const port = computed(() => getRestApiPort(default_local_port.value));
 
   const base_url = computed(() => {
     let app_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
