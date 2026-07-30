@@ -11,6 +11,7 @@ import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/Wi
 const AXIS_SCALE = 0.45;
 const SIZE_RATIO = 0.1;
 const DEBOUNCE_DELAY = 200;
+const CHANGE_THRESHOLD = 1e-4;
 
 const show = defineModel("show", { type: Boolean, default: false });
 const dataStore = useDataStore();
@@ -31,6 +32,8 @@ let localRenderWindow = undefined;
 let widgetManager = undefined;
 let planeWidget = undefined;
 let fromWidget = false;
+let maxDistance = 0;
+let isLimitingCameraZoom = false;
 
 function getSceneBounds() {
   const actors = Object.values(hybridViewerStore.hybridDb)
@@ -59,6 +62,37 @@ function getSceneCenter() {
   return [0, 2, 4].map((i) => Number(((bounds[i] + bounds[i + 1]) / 2).toFixed(4)));
 }
 
+function isArrayDiff(arrA, arrB) {
+  return arrA.some((val, idx) => Math.abs(val - arrB[idx]) > CHANGE_THRESHOLD);
+}
+
+function hasPlaneChanged(origin, normal, currentOrigin, currentNormal) {
+  return isArrayDiff(origin, currentOrigin) || isArrayDiff(normal, currentNormal);
+}
+
+function limitCameraZoomOut(camera) {
+  if (isLimitingCameraZoom || maxDistance <= 0) {
+    return;
+  }
+  const currentDist = camera.getDistance();
+  if (currentDist <= maxDistance + CHANGE_THRESHOLD) {
+    return;
+  }
+
+  isLimitingCameraZoom = true;
+  const focal = camera.getFocalPoint();
+  const pos = camera.getPosition();
+  const ratio = maxDistance / currentDist;
+
+  camera.setPosition(
+    focal[0] + (pos[0] - focal[0]) * ratio,
+    focal[1] + (pos[1] - focal[1]) * ratio,
+    focal[2] + (pos[2] - focal[2]) * ratio,
+  );
+  localRenderWindow.getRenderWindow().render();
+  isLimitingCameraZoom = false;
+}
+
 function initLocalWidget(container) {
   container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
 
@@ -67,10 +101,12 @@ function initLocalWidget(container) {
     listenWindowResize: false,
   });
   localRenderWindow.setContainer(container);
+
+  const camera = localRenderWindow.getRenderer().getActiveCamera();
+  camera.onModified(() => limitCameraZoomOut(camera));
+
   const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
-  canvas.style.width = "100%";
-  canvas.style.height = "100%";
-  canvas.style.background = "transparent";
+  Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
   localRenderWindow.resize();
 
   widgetManager = vtkWidgetManager();
@@ -91,11 +127,15 @@ function initLocalWidget(container) {
   widgetState.setNormal(planes.value[0].normal);
 
   widgetState.onModified(() => {
+    const origin = widgetState.getOrigin().map((val) => Number(val.toFixed(4)));
+    const normal = widgetState.getNormal().map((val) => Number(val.toFixed(4)));
+    if (!hasPlaneChanged(origin, normal, planes.value[0].origin, planes.value[0].normal)) {
+      return;
+    }
+
     fromWidget = true;
-    const origin = widgetState.getOrigin();
-    const normal = widgetState.getNormal();
-    planes.value[0].origin = origin.map((val) => Number(val.toFixed(4)));
-    planes.value[0].normal = normal.map((val) => Number(val.toFixed(4)));
+    planes.value[0].origin = origin;
+    planes.value[0].normal = normal;
     fromWidget = false;
     debouncedApply();
   });
@@ -133,8 +173,10 @@ function syncLocalCamera() {
     return;
   }
   const renderer = localRenderWindow.getRenderer();
-  applyCameraOptions(renderer.getActiveCamera(), hybridViewerStore.camera_options);
+  const camera = renderer.getActiveCamera();
+  applyCameraOptions(camera, hybridViewerStore.camera_options);
   renderer.resetCamera();
+  maxDistance = camera.getDistance();
   localRenderWindow.getRenderWindow().render();
 }
 
