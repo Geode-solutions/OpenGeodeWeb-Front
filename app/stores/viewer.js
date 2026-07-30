@@ -13,6 +13,11 @@ import { appMode } from "@ogw_front/utils/local/app_mode";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
+import {
+  isCloudMode,
+  getWebsocketApiProtocol,
+  getWebsocketApiPort
+} from "@ogw_front/utils/stores.js";
 
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_REQUEST = 10;
@@ -34,22 +39,16 @@ export const useViewerStore = defineStore(
     const busy = ref(0);
 
     const protocol = computed(() => {
-      if (infraStore.app_mode === appMode.CLOUD) {
-        return "wss";
-      }
-      return "ws";
+      return getWebsocketApiProtocol();
     });
 
     const port = computed(() => {
-      if (infraStore.app_mode === appMode.CLOUD) {
-        return "443";
-      }
-      return default_local_port.value;
+      return getWebsocketApiPort(default_local_port.value);
     });
 
     const base_url = computed(() => {
       let viewer_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
-      if (infraStore.app_mode === appMode.CLOUD) {
+      if (isCloudMode()) {
         viewer_url += `/viewer`;
       }
       viewer_url += "/ws";
