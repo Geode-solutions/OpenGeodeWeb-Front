@@ -4,6 +4,7 @@ import { unlink } from "node:fs";
 
 // Third party imports
 import Conf from "conf";
+import sanitize from "sanitize-filename";
 
 // Local imports
 
@@ -16,6 +17,12 @@ function projectConf(projectName) {
 function confFolderPath(projectName) {
   const projectConfig = projectConf(projectName);
   return path.dirname(projectConfig.path);
+}
+
+function targetExtensionFilePath(projectName, filename) {
+  const safeFilename = sanitize(filename);
+  const targetPath = path.join(configFolderPath(projectName), safeFilename);
+  return targetPath;
 }
 
 function extensionsConf(projectName) {
@@ -52,10 +59,11 @@ function extensionPathFromConf(projectName, extensionId) {
 }
 
 export {
-  confFolderPath,
-  projectConf,
-  extensionsConf,
   addExtensionToConf,
-  removeExtensionFromConf,
+  confFolderPath,
   extensionPathFromConf,
+  extensionsConf,
+  projectConf,
+  removeExtensionFromConf,
+  targetExtensionFilePath,
 };

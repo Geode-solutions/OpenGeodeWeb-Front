@@ -2,13 +2,20 @@
 
 // Third party imports
 import _ from "lodash";
+import StreamZip from "node-stream-zip";
 
 // Local imports
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
+import { addExtensionToConf } from "@geode/opengeodeweb-front/app/utils/config.js";
 
 async function importExtensionFile(file) {
   await uploadExtension(file);
+  return registerRunningExtensions();
+}
+
+async function importExtensionURL(url) {
+  await downloadExtension(url);
   return registerRunningExtensions();
 }
 
@@ -42,6 +49,21 @@ async function registerRunningExtensions() {
   );
 }
 
+async function registerExtensionFile(file) {
+  const StreamZipAsync = StreamZip.async;
+  const zip = new StreamZipAsync({
+    file,
+    storeEntries: true,
+  });
+  const metadataJson = await zip.entryData("metadata.json");
+  const metadata = JSON.parse(metadataJson);
+  const { id } = metadata;
+  addExtensionToConf(projectName, {
+    extensionId: id,
+    extensionPath: file,
+  });
+}
+
 async function unloadExtension(extensionId) {
   const appStore = useAppStore();
   console.log("[ExtensionManager] Unloading extension:", extensionId);
@@ -72,6 +94,27 @@ async function unloadExtension(extensionId) {
 async function uploadExtension(file) {
   const appStore = useAppStore();
   await appStore.upload(file);
+}
+
+async function downloadExtension({ url, extensionFileName }) {
+  const appStore = useAppStore();
+  const params = { projectFolderPath, projectName, url, extensionFileName };
+
+  const schema = {
+    $id: "/api/microservice/extensions/download",
+    methods: ["POST"],
+    type: "object",
+    properties: {
+      extensionFileName: { type: "string" },
+      projectFolderPath: { type: "string" },
+      projectName: { type: "string" },
+      url: { type: "string" },
+    },
+    required: ["projectFolderPath", "projectName"],
+    additionalProperties: false,
+  };
+
+  return appStore.request({ schema, params });
 }
 
 function runExtensions() {
@@ -121,9 +164,11 @@ function killExtension(extensionId) {
 
 export {
   importExtensionFile,
-  unloadExtension,
-  uploadExtension,
+  importExtensionURL,
+  killExtension,
+  registerExtensionFile,
   registerRunningExtensions,
   runExtensions,
-  killExtension,
+  unloadExtension,
+  uploadExtension,
 };

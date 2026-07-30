@@ -2,26 +2,23 @@
 import { finished, pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
 import fs from "node:fs";
-import path from "node:path";
 
 // Third party imports
 import { createError, defineEventHandler, getRequestHeaders, getRequestWebStream } from "h3";
-import StreamZip from "node-stream-zip";
 import busboy from "busboy";
-import sanitize from "sanitize-filename";
 
 // Local imports
-import { addExtensionToConf, confFolderPath } from "@geode/opengeodeweb-front/app/utils/config.js";
+import { targetExtensionFilePath } from "@geode/opengeodeweb-front/app/utils/config.js";
+import { registerExtensionFile } from "@geode/opengeodeweb-front/app/utils/extension.js";
 
 const CODE_201 = 201;
 const FILE_SIZE_LIMIT = 107_374_182;
 
 export default defineEventHandler(async (event) => {
-  const projectName = "vease";
+  const body = await readBody(event);
+  const { projectName } = body;
   const writePromises = [];
   const savedFiles = [];
-
-  const configFolderPath = confFolderPath(projectName);
 
   const busboyInstance = busboy({
     headers: getRequestHeaders(event),
@@ -37,17 +34,13 @@ export default defineEventHandler(async (event) => {
       fileStream.resume();
       return;
     }
-
-    const safeFilename = sanitize(info.filename);
-    const targetPath = path.join(configFolderPath, safeFilename);
-
+    const targetPath = targetExtensionFilePath(projectName, info.filename);
     const writePromise = (async () => {
       const writeStream = fs.createWriteStream(targetPath);
       await pipeline(fileStream, writeStream);
       savedFiles.push(targetPath);
       console.log("File written:", targetPath);
     })();
-
     writePromises.push(writePromise);
     fileStream.on("limit", () => busboyInstance.destroy(new Error("File too large")));
   });
@@ -62,32 +55,13 @@ export default defineEventHandler(async (event) => {
   const webStream = getRequestWebStream(event);
   Readable.fromWeb(webStream).pipe(busboyInstance);
   await finished(busboyInstance);
-
   if (writePromises.length > 0) {
     await Promise.all(writePromises);
     console.log("All disk writes completed");
   }
-
   if (savedFiles.length === 0) {
     throw createError({ statusCode: 400, message: "No file received" });
   }
-
-  await Promise.all(
-    savedFiles.map(async (file) => {
-      const StreamZipAsync = StreamZip.async;
-      const zip = new StreamZipAsync({
-        file,
-        storeEntries: true,
-      });
-      const metadataJson = await zip.entryData("metadata.json");
-      const metadata = JSON.parse(metadataJson);
-      const { id } = metadata;
-      await addExtensionToConf(projectName, {
-        extensionId: id,
-        extensionPath: file,
-      });
-    }),
-  );
-
+  await Promise.all(savedFiles.map(async (file) => await registerExtensionFile(file)));
   return { statusCode: CODE_201 };
 });
