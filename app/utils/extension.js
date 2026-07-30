@@ -1,13 +1,13 @@
 // Node.js imports
 
 // Third party imports
-import _ from "lodash";
 import StreamZip from "node-stream-zip";
+import _ from "lodash";
 
 // Local imports
+import { addExtensionToConf } from "@ogw_front/utils/config.js";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
-import { addExtensionToConf } from "@ogw_front/utils/config.js";
 
 async function importExtensionFile(file) {
   await uploadExtension(file);
@@ -96,7 +96,7 @@ async function uploadExtension(file) {
   await appStore.upload(file);
 }
 
-async function downloadExtension({ url, extensionFileName }) {
+function downloadExtension({ url, extensionFileName }) {
   const appStore = useAppStore();
   const params = { projectFolderPath, projectName, url, extensionFileName };
 
