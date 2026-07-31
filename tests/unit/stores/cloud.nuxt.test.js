@@ -43,8 +43,13 @@ describe("cloud store", () => {
           handler: postFakeCall,
         });
 
+        registerEndpoint("https://test.com:443/server/api/microservice/app/set_app_base_url", {
+          method: "POST",
+          handler: () => console.log("coucou from endpoint"),
+        });
+
         postFakeCall.mockReturnValue({
-          url: "http://test.com",
+          url: "test.com",
         });
         const email = "noreply@example.com";
         await cloudStore.launch(email);
