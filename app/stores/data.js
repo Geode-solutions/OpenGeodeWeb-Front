@@ -21,7 +21,14 @@ function checkItemViewable(item) {
   if (item.binary_light_viewable !== undefined) {
     return item.binary_light_viewable !== "not_viewable";
   }
-  return false;
+  if (
+    item.geode_object_type === "HorizonStack3D" ||
+    item.id === "HorizonStack3D" ||
+    item.title === "HorizonStack3D"
+  ) {
+    return false;
+  }
+  return true;
 }
 
 function isItemViewable(itemOrId) {

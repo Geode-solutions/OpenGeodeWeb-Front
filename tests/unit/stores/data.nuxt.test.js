@@ -124,4 +124,39 @@ describe("useDataStore - collections", () => {
       },
     ]);
   });
+
+  describe("isItemViewable", () => {
+    test("correctly identifies viewable and HorizonStack3D items", () => {
+      const dataStore = useDataStore();
+
+      // Standard viewable item (BRep)
+      expect(
+        dataStore.isItemViewable({ id: "1", title: "BRep 1", geode_object_type: "BRep" }),
+      ).toBe(true);
+
+      // Group node for viewable type
+      expect(dataStore.isItemViewable({ id: "BRep", title: "BRep" })).toBe(true);
+
+      // HorizonStack3D leaf item
+      expect(
+        dataStore.isItemViewable({
+          id: "2",
+          title: "HS 1",
+          geode_object_type: "HorizonStack3D",
+        }),
+      ).toBe(false);
+
+      // HorizonStack3D group node
+      expect(
+        dataStore.isItemViewable({ id: "HorizonStack3D", title: "HorizonStack3D" }),
+      ).toBe(false);
+    });
+
+    test("respects explicit is_viewable overrides", () => {
+      const dataStore = useDataStore();
+
+      expect(dataStore.isItemViewable({ is_viewable: false })).toBe(false);
+      expect(dataStore.isItemViewable({ is_viewable: true })).toBe(true);
+    });
+  });
 });
