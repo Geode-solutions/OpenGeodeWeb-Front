@@ -1,219 +1,48 @@
 <script setup>
+import {
+  DEBOUNCE_DELAY,
+  DEFAULT_NORMALS,
+  getPlaneCssColor,
+} from "@ogw_front/utils/clipping_planes";
 import ToolPanel from "@ogw_front/components/ToolPanel";
-import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer_camera";
+import { useClippingPlanesWidget } from "@ogw_front/composables/clipping_planes_widget";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
-import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
-
-const AXIS_SCALE = 0.45;
-const SIZE_RATIO = 0.1;
-const DEBOUNCE_DELAY = 200;
-const CHANGE_THRESHOLD = 1e-4;
 
 const show = defineModel("show", { type: Boolean, default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
-
 const targetAllVisible = ref(true);
 const selectedDatasetIds = ref([]);
-const planes = ref([{ origin: [0, 0, 0], normal: [1, 0, 0] }]);
-
+const planes = ref([{ origin: undefined, normal: [1, 0, 0] }]);
 const allItems = dataStore.refAllItems();
 const availableDatasets = computed(() =>
   allItems.value.map((item) => ({ title: item.name || item.id, value: item.id })),
 );
-
 const widgetContainer = useTemplateRef("widgetContainer");
-let localRenderWindow = undefined;
-let widgetManager = undefined;
-let planeWidget = undefined;
-let widgetHandle = undefined;
-let fromWidget = false;
-let maxDistance = 0;
-let isLimitingCameraZoom = false;
-
-function getSceneBoundsInfo() {
-  const targetIds = targetAllVisible.value
-    ? allItems.value.map((item) => item.id)
-    : selectedDatasetIds.value;
-
-  const actors = targetIds.map((id) => hybridViewerStore.hybridDb[id]?.actor).filter(Boolean);
-  const activeActors =
-    actors.length > 0
-      ? actors
-      : Object.values(hybridViewerStore.hybridDb)
-          .map((entry) => entry.actor)
-          .filter(Boolean);
-
-  if (activeActors.length === 0) {
-    return {
-      center: [0, 0, 0],
-      cubicBounds: [-1, 1, -1, 1, -1, 1],
-    };
-  }
-
-  let bounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
-  for (const actor of activeActors) {
-    const actorBounds = actor.getBounds();
-    bounds = [
-      Math.min(bounds[0], actorBounds[0]),
-      Math.max(bounds[1], actorBounds[1]),
-      Math.min(bounds[2], actorBounds[2]),
-      Math.max(bounds[3], actorBounds[3]),
-      Math.min(bounds[4], actorBounds[4]),
-      Math.max(bounds[5], actorBounds[5]),
-    ];
-  }
-
-  const [xmin, xmax, ymin, ymax, zmin, zmax] = bounds;
-  const center = [
-    Number(((xmin + xmax) / 2).toFixed(4)),
-    Number(((ymin + ymax) / 2).toFixed(4)),
-    Number(((zmin + zmax) / 2).toFixed(4)),
-  ];
-  const halfExtent = Math.max(xmax - xmin, ymax - ymin, zmax - zmin) / 2;
-  const cubicBounds = [
-    center[0] - halfExtent,
-    center[0] + halfExtent,
-    center[1] - halfExtent,
-    center[1] + halfExtent,
-    center[2] - halfExtent,
-    center[2] + halfExtent,
-  ];
-
-  return { center, cubicBounds };
-}
-
-function getSceneCenter() {
-  return getSceneBoundsInfo().center;
-}
-
-function hasPlaneChanged(origin, normal, currentOrigin, currentNormal) {
-  return (
-    origin.some((val, idx) => Math.abs(val - currentOrigin[idx]) > CHANGE_THRESHOLD) ||
-    normal.some((val, idx) => Math.abs(val - currentNormal[idx]) > CHANGE_THRESHOLD)
-  );
-}
-
-function limitCameraZoomOut(camera) {
-  if (maxDistance <= 0 || isLimitingCameraZoom) {
-    return;
-  }
-  const currentDist = camera.getDistance();
-  if (currentDist <= maxDistance + CHANGE_THRESHOLD) {
-    return;
-  }
-
-  isLimitingCameraZoom = true;
-  const focal = camera.getFocalPoint();
-  const pos = camera.getPosition();
-  const ratio = maxDistance / currentDist;
-
-  camera.setPosition(
-    focal[0] + (pos[0] - focal[0]) * ratio,
-    focal[1] + (pos[1] - focal[1]) * ratio,
-    focal[2] + (pos[2] - focal[2]) * ratio,
-  );
-  localRenderWindow.getRenderWindow().render();
-  isLimitingCameraZoom = false;
-}
-
-function setupWidgetStateEvents(widgetState) {
-  widgetState.onModified(() => {
-    const origin = widgetState.getOrigin().map((val) => Number(val.toFixed(4)));
-    const normal = widgetState.getNormal().map((val) => Number(val.toFixed(4)));
-    if (!hasPlaneChanged(origin, normal, planes.value[0].origin, planes.value[0].normal)) {
-      return;
-    }
-
-    fromWidget = true;
-    planes.value[0].origin = origin;
-    planes.value[0].normal = normal;
-    fromWidget = false;
-    debouncedApply();
-  });
-}
-
-function cleanupLocalWidget() {
-  maxDistance = 0;
-  isLimitingCameraZoom = false;
-  if (localRenderWindow) {
-    localRenderWindow.delete();
-    localRenderWindow = undefined;
-    widgetManager = undefined;
-    planeWidget = undefined;
-    widgetHandle = undefined;
-  }
-}
-
-function initLocalWidget(container) {
-  cleanupLocalWidget();
-  container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
-  localRenderWindow = vtkGenericRenderWindow({
-    background: [0, 0, 0, 0],
-    listenWindowResize: false,
-  });
-  localRenderWindow.setContainer(container);
-  const camera = localRenderWindow.getRenderer().getActiveCamera();
-  camera.onModified(() => limitCameraZoomOut(camera));
-
-  const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
-  Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
-  localRenderWindow.resize();
-
-  widgetManager = vtkWidgetManager();
-  widgetManager.setRenderer(localRenderWindow.getRenderer());
-  planeWidget = vtkImplicitPlaneWidget();
-  widgetHandle = widgetManager.addWidget(planeWidget);
-  updateWidgetPlacement();
-  setupWidgetStateEvents(planeWidget.getWidgetState());
-}
-
-watch(widgetContainer, (container) => {
-  if (container) {
-    const domElement = container.$el || container;
-    initLocalWidget(domElement);
-  }
-});
-
-watch(
+const debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
+const {
+  getSceneCenter,
+  syncWidgets,
+  syncLocalCamera,
+  cleanupLocalWidget,
+  initLocalWidget,
+  updateWidgetPlacement,
+  isFromWidget,
+  setFromWidget,
+} = useClippingPlanesWidget({
   planes,
-  () => {
-    if (fromWidget || !planeWidget) {
-      return;
-    }
-    const widgetState = planeWidget.getWidgetState();
-    widgetState.setOrigin(planes.value[0].origin);
-    widgetState.setNormal(planes.value[0].normal);
-    localRenderWindow.getRenderWindow().render();
-    debouncedApply();
-  },
-  { deep: true },
-);
-
-onBeforeUnmount(() => {
-  cleanupLocalWidget();
+  targetAllVisible,
+  selectedDatasetIds,
+  allItems,
+  hybridViewerStore,
+  debouncedApply,
 });
-
-function syncLocalCamera() {
-  if (!localRenderWindow) {
-    return;
-  }
-  const renderer = localRenderWindow.getRenderer();
-  const camera = renderer.getActiveCamera();
-  applyCameraOptions(camera, hybridViewerStore.camera_options);
-  renderer.resetCamera();
-  maxDistance = camera.getDistance();
-  localRenderWindow.getRenderWindow().render();
-}
-
-watch(() => hybridViewerStore.camera_options, syncLocalCamera, { deep: true });
 
 function addPlane() {
-  planes.value.push({ origin: getSceneCenter(), normal: [1, 0, 0] });
+  const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length];
+  planes.value.push({ origin: getSceneCenter(), normal });
 }
 
 function removePlane(index) {
@@ -221,27 +50,63 @@ function removePlane(index) {
 }
 
 function flipNormal(plane) {
-  plane.normal = plane.normal.map((normal) => -normal);
+  plane.normal = plane.normal.map((component) => -component);
+  syncWidgets();
+  applyClippingPlanes();
 }
 
-function updateWidgetPlacement() {
-  if (!widgetHandle || !localRenderWindow) {
+async function applyClippingPlanes() {
+  const allIds = allItems.value.map((item) => item.id);
+  if (allIds.length === 0) {
     return;
   }
-  maxDistance = 0;
-  const { center, cubicBounds } = getSceneBoundsInfo();
-  widgetHandle.placeWidget(cubicBounds);
-  widgetHandle.setAxisScale(AXIS_SCALE);
-  widgetHandle.setHandleSizeRatio(SIZE_RATIO);
-  planes.value[0].origin = center;
-  planeWidget?.getWidgetState().setOrigin(center);
-  syncLocalCamera();
+  const targetIds = targetAllVisible.value ? allIds : selectedDatasetIds.value;
+  const untargetedIds = allIds.filter((id) => !targetIds.includes(id));
+  const planesData = planes.value
+    .filter((plane) => plane.origin !== undefined && plane.origin !== null)
+    .map((plane) => ({
+      origin: plane.origin.map(Number),
+      normal: plane.normal.map(Number),
+    }));
+  await Promise.all([
+    targetIds.length > 0 && hybridViewerStore.setClippingPlanes(targetIds, planesData),
+    untargetedIds.length > 0 && hybridViewerStore.setClippingPlanes(untargetedIds, []),
+  ]);
 }
 
-const debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
+async function resetClippingPlanes() {
+  setFromWidget(true);
+  planes.value = [{ origin: undefined, normal: [1, 0, 0] }];
+  updateWidgetPlacement({ isReset: true });
+  setFromWidget(false);
+  await applyClippingPlanes();
+}
+
+async function removeClippingPlanes() {
+  const allIds = allItems.value.map((item) => item.id);
+  await hybridViewerStore.setClippingPlanes(allIds, []);
+}
+
+watch(widgetContainer, (container) => {
+  if (container) {
+    initLocalWidget(container.$el || container);
+  }
+});
 
 watch(
-  [show, targetAllVisible, selectedDatasetIds, allItems],
+  planes,
+  () => {
+    if (isFromWidget()) {
+      return;
+    }
+    syncWidgets();
+    debouncedApply();
+  },
+  { deep: true },
+);
+
+watch(
+  [show, targetAllVisible, selectedDatasetIds],
   ([visible]) => {
     if (visible) {
       updateWidgetPlacement();
@@ -251,42 +116,26 @@ watch(
   { immediate: true },
 );
 
-async function applyClippingPlanes() {
-  const allIds = allItems.value.map((item) => item.id);
-  if (allIds.length === 0) {
-    return;
+watch(allItems, () => {
+  if (show.value) {
+    updateWidgetPlacement({ isReset: true });
+    applyClippingPlanes();
   }
+});
 
-  const targetIds = targetAllVisible.value ? allIds : selectedDatasetIds.value;
-  const untargetedIds = allIds.filter((id) => !targetIds.includes(id));
-  const planesData = planes.value.map((plane) => ({
-    origin: plane.origin.map(Number),
-    normal: plane.normal.map(Number),
-  }));
+watch(
+  () => Object.values(hybridViewerStore.hybridDb).filter((entry) => entry && entry.actor).length,
+  (actorCount) => {
+    if (show.value && actorCount > 0) {
+      updateWidgetPlacement({ isReset: true });
+      applyClippingPlanes();
+    }
+  },
+);
 
-  if (targetIds.length > 0) {
-    await hybridViewerStore.setClippingPlanes(targetIds, planesData);
-  }
-  if (untargetedIds.length > 0) {
-    await hybridViewerStore.setClippingPlanes(untargetedIds, []);
-  }
-}
+watch(() => hybridViewerStore.camera_options, syncLocalCamera, { deep: true });
 
-async function resetClippingPlanes() {
-  fromWidget = true;
-  planes.value[0].normal = [1, 0, 0];
-  planeWidget?.getWidgetState().setNormal([1, 0, 0]);
-  updateWidgetPlacement();
-  fromWidget = false;
-  await applyClippingPlanes();
-}
-
-async function removeClippingPlanes() {
-  const allIds = allItems.value.map((item) => item.id);
-  if (allIds.length > 0) {
-    await hybridViewerStore.setClippingPlanes(allIds, []);
-  }
-}
+onBeforeUnmount(cleanupLocalWidget);
 </script>
 
 <template>
@@ -334,10 +183,23 @@ async function removeClippingPlanes() {
         v-for="(plane, idx) in planes"
         :key="idx"
         variant="outlined"
-        class="pa-2 mb-3 rounded-lg border-opacity-25"
+        class="pa-2 mb-3 rounded-lg border-opacity-50"
+        :style="{ borderColor: getPlaneCssColor(idx) }"
       >
         <v-row align="center" justify="space-between" no-gutters class="mb-1">
-          <v-col class="text-caption font-weight-medium">Plane #{{ idx + 1 }}</v-col>
+          <v-col cols="auto" class="d-flex align-center">
+            <v-chip
+              size="x-small"
+              variant="flat"
+              :style="{
+                backgroundColor: getPlaneCssColor(idx),
+                color: 'white',
+              }"
+              class="font-weight-bold"
+            >
+              Plane #{{ idx + 1 }}
+            </v-chip>
+          </v-col>
           <v-col cols="auto">
             <v-btn
               icon="mdi-trash-can-outline"
@@ -352,7 +214,7 @@ async function removeClippingPlanes() {
         <v-row no-gutters class="mb-1">
           <v-col class="text-caption text-medium-emphasis">Origin [X, Y, Z]</v-col>
         </v-row>
-        <v-row dense class="mb-2">
+        <v-row v-if="plane.origin" dense class="mb-2">
           <v-col v-for="axis in 3" :key="'orig-' + axis" cols="4">
             <v-text-field
               v-model.number="plane.origin[axis - 1]"
@@ -361,6 +223,18 @@ async function removeClippingPlanes() {
               density="compact"
               hide-details
               step="any"
+              class="text-caption"
+            />
+          </v-col>
+        </v-row>
+        <v-row v-else dense class="mb-2">
+          <v-col v-for="axis in 3" :key="'orig-placeholder-' + axis" cols="4">
+            <v-text-field
+              placeholder="—"
+              variant="outlined"
+              density="compact"
+              hide-details
+              disabled
               class="text-caption"
             />
           </v-col>
