@@ -15,13 +15,13 @@ const CI_WORKERS = 2;
 const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY;
 const maxWorkers = process.env.CI ? CI_WORKERS : 3;
 
+const aliases = {
+  "@ogw_tests": path.resolve(__dirname, "."),
+  "@geode/opengeodeweb-front/shared": path.resolve(__dirname, "..", "shared"),
+};
+
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
-  resolve: {
-    alias: {
-      "@ogw_tests": path.resolve(__dirname, "."),
-    },
-  },
   test: {
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
     projects: [
@@ -32,6 +32,7 @@ export default defineConfig({
           include: ["tests/unit/**/*.test.js"],
           globals: true,
           environment: "nuxt",
+          alias: aliases,
           testTimeout: TIMEOUTS.unit,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
           server: {
@@ -49,6 +50,7 @@ export default defineConfig({
           include: ["tests/integration/**/*.test.js"],
           globals: true,
           environment: "nuxt",
+          alias: aliases,
           maxWorkers,
           testTimeout: TIMEOUTS.integration,
           setupFiles: [path.resolve(__dirname, "./setup_indexeddb.js")],
