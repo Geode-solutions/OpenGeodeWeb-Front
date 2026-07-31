@@ -4,7 +4,7 @@ import pTimeout from "p-timeout";
 // Local imports
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import { validate_schema } from "@ogw_front/utils/validate_schema";
+import { validate_schema } from "@ogw_shared/utils/validate_schema";
 
 const ERROR_400 = 400;
 
