@@ -200,7 +200,6 @@ onBeforeUnmount(cleanupLocalWidget);
       <v-card
         v-for="(plane, idx) in planes"
         :key="idx"
-        data-testid="planeCard"
         variant="outlined"
         class="pa-2 mb-3 rounded-lg border-opacity-50"
         :style="{ borderColor: getPlaneCssColor(idx) }"
@@ -221,7 +220,7 @@ onBeforeUnmount(cleanupLocalWidget);
           </v-col>
           <v-col cols="auto">
             <v-btn
-              data-testid="removePlaneButton"
+              :data-testid="`removePlaneButton_${idx}`"
               icon="mdi-trash-can-outline"
               size="x-small"
               variant="text"
@@ -238,7 +237,7 @@ onBeforeUnmount(cleanupLocalWidget);
           <v-col v-for="axis in 3" :key="'orig-' + axis" cols="4">
             <v-text-field
               v-model.number="plane.origin[axis - 1]"
-              data-testid="planeOriginInput"
+              :data-testid="`planeOriginInput_${idx}_${axis - 1}`"
               type="number"
               variant="outlined"
               density="compact"
@@ -265,7 +264,7 @@ onBeforeUnmount(cleanupLocalWidget);
           <v-col class="text-caption text-medium-emphasis">Normal [X, Y, Z]</v-col>
           <v-col cols="auto">
             <v-btn
-              data-testid="invertNormalButton"
+              :data-testid="`invertNormalButton_${idx}`"
               size="x-small"
               variant="text"
               color="primary"
@@ -281,7 +280,7 @@ onBeforeUnmount(cleanupLocalWidget);
           <v-col v-for="axis in 3" :key="'norm-' + axis" cols="4">
             <v-text-field
               v-model.number="plane.normal[axis - 1]"
-              data-testid="planeNormalInput"
+              :data-testid="`planeNormalInput_${idx}_${axis - 1}`"
               type="number"
               variant="outlined"
               density="compact"
