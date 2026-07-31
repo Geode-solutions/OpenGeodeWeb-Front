@@ -11,7 +11,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
 
-function isItemViewable(item) {
+function checkItemViewable(item) {
   if (!item || typeof item !== "object") {
     return false;
   }
@@ -21,7 +21,14 @@ function isItemViewable(item) {
   if (item.binary_light_viewable !== undefined) {
     return item.binary_light_viewable !== "not_viewable";
   }
-  return true;
+  return false;
+}
+
+function isItemViewable(itemOrId) {
+  if (typeof itemOrId === "string") {
+    return database.data.get(itemOrId).then(checkItemViewable);
+  }
+  return checkItemViewable(itemOrId);
 }
 
 // oxlint-disable-next-line max-lines-per-function, max-statements

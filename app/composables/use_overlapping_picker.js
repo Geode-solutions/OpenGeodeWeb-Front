@@ -72,8 +72,7 @@ export function useOverlappingPicker() {
     const viewableChecks = await Promise.all(
       visibleStyleIds.map(async (styleId) => {
         try {
-          const dataItem = await dataStore.item(styleId);
-          return dataStore.isItemViewable(dataItem) ? styleId : undefined;
+          return (await dataStore.isItemViewable(styleId)) ? styleId : undefined;
         } catch {
           return undefined;
         }

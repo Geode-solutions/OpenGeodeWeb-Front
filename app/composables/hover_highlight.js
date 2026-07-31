@@ -22,8 +22,7 @@ export function useHoverhighlight() {
       currentId = id;
       currentType = type;
 
-      const value = await dataStore.item(id);
-      if (value && !dataStore.isItemViewable(value)) {
+      if (!(await dataStore.isItemViewable(id))) {
         return;
       }
 
