@@ -4,7 +4,14 @@ import { Readable } from "node:stream";
 import fs from "node:fs";
 
 // Third party imports
-import { createError, defineEventHandler, getRequestHeaders, getRequestWebStream } from "h3";
+import {
+  createError,
+  defineEventHandler,
+  getRequestHeaders,
+  getRequestWebStream,
+  readBody,
+  getQuery,
+} from "h3";
 import busboy from "busboy";
 
 // Local imports
@@ -14,11 +21,9 @@ import {
 } from "@geode/opengeodeweb-front/server/utils/app_config.js";
 
 const CODE_201 = 201;
-const FILE_SIZE_LIMIT = 107_374_182;
+const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const { projectName } = body;
   const writePromises = [];
   const savedFiles = [];
 
@@ -28,6 +33,13 @@ export default defineEventHandler(async (event) => {
       fileSize: FILE_SIZE_LIMIT,
       files: 1,
     },
+  });
+  let projectName = "";
+  busboyInstance.on("field", (name, value) => {
+    console.log(`Field ${name}: ${value}`);
+    if (name === "projectName") {
+      projectName = value;
+    }
   });
 
   busboyInstance.on("file", (fieldname, fileStream, info) => {
@@ -45,10 +57,6 @@ export default defineEventHandler(async (event) => {
     })();
     writePromises.push(writePromise);
     fileStream.on("limit", () => busboyInstance.destroy(new Error("File too large")));
-  });
-
-  busboyInstance.on("field", (name, value) => {
-    console.log(`Field ${name}: ${value}`);
   });
 
   busboyInstance.on("filesLimit", () => busboyInstance.destroy(new Error("Too many files")));
