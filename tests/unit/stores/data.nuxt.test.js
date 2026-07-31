@@ -147,9 +147,9 @@ describe("useDataStore - collections", () => {
       ).toBe(false);
 
       // HorizonStack3D group node
-      expect(
-        dataStore.isItemViewable({ id: "HorizonStack3D", title: "HorizonStack3D" }),
-      ).toBe(false);
+      expect(dataStore.isItemViewable({ id: "HorizonStack3D", title: "HorizonStack3D" })).toBe(
+        false,
+      );
     });
 
     test("respects explicit is_viewable overrides", () => {
