@@ -40,7 +40,9 @@ export const useViewerStore = defineStore(
     const busy = ref(0);
 
     const protocol = computed(() => getWebsocketApiProtocol());
+
     const port = computed(() => getWebsocketApiPort(default_local_port.value));
+
     const base_url = computed(() => {
       let viewer_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
       if (isCloudMode()) {

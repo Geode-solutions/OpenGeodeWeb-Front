@@ -10,7 +10,6 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
-  const infraStore = useInfraStore();
   const default_local_port = ref("3000");
 
   const protocol = computed(() => getRestApiProtocol());
@@ -18,6 +17,7 @@ export const useAppStore = defineStore("app", () => {
   const port = computed(() => getRestApiPort(default_local_port.value));
 
   const base_url = computed(() => {
+    const infraStore = useInfraStore();
     let app_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
     if (isCloudMode()) {
       app_url += `/server`;

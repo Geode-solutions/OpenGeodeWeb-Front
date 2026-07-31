@@ -3,6 +3,7 @@ import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
+import { deriveAllowedObjects } from "@ogw_shared/utils/utils.js";
 
 const schema = schemas.opengeodeweb_back.allowed_objects;
 
@@ -15,84 +16,34 @@ const { filenames } = defineProps({
 const backStore = useBackStore();
 
 const loading = ref(false);
-const allowed_objects = ref({});
-const toggle_loading = useToggle(loading);
-const multiple_files_no_common = ref(false);
+const allowedGeodeObjects = ref({});
+const toggleLoading = useToggle(loading);
+const multipleFilesNoCommon = ref(false);
 
-function select_geode_object(object_map) {
-  const object_keys = Object.keys(object_map);
-  if (object_keys.length === 0) {
-    return undefined;
-  }
-  if (object_keys.length === 1 && object_map[object_keys[0]].is_loadable > 0) {
-    return object_keys[0];
-  }
-  const highest_load_score = Math.max(...object_keys.map((key) => object_map[key].is_loadable));
-  if (highest_load_score <= 0) {
-    return undefined;
-  }
-  const best_score_objects = object_keys.filter(
-    (key) => object_map[key].is_loadable === highest_load_score,
-  );
-  if (best_score_objects.length === 1) {
-    return best_score_objects[0];
-  }
-  const highest_priority = Math.max(
-    ...best_score_objects.map((key) => object_map[key].object_priority ?? -Infinity),
-  );
-  const best_priority_objects = best_score_objects.filter(
-    (key) => object_map[key].object_priority === highest_priority,
-  );
-  if (highest_priority !== -Infinity && best_priority_objects.length === 1) {
-    return best_priority_objects[0];
-  }
-  return undefined;
-}
-
-function isCsvFile(filename) {
-  return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
-}
-
-async function getAllowedObjects() {
-  toggle_loading();
-  allowed_objects.value = {};
-  multiple_files_no_common.value = false;
-
-  const promise_array = filenames.map((filename) => {
+async function fetchAllowedObjectsList() {
+  const promiseArray = filenames.map((filename) => {
     const params = { filename };
     return backStore.request({ schema, params });
   });
-  const responses = await Promise.all(promise_array);
-  const allowed_objects_list = responses.map((response) => response.allowed_objects);
-  const all_keys = [...new Set(allowed_objects_list.flatMap((obj) => Object.keys(obj)))];
-  const common_keys = all_keys.filter((key) => allowed_objects_list.every((obj) => key in obj));
+  const responses = await Promise.all(promiseArray);
+  return responses.map((response) => response.allowed_objects);
+}
 
-  if (filenames.length > 1 && all_keys.length > 0 && common_keys.length === 0) {
-    multiple_files_no_common.value = true;
-  }
+async function getAllowedGeodeObjects() {
+  toggleLoading();
+  allowedGeodeObjects.value = {};
+  multipleFilesNoCommon.value = false;
 
-  const final_object = {};
-  for (const key of common_keys) {
-    const load_scores = allowed_objects_list.map((obj) => obj[key].is_loadable);
-    const priorities = allowed_objects_list
-      .map((obj) => obj[key].object_priority)
-      .filter((priority) => priority !== undefined);
-    final_object[key] = { is_loadable: Math.min(...load_scores) };
-    if (priorities.length > 0) {
-      final_object[key].object_priority = Math.max(...priorities);
-    }
-  }
-  const isCsv = filenames.some((filename) => isCsvFile(filename));
-  if (isCsv && !final_object["PointSet3D"]) {
-    final_object["PointSet3D"] = { is_loadable: 1, object_priority: 100 };
-  }
+  const allowedGeodeObjectsList = await fetchAllowedObjectsList();
+  const derived = deriveAllowedObjects(filenames, allowedGeodeObjectsList);
 
-  allowed_objects.value = final_object;
-  const selected_object = select_geode_object(final_object);
-  if (selected_object) {
-    setGeodeObject(selected_object);
+  allowedGeodeObjects.value = derived.allowedGeodeObjects;
+  multipleFilesNoCommon.value = derived.multipleFilesNoCommon;
+  console.log({ derived });
+  if (derived.selectedGeodeObject) {
+    setGeodeObject(derived.selectedGeodeObject);
   }
-  toggle_loading();
+  toggleLoading();
 }
 
 function setGeodeObject(geode_object_type) {
@@ -102,13 +53,13 @@ function setGeodeObject(geode_object_type) {
   }
 }
 // oxlint-disable-next-line no-top-level-await
-await getAllowedObjects();
+await getAllowedGeodeObjects();
 </script>
 
 <template>
   <FetchingData v-if="loading" />
-  <v-row v-else-if="Object.keys(allowed_objects).length" class="justify-left">
-    <v-col v-for="(value, key) in allowed_objects" :key="key" cols="3" md="4">
+  <v-row v-else-if="Object.keys(allowedGeodeObjects).length" class="justify-left">
+    <v-col v-for="(value, key) in allowedGeodeObjects" :key="key" cols="3" md="4">
       <v-tooltip
         :text="
           value['is_loadable']
@@ -139,7 +90,7 @@ await getAllowedObjects();
       </v-tooltip>
     </v-col>
   </v-row>
-  <v-row v-else-if="multiple_files_no_common" class="pa-5">
+  <v-row v-else-if="multipleFilesNoCommon" class="pa-5">
     <v-card class="card" variant="tonal" rounded>
       <v-card-text>
         These files cannot be loaded together because they don't share a common data type.
