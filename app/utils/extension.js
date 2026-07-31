@@ -71,7 +71,7 @@ async function unloadExtension(extensionId) {
 
 async function uploadExtension(file) {
   const appStore = useAppStore();
-  await appStore.uploadExtension(file);
+  await appStore.upload(file);
 }
 
 function runExtensions() {

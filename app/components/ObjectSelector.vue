@@ -1,9 +1,9 @@
 <script setup>
 import FetchingData from "@ogw_front/components/FetchingData.vue";
+import { deriveAllowedObjects } from "@ogw_shared/utils/utils.js";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
-import { deriveAllowedObjects } from "@ogw_shared/utils/utils.js";
 
 const schema = schemas.opengeodeweb_back.allowed_objects;
 
@@ -39,7 +39,6 @@ async function getAllowedGeodeObjects() {
 
   allowedGeodeObjects.value = derived.allowedGeodeObjects;
   multipleFilesNoCommon.value = derived.multipleFilesNoCommon;
-  console.log({ derived });
   if (derived.selectedGeodeObject) {
     setGeodeObject(derived.selectedGeodeObject);
   }

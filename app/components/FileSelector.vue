@@ -1,12 +1,13 @@
 <script setup>
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+
 import FetchingData from "@ogw_front/components/FetchingData";
 import FileUploader from "@ogw_front/components/FileUploader";
 import { useBackStore } from "@ogw_front/stores/back";
 
-const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
+const schema = schemas.opengeodeweb_back.allowed_files;
 
-const backStore = useBackStore();
+const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
 const { multiple, files, autoUpload, showOverlay } = defineProps({
   multiple: { type: Boolean, required: true },
@@ -34,9 +35,7 @@ watch(
   },
 );
 
-function toggleLoading() {
-  useToggle(loading);
-}
+const toggle_loading = useToggle(loading);
 
 function files_uploaded_event(value) {
   if (value.length > 0) {
@@ -45,16 +44,16 @@ function files_uploaded_event(value) {
   }
 }
 
-async function getAllowedFiles() {
-  toggleLoading();
-  const schema = schemas.opengeodeweb_back.allowed_files;
+async function get_allowed_files() {
+  toggle_loading();
+  const backStore = useBackStore();
   const response = await backStore.request({ schema });
   accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
-  toggleLoading();
+  toggle_loading();
 }
 
 // oxlint-disable-next-line no-top-level-await
-await getAllowedFiles();
+await get_allowed_files();
 </script>
 
 <template>

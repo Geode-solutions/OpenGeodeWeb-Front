@@ -5,7 +5,6 @@ function fetchRaw(
   { route, method, params = {}, baseURL, headers = {}, max_retry, timeout, expectEvent = false },
   { onRequestError, onResponse, onResponseError } = {},
 ) {
-  console.log("fetchRaw", { route, method, params, baseURL, headers, max_retry, timeout, expectEvent });
   if (expectEvent) { headers["Accept"] = "text/event-stream" }
 
   const request_options = { method, headers };

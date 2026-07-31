@@ -40,34 +40,34 @@ function intersectAllowedObjects(allowedObjectsList) {
   const allKeys = [...new Set(allowedObjectsList.flatMap((object) => Object.keys(object)))];
   const commonKeys = allKeys.filter((key) => allowedObjectsList.every((object) => key in object));
 
-  const merged = {};
+  const mergedAllowedObjects = {};
   for (const key of commonKeys) {
     const loadScores = allowedObjectsList.map((object) => object[key].is_loadable);
     const priorities = allowedObjectsList
       .map((object) => object[key].object_priority)
       .filter((priority) => priority !== undefined);
 
-    merged[key] = { is_loadable: Math.min(...loadScores) };
+    mergedAllowedObjects[key] = { is_loadable: Math.min(...loadScores) };
     if (priorities.length > 0) {
-      merged[key].object_priority = Math.max(...priorities);
+      mergedAllowedObjects[key].object_priority = Math.max(...priorities);
     }
   }
 
-  return { commonKeys, allKeys, merged };
+  return { commonKeys, allKeys, mergedAllowedObjects };
 }
 
 
 function deriveAllowedObjects(filenames, allowedObjectsList) {
-  const { commonKeys, allKeys, merged } = intersectAllowedObjects(allowedObjectsList);
+  const { commonKeys, allKeys, mergedAllowedObjects } = intersectAllowedObjects(allowedObjectsList);
 
   const multipleFilesNoCommon =
     filenames.length > 1 && allKeys.length > 0 && commonKeys.length === 0;
 
 
-  const selectedGeodeObject = selectGeodeObject(merged);
+  const selectedGeodeObject = selectGeodeObject(mergedAllowedObjects);
 
   return {
-    allowed_objects: merged,
+    mergedAllowedObjects,
     multipleFilesNoCommon,
     selectedGeodeObject,
   };
