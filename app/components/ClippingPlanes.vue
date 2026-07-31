@@ -60,18 +60,20 @@ async function applyClippingPlanes() {
   if (allIds.length === 0) {
     return;
   }
+  const center = getSceneCenter();
   const targetIds = targetAllVisible.value ? allIds : selectedDatasetIds.value;
   const untargetedIds = allIds.filter((id) => !targetIds.includes(id));
-  const planesData = planes.value
-    .filter((plane) => plane.origin !== undefined && plane.origin !== null)
-    .map((plane) => ({
-      origin: plane.origin.map(Number),
-      normal: plane.normal.map(Number),
-    }));
-  await Promise.all([
-    targetIds.length > 0 && hybridViewerStore.setClippingPlanes(targetIds, planesData),
-    untargetedIds.length > 0 && hybridViewerStore.setClippingPlanes(untargetedIds, []),
-  ]);
+  const planesData = planes.value.map((plane) => ({
+    origin: (plane.origin || center).map(Number),
+    normal: plane.normal.map(Number),
+  }));
+
+  if (targetIds.length > 0) {
+    await hybridViewerStore.setClippingPlanes(targetIds, planesData);
+  }
+  if (untargetedIds.length > 0) {
+    await hybridViewerStore.setClippingPlanes(untargetedIds, []);
+  }
 }
 
 async function resetClippingPlanes() {
@@ -105,15 +107,22 @@ watch(
   { deep: true },
 );
 
+watch(show, (visible) => {
+  if (visible) {
+    updateWidgetPlacement({ isReset: true });
+    applyClippingPlanes();
+  }
+});
+
 watch(
-  [show, targetAllVisible, selectedDatasetIds],
-  ([visible]) => {
-    if (visible) {
-      updateWidgetPlacement();
-      debouncedApply();
+  [targetAllVisible, selectedDatasetIds],
+  () => {
+    if (show.value) {
+      updateWidgetPlacement({ isReset: true });
+      applyClippingPlanes();
     }
   },
-  { immediate: true },
+  { deep: true },
 );
 
 watch(allItems, () => {
