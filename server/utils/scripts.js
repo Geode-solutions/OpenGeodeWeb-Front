@@ -10,6 +10,7 @@ import { getPort } from "get-port-please";
 
 // Local imports
 import { appMode } from "@geode/opengeodeweb-front/shared/app_mode.js";
+import { setAppBaseUrl } from "@geode/opengeodeweb-front/shared/scripts.js";
 
 const BYTES_PER_KIBIBYTE = 1024;
 const MAX_ERROR_BUFFER_KIBIBYTES = 64;
@@ -164,7 +165,9 @@ async function runBrowser(scriptName) {
       PORT: port,
     },
   });
-  return await waitNuxt(nuxtProcess);
+  await waitNuxt(nuxtProcess);
+  await setAppBaseUrl(`http://localhost:${port}`);
+  return port;
 }
 
 export { commandExistsSync, getAvailablePort, runBrowser, waitForReady };

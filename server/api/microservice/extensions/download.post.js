@@ -8,7 +8,7 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   registerExtensionFile,
   targetExtensionFilePath,
-} from "@geode/opengeodeweb-front/server/utils/config.js";
+} from "@geode/opengeodeweb-front/server/utils/app_config.js";
 
 export default defineEventHandler(async (event) => {
   try {

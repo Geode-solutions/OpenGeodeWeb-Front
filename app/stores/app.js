@@ -9,7 +9,7 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
-  const default_local_port = ref("3000");
+  const default_local_port = ref(globalThis.location.port);
   const status = ref(Status.NOT_CONNECTED);
 
   const protocol = computed(() => getRestApiProtocol());
