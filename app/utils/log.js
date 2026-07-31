@@ -1,7 +1,7 @@
 function startRequestLog(microservice, schema) {
   console.log(`[${microservice.$id}] Request:`, schema.$id);
   const requestStartingTime = new Date(Date.now());
-  return requestStartingTime
+  return requestStartingTime;
 }
 
 function endRequestLog(microservice, schema, requestStartingTime) {
@@ -10,9 +10,9 @@ function endRequestLog(microservice, schema, requestStartingTime) {
     `[${microservice.$id}] Request completed:`,
     schema.$id,
     "in",
-    (requestEndingTime.getSeconds() - requestStartingTime.getSeconds()),
+    requestEndingTime.getSeconds() - requestStartingTime.getSeconds(),
     "s",
   );
 }
 
-export { startRequestLog, endRequestLog }
+export { startRequestLog, endRequestLog };

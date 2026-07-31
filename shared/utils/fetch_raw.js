@@ -5,11 +5,17 @@ function fetchRaw(
   { route, method, params = {}, baseURL, headers = {}, max_retry, timeout, expectEvent = false },
   { onRequestError, onResponse, onResponseError } = {},
 ) {
-  if (expectEvent) { headers["Accept"] = "text/event-stream" }
+  if (expectEvent) {
+    headers["Accept"] = "text/event-stream";
+  }
 
   const request_options = { method, headers };
-  if (hasBody(params)) { request_options.body = params }
-  if (max_retry) { request_options.max_retry = max_retry }
+  if (hasBody(params)) {
+    request_options.body = params;
+  }
+  if (max_retry) {
+    request_options.max_retry = max_retry;
+  }
 
   function doFetch() {
     return $fetch(route, {

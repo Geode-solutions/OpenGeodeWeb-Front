@@ -16,9 +16,8 @@ import { viewer_call } from "@ogw_internal/utils/viewer_call";
 import {
   isCloudMode,
   getWebsocketApiProtocol,
-  getWebsocketApiPort
+  getWebsocketApiPort,
 } from "@ogw_front/utils/stores.js";
-
 
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_REQUEST = 10;

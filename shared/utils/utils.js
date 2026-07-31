@@ -56,13 +56,11 @@ function intersectAllowedObjects(allowedObjectsList) {
   return { commonKeys, allKeys, mergedAllowedObjects };
 }
 
-
 function deriveAllowedObjects(filenames, allowedObjectsList) {
   const { commonKeys, allKeys, mergedAllowedObjects } = intersectAllowedObjects(allowedObjectsList);
 
   const multipleFilesNoCommon =
     filenames.length > 1 && allKeys.length > 0 && commonKeys.length === 0;
-
 
   const selectedGeodeObject = selectGeodeObject(mergedAllowedObjects);
 

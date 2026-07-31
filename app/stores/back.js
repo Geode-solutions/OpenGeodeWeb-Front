@@ -6,11 +6,7 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import {
-  isCloudMode,
-  getRestApiProtocol,
-  getRestApiPort
-} from "@ogw_front/utils/stores";
+import { isCloudMode, getRestApiProtocol, getRestApiPort } from "@ogw_front/utils/stores";
 
 const MILLISECONDS_IN_SECOND = 1000;
 const DEFAULT_PING_INTERVAL_SECONDS = 10;
@@ -24,10 +20,10 @@ export const useBackStore = defineStore("back", {
   }),
   getters: {
     protocol() {
-      return getRestApiProtocol()
+      return getRestApiProtocol();
     },
     port() {
-      return getRestApiPort(this.default_local_port)
+      return getRestApiPort(this.default_local_port);
     },
     base_url() {
       const infraStore = useInfraStore();

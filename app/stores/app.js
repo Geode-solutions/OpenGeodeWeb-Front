@@ -6,7 +6,6 @@ import { killExtension } from "@ogw_front/utils/extension.js";
 import { isCloudMode, getRestApiProtocol, getRestApiPort } from "@ogw_front/utils/stores.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
@@ -24,7 +23,6 @@ export const useAppStore = defineStore("app", () => {
     }
     return app_url;
   });
-
 
   function registerStore(store) {
     const isAlreadyRegistered = stores.some((registeredStore) => registeredStore.$id === store.$id);
@@ -255,7 +253,6 @@ export const useAppStore = defineStore("app", () => {
   }
   const is_busy = computed(() => request_counter.value > 0);
 
-
   const projectFolderPath = ref("");
   function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
@@ -278,8 +275,6 @@ export const useAppStore = defineStore("app", () => {
       },
     );
   }
-
-
 
   return {
     stores,
