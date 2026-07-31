@@ -1,12 +1,20 @@
-import { hasBody } from "./file.js";
+// Third party imports
+import _ from "lodash";
 import pTimeout from "p-timeout";
+
+// Local imports
+import { hasBody } from "./file.js";
 
 function fetchRaw(
   { route, method, params = {}, baseURL, headers = {}, max_retry, timeout, expectEvent = false },
   { onRequestError, onResponse, onResponseError } = {},
 ) {
   if (expectEvent) {
-    headers["Accept"] = "text/event-stream";
+    if (_.isEmpty(headers)) {
+      headers["Accept"] = "text/event-stream";
+    } else {
+      headers["Accept"] = `${headers["Accept"]}, text/event-stream`;
+    }
   }
 
   const request_options = { method, headers };

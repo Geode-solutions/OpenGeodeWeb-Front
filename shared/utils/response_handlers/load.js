@@ -56,7 +56,7 @@ function intersectAllowedObjects(allowedObjectsList) {
   return { commonKeys, allKeys, mergedAllowedObjects };
 }
 
-function deriveAllowedObjects(filenames, allowedObjectsList) {
+function resolveAllowedObjects(filenames, allowedObjectsList) {
   const { commonKeys, allKeys, mergedAllowedObjects } = intersectAllowedObjects(allowedObjectsList);
 
   const multipleFilesNoCommon =
@@ -71,4 +71,4 @@ function deriveAllowedObjects(filenames, allowedObjectsList) {
   };
 }
 
-export { deriveAllowedObjects, getFileExtension };
+export { resolveAllowedObjects, getFileExtension };
