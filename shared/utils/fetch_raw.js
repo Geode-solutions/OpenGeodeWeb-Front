@@ -10,7 +10,7 @@ function fetchRaw(
   { onRequestError, onResponse, onResponseError } = {},
 ) {
   if (expectEvent) {
-    const value = "text/event-stream"
+    const value = "text/event-stream";
     if (_.isEmpty(headers)) {
       headers["Accept"] = value;
     } else {
