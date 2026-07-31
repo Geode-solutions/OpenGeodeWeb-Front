@@ -3,7 +3,6 @@ function getFileExtension(filename) {
 }
 
 function selectGeodeObject(objectMap) {
-  console.log("selectGeodeObject", { objectMap });
   const objectKeys = Object.keys(objectMap);
   if (objectKeys.length === 0) {
     return undefined;
@@ -38,16 +37,14 @@ function selectGeodeObject(objectMap) {
 }
 
 function intersectAllowedObjects(allowedObjectsList) {
-  console.log("intersectAllowedObjects", { allowedObjectsList });
-
-  const allKeys = [...new Set(allowedObjectsList.flatMap((obj) => Object.keys(obj)))];
-  const commonKeys = allKeys.filter((key) => allowedObjectsList.every((obj) => key in obj));
+  const allKeys = [...new Set(allowedObjectsList.flatMap((object) => Object.keys(object)))];
+  const commonKeys = allKeys.filter((key) => allowedObjectsList.every((object) => key in object));
 
   const merged = {};
   for (const key of commonKeys) {
-    const loadScores = allowedObjectsList.map((obj) => obj[key].is_loadable);
+    const loadScores = allowedObjectsList.map((object) => object[key].is_loadable);
     const priorities = allowedObjectsList
-      .map((obj) => obj[key].object_priority)
+      .map((object) => object[key].object_priority)
       .filter((priority) => priority !== undefined);
 
     merged[key] = { is_loadable: Math.min(...loadScores) };
@@ -61,8 +58,6 @@ function intersectAllowedObjects(allowedObjectsList) {
 
 
 function deriveAllowedObjects(filenames, allowedObjectsList) {
-  console.log("deriveAllowedObjects", { filenames, allowedObjectsList });
-
   const { commonKeys, allKeys, merged } = intersectAllowedObjects(allowedObjectsList);
 
   const multipleFilesNoCommon =

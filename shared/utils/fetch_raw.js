@@ -1,8 +1,8 @@
-import pTimeout from "p-timeout";
 import { hasBody } from "./file.js";
+import pTimeout from "p-timeout";
 
 function fetchRaw(
-  { route, method, params = {}, baseURL, headers, max_retry, timeout, expectEvent = false },
+  { route, method, params = {}, baseURL, headers = {}, max_retry, timeout, expectEvent = false },
   { onRequestError, onResponse, onResponseError } = {},
 ) {
   console.log("fetchRaw", { route, method, params, baseURL, headers, max_retry, timeout, expectEvent });
