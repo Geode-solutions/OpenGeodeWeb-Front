@@ -8,8 +8,12 @@ import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
+import {
+  getWebsocketApiPort,
+  getWebsocketApiProtocol,
+  isCloudMode,
+} from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/local/app_mode";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
@@ -33,23 +37,13 @@ export const useViewerStore = defineStore(
     const version = ref("0.0.0");
     const busy = ref(0);
 
-    const protocol = computed(() => {
-      if (infraStore.app_mode === appMode.CLOUD) {
-        return "wss";
-      }
-      return "ws";
-    });
+    const protocol = computed(() => getWebsocketApiProtocol());
 
-    const port = computed(() => {
-      if (infraStore.app_mode === appMode.CLOUD) {
-        return "443";
-      }
-      return default_local_port.value;
-    });
+    const port = computed(() => getWebsocketApiPort(default_local_port.value));
 
     const base_url = computed(() => {
       let viewer_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
-      if (infraStore.app_mode === appMode.CLOUD) {
+      if (isCloudMode()) {
         viewer_url += `/viewer`;
       }
       viewer_url += "/ws";
@@ -133,7 +127,7 @@ export const useViewerStore = defineStore(
 
       const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = {
-        $id: "/api/local/run_viewer",
+        $id: "/api/local/app/run_viewer",
         methods: ["POST"],
         type: "object",
         properties: { COMMAND_VIEWER: { type: "string" }, NUXT_ROOT_PATH: { type: "string" } },

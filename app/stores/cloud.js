@@ -1,4 +1,5 @@
 import { Status } from "@ogw_front/utils/status";
+import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAppStore } from "./app";
 import { useFeedbackStore } from "./feedback";
 import { useInfraStore } from "./infra";
@@ -40,6 +41,7 @@ export const useCloudStore = defineStore("cloud", {
             infraStore.$patch({
               domain_name: response.url,
             });
+            setAppBaseUrl(appStore.base_url);
           },
           response_error_function: () => {
             feedbackStore.$patch({ server_error: true });

@@ -7,7 +7,7 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   createPath,
   generateProjectFolderPath,
-} from "@geode/opengeodeweb-front/app/utils/local/path.js";
+} from "@geode/opengeodeweb-front/server/utils/path.js";
 
 export default defineEventHandler(async (event) => {
   try {

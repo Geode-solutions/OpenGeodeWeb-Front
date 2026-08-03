@@ -7,7 +7,7 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   addMicroserviceMetadatas,
   runViewer,
-} from "@geode/opengeodeweb-front/app/utils/local/microservices.js";
+} from "@geode/opengeodeweb-front/server/utils/microservices.js";
 
 export default defineEventHandler(async (event) => {
   try {
