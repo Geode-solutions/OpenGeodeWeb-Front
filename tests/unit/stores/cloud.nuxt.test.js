@@ -65,11 +65,15 @@ describe("cloud store", () => {
         const error = createError({ statusCode: 500, statusMessage: "500 Internal Server Error" });
 
         fetchMock.mockImplementation((route, options) => {
-          options.onResponseError?.({ response: { status: 500, name: "Error", description: "500 Internal Server Error" } });
+          options.onResponseError?.({
+            response: { status: 500, name: "Error", description: "500 Internal Server Error" },
+          });
           return Promise.reject(error);
         });
 
-        await expect(cloudStore.launch("noreply@example.com")).rejects.toThrow("500 Internal Server Error");
+        await expect(cloudStore.launch("noreply@example.com")).rejects.toThrow(
+          "500 Internal Server Error",
+        );
 
         expect(cloudStore.status).toBe(Status.NOT_CONNECTED);
         expect(feedbackStore.server_error).toBe(true);

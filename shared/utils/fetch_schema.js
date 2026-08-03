@@ -8,8 +8,12 @@ const ERROR_400 = 400;
 
 function fetchSchema(
   { schema, params = {}, baseURL, headers, timeout, expectEvent = false },
-  { request_error_function, response_function, response_error_function, validation_error_function } = {}
-
+  {
+    request_error_function,
+    response_function,
+    response_error_function,
+    validation_error_function,
+  } = {},
 ) {
   console.log("fetchSchema", { schema, baseURL, params, headers, timeout });
   const { valid, error: schema_error } = validate_schema(schema, params);
