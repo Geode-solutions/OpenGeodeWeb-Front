@@ -1,8 +1,8 @@
 // Third party imports
-import { validate_schema } from "@geode/opengeodeweb-front/app/utils/validate_schema.js";
 
 // Local imports
 import { fetchRaw } from "./fetch_raw.js";
+import { validate_schema } from "./validate_schema.js";
 
 const ERROR_400 = 400;
 
