@@ -1,11 +1,12 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
 
-const { title, width, closeLabel, actionLabel } = defineProps({
+const { title, width, closeLabel, actionLabel, clickOutside } = defineProps({
   title: { type: String, default: "" },
   width: { type: Number, default: 260 },
   closeLabel: { type: String, default: "Close" },
   actionLabel: { type: String, default: undefined },
+  clickOutside: { type: Boolean, default: true },
 });
 
 const model = defineModel({ type: Boolean, default: false });
@@ -19,7 +20,7 @@ function close() {
 <template>
   <GlassCard
     v-if="model"
-    v-click-outside="close"
+    v-click-outside="{ handler: close, closeConditional: () => clickOutside }"
     :title="title"
     :width="width"
     :ripple="false"
