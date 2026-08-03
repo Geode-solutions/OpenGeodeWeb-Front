@@ -21,7 +21,6 @@ function setAppBaseUrl(appBaseUrl) {
   return fetchSchema({ schema, params, baseURL: appBaseUrl });
 }
 
-
 function setBackBaseUrl(appBaseUrl, backBaseUrl) {
   console.log("[API] setBackBaseUrl", backBaseUrl);
   const schema = {
