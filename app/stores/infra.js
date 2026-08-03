@@ -1,5 +1,5 @@
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/local/app_mode";
+import { appMode } from "@ogw_shared/app_mode";
 import { registerRunningExtensions } from "@ogw_front/utils/extension";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useCloudStore } from "@ogw_front/stores/cloud";

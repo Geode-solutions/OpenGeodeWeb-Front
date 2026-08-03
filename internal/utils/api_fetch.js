@@ -7,6 +7,7 @@ export function api_fetch(
   { schema, params = {}, headers = {} },
   { request_error_function, response_function, response_error_function, timeout } = {},
 ) {
+  console.log("[API] Fetching", microservice.base_url);
   const feedbackStore = useFeedbackStore();
   microservice.start_request();
 

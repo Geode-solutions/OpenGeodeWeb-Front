@@ -1,4 +1,4 @@
-import { appMode } from "@ogw_front/utils/local/app_mode";
+import { appMode } from "@ogw_shared/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 function isCloudMode() {

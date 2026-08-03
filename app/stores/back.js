@@ -1,3 +1,4 @@
+import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores";
 import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
@@ -76,7 +77,7 @@ export const useBackStore = defineStore("back", {
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = {
-        $id: "/api/local/run_back",
+        $id: "/api/local/app/run_back",
         methods: ["POST"],
         type: "object",
         properties: {

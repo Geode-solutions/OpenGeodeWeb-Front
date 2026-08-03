@@ -8,6 +8,11 @@ import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
+import {
+  getWebsocketApiPort,
+  getWebsocketApiProtocol,
+  isCloudMode,
+} from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
@@ -128,7 +133,7 @@ export const useViewerStore = defineStore(
 
       const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = {
-        $id: "/api/local/run_viewer",
+        $id: "/api/local/app/run_viewer",
         methods: ["POST"],
         type: "object",
         properties: { COMMAND_VIEWER: { type: "string" }, NUXT_ROOT_PATH: { type: "string" } },

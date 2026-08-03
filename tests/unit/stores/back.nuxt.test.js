@@ -5,7 +5,7 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/local/app_mode";
+import { appMode } from "@ogw_shared/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";

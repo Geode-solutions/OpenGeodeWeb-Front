@@ -12,6 +12,11 @@ async function importExtensionFile(file) {
   return registerRunningExtensions();
 }
 
+async function importExtensionURL(url) {
+  await downloadExtension(url);
+  return registerRunningExtensions();
+}
+
 async function registerRunningExtensions() {
   const appStore = useAppStore();
   const infraStore = useInfraStore();
@@ -74,6 +79,27 @@ async function uploadExtension(file) {
   await appStore.upload(file);
 }
 
+function downloadExtension({ url, extensionFileName }) {
+  const appStore = useAppStore();
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const params = { projectName, url, extensionFileName };
+
+  const schema = {
+    $id: "/api/microservice/extensions/download",
+    methods: ["POST"],
+    type: "object",
+    properties: {
+      extensionFileName: { type: "string" },
+      projectName: { type: "string" },
+      url: { type: "string" },
+    },
+    required: ["extensionFileName", "projectName", "url"],
+    additionalProperties: false,
+  };
+
+  return appStore.request({ schema, params });
+}
+
 function runExtensions() {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
@@ -121,9 +147,10 @@ function killExtension(extensionId) {
 
 export {
   importExtensionFile,
-  unloadExtension,
-  uploadExtension,
+  importExtensionURL,
+  killExtension,
   registerRunningExtensions,
   runExtensions,
-  killExtension,
+  unloadExtension,
+  uploadExtension,
 };

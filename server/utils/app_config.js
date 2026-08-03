@@ -4,6 +4,8 @@ import { unlink } from "node:fs";
 
 // Third party imports
 import Conf from "conf";
+import StreamZip from "node-stream-zip";
+import sanitize from "sanitize-filename";
 
 // Local imports
 
@@ -16,6 +18,12 @@ function projectConf(projectName) {
 function confFolderPath(projectName) {
   const projectConfig = projectConf(projectName);
   return path.dirname(projectConfig.path);
+}
+
+function targetExtensionFilePath(projectName, filename) {
+  const safeFilename = sanitize(filename);
+  const targetPath = path.join(confFolderPath(projectName), safeFilename);
+  return targetPath;
 }
 
 function extensionsConf(projectName) {
@@ -51,11 +59,28 @@ function extensionPathFromConf(projectName, extensionId) {
   return projectConfig.get(`extensions.${extensionId}.path`);
 }
 
+async function registerExtensionFile(projectName, file) {
+  const StreamZipAsync = StreamZip.async;
+  const zip = new StreamZipAsync({
+    file,
+    storeEntries: true,
+  });
+  const metadataJson = await zip.entryData("metadata.json");
+  const metadata = JSON.parse(metadataJson);
+  const { id } = metadata;
+  addExtensionToConf(projectName, {
+    extensionId: id,
+    extensionPath: file,
+  });
+}
+
 export {
-  confFolderPath,
-  projectConf,
-  extensionsConf,
   addExtensionToConf,
-  removeExtensionFromConf,
+  confFolderPath,
   extensionPathFromConf,
+  extensionsConf,
+  projectConf,
+  registerExtensionFile,
+  removeExtensionFromConf,
+  targetExtensionFilePath,
 };

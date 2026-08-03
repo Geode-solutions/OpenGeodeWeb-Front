@@ -3,7 +3,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
 function upload_file(
   microservice,
-  { schema, file },
+  { schema, file, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
   console.log("[UPLOAD_FILE] Uploading file", { schema, file });
@@ -13,8 +13,11 @@ function upload_file(
     throw new Error("file must be a instance of File");
   }
 
-  const params = new FormData();
-  params.append("file", file);
+  const body = new FormData();
+  for (const [key, value] of Object.entries(params)) {
+    body.append(key, value);
+  }
+  body.append("file", file);
 
   microservice.start_request();
   const route = schema.$id;
@@ -23,7 +26,7 @@ function upload_file(
     {
       route,
       method: schema.methods.find((method) => method !== "OPTIONS"),
-      params,
+      params: body,
       baseURL: microservice.base_url,
     },
     {

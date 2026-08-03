@@ -1,15 +1,16 @@
 // Local imports
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
+import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
-import { upload_file } from "@ogw_internal/utils/upload_file.js";
-
 import { killExtension } from "@ogw_front/utils/extension.js";
+import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
-  const default_local_port = ref("3000");
+  const default_local_port = ref(globalThis.location.port);
+  const status = ref(Status.NOT_CONNECTED);
 
   const protocol = computed(() => getRestApiProtocol());
 
@@ -211,11 +212,13 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function upload(file, callbacks = {}) {
-    const route = "/api/microservice/extensions/upload";
+    const route = "/api/local/extensions/upload";
     const store = useAppStore();
+    const { PROJECT: projectName } = useRuntimeConfig().public;
+    const params = { projectName };
     return upload_file(
       store,
-      { schema, file },
+      { schema, file, params },
       {
         ...callbacks,
         response_function: async (response) => {
@@ -257,7 +260,7 @@ export const useAppStore = defineStore("app", () => {
   function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = {
-      $id: "/api/local/project_folder_path",
+      $id: "/api/local/app/project_folder_path",
       methods: ["POST"],
       type: "object",
       properties: { PROJECT: { type: "string" } },
@@ -278,7 +281,13 @@ export const useAppStore = defineStore("app", () => {
 
   return {
     stores,
+    default_local_port,
+    request_counter,
+    status,
+    protocol,
+    port,
     base_url,
+    is_busy,
     registerStore,
     exportStores,
     importStores,
@@ -299,6 +308,5 @@ export const useAppStore = defineStore("app", () => {
     createProjectFolder,
     start_request,
     stop_request,
-    is_busy,
   };
 });
