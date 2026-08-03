@@ -12,7 +12,7 @@ import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/W
 import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
 
 // oxlint-disable-next-line max-params max-lines-per-function
-export function useClippingPlanesWidget({
+function useClippingPlanesWidget({
   planes,
   targetAllVisible,
   selectedDatasetIds,
@@ -258,3 +258,5 @@ export function useClippingPlanesWidget({
     setFromWidget,
   };
 }
+
+export { useClippingPlanesWidget };
