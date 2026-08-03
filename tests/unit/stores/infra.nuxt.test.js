@@ -295,8 +295,6 @@ describe("infra store", () => {
     });
 
     test("with end-point", async () => {
-
-
       const infraStore = useInfraStore();
       const backStore = useBackStore();
       const viewerStore = useViewerStore();
