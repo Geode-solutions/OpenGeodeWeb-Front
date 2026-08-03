@@ -9,7 +9,7 @@ export const useInfraStore = defineStore("infra", {
     app_mode: useRuntimeConfig().public.MODE,
     status: Status.NOT_CREATED,
     microservices: [],
-    domain_name: "localhost",
+    domain_name: globalThis.location.hostname,
   }),
   getters: {
     microservices_connected() {
