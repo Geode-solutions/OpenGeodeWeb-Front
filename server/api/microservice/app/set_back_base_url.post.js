@@ -2,7 +2,7 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { setBackBaseUrl } from "@vease_server/utils/config.js";
+import { setBackBaseUrl } from "@ogw_shared/utils/server_config.js";
 
 export default defineEventHandler(async (event) => {
   try {
