@@ -1,6 +1,7 @@
 import _ from "lodash";
 
 function assertFile(file) {
+  console.log("[ASSERT_FILE] Asserting file", { file });
   if (!(file instanceof File)) {
     throw new Error("file must be an instance of File");
   }

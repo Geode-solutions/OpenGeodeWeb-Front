@@ -284,18 +284,33 @@ describe("infra store", () => {
   });
 
   describe("create_backend", () => {
+    let fetchMock = undefined;
+
+    beforeEach(() => {
+      fetchMock = vi.fn();
+      vi.stubGlobal("$fetch", fetchMock);
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
     test("with end-point", async () => {
+
+
       const infraStore = useInfraStore();
       const backStore = useBackStore();
       const viewerStore = useViewerStore();
 
       infraStore.app_mode = appMode.CLOUD;
       const url = "test.com";
-      registerEndpoint("https://localhost:443/server/api/serverless/run_cloud", {
-        method: "POST",
-        handler: () => ({ url }),
+      fetchMock.mockImplementation((route, options) => {
+        const data = { url };
+        options.onResponse?.({ response: { ok: true, _data: data } });
+        return Promise.resolve(data);
       });
-      await infraStore.create_backend("", "", false);
+
+      await infraStore.create_backend("noreply@example.com");
       expect(infraStore.status).toBe(Status.CREATED);
       expect(infraStore.domain_name).toBe(url);
 

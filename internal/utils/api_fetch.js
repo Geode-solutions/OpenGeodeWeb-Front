@@ -22,30 +22,30 @@ export function api_fetch(
       timeout,
     },
     {
-      onRequestError(error) {
+      request_error_function(error) {
         microservice.stop_request();
         feedbackStore.add_error(error.code, schema.$id, error.message, error.stack);
         if (request_error_function) {
           request_error_function(error);
         }
       },
-      onResponse(data) {
+      response_function(data) {
         endRequestLog(microservice, schema, requestStartingTime);
         microservice.stop_request();
         if (response_function) {
           response_function(data);
         }
       },
-      onResponseError(response) {
+      response_error_function(response) {
         microservice.stop_request();
         feedbackStore.add_error(response.status, schema.$id, response.name, response.description);
         if (response_error_function) {
           response_error_function(response);
         }
       },
-      onValidationError(code, route, name, error) {
+      validation_error_function({ code, name, error }) {
         microservice.stop_request();
-        feedbackStore.add_error(code, route, name, error);
+        feedbackStore.add_error(code, schema.$id, name, error);
       },
     },
   );

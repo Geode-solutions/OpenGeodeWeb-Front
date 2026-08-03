@@ -1,6 +1,5 @@
 // Third party imports
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
-import { registerEndpoint } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
@@ -10,7 +9,6 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 // CONSTANTS
 const PROJECT = "project";
-const STATUS_500 = 500;
 
 function setupConfig() {
   const config = useRuntimeConfig();
@@ -31,28 +29,29 @@ describe("cloud store", () => {
 
   describe("actions", () => {
     describe("launch", () => {
-      const postFakeCall = vi.fn();
+      let fetchMock = undefined;
+
+      beforeEach(() => {
+        fetchMock = vi.fn();
+        vi.stubGlobal("$fetch", fetchMock);
+      });
+
+      afterEach(() => {
+        vi.unstubAllGlobals();
+      });
 
       test("successful launch", async () => {
         setupConfig();
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        registerEndpoint("https://localhost:443/server/api/serverless/run_cloud", {
-          method: "POST",
-          handler: postFakeCall,
+        fetchMock.mockImplementation((route, options) => {
+          const data = { url: "test.com" };
+          options.onResponse?.({ response: { ok: true, _data: data } });
+          return Promise.resolve(data);
         });
 
-        registerEndpoint("https://test.com:443/server/api/microservice/app/set_app_base_url", {
-          method: "POST",
-          handler: () => console.log("coucou from endpoint"),
-        });
-
-        postFakeCall.mockReturnValue({
-          url: "test.com",
-        });
-        const email = "noreply@example.com";
-        await cloudStore.launch(email);
+        await cloudStore.launch("noreply@example.com");
 
         expect(cloudStore.status).toBe(Status.CONNECTED);
         expect(feedbackStore.server_error).toBe(false);
@@ -63,19 +62,14 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        registerEndpoint("https://localhost:443/server/api/serverless/run_cloud", {
-          method: "POST",
-          handler: postFakeCall,
+        const error = createError({ statusCode: 500, statusMessage: "500 Internal Server Error" });
+
+        fetchMock.mockImplementation((route, options) => {
+          options.onResponseError?.({ response: { status: 500, name: "Error", description: "500 Internal Server Error" } });
+          return Promise.reject(error);
         });
 
-        postFakeCall.mockImplementation(() => {
-          throw createError({
-            status: STATUS_500,
-            statusMessage: "Internal Server Error",
-          });
-        });
-        const email = "noreply@example.com";
-        await expect(cloudStore.launch(email)).rejects.toThrow("500 Internal Server Error");
+        await expect(cloudStore.launch("noreply@example.com")).rejects.toThrow("500 Internal Server Error");
 
         expect(cloudStore.status).toBe(Status.NOT_CONNECTED);
         expect(feedbackStore.server_error).toBe(true);

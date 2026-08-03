@@ -10,7 +10,7 @@ function upload_file(
   const feedbackStore = useFeedbackStore();
 
   if (!(file instanceof File)) {
-    throw new Error("file must be a instance of File");
+    return Promise.reject(new Error("file must be an instance of File"));
   }
 
   const body = new FormData();
@@ -30,20 +30,20 @@ function upload_file(
       baseURL: microservice.base_url,
     },
     {
-      onRequestError(error) {
+      request_error_function(error) {
         microservice.stop_request();
         feedbackStore.add_error(error.code, route, error.message, error.stack);
         if (request_error_function) {
           request_error_function(error);
         }
       },
-      onResponse(response) {
+      response_function(data) {
         microservice.stop_request();
         if (response_function) {
-          response_function(response);
+          response_function(data);
         }
       },
-      onResponseError(response) {
+      response_error_function(response) {
         microservice.stop_request();
         feedbackStore.add_error(response.status, route, response.name, response.description);
         if (response_error_function) {

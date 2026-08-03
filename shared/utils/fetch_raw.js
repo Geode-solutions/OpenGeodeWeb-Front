@@ -7,7 +7,7 @@ import { hasBody } from "./file.js";
 
 function fetchRaw(
   { route, method, params = {}, baseURL, headers = {}, max_retry, timeout, expectEvent = false },
-  { onRequestError, onResponse, onResponseError } = {},
+  { request_error_function, response_function, response_error_function } = {}
 ) {
   if (expectEvent) {
     const value = "text/event-stream";
@@ -31,18 +31,18 @@ function fetchRaw(
       baseURL,
       ...request_options,
       onRequestError({ error }) {
-        if (onRequestError) {
-          onRequestError(error);
+        if (request_error_function) {
+          request_error_function(error);
         }
       },
       onResponse({ response }) {
-        if (response.ok && onResponse) {
-          onResponse(response._data);
+        if (response.ok && response_function) {
+          response_function(response._data);
         }
       },
       onResponseError({ response }) {
-        if (onResponseError) {
-          onResponseError(response);
+        if (response_error_function) {
+          response_error_function(response);
         }
       },
     });

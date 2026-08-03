@@ -8,7 +8,8 @@ const ERROR_400 = 400;
 
 function fetchSchema(
   { schema, params = {}, baseURL, headers, timeout, expectEvent = false },
-  { onRequestError, onResponse, onResponseError, onValidationError } = {},
+  { request_error_function, response_function, response_error_function, validation_error_function } = {}
+
 ) {
   console.log("fetchSchema", { schema, baseURL, params, headers, timeout });
   const { valid, error: schema_error } = validate_schema(schema, params);
@@ -17,8 +18,8 @@ function fetchSchema(
     if (process.env.NODE_ENV !== "production") {
       console.log("Bad request", schema_error, schema, params);
     }
-    if (onValidationError) {
-      onValidationError({ code: ERROR_400, name: "Bad request", error: schema_error });
+    if (validation_error_function) {
+      validation_error_function({ code: ERROR_400, name: "Bad request", error: schema_error });
     }
     throw new Error(`${schema.$id}: ${schema_error}`);
   }
@@ -34,7 +35,7 @@ function fetchSchema(
       timeout,
       expectEvent,
     },
-    { onRequestError, onResponse, onResponseError },
+    { request_error_function, response_function, response_error_function },
   );
 }
 
