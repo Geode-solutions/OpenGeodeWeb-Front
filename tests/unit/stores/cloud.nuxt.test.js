@@ -47,6 +47,7 @@ describe("cloud store", () => {
 
         fetchMock.mockImplementation((route, options) => {
           const data = { url: "test.com" };
+          // oxlint-disable-next-line eslint/id-length
           options.onResponse?.({ response: { ok: true, _data: data } });
           return Promise.resolve(data);
         });

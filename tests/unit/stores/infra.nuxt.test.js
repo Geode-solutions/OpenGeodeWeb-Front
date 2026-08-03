@@ -1,6 +1,5 @@
 // Third party imports
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
-import { registerEndpoint } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
@@ -306,6 +305,7 @@ describe("infra store", () => {
       const url = "test.com";
       fetchMock.mockImplementation((route, options) => {
         const data = { url };
+        // oxlint-disable-next-line eslint/id-length
         options.onResponse?.({ response: { ok: true, _data: data } });
         return Promise.resolve(data);
       });
