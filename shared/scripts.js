@@ -54,4 +54,3 @@ function setViewerBaseUrl(appBaseUrl, viewerBaseUrl) {
 }
 
 export { setAppBaseUrl, setBackBaseUrl, setViewerBaseUrl };
-
