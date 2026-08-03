@@ -38,16 +38,21 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        registerEndpoint("/api/serverless/run_cloud", {
+        registerEndpoint("https://localhost:443/server/api/serverless/run_cloud", {
           method: "POST",
           handler: postFakeCall,
         });
 
-        postFakeCall.mockReturnValue({
-          url: "http://test.com",
+        registerEndpoint("https://test.com:443/server/api/microservice/app/set_app_base_url", {
+          method: "POST",
+          handler: () => console.log("coucou from endpoint"),
         });
 
-        await cloudStore.launch("", "", false);
+        postFakeCall.mockReturnValue({
+          url: "test.com",
+        });
+        const email = "noreply@example.com";
+        await cloudStore.launch(email);
 
         expect(cloudStore.status).toBe(Status.CONNECTED);
         expect(feedbackStore.server_error).toBe(false);
@@ -58,7 +63,7 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        registerEndpoint("/api/serverless/run_cloud", {
+        registerEndpoint("https://localhost:443/server/api/serverless/run_cloud", {
           method: "POST",
           handler: postFakeCall,
         });
@@ -69,8 +74,8 @@ describe("cloud store", () => {
             statusMessage: "Internal Server Error",
           });
         });
-
-        await expect(cloudStore.launch("", "", false)).rejects.toThrow("500 Internal Server Error");
+        const email = "noreply@example.com";
+        await expect(cloudStore.launch(email)).rejects.toThrow("500 Internal Server Error");
 
         expect(cloudStore.status).toBe(Status.NOT_CONNECTED);
         expect(feedbackStore.server_error).toBe(true);

@@ -2,7 +2,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
 async function upload_file(
   microservice,
-  { route, file },
+  { route, file, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
   console.log("[UPLOAD_FILE] Uploading file", { route, file });
@@ -12,6 +12,9 @@ async function upload_file(
   }
 
   const body = new FormData();
+  for (const [key, value] of Object.entries(params)) {
+    body.append(key, value);
+  }
   body.append("file", file);
 
   const request_options = {

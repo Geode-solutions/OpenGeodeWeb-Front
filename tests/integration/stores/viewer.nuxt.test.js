@@ -7,7 +7,7 @@ import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb
 // Local imports
 import { beforeAllTimeout, runMicroservices } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
-import { cleanupBackend } from "@ogw_front/utils/local/cleanup";
+import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 

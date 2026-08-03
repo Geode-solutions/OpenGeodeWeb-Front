@@ -1,14 +1,28 @@
 // Local imports
+import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
+import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
-import { upload_file } from "@ogw_internal/utils/upload_file.js";
-
 import { killExtension } from "@ogw_front/utils/extension.js";
+import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
   const globalComponents = ref(new Map());
+  const default_local_port = ref(globalThis.location.port);
+  const status = ref(Status.NOT_CONNECTED);
+  const protocol = computed(() => getRestApiProtocol());
+  const port = computed(() => getRestApiPort(default_local_port.value));
+
+  const base_url = computed(() => {
+    const infraStore = useInfraStore();
+    let app_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
+    if (isCloudMode()) {
+      app_url += `/server`;
+    }
+    return app_url;
+  });
 
   function registerGlobalComponent(extensionId, componentId, component) {
     if (!globalComponents.value.has(extensionId)) {
@@ -108,7 +122,7 @@ export const useAppStore = defineStore("app", () => {
     return loadedExtensions.value.get(id);
   }
 
-  async function loadExtension(path, port, backendPath = undefined) {
+  async function loadExtension(path, extensionPort, backendPath = undefined) {
     try {
       let finalURL = path;
 
@@ -125,7 +139,7 @@ export const useAppStore = defineStore("app", () => {
       // oxlint-disable-next-line no-inline-comments
       const extensionModule = await import(/* @vite-ignore */ finalURL);
       const store = extensionModule.metadata.store();
-      store.$patch({ default_local_port: port });
+      store.$patch({ default_local_port: extensionPort });
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL);
@@ -213,11 +227,13 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function upload(file, callbacks = {}) {
-    const route = "/api/microservice/extensions/upload";
+    const route = "/api/local/extensions/upload";
     const store = useAppStore();
+    const { PROJECT: projectName } = useRuntimeConfig().public;
+    const params = { projectName };
     return upload_file(
       store,
-      { route, file },
+      { route, file, params },
       {
         ...callbacks,
         response_function: async (response) => {
@@ -256,12 +272,13 @@ export const useAppStore = defineStore("app", () => {
   function stop_request() {
     request_counter.value -= 1;
   }
+  const is_busy = computed(() => request_counter.value > 0);
 
   const projectFolderPath = ref("");
   function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = {
-      $id: "/api/local/project_folder_path",
+      $id: "/api/local/app/project_folder_path",
       methods: ["POST"],
       type: "object",
       properties: { PROJECT: { type: "string" } },
@@ -282,6 +299,13 @@ export const useAppStore = defineStore("app", () => {
 
   return {
     stores,
+    default_local_port,
+    request_counter,
+    status,
+    protocol,
+    port,
+    base_url,
+    is_busy,
     registerStore,
     exportStores,
     importStores,

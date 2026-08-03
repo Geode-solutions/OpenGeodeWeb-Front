@@ -9,14 +9,14 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   addMicroserviceMetadatas,
   runBack,
-} from "@geode/opengeodeweb-front/app/utils/local/microservices.js";
+} from "@geode/opengeodeweb-front/server/utils/microservices.js";
 import {
   executableName,
   extensionFolderPath,
   extensionFrontendPath,
-} from "@geode/opengeodeweb-front/app/utils/local/path.js";
-import { extensionsConf } from "@geode/opengeodeweb-front/app/utils/config.js";
-import { unzipFile } from "@geode/opengeodeweb-front/app/utils/server.js";
+} from "@geode/opengeodeweb-front/server/utils/path.js";
+import { extensionsConf } from "@geode/opengeodeweb-front/server/utils/app_config.js";
+import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.js";
 
 export default defineEventHandler(async (event) => {
   try {
