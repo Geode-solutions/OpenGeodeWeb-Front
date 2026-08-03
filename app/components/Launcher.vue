@@ -2,7 +2,7 @@
 import Loading from "@ogw_front/components/Loading";
 import Recaptcha from "@ogw_front/components/Recaptcha";
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_front/utils/local/app_mode";
+import { appMode } from "@ogw_shared/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 const { appName, email, isUserAuthenticated, logo } = defineProps({
