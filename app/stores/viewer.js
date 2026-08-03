@@ -18,12 +18,6 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
-import {
-  getWebsocketApiPort,
-  getWebsocketApiProtocol,
-  isCloudMode,
-} from "@ogw_front/utils/stores.js";
-
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_REQUEST = 10;
 const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST;
