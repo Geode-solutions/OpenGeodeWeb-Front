@@ -12,7 +12,6 @@ vi.mock(import("ofetch"), () => ({
   $fetch: vi.fn(),
 }));
 
-
 // CONSTANTS
 const PROJECT = "project";
 

@@ -60,7 +60,11 @@ async function importProject(file) {
   form.append("file", file, originalFileName);
 
   const params = { file: form };
-  const result = await fetchRaw({ route: importProjectSchema.$id, params, baseURL: backStore.base_url });
+  const result = await fetchRaw({
+    route: importProjectSchema.$id,
+    params,
+    baseURL: backStore.base_url,
+  });
   const snapshot = result && result.snapshot ? result.snapshot : {};
 
   treeviewStore.isImporting = true;
