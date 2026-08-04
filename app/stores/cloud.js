@@ -1,4 +1,5 @@
 import { Status } from "@ogw_front/utils/status";
+import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAppStore } from "./app";
 import { useFeedbackStore } from "./feedback";
@@ -26,7 +27,7 @@ export const useCloudStore = defineStore("cloud", {
       console.log("[CLOUD] params", params);
       const appStore = useAppStore();
       const feedbackStore = useFeedbackStore();
-      return appStore.request(
+      return fetchSchema(
         { schema, params },
         {
           request_error_function: () => {
