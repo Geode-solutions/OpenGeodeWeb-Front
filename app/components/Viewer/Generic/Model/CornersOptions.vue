@@ -159,7 +159,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
     <VisibilitySwitch data-testid="modelCornersVisibilitySwitch" v-model="cornersVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentId="targetCornerIds[0]"
+      :componentId="targetCornerIds"
       v-model:coloring_style_key="cornersActiveColoring"
       v-model:color="cornersColor"
       v-model:vertex_attribute_name="cornersVertexAttributeName"

@@ -11,7 +11,7 @@ const attributeColorMap = defineModel("attributeColorMap", { type: String });
 
 const { id, componentId, schema } = defineProps({
   id: { type: String, required: true },
-  componentId: { type: String, default: undefined },
+  componentId: { type: [String, Array], default: undefined },
   schema: { type: Object, required: true },
 });
 
@@ -64,14 +64,27 @@ function resetRange() {
   }
 }
 
+function hasSelectedComponent(component) {
+  if (component === undefined) {
+    return false;
+  }
+  if (Array.isArray(component)) {
+    return component.length > 0;
+  }
+  return true;
+}
+
 function getAttributes() {
-  if (schema.properties.component_id && componentId === undefined) {
+  const requiresComponent = schema.properties.component_ids !== undefined;
+  if (requiresComponent && !hasSelectedComponent(componentId)) {
     return;
   }
+
   const params = { id };
-  if (componentId !== undefined) {
-    params.component_id = componentId;
+  if (requiresComponent) {
+    params.component_ids = Array.isArray(componentId) ? componentId : [componentId];
   }
+
   backStore.request(
     { schema, params },
     {

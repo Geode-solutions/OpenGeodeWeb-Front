@@ -234,7 +234,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
     <VisibilitySwitch data-testid="modelLinesVisibilitySwitch" v-model="linesVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentId="targetLineIds[0]"
+      :componentId="targetLineIds"
       v-model:coloring_style_key="linesActiveColoring"
       v-model:color="linesColor"
       v-model:vertex_attribute_name="linesVertexAttributeName"

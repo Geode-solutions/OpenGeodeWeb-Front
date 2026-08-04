@@ -242,7 +242,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
     <VisibilitySwitch data-testid="modelSurfacesVisibilitySwitch" v-model="surfacesVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentId="targetSurfaceIds[0]"
+      :componentId="targetSurfaceIds"
       v-model:coloring_style_key="surfacesActiveColoring"
       v-model:color="surfacesColor"
       v-model:vertex_attribute_name="surfacesVertexAttributeName"

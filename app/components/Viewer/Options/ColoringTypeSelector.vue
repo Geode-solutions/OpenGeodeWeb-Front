@@ -38,7 +38,7 @@ const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_m
 
 const { id, componentId, capabilities, schemas, allowRandom } = defineProps({
   id: { type: String, required: true },
-  componentId: { type: String, default: undefined },
+  componentId: { type: [String, Array], default: undefined },
   capabilities: {
     type: Object,
     default: () => ({}),
