@@ -10,7 +10,7 @@ function setAppBaseUrl(baseUrl) {
   return config.setItem("APP_BASE_URL", baseUrl);
 }
 function getBackBaseUrl() {
-  return config.getItem("BACK_BASE_URL");;
+  return config.getItem("BACK_BASE_URL");
 }
 function setBackBaseUrl(baseUrl) {
   return config.setItem("BACK_BASE_URL", baseUrl);
