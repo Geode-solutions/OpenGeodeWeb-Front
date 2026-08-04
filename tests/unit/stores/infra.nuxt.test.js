@@ -14,7 +14,6 @@ vi.mock(import("ofetch"), () => ({
   $fetch: vi.fn(),
 }));
 
-
 // Mock navigator.locks API
 const mockLockRequest = vi
   .fn()
@@ -289,8 +288,6 @@ describe("infra store", () => {
   });
 
   describe("create_backend", () => {
-
-
     test("with end-point", async () => {
       const infraStore = useInfraStore();
       const backStore = useBackStore();
