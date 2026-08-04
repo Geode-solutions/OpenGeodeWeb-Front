@@ -9,11 +9,10 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
+  const globalComponents = ref(new Map());
   const default_local_port = ref(globalThis.location.port);
   const status = ref(Status.NOT_CONNECTED);
-
   const protocol = computed(() => getRestApiProtocol());
-
   const port = computed(() => getRestApiPort(default_local_port.value));
 
   const base_url = computed(() => {
@@ -24,6 +23,22 @@ export const useAppStore = defineStore("app", () => {
     }
     return app_url;
   });
+
+  function registerGlobalComponent(extensionId, componentId, component) {
+    if (!globalComponents.value.has(extensionId)) {
+      globalComponents.value.set(extensionId, new Map());
+    }
+    globalComponents.value.get(extensionId).set(componentId, component);
+    console.log(
+      `[AppStore] Registered global component ${componentId} for extension ${extensionId}`,
+    );
+  }
+
+  function unregisterGlobalComponent(extensionId, componentId) {
+    if (globalComponents.value.has(extensionId)) {
+      globalComponents.value.get(extensionId).delete(componentId);
+    }
+  }
 
   function registerStore(store) {
     const isAlreadyRegistered = stores.some((registeredStore) => registeredStore.$id === store.$id);
@@ -308,5 +323,8 @@ export const useAppStore = defineStore("app", () => {
     createProjectFolder,
     start_request,
     stop_request,
+    globalComponents,
+    registerGlobalComponent,
+    unregisterGlobalComponent,
   };
 });

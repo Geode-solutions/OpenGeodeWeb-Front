@@ -1,3 +1,4 @@
+import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -5,6 +6,7 @@ const HOVER_DELAY = 200;
 
 export function useHoverhighlight() {
   const viewerStore = useViewerStore();
+  const dataStore = useDataStore();
   let timer = undefined;
   let currentId = undefined;
   let currentType = undefined;
@@ -19,6 +21,10 @@ export function useHoverhighlight() {
     async function highlightAction() {
       currentId = id;
       currentType = type;
+
+      if (!(await dataStore.isItemViewable(id))) {
+        return;
+      }
 
       let block_ids = [];
       if (typeof block_ids_provider === "function") {

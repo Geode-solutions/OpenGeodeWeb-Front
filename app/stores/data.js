@@ -11,6 +11,33 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
 
+function checkItemViewable(item) {
+  if (!item || typeof item !== "object") {
+    return false;
+  }
+  if (item.is_viewable !== undefined) {
+    return Boolean(item.is_viewable);
+  }
+  if (item.binary_light_viewable !== undefined) {
+    return item.binary_light_viewable !== "not_viewable";
+  }
+  if (
+    item.geode_object_type === "HorizonStack3D" ||
+    item.id === "HorizonStack3D" ||
+    item.title === "HorizonStack3D"
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function isItemViewable(itemOrId) {
+  if (typeof itemOrId === "string") {
+    return database.data.get(itemOrId).then(checkItemViewable);
+  }
+  return checkItemViewable(itemOrId);
+}
+
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
@@ -93,8 +120,11 @@ export const useDataStore = defineStore("data", () => {
       geode_object_type: new_item.geode_object_type,
       visible: true,
       created_at: new Date().toISOString(),
-      binary_light_viewable: new_item.binary_light_viewable,
+      is_viewable: new_item.is_viewable,
     };
+    if (new_item.binary_light_viewable !== undefined && new_item.binary_light_viewable !== null) {
+      itemData.binary_light_viewable = new_item.binary_light_viewable;
+    }
     return data_db.put(itemData);
   }
 
@@ -213,6 +243,7 @@ export const useDataStore = defineStore("data", () => {
     item,
     allItems,
     refItem,
+    isItemViewable,
     meshComponentType,
     registerObject,
     deregisterObject,
