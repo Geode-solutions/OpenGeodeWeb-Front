@@ -137,6 +137,7 @@ function toggleOptions() {
           @click.stop="toggleOptions"
           v-bind="tooltipProps"
           class="menu-btn"
+          data-testid="circularMenuItemButton"
           elevation="2"
           :style="computedItemStyles"
         >
