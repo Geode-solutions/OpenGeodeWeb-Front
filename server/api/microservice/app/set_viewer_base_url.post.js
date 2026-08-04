@@ -2,7 +2,7 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { setViewerBaseUrl } from "@ogw_shared/utils/server_config.js";
+import { setViewerBaseUrl } from "@geode/opengeodeweb-front/server/utils/server_config.js";
 
 export default defineEventHandler(async (event) => {
   try {
