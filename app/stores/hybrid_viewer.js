@@ -137,6 +137,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     });
   }
 
+  async function setClippingPlanes(ids, planes) {
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.clipping_planes;
+    const params = { ids, planes };
+    await viewerStore.request({ schema, params });
+    await remoteRender();
+  }
+
   function resetCamera() {
     genericRenderWindow.value.getRenderer().resetCamera();
     genericRenderWindow.value.getRenderWindow().render();
@@ -307,6 +314,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     removeItem,
     setVisibility,
     setZScaling,
+    setClippingPlanes,
     syncRemoteCamera,
     setCamera,
     initHybridViewer,
