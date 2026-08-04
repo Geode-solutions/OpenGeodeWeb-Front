@@ -13,7 +13,6 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-
 async function exportProject() {
   console.log("[export triggered]");
   const appStore = useAppStore();
@@ -61,7 +60,11 @@ async function importProject(file) {
   form.append("file", file, originalFileName);
 
   const params = { file: form };
-  const result = await fetchSchema({ schema: importProjectSchema, params, baseURL: backStore.base_url });
+  const result = await fetchSchema({
+    schema: importProjectSchema,
+    params,
+    baseURL: backStore.base_url,
+  });
   const snapshot = result && result.snapshot ? result.snapshot : {};
 
   treeviewStore.isImporting = true;
