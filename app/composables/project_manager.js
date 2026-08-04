@@ -65,8 +65,10 @@ async function importProject(file) {
   form.append("file", file, originalFileName);
 
   const result = await fetchRaw({
-    route: importProjectSchema.$id, params: form,
-    method: importProjectSchema.methods[0], baseURL: backStore.base_url
+    route: importProjectSchema.$id,
+    params: form,
+    method: importProjectSchema.methods[0],
+    baseURL: backStore.base_url,
   });
   const snapshot = result && result.snapshot ? result.snapshot : {};
 
