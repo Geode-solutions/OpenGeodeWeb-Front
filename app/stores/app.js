@@ -227,7 +227,10 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function upload(file, callbacks = {}) {
-    const route = "/api/local/extensions/upload";
+    const schema = {
+      $id: "/api/local/extensions/upload",
+      methods: ["OPTIONS", "PUT"],
+    };
     const store = useAppStore();
     const { PROJECT: projectName } = useRuntimeConfig().public;
     const params = { projectName };
