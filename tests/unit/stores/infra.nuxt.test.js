@@ -1,5 +1,6 @@
 // Third party imports
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
+import { $fetch } from "ofetch";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
@@ -8,6 +9,11 @@ import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+
+vi.mock(import("ofetch"), () => ({
+  $fetch: vi.fn(),
+}));
+
 
 // Mock navigator.locks API
 const mockLockRequest = vi
@@ -283,16 +289,7 @@ describe("infra store", () => {
   });
 
   describe("create_backend", () => {
-    let fetchMock = undefined;
 
-    beforeEach(() => {
-      fetchMock = vi.fn();
-      vi.stubGlobal("$fetch", fetchMock);
-    });
-
-    afterEach(() => {
-      vi.unstubAllGlobals();
-    });
 
     test("with end-point", async () => {
       const infraStore = useInfraStore();
@@ -301,7 +298,7 @@ describe("infra store", () => {
 
       infraStore.app_mode = appMode.CLOUD;
       const url = "test.com";
-      fetchMock.mockImplementation((route, options) => {
+      $fetch.mockImplementation((route, options) => {
         const data = { url };
         // oxlint-disable-next-line eslint/id-length
         options.onResponse?.({ response: { ok: true, _data: data } });

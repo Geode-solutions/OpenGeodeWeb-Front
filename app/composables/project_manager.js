@@ -2,7 +2,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
+import { fetchRaw } from "@ogw_shared/utils/fetch_raw";
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -23,7 +23,7 @@ async function exportProject() {
   const schema = back_schemas.opengeodeweb_back.export_project;
   const defaultName = "project.vease";
   const params = { snapshot, filename: defaultName };
-  const result = await fetchSchema({ schema, params, baseURL: backStore.base_url });
+  const result = await fetchRaw({ route: schema.$id, params, baseURL: backStore.base_url });
 
   fileDownload(result, defaultName);
   feedbackStore.add_success("Project exported successfully");
@@ -61,7 +61,7 @@ async function importProject(file) {
   form.append("file", file, originalFileName);
 
   const params = { file: form };
-  const result = await fetchSchema({ schema: importProjectSchema, params, baseURL: backStore.base_url });
+  const result = await fetchRaw({ route: importProjectSchema.$id, params, baseURL: backStore.base_url });
   const snapshot = result && result.snapshot ? result.snapshot : {};
 
   treeviewStore.isImporting = true;

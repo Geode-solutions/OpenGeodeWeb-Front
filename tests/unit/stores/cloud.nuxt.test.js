@@ -1,11 +1,17 @@
 // Third party imports
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
+import { $fetch } from "ofetch";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+
+vi.mock(import("ofetch"), () => ({
+  $fetch: vi.fn(),
+}));
+
 
 // CONSTANTS
 const PROJECT = "project";
@@ -29,15 +35,8 @@ describe("cloud store", () => {
 
   describe("actions", () => {
     describe("launch", () => {
-      let fetchMock = undefined;
-
       beforeEach(() => {
-        fetchMock = vi.fn();
-        vi.stubGlobal("$fetch", fetchMock);
-      });
-
-      afterEach(() => {
-        vi.unstubAllGlobals();
+        $fetch.mockReset();
       });
 
       test("successful launch", async () => {
@@ -45,7 +44,7 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        fetchMock.mockImplementation((route, options) => {
+        $fetch.mockImplementation((route, options) => {
           const data = { url: "test.com" };
           // oxlint-disable-next-line eslint/id-length
           options.onResponse?.({ response: { ok: true, _data: data } });
@@ -65,7 +64,7 @@ describe("cloud store", () => {
 
         const error = createError({ statusCode: 500, statusMessage: "500 Internal Server Error" });
 
-        fetchMock.mockImplementation((route, options) => {
+        $fetch.mockImplementation((route, options) => {
           options.onResponseError?.({
             response: { status: 500, name: "Error", description: "500 Internal Server Error" },
           });
