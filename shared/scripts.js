@@ -22,7 +22,7 @@ function setAppBaseUrl(appBaseUrl) {
 }
 
 function setBackBaseUrl(appBaseUrl, backBaseUrl) {
-  console.log("[API] setBackBaseUrl", backBaseUrl);
+  console.log("[API] setBackBaseUrl", appBaseUrl, backBaseUrl);
   const schema = {
     $id: "/api/microservice/app/set_back_base_url",
     methods: ["POST"],
@@ -38,7 +38,7 @@ function setBackBaseUrl(appBaseUrl, backBaseUrl) {
 }
 
 function setViewerBaseUrl(appBaseUrl, viewerBaseUrl) {
-  console.log("[API] setViewerBaseUrl", viewerBaseUrl);
+  console.log("[API] setViewerBaseUrl", appBaseUrl, viewerBaseUrl);
   const schema = {
     $id: "/api/microservice/app/set_viewer_base_url",
     methods: ["POST"],
