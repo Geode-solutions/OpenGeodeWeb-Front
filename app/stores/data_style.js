@@ -21,6 +21,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function setVisibility(id, visibility) {
     const item = await dataStore.item(id);
+    if (!(await dataStore.isItemViewable(item))) {
+      return dataStyleState.mutateStyle(id, { visibility });
+    }
+
     const { viewer_type } = item;
 
     if (viewer_type === "mesh") {
@@ -34,6 +38,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyDefaultStyle(id) {
     const item = await dataStore.item(id);
+    if (!(await dataStore.isItemViewable(item))) {
+      throw new Error(`applyDefaultStyle called for non-viewable item: ${id}`);
+    }
+
     const { viewer_type } = item;
 
     if (viewer_type === "mesh") {
@@ -81,6 +89,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const ids = Object.keys(dataStyleState.styles.value);
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id);
+      if (!(await dataStore.isItemViewable(meta))) {
+        return;
+      }
       const viewerType = meta.viewer_type;
       if (viewerType === "mesh") {
         return meshStyleStore.applyMeshStyle(id);

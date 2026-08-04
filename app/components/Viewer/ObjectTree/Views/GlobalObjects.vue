@@ -179,46 +179,48 @@ function expandAll() {
       </template>
 
       <template #append="{ item }">
-        <v-btn
-          v-if="item.viewer_type"
-          icon="mdi-target"
-          size="medium"
-          variant="text"
-          v-tooltip="'Focus camera on object'"
-          @click.stop="hybridViewerStore.focusCameraOnObject(item.id)"
-        />
-        <v-btn
-          v-if="isModel(item)"
-          icon="mdi-magnify-expand"
-          size="medium"
-          class="ml-2"
-          variant="text"
-          v-tooltip="'Model\'s mesh components'"
-          @click.stop="
-            treeviewStore.displayAdditionalTree(
-              item.id,
-              item.title,
-              item.geode_object_type,
-              'model_components',
-            )
-          "
-        />
-        <v-btn
-          v-if="isModel(item) && hasCollectionsMap[item.id]"
-          icon="mdi-format-list-group"
-          size="medium"
-          class="ml-2"
-          variant="text"
-          v-tooltip="'Model\'s collections'"
-          @click.stop="
-            treeviewStore.displayAdditionalTree(
-              item.id,
-              item.title,
-              item.geode_object_type,
-              'model_collections',
-            )
-          "
-        />
+        <template v-if="item.geode_object_type !== 'HorizonStack3D'">
+          <v-btn
+            v-if="item.viewer_type"
+            icon="mdi-target"
+            size="medium"
+            variant="text"
+            v-tooltip="'Focus camera on object'"
+            @click.stop="hybridViewerStore.focusCameraOnObject(item.id)"
+          />
+          <v-btn
+            v-if="isModel(item)"
+            icon="mdi-magnify-expand"
+            size="medium"
+            class="ml-2"
+            variant="text"
+            v-tooltip="'Model\'s mesh components'"
+            @click.stop="
+              treeviewStore.displayAdditionalTree(
+                item.id,
+                item.title,
+                item.geode_object_type,
+                'model_components',
+              )
+            "
+          />
+          <v-btn
+            v-if="isModel(item) && hasCollectionsMap[item.id]"
+            icon="mdi-format-list-group"
+            size="medium"
+            class="ml-2"
+            variant="text"
+            v-tooltip="'Model\'s collections'"
+            @click.stop="
+              treeviewStore.displayAdditionalTree(
+                item.id,
+                item.title,
+                item.geode_object_type,
+                'model_collections',
+              )
+            "
+          />
+        </template>
       </template>
     </CommonTreeView>
   </div>
