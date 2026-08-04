@@ -27,8 +27,8 @@ export function useModelCornersColor() {
   }
 
   async function setModelCornersActiveColoring(modelId, corners_ids, activeColoring) {
-    await modelCommonStyle.mutateComponentStyles(modelId, corners_ids, {
-      coloring: { active: activeColoring },
+    await modelCornersCommonStyle.mutateModelCornersColoring(modelId, corners_ids, {
+      active: activeColoring,
     });
     if (activeColoring === "constant" || activeColoring === "random") {
       const color = modelCornerColor(modelId, corners_ids[0]);

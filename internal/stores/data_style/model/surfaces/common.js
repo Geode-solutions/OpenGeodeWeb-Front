@@ -21,6 +21,9 @@ export function useModelSurfacesCommonStyle() {
   }
 
   function mutateModelSurfacesColoring(id, surfaces_ids, values) {
+    modelCommonStyle.mutateModelComponentTypeStyle(id, "Surface", {
+      coloring: values,
+    });
     return modelCommonStyle.mutateComponentStyles(id, surfaces_ids, {
       coloring: values,
     });
