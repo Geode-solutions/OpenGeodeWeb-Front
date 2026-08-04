@@ -2,8 +2,8 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
+import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
-
 import { useAppStore } from "@ogw_front/stores/app";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -13,6 +13,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+
 async function exportProject() {
   console.log("[export triggered]");
   const appStore = useAppStore();
@@ -21,12 +22,9 @@ async function exportProject() {
   const snapshot = await appStore.exportStores();
   const schema = back_schemas.opengeodeweb_back.export_project;
   const defaultName = "project.vease";
+  const params = { snapshot, filename: defaultName };
+  const result = await fetchSchema({ schema, params, baseURL: backStore.base_url });
 
-  const result = await $fetch(schema.$id, {
-    baseURL: backStore.base_url,
-    method: schema.methods.find((method) => method !== "OPTIONS"),
-    body: { snapshot, filename: defaultName },
-  });
   fileDownload(result, defaultName);
   feedbackStore.add_success("Project exported successfully");
   return { result };
@@ -46,15 +44,15 @@ async function importProject(file) {
   if (client && client.getConnection && client.getConnection().getSession) {
     await client.getConnection().getSession().call("opengeodeweb_viewer.release_database", [{}]);
   }
-  const schema = viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;
+  const resetVisualizationSchema = viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;
   const timeout = undefined;
-  await viewerStore.request({ schema, timeout });
+  await viewerStore.request({ schema: resetVisualizationSchema, timeout });
 
   treeviewStore.clear();
   dataStore.clear();
   hybridViewerStore.clear();
 
-  const schemaImport = back_schemas.opengeodeweb_back.import_project;
+  const importProjectSchema = back_schemas.opengeodeweb_back.import_project;
   const form = new FormData();
   const originalFileName = file && file.name ? file.name : "project.vease";
   if (!originalFileName.toLowerCase().endsWith(".vease")) {
@@ -62,11 +60,8 @@ async function importProject(file) {
   }
   form.append("file", file, originalFileName);
 
-  const result = await $fetch(schemaImport.$id, {
-    baseURL: backStore.base_url,
-    method: "POST",
-    body: form,
-  });
+  const params = { file: form };
+  const result = await fetchSchema({ schema: importProjectSchema, params, baseURL: backStore.base_url });
   const snapshot = result && result.snapshot ? result.snapshot : {};
 
   treeviewStore.isImporting = true;
