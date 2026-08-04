@@ -22,7 +22,12 @@ async function exportProject() {
   const schema = back_schemas.opengeodeweb_back.export_project;
   const defaultName = "project.vease";
   const params = { snapshot, filename: defaultName };
-  const result = await fetchRaw({ route: schema.$id, params, baseURL: backStore.base_url });
+  const result = await fetchRaw({
+    route: schema.$id,
+    params,
+    method: schema.methods[0],
+    baseURL: backStore.base_url,
+  });
 
   fileDownload(result, defaultName);
   feedbackStore.add_success("Project exported successfully");
@@ -59,8 +64,10 @@ async function importProject(file) {
   }
   form.append("file", file, originalFileName);
 
-  const params = { file: form };
-  const result = await fetchRaw({ route: importProjectSchema.$id, params, baseURL: backStore.base_url });
+  const result = await fetchRaw({
+    route: importProjectSchema.$id, params: form,
+    method: importProjectSchema.methods[0], baseURL: backStore.base_url
+  });
   const snapshot = result && result.snapshot ? result.snapshot : {};
 
   treeviewStore.isImporting = true;
