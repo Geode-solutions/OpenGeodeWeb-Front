@@ -271,7 +271,8 @@ export const useAppStore = defineStore("app", () => {
   }
   const is_busy = computed(() => request_counter.value > 0);
 
-  const projectFolderPath = ref(isCloudMode() ? "/project" : "");
+  const projectFolderPath = ref("");
+
   function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = {
