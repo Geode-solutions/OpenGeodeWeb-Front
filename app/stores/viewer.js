@@ -4,6 +4,7 @@ import _ from "lodash";
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
 import SmartConnect from "wslink/src/SmartConnect";
+import { initWebSocketClient } from "@ogw_shared/utils/ws_client";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -35,7 +36,6 @@ export const useViewerStore = defineStore(
     const request_counter = ref(0);
     const status = ref(Status.NOT_CONNECTED);
     const version = ref("0.0.0");
-    const busy = ref(0);
 
     const protocol = computed(() => getWebsocketApiProtocol());
 
@@ -75,35 +75,11 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock);
           status.value = Status.CONNECTING;
-          vtkWSLinkClient.setSmartConnectClass(SmartConnect);
-
-          if (_.isEmpty(client.value)) {
-            client.value = newInstance();
-          }
-
-          client.value.onBusyChange((count) => {
-            busy.value = count;
-          });
-          client.value.onConnectionError((httpReq) => {
-            const message = httpReq?.response?.error || `Connection error`;
-            console.error(message);
-          });
-          client.value.onConnectionClose((httpReq) => {
-            const message = httpReq?.response?.error || `Connection close`;
-            status.value = Status.NOT_CONNECTED;
-            console.error(message);
-          });
-
-          client.value.beginBusy();
-          await client.value.connect({
-            application: "Viewer",
-            sessionURL: base_url.value,
-          });
+          client.value = await initWebSocketClient(base_url.value, client.value);
           connectImageStream(client.value.getConnection().getSession());
           client.value.endBusy();
           const schema = schemas.opengeodeweb_viewer.viewer.reset_visualization;
-          const timeout = undefined;
-          await request({ schema, timeout });
+          await request({ schema });
           status.value = Status.CONNECTED;
         } catch (error) {
           console.error("ws_connect error", error);

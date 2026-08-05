@@ -1,13 +1,13 @@
 // Third party imports
 
 // Local imports
-import { fetchRaw } from "./fetch_raw.js";
+import { callRaw } from "./call_raw.js";
 import { validateSchema } from "./validate_schema.js";
 
 const ERROR_400 = 400;
 
-function fetchSchema(
-  { schema, params = {}, baseURL, headers, timeout, expectEvent = false },
+function callSchema(
+  { schema, params = {}, client, timeout },
   {
     request_error_function,
     response_function,
@@ -27,16 +27,12 @@ function fetchSchema(
     throw new Error(`${schema.$id}: ${schema_error}`);
   }
 
-  return fetchRaw(
+  return callRaw(
     {
-      route: schema.$id,
-      method: schema.methods.find((method) => method !== "OPTIONS"),
+      rpc: schema.$id,
       params,
-      baseURL,
-      headers,
-      max_retry: schema.max_retry,
+      client,
       timeout,
-      expectEvent,
     },
     {
       request_error_function,
@@ -46,4 +42,4 @@ function fetchSchema(
   );
 }
 
-export { fetchSchema };
+export { callSchema };

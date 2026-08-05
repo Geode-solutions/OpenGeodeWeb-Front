@@ -1,12 +1,6 @@
-// Third party imports
-import pTimeout from "p-timeout";
-
-// Local imports
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
+import { callSchema } from "@ogw_shared/utils/call_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import { validate_schema } from "@ogw_shared/utils/validate_schema";
-
-const ERROR_400 = 400;
 
 export function viewer_call(
   microservice,
@@ -14,52 +8,42 @@ export function viewer_call(
   { request_error_function, response_function, response_error_function } = {},
 ) {
   const feedbackStore = useFeedbackStore();
-
-  const { valid, error: schema_error } = validate_schema(schema, params);
-
-  if (!valid) {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Bad request", schema_error, schema, params);
-    }
-    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", schema_error);
-    throw new Error(`${schema.$id}: ${schema_error}`);
-  }
-
   const { client } = microservice;
 
-  async function performCall() {
-    if (!client.getConnection) {
-      return;
-    }
-    microservice.start_request();
-    const requestStart = startRequestLog(microservice, schema);
-    try {
-      const value = await client.getConnection().getSession().call(schema.$id, [params]);
-      endRequestLog(microservice, schema, requestStart);
-      if (response_function) {
-        await response_function(value);
-      }
-      return value;
-    } catch (error) {
-      feedbackStore.add_error(error.code, schema.$id, error.message, error.message);
-      if (request_error_function) {
-        request_error_function(error);
-      }
-      if (response_error_function) {
-        response_error_function(error);
-      }
-      throw error;
-    } finally {
-      microservice.stop_request();
-    }
-  }
-
-  if (timeout > 0) {
-    return pTimeout(performCall(), {
-      milliseconds: timeout,
-      message: `${schema.$id}: Timed out after ${timeout}ms`,
-    });
-  }
-
-  return performCall();
+  const requestStartingTime = startRequestLog(microservice, schema);
+  return callSchema(
+    {
+      schema,
+      params,
+      client,
+      timeout,
+    },
+    {
+      request_error_function(error) {
+        microservice.stop_request();
+        feedbackStore.add_error(error.code, schema.$id, error.message, error.message);
+        if (request_error_function) {
+          request_error_function(error);
+        }
+      },
+      response_function(data) {
+        endRequestLog(microservice, schema, requestStartingTime);
+        microservice.stop_request();
+        if (response_function) {
+          response_function(data);
+        }
+      },
+      response_error_function(response) {
+        microservice.stop_request();
+        feedbackStore.add_error(error.code, schema.$id, error.message, error.message);
+        if (response_error_function) {
+          response_error_function(response);
+        }
+      },
+      validation_error_function({ code, name, error }) {
+        microservice.stop_request();
+        feedbackStore.add_error(code, schema.$id, name, error);
+      },
+    },
+  );
 }
