@@ -1,14 +1,16 @@
+import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
-async function upload_file(
+function upload_file(
   microservice,
-  { route, file, params = {} },
+  { schema, file, params = {} },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  console.log("[UPLOAD_FILE] Uploading file", { route, file });
+  console.log("[UPLOAD_FILE] Uploading file", { schema, file });
   const feedbackStore = useFeedbackStore();
+
   if (!(file instanceof File)) {
-    throw new Error("file must be a instance of File");
+    return Promise.reject(new Error("file must be an instance of File"));
   }
 
   const body = new FormData();
@@ -17,37 +19,39 @@ async function upload_file(
   }
   body.append("file", file);
 
-  const request_options = {
-    method: "PUT",
-    body,
-  };
   microservice.start_request();
-  return await $fetch(route, {
-    baseURL: microservice.base_url || "",
-    ...request_options,
-    onRequestError({ error }) {
-      microservice.stop_request();
-      feedbackStore.add_error(error.code, route, error.message, error.stack);
-      if (request_error_function) {
-        request_error_function(error);
-      }
+  const route = schema.$id;
+
+  return fetchRaw(
+    {
+      route,
+      method: schema.methods.find((method) => method !== "OPTIONS"),
+      params: body,
+      baseURL: microservice.base_url,
     },
-    onResponse({ response }) {
-      if (response.ok) {
+    {
+      request_error_function(error) {
+        microservice.stop_request();
+        feedbackStore.add_error(error.code, route, error.message, error.stack);
+        if (request_error_function) {
+          request_error_function(error);
+        }
+      },
+      response_function(data) {
         microservice.stop_request();
         if (response_function) {
-          response_function(response);
+          response_function(data);
         }
-      }
+      },
+      response_error_function(response) {
+        microservice.stop_request();
+        feedbackStore.add_error(response.status, route, response.name, response.description);
+        if (response_error_function) {
+          response_error_function(response);
+        }
+      },
     },
-    onResponseError({ response }) {
-      microservice.stop_request();
-      feedbackStore.add_error(response.status, route, response.name, response.description);
-      if (response_error_function) {
-        response_error_function(response);
-      }
-    },
-  });
+  );
 }
 
 export { upload_file };

@@ -1,4 +1,5 @@
 // Third party imports
+import { $fetch } from "ofetch";
 import _ from "lodash";
 import pTimeout from "p-timeout";
 

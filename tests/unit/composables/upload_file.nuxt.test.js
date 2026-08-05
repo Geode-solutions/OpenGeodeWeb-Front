@@ -22,7 +22,7 @@ describe("upload_file", () => {
     const backStore = useBackStore();
     const file = "toto";
 
-    await expect(backStore.upload(file)).rejects.toThrow("file must be a instance of File");
+    await expect(backStore.upload(file)).rejects.toThrow("file must be an instance of File");
   });
 
   test("onResponse", async () => {
@@ -36,7 +36,7 @@ describe("upload_file", () => {
     let response_value = "";
     await backStore.upload(file, {
       response_function: (response) => {
-        response_value = response._data.test;
+        response_value = response.test;
       },
     });
     expect(feedbackStore.feedbacks).toHaveLength(ZERO);
