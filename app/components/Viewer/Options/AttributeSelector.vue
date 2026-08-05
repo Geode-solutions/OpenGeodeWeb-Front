@@ -9,9 +9,9 @@ const attributeItem = defineModel("attributeItem", { type: Number });
 const attributeRange = defineModel("attributeRange", { type: Array });
 const attributeColorMap = defineModel("attributeColorMap", { type: String });
 
-const { id, componentId, schema } = defineProps({
+const { id, componentIds, schema } = defineProps({
   id: { type: String, required: true },
-  componentId: { type: String, default: undefined },
+  componentIds: { type: Array, default: undefined },
   schema: { type: Object, required: true },
 });
 
@@ -64,14 +64,21 @@ function resetRange() {
   }
 }
 
+function hasSelectedComponent(components) {
+  return Array.isArray(components) && components.length > 0;
+}
+
 function getAttributes() {
-  if (schema.properties.component_id && componentId === undefined) {
+  const requiresComponent = schema.properties.component_ids !== undefined;
+  if (requiresComponent && !hasSelectedComponent(componentIds)) {
     return;
   }
+
   const params = { id };
-  if (componentId !== undefined) {
-    params.component_id = componentId;
+  if (requiresComponent) {
+    params.component_ids = componentIds;
   }
+
   backStore.request(
     { schema, params },
     {
@@ -87,7 +94,7 @@ onMounted(() => {
 });
 
 watch(
-  () => [id, componentId, schema],
+  () => [id, componentIds, schema],
   () => {
     getAttributes();
   },

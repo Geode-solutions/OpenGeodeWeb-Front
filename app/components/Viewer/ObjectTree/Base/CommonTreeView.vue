@@ -142,6 +142,7 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
     >
       <template #default="{ item, index }">
         <v-list-item
+          data-testid="treeRowWrapper"
           :class="[
             'tree-row-wrapper',
             {
