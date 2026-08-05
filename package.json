@@ -84,8 +84,5 @@
     "vitest": "4.1.10",
     "vitest-environment-nuxt": "2.0.0",
     "vitest-indexeddb": "0.0.1"
-  },
-  "overrides": {
-    "vue": "latest"
   }
 }
