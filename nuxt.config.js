@@ -69,4 +69,10 @@ export default defineNuxtConfig({
       ],
     },
   },
+
+  nitro: {
+    externals: {
+      external: ["ws"],
+    },
+  },
 });
