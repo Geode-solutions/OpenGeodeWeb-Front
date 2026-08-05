@@ -35,13 +35,6 @@ async function importWorkflow(files) {
   return results;
 }
 
-function buildImportItemFromPayloadApi(value, geode_object_type) {
-  return {
-    geode_object_type,
-    ...value,
-  };
-}
-
 async function importItem(item) {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
@@ -61,14 +54,19 @@ async function importItem(item) {
     item.viewer_type === "model" ? dataStore.addComponentRelations(item) : Promise.resolve();
   treeviewStore.addItem(item.geode_object_type, item.name, item.id, item.viewer_type);
   const addDataStyleTask = dataStyleStore.addDataStyle(item.id, item.geode_object_type);
-  const addViewerTask = addDataTask.then(() => {
-    if (item.nb_vertices === 0) {
+  const addViewerTask = addDataTask.then(async () => {
+    if (!(await dataStore.isItemViewable(item))) {
       return;
     }
     return hybridViewerStore.addItem(item.id);
   });
   const applyStyleTask = Promise.all([registerTask, addDataComponentsTask, addDataStyleTask]).then(
-    () => dataStyleStore.applyDefaultStyle(item.id),
+    async () => {
+      if (await dataStore.isItemViewable(item)) {
+        return dataStyleStore.applyDefaultStyle(item.id);
+      }
+      return undefined;
+    },
   );
   await Promise.all([
     registerTask,
@@ -89,8 +87,7 @@ async function importFile(filename, geode_object_type) {
     filename,
   };
   const response = await backStore.request({ schema, params });
-  const item = buildImportItemFromPayloadApi(response, geode_object_type);
-  return importItem(item);
+  return importItem(response);
 }
 
 async function importWorkflowFromSnapshot(items) {

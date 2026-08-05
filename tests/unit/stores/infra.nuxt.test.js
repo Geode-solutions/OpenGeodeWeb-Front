@@ -1,6 +1,6 @@
 // Third party imports
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
-import { registerEndpoint } from "@nuxt/test-utils/runtime";
+import { $fetch } from "ofetch";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
@@ -9,6 +9,10 @@ import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+
+vi.mock(import("ofetch"), () => ({
+  $fetch: vi.fn(),
+}));
 
 // Mock navigator.locks API
 const mockLockRequest = vi
@@ -291,11 +295,14 @@ describe("infra store", () => {
 
       infraStore.app_mode = appMode.CLOUD;
       const url = "test.com";
-      registerEndpoint("https://localhost:443/server/api/serverless/run_cloud", {
-        method: "POST",
-        handler: () => ({ url }),
+      $fetch.mockImplementation((route, options) => {
+        const data = { url };
+        // oxlint-disable-next-line eslint/id-length
+        options.onResponse?.({ response: { ok: true, _data: data } });
+        return Promise.resolve(data);
       });
-      await infraStore.create_backend("", "", false);
+
+      await infraStore.create_backend("noreply@example.com");
       expect(infraStore.status).toBe(Status.CREATED);
       expect(infraStore.domain_name).toBe(url);
 

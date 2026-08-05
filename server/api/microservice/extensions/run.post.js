@@ -20,6 +20,7 @@ import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.js";
 
 export default defineEventHandler(async (event) => {
   try {
+    console.log("NITRO: runExtensions", event);
     const body = await readBody(event);
     const { projectFolderPath, projectName } = body;
     const extensionsConfig = extensionsConf(projectName);

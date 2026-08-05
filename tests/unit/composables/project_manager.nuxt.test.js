@@ -8,6 +8,12 @@ import { exportProject, importProject } from "@ogw_front/composables/project_man
 import { appMode } from "@ogw_shared/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 
+import { $fetch } from "ofetch";
+
+vi.mock(import("ofetch"), () => ({
+  $fetch: vi.fn(),
+}));
+
 // Constants
 const PANEL_WIDTH = 300;
 const Z_SCALE = 1.5;
@@ -105,6 +111,7 @@ const dataStoreMock = {
   registerObject: vi.fn().mockResolvedValue(),
   addItem: vi.fn().mockResolvedValue(),
   importStores: vi.fn().mockResolvedValue(),
+  isItemViewable: vi.fn().mockReturnValue(true),
 };
 const dataStyleStoreMock = {
   importStores: vi.fn().mockResolvedValue(),
@@ -140,7 +147,12 @@ const hybridViewerStoreMock = {
 };
 
 // MOCKS
-vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ snapshot: snapshotMock }));
+$fetch.mockImplementation((route, options) => {
+  const data = { snapshot: snapshotMock };
+  // oxlint-disable-next-line eslint/id-length
+  options.onResponse?.({ response: { ok: true, _data: data } });
+  return Promise.resolve(data);
+});
 vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: viewer_call_mock_fn,
 }));
