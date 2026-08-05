@@ -1,79 +1,52 @@
-import _ from "lodash";
+import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
+import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import { validate_schema } from "@ogw_front/utils/validate_schema";
-
-const ERROR_400 = 400;
 
 export function api_fetch(
   microservice,
-  { schema, params, headers },
+  { schema, params = {}, headers = {} },
   { request_error_function, response_function, response_error_function, timeout } = {},
 ) {
   console.log("[API] Fetching", microservice.base_url);
   const feedbackStore = useFeedbackStore();
-
-  const body = params || {};
-
-  const { valid, error: schema_error } = validate_schema(schema, body);
-
-  if (!valid) {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Bad request", schema_error, schema, params);
-    }
-    feedbackStore.add_error(ERROR_400, schema.$id, "Bad request", schema_error);
-    throw new Error(`${schema.$id}: ${schema_error}`);
-  }
-
   microservice.start_request();
 
-  const method = schema.methods.find((methodItem) => methodItem !== "OPTIONS");
-  const request_options = {
-    method,
-    headers,
-  };
-  if (!_.isEmpty(body)) {
-    request_options.body = body;
-  }
-
-  if (schema.max_retry) {
-    request_options.max_retry = schema.max_retry;
-  }
-
-  function performFetch() {
-    return $fetch(schema.$id, {
+  const requestStartingTime = startRequestLog(microservice, schema);
+  return fetchSchema(
+    {
+      schema,
       baseURL: microservice.base_url,
-      ...request_options,
-      onRequestError({ error }) {
+      params,
+      headers,
+      max_retry: schema.max_retry,
+      timeout,
+    },
+    {
+      request_error_function(error) {
         microservice.stop_request();
         feedbackStore.add_error(error.code, schema.$id, error.message, error.stack);
         if (request_error_function) {
           request_error_function(error);
         }
       },
-      onResponse({ response }) {
-        if (response.ok) {
-          microservice.stop_request();
-          if (response_function) {
-            response_function(response._data);
-          }
+      response_function(data) {
+        endRequestLog(microservice, schema, requestStartingTime);
+        microservice.stop_request();
+        if (response_function) {
+          response_function(data);
         }
       },
-      onResponseError({ response }) {
+      response_error_function(response) {
         microservice.stop_request();
         feedbackStore.add_error(response.status, schema.$id, response.name, response.description);
         if (response_error_function) {
           response_error_function(response);
         }
       },
-    });
-  }
-
-  if (timeout > 0) {
-    return pTimeout(performCall(), {
-      milliseconds: timeout,
-      message: `${schema.$id}: Timed out after ${timeout}ms`,
-    });
-  }
-
-  return performFetch();
+      validation_error_function({ code, name, error }) {
+        microservice.stop_request();
+        feedbackStore.add_error(code, schema.$id, name, error);
+      },
+    },
+  );
 }

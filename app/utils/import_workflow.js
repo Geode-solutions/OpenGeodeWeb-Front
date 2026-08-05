@@ -35,13 +35,6 @@ async function importWorkflow(files) {
   return results;
 }
 
-function buildImportItemFromPayloadApi(value, geode_object_type) {
-  return {
-    geode_object_type,
-    ...value,
-  };
-}
-
 async function importItem(item) {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
@@ -94,8 +87,7 @@ async function importFile(filename, geode_object_type) {
     filename,
   };
   const response = await backStore.request({ schema, params });
-  const item = buildImportItemFromPayloadApi(response, geode_object_type);
-  return importItem(item);
+  return importItem(response);
 }
 
 async function importWorkflowFromSnapshot(items) {

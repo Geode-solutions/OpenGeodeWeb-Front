@@ -43,6 +43,9 @@ export const useCloudStore = defineStore("cloud", {
               domain_name: response.url,
             });
             setAppBaseUrl(appStore.base_url);
+            appStore.$patch({
+              projectFolderPath: "/project",
+            });
           },
           response_error_function: () => {
             feedbackStore.$patch({ server_error: true });

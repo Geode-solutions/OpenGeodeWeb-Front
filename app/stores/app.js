@@ -227,13 +227,16 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function upload(file, callbacks = {}) {
-    const route = "/api/local/extensions/upload";
+    const schema = {
+      $id: "/api/local/extensions/upload",
+      methods: ["OPTIONS", "PUT"],
+    };
     const store = useAppStore();
     const { PROJECT: projectName } = useRuntimeConfig().public;
     const params = { projectName };
     return upload_file(
       store,
-      { route, file, params },
+      { schema, file, params },
       {
         ...callbacks,
         response_function: async (response) => {
@@ -247,16 +250,13 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function request({ schema, params }, callbacks = {}) {
-    console.log("[APP] Request:", schema.$id);
-
     const store = useAppStore();
     return api_fetch(
       store,
-      { schema, params, headers: {} },
+      { schema, params },
       {
         ...callbacks,
         response_function: async (response) => {
-          console.log("[APP] Request completed:", schema.$id);
           if (callbacks.response_function) {
             await callbacks.response_function(response);
           }
@@ -274,7 +274,8 @@ export const useAppStore = defineStore("app", () => {
   }
   const is_busy = computed(() => request_counter.value > 0);
 
-  const projectFolderPath = ref(isCloudMode() ? "/project" : "");
+  const projectFolderPath = ref("");
+
   function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = {

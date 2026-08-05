@@ -77,11 +77,6 @@ export const useInfraStore = defineStore("infra", {
     },
     async create_connection() {
       console.log("[INFRA] Starting create_connection");
-      console.log(
-        "[INFRA] Connecting microservices:",
-        this.microservices.map((store) => store.$id),
-      );
-
       await Promise.all(
         this.microservices.map(async (store) => {
           console.log("[INFRA] Connecting to microservice:", store.$id);

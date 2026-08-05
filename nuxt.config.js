@@ -69,10 +69,4 @@ export default defineNuxtConfig({
       ],
     },
   },
-
-  nitro: {
-    rollupConfig: {
-      external: ["events", "node:events"],
-    },
-  },
 });
