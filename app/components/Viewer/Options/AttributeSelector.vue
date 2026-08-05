@@ -9,9 +9,9 @@ const attributeItem = defineModel("attributeItem", { type: Number });
 const attributeRange = defineModel("attributeRange", { type: Array });
 const attributeColorMap = defineModel("attributeColorMap", { type: String });
 
-const { id, componentId, schema } = defineProps({
+const { id, componentIds, schema } = defineProps({
   id: { type: String, required: true },
-  componentId: { type: [String, Array], default: undefined },
+  componentIds: { type: Array, default: undefined },
   schema: { type: Object, required: true },
 });
 
@@ -64,25 +64,19 @@ function resetRange() {
   }
 }
 
-function hasSelectedComponent(component) {
-  if (component === undefined) {
-    return false;
-  }
-  if (Array.isArray(component)) {
-    return component.length > 0;
-  }
-  return true;
+function hasSelectedComponent(components) {
+  return Array.isArray(components) && components.length > 0;
 }
 
 function getAttributes() {
   const requiresComponent = schema.properties.component_ids !== undefined;
-  if (requiresComponent && !hasSelectedComponent(componentId)) {
+  if (requiresComponent && !hasSelectedComponent(componentIds)) {
     return;
   }
 
   const params = { id };
   if (requiresComponent) {
-    params.component_ids = Array.isArray(componentId) ? componentId : [componentId];
+    params.component_ids = componentIds;
   }
 
   backStore.request(
@@ -100,7 +94,7 @@ onMounted(() => {
 });
 
 watch(
-  () => [id, componentId, schema],
+  () => [id, componentIds, schema],
   () => {
     getAttributes();
   },
