@@ -7,6 +7,7 @@ import path from "node:path";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
 
 // Local imports
+import { addNginxLocation, addSupervisorProgram } from "./cloud.js";
 import { getAvailablePort, waitForReady } from "./scripts.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 import { executablePath } from "./path.js";
@@ -57,33 +58,11 @@ function isPortInUseError(errorMessage) {
 }
 
 async function runBack(execName, execPath, args = {}, attempts = 0) {
-  const { projectFolderPath } = args;
-  if (!projectFolderPath) {
-    throw new Error("projectFolderPath is required");
-  }
-  let { uploadFolderPath } = args;
-  if (!uploadFolderPath) {
-    uploadFolderPath = path.join(projectFolderPath, "uploads");
-  }
   try {
     const port = await getAvailablePort();
-    const backArgs = [
-      "--port",
-      String(port),
-      "--project_folder_path",
-      projectFolderPath,
-      "--upload_folder_path",
-      uploadFolderPath,
-      "--allowed_origins",
-      "http://localhost:*",
-      "--timeout",
-      "0",
-    ];
-    if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
-      backArgs.push("--debug");
-    }
-    console.log("runBack", execPath, execName, backArgs);
-    await runScript(execPath, execName, backArgs, "Serving Flask app");
+    const executableArgs = backArgs(args, port);
+    console.log("runBack", execPath, execName, executableArgs);
+    await runScript(execPath, execName, executableArgs, "Serving Flask app");
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
@@ -129,6 +108,52 @@ async function runViewer(execName, execPath, args = {}, attempts = 0) {
   }
 }
 
+function backArgs(args, port) {
+  const { projectFolderPath } = args;
+  if (!projectFolderPath) {
+    throw new Error("projectFolderPath is required");
+  }
+  const uploadFolderPath = args.uploadFolderPath || path.join(projectFolderPath, "uploads");
+  const executableArgs = [
+    "--port",
+    String(port),
+    "--project_folder_path",
+    projectFolderPath,
+    "--upload_folder_path",
+    uploadFolderPath,
+    "--allowed_origins",
+    "http://localhost:*",
+    "--timeout",
+    "0",
+  ];
+  if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
+    executableArgs.push("--debug");
+  }
+  return executableArgs;
+}
+
+async function runExtension(extensionId, execName, execPath, args = {}, attempts = 0) {
+  try {
+    const port = await getAvailablePort();
+    const executableArgs = backArgs(args, port);
+    const command = executablePath(execPath, execName);
+    console.log("runExtension", execPath, execName, executableArgs);
+    addSupervisorProgram(extensionId, command, executableArgs);
+    addNginxLocation(extensionId, port);
+    return port;
+  } catch (error) {
+    if (!isPortInUseError(error)) {
+      console.log("runBack error", error);
+      throw error;
+    }
+    if (attempts <= MAX_PORT_RETRIES) {
+      console.log("Retrying runExtension on conflicting port", port);
+      const port = await runExtension(extensionId, execName, execPath, args, attempts + 1);
+      return port;
+    }
+  }
+}
+
 function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   const microservices = projectMicroservices(projectFolderPath);
   if (serviceObj.type === "back") {
@@ -147,4 +172,4 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   );
 }
 
-export { addMicroserviceMetadatas, runBack, runViewer };
+export { addMicroserviceMetadatas, runBack, runExtension, runViewer };

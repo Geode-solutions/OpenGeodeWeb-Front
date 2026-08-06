@@ -4,6 +4,7 @@
 import _ from "lodash";
 
 // Local imports
+import { isCloudMode } from "@ogw_front/utils/stores";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
@@ -105,9 +106,9 @@ function runExtensions() {
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;
   const params = { projectFolderPath, projectName };
-
+  const endpoint = isCloudMode() ? "cloud" : "local";
   const schema = {
-    $id: "/api/microservice/extensions/run",
+    $id: `/api/${endpoint}/extensions/run`,
     methods: ["POST"],
     type: "object",
     properties: {
@@ -130,7 +131,7 @@ function killExtension(extensionId) {
   console.log(`[AppStore] Killing extension: ${extensionId}`, { params });
 
   const schema = {
-    $id: "/api/microservice/extensions/kill",
+    $id: "/api/local/extensions/kill",
     methods: ["POST"],
     type: "object",
     properties: {
