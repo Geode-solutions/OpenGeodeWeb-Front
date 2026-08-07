@@ -1,32 +1,37 @@
-import { createStorage, prefixStorage } from "unstorage";
-
-const storage = createStorage();
-const config = prefixStorage(storage, "config");
+const storage = new Map();
 
 function getAppBaseUrl() {
-  return config.getItem("APP_BASE_URL");
+  return storage.get("APP_BASE_URL");
 }
 function setAppBaseUrl(baseUrl) {
-  return config.setItem("APP_BASE_URL", baseUrl);
+  return storage.set("APP_BASE_URL", baseUrl);
 }
 function getBackBaseUrl() {
-  return config.getItem("BACK_BASE_URL");
+  return storage.get("BACK_BASE_URL");
 }
 function setBackBaseUrl(baseUrl) {
-  return config.setItem("BACK_BASE_URL", baseUrl);
+  return storage.set("BACK_BASE_URL", baseUrl);
 }
 function getViewerBaseUrl() {
-  return config.getItem("VIEWER_BASE_URL");
+  return storage.get("VIEWER_BASE_URL");
 }
 function setViewerBaseUrl(baseUrl) {
-  return config.setItem("VIEWER_BASE_URL", baseUrl);
+  return storage.set("VIEWER_BASE_URL", baseUrl);
+}
+function getIsAppReady() {
+  return storage.get("IS_APP_READY") ?? false;
+}
+function setIsAppReady(isAppReady) {
+  return storage.set("IS_APP_READY", isAppReady);
 }
 
 export {
   getAppBaseUrl,
-  setAppBaseUrl,
   getBackBaseUrl,
+  getIsAppReady,
   getViewerBaseUrl,
+  setAppBaseUrl,
   setBackBaseUrl,
+  setIsAppReady,
   setViewerBaseUrl,
 };
