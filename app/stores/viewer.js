@@ -1,11 +1,9 @@
 // Third party imports
-import vtkWSLinkClient, { newInstance } from "@kitware/vtk.js/IO/Core/WSLinkClient";
 import _ from "lodash";
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
-import SmartConnect from "wslink/src/SmartConnect";
-import { initWebSocketClient } from "@ogw_shared/utils/ws_client";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
+import { initWebSocketClient } from "@ogw_internal/utils/ws_client";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
