@@ -29,8 +29,8 @@ export function useModelLinesColor() {
   }
 
   async function setModelLinesActiveColoring(modelId, lines_ids, activeColoring) {
-    await modelCommonStyle.mutateComponentStyles(modelId, lines_ids, {
-      coloring: { active: activeColoring },
+    await modelLinesCommonStyle.mutateModelLinesColoring(modelId, lines_ids, {
+      active: activeColoring,
     });
     if (activeColoring === "constant" || activeColoring === "random") {
       const color = modelLineColor(modelId, lines_ids[0]);

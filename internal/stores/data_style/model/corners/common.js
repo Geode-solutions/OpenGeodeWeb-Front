@@ -21,6 +21,9 @@ export function useModelCornersCommonStyle() {
   }
 
   function mutateModelCornersColoring(id, corners_ids, values) {
+    modelCommonStyle.mutateModelComponentTypeStyle(id, "Corner", {
+      coloring: values,
+    });
     return modelCommonStyle.mutateComponentStyles(id, corners_ids, {
       coloring: values,
     });

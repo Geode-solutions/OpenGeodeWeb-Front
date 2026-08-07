@@ -15,6 +15,7 @@ const filterText = ref("");
 const canvasRefs = ref({});
 const loading = ref(true);
 const renderJobId = ref(0);
+const openedGroups = ref([]);
 
 function setCanvasRef(presetName, element, id) {
   if (element) {
@@ -43,6 +44,18 @@ const filteredPresets = computed(() => {
   }
   return result;
 });
+
+watch(
+  [filterText, filteredPresets],
+  () => {
+    if (filterText.value) {
+      openedGroups.value = filteredPresets.value
+        .filter((item) => item.Children)
+        .map((item) => item.Name);
+    }
+  },
+  { immediate: true },
+);
 
 function processChunk(entries, index, jobId) {
   if (jobId !== renderJobId.value || index >= entries.length) {
@@ -103,6 +116,7 @@ watch(filteredPresets, drawAllCanvases);
     />
 
     <v-list
+      v-model:opened="openedGroups"
       data-testid="colorMapList"
       density="compact"
       max-height="350"

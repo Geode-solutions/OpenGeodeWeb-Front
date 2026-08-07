@@ -32,8 +32,8 @@ export function useModelBlocksColor() {
   }
 
   async function setModelBlocksActiveColoring(modelId, blocks_ids, activeColoring) {
-    await modelCommonStyle.mutateComponentStyles(modelId, blocks_ids, {
-      coloring: { active: activeColoring },
+    await modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blocks_ids, {
+      active: activeColoring,
     });
     if (activeColoring === "constant" || activeColoring === "random") {
       const color = modelBlockColor(modelId, blocks_ids[0]);
