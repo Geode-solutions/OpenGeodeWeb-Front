@@ -238,7 +238,7 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
     <VisibilitySwitch data-testid="modelBlocksVisibilitySwitch" v-model="blocksVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentId="targetBlockIds[0]"
+      :componentIds="targetBlockIds"
       v-model:coloring_style_key="blocksActiveColoring"
       v-model:color="blocksColor"
       v-model:vertex_attribute_name="blocksVertexAttributeName"
@@ -255,11 +255,16 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
     />
   </OptionsSection>
 
-  <OptionsSection v-if="blockId" title="Component Options" class="mt-4">
+  <OptionsSection
+    v-if="blockId"
+    title="Component Options"
+    class="mt-4"
+    data-testid="modelComponentOptions"
+  >
     <VisibilitySwitch v-model="blockVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentId="blockId"
+      :componentIds="[blockId]"
       v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"
       v-model:vertex_attribute_name="vertexAttributeName"

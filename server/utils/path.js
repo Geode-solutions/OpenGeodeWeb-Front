@@ -138,8 +138,18 @@ async function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPa
   throw new Error(`Failed to find ${unzippedfrontendFilePath}`);
 }
 
+function extensionBackendPath(unzippedExtensionPath, backendExecutableName) {
+  const backendExecutablePath = path.join(
+    unzippedExtensionPath,
+    executableName(backendExecutableName),
+  );
+  console.log("runExtensions", { backendExecutablePath });
+  return backendExecutablePath;
+}
+
 export {
   createPath,
+  extensionBackendPath,
   extensionFrontendPath,
   extensionFolderPath,
   executablePath,
