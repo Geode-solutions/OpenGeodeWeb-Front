@@ -9,6 +9,10 @@ export function useMeshPointsCommonStyle() {
     });
   }
 
+  function mutateMeshPointsVisibility(response) {
+    return mutateMeshPointsStyle(response.id, { visibility: response.visibility });
+  }
+
   function meshPointsStyle(id) {
     return dataStyleState.getStyle(id).points;
   }
@@ -26,7 +30,8 @@ export function useMeshPointsCommonStyle() {
   return {
     meshPointsStyle,
     meshPointsColoring,
-    mutateMeshPointsStyle,
+    // mutateMeshPointsStyle,
     mutateMeshPointsColoring,
+    mutateMeshPointsVisibility,
   };
 }

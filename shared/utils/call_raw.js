@@ -4,15 +4,14 @@ import pTimeout from "p-timeout";
 
 // Local imports
 
-function callClient(
-  { rpc, params = {}, client }) {
+function callClient({ rpc, params = {}, client }) {
   console.log("callClient", { rpc, params, client });
 
   if (globalThis.window !== undefined) {
     return client.getConnection().getSession().call(rpc, [params]);
   }
   console.log(`Calling from server ${rpc} with params:`, params);
-  return client.call(rpc, params);
+  return client.call(rpc, params, { stream: true });
 }
 
 function callRaw(
