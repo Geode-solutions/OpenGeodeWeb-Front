@@ -251,7 +251,12 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
     />
   </OptionsSection>
 
-  <OptionsSection v-if="lineId" title="Component Options" class="mt-4" data-testid="modelComponentOptions">
+  <OptionsSection
+    v-if="lineId"
+    title="Component Options"
+    class="mt-4"
+    data-testid="modelComponentOptions"
+  >
     <VisibilitySwitch v-model="lineVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"

@@ -172,7 +172,12 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
     />
   </OptionsSection>
 
-  <OptionsSection v-if="cornerId" title="Component Options" class="mt-4" data-testid="modelComponentOptions">
+  <OptionsSection
+    v-if="cornerId"
+    title="Component Options"
+    class="mt-4"
+    data-testid="modelComponentOptions"
+  >
     <VisibilitySwitch v-model="cornerVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
