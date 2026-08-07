@@ -33,3 +33,4 @@ package-lock.json
 /opengeodeweb-back
 /opengeodeweb-viewer
 VTK.txt
+*.nuxtrc
