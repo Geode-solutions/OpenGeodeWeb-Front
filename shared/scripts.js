@@ -53,4 +53,20 @@ function setViewerBaseUrl(appBaseUrl, viewerBaseUrl) {
   return fetchSchema({ schema, params, baseURL: appBaseUrl });
 }
 
-export { setAppBaseUrl, setBackBaseUrl, setViewerBaseUrl };
+function setIsAppReady(appBaseUrl, isReady) {
+  console.log("[API] setIsAppReady", isReady);
+  const schema = {
+    $id: "/api/microservice/app/set_is_app_ready",
+    methods: ["POST"],
+    type: "object",
+    properties: {
+      isReady: { type: "boolean" },
+    },
+    required: ["baseUrl"],
+    additionalProperties: false,
+  };
+  const params = { isReady };
+  return fetchSchema({ schema, params, baseURL: appBaseUrl });
+}
+
+export { setAppBaseUrl, setBackBaseUrl, setIsAppReady, setViewerBaseUrl };
