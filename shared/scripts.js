@@ -62,7 +62,7 @@ function setIsAppReady(appBaseUrl, isReady) {
     properties: {
       isReady: { type: "boolean" },
     },
-    required: ["baseUrl"],
+    required: ["isReady"],
     additionalProperties: false,
   };
   const params = { isReady };
