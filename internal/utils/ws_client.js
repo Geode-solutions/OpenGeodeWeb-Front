@@ -26,4 +26,4 @@ async function initWebSocketClient(baseUrl, initialClient = {}) {
   return client;
 }
 
-export { initWebSocketClient }
+export { initWebSocketClient };
