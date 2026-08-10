@@ -48,6 +48,7 @@ function handleRowClick(event) {
     <div class="d-flex align-center flex-shrink-0">
       <v-icon
         v-if="!item.isLeaf"
+        :data-testid="item.isOpen ? 'collapseTreeRowButton' : 'expandTreeRowButton'"
         :icon="item.isOpen ? 'mdi-menu-down' : 'mdi-menu-right'"
         class="me-1"
         color="black"
@@ -69,6 +70,13 @@ function handleRowClick(event) {
         />
         <v-btn
           v-else-if="showEyeButton"
+          :data-testid="
+            getIndeterminate(item.raw)
+              ? 'indeterminateObjectEyeButton'
+              : isSelected(item.raw)
+                ? 'visibleObjectEyeButton'
+                : 'hiddenObjectEyeButton'
+          "
           :icon="
             getIndeterminate(item.raw)
               ? 'mdi-eye-minus-outline'

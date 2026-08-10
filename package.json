@@ -62,7 +62,6 @@
     "sanitize-filename": "1.6.3",
     "sass": "1.87.0",
     "semver": "7.7.1",
-    "unstorage": "1.17.5",
     "uuid": "11.1.0",
     "vuetify": "3.12.5",
     "vuetify-nuxt-module": "0.18.7",

@@ -182,6 +182,7 @@ function expandAll() {
         <template v-if="item.geode_object_type !== 'HorizonStack3D'">
           <v-btn
             v-if="item.viewer_type"
+            data-testid="focusObjectButton"
             icon="mdi-target"
             size="medium"
             variant="text"
@@ -190,6 +191,7 @@ function expandAll() {
           />
           <v-btn
             v-if="isModel(item)"
+            data-testid="expandModelComponentsButton"
             icon="mdi-magnify-expand"
             size="medium"
             class="ml-2"
@@ -206,6 +208,7 @@ function expandAll() {
           />
           <v-btn
             v-if="isModel(item) && hasCollectionsMap[item.id]"
+            data-testid="expandModelCollectionsButton"
             icon="mdi-format-list-group"
             size="medium"
             class="ml-2"

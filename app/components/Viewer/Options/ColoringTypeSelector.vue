@@ -36,9 +36,9 @@ const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_m
   type: String,
 });
 
-const { id, componentId, capabilities, schemas, allowRandom } = defineProps({
+const { id, componentIds, capabilities, schemas, allowRandom } = defineProps({
   id: { type: String, required: true },
-  componentId: { type: String, default: undefined },
+  componentIds: { type: Array, default: undefined },
   capabilities: {
     type: Object,
     default: () => ({}),
@@ -215,7 +215,7 @@ watch(
           v-model:attributeRange="vertex_attribute_range"
           v-model:attributeColorMap="vertex_attribute_color_map"
           :id="id"
-          :componentId="componentId"
+          :componentIds="componentIds"
           :schema="vertexSchema"
         />
       </template>
@@ -226,7 +226,7 @@ watch(
           v-model:attributeRange="edge_attribute_range"
           v-model:attributeColorMap="edge_attribute_color_map"
           :id="id"
-          :componentId="componentId"
+          :componentIds="componentIds"
           :schema="edgeSchema"
         />
       </template>
@@ -237,7 +237,7 @@ watch(
           v-model:attributeRange="cell_attribute_range"
           v-model:attributeColorMap="cell_attribute_color_map"
           :id="id"
-          :componentId="componentId"
+          :componentIds="componentIds"
           :schema="cellSchema"
         />
       </template>
@@ -248,7 +248,7 @@ watch(
           v-model:attributeRange="polygon_attribute_range"
           v-model:attributeColorMap="polygon_attribute_color_map"
           :id="id"
-          :componentId="componentId"
+          :componentIds="componentIds"
           :schema="polygonSchema"
         />
       </template>
@@ -259,7 +259,7 @@ watch(
           v-model:attributeRange="polyhedron_attribute_range"
           v-model:attributeColorMap="polyhedron_attribute_color_map"
           :id="id"
-          :componentId="componentId"
+          :componentIds="componentIds"
           :schema="polyhedronSchema"
         />
       </template>
