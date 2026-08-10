@@ -40,6 +40,10 @@ function createServerWsRpcClient(baseUrl) {
         return;
       }
 
+      if (typeof message.id === "string" && message.id.startsWith("publish:")) {
+        return;
+      }
+
       const entry = pending.get(message.id);
       if (!entry) {
         return;
@@ -59,8 +63,9 @@ function createServerWsRpcClient(baseUrl) {
 
     socket.on("close", () => {
       onCloseCallback?.();
-      // Reject any calls still in flight
-      pending.forEach(({ reject: rejectPending }) => rejectPending(new Error("WebSocket closed")));
+      for (const { reject: rejectPending } of pending.values()) {
+        rejectPending(new Error("WebSocket closed"));
+      }
       pending.clear();
     });
   });
@@ -71,7 +76,15 @@ function createServerWsRpcClient(baseUrl) {
     //oxlint-disable-next-line promise/avoid-new
     return new Promise((resolve, reject) => {
       pending.set(id, { resolve, reject });
-      socket.send(JSON.stringify({ wslink: '1.0', id, method: rpc, args: [params] }));
+      socket.send(
+        JSON.stringify({
+          wslink: "1.0",
+          id,
+          method: rpc,
+          args: [params],
+          kwargs: { stream: true },
+        }),
+      );
     });
   }
 
@@ -83,10 +96,12 @@ function createServerWsRpcClient(baseUrl) {
     return socket.readyState === WebSocket.OPEN;
   }
 
+  //oxlint-disable-next-line promise/prefer-await-to-callbacks
   function onConnectionClose(callback) {
     onCloseCallback = callback;
   }
 
+  //oxlint-disable-next-line promise/prefer-await-to-callbacks
   function onConnectionError(callback) {
     onErrorCallback = callback;
   }

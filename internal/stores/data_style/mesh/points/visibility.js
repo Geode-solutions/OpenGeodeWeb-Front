@@ -23,7 +23,9 @@ export function useMeshPointsVisibilityStyle() {
         params,
       },
       {
-        response_function: meshPointsCommonStyle.mutateMeshPointsVisibility,
+        response_function(response) {
+          return meshPointsCommonStyle.mutateMeshPointsVisibility(response);
+        },
       },
     );
   }

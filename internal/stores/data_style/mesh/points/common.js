@@ -30,8 +30,8 @@ export function useMeshPointsCommonStyle() {
   return {
     meshPointsStyle,
     meshPointsColoring,
-    // mutateMeshPointsStyle,
     mutateMeshPointsColoring,
+    mutateMeshPointsStyle,
     mutateMeshPointsVisibility,
   };
 }

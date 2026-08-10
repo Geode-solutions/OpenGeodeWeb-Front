@@ -5,25 +5,20 @@ import pTimeout from "p-timeout";
 // Local imports
 
 function callClient({ rpc, params = {}, client }) {
-  console.log("callClient", { rpc, params, client });
-
   if (globalThis.window !== undefined) {
     return client.getConnection().getSession().call(rpc, [params]);
   }
-  console.log(`Calling from server ${rpc} with params:`, params);
-  return client.call(rpc, params, { stream: true });
+  return client.call(rpc, params);
 }
 
 function callRaw(
   { rpc, params = {}, client, timeout },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-  console.log("callRaw", { rpc, params, timeout });
 
   async function performCall() {
     try {
       const response = await callClient({ rpc, params, client });
-      console.log(`callRaw response for ${rpc}:`, { response });
       if (response_function) {
         await response_function(response);
       }
