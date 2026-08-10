@@ -25,7 +25,6 @@ function setIsAppReady(isAppReady) {
   return storage.set("IS_APP_READY", isAppReady);
 }
 
-
 async function getViewerWebSocketClient() {
   const viewerClient = storage.get("VIEWER_CLIENT") ?? undefined;
   if (viewerClient?.isOpen()) {

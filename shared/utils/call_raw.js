@@ -15,7 +15,6 @@ function callRaw(
   { rpc, params = {}, client, timeout },
   { request_error_function, response_function, response_error_function } = {},
 ) {
-
   async function performCall() {
     try {
       const response = await callClient({ rpc, params, client });
