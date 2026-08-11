@@ -23,8 +23,8 @@ function sleep(milliseconds) {
   });
 }
 
-let id = "",
-  projectFolderPath = "";
+let id = "";
+let projectFolderPath = "";
 
 describe("model", () => {
   beforeAll(async () => {
