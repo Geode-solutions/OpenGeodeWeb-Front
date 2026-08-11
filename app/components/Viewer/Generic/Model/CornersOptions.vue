@@ -67,7 +67,7 @@ const cornerActiveColoring = computed({
 
 // Group Attributes
 const cornersVertexAttributeName = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, targetCornerIds[0]),
+  get: () => dataStyleStore.modelCornersVertexAttributeName(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
@@ -75,7 +75,7 @@ const cornersVertexAttributeName = computed({
 });
 
 const cornersVertexAttributeItem = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, targetCornerIds[0]),
+  get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeItem(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
@@ -83,7 +83,7 @@ const cornersVertexAttributeItem = computed({
 });
 
 const cornersVertexAttributeRange = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, targetCornerIds[0]),
+  get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeRange(
       modelId,
@@ -96,7 +96,7 @@ const cornersVertexAttributeRange = computed({
 });
 
 const cornersVertexAttributeColorMap = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, targetCornerIds[0]),
+  get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
@@ -155,7 +155,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
 </script>
 
 <template>
-  <OptionsSection title="Corners Options" class="mt-4">
+  <OptionsSection title="Corners Options" class="mt-4" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelCornersVisibilitySwitch" v-model="cornersVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"

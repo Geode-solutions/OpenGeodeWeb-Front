@@ -10,10 +10,19 @@ export function useModelLinesCommonStyle() {
     return dataStyleState.getStyle(id).lines;
   }
 
+  function modelComponentTypeLinesStyle(id) {
+    const defaultStyle = modelLinesStyle(id);
+    const typeStyle = dataStyleState.getModelComponentTypeStyle(id, "Line");
+    return merge({}, defaultStyle, typeStyle);
+  }
+
   function modelLineStyle(id, line_id) {
-    const groupStyle = modelLinesStyle(id);
+    if (line_id === undefined) {
+      return modelComponentTypeLinesStyle(id);
+    }
+    const typeStyle = modelComponentTypeLinesStyle(id);
     const individualStyle = dataStyleState.getComponentStyle(id, line_id);
-    return merge({}, groupStyle, individualStyle);
+    return merge({}, typeStyle, individualStyle);
   }
 
   function modelLineColoring(id, line_id) {
@@ -26,8 +35,8 @@ export function useModelLinesCommonStyle() {
     });
   }
 
-  function mutateModelLineColoring(id, line_id, values) {
-    return modelCommonStyle.mutateComponentStyle(id, line_id, {
+  function mutateModelLinesTypeColoring(id, values) {
+    return modelCommonStyle.mutateModelComponentTypeStyle(id, "Line", {
       coloring: values,
     });
   }
@@ -37,6 +46,6 @@ export function useModelLinesCommonStyle() {
     modelLineStyle,
     modelLineColoring,
     mutateModelLinesColoring,
-    mutateModelLineColoring,
+    mutateModelLinesTypeColoring,
   };
 }

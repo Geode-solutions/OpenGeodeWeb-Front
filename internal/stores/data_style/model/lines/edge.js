@@ -43,6 +43,11 @@ function useModelLinesEdgeAttribute() {
   }
 
   function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
+    if (lineIds.length > 1) {
+      modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
+        edge: values,
+      });
+    }
     return modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
       edge: values,
     });

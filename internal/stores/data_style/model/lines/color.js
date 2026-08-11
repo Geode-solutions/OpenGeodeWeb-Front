@@ -29,6 +29,11 @@ export function useModelLinesColor() {
   }
 
   async function setModelLinesActiveColoring(modelId, lines_ids, activeColoring) {
+    if (lines_ids.length > 1) {
+      modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
+        active: activeColoring,
+      });
+    }
     await modelCommonStyle.mutateComponentStyles(modelId, lines_ids, {
       coloring: { active: activeColoring },
     });
