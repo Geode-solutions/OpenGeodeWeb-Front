@@ -45,6 +45,16 @@ const filteredPresets = computed(() => {
   return result;
 });
 
+watch(filterText, (newFilterText) => {
+  if (newFilterText) {
+    openedGroups.value = filteredPresets.value
+      .filter((item) => item.Children)
+      .map((item) => item.Name);
+  } else {
+    openedGroups.value = [];
+  }
+});
+
 function processChunk(entries, index, jobId) {
   if (jobId !== renderJobId.value || index >= entries.length) {
     if (jobId === renderJobId.value) {
