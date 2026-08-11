@@ -94,9 +94,9 @@ async function performAddItem(id, options) {
   }
   const reader = vtkXMLPolyDataReader();
   await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
-  const actor = vtkActor(),
-    mapper = vtkMapper(),
-    polydata = reader.getOutputData(0);
+  const actor = vtkActor();
+  const mapper = vtkMapper();
+  const polydata = reader.getOutputData(0);
   mapper.setInputData(polydata);
   actor.getProperty().setColor(actorColor);
   actor.setMapper(mapper);

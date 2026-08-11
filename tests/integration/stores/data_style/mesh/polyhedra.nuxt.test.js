@@ -20,8 +20,8 @@ const range = [MINIMUM_RANGE, MAXIMUM_RANGE];
 const default_vertex_attribute = { name: "toto_on_vertices", item: 0, range };
 const default_polyhedron_attribute = { name: "toto_on_polyhedra", item: 0, range };
 
-let id = "",
-  projectFolderPath = "";
+let id = "";
+let projectFolderPath = "";
 
 describe("mesh polyhedra", () => {
   beforeAll(async () => {

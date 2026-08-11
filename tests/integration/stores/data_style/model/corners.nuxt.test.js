@@ -25,8 +25,8 @@ function sleep(milliseconds) {
   });
 }
 
-let id = "",
-  projectFolderPath = "";
+let id = "";
+let projectFolderPath = "";
 
 describe("model corners", () => {
   beforeAll(async () => {
