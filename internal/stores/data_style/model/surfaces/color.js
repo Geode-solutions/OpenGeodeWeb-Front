@@ -29,8 +29,7 @@ export function useModelSurfacesColor() {
   }
 
   async function setModelSurfacesActiveColoring(modelId, surfaces_ids, activeColoring) {
-    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, "Surface");
-    if (surfaces_ids.length === idsForType.length) {
+    if (surfaces_ids.length > 1) {
       modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
         active: activeColoring,
       });

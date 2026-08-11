@@ -30,9 +30,6 @@ export function useModelLinesCommonStyle() {
   }
 
   function mutateModelLinesColoring(id, lines_ids, values) {
-    modelCommonStyle.mutateModelComponentTypeStyle(id, "Line", {
-      coloring: values,
-    });
     return modelCommonStyle.mutateComponentStyles(id, lines_ids, {
       coloring: values,
     });

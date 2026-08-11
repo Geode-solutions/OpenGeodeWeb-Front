@@ -30,9 +30,6 @@ export function useModelBlocksCommonStyle() {
   }
 
   function mutateModelBlocksColoring(id, blocks_ids, values) {
-    modelCommonStyle.mutateModelComponentTypeStyle(id, "Block", {
-      coloring: values,
-    });
     return modelCommonStyle.mutateComponentStyles(id, blocks_ids, {
       coloring: values,
     });
