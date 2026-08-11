@@ -32,7 +32,8 @@ export function useModelBlocksColor() {
   }
 
   async function setModelBlocksActiveColoring(modelId, blocks_ids, activeColoring) {
-    if (blocks_ids.length > 1) {
+    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, "Block");
+    if (blocks_ids.length === idsForType.length) {
       modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
         active: activeColoring,
       });

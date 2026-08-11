@@ -29,7 +29,8 @@ export function useModelLinesColor() {
   }
 
   async function setModelLinesActiveColoring(modelId, lines_ids, activeColoring) {
-    if (lines_ids.length > 1) {
+    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, "Line");
+    if (lines_ids.length === idsForType.length) {
       modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
         active: activeColoring,
       });
