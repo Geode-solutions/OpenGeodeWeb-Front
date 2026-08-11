@@ -43,6 +43,11 @@ function useModelBlocksVertexAttribute() {
   }
 
   function mutateModelBlocksVertexStyle(modelId, blockIds, values) {
+    if (blockIds.length > 1) {
+      modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+        vertex: values,
+      });
+    }
     return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
       vertex: values,
     });

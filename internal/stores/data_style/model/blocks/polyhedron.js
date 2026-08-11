@@ -44,6 +44,11 @@ function useModelBlocksPolyhedronAttribute() {
   }
 
   function mutateModelBlocksPolyhedronStyle(modelId, blockIds, values) {
+    if (blockIds.length > 1) {
+      modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+        polyhedron: values,
+      });
+    }
     return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
       polyhedron: values,
     });

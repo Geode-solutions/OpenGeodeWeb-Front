@@ -67,7 +67,7 @@ const lineActiveColoring = computed({
 
 // Group Attributes
 const linesVertexAttributeName = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, targetLineIds[0]),
+  get: () => dataStyleStore.modelLinesVertexAttributeName(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeName(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -75,7 +75,7 @@ const linesVertexAttributeName = computed({
 });
 
 const linesVertexAttributeItem = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId, targetLineIds[0]),
+  get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeItem(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -83,7 +83,7 @@ const linesVertexAttributeItem = computed({
 });
 
 const linesVertexAttributeRange = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, targetLineIds[0]),
+  get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeRange(
       modelId,
@@ -96,7 +96,7 @@ const linesVertexAttributeRange = computed({
 });
 
 const linesVertexAttributeColorMap = computed({
-  get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId, targetLineIds[0]),
+  get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -104,7 +104,7 @@ const linesVertexAttributeColorMap = computed({
 });
 
 const linesEdgeAttributeName = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, targetLineIds[0]),
+  get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeName(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -112,7 +112,7 @@ const linesEdgeAttributeName = computed({
 });
 
 const linesEdgeAttributeItem = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId, targetLineIds[0]),
+  get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeItem(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -120,7 +120,7 @@ const linesEdgeAttributeItem = computed({
 });
 
 const linesEdgeAttributeRange = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, targetLineIds[0]),
+  get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeRange(
       modelId,
@@ -133,7 +133,7 @@ const linesEdgeAttributeRange = computed({
 });
 
 const linesEdgeAttributeColorMap = computed({
-  get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, targetLineIds[0]),
+  get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -230,7 +230,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
 </script>
 
 <template>
-  <OptionsSection title="Lines Options" class="mt-4">
+  <OptionsSection title="Lines Options" class="mt-4" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelLinesVisibilitySwitch" v-model="linesVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"

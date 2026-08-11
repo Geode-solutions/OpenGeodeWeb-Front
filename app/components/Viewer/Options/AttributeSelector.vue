@@ -100,7 +100,7 @@ watch(
   },
 );
 
-watch([attributeName, attributeItem], () => {
+watch([attributeName, attributeItem, currentAttribute], () => {
   if (attributeColorMap.value === undefined) {
     attributeColorMap.value = "batlow";
   }
