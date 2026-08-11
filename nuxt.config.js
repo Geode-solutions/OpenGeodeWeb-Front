@@ -41,6 +41,9 @@ export default defineNuxtConfig({
   },
 
   vuetify: {
+    moduleOptions: {
+      prefixComposables: true,
+    },
     vuetifyOptions: {
       defaults: {
         VTooltip: {
