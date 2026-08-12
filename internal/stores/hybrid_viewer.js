@@ -298,4 +298,3 @@ export {
   performSetVisibility,
   performSetZScaling,
 };
-
