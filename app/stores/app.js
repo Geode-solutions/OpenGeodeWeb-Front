@@ -6,6 +6,8 @@ import { killExtension } from "@ogw_front/utils/extension.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json";
+
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores = [];
@@ -227,11 +229,8 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function upload(file, callbacks = {}) {
-    const schema = {
-      $id: "/api/local/extensions/upload",
-      methods: ["OPTIONS", "PUT"],
-    };
     const store = useAppStore();
+    const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
     const { PROJECT: projectName } = useRuntimeConfig().public;
     const params = { projectName };
     return upload_file(
@@ -278,14 +277,7 @@ export const useAppStore = defineStore("app", () => {
 
   function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
-    const schema = {
-      $id: "/api/local/app/project_folder_path",
-      methods: ["POST"],
-      type: "object",
-      properties: { PROJECT: { type: "string" } },
-      required: ["PROJECT"],
-      additionalProperties: true,
-    };
+    const schema = opengeodeweb_front_schemas.api.app.project_folder_path;
     const params = { PROJECT };
     return request(
       { schema, params },

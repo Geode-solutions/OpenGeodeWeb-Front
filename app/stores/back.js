@@ -7,6 +7,8 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json";
+
 const MILLISECONDS_IN_SECOND = 1000;
 const DEFAULT_PING_INTERVAL_SECONDS = 10;
 
@@ -74,17 +76,7 @@ export const useBackStore = defineStore("back", {
       console.log("[GEODE] Launching back microservice...", { args });
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
-      const schema = {
-        $id: "/api/local/app/run_back",
-        methods: ["POST"],
-        type: "object",
-        properties: {
-          COMMAND_BACK: { type: "string" },
-          NUXT_ROOT_PATH: { type: "string" },
-        },
-        required: ["COMMAND_BACK", "NUXT_ROOT_PATH"],
-        additionalProperties: true,
-      };
+      const schema = opengeodeweb_front_schemas.api.app.run_back;
       const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
 
       console.log("[GEODE] params", params);

@@ -1,0 +1,10 @@
+{
+  "route": "/set_is_app_ready",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "isReady": { "type": "boolean" }
+  },
+  "required": ["isReady"],
+  "additionalProperties": false
+}
