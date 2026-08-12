@@ -20,8 +20,8 @@ const range = [MINIMUM_RANGE, MAXIMUM_RANGE];
 const default_vertex_attribute = { name: "points", item: 0, range };
 const default_polygon_attribute = { name: "test_attribute", item: 0, range };
 
-let id = "",
-  projectFolderPath = "";
+let id = "";
+let projectFolderPath = "";
 
 describe("mesh polygons", () => {
   beforeAll(async () => {

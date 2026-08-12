@@ -10,10 +10,19 @@ export function useModelSurfacesCommonStyle() {
     return dataStyleState.getStyle(id).surfaces;
   }
 
+  function modelComponentTypeSurfacesStyle(id) {
+    const defaultStyle = modelSurfacesStyle(id);
+    const typeStyle = dataStyleState.getModelComponentTypeStyle(id, "Surface");
+    return merge({}, defaultStyle, typeStyle);
+  }
+
   function modelSurfaceStyle(id, surface_id) {
-    const groupStyle = modelSurfacesStyle(id);
+    if (surface_id === undefined) {
+      return modelComponentTypeSurfacesStyle(id);
+    }
+    const typeStyle = modelComponentTypeSurfacesStyle(id);
     const individualStyle = dataStyleState.getComponentStyle(id, surface_id);
-    return merge({}, groupStyle, individualStyle);
+    return merge({}, typeStyle, individualStyle);
   }
 
   function modelSurfaceColoring(id, surface_id) {
@@ -26,8 +35,8 @@ export function useModelSurfacesCommonStyle() {
     });
   }
 
-  function mutateModelSurfaceColoring(id, surface_id, values) {
-    return modelCommonStyle.mutateComponentStyle(id, surface_id, {
+  function mutateModelSurfacesTypeColoring(id, values) {
+    return modelCommonStyle.mutateModelComponentTypeStyle(id, "Surface", {
       coloring: values,
     });
   }
@@ -37,6 +46,6 @@ export function useModelSurfacesCommonStyle() {
     modelSurfaceStyle,
     modelSurfaceColoring,
     mutateModelSurfacesColoring,
-    mutateModelSurfaceColoring,
+    mutateModelSurfacesTypeColoring,
   };
 }

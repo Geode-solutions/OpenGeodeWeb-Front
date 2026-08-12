@@ -44,6 +44,11 @@ function useModelSurfacesPolygonAttribute() {
   }
 
   function mutateModelSurfacesPolygonStyle(modelId, surfaceIds, values) {
+    if (surfaceIds.length > 1) {
+      modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+        polygon: values,
+      });
+    }
     return modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
       polygon: values,
     });

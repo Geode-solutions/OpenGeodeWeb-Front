@@ -29,6 +29,11 @@ export function useModelSurfacesColor() {
   }
 
   async function setModelSurfacesActiveColoring(modelId, surfaces_ids, activeColoring) {
+    if (surfaces_ids.length > 1) {
+      modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+        active: activeColoring,
+      });
+    }
     await modelCommonStyle.mutateComponentStyles(modelId, surfaces_ids, {
       coloring: { active: activeColoring },
     });

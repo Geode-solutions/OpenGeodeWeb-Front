@@ -44,6 +44,11 @@ function useModelSurfacesVertexAttribute() {
   }
 
   function mutateModelSurfacesVertexStyle(modelId, surfaceIds, values) {
+    if (surfaceIds.length > 1) {
+      modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+        vertex: values,
+      });
+    }
     return modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
       vertex: values,
     });
