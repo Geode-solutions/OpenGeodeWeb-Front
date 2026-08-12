@@ -21,7 +21,10 @@ import {
   performClearHoverHighlight,
   performClickPicking,
   performRemoveItem,
+  performResize,
+  performSetClippingPlanes,
   performSetContainer,
+  performSetShrink,
   performSetVisibility,
   performSetZScaling,
 } from "@ogw_internal/stores/hybrid_viewer";
@@ -138,17 +141,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function setClippingPlanes(ids, planes) {
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.clipping_planes;
-    const params = { ids, planes };
-    await viewerStore.request({ schema, params });
-    await remoteRender();
+    await performSetClippingPlanes(ids, planes, { viewerStore, viewer_schemas, remoteRender });
   }
 
   async function setShrink(ids, shrink_factor) {
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.shrink;
-    const params = { ids, shrink_factor };
-    await viewerStore.request({ schema, params });
-    await remoteRender();
+    await performSetShrink(ids, shrink_factor, { viewerStore, viewer_schemas, remoteRender });
   }
 
   function resetCamera() {
@@ -273,18 +270,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   async function resize(width, height) {
-    if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
-      return;
-    }
-    const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-    const canvas = webGLRenderWindow.getCanvas();
-    canvas.width = width;
-    canvas.height = height;
-    await nextTick();
-    webGLRenderWindow.setSize(width, height);
-    viewStream.setSize(width, height);
-    genericRenderWindow.value.getRenderWindow().render();
-    remoteRender();
+    await performResize(width, height, {
+      viewerStore,
+      status,
+      Status,
+      genericRenderWindow: genericRenderWindow.value,
+      viewStream,
+      remoteRender,
+    });
   }
 
   function getAverageBrightness(rect) {
@@ -324,7 +317,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setClippingPlanes,
     setShrink,
     syncRemoteCamera,
-
     setCamera,
     initHybridViewer,
     remoteRender,

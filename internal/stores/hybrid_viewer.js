@@ -252,14 +252,50 @@ function performClear(options) {
   }
 }
 
+async function performSetClippingPlanes(ids, planes, options) {
+  const { viewerStore, viewer_schemas, remoteRender } = options;
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.clipping_planes;
+  const params = { ids, planes };
+  await viewerStore.request({ schema, params });
+  await remoteRender();
+}
+
+async function performSetShrink(ids, shrink_factor, options) {
+  const { viewerStore, viewer_schemas, remoteRender } = options;
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.shrink;
+  const params = { ids, shrink_factor };
+  await viewerStore.request({ schema, params });
+  await remoteRender();
+}
+
+async function performResize(width, height, options) {
+  const { viewerStore, status, Status, genericRenderWindow, viewStream, remoteRender } = options;
+  if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
+    return;
+  }
+  const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
+  const canvas = webGLRenderWindow.getCanvas();
+  canvas.width = width;
+  canvas.height = height;
+  await nextTick();
+  webGLRenderWindow.setSize(width, height);
+  viewStream.setSize(width, height);
+  genericRenderWindow.getRenderWindow().render();
+  remoteRender();
+}
+
 export {
   performAddItem,
+  performClear,
   performClearHoverHighlight,
   performClickPicking,
   performHoverHighlight,
-  performSetContainer,
-  performSetZScaling,
   performRemoveItem,
+  performResize,
+  performSetClippingPlanes,
+  performSetContainer,
+  performSetShrink,
   performSetVisibility,
-  performClear,
+  performSetZScaling,
 };
+
