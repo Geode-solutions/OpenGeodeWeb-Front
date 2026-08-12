@@ -144,6 +144,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     await remoteRender();
   }
 
+  async function setShrink(ids, shrink_factor) {
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.shrink;
+    const params = { ids, shrink_factor };
+    await viewerStore.request({ schema, params });
+    await remoteRender();
+  }
+
   function resetCamera() {
     genericRenderWindow.value.getRenderer().resetCamera();
     genericRenderWindow.value.getRenderWindow().render();
@@ -315,7 +322,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     setVisibility,
     setZScaling,
     setClippingPlanes,
+    setShrink,
     syncRemoteCamera,
+
     setCamera,
     initHybridViewer,
     remoteRender,
