@@ -67,7 +67,7 @@ const blockActiveColoring = computed({
 
 // Group Attributes
 const blocksVertexAttributeName = computed({
-  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, targetBlockIds[0]),
+  get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeName(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
@@ -75,7 +75,7 @@ const blocksVertexAttributeName = computed({
 });
 
 const blocksVertexAttributeItem = computed({
-  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, targetBlockIds[0]),
+  get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
@@ -83,7 +83,7 @@ const blocksVertexAttributeItem = computed({
 });
 
 const blocksVertexAttributeRange = computed({
-  get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, targetBlockIds[0]),
+  get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeRange(
       modelId,
@@ -96,7 +96,7 @@ const blocksVertexAttributeRange = computed({
 });
 
 const blocksVertexAttributeColorMap = computed({
-  get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, targetBlockIds[0]),
+  get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
@@ -104,7 +104,7 @@ const blocksVertexAttributeColorMap = computed({
 });
 
 const blocksPolyhedronAttributeName = computed({
-  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, targetBlockIds[0]),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
@@ -112,7 +112,7 @@ const blocksPolyhedronAttributeName = computed({
 });
 
 const blocksPolyhedronAttributeItem = computed({
-  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, targetBlockIds[0]),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
@@ -120,7 +120,7 @@ const blocksPolyhedronAttributeItem = computed({
 });
 
 const blocksPolyhedronAttributeRange = computed({
-  get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, targetBlockIds[0]),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
       modelId,
@@ -133,7 +133,7 @@ const blocksPolyhedronAttributeRange = computed({
 });
 
 const blocksPolyhedronAttributeColorMap = computed({
-  get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, targetBlockIds[0]),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
       modelId,
@@ -234,7 +234,7 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
 </script>
 
 <template>
-  <OptionsSection title="Blocks Options" class="mt-4">
+  <OptionsSection title="Blocks Options" class="mt-4" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelBlocksVisibilitySwitch" v-model="blocksVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"

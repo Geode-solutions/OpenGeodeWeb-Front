@@ -10,10 +10,19 @@ export function useModelCornersCommonStyle() {
     return dataStyleState.getStyle(id).corners;
   }
 
+  function modelComponentTypeCornersStyle(id) {
+    const defaultStyle = modelCornersStyle(id);
+    const typeStyle = dataStyleState.getModelComponentTypeStyle(id, "Corner");
+    return merge({}, defaultStyle, typeStyle);
+  }
+
   function modelCornerStyle(id, corner_id) {
-    const groupStyle = modelCornersStyle(id);
+    if (corner_id === undefined) {
+      return modelComponentTypeCornersStyle(id);
+    }
+    const typeStyle = modelComponentTypeCornersStyle(id);
     const individualStyle = dataStyleState.getComponentStyle(id, corner_id);
-    return merge({}, groupStyle, individualStyle);
+    return merge({}, typeStyle, individualStyle);
   }
 
   function modelCornerColoring(id, corner_id) {
@@ -26,8 +35,8 @@ export function useModelCornersCommonStyle() {
     });
   }
 
-  function mutateModelCornerColoring(id, corner_id, values) {
-    return modelCommonStyle.mutateComponentStyle(id, corner_id, {
+  function mutateModelCornersTypeColoring(id, values) {
+    return modelCommonStyle.mutateModelComponentTypeStyle(id, "Corner", {
       coloring: values,
     });
   }
@@ -37,6 +46,6 @@ export function useModelCornersCommonStyle() {
     modelCornerStyle,
     modelCornerColoring,
     mutateModelCornersColoring,
-    mutateModelCornerColoring,
+    mutateModelCornersTypeColoring,
   };
 }

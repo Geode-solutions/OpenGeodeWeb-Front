@@ -15,6 +15,7 @@ const filterText = ref("");
 const canvasRefs = ref({});
 const loading = ref(true);
 const renderJobId = ref(0);
+const openedGroups = ref([]);
 
 function setCanvasRef(presetName, element, id) {
   if (element) {
@@ -42,6 +43,16 @@ const filteredPresets = computed(() => {
     }
   }
   return result;
+});
+
+watch(filterText, (newFilterText) => {
+  if (newFilterText) {
+    openedGroups.value = filteredPresets.value
+      .filter((item) => item.Children)
+      .map((item) => item.Name);
+  } else {
+    openedGroups.value = [];
+  }
 });
 
 function processChunk(entries, index, jobId) {
@@ -103,6 +114,7 @@ watch(filteredPresets, drawAllCanvases);
     />
 
     <v-list
+      v-model:opened="openedGroups"
       data-testid="colorMapList"
       density="compact"
       max-height="350"
@@ -110,7 +122,7 @@ watch(filteredPresets, drawAllCanvases);
       class="pa-0"
       :style="{ opacity: loading ? '0.3' : '1', transition: 'opacity 0.2s' }"
     >
-      <template v-for="(item, index) in filteredPresets" :key="index">
+      <template v-for="(item, itemIdx) in filteredPresets" :key="item.Name">
         <v-list-group v-if="item.Children" :value="item.Name">
           <template #activator="{ props: gProps }">
             <v-list-item v-bind="gProps" :title="item.Name" class="text-white font-weight-bold" />
@@ -118,7 +130,7 @@ watch(filteredPresets, drawAllCanvases);
 
           <v-list-item
             v-for="(child, childIdx) in item.Children"
-            :key="childIdx"
+            :key="child.Name"
             :active="child.Name === selectedPresetName"
             @click="emit('select', child)"
             class="px-2 mb-1"
@@ -127,7 +139,7 @@ watch(filteredPresets, drawAllCanvases);
             <div class="d-flex flex-column py-1">
               <span class="text-caption text-grey-lighten-1 mb-1">{{ child.Name }}</span>
               <canvas
-                :ref="(element) => setCanvasRef(child.Name, element, `g-${index}-${childIdx}`)"
+                :ref="(element) => setCanvasRef(child.Name, element, `g-${itemIdx}-${childIdx}`)"
                 width="200"
                 height="18"
                 class="w-100 rounded-xs border-thin"
@@ -147,7 +159,7 @@ watch(filteredPresets, drawAllCanvases);
           <div class="d-flex flex-column py-1">
             <span class="text-caption text-grey-lighten-1 mb-1">{{ item.Name }}</span>
             <canvas
-              :ref="(element) => setCanvasRef(item.Name, element, `s-${index}`)"
+              :ref="(element) => setCanvasRef(item.Name, element, `s-${itemIdx}`)"
               width="200"
               height="18"
               class="w-100 rounded-xs border-thin"

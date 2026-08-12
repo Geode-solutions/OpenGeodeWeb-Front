@@ -43,6 +43,11 @@ function useModelLinesVertexAttribute() {
   }
 
   function mutateModelLinesVertexStyle(modelId, lineIds, values) {
+    if (lineIds.length > 1) {
+      modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
+        vertex: values,
+      });
+    }
     return modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
       vertex: values,
     });

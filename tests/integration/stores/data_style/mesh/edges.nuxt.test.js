@@ -20,8 +20,8 @@ const range = [MINIMUM_RANGE, MAXIMUM_RANGE];
 const default_vertex_attribute = { name: "vertex_attribute", item: 0, range };
 const default_edge_attribute = { name: "edge_attribute", item: 0, range };
 
-let id = "",
-  projectFolderPath = "";
+let id = "";
+let projectFolderPath = "";
 
 describe("mesh edges", () => {
   beforeAll(async () => {
