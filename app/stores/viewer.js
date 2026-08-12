@@ -6,8 +6,8 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
 import SmartConnect from "wslink/src/SmartConnect";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json";
-import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
 import {

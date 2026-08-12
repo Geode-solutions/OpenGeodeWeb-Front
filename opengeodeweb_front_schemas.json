@@ -49,14 +49,14 @@
           "additionalProperties": true
         },
         "run_back": {
-          "$id": "api/local/app/run_viewer",
-          "route": "/run_viewer",
+          "$id": "api/local/app/run_back",
+          "route": "/run_back",
           "methods": [
             "POST"
           ],
           "type": "object",
           "properties": {
-            "COMMAND_VIEWER": {
+            "COMMAND_BACK": {
               "type": "string"
             },
             "NUXT_ROOT_PATH": {
@@ -64,7 +64,7 @@
             }
           },
           "required": [
-            "COMMAND_VIEWER",
+            "COMMAND_BACK",
             "NUXT_ROOT_PATH"
           ],
           "additionalProperties": true
@@ -231,6 +231,24 @@
       },
       "extensions": {}
     },
-    "serverless": {}
+    "serverless": {
+      "run_cloud": {
+        "$id": "api/serverless/run_cloud",
+        "route": "/run_cloud",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "additionalProperties": false
+      }
+    }
   }
 }

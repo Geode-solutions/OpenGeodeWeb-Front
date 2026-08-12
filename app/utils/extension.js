@@ -8,7 +8,7 @@ import { isCloudMode } from "@ogw_front/utils/stores";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json";
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };;
 
 async function importExtensionFile(file) {
   await uploadExtension(file);

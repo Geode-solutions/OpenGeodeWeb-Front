@@ -5,8 +5,7 @@ import { useAppStore } from "./app";
 import { useFeedbackStore } from "./feedback";
 import { useInfraStore } from "./infra";
 
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json";
-
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
 export const useCloudStore = defineStore("cloud", {
   state: () => ({

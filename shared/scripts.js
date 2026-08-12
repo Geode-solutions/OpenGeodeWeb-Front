@@ -5,7 +5,7 @@
 // Local imports
 import { fetchSchema } from "./utils/fetch_schema.js";
 
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json";
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
 function setAppBaseUrl(appBaseUrl) {
   console.log("[API] setAppBaseUrl", appBaseUrl);
