@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
+import { isModelCornersVertexAttributeValid } from "@ogw_internal/stores/data_style/model/corners/vertex";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -25,8 +26,8 @@ function sleep(milliseconds) {
   });
 }
 
-let id = "",
-  projectFolderPath = "";
+let id = "";
+let projectFolderPath = "";
 
 describe("model corners", () => {
   beforeAll(async () => {
@@ -97,6 +98,17 @@ describe("model corners", () => {
   });
 
   describe("corners vertex attribute", () => {
+    test("coloring vertex attribute", () => {
+      const attribute = {
+        name: undefined,
+        item: undefined,
+        minimum: undefined,
+        maximum: undefined,
+        colorMap: undefined,
+      };
+      expect(isModelCornersVertexAttributeValid(attribute)).toBe(false);
+    });
+
     test("coloring vertex attribute — no request until range+colormap set", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();

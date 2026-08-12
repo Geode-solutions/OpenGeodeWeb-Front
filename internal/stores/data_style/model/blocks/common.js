@@ -10,10 +10,19 @@ export function useModelBlocksCommonStyle() {
     return dataStyleState.getStyle(id).blocks;
   }
 
+  function modelComponentTypeBlocksStyle(id) {
+    const defaultStyle = modelBlocksStyle(id);
+    const typeStyle = dataStyleState.getModelComponentTypeStyle(id, "Block");
+    return merge({}, defaultStyle, typeStyle);
+  }
+
   function modelBlockStyle(id, block_id) {
-    const groupStyle = modelBlocksStyle(id);
+    if (block_id === undefined) {
+      return modelComponentTypeBlocksStyle(id);
+    }
+    const typeStyle = modelComponentTypeBlocksStyle(id);
     const individualStyle = dataStyleState.getComponentStyle(id, block_id);
-    return merge({}, groupStyle, individualStyle);
+    return merge({}, typeStyle, individualStyle);
   }
 
   function modelBlockColoring(id, block_id) {
@@ -26,8 +35,8 @@ export function useModelBlocksCommonStyle() {
     });
   }
 
-  function mutateModelBlockColoring(id, block_id, values) {
-    return modelCommonStyle.mutateComponentStyle(id, block_id, {
+  function mutateModelBlocksTypeColoring(id, values) {
+    return modelCommonStyle.mutateModelComponentTypeStyle(id, "Block", {
       coloring: values,
     });
   }
@@ -37,6 +46,6 @@ export function useModelBlocksCommonStyle() {
     modelBlockStyle,
     modelBlockColoring,
     mutateModelBlocksColoring,
-    mutateModelBlockColoring,
+    mutateModelBlocksTypeColoring,
   };
 }

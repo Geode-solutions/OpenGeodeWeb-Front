@@ -25,8 +25,10 @@ export function useModelCornersStyle() {
       }
       visibilityGroups[visibility].push(corner_id);
     }
-    return Object.entries(visibilityGroups).map(([visibility, ids]) =>
-      modelVisibilityStyle.setModelCornersVisibility(modelId, ids, visibility === "true"),
+    return Promise.all(
+      Object.entries(visibilityGroups).map(([visibility, ids]) =>
+        modelVisibilityStyle.setModelCornersVisibility(modelId, ids, visibility === "true"),
+      ),
     );
   }
 

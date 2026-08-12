@@ -14,8 +14,8 @@ const mesh_schemas = viewer_schemas.opengeodeweb_viewer.mesh;
 const file_name = "test.og_rgd3d";
 const geode_object = "RegularGrid3D";
 
-let id = "",
-  projectFolderPath = "";
+let id = "";
+let projectFolderPath = "";
 
 describe("mesh", () => {
   beforeAll(async () => {

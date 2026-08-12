@@ -44,10 +44,10 @@ function drawCanvasForPreset(presetName, canvas) {
   const table = lut.getUint8Table(rgbPoints[0], rgbPoints.at(-LAST_POINT_OFFSET), width, true);
   const imageData = ctx.createImageData(width, height);
   for (let xCoord = 0; xCoord < width; xCoord += 1) {
-    const alpha = table[xCoord * 4 + THREE],
-      blue = table[xCoord * 4 + 2],
-      green = table[xCoord * 4 + 1],
-      red = table[xCoord * 4];
+    const alpha = table[xCoord * 4 + THREE];
+    const blue = table[xCoord * 4 + 2];
+    const green = table[xCoord * 4 + 1];
+    const red = table[xCoord * 4];
     for (let yCoord = 0; yCoord < height; yCoord += 1) {
       const pixelIdx = (yCoord * width + xCoord) * 4;
       imageData.data[pixelIdx] = red;

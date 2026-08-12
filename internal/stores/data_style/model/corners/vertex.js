@@ -43,6 +43,11 @@ function useModelCornersVertexAttribute() {
   }
 
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
+    if (cornerIds.length > 1) {
+      modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
+        vertex: values,
+      });
+    }
     return modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
       vertex: values,
     });
