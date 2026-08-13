@@ -5,9 +5,7 @@
         "run": {
           "$id": "api/cloud/extensions/run",
           "route": "/run",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "projectFolderPath": {
@@ -17,10 +15,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "projectFolderPath",
-            "projectName"
-          ],
+          "required": ["projectFolderPath", "projectName"],
           "additionalProperties": false
         }
       }
@@ -30,9 +25,7 @@
         "run_viewer": {
           "$id": "api/local/app/run_viewer",
           "route": "/run_viewer",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "COMMAND_VIEWER": {
@@ -42,18 +35,13 @@
               "type": "string"
             }
           },
-          "required": [
-            "COMMAND_VIEWER",
-            "NUXT_ROOT_PATH"
-          ],
+          "required": ["COMMAND_VIEWER", "NUXT_ROOT_PATH"],
           "additionalProperties": true
         },
         "run_back": {
           "$id": "api/local/app/run_back",
           "route": "/run_back",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "COMMAND_BACK": {
@@ -63,35 +51,26 @@
               "type": "string"
             }
           },
-          "required": [
-            "COMMAND_BACK",
-            "NUXT_ROOT_PATH"
-          ],
+          "required": ["COMMAND_BACK", "NUXT_ROOT_PATH"],
           "additionalProperties": true
         },
         "project_folder_path": {
           "$id": "api/local/app/project_folder_path",
           "route": "/project_folder_path",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "PROJECT": {
               "type": "string"
             }
           },
-          "required": [
-            "PROJECT"
-          ],
+          "required": ["PROJECT"],
           "additionalProperties": true
         },
         "kill": {
           "$id": "api/local/app/kill",
           "route": "/kill",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {},
           "required": [],
@@ -102,9 +81,7 @@
         "run": {
           "$id": "api/local/extensions/run",
           "route": "/run",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "projectFolderPath": {
@@ -114,18 +91,13 @@
               "type": "string"
             }
           },
-          "required": [
-            "projectFolderPath",
-            "projectName"
-          ],
+          "required": ["projectFolderPath", "projectName"],
           "additionalProperties": false
         },
         "kill": {
           "$id": "api/local/extensions/kill",
           "route": "/kill",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "extensionId": {
@@ -138,11 +110,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "extensionId",
-            "projectFolderPath",
-            "projectName"
-          ],
+          "required": ["extensionId", "projectFolderPath", "projectName"],
           "additionalProperties": false
         }
       }
@@ -152,77 +120,59 @@
         "set_viewer_base_url": {
           "$id": "api/microservice/app/set_viewer_base_url",
           "route": "/set_viewer_base_url",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "baseUrl": {
               "type": "string"
             }
           },
-          "required": [
-            "baseUrl"
-          ],
+          "required": ["baseUrl"],
           "additionalProperties": false
         },
         "set_is_app_ready": {
           "$id": "api/microservice/app/set_is_app_ready",
           "route": "/set_is_app_ready",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "isReady": {
               "type": "boolean"
             }
           },
-          "required": [
-            "isReady"
-          ],
+          "required": ["isReady"],
           "additionalProperties": false
         },
         "set_back_base_url": {
           "$id": "api/microservice/app/set_back_base_url",
           "route": "/set_back_base_url",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "baseUrl": {
               "type": "string"
             }
           },
-          "required": [
-            "baseUrl"
-          ],
+          "required": ["baseUrl"],
           "additionalProperties": false
         },
         "set_app_base_url": {
           "$id": "api/microservice/app/set_app_base_url",
           "route": "/set_app_base_url",
-          "methods": [
-            "POST"
-          ],
+          "methods": ["POST"],
           "type": "object",
           "properties": {
             "baseUrl": {
               "type": "string"
             }
           },
-          "required": [
-            "baseUrl"
-          ],
+          "required": ["baseUrl"],
           "additionalProperties": false
         },
         "get_is_app_ready": {
           "$id": "api/microservice/app/api/microservice/app/get_is_app_ready",
           "route": "/api/microservice/app/get_is_app_ready",
-          "methods": [
-            "GET"
-          ],
+          "methods": ["GET"],
           "type": "object",
           "properties": {},
           "required": [],
@@ -235,18 +185,14 @@
       "run_cloud": {
         "$id": "api/serverless/run_cloud",
         "route": "/run_cloud",
-        "methods": [
-          "POST"
-        ],
+        "methods": ["POST"],
         "type": "object",
         "properties": {
           "email": {
             "type": "string"
           }
         },
-        "required": [
-          "email"
-        ],
+        "required": ["email"],
         "additionalProperties": false
       }
     }
