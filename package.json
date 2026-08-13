@@ -16,16 +16,10 @@
     "type": "git",
     "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Front.git"
   },
-  "files": [
-    "opengeodeweb_front_schemas.json"
-  ],
   "type": "module",
   "main": "./nuxt.config.js",
   "exports": {
-    "./opengeodeweb_front_schemas.json": {
-      "import": "./opengeodeweb_front_schemas.json",
-      "require": "./opengeodeweb_front_schemas.json"
-    }
+    "./*": "./*"
   },
   "publishConfig": {
     "access": "public"
