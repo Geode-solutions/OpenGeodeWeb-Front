@@ -1,0 +1,11 @@
+{
+  "route": "/download",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "extension": { "type": "string" },
+    "platform": { "type": "string" }
+  },
+  "required": ["extension", "platform"],
+  "additionalProperties": false
+}

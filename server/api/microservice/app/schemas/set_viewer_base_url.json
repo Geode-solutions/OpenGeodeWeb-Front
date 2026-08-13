@@ -1,0 +1,10 @@
+{
+  "route": "/set_viewer_base_url",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "baseUrl": { "type": "string" }
+  },
+  "required": ["baseUrl"],
+  "additionalProperties": false
+}
