@@ -28,7 +28,7 @@
     "build:microservices": "concurrently \"npm run build:back\" \"npm run build:viewer\"",
     "json": "npx opengeodeweb-microservice-generate --startDir server/api --key route --separator / --prefix api",
     "test": "npm run test:unit",
-    "tests": "vitest --config ./tests/vitest.config.js",
+    "tests": "npm run json && vitest --config ./tests/vitest.config.js",
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
     "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
