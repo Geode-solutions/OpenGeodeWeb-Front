@@ -16,8 +16,17 @@
     "type": "git",
     "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Front.git"
   },
+  "files": [
+    "opengeodeweb_front_schemas.json"
+  ],
   "type": "module",
   "main": "./nuxt.config.js",
+  "exports": {
+    "./opengeodeweb_front_schemas.json": {
+      "import": "./opengeodeweb_front_schemas.json",
+      "require": "./opengeodeweb_front_schemas.json"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -28,7 +37,7 @@
     "build:microservices": "concurrently \"npm run build:back\" \"npm run build:viewer\"",
     "json": "npx opengeodeweb-microservice-generate --startDir server/api --key route --separator / --prefix api",
     "test": "npm run test:unit",
-    "tests": "npm run json && vitest --config ./tests/vitest.config.js",
+    "tests": "vitest --config ./tests/vitest.config.js",
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
     "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
