@@ -1,0 +1,12 @@
+{
+  "route": "/upload",
+  "methods": ["OPTIONS", "PUT"],
+  "type": "object",
+  "properties": {
+    "filename": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

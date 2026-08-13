@@ -78,6 +78,19 @@
         }
       },
       "extensions": {
+        "upload": {
+          "$id": "api/local/extensions/upload",
+          "route": "/upload",
+          "methods": ["OPTIONS", "PUT"],
+          "type": "object",
+          "properties": {
+            "filename": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
         "run": {
           "$id": "api/local/extensions/run",
           "route": "/run",
@@ -179,7 +192,24 @@
           "additionalProperties": false
         }
       },
-      "extensions": {}
+      "extensions": {
+        "download": {
+          "$id": "api/microservice/extensions/download",
+          "route": "/download",
+          "methods": ["POST"],
+          "type": "object",
+          "properties": {
+            "extension": {
+              "type": "string"
+            },
+            "platform": {
+              "type": "string"
+            }
+          },
+          "required": ["extension", "platform"],
+          "additionalProperties": false
+        }
+      }
     },
     "serverless": {
       "run_cloud": {
