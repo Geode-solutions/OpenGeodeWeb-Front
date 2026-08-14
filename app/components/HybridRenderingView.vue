@@ -55,6 +55,14 @@ function debounce(func, wait) {
 
 async function handleClick(event) {
   const { offsetX, offsetY, clientX, clientY } = event;
+  if (hybridViewerStore.is_ruler_active) {
+    const rect = container.value.$el.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = elementHeight.value - (event.clientY - rect.top);
+    await hybridViewerStore.handleRulerClick(x, y);
+    return;
+  }
+
   if (viewerStore.picking_mode) {
     const rect = container.value.$el.getBoundingClientRect();
     const x = event.clientX - rect.left;
