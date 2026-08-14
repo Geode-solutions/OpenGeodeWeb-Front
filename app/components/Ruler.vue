@@ -72,11 +72,11 @@ async function applyManualCoords() {
       <v-divider class="mb-3" />
 
       <div class="text-caption font-weight-bold mb-2 text-medium-emphasis">Point 1</div>
-      <v-row dense class="mb-1">
+      <v-row dense class="mb-1" data-testid="rulerPointCard">
         <v-col v-for="(axis, index) in ['X', 'Y', 'Z']" :key="axis">
           <v-text-field
             v-model.number="localPoint1[index]"
-            :data-testid="`rulerPoint1${axis}`"
+            data-testid="rulerPointCoordInput"
             :label="axis"
             type="number"
             density="compact"
@@ -87,11 +87,11 @@ async function applyManualCoords() {
       </v-row>
 
       <div class="text-caption font-weight-bold mb-2 mt-3 text-medium-emphasis">Point 2</div>
-      <v-row dense class="mb-1">
+      <v-row dense class="mb-1" data-testid="rulerPointCard">
         <v-col v-for="(axis, index) in ['X', 'Y', 'Z']" :key="axis">
           <v-text-field
             v-model.number="localPoint2[index]"
-            :data-testid="`rulerPoint2${axis}`"
+            data-testid="rulerPointCoordInput"
             :label="axis"
             type="number"
             density="compact"
