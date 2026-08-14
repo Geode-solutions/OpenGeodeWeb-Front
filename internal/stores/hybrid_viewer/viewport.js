@@ -1,11 +1,11 @@
 import { WHEEL_TIME_OUT_MS } from "./constants";
 import { centerCameraOnPosition } from "./camera";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 function useHybridViewerViewport(options) {
   const {
     genericRenderWindow,
-    viewerStore,
-    viewer_schemas,
     remoteRender,
     status,
     Status,
@@ -16,6 +16,7 @@ function useHybridViewerViewport(options) {
     setImageStyle,
   } = options;
 
+  const viewerStore = useViewerStore();
   const viewStream = ref(undefined);
   let wheelEventEndTimeout = undefined;
 
@@ -31,7 +32,6 @@ function useHybridViewerViewport(options) {
       is_moving,
       clickPickingCallback: performClickPicking,
       viewerStore,
-      viewer_schemas,
       syncRemoteCamera,
       hoverHighlight,
       wheelTimeoutMs: WHEEL_TIME_OUT_MS,
@@ -59,7 +59,7 @@ function useHybridViewerViewport(options) {
 }
 
 function performClickPicking(event, options) {
-  const { container, viewerStore, viewer_schemas, genericRenderWindow, syncRemoteCamera } = options;
+  const { container, viewerStore, genericRenderWindow, syncRemoteCamera } = options;
   const rect = container.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
   const params = {
@@ -97,7 +97,6 @@ function performSetContainer(options) {
     is_moving,
     clickPickingCallback,
     viewerStore,
-    viewer_schemas,
     syncRemoteCamera,
     hoverHighlight,
     wheelTimeoutMs,
@@ -129,7 +128,6 @@ function performSetContainer(options) {
         clickPickingCallback(event, {
           container: container.value.$el,
           viewerStore,
-          viewer_schemas,
           genericRenderWindow,
           syncRemoteCamera,
         });

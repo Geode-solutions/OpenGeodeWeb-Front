@@ -4,7 +4,7 @@ import {
   useHybridViewerCamera,
 } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { BACKGROUND_COLOR } from "@ogw_internal/stores/hybrid_viewer/constants";
-import { computeAverageBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
+import { useHybridViewerBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
 import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filters";
 import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/highlight";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
@@ -12,14 +12,12 @@ import { useHybridViewerViewport } from "@ogw_internal/stores/hybrid_viewer/view
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
 import { Status } from "@ogw_front/utils/status";
-import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // oxlint-disable max-lines-per-function, max-statements
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
-  const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const genericRenderWindow = reactive({});
   const status = ref(Status.NOT_CREATED);
@@ -36,12 +34,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     }
   });
 
-  const latestImage = ref(undefined);
-  const offscreenCanvas =
-    typeof document === "undefined" ? undefined : document.createElement("canvas");
-  const offscreenCtx = offscreenCanvas
-    ? offscreenCanvas.getContext("2d", { willReadFrequently: true })
-    : undefined;
+  const brightnessStore = useHybridViewerBrightness({ genericRenderWindow });
 
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
@@ -61,7 +54,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       if (is_moving.value) {
         return;
       }
-      latestImage.value = event.image;
+      brightnessStore.latestImage.value = event.image;
       webGLRenderWindow.setBackgroundImage(event.image);
       imageStyle.opacity = 1;
     });
@@ -99,29 +92,20 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   const sceneStore = useHybridViewerScene({
     genericRenderWindow,
-    viewerStore,
-    viewer_schemas,
     remoteRender,
-    dataStore,
   });
 
   const filtersStore = useHybridViewerFilters({
-    viewerStore,
-    viewer_schemas,
     remoteRender,
   });
 
   const highlightStore = useHybridViewerHighlight({
     genericRenderWindow,
-    viewerStore,
-    viewer_schemas,
     hybridDb: sceneStore.hybridDb,
   });
 
   const cameraStore = useHybridViewerCamera({
     genericRenderWindow,
-    viewerStore,
-    viewer_schemas,
     remoteRender,
     hybridDb: sceneStore.hybridDb,
     is_moving,
@@ -130,8 +114,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   const viewportStore = useHybridViewerViewport({
     genericRenderWindow,
-    viewerStore,
-    viewer_schemas,
     remoteRender,
     status,
     Status,
@@ -141,15 +123,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     hoverHighlight: highlightStore.hoverHighlight,
     setImageStyle: (style) => (imageStyle = style),
   });
-
-  function getAverageBrightness(rect) {
-    return computeAverageBrightness(rect, {
-      latestImage: latestImage.value,
-      offscreenCtx,
-      offscreenCanvas,
-      genericRenderWindow: genericRenderWindow.value,
-    });
-  }
 
   function exportStores() {
     const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
@@ -175,8 +148,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     is_picking,
     exportStores,
     importStores,
-    latestImage,
-    getAverageBrightness,
+    ...brightnessStore,
     ...sceneStore,
     ...viewportStore,
     ...filtersStore,

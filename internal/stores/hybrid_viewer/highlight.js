@@ -1,8 +1,11 @@
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import { database } from "@ogw_internal/database/database.js";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 function useHybridViewerHighlight(options) {
-  const { genericRenderWindow, viewerStore, viewer_schemas, hybridDb } = options;
+  const { genericRenderWindow, hybridDb } = options;
+  const viewerStore = useViewerStore();
 
   const is_hover_highlight = ref(false);
   const hover_highlight_field_type = ref("CELL");
@@ -17,7 +20,6 @@ function useHybridViewerHighlight(options) {
     genericRenderWindow,
     is_hover_highlight,
     viewerStore,
-    viewer_schemas,
     hover_highlight_field_type,
     hybridDb,
     hoverData,
@@ -31,7 +33,6 @@ function useHybridViewerHighlight(options) {
     clearHoverData();
     performClearHoverHighlight({
       viewerStore,
-      viewer_schemas,
       hover_highlight_field_type,
       hybridDb,
     });
@@ -52,7 +53,6 @@ function performHoverHighlight(event, options) {
     is_hover_highlight,
     genericRenderWindow,
     viewerStore,
-    viewer_schemas,
     hover_highlight_field_type,
     hybridDb,
     onResponse,
@@ -84,7 +84,7 @@ function performHoverHighlight(event, options) {
 }
 
 function performClearHoverHighlight(options) {
-  const { viewerStore, viewer_schemas, hover_highlight_field_type, hybridDb } = options;
+  const { viewerStore, hover_highlight_field_type, hybridDb } = options;
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
   const params = {
     x: -1,
@@ -111,7 +111,6 @@ function createHoverHighlight(options) {
     genericRenderWindow,
     is_hover_highlight,
     viewerStore,
-    viewer_schemas,
     hover_highlight_field_type,
     hybridDb,
     hoverData,
@@ -138,7 +137,6 @@ function createHoverHighlight(options) {
       is_hover_highlight,
       genericRenderWindow: genericRenderWindow.value,
       viewerStore,
-      viewer_schemas,
       hover_highlight_field_type,
       hybridDb,
       onResponse: async (response) => {

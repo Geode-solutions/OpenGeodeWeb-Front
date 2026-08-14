@@ -5,6 +5,8 @@ import {
   computeAnimationDuration,
 } from "./camera_animation";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const BUMP_MULTIPLIER = 0.2;
 const ALIGNMENT_THRESHOLD = 0.9;
@@ -22,21 +24,19 @@ const ORIENTATIONS = {
 function useHybridViewerCamera(options) {
   const {
     genericRenderWindow,
-    viewerStore,
-    viewer_schemas,
     remoteRender,
     hybridDb,
     is_moving,
     getImageStyle,
   } = options;
 
+  const viewerStore = useViewerStore();
   const camera_options = reactive({});
 
   function syncRemoteCamera() {
     performSyncRemoteCamera({
       genericRenderWindow: genericRenderWindow.value,
       viewerStore,
-      viewer_schemas,
       remoteRender,
       camera_options,
     });
@@ -61,7 +61,6 @@ function useHybridViewerCamera(options) {
     await performFocusCameraOnObject(id, {
       hybridDb,
       viewerStore,
-      viewer_schemas,
       genericRenderWindow: genericRenderWindow.value,
       block_ids,
       is_moving,
@@ -196,7 +195,6 @@ async function performFocusCameraOnObject(id, options) {
   const {
     hybridDb,
     viewerStore,
-    viewer_schemas,
     genericRenderWindow,
     block_ids = [],
     is_moving,
@@ -233,7 +231,7 @@ async function performFocusCameraOnObject(id, options) {
 }
 
 function performSyncRemoteCamera(options) {
-  const { genericRenderWindow, viewerStore, viewer_schemas, remoteRender, camera_options } =
+  const { genericRenderWindow, viewerStore, remoteRender, camera_options } =
     options;
   const camera = genericRenderWindow.getRenderer().getActiveCamera();
   const options_camera = getCameraOptions(camera);

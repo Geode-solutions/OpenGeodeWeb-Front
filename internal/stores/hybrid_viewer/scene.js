@@ -1,4 +1,7 @@
 import { ACTOR_COLOR } from "./constants";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
@@ -6,13 +9,12 @@ import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLP
 function useHybridViewerScene(options) {
   const {
     genericRenderWindow,
-    viewerStore,
-    viewer_schemas,
     remoteRender,
-    dataStore,
     gridActor,
   } = options;
 
+  const dataStore = useDataStore();
+  const viewerStore = useViewerStore();
   const hybridDb = reactive({});
   const zScale = ref(1);
 
@@ -45,7 +47,6 @@ function useHybridViewerScene(options) {
       genericRenderWindow: genericRenderWindow.value,
       gridActor,
       viewerStore,
-      viewer_schemas,
       remoteRender,
     });
   }
@@ -126,7 +127,7 @@ function performSetVisibility(id, visibility, options) {
 }
 
 async function performSetZScaling(z_scale, options) {
-  const { zScale, genericRenderWindow, gridActor, viewerStore, viewer_schemas, remoteRender } =
+  const { zScale, genericRenderWindow, gridActor, viewerStore, remoteRender } =
     options;
   zScale.value = z_scale;
   const renderer = genericRenderWindow.getRenderer();
