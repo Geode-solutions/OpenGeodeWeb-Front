@@ -4,14 +4,8 @@ import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
 function useHybridViewerScene(options) {
-  const {
-    genericRenderWindow,
-    viewerStore,
-    viewer_schemas,
-    remoteRender,
-    dataStore,
-    gridActor,
-  } = options;
+  const { genericRenderWindow, viewerStore, viewer_schemas, remoteRender, dataStore, gridActor } =
+    options;
 
   const hybridDb = reactive({});
   const zScale = ref(1);
