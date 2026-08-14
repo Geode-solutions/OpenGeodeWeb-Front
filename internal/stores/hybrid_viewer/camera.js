@@ -22,11 +22,12 @@ const ORIENTATIONS = {
   xminus: { position: [-1, 0, 0], view_up: [0, 0, 1] },
 };
 
-function getImageStyle(genericRenderWindow) {
-  if (!genericRenderWindow) {
+function getImageStyle() {
+  const { genericRenderWindow } = useHybridViewerStore();
+  if (!genericRenderWindow.value) {
     return undefined;
   }
-  const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
+  const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
   if (!webGLRenderWindow) {
     return undefined;
   }
@@ -116,7 +117,7 @@ function performSetCamera(targetCameraOptions) {
   const hybridViewerStore = useHybridViewerStore();
   const { genericRenderWindow, syncRemoteCamera } = hybridViewerStore;
   const { is_moving } = storeToRefs(hybridViewerStore);
-  const imageStyle = getImageStyle(genericRenderWindow.value);
+  const imageStyle = getImageStyle();
   const renderer = genericRenderWindow.value.getRenderer();
   const camera = renderer.getActiveCamera();
   const startState = getCameraOptions(camera);
@@ -150,7 +151,7 @@ function performCameraOrientation(orientation) {
   const hybridViewerStore = useHybridViewerStore();
   const { genericRenderWindow, syncRemoteCamera } = hybridViewerStore;
   const { is_moving } = storeToRefs(hybridViewerStore);
-  const imageStyle = getImageStyle(genericRenderWindow.value);
+  const imageStyle = getImageStyle();
   const config = ORIENTATIONS[orientation.toLowerCase()];
   const renderer = genericRenderWindow.value.getRenderer();
   const camera = renderer.getActiveCamera();
