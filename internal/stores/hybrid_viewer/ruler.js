@@ -35,18 +35,54 @@ function useHybridViewerRuler() {
   watch([is_ruler_active, ruler_snap], updateRulerSnapHighlight);
 
   async function applyRuler() {
-    await performApplyRuler(ruler_point1.value, ruler_point2.value, ruler_distance);
+    if (!ruler_point1.value) {
+      return;
+    }
+    const points = ruler_point2.value
+      ? [ruler_point1.value, ruler_point2.value]
+      : [ruler_point1.value];
+    const { remoteRender } = useHybridViewerStore();
+    const viewerStore = useViewerStore();
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.ruler;
+    const response = await viewerStore.request({ schema, params: { points } });
+    ruler_distance.value = response.distance;
+    await remoteRender();
   }
 
   async function handleRulerClick(x, y) {
-    await performHandleRulerClick(x, y, {
-      ruler_snap: ruler_snap.value,
-      ruler_awaiting_point,
-      ruler_point1,
-      ruler_point2,
-      ruler_distance,
-      applyRuler,
-    });
+    const { hybridDb } = useHybridViewerStore();
+    const viewerStore = useViewerStore();
+    let coords = undefined;
+    if (ruler_snap.value) {
+      const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
+      const params = {
+        x: Math.round(x),
+        y: Math.round(y),
+        field_type: "POINT",
+        ids: Object.keys(hybridDb),
+      };
+      const response = await viewerStore.request({ schema, params });
+      coords = response.attributes?.coordinates;
+    } else {
+      const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+      const params = { x: Math.round(x), y: Math.round(y) };
+      const response = await viewerStore.request({ schema, params });
+      coords = [response.x, response.y, response.z];
+    }
+    if (!coords) {
+      return;
+    }
+
+    if (ruler_awaiting_point.value === 1) {
+      ruler_point1.value = coords;
+      ruler_point2.value = undefined;
+      ruler_distance.value = undefined;
+      ruler_awaiting_point.value = 2;
+    } else {
+      ruler_point2.value = coords;
+      ruler_awaiting_point.value = 1;
+    }
+    await applyRuler();
   }
 
   function deactivateRuler() {
@@ -61,7 +97,11 @@ function useHybridViewerRuler() {
     ruler_distance.value = undefined;
     ruler_awaiting_point.value = 1;
     deactivateRuler();
-    await performClearRuler();
+    const { remoteRender } = useHybridViewerStore();
+    const viewerStore = useViewerStore();
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.reset_ruler;
+    await viewerStore.request({ schema });
+    await remoteRender();
   }
 
   return {
@@ -78,66 +118,4 @@ function useHybridViewerRuler() {
   };
 }
 
-async function performApplyRuler(point1, point2, rulerDistanceRef) {
-  const points = point2 ? [point1, point2] : [point1];
-  const { remoteRender } = useHybridViewerStore();
-  const viewerStore = useViewerStore();
-  const schema = viewer_schemas.opengeodeweb_viewer.viewer.ruler;
-  const response = await viewerStore.request({ schema, params: { points } });
-  rulerDistanceRef.value = response.distance;
-  await remoteRender();
-}
-
-async function performHandleRulerClick(x, y, options) {
-  const {
-    ruler_snap,
-    ruler_awaiting_point,
-    ruler_point1,
-    ruler_point2,
-    ruler_distance,
-    applyRuler,
-  } = options;
-  const { hybridDb } = useHybridViewerStore();
-  const viewerStore = useViewerStore();
-  let coords = undefined;
-  if (ruler_snap) {
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
-    const params = {
-      x: Math.round(x),
-      y: Math.round(y),
-      field_type: "POINT",
-      ids: Object.keys(hybridDb),
-    };
-    const response = await viewerStore.request({ schema, params });
-    coords = response.attributes?.coordinates;
-  } else {
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-    const params = { x: Math.round(x), y: Math.round(y) };
-    const response = await viewerStore.request({ schema, params });
-    coords = [response.x, response.y, response.z];
-  }
-  if (!coords) {
-    return;
-  }
-
-  if (ruler_awaiting_point.value === 1) {
-    ruler_point1.value = coords;
-    ruler_point2.value = undefined;
-    ruler_distance.value = undefined;
-    ruler_awaiting_point.value = 2;
-  } else {
-    ruler_point2.value = coords;
-    ruler_awaiting_point.value = 1;
-  }
-  await applyRuler();
-}
-
-async function performClearRuler() {
-  const { remoteRender } = useHybridViewerStore();
-  const viewerStore = useViewerStore();
-  const schema = viewer_schemas.opengeodeweb_viewer.viewer.reset_ruler;
-  await viewerStore.request({ schema });
-  await remoteRender();
-}
-
-export { performApplyRuler, performClearRuler, performHandleRulerClick, useHybridViewerRuler };
+export { useHybridViewerRuler };
