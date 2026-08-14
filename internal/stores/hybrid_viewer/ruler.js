@@ -79,14 +79,11 @@ function useHybridViewerRuler() {
 }
 
 async function performApplyRuler(point1, point2, rulerDistanceRef) {
-  if (!point1 || !point2) {
-    return;
-  }
+  const points = point2 ? [point1, point2] : [point1];
   const { remoteRender } = useHybridViewerStore();
   const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.ruler;
-  const params = { point1, point2 };
-  const response = await viewerStore.request({ schema, params });
+  const response = await viewerStore.request({ schema, params: { points } });
   rulerDistanceRef.value = response.distance;
   await remoteRender();
 }
@@ -100,7 +97,7 @@ async function performHandleRulerClick(x, y, options) {
     ruler_distance,
     applyRuler,
   } = options;
-  const { hybridDb, remoteRender } = useHybridViewerStore();
+  const { hybridDb } = useHybridViewerStore();
   const viewerStore = useViewerStore();
   let coords = undefined;
   if (ruler_snap) {
@@ -128,14 +125,11 @@ async function performHandleRulerClick(x, y, options) {
     ruler_point2.value = undefined;
     ruler_distance.value = undefined;
     ruler_awaiting_point.value = 2;
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.ruler;
-    await viewerStore.request({ schema, params: { point1: coords } });
-    await remoteRender();
   } else {
     ruler_point2.value = coords;
     ruler_awaiting_point.value = 1;
-    await applyRuler();
   }
+  await applyRuler();
 }
 
 async function performClearRuler() {
