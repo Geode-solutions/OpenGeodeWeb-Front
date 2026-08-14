@@ -110,7 +110,9 @@ function createHoverHighlight(options = {}) {
 
   return useDebounceFn((event) => {
     const { genericRenderWindow } = useHybridViewerStore();
-    const containerElement = genericRenderWindow.value ? genericRenderWindow.value.getContainer() : undefined;
+    const containerElement = genericRenderWindow.value
+      ? genericRenderWindow.value.getContainer()
+      : undefined;
     let relativeMousePosition = { x: 0, y: 0 };
     if (containerElement) {
       const containerRect = containerElement.getBoundingClientRect();

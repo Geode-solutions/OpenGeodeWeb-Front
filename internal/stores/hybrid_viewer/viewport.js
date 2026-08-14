@@ -58,13 +58,8 @@ function performSetContainer(container) {
     return;
   }
 
-  const {
-    genericRenderWindow,
-    is_picking,
-    is_moving,
-    syncRemoteCamera,
-    hoverHighlight,
-  } = useHybridViewerStore();
+  const { genericRenderWindow, is_picking, is_moving, syncRemoteCamera, hoverHighlight } =
+    useHybridViewerStore();
 
   genericRenderWindow.value.setContainer(container.value.$el);
   const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
