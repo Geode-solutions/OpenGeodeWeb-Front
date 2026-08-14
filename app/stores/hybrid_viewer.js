@@ -7,6 +7,7 @@ import { BACKGROUND_COLOR } from "@ogw_internal/stores/hybrid_viewer/constants";
 import { useHybridViewerBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
 import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filters";
 import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/highlight";
+import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
 import { useHybridViewerViewport } from "@ogw_internal/stores/hybrid_viewer/viewport";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -25,7 +26,19 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const is_picking = ref(false);
   let imageStyle = undefined;
 
-  watch(is_picking, (value) => {
+  const brightnessStore = useHybridViewerBrightness();
+  const sceneStore = useHybridViewerScene();
+  const filtersStore = useHybridViewerFilters();
+  const highlightStore = useHybridViewerHighlight();
+  const rulerStore = useHybridViewerRuler();
+  const cameraStore = useHybridViewerCamera();
+  const viewportStore = useHybridViewerViewport();
+
+  const is_cursor_crosshair = computed(
+    () => is_picking.value || rulerStore.is_ruler_active.value,
+  );
+
+  watch(is_cursor_crosshair, (value) => {
     if (!genericRenderWindow.value) {
       return;
     }
@@ -35,8 +48,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       canvas.parentElement.style.cursor = value ? "crosshair" : "default";
     }
   });
-
-  const brightnessStore = useHybridViewerBrightness();
 
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
@@ -94,12 +105,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return renderPromise;
   }
 
-  const sceneStore = useHybridViewerScene();
-  const filtersStore = useHybridViewerFilters();
-  const highlightStore = useHybridViewerHighlight();
-  const cameraStore = useHybridViewerCamera();
-  const viewportStore = useHybridViewerViewport();
-
   function exportStores() {
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
@@ -123,6 +128,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     ...viewportStore,
     ...filtersStore,
     ...highlightStore,
+    ...rulerStore,
     ...cameraStore,
   };
 });

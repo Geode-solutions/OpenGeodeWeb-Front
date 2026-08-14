@@ -25,7 +25,9 @@ function stopHoverHighlight() {
 }
 
 onKeyStroke("Escape", () => {
-  if (hybridViewerStore.is_hover_highlight) {
+  if (hybridViewerStore.is_ruler_active) {
+    hybridViewerStore.deactivateRuler();
+  } else if (hybridViewerStore.is_hover_highlight) {
     stopHoverHighlight();
   }
 });
@@ -124,6 +126,30 @@ defineExpose({ get_viewer_id });
         Highlight active ({{
           hybridViewerStore.hover_highlight_field_type === "CELL" ? "Cells" : "Points"
         }}) &middot; Esc to stop
+        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
+        <v-icon icon="mdi-close" size="small" />
+      </v-chip>
+    </div>
+  </v-fade-transition>
+
+  <v-fade-transition>
+    <div
+      v-if="hybridViewerStore.is_ruler_active"
+      class="picking-message-container d-flex justify-center w-100 pa-4"
+    >
+      <v-chip
+        data-testid="rulerActiveChip"
+        color="secondary"
+        elevation="8"
+        size="large"
+        variant="flat"
+        class="pick-pulse"
+        style="pointer-events: auto"
+        prepend-icon="mdi-ruler"
+        @click="hybridViewerStore.clearRuler()"
+      >
+        Ruler &mdash; click to set point {{ hybridViewerStore.ruler_awaiting_point }}
+        &middot; Esc to stop
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />
       </v-chip>

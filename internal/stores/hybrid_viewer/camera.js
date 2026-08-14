@@ -256,6 +256,76 @@ async function applySnapshot(snapshot) {
   }
 }
 
+function useHybridViewerCamera(options) {
+  const {
+    genericRenderWindow,
+    viewerStore,
+    viewer_schemas,
+    remoteRender,
+    hybridDb,
+    is_moving,
+    getImageStyle,
+  } = options;
+
+  const camera_options = reactive({});
+
+  function syncRemoteCamera() {
+    performSyncRemoteCamera({
+      genericRenderWindow: genericRenderWindow.value,
+      viewerStore,
+      viewer_schemas,
+      remoteRender,
+      camera_options,
+    });
+  }
+
+  function setCamera(targetCameraOptions) {
+    performSetCamera(targetCameraOptions, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle: getImageStyle(),
+      syncRemoteCamera,
+    });
+  }
+
+  function resetCamera() {
+    genericRenderWindow.value.getRenderer().resetCamera();
+    genericRenderWindow.value.getRenderWindow().render();
+    syncRemoteCamera();
+  }
+
+  async function focusCameraOnObject(id, block_ids = []) {
+    await performFocusCameraOnObject(id, {
+      hybridDb,
+      viewerStore,
+      viewer_schemas,
+      genericRenderWindow: genericRenderWindow.value,
+      block_ids,
+      is_moving,
+      imageStyle: getImageStyle(),
+      syncRemoteCamera,
+    });
+  }
+
+  function setCameraOrientation(orientation) {
+    performCameraOrientation(orientation, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle: getImageStyle(),
+      syncRemoteCamera,
+    });
+  }
+
+  return {
+    camera_options,
+    syncRemoteCamera,
+    setCamera,
+    resetCamera,
+    focusCameraOnObject,
+    setCameraOrientation,
+  };
+}
+
 export {
   ALIGNMENT_THRESHOLD,
   BUMP_MULTIPLIER,
