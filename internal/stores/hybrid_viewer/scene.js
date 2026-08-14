@@ -98,10 +98,11 @@ function performSetVisibility(id, visibility) {
 }
 
 async function performSetZScaling(z_scale) {
-  const { genericRenderWindow, zScale, remoteRender } = useHybridViewerStore();
-  if (zScale) {
-    zScale.value = z_scale;
-  }
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, remoteRender } = hybridViewerStore;
+  const { zScale } = storeToRefs(hybridViewerStore);
+  zScale.value = z_scale;
+
   const renderer = genericRenderWindow.value.getRenderer();
   for (const actor of renderer.getActors()) {
     const scale = actor.getScale();
@@ -125,10 +126,8 @@ function performClear() {
   }
   const renderWindow = genericRenderWindow.value.getRenderWindow();
   renderWindow.render();
-  if (hybridDb) {
-    for (const id of Object.keys(hybridDb)) {
-      delete hybridDb[id];
-    }
+  for (const id of Object.keys(hybridDb)) {
+    delete hybridDb[id];
   }
 }
 

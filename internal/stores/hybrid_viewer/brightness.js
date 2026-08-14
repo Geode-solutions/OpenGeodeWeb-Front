@@ -14,12 +14,10 @@ function useHybridViewerBrightness() {
     : undefined;
 
   function getAverageBrightness(rect) {
-    const { genericRenderWindow } = useHybridViewerStore();
     return computeAverageBrightness(rect, {
       latestImage: latestImage.value,
       offscreenCtx,
       offscreenCanvas,
-      genericRenderWindow: genericRenderWindow.value,
     });
   }
 
@@ -41,11 +39,12 @@ function mapRect(rect, latestImage, canvasRect) {
 }
 
 function computeAverageBrightness(rect, options) {
-  const { latestImage, offscreenCtx, offscreenCanvas, genericRenderWindow } = options;
-  if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow) {
+  const { latestImage, offscreenCtx, offscreenCanvas } = options;
+  const { genericRenderWindow } = useHybridViewerStore();
+  if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow.value) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
-  const canvas = genericRenderWindow.getApiSpecificRenderWindow().getCanvas();
+  const canvas = genericRenderWindow.value.getApiSpecificRenderWindow().getCanvas();
   if (!canvas) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }

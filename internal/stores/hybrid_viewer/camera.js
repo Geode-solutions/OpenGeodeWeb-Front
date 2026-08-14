@@ -113,7 +113,9 @@ function centerCameraOnPosition(camera, pickedPosition) {
 }
 
 function performSetCamera(targetCameraOptions) {
-  const { genericRenderWindow, is_moving, syncRemoteCamera } = useHybridViewerStore();
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, syncRemoteCamera } = hybridViewerStore;
+  const { is_moving } = storeToRefs(hybridViewerStore);
   const imageStyle = getImageStyle(genericRenderWindow.value);
   const renderer = genericRenderWindow.value.getRenderer();
   const camera = renderer.getActiveCamera();
@@ -145,7 +147,9 @@ function performSetCamera(targetCameraOptions) {
 }
 
 function performCameraOrientation(orientation) {
-  const { genericRenderWindow, is_moving, syncRemoteCamera } = useHybridViewerStore();
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, syncRemoteCamera } = hybridViewerStore;
+  const { is_moving } = storeToRefs(hybridViewerStore);
   const imageStyle = getImageStyle(genericRenderWindow.value);
   const config = ORIENTATIONS[orientation.toLowerCase()];
   const renderer = genericRenderWindow.value.getRenderer();
@@ -242,23 +246,12 @@ async function applySnapshot(snapshot) {
   if (!snapshot) {
     return;
   }
-  const { genericRenderWindow, setZScaling, setCamera, syncRemoteCamera } = useHybridViewerStore();
-  const z_scale = snapshot.zScale;
-  if (typeof z_scale === "number") {
-    await setZScaling(z_scale);
+  const { setZScaling, setCamera } = useHybridViewerStore();
+  if (typeof snapshot.zScale === "number") {
+    await setZScaling(snapshot.zScale);
   }
-  const { camera_options: snapshot_camera_options } = snapshot;
-  if (snapshot_camera_options) {
-    if (setCamera) {
-      setCamera(snapshot_camera_options);
-    } else {
-      const renderer = genericRenderWindow.value.getRenderer();
-      const camera = renderer.getActiveCamera();
-      applyCameraOptions(camera, snapshot_camera_options);
-      const renderWindow = genericRenderWindow.value.getRenderWindow();
-      renderWindow.render();
-      syncRemoteCamera();
-    }
+  if (snapshot.camera_options) {
+    setCamera(snapshot.camera_options);
   }
 }
 

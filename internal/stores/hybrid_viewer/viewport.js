@@ -58,8 +58,9 @@ function performSetContainer(container) {
     return;
   }
 
-  const { genericRenderWindow, is_picking, is_moving, syncRemoteCamera, hoverHighlight } =
-    useHybridViewerStore();
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, syncRemoteCamera, hoverHighlight } = hybridViewerStore;
+  const { is_picking, is_moving } = storeToRefs(hybridViewerStore);
 
   genericRenderWindow.value.setContainer(container.value.$el);
   const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
@@ -123,7 +124,9 @@ function performSetContainer(container) {
 }
 
 async function performResize(width, height) {
-  const { genericRenderWindow, status, viewStream, remoteRender } = useHybridViewerStore();
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, remoteRender } = hybridViewerStore;
+  const { status, viewStream } = storeToRefs(hybridViewerStore);
   const viewerStore = useViewerStore();
   if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
     return;
@@ -134,7 +137,7 @@ async function performResize(width, height) {
   canvas.height = height;
   await nextTick();
   webGLRenderWindow.setSize(width, height);
-  if (viewStream && viewStream.value) {
+  if (viewStream.value) {
     viewStream.value.setSize(width, height);
   }
   const renderWindow = genericRenderWindow.value.getRenderWindow();

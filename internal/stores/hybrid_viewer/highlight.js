@@ -14,15 +14,7 @@ function useHybridViewerHighlight() {
 
   const clearHoverData = createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId);
 
-  const hoverHighlight = createHoverHighlight({
-    is_hover_highlight,
-    hover_highlight_field_type,
-    hoverData,
-    hoverPosition,
-    currentHoverId,
-    hoverTimeoutRef,
-    clearHoverData,
-  });
+  const hoverHighlight = createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData });
 
   function clearHoverHighlight() {
     clearHoverData();
@@ -39,16 +31,14 @@ function useHybridViewerHighlight() {
   };
 }
 
-function performHoverHighlight(event, options = {}) {
-  const { is_hover_highlight, hover_highlight_field_type, onResponse } = options;
+function performHoverHighlight(event, onResponse) {
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, hybridDb } = hybridViewerStore;
+  const { is_hover_highlight, hover_highlight_field_type } = storeToRefs(hybridViewerStore);
   if (!is_hover_highlight.value) {
     return;
   }
-  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
-  if (!genericRenderWindow.value) {
-    return;
-  }
-  const container = genericRenderWindow.value.getContainer();
+  const container = genericRenderWindow.value?.getContainer();
   if (!container) {
     return;
   }
@@ -61,27 +51,19 @@ function performHoverHighlight(event, options = {}) {
     field_type: hover_highlight_field_type.value,
     ids: Object.keys(hybridDb),
   };
-  viewerStore.request(
-    {
-      schema,
-      params,
-    },
-    {
-      response_function: onResponse,
-    },
-  );
+  viewerStore.request({ schema, params }, { response_function: onResponse });
 }
 
 function performClearHoverHighlight() {
-  const { hover_highlight_field_type, hybridDb } = useHybridViewerStore();
-  const fieldType = hover_highlight_field_type ? hover_highlight_field_type.value : "CELL";
+  const { hybridDb } = useHybridViewerStore();
+  const { hover_highlight_field_type } = storeToRefs(useHybridViewerStore());
   const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
   const params = {
     x: -1,
     y: -1,
-    field_type: fieldType,
-    ids: Object.keys(hybridDb || {}),
+    field_type: hover_highlight_field_type.value,
+    ids: Object.keys(hybridDb),
   };
   viewerStore.request({ schema, params });
 }
@@ -97,94 +79,76 @@ function createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId) {
   };
 }
 
-function createHoverHighlight(options = {}) {
-  const {
-    is_hover_highlight,
-    hover_highlight_field_type,
-    hoverData,
-    hoverPosition,
-    currentHoverId,
-    hoverTimeoutRef,
-    clearHoverData,
-  } = options;
-
+function createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData }) {
   return useDebounceFn((event) => {
-    const { genericRenderWindow } = useHybridViewerStore();
-    const containerElement = genericRenderWindow.value
-      ? genericRenderWindow.value.getContainer()
-      : undefined;
-    let relativeMousePosition = { x: 0, y: 0 };
-    if (containerElement) {
-      const containerRect = containerElement.getBoundingClientRect();
-      relativeMousePosition = {
-        x: event.clientX - containerRect.left,
-        y: event.clientY - containerRect.top,
+    const hybridViewerStore = useHybridViewerStore();
+    const { genericRenderWindow } = hybridViewerStore;
+    const { is_hover_highlight, hoverData, hoverPosition } = storeToRefs(hybridViewerStore);
+    const containerElement = genericRenderWindow.value?.getContainer();
+    const relativeMousePosition = containerElement
+      ? {
+          x: event.clientX - containerElement.getBoundingClientRect().left,
+          y: event.clientY - containerElement.getBoundingClientRect().top,
+        }
+      : { x: event.clientX, y: event.clientY };
+
+    performHoverHighlight(event, async (response) => {
+      const isResponseValid =
+        response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
+      if (!is_hover_highlight.value || !isResponseValid) {
+        clearHoverData();
+        return;
+      }
+
+      const hoverKey = `${response.id}_${response.field_type}_${response.picked_id}`;
+      if (currentHoverId.value === hoverKey) {
+        return;
+      }
+
+      if (hoverTimeoutRef.value) {
+        clearTimeout(hoverTimeoutRef.value);
+        hoverTimeoutRef.value = undefined;
+      }
+
+      hoverData.value = undefined;
+      currentHoverId.value = hoverKey;
+
+      let componentInfo = undefined;
+      let modelName = undefined;
+
+      const modelRecord = await database.data.get(response.id);
+      if (modelRecord) {
+        modelName = modelRecord.name;
+      }
+
+      if (response.geode_id) {
+        const components = database.model_components.where("[id+geode_id]");
+        const query = components.equals([response.id, response.geode_id]);
+        const component = await query.first();
+        if (component) {
+          componentInfo = {
+            name: component.name,
+            id: component.geode_id,
+            type: component.type,
+          };
+        }
+      }
+
+      const newHoverData = {
+        modelId: response.id,
+        modelName,
+        blockName: response.geode_id,
+        pickedId: response.picked_id,
+        fieldType: response.field_type,
+        component: componentInfo,
+        attributes: response.attributes || {},
       };
-    } else {
-      relativeMousePosition = { x: event.clientX, y: event.clientY };
-    }
 
-    performHoverHighlight(event, {
-      is_hover_highlight,
-      hover_highlight_field_type,
-      onResponse: async (response) => {
-        const isResponseValid =
-          response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
-        if (!is_hover_highlight.value || !isResponseValid) {
-          clearHoverData();
-          return;
-        }
-
-        const hoverKey = `${response.id}_${response.field_type}_${response.picked_id}`;
-        if (currentHoverId.value === hoverKey) {
-          return;
-        }
-
-        if (hoverTimeoutRef.value) {
-          clearTimeout(hoverTimeoutRef.value);
-          hoverTimeoutRef.value = undefined;
-        }
-
-        hoverData.value = undefined;
-        currentHoverId.value = hoverKey;
-
-        let componentInfo = undefined;
-        let modelName = undefined;
-
-        const modelRecord = await database.data.get(response.id);
-        if (modelRecord) {
-          modelName = modelRecord.name;
-        }
-
-        if (response.geode_id) {
-          const components = database.model_components.where("[id+geode_id]");
-          const query = components.equals([response.id, response.geode_id]);
-          const component = await query.first();
-          if (component) {
-            componentInfo = {
-              name: component.name,
-              id: component.geode_id,
-              type: component.type,
-            };
-          }
-        }
-
-        const newHoverData = {
-          modelId: response.id,
-          modelName,
-          blockName: response.geode_id,
-          pickedId: response.picked_id,
-          fieldType: response.field_type,
-          component: componentInfo,
-          attributes: response.attributes || {},
-        };
-
-        hoverTimeoutRef.value = setTimeout(() => {
-          hoverPosition.value = relativeMousePosition;
-          hoverData.value = newHoverData;
-          hoverTimeoutRef.value = undefined;
-        }, HOVER_TIMEOUT_MS);
-      },
+      hoverTimeoutRef.value = setTimeout(() => {
+        hoverPosition.value = relativeMousePosition;
+        hoverData.value = newHoverData;
+        hoverTimeoutRef.value = undefined;
+      }, HOVER_TIMEOUT_MS);
     });
   }, HOVER_DEBOUNCE_MS);
 }

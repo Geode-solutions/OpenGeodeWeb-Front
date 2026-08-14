@@ -111,9 +111,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
 
   return {
     genericRenderWindow,
+    status,
+    is_moving,
+    is_picking,
     initHybridViewer,
     remoteRender,
-    is_picking,
     exportStores,
     importStores: applySnapshot,
     ...brightnessStore,
