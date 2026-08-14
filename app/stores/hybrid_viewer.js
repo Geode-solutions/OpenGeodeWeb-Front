@@ -34,9 +34,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const cameraStore = useHybridViewerCamera();
   const viewportStore = useHybridViewerViewport();
 
-  const is_cursor_crosshair = computed(
-    () => is_picking.value || rulerStore.is_ruler_active.value,
-  );
+  const is_cursor_crosshair = computed(() => is_picking.value || rulerStore.is_ruler_active.value);
 
   watch(is_cursor_crosshair, (value) => {
     if (!genericRenderWindow.value) {
