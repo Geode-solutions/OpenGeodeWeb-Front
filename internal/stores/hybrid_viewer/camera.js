@@ -3,7 +3,7 @@ import {
   SHORT_ANIMATION_DURATION,
   animateCamera,
   computeAnimationDuration,
-} from "@ogw_internal/stores/hybrid_viewer_camera_animation";
+} from "./camera_animation";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
 
 const BUMP_MULTIPLIER = 0.2;
@@ -18,6 +18,76 @@ const ORIENTATIONS = {
   xplus: { position: [1, 0, 0], view_up: [0, 0, 1] },
   xminus: { position: [-1, 0, 0], view_up: [0, 0, 1] },
 };
+
+function useHybridViewerCamera(options) {
+  const {
+    genericRenderWindow,
+    viewerStore,
+    viewer_schemas,
+    remoteRender,
+    hybridDb,
+    is_moving,
+    getImageStyle,
+  } = options;
+
+  const camera_options = reactive({});
+
+  function syncRemoteCamera() {
+    performSyncRemoteCamera({
+      genericRenderWindow: genericRenderWindow.value,
+      viewerStore,
+      viewer_schemas,
+      remoteRender,
+      camera_options,
+    });
+  }
+
+  function setCamera(targetCameraOptions) {
+    performSetCamera(targetCameraOptions, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle: getImageStyle(),
+      syncRemoteCamera,
+    });
+  }
+
+  function resetCamera() {
+    genericRenderWindow.value.getRenderer().resetCamera();
+    genericRenderWindow.value.getRenderWindow().render();
+    syncRemoteCamera();
+  }
+
+  async function focusCameraOnObject(id, block_ids = []) {
+    await performFocusCameraOnObject(id, {
+      hybridDb,
+      viewerStore,
+      viewer_schemas,
+      genericRenderWindow: genericRenderWindow.value,
+      block_ids,
+      is_moving,
+      imageStyle: getImageStyle(),
+      syncRemoteCamera,
+    });
+  }
+
+  function setCameraOrientation(orientation) {
+    performCameraOrientation(orientation, {
+      genericRenderWindow: genericRenderWindow.value,
+      is_moving,
+      imageStyle: getImageStyle(),
+      syncRemoteCamera,
+    });
+  }
+
+  return {
+    camera_options,
+    syncRemoteCamera,
+    setCamera,
+    resetCamera,
+    focusCameraOnObject,
+    setCameraOrientation,
+  };
+}
 
 function getCameraOptions(camera) {
   if (!camera?.getFocalPoint) {
@@ -208,8 +278,8 @@ async function applySnapshot(snapshot, options) {
 }
 
 export {
-  BUMP_MULTIPLIER,
   ALIGNMENT_THRESHOLD,
+  BUMP_MULTIPLIER,
   EASE_EXPONENT,
   ORIENTATIONS,
   applyCameraOptions,
@@ -220,4 +290,5 @@ export {
   performFocusCameraOnObject,
   performSetCamera,
   performSyncRemoteCamera,
+  useHybridViewerCamera,
 };

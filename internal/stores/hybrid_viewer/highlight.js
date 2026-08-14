@@ -1,6 +1,99 @@
-import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./hybrid_viewer_constants";
+import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import { database } from "@ogw_internal/database/database.js";
-import { performHoverHighlight } from "./hybrid_viewer";
+
+function useHybridViewerHighlight(options) {
+  const { genericRenderWindow, viewerStore, viewer_schemas, hybridDb } = options;
+
+  const is_hover_highlight = ref(false);
+  const hover_highlight_field_type = ref("CELL");
+  const hoverData = ref(undefined);
+  const hoverPosition = ref({ x: 0, y: 0 });
+  const hoverTimeoutRef = ref(undefined);
+  const currentHoverId = ref(undefined);
+
+  const clearHoverData = createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId);
+
+  const hoverHighlight = createHoverHighlight({
+    genericRenderWindow,
+    is_hover_highlight,
+    viewerStore,
+    viewer_schemas,
+    hover_highlight_field_type,
+    hybridDb,
+    hoverData,
+    hoverPosition,
+    currentHoverId,
+    hoverTimeoutRef,
+    clearHoverData,
+  });
+
+  function clearHoverHighlight() {
+    clearHoverData();
+    performClearHoverHighlight({
+      viewerStore,
+      viewer_schemas,
+      hover_highlight_field_type,
+      hybridDb,
+    });
+  }
+
+  return {
+    is_hover_highlight,
+    hover_highlight_field_type,
+    hoverData,
+    hoverPosition,
+    clearHoverHighlight,
+    hoverHighlight,
+  };
+}
+
+function performHoverHighlight(event, options) {
+  const {
+    is_hover_highlight,
+    genericRenderWindow,
+    viewerStore,
+    viewer_schemas,
+    hover_highlight_field_type,
+    hybridDb,
+    onResponse,
+  } = options;
+  if (!is_hover_highlight.value) {
+    return;
+  }
+  const container = genericRenderWindow.getContainer();
+  if (!container) {
+    return;
+  }
+  const rect = container.getBoundingClientRect();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
+  const params = {
+    x: Math.round(event.clientX - rect.left),
+    y: Math.round(rect.height - (event.clientY - rect.top)),
+    field_type: hover_highlight_field_type.value,
+    ids: Object.keys(hybridDb),
+  };
+  viewerStore.request(
+    {
+      schema,
+      params,
+    },
+    {
+      response_function: onResponse,
+    },
+  );
+}
+
+function performClearHoverHighlight(options) {
+  const { viewerStore, viewer_schemas, hover_highlight_field_type, hybridDb } = options;
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
+  const params = {
+    x: -1,
+    y: -1,
+    field_type: hover_highlight_field_type.value,
+    ids: Object.keys(hybridDb),
+  };
+  viewerStore.request({ schema, params });
+}
 
 function createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId) {
   return function clearHoverData() {
@@ -111,4 +204,10 @@ function createHoverHighlight(options) {
   }, HOVER_DEBOUNCE_MS);
 }
 
-export { createClearHoverData, createHoverHighlight };
+export {
+  createClearHoverData,
+  createHoverHighlight,
+  performClearHoverHighlight,
+  performHoverHighlight,
+  useHybridViewerHighlight,
+};

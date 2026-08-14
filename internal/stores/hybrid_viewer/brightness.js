@@ -1,4 +1,4 @@
-import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./hybrid_viewer_constants";
+import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./constants";
 
 const RGBA_CHANNELS = 4;
 const SAMPLE_SIZE = 10;
