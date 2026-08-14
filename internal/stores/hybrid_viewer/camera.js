@@ -22,13 +22,7 @@ const ORIENTATIONS = {
 };
 
 function useHybridViewerCamera(options) {
-  const {
-    genericRenderWindow,
-    remoteRender,
-    hybridDb,
-    is_moving,
-    getImageStyle,
-  } = options;
+  const { genericRenderWindow, remoteRender, hybridDb, is_moving, getImageStyle } = options;
 
   const viewerStore = useViewerStore();
   const camera_options = reactive({});
@@ -231,8 +225,7 @@ async function performFocusCameraOnObject(id, options) {
 }
 
 function performSyncRemoteCamera(options) {
-  const { genericRenderWindow, viewerStore, remoteRender, camera_options } =
-    options;
+  const { genericRenderWindow, viewerStore, remoteRender, camera_options } = options;
   const camera = genericRenderWindow.getRenderer().getActiveCamera();
   const options_camera = getCameraOptions(camera);
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.update_camera;
