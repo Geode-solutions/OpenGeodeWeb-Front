@@ -146,9 +146,4 @@ async function performClearRuler() {
   await remoteRender();
 }
 
-export {
-  performApplyRuler,
-  performClearRuler,
-  performHandleRulerClick,
-  useHybridViewerRuler,
-};
+export { performApplyRuler, performClearRuler, performHandleRulerClick, useHybridViewerRuler };
