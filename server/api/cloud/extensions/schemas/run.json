@@ -1,0 +1,11 @@
+{
+  "route": "/run",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "projectFolderPath": { "type": "string" },
+    "projectName": { "type": "string" }
+  },
+  "required": ["projectFolderPath", "projectName"],
+  "additionalProperties": false
+}

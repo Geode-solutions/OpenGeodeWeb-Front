@@ -1,0 +1,11 @@
+{
+  "route": "/run_back",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "COMMAND_BACK": { "type": "string" },
+    "NUXT_ROOT_PATH": { "type": "string" }
+  },
+  "required": ["COMMAND_BACK", "NUXT_ROOT_PATH"],
+  "additionalProperties": true
+}

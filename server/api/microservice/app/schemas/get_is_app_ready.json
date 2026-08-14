@@ -1,0 +1,8 @@
+{
+  "route": "/api/microservice/app/get_is_app_ready",
+  "methods": ["GET"],
+  "type": "object",
+  "properties": {},
+  "required": [],
+  "additionalProperties": false
+}
