@@ -3,8 +3,11 @@ import {
   SHORT_ANIMATION_DURATION,
   animateCamera,
   computeAnimationDuration,
-} from "@ogw_internal/stores/hybrid_viewer_camera_animation";
+} from "./camera_animation";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const BUMP_MULTIPLIER = 0.2;
 const ALIGNMENT_THRESHOLD = 0.9;
@@ -19,8 +22,59 @@ const ORIENTATIONS = {
   xminus: { position: [-1, 0, 0], view_up: [0, 0, 1] },
 };
 
+function getImageStyle() {
+  const { genericRenderWindow } = useHybridViewerStore();
+  if (!genericRenderWindow.value) {
+    return undefined;
+  }
+  const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
+  if (!webGLRenderWindow) {
+    return undefined;
+  }
+  const bgImage = webGLRenderWindow.getReferenceByName("bgImage");
+  return bgImage ? bgImage.style : undefined;
+}
+
+function useHybridViewerCamera() {
+  const camera_options = reactive({});
+
+  function syncRemoteCamera() {
+    performSyncRemoteCamera();
+  }
+
+  function setCamera(targetCameraOptions) {
+    performSetCamera(targetCameraOptions);
+  }
+
+  function resetCamera() {
+    const { genericRenderWindow } = useHybridViewerStore();
+    const renderer = genericRenderWindow.value.getRenderer();
+    renderer.resetCamera();
+    const renderWindow = genericRenderWindow.value.getRenderWindow();
+    renderWindow.render();
+    syncRemoteCamera();
+  }
+
+  async function focusCameraOnObject(id, block_ids = []) {
+    await performFocusCameraOnObject(id, block_ids);
+  }
+
+  function setCameraOrientation(orientation) {
+    performCameraOrientation(orientation);
+  }
+
+  return {
+    camera_options,
+    syncRemoteCamera,
+    setCamera,
+    resetCamera,
+    focusCameraOnObject,
+    setCameraOrientation,
+  };
+}
+
 function getCameraOptions(camera) {
-  if (!camera?.getFocalPoint) {
+  if (!camera || !camera.getFocalPoint) {
     return camera;
   }
   return {
@@ -34,7 +88,7 @@ function getCameraOptions(camera) {
 }
 
 function applyCameraOptions(camera, options) {
-  if (camera?.set && options) {
+  if (camera && camera.set && options) {
     camera.set({
       focalPoint: options.focal_point,
       viewUp: options.view_up,
@@ -59,9 +113,13 @@ function centerCameraOnPosition(camera, pickedPosition) {
   );
 }
 
-function performSetCamera(targetCameraOptions, options) {
-  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera } = options;
-  const camera = genericRenderWindow.getRenderer().getActiveCamera();
+function performSetCamera(targetCameraOptions) {
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, syncRemoteCamera } = hybridViewerStore;
+  const { is_moving } = storeToRefs(hybridViewerStore);
+  const imageStyle = getImageStyle();
+  const renderer = genericRenderWindow.value.getRenderer();
+  const camera = renderer.getActiveCamera();
   const startState = getCameraOptions(camera);
   const duration = computeAnimationDuration(startState, targetCameraOptions);
   is_moving.value = true;
@@ -75,20 +133,27 @@ function performSetCamera(targetCameraOptions, options) {
     duration,
     bumpMultiplier: 0,
     easeExponent: EASE_EXPONENT,
-    onUpdate: () => genericRenderWindow.getRenderWindow().render(),
+    onUpdate: () => {
+      const renderWindow = genericRenderWindow.value.getRenderWindow();
+      renderWindow.render();
+    },
     onEnd: () => {
       applyCameraOptions(camera, targetCameraOptions);
-      genericRenderWindow.getRenderWindow().render();
+      const renderWindow = genericRenderWindow.value.getRenderWindow();
+      renderWindow.render();
       is_moving.value = false;
       syncRemoteCamera();
     },
   });
 }
 
-function performCameraOrientation(orientation, options) {
-  const { genericRenderWindow, is_moving, imageStyle, syncRemoteCamera } = options;
+function performCameraOrientation(orientation) {
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, syncRemoteCamera } = hybridViewerStore;
+  const { is_moving } = storeToRefs(hybridViewerStore);
+  const imageStyle = getImageStyle();
   const config = ORIENTATIONS[orientation.toLowerCase()];
-  const renderer = genericRenderWindow.getRenderer();
+  const renderer = genericRenderWindow.value.getRenderer();
   const camera = renderer.getActiveCamera();
   const startState = getCameraOptions(camera);
 
@@ -105,7 +170,9 @@ function performCameraOrientation(orientation, options) {
   const duration =
     alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
   is_moving.value = true;
-  imageStyle.opacity = 0;
+  if (imageStyle) {
+    imageStyle.opacity = 0;
+  }
 
   animateCamera({
     camera,
@@ -114,7 +181,10 @@ function performCameraOrientation(orientation, options) {
     duration,
     bumpMultiplier: BUMP_MULTIPLIER,
     easeExponent: EASE_EXPONENT,
-    onUpdate: () => genericRenderWindow.getRenderWindow().render(),
+    onUpdate: () => {
+      const renderWindow = genericRenderWindow.value.getRenderWindow();
+      renderWindow.render();
+    },
     onEnd: () => {
       is_moving.value = false;
       syncRemoteCamera();
@@ -122,22 +192,14 @@ function performCameraOrientation(orientation, options) {
   });
 }
 
-async function performFocusCameraOnObject(id, options) {
-  const {
-    hybridDb,
-    viewerStore,
-    viewer_schemas,
-    genericRenderWindow,
-    block_ids = [],
-    is_moving,
-    imageStyle,
-    syncRemoteCamera,
-  } = options;
+async function performFocusCameraOnObject(id, block_ids = []) {
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
 
   if (!hybridDb[id]) {
     return;
   }
 
+  const viewerStore = useViewerStore();
   let bounds = [];
   if (block_ids.length > 0) {
     const schema = viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds;
@@ -147,25 +209,21 @@ async function performFocusCameraOnObject(id, options) {
     bounds = hybridDb[id].actor.getBounds();
   }
 
-  const renderer = genericRenderWindow.getRenderer();
+  const renderer = genericRenderWindow.value.getRenderer();
   const camera = renderer.getActiveCamera();
   const startOptions = getCameraOptions(camera);
   renderer.resetCamera(bounds);
   const targetOptions = getCameraOptions(camera);
   applyCameraOptions(camera, startOptions);
 
-  performSetCamera(targetOptions, {
-    genericRenderWindow,
-    is_moving,
-    imageStyle,
-    syncRemoteCamera,
-  });
+  performSetCamera(targetOptions);
 }
 
-function performSyncRemoteCamera(options) {
-  const { genericRenderWindow, viewerStore, viewer_schemas, remoteRender, camera_options } =
-    options;
-  const camera = genericRenderWindow.getRenderer().getActiveCamera();
+function performSyncRemoteCamera() {
+  const { genericRenderWindow, camera_options, remoteRender } = useHybridViewerStore();
+  const viewerStore = useViewerStore();
+  const renderer = genericRenderWindow.value.getRenderer();
+  const camera = renderer.getActiveCamera();
   const options_camera = getCameraOptions(camera);
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.update_camera;
   const params = { camera_options: options_camera };
@@ -177,39 +235,30 @@ function performSyncRemoteCamera(options) {
     {
       response_function: () => {
         remoteRender();
-        Object.assign(camera_options, options_camera);
+        if (camera_options) {
+          Object.assign(camera_options, options_camera);
+        }
       },
     },
   );
 }
 
-async function applySnapshot(snapshot, options) {
-  const { genericRenderWindow, setZScaling, syncRemoteCamera, setCamera } = options;
+async function applySnapshot(snapshot) {
   if (!snapshot) {
     return;
   }
-  const z_scale = snapshot.zScale;
-  if (typeof z_scale === "number") {
-    await setZScaling(z_scale);
+  const { setZScaling, setCamera } = useHybridViewerStore();
+  if (typeof snapshot.zScale === "number") {
+    await setZScaling(snapshot.zScale);
   }
-  const { camera_options: snapshot_camera_options } = snapshot;
-  if (snapshot_camera_options) {
-    if (setCamera) {
-      setCamera(snapshot_camera_options);
-    } else {
-      applyCameraOptions(
-        genericRenderWindow.getRenderer().getActiveCamera(),
-        snapshot_camera_options,
-      );
-      genericRenderWindow.getRenderWindow().render();
-      syncRemoteCamera();
-    }
+  if (snapshot.camera_options) {
+    setCamera(snapshot.camera_options);
   }
 }
 
 export {
-  BUMP_MULTIPLIER,
   ALIGNMENT_THRESHOLD,
+  BUMP_MULTIPLIER,
   EASE_EXPONENT,
   ORIENTATIONS,
   applyCameraOptions,
@@ -220,4 +269,5 @@ export {
   performFocusCameraOnObject,
   performSetCamera,
   performSyncRemoteCamera,
+  useHybridViewerCamera,
 };
