@@ -26,15 +26,17 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   let imageStyle = undefined;
 
   watch(is_picking, (value) => {
-    const element = genericRenderWindow.value
-      ?.getApiSpecificRenderWindow()
-      ?.getCanvas()?.parentElement;
-    if (element) {
-      element.style.cursor = value ? "crosshair" : "default";
+    if (!genericRenderWindow.value) {
+      return;
+    }
+    const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
+    const canvas = webGLRenderWindow.getCanvas();
+    if (canvas && canvas.parentElement) {
+      canvas.parentElement.style.cursor = value ? "crosshair" : "default";
     }
   });
 
-  const brightnessStore = useHybridViewerBrightness({ genericRenderWindow });
+  const brightnessStore = useHybridViewerBrightness();
 
   async function initHybridViewer() {
     if (status.value !== Status.NOT_CREATED) {
@@ -49,7 +51,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
     Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
     await viewerStore.ws_connect();
-    viewportStore.viewStream.value = viewerStore.client.getImageStream().createViewStream("-1");
+    const imageStream = viewerStore.client.getImageStream();
+    viewportStore.viewStream.value = imageStream.createViewStream("-1");
     viewportStore.viewStream.value.onImageReady((event) => {
       if (is_moving.value) {
         return;
@@ -58,7 +61,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       webGLRenderWindow.setBackgroundImage(event.image);
       imageStyle.opacity = 1;
     });
-    const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
     Object.assign(cameraStore.camera_options, getCameraOptions(camera));
     camera.onModified(() => {
       Object.assign(cameraStore.camera_options, getCameraOptions(camera));
@@ -90,55 +94,19 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return renderPromise;
   }
 
-  const sceneStore = useHybridViewerScene({
-    genericRenderWindow,
-    remoteRender,
-  });
-
-  const filtersStore = useHybridViewerFilters({
-    remoteRender,
-  });
-
-  const highlightStore = useHybridViewerHighlight({
-    genericRenderWindow,
-    hybridDb: sceneStore.hybridDb,
-  });
-
-  const cameraStore = useHybridViewerCamera({
-    genericRenderWindow,
-    remoteRender,
-    hybridDb: sceneStore.hybridDb,
-    is_moving,
-    getImageStyle: () => imageStyle,
-  });
-
-  const viewportStore = useHybridViewerViewport({
-    genericRenderWindow,
-    remoteRender,
-    status,
-    Status,
-    is_picking,
-    is_moving,
-    syncRemoteCamera: cameraStore.syncRemoteCamera,
-    hoverHighlight: highlightStore.hoverHighlight,
-    setImageStyle: (style) => (imageStyle = style),
-  });
+  const sceneStore = useHybridViewerScene();
+  const filtersStore = useHybridViewerFilters();
+  const highlightStore = useHybridViewerHighlight();
+  const cameraStore = useHybridViewerCamera();
+  const viewportStore = useHybridViewerViewport();
 
   function exportStores() {
-    const camera = genericRenderWindow.value.getRenderer().getActiveCamera();
+    const renderer = genericRenderWindow.value.getRenderer();
+    const camera = renderer.getActiveCamera();
     return {
       zScale: sceneStore.zScale.value,
       camera_options: getCameraOptions(camera) || cameraStore.camera_options,
     };
-  }
-
-  async function importStores(snapshot) {
-    await applySnapshot(snapshot, {
-      genericRenderWindow: genericRenderWindow.value,
-      setZScaling: sceneStore.setZScaling,
-      syncRemoteCamera: cameraStore.syncRemoteCamera,
-      setCamera: cameraStore.setCamera,
-    });
   }
 
   return {
@@ -147,7 +115,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     remoteRender,
     is_picking,
     exportStores,
-    importStores,
+    importStores: applySnapshot,
     ...brightnessStore,
     ...sceneStore,
     ...viewportStore,

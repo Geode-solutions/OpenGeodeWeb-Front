@@ -1,12 +1,11 @@
 import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./constants";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const RGBA_CHANNELS = 4;
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
 
-function useHybridViewerBrightness(options) {
-  const { genericRenderWindow } = options;
-
+function useHybridViewerBrightness() {
   const latestImage = ref(undefined);
   const offscreenCanvas =
     typeof document === "undefined" ? undefined : document.createElement("canvas");
@@ -15,11 +14,12 @@ function useHybridViewerBrightness(options) {
     : undefined;
 
   function getAverageBrightness(rect) {
+    const hybridViewerStore = useHybridViewerStore();
     return computeAverageBrightness(rect, {
       latestImage: latestImage.value,
       offscreenCtx,
       offscreenCanvas,
-      genericRenderWindow: genericRenderWindow.value,
+      genericRenderWindow: hybridViewerStore.genericRenderWindow.value,
     });
   }
 

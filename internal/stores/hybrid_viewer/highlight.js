@@ -1,12 +1,10 @@
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import { database } from "@ogw_internal/database/database.js";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-function useHybridViewerHighlight(options) {
-  const { genericRenderWindow, hybridDb } = options;
-  const viewerStore = useViewerStore();
-
+function useHybridViewerHighlight() {
   const is_hover_highlight = ref(false);
   const hover_highlight_field_type = ref("CELL");
   const hoverData = ref(undefined);
@@ -17,11 +15,8 @@ function useHybridViewerHighlight(options) {
   const clearHoverData = createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId);
 
   const hoverHighlight = createHoverHighlight({
-    genericRenderWindow,
     is_hover_highlight,
-    viewerStore,
     hover_highlight_field_type,
-    hybridDb,
     hoverData,
     hoverPosition,
     currentHoverId,
@@ -31,11 +26,7 @@ function useHybridViewerHighlight(options) {
 
   function clearHoverHighlight() {
     clearHoverData();
-    performClearHoverHighlight({
-      viewerStore,
-      hover_highlight_field_type,
-      hybridDb,
-    });
+    performClearHoverHighlight();
   }
 
   return {
@@ -48,29 +39,32 @@ function useHybridViewerHighlight(options) {
   };
 }
 
-function performHoverHighlight(event, options) {
+function performHoverHighlight(event, options = {}) {
   const {
     is_hover_highlight,
-    genericRenderWindow,
-    viewerStore,
     hover_highlight_field_type,
-    hybridDb,
     onResponse,
   } = options;
   if (!is_hover_highlight.value) {
+    return;
+  }
+  const hybridViewerStore = useHybridViewerStore();
+  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
+  if (!genericRenderWindow) {
     return;
   }
   const container = genericRenderWindow.getContainer();
   if (!container) {
     return;
   }
+  const viewerStore = useViewerStore();
   const rect = container.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
   const params = {
     x: Math.round(event.clientX - rect.left),
     y: Math.round(rect.height - (event.clientY - rect.top)),
     field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridDb),
+    ids: Object.keys(hybridViewerStore.hybridDb),
   };
   viewerStore.request(
     {
@@ -83,14 +77,18 @@ function performHoverHighlight(event, options) {
   );
 }
 
-function performClearHoverHighlight(options) {
-  const { viewerStore, hover_highlight_field_type, hybridDb } = options;
+function performClearHoverHighlight() {
+  const hybridViewerStore = useHybridViewerStore();
+  const fieldType = hybridViewerStore.hover_highlight_field_type
+    ? hybridViewerStore.hover_highlight_field_type.value
+    : "CELL";
+  const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
   const params = {
     x: -1,
     y: -1,
-    field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridDb),
+    field_type: fieldType,
+    ids: Object.keys(hybridViewerStore.hybridDb || {}),
   };
   viewerStore.request({ schema, params });
 }
@@ -106,13 +104,10 @@ function createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId) {
   };
 }
 
-function createHoverHighlight(options) {
+function createHoverHighlight(options = {}) {
   const {
-    genericRenderWindow,
     is_hover_highlight,
-    viewerStore,
     hover_highlight_field_type,
-    hybridDb,
     hoverData,
     hoverPosition,
     currentHoverId,
@@ -121,7 +116,9 @@ function createHoverHighlight(options) {
   } = options;
 
   return useDebounceFn((event) => {
-    const containerElement = genericRenderWindow.value?.getContainer();
+    const hybridViewerStore = useHybridViewerStore();
+    const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
+    const containerElement = genericRenderWindow ? genericRenderWindow.getContainer() : undefined;
     let relativeMousePosition = { x: 0, y: 0 };
     if (containerElement) {
       const containerRect = containerElement.getBoundingClientRect();
@@ -135,10 +132,7 @@ function createHoverHighlight(options) {
 
     performHoverHighlight(event, {
       is_hover_highlight,
-      genericRenderWindow: genericRenderWindow.value,
-      viewerStore,
       hover_highlight_field_type,
-      hybridDb,
       onResponse: async (response) => {
         const isResponseValid =
           response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
@@ -169,10 +163,9 @@ function createHoverHighlight(options) {
         }
 
         if (response.geode_id) {
-          const component = await database.model_components
-            .where("[id+geode_id]")
-            .equals([response.id, response.geode_id])
-            .first();
+          const components = database.model_components.where("[id+geode_id]");
+          const query = components.equals([response.id, response.geode_id]);
+          const component = await query.first();
           if (component) {
             componentInfo = {
               name: component.name,

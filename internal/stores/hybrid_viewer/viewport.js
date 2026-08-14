@@ -1,54 +1,19 @@
+import { Status } from "@ogw_front/utils/status";
 import { WHEEL_TIME_OUT_MS } from "./constants";
 import { centerCameraOnPosition } from "./camera";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-function useHybridViewerViewport(options) {
-  const {
-    genericRenderWindow,
-    remoteRender,
-    status,
-    Status,
-    is_picking,
-    is_moving,
-    syncRemoteCamera,
-    hoverHighlight,
-    setImageStyle,
-  } = options;
-
-  const viewerStore = useViewerStore();
+function useHybridViewerViewport() {
   const viewStream = ref(undefined);
-  let wheelEventEndTimeout = undefined;
 
   function setContainer(container) {
-    performSetContainer({
-      container,
-      genericRenderWindow: genericRenderWindow.value,
-      imageStyleSetter: (style) => setImageStyle(style),
-      resize,
-      useMousePressed,
-      useEventListener,
-      is_picking,
-      is_moving,
-      clickPickingCallback: performClickPicking,
-      viewerStore,
-      syncRemoteCamera,
-      hoverHighlight,
-      wheelTimeoutMs: WHEEL_TIME_OUT_MS,
-      wheelEventEndTimeout,
-      wheelTimeoutSetter: (timeout) => (wheelEventEndTimeout = timeout),
-    });
+    performSetContainer(container);
   }
 
   async function resize(width, height) {
-    await performResize(width, height, {
-      viewerStore,
-      status,
-      Status,
-      genericRenderWindow: genericRenderWindow.value,
-      viewStream: viewStream.value,
-      remoteRender,
-    });
+    await performResize(width, height);
   }
 
   return {
@@ -58,9 +23,11 @@ function useHybridViewerViewport(options) {
   };
 }
 
-function performClickPicking(event, options) {
-  const { container, viewerStore, genericRenderWindow, syncRemoteCamera } = options;
-  const rect = container.getBoundingClientRect();
+function performClickPicking(event, containerElement) {
+  const hybridViewerStore = useHybridViewerStore();
+  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
+  const viewerStore = useViewerStore();
+  const rect = containerElement.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
   const params = {
     x: Math.round(event.clientX - rect.left),
@@ -75,47 +42,34 @@ function performClickPicking(event, options) {
       response_function: ({ x, y, z }) => {
         const pickedPos = [x, y, z];
         if (pickedPos.some((val) => val !== 0)) {
-          const camera = genericRenderWindow.getRenderer().getActiveCamera();
+          const renderer = genericRenderWindow.getRenderer();
+          const camera = renderer.getActiveCamera();
           centerCameraOnPosition(camera, pickedPos);
-          genericRenderWindow.getRenderWindow().render();
-          syncRemoteCamera();
+          const renderWindow = genericRenderWindow.getRenderWindow();
+          renderWindow.render();
+          hybridViewerStore.syncRemoteCamera();
         }
       },
     },
   );
 }
 
-function performSetContainer(options) {
-  const {
-    container,
-    genericRenderWindow,
-    imageStyleSetter,
-    resize,
-    useMousePressed,
-    useEventListener,
-    is_picking,
-    is_moving,
-    clickPickingCallback,
-    viewerStore,
-    syncRemoteCamera,
-    hoverHighlight,
-    wheelTimeoutMs,
-    wheelEventEndTimeout,
-    wheelTimeoutSetter,
-  } = options;
-
-  if (!container.value) {
+function performSetContainer(container) {
+  if (!container || !container.value) {
     return;
   }
+
+  const hybridViewerStore = useHybridViewerStore();
+  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
+  const { is_picking, is_moving } = hybridViewerStore;
 
   genericRenderWindow.setContainer(container.value.$el);
   const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
   webGLRenderWindow.setUseBackgroundImage(true);
   const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
   Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
-  imageStyleSetter(imageStyle);
 
-  resize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
+  performResize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
 
   let has_dragged = false;
   useMousePressed({
@@ -125,12 +79,7 @@ function performSetContainer(options) {
         return;
       }
       if (event.button === 0 && is_picking.value) {
-        clickPickingCallback(event, {
-          container: container.value.$el,
-          viewerStore,
-          genericRenderWindow,
-          syncRemoteCamera,
-        });
+        performClickPicking(event, container.value.$el);
         is_picking.value = false;
         return;
       }
@@ -141,8 +90,9 @@ function performSetContainer(options) {
     onReleased: () => {
       is_moving.value = false;
       if (has_dragged) {
-        genericRenderWindow.getRenderer().resetCameraClippingRange();
-        syncRemoteCamera();
+        const renderer = genericRenderWindow.getRenderer();
+        renderer.resetCameraClippingRange();
+        hybridViewerStore.syncRemoteCamera();
       }
       has_dragged = false;
     },
@@ -155,26 +105,29 @@ function performSetContainer(options) {
         imageStyle.opacity = 0;
       }
     }
-    hoverHighlight(event);
+    hybridViewerStore.hoverHighlight(event);
   });
+  let wheelEventEndTimeout = undefined;
   useEventListener(container, "wheel", () => {
     is_moving.value = true;
     if (imageStyle) {
       imageStyle.opacity = 0;
     }
     clearTimeout(wheelEventEndTimeout);
-    wheelTimeoutSetter(
-      setTimeout(() => {
-        is_moving.value = false;
-        genericRenderWindow.getRenderer().resetCameraClippingRange();
-        syncRemoteCamera();
-      }, wheelTimeoutMs),
-    );
+    wheelEventEndTimeout = setTimeout(() => {
+      is_moving.value = false;
+      const renderer = genericRenderWindow.getRenderer();
+      renderer.resetCameraClippingRange();
+      hybridViewerStore.syncRemoteCamera();
+    }, WHEEL_TIME_OUT_MS);
   });
 }
 
-async function performResize(width, height, options) {
-  const { viewerStore, status, Status, genericRenderWindow, viewStream, remoteRender } = options;
+async function performResize(width, height) {
+  const hybridViewerStore = useHybridViewerStore();
+  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
+  const { status, viewStream } = hybridViewerStore;
+  const viewerStore = useViewerStore();
   if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
     return;
   }
@@ -184,9 +137,12 @@ async function performResize(width, height, options) {
   canvas.height = height;
   await nextTick();
   webGLRenderWindow.setSize(width, height);
-  viewStream.setSize(width, height);
-  genericRenderWindow.getRenderWindow().render();
-  remoteRender();
+  if (viewStream && viewStream.value) {
+    viewStream.value.setSize(width, height);
+  }
+  const renderWindow = genericRenderWindow.getRenderWindow();
+  renderWindow.render();
+  await hybridViewerStore.remoteRender();
 }
 
 export { performClickPicking, performResize, performSetContainer, useHybridViewerViewport };

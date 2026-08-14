@@ -1,16 +1,14 @@
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-function useHybridViewerFilters(options) {
-  const { remoteRender } = options;
-  const viewerStore = useViewerStore();
-
+function useHybridViewerFilters() {
   async function setClippingPlanes(ids, planes) {
-    await performSetClippingPlanes(ids, planes, { viewerStore, remoteRender });
+    await performSetClippingPlanes(ids, planes);
   }
 
   async function setShrink(ids, shrink_factor) {
-    await performSetShrink(ids, shrink_factor, { viewerStore, remoteRender });
+    await performSetShrink(ids, shrink_factor);
   }
 
   return {
@@ -19,20 +17,20 @@ function useHybridViewerFilters(options) {
   };
 }
 
-async function performSetClippingPlanes(ids, planes, options) {
-  const { viewerStore, remoteRender } = options;
+async function performSetClippingPlanes(ids, planes) {
+  const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.clipping_planes;
   const params = { ids, planes };
   await viewerStore.request({ schema, params });
-  await remoteRender();
+  await useHybridViewerStore().remoteRender();
 }
 
-async function performSetShrink(ids, shrink_factor, options) {
-  const { viewerStore, remoteRender } = options;
+async function performSetShrink(ids, shrink_factor) {
+  const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.shrink;
   const params = { ids, shrink_factor };
   await viewerStore.request({ schema, params });
-  await remoteRender();
+  await useHybridViewerStore().remoteRender();
 }
 
 export { performSetClippingPlanes, performSetShrink, useHybridViewerFilters };
