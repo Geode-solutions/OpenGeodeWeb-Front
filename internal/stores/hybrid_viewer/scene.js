@@ -43,9 +43,8 @@ function useHybridViewerScene() {
 }
 
 async function performAddItem(id) {
-  const hybridViewerStore = useHybridViewerStore();
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-  if (!genericRenderWindow) {
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
+  if (!genericRenderWindow.value) {
     return;
   }
   const dataStore = useDataStore();
@@ -63,9 +62,9 @@ async function performAddItem(id) {
   const property = actor.getProperty();
   property.setColor(ACTOR_COLOR);
   actor.setMapper(mapper);
-  const renderer = genericRenderWindow.getRenderer();
-  if (hybridViewerStore.hybridDb[id] && hybridViewerStore.hybridDb[id].actor) {
-    renderer.removeActor(hybridViewerStore.hybridDb[id].actor);
+  const renderer = genericRenderWindow.value.getRenderer();
+  if (hybridDb[id] && hybridDb[id].actor) {
+    renderer.removeActor(hybridDb[id].actor);
   }
   const actors = renderer.getActors();
   const isFirst = actors.length === 0;
@@ -73,66 +72,62 @@ async function performAddItem(id) {
   if (isFirst) {
     renderer.resetCamera();
   }
-  hybridViewerStore.hybridDb[id] = { actor, polydata, mapper };
+  hybridDb[id] = { actor, polydata, mapper };
 }
 
 function performRemoveItem(id) {
-  const hybridViewerStore = useHybridViewerStore();
-  if (!hybridViewerStore.hybridDb[id]) {
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
+  if (!hybridDb[id]) {
     return;
   }
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-  const renderer = genericRenderWindow.getRenderer();
-  renderer.removeActor(hybridViewerStore.hybridDb[id].actor);
-  const renderWindow = genericRenderWindow.getRenderWindow();
+  const renderer = genericRenderWindow.value.getRenderer();
+  renderer.removeActor(hybridDb[id].actor);
+  const renderWindow = genericRenderWindow.value.getRenderWindow();
   renderWindow.render();
-  delete hybridViewerStore.hybridDb[id];
+  delete hybridDb[id];
 }
 
 function performSetVisibility(id, visibility) {
-  const hybridViewerStore = useHybridViewerStore();
-  if (!hybridViewerStore.hybridDb[id]) {
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
+  if (!hybridDb[id]) {
     return;
   }
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-  hybridViewerStore.hybridDb[id].actor.setVisibility(visibility);
-  const renderWindow = genericRenderWindow.getRenderWindow();
+  hybridDb[id].actor.setVisibility(visibility);
+  const renderWindow = genericRenderWindow.value.getRenderWindow();
   renderWindow.render();
 }
 
 async function performSetZScaling(z_scale) {
-  const hybridViewerStore = useHybridViewerStore();
-  if (hybridViewerStore.zScale) {
-    hybridViewerStore.zScale.value = z_scale;
+  const { genericRenderWindow, zScale, remoteRender } = useHybridViewerStore();
+  if (zScale) {
+    zScale.value = z_scale;
   }
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-  const renderer = genericRenderWindow.getRenderer();
+  const renderer = genericRenderWindow.value.getRenderer();
   for (const actor of renderer.getActors()) {
     const scale = actor.getScale();
     actor.setScale(scale[0], scale[1], z_scale);
   }
   renderer.resetCamera();
-  const renderWindow = genericRenderWindow.getRenderWindow();
+  const renderWindow = genericRenderWindow.value.getRenderWindow();
   renderWindow.render();
   const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.set_z_scaling;
   const params = { z_scale };
   await viewerStore.request({ schema, params });
-  await hybridViewerStore.remoteRender();
+  await remoteRender();
 }
 
 function performClear() {
-  const hybridViewerStore = useHybridViewerStore();
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-  const renderer = genericRenderWindow.getRenderer();
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
+  const renderer = genericRenderWindow.value.getRenderer();
   for (const actor of renderer.getActors()) {
     renderer.removeActor(actor);
   }
-  const renderWindow = genericRenderWindow.getRenderWindow();
+  const renderWindow = genericRenderWindow.value.getRenderWindow();
   renderWindow.render();
-  if (hybridViewerStore.hybridDb) {
-    for (const id of Object.keys(hybridViewerStore.hybridDb)) {
-      delete hybridViewerStore.hybridDb[id];
+  if (hybridDb) {
+    for (const id of Object.keys(hybridDb)) {
+      delete hybridDb[id];
     }
   }
 }

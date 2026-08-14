@@ -44,12 +44,11 @@ function performHoverHighlight(event, options = {}) {
   if (!is_hover_highlight.value) {
     return;
   }
-  const hybridViewerStore = useHybridViewerStore();
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-  if (!genericRenderWindow) {
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
+  if (!genericRenderWindow.value) {
     return;
   }
-  const container = genericRenderWindow.getContainer();
+  const container = genericRenderWindow.value.getContainer();
   if (!container) {
     return;
   }
@@ -60,7 +59,7 @@ function performHoverHighlight(event, options = {}) {
     x: Math.round(event.clientX - rect.left),
     y: Math.round(rect.height - (event.clientY - rect.top)),
     field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridViewerStore.hybridDb),
+    ids: Object.keys(hybridDb),
   };
   viewerStore.request(
     {
@@ -74,17 +73,15 @@ function performHoverHighlight(event, options = {}) {
 }
 
 function performClearHoverHighlight() {
-  const hybridViewerStore = useHybridViewerStore();
-  const fieldType = hybridViewerStore.hover_highlight_field_type
-    ? hybridViewerStore.hover_highlight_field_type.value
-    : "CELL";
+  const { hover_highlight_field_type, hybridDb } = useHybridViewerStore();
+  const fieldType = hover_highlight_field_type ? hover_highlight_field_type.value : "CELL";
   const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
   const params = {
     x: -1,
     y: -1,
     field_type: fieldType,
-    ids: Object.keys(hybridViewerStore.hybridDb || {}),
+    ids: Object.keys(hybridDb || {}),
   };
   viewerStore.request({ schema, params });
 }
@@ -112,9 +109,8 @@ function createHoverHighlight(options = {}) {
   } = options;
 
   return useDebounceFn((event) => {
-    const hybridViewerStore = useHybridViewerStore();
-    const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-    const containerElement = genericRenderWindow ? genericRenderWindow.getContainer() : undefined;
+    const { genericRenderWindow } = useHybridViewerStore();
+    const containerElement = genericRenderWindow.value ? genericRenderWindow.value.getContainer() : undefined;
     let relativeMousePosition = { x: 0, y: 0 };
     if (containerElement) {
       const containerRect = containerElement.getBoundingClientRect();

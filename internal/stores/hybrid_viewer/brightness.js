@@ -14,12 +14,12 @@ function useHybridViewerBrightness() {
     : undefined;
 
   function getAverageBrightness(rect) {
-    const hybridViewerStore = useHybridViewerStore();
+    const { genericRenderWindow } = useHybridViewerStore();
     return computeAverageBrightness(rect, {
       latestImage: latestImage.value,
       offscreenCtx,
       offscreenCanvas,
-      genericRenderWindow: hybridViewerStore.genericRenderWindow.value,
+      genericRenderWindow: genericRenderWindow.value,
     });
   }
 

@@ -24,8 +24,7 @@ function useHybridViewerViewport() {
 }
 
 function performClickPicking(event, containerElement) {
-  const hybridViewerStore = useHybridViewerStore();
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
+  const { genericRenderWindow, syncRemoteCamera } = useHybridViewerStore();
   const viewerStore = useViewerStore();
   const rect = containerElement.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
@@ -42,12 +41,12 @@ function performClickPicking(event, containerElement) {
       response_function: ({ x, y, z }) => {
         const pickedPos = [x, y, z];
         if (pickedPos.some((val) => val !== 0)) {
-          const renderer = genericRenderWindow.getRenderer();
+          const renderer = genericRenderWindow.value.getRenderer();
           const camera = renderer.getActiveCamera();
           centerCameraOnPosition(camera, pickedPos);
-          const renderWindow = genericRenderWindow.getRenderWindow();
+          const renderWindow = genericRenderWindow.value.getRenderWindow();
           renderWindow.render();
-          hybridViewerStore.syncRemoteCamera();
+          syncRemoteCamera();
         }
       },
     },
@@ -59,12 +58,16 @@ function performSetContainer(container) {
     return;
   }
 
-  const hybridViewerStore = useHybridViewerStore();
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-  const { is_picking, is_moving } = hybridViewerStore;
+  const {
+    genericRenderWindow,
+    is_picking,
+    is_moving,
+    syncRemoteCamera,
+    hoverHighlight,
+  } = useHybridViewerStore();
 
-  genericRenderWindow.setContainer(container.value.$el);
-  const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
+  genericRenderWindow.value.setContainer(container.value.$el);
+  const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
   webGLRenderWindow.setUseBackgroundImage(true);
   const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
   Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
@@ -90,9 +93,9 @@ function performSetContainer(container) {
     onReleased: () => {
       is_moving.value = false;
       if (has_dragged) {
-        const renderer = genericRenderWindow.getRenderer();
+        const renderer = genericRenderWindow.value.getRenderer();
         renderer.resetCameraClippingRange();
-        hybridViewerStore.syncRemoteCamera();
+        syncRemoteCamera();
       }
       has_dragged = false;
     },
@@ -105,8 +108,9 @@ function performSetContainer(container) {
         imageStyle.opacity = 0;
       }
     }
-    hybridViewerStore.hoverHighlight(event);
+    hoverHighlight(event);
   });
+
   let wheelEventEndTimeout = undefined;
   useEventListener(container, "wheel", () => {
     is_moving.value = true;
@@ -116,22 +120,20 @@ function performSetContainer(container) {
     clearTimeout(wheelEventEndTimeout);
     wheelEventEndTimeout = setTimeout(() => {
       is_moving.value = false;
-      const renderer = genericRenderWindow.getRenderer();
+      const renderer = genericRenderWindow.value.getRenderer();
       renderer.resetCameraClippingRange();
-      hybridViewerStore.syncRemoteCamera();
+      syncRemoteCamera();
     }, WHEEL_TIME_OUT_MS);
   });
 }
 
 async function performResize(width, height) {
-  const hybridViewerStore = useHybridViewerStore();
-  const genericRenderWindow = hybridViewerStore.genericRenderWindow.value;
-  const { status, viewStream } = hybridViewerStore;
+  const { genericRenderWindow, status, viewStream, remoteRender } = useHybridViewerStore();
   const viewerStore = useViewerStore();
   if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
     return;
   }
-  const webGLRenderWindow = genericRenderWindow.getApiSpecificRenderWindow();
+  const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
   const canvas = webGLRenderWindow.getCanvas();
   canvas.width = width;
   canvas.height = height;
@@ -140,9 +142,9 @@ async function performResize(width, height) {
   if (viewStream && viewStream.value) {
     viewStream.value.setSize(width, height);
   }
-  const renderWindow = genericRenderWindow.getRenderWindow();
+  const renderWindow = genericRenderWindow.value.getRenderWindow();
   renderWindow.render();
-  await hybridViewerStore.remoteRender();
+  await remoteRender();
 }
 
 export { performClickPicking, performResize, performSetContainer, useHybridViewerViewport };
