@@ -7,11 +7,7 @@ import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
 function useHybridViewerScene(options) {
-  const {
-    genericRenderWindow,
-    remoteRender,
-    gridActor,
-  } = options;
+  const { genericRenderWindow, remoteRender, gridActor } = options;
 
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
@@ -127,8 +123,7 @@ function performSetVisibility(id, visibility, options) {
 }
 
 async function performSetZScaling(z_scale, options) {
-  const { zScale, genericRenderWindow, gridActor, viewerStore, remoteRender } =
-    options;
+  const { zScale, genericRenderWindow, gridActor, viewerStore, remoteRender } = options;
   zScale.value = z_scale;
   const renderer = genericRenderWindow.getRenderer();
   for (const actor of renderer.getActors()) {
