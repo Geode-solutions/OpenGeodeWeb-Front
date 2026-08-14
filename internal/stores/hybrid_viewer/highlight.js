@@ -40,11 +40,7 @@ function useHybridViewerHighlight() {
 }
 
 function performHoverHighlight(event, options = {}) {
-  const {
-    is_hover_highlight,
-    hover_highlight_field_type,
-    onResponse,
-  } = options;
+  const { is_hover_highlight, hover_highlight_field_type, onResponse } = options;
   if (!is_hover_highlight.value) {
     return;
   }
