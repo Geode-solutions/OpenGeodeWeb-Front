@@ -74,7 +74,11 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock);
           status.value = Status.CONNECTING;
-          client.value = await initWebSocketClient(base_url.value, client.value);
+          client.value = await initWebSocketClient(base_url.value, client.value, {
+            onConnectionClose: () => {
+              status.value = Status.NOT_CONNECTED;
+            },
+          });
           connectImageStream(client.value.getConnection().getSession());
           client.value.endBusy();
           const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;

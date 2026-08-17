@@ -3,7 +3,7 @@ import vtkWSLinkClient, { newInstance } from "@kitware/vtk.js/IO/Core/WSLinkClie
 import SmartConnect from "wslink/src/SmartConnect";
 import _ from "lodash";
 
-async function initWebSocketClient(baseUrl, initialClient = {}) {
+async function initWebSocketClient(baseUrl, initialClient = {}, { onConnectionClose } = {}) {
   vtkWSLinkClient.setSmartConnectClass(SmartConnect);
   const client = _.isEmpty(initialClient) ? newInstance() : initialClient;
 
@@ -13,7 +13,7 @@ async function initWebSocketClient(baseUrl, initialClient = {}) {
   });
   client.onConnectionClose((httpReq) => {
     const message = httpReq?.response?.error || `Connection close`;
-    status.value = Status.NOT_CONNECTED;
+    onConnectionClose();
     console.error(message);
   });
 
