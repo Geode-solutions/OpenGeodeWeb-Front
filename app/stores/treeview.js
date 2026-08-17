@@ -22,20 +22,22 @@ export const useTreeviewStore = defineStore("treeview", () => {
   async function loadConfig() {
     try {
       const config = await database.treeview_config.get("main");
-      if (config?.opened_views) {
-        opened_views.value = config.opened_views;
-      }
-      if (config?.panelWidth) {
-        panelWidth.value = config.panelWidth;
-      }
-      if (config?.additionalPanelWidth) {
-        additionalPanelWidth.value = config.additionalPanelWidth;
-      }
-      if (config?.selectionIds) {
-        selection.value = config.selectionIds;
-      }
-      if (config?.rowHeights) {
-        rowHeights.value = config.rowHeights;
+      if (config) {
+        if (config.opened_views) {
+          opened_views.value = config.opened_views;
+        }
+        if (config.panelWidth) {
+          panelWidth.value = config.panelWidth;
+        }
+        if (config.additionalPanelWidth) {
+          additionalPanelWidth.value = config.additionalPanelWidth;
+        }
+        if (config.selectionIds) {
+          selection.value = config.selectionIds;
+        }
+        if (config.rowHeights) {
+          rowHeights.value = config.rowHeights;
+        }
       }
     } catch (error) {
       console.error("Failed to load treeview config:", error);
@@ -161,16 +163,24 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
+  // oxlint-disable-next-line max-lines-per-function
   function importStores(snapshot) {
-    opened_views.value = snapshot?.opened_views || [
+    const {
+      selection: snapshotSelection,
+      opened_views: snapshotOpenedViews,
+      panelWidth: snapshotPanelWidth,
+      additionalPanelWidth: snapshotAdditionalPanelWidth,
+      rowHeights: snapshotRowHeights,
+    } = snapshot;
+    opened_views.value = snapshotOpenedViews || [
       { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
     ];
-    panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
-    additionalPanelWidth.value = snapshot?.additionalPanelWidth || PANEL_WIDTH;
-    rowHeights.value = snapshot?.rowHeights || [];
+    panelWidth.value = snapshotPanelWidth || PANEL_WIDTH;
+    additionalPanelWidth.value = snapshotAdditionalPanelWidth || PANEL_WIDTH;
+    rowHeights.value = snapshotRowHeights || [];
     pendingSelectionIds.value =
-      snapshot?.selectionIds ||
-      (snapshot?.selection || []).map((selectionItem) => selectionItem.id || selectionItem) ||
+      selectionIds ||
+      (snapshotSelection || []).map((selectionItem) => selectionItem.id || selectionItem) ||
       [];
   }
 

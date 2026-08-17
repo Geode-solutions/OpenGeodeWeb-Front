@@ -147,7 +147,7 @@ export const useAppStore = defineStore("app", () => {
         URL.revokeObjectURL(finalURL);
       }
 
-      if (!extensionModule.metadata?.id) {
+      if (!("id" in extensionModule.metadata)) {
         throw new Error("Extension must have metadata.id");
       }
 
@@ -225,7 +225,7 @@ export const useAppStore = defineStore("app", () => {
   }
 
   function getExtensionEnabled(extensionId) {
-    return getExtension(extensionId)?.enabled ?? false;
+    return getExtension(extensionId).enabled;
   }
 
   function upload(file, callbacks = {}) {

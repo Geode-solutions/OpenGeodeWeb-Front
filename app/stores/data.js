@@ -97,7 +97,7 @@ export const useDataStore = defineStore("data", () => {
       .where("[id+geode_id]")
       .equals([modelId, geode_id])
       .first();
-    return component?.type;
+    return component.type;
   }
 
   async function registerObject(id, name) {
