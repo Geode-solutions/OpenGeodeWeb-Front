@@ -1,8 +1,31 @@
-import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./hybrid_viewer_constants";
+import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./constants";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const RGBA_CHANNELS = 4;
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
+
+function useHybridViewerBrightness() {
+  const latestImage = ref(undefined);
+  const offscreenCanvas =
+    typeof document === "undefined" ? undefined : document.createElement("canvas");
+  const offscreenCtx = offscreenCanvas
+    ? offscreenCanvas.getContext("2d", { willReadFrequently: true })
+    : undefined;
+
+  function getAverageBrightness(rect) {
+    return computeAverageBrightness(rect, {
+      latestImage: latestImage.value,
+      offscreenCtx,
+      offscreenCanvas,
+    });
+  }
+
+  return {
+    latestImage,
+    getAverageBrightness,
+  };
+}
 
 function mapRect(rect, latestImage, canvasRect) {
   const scaleX = latestImage.width / canvasRect.width;
@@ -16,11 +39,12 @@ function mapRect(rect, latestImage, canvasRect) {
 }
 
 function computeAverageBrightness(rect, options) {
-  const { latestImage, offscreenCtx, offscreenCanvas, genericRenderWindow } = options;
-  if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow) {
+  const { latestImage, offscreenCtx, offscreenCanvas } = options;
+  const { genericRenderWindow } = useHybridViewerStore();
+  if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow.value) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
-  const canvas = genericRenderWindow.getApiSpecificRenderWindow().getCanvas();
+  const canvas = genericRenderWindow.value.getApiSpecificRenderWindow().getCanvas();
   if (!canvas) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
@@ -59,4 +83,4 @@ function computeAverageBrightness(rect, options) {
   }
 }
 
-export { computeAverageBrightness };
+export { computeAverageBrightness, useHybridViewerBrightness };

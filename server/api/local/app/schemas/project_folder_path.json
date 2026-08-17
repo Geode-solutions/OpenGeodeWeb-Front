@@ -1,0 +1,8 @@
+{
+  "route": "/project_folder_path",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": { "PROJECT": { "type": "string" } },
+  "required": ["PROJECT"],
+  "additionalProperties": true
+}

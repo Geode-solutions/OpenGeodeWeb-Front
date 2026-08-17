@@ -1,0 +1,10 @@
+{
+  "route": "/run_cloud",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "email": { "type": "string" }
+  },
+  "required": ["email"],
+  "additionalProperties": false
+}

@@ -8,6 +8,8 @@ import { isCloudMode } from "@ogw_front/utils/stores";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+
 async function importExtensionFile(file) {
   await uploadExtension(file);
   return registerRunningExtensions();
@@ -83,21 +85,8 @@ async function uploadExtension(file) {
 function downloadExtension({ url, extensionFileName }) {
   const appStore = useAppStore();
   const { PROJECT: projectName } = useRuntimeConfig().public;
+  const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
   const params = { projectName, url, extensionFileName };
-
-  const schema = {
-    $id: "/api/microservice/extensions/download",
-    methods: ["POST"],
-    type: "object",
-    properties: {
-      extensionFileName: { type: "string" },
-      projectName: { type: "string" },
-      url: { type: "string" },
-    },
-    required: ["extensionFileName", "projectName", "url"],
-    additionalProperties: false,
-  };
-
   return appStore.request({ schema, params });
 }
 
@@ -105,20 +94,10 @@ function runExtensions() {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;
+  const schema = isCloudMode()
+    ? opengeodeweb_front_schemas.api.cloud.extensions.run
+    : opengeodeweb_front_schemas.api.local.extensions.run;
   const params = { projectFolderPath, projectName };
-  const endpoint = isCloudMode() ? "cloud" : "local";
-  const schema = {
-    $id: `/api/${endpoint}/extensions/run`,
-    methods: ["POST"],
-    type: "object",
-    properties: {
-      projectFolderPath: { type: "string" },
-      projectName: { type: "string" },
-    },
-    required: ["projectFolderPath", "projectName"],
-    additionalProperties: false,
-  };
-
   return appStore.request({ schema, params });
 }
 
@@ -126,23 +105,8 @@ function killExtension(extensionId) {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;
+  const schema = opengeodeweb_front_schemas.api.local.extensions.kill;
   const params = { extensionId, projectFolderPath, projectName };
-
-  console.log(`[AppStore] Killing extension: ${extensionId}`, { params });
-
-  const schema = {
-    $id: "/api/local/extensions/kill",
-    methods: ["POST"],
-    type: "object",
-    properties: {
-      extensionId: { type: "string" },
-      projectFolderPath: { type: "string" },
-      projectName: { type: "string" },
-    },
-    required: ["extensionId", "projectFolderPath", "projectName"],
-    additionalProperties: false,
-  };
-
   return appStore.request({ schema, params });
 }
 

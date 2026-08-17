@@ -1,0 +1,12 @@
+{
+  "route": "/kill",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "extensionId": { "type": "string" },
+    "projectFolderPath": { "type": "string" },
+    "projectName": { "type": "string" }
+  },
+  "required": ["extensionId", "projectFolderPath", "projectName"],
+  "additionalProperties": false
+}

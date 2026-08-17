@@ -4,7 +4,9 @@ import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.sv
 import CameraManager from "@ogw_front/components/CameraManager";
 import CameraOrientation from "@ogw_front/components/CameraOrientation";
 import ClippingPlanes from "@ogw_front/components/ClippingPlanes";
+import Ruler from "@ogw_front/components/Ruler";
 import Screenshot from "@ogw_front/components/Screenshot";
+import ShrinkFilter from "@ogw_front/components/ShrinkFilter";
 import ZScaling from "@ogw_front/components/ZScaling";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -17,6 +19,8 @@ const show_camera_manager = ref(false);
 const showCameraOrientation = ref(false);
 const showZScaling = ref(false);
 const showClippingPlanes = ref(false);
+const showShrinkFilter = ref(false);
+const showRuler = ref(false);
 const grid_scale = ref(false);
 const zScale = ref(hybridViewerStore.zScale);
 
@@ -162,6 +166,24 @@ const camera_options = computed(() => [
       showClippingPlanes.value = !showClippingPlanes.value;
     },
   },
+  {
+    testId: "shrinkFilterButton",
+    tooltip: "Shrink Filter",
+    icon: "mdi-arrow-collapse-all",
+    color: showShrinkFilter.value ? "primary" : undefined,
+    action: () => {
+      showShrinkFilter.value = !showShrinkFilter.value;
+    },
+  },
+  {
+    testId: "rulerButton",
+    tooltip: "Ruler",
+    icon: "mdi-ruler",
+    color: showRuler.value ? "primary" : undefined,
+    action: () => {
+      showRuler.value = !showRuler.value;
+    },
+  },
 ]);
 </script>
 
@@ -235,6 +257,8 @@ const camera_options = computed(() => [
     @apply="handleZScalingClose"
   />
   <ClippingPlanes v-model:show="showClippingPlanes" />
+  <ShrinkFilter v-model:show="showShrinkFilter" />
+  <Ruler v-model:show="showRuler" />
 </template>
 
 <style module>

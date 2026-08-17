@@ -4,7 +4,9 @@ import _ from "lodash";
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import { initWebSocketClient } from "@ogw_internal/utils/ws_client";
-import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
 import {
@@ -55,7 +57,7 @@ export const useViewerStore = defineStore(
     }
 
     async function set_picked_point(x, y) {
-      const schema = schemas.opengeodeweb_viewer.viewer.get_point_position;
+      const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
       const params = { x: Math.round(x), y: Math.round(y) };
       const response = await request({ schema, params });
       const { x: world_x, y: world_y, z: world_z } = response;
@@ -76,8 +78,9 @@ export const useViewerStore = defineStore(
           client.value = await initWebSocketClient(base_url.value, client.value);
           connectImageStream(client.value.getConnection().getSession());
           client.value.endBusy();
-          const schema = schemas.opengeodeweb_viewer.viewer.reset_visualization;
-          await request({ schema });
+          const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;
+          const timeout = undefined;
+          await request({ schema, timeout });
           status.value = Status.CONNECTED;
         } catch (error) {
           console.error("ws_connect error", error);
@@ -100,15 +103,7 @@ export const useViewerStore = defineStore(
       const appStore = useAppStore();
 
       const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
-      const schema = {
-        $id: "/api/local/app/run_viewer",
-        methods: ["POST"],
-        type: "object",
-        properties: { COMMAND_VIEWER: { type: "string" }, NUXT_ROOT_PATH: { type: "string" } },
-        required: ["COMMAND_VIEWER", "NUXT_ROOT_PATH"],
-        additionalProperties: true,
-      };
-
+      const schema = opengeodeweb_front_schemas.api.local.app.run_viewer;
       const params = { COMMAND_VIEWER, NUXT_ROOT_PATH, args };
       console.log("[VIEWER] params", params);
 

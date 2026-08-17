@@ -5,6 +5,8 @@ import { useAppStore } from "./app";
 import { useFeedbackStore } from "./feedback";
 import { useInfraStore } from "./infra";
 
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+
 export const useCloudStore = defineStore("cloud", {
   state: () => ({
     status: Status.NOT_CONNECTED,
@@ -13,16 +15,7 @@ export const useCloudStore = defineStore("cloud", {
     launch(email) {
       this.status = Status.CONNECTING;
       console.log("[CLOUD] Launching cloud backend...");
-      const schema = {
-        $id: "/api/serverless/run_cloud",
-        methods: ["POST"],
-        type: "object",
-        properties: {
-          email: { type: "string" },
-        },
-        required: ["email"],
-        additionalProperties: true,
-      };
+      const schema = opengeodeweb_front_schemas.api.serverless.run_cloud;
       const params = { email };
       console.log("[CLOUD] params", params);
       const appStore = useAppStore();
