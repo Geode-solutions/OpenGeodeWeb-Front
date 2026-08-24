@@ -1,6 +1,7 @@
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useElementBounding, useThrottleFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const LUMINANCE_THRESHOLD = 0.65;
 const ADAPTIVE_EXPONENT = 0.3;
@@ -22,8 +23,10 @@ function getValue(val) {
   return val ?? 0;
 }
 
+// oxlint-disable max-lines-per-function
 export function useAdaptiveStyles(target, options = {}) {
   const hybridViewerStore = useHybridViewerStore();
+  const treeviewStore = useTreeviewStore();
 
   const isCoordinates =
     target &&
@@ -65,18 +68,32 @@ export function useAdaptiveStyles(target, options = {}) {
 
   const brightness = ref(LUMINANCE_THRESHOLD);
 
-  const updateBrightness = useThrottleFn(() => {
+  function calculateBrightness() {
     brightness.value = hybridViewerStore.getAverageBrightness({
       x: x.value,
       y: y.value,
       width: width.value,
       height: height.value,
     });
-  }, ADAPTIVE_REFRESH_RATE);
+  }
+
+  const updateBrightness = useThrottleFn(calculateBrightness, ADAPTIVE_REFRESH_RATE);
 
   watch([x, y, width, height, () => hybridViewerStore.latestImage], updateBrightness, {
     immediate: true,
   });
+
+  async function forceRefresh() {
+    await nextTick();
+    bounding.update?.();
+    calculateBrightness();
+  }
+
+  onMounted(() => {
+    forceRefresh();
+  });
+
+  watch(() => treeviewStore.opened_views, forceRefresh, { deep: true });
 
   const adaptiveStyles = computed(() => {
     const normalized = Math.min(1, brightness.value / LUMINANCE_THRESHOLD);
