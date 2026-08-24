@@ -1,4 +1,4 @@
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, getCurrentInstance, nextTick, onMounted, ref, watch } from "vue";
 import { useElementBounding, useThrottleFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -89,9 +89,11 @@ export function useAdaptiveStyles(target, options = {}) {
     calculateBrightness();
   }
 
-  onMounted(() => {
-    forceRefresh();
-  });
+  if (getCurrentInstance()) {
+    onMounted(() => {
+      forceRefresh();
+    });
+  }
 
   watch(() => treeviewStore.opened_views, forceRefresh, { deep: true });
 
