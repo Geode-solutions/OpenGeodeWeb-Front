@@ -24,15 +24,23 @@ function stopHoverHighlight() {
   hybridViewerStore.clearHoverHighlight();
 }
 
-onKeyStroke("Escape", () => {
+onKeyStroke("Escape", (event) => {
+  let consumed = false;
   if (viewerStore.picking_mode) {
     viewerStore.toggle_picking_mode(false);
+    consumed = true;
   } else if (hybridViewerStore.is_picking) {
     hybridViewerStore.is_picking = false;
+    consumed = true;
   } else if (hybridViewerStore.is_ruler_active) {
     hybridViewerStore.deactivateRuler();
+    consumed = true;
   } else if (hybridViewerStore.is_hover_highlight) {
     stopHoverHighlight();
+    consumed = true;
+  }
+  if (consumed && event) {
+    event.stopImmediatePropagation();
   }
 });
 
