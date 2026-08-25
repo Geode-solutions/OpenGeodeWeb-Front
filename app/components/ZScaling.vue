@@ -23,7 +23,7 @@ function apply() {
     title="Z Scaling Control"
     :width="width"
     action-label="Apply"
-    :escape-function="escapeFunction"
+    :escapeFunction="escapeFunction"
     @action="apply"
   >
     <v-container class="pa-3 py-1">

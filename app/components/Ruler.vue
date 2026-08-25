@@ -61,7 +61,7 @@ async function applyManualCoords() {
     :width="300"
     close-label="Stop ruler"
     :click-outside="false"
-    :escape-function="escapeFunction"
+    :escapeFunction="escapeFunction"
   >
     <v-card-text class="pa-3">
       <v-switch

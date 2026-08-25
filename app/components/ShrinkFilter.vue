@@ -97,7 +97,7 @@ watch(
     title="Shrink Filter"
     :width="340"
     :click-outside="false"
-    :escape-function="escapeFunction"
+    :escapeFunction="escapeFunction"
   >
     <v-card-text class="pa-3 max-panel-height overflow-y-auto overflow-x-hidden">
       <v-switch

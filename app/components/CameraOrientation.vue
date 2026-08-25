@@ -173,7 +173,7 @@ watch(hoveredFace, (newFace, oldFace) => {
     v-model="show"
     title="Camera Orientations"
     :width="width"
-    :escape-function="escapeFunction"
+    :escapeFunction="escapeFunction"
     style="top: 90px; right: 55px"
     z-index="1"
   >

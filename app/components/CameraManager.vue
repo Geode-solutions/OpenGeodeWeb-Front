@@ -34,7 +34,7 @@ function handleClose() {
     v-model="show"
     title="Camera Positions"
     :width="width"
-    :escape-function="handleClose"
+    :escapeFunction="handleClose"
     style="top: 90px; right: 55px"
     z-index="1"
   >

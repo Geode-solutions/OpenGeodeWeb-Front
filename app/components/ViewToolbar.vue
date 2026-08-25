@@ -50,23 +50,6 @@ useEventListener(
       for (const key of openMenuKeys) {
         openSubMenus.value[key] = false;
       }
-      return;
-    }
-
-    if (showCameraOrientation.value) {
-      showCameraOrientation.value = false;
-    } else if (show_camera_manager.value) {
-      show_camera_manager.value = false;
-    } else if (take_screenshot.value) {
-      take_screenshot.value = false;
-    } else if (showZScaling.value) {
-      handleZScalingClose();
-    } else if (showClippingPlanes.value) {
-      showClippingPlanes.value = false;
-    } else if (showShrinkFilter.value) {
-      showShrinkFilter.value = false;
-    } else if (showRuler.value) {
-      showRuler.value = false;
     }
   },
   { capture: true },
@@ -297,7 +280,7 @@ const camera_options = computed(() => [
     v-model:show="showZScaling"
     v-model="zScale"
     :width="260"
-    :escape-function="handleZScalingClose"
+    :escapeFunction="handleZScalingClose"
     @apply="handleZScalingClose"
   />
   <ClippingPlanes

@@ -87,7 +87,7 @@ function handleClose() {
     :width="width"
     close-label="Cancel"
     action-label="Screenshot"
-    :escape-function="escapeFunction"
+    :escapeFunction="escapeFunction"
     @action="takeScreenshot"
   >
     <v-container class="pa-3 py-1">

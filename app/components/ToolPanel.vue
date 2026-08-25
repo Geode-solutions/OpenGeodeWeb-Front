@@ -1,6 +1,5 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
-import { useEventListener } from "@vueuse/core";
 
 const { title, width, closeLabel, actionLabel, clickOutside, escapeFunction } = defineProps({
   title: { type: String, default: "" },
@@ -20,17 +19,6 @@ function close() {
   }
   model.value = false;
 }
-
-useEventListener(
-  globalThis,
-  "keydown",
-  (event) => {
-    if (event.key === "Escape" && model.value) {
-      close();
-    }
-  },
-  { capture: true },
-);
 </script>
 
 <template>
@@ -43,6 +31,7 @@ useEventListener(
     variant="panel"
     padding="pa-0"
     class="position-absolute rounded-xl elevation-24 tool-panel"
+    :escapeFunction="close"
     v-bind="$attrs"
   >
     <v-card-text class="pa-0 overflow-hidden position-relative">

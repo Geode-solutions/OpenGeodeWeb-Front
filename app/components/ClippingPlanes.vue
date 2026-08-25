@@ -154,7 +154,7 @@ onBeforeUnmount(cleanupLocalWidget);
     title="Clipping Planes"
     :width="360"
     :click-outside="false"
-    :escape-function="escapeFunction"
+    :escapeFunction="escapeFunction"
   >
     <v-card-text class="pa-3 max-panel-height overflow-y-auto">
       <v-sheet
