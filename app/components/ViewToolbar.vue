@@ -9,6 +9,7 @@ import Screenshot from "@ogw_front/components/Screenshot";
 import ShrinkFilter from "@ogw_front/components/ShrinkFilter";
 import ZScaling from "@ogw_front/components/ZScaling";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import { useEventListener } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -23,6 +24,7 @@ const showShrinkFilter = ref(false);
 const showRuler = ref(false);
 const grid_scale = ref(false);
 const zScale = ref(hybridViewerStore.zScale);
+const openSubMenus = ref({});
 
 watch(
   () => hybridViewerStore.zScale,
@@ -35,6 +37,40 @@ async function handleZScalingClose() {
   await hybridViewerStore.setZScaling(zScale.value);
   showZScaling.value = false;
 }
+
+useEventListener(
+  globalThis,
+  "keydown",
+  (event) => {
+    if (event.key !== "Escape") {
+      return;
+    }
+    const openMenuKeys = Object.keys(openSubMenus.value).filter((key) => openSubMenus.value[key]);
+    if (openMenuKeys.length > 0) {
+      for (const key of openMenuKeys) {
+        openSubMenus.value[key] = false;
+      }
+      return;
+    }
+
+    if (showCameraOrientation.value) {
+      showCameraOrientation.value = false;
+    } else if (show_camera_manager.value) {
+      show_camera_manager.value = false;
+    } else if (take_screenshot.value) {
+      take_screenshot.value = false;
+    } else if (showZScaling.value) {
+      handleZScalingClose();
+    } else if (showClippingPlanes.value) {
+      showClippingPlanes.value = false;
+    } else if (showShrinkFilter.value) {
+      showShrinkFilter.value = false;
+    } else if (showRuler.value) {
+      showRuler.value = false;
+    }
+  },
+  { capture: true },
+);
 
 const camera_options = computed(() => [
   {
@@ -193,6 +229,7 @@ const camera_options = computed(() => [
       <v-col>
         <v-menu
           v-if="camera_option.menu && !camera_option.action"
+          v-model="openSubMenus[camera_option.testId]"
           location="start"
           :close-on-content-click="false"
         >
@@ -246,16 +283,11 @@ const camera_options = computed(() => [
   <CameraOrientation
     v-model:show="showCameraOrientation"
     panel
-    :escape-function="() => (showCameraOrientation = false)"
     @select="hybridViewerStore.setCameraOrientation"
   />
-  <Screenshot
-    v-model="take_screenshot"
-    :escape-function="() => (take_screenshot = false)"
-  />
+  <Screenshot v-model="take_screenshot" />
   <CameraManager
     :showDialog="show_camera_manager"
-    :escape-function="() => (show_camera_manager = false)"
     @close="show_camera_manager = false"
   />
   <ZScaling
@@ -265,18 +297,9 @@ const camera_options = computed(() => [
     :escape-function="handleZScalingClose"
     @apply="handleZScalingClose"
   />
-  <ClippingPlanes
-    v-model:show="showClippingPlanes"
-    :escape-function="() => (showClippingPlanes = false)"
-  />
-  <ShrinkFilter
-    v-model:show="showShrinkFilter"
-    :escape-function="() => (showShrinkFilter = false)"
-  />
-  <Ruler
-    v-model:show="showRuler"
-    :escape-function="() => (showRuler = false)"
-  />
+  <ClippingPlanes v-model:show="showClippingPlanes" />
+  <ShrinkFilter v-model:show="showShrinkFilter" />
+  <Ruler v-model:show="showRuler" />
 </template>
 
 <style module>

@@ -25,7 +25,11 @@ function stopHoverHighlight() {
 }
 
 onKeyStroke("Escape", () => {
-  if (hybridViewerStore.is_ruler_active) {
+  if (viewerStore.picking_mode) {
+    viewerStore.toggle_picking_mode(false);
+  } else if (hybridViewerStore.is_picking) {
+    hybridViewerStore.is_picking = false;
+  } else if (hybridViewerStore.is_ruler_active) {
     hybridViewerStore.deactivateRuler();
   } else if (hybridViewerStore.is_hover_highlight) {
     stopHoverHighlight();

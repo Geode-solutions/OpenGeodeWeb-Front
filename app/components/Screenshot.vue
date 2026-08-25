@@ -71,6 +71,13 @@ watch(screenshot_type, (value) => {
     output_extension.value = "png";
   }
 });
+
+function handleClose() {
+  if (escapeFunction) {
+    escapeFunction();
+  }
+  show.value = false;
+}
 </script>
 
 <template>
@@ -167,7 +174,7 @@ watch(screenshot_type, (value) => {
           color="white"
           data-testid="screenshotCancelButton"
           class="text-caption text-none"
-          @click="show = false"
+          @click="handleClose"
         >
           Cancel
         </v-btn>

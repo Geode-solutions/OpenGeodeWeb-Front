@@ -1,6 +1,6 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
-import { onKeyStroke } from "@vueuse/core";
+import { useEventListener } from "@vueuse/core";
 
 const { title, width, closeLabel, actionLabel, clickOutside, escapeFunction } = defineProps({
   title: { type: String, default: "" },
@@ -21,11 +21,16 @@ function close() {
   model.value = false;
 }
 
-onKeyStroke("Escape", () => {
-  if (model.value) {
-    close();
-  }
-});
+useEventListener(
+  globalThis,
+  "keydown",
+  (event) => {
+    if (event.key === "Escape" && model.value) {
+      close();
+    }
+  },
+  { capture: true },
+);
 </script>
 
 <template>

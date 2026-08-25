@@ -1,6 +1,7 @@
 <script setup>
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
+import { onKeyStroke } from "@vueuse/core";
 
 const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } = defineProps({
   search: { type: String, required: true },
@@ -13,6 +14,13 @@ const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } =
 const emit = defineEmits(["update:search", "toggle-sort", "collapse-all", "expand-all"]);
 
 const showSearch = ref(false);
+const filterMenuOpen = ref(false);
+
+onKeyStroke("Escape", () => {
+  if (filterMenuOpen.value) {
+    filterMenuOpen.value = false;
+  }
+});
 
 watch(
   () => showSearch.value,
@@ -79,7 +87,7 @@ watch(
             tooltipLocation="bottom"
             @click="emit('toggle-sort')"
           />
-          <v-menu :close-on-content-click="false">
+          <v-menu v-model="filterMenuOpen" :close-on-content-click="false">
             <template #activator="{ props: menuProps }">
               <ActionButton
                 data-testid="filterObjectsButton"
