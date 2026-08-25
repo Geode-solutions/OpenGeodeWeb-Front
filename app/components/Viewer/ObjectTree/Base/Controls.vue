@@ -13,7 +13,7 @@ const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } =
 const emit = defineEmits(["update:search", "toggle-sort", "collapse-all", "expand-all"]);
 
 const showSearch = ref(false);
-const filterMenuOpen = ref(false);
+
 
 watch(
   () => showSearch.value,
@@ -80,7 +80,7 @@ watch(
             tooltipLocation="bottom"
             @click="emit('toggle-sort')"
           />
-          <v-menu v-model="filterMenuOpen" :close-on-content-click="false">
+          <v-menu :close-on-content-click="false">
             <template #activator="{ props: menuProps }">
               <ActionButton
                 data-testid="filterObjectsButton"
