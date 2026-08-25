@@ -176,8 +176,6 @@ watch(
   },
 );
 
-
-
 function onConfirm() {
   emit("confirm", computedResult.value);
   emit("update:modelValue", false);

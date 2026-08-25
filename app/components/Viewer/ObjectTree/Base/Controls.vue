@@ -2,7 +2,6 @@
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 
-
 const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } = defineProps({
   search: { type: String, required: true },
   sortType: { type: String, required: true },
@@ -15,8 +14,6 @@ const emit = defineEmits(["update:search", "toggle-sort", "collapse-all", "expan
 
 const showSearch = ref(false);
 const filterMenuOpen = ref(false);
-
-
 
 watch(
   () => showSearch.value,
