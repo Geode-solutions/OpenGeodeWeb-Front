@@ -246,19 +246,37 @@ const camera_options = computed(() => [
   <CameraOrientation
     v-model:show="showCameraOrientation"
     panel
+    :escape-function="() => (showCameraOrientation = false)"
     @select="hybridViewerStore.setCameraOrientation"
   />
-  <Screenshot v-model="take_screenshot" />
-  <CameraManager :showDialog="show_camera_manager" @close="show_camera_manager = false" />
+  <Screenshot
+    v-model="take_screenshot"
+    :escape-function="() => (take_screenshot = false)"
+  />
+  <CameraManager
+    :showDialog="show_camera_manager"
+    :escape-function="() => (show_camera_manager = false)"
+    @close="show_camera_manager = false"
+  />
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"
     :width="260"
+    :escape-function="handleZScalingClose"
     @apply="handleZScalingClose"
   />
-  <ClippingPlanes v-model:show="showClippingPlanes" />
-  <ShrinkFilter v-model:show="showShrinkFilter" />
-  <Ruler v-model:show="showRuler" />
+  <ClippingPlanes
+    v-model:show="showClippingPlanes"
+    :escape-function="() => (showClippingPlanes = false)"
+  />
+  <ShrinkFilter
+    v-model:show="showShrinkFilter"
+    :escape-function="() => (showShrinkFilter = false)"
+  />
+  <Ruler
+    v-model:show="showRuler"
+    :escape-function="() => (showRuler = false)"
+  />
 </template>
 
 <style module>

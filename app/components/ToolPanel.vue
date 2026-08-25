@@ -1,20 +1,31 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
+import { onKeyStroke } from "@vueuse/core";
 
-const { title, width, closeLabel, actionLabel, clickOutside } = defineProps({
+const { title, width, closeLabel, actionLabel, clickOutside, escapeFunction } = defineProps({
   title: { type: String, default: "" },
   width: { type: Number, default: 260 },
   closeLabel: { type: String, default: "Close" },
   actionLabel: { type: String, default: undefined },
   clickOutside: { type: Boolean, default: true },
+  escapeFunction: { type: Function, default: undefined },
 });
 
 const model = defineModel({ type: Boolean, default: false });
 const emit = defineEmits(["action"]);
 
 function close() {
+  if (escapeFunction) {
+    escapeFunction();
+  }
   model.value = false;
 }
+
+onKeyStroke("Escape", () => {
+  if (model.value) {
+    close();
+  }
+});
 </script>
 
 <template>

@@ -1,49 +1,64 @@
 <script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
 import List from "@ogw_front/components/CameraManager/List";
 import Saver from "@ogw_front/components/CameraManager/Saver";
+import ToolPanel from "@ogw_front/components/ToolPanel";
 
 const emit = defineEmits(["close"]);
 
-const { showDialog, width } = defineProps({
+const { showDialog, width, escapeFunction } = defineProps({
   showDialog: { type: Boolean, required: true },
   width: { type: Number, required: false, default: 260 },
+  escapeFunction: { type: Function, default: undefined },
 });
+
+const show = computed({
+  get: () => showDialog,
+  set: (val) => {
+    if (!val) {
+      handleClose();
+    }
+  },
+});
+
+function handleClose() {
+  if (escapeFunction) {
+    escapeFunction();
+  } else {
+    emit("close");
+  }
+}
 </script>
 
 <template>
-  <GlassCard
-    v-if="showDialog"
-    @click.stop
+  <ToolPanel
+    v-model="show"
     title="Camera Positions"
     :width="width"
-    :ripple="false"
-    variant="panel"
-    padding="pa-0"
-    class="position-absolute elevation-24"
-    style="top: 90px; right: 55px; z-index: 1"
+    :escape-function="handleClose"
+    style="top: 90px; right: 55px"
+    z-index="1"
   >
     <v-card-text class="pa-0">
       <Saver />
-      <v-divider></v-divider>
+      <v-divider />
       <List />
     </v-card-text>
 
-    <v-divider></v-divider>
-
-    <v-card-actions class="pa-2">
-      <v-spacer></v-spacer>
-      <v-btn
-        variant="text"
-        size="small"
-        color="white"
-        class="text-caption text-none"
-        data-testid="closeCameraManagerButton"
-        @click="emit('close')"
-        >Close</v-btn
-      >
-    </v-card-actions>
-  </GlassCard>
+    <template #actions>
+      <v-card-actions class="justify-center pb-3 pt-0" style="gap: 8px">
+        <v-btn
+          variant="text"
+          size="small"
+          color="white"
+          class="text-caption text-none"
+          data-testid="closeCameraManagerButton"
+          @click="handleClose"
+        >
+          Close
+        </v-btn>
+      </v-card-actions>
+    </template>
+  </ToolPanel>
 </template>
 
 <style scoped>

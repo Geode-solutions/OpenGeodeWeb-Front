@@ -5,9 +5,10 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
-const { panel, width } = defineProps({
+const { panel, width, escapeFunction } = defineProps({
   panel: { type: Boolean, default: false },
   width: { type: Number, default: 260 },
+  escapeFunction: { type: Function, default: undefined },
 });
 
 const show = defineModel("show", { type: Boolean, default: false });
@@ -172,6 +173,7 @@ watch(hoveredFace, (newFace, oldFace) => {
     v-model="show"
     title="Camera Orientations"
     :width="width"
+    :escape-function="escapeFunction"
     style="top: 90px; right: 55px"
     z-index="1"
   >

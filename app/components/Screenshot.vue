@@ -8,8 +8,9 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const show = defineModel({ type: Boolean, default: false });
 
-const { width } = defineProps({
+const { width, escapeFunction } = defineProps({
   width: { type: Number, default: 260 },
+  escapeFunction: { type: Function, default: undefined },
 });
 
 const output_extensions =
@@ -79,6 +80,7 @@ watch(screenshot_type, (value) => {
     :width="width"
     close-label="Cancel"
     action-label="Screenshot"
+    :escape-function="escapeFunction"
     @action="takeScreenshot"
   >
     <v-container class="pa-3 py-1">

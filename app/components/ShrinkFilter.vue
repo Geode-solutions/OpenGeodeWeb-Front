@@ -8,6 +8,10 @@ const DEFAULT_SHRINK_VALUE = 0.8;
 const MAX_SHRINK_VALUE = 1;
 const DEBOUNCE_DELAY = 100;
 
+const { escapeFunction } = defineProps({
+  escapeFunction: { type: Function, default: undefined },
+});
+
 const show = defineModel("show", { type: Boolean, default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -88,7 +92,13 @@ watch(
 </script>
 
 <template>
-  <ToolPanel v-model="show" title="Shrink Filter" :width="340" :click-outside="false">
+  <ToolPanel
+    v-model="show"
+    title="Shrink Filter"
+    :width="340"
+    :click-outside="false"
+    :escape-function="escapeFunction"
+  >
     <v-card-text class="pa-3 max-panel-height overflow-y-auto overflow-x-hidden">
       <v-switch
         v-model="targetAllVisible"

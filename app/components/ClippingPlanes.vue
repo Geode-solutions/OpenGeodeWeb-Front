@@ -7,6 +7,10 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+const { escapeFunction } = defineProps({
+  escapeFunction: { type: Function, default: undefined },
+});
+
 const show = defineModel("show", { type: Boolean, default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -145,7 +149,13 @@ onBeforeUnmount(cleanupLocalWidget);
 </script>
 
 <template>
-  <ToolPanel v-model="show" title="Clipping Planes" :width="360" :click-outside="false">
+  <ToolPanel
+    v-model="show"
+    title="Clipping Planes"
+    :width="360"
+    :click-outside="false"
+    :escape-function="escapeFunction"
+  >
     <v-card-text class="pa-3 max-panel-height overflow-y-auto">
       <v-sheet
         ref="widgetContainer"
