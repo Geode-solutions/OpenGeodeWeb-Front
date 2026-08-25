@@ -108,7 +108,7 @@ async function copyToClipboard(text, label) {
             @click.stop="copyToClipboard(actualItem.title, 'Name')"
           />
         </span>
-        <span class="text-caption d-flex align-center">
+        <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">Status:</strong>
           <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
         </span>
