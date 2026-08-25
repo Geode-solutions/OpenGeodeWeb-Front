@@ -14,7 +14,6 @@ const emit = defineEmits(["update:search", "toggle-sort", "collapse-all", "expan
 
 const showSearch = ref(false);
 
-
 watch(
   () => showSearch.value,
   (val) => {
