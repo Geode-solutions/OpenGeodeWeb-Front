@@ -18,8 +18,6 @@ function selectItem(item) {
 function handleUpdate(val) {
   emit("update:displayIntermediate", val);
 }
-
-
 </script>
 
 <template>

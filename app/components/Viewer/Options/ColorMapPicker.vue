@@ -24,8 +24,6 @@ function onSelectPreset(preset) {
   menuOpen.value = false;
 }
 
-
-
 onMounted(() => nextTick(drawLutCanvas));
 watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas);
 </script>

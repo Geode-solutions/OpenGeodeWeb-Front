@@ -16,8 +16,6 @@ const show = defineModel("show", { type: Boolean, default: false });
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-
-
 const componentNames = [
   { getterKey: "meshPoints", setterKey: "MeshPoints", key: "points" },
   { getterKey: "meshEdges", setterKey: "MeshEdges", key: "edges" },
