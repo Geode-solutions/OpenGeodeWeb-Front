@@ -1,7 +1,7 @@
 <script setup>
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
 import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
-import { onKeyStroke } from "@vueuse/core";
+
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -16,11 +16,7 @@ const show = defineModel("show", { type: Boolean, default: false });
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-onKeyStroke("Escape", () => {
-  if (show.value) {
-    show.value = false;
-  }
-});
+
 
 const componentNames = [
   { getterKey: "meshPoints", setterKey: "MeshPoints", key: "points" },

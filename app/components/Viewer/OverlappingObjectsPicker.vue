@@ -2,7 +2,6 @@
 import GlassCard from "@ogw_front/components/GlassCard";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
-import { onKeyStroke } from "@vueuse/core";
 
 const { displayIntermediate, intermediateItems, menuStyle } = defineProps({
   displayIntermediate: { type: Boolean, required: true },
@@ -20,11 +19,7 @@ function handleUpdate(val) {
   emit("update:displayIntermediate", val);
 }
 
-onKeyStroke("Escape", () => {
-  if (displayIntermediate) {
-    handleUpdate(false);
-  }
-});
+
 </script>
 
 <template>

@@ -1,8 +1,8 @@
 <script setup>
-import { onKeyStroke, useEventListener } from "@vueuse/core";
 import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton";
 import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems";
 import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard";
+import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
@@ -36,9 +36,8 @@ const dragStartY = ref(0);
 const menuX = ref(x);
 const menuY = ref(y);
 
-onKeyStroke("Escape", () => {
-  if (show_menu.value) {
-    show_menu.value = false;
+watch(show_menu, (newVal) => {
+  if (!newVal) {
     menuStore.closeMenu();
   }
 });

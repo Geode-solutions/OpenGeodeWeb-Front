@@ -2,7 +2,6 @@
 import { drawCanvasForPreset, getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import ColorMapList from "./ColorMapList.vue";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
-import { onKeyStroke } from "@vueuse/core";
 
 const { max, min } = defineProps({
   min: { type: Number, required: true },
@@ -25,11 +24,7 @@ function onSelectPreset(preset) {
   menuOpen.value = false;
 }
 
-onKeyStroke("Escape", () => {
-  if (menuOpen.value) {
-    menuOpen.value = false;
-  }
-});
+
 
 onMounted(() => nextTick(drawLutCanvas));
 watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas);
