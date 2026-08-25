@@ -1,10 +1,10 @@
 <script setup>
 import ToolPanel from "@ogw_front/components/ToolPanel";
 import fileDownload from "js-file-download";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
+import { useClipboardItems } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const show = defineModel({ type: Boolean, default: false });
 
@@ -18,6 +18,8 @@ const filename = ref("");
 const output_extension = ref("png");
 const include_background = ref(true);
 const screenshot_type = ref("file");
+
+const { copy } = useClipboardItems();
 
 async function takeScreenshot() {
   const viewerStore = useViewerStore();
@@ -42,7 +44,7 @@ async function takeScreenshot() {
         } else {
           try {
             const pngBlob = new Blob([response.blob], { type: "image/png" });
-            await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })]);
+            await copy([new ClipboardItem({ "image/png": pngBlob })]);
             feedbackStore.add_success("Screenshot copied to clipboard");
           } catch (error) {
             feedbackStore.add_error(
