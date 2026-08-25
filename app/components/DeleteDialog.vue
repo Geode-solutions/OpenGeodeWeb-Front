@@ -1,6 +1,5 @@
 <script setup>
 import GlassCard from "./GlassCard.vue";
-import { onKeyStroke } from "@vueuse/core";
 
 const { show, item, selectedCount } = defineProps({
   show: {
@@ -18,12 +17,6 @@ const { show, item, selectedCount } = defineProps({
 });
 
 const emit = defineEmits(["update:show", "confirm"]);
-
-onKeyStroke("Escape", () => {
-  if (show) {
-    emit("update:show", false);
-  }
-});
 </script>
 
 <template>

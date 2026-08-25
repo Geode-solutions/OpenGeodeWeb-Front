@@ -1,6 +1,6 @@
 <script setup>
 import { computed, useAttrs } from "vue";
-import { useEventListener } from "@vueuse/core";
+import { onKeyStroke } from "@vueuse/core";
 
 const { variant, rounded, padding, theme, escapeFunction } = defineProps({
   variant: {
@@ -17,16 +17,11 @@ const { variant, rounded, padding, theme, escapeFunction } = defineProps({
 const attrs = useAttrs();
 const isInteractive = computed(() => Boolean(attrs.onClick));
 
-useEventListener(
-  globalThis,
-  "keydown",
-  (event) => {
-    if (event.key === "Escape" && escapeFunction) {
-      escapeFunction();
-    }
-  },
-  { capture: true },
-);
+onKeyStroke("Escape", () => {
+  if (escapeFunction) {
+    escapeFunction();
+  }
+});
 </script>
 
 <template>

@@ -8,8 +8,8 @@ import Ruler from "@ogw_front/components/Ruler";
 import Screenshot from "@ogw_front/components/Screenshot";
 import ShrinkFilter from "@ogw_front/components/ShrinkFilter";
 import ZScaling from "@ogw_front/components/ZScaling";
+import { onKeyStroke } from "@vueuse/core";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import { useEventListener } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -38,22 +38,14 @@ async function handleZScalingClose() {
   showZScaling.value = false;
 }
 
-useEventListener(
-  globalThis,
-  "keydown",
-  (event) => {
-    if (event.key !== "Escape") {
-      return;
+onKeyStroke("Escape", () => {
+  const openMenuKeys = Object.keys(openSubMenus.value).filter((key) => openSubMenus.value[key]);
+  if (openMenuKeys.length > 0) {
+    for (const key of openMenuKeys) {
+      openSubMenus.value[key] = false;
     }
-    const openMenuKeys = Object.keys(openSubMenus.value).filter((key) => openSubMenus.value[key]);
-    if (openMenuKeys.length > 0) {
-      for (const key of openMenuKeys) {
-        openSubMenus.value[key] = false;
-      }
-    }
-  },
-  { capture: true },
-);
+  }
+});
 
 const camera_options = computed(() => [
   {
