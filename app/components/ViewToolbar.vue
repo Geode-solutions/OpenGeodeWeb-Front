@@ -285,7 +285,10 @@ const camera_options = computed(() => [
     panel
     @select="hybridViewerStore.setCameraOrientation"
   />
-  <Screenshot v-model="take_screenshot" />
+  <Screenshot
+    v-model="take_screenshot"
+    :escape-function="() => (take_screenshot = false)"
+  />
   <CameraManager
     :showDialog="show_camera_manager"
     @close="show_camera_manager = false"
@@ -297,9 +300,18 @@ const camera_options = computed(() => [
     :escape-function="handleZScalingClose"
     @apply="handleZScalingClose"
   />
-  <ClippingPlanes v-model:show="showClippingPlanes" />
-  <ShrinkFilter v-model:show="showShrinkFilter" />
-  <Ruler v-model:show="showRuler" />
+  <ClippingPlanes
+    v-model:show="showClippingPlanes"
+    :escape-function="() => (showClippingPlanes = false)"
+  />
+  <ShrinkFilter
+    v-model:show="showShrinkFilter"
+    :escape-function="() => (showShrinkFilter = false)"
+  />
+  <Ruler
+    v-model:show="showRuler"
+    :escape-function="() => (showRuler = false)"
+  />
 </template>
 
 <style module>
