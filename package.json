@@ -27,8 +27,8 @@
   },
   "scripts": {
     "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
-    "build:back": "npx opengeodeweb-microservice-pyinstaller ../OpenGeodeWeb-Back",
-    "build:viewer": "npx opengeodeweb-microservice-pyinstaller ../OpenGeodeWeb-Viewer",
+    "build:back": "npx opengeodeweb-microservice-pyinstaller --projectPath ../OpenGeodeWeb-Back --localPackagesPaths ../../OpenGeodeWeb/OpenGeodeWeb-Microservice",
+    "build:viewer": "npx opengeodeweb-microservice-pyinstaller --projectPath ../OpenGeodeWeb-Viewer --localPackagesPaths ../../OpenGeodeWeb/OpenGeodeWeb-Microservice",
     "build:microservices": "concurrently \"npm run build:back\" \"npm run build:viewer\"",
     "json": "npx opengeodeweb-microservice-generate --startDir server/api --key route --separator / --prefix api",
     "test": "npm run test:unit",
