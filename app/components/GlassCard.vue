@@ -1,7 +1,8 @@
 <script setup>
 import { computed, useAttrs } from "vue";
+import { onKeyStroke } from "@vueuse/core";
 
-const { variant, rounded, padding, theme } = defineProps({
+const { variant, rounded, padding, theme, escapeFunction } = defineProps({
   variant: {
     type: String,
     default: "panel",
@@ -10,10 +11,17 @@ const { variant, rounded, padding, theme } = defineProps({
   rounded: { type: String, default: "xl" },
   padding: { type: String, default: "pa-6" },
   theme: { type: String, default: undefined },
+  escapeFunction: { type: Function, default: undefined },
 });
 
 const attrs = useAttrs();
 const isInteractive = computed(() => Boolean(attrs.onClick));
+
+onKeyStroke("Escape", () => {
+  if (escapeFunction) {
+    escapeFunction();
+  }
+});
 </script>
 
 <template>

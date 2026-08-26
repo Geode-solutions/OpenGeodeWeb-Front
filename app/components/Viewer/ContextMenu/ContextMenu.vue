@@ -36,6 +36,12 @@ const dragStartY = ref(0);
 const menuX = ref(x);
 const menuY = ref(y);
 
+watch(show_menu, (newVal) => {
+  if (!newVal) {
+    menuStore.closeMenu();
+  }
+});
+
 watch(
   () => [x, y, containerWidth, containerHeight],
   ([newX, newY]) => {

@@ -8,8 +8,9 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const show = defineModel({ type: Boolean, default: false });
 
-const { width } = defineProps({
+const { width, escapeFunction } = defineProps({
   width: { type: Number, default: 260 },
+  escapeFunction: { type: Function, default: undefined },
 });
 
 const output_extensions =
@@ -72,6 +73,13 @@ watch(screenshot_type, (value) => {
     output_extension.value = "png";
   }
 });
+
+function handleClose() {
+  if (escapeFunction) {
+    escapeFunction();
+  }
+  show.value = false;
+}
 </script>
 
 <template>
@@ -81,6 +89,7 @@ watch(screenshot_type, (value) => {
     :width="width"
     close-label="Cancel"
     action-label="Screenshot"
+    :escapeFunction="escapeFunction"
     @action="takeScreenshot"
   >
     <v-container class="pa-3 py-1">
@@ -167,7 +176,7 @@ watch(screenshot_type, (value) => {
           color="white"
           data-testid="screenshotCancelButton"
           class="text-caption text-none"
-          @click="show = false"
+          @click="handleClose"
         >
           Cancel
         </v-btn>

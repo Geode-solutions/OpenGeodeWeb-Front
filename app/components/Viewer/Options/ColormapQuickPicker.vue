@@ -1,6 +1,7 @@
 <script setup>
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
 import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
+
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
