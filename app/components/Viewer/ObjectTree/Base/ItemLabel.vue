@@ -1,8 +1,10 @@
 <script setup>
 import { middleTruncate } from "@ogw_front/utils/string";
+import { useClipboard } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const feedbackStore = useFeedbackStore();
+const { copy } = useClipboard();
 
 const { item, isLeaf } = defineProps({
   item: { type: Object, required: true },
@@ -52,7 +54,7 @@ const tooltipDisabled = computed(() => {
 });
 
 async function copyToClipboard(text, label) {
-  await navigator.clipboard.writeText(text);
+  await copy(text);
   feedbackStore.add_success(`${label} copied to clipboard`);
 }
 </script>

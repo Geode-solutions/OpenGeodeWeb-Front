@@ -1,15 +1,16 @@
 <script setup>
 import ToolPanel from "@ogw_front/components/ToolPanel";
 import fileDownload from "js-file-download";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
+import { useClipboardItems } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const show = defineModel({ type: Boolean, default: false });
 
-const { width } = defineProps({
+const { width, escapeFunction } = defineProps({
   width: { type: Number, default: 260 },
+  escapeFunction: { type: Function, default: undefined },
 });
 
 const output_extensions =
@@ -18,6 +19,8 @@ const filename = ref("");
 const output_extension = ref("png");
 const include_background = ref(true);
 const screenshot_type = ref("file");
+
+const { copy } = useClipboardItems();
 
 async function takeScreenshot() {
   const viewerStore = useViewerStore();
@@ -42,7 +45,7 @@ async function takeScreenshot() {
         } else {
           try {
             const pngBlob = new Blob([response.blob], { type: "image/png" });
-            await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })]);
+            await copy([new ClipboardItem({ "image/png": pngBlob })]);
             feedbackStore.add_success("Screenshot copied to clipboard");
           } catch (error) {
             feedbackStore.add_error(
@@ -70,6 +73,13 @@ watch(screenshot_type, (value) => {
     output_extension.value = "png";
   }
 });
+
+function handleClose() {
+  if (escapeFunction) {
+    escapeFunction();
+  }
+  show.value = false;
+}
 </script>
 
 <template>
@@ -79,6 +89,7 @@ watch(screenshot_type, (value) => {
     :width="width"
     close-label="Cancel"
     action-label="Screenshot"
+    :escapeFunction="escapeFunction"
     @action="takeScreenshot"
   >
     <v-container class="pa-3 py-1">
@@ -165,7 +176,7 @@ watch(screenshot_type, (value) => {
           color="white"
           data-testid="screenshotCancelButton"
           class="text-caption text-none"
-          @click="show = false"
+          @click="handleClose"
         >
           Cancel
         </v-btn>

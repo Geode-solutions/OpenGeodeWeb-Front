@@ -4,8 +4,9 @@ import ToolPanel from "@ogw_front/components/ToolPanel";
 const zScale = defineModel({ type: Number, default: 1 });
 const show = defineModel("show", { type: Boolean, default: false });
 
-const { width } = defineProps({
+const { width, escapeFunction } = defineProps({
   width: { type: Number, default: 260 },
+  escapeFunction: { type: Function, default: undefined },
 });
 
 const emit = defineEmits(["apply"]);
@@ -22,6 +23,7 @@ function apply() {
     title="Z Scaling Control"
     :width="width"
     action-label="Apply"
+    :escapeFunction="escapeFunction"
     @action="apply"
   >
     <v-container class="pa-3 py-1">

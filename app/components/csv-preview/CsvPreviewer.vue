@@ -1,7 +1,8 @@
 <script setup>
+import { useToggle } from "@vueuse/core";
+
 import CsvSettings from "./CsvSettings.vue";
 import CsvTable from "./CsvTable.vue";
-import { useToggle } from "@vueuse/core";
 
 const { file, modelValue } = defineProps({
   file: { type: Object, required: true },
