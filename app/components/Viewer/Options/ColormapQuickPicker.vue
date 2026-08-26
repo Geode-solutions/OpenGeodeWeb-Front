@@ -3,7 +3,7 @@ import AttributeRangeSelector from "@ogw_front/components/Viewer/Options/Attribu
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
 
 import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
-import { useGlobalAttributeStyle } from "@ogw_front/composables/use_global_attribute_style";
+import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute_style";
 
 const { dataId, x, y } = defineProps({
   dataId: { required: false, type: String, default: undefined },
