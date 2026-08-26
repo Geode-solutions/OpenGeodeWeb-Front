@@ -1,6 +1,7 @@
 <script setup>
 import GlassCard from "@ogw_front/components/GlassCard";
 import { middleTruncate } from "@ogw_front/utils/string";
+import { useClipboard } from "@vueuse/core";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
@@ -18,6 +19,8 @@ const ID_SLICE_END_OFFSET = 7;
 const TRUNCATE_MAX_LENGTH = 22;
 const TRUNCATE_START_CHARS = 12;
 const TRUNCATE_END_CHARS = 7;
+
+const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
 
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
@@ -78,17 +81,12 @@ const displayComponentTitle = computed(() => {
   );
 });
 
-const copied = ref(false);
 async function copyId(targetId) {
   if (!targetId) {
     return;
   }
   try {
-    await navigator.clipboard.writeText(targetId);
-    copied.value = true;
-    setTimeout(() => {
-      copied.value = false;
-    }, COPIED_TIMEOUT);
+    await copy(targetId);
   } catch (error) {
     console.error("Failed to copy ID:", error);
   }

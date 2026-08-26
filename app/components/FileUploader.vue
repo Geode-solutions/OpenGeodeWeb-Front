@@ -8,7 +8,7 @@ const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"]);
 
 const { multiple, accept, files, autoUpload, showOverlay, mini } = defineProps({
   multiple: { type: Boolean, default: false },
-  accept: { type: String, default: "" },
+  accept: { type: [String, Array], default: "" },
   files: { type: Array, default: () => [] },
   autoUpload: { type: Boolean, default: true },
   showOverlay: { type: Boolean, default: false },

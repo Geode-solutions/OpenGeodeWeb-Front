@@ -12,7 +12,7 @@ const { isDragging, loading, texts, accept, showExtensions } = defineProps({
       loading: "Loading...",
     }),
   },
-  accept: { type: String, default: "" },
+  accept: { type: [String, Array], default: "" },
   showExtensions: { type: Boolean, required: true },
 });
 
@@ -51,7 +51,7 @@ const emit = defineEmits(["click"]);
           v-if="accept && showExtensions"
           class="text-body-2 text-white opacity-60 bg-transparent"
         >
-          {{ accept }}
+          {{ Array.isArray(accept) ? accept.join(", ") : accept }}
         </v-sheet>
       </v-card-text>
     </GlassCard>

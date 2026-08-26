@@ -6,7 +6,7 @@ import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 const { multiple, accept, loading, showExtensions, fullscreen, inline, showOverlay, texts } =
   defineProps({
     multiple: { type: Boolean, default: false },
-    accept: { type: String, default: "" },
+    accept: { type: [String, Array], default: "" },
     loading: { type: Boolean, default: false },
     showExtensions: { type: Boolean, default: true },
     fullscreen: { type: Boolean, default: false },
@@ -28,6 +28,52 @@ const isDragging = ref(false);
 const isInternalDrag = ref(false);
 const dragCounter = ref(0);
 const fileInput = ref(undefined);
+
+const WILDCARD_SUFFIX_LENGTH = 2;
+
+function isFileAccepted(file, acceptValue) {
+  const fileName = (file.name || "").toLowerCase();
+  const fileType = (file.type || "").toLowerCase();
+  const isVext = fileName.endsWith(".vext");
+
+  if (!acceptValue) {
+    return !isVext;
+  }
+  let rules = [];
+  if (Array.isArray(acceptValue)) {
+    rules = acceptValue;
+  } else if (typeof acceptValue === "string") {
+    rules = acceptValue.split(",");
+  }
+  rules = rules.map((rule) => String(rule).trim()).filter(Boolean);
+  if (rules.length === 0) {
+    return !isVext;
+  }
+
+  return rules.some((rule) => {
+    let cleanRule = rule.toLowerCase();
+    if (!cleanRule) {
+      return !isVext;
+    }
+    if (cleanRule === "*" || cleanRule === "*.*") {
+      return !isVext;
+    }
+    if (cleanRule.startsWith("*.")) {
+      cleanRule = cleanRule.slice(1);
+    }
+    if (cleanRule.startsWith(".")) {
+      return fileName.endsWith(cleanRule);
+    }
+    if (cleanRule.includes("/")) {
+      if (cleanRule.endsWith("/*")) {
+        const typeGroup = cleanRule.slice(0, -WILDCARD_SUFFIX_LENGTH);
+        return fileType.startsWith(typeGroup);
+      }
+      return fileType === cleanRule;
+    }
+    return fileName.endsWith(`.${cleanRule}`);
+  });
+}
 
 function triggerFileDialog() {
   fileInput.value?.click();
@@ -58,7 +104,7 @@ function onDrop(event) {
   event.preventDefault();
   dragCounter.value = 0;
   isDragging.value = false;
-  const files = [...event.dataTransfer.files];
+  const files = [...event.dataTransfer.files].filter((file) => isFileAccepted(file, accept));
   if (files.length > 0) {
     emit("files-selected", files);
   }

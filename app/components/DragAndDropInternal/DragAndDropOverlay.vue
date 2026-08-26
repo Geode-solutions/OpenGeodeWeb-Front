@@ -14,7 +14,7 @@ const { isDragging, showOverlay, fullscreen, loading, texts, multiple, accept, s
       }),
     },
     multiple: { type: Boolean, required: true },
-    accept: { type: String, default: "" },
+    accept: { type: [String, Array], default: "" },
     showExtensions: { type: Boolean, required: true },
   });
 </script>
@@ -76,7 +76,7 @@ const { isDragging, showOverlay, fullscreen, loading, texts, multiple, accept, s
                 :size="fullscreen ? 'x-large' : 'large'"
                 class="px-8 glow-chip"
               >
-                Accepted formats: {{ accept }}
+                Accepted formats: {{ Array.isArray(accept) ? accept.join(", ") : accept }}
               </v-chip>
 
               <v-sheet
