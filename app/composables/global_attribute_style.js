@@ -67,7 +67,7 @@ export function useGlobalAttributeStyle(dataIdRef) {
       if (!targetId) {
         return [0, 1];
       }
-      
+
       for (const comp of getActiveComponents(targetId)) {
         const getterName = `${comp.getterKey}${comp.attributeType}Range`;
         const getter = dataStyleStore[getterName];
@@ -85,7 +85,7 @@ export function useGlobalAttributeStyle(dataIdRef) {
       if (!targetId) {
         return;
       }
-      
+
       let updated = false;
       for (const comp of getActiveComponents(targetId)) {
         const setterName = `set${comp.setterKey}${comp.attributeType}Range`;
@@ -98,7 +98,7 @@ export function useGlobalAttributeStyle(dataIdRef) {
       if (updated) {
         hybridViewerStore.remoteRender();
       }
-    }
+    },
   });
 
   async function applyGlobalColormap(newMap) {
