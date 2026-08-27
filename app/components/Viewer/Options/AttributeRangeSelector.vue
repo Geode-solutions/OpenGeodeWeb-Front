@@ -22,6 +22,8 @@ const maximum = defineModel("maximum", { type: Number });
     </v-col>
     <v-col cols="2" class="d-flex justify-center">
       <v-btn
+        data-testid="resetRangeButton"
+        aria-label="Reset range"
         icon="mdi-arrow-left-right"
         size="x-small"
         variant="text"
