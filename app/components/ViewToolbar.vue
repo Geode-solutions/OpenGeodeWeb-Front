@@ -47,6 +47,28 @@ onKeyStroke("Escape", () => {
   }
 });
 
+function closeAllToolsExcept(toolRef) {
+  const tools = [
+    showCameraOrientation,
+    show_camera_manager,
+    take_screenshot,
+    showZScaling,
+    showClippingPlanes,
+    showShrinkFilter,
+    showRuler,
+  ];
+  for (const tool of tools) {
+    if (tool !== toolRef) {
+      tool.value = false;
+    }
+  }
+}
+
+function toggleTool(toolRef) {
+  closeAllToolsExcept(toolRef);
+  toolRef.value = !toolRef.value;
+}
+
 const camera_options = computed(() => [
   {
     testId: "resetCameraButton",
@@ -118,7 +140,7 @@ const camera_options = computed(() => [
     tooltip: "Camera orientation",
     icon: "mdi-rotate-3d",
     action: () => {
-      showCameraOrientation.value = !showCameraOrientation.value;
+      toggleTool(showCameraOrientation);
     },
   },
   {
@@ -127,7 +149,7 @@ const camera_options = computed(() => [
     icon: CameraBookmarkIcon,
     iconSize: 34,
     action: () => {
-      show_camera_manager.value = !show_camera_manager.value;
+      toggleTool(show_camera_manager);
     },
   },
   {
@@ -135,7 +157,7 @@ const camera_options = computed(() => [
     tooltip: "Take a screenshot",
     icon: "mdi-camera",
     action: () => {
-      take_screenshot.value = !take_screenshot.value;
+      toggleTool(take_screenshot);
     },
   },
   {
@@ -165,7 +187,7 @@ const camera_options = computed(() => [
     tooltip: "Z Scaling Control",
     icon: "mdi-sort",
     action: () => {
-      showZScaling.value = !showZScaling.value;
+      toggleTool(showZScaling);
     },
   },
   {
@@ -174,7 +196,7 @@ const camera_options = computed(() => [
     icon: "mdi-content-cut",
     color: showClippingPlanes.value ? "primary" : undefined,
     action: () => {
-      showClippingPlanes.value = !showClippingPlanes.value;
+      toggleTool(showClippingPlanes);
     },
   },
   {
@@ -183,7 +205,7 @@ const camera_options = computed(() => [
     icon: "mdi-arrow-collapse-all",
     color: showShrinkFilter.value ? "primary" : undefined,
     action: () => {
-      showShrinkFilter.value = !showShrinkFilter.value;
+      toggleTool(showShrinkFilter);
     },
   },
   {
@@ -192,7 +214,7 @@ const camera_options = computed(() => [
     icon: "mdi-ruler",
     color: showRuler.value ? "primary" : undefined,
     action: () => {
-      showRuler.value = !showRuler.value;
+      toggleTool(showRuler);
     },
   },
 ]);

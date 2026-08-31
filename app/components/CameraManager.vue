@@ -35,8 +35,6 @@ function handleClose() {
     title="Camera Positions"
     :width="width"
     :escapeFunction="handleClose"
-    style="top: 90px; right: 55px"
-    z-index="1"
   >
     <v-card-text class="pa-0">
       <Saver />
