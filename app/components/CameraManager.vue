@@ -30,12 +30,7 @@ function handleClose() {
 </script>
 
 <template>
-  <ToolPanel
-    v-model="show"
-    title="Camera Positions"
-    :width="width"
-    :escapeFunction="handleClose"
-  >
+  <ToolPanel v-model="show" title="Camera Positions" :width="width" :escapeFunction="handleClose">
     <v-card-text class="pa-0">
       <Saver />
       <v-divider />
