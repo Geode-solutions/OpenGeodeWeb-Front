@@ -36,6 +36,11 @@ function executablePath(execPath, execName) {
 
   console.log("[executablePath]", { execPath, execName, mode, nodeEnv, resourcesPath });
 
+  if (commandExistsSync(osExecutableName)) {
+    console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
+    return osExecutableName;
+  }
+
   const foundAtExecPath = findExecutableInDir(execPath, execName, osExecutableName);
   if (foundAtExecPath) {
     return foundAtExecPath;
@@ -49,11 +54,6 @@ function executablePath(execPath, execName) {
     throw new Error(
       `Executable not found in execPath (${execPath}) or resourcesPath (${resourcesPath}): ${osExecutableName}`,
     );
-  }
-
-  if (commandExistsSync(osExecutableName)) {
-    console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
-    return osExecutableName;
   }
 
   throw new Error(`Executable not found: ${osExecutableName}`);
