@@ -8,6 +8,7 @@ import Ruler from "@ogw_front/components/Ruler";
 import Screenshot from "@ogw_front/components/Screenshot";
 import ShrinkFilter from "@ogw_front/components/ShrinkFilter";
 import ZScaling from "@ogw_front/components/ZScaling";
+import { onKeyStroke } from "@vueuse/core";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -23,6 +24,7 @@ const showShrinkFilter = ref(false);
 const showRuler = ref(false);
 const grid_scale = ref(false);
 const zScale = ref(hybridViewerStore.zScale);
+const openSubMenus = ref({});
 
 watch(
   () => hybridViewerStore.zScale,
@@ -35,6 +37,15 @@ async function handleZScalingClose() {
   await hybridViewerStore.setZScaling(zScale.value);
   showZScaling.value = false;
 }
+
+onKeyStroke("Escape", () => {
+  const openMenuKeys = Object.keys(openSubMenus.value).filter((key) => openSubMenus.value[key]);
+  if (openMenuKeys.length > 0) {
+    for (const key of openMenuKeys) {
+      openSubMenus.value[key] = false;
+    }
+  }
+});
 
 const camera_options = computed(() => [
   {
@@ -193,6 +204,7 @@ const camera_options = computed(() => [
       <v-col>
         <v-menu
           v-if="camera_option.menu && !camera_option.action"
+          v-model="openSubMenus[camera_option.testId]"
           location="start"
           :close-on-content-click="false"
         >
@@ -248,17 +260,24 @@ const camera_options = computed(() => [
     panel
     @select="hybridViewerStore.setCameraOrientation"
   />
-  <Screenshot v-model="take_screenshot" />
+  <Screenshot v-model="take_screenshot" :escapeFunction="() => (take_screenshot = false)" />
   <CameraManager :showDialog="show_camera_manager" @close="show_camera_manager = false" />
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"
     :width="260"
+    :escapeFunction="handleZScalingClose"
     @apply="handleZScalingClose"
   />
-  <ClippingPlanes v-model:show="showClippingPlanes" />
-  <ShrinkFilter v-model:show="showShrinkFilter" />
-  <Ruler v-model:show="showRuler" />
+  <ClippingPlanes
+    v-model:show="showClippingPlanes"
+    :escapeFunction="() => (showClippingPlanes = false)"
+  />
+  <ShrinkFilter
+    v-model:show="showShrinkFilter"
+    :escapeFunction="() => (showShrinkFilter = false)"
+  />
+  <Ruler v-model:show="showRuler" :escapeFunction="() => (showRuler = false)" />
 </template>
 
 <style module>

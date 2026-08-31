@@ -2,6 +2,10 @@
 import ToolPanel from "@ogw_front/components/ToolPanel";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+const { escapeFunction } = defineProps({
+  escapeFunction: { type: Function, default: undefined },
+});
+
 const show = defineModel("show", { type: Boolean, default: false });
 const hybridViewerStore = useHybridViewerStore();
 
@@ -57,6 +61,7 @@ async function applyManualCoords() {
     :width="300"
     close-label="Stop ruler"
     :click-outside="false"
+    :escapeFunction="escapeFunction"
   >
     <v-card-text class="pa-3">
       <v-switch
