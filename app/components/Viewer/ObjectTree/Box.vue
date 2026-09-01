@@ -177,5 +177,7 @@ watch(
   background-color: rgba(255, 255, 255, 0.05);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
 }
 </style>
