@@ -46,12 +46,13 @@ const {
   emit,
 );
 
-const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } = useTreeScroll(
-  computed(() => ({ scrollTop })),
-  emit,
-  displayItems,
-  actualItemProps,
-);
+const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
+  useTreeScroll(
+    computed(() => ({ scrollTop })),
+    emit,
+    displayItems,
+    actualItemProps,
+  );
 
 const lastActiveIndex = ref(-1);
 
