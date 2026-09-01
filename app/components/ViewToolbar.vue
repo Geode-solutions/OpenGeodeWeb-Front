@@ -15,14 +15,14 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
-const take_screenshot = ref(false);
-const show_camera_manager = ref(false);
+const showScreenshot = ref(false);
+const showCameraManager = ref(false);
 const showCameraOrientation = ref(false);
 const showZScaling = ref(false);
 const showClippingPlanes = ref(false);
 const showShrinkFilter = ref(false);
 const showRuler = ref(false);
-const grid_scale = ref(false);
+const gridScale = ref(false);
 const zScale = ref(hybridViewerStore.zScale);
 const openSubMenus = ref({});
 
@@ -50,8 +50,8 @@ onKeyStroke("Escape", () => {
 function closeAllToolsExcept(toolRef) {
   const tools = [
     showCameraOrientation,
-    show_camera_manager,
-    take_screenshot,
+    showCameraManager,
+    showScreenshot,
     showZScaling,
     showClippingPlanes,
     showShrinkFilter,
@@ -149,7 +149,7 @@ const camera_options = computed(() => [
     icon: CameraBookmarkIcon,
     iconSize: 34,
     action: () => {
-      toggleTool(show_camera_manager);
+      toggleTool(showCameraManager);
     },
   },
   {
@@ -157,17 +157,17 @@ const camera_options = computed(() => [
     tooltip: "Take a screenshot",
     icon: "mdi-camera",
     action: () => {
-      toggleTool(take_screenshot);
+      toggleTool(showScreenshot);
     },
   },
   {
     testId: "gridScaleButton",
     tooltip: "Toggle grid scale",
     icon: "mdi-ruler-square",
-    color: grid_scale.value ? "primary" : undefined,
+    color: gridScale.value ? "primary" : undefined,
     action: () => {
       const schema = schemas.opengeodeweb_viewer.viewer.grid_scale;
-      const params = { visibility: !grid_scale.value };
+      const params = { visibility: !gridScale.value };
       viewerStore.request(
         {
           schema,
@@ -175,7 +175,7 @@ const camera_options = computed(() => [
         },
         {
           response_function: () => {
-            grid_scale.value = !grid_scale.value;
+            gridScale.value = !gridScale.value;
             hybridViewerStore.remoteRender();
           },
         },
@@ -282,8 +282,8 @@ const camera_options = computed(() => [
     panel
     @select="hybridViewerStore.setCameraOrientation"
   />
-  <Screenshot v-model="take_screenshot" :escapeFunction="() => (take_screenshot = false)" />
-  <CameraManager :showDialog="show_camera_manager" @close="show_camera_manager = false" />
+  <Screenshot v-model="showScreenshot" :escapeFunction="() => (showScreenshot = false)" />
+  <CameraManager :showDialog="showCameraManager" @close="showCameraManager = false" />
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"
