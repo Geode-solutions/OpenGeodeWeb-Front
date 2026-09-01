@@ -169,6 +169,7 @@ function expandAll() {
       @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
       @hover:enter="handleHoverEnter"
       @hover:leave="handleHoverLeave"
+      @contextmenu="emit('show-menu', { event: $event.event, itemId: $event.item.id })"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
