@@ -34,7 +34,8 @@ describe("step", () => {
     const wrapper = mount(
       {
         components: { Step },
-        template: '<v-stepper-vertical><Step :stepIndex="0" :stepperTree="stepperTree" /></v-stepper-vertical>',
+        template:
+          '<v-stepper-vertical><Step :stepIndex="0" :stepperTree="stepperTree" /></v-stepper-vertical>',
         setup() {
           return { stepperTree: stepper_tree };
         },
