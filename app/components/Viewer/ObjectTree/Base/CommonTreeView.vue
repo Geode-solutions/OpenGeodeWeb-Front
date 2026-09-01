@@ -119,8 +119,8 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
     class="common-tree-view-wrapper"
     tabindex="0"
     @keydown="handleKeyDown"
-    @mousedown="treeWrapper?.focus()"
-    @mouseenter="treeWrapper?.focus()"
+    @mousedown="treeWrapper.focus()"
+    @mouseenter="treeWrapper.focus()"
   >
     <StickyHeader
       v-if="stickyHeader"
@@ -160,11 +160,11 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
           @mousedown.prevent
           @click="
             handleItemClick(item, index, $event);
-            treeWrapper?.focus();
+            treeWrapper.focus();
           "
           @contextmenu.prevent.stop="
             emit('contextmenu', { event: $event, item: item.raw });
-            treeWrapper?.focus();
+            treeWrapper.focus();
           "
           @mouseenter="emit('hover:enter', { item })"
           @mouseleave="emit('hover:leave', { item })"
