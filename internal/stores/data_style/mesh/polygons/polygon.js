@@ -64,6 +64,32 @@ function useMeshPolygonsPolygonAttributeStyle() {
     });
   }
 
+  function meshPolygonsPolygonAttributeLastItem(id, name) {
+    const { storedConfigs } = meshPolygonsPolygonAttribute(id);
+    if (storedConfigs && name in storedConfigs) {
+      return storedConfigs[name].lastItem;
+    }
+    return 0;
+  }
+
+  function meshPolygonsPolygonAttributeName(id) {
+    return meshPolygonsPolygonAttribute(id).name;
+  }
+
+  function meshPolygonsPolygonAttributeItem(id) {
+    const { item, name } = meshPolygonsPolygonAttribute(id);
+    return item ?? meshPolygonsPolygonAttributeLastItem(id, name);
+  }
+
+  function setMeshPolygonsPolygonAttribute(id, { name, item, minimum, maximum, colorMap }) {
+    mutateMeshPolygonsPolygonStyle(id, { name, item });
+    setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, { minimum, maximum, colorMap });
+    const points = getRGBPointsFromPreset(colorMap);
+    const schema = meshPolygonsPolygonAttributeSchemas.attribute;
+    const params = { id, name, item, points, minimum, maximum };
+    return viewerStore.request({ schema, params });
+  }
+
   function applyPolygonAttribute(id) {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
@@ -80,32 +106,15 @@ function useMeshPolygonsPolygonAttributeStyle() {
     }
   }
 
-  function meshPolygonsPolygonAttributeName(id) {
-    return meshPolygonsPolygonAttribute(id).name;
-  }
-
   function setMeshPolygonsPolygonAttributeName(id, name) {
     const item = meshPolygonsPolygonAttributeLastItem(id, name);
     mutateMeshPolygonsPolygonStyle(id, { name, item });
     return applyPolygonAttribute(id);
   }
 
-  function meshPolygonsPolygonAttributeItem(id) {
-    const { item, name } = meshPolygonsPolygonAttribute(id);
-    return item ?? meshPolygonsPolygonAttributeLastItem(id, name);
-  }
-
   function setMeshPolygonsPolygonAttributeItem(id, item) {
     mutateMeshPolygonsPolygonStyle(id, { item });
     return applyPolygonAttribute(id);
-  }
-
-  function meshPolygonsPolygonAttributeLastItem(id, name) {
-    const { storedConfigs } = meshPolygonsPolygonAttribute(id);
-    if (storedConfigs && name in storedConfigs) {
-      return storedConfigs[name].lastItem;
-    }
-    return 0;
   }
 
   function meshPolygonsPolygonAttributeRange(id) {
@@ -134,15 +143,6 @@ function useMeshPolygonsPolygonAttributeStyle() {
     const item = meshPolygonsPolygonAttributeItem(id);
     setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, { colorMap });
     return applyPolygonAttribute(id);
-  }
-
-  function setMeshPolygonsPolygonAttribute(id, { name, item, minimum, maximum, colorMap }) {
-    mutateMeshPolygonsPolygonStyle(id, { name, item });
-    setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, { minimum, maximum, colorMap });
-    const points = getRGBPointsFromPreset(colorMap);
-    const schema = meshPolygonsPolygonAttributeSchemas.attribute;
-    const params = { id, name, item, points, minimum, maximum };
-    return viewerStore.request({ schema, params });
   }
 
   return {

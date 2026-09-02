@@ -69,20 +69,20 @@ function useModelBlocksPolyhedronAttribute() {
     return modelBlocksPolyhedronAttribute(modelId, blockId).name;
   }
 
-  function modelBlocksPolyhedronAttributeItem(modelId, blockId) {
-    const polyhedronAttribute = modelBlocksPolyhedronAttribute(modelId, blockId);
-    return (
-      polyhedronAttribute.item ??
-      modelBlocksPolyhedronAttributeLastItem(modelId, blockId, polyhedronAttribute.name)
-    );
-  }
-
   function modelBlocksPolyhedronAttributeLastItem(modelId, blockId, name) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
     if (!(name in storedConfigs)) {
       return 0;
     }
     return storedConfigs[name].lastItem;
+  }
+
+  function modelBlocksPolyhedronAttributeItem(modelId, blockId) {
+    const polyhedronAttribute = modelBlocksPolyhedronAttribute(modelId, blockId);
+    return (
+      polyhedronAttribute.item ??
+      modelBlocksPolyhedronAttributeLastItem(modelId, blockId, polyhedronAttribute.name)
+    );
   }
 
   function modelBlocksPolyhedronAttributeRange(modelId, blockId) {
@@ -98,6 +98,31 @@ function useModelBlocksPolyhedronAttribute() {
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
     return storedConfig.colorMap;
+  }
+
+  async function setModelBlocksPolyhedronAttribute(
+    modelId,
+    blockIds,
+    { name, item, minimum, maximum, colorMap },
+  ) {
+    mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item });
+    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+      minimum,
+      maximum,
+      colorMap,
+    });
+    const points = getRGBPointsFromPreset(colorMap);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
+    const params = {
+      id: modelId,
+      block_ids: viewer_ids,
+      name,
+      item,
+      points,
+      minimum,
+      maximum,
+    };
+    return viewerStore.request({ schema: modelBlockPolyhedronAttributeSchema, params });
   }
 
   function applyPolyhedronAttribute(modelId, blockIds) {
@@ -148,31 +173,6 @@ function useModelBlocksPolyhedronAttribute() {
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, { colorMap });
     return applyPolyhedronAttribute(modelId, blockIds);
-  }
-
-  async function setModelBlocksPolyhedronAttribute(
-    modelId,
-    blockIds,
-    { name, item, minimum, maximum, colorMap },
-  ) {
-    mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item });
-    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
-      minimum,
-      maximum,
-      colorMap,
-    });
-    const points = getRGBPointsFromPreset(colorMap);
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
-    const params = {
-      id: modelId,
-      block_ids: viewer_ids,
-      name,
-      item,
-      points,
-      minimum,
-      maximum,
-    };
-    return viewerStore.request({ schema: modelBlockPolyhedronAttributeSchema, params });
   }
 
   return {

@@ -42,6 +42,30 @@ watch(show_menu, (newVal) => {
   }
 });
 
+function clampPosition(posX, posY) {
+  const margin = RADIUS + MARGIN_OFFSET;
+  return {
+    x: Math.min(Math.max(posX, margin), containerWidth - margin),
+    y: Math.min(Math.max(posY, margin), containerHeight - margin),
+  };
+}
+
+function handleDrag(event) {
+  const { x: clampedX, y: clampedY } = clampPosition(
+    event.clientX - dragStartX.value,
+    event.clientY - dragStartY.value,
+  );
+  menuX.value = clampedX;
+  menuY.value = clampedY;
+  menuStore.setMenuPosition(clampedX, clampedY);
+}
+
+function stopDrag(event) {
+  isDragging.value = false;
+  event.stopPropagation();
+  menuStore.setMenuPosition(menuX.value, menuY.value);
+}
+
 watch(
   () => [x, y, containerWidth, containerHeight],
   ([newX, newY]) => {
@@ -119,30 +143,6 @@ function startDrag(event) {
   isDragging.value = true;
   dragStartX.value = event.clientX - menuX.value;
   dragStartY.value = event.clientY - menuY.value;
-}
-
-function clampPosition(posX, posY) {
-  const margin = RADIUS + MARGIN_OFFSET;
-  return {
-    x: Math.min(Math.max(posX, margin), containerWidth - margin),
-    y: Math.min(Math.max(posY, margin), containerHeight - margin),
-  };
-}
-
-function handleDrag(event) {
-  const { x: clampedX, y: clampedY } = clampPosition(
-    event.clientX - dragStartX.value,
-    event.clientY - dragStartY.value,
-  );
-  menuX.value = clampedX;
-  menuY.value = clampedY;
-  menuStore.setMenuPosition(clampedX, clampedY);
-}
-
-function stopDrag(event) {
-  isDragging.value = false;
-  event.stopPropagation();
-  menuStore.setMenuPosition(menuX.value, menuY.value);
 }
 
 function getMenuStyle() {

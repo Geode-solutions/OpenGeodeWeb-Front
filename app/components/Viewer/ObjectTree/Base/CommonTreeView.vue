@@ -52,6 +52,14 @@ const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex } = useTreeS
   actualItemProps,
 );
 
+const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
+  displayItems,
+  emit,
+  scrollToIndex,
+  toggleOpen,
+  (item) => handleItemClick(item),
+);
+
 const lastActiveIndex = ref(-1);
 
 function handleItemClick(item, index, event) {
@@ -100,14 +108,6 @@ function handleItemClick(item, index, event) {
     toggleOpen(item.raw);
   }
 }
-
-const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
-  displayItems,
-  emit,
-  scrollToIndex,
-  toggleOpen,
-  handleItemClick,
-);
 </script>
 
 <template>

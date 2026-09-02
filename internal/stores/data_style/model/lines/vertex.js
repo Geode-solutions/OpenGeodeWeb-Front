@@ -68,20 +68,20 @@ function useModelLinesVertexAttribute() {
     return modelLinesVertexAttribute(modelId, lineId).name;
   }
 
-  function modelLinesVertexAttributeItem(modelId, lineId) {
-    const vertexAttribute = modelLinesVertexAttribute(modelId, lineId);
-    return (
-      vertexAttribute.item ??
-      modelLinesVertexAttributeLastItem(modelId, lineId, vertexAttribute.name)
-    );
-  }
-
   function modelLinesVertexAttributeLastItem(modelId, lineId, name) {
     const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
     if (!(name in storedConfigs)) {
       return 0;
     }
     return storedConfigs[name].lastItem;
+  }
+
+  function modelLinesVertexAttributeItem(modelId, lineId) {
+    const vertexAttribute = modelLinesVertexAttribute(modelId, lineId);
+    return (
+      vertexAttribute.item ??
+      modelLinesVertexAttributeLastItem(modelId, lineId, vertexAttribute.name)
+    );
   }
 
   function modelLinesVertexAttributeRange(modelId, lineId) {
@@ -97,6 +97,31 @@ function useModelLinesVertexAttribute() {
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.colorMap;
+  }
+
+  async function setModelLinesVertexAttribute(
+    modelId,
+    lineIds,
+    { name, item, minimum, maximum, colorMap },
+  ) {
+    mutateModelLinesVertexStyle(modelId, lineIds, { name, item });
+    setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
+      minimum,
+      maximum,
+      colorMap,
+    });
+    const points = getRGBPointsFromPreset(colorMap);
+    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
+    const params = {
+      id: modelId,
+      block_ids: line_viewer_ids,
+      name,
+      item,
+      points,
+      minimum,
+      maximum,
+    };
+    return viewerStore.request({ schema: attributeSchema, params });
   }
 
   function applyVertexAttribute(modelId, lineIds) {
@@ -139,31 +164,6 @@ function useModelLinesVertexAttribute() {
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, { colorMap });
     return applyVertexAttribute(modelId, lineIds);
-  }
-
-  async function setModelLinesVertexAttribute(
-    modelId,
-    lineIds,
-    { name, item, minimum, maximum, colorMap },
-  ) {
-    mutateModelLinesVertexStyle(modelId, lineIds, { name, item });
-    setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
-      minimum,
-      maximum,
-      colorMap,
-    });
-    const points = getRGBPointsFromPreset(colorMap);
-    const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
-    const params = {
-      id: modelId,
-      block_ids: line_viewer_ids,
-      name,
-      item,
-      points,
-      minimum,
-      maximum,
-    };
-    return viewerStore.request({ schema: attributeSchema, params });
   }
 
   return {

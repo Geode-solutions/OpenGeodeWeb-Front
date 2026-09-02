@@ -69,20 +69,20 @@ function useModelSurfacesPolygonAttribute() {
     return modelSurfacesPolygonAttribute(modelId, surfaceId).name;
   }
 
-  function modelSurfacesPolygonAttributeItem(modelId, surfaceId) {
-    const polygonAttribute = modelSurfacesPolygonAttribute(modelId, surfaceId);
-    return (
-      polygonAttribute.item ??
-      modelSurfacesPolygonAttributeLastItem(modelId, surfaceId, polygonAttribute.name)
-    );
-  }
-
   function modelSurfacesPolygonAttributeLastItem(modelId, surfaceId, name) {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
     if (!(name in storedConfigs)) {
       return 0;
     }
     return storedConfigs[name].lastItem;
+  }
+
+  function modelSurfacesPolygonAttributeItem(modelId, surfaceId) {
+    const polygonAttribute = modelSurfacesPolygonAttribute(modelId, surfaceId);
+    return (
+      polygonAttribute.item ??
+      modelSurfacesPolygonAttributeLastItem(modelId, surfaceId, polygonAttribute.name)
+    );
   }
 
   function modelSurfacesPolygonAttributeRange(modelId, surfaceId) {
@@ -98,6 +98,31 @@ function useModelSurfacesPolygonAttribute() {
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
     return storedConfig.colorMap;
+  }
+
+  async function setModelSurfacesPolygonAttribute(
+    modelId,
+    surfaceIds,
+    { name, item, minimum, maximum, colorMap },
+  ) {
+    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
+    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      minimum,
+      maximum,
+      colorMap,
+    });
+    const points = getRGBPointsFromPreset(colorMap);
+    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
+    const params = {
+      id: modelId,
+      block_ids: surface_viewer_ids,
+      name,
+      item,
+      points,
+      minimum,
+      maximum,
+    };
+    return viewerStore.request({ schema: attributeSchema, params });
   }
 
   function applyPolygonAttribute(modelId, surfaceIds) {
@@ -148,31 +173,6 @@ function useModelSurfacesPolygonAttribute() {
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
     setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, { colorMap });
     return applyPolygonAttribute(modelId, surfaceIds);
-  }
-
-  async function setModelSurfacesPolygonAttribute(
-    modelId,
-    surfaceIds,
-    { name, item, minimum, maximum, colorMap },
-  ) {
-    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
-    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
-      minimum,
-      maximum,
-      colorMap,
-    });
-    const points = getRGBPointsFromPreset(colorMap);
-    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
-    const params = {
-      id: modelId,
-      block_ids: surface_viewer_ids,
-      name,
-      item,
-      points,
-      minimum,
-      maximum,
-    };
-    return viewerStore.request({ schema: attributeSchema, params });
   }
 
   return {
