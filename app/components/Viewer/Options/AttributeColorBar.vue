@@ -1,4 +1,5 @@
 <script setup>
+import AttributeRangeSelector from "./AttributeRangeSelector.vue";
 import ColorMapPicker from "./ColorMapPicker.vue";
 
 const emit = defineEmits(["reset"]);
@@ -11,43 +12,12 @@ const colorMap = defineModel("colorMap", { type: String });
 <template>
   <div class="attribute-colorbar mt-3">
     <ColorMapPicker v-model:selected-preset-name="colorMap" :min="minimum" :max="maximum" />
-    <v-row dense align="center" class="mt-2" no-gutters>
-      <v-col cols="5" class="pe-1">
-        <v-text-field
-          data-testid="attributeMinInput"
-          :model-value="minimum"
-          @update:model-value="(value) => (minimum = Number(value))"
-          label="Min"
-          type="number"
-          :max="maximum"
-          density="compact"
-          hide-details
-          variant="outlined"
-        />
-      </v-col>
-      <v-col cols="2" class="d-flex justify-center">
-        <v-btn
-          icon="mdi-arrow-left-right"
-          size="x-small"
-          variant="text"
-          @click="emit('reset')"
-          v-tooltip="'Reset range'"
-        />
-      </v-col>
-      <v-col cols="5" class="ps-1">
-        <v-text-field
-          data-testid="attributeMaxInput"
-          :model-value="maximum"
-          @update:model-value="(value) => (maximum = Number(value))"
-          label="Max"
-          type="number"
-          :min="minimum"
-          density="compact"
-          hide-details
-          variant="outlined"
-        />
-      </v-col>
-    </v-row>
+    <AttributeRangeSelector
+      v-model:minimum="minimum"
+      v-model:maximum="maximum"
+      class="mt-2"
+      @reset="emit('reset')"
+    />
   </div>
 </template>
 
