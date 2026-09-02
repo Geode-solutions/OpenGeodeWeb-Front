@@ -174,6 +174,7 @@ function getLeafViewerIds(item) {
       @update:scroll-top="treeviewStore.setScrollTop(actualViewId, $event)"
       @hover:enter="handleHoverEnter"
       @hover:leave="handleHoverLeave"
+      @contextmenu="showContextMenu($event.event, $event.item)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -181,7 +182,7 @@ function getLeafViewerIds(item) {
           :is-leaf="isLeaf"
           show-tooltip
           class="text-body-1"
-          @contextmenu.prevent.stop="showContextMenu($event, item)"
+          @contextmenu="showContextMenu($event, item)"
         />
       </template>
 

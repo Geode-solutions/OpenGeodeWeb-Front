@@ -24,6 +24,7 @@ const emit = defineEmits([
   "update:scrollTop",
   "hover:enter",
   "hover:leave",
+  "contextmenu",
 ]);
 
 const {
@@ -45,12 +46,13 @@ const {
   emit,
 );
 
-const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex } = useTreeScroll(
-  computed(() => ({ scrollTop })),
-  emit,
-  displayItems,
-  actualItemProps,
-);
+const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
+  useTreeScroll(
+    computed(() => ({ scrollTop })),
+    emit,
+    displayItems,
+    actualItemProps,
+  );
 
 const lastActiveIndex = ref(-1);
 const focusedIndex = ref(-1);
@@ -108,7 +110,6 @@ const { handleKeyDown } = useTreeKeyboardNav(
   scrollToIndex,
   toggleOpen,
   handleItemClick,
-  focusedIndex,
 );
 </script>
 
@@ -119,6 +120,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
     tabindex="0"
     @keydown="handleKeyDown"
     @mousedown="treeWrapper.focus()"
+    @mouseenter="treeWrapper.focus()"
   >
     <StickyHeader
       v-if="stickyHeader"
@@ -158,6 +160,10 @@ const { handleKeyDown } = useTreeKeyboardNav(
           @mousedown.prevent
           @click="
             handleItemClick(item, index, $event);
+            treeWrapper.focus();
+          "
+          @contextmenu.prevent.stop="
+            emit('contextmenu', { event: $event, item: item.raw });
             treeWrapper.focus();
           "
           @mouseenter="emit('hover:enter', { item })"
