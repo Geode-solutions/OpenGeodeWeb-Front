@@ -64,16 +64,6 @@ function waitForReady(child, expectedResponse, signal) {
       }
     }
 
-    function cleanup() {
-      readlineStdout.removeListener("line", onLine);
-      readlineStderr.removeListener("line", onErrLine);
-      child.removeListener("error", onError);
-      child.removeListener("close", onClose);
-      if (signal) {
-        signal.removeEventListener("abort", onAbort);
-      }
-    }
-
     function onLine(lineOutput) {
       console.log(`[${child.name}] ${lineOutput}`);
       recordOutput(lineOutput);
@@ -117,6 +107,16 @@ function waitForReady(child, expectedResponse, signal) {
     function onAbort() {
       cleanup();
       reject(new Error(`[${child.name}] timed out waiting for "${expectedResponse}"`));
+    }
+
+    function cleanup() {
+      readlineStdout.removeListener("line", onLine);
+      readlineStderr.removeListener("line", onErrLine);
+      child.removeListener("error", onError);
+      child.removeListener("close", onClose);
+      if (signal) {
+        signal.removeEventListener("abort", onAbort);
+      }
     }
 
     readlineStdout.on("line", onLine);

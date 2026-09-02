@@ -143,6 +143,17 @@ function useModelVisibilityStyle(componentStyleFunctions) {
     );
   }
 
+  async function setModelComponentTypeVisibility(modelId, componentType, visibility) {
+    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
+      visibility,
+    });
+    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
+    if (idsForType.length === 0) {
+      return;
+    }
+    await setModelComponentsVisibility(modelId, idsForType, visibility);
+  }
+
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
     const typeIds = componentIds.filter((id) => MESH_COMPONENT_TYPES.includes(id));
     const individualIds = componentIds.filter((id) => !MESH_COMPONENT_TYPES.includes(id));
@@ -164,17 +175,6 @@ function useModelVisibilityStyle(componentStyleFunctions) {
       );
     }
     return await Promise.all(promises);
-  }
-
-  async function setModelComponentTypeVisibility(modelId, componentType, visibility) {
-    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
-      visibility,
-    });
-    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
-    if (idsForType.length === 0) {
-      return;
-    }
-    await setModelComponentsVisibility(modelId, idsForType, visibility);
   }
 
   function modelComponentVisibility(modelId, componentId) {

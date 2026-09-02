@@ -11,6 +11,13 @@ import { v4 as uuidv4 } from "uuid";
 import { appMode } from "@geode/opengeodeweb-front/shared/app_mode.js";
 import { commandExistsSync } from "./scripts.js";
 
+function executableName(execName) {
+  if (process.platform === "win32") {
+    return `${execName}.exe`;
+  }
+  return execName;
+}
+
 function findExecutableInDir(baseDir, execName, osExecutableName) {
   const oneFilePath = path.join(baseDir, osExecutableName);
   if (fs.existsSync(oneFilePath) && fs.statSync(oneFilePath).isFile()) {
@@ -57,13 +64,6 @@ function executablePath(execPath, execName) {
   }
 
   throw new Error(`Executable not found: ${osExecutableName}`);
-}
-
-function executableName(execName) {
-  if (process.platform === "win32") {
-    return `${execName}.exe`;
-  }
-  return execName;
 }
 
 function createPath(dirPath) {
