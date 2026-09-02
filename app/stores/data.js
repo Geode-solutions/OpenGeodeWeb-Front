@@ -10,7 +10,6 @@ import { useDataMesh } from "./data_helpers/mesh.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
-
 function checkItemViewable(item) {
   if (!item || typeof item !== "object") {
     return false;
@@ -21,16 +20,11 @@ function checkItemViewable(item) {
   if (item.binary_light_viewable !== undefined) {
     return item.binary_light_viewable !== "not_viewable";
   }
-  if (
-    item.geode_object_type === "HorizonStack3D" ||
-    item.id === "HorizonStack3D" ||
-    item.title === "HorizonStack3D"
-  ) {
+  if (item.geode_object_type === "HorizonStack3D" || item.id === "HorizonStack3D" || item.title === "HorizonStack3D") {
     return false;
   }
   return true;
 }
-
 function isItemViewable(itemOrId) {
   if (typeof itemOrId === "string") {
     return database.data.get(itemOrId).then(checkItemViewable);
@@ -44,7 +38,6 @@ export const useDataStore = defineStore("data", () => {
   const data_db = database.data;
   const model_components_db = database.model_components;
   const model_components_relation_db = database.model_components_relation;
-
   const {
     formatedMeshComponents,
     refFormatedMeshComponents,
@@ -55,17 +48,15 @@ export const useDataStore = defineStore("data", () => {
     getCornersGeodeIds,
     getLinesGeodeIds,
     getSurfacesGeodeIds,
-    getBlocksGeodeIds,
+    getBlocksGeodeIds
   } = useDataMesh();
-
   const {
     hasCollectionComponents,
     getAllCollectionComponents,
     fetchAllCollectionComponents,
     formatedCollectionComponents,
-    refFormatedCollectionComponents,
+    refFormatedCollectionComponents
   } = useDataCollections();
-
   async function item(id) {
     const data_item = await data_db.get(id);
     if (!data_item) {
@@ -73,45 +64,45 @@ export const useDataStore = defineStore("data", () => {
     }
     return data_item;
   }
-
   async function allItems() {
     return await data_db.toArray();
   }
-
   function refItem(id) {
-    return useObservable(
-      liveQuery(() => data_db.get(id)),
-      { initialValue: {} },
-    );
+    return useObservable(liveQuery(() => data_db.get(id)), {
+      initialValue: {}
+    });
   }
-
   function refAllItems() {
-    return useObservable(
-      liveQuery(() => data_db.toArray()),
-      { initialValue: [] },
-    );
+    return useObservable(liveQuery(() => data_db.toArray()), {
+      initialValue: []
+    });
   }
-
   async function meshComponentType(modelId, geode_id) {
-    const component = await model_components_db
-      .where("[id+geode_id]")
-      .equals([modelId, geode_id])
-      .first();
+    const component = await model_components_db.where("[id+geode_id]").equals([modelId, geode_id]).first();
     return component?.type;
   }
-
   async function registerObject(id, name) {
     const schema = viewer_generic_schemas.register;
-    const params = { id, name };
-    return await viewerStore.request({ schema, params, timeout: 0 });
+    const params = {
+      id,
+      name
+    };
+    return await viewerStore.request({
+      schema,
+      params,
+      timeout: 0
+    });
   }
-
   async function deregisterObject(id) {
     const schema = viewer_generic_schemas.deregister;
-    const params = { id };
-    return await viewerStore.request({ schema, params });
+    const params = {
+      id
+    };
+    return await viewerStore.request({
+      schema,
+      params
+    });
   }
-
   function addItem(new_item) {
     const itemData = {
       id: new_item.id,
@@ -120,14 +111,13 @@ export const useDataStore = defineStore("data", () => {
       geode_object_type: new_item.geode_object_type,
       visible: true,
       created_at: new Date().toISOString(),
-      is_viewable: new_item.is_viewable,
+      is_viewable: new_item.is_viewable
     };
     if (new_item.binary_light_viewable !== undefined && new_item.binary_light_viewable !== null) {
       itemData.binary_light_viewable = new_item.binary_light_viewable;
     }
     return data_db.put(itemData);
   }
-
   function addComponents(new_item) {
     const allComponents = [];
     function addModelComponents(components) {
@@ -138,7 +128,7 @@ export const useDataStore = defineStore("data", () => {
           type: component.type,
           viewer_id: component.viewer_id,
           name: component.name,
-          is_active: component.is_active,
+          is_active: component.is_active
         });
       }
     }
@@ -150,7 +140,6 @@ export const useDataStore = defineStore("data", () => {
     }
     return model_components_db.bulkPut(allComponents);
   }
-
   function addComponentRelations(new_item) {
     const relations = [];
     function addModelComponentRelations(components, parent, type) {
@@ -159,7 +148,7 @@ export const useDataStore = defineStore("data", () => {
           id: new_item.id,
           parent,
           child,
-          type,
+          type
         });
       }
     }
@@ -182,62 +171,49 @@ export const useDataStore = defineStore("data", () => {
     }
     return model_components_relation_db.bulkPut(relations);
   }
-
   async function getComponentByViewerId(modelId, viewer_id) {
-    const component = await model_components_db
-      .where("viewer_id")
-      .equals(Number(viewer_id))
-      .and((model_component) => model_component.id === modelId)
-      .first();
+    const component = await model_components_db.where("viewer_id").equals(Number(viewer_id)).and(model_component => model_component.id === modelId).first();
     return component;
   }
-
-  async function deleteItem(id) {
-    await data_db.delete(id);
-    await deleteModelComponents(id);
-  }
-
-  async function updateItem(id, changes) {
-    await data_db.update(id, changes);
-  }
-
   async function deleteModelComponents(modelId) {
     await model_components_db.where("id").equals(modelId).delete();
     await database.model_components_relation.where("id").equals(modelId).delete();
   }
-
+  async function deleteItem(id) {
+    await data_db.delete(id);
+    await deleteModelComponents(id);
+  }
+  async function updateItem(id, changes) {
+    await data_db.update(id, changes);
+  }
   async function getAllModelComponentsViewerIds(modelId) {
     const components = await model_components_db.where("id").equals(modelId).toArray();
-    return components.map((component) => Math.trunc(Number(component.viewer_id)));
+    return components.map(component => Math.trunc(Number(component.viewer_id)));
   }
-
   async function getMeshComponentsViewerIds(modelId, meshComponentGeodeIds) {
-    const components = await model_components_db
-      .where("[id+geode_id]")
-      .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
-      .toArray();
-    return components.map((component) => Math.trunc(Number(component.viewer_id)));
+    const components = await model_components_db.where("[id+geode_id]").anyOf(meshComponentGeodeIds.map(geode_id => [modelId, geode_id])).toArray();
+    return components.map(component => Math.trunc(Number(component.viewer_id)));
   }
-
   async function exportStores() {
     const items = await data_db.toArray();
     const modelComponents = await model_components_db.toArray();
     const modelComponentsRelations = await model_components_relation_db.toArray();
-    return { items, modelComponents, modelComponentsRelations };
+    return {
+      items,
+      modelComponents,
+      modelComponentsRelations
+    };
   }
-
-  async function importStores(snapshot) {
-    await clear();
-    await model_components_db.bulkPut(snapshot.modelComponents);
-    await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
-  }
-
   async function clear() {
     await data_db.clear();
     await model_components_db.clear();
     await model_components_relation_db.clear();
   }
-
+  async function importStores(snapshot) {
+    await clear();
+    await model_components_db.bulkPut(snapshot.modelComponents);
+    await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
+  }
   return {
     refAllItems,
     item,
@@ -255,11 +231,9 @@ export const useDataStore = defineStore("data", () => {
     getAllModelComponentsViewerIds,
     getMeshComponentsViewerIds,
     getComponentByViewerId,
-
     exportStores,
     importStores,
     clear,
-
     formatedMeshComponents,
     refFormatedMeshComponents,
     getMeshComponentsByType,
@@ -270,11 +244,10 @@ export const useDataStore = defineStore("data", () => {
     getLinesGeodeIds,
     getSurfacesGeodeIds,
     getBlocksGeodeIds,
-
     hasCollectionComponents,
     getAllCollectionComponents,
     fetchAllCollectionComponents,
     formatedCollectionComponents,
-    refFormatedCollectionComponents,
+    refFormatedCollectionComponents
   };
 });

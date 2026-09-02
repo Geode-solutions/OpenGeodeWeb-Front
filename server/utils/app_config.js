@@ -10,22 +10,23 @@ import sanitize from "sanitize-filename";
 // Local imports
 
 function projectConf(projectName) {
-  const projectConfig = new Conf({ projectName });
-  console.log(projectConf.name, { projectConfig });
+  const projectConfig = new Conf({
+    projectName
+  });
+  console.log(projectConf.name, {
+    projectConfig
+  });
   return projectConfig;
 }
-
 function confFolderPath(projectName) {
   const projectConfig = projectConf(projectName);
   return path.dirname(projectConfig.path);
 }
-
 function targetExtensionFilePath(projectName, filename) {
   const safeFilename = sanitize(filename);
   const targetPath = path.join(confFolderPath(projectName), safeFilename);
   return targetPath;
 }
-
 function extensionsConf(projectName) {
   const projectConfig = projectConf(projectName);
   if (!projectConfig.has("extensions")) {
@@ -34,17 +35,21 @@ function extensionsConf(projectName) {
   const extensionsConfig = projectConfig.get("extensions");
   return extensionsConfig;
 }
-
-function addExtensionToConf(projectName, { extensionId, extensionPath }) {
+function addExtensionToConf(projectName, {
+  extensionId,
+  extensionPath
+}) {
   const projectConfig = projectConf(projectName);
   projectConfig.set(`extensions.${extensionId}.path`, extensionPath);
 }
-
+function extensionPathFromConf(projectName, extensionId) {
+  const projectConfig = projectConf(projectName);
+  return projectConfig.get(`extensions.${extensionId}.path`);
+}
 async function removeExtensionFromConf(projectName, extensionId) {
   const projectConfig = projectConf(projectName);
   const extensionArchivePath = extensionPathFromConf(projectName, extensionId);
-
-  await unlink(extensionArchivePath, (error) => {
+  await unlink(extensionArchivePath, error => {
     if (error) {
       throw error;
     }
@@ -53,34 +58,20 @@ async function removeExtensionFromConf(projectName, extensionId) {
   projectConfig.delete(`extensions.${extensionId}`);
   console.log(`${extensionId} was deleted from ${projectName} config`);
 }
-
-function extensionPathFromConf(projectName, extensionId) {
-  const projectConfig = projectConf(projectName);
-  return projectConfig.get(`extensions.${extensionId}.path`);
-}
-
 async function registerExtensionFile(projectName, file) {
   const StreamZipAsync = StreamZip.async;
   const zip = new StreamZipAsync({
     file,
-    storeEntries: true,
+    storeEntries: true
   });
   const metadataJson = await zip.entryData("metadata.json");
   const metadata = JSON.parse(metadataJson);
-  const { id } = metadata;
+  const {
+    id
+  } = metadata;
   addExtensionToConf(projectName, {
     extensionId: id,
-    extensionPath: file,
+    extensionPath: file
   });
 }
-
-export {
-  addExtensionToConf,
-  confFolderPath,
-  extensionPathFromConf,
-  extensionsConf,
-  projectConf,
-  registerExtensionFile,
-  removeExtensionFromConf,
-  targetExtensionFilePath,
-};
+export { addExtensionToConf, confFolderPath, extensionPathFromConf, extensionsConf, projectConf, registerExtensionFile, removeExtensionFromConf, targetExtensionFilePath };

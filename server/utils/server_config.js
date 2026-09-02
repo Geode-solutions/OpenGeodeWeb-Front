@@ -1,7 +1,6 @@
 import { createServerWsRpcClient } from "./ws_client.js";
 
 const storage = new Map();
-
 function getAppBaseUrl() {
   return storage.get("APP_BASE_URL");
 }
@@ -26,16 +25,6 @@ function getIsAppReady() {
 function setIsAppReady(isAppReady) {
   return storage.set("IS_APP_READY", isAppReady);
 }
-
-async function getViewerWebSocketClient() {
-  const viewerClient = storage.get("VIEWER_CLIENT") ?? undefined;
-  if (viewerClient?.isOpen()) {
-    return viewerClient;
-  }
-  const viewerBaseUrl = await getViewerBaseUrl();
-  return setViewerWebSocketClient(viewerBaseUrl);
-}
-
 async function setViewerWebSocketClient(baseUrl) {
   const client = createServerWsRpcClient(baseUrl);
   client.onConnectionClose(() => {
@@ -47,16 +36,12 @@ async function setViewerWebSocketClient(baseUrl) {
   storage.set("VIEWER_CLIENT", client);
   return client;
 }
-
-export {
-  getAppBaseUrl,
-  getBackBaseUrl,
-  getIsAppReady,
-  getViewerBaseUrl,
-  getViewerWebSocketClient,
-  setAppBaseUrl,
-  setBackBaseUrl,
-  setIsAppReady,
-  setViewerBaseUrl,
-  setViewerWebSocketClient,
-};
+async function getViewerWebSocketClient() {
+  const viewerClient = storage.get("VIEWER_CLIENT") ?? undefined;
+  if (viewerClient?.isOpen()) {
+    return viewerClient;
+  }
+  const viewerBaseUrl = await getViewerBaseUrl();
+  return setViewerWebSocketClient(viewerBaseUrl);
+}
+export { getAppBaseUrl, getBackBaseUrl, getIsAppReady, getViewerBaseUrl, getViewerWebSocketClient, setAppBaseUrl, setBackBaseUrl, setIsAppReady, setViewerBaseUrl, setViewerWebSocketClient };

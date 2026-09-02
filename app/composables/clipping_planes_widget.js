@@ -1,12 +1,4 @@
-import {
-  AXIS_SCALE,
-  CHANGE_THRESHOLD,
-  PLANE_COLORS,
-  SIZE_RATIO,
-  computeSceneBoundsInfo,
-  getPlaneStyle,
-  hasPlaneChanged,
-} from "@ogw_front/utils/clipping_planes";
+import { AXIS_SCALE, CHANGE_THRESHOLD, PLANE_COLORS, SIZE_RATIO, computeSceneBoundsInfo, getPlaneStyle, hasPlaneChanged } from "@ogw_front/utils/clipping_planes";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
 import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
@@ -18,7 +10,7 @@ function useClippingPlanesWidget({
   selectedDatasetIds,
   allItems,
   hybridViewerStore,
-  debouncedApply,
+  debouncedApply
 }) {
   let localRenderWindow = undefined;
   let widgetManager = undefined;
@@ -26,33 +18,23 @@ function useClippingPlanesWidget({
   let fromWidget = false;
   let maxDistance = 0;
   let isLimitingCameraZoom = false;
-
   function resolveActiveActors() {
-    const targetIds = targetAllVisible.value
-      ? allItems.value.map((item) => item.id)
-      : selectedDatasetIds.value;
-    const targeted = targetIds
-      .map((id) => {
-        const item = hybridViewerStore.hybridDb[id];
-        return item ? item.actor : undefined;
-      })
-      .filter(Boolean);
+    const targetIds = targetAllVisible.value ? allItems.value.map(item => item.id) : selectedDatasetIds.value;
+    const targeted = targetIds.map(id => {
+      const item = hybridViewerStore.hybridDb[id];
+      return item ? item.actor : undefined;
+    }).filter(Boolean);
     if (targeted.length > 0) {
       return targeted;
     }
-    return Object.values(hybridViewerStore.hybridDb)
-      .map((entry) => entry && entry.actor)
-      .filter(Boolean);
+    return Object.values(hybridViewerStore.hybridDb).map(entry => entry && entry.actor).filter(Boolean);
   }
-
   function getSceneBoundsInfo() {
     return computeSceneBoundsInfo(resolveActiveActors());
   }
-
   function getSceneCenter() {
     return getSceneBoundsInfo().center;
   }
-
   function createWidgetEntry(planeWidget, widgetHandle, planeIndex) {
     const widgetState = planeWidget.getWidgetState();
     const plane = planes.value[planeIndex];
@@ -64,16 +46,9 @@ function useClippingPlanesWidget({
       if (fromWidget) {
         return;
       }
-      const origin = widgetState.getOrigin().map((val) => Number(val.toFixed(4)));
-      const normal = widgetState.getNormal().map((val) => Number(val.toFixed(4)));
-      if (
-        !hasPlaneChanged(
-          origin,
-          normal,
-          planes.value[planeIndex].origin,
-          planes.value[planeIndex].normal,
-        )
-      ) {
+      const origin = widgetState.getOrigin().map(val => Number(val.toFixed(4)));
+      const normal = widgetState.getNormal().map(val => Number(val.toFixed(4)));
+      if (!hasPlaneChanged(origin, normal, planes.value[planeIndex].origin, planes.value[planeIndex].normal)) {
         return;
       }
       fromWidget = true;
@@ -84,10 +59,12 @@ function useClippingPlanesWidget({
       });
       debouncedApply();
     });
-
-    return { planeWidget, widgetHandle, subscription };
+    return {
+      planeWidget,
+      widgetHandle,
+      subscription
+    };
   }
-
   function syncWidgets() {
     if (!widgetManager || !localRenderWindow) {
       return;
@@ -98,7 +75,9 @@ function useClippingPlanesWidget({
       widgetManager.removeWidget(entry.planeWidget);
       entry.planeWidget.delete();
     }
-    const { cubicBounds } = getSceneBoundsInfo();
+    const {
+      cubicBounds
+    } = getSceneBoundsInfo();
     for (const [idx, plane] of planes.value.entries()) {
       const rgb = PLANE_COLORS[idx % PLANE_COLORS.length];
       if (!widgetEntries[idx]) {
@@ -123,31 +102,22 @@ function useClippingPlanesWidget({
     }
     localRenderWindow.getRenderWindow().render();
   }
-
   function limitCameraZoomOut(camera) {
     if (maxDistance <= 0 || isLimitingCameraZoom) {
       return;
     }
-
     const currentDist = camera.getDistance();
     if (currentDist <= maxDistance + CHANGE_THRESHOLD) {
       return;
     }
-
     isLimitingCameraZoom = true;
     const focal = camera.getFocalPoint();
     const pos = camera.getPosition();
     const ratio = maxDistance / currentDist;
-
-    camera.setPosition(
-      focal[0] + (pos[0] - focal[0]) * ratio,
-      focal[1] + (pos[1] - focal[1]) * ratio,
-      focal[2] + (pos[2] - focal[2]) * ratio,
-    );
+    camera.setPosition(focal[0] + (pos[0] - focal[0]) * ratio, focal[1] + (pos[1] - focal[1]) * ratio, focal[2] + (pos[2] - focal[2]) * ratio);
     localRenderWindow.getRenderWindow().render();
     isLimitingCameraZoom = false;
   }
-
   function syncLocalCamera() {
     if (!localRenderWindow) {
       return;
@@ -155,34 +125,27 @@ function useClippingPlanesWidget({
     const renderer = localRenderWindow.getRenderer();
     const camera = renderer.getActiveCamera();
     const mainCam = hybridViewerStore.camera_options;
-    const { center, cubicBounds } = getSceneBoundsInfo();
+    const {
+      center,
+      cubicBounds
+    } = getSceneBoundsInfo();
     renderer.resetCamera(cubicBounds);
     if (mainCam && mainCam.focal_point && mainCam.position) {
-      const dir = [
-        mainCam.position[0] - mainCam.focal_point[0],
-        mainCam.position[1] - mainCam.focal_point[1],
-        mainCam.position[2] - mainCam.focal_point[2],
-      ];
+      const dir = [mainCam.position[0] - mainCam.focal_point[0], mainCam.position[1] - mainCam.focal_point[1], mainCam.position[2] - mainCam.focal_point[2]];
       const dirLen = Math.hypot(...dir);
       if (dirLen > 0) {
         const distance = camera.getDistance();
-        const normDir = dir.map((component) => component / dirLen);
+        const normDir = dir.map(component => component / dirLen);
         camera.setFocalPoint(...center);
-        camera.setPosition(
-          center[0] + normDir[0] * distance,
-          center[1] + normDir[1] * distance,
-          center[2] + normDir[2] * distance,
-        );
+        camera.setPosition(center[0] + normDir[0] * distance, center[1] + normDir[1] * distance, center[2] + normDir[2] * distance);
         if (mainCam.view_up) {
           camera.setViewUp(...mainCam.view_up);
         }
       }
     }
-
     limitCameraZoomOut(camera);
     localRenderWindow.getRenderWindow().render();
   }
-
   function cleanupLocalWidget() {
     maxDistance = 0;
     isLimitingCameraZoom = false;
@@ -200,26 +163,9 @@ function useClippingPlanesWidget({
       widgetManager = undefined;
     }
   }
-
-  function initLocalWidget(container) {
-    cleanupLocalWidget();
-    container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
-    localRenderWindow = vtkGenericRenderWindow({
-      background: [0, 0, 0, 0],
-      listenWindowResize: false,
-    });
-    localRenderWindow.setContainer(container);
-    const camera = localRenderWindow.getRenderer().getActiveCamera();
-    camera.onModified(() => limitCameraZoomOut(camera));
-    const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
-    Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
-    localRenderWindow.resize();
-    widgetManager = vtkWidgetManager();
-    widgetManager.setRenderer(localRenderWindow.getRenderer());
-    updateWidgetPlacement();
-  }
-
-  function updateWidgetPlacement({ isReset = false } = {}) {
+  function updateWidgetPlacement({
+    isReset = false
+  } = {}) {
     if (!widgetManager || !localRenderWindow) {
       return;
     }
@@ -238,15 +184,35 @@ function useClippingPlanesWidget({
       maxDistance = localRenderWindow.getRenderer().getActiveCamera().getDistance();
     }
   }
-
+  function initLocalWidget(container) {
+    cleanupLocalWidget();
+    container.addEventListener("wheel", event => event.stopPropagation(), {
+      passive: true
+    });
+    localRenderWindow = vtkGenericRenderWindow({
+      background: [0, 0, 0, 0],
+      listenWindowResize: false
+    });
+    localRenderWindow.setContainer(container);
+    const camera = localRenderWindow.getRenderer().getActiveCamera();
+    camera.onModified(() => limitCameraZoomOut(camera));
+    const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
+    Object.assign(canvas.style, {
+      width: "100%",
+      height: "100%",
+      background: "transparent"
+    });
+    localRenderWindow.resize();
+    widgetManager = vtkWidgetManager();
+    widgetManager.setRenderer(localRenderWindow.getRenderer());
+    updateWidgetPlacement();
+  }
   function isFromWidget() {
     return fromWidget;
   }
-
   function setFromWidget(value) {
     fromWidget = value;
   }
-
   return {
     getSceneCenter,
     syncWidgets,
@@ -255,8 +221,7 @@ function useClippingPlanesWidget({
     initLocalWidget,
     updateWidgetPlacement,
     isFromWidget,
-    setFromWidget,
+    setFromWidget
   };
 }
-
 export { useClippingPlanesWidget };

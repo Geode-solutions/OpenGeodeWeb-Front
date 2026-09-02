@@ -9,15 +9,14 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.corners.attribute.vertex.attribute;
-
-function isModelCornersVertexAttributeValid({ name, item, minimum, maximum, colorMap }) {
-  return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
-  );
+function isModelCornersVertexAttributeValid({
+  name,
+  item,
+  minimum,
+  maximum,
+  colorMap
+}) {
+  return name !== undefined && item !== undefined && minimum !== undefined && maximum !== undefined && colorMap !== undefined;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -25,135 +24,89 @@ function useModelCornersVertexAttribute() {
   const dataStore = useDataStore();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
   const viewerStore = useViewerStore();
-
   function modelCornersVertexAttribute(modelId, cornerId) {
     return modelCornersCommonStyle.modelCornerColoring(modelId, cornerId).vertex;
   }
-
   function modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item) {
-    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
+    const {
+      storedConfigs
+    } = modelCornersVertexAttribute(modelId, cornerId);
     if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
       maximum: undefined,
-      colorMap: undefined,
+      colorMap: undefined
     };
   }
-
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
     if (cornerIds.length > 1) {
       modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
-        vertex: values,
+        vertex: values
       });
     }
     return modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
-      vertex: values,
+      vertex: values
     });
   }
-
   function setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, config) {
     return mutateModelCornersVertexStyle(modelId, cornerIds, {
       storedConfigs: {
         [name]: {
           lastItem: item,
-          [item]: config,
-        },
-      },
+          [item]: config
+        }
+      }
     });
   }
-
   function modelCornersVertexAttributeName(modelId, cornerId) {
     return modelCornersVertexAttribute(modelId, cornerId).name;
   }
-
-  function modelCornersVertexAttributeItem(modelId, cornerId) {
-    const vertexAttribute = modelCornersVertexAttribute(modelId, cornerId);
-    return (
-      vertexAttribute.item ??
-      modelCornersVertexAttributeLastItem(modelId, cornerId, vertexAttribute.name)
-    );
-  }
-
   function modelCornersVertexAttributeLastItem(modelId, cornerId, name) {
-    const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
+    const {
+      storedConfigs
+    } = modelCornersVertexAttribute(modelId, cornerId);
     if (!(name in storedConfigs)) {
       return 0;
     }
     return storedConfigs[name].lastItem;
   }
-
+  function modelCornersVertexAttributeItem(modelId, cornerId) {
+    const vertexAttribute = modelCornersVertexAttribute(modelId, cornerId);
+    return vertexAttribute.item ?? modelCornersVertexAttributeLastItem(modelId, cornerId, vertexAttribute.name);
+  }
   function modelCornersVertexAttributeRange(modelId, cornerId) {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
-    const { minimum, maximum } = storedConfig;
+    const {
+      minimum,
+      maximum
+    } = storedConfig;
     return [minimum, maximum];
   }
-
   function modelCornersVertexAttributeColorMap(modelId, cornerId) {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
     return storedConfig.colorMap;
   }
-
-  function applyVertexAttribute(modelId, cornerIds) {
-    const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
-    const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
-    const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
-    const attribute = {
+  async function setModelCornersVertexAttribute(modelId, cornerIds, {
+    name,
+    item,
+    minimum,
+    maximum,
+    colorMap
+  }) {
+    mutateModelCornersVertexStyle(modelId, cornerIds, {
       name,
-      item,
-      minimum: storedConfig.minimum,
-      maximum: storedConfig.maximum,
-      colorMap: storedConfig.colorMap,
-    };
-    if (isModelCornersVertexAttributeValid(attribute)) {
-      return setModelCornersVertexAttribute(modelId, cornerIds, attribute);
-    }
-    return Promise.resolve();
-  }
-
-  function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
-    const item = modelCornersVertexAttributeLastItem(modelId, cornerIds[0], name);
-    mutateModelCornersVertexStyle(modelId, cornerIds, { name, item });
-    return applyVertexAttribute(modelId, cornerIds);
-  }
-
-  function setModelCornersVertexAttributeItem(modelId, cornerIds, item) {
-    mutateModelCornersVertexStyle(modelId, cornerIds, { item });
-    return applyVertexAttribute(modelId, cornerIds);
-  }
-
-  function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
-    const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
-    const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
-    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
-      minimum,
-      maximum,
+      item
     });
-    return applyVertexAttribute(modelId, cornerIds);
-  }
-
-  function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
-    const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
-    const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
-    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { colorMap });
-    return applyVertexAttribute(modelId, cornerIds);
-  }
-
-  async function setModelCornersVertexAttribute(
-    modelId,
-    cornerIds,
-    { name, item, minimum, maximum, colorMap },
-  ) {
-    mutateModelCornersVertexStyle(modelId, cornerIds, { name, item });
     setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
       minimum,
       maximum,
-      colorMap,
+      colorMap
     });
     const points = getRGBPointsFromPreset(colorMap);
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
@@ -164,11 +117,60 @@ function useModelCornersVertexAttribute() {
       item,
       points,
       minimum,
-      maximum,
+      maximum
     };
-    return viewerStore.request({ schema: attributeSchema, params });
+    return viewerStore.request({
+      schema: attributeSchema,
+      params
+    });
   }
-
+  function applyVertexAttribute(modelId, cornerIds) {
+    const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
+    const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
+    const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
+    const attribute = {
+      name,
+      item,
+      minimum: storedConfig.minimum,
+      maximum: storedConfig.maximum,
+      colorMap: storedConfig.colorMap
+    };
+    if (isModelCornersVertexAttributeValid(attribute)) {
+      return setModelCornersVertexAttribute(modelId, cornerIds, attribute);
+    }
+    return Promise.resolve();
+  }
+  function setModelCornersVertexAttributeName(modelId, cornerIds, name) {
+    const item = modelCornersVertexAttributeLastItem(modelId, cornerIds[0], name);
+    mutateModelCornersVertexStyle(modelId, cornerIds, {
+      name,
+      item
+    });
+    return applyVertexAttribute(modelId, cornerIds);
+  }
+  function setModelCornersVertexAttributeItem(modelId, cornerIds, item) {
+    mutateModelCornersVertexStyle(modelId, cornerIds, {
+      item
+    });
+    return applyVertexAttribute(modelId, cornerIds);
+  }
+  function setModelCornersVertexAttributeRange(modelId, cornerIds, minimum, maximum) {
+    const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
+    const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
+    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
+      minimum,
+      maximum
+    });
+    return applyVertexAttribute(modelId, cornerIds);
+  }
+  function setModelCornersVertexAttributeColorMap(modelId, cornerIds, colorMap) {
+    const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
+    const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
+    setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
+      colorMap
+    });
+    return applyVertexAttribute(modelId, cornerIds);
+  }
   return {
     modelCornersVertexAttributeName,
     modelCornersVertexAttributeItem,
@@ -179,8 +181,7 @@ function useModelCornersVertexAttribute() {
     setModelCornersVertexAttributeName,
     setModelCornersVertexAttributeItem,
     setModelCornersVertexAttributeRange,
-    setModelCornersVertexAttributeColorMap,
+    setModelCornersVertexAttributeColorMap
   };
 }
-
 export { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute };

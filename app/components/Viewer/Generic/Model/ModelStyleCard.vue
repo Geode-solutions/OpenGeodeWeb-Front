@@ -90,6 +90,22 @@ const modelVisibility = computed({
   },
 });
 
+const modelComponentsActiveColoring = computed({
+  get: () => dataStyleStore.getModelActiveColoring(modelId.value),
+  set: async (coloringType) => {
+    await dataStyleStore.mutateStyle(modelId.value, {
+      coloring: { active: coloringType },
+    });
+    await dataStyleStore.setModelComponentsColor(
+      modelId.value,
+      selection.value,
+      dataStyleStore.getModelColor(modelId.value),
+      coloringType,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const modelComponentsColor = computed({
   get: () => dataStyleStore.getModelColor(modelId.value),
   set: async (color) => {
@@ -100,23 +116,7 @@ const modelComponentsColor = computed({
       modelId.value,
       selection.value,
       color,
-      modelComponentsActiveColoring.value,
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
-
-const modelComponentsActiveColoring = computed({
-  get: () => dataStyleStore.getModelActiveColoring(modelId.value),
-  set: async (coloringType) => {
-    await dataStyleStore.mutateStyle(modelId.value, {
-      coloring: { active: coloringType },
-    });
-    await dataStyleStore.setModelComponentsColor(
-      modelId.value,
-      selection.value,
-      modelComponentsColor.value,
-      coloringType,
+      dataStyleStore.getModelActiveColoring(modelId.value),
     );
     hybridViewerStore.remoteRender();
   },
