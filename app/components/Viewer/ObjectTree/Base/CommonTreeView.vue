@@ -59,7 +59,7 @@ const { focusedIndex, handleKeyDown } = useTreeKeyboardNav(
   emit,
   scrollToIndex,
   toggleOpen,
-  handleItemClick,
+  (...args) => handleItemClick(...args),
 );
 
 function handleItemClick(item, index, event) {

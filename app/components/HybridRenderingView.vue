@@ -22,6 +22,18 @@ const dataStore = useDataStore();
 const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
+function debounce(func, wait) {
+  let timeout = undefined;
+  return function executedFunction(...args) {
+    function later() {
+      clearTimeout(timeout);
+      func(...args);
+    }
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 const debouncedResize = debounce(() => {
   hybridViewerStore.resize(elementWidth.value, elementHeight.value);
 }, DEFAULT_ELEMENT_HEIGHT);
@@ -40,18 +52,6 @@ onMounted(async () => {
 });
 
 const { pickColormap, quickColormap } = useQuickColormap();
-
-function debounce(func, wait) {
-  let timeout = undefined;
-  return function executedFunction(...args) {
-    function later() {
-      clearTimeout(timeout);
-      func(...args);
-    }
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
 
 async function handleClick(event) {
   const { offsetX, offsetY, clientX, clientY } = event;
