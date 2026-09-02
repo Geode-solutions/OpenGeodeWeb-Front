@@ -29,6 +29,13 @@ async function fetchAllowedObjectsList() {
   return responses.map((response) => response.allowed_objects);
 }
 
+function setGeodeObject(geode_object_type) {
+  if (geode_object_type) {
+    emit("update_values", { geode_object_type });
+    emit("increment_step");
+  }
+}
+
 async function getAllowedGeodeObjects() {
   toggleLoading();
   allowedGeodeObjects.value = {};
@@ -43,13 +50,6 @@ async function getAllowedGeodeObjects() {
     setGeodeObject(resolved.selectedGeodeObject);
   }
   toggleLoading();
-}
-
-function setGeodeObject(geode_object_type) {
-  if (geode_object_type) {
-    emit("update_values", { geode_object_type });
-    emit("increment_step");
-  }
 }
 // oxlint-disable-next-line no-top-level-await
 await getAllowedGeodeObjects();

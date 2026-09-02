@@ -8,13 +8,15 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
-
 async function getModelComponentsMap(modelId) {
   const dataStore = useDataStore();
   const results = await Promise.all(
     MESH_COMPONENT_TYPES.map(async (type) => {
       const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, type);
-      return geodeIds.map((geode_id) => ({ geode_id, type }));
+      return geodeIds.map((geode_id) => ({
+        geode_id,
+        type,
+      }));
     }),
   );
   const allComponents = results.flat();
@@ -25,7 +27,6 @@ async function getModelComponentsMap(modelId) {
     ),
   };
 }
-
 async function dispatchToComponentTypes(
   modelId,
   componentIds,
@@ -34,21 +35,18 @@ async function dispatchToComponentTypes(
   ...args
 ) {
   const { componentsMap } = await getModelComponentsMap(modelId);
-
   const idsByComponent = {
     Block: [],
     Surface: [],
     Line: [],
     Corner: [],
   };
-
   for (const id of componentIds) {
     const type = componentsMap[id]?.type;
     if (type && idsByComponent[type]) {
       idsByComponent[type].push(id);
     }
   }
-
   const promises = [];
   if (action === "Visibility") {
     if (idsByComponent.Block.length > 0) {
@@ -113,59 +111,42 @@ async function dispatchToComponentTypes(
       );
     }
   }
-
   return Promise.all(promises);
 }
-
 function useModelVisibilityStyle(componentStyleFunctions) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
   const modelCommonStyle = useModelCommonStyle();
-
   function modelVisibility(modelId) {
     return dataStyleState.getStyle(modelId).visibility;
   }
-
   function setModelVisibility(modelId, visibility) {
     const schema = model_schemas.visibility;
-    const params = { id: modelId, visibility };
+    const params = {
+      id: modelId,
+      visibility,
+    };
     return viewerStore.request(
-      { schema, params },
+      {
+        schema,
+        params,
+      },
       {
         response_function: async () => {
           await hybridViewerStore.setVisibility(modelId, visibility);
-          await dataStyleState.mutateStyle(modelId, { visibility });
-          return { id: modelId, visibility };
+          await dataStyleState.mutateStyle(modelId, {
+            visibility,
+          });
+          return {
+            id: modelId,
+            visibility,
+          };
         },
       },
     );
   }
-
-  async function setModelComponentsVisibility(modelId, componentIds, visibility) {
-    const typeIds = componentIds.filter((id) => MESH_COMPONENT_TYPES.includes(id));
-    const individualIds = componentIds.filter((id) => !MESH_COMPONENT_TYPES.includes(id));
-
-    const promises = [];
-    for (const typeId of typeIds) {
-      promises.push(setModelComponentTypeVisibility(modelId, typeId, visibility));
-    }
-
-    if (individualIds.length > 0) {
-      promises.push(
-        dispatchToComponentTypes(
-          modelId,
-          individualIds,
-          "Visibility",
-          { componentStyleFunctions },
-          visibility,
-        ),
-      );
-    }
-    return await Promise.all(promises);
-  }
-
   async function setModelComponentTypeVisibility(modelId, componentType, visibility) {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
       visibility,
@@ -174,19 +155,46 @@ function useModelVisibilityStyle(componentStyleFunctions) {
     if (idsForType.length === 0) {
       return;
     }
-    await setModelComponentsVisibility(modelId, idsForType, visibility);
+    await dispatchToComponentTypes(
+      modelId,
+      idsForType,
+      "Visibility",
+      {
+        componentStyleFunctions,
+      },
+      visibility,
+    );
   }
-
+  async function setModelComponentsVisibility(modelId, componentIds, visibility) {
+    const typeIds = componentIds.filter((id) => MESH_COMPONENT_TYPES.includes(id));
+    const individualIds = componentIds.filter((id) => !MESH_COMPONENT_TYPES.includes(id));
+    const promises = [];
+    for (const typeId of typeIds) {
+      promises.push(setModelComponentTypeVisibility(modelId, typeId, visibility));
+    }
+    if (individualIds.length > 0) {
+      promises.push(
+        dispatchToComponentTypes(
+          modelId,
+          individualIds,
+          "Visibility",
+          {
+            componentStyleFunctions,
+          },
+          visibility,
+        ),
+      );
+    }
+    return await Promise.all(promises);
+  }
   function modelComponentVisibility(modelId, componentId) {
     const selection = useModelSelection(modelId, dataStyleState);
     return selection.value.includes(componentId);
   }
-
   function modelComponentTypeVisibility(modelId, componentType) {
     const selection = useModelSelection(modelId, dataStyleState);
     return selection.value.includes(componentType);
   }
-
   return {
     modelVisibility,
     setModelVisibility,
@@ -196,5 +204,4 @@ function useModelVisibilityStyle(componentStyleFunctions) {
     modelComponentTypeVisibility,
   };
 }
-
 export { getModelComponentsMap, dispatchToComponentTypes, useModelVisibilityStyle };

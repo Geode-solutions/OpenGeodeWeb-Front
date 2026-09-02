@@ -1,6 +1,11 @@
-export function useTreeKeyboardNav(displayItems, emit, scrollToIndex, toggleOpen, handleItemClick) {
-  const focusedIndex = ref(-1);
-
+export function useTreeKeyboardNav(
+  displayItems,
+  emit,
+  scrollToIndex,
+  toggleOpen,
+  handleItemClick,
+  focusedIndex = ref(-1),
+) {
   function findParentIndex(item, currentIndex) {
     for (let index = currentIndex - 1; index >= 0; index -= 1) {
       if (displayItems.value[index].depth < item.depth) {

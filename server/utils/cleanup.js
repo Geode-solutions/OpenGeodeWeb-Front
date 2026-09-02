@@ -9,7 +9,6 @@ import pTimeout from "p-timeout";
 import { rimraf } from "rimraf";
 
 const MAX_DELETE_FOLDER_RETRIES = 5;
-
 async function deleteFolderRecursive(folderPath) {
   if (!fs.existsSync(folderPath)) {
     console.log(`Folder ${folderPath} does not exist.`);
@@ -36,9 +35,10 @@ async function deleteFolderRecursive(folderPath) {
     `Failed to delete folder ${folderPath} after ${MAX_DELETE_FOLDER_RETRIES} retries`,
   );
 }
-
 function killHttpMicroservice(microservice) {
-  console.log("killHttpMicroservice", { ...microservice });
+  console.log("killHttpMicroservice", {
+    ...microservice,
+  });
   const failMessage = `Failed to kill ${microservice.name}`;
   async function do_kill() {
     try {
@@ -54,9 +54,10 @@ function killHttpMicroservice(microservice) {
     message: failMessage,
   });
 }
-
 function killWebsocketMicroservice(microservice) {
-  console.log("killWebsocketMicroservice", { ...microservice });
+  console.log("killWebsocketMicroservice", {
+    ...microservice,
+  });
   const failMessage = `Failed to kill ${microservice.name}`;
   const successMessage = `Disconnected from ${microservice.name} WebSocket server`;
   function do_kill() {
@@ -69,7 +70,11 @@ function killWebsocketMicroservice(microservice) {
           JSON.stringify({
             id: "system:hello",
             method: "wslink.hello",
-            args: [{ secret: "wslink-secret" }],
+            args: [
+              {
+                secret: "wslink-secret",
+              },
+            ],
           }),
         );
       });
@@ -104,7 +109,6 @@ function killWebsocketMicroservice(microservice) {
     message: failMessage,
   });
 }
-
 async function killMicroservice(microservice) {
   if (microservice.type === "back") {
     await killHttpMicroservice(microservice);
@@ -114,9 +118,10 @@ async function killMicroservice(microservice) {
     throw new Error(`Unknown microservice type: ${microservice.type}`);
   }
 }
-
 async function killMicroservices(microservices) {
-  console.log("killMicroservices", { microservices });
+  console.log("killMicroservices", {
+    microservices,
+  });
   const results = await Promise.allSettled(
     microservices.map((microservice) => killMicroservice(microservice)),
   );
@@ -126,19 +131,23 @@ async function killMicroservices(microservices) {
     microservices.splice(microservices.indexOf(microservice), 1);
   }
 }
-
+function microservicesMetadatasPath(projectFolderPath) {
+  return path.join(projectFolderPath, "microservices.json");
+}
 function projectMicroservices(projectFolderPath) {
-  console.log("projectMicroservices", { projectFolderPath });
+  console.log("projectMicroservices", {
+    projectFolderPath,
+  });
   const filePath = microservicesMetadatasPath(projectFolderPath);
-
   if (!fs.existsSync(filePath)) {
-    const microservicesMetadatas = { microservices: [] };
+    const microservicesMetadatas = {
+      microservices: [],
+    };
     fs.writeFileSync(filePath, JSON.stringify(microservicesMetadatas, undefined, 2), "utf8");
   }
   const content = JSON.parse(fs.readFileSync(filePath, "utf8"));
   return content.microservices;
 }
-
 async function cleanupBackend(projectFolderPath) {
   if (!fs.existsSync(projectFolderPath)) {
     console.log(`Folder ${projectFolderPath} does not exist. Skipping cleanup.`);
@@ -148,15 +157,9 @@ async function cleanupBackend(projectFolderPath) {
   await killMicroservices(microservices);
   await deleteFolderRecursive(projectFolderPath);
 }
-
 function getMicroserviceByName(microservices, name) {
   return microservices.find((microservice) => microservice.name === name);
 }
-
-function microservicesMetadatasPath(projectFolderPath) {
-  return path.join(projectFolderPath, "microservices.json");
-}
-
 export {
   cleanupBackend,
   deleteFolderRecursive,

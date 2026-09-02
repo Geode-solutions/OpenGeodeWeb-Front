@@ -36,6 +36,36 @@ const dragStartY = ref(0);
 const menuX = ref(x);
 const menuY = ref(y);
 
+function clampPosition(posX, posY) {
+  const margin = RADIUS + MARGIN_OFFSET;
+  return {
+    x: Math.min(Math.max(posX, margin), containerWidth - margin),
+    y: Math.min(Math.max(posY, margin), containerHeight - margin),
+  };
+}
+
+function startDrag(event) {
+  isDragging.value = true;
+  dragStartX.value = event.clientX - menuX.value;
+  dragStartY.value = event.clientY - menuY.value;
+}
+
+function handleDrag(event) {
+  const { x: clampedX, y: clampedY } = clampPosition(
+    event.clientX - dragStartX.value,
+    event.clientY - dragStartY.value,
+  );
+  menuX.value = clampedX;
+  menuY.value = clampedY;
+  menuStore.setMenuPosition(clampedX, clampedY);
+}
+
+function stopDrag(event) {
+  isDragging.value = false;
+  event.stopPropagation();
+  menuStore.setMenuPosition(menuX.value, menuY.value);
+}
+
 watch(show_menu, (newVal) => {
   if (!newVal) {
     menuStore.closeMenu();
@@ -114,36 +144,6 @@ const isOverToolbar = computed(() => {
     btnY + btnHeight > rect.top
   );
 });
-
-function startDrag(event) {
-  isDragging.value = true;
-  dragStartX.value = event.clientX - menuX.value;
-  dragStartY.value = event.clientY - menuY.value;
-}
-
-function clampPosition(posX, posY) {
-  const margin = RADIUS + MARGIN_OFFSET;
-  return {
-    x: Math.min(Math.max(posX, margin), containerWidth - margin),
-    y: Math.min(Math.max(posY, margin), containerHeight - margin),
-  };
-}
-
-function handleDrag(event) {
-  const { x: clampedX, y: clampedY } = clampPosition(
-    event.clientX - dragStartX.value,
-    event.clientY - dragStartY.value,
-  );
-  menuX.value = clampedX;
-  menuY.value = clampedY;
-  menuStore.setMenuPosition(clampedX, clampedY);
-}
-
-function stopDrag(event) {
-  isDragging.value = false;
-  event.stopPropagation();
-  menuStore.setMenuPosition(menuX.value, menuY.value);
-}
 
 function getMenuStyle() {
   return {
