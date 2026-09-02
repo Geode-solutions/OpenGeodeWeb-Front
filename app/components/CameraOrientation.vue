@@ -174,8 +174,6 @@ watch(hoveredFace, (newFace, oldFace) => {
     title="Camera Orientations"
     :width="width"
     :escapeFunction="escapeFunction"
-    style="top: 90px; right: 55px"
-    z-index="1"
   >
     <div
       class="pa-0 overflow-hidden position-relative"

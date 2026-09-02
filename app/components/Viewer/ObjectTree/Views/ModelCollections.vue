@@ -96,6 +96,16 @@ function showContextMenu(event, item) {
   });
 }
 
+function extractIds(node) {
+  if (node.children) {
+    return node.children.flatMap((child) => extractIds(child));
+  }
+  if (Number.isInteger(node.viewer_id)) {
+    return [node.viewer_id];
+  }
+  return [];
+}
+
 function handleHoverEnter({ item, immediate = false }) {
   const actualItem = item.raw || item;
 
@@ -124,16 +134,6 @@ function expandAll() {
   }
   traverse(itemsForTreeView.value);
   opened.value = allIds;
-}
-
-function extractIds(node) {
-  if (node.children) {
-    return node.children.flatMap((child) => extractIds(child));
-  }
-  if (Number.isInteger(node.viewer_id)) {
-    return [node.viewer_id];
-  }
-  return [];
 }
 
 function getLeafViewerIds(item) {

@@ -22,7 +22,8 @@ const availableDatasets = computed(() =>
   allItems.value.map((item) => ({ title: item.name || item.id, value: item.id })),
 );
 const widgetContainer = useTemplateRef("widgetContainer");
-const debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
+let debouncedApply = undefined;
+
 const {
   getSceneCenter,
   syncWidgets,
@@ -38,23 +39,8 @@ const {
   selectedDatasetIds,
   allItems,
   hybridViewerStore,
-  debouncedApply,
+  debouncedApply: () => debouncedApply(),
 });
-
-function addPlane() {
-  const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length];
-  planes.value.push({ origin: getSceneCenter(), normal });
-}
-
-function removePlane(index) {
-  planes.value.splice(index, 1);
-}
-
-function flipNormal(plane) {
-  plane.normal = plane.normal.map((component) => -component);
-  syncWidgets();
-  applyClippingPlanes();
-}
 
 async function applyClippingPlanes() {
   const allIds = allItems.value.map((item) => item.id);
@@ -75,6 +61,23 @@ async function applyClippingPlanes() {
   if (untargetedIds.length > 0) {
     await hybridViewerStore.setClippingPlanes(untargetedIds, []);
   }
+}
+
+debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
+
+function addPlane() {
+  const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length];
+  planes.value.push({ origin: getSceneCenter(), normal });
+}
+
+function removePlane(index) {
+  planes.value.splice(index, 1);
+}
+
+function flipNormal(plane) {
+  plane.normal = plane.normal.map((component) => -component);
+  syncWidgets();
+  applyClippingPlanes();
 }
 
 async function resetClippingPlanes() {

@@ -7,41 +7,6 @@ import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
-function useHybridViewerScene() {
-  const hybridDb = reactive({});
-  const zScale = ref(1);
-
-  async function addItem(id) {
-    await performAddItem(id);
-  }
-
-  function removeItem(id) {
-    performRemoveItem(id);
-  }
-
-  function setVisibility(id, visibility) {
-    performSetVisibility(id, visibility);
-  }
-
-  async function setZScaling(z_scale) {
-    await performSetZScaling(z_scale);
-  }
-
-  function clear() {
-    performClear();
-  }
-
-  return {
-    hybridDb,
-    zScale,
-    addItem,
-    removeItem,
-    setVisibility,
-    setZScaling,
-    clear,
-  };
-}
-
 async function performAddItem(id) {
   const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   if (!genericRenderWindow.value) {
@@ -52,7 +17,6 @@ async function performAddItem(id) {
   if (value && !dataStore.isItemViewable(value)) {
     return;
   }
-
   const reader = vtkXMLPolyDataReader();
   await reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable));
   const actor = vtkActor();
@@ -72,9 +36,12 @@ async function performAddItem(id) {
   if (isFirst) {
     renderer.resetCamera();
   }
-  hybridDb[id] = { actor, polydata, mapper };
+  hybridDb[id] = {
+    actor,
+    polydata,
+    mapper,
+  };
 }
-
 function performRemoveItem(id) {
   const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   if (!hybridDb[id]) {
@@ -86,7 +53,6 @@ function performRemoveItem(id) {
   renderWindow.render();
   delete hybridDb[id];
 }
-
 function performSetVisibility(id, visibility) {
   const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   if (!hybridDb[id]) {
@@ -96,13 +62,11 @@ function performSetVisibility(id, visibility) {
   const renderWindow = genericRenderWindow.value.getRenderWindow();
   renderWindow.render();
 }
-
 async function performSetZScaling(z_scale) {
   const hybridViewerStore = useHybridViewerStore();
   const { genericRenderWindow, remoteRender } = hybridViewerStore;
   const { zScale } = storeToRefs(hybridViewerStore);
   zScale.value = z_scale;
-
   const renderer = genericRenderWindow.value.getRenderer();
   for (const actor of renderer.getActors()) {
     const scale = actor.getScale();
@@ -113,11 +77,15 @@ async function performSetZScaling(z_scale) {
   renderWindow.render();
   const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.set_z_scaling;
-  const params = { z_scale };
-  await viewerStore.request({ schema, params });
+  const params = {
+    z_scale,
+  };
+  await viewerStore.request({
+    schema,
+    params,
+  });
   await remoteRender();
 }
-
 function performClear() {
   const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   const renderer = genericRenderWindow.value.getRenderer();
@@ -130,7 +98,34 @@ function performClear() {
     delete hybridDb[id];
   }
 }
-
+function useHybridViewerScene() {
+  const hybridDb = reactive({});
+  const zScale = ref(1);
+  async function addItem(id) {
+    await performAddItem(id);
+  }
+  function removeItem(id) {
+    performRemoveItem(id);
+  }
+  function setVisibility(id, visibility) {
+    performSetVisibility(id, visibility);
+  }
+  async function setZScaling(z_scale) {
+    await performSetZScaling(z_scale);
+  }
+  function clear() {
+    performClear();
+  }
+  return {
+    hybridDb,
+    zScale,
+    addItem,
+    removeItem,
+    setVisibility,
+    setZScaling,
+    clear,
+  };
+}
 export {
   performAddItem,
   performClear,
