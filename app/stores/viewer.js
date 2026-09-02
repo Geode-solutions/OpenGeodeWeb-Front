@@ -54,6 +54,22 @@ export const useViewerStore = defineStore(
 
     const is_busy = computed(() => request_counter.value > 0);
 
+    function request({ schema, params = {}, timeout = request_timeout }, callbacks = {}) {
+      const store = useViewerStore();
+      return viewer_call(
+        store,
+        { schema, params, timeout },
+        {
+          ...callbacks,
+          response_function: async (response) => {
+            if (callbacks.response_function) {
+              await callbacks.response_function(response);
+            }
+          },
+        },
+      );
+    }
+
     function toggle_picking_mode(value) {
       picking_mode.value = value;
     }
@@ -147,22 +163,6 @@ export const useViewerStore = defineStore(
       console.log("[VIEWER] Connecting to viewer microservice...");
       await ws_connect();
       console.log("[VIEWER] Viewer connected successfully");
-    }
-
-    function request({ schema, params = {}, timeout = request_timeout }, callbacks = {}) {
-      const store = useViewerStore();
-      return viewer_call(
-        store,
-        { schema, params, timeout },
-        {
-          ...callbacks,
-          response_function: async (response) => {
-            if (callbacks.response_function) {
-              await callbacks.response_function(response);
-            }
-          },
-        },
-      );
     }
 
     function get_version(schema) {

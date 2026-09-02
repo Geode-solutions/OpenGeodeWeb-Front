@@ -54,27 +54,6 @@ function autoDetectSeparator(content) {
   return best;
 }
 
-function readAndParse() {
-  if (!file) {
-    return;
-  }
-  toggleLoading(true);
-
-  const reader = new FileReader();
-  reader.addEventListener("load", (event) => {
-    rawContent.value = event.target.result;
-    if (!separator.value || separator.value === ",") {
-      separator.value = autoDetectSeparator(rawContent.value);
-    }
-    parseContent();
-    toggleLoading(false);
-  });
-  reader.addEventListener("error", () => {
-    toggleLoading(false);
-  });
-  reader.readAsText(file, "utf8");
-}
-
 function parseContent() {
   if (!rawContent.value) {
     return;
@@ -123,6 +102,27 @@ function parseContent() {
     }
     return obj;
   });
+}
+
+function readAndParse() {
+  if (!file) {
+    return;
+  }
+  toggleLoading(true);
+
+  const reader = new FileReader();
+  reader.addEventListener("load", (event) => {
+    rawContent.value = event.target.result;
+    if (!separator.value || separator.value === ",") {
+      separator.value = autoDetectSeparator(rawContent.value);
+    }
+    parseContent();
+    toggleLoading(false);
+  });
+  reader.addEventListener("error", () => {
+    toggleLoading(false);
+  });
+  reader.readAsText(file, "utf8");
 }
 const computedResult = computed(() => {
   const xIndex = previewHeaders.value.findIndex((header) => header.key === xColumn.value);

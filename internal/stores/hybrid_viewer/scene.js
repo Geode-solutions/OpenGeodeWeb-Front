@@ -7,41 +7,6 @@ import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
-function useHybridViewerScene() {
-  const hybridDb = reactive({});
-  const zScale = ref(1);
-
-  async function addItem(id) {
-    await performAddItem(id);
-  }
-
-  function removeItem(id) {
-    performRemoveItem(id);
-  }
-
-  function setVisibility(id, visibility) {
-    performSetVisibility(id, visibility);
-  }
-
-  async function setZScaling(z_scale) {
-    await performSetZScaling(z_scale);
-  }
-
-  function clear() {
-    performClear();
-  }
-
-  return {
-    hybridDb,
-    zScale,
-    addItem,
-    removeItem,
-    setVisibility,
-    setZScaling,
-    clear,
-  };
-}
-
 async function performAddItem(id) {
   const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   if (!genericRenderWindow.value) {
@@ -129,6 +94,41 @@ function performClear() {
   for (const id of Object.keys(hybridDb)) {
     delete hybridDb[id];
   }
+}
+
+function useHybridViewerScene() {
+  const hybridDb = reactive({});
+  const zScale = ref(1);
+
+  async function addItem(id) {
+    await performAddItem(id);
+  }
+
+  function removeItem(id) {
+    performRemoveItem(id);
+  }
+
+  function setVisibility(id, visibility) {
+    performSetVisibility(id, visibility);
+  }
+
+  async function setZScaling(z_scale) {
+    await performSetZScaling(z_scale);
+  }
+
+  function clear() {
+    performClear();
+  }
+
+  return {
+    hybridDb,
+    zScale,
+    addItem,
+    removeItem,
+    setVisibility,
+    setZScaling,
+    clear,
+  };
 }
 
 export {

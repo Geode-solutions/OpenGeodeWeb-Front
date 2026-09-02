@@ -5,28 +5,6 @@ const RGBA_CHANNELS = 4;
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
 
-function useHybridViewerBrightness() {
-  const latestImage = ref(undefined);
-  const offscreenCanvas =
-    typeof document === "undefined" ? undefined : document.createElement("canvas");
-  const offscreenCtx = offscreenCanvas
-    ? offscreenCanvas.getContext("2d", { willReadFrequently: true })
-    : undefined;
-
-  function getAverageBrightness(rect) {
-    return computeAverageBrightness(rect, {
-      latestImage: latestImage.value,
-      offscreenCtx,
-      offscreenCanvas,
-    });
-  }
-
-  return {
-    latestImage,
-    getAverageBrightness,
-  };
-}
-
 function mapRect(rect, latestImage, canvasRect) {
   const scaleX = latestImage.width / canvasRect.width;
   const scaleY = latestImage.height / canvasRect.height;
@@ -81,6 +59,28 @@ function computeAverageBrightness(rect, options) {
   } catch {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
+}
+
+function useHybridViewerBrightness() {
+  const latestImage = ref(undefined);
+  const offscreenCanvas =
+    typeof document === "undefined" ? undefined : document.createElement("canvas");
+  const offscreenCtx = offscreenCanvas
+    ? offscreenCanvas.getContext("2d", { willReadFrequently: true })
+    : undefined;
+
+  function getAverageBrightness(rect) {
+    return computeAverageBrightness(rect, {
+      latestImage: latestImage.value,
+      offscreenCtx,
+      offscreenCanvas,
+    });
+  }
+
+  return {
+    latestImage,
+    getAverageBrightness,
+  };
 }
 
 export { computeAverageBrightness, useHybridViewerBrightness };

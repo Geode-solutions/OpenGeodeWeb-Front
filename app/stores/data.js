@@ -192,6 +192,11 @@ export const useDataStore = defineStore("data", () => {
     return component;
   }
 
+  async function deleteModelComponents(modelId) {
+    await model_components_db.where("id").equals(modelId).delete();
+    await database.model_components_relation.where("id").equals(modelId).delete();
+  }
+
   async function deleteItem(id) {
     await data_db.delete(id);
     await deleteModelComponents(id);
@@ -199,11 +204,6 @@ export const useDataStore = defineStore("data", () => {
 
   async function updateItem(id, changes) {
     await data_db.update(id, changes);
-  }
-
-  async function deleteModelComponents(modelId) {
-    await model_components_db.where("id").equals(modelId).delete();
-    await database.model_components_relation.where("id").equals(modelId).delete();
   }
 
   async function getAllModelComponentsViewerIds(modelId) {
@@ -226,16 +226,16 @@ export const useDataStore = defineStore("data", () => {
     return { items, modelComponents, modelComponentsRelations };
   }
 
-  async function importStores(snapshot) {
-    await clear();
-    await model_components_db.bulkPut(snapshot.modelComponents);
-    await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
-  }
-
   async function clear() {
     await data_db.clear();
     await model_components_db.clear();
     await model_components_relation_db.clear();
+  }
+
+  async function importStores(snapshot) {
+    await clear();
+    await model_components_db.bulkPut(snapshot.modelComponents);
+    await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
   }
 
   return {

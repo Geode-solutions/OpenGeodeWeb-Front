@@ -18,6 +18,14 @@ const selected_crs = ref([]);
 const toggle_loading = useToggle(data_table_loading);
 const backStore = useBackStore();
 
+function get_selected_crs(crs_code) {
+  for (let i = 0; i <= crs_list.value.length; i += 1) {
+    if (crs_list.value[i]["code"] === crs_code) {
+      return crs_list.value[i];
+    }
+  }
+}
+
 watch(selected_crs, (new_value) => {
   const crs = get_selected_crs(new_value[0]);
   const keys_values_object = {
@@ -26,14 +34,6 @@ watch(selected_crs, (new_value) => {
   emit("update_values", keys_values_object);
   emit("increment_step");
 });
-
-function get_selected_crs(crs_code) {
-  for (let i = 0; i <= crs_list.value.length; i += 1) {
-    if (crs_list.value[i]["code"] === crs_code) {
-      return crs_list.value[i];
-    }
-  }
-}
 
 async function get_crs_table() {
   const params = { geode_object_type: geodeObjectType };

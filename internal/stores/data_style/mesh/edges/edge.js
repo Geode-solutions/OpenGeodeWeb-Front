@@ -32,6 +32,23 @@ function useMeshEdgesEdgeAttributeStyle() {
     return meshEdgesColoring(id).edge;
   }
 
+  function meshEdgesEdgeAttributeName(id) {
+    return meshEdgesEdgeAttribute(id).name;
+  }
+
+  function meshEdgesEdgeAttributeLastItem(id, name) {
+    const { storedConfigs } = meshEdgesEdgeAttribute(id);
+    if (storedConfigs && name in storedConfigs) {
+      return storedConfigs[name].lastItem;
+    }
+    return 0;
+  }
+
+  function meshEdgesEdgeAttributeItem(id) {
+    const { item, name } = meshEdgesEdgeAttribute(id);
+    return item ?? meshEdgesEdgeAttributeLastItem(id, name);
+  }
+
   function meshEdgesEdgeAttributeStoredConfig(id, name, item) {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
     if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
@@ -63,6 +80,15 @@ function useMeshEdgesEdgeAttributeStyle() {
     });
   }
 
+  function setMeshEdgesEdgeAttribute(id, { name, item, minimum, maximum, colorMap }) {
+    mutateMeshEdgesEdgeStyle(id, { name, item });
+    setMeshEdgesEdgeAttributeStoredConfig(id, name, item, { minimum, maximum, colorMap });
+    const points = getRGBPointsFromPreset(colorMap);
+    const schema = meshEdgesEdgeAttributeSchemas.attribute;
+    const params = { id, name, item, points, minimum, maximum };
+    return viewerStore.request({ schema, params });
+  }
+
   function applyEdgeAttribute(id) {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);
@@ -79,32 +105,15 @@ function useMeshEdgesEdgeAttributeStyle() {
     }
   }
 
-  function meshEdgesEdgeAttributeName(id) {
-    return meshEdgesEdgeAttribute(id).name;
-  }
-
   function setMeshEdgesEdgeAttributeName(id, name) {
     const item = meshEdgesEdgeAttributeLastItem(id, name);
     mutateMeshEdgesEdgeStyle(id, { name, item });
     return applyEdgeAttribute(id);
   }
 
-  function meshEdgesEdgeAttributeItem(id) {
-    const { item, name } = meshEdgesEdgeAttribute(id);
-    return item ?? meshEdgesEdgeAttributeLastItem(id, name);
-  }
-
   function setMeshEdgesEdgeAttributeItem(id, item) {
     mutateMeshEdgesEdgeStyle(id, { item });
     return applyEdgeAttribute(id);
-  }
-
-  function meshEdgesEdgeAttributeLastItem(id, name) {
-    const { storedConfigs } = meshEdgesEdgeAttribute(id);
-    if (storedConfigs && name in storedConfigs) {
-      return storedConfigs[name].lastItem;
-    }
-    return 0;
   }
 
   function meshEdgesEdgeAttributeRange(id) {
@@ -133,15 +142,6 @@ function useMeshEdgesEdgeAttributeStyle() {
     const item = meshEdgesEdgeAttributeItem(id);
     setMeshEdgesEdgeAttributeStoredConfig(id, name, item, { colorMap });
     return applyEdgeAttribute(id);
-  }
-
-  function setMeshEdgesEdgeAttribute(id, { name, item, minimum, maximum, colorMap }) {
-    mutateMeshEdgesEdgeStyle(id, { name, item });
-    setMeshEdgesEdgeAttributeStoredConfig(id, name, item, { minimum, maximum, colorMap });
-    const points = getRGBPointsFromPreset(colorMap);
-    const schema = meshEdgesEdgeAttributeSchemas.attribute;
-    const params = { id, name, item, points, minimum, maximum };
-    return viewerStore.request({ schema, params });
   }
 
   return {

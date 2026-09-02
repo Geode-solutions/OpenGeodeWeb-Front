@@ -10,14 +10,28 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
-async function importExtensionFile(file) {
-  await uploadExtension(file);
-  return registerRunningExtensions();
+function runExtensions() {
+  const appStore = useAppStore();
+  const { projectFolderPath } = appStore;
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const schema = isCloudMode()
+    ? opengeodeweb_front_schemas.api.cloud.extensions.run
+    : opengeodeweb_front_schemas.api.local.extensions.run;
+  const params = { projectFolderPath, projectName };
+  return appStore.request({ schema, params });
 }
 
-async function importExtensionURL(url) {
-  await downloadExtension(url);
-  return registerRunningExtensions();
+async function uploadExtension(file) {
+  const appStore = useAppStore();
+  await appStore.upload(file);
+}
+
+function downloadExtension({ url, extensionFileName }) {
+  const appStore = useAppStore();
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
+  const params = { projectName, url, extensionFileName };
+  return appStore.request({ schema, params });
 }
 
 async function registerRunningExtensions() {
@@ -50,6 +64,16 @@ async function registerRunningExtensions() {
   );
 }
 
+async function importExtensionFile(file) {
+  await uploadExtension(file);
+  return registerRunningExtensions();
+}
+
+async function importExtensionURL(url) {
+  await downloadExtension(url);
+  return registerRunningExtensions();
+}
+
 async function unloadExtension(extensionId) {
   const appStore = useAppStore();
   console.log("[ExtensionManager] Unloading extension:", extensionId);
@@ -75,30 +99,6 @@ async function unloadExtension(extensionId) {
 
   console.log("[ExtensionManager] Extension unloaded:", extensionId);
   return true;
-}
-
-async function uploadExtension(file) {
-  const appStore = useAppStore();
-  await appStore.upload(file);
-}
-
-function downloadExtension({ url, extensionFileName }) {
-  const appStore = useAppStore();
-  const { PROJECT: projectName } = useRuntimeConfig().public;
-  const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
-  const params = { projectName, url, extensionFileName };
-  return appStore.request({ schema, params });
-}
-
-function runExtensions() {
-  const appStore = useAppStore();
-  const { projectFolderPath } = appStore;
-  const { PROJECT: projectName } = useRuntimeConfig().public;
-  const schema = isCloudMode()
-    ? opengeodeweb_front_schemas.api.cloud.extensions.run
-    : opengeodeweb_front_schemas.api.local.extensions.run;
-  const params = { projectFolderPath, projectName };
-  return appStore.request({ schema, params });
 }
 
 function killExtension(extensionId) {

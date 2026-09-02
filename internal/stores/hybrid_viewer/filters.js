@@ -2,21 +2,6 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-function useHybridViewerFilters() {
-  async function setClippingPlanes(ids, planes) {
-    await performSetClippingPlanes(ids, planes);
-  }
-
-  async function setShrink(ids, shrink_factor) {
-    await performSetShrink(ids, shrink_factor);
-  }
-
-  return {
-    setClippingPlanes,
-    setShrink,
-  };
-}
-
 async function performSetClippingPlanes(ids, planes) {
   const viewerStore = useViewerStore();
   const { remoteRender } = useHybridViewerStore();
@@ -33,6 +18,21 @@ async function performSetShrink(ids, shrink_factor) {
   const params = { ids, shrink_factor };
   await viewerStore.request({ schema, params });
   await remoteRender();
+}
+
+function useHybridViewerFilters() {
+  async function setClippingPlanes(ids, planes) {
+    await performSetClippingPlanes(ids, planes);
+  }
+
+  async function setShrink(ids, shrink_factor) {
+    await performSetShrink(ids, shrink_factor);
+  }
+
+  return {
+    setClippingPlanes,
+    setShrink,
+  };
 }
 
 export { performSetClippingPlanes, performSetShrink, useHybridViewerFilters };

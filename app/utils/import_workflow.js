@@ -10,31 +10,6 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-async function importWorkflow(files) {
-  const chunk_size = 5;
-  const chunks = [];
-  for (let i = 0; i < files.length; i += chunk_size) {
-    chunks.push(files.slice(i, i + chunk_size));
-  }
-
-  const results = [];
-  async function processChunk(chunkIndex) {
-    if (chunkIndex >= chunks.length) {
-      return;
-    }
-    const chunk = chunks[chunkIndex];
-    const chunk_results = await Promise.all(
-      chunk.map(({ filename, geode_object_type }) => importFile(filename, geode_object_type)),
-    );
-    results.push(...chunk_results);
-    await processChunk(chunkIndex + 1);
-  }
-  await processChunk(0);
-  const hybridViewerStore = useHybridViewerStore();
-  hybridViewerStore.remoteRender();
-  return results;
-}
-
 async function importItem(item) {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
@@ -88,6 +63,31 @@ async function importFile(filename, geode_object_type) {
   };
   const response = await backStore.request({ schema, params });
   return importItem(response);
+}
+
+async function importWorkflow(files) {
+  const chunk_size = 5;
+  const chunks = [];
+  for (let i = 0; i < files.length; i += chunk_size) {
+    chunks.push(files.slice(i, i + chunk_size));
+  }
+
+  const results = [];
+  async function processChunk(chunkIndex) {
+    if (chunkIndex >= chunks.length) {
+      return;
+    }
+    const chunk = chunks[chunkIndex];
+    const chunk_results = await Promise.all(
+      chunk.map(({ filename, geode_object_type }) => importFile(filename, geode_object_type)),
+    );
+    results.push(...chunk_results);
+    await processChunk(chunkIndex + 1);
+  }
+  await processChunk(0);
+  const hybridViewerStore = useHybridViewerStore();
+  hybridViewerStore.remoteRender();
+  return results;
 }
 
 async function importWorkflowFromSnapshot(items) {

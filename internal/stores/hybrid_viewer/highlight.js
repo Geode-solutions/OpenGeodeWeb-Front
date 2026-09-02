@@ -4,33 +4,6 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-function useHybridViewerHighlight() {
-  const is_hover_highlight = ref(false);
-  const hover_highlight_field_type = ref("CELL");
-  const hoverData = ref(undefined);
-  const hoverPosition = ref({ x: 0, y: 0 });
-  const hoverTimeoutRef = ref(undefined);
-  const currentHoverId = ref(undefined);
-
-  const clearHoverData = createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId);
-
-  const hoverHighlight = createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData });
-
-  function clearHoverHighlight() {
-    clearHoverData();
-    performClearHoverHighlight();
-  }
-
-  return {
-    is_hover_highlight,
-    hover_highlight_field_type,
-    hoverData,
-    hoverPosition,
-    clearHoverHighlight,
-    hoverHighlight,
-  };
-}
-
 function performHoverHighlight(event, onResponse) {
   const hybridViewerStore = useHybridViewerStore();
   const { genericRenderWindow, hybridDb } = hybridViewerStore;
@@ -151,6 +124,33 @@ function createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData 
       }, HOVER_TIMEOUT_MS);
     });
   }, HOVER_DEBOUNCE_MS);
+}
+
+function useHybridViewerHighlight() {
+  const is_hover_highlight = ref(false);
+  const hover_highlight_field_type = ref("CELL");
+  const hoverData = ref(undefined);
+  const hoverPosition = ref({ x: 0, y: 0 });
+  const hoverTimeoutRef = ref(undefined);
+  const currentHoverId = ref(undefined);
+
+  const clearHoverData = createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId);
+
+  const hoverHighlight = createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData });
+
+  function clearHoverHighlight() {
+    clearHoverData();
+    performClearHoverHighlight();
+  }
+
+  return {
+    is_hover_highlight,
+    hover_highlight_field_type,
+    hoverData,
+    hoverPosition,
+    clearHoverHighlight,
+    hoverHighlight,
+  };
 }
 
 export {

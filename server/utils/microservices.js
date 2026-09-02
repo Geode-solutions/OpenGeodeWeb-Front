@@ -57,57 +57,6 @@ function isPortInUseError(errorMessage) {
   return /EADDRINUSE|address already in use|port already in use/iu.test(errorMessage);
 }
 
-async function runBack(execName, execPath, args = {}, attempts = 0) {
-  try {
-    const port = await getAvailablePort();
-    const executableArgs = backArgs(args, port);
-    console.log("runBack", execPath, execName, executableArgs);
-    await runScript(execPath, execName, executableArgs, "Serving Flask app");
-    return port;
-  } catch (error) {
-    if (!isPortInUseError(error)) {
-      console.log("runBack error", error);
-      throw error;
-    }
-    if (attempts <= MAX_PORT_RETRIES) {
-      console.log("Retrying runBack on conflicting port", port);
-      const port = await runBack(execName, execPath, args, attempts + 1);
-      return port;
-    }
-  }
-}
-
-async function runViewer(execName, execPath, args = {}, attempts = 0) {
-  const { projectFolderPath } = args;
-  if (!projectFolderPath) {
-    throw new Error("projectFolderPath is required");
-  }
-  try {
-    const port = await getAvailablePort();
-    const viewerArgs = [
-      "--port",
-      String(port),
-      "--project_folder_path",
-      projectFolderPath,
-      "--timeout",
-      "0",
-    ];
-    console.log("runViewer", execPath, execName, viewerArgs);
-    await runScript(execPath, execName, viewerArgs, "Starting factory");
-    return port;
-  } catch (error) {
-    if (!isPortInUseError(error)) {
-      console.log("runBack error", error);
-      throw error;
-    }
-    if (attempts <= MAX_PORT_RETRIES) {
-      console.log("Retrying runViewer on conflicting port", port);
-      const port = await runViewer(execName, execPath, args, attempts + 1);
-      return port;
-    }
-  }
-}
-
 function backArgs(args, port) {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
@@ -132,9 +81,63 @@ function backArgs(args, port) {
   return executableArgs;
 }
 
-async function runExtension(extensionId, execName, execPath, args = {}, attempts = 0) {
+async function runBack(execName, execPath, args = {}, attempts = 0) {
+  let port = undefined;
   try {
-    const port = await getAvailablePort();
+    port = await getAvailablePort();
+    const executableArgs = backArgs(args, port);
+    console.log("runBack", execPath, execName, executableArgs);
+    await runScript(execPath, execName, executableArgs, "Serving Flask app");
+    return port;
+  } catch (error) {
+    if (!isPortInUseError(error)) {
+      console.log("runBack error", error);
+      throw error;
+    }
+    if (attempts <= MAX_PORT_RETRIES) {
+      console.log("Retrying runBack on conflicting port", port);
+      const retryPort = await runBack(execName, execPath, args, attempts + 1);
+      return retryPort;
+    }
+  }
+}
+
+async function runViewer(execName, execPath, args = {}, attempts = 0) {
+  const { projectFolderPath } = args;
+  if (!projectFolderPath) {
+    throw new Error("projectFolderPath is required");
+  }
+  let port = undefined;
+  try {
+    port = await getAvailablePort();
+    const viewerArgs = [
+      "--port",
+      String(port),
+      "--project_folder_path",
+      projectFolderPath,
+      "--timeout",
+      "0",
+    ];
+    console.log("runViewer", execPath, execName, viewerArgs);
+    await runScript(execPath, execName, viewerArgs, "Starting factory");
+    return port;
+  } catch (error) {
+    if (!isPortInUseError(error)) {
+      console.log("runBack error", error);
+      throw error;
+    }
+    if (attempts <= MAX_PORT_RETRIES) {
+      console.log("Retrying runViewer on conflicting port", port);
+      const retryPort = await runViewer(execName, execPath, args, attempts + 1);
+      return retryPort;
+    }
+  }
+}
+
+async function runExtension(extensionId, execName, execPath, args = {}, attempts = 0) {
+  let port = undefined;
+  try {
+    port = await getAvailablePort();
     const executableArgs = backArgs(args, port);
     const command = executablePath(execPath, execName);
     console.log("runExtension", execPath, execName, executableArgs);
@@ -148,8 +151,8 @@ async function runExtension(extensionId, execName, execPath, args = {}, attempts
     }
     if (attempts <= MAX_PORT_RETRIES) {
       console.log("Retrying runExtension on conflicting port", port);
-      const port = await runExtension(extensionId, execName, execPath, args, attempts + 1);
-      return port;
+      const retryPort = await runExtension(extensionId, execName, execPath, args, attempts + 1);
+      return retryPort;
     }
   }
 }

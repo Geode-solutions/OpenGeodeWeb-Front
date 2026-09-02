@@ -71,6 +71,17 @@ watch([width, height], () => {
   resize();
 });
 
+function connect() {
+  if (viewerStore.status !== Status.CONNECTED) {
+    return;
+  }
+  const session = viewerStore.client.getConnection().getSession();
+  view.setSession(session);
+  view.setViewId(props.viewId);
+  connected.value = true;
+  view.render();
+}
+
 watch(
   () => viewerStore.client,
   () => {
@@ -87,17 +98,6 @@ watch(
     }
   },
 );
-
-function connect() {
-  if (viewerStore.status !== Status.CONNECTED) {
-    return;
-  }
-  const session = viewerStore.client.getConnection().getSession();
-  view.setSession(session);
-  view.setViewId(props.viewId);
-  connected.value = true;
-  view.render();
-}
 
 onMounted(async () => {
   if (import.meta.client) {

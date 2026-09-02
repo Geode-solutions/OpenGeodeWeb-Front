@@ -143,16 +143,7 @@ function useModelVisibilityStyle(componentStyleFunctions) {
     );
   }
 
-  async function setModelComponentTypeVisibility(modelId, componentType, visibility) {
-    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
-      visibility,
-    });
-    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
-    if (idsForType.length === 0) {
-      return;
-    }
-    await setModelComponentsVisibility(modelId, idsForType, visibility);
-  }
+  let setModelComponentTypeVisibility = undefined;
 
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
     const typeIds = componentIds.filter((id) => MESH_COMPONENT_TYPES.includes(id));
@@ -176,6 +167,22 @@ function useModelVisibilityStyle(componentStyleFunctions) {
     }
     return await Promise.all(promises);
   }
+
+  // oxlint-disable-next-line func-names
+  setModelComponentTypeVisibility = async function (
+    modelId,
+    componentType,
+    visibility,
+  ) {
+    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
+      visibility,
+    });
+    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
+    if (idsForType.length === 0) {
+      return;
+    }
+    await setModelComponentsVisibility(modelId, idsForType, visibility);
+  };
 
   function modelComponentVisibility(modelId, componentId) {
     const selection = useModelSelection(modelId, dataStyleState);

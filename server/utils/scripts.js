@@ -64,6 +64,8 @@ function waitForReady(child, expectedResponse, signal) {
       }
     }
 
+    let cleanup = undefined;
+
     function onLine(lineOutput) {
       console.log(`[${child.name}] ${lineOutput}`);
       recordOutput(lineOutput);
@@ -109,7 +111,8 @@ function waitForReady(child, expectedResponse, signal) {
       reject(new Error(`[${child.name}] timed out waiting for "${expectedResponse}"`));
     }
 
-    function cleanup() {
+    // oxlint-disable-next-line func-names
+    cleanup = function () {
       readlineStdout.removeListener("line", onLine);
       readlineStderr.removeListener("line", onErrLine);
       child.removeListener("error", onError);
@@ -117,7 +120,7 @@ function waitForReady(child, expectedResponse, signal) {
       if (signal) {
         signal.removeEventListener("abort", onAbort);
       }
-    }
+    };
 
     readlineStdout.on("line", onLine);
     readlineStderr.on("line", onErrLine);

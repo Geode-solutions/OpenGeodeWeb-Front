@@ -77,6 +77,13 @@ function useModelColorStyle(componentStyleFunctions) {
     },
   };
 
+  function modelComponentTypeColor(modelId, type) {
+    return (
+      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.constant ||
+      dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.constant
+    );
+  }
+
   function getModelComponentColor(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).coloring?.constant;
   }
@@ -93,17 +100,32 @@ function useModelColorStyle(componentStyleFunctions) {
     return dataStyleState.getComponentStyle(modelId, componentId).coloring?.active;
   }
 
-  function modelComponentTypeColor(modelId, type) {
-    return (
-      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.constant ||
-      dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.constant
-    );
-  }
-
   function getModelComponentTypeActiveColoring(modelId, type) {
     return (
       dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.active ||
       dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.active
+    );
+  }
+
+  async function setModelComponentsColor(
+    modelId,
+    componentIds,
+    color,
+    activeColoring = "constant",
+  ) {
+    await modelCommonStyle.mutateComponentStyles(modelId, componentIds, {
+      coloring: {
+        constant: color,
+        active: activeColoring,
+      },
+    });
+    return await dispatchToComponentTypes(
+      modelId,
+      componentIds,
+      "Color",
+      { componentStyleFunctions },
+      color,
+      activeColoring,
     );
   }
 
@@ -180,28 +202,6 @@ function useModelColorStyle(componentStyleFunctions) {
         await setColorMap(modelId, [componentId], colorMap);
       }
     }
-  }
-
-  async function setModelComponentsColor(
-    modelId,
-    componentIds,
-    color,
-    activeColoring = "constant",
-  ) {
-    await modelCommonStyle.mutateComponentStyles(modelId, componentIds, {
-      coloring: {
-        constant: color,
-        active: activeColoring,
-      },
-    });
-    return await dispatchToComponentTypes(
-      modelId,
-      componentIds,
-      "Color",
-      { componentStyleFunctions },
-      color,
-      activeColoring,
-    );
   }
 
   function getModelColor(modelId) {

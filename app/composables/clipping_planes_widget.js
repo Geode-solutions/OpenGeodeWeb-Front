@@ -201,24 +201,6 @@ function useClippingPlanesWidget({
     }
   }
 
-  function initLocalWidget(container) {
-    cleanupLocalWidget();
-    container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
-    localRenderWindow = vtkGenericRenderWindow({
-      background: [0, 0, 0, 0],
-      listenWindowResize: false,
-    });
-    localRenderWindow.setContainer(container);
-    const camera = localRenderWindow.getRenderer().getActiveCamera();
-    camera.onModified(() => limitCameraZoomOut(camera));
-    const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
-    Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
-    localRenderWindow.resize();
-    widgetManager = vtkWidgetManager();
-    widgetManager.setRenderer(localRenderWindow.getRenderer());
-    updateWidgetPlacement();
-  }
-
   function updateWidgetPlacement({ isReset = false } = {}) {
     if (!widgetManager || !localRenderWindow) {
       return;
@@ -237,6 +219,24 @@ function useClippingPlanesWidget({
     if (maxDistance <= 0) {
       maxDistance = localRenderWindow.getRenderer().getActiveCamera().getDistance();
     }
+  }
+
+  function initLocalWidget(container) {
+    cleanupLocalWidget();
+    container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+    localRenderWindow = vtkGenericRenderWindow({
+      background: [0, 0, 0, 0],
+      listenWindowResize: false,
+    });
+    localRenderWindow.setContainer(container);
+    const camera = localRenderWindow.getRenderer().getActiveCamera();
+    camera.onModified(() => limitCameraZoomOut(camera));
+    const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
+    Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
+    localRenderWindow.resize();
+    widgetManager = vtkWidgetManager();
+    widgetManager.setRenderer(localRenderWindow.getRenderer());
+    updateWidgetPlacement();
   }
 
   function isFromWidget() {

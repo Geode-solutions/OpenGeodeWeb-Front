@@ -11,6 +11,14 @@ const { showDialog, width, escapeFunction } = defineProps({
   escapeFunction: { type: Function, default: undefined },
 });
 
+function handleClose() {
+  if (escapeFunction) {
+    escapeFunction();
+  } else {
+    emit("close");
+  }
+}
+
 const show = computed({
   get: () => showDialog,
   set: (val) => {
@@ -19,14 +27,6 @@ const show = computed({
     }
   },
 });
-
-function handleClose() {
-  if (escapeFunction) {
-    escapeFunction();
-  } else {
-    emit("close");
-  }
-}
 </script>
 
 <template>
