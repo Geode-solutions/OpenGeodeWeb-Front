@@ -9,14 +9,14 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge.attribute;
-function isModelLinesEdgeAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap
-}) {
-  return name !== undefined && item !== undefined && minimum !== undefined && maximum !== undefined && colorMap !== undefined;
+function isModelLinesEdgeAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -28,26 +28,24 @@ function useModelLinesEdgeAttribute() {
     return modelLinesCommonStyle.modelLineColoring(modelId, lineId).edge;
   }
   function modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item) {
-    const {
-      storedConfigs
-    } = modelLinesEdgeAttribute(modelId, lineId);
+    const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
     if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
       maximum: undefined,
-      colorMap: undefined
+      colorMap: undefined,
     };
   }
   function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
     if (lineIds.length > 1) {
       modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
-        edge: values
+        edge: values,
       });
     }
     return modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
-      edge: values
+      edge: values,
     });
   }
   function setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, config) {
@@ -55,18 +53,16 @@ function useModelLinesEdgeAttribute() {
       storedConfigs: {
         [name]: {
           lastItem: item,
-          [item]: config
-        }
-      }
+          [item]: config,
+        },
+      },
     });
   }
   function modelLinesEdgeAttributeName(modelId, lineId) {
     return modelLinesEdgeAttribute(modelId, lineId).name;
   }
   function modelLinesEdgeAttributeLastItem(modelId, lineId, name) {
-    const {
-      storedConfigs
-    } = modelLinesEdgeAttribute(modelId, lineId);
+    const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
     if (!(name in storedConfigs)) {
       return 0;
     }
@@ -74,16 +70,15 @@ function useModelLinesEdgeAttribute() {
   }
   function modelLinesEdgeAttributeItem(modelId, lineId) {
     const edgeAttribute = modelLinesEdgeAttribute(modelId, lineId);
-    return edgeAttribute.item ?? modelLinesEdgeAttributeLastItem(modelId, lineId, edgeAttribute.name);
+    return (
+      edgeAttribute.item ?? modelLinesEdgeAttributeLastItem(modelId, lineId, edgeAttribute.name)
+    );
   }
   function modelLinesEdgeAttributeRange(modelId, lineId) {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
     const item = modelLinesEdgeAttributeItem(modelId, lineId);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
-    const {
-      minimum,
-      maximum
-    } = storedConfig;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
   function modelLinesEdgeAttributeColorMap(modelId, lineId) {
@@ -92,21 +87,19 @@ function useModelLinesEdgeAttribute() {
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.colorMap;
   }
-  async function setModelLinesEdgeAttribute(modelId, lineIds, {
-    name,
-    item,
-    minimum,
-    maximum,
-    colorMap
-  }) {
+  async function setModelLinesEdgeAttribute(
+    modelId,
+    lineIds,
+    { name, item, minimum, maximum, colorMap },
+  ) {
     mutateModelLinesEdgeStyle(modelId, lineIds, {
       name,
-      item
+      item,
     });
     setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, {
       minimum,
       maximum,
-      colorMap
+      colorMap,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
@@ -117,11 +110,11 @@ function useModelLinesEdgeAttribute() {
       item,
       points,
       minimum,
-      maximum
+      maximum,
     };
     return viewerStore.request({
       schema: attributeSchema,
-      params
+      params,
     });
   }
   function applyEdgeAttribute(modelId, lineIds) {
@@ -133,7 +126,7 @@ function useModelLinesEdgeAttribute() {
       item,
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
-      colorMap: storedConfig.colorMap
+      colorMap: storedConfig.colorMap,
     };
     if (isModelLinesEdgeAttributeValid(attribute)) {
       return setModelLinesEdgeAttribute(modelId, lineIds, attribute);
@@ -144,13 +137,13 @@ function useModelLinesEdgeAttribute() {
     const item = modelLinesEdgeAttributeLastItem(modelId, lineIds[0], name);
     mutateModelLinesEdgeStyle(modelId, lineIds, {
       name,
-      item
+      item,
     });
     return applyEdgeAttribute(modelId, lineIds);
   }
   function setModelLinesEdgeAttributeItem(modelId, lineIds, item) {
     mutateModelLinesEdgeStyle(modelId, lineIds, {
-      item
+      item,
     });
     return applyEdgeAttribute(modelId, lineIds);
   }
@@ -159,7 +152,7 @@ function useModelLinesEdgeAttribute() {
     const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
     setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, {
       minimum,
-      maximum
+      maximum,
     });
     return applyEdgeAttribute(modelId, lineIds);
   }
@@ -167,7 +160,7 @@ function useModelLinesEdgeAttribute() {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
     setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, {
-      colorMap
+      colorMap,
     });
     return applyEdgeAttribute(modelId, lineIds);
   }
@@ -181,7 +174,7 @@ function useModelLinesEdgeAttribute() {
     setModelLinesEdgeAttributeName,
     setModelLinesEdgeAttributeItem,
     setModelLinesEdgeAttributeRange,
-    setModelLinesEdgeAttributeColorMap
+    setModelLinesEdgeAttributeColorMap,
   };
 }
 export { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute };

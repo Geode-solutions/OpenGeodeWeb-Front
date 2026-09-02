@@ -18,12 +18,12 @@ const MAX_ERROR_BUFFER_BYTES = MAX_ERROR_BUFFER_KIBIBYTES * BYTES_PER_KIBIBYTE;
 function getAvailablePort() {
   return getPort({
     host: "localhost",
-    random: true
+    random: true,
   });
 }
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || "";
-  return envPath.split(path.delimiter).some(directory => {
+  return envPath.split(path.delimiter).some((directory) => {
     const filePath = path.join(directory, execName);
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
   });
@@ -38,14 +38,17 @@ function waitForReady(child, expectedResponse, signal) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
     const readlineStdout = readline.createInterface({
-      input: child.stdout
+      input: child.stdout,
     });
     const readlineStderr = readline.createInterface({
-      input: child.stderr
+      input: child.stderr,
     });
     let recentOutput = "";
     function recordOutput(lineOutput) {
-      const safeLine = byteLength(lineOutput) > MAX_ERROR_BUFFER_BYTES / 2 ? `${lineOutput.slice(0, MAX_ERROR_BUFFER_BYTES / 2)}…[truncated]` : lineOutput;
+      const safeLine =
+        byteLength(lineOutput) > MAX_ERROR_BUFFER_BYTES / 2
+          ? `${lineOutput.slice(0, MAX_ERROR_BUFFER_BYTES / 2)}…[truncated]`
+          : lineOutput;
       recentOutput = `${recentOutput} ${safeLine}\n`;
       while (byteLength(recentOutput) > MAX_ERROR_BUFFER_BYTES) {
         const newline = recentOutput.indexOf("\n");
@@ -128,16 +131,16 @@ function waitForReady(child, expectedResponse, signal) {
     child.once("close", onClose);
     if (signal) {
       signal.addEventListener("abort", onAbort, {
-        once: true
+        once: true,
       });
     }
   });
 }
 async function waitNuxt(nuxtProcess) {
-  nuxtProcess.stderr.on("data", data => {
+  nuxtProcess.stderr.on("data", (data) => {
     console.log("Nuxt STDERR:", data.toString().trim());
   });
-  nuxtProcess.on("close", code => {
+  nuxtProcess.on("close", (code) => {
     console.log(`Nuxt process closed with code ${code}`);
   });
   for await (const [data] of on(nuxtProcess.stdout, "data")) {
@@ -146,7 +149,7 @@ async function waitNuxt(nuxtProcess) {
     const portMatch = output.match(/Listening on http:\/\/\[::\]:(?<port>\d+)/u);
     if (portMatch) {
       console.log("Nuxt listening on port", portMatch.groups.port);
-      nuxtProcess.stdout.on("data", newData => {
+      nuxtProcess.stdout.on("data", (newData) => {
         console.log("Nuxt STDOUT:", newData.toString().trim());
       });
       return portMatch.groups.port;
@@ -162,8 +165,8 @@ async function runBrowser(scriptName) {
     FORCE_COLOR: true,
     env: {
       ...process.env,
-      PORT: port
-    }
+      PORT: port,
+    },
   });
   await waitNuxt(nuxtProcess);
   await setAppBaseUrl(`http://localhost:${port}`);

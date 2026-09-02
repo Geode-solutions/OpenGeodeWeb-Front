@@ -8,10 +8,7 @@ import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
 async function performAddItem(id) {
-  const {
-    genericRenderWindow,
-    hybridDb
-  } = useHybridViewerStore();
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   if (!genericRenderWindow.value) {
     return;
   }
@@ -42,14 +39,11 @@ async function performAddItem(id) {
   hybridDb[id] = {
     actor,
     polydata,
-    mapper
+    mapper,
   };
 }
 function performRemoveItem(id) {
-  const {
-    genericRenderWindow,
-    hybridDb
-  } = useHybridViewerStore();
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   if (!hybridDb[id]) {
     return;
   }
@@ -60,10 +54,7 @@ function performRemoveItem(id) {
   delete hybridDb[id];
 }
 function performSetVisibility(id, visibility) {
-  const {
-    genericRenderWindow,
-    hybridDb
-  } = useHybridViewerStore();
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   if (!hybridDb[id]) {
     return;
   }
@@ -73,13 +64,8 @@ function performSetVisibility(id, visibility) {
 }
 async function performSetZScaling(z_scale) {
   const hybridViewerStore = useHybridViewerStore();
-  const {
-    genericRenderWindow,
-    remoteRender
-  } = hybridViewerStore;
-  const {
-    zScale
-  } = storeToRefs(hybridViewerStore);
+  const { genericRenderWindow, remoteRender } = hybridViewerStore;
+  const { zScale } = storeToRefs(hybridViewerStore);
   zScale.value = z_scale;
   const renderer = genericRenderWindow.value.getRenderer();
   for (const actor of renderer.getActors()) {
@@ -92,19 +78,16 @@ async function performSetZScaling(z_scale) {
   const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.set_z_scaling;
   const params = {
-    z_scale
+    z_scale,
   };
   await viewerStore.request({
     schema,
-    params
+    params,
   });
   await remoteRender();
 }
 function performClear() {
-  const {
-    genericRenderWindow,
-    hybridDb
-  } = useHybridViewerStore();
+  const { genericRenderWindow, hybridDb } = useHybridViewerStore();
   const renderer = genericRenderWindow.value.getRenderer();
   for (const actor of renderer.getActors()) {
     renderer.removeActor(actor);
@@ -140,7 +123,14 @@ function useHybridViewerScene() {
     removeItem,
     setVisibility,
     setZScaling,
-    clear
+    clear,
   };
 }
-export { performAddItem, performClear, performRemoveItem, performSetVisibility, performSetZScaling, useHybridViewerScene };
+export {
+  performAddItem,
+  performClear,
+  performRemoveItem,
+  performSetVisibility,
+  performSetZScaling,
+  useHybridViewerScene,
+};

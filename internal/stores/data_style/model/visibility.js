@@ -10,30 +10,36 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 async function getModelComponentsMap(modelId) {
   const dataStore = useDataStore();
-  const results = await Promise.all(MESH_COMPONENT_TYPES.map(async type => {
-    const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, type);
-    return geodeIds.map(geode_id => ({
-      geode_id,
-      type
-    }));
-  }));
+  const results = await Promise.all(
+    MESH_COMPONENT_TYPES.map(async (type) => {
+      const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, type);
+      return geodeIds.map((geode_id) => ({
+        geode_id,
+        type,
+      }));
+    }),
+  );
   const allComponents = results.flat();
   return {
     allComponents,
-    componentsMap: Object.fromEntries(allComponents.map(component => [component.geode_id, component]))
+    componentsMap: Object.fromEntries(
+      allComponents.map((component) => [component.geode_id, component]),
+    ),
   };
 }
-async function dispatchToComponentTypes(modelId, componentIds, action, {
-  componentStyleFunctions
-}, ...args) {
-  const {
-    componentsMap
-  } = await getModelComponentsMap(modelId);
+async function dispatchToComponentTypes(
+  modelId,
+  componentIds,
+  action,
+  { componentStyleFunctions },
+  ...args
+) {
+  const { componentsMap } = await getModelComponentsMap(modelId);
   const idsByComponent = {
     Block: [],
     Surface: [],
     Line: [],
-    Corner: []
+    Corner: [],
   };
   for (const id of componentIds) {
     const type = componentsMap[id]?.type;
@@ -44,29 +50,65 @@ async function dispatchToComponentTypes(modelId, componentIds, action, {
   const promises = [];
   if (action === "Visibility") {
     if (idsByComponent.Block.length > 0) {
-      promises.push(componentStyleFunctions.Block.setModelBlocksVisibility(modelId, idsByComponent.Block, ...args));
+      promises.push(
+        componentStyleFunctions.Block.setModelBlocksVisibility(
+          modelId,
+          idsByComponent.Block,
+          ...args,
+        ),
+      );
     }
     if (idsByComponent.Surface.length > 0) {
-      promises.push(componentStyleFunctions.Surface.setModelSurfacesVisibility(modelId, idsByComponent.Surface, ...args));
+      promises.push(
+        componentStyleFunctions.Surface.setModelSurfacesVisibility(
+          modelId,
+          idsByComponent.Surface,
+          ...args,
+        ),
+      );
     }
     if (idsByComponent.Line.length > 0) {
-      promises.push(componentStyleFunctions.Line.setModelLinesVisibility(modelId, idsByComponent.Line, ...args));
+      promises.push(
+        componentStyleFunctions.Line.setModelLinesVisibility(modelId, idsByComponent.Line, ...args),
+      );
     }
     if (idsByComponent.Corner.length > 0) {
-      promises.push(componentStyleFunctions.Corner.setModelCornersVisibility(modelId, idsByComponent.Corner, ...args));
+      promises.push(
+        componentStyleFunctions.Corner.setModelCornersVisibility(
+          modelId,
+          idsByComponent.Corner,
+          ...args,
+        ),
+      );
     }
   } else if (action === "Color") {
     if (idsByComponent.Block.length > 0) {
-      promises.push(componentStyleFunctions.Block.setModelBlocksColor(modelId, idsByComponent.Block, ...args));
+      promises.push(
+        componentStyleFunctions.Block.setModelBlocksColor(modelId, idsByComponent.Block, ...args),
+      );
     }
     if (idsByComponent.Surface.length > 0) {
-      promises.push(componentStyleFunctions.Surface.setModelSurfacesColor(modelId, idsByComponent.Surface, ...args));
+      promises.push(
+        componentStyleFunctions.Surface.setModelSurfacesColor(
+          modelId,
+          idsByComponent.Surface,
+          ...args,
+        ),
+      );
     }
     if (idsByComponent.Line.length > 0) {
-      promises.push(componentStyleFunctions.Line.setModelLinesColor(modelId, idsByComponent.Line, ...args));
+      promises.push(
+        componentStyleFunctions.Line.setModelLinesColor(modelId, idsByComponent.Line, ...args),
+      );
     }
     if (idsByComponent.Corner.length > 0) {
-      promises.push(componentStyleFunctions.Corner.setModelCornersColor(modelId, idsByComponent.Corner, ...args));
+      promises.push(
+        componentStyleFunctions.Corner.setModelCornersColor(
+          modelId,
+          idsByComponent.Corner,
+          ...args,
+        ),
+      );
     }
   }
   return Promise.all(promises);
@@ -84,47 +126,64 @@ function useModelVisibilityStyle(componentStyleFunctions) {
     const schema = model_schemas.visibility;
     const params = {
       id: modelId,
-      visibility
+      visibility,
     };
-    return viewerStore.request({
-      schema,
-      params
-    }, {
-      response_function: async () => {
-        await hybridViewerStore.setVisibility(modelId, visibility);
-        await dataStyleState.mutateStyle(modelId, {
-          visibility
-        });
-        return {
-          id: modelId,
-          visibility
-        };
-      }
-    });
+    return viewerStore.request(
+      {
+        schema,
+        params,
+      },
+      {
+        response_function: async () => {
+          await hybridViewerStore.setVisibility(modelId, visibility);
+          await dataStyleState.mutateStyle(modelId, {
+            visibility,
+          });
+          return {
+            id: modelId,
+            visibility,
+          };
+        },
+      },
+    );
   }
   async function setModelComponentTypeVisibility(modelId, componentType, visibility) {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
-      visibility
+      visibility,
     });
     const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, componentType);
     if (idsForType.length === 0) {
       return;
     }
-    await dispatchToComponentTypes(modelId, idsForType, "Visibility", {
-      componentStyleFunctions
-    }, visibility);
+    await dispatchToComponentTypes(
+      modelId,
+      idsForType,
+      "Visibility",
+      {
+        componentStyleFunctions,
+      },
+      visibility,
+    );
   }
   async function setModelComponentsVisibility(modelId, componentIds, visibility) {
-    const typeIds = componentIds.filter(id => MESH_COMPONENT_TYPES.includes(id));
-    const individualIds = componentIds.filter(id => !MESH_COMPONENT_TYPES.includes(id));
+    const typeIds = componentIds.filter((id) => MESH_COMPONENT_TYPES.includes(id));
+    const individualIds = componentIds.filter((id) => !MESH_COMPONENT_TYPES.includes(id));
     const promises = [];
     for (const typeId of typeIds) {
       promises.push(setModelComponentTypeVisibility(modelId, typeId, visibility));
     }
     if (individualIds.length > 0) {
-      promises.push(dispatchToComponentTypes(modelId, individualIds, "Visibility", {
-        componentStyleFunctions
-      }, visibility));
+      promises.push(
+        dispatchToComponentTypes(
+          modelId,
+          individualIds,
+          "Visibility",
+          {
+            componentStyleFunctions,
+          },
+          visibility,
+        ),
+      );
     }
     return await Promise.all(promises);
   }
@@ -142,7 +201,7 @@ function useModelVisibilityStyle(componentStyleFunctions) {
     setModelComponentsVisibility,
     setModelComponentTypeVisibility,
     modelComponentVisibility,
-    modelComponentTypeVisibility
+    modelComponentTypeVisibility,
   };
 }
 export { getModelComponentsMap, dispatchToComponentTypes, useModelVisibilityStyle };

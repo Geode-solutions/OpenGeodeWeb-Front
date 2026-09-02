@@ -8,14 +8,14 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const meshCellsCellAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
-function isMeshCellsCellAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap
-}) {
-  return name !== undefined && item !== undefined && minimum !== undefined && maximum !== undefined && colorMap !== undefined;
+function isMeshCellsCellAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -26,23 +26,21 @@ function useMeshCellsCellAttributeStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).cell;
   }
   function meshCellsCellAttributeStoredConfig(id, name, item) {
-    const {
-      storedConfigs
-    } = meshCellsCellAttribute(id);
+    const { storedConfigs } = meshCellsCellAttribute(id);
     if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
       maximum: undefined,
-      colorMap: undefined
+      colorMap: undefined,
     };
   }
   function mutateMeshCellsCellStyle(id, values) {
     return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: {
-        cell: values
-      }
+        cell: values,
+      },
     });
   }
   function setMeshCellsCellAttributeStoredConfig(id, name, item, config) {
@@ -50,45 +48,34 @@ function useMeshCellsCellAttributeStyle() {
       storedConfigs: {
         [name]: {
           lastItem: item,
-          [item]: config
-        }
-      }
+          [item]: config,
+        },
+      },
     });
   }
   function meshCellsCellAttributeName(id) {
     return meshCellsCellAttribute(id).name;
   }
   function meshCellsCellAttributeLastItem(id, name) {
-    const {
-      storedConfigs
-    } = meshCellsCellAttribute(id);
+    const { storedConfigs } = meshCellsCellAttribute(id);
     if (storedConfigs && name in storedConfigs) {
       return storedConfigs[name].lastItem;
     }
     return 0;
   }
   function meshCellsCellAttributeItem(id) {
-    const {
-      item,
-      name
-    } = meshCellsCellAttribute(id);
+    const { item, name } = meshCellsCellAttribute(id);
     return item ?? meshCellsCellAttributeLastItem(id, name);
   }
-  function setMeshCellsCellAttribute(id, {
-    name,
-    item,
-    minimum,
-    maximum,
-    colorMap
-  }) {
+  function setMeshCellsCellAttribute(id, { name, item, minimum, maximum, colorMap }) {
     mutateMeshCellsCellStyle(id, {
       name,
-      item
+      item,
     });
     setMeshCellsCellAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
-      colorMap
+      colorMap,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsCellAttributeSchemas.attribute;
@@ -98,11 +85,11 @@ function useMeshCellsCellAttributeStyle() {
       item,
       points,
       minimum,
-      maximum
+      maximum,
     };
     return viewerStore.request({
       schema,
-      params
+      params,
     });
   }
   function applyCellAttribute(id) {
@@ -114,7 +101,7 @@ function useMeshCellsCellAttributeStyle() {
       item,
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
-      colorMap: storedConfig.colorMap
+      colorMap: storedConfig.colorMap,
     };
     if (isMeshCellsCellAttributeValid(attribute)) {
       return setMeshCellsCellAttribute(id, attribute);
@@ -124,13 +111,13 @@ function useMeshCellsCellAttributeStyle() {
     const item = meshCellsCellAttributeLastItem(id, name);
     await mutateMeshCellsCellStyle(id, {
       name,
-      item
+      item,
     });
     return applyCellAttribute(id);
   }
   async function setMeshCellsCellAttributeItem(id, item) {
     await mutateMeshCellsCellStyle(id, {
-      item
+      item,
     });
     return applyCellAttribute(id);
   }
@@ -145,7 +132,7 @@ function useMeshCellsCellAttributeStyle() {
     const item = meshCellsCellAttributeItem(id);
     await setMeshCellsCellAttributeStoredConfig(id, name, item, {
       minimum,
-      maximum
+      maximum,
     });
     return applyCellAttribute(id);
   }
@@ -159,7 +146,7 @@ function useMeshCellsCellAttributeStyle() {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
     await setMeshCellsCellAttributeStoredConfig(id, name, item, {
-      colorMap
+      colorMap,
     });
     return applyCellAttribute(id);
   }
@@ -173,7 +160,7 @@ function useMeshCellsCellAttributeStyle() {
     setMeshCellsCellAttributeName,
     setMeshCellsCellAttributeItem,
     setMeshCellsCellAttributeRange,
-    setMeshCellsCellAttributeColorMap
+    setMeshCellsCellAttributeColorMap,
   };
 }
 export { isMeshCellsCellAttributeValid, useMeshCellsCellAttributeStyle };

@@ -7,15 +7,16 @@ import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshCellsVertexAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
-function isMeshCellsVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap
-}) {
-  return name !== undefined && item !== undefined && minimum !== undefined && maximum !== undefined && colorMap !== undefined;
+const meshCellsVertexAttributeSchemas =
+  viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
+function isMeshCellsVertexAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -26,23 +27,21 @@ function useMeshCellsVertexAttributeStyle() {
     return meshCellsCommonStyle.meshCellsColoring(id).vertex;
   }
   function meshCellsVertexAttributeStoredConfig(id, name, item) {
-    const {
-      storedConfigs
-    } = meshCellsVertexAttribute(id);
+    const { storedConfigs } = meshCellsVertexAttribute(id);
     if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
       maximum: undefined,
-      colorMap: undefined
+      colorMap: undefined,
     };
   }
   function mutateMeshCellsVertexStyle(id, values) {
     return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: {
-        vertex: values
-      }
+        vertex: values,
+      },
     });
   }
   function setMeshCellsVertexAttributeStoredConfig(id, name, item, config) {
@@ -50,45 +49,34 @@ function useMeshCellsVertexAttributeStyle() {
       storedConfigs: {
         [name]: {
           lastItem: item,
-          [item]: config
-        }
-      }
+          [item]: config,
+        },
+      },
     });
   }
   function meshCellsVertexAttributeName(id) {
     return meshCellsVertexAttribute(id).name;
   }
   function meshCellsVertexAttributeLastItem(id, name) {
-    const {
-      storedConfigs
-    } = meshCellsVertexAttribute(id);
+    const { storedConfigs } = meshCellsVertexAttribute(id);
     if (storedConfigs && name in storedConfigs) {
       return storedConfigs[name].lastItem;
     }
     return 0;
   }
   function meshCellsVertexAttributeItem(id) {
-    const {
-      item,
-      name
-    } = meshCellsVertexAttribute(id);
+    const { item, name } = meshCellsVertexAttribute(id);
     return item ?? meshCellsVertexAttributeLastItem(id, name);
   }
-  function setMeshCellsVertexAttribute(id, {
-    name,
-    item,
-    minimum,
-    maximum,
-    colorMap
-  }) {
+  function setMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
     mutateMeshCellsVertexStyle(id, {
       name,
-      item
+      item,
     });
     setMeshCellsVertexAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
-      colorMap
+      colorMap,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsVertexAttributeSchemas.attribute;
@@ -98,11 +86,11 @@ function useMeshCellsVertexAttributeStyle() {
       item,
       points,
       minimum,
-      maximum
+      maximum,
     };
     return viewerStore.request({
       schema,
-      params
+      params,
     });
   }
   function applyVertexAttribute(id) {
@@ -114,7 +102,7 @@ function useMeshCellsVertexAttributeStyle() {
       item,
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
-      colorMap: storedConfig.colorMap
+      colorMap: storedConfig.colorMap,
     };
     if (isMeshCellsVertexAttributeValid(attribute)) {
       return setMeshCellsVertexAttribute(id, attribute);
@@ -124,13 +112,13 @@ function useMeshCellsVertexAttributeStyle() {
     const item = meshCellsVertexAttributeLastItem(id, name);
     mutateMeshCellsVertexStyle(id, {
       name,
-      item
+      item,
     });
     return applyVertexAttribute(id);
   }
   function setMeshCellsVertexAttributeItem(id, item) {
     mutateMeshCellsVertexStyle(id, {
-      item
+      item,
     });
     return applyVertexAttribute(id);
   }
@@ -145,7 +133,7 @@ function useMeshCellsVertexAttributeStyle() {
     const item = meshCellsVertexAttributeItem(id);
     setMeshCellsVertexAttributeStoredConfig(id, name, item, {
       minimum,
-      maximum
+      maximum,
     });
     return applyVertexAttribute(id);
   }
@@ -159,7 +147,7 @@ function useMeshCellsVertexAttributeStyle() {
     const name = meshCellsVertexAttributeName(id);
     const item = meshCellsVertexAttributeItem(id);
     setMeshCellsVertexAttributeStoredConfig(id, name, item, {
-      colorMap
+      colorMap,
     });
     return applyVertexAttribute(id);
   }
@@ -173,7 +161,7 @@ function useMeshCellsVertexAttributeStyle() {
     setMeshCellsVertexAttributeName,
     setMeshCellsVertexAttributeItem,
     setMeshCellsVertexAttributeRange,
-    setMeshCellsVertexAttributeColorMap
+    setMeshCellsVertexAttributeColorMap,
   };
 }
 export { isMeshCellsVertexAttributeValid, useMeshCellsVertexAttributeStyle };

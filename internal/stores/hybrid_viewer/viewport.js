@@ -7,14 +7,8 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 async function performResize(width, height) {
   const hybridViewerStore = useHybridViewerStore();
-  const {
-    genericRenderWindow,
-    remoteRender
-  } = hybridViewerStore;
-  const {
-    status,
-    viewStream
-  } = storeToRefs(hybridViewerStore);
+  const { genericRenderWindow, remoteRender } = hybridViewerStore;
+  const { status, viewStream } = storeToRefs(hybridViewerStore);
   const viewerStore = useViewerStore();
   if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
     return;
@@ -33,65 +27,54 @@ async function performResize(width, height) {
   await remoteRender();
 }
 function performClickPicking(event, containerElement) {
-  const {
-    genericRenderWindow,
-    syncRemoteCamera
-  } = useHybridViewerStore();
+  const { genericRenderWindow, syncRemoteCamera } = useHybridViewerStore();
   const viewerStore = useViewerStore();
   const rect = containerElement.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
   const params = {
     x: Math.round(event.clientX - rect.left),
-    y: Math.round(rect.height - (event.clientY - rect.top))
+    y: Math.round(rect.height - (event.clientY - rect.top)),
   };
-  viewerStore.request({
-    schema,
-    params
-  }, {
-    response_function: ({
-      x,
-      y,
-      z
-    }) => {
-      const pickedPos = [x, y, z];
-      if (pickedPos.some(val => val !== 0)) {
-        const renderer = genericRenderWindow.value.getRenderer();
-        const camera = renderer.getActiveCamera();
-        centerCameraOnPosition(camera, pickedPos);
-        const renderWindow = genericRenderWindow.value.getRenderWindow();
-        renderWindow.render();
-        syncRemoteCamera();
-      }
-    }
-  });
+  viewerStore.request(
+    {
+      schema,
+      params,
+    },
+    {
+      response_function: ({ x, y, z }) => {
+        const pickedPos = [x, y, z];
+        if (pickedPos.some((val) => val !== 0)) {
+          const renderer = genericRenderWindow.value.getRenderer();
+          const camera = renderer.getActiveCamera();
+          centerCameraOnPosition(camera, pickedPos);
+          const renderWindow = genericRenderWindow.value.getRenderWindow();
+          renderWindow.render();
+          syncRemoteCamera();
+        }
+      },
+    },
+  );
 }
 function performSetContainer(container) {
   if (!container || !container.value) {
     return;
   }
   const hybridViewerStore = useHybridViewerStore();
-  const {
-    genericRenderWindow,
-    syncRemoteCamera,
-    hoverHighlight
-  } = hybridViewerStore;
-  const {
-    is_picking,
-    is_moving
-  } = storeToRefs(hybridViewerStore);
+  const { genericRenderWindow, syncRemoteCamera, hoverHighlight } = hybridViewerStore;
+  const { is_picking, is_moving } = storeToRefs(hybridViewerStore);
   genericRenderWindow.value.setContainer(container.value.$el);
   const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
   webGLRenderWindow.setUseBackgroundImage(true);
   const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
   Object.assign(imageStyle, {
     transition: "opacity 0.1s ease-in",
-    zIndex: 1
+    zIndex: 1,
   });
   performResize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
   let has_dragged = false;
   useMousePressed({
     target: container,
-    onPressed: event => {
+    onPressed: (event) => {
       if (event.button !== 0 && event.button !== 1) {
         return;
       }
@@ -112,9 +95,9 @@ function performSetContainer(container) {
         syncRemoteCamera();
       }
       has_dragged = false;
-    }
+    },
   });
-  useEventListener(container, "mousemove", event => {
+  useEventListener(container, "mousemove", (event) => {
     if (is_moving.value) {
       has_dragged = true;
       if (imageStyle) {
@@ -149,7 +132,7 @@ function useHybridViewerViewport() {
   return {
     setContainer,
     resize,
-    viewStream
+    viewStream,
   };
 }
 export { performClickPicking, performResize, performSetContainer, useHybridViewerViewport };

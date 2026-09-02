@@ -7,15 +7,16 @@ import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshEdgesVertexAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.vertex;
-function isMeshEdgesVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap
-}) {
-  return name !== undefined && item !== undefined && minimum !== undefined && maximum !== undefined && colorMap !== undefined;
+const meshEdgesVertexAttributeSchemas =
+  viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.vertex;
+function isMeshEdgesVertexAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -29,23 +30,21 @@ function useMeshEdgesVertexAttributeStyle() {
     return meshEdgesColoring(id).vertex;
   }
   function meshEdgesVertexAttributeStoredConfig(id, name, item) {
-    const {
-      storedConfigs
-    } = meshEdgesVertexAttribute(id);
+    const { storedConfigs } = meshEdgesVertexAttribute(id);
     if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
       maximum: undefined,
-      colorMap: undefined
+      colorMap: undefined,
     };
   }
   function mutateMeshEdgesVertexStyle(id, values) {
     return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
       coloring: {
-        vertex: values
-      }
+        vertex: values,
+      },
     });
   }
   function setMeshEdgesVertexAttributeStoredConfig(id, name, item, config) {
@@ -53,45 +52,34 @@ function useMeshEdgesVertexAttributeStyle() {
       storedConfigs: {
         [name]: {
           lastItem: item,
-          [item]: config
-        }
-      }
+          [item]: config,
+        },
+      },
     });
   }
   function meshEdgesVertexAttributeName(id) {
     return meshEdgesVertexAttribute(id).name;
   }
   function meshEdgesVertexAttributeLastItem(id, name) {
-    const {
-      storedConfigs
-    } = meshEdgesVertexAttribute(id);
+    const { storedConfigs } = meshEdgesVertexAttribute(id);
     if (storedConfigs && name in storedConfigs) {
       return storedConfigs[name].lastItem;
     }
     return 0;
   }
   function meshEdgesVertexAttributeItem(id) {
-    const {
-      item,
-      name
-    } = meshEdgesVertexAttribute(id);
+    const { item, name } = meshEdgesVertexAttribute(id);
     return item ?? meshEdgesVertexAttributeLastItem(id, name);
   }
-  function setMeshEdgesVertexAttribute(id, {
-    name,
-    item,
-    minimum,
-    maximum,
-    colorMap
-  }) {
+  function setMeshEdgesVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
     mutateMeshEdgesVertexStyle(id, {
       name,
-      item
+      item,
     });
     setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
-      colorMap
+      colorMap,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshEdgesVertexAttributeSchemas.attribute;
@@ -101,11 +89,11 @@ function useMeshEdgesVertexAttributeStyle() {
       item,
       points,
       minimum,
-      maximum
+      maximum,
     };
     return viewerStore.request({
       schema,
-      params
+      params,
     });
   }
   function applyVertexAttribute(id) {
@@ -117,7 +105,7 @@ function useMeshEdgesVertexAttributeStyle() {
       item,
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
-      colorMap: storedConfig.colorMap
+      colorMap: storedConfig.colorMap,
     };
     if (isMeshEdgesVertexAttributeValid(attribute)) {
       return setMeshEdgesVertexAttribute(id, attribute);
@@ -127,13 +115,13 @@ function useMeshEdgesVertexAttributeStyle() {
     const item = meshEdgesVertexAttributeLastItem(id, name);
     mutateMeshEdgesVertexStyle(id, {
       name,
-      item
+      item,
     });
     return applyVertexAttribute(id);
   }
   function setMeshEdgesVertexAttributeItem(id, item) {
     mutateMeshEdgesVertexStyle(id, {
-      item
+      item,
     });
     return applyVertexAttribute(id);
   }
@@ -148,7 +136,7 @@ function useMeshEdgesVertexAttributeStyle() {
     const item = meshEdgesVertexAttributeItem(id);
     setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
       minimum,
-      maximum
+      maximum,
     });
     return applyVertexAttribute(id);
   }
@@ -162,7 +150,7 @@ function useMeshEdgesVertexAttributeStyle() {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);
     setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
-      colorMap
+      colorMap,
     });
     return applyVertexAttribute(id);
   }
@@ -176,7 +164,7 @@ function useMeshEdgesVertexAttributeStyle() {
     setMeshEdgesVertexAttributeName,
     setMeshEdgesVertexAttributeItem,
     setMeshEdgesVertexAttributeRange,
-    setMeshEdgesVertexAttributeColorMap
+    setMeshEdgesVertexAttributeColorMap,
   };
 }
 export { isMeshEdgesVertexAttributeValid, useMeshEdgesVertexAttributeStyle };

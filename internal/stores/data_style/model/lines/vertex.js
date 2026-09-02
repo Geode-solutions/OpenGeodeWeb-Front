@@ -9,14 +9,14 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.vertex.attribute;
-function isModelLinesVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap
-}) {
-  return name !== undefined && item !== undefined && minimum !== undefined && maximum !== undefined && colorMap !== undefined;
+function isModelLinesVertexAttributeValid({ name, item, minimum, maximum, colorMap }) {
+  return (
+    name !== undefined &&
+    item !== undefined &&
+    minimum !== undefined &&
+    maximum !== undefined &&
+    colorMap !== undefined
+  );
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -28,26 +28,24 @@ function useModelLinesVertexAttribute() {
     return modelLinesCommonStyle.modelLineColoring(modelId, lineId).vertex;
   }
   function modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item) {
-    const {
-      storedConfigs
-    } = modelLinesVertexAttribute(modelId, lineId);
+    const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
     if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
       return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
       maximum: undefined,
-      colorMap: undefined
+      colorMap: undefined,
     };
   }
   function mutateModelLinesVertexStyle(modelId, lineIds, values) {
     if (lineIds.length > 1) {
       modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
-        vertex: values
+        vertex: values,
       });
     }
     return modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
-      vertex: values
+      vertex: values,
     });
   }
   function setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, config) {
@@ -55,18 +53,16 @@ function useModelLinesVertexAttribute() {
       storedConfigs: {
         [name]: {
           lastItem: item,
-          [item]: config
-        }
-      }
+          [item]: config,
+        },
+      },
     });
   }
   function modelLinesVertexAttributeName(modelId, lineId) {
     return modelLinesVertexAttribute(modelId, lineId).name;
   }
   function modelLinesVertexAttributeLastItem(modelId, lineId, name) {
-    const {
-      storedConfigs
-    } = modelLinesVertexAttribute(modelId, lineId);
+    const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
     if (!(name in storedConfigs)) {
       return 0;
     }
@@ -74,16 +70,16 @@ function useModelLinesVertexAttribute() {
   }
   function modelLinesVertexAttributeItem(modelId, lineId) {
     const vertexAttribute = modelLinesVertexAttribute(modelId, lineId);
-    return vertexAttribute.item ?? modelLinesVertexAttributeLastItem(modelId, lineId, vertexAttribute.name);
+    return (
+      vertexAttribute.item ??
+      modelLinesVertexAttributeLastItem(modelId, lineId, vertexAttribute.name)
+    );
   }
   function modelLinesVertexAttributeRange(modelId, lineId) {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
-    const {
-      minimum,
-      maximum
-    } = storedConfig;
+    const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
   function modelLinesVertexAttributeColorMap(modelId, lineId) {
@@ -92,21 +88,19 @@ function useModelLinesVertexAttribute() {
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.colorMap;
   }
-  async function setModelLinesVertexAttribute(modelId, lineIds, {
-    name,
-    item,
-    minimum,
-    maximum,
-    colorMap
-  }) {
+  async function setModelLinesVertexAttribute(
+    modelId,
+    lineIds,
+    { name, item, minimum, maximum, colorMap },
+  ) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
-      item
+      item,
     });
     setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
       minimum,
       maximum,
-      colorMap
+      colorMap,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
@@ -117,11 +111,11 @@ function useModelLinesVertexAttribute() {
       item,
       points,
       minimum,
-      maximum
+      maximum,
     };
     return viewerStore.request({
       schema: attributeSchema,
-      params
+      params,
     });
   }
   function applyVertexAttribute(modelId, lineIds) {
@@ -133,7 +127,7 @@ function useModelLinesVertexAttribute() {
       item,
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
-      colorMap: storedConfig.colorMap
+      colorMap: storedConfig.colorMap,
     };
     if (isModelLinesVertexAttributeValid(attribute)) {
       return setModelLinesVertexAttribute(modelId, lineIds, attribute);
@@ -144,13 +138,13 @@ function useModelLinesVertexAttribute() {
     const item = modelLinesVertexAttributeLastItem(modelId, lineIds[0], name);
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
-      item
+      item,
     });
     return applyVertexAttribute(modelId, lineIds);
   }
   function setModelLinesVertexAttributeItem(modelId, lineIds, item) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
-      item
+      item,
     });
     return applyVertexAttribute(modelId, lineIds);
   }
@@ -159,7 +153,7 @@ function useModelLinesVertexAttribute() {
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
       minimum,
-      maximum
+      maximum,
     });
     return applyVertexAttribute(modelId, lineIds);
   }
@@ -167,7 +161,7 @@ function useModelLinesVertexAttribute() {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
-      colorMap
+      colorMap,
     });
     return applyVertexAttribute(modelId, lineIds);
   }
@@ -181,7 +175,7 @@ function useModelLinesVertexAttribute() {
     setModelLinesVertexAttributeName,
     setModelLinesVertexAttributeItem,
     setModelLinesVertexAttributeRange,
-    setModelLinesVertexAttributeColorMap
+    setModelLinesVertexAttributeColorMap,
   };
 }
 export { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute };

@@ -16,14 +16,8 @@ function createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId) {
 }
 function performHoverHighlight(event, onResponse) {
   const hybridViewerStore = useHybridViewerStore();
-  const {
-    genericRenderWindow,
-    hybridDb
-  } = hybridViewerStore;
-  const {
-    is_hover_highlight,
-    hover_highlight_field_type
-  } = storeToRefs(hybridViewerStore);
+  const { genericRenderWindow, hybridDb } = hybridViewerStore;
+  const { is_hover_highlight, hover_highlight_field_type } = storeToRefs(hybridViewerStore);
   if (!is_hover_highlight.value) {
     return;
   }
@@ -38,40 +32,36 @@ function performHoverHighlight(event, onResponse) {
     x: Math.round(event.clientX - rect.left),
     y: Math.round(rect.height - (event.clientY - rect.top)),
     field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridDb)
+    ids: Object.keys(hybridDb),
   };
-  viewerStore.request({
-    schema,
-    params
-  }, {
-    response_function: onResponse
-  });
+  viewerStore.request(
+    {
+      schema,
+      params,
+    },
+    {
+      response_function: onResponse,
+    },
+  );
 }
-function createHoverHighlight({
-  hoverTimeoutRef,
-  currentHoverId,
-  clearHoverData
-}) {
-  return useDebounceFn(event => {
+function createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData }) {
+  return useDebounceFn((event) => {
     const hybridViewerStore = useHybridViewerStore();
-    const {
-      genericRenderWindow
-    } = hybridViewerStore;
-    const {
-      is_hover_highlight,
-      hoverData,
-      hoverPosition
-    } = storeToRefs(hybridViewerStore);
+    const { genericRenderWindow } = hybridViewerStore;
+    const { is_hover_highlight, hoverData, hoverPosition } = storeToRefs(hybridViewerStore);
     const containerElement = genericRenderWindow.value?.getContainer();
-    const relativeMousePosition = containerElement ? {
-      x: event.clientX - containerElement.getBoundingClientRect().left,
-      y: event.clientY - containerElement.getBoundingClientRect().top
-    } : {
-      x: event.clientX,
-      y: event.clientY
-    };
-    performHoverHighlight(event, async response => {
-      const isResponseValid = response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
+    const relativeMousePosition = containerElement
+      ? {
+          x: event.clientX - containerElement.getBoundingClientRect().left,
+          y: event.clientY - containerElement.getBoundingClientRect().top,
+        }
+      : {
+          x: event.clientX,
+          y: event.clientY,
+        };
+    performHoverHighlight(event, async (response) => {
+      const isResponseValid =
+        response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
       if (!is_hover_highlight.value || !isResponseValid) {
         clearHoverData();
         return;
@@ -100,7 +90,7 @@ function createHoverHighlight({
           componentInfo = {
             name: component.name,
             id: component.geode_id,
-            type: component.type
+            type: component.type,
           };
         }
       }
@@ -111,7 +101,7 @@ function createHoverHighlight({
         pickedId: response.picked_id,
         fieldType: response.field_type,
         component: componentInfo,
-        attributes: response.attributes || {}
+        attributes: response.attributes || {},
       };
       hoverTimeoutRef.value = setTimeout(() => {
         hoverPosition.value = relativeMousePosition;
@@ -122,23 +112,19 @@ function createHoverHighlight({
   }, HOVER_DEBOUNCE_MS);
 }
 function performClearHoverHighlight() {
-  const {
-    hybridDb
-  } = useHybridViewerStore();
-  const {
-    hover_highlight_field_type
-  } = storeToRefs(useHybridViewerStore());
+  const { hybridDb } = useHybridViewerStore();
+  const { hover_highlight_field_type } = storeToRefs(useHybridViewerStore());
   const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
   const params = {
     x: -1,
     y: -1,
     field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridDb)
+    ids: Object.keys(hybridDb),
   };
   viewerStore.request({
     schema,
-    params
+    params,
   });
 }
 function useHybridViewerHighlight() {
@@ -147,7 +133,7 @@ function useHybridViewerHighlight() {
   const hoverData = ref(undefined);
   const hoverPosition = ref({
     x: 0,
-    y: 0
+    y: 0,
   });
   const hoverTimeoutRef = ref(undefined);
   const currentHoverId = ref(undefined);
@@ -155,7 +141,7 @@ function useHybridViewerHighlight() {
   const hoverHighlight = createHoverHighlight({
     hoverTimeoutRef,
     currentHoverId,
-    clearHoverData
+    clearHoverData,
   });
   function clearHoverHighlight() {
     clearHoverData();
@@ -167,7 +153,13 @@ function useHybridViewerHighlight() {
     hoverData,
     hoverPosition,
     clearHoverHighlight,
-    hoverHighlight
+    hoverHighlight,
   };
 }
-export { createClearHoverData, createHoverHighlight, performClearHoverHighlight, performHoverHighlight, useHybridViewerHighlight };
+export {
+  createClearHoverData,
+  createHoverHighlight,
+  performClearHoverHighlight,
+  performHoverHighlight,
+  useHybridViewerHighlight,
+};

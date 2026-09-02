@@ -22,7 +22,9 @@ function findExecutableInDir(baseDir, execName, osExecutableName) {
     console.log(`[executablePath] Found OneDir executable: ${oneDirPath}`);
     return oneDirPath;
   }
-  console.log(`[executablePath] Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`);
+  console.log(
+    `[executablePath] Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`,
+  );
   return undefined;
 }
 function executableName(execName) {
@@ -41,7 +43,7 @@ function executablePath(execPath, execName) {
     execName,
     mode,
     nodeEnv,
-    resourcesPath
+    resourcesPath,
   });
   const foundAtExecPath = findExecutableInDir(execPath, execName, osExecutableName);
   if (foundAtExecPath) {
@@ -52,7 +54,9 @@ function executablePath(execPath, execName) {
     if (foundInResources) {
       return foundInResources;
     }
-    throw new Error(`Executable not found in execPath (${execPath}) or resourcesPath (${resourcesPath}): ${osExecutableName}`);
+    throw new Error(
+      `Executable not found in execPath (${execPath}) or resourcesPath (${resourcesPath}): ${osExecutableName}`,
+    );
   }
   if (commandExistsSync(osExecutableName)) {
     console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
@@ -63,7 +67,7 @@ function executablePath(execPath, execName) {
 function createPath(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, {
-      recursive: true
+      recursive: true,
     });
     console.log(`${dirPath} directory created successfully!`);
   }
@@ -81,10 +85,12 @@ async function lookForLocalExtensionDistPath(rootPath, extentionRepoName, fronte
   if (!fs.existsSync(localExtensionDistPath)) {
     return;
   }
-  console.log(`[extensionFrontendPath] Found existing folder: ${localExtensionDistPath}, deleting it...`);
+  console.log(
+    `[extensionFrontendPath] Found existing folder: ${localExtensionDistPath}, deleting it...`,
+  );
   fs.rmSync(localExtensionDistPath, {
     recursive: true,
-    force: true
+    force: true,
   });
   const now = new Date();
   fs.utimesSync(path.join(localExtensionPath, "package.json"), now, now);
@@ -106,10 +112,17 @@ async function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPa
     unzippedExtensionPath,
     frontendFile,
     rootPath,
-    extensionId
+    extensionId,
   });
-  const extentionRepoName = extensionId.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join("-");
-  const localFilePath = await lookForLocalExtensionDistPath(rootPath, extentionRepoName, frontendFile);
+  const extentionRepoName = extensionId
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("-");
+  const localFilePath = await lookForLocalExtensionDistPath(
+    rootPath,
+    extentionRepoName,
+    frontendFile,
+  );
   if (localFilePath) {
     return localFilePath;
   }
@@ -120,10 +133,21 @@ async function extensionFrontendPath(unzippedExtensionPath, frontendFile, rootPa
   throw new Error(`Failed to find ${unzippedfrontendFilePath}`);
 }
 function extensionBackendPath(unzippedExtensionPath, backendExecutableName) {
-  const backendExecutablePath = path.join(unzippedExtensionPath, executableName(backendExecutableName));
+  const backendExecutablePath = path.join(
+    unzippedExtensionPath,
+    executableName(backendExecutableName),
+  );
   console.log("runExtensions", {
-    backendExecutablePath
+    backendExecutablePath,
   });
   return backendExecutablePath;
 }
-export { createPath, extensionBackendPath, extensionFrontendPath, extensionFolderPath, executablePath, executableName, generateProjectFolderPath };
+export {
+  createPath,
+  extensionBackendPath,
+  extensionFrontendPath,
+  extensionFolderPath,
+  executablePath,
+  executableName,
+  generateProjectFolderPath,
+};

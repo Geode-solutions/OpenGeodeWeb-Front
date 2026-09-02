@@ -15,75 +15,62 @@ async function uploadExtension(file) {
 }
 function runExtensions() {
   const appStore = useAppStore();
-  const {
-    projectFolderPath
-  } = appStore;
-  const {
-    PROJECT: projectName
-  } = useRuntimeConfig().public;
-  const schema = isCloudMode() ? opengeodeweb_front_schemas.api.cloud.extensions.run : opengeodeweb_front_schemas.api.local.extensions.run;
+  const { projectFolderPath } = appStore;
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const schema = isCloudMode()
+    ? opengeodeweb_front_schemas.api.cloud.extensions.run
+    : opengeodeweb_front_schemas.api.local.extensions.run;
   const params = {
     projectFolderPath,
-    projectName
+    projectName,
   };
   return appStore.request({
     schema,
-    params
+    params,
   });
 }
 async function registerRunningExtensions() {
   const appStore = useAppStore();
   const infraStore = useInfraStore();
-  const {
-    extensionsArray
-  } = await runExtensions();
-  return Promise.all(extensionsArray.map(async extension => {
-    const {
-      id,
-      name,
-      version,
-      frontendContent,
-      port
-    } = extension;
-    const blob = new Blob([frontendContent], {
-      type: "application/javascript"
-    });
-    const blobUrl = URL.createObjectURL(blob);
-    const extensionModule = await appStore.loadExtension(blobUrl, port);
-    console.log("[ExtensionManager] Extension loaded:", id);
-    const storeFactory = extensionModule.metadata.store;
-    const store = storeFactory();
-    appStore.registerStore(store);
-    console.log("[ExtensionManager] Store registered:", store.$id);
-    infraStore.register_microservice(store);
-    return {
-      name,
-      version,
-      extensionModule
-    };
-  }));
+  const { extensionsArray } = await runExtensions();
+  return Promise.all(
+    extensionsArray.map(async (extension) => {
+      const { id, name, version, frontendContent, port } = extension;
+      const blob = new Blob([frontendContent], {
+        type: "application/javascript",
+      });
+      const blobUrl = URL.createObjectURL(blob);
+      const extensionModule = await appStore.loadExtension(blobUrl, port);
+      console.log("[ExtensionManager] Extension loaded:", id);
+      const storeFactory = extensionModule.metadata.store;
+      const store = storeFactory();
+      appStore.registerStore(store);
+      console.log("[ExtensionManager] Store registered:", store.$id);
+      infraStore.register_microservice(store);
+      return {
+        name,
+        version,
+        extensionModule,
+      };
+    }),
+  );
 }
 async function importExtensionFile(file) {
   await uploadExtension(file);
   return registerRunningExtensions();
 }
-function downloadExtension({
-  url,
-  extensionFileName
-}) {
+function downloadExtension({ url, extensionFileName }) {
   const appStore = useAppStore();
-  const {
-    PROJECT: projectName
-  } = useRuntimeConfig().public;
+  const { PROJECT: projectName } = useRuntimeConfig().public;
   const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
   const params = {
     projectName,
     url,
-    extensionFileName
+    extensionFileName,
   };
   return appStore.request({
     schema,
-    params
+    params,
   });
 }
 async function importExtensionURL(url) {
@@ -116,21 +103,25 @@ async function unloadExtension(extensionId) {
 }
 function killExtension(extensionId) {
   const appStore = useAppStore();
-  const {
-    projectFolderPath
-  } = appStore;
-  const {
-    PROJECT: projectName
-  } = useRuntimeConfig().public;
+  const { projectFolderPath } = appStore;
+  const { PROJECT: projectName } = useRuntimeConfig().public;
   const schema = opengeodeweb_front_schemas.api.local.extensions.kill;
   const params = {
     extensionId,
     projectFolderPath,
-    projectName
+    projectName,
   };
   return appStore.request({
     schema,
-    params
+    params,
   });
 }
-export { importExtensionFile, importExtensionURL, killExtension, registerRunningExtensions, runExtensions, unloadExtension, uploadExtension };
+export {
+  importExtensionFile,
+  importExtensionURL,
+  killExtension,
+  registerRunningExtensions,
+  runExtensions,
+  unloadExtension,
+  uploadExtension,
+};

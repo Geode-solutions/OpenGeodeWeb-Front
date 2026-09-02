@@ -7,12 +7,7 @@ function useModelColorStyle(componentStyleFunctions) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
-  const {
-    Surface,
-    Line,
-    Block,
-    Corner
-  } = componentStyleFunctions;
+  const { Surface, Line, Block, Corner } = componentStyleFunctions;
   const ATTRIBUTE_FUNCTIONS = {
     Surface: {
       vertex: {
@@ -21,7 +16,7 @@ function useModelColorStyle(componentStyleFunctions) {
         getRange: Surface.modelSurfacesVertexAttributeRange,
         setRange: Surface.setModelSurfacesVertexAttributeRange,
         getColorMap: Surface.modelSurfacesVertexAttributeColorMap,
-        setColorMap: Surface.setModelSurfacesVertexAttributeColorMap
+        setColorMap: Surface.setModelSurfacesVertexAttributeColorMap,
       },
       polygon: {
         getName: Surface.modelSurfacesPolygonAttributeName,
@@ -29,8 +24,8 @@ function useModelColorStyle(componentStyleFunctions) {
         getRange: Surface.modelSurfacesPolygonAttributeRange,
         setRange: Surface.setModelSurfacesPolygonAttributeRange,
         getColorMap: Surface.modelSurfacesPolygonAttributeColorMap,
-        setColorMap: Surface.setModelSurfacesPolygonAttributeColorMap
-      }
+        setColorMap: Surface.setModelSurfacesPolygonAttributeColorMap,
+      },
     },
     Line: {
       vertex: {
@@ -39,7 +34,7 @@ function useModelColorStyle(componentStyleFunctions) {
         getRange: Line.modelLinesVertexAttributeRange,
         setRange: Line.setModelLinesVertexAttributeRange,
         getColorMap: Line.modelLinesVertexAttributeColorMap,
-        setColorMap: Line.setModelLinesVertexAttributeColorMap
+        setColorMap: Line.setModelLinesVertexAttributeColorMap,
       },
       edge: {
         getName: Line.modelLinesEdgeAttributeName,
@@ -47,8 +42,8 @@ function useModelColorStyle(componentStyleFunctions) {
         getRange: Line.modelLinesEdgeAttributeRange,
         setRange: Line.setModelLinesEdgeAttributeRange,
         getColorMap: Line.modelLinesEdgeAttributeColorMap,
-        setColorMap: Line.setModelLinesEdgeAttributeColorMap
-      }
+        setColorMap: Line.setModelLinesEdgeAttributeColorMap,
+      },
     },
     Block: {
       vertex: {
@@ -57,7 +52,7 @@ function useModelColorStyle(componentStyleFunctions) {
         getRange: Block.modelBlocksVertexAttributeRange,
         setRange: Block.setModelBlocksVertexAttributeRange,
         getColorMap: Block.modelBlocksVertexAttributeColorMap,
-        setColorMap: Block.setModelBlocksVertexAttributeColorMap
+        setColorMap: Block.setModelBlocksVertexAttributeColorMap,
       },
       polyhedron: {
         getName: Block.modelBlocksPolyhedronAttributeName,
@@ -65,8 +60,8 @@ function useModelColorStyle(componentStyleFunctions) {
         getRange: Block.modelBlocksPolyhedronAttributeRange,
         setRange: Block.setModelBlocksPolyhedronAttributeRange,
         getColorMap: Block.modelBlocksPolyhedronAttributeColorMap,
-        setColorMap: Block.setModelBlocksPolyhedronAttributeColorMap
-      }
+        setColorMap: Block.setModelBlocksPolyhedronAttributeColorMap,
+      },
     },
     Corner: {
       vertex: {
@@ -75,15 +70,18 @@ function useModelColorStyle(componentStyleFunctions) {
         getRange: Corner.modelCornersVertexAttributeRange,
         setRange: Corner.setModelCornersVertexAttributeRange,
         getColorMap: Corner.modelCornersVertexAttributeColorMap,
-        setColorMap: Corner.setModelCornersVertexAttributeColorMap
-      }
-    }
+        setColorMap: Corner.setModelCornersVertexAttributeColorMap,
+      },
+    },
   };
   function getModelComponentColor(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).coloring?.constant;
   }
   function modelComponentTypeColor(modelId, type) {
-    return dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.constant || dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.constant;
+    return (
+      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.constant ||
+      dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.constant
+    );
   }
   function getModelComponentEffectiveColor(modelId, componentId, type) {
     const individualColor = getModelComponentColor(modelId, componentId);
@@ -96,25 +94,40 @@ function useModelColorStyle(componentStyleFunctions) {
     return dataStyleState.getComponentStyle(modelId, componentId).coloring?.active;
   }
   function getModelComponentTypeActiveColoring(modelId, type) {
-    return dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.active || dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.active;
+    return (
+      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.active ||
+      dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.active
+    );
   }
-  async function setModelComponentsColor(modelId, componentIds, color, activeColoring = "constant") {
+  async function setModelComponentsColor(
+    modelId,
+    componentIds,
+    color,
+    activeColoring = "constant",
+  ) {
     await modelCommonStyle.mutateComponentStyles(modelId, componentIds, {
       coloring: {
         constant: color,
-        active: activeColoring
-      }
+        active: activeColoring,
+      },
     });
-    return await dispatchToComponentTypes(modelId, componentIds, "Color", {
-      componentStyleFunctions
-    }, color, activeColoring);
+    return await dispatchToComponentTypes(
+      modelId,
+      componentIds,
+      "Color",
+      {
+        componentStyleFunctions,
+      },
+      color,
+      activeColoring,
+    );
   }
   async function setModelComponentTypeColor(modelId, type, color) {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
       coloring: {
         constant: color,
-        active: "constant"
-      }
+        active: "constant",
+      },
     });
     const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
     if (idsForType.length === 0) {
@@ -125,8 +138,8 @@ function useModelColorStyle(componentStyleFunctions) {
   async function setModelComponentTypeActiveColoring(modelId, type, activeColoring) {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
       coloring: {
-        active: activeColoring
-      }
+        active: activeColoring,
+      },
     });
     const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
     if (idsForType.length === 0) {
@@ -138,17 +151,11 @@ function useModelColorStyle(componentStyleFunctions) {
     }
     await modelCommonStyle.mutateComponentStyles(modelId, idsForType, {
       coloring: {
-        active: activeColoring
-      }
+        active: activeColoring,
+      },
     });
-    const {
-      getName,
-      setName,
-      getRange,
-      setRange,
-      getColorMap,
-      setColorMap
-    } = ATTRIBUTE_FUNCTIONS[type][activeColoring];
+    const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
+      ATTRIBUTE_FUNCTIONS[type][activeColoring];
     const name = getName(modelId, idsForType[0]);
     if (name) {
       await setName(modelId, idsForType, name);
@@ -165,22 +172,16 @@ function useModelColorStyle(componentStyleFunctions) {
   async function setModelComponentActiveColoring(modelId, componentId, activeColoring) {
     await modelCommonStyle.mutateComponentStyle(modelId, componentId, {
       coloring: {
-        active: activeColoring
-      }
+        active: activeColoring,
+      },
     });
     if (activeColoring === "random" || activeColoring === "constant") {
       await setModelComponentsColor(modelId, [componentId], undefined, activeColoring);
       return;
     }
     const type = await dataStore.meshComponentType(modelId, componentId);
-    const {
-      getName,
-      setName,
-      getRange,
-      setRange,
-      getColorMap,
-      setColorMap
-    } = ATTRIBUTE_FUNCTIONS[type][activeColoring];
+    const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
+      ATTRIBUTE_FUNCTIONS[type][activeColoring];
     const name = getName(modelId, componentId);
     if (name) {
       await setName(modelId, [componentId], name);
@@ -211,7 +212,7 @@ function useModelColorStyle(componentStyleFunctions) {
     setModelComponentTypeColor,
     setModelComponentTypeActiveColoring,
     setModelComponentActiveColoring,
-    setModelComponentsColor
+    setModelComponentsColor,
   };
 }
 export { useModelColorStyle };

@@ -44,4 +44,15 @@ async function getViewerWebSocketClient() {
   const viewerBaseUrl = await getViewerBaseUrl();
   return setViewerWebSocketClient(viewerBaseUrl);
 }
-export { getAppBaseUrl, getBackBaseUrl, getIsAppReady, getViewerBaseUrl, getViewerWebSocketClient, setAppBaseUrl, setBackBaseUrl, setIsAppReady, setViewerBaseUrl, setViewerWebSocketClient };
+export {
+  getAppBaseUrl,
+  getBackBaseUrl,
+  getIsAppReady,
+  getViewerBaseUrl,
+  getViewerWebSocketClient,
+  setAppBaseUrl,
+  setBackBaseUrl,
+  setIsAppReady,
+  setViewerBaseUrl,
+  setViewerWebSocketClient,
+};

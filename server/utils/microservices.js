@@ -15,11 +15,17 @@ import { executablePath } from "./path.js";
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
 const MAX_PORT_RETRIES = 1;
-async function runScript(execPath, execName, args, expectedResponse, timeoutSeconds = DEFAULT_TIMEOUT_SECONDS) {
+async function runScript(
+  execPath,
+  execName,
+  args,
+  expectedResponse,
+  timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
+) {
   const command = executablePath(execPath, execName);
   console.log("runScript", command, args);
   const child = child_process.spawn(command, args, {
-    stdio: ["ignore", "pipe", "pipe"]
+    stdio: ["ignore", "pipe", "pipe"],
   });
   child.name = command.replace(/^.*[\\/]/u, "");
   child.on("spawn", () => {
@@ -44,14 +50,23 @@ function isPortInUseError(errorMessage) {
   return /EADDRINUSE|address already in use|port already in use/iu.test(errorMessage);
 }
 function backArgs(args, port) {
-  const {
-    projectFolderPath
-  } = args;
+  const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
   const uploadFolderPath = args.uploadFolderPath || path.join(projectFolderPath, "uploads");
-  const executableArgs = ["--port", String(port), "--project_folder_path", projectFolderPath, "--upload_folder_path", uploadFolderPath, "--allowed_origins", "http://localhost:*", "--timeout", "0"];
+  const executableArgs = [
+    "--port",
+    String(port),
+    "--project_folder_path",
+    projectFolderPath,
+    "--upload_folder_path",
+    uploadFolderPath,
+    "--allowed_origins",
+    "http://localhost:*",
+    "--timeout",
+    "0",
+  ];
   if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
     executableArgs.push("--debug");
   }
@@ -78,16 +93,21 @@ async function runBack(execName, execPath, args = {}, attempts = 0) {
   }
 }
 async function runViewer(execName, execPath, args = {}, attempts = 0) {
-  const {
-    projectFolderPath
-  } = args;
+  const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
   let port = undefined;
   try {
     port = await getAvailablePort();
-    const viewerArgs = ["--port", String(port), "--project_folder_path", projectFolderPath, "--timeout", "0"];
+    const viewerArgs = [
+      "--port",
+      String(port),
+      "--project_folder_path",
+      projectFolderPath,
+      "--timeout",
+      "0",
+    ];
     console.log("runViewer", execPath, execName, viewerArgs);
     await runScript(execPath, execName, viewerArgs, "Starting factory");
     return port;
@@ -136,8 +156,15 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
     serviceObj.url = `ws://localhost:${serviceObj.port}/ws`;
   }
   microservices.push(serviceObj);
-  fs.writeFileSync(microservicesMetadatasPath(projectFolderPath), JSON.stringify({
-    microservices
-  }, undefined, 2));
+  fs.writeFileSync(
+    microservicesMetadatasPath(projectFolderPath),
+    JSON.stringify(
+      {
+        microservices,
+      },
+      undefined,
+      2,
+    ),
+  );
 }
 export { addMicroserviceMetadatas, runBack, runExtension, runViewer };

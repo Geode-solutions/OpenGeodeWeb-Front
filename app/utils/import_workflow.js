@@ -21,8 +21,10 @@ async function importItem(item) {
   }
   const registerTask = dataStore.registerObject(item.id, item.name);
   const addDataTask = dataStore.addItem(item);
-  const addDataComponentsTask = item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
-  const addDataRelationsTask = item.viewer_type === "model" ? dataStore.addComponentRelations(item) : Promise.resolve();
+  const addDataComponentsTask =
+    item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
+  const addDataRelationsTask =
+    item.viewer_type === "model" ? dataStore.addComponentRelations(item) : Promise.resolve();
   treeviewStore.addItem(item.geode_object_type, item.name, item.id, item.viewer_type);
   const addDataStyleTask = dataStyleStore.addDataStyle(item.id, item.geode_object_type);
   const addViewerTask = addDataTask.then(async () => {
@@ -31,13 +33,22 @@ async function importItem(item) {
     }
     return hybridViewerStore.addItem(item.id);
   });
-  const applyStyleTask = Promise.all([registerTask, addDataComponentsTask, addDataStyleTask]).then(async () => {
-    if (await dataStore.isItemViewable(item)) {
-      return dataStyleStore.applyDefaultStyle(item.id);
-    }
-    return undefined;
-  });
-  await Promise.all([registerTask, addDataTask, addDataComponentsTask, addDataRelationsTask, addViewerTask, applyStyleTask]);
+  const applyStyleTask = Promise.all([registerTask, addDataComponentsTask, addDataStyleTask]).then(
+    async () => {
+      if (await dataStore.isItemViewable(item)) {
+        return dataStyleStore.applyDefaultStyle(item.id);
+      }
+      return undefined;
+    },
+  );
+  await Promise.all([
+    registerTask,
+    addDataTask,
+    addDataComponentsTask,
+    addDataRelationsTask,
+    addViewerTask,
+    applyStyleTask,
+  ]);
   return item.id;
 }
 async function importFile(filename, geode_object_type) {
@@ -45,11 +56,11 @@ async function importFile(filename, geode_object_type) {
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
   const params = {
     geode_object_type,
-    filename
+    filename,
   };
   const response = await backStore.request({
     schema,
-    params
+    params,
   });
   return importItem(response);
 }
@@ -65,10 +76,9 @@ async function importWorkflow(files) {
       return;
     }
     const chunk = chunks[chunkIndex];
-    const chunk_results = await Promise.all(chunk.map(({
-      filename,
-      geode_object_type
-    }) => importFile(filename, geode_object_type)));
+    const chunk_results = await Promise.all(
+      chunk.map(({ filename, geode_object_type }) => importFile(filename, geode_object_type)),
+    );
     results.push(...chunk_results);
     await processChunk(chunkIndex + 1);
   }
@@ -79,7 +89,7 @@ async function importWorkflow(files) {
 }
 async function importWorkflowFromSnapshot(items) {
   console.log("[importWorkflowFromSnapshot] start", {
-    count: items?.length
+    count: items?.length,
   });
   const hybridViewerStore = useHybridViewerStore();
   const chunk_size = 5;
@@ -93,14 +103,14 @@ async function importWorkflowFromSnapshot(items) {
       return;
     }
     const chunk = chunks[chunkIndex];
-    const chunk_ids = await Promise.all(chunk.map(item => importItem(item)));
+    const chunk_ids = await Promise.all(chunk.map((item) => importItem(item)));
     ids.push(...chunk_ids);
     await processChunk(chunkIndex + 1);
   }
   await processChunk(0);
   hybridViewerStore.remoteRender();
   console.log("[importWorkflowFromSnapshot] done", {
-    ids
+    ids,
   });
   return ids;
 }
