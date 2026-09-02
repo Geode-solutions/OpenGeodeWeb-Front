@@ -169,11 +169,7 @@ function useModelVisibilityStyle(componentStyleFunctions) {
   }
 
   // oxlint-disable-next-line func-names
-  setModelComponentTypeVisibility = async function (
-    modelId,
-    componentType,
-    visibility,
-  ) {
+  setModelComponentTypeVisibility = async function (modelId, componentType, visibility) {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
       visibility,
     });
