@@ -39,7 +39,7 @@ function handleUpdate(val) {
     >
       <v-card-title
         class="d-flex align-center py-2 px-3 text-caption text-uppercase font-weight-black text-medium-emphasis"
-        style="font-size: 0.75rem !important;"
+        style="font-size: 0.75rem !important"
       >
         <v-icon icon="mdi-layers-triple" size="small" class="mr-2" color="secondary" />
         Overlapping objects
