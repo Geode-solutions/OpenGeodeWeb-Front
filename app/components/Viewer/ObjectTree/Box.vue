@@ -100,8 +100,9 @@ watch(
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
       <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
       <span
-        class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
+        class="text-subtitle-2 font-weight-medium d-inline-flex align-center"
         style="
+          font-size: 0.875rem !important;
           height: 24px;
           line-height: 1;
           overflow: hidden;
@@ -177,5 +178,6 @@ watch(
   background-color: rgba(255, 255, 255, 0.05);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
+  font-size: 0.875rem !important;
 }
 </style>
