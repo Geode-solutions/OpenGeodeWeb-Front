@@ -17,10 +17,15 @@ async function importItem(item) {
   const treeviewStore = useTreeviewStore();
   if (item.nb_vertices === 0) {
     const feedbackStore = useFeedbackStore();
-    feedbackStore.add_warning(`Pointset "${item.name}" is empty`);
+    feedbackStore.add_warning(`"${item.geode_object_type}" with name "${item.name}" is empty`);
   }
-  const registerTask = dataStore.registerObject(item.id, item.name);
   const addDataTask = dataStore.addItem(item);
+  const registerTask = addDataTask.then(async () => {
+     if (!(await dataStore.isItemViewable(item))) {
+      return;
+    }
+    return dataStore.registerObject(item.id, item.name)
+  });
   const addDataComponentsTask =
     item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
   const addDataRelationsTask =
