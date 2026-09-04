@@ -15,7 +15,6 @@ import { executablePath } from "./path.js";
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
 const MAX_PORT_RETRIES = 1;
-
 async function runScript(
   execPath,
   execName,
@@ -25,23 +24,18 @@ async function runScript(
 ) {
   const command = executablePath(execPath, execName);
   console.log("runScript", command, args);
-
   const child = child_process.spawn(command, args, {
     stdio: ["ignore", "pipe", "pipe"],
   });
-
   child.name = command.replace(/^.*[\\/]/u, "");
-
   child.on("spawn", () => {
     console.log(`[${child.name}] spawned, pid=${child.pid}`);
   });
-
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutSeconds * MILLISECONDS_PER_SECOND);
   if (typeof timer.unref === "function") {
     timer.unref();
   }
-
   try {
     const result = await waitForReady(child, expectedResponse, controller.signal);
     clearTimeout(timer);
@@ -52,7 +46,6 @@ async function runScript(
     throw error;
   }
 }
-
 function isPortInUseError(errorMessage) {
   return /EADDRINUSE|address already in use|port already in use/iu.test(errorMessage);
 }
@@ -96,8 +89,8 @@ async function runBack(execName, execPath, args = {}, attempts = 0) {
     }
     if (attempts <= MAX_PORT_RETRIES) {
       console.log("Retrying runBack on conflicting port", port);
-      const retryPort = await runBack(execName, execPath, args, attempts + 1);
-      return retryPort;
+      const newPort = await runBack(execName, execPath, args, attempts + 1);
+      return newPort;
     }
   }
 }
@@ -128,8 +121,8 @@ async function runViewer(execName, execPath, args = {}, attempts = 0) {
     }
     if (attempts <= MAX_PORT_RETRIES) {
       console.log("Retrying runViewer on conflicting port", port);
-      const retryPort = await runViewer(execName, execPath, args, attempts + 1);
-      return retryPort;
+      const newPort = await runViewer(execName, execPath, args, attempts + 1);
+      return newPort;
     }
   }
 }
@@ -151,12 +144,11 @@ async function runExtension(extensionId, execName, execPath, args = {}, attempts
     }
     if (attempts <= MAX_PORT_RETRIES) {
       console.log("Retrying runExtension on conflicting port", port);
-      const retryPort = await runExtension(extensionId, execName, execPath, args, attempts + 1);
-      return retryPort;
+      const newPort = await runExtension(extensionId, execName, execPath, args, attempts + 1);
+      return newPort;
     }
   }
 }
-
 function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   const microservices = projectMicroservices(projectFolderPath);
   if (serviceObj.type === "back") {
@@ -167,12 +159,16 @@ function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
   } else if (serviceObj.type === "viewer") {
     serviceObj.url = `ws://localhost:${serviceObj.port}/ws`;
   }
-
   microservices.push(serviceObj);
   fs.writeFileSync(
     microservicesMetadatasPath(projectFolderPath),
-    JSON.stringify({ microservices }, undefined, 2),
+    JSON.stringify(
+      {
+        microservices,
+      },
+      undefined,
+      2,
+    ),
   );
 }
-
 export { addMicroserviceMetadatas, runBack, runExtension, runViewer };

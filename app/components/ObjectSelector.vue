@@ -51,7 +51,6 @@ async function getAllowedGeodeObjects() {
   }
   toggleLoading();
 }
-
 // oxlint-disable-next-line no-top-level-await
 await getAllowedGeodeObjects();
 </script>

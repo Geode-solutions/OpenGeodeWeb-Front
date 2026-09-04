@@ -26,7 +26,6 @@ function useClippingPlanesWidget({
   let fromWidget = false;
   let maxDistance = 0;
   let isLimitingCameraZoom = false;
-
   function resolveActiveActors() {
     const targetIds = targetAllVisible.value
       ? allItems.value.map((item) => item.id)
@@ -44,15 +43,12 @@ function useClippingPlanesWidget({
       .map((entry) => entry && entry.actor)
       .filter(Boolean);
   }
-
   function getSceneBoundsInfo() {
     return computeSceneBoundsInfo(resolveActiveActors());
   }
-
   function getSceneCenter() {
     return getSceneBoundsInfo().center;
   }
-
   function createWidgetEntry(planeWidget, widgetHandle, planeIndex) {
     const widgetState = planeWidget.getWidgetState();
     const plane = planes.value[planeIndex];
@@ -84,10 +80,12 @@ function useClippingPlanesWidget({
       });
       debouncedApply();
     });
-
-    return { planeWidget, widgetHandle, subscription };
+    return {
+      planeWidget,
+      widgetHandle,
+      subscription,
+    };
   }
-
   function syncWidgets() {
     if (!widgetManager || !localRenderWindow) {
       return;
@@ -123,22 +121,18 @@ function useClippingPlanesWidget({
     }
     localRenderWindow.getRenderWindow().render();
   }
-
   function limitCameraZoomOut(camera) {
     if (maxDistance <= 0 || isLimitingCameraZoom) {
       return;
     }
-
     const currentDist = camera.getDistance();
     if (currentDist <= maxDistance + CHANGE_THRESHOLD) {
       return;
     }
-
     isLimitingCameraZoom = true;
     const focal = camera.getFocalPoint();
     const pos = camera.getPosition();
     const ratio = maxDistance / currentDist;
-
     camera.setPosition(
       focal[0] + (pos[0] - focal[0]) * ratio,
       focal[1] + (pos[1] - focal[1]) * ratio,
@@ -147,7 +141,6 @@ function useClippingPlanesWidget({
     localRenderWindow.getRenderWindow().render();
     isLimitingCameraZoom = false;
   }
-
   function syncLocalCamera() {
     if (!localRenderWindow) {
       return;
@@ -178,11 +171,9 @@ function useClippingPlanesWidget({
         }
       }
     }
-
     limitCameraZoomOut(camera);
     localRenderWindow.getRenderWindow().render();
   }
-
   function cleanupLocalWidget() {
     maxDistance = 0;
     isLimitingCameraZoom = false;
@@ -200,7 +191,6 @@ function useClippingPlanesWidget({
       widgetManager = undefined;
     }
   }
-
   function updateWidgetPlacement({ isReset = false } = {}) {
     if (!widgetManager || !localRenderWindow) {
       return;
@@ -242,11 +232,9 @@ function useClippingPlanesWidget({
   function isFromWidget() {
     return fromWidget;
   }
-
   function setFromWidget(value) {
     fromWidget = value;
   }
-
   return {
     getSceneCenter,
     syncWidgets,
@@ -258,5 +246,4 @@ function useClippingPlanesWidget({
     setFromWidget,
   };
 }
-
 export { useClippingPlanesWidget };

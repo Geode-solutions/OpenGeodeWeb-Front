@@ -1,6 +1,6 @@
 export function useTreeScroll(propsIn, emit, displayItems, actualItemProps) {
   const SCROLL_STICKY_THRESHOLD = 10;
-  const DEFAULT_ITEM_HEIGHT = 44;
+  const DEFAULT_ITEM_HEIGHT = 28;
 
   const props = toRef(propsIn);
   const internalScrollTop = ref(props.value.scrollTop || 0);
@@ -81,11 +81,23 @@ export function useTreeScroll(propsIn, emit, displayItems, actualItemProps) {
     }
   }
 
+  function getScrollInfo() {
+    const container = virtualScrollRef.value?.$el;
+    const containerHeight = container ? container.clientHeight : 0;
+    const itemHeight = actualItemProps.value?.height || DEFAULT_ITEM_HEIGHT;
+    return {
+      scrollTop: internalScrollTop.value,
+      containerHeight,
+      itemHeight,
+    };
+  }
+
   return {
     internalScrollTop,
     virtualScrollRef,
     stickyHeader,
     handleScroll,
     scrollToIndex,
+    getScrollInfo,
   };
 }

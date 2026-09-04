@@ -168,6 +168,7 @@ watch(filteredPresets, drawAllCanvases);
         </v-list-item>
       </template>
     </v-list>
+    <slot></slot>
   </GlassCard>
 </template>
 

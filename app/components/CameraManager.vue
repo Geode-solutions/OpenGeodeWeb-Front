@@ -30,14 +30,7 @@ const show = computed({
 </script>
 
 <template>
-  <ToolPanel
-    v-model="show"
-    title="Camera Positions"
-    :width="width"
-    :escapeFunction="handleClose"
-    style="top: 90px; right: 55px"
-    z-index="1"
-  >
+  <ToolPanel v-model="show" title="Camera Positions" :width="width" :escapeFunction="handleClose">
     <v-card-text class="pa-0">
       <Saver />
       <v-divider />

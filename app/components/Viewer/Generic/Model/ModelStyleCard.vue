@@ -115,7 +115,7 @@ const modelComponentsActiveColoring = computed({
     await dataStyleStore.setModelComponentsColor(
       modelId.value,
       selection.value,
-      modelComponentsColor.value,
+      dataStyleStore.getModelColor(modelId.value),
       coloringType,
     );
     hybridViewerStore.remoteRender();

@@ -10,7 +10,6 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const modelBlockPolyhedronAttributeSchema =
   viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.polyhedron.attribute;
-
 function isModelBlocksPolyhedronAttributeValid({ name, item, minimum, maximum, colorMap }) {
   return (
     name !== undefined &&
@@ -26,11 +25,9 @@ function useModelBlocksPolyhedronAttribute() {
   const dataStore = useDataStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const viewerStore = useViewerStore();
-
   function modelBlocksPolyhedronAttribute(modelId, blockId) {
     return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).polyhedron;
   }
-
   function modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
     if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
@@ -42,7 +39,6 @@ function useModelBlocksPolyhedronAttribute() {
       colorMap: undefined,
     };
   }
-
   function mutateModelBlocksPolyhedronStyle(modelId, blockIds, values) {
     if (blockIds.length > 1) {
       modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
@@ -53,7 +49,6 @@ function useModelBlocksPolyhedronAttribute() {
       polyhedron: values,
     });
   }
-
   function setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, config) {
     return mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       storedConfigs: {
@@ -64,11 +59,9 @@ function useModelBlocksPolyhedronAttribute() {
       },
     });
   }
-
   function modelBlocksPolyhedronAttributeName(modelId, blockId) {
     return modelBlocksPolyhedronAttribute(modelId, blockId).name;
   }
-
   function modelBlocksPolyhedronAttributeLastItem(modelId, blockId, name) {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
     if (!(name in storedConfigs)) {
@@ -76,7 +69,6 @@ function useModelBlocksPolyhedronAttribute() {
     }
     return storedConfigs[name].lastItem;
   }
-
   function modelBlocksPolyhedronAttributeItem(modelId, blockId) {
     const polyhedronAttribute = modelBlocksPolyhedronAttribute(modelId, blockId);
     return (
@@ -84,7 +76,6 @@ function useModelBlocksPolyhedronAttribute() {
       modelBlocksPolyhedronAttributeLastItem(modelId, blockId, polyhedronAttribute.name)
     );
   }
-
   function modelBlocksPolyhedronAttributeRange(modelId, blockId) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
@@ -92,20 +83,21 @@ function useModelBlocksPolyhedronAttribute() {
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-
   function modelBlocksPolyhedronAttributeColorMap(modelId, blockId) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
     return storedConfig.colorMap;
   }
-
   async function setModelBlocksPolyhedronAttribute(
     modelId,
     blockIds,
     { name, item, minimum, maximum, colorMap },
   ) {
-    mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item });
+    mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+      name,
+      item,
+    });
     setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
       minimum,
       maximum,
@@ -122,9 +114,11 @@ function useModelBlocksPolyhedronAttribute() {
       minimum,
       maximum,
     };
-    return viewerStore.request({ schema: modelBlockPolyhedronAttributeSchema, params });
+    return viewerStore.request({
+      schema: modelBlockPolyhedronAttributeSchema,
+      params,
+    });
   }
-
   function applyPolyhedronAttribute(modelId, blockIds) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
@@ -146,18 +140,20 @@ function useModelBlocksPolyhedronAttribute() {
     }
     return Promise.resolve();
   }
-
   function setModelBlocksPolyhedronAttributeName(modelId, blockIds, name) {
     const item = modelBlocksPolyhedronAttributeLastItem(modelId, blockIds[0], name);
-    mutateModelBlocksPolyhedronStyle(modelId, blockIds, { name, item });
+    mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+      name,
+      item,
+    });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
-
   function setModelBlocksPolyhedronAttributeItem(modelId, blockIds, item) {
-    mutateModelBlocksPolyhedronStyle(modelId, blockIds, { item });
+    mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+      item,
+    });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
-
   function setModelBlocksPolyhedronAttributeRange(modelId, blockIds, minimum, maximum) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
@@ -167,14 +163,14 @@ function useModelBlocksPolyhedronAttribute() {
     });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
-
   function setModelBlocksPolyhedronAttributeColorMap(modelId, blockIds, colorMap) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
-    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, { colorMap });
+    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+      colorMap,
+    });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
-
   return {
     modelBlocksPolyhedronAttributeName,
     modelBlocksPolyhedronAttributeItem,
@@ -188,5 +184,4 @@ function useModelBlocksPolyhedronAttribute() {
     setModelBlocksPolyhedronAttributeColorMap,
   };
 }
-
 export { isModelBlocksPolyhedronAttributeValid, useModelBlocksPolyhedronAttribute };

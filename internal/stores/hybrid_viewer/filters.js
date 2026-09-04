@@ -6,33 +6,40 @@ async function performSetClippingPlanes(ids, planes) {
   const viewerStore = useViewerStore();
   const { remoteRender } = useHybridViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.clipping_planes;
-  const params = { ids, planes };
-  await viewerStore.request({ schema, params });
+  const params = {
+    ids,
+    planes,
+  };
+  await viewerStore.request({
+    schema,
+    params,
+  });
   await remoteRender();
 }
-
 async function performSetShrink(ids, shrink_factor) {
   const viewerStore = useViewerStore();
   const { remoteRender } = useHybridViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.shrink;
-  const params = { ids, shrink_factor };
-  await viewerStore.request({ schema, params });
+  const params = {
+    ids,
+    shrink_factor,
+  };
+  await viewerStore.request({
+    schema,
+    params,
+  });
   await remoteRender();
 }
-
 function useHybridViewerFilters() {
   async function setClippingPlanes(ids, planes) {
     await performSetClippingPlanes(ids, planes);
   }
-
   async function setShrink(ids, shrink_factor) {
     await performSetShrink(ids, shrink_factor);
   }
-
   return {
     setClippingPlanes,
     setShrink,
   };
 }
-
 export { performSetClippingPlanes, performSetShrink, useHybridViewerFilters };

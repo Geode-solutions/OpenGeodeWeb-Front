@@ -21,6 +21,7 @@ const allItems = dataStore.refAllItems();
 const availableDatasets = computed(() =>
   allItems.value.map((item) => ({ title: item.name || item.id, value: item.id })),
 );
+const widgetContainer = useTemplateRef("widgetContainer");
 let debouncedApply = undefined;
 
 const {

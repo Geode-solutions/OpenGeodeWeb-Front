@@ -36,18 +36,18 @@ const dragStartY = ref(0);
 const menuX = ref(x);
 const menuY = ref(y);
 
-watch(show_menu, (newVal) => {
-  if (!newVal) {
-    menuStore.closeMenu();
-  }
-});
-
 function clampPosition(posX, posY) {
   const margin = RADIUS + MARGIN_OFFSET;
   return {
     x: Math.min(Math.max(posX, margin), containerWidth - margin),
     y: Math.min(Math.max(posY, margin), containerHeight - margin),
   };
+}
+
+function startDrag(event) {
+  isDragging.value = true;
+  dragStartX.value = event.clientX - menuX.value;
+  dragStartY.value = event.clientY - menuY.value;
 }
 
 function handleDrag(event) {
@@ -65,6 +65,12 @@ function stopDrag(event) {
   event.stopPropagation();
   menuStore.setMenuPosition(menuX.value, menuY.value);
 }
+
+watch(show_menu, (newVal) => {
+  if (!newVal) {
+    menuStore.closeMenu();
+  }
+});
 
 watch(
   () => [x, y, containerWidth, containerHeight],
@@ -138,12 +144,6 @@ const isOverToolbar = computed(() => {
     btnY + btnHeight > rect.top
   );
 });
-
-function startDrag(event) {
-  isDragging.value = true;
-  dragStartX.value = event.clientX - menuX.value;
-  dragStartY.value = event.clientY - menuY.value;
-}
 
 function getMenuStyle() {
   return {

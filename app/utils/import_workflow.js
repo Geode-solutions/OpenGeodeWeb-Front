@@ -15,12 +15,10 @@ async function importItem(item) {
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
   const treeviewStore = useTreeviewStore();
-
   if (item.nb_vertices === 0) {
     const feedbackStore = useFeedbackStore();
     feedbackStore.add_warning(`Pointset "${item.name}" is empty`);
   }
-
   const registerTask = dataStore.registerObject(item.id, item.name);
   const addDataTask = dataStore.addItem(item);
   const addDataComponentsTask =
@@ -53,7 +51,6 @@ async function importItem(item) {
   ]);
   return item.id;
 }
-
 async function importFile(filename, geode_object_type) {
   const backStore = useBackStore();
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
@@ -61,7 +58,10 @@ async function importFile(filename, geode_object_type) {
     geode_object_type,
     filename,
   };
-  const response = await backStore.request({ schema, params });
+  const response = await backStore.request({
+    schema,
+    params,
+  });
   return importItem(response);
 }
 
@@ -93,13 +93,11 @@ async function importWorkflow(files) {
 async function importWorkflowFromSnapshot(items) {
   console.log("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
-
   const chunk_size = 5;
   const chunks = [];
   for (let i = 0; i < items.length; i += chunk_size) {
     chunks.push(items.slice(i, i + chunk_size));
   }
-
   const ids = [];
   async function processChunk(chunkIndex) {
     if (chunkIndex >= chunks.length) {
@@ -112,8 +110,9 @@ async function importWorkflowFromSnapshot(items) {
   }
   await processChunk(0);
   hybridViewerStore.remoteRender();
-  console.log("[importWorkflowFromSnapshot] done", { ids });
+  console.log("[importWorkflowFromSnapshot] done", {
+    ids,
+  });
   return ids;
 }
-
 export { importFile, importWorkflow, importWorkflowFromSnapshot, importItem };
