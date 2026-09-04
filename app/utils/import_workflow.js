@@ -64,12 +64,14 @@ async function importFile(filename, geode_object_type) {
   });
   return importItem(response);
 }
+
 async function importWorkflow(files) {
   const chunk_size = 5;
   const chunks = [];
   for (let i = 0; i < files.length; i += chunk_size) {
     chunks.push(files.slice(i, i + chunk_size));
   }
+
   const results = [];
   async function processChunk(chunkIndex) {
     if (chunkIndex >= chunks.length) {
@@ -87,10 +89,9 @@ async function importWorkflow(files) {
   hybridViewerStore.remoteRender();
   return results;
 }
+
 async function importWorkflowFromSnapshot(items) {
-  console.log("[importWorkflowFromSnapshot] start", {
-    count: items?.length,
-  });
+  console.log("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
   const chunk_size = 5;
   const chunks = [];

@@ -14,6 +14,7 @@ function createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId) {
     currentHoverId.value = undefined;
   };
 }
+
 function performHoverHighlight(event, onResponse) {
   const hybridViewerStore = useHybridViewerStore();
   const { genericRenderWindow, hybridDb } = hybridViewerStore;
@@ -127,6 +128,7 @@ function performClearHoverHighlight() {
     params,
   });
 }
+
 function useHybridViewerHighlight() {
   const is_hover_highlight = ref(false);
   const hover_highlight_field_type = ref("CELL");
@@ -143,10 +145,12 @@ function useHybridViewerHighlight() {
     currentHoverId,
     clearHoverData,
   });
+
   function clearHoverHighlight() {
     clearHoverData();
     performClearHoverHighlight();
   }
+
   return {
     is_hover_highlight,
     hover_highlight_field_type,
@@ -156,6 +160,7 @@ function useHybridViewerHighlight() {
     hoverHighlight,
   };
 }
+
 export {
   createClearHoverData,
   createHoverHighlight,

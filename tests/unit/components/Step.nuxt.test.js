@@ -31,12 +31,21 @@ describe("step", () => {
       ],
       { geode_object_type },
     );
-    const wrapper = mount(Step, {
-      global: {
-        plugins: [vuetify],
+    const wrapper = mount(
+      {
+        components: { Step },
+        template:
+          '<v-stepper-vertical><Step :stepIndex="0" :stepperTree="stepperTree" /></v-stepper-vertical>',
+        setup() {
+          return { stepperTree: stepper_tree };
+        },
       },
-      props: { stepIndex: 0, stepperTree: stepper_tree },
-    });
+      {
+        global: {
+          plugins: [vuetify],
+        },
+      },
+    );
     expect(wrapper.exists()).toBe(true);
   });
 });

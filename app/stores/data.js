@@ -196,13 +196,16 @@ export const useDataStore = defineStore("data", () => {
     await model_components_db.where("id").equals(modelId).delete();
     await database.model_components_relation.where("id").equals(modelId).delete();
   }
+
   async function deleteItem(id) {
     await data_db.delete(id);
     await deleteModelComponents(id);
   }
+
   async function updateItem(id, changes) {
     await data_db.update(id, changes);
   }
+
   async function getAllModelComponentsViewerIds(modelId) {
     const components = await model_components_db.where("id").equals(modelId).toArray();
     return components.map((component) => Math.trunc(Number(component.viewer_id)));
@@ -224,11 +227,13 @@ export const useDataStore = defineStore("data", () => {
       modelComponentsRelations,
     };
   }
+
   async function clear() {
     await data_db.clear();
     await model_components_db.clear();
     await model_components_relation_db.clear();
   }
+
   async function importStores(snapshot) {
     await clear();
     await model_components_db.bulkPut(snapshot.modelComponents);

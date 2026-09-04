@@ -49,6 +49,7 @@ async function runScript(
 function isPortInUseError(errorMessage) {
   return /EADDRINUSE|address already in use|port already in use/iu.test(errorMessage);
 }
+
 function backArgs(args, port) {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
@@ -72,6 +73,7 @@ function backArgs(args, port) {
   }
   return executableArgs;
 }
+
 async function runBack(execName, execPath, args = {}, attempts = 0) {
   let port = undefined;
   try {
@@ -92,6 +94,7 @@ async function runBack(execName, execPath, args = {}, attempts = 0) {
     }
   }
 }
+
 async function runViewer(execName, execPath, args = {}, attempts = 0) {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
@@ -123,6 +126,7 @@ async function runViewer(execName, execPath, args = {}, attempts = 0) {
     }
   }
 }
+
 async function runExtension(extensionId, execName, execPath, args = {}, attempts = 0) {
   let port = undefined;
   try {
