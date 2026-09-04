@@ -21,10 +21,10 @@ async function importItem(item) {
   }
   const addDataTask = dataStore.addItem(item);
   const registerTask = addDataTask.then(async () => {
-     if (!(await dataStore.isItemViewable(item))) {
+    if (!(await dataStore.isItemViewable(item))) {
       return;
     }
-    return dataStore.registerObject(item.id, item.name)
+    return dataStore.registerObject(item.id, item.name);
   });
   const addDataComponentsTask =
     item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
