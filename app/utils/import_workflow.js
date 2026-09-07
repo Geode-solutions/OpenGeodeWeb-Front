@@ -69,12 +69,8 @@ async function importFile(filename, geode_object_type) {
   });
   return importItem(response);
 }
-<<<<<<< Updated upstream
-async function importWorkflow(files) {
-=======
 
 async function importWorkflow(files, onProgress) {
->>>>>>> Stashed changes
   const chunk_size = 5;
   const chunks = [];
   for (let i = 0; i < files.length; i += chunk_size) {
