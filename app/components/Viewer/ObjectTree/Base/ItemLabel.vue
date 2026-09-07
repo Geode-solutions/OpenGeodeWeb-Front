@@ -21,6 +21,9 @@ const actualItem = computed(() => item.raw || item);
 const UUID_END_CHARS = 12;
 const ELLIPSIS_LENGTH = 3;
 const MIN_START_CHARS = 4;
+const TOOLTIP_NAME_MAX_LENGTH = 40;
+const TOOLTIP_NAME_START_CHARS = 10;
+const TOOLTIP_NAME_END_CHARS = 8;
 
 const displayTitle = computed(() => {
   const { title } = actualItem.value;
@@ -44,6 +47,19 @@ const displayTitle = computed(() => {
   const startChars = Math.max(MIN_START_CHARS, maxChars - endChars - ELLIPSIS_LENGTH);
 
   return middleTruncate(title, maxChars, startChars, endChars);
+});
+
+const tooltipTitle = computed(() => {
+  const { title } = actualItem.value;
+  if (!title) {
+    return "";
+  }
+  return middleTruncate(
+    title,
+    TOOLTIP_NAME_MAX_LENGTH,
+    TOOLTIP_NAME_START_CHARS,
+    TOOLTIP_NAME_END_CHARS,
+  );
 });
 
 const tooltipDisabled = computed(() => {
@@ -75,6 +91,7 @@ async function copyToClipboard(text, label) {
       <template #activator="{ props: tooltipProps }">
         <span
           v-bind="tooltipProps"
+          data-testid="treeItemLabel"
           class="tree-item-label"
           :class="{ 'inactive-item': actualItem.is_active === false }"
           @contextmenu.prevent.stop="emit('contextmenu', $event)"
@@ -90,6 +107,7 @@ async function copyToClipboard(text, label) {
           <strong class="text-white mr-1">ID:</strong>
           <span>{{ actualItem.id }}</span>
           <v-btn
+            data-testid="copyIdBtn"
             icon="mdi-content-copy"
             variant="text"
             size="x-small"
@@ -100,8 +118,9 @@ async function copyToClipboard(text, label) {
         </span>
         <span v-if="actualItem.title" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">Name:</strong>
-          <span>{{ actualItem.title }}</span>
+          <span>{{ tooltipTitle }}</span>
           <v-btn
+            data-testid="copyNameBtn"
             icon="mdi-content-copy"
             variant="text"
             size="x-small"
