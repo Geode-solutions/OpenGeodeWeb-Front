@@ -69,7 +69,6 @@ async function importFile(filename, geode_object_type) {
   });
   return importItem(response);
 }
-
 async function importWorkflow(files, onProgress) {
   const chunk_size = 5;
   const chunks = [];
