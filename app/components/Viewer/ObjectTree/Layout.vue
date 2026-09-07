@@ -202,6 +202,7 @@ function onVerticalResizeStart(event, index) {
     <div
       ref="activity-bar"
       class="activity-bar d-flex flex-column align-center py-2"
+      :class="{ 'is-closed': treeviewStore.opened_views.length === 0 }"
       :style="activityBarAdaptiveStyles"
     >
       <v-btn
@@ -318,9 +319,20 @@ function onVerticalResizeStart(event, index) {
   height: 100%;
   border-radius: 16px 0 0 16px;
   margin-left: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: none;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
+  transition:
+    background-color 0.3s ease,
+    backdrop-filter 0.3s ease,
+    border-radius 0.2s ease;
+}
+
+.activity-bar.is-closed {
+  border-radius: 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .activity-bar::before {
