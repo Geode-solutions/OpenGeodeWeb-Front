@@ -73,7 +73,7 @@ function performSyncRemoteCamera() {
   const params = {
     camera_options: options_camera,
   };
-  viewerStore.request(
+  return viewerStore.request(
     {
       schema,
       params,
@@ -203,7 +203,7 @@ function performCameraOrientation(orientation) {
 function useHybridViewerCamera() {
   const camera_options = reactive({});
   function syncRemoteCamera() {
-    performSyncRemoteCamera();
+    return performSyncRemoteCamera();
   }
   function setCamera(targetCameraOptions) {
     performSetCamera(targetCameraOptions);
