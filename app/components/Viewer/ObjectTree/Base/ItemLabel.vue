@@ -2,7 +2,7 @@
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import { useResponsiveMiddleTruncate } from "@ogw_front/composables/use_middle_truncate";
+import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_middle_truncate";
 
 const feedbackStore = useFeedbackStore();
 const { copy } = useClipboard();
