@@ -2,6 +2,7 @@
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { useResponsiveMiddleTruncate } from "@ogw_front/composables/use_middle_truncate";
 
 const feedbackStore = useFeedbackStore();
 const { copy } = useClipboard();
@@ -18,49 +19,20 @@ const { width: containerWidth } = useElementSize(labelContainer);
 
 const actualItem = computed(() => item.raw || item);
 
-const UUID_END_CHARS = 12;
-const ELLIPSIS_LENGTH = 3;
-const MIN_START_CHARS = 4;
 const TOOLTIP_NAME_MAX_LENGTH = 40;
 const TOOLTIP_NAME_START_CHARS = 10;
 const TOOLTIP_NAME_END_CHARS = 8;
 
-const displayTitle = computed(() => {
-  const { title } = actualItem.value;
-  if (!title) {
-    return "";
-  }
+const displayTitle = useResponsiveMiddleTruncate(() => actualItem.value.title, containerWidth);
 
-  // Estimate max characters based on width (approx 9px per char for typical font)
-  // We subtract some padding/icon space
-  const estimatedCharWidth = 8.5;
-  const maxChars = Math.floor(containerWidth.value / estimatedCharWidth);
-
-  // Only truncate if the text is longer than what fits
-  if (title.length <= maxChars) {
-    return title;
-  }
-
-  // Calculate dynamic start/end based on available space
-  // For UUIDs, showing the last 12 characters is often useful
-  const endChars = Math.min(UUID_END_CHARS, Math.floor(maxChars / ELLIPSIS_LENGTH));
-  const startChars = Math.max(MIN_START_CHARS, maxChars - endChars - ELLIPSIS_LENGTH);
-
-  return middleTruncate(title, maxChars, startChars, endChars);
-});
-
-const tooltipTitle = computed(() => {
-  const { title } = actualItem.value;
-  if (!title) {
-    return "";
-  }
-  return middleTruncate(
-    title,
+const tooltipTitle = computed(() =>
+  middleTruncate(
+    actualItem.value.title,
     TOOLTIP_NAME_MAX_LENGTH,
     TOOLTIP_NAME_START_CHARS,
     TOOLTIP_NAME_END_CHARS,
-  );
-});
+  ),
+);
 
 const tooltipDisabled = computed(() => {
   if (isLeaf !== undefined) {
