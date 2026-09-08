@@ -6,7 +6,7 @@ import path from "node:path";
 import JSZip from "jszip";
 import { extract as extractTar } from "tar";
 
-const TAR_ARCHIVE_PATTERN = /\.(tar\.gz|tgz|tar)$/u;
+const TAR_ARCHIVE_PATTERN = /\.(?<ext>tar\.gz|tgz|tar)$/u;
 
 async function extractZipArchive(zipFilePath, outputDir) {
   const data = await fs.promises.readFile(zipFilePath);
