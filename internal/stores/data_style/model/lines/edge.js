@@ -90,7 +90,7 @@ function useModelLinesEdgeAttribute() {
   async function setModelLinesEdgeAttribute(
     modelId,
     lineIds,
-    { name, item, minimum, maximum, colorMap },
+    { name, item, minimum, maximum, colorMap, no_data = false },
   ) {
     mutateModelLinesEdgeStyle(modelId, lineIds, {
       name,
@@ -100,6 +100,7 @@ function useModelLinesEdgeAttribute() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
@@ -111,6 +112,7 @@ function useModelLinesEdgeAttribute() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -127,6 +129,7 @@ function useModelLinesEdgeAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isModelLinesEdgeAttributeValid(attribute)) {
       return setModelLinesEdgeAttribute(modelId, lineIds, attribute);

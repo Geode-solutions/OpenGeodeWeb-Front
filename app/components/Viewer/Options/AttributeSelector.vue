@@ -131,6 +131,14 @@ watch([attributeName, attributeItem, currentAttribute], () => {
     class="mt-3"
     hide-details
   />
+  <div
+    v-if="currentAttribute && currentAttribute.no_data"
+    class="text-caption text-medium-emphasis mt-1 d-flex align-center ga-1"
+    data-testid="noDataInfo"
+  >
+    <v-icon icon="mdi-information-outline" size="14" color="info" />
+    <span>Contains unmapped elements</span>
+  </div>
   <ViewerOptionsAttributeColorBar
     v-if="attributeName"
     v-model:minimum="rangeMin"

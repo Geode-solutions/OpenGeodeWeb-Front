@@ -71,7 +71,7 @@ function useMeshPolyhedraVertexAttributeStyle() {
     const { item, name } = meshPolyhedraVertexAttribute(id);
     return item ?? meshPolyhedraVertexAttributeLastItem(id, name);
   }
-  function setMeshPolyhedraVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
+  function setMeshPolyhedraVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false }) {
     mutateMeshPolyhedraVertexStyle(id, {
       name,
       item,
@@ -80,6 +80,7 @@ function useMeshPolyhedraVertexAttributeStyle() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshPolyhedraVertexAttributeSchemas.attribute;
@@ -90,6 +91,7 @@ function useMeshPolyhedraVertexAttributeStyle() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema,
@@ -106,6 +108,7 @@ function useMeshPolyhedraVertexAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isMeshPolyhedraVertexAttributeValid(attribute)) {
       return setMeshPolyhedraVertexAttribute(id, attribute);

@@ -71,7 +71,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     const { item, name } = meshPolyhedraPolyhedronAttribute(id);
     return item ?? meshPolyhedraPolyhedronAttributeLastItem(id, name);
   }
-  function setMeshPolyhedraPolyhedronAttribute(id, { name, item, minimum, maximum, colorMap }) {
+  function setMeshPolyhedraPolyhedronAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false }) {
     mutateMeshPolyhedraPolyhedronStyle(id, {
       name,
       item,
@@ -80,6 +80,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshPolyhedraPolyhedronAttributeSchemas.attribute;
@@ -90,6 +91,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema,
@@ -106,6 +108,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isMeshPolyhedraPolyhedronAttributeValid(attribute)) {
       return setMeshPolyhedraPolyhedronAttribute(id, attribute);

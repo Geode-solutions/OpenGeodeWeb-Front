@@ -71,7 +71,7 @@ function useMeshPolygonsVertexAttributeStyle() {
     const { item, name } = meshPolygonsVertexAttribute(id);
     return item ?? meshPolygonsVertexAttributeLastItem(id, name);
   }
-  function setMeshPolygonsVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
+  function setMeshPolygonsVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false }) {
     mutateMeshPolygonsVertexStyle(id, {
       name,
       item,
@@ -80,6 +80,7 @@ function useMeshPolygonsVertexAttributeStyle() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshPolygonsVertexAttributeSchemas.attribute;
@@ -90,6 +91,7 @@ function useMeshPolygonsVertexAttributeStyle() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema,
@@ -106,6 +108,7 @@ function useMeshPolygonsVertexAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isMeshPolygonsVertexAttributeValid(attribute)) {
       return setMeshPolygonsVertexAttribute(id, attribute);

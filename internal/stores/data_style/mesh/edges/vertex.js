@@ -71,7 +71,7 @@ function useMeshEdgesVertexAttributeStyle() {
     const { item, name } = meshEdgesVertexAttribute(id);
     return item ?? meshEdgesVertexAttributeLastItem(id, name);
   }
-  function setMeshEdgesVertexAttribute(id, { name, item, minimum, maximum, colorMap }) {
+  function setMeshEdgesVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false }) {
     mutateMeshEdgesVertexStyle(id, {
       name,
       item,
@@ -80,6 +80,7 @@ function useMeshEdgesVertexAttributeStyle() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshEdgesVertexAttributeSchemas.attribute;
@@ -90,6 +91,7 @@ function useMeshEdgesVertexAttributeStyle() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema,
@@ -106,6 +108,7 @@ function useMeshEdgesVertexAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isMeshEdgesVertexAttributeValid(attribute)) {
       return setMeshEdgesVertexAttribute(id, attribute);

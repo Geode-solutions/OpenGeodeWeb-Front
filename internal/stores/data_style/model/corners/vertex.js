@@ -91,7 +91,7 @@ function useModelCornersVertexAttribute() {
   async function setModelCornersVertexAttribute(
     modelId,
     cornerIds,
-    { name, item, minimum, maximum, colorMap },
+    { name, item, minimum, maximum, colorMap, no_data = false },
   ) {
     mutateModelCornersVertexStyle(modelId, cornerIds, {
       name,
@@ -101,6 +101,7 @@ function useModelCornersVertexAttribute() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
@@ -112,6 +113,7 @@ function useModelCornersVertexAttribute() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -128,6 +130,7 @@ function useModelCornersVertexAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isModelCornersVertexAttributeValid(attribute)) {
       return setModelCornersVertexAttribute(modelId, cornerIds, attribute);

@@ -92,7 +92,7 @@ function useModelSurfacesPolygonAttribute() {
   async function setModelSurfacesPolygonAttribute(
     modelId,
     surfaceIds,
-    { name, item, minimum, maximum, colorMap },
+    { name, item, minimum, maximum, colorMap, no_data = false },
   ) {
     mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
       name,
@@ -102,6 +102,7 @@ function useModelSurfacesPolygonAttribute() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
@@ -113,6 +114,7 @@ function useModelSurfacesPolygonAttribute() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -134,6 +136,7 @@ function useModelSurfacesPolygonAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isModelSurfacesPolygonAttributeValid(attribute)) {
       return setModelSurfacesPolygonAttribute(modelId, surfaceIds, attribute);

@@ -91,7 +91,7 @@ function useModelBlocksVertexAttribute() {
   async function setModelBlocksVertexAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap },
+    { name, item, minimum, maximum, colorMap, no_data = false },
   ) {
     mutateModelBlocksVertexStyle(modelId, blockIds, {
       name,
@@ -101,6 +101,7 @@ function useModelBlocksVertexAttribute() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
@@ -112,6 +113,7 @@ function useModelBlocksVertexAttribute() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -128,6 +130,7 @@ function useModelBlocksVertexAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isModelBlocksVertexAttributeValid(attribute)) {
       return setModelBlocksVertexAttribute(modelId, blockIds, attribute);

@@ -92,7 +92,7 @@ function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap },
+    { name, item, minimum, maximum, colorMap, no_data = false },
   ) {
     mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
@@ -102,6 +102,7 @@ function useModelBlocksPolyhedronAttribute() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
@@ -113,6 +114,7 @@ function useModelBlocksPolyhedronAttribute() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema: modelBlockPolyhedronAttributeSchema,
@@ -134,6 +136,7 @@ function useModelBlocksPolyhedronAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isModelBlocksPolyhedronAttributeValid(attribute)) {
       return setModelBlocksPolyhedronAttribute(modelId, blockIds, attribute);

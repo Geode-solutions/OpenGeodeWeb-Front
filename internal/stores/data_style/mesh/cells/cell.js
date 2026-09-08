@@ -67,7 +67,7 @@ function useMeshCellsCellAttributeStyle() {
     const { item, name } = meshCellsCellAttribute(id);
     return item ?? meshCellsCellAttributeLastItem(id, name);
   }
-  function setMeshCellsCellAttribute(id, { name, item, minimum, maximum, colorMap }) {
+  function setMeshCellsCellAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false }) {
     mutateMeshCellsCellStyle(id, {
       name,
       item,
@@ -76,6 +76,7 @@ function useMeshCellsCellAttributeStyle() {
       minimum,
       maximum,
       colorMap,
+      no_data,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsCellAttributeSchemas.attribute;
@@ -86,6 +87,7 @@ function useMeshCellsCellAttributeStyle() {
       points,
       minimum,
       maximum,
+      no_data: no_data ?? false,
     };
     return viewerStore.request({
       schema,
@@ -102,6 +104,7 @@ function useMeshCellsCellAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data: storedConfig.no_data,
     };
     if (isMeshCellsCellAttributeValid(attribute)) {
       return setMeshCellsCellAttribute(id, attribute);
