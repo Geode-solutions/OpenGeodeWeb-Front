@@ -21,6 +21,11 @@ const TRUNCATE_START_CHARS = 12;
 const TRUNCATE_END_CHARS = 7;
 
 const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
+const copiedId = ref("");
+
+function isCopied(id) {
+  return copied.value && copiedId.value === id;
+}
 
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
@@ -87,6 +92,7 @@ async function copyId(targetId) {
   }
   try {
     await copy(targetId);
+    copiedId.value = targetId;
   } catch (error) {
     console.error("Failed to copy ID:", error);
   }
@@ -102,7 +108,7 @@ function formatId(id) {
   return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
 }
 
-const formattedId = computed(() => formatId(metaData?.id));
+const formattedId = computed(() => formatId(metaData.id));
 </script>
 
 <template>
@@ -136,12 +142,12 @@ const formattedId = computed(() => formatId(metaData?.id));
             @click.stop="copyId(metaData.id)"
           >
             <span class="id-text">
-              {{ copied ? "COPIED!" : formattedId }}
+              {{ isCopied(metaData.id) ? "COPIED!" : formattedId }}
             </span>
             <v-icon
-              :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+              :icon="isCopied(metaData.id) ? 'mdi-check' : 'mdi-content-copy'"
               size="10"
-              :color="copied ? 'success' : 'white'"
+              :color="isCopied(metaData.id) ? 'success' : 'white'"
               class="ml-1"
             />
           </v-col>
@@ -166,9 +172,14 @@ const formattedId = computed(() => formatId(metaData?.id));
               @click.stop="copyId(componentItem.id)"
             >
               <span class="id-text">
-                {{ formatId(componentItem.id) }}
+                {{ isCopied(componentItem.id) ? "COPIED!" : formatId(componentItem.id) }}
               </span>
-              <v-icon icon="mdi-content-copy" size="10" color="white" class="ml-1" />
+              <v-icon
+                :icon="isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'"
+                size="10"
+                :color="isCopied(componentItem.id) ? 'success' : 'white'"
+                class="ml-1"
+              />
             </v-col>
           </template>
         </v-row>
