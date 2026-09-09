@@ -43,7 +43,6 @@ export default defineNuxtConfig({
   vuetify: {
     moduleOptions: {
       prefixComposables: true,
-      enableRules: false,
     },
     vuetifyOptions: {
       defaults: {
