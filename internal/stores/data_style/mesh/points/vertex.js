@@ -70,7 +70,10 @@ function useMeshPointsVertexAttributeStyle() {
     const { item, name } = meshPointsVertexAttribute(id);
     return item ?? meshPointsVertexAttributeLastItem(id, name);
   }
-  function setMeshPointsVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshPointsVertexAttribute(
+    id,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+  ) {
     mutateMeshPointsVertexStyle(id, {
       name,
       item,

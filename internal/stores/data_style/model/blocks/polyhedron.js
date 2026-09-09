@@ -185,7 +185,12 @@ function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttributeNoDataColor(modelId, blockIds, no_data_color) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
-    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name, item);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(
+      modelId,
+      blockIds[0],
+      name,
+      item,
+    );
     await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
       ...storedConfig,
       no_data_color,

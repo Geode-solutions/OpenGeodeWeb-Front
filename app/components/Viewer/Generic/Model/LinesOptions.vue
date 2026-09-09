@@ -111,7 +111,6 @@ const linesVertexAttributeNoDataColor = computed({
   },
 });
 
-
 const linesEdgeAttributeName = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId),
   set: async (newValue) => {
@@ -156,7 +155,6 @@ const linesEdgeAttributeNoDataColor = computed({
     hybridViewerStore.remoteRender();
   },
 });
-
 
 // Individual Attributes
 const vertexAttributeName = computed({
@@ -204,7 +202,6 @@ const vertexAttributeNoDataColor = computed({
   },
 });
 
-
 const edgeAttributeName = computed({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, lineId),
   set: async (newValue) => {
@@ -249,7 +246,6 @@ const edgeAttributeNoDataColor = computed({
     hybridViewerStore.remoteRender();
   },
 });
-
 
 const capabilities = {
   color: { available: true },

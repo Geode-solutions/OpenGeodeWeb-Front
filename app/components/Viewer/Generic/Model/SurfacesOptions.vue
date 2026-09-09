@@ -119,7 +119,6 @@ const surfacesVertexAttributeNoDataColor = computed({
   },
 });
 
-
 const surfacesPolygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId),
   set: async (newValue) => {
@@ -173,7 +172,6 @@ const surfacesPolygonAttributeNoDataColor = computed({
   },
 });
 
-
 // Individual Attributes
 const vertexAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, surfaceId),
@@ -220,7 +218,6 @@ const vertexAttributeNoDataColor = computed({
   },
 });
 
-
 const polygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
   set: async (newValue) => {
@@ -261,11 +258,14 @@ const polygonAttributeColorMap = computed({
 const polygonAttributeNoDataColor = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, surfaceId),
   set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeNoDataColor(modelId, [surfaceId], newValue);
+    await dataStyleStore.setModelSurfacesPolygonAttributeNoDataColor(
+      modelId,
+      [surfaceId],
+      newValue,
+    );
     hybridViewerStore.remoteRender();
   },
 });
-
 
 const capabilities = {
   color: { available: true },

@@ -70,7 +70,10 @@ function useMeshCellsVertexAttributeStyle() {
     const { item, name } = meshCellsVertexAttribute(id);
     return item ?? meshCellsVertexAttributeLastItem(id, name);
   }
-  function setMeshCellsVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshCellsVertexAttribute(
+    id,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+  ) {
     mutateMeshCellsVertexStyle(id, {
       name,
       item,

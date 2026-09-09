@@ -69,7 +69,10 @@ function useMeshCellsCellAttributeStyle() {
     const { item, name } = meshCellsCellAttribute(id);
     return item ?? meshCellsCellAttributeLastItem(id, name);
   }
-  function setMeshCellsCellAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshCellsCellAttribute(
+    id,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+  ) {
     mutateMeshCellsCellStyle(id, {
       name,
       item,

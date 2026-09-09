@@ -73,7 +73,10 @@ function useMeshPolygonsVertexAttributeStyle() {
     const { item, name } = meshPolygonsVertexAttribute(id);
     return item ?? meshPolygonsVertexAttributeLastItem(id, name);
   }
-  function setMeshPolygonsVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshPolygonsVertexAttribute(
+    id,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+  ) {
     mutateMeshPolygonsVertexStyle(id, {
       name,
       item,

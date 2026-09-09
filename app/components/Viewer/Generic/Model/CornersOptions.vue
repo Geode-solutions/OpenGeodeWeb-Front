@@ -106,11 +106,14 @@ const cornersVertexAttributeColorMap = computed({
 const cornersVertexAttributeNoDataColor = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeNoDataColor(modelId, targetCornerIds, newValue);
+    await dataStyleStore.setModelCornersVertexAttributeNoDataColor(
+      modelId,
+      targetCornerIds,
+      newValue,
+    );
     hybridViewerStore.remoteRender();
   },
 });
-
 
 // Individual Attributes
 const vertexAttributeName = computed({
@@ -157,7 +160,6 @@ const vertexAttributeNoDataColor = computed({
     hybridViewerStore.remoteRender();
   },
 });
-
 
 const capabilities = {
   color: { available: true },

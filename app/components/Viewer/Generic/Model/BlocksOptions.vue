@@ -106,11 +106,14 @@ const blocksVertexAttributeColorMap = computed({
 const blocksVertexAttributeNoDataColor = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(modelId, targetBlockIds, newValue);
+    await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(
+      modelId,
+      targetBlockIds,
+      newValue,
+    );
     hybridViewerStore.remoteRender();
   },
 });
-
 
 const blocksPolyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId),
@@ -165,7 +168,6 @@ const blocksPolyhedronAttributeNoDataColor = computed({
   },
 });
 
-
 // Individual Attributes
 const vertexAttributeName = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
@@ -212,7 +214,6 @@ const vertexAttributeNoDataColor = computed({
   },
 });
 
-
 const polyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
   set: async (newValue) => {
@@ -257,7 +258,6 @@ const polyhedronAttributeNoDataColor = computed({
     hybridViewerStore.remoteRender();
   },
 });
-
 
 const capabilities = {
   color: { available: true },

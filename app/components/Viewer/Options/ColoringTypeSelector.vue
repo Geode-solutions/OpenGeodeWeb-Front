@@ -13,7 +13,9 @@ const vertex_attribute_name = defineModel("vertex_attribute_name", { type: Strin
 const vertex_attribute_item = defineModel("vertex_attribute_item", { type: Number });
 const vertex_attribute_range = defineModel("vertex_attribute_range", { type: Array });
 const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", { type: String });
-const vertex_attribute_no_data_color = defineModel("vertex_attribute_no_data_color", { type: Object });
+const vertex_attribute_no_data_color = defineModel("vertex_attribute_no_data_color", {
+  type: Object,
+});
 
 const edge_attribute_name = defineModel("edge_attribute_name", { type: String });
 const edge_attribute_item = defineModel("edge_attribute_item", { type: Number });
@@ -31,7 +33,9 @@ const polygon_attribute_name = defineModel("polygon_attribute_name", { type: Str
 const polygon_attribute_item = defineModel("polygon_attribute_item", { type: Number });
 const polygon_attribute_range = defineModel("polygon_attribute_range", { type: Array });
 const polygon_attribute_color_map = defineModel("polygon_attribute_color_map", { type: String });
-const polygon_attribute_no_data_color = defineModel("polygon_attribute_no_data_color", { type: Object });
+const polygon_attribute_no_data_color = defineModel("polygon_attribute_no_data_color", {
+  type: Object,
+});
 
 const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", { type: String });
 const polyhedron_attribute_item = defineModel("polyhedron_attribute_item", { type: Number });

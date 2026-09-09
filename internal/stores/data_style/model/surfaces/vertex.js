@@ -185,7 +185,12 @@ function useModelSurfacesVertexAttribute() {
   async function setModelSurfacesVertexAttributeNoDataColor(modelId, surfaceIds, no_data_color) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(
+      modelId,
+      surfaceIds[0],
+      name,
+      item,
+    );
     await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
       ...storedConfig,
       no_data_color,

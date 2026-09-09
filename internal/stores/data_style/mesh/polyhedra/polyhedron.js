@@ -73,7 +73,10 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     const { item, name } = meshPolyhedraPolyhedronAttribute(id);
     return item ?? meshPolyhedraPolyhedronAttributeLastItem(id, name);
   }
-  function setMeshPolyhedraPolyhedronAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshPolyhedraPolyhedronAttribute(
+    id,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+  ) {
     mutateMeshPolyhedraPolyhedronStyle(id, {
       name,
       item,

@@ -185,7 +185,12 @@ function useModelSurfacesPolygonAttribute() {
   async function setModelSurfacesPolygonAttributeNoDataColor(modelId, surfaceIds, no_data_color) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
+      modelId,
+      surfaceIds[0],
+      name,
+      item,
+    );
     await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
       ...storedConfig,
       no_data_color,

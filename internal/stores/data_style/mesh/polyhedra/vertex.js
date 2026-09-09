@@ -73,7 +73,10 @@ function useMeshPolyhedraVertexAttributeStyle() {
     const { item, name } = meshPolyhedraVertexAttribute(id);
     return item ?? meshPolyhedraVertexAttributeLastItem(id, name);
   }
-  function setMeshPolyhedraVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshPolyhedraVertexAttribute(
+    id,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+  ) {
     mutateMeshPolyhedraVertexStyle(id, {
       name,
       item,
