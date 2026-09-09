@@ -1,5 +1,12 @@
 <script setup>
 // oxlint-disable id-length
+defineProps({
+  disabledAlpha: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const colorPickerRef = useTemplateRef("colorPickerRef");
 const model = defineModel({ type: Object });
 const { pressed } = useMousePressed({ target: colorPickerRef });
@@ -53,8 +60,9 @@ watch(pressed, (value) => {
     canvas-height="75"
     hide-inputs
     hide-eye-dropper
+    :disabled-alpha="disabledAlpha"
     width="220"
-    mode="rgba"
+    :mode="disabledAlpha ? 'rgb' : 'rgba'"
     class="mx-auto"
   />
 </template>

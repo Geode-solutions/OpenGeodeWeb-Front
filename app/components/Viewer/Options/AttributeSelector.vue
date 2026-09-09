@@ -143,27 +143,24 @@ watch([attributeName, attributeItem, currentAttribute], () => {
   />
   <div
     v-if="currentAttribute && currentAttribute.no_data"
-    class="text-caption text-medium-emphasis mt-1 d-flex align-center ga-1"
+    class="text-caption text-high-emphasis mt-1 d-flex align-center ga-1"
     data-testid="noDataInfo"
   >
     <v-icon icon="mdi-information-outline" size="14" color="info" />
     <span>Contains unmapped elements</span>
     <v-menu :close-on-content-click="false">
       <template #activator="{ props }">
-        <v-btn
+        <button
           v-bind="props"
-          icon
-          density="compact"
-          size="x-small"
-          variant="text"
+          type="button"
+          class="color-picker-rect-btn ml-1"
+          :style="{ backgroundColor: cssNoDataColor }"
           v-tooltip="'Change unmapped elements color'"
           data-testid="noDataColorBtn"
-        >
-          <v-icon icon="mdi-circle" :style="{ color: cssNoDataColor }" />
-        </v-btn>
+        />
       </template>
       <v-card class="pa-2">
-        <ViewerOptionsColorPicker v-model="attributeNoDataColor" />
+        <ViewerOptionsColorPicker v-model="attributeNoDataColor" disabled-alpha />
       </v-card>
     </v-menu>
   </div>
@@ -175,3 +172,23 @@ watch([attributeName, attributeItem, currentAttribute], () => {
     @reset="resetRange"
   />
 </template>
+
+<style scoped>
+.color-picker-rect-btn {
+  width: 26px;
+  height: 15px;
+  border-radius: 3px;
+  border: 2px solid rgba(255, 255, 255, 0.912);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.color-picker-rect-btn:hover {
+  border-color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.1);
+}
+</style>
