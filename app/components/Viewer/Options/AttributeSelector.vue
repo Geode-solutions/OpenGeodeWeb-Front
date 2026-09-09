@@ -1,5 +1,6 @@
 <script setup>
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
+import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const backStore = useBackStore();
@@ -17,6 +18,9 @@ const { id, componentIds, schema } = defineProps({
 
 const attributes = ref([]);
 
+const currentAttribute = computed(() =>
+  attributes.value.find((attr) => attr.attribute_name === attributeName.value),
+);
 const rangeMin = computed({
   get: () => (attributeRange.value ? attributeRange.value[0] : undefined),
   set: (val) => {
@@ -40,10 +44,6 @@ const rangeMax = computed({
   },
 });
 
-const currentAttribute = computed(() =>
-  attributes.value.find((attr) => attr.attribute_name === attributeName.value),
-);
-
 const componentItems = computed(() => {
   if (!currentAttribute.value) {
     return [];
@@ -57,10 +57,8 @@ const componentItems = computed(() => {
 function resetRange() {
   if (currentAttribute.value) {
     const comp = attributeItem.value ?? 0;
-    attributeRange.value = [
-      currentAttribute.value.min_values[comp],
-      currentAttribute.value.max_values[comp],
-    ];
+    const { min, max } = getAttributeRange(currentAttribute.value, comp);
+    attributeRange.value = [min, max];
   }
 }
 

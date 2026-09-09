@@ -2,6 +2,8 @@ import { BaseDatabase } from "./base_database";
 import { Dexie } from "dexie";
 import { ExtendedDatabase } from "./extended_database";
 
+const databaseContainer = { instance: undefined };
+
 class Database extends BaseDatabase {
   constructor() {
     super("Database");
@@ -58,7 +60,7 @@ class Database extends BaseDatabase {
 }
 // oxlint-disable-next-line no-top-level-await
 await Dexie.delete("Database");
-const databaseContainer = { instance: new Database() };
+databaseContainer.instance = new Database();
 databaseContainer.instance.clear();
 
 const database = new Proxy(

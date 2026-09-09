@@ -7,9 +7,7 @@ function useModelColorStyle(componentStyleFunctions) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
-
   const { Surface, Line, Block, Corner } = componentStyleFunctions;
-
   const ATTRIBUTE_FUNCTIONS = {
     Surface: {
       vertex: {
@@ -76,11 +74,15 @@ function useModelColorStyle(componentStyleFunctions) {
       },
     },
   };
-
   function getModelComponentColor(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).coloring?.constant;
   }
-
+  function modelComponentTypeColor(modelId, type) {
+    return (
+      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.constant ||
+      dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.constant
+    );
+  }
   function getModelComponentEffectiveColor(modelId, componentId, type) {
     const individualColor = getModelComponentColor(modelId, componentId);
     if (individualColor !== undefined) {
@@ -88,100 +90,15 @@ function useModelColorStyle(componentStyleFunctions) {
     }
     return modelComponentTypeColor(modelId, type);
   }
-
   function getModelComponentActiveColoring(modelId, componentId) {
     return dataStyleState.getComponentStyle(modelId, componentId).coloring?.active;
   }
-
-  function modelComponentTypeColor(modelId, type) {
-    return (
-      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.constant ||
-      dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.constant
-    );
-  }
-
   function getModelComponentTypeActiveColoring(modelId, type) {
     return (
       dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.active ||
       dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`].coloring.active
     );
   }
-
-  async function setModelComponentTypeColor(modelId, type, color) {
-    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
-      coloring: {
-        constant: color,
-        active: "constant",
-      },
-    });
-    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
-    if (idsForType.length === 0) {
-      return;
-    }
-    await setModelComponentsColor(modelId, idsForType, color);
-  }
-
-  async function setModelComponentTypeActiveColoring(modelId, type, activeColoring) {
-    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
-      coloring: { active: activeColoring },
-    });
-    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
-    if (idsForType.length === 0) {
-      return;
-    }
-
-    if (activeColoring === "random" || activeColoring === "constant") {
-      await setModelComponentsColor(modelId, idsForType, undefined, activeColoring);
-      return;
-    }
-
-    await modelCommonStyle.mutateComponentStyles(modelId, idsForType, {
-      coloring: { active: activeColoring },
-    });
-    const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
-      ATTRIBUTE_FUNCTIONS[type][activeColoring];
-
-    const name = getName(modelId, idsForType[0]);
-    if (name) {
-      await setName(modelId, idsForType, name);
-      const [minimum, maximum] = getRange(modelId, idsForType[0]);
-      if (minimum !== undefined && maximum !== undefined) {
-        await setRange(modelId, idsForType, minimum, maximum);
-      }
-      const colorMap = getColorMap(modelId, idsForType[0]);
-      if (colorMap) {
-        await setColorMap(modelId, idsForType, colorMap);
-      }
-    }
-  }
-
-  async function setModelComponentActiveColoring(modelId, componentId, activeColoring) {
-    await modelCommonStyle.mutateComponentStyle(modelId, componentId, {
-      coloring: { active: activeColoring },
-    });
-    if (activeColoring === "random" || activeColoring === "constant") {
-      await setModelComponentsColor(modelId, [componentId], undefined, activeColoring);
-      return;
-    }
-
-    const type = await dataStore.meshComponentType(modelId, componentId);
-    const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
-      ATTRIBUTE_FUNCTIONS[type][activeColoring];
-
-    const name = getName(modelId, componentId);
-    if (name) {
-      await setName(modelId, [componentId], name);
-      const [minimum, maximum] = getRange(modelId, componentId);
-      if (minimum !== undefined && maximum !== undefined) {
-        await setRange(modelId, [componentId], minimum, maximum);
-      }
-      const colorMap = getColorMap(modelId, componentId);
-      if (colorMap) {
-        await setColorMap(modelId, [componentId], colorMap);
-      }
-    }
-  }
-
   async function setModelComponentsColor(
     modelId,
     componentIds,
@@ -198,20 +115,92 @@ function useModelColorStyle(componentStyleFunctions) {
       modelId,
       componentIds,
       "Color",
-      { componentStyleFunctions },
+      {
+        componentStyleFunctions,
+      },
       color,
       activeColoring,
     );
   }
-
+  async function setModelComponentTypeColor(modelId, type, color) {
+    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
+      coloring: {
+        constant: color,
+        active: "constant",
+      },
+    });
+    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
+    if (idsForType.length === 0) {
+      return;
+    }
+    await setModelComponentsColor(modelId, idsForType, color);
+  }
+  async function setModelComponentTypeActiveColoring(modelId, type, activeColoring) {
+    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
+      coloring: {
+        active: activeColoring,
+      },
+    });
+    const idsForType = await dataStore.getMeshComponentGeodeIds(modelId, type);
+    if (idsForType.length === 0) {
+      return;
+    }
+    if (activeColoring === "random" || activeColoring === "constant") {
+      await setModelComponentsColor(modelId, idsForType, undefined, activeColoring);
+      return;
+    }
+    await modelCommonStyle.mutateComponentStyles(modelId, idsForType, {
+      coloring: {
+        active: activeColoring,
+      },
+    });
+    const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
+      ATTRIBUTE_FUNCTIONS[type][activeColoring];
+    const name = getName(modelId, idsForType[0]);
+    if (name) {
+      await setName(modelId, idsForType, name);
+      const [minimum, maximum] = getRange(modelId, idsForType[0]);
+      if (minimum !== undefined && maximum !== undefined) {
+        await setRange(modelId, idsForType, minimum, maximum);
+      }
+      const colorMap = getColorMap(modelId, idsForType[0]);
+      if (colorMap) {
+        await setColorMap(modelId, idsForType, colorMap);
+      }
+    }
+  }
+  async function setModelComponentActiveColoring(modelId, componentId, activeColoring) {
+    await modelCommonStyle.mutateComponentStyle(modelId, componentId, {
+      coloring: {
+        active: activeColoring,
+      },
+    });
+    if (activeColoring === "random" || activeColoring === "constant") {
+      await setModelComponentsColor(modelId, [componentId], undefined, activeColoring);
+      return;
+    }
+    const type = await dataStore.meshComponentType(modelId, componentId);
+    const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
+      ATTRIBUTE_FUNCTIONS[type][activeColoring];
+    const name = getName(modelId, componentId);
+    if (name) {
+      await setName(modelId, [componentId], name);
+      const [minimum, maximum] = getRange(modelId, componentId);
+      if (minimum !== undefined && maximum !== undefined) {
+        await setRange(modelId, [componentId], minimum, maximum);
+      }
+      const colorMap = getColorMap(modelId, componentId);
+      if (colorMap) {
+        await setColorMap(modelId, [componentId], colorMap);
+      }
+    }
+  }
   function getModelColor(modelId) {
     return dataStyleState.getStyle(modelId).coloring.constant;
   }
-
   function getModelActiveColoring(modelId) {
     return dataStyleState.getStyle(modelId).coloring.active;
   }
-
   return {
     getModelColor,
     getModelActiveColoring,
@@ -226,5 +215,4 @@ function useModelColorStyle(componentStyleFunctions) {
     setModelComponentsColor,
   };
 }
-
 export { useModelColorStyle };

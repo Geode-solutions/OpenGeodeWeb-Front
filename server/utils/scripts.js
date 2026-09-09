@@ -15,14 +15,12 @@ import { setAppBaseUrl } from "@geode/opengeodeweb-front/shared/scripts.js";
 const BYTES_PER_KIBIBYTE = 1024;
 const MAX_ERROR_BUFFER_KIBIBYTES = 64;
 const MAX_ERROR_BUFFER_BYTES = MAX_ERROR_BUFFER_KIBIBYTES * BYTES_PER_KIBIBYTE;
-
 function getAvailablePort() {
   return getPort({
     host: "localhost",
     random: true,
   });
 }
-
 function commandExistsSync(execName) {
   const envPath = process.env.PATH || "";
   return envPath.split(path.delimiter).some((directory) => {
@@ -30,9 +28,7 @@ function commandExistsSync(execName) {
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
   });
 }
-
 const encoder = new TextEncoder();
-
 function byteLength(str) {
   return encoder.encode(str).byteLength;
 }
@@ -41,19 +37,19 @@ function byteLength(str) {
 function waitForReady(child, expectedResponse, signal) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
-    const readlineStdout = readline.createInterface({ input: child.stdout });
-    const readlineStderr = readline.createInterface({ input: child.stderr });
-
+    const readlineStdout = readline.createInterface({
+      input: child.stdout,
+    });
+    const readlineStderr = readline.createInterface({
+      input: child.stderr,
+    });
     let recentOutput = "";
-
     function recordOutput(lineOutput) {
       const safeLine =
         byteLength(lineOutput) > MAX_ERROR_BUFFER_BYTES / 2
           ? `${lineOutput.slice(0, MAX_ERROR_BUFFER_BYTES / 2)}…[truncated]`
           : lineOutput;
-
       recentOutput = `${recentOutput} ${safeLine}\n`;
-
       while (byteLength(recentOutput) > MAX_ERROR_BUFFER_BYTES) {
         const newline = recentOutput.indexOf("\n");
         if (newline === -1) {
@@ -63,18 +59,31 @@ function waitForReady(child, expectedResponse, signal) {
         recentOutput = recentOutput.slice(newline + 1);
       }
     }
+    let onLine = undefined;
+    let onErrLine = undefined;
+    let onError = undefined;
+    let onClose = undefined;
+    let onAbort = undefined;
 
     function cleanup() {
-      readlineStdout.removeListener("line", onLine);
-      readlineStderr.removeListener("line", onErrLine);
-      child.removeListener("error", onError);
-      child.removeListener("close", onClose);
-      if (signal) {
+      if (onLine) {
+        readlineStdout.removeListener("line", onLine);
+      }
+      if (onErrLine) {
+        readlineStderr.removeListener("line", onErrLine);
+      }
+      if (onError) {
+        child.removeListener("error", onError);
+      }
+      if (onClose) {
+        child.removeListener("close", onClose);
+      }
+      if (signal && onAbort) {
         signal.removeEventListener("abort", onAbort);
       }
     }
 
-    function onLine(lineOutput) {
+    onLine = (lineOutput) => {
       console.log(`[${child.name}] ${lineOutput}`);
       recordOutput(lineOutput);
       if (lineOutput.includes(expectedResponse)) {
@@ -90,45 +99,43 @@ function waitForReady(child, expectedResponse, signal) {
         });
         resolve(child);
       }
-    }
+    };
 
-    function onErrLine(line) {
+    onErrLine = (line) => {
       console.log(`[${child.name}] ${line}`);
       recordOutput(line);
-    }
+    };
 
-    function onError(err) {
+    onError = (err) => {
       cleanup();
       reject(err);
-    }
+    };
 
-    function onClose(code) {
+    onClose = (code) => {
       console.log(`[${child.name}] exited with code ${code}`);
       cleanup();
       reject(
         new Error(
-          `[${child.name}] exited with code ${code} before becoming ready.${
-            recentOutput ? `\nRecent output:\n${recentOutput}` : ""
-          }`,
+          `[${child.name}] exited with code ${code} before becoming ready.${recentOutput ? `\nRecent output:\n${recentOutput}` : ""}`,
         ),
       );
-    }
+    };
 
-    function onAbort() {
+    onAbort = () => {
       cleanup();
       reject(new Error(`[${child.name}] timed out waiting for "${expectedResponse}"`));
-    }
-
+    };
     readlineStdout.on("line", onLine);
     readlineStderr.on("line", onErrLine);
     child.once("error", onError);
     child.once("close", onClose);
     if (signal) {
-      signal.addEventListener("abort", onAbort, { once: true });
+      signal.addEventListener("abort", onAbort, {
+        once: true,
+      });
     }
   });
 }
-
 async function waitNuxt(nuxtProcess) {
   nuxtProcess.stderr.on("data", (data) => {
     console.log("Nuxt STDERR:", data.toString().trim());
@@ -136,7 +143,6 @@ async function waitNuxt(nuxtProcess) {
   nuxtProcess.on("close", (code) => {
     console.log(`Nuxt process closed with code ${code}`);
   });
-
   for await (const [data] of on(nuxtProcess.stdout, "data")) {
     const output = data.toString();
     console.log("Nuxt STDOUT:", output.trim());
@@ -151,12 +157,9 @@ async function waitNuxt(nuxtProcess) {
   }
   throw new Error("Nuxt process closed");
 }
-
 async function runBrowser(scriptName) {
   process.env.MODE = appMode.BROWSER;
-
   const port = await getAvailablePort();
-
   const nuxtProcess = child_process.spawn("npm", ["run", scriptName], {
     shell: true,
     FORCE_COLOR: true,
@@ -169,5 +172,4 @@ async function runBrowser(scriptName) {
   await setAppBaseUrl(`http://localhost:${port}`);
   return port;
 }
-
 export { commandExistsSync, getAvailablePort, runBrowser, waitForReady };

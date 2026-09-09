@@ -15,7 +15,7 @@ const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
 });
 
-const id = toRef(() => itemProps.id);
+const id = computed(() => itemProps.meta_data.modelId || itemProps.id);
 
 const visibility = computed({
   get: () => dataStyleStore.modelEdgesVisibility(id.value),

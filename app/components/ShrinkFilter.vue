@@ -24,8 +24,6 @@ const availableDatasets = computed(() =>
   allItems.value.map((item) => ({ title: item.name || item.id, value: item.id })),
 );
 
-const debouncedApply = useDebounceFn(() => applyShrink(), DEBOUNCE_DELAY);
-
 async function applyShrink() {
   const allIds = allItems.value.map((item) => item.id);
   if (allIds.length === 0) {
@@ -41,6 +39,8 @@ async function applyShrink() {
     await hybridViewerStore.setShrink(untargetedIds, MAX_SHRINK_VALUE);
   }
 }
+
+const debouncedApply = useDebounceFn(() => applyShrink(), DEBOUNCE_DELAY);
 
 async function resetShrink() {
   shrinkFactor.value = DEFAULT_SHRINK_VALUE;

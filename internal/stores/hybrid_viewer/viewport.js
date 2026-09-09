@@ -5,24 +5,27 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-function useHybridViewerViewport() {
-  const viewStream = ref(undefined);
-
-  function setContainer(container) {
-    performSetContainer(container);
+async function performResize(width, height) {
+  const hybridViewerStore = useHybridViewerStore();
+  const { genericRenderWindow, remoteRender } = hybridViewerStore;
+  const { status, viewStream } = storeToRefs(hybridViewerStore);
+  const viewerStore = useViewerStore();
+  if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
+    return;
   }
-
-  async function resize(width, height) {
-    await performResize(width, height);
+  const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
+  const canvas = webGLRenderWindow.getCanvas();
+  canvas.width = width;
+  canvas.height = height;
+  await nextTick();
+  webGLRenderWindow.setSize(width, height);
+  if (viewStream.value) {
+    viewStream.value.setSize(width, height);
   }
-
-  return {
-    setContainer,
-    resize,
-    viewStream,
-  };
+  const renderWindow = genericRenderWindow.value.getRenderWindow();
+  renderWindow.render();
+  await remoteRender();
 }
-
 function performClickPicking(event, containerElement) {
   const { genericRenderWindow, syncRemoteCamera } = useHybridViewerStore();
   const viewerStore = useViewerStore();
@@ -52,24 +55,22 @@ function performClickPicking(event, containerElement) {
     },
   );
 }
-
 function performSetContainer(container) {
   if (!container || !container.value) {
     return;
   }
-
   const hybridViewerStore = useHybridViewerStore();
   const { genericRenderWindow, syncRemoteCamera, hoverHighlight } = hybridViewerStore;
   const { is_picking, is_moving } = storeToRefs(hybridViewerStore);
-
   genericRenderWindow.value.setContainer(container.value.$el);
   const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
   webGLRenderWindow.setUseBackgroundImage(true);
   const imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
-  Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
-
+  Object.assign(imageStyle, {
+    transition: "opacity 0.1s ease-in",
+    zIndex: 1,
+  });
   performResize(container.value.$el.offsetWidth, container.value.$el.offsetHeight);
-
   let has_dragged = false;
   useMousePressed({
     target: container,
@@ -96,7 +97,6 @@ function performSetContainer(container) {
       has_dragged = false;
     },
   });
-
   useEventListener(container, "mousemove", (event) => {
     if (is_moving.value) {
       has_dragged = true;
@@ -106,7 +106,6 @@ function performSetContainer(container) {
     }
     hoverHighlight(event);
   });
-
   let wheelEventEndTimeout = undefined;
   useEventListener(container, "wheel", () => {
     is_moving.value = true;
@@ -122,27 +121,18 @@ function performSetContainer(container) {
     }, WHEEL_TIME_OUT_MS);
   });
 }
-
-async function performResize(width, height) {
-  const hybridViewerStore = useHybridViewerStore();
-  const { genericRenderWindow, remoteRender } = hybridViewerStore;
-  const { status, viewStream } = storeToRefs(hybridViewerStore);
-  const viewerStore = useViewerStore();
-  if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
-    return;
+function useHybridViewerViewport() {
+  const viewStream = ref(undefined);
+  function setContainer(container) {
+    performSetContainer(container);
   }
-  const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-  const canvas = webGLRenderWindow.getCanvas();
-  canvas.width = width;
-  canvas.height = height;
-  await nextTick();
-  webGLRenderWindow.setSize(width, height);
-  if (viewStream.value) {
-    viewStream.value.setSize(width, height);
+  async function resize(width, height) {
+    await performResize(width, height);
   }
-  const renderWindow = genericRenderWindow.value.getRenderWindow();
-  renderWindow.render();
-  await remoteRender();
+  return {
+    setContainer,
+    resize,
+    viewStream,
+  };
 }
-
 export { performClickPicking, performResize, performSetContainer, useHybridViewerViewport };

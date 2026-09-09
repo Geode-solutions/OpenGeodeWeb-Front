@@ -65,6 +65,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
     { deep: true },
   );
 
+  function closeView(id) {
+    opened_views.value = opened_views.value.filter((view) => view.id !== id);
+  }
+
   watch(selection, (current, previous) => {
     const { removed } = compareSelections(current, previous);
     for (const id of removed) {
@@ -76,10 +80,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
       }
     }
   });
-
-  function closeView(id) {
-    opened_views.value = opened_views.value.filter((view) => view.id !== id);
-  }
 
   function toggleView(id) {
     const index = opened_views.value.findIndex((view) => view.id === id);

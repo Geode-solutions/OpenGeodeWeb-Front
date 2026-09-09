@@ -1,9 +1,9 @@
 <script setup>
+import AttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
-import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 
-import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
+import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute_style";
 
 const { dataId, x, y } = defineProps({
   dataId: { required: false, type: String, default: undefined },
@@ -13,94 +13,28 @@ const { dataId, x, y } = defineProps({
 
 const show = defineModel("show", { type: Boolean, default: false });
 
-const dataStyleStore = useDataStyleStore();
-const hybridViewerStore = useHybridViewerStore();
+const dataIdRef = computed(() => dataId);
+const { currentColormap, currentRange, applyGlobalColormap, resetGlobalRange } =
+  useGlobalAttributeStyle(dataIdRef);
 
-const componentNames = [
-  { getterKey: "meshPoints", setterKey: "MeshPoints", key: "points" },
-  { getterKey: "meshEdges", setterKey: "MeshEdges", key: "edges" },
-  { getterKey: "meshPolygons", setterKey: "MeshPolygons", key: "polygons" },
-  { getterKey: "meshCells", setterKey: "MeshCells", key: "cells" },
-  { getterKey: "meshPolyhedra", setterKey: "MeshPolyhedra", key: "polyhedra" },
-];
-
-const current = computed(() => {
-  const targetId = dataId;
-  if (!targetId) {
-    return "batlow";
-  }
-
-  const style = dataStyleStore.getStyle(targetId);
-  if (!style) {
-    return "batlow";
-  }
-
-  for (const { key, getterKey } of componentNames) {
-    if (!style[key] || !style[key].coloring) {
-      continue;
-    }
-
-    const activeColoring = style[key].coloring.active;
-    if (!["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
-      continue;
-    }
-
-    const attributeType = `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
-    const getterName = `${getterKey}${attributeType}ColorMap`;
-    const getter = dataStyleStore[getterName];
-
-    if (!getter) {
-      continue;
-    }
-
-    const colorMap = getter(targetId);
-    if (colorMap) {
-      return colorMap;
-    }
-  }
-
-  return "batlow";
+const minimum = computed({
+  get: () => currentRange.value[0],
+  set: (val) => {
+    currentRange.value = [val, currentRange.value[1]];
+  },
 });
 
-const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(current.value));
+const maximum = computed({
+  get: () => currentRange.value[1],
+  set: (val) => {
+    currentRange.value = [currentRange.value[0], val];
+  },
+});
+
+const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(currentColormap.value));
 
 async function onQuickColormapSelect(preset) {
-  show.value = false;
-  const newMap = preset.Name;
-  const targetId = dataId;
-  if (!targetId) {
-    return;
-  }
-
-  const style = dataStyleStore.getStyle(targetId);
-  if (!style) {
-    return;
-  }
-
-  const promises = [];
-
-  for (const { key, setterKey } of componentNames) {
-    if (!style[key] || !style[key].coloring) {
-      continue;
-    }
-
-    const activeColoring = style[key].coloring.active;
-    if (!["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
-      continue;
-    }
-
-    const attributeType = `${activeColoring.charAt(0).toUpperCase() + activeColoring.slice(1)}Attribute`;
-    const setterName = `set${setterKey}${attributeType}ColorMap`;
-    const setter = dataStyleStore[setterName];
-
-    if (setter) {
-      promises.push(setter(targetId, newMap));
-    }
-  }
-
-  await Promise.all(promises);
-
-  hybridViewerStore.remoteRender();
+  await applyGlobalColormap(preset.Name);
 }
 </script>
 
@@ -114,8 +48,15 @@ async function onQuickColormapSelect(preset) {
   >
     <ColorMapList
       :presets="quickColormapPresets"
-      :selected-preset-name="current"
+      :selected-preset-name="currentColormap"
       @select="onQuickColormapSelect"
-    />
+    >
+      <v-divider class="my-2"></v-divider>
+      <AttributeRangeSelector
+        v-model:minimum="minimum"
+        v-model:maximum="maximum"
+        @reset="resetGlobalRange"
+      />
+    </ColorMapList>
   </v-menu>
 </template>

@@ -71,7 +71,7 @@ function close() {
 .tool-panel {
   z-index: 1;
   top: 90px;
-  right: 55px;
+  right: 70px;
 }
 :deep(.v-card-title) {
   font-size: 0.9rem !important;

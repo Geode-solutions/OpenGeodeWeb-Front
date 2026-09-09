@@ -5,7 +5,7 @@ export function useVirtualTree(propsIn, emit) {
     value: "id",
     title: "title",
     children: "children",
-    height: 44,
+    height: 28,
     ...props.value.itemProps,
   }));
 

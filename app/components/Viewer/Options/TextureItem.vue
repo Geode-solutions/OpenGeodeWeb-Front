@@ -35,10 +35,6 @@ watch(
 const textureCoordinates = ref([]);
 const backStore = useBackStore();
 
-onMounted(() => {
-  getTextureCoordinates();
-});
-
 function getTextureCoordinates() {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;
   const params = { id };
@@ -51,6 +47,10 @@ function getTextureCoordinates() {
     },
   );
 }
+
+onMounted(() => {
+  getTextureCoordinates();
+});
 
 async function files_uploaded_event(value) {
   if (value.length > 0) {
