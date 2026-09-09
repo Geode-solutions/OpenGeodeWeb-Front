@@ -13,6 +13,7 @@ async function uploadExtension(file) {
   const appStore = useAppStore();
   await appStore.upload(file);
 }
+
 function runExtensions() {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
@@ -29,6 +30,22 @@ function runExtensions() {
     params,
   });
 }
+
+function downloadExtension({ url, extensionFileName }) {
+  const appStore = useAppStore();
+  const { PROJECT: projectName } = useRuntimeConfig().public;
+  const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
+  const params = {
+    projectName,
+    url,
+    extensionFileName,
+  };
+  return appStore.request({
+    schema,
+    params,
+  });
+}
+
 async function registerRunningExtensions() {
   const appStore = useAppStore();
   const infraStore = useInfraStore();
@@ -55,28 +72,17 @@ async function registerRunningExtensions() {
     }),
   );
 }
+
 async function importExtensionFile(file) {
   await uploadExtension(file);
   return registerRunningExtensions();
 }
-function downloadExtension({ url, extensionFileName }) {
-  const appStore = useAppStore();
-  const { PROJECT: projectName } = useRuntimeConfig().public;
-  const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
-  const params = {
-    projectName,
-    url,
-    extensionFileName,
-  };
-  return appStore.request({
-    schema,
-    params,
-  });
-}
+
 async function importExtensionURL(url) {
   await downloadExtension(url);
   return registerRunningExtensions();
 }
+
 async function unloadExtension(extensionId) {
   const appStore = useAppStore();
   console.log("[ExtensionManager] Unloading extension:", extensionId);
@@ -101,6 +107,7 @@ async function unloadExtension(extensionId) {
   console.log("[ExtensionManager] Extension unloaded:", extensionId);
   return true;
 }
+
 function killExtension(extensionId) {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;

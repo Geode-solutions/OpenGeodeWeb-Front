@@ -39,10 +39,12 @@ function addExtensionToConf(projectName, { extensionId, extensionPath }) {
   const projectConfig = projectConf(projectName);
   projectConfig.set(`extensions.${extensionId}.path`, extensionPath);
 }
+
 function extensionPathFromConf(projectName, extensionId) {
   const projectConfig = projectConf(projectName);
   return projectConfig.get(`extensions.${extensionId}.path`);
 }
+
 async function removeExtensionFromConf(projectName, extensionId) {
   const projectConfig = projectConf(projectName);
   const extensionArchivePath = extensionPathFromConf(projectName, extensionId);
@@ -55,6 +57,7 @@ async function removeExtensionFromConf(projectName, extensionId) {
   projectConfig.delete(`extensions.${extensionId}`);
   console.log(`${extensionId} was deleted from ${projectName} config`);
 }
+
 async function registerExtensionFile(projectName, file) {
   const StreamZipAsync = StreamZip.async;
   const zip = new StreamZipAsync({

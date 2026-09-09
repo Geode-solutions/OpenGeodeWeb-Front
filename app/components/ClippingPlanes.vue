@@ -39,7 +39,7 @@ const {
   selectedDatasetIds,
   allItems,
   hybridViewerStore,
-  debouncedApply: () => debouncedApply(),
+  debouncedApply: (...args) => debouncedApply?.(...args),
 });
 
 async function applyClippingPlanes() {

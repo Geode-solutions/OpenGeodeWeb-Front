@@ -210,11 +210,10 @@ function useClippingPlanesWidget({
       maxDistance = localRenderWindow.getRenderer().getActiveCamera().getDistance();
     }
   }
+
   function initLocalWidget(container) {
     cleanupLocalWidget();
-    container.addEventListener("wheel", (event) => event.stopPropagation(), {
-      passive: true,
-    });
+    container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
     localRenderWindow = vtkGenericRenderWindow({
       background: [0, 0, 0, 0],
       listenWindowResize: false,
@@ -223,16 +222,13 @@ function useClippingPlanesWidget({
     const camera = localRenderWindow.getRenderer().getActiveCamera();
     camera.onModified(() => limitCameraZoomOut(camera));
     const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
-    Object.assign(canvas.style, {
-      width: "100%",
-      height: "100%",
-      background: "transparent",
-    });
+    Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
     localRenderWindow.resize();
     widgetManager = vtkWidgetManager();
     widgetManager.setRenderer(localRenderWindow.getRenderer());
     updateWidgetPlacement();
   }
+
   function isFromWidget() {
     return fromWidget;
   }
