@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   },
 
   // ** Global CSS
-  css: ["vuetify/lib/styles/main.sass"],
+  css: ["vuetify/lib/styles/main.sass", path.resolve(__dirname, "app/assets/css/main.css")],
 
   // ** Build configuration
   build: {
