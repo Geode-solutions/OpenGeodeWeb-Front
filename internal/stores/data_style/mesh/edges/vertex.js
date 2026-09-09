@@ -96,7 +96,7 @@ function useMeshEdgesVertexAttributeStyle() {
       points,
       minimum,
       maximum,
-      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
+      no_data_color,
     };
     return viewerStore.request({
       schema,

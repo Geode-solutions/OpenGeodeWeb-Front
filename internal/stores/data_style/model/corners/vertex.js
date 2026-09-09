@@ -93,7 +93,7 @@ function useModelCornersVertexAttribute() {
   async function setModelCornersVertexAttribute(
     modelId,
     cornerIds,
-    { name, item, minimum, maximum, colorMap },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelCornersVertexStyle(modelId, cornerIds, {
       name,
@@ -115,7 +115,7 @@ function useModelCornersVertexAttribute() {
       points,
       minimum,
       maximum,
-      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
+      no_data_color,
     };
     return viewerStore.request({
       schema: attributeSchema,
