@@ -17,7 +17,11 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: [["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }], "@vueuse/nuxt"],
+  modules: [
+    ["vuetify-nuxt-module", { enableRules: false }],
+    ["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }],
+    "@vueuse/nuxt",
+  ],
   imports: {
     scan: false,
   },
