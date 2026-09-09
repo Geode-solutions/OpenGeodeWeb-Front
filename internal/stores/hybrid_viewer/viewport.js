@@ -26,9 +26,10 @@ async function performResize(width, height) {
   renderWindow.render();
   await remoteRender();
 }
-function performClickPicking(event, containerElement) {
+async function performClickPicking(event, containerElement) {
   const { genericRenderWindow, syncRemoteCamera } = useHybridViewerStore();
   const viewerStore = useViewerStore();
+  await syncRemoteCamera();
   const rect = containerElement.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
   const params = {
