@@ -94,7 +94,7 @@ function useModelSurfacesVertexAttribute() {
   async function setModelSurfacesVertexAttribute(
     modelId,
     surfaceIds,
-    { name, item, minimum, maximum, colorMap, no_data_color },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelSurfacesVertexStyle(modelId, surfaceIds, {
       name,

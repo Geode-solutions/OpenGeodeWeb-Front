@@ -75,7 +75,7 @@ function useMeshEdgesVertexAttributeStyle() {
   }
   function setMeshEdgesVertexAttribute(
     id,
-    { name, item, minimum, maximum, colorMap, no_data_color },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateMeshEdgesVertexStyle(id, {
       name,

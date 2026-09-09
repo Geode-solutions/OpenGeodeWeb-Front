@@ -92,7 +92,7 @@ function useModelLinesEdgeAttribute() {
   async function setModelLinesEdgeAttribute(
     modelId,
     lineIds,
-    { name, item, minimum, maximum, colorMap, no_data_color },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelLinesEdgeStyle(modelId, lineIds, {
       name,

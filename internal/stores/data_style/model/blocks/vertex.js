@@ -93,7 +93,7 @@ function useModelBlocksVertexAttribute() {
   async function setModelBlocksVertexAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap, no_data_color },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelBlocksVertexStyle(modelId, blockIds, {
       name,

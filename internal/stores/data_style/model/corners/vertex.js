@@ -93,7 +93,7 @@ function useModelCornersVertexAttribute() {
   async function setModelCornersVertexAttribute(
     modelId,
     cornerIds,
-    { name, item, minimum, maximum, colorMap, no_data_color },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelCornersVertexStyle(modelId, cornerIds, {
       name,

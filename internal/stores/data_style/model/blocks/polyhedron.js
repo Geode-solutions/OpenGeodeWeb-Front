@@ -94,7 +94,7 @@ function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap, no_data_color },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
