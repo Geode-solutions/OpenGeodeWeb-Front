@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -36,6 +37,7 @@ function useModelBlocksVertexAttribute() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateModelBlocksVertexStyle(modelId, blockIds, values) {
@@ -91,7 +93,7 @@ function useModelBlocksVertexAttribute() {
   async function setModelBlocksVertexAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap, no_data = false },
+    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelBlocksVertexStyle(modelId, blockIds, {
       name,
@@ -102,6 +104,7 @@ function useModelBlocksVertexAttribute() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
@@ -114,6 +117,7 @@ function useModelBlocksVertexAttribute() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -131,6 +135,7 @@ function useModelBlocksVertexAttribute() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isModelBlocksVertexAttributeValid(attribute)) {
       return setModelBlocksVertexAttribute(modelId, blockIds, attribute);
@@ -168,6 +173,38 @@ function useModelBlocksVertexAttribute() {
     });
     return applyVertexAttribute(modelId, blockIds);
   }
+  function modelBlocksVertexAttributeNoData(modelId, blockId) {
+    const name = modelBlocksVertexAttributeName(modelId, blockId);
+    const item = modelBlocksVertexAttributeItem(modelId, blockId);
+    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setModelBlocksVertexAttributeNoData(modelId, blockIds, no_data) {
+    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
+    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name, item);
+    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyVertexAttribute(modelId, blockIds);
+  }
+  function modelBlocksVertexAttributeNoDataColor(modelId, blockId) {
+    const name = modelBlocksVertexAttributeName(modelId, blockId);
+    const item = modelBlocksVertexAttributeItem(modelId, blockId);
+    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setModelBlocksVertexAttributeNoDataColor(modelId, blockIds, no_data_color) {
+    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
+    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name, item);
+    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyVertexAttribute(modelId, blockIds);
+  }
   return {
     modelBlocksVertexAttributeName,
     modelBlocksVertexAttributeItem,
@@ -179,6 +216,10 @@ function useModelBlocksVertexAttribute() {
     setModelBlocksVertexAttributeItem,
     setModelBlocksVertexAttributeRange,
     setModelBlocksVertexAttributeColorMap,
+    modelBlocksVertexAttributeNoData,
+    setModelBlocksVertexAttributeNoData,
+    modelBlocksVertexAttributeNoDataColor,
+    setModelBlocksVertexAttributeNoDataColor,
   };
 }
 export { isModelBlocksVertexAttributeValid, useModelBlocksVertexAttribute };

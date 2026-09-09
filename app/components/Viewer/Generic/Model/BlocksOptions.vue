@@ -103,6 +103,15 @@ const blocksVertexAttributeColorMap = computed({
   },
 });
 
+const blocksVertexAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(modelId, targetBlockIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+
 const blocksPolyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId),
   set: async (newValue) => {
@@ -144,6 +153,19 @@ const blocksPolyhedronAttributeColorMap = computed({
   },
 });
 
+const blocksPolyhedronAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(
+      modelId,
+      targetBlockIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+
 // Individual Attributes
 const vertexAttributeName = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
@@ -182,6 +204,15 @@ const vertexAttributeColorMap = computed({
   },
 });
 
+const vertexAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, blockId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(modelId, [blockId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+
 const polyhedronAttributeName = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
   set: async (newValue) => {
@@ -219,6 +250,15 @@ const polyhedronAttributeColorMap = computed({
   },
 });
 
+const polyhedronAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, blockId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(modelId, [blockId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+
 const capabilities = {
   color: { available: true },
   textures: { available: false },
@@ -245,10 +285,12 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
       v-model:vertex_attribute_item="blocksVertexAttributeItem"
       v-model:vertex_attribute_range="blocksVertexAttributeRange"
       v-model:vertex_attribute_color_map="blocksVertexAttributeColorMap"
+      v-model:vertex_attribute_no_data_color="blocksVertexAttributeNoDataColor"
       v-model:polyhedron_attribute_name="blocksPolyhedronAttributeName"
       v-model:polyhedron_attribute_item="blocksPolyhedronAttributeItem"
       v-model:polyhedron_attribute_range="blocksPolyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="blocksPolyhedronAttributeColorMap"
+      v-model:polyhedron_attribute_no_data_color="blocksPolyhedronAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
       :allowRandom="true"
@@ -271,10 +313,12 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
       v-model:vertex_attribute_item="vertexAttributeItem"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+      v-model:vertex_attribute_no_data_color="vertexAttributeNoDataColor"
       v-model:polyhedron_attribute_name="polyhedronAttributeName"
       v-model:polyhedron_attribute_item="polyhedronAttributeItem"
       v-model:polyhedron_attribute_range="polyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="polyhedronAttributeColorMap"
+      v-model:polyhedron_attribute_no_data_color="polyhedronAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
       :allowRandom="true"

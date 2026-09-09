@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -37,6 +38,7 @@ function useModelSurfacesVertexAttribute() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateModelSurfacesVertexStyle(modelId, surfaceIds, values) {
@@ -92,7 +94,7 @@ function useModelSurfacesVertexAttribute() {
   async function setModelSurfacesVertexAttribute(
     modelId,
     surfaceIds,
-    { name, item, minimum, maximum, colorMap, no_data = false },
+    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelSurfacesVertexStyle(modelId, surfaceIds, {
       name,
@@ -103,6 +105,7 @@ function useModelSurfacesVertexAttribute() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
@@ -115,6 +118,7 @@ function useModelSurfacesVertexAttribute() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -137,6 +141,7 @@ function useModelSurfacesVertexAttribute() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isModelSurfacesVertexAttributeValid(attribute)) {
       return setModelSurfacesVertexAttribute(modelId, surfaceIds, attribute);
@@ -174,6 +179,38 @@ function useModelSurfacesVertexAttribute() {
     });
     return applyVertexAttribute(modelId, surfaceIds);
   }
+  function modelSurfacesVertexAttributeNoData(modelId, surfaceId) {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setModelSurfacesVertexAttributeNoData(modelId, surfaceIds, no_data) {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyVertexAttribute(modelId, surfaceIds);
+  }
+  function modelSurfacesVertexAttributeNoDataColor(modelId, surfaceId) {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setModelSurfacesVertexAttributeNoDataColor(modelId, surfaceIds, no_data_color) {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyVertexAttribute(modelId, surfaceIds);
+  }
   return {
     modelSurfacesVertexAttributeName,
     modelSurfacesVertexAttributeItem,
@@ -185,6 +222,10 @@ function useModelSurfacesVertexAttribute() {
     setModelSurfacesVertexAttributeItem,
     setModelSurfacesVertexAttributeRange,
     setModelSurfacesVertexAttributeColorMap,
+    modelSurfacesVertexAttributeNoData,
+    setModelSurfacesVertexAttributeNoData,
+    modelSurfacesVertexAttributeNoDataColor,
+    setModelSurfacesVertexAttributeNoDataColor,
   };
 }
 export { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute };

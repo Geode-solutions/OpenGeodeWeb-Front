@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -37,6 +38,7 @@ function useModelBlocksPolyhedronAttribute() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateModelBlocksPolyhedronStyle(modelId, blockIds, values) {
@@ -92,7 +94,7 @@ function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap, no_data = false },
+    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
@@ -103,6 +105,7 @@ function useModelBlocksPolyhedronAttribute() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
@@ -115,6 +118,7 @@ function useModelBlocksPolyhedronAttribute() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema: modelBlockPolyhedronAttributeSchema,
@@ -137,6 +141,7 @@ function useModelBlocksPolyhedronAttribute() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isModelBlocksPolyhedronAttributeValid(attribute)) {
       return setModelBlocksPolyhedronAttribute(modelId, blockIds, attribute);
@@ -174,6 +179,38 @@ function useModelBlocksPolyhedronAttribute() {
     });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
+  function modelBlocksPolyhedronAttributeNoData(modelId, blockId) {
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setModelBlocksPolyhedronAttributeNoData(modelId, blockIds, no_data) {
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name, item);
+    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyPolyhedronAttribute(modelId, blockIds);
+  }
+  function modelBlocksPolyhedronAttributeNoDataColor(modelId, blockId) {
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setModelBlocksPolyhedronAttributeNoDataColor(modelId, blockIds, no_data_color) {
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name, item);
+    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyPolyhedronAttribute(modelId, blockIds);
+  }
   return {
     modelBlocksPolyhedronAttributeName,
     modelBlocksPolyhedronAttributeItem,
@@ -185,6 +222,10 @@ function useModelBlocksPolyhedronAttribute() {
     setModelBlocksPolyhedronAttributeItem,
     setModelBlocksPolyhedronAttributeRange,
     setModelBlocksPolyhedronAttributeColorMap,
+    modelBlocksPolyhedronAttributeNoData,
+    setModelBlocksPolyhedronAttributeNoData,
+    modelBlocksPolyhedronAttributeNoDataColor,
+    setModelBlocksPolyhedronAttributeNoDataColor,
   };
 }
 export { isModelBlocksPolyhedronAttributeValid, useModelBlocksPolyhedronAttribute };

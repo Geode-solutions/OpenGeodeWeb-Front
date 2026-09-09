@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -38,6 +39,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateMeshPolygonsPolygonStyle(id, values) {
@@ -71,7 +73,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
     const { item, name } = meshPolygonsPolygonAttribute(id);
     return item ?? meshPolygonsPolygonAttributeLastItem(id, name);
   }
-  function setMeshPolygonsPolygonAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false }) {
+  function setMeshPolygonsPolygonAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR }) {
     mutateMeshPolygonsPolygonStyle(id, {
       name,
       item,
@@ -81,6 +83,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshPolygonsPolygonAttributeSchemas.attribute;
@@ -92,6 +95,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema,
@@ -109,6 +113,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPolygonsPolygonAttributeValid(attribute)) {
       return setMeshPolygonsPolygonAttribute(id, attribute);
@@ -157,6 +162,38 @@ function useMeshPolygonsPolygonAttributeStyle() {
     });
     return applyPolygonAttribute(id);
   }
+  function meshPolygonsPolygonAttributeNoData(id) {
+    const name = meshPolygonsPolygonAttributeName(id);
+    const item = meshPolygonsPolygonAttributeItem(id);
+    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setMeshPolygonsPolygonAttributeNoData(id, no_data) {
+    const name = meshPolygonsPolygonAttributeName(id);
+    const item = meshPolygonsPolygonAttributeItem(id);
+    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
+    await setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyPolygonAttribute(id);
+  }
+  function meshPolygonsPolygonAttributeNoDataColor(id) {
+    const name = meshPolygonsPolygonAttributeName(id);
+    const item = meshPolygonsPolygonAttributeItem(id);
+    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setMeshPolygonsPolygonAttributeNoDataColor(id, no_data_color) {
+    const name = meshPolygonsPolygonAttributeName(id);
+    const item = meshPolygonsPolygonAttributeItem(id);
+    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
+    await setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyPolygonAttribute(id);
+  }
   return {
     meshPolygonsPolygonAttributeName,
     meshPolygonsPolygonAttributeItem,
@@ -168,6 +205,10 @@ function useMeshPolygonsPolygonAttributeStyle() {
     setMeshPolygonsPolygonAttributeItem,
     setMeshPolygonsPolygonAttributeRange,
     setMeshPolygonsPolygonAttributeColorMap,
+    meshPolygonsPolygonAttributeNoData,
+    setMeshPolygonsPolygonAttributeNoData,
+    meshPolygonsPolygonAttributeNoDataColor,
+    setMeshPolygonsPolygonAttributeNoDataColor,
   };
 }
 export { isMeshPolygonsPolygonAttributeValid, useMeshPolygonsPolygonAttributeStyle };

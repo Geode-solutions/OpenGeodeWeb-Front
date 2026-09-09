@@ -93,6 +93,24 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
+const vertex_attribute_no_data = computed({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeNoData(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeNoData(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_no_data_color = computed({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeNoDataColor(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const polygon_attribute_name = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
   set: async (newValue) => {
@@ -129,6 +147,24 @@ const polygon_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
+const polygon_attribute_no_data = computed({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeNoData(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeNoData(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const polygon_attribute_no_data_color = computed({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(id.value),
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 </script>
 
 <template>
@@ -154,10 +190,14 @@ const polygon_attribute_color_map = computed({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+          v-model:vertex_attribute_no_data="vertex_attribute_no_data"
+          v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:polygon_attribute_name="polygon_attribute_name"
           v-model:polygon_attribute_item="polygon_attribute_item"
           v-model:polygon_attribute_range="polygon_attribute_range"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
+          v-model:polygon_attribute_no_data="polygon_attribute_no_data"
+          v-model:polygon_attribute_no_data_color="polygon_attribute_no_data_color"
           :capabilities="capabilities"
         />
       </template>

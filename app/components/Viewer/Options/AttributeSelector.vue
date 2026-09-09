@@ -1,5 +1,7 @@
 <script setup>
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
+import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -9,6 +11,8 @@ const attributeName = defineModel("attributeName", { type: String });
 const attributeItem = defineModel("attributeItem", { type: Number });
 const attributeRange = defineModel("attributeRange", { type: Array });
 const attributeColorMap = defineModel("attributeColorMap", { type: String });
+const attributeNoData = defineModel("attributeNoData", { type: Boolean });
+const attributeNoDataColor = defineModel("attributeNoDataColor", { type: Object });
 
 const { id, componentIds, schema } = defineProps({
   id: { type: String, required: true },
@@ -21,6 +25,10 @@ const attributes = ref([]);
 const currentAttribute = computed(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
+const cssNoDataColor = computed(() => {
+  const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+});
 const rangeMin = computed({
   get: () => (attributeRange.value ? attributeRange.value[0] : undefined),
   set: (val) => {
@@ -99,8 +107,14 @@ watch(
 );
 
 watch([attributeName, attributeItem, currentAttribute], () => {
+  if (currentAttribute.value) {
+    attributeNoData.value = currentAttribute.value.no_data ?? false;
+  }
   if (attributeColorMap.value === undefined) {
     attributeColorMap.value = "batlow";
+  }
+  if (attributeNoDataColor.value === undefined) {
+    attributeNoDataColor.value = DEFAULT_NO_DATA_COLOR;
   }
   if (!attributeRange.value || attributeRange.value[0] === undefined) {
     resetRange();
@@ -138,6 +152,24 @@ watch([attributeName, attributeItem, currentAttribute], () => {
   >
     <v-icon icon="mdi-information-outline" size="14" color="info" />
     <span>Contains unmapped elements</span>
+    <v-menu :close-on-content-click="false">
+      <template #activator="{ props }">
+        <v-btn
+          v-bind="props"
+          icon
+          density="compact"
+          size="x-small"
+          variant="text"
+          v-tooltip="'Change unmapped elements color'"
+          data-testid="noDataColorBtn"
+        >
+          <v-icon icon="mdi-circle" :style="{ color: cssNoDataColor }" />
+        </v-btn>
+      </template>
+      <v-card class="pa-2">
+        <ViewerOptionsColorPicker v-model="attributeNoDataColor" />
+      </v-card>
+    </v-menu>
   </div>
   <ViewerOptionsAttributeColorBar
     v-if="attributeName"

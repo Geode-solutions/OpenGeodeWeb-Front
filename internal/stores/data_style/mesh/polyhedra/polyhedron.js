@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -38,6 +39,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateMeshPolyhedraPolyhedronStyle(id, values) {
@@ -71,7 +73,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     const { item, name } = meshPolyhedraPolyhedronAttribute(id);
     return item ?? meshPolyhedraPolyhedronAttributeLastItem(id, name);
   }
-  function setMeshPolyhedraPolyhedronAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false }) {
+  function setMeshPolyhedraPolyhedronAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR }) {
     mutateMeshPolyhedraPolyhedronStyle(id, {
       name,
       item,
@@ -81,6 +83,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshPolyhedraPolyhedronAttributeSchemas.attribute;
@@ -92,6 +95,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema,
@@ -109,6 +113,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPolyhedraPolyhedronAttributeValid(attribute)) {
       return setMeshPolyhedraPolyhedronAttribute(id, attribute);
@@ -157,6 +162,38 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     });
     return applyPolyhedronAttribute(id);
   }
+  function meshPolyhedraPolyhedronAttributeNoData(id) {
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setMeshPolyhedraPolyhedronAttributeNoData(id, no_data) {
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
+    await setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyPolyhedronAttribute(id);
+  }
+  function meshPolyhedraPolyhedronAttributeNoDataColor(id) {
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setMeshPolyhedraPolyhedronAttributeNoDataColor(id, no_data_color) {
+    const name = meshPolyhedraPolyhedronAttributeName(id);
+    const item = meshPolyhedraPolyhedronAttributeItem(id);
+    const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
+    await setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyPolyhedronAttribute(id);
+  }
   return {
     meshPolyhedraPolyhedronAttributeName,
     meshPolyhedraPolyhedronAttributeItem,
@@ -168,6 +205,10 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     setMeshPolyhedraPolyhedronAttributeItem,
     setMeshPolyhedraPolyhedronAttributeRange,
     setMeshPolyhedraPolyhedronAttributeColorMap,
+    meshPolyhedraPolyhedronAttributeNoData,
+    setMeshPolyhedraPolyhedronAttributeNoData,
+    meshPolyhedraPolyhedronAttributeNoDataColor,
+    setMeshPolyhedraPolyhedronAttributeNoDataColor,
   };
 }
 export { isMeshPolyhedraPolyhedronAttributeValid, useMeshPolyhedraPolyhedronAttributeStyle };

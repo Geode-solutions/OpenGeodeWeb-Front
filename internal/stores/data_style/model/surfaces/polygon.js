@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -37,6 +38,7 @@ function useModelSurfacesPolygonAttribute() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateModelSurfacesPolygonStyle(modelId, surfaceIds, values) {
@@ -92,7 +94,7 @@ function useModelSurfacesPolygonAttribute() {
   async function setModelSurfacesPolygonAttribute(
     modelId,
     surfaceIds,
-    { name, item, minimum, maximum, colorMap, no_data = false },
+    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
       name,
@@ -103,6 +105,7 @@ function useModelSurfacesPolygonAttribute() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
@@ -115,6 +118,7 @@ function useModelSurfacesPolygonAttribute() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -137,6 +141,7 @@ function useModelSurfacesPolygonAttribute() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isModelSurfacesPolygonAttributeValid(attribute)) {
       return setModelSurfacesPolygonAttribute(modelId, surfaceIds, attribute);
@@ -174,6 +179,38 @@ function useModelSurfacesPolygonAttribute() {
     });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
+  function modelSurfacesPolygonAttributeNoData(modelId, surfaceId) {
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setModelSurfacesPolygonAttributeNoData(modelId, surfaceIds, no_data) {
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyPolygonAttribute(modelId, surfaceIds);
+  }
+  function modelSurfacesPolygonAttributeNoDataColor(modelId, surfaceId) {
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setModelSurfacesPolygonAttributeNoDataColor(modelId, surfaceIds, no_data_color) {
+    const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
+    const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyPolygonAttribute(modelId, surfaceIds);
+  }
   return {
     modelSurfacesPolygonAttributeName,
     modelSurfacesPolygonAttributeItem,
@@ -185,6 +222,10 @@ function useModelSurfacesPolygonAttribute() {
     setModelSurfacesPolygonAttributeItem,
     setModelSurfacesPolygonAttributeRange,
     setModelSurfacesPolygonAttributeColorMap,
+    modelSurfacesPolygonAttributeNoData,
+    setModelSurfacesPolygonAttributeNoData,
+    modelSurfacesPolygonAttributeNoDataColor,
+    setModelSurfacesPolygonAttributeNoDataColor,
   };
 }
 export { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute };

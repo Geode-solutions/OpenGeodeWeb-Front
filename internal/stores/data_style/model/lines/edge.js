@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -36,6 +37,7 @@ function useModelLinesEdgeAttribute() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateModelLinesEdgeStyle(modelId, lineIds, values) {
@@ -90,7 +92,7 @@ function useModelLinesEdgeAttribute() {
   async function setModelLinesEdgeAttribute(
     modelId,
     lineIds,
-    { name, item, minimum, maximum, colorMap, no_data = false },
+    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelLinesEdgeStyle(modelId, lineIds, {
       name,
@@ -101,6 +103,7 @@ function useModelLinesEdgeAttribute() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
@@ -113,6 +116,7 @@ function useModelLinesEdgeAttribute() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -130,6 +134,7 @@ function useModelLinesEdgeAttribute() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isModelLinesEdgeAttributeValid(attribute)) {
       return setModelLinesEdgeAttribute(modelId, lineIds, attribute);
@@ -167,6 +172,38 @@ function useModelLinesEdgeAttribute() {
     });
     return applyEdgeAttribute(modelId, lineIds);
   }
+  function modelLinesEdgeAttributeNoData(modelId, lineId) {
+    const name = modelLinesEdgeAttributeName(modelId, lineId);
+    const item = modelLinesEdgeAttributeItem(modelId, lineId);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setModelLinesEdgeAttributeNoData(modelId, lineIds, no_data) {
+    const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineIds[0], name, item);
+    await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyEdgeAttribute(modelId, lineIds);
+  }
+  function modelLinesEdgeAttributeNoDataColor(modelId, lineId) {
+    const name = modelLinesEdgeAttributeName(modelId, lineId);
+    const item = modelLinesEdgeAttributeItem(modelId, lineId);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setModelLinesEdgeAttributeNoDataColor(modelId, lineIds, no_data_color) {
+    const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
+    const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineIds[0], name, item);
+    await setModelLinesEdgeAttributeStoredConfig(modelId, lineIds, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyEdgeAttribute(modelId, lineIds);
+  }
   return {
     modelLinesEdgeAttributeName,
     modelLinesEdgeAttributeItem,
@@ -178,6 +215,10 @@ function useModelLinesEdgeAttribute() {
     setModelLinesEdgeAttributeItem,
     setModelLinesEdgeAttributeRange,
     setModelLinesEdgeAttributeColorMap,
+    modelLinesEdgeAttributeNoData,
+    setModelLinesEdgeAttributeNoData,
+    modelLinesEdgeAttributeNoDataColor,
+    setModelLinesEdgeAttributeNoDataColor,
   };
 }
 export { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute };

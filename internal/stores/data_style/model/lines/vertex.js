@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -36,6 +37,7 @@ function useModelLinesVertexAttribute() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateModelLinesVertexStyle(modelId, lineIds, values) {
@@ -91,7 +93,7 @@ function useModelLinesVertexAttribute() {
   async function setModelLinesVertexAttribute(
     modelId,
     lineIds,
-    { name, item, minimum, maximum, colorMap, no_data = false },
+    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
@@ -102,6 +104,7 @@ function useModelLinesVertexAttribute() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
@@ -114,6 +117,7 @@ function useModelLinesVertexAttribute() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -131,6 +135,7 @@ function useModelLinesVertexAttribute() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isModelLinesVertexAttributeValid(attribute)) {
       return setModelLinesVertexAttribute(modelId, lineIds, attribute);
@@ -168,6 +173,38 @@ function useModelLinesVertexAttribute() {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
+  function modelLinesVertexAttributeNoData(modelId, lineId) {
+    const name = modelLinesVertexAttributeName(modelId, lineId);
+    const item = modelLinesVertexAttributeItem(modelId, lineId);
+    const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setModelLinesVertexAttributeNoData(modelId, lineIds, no_data) {
+    const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
+    const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
+    const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);
+    await setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyVertexAttribute(modelId, lineIds);
+  }
+  function modelLinesVertexAttributeNoDataColor(modelId, lineId) {
+    const name = modelLinesVertexAttributeName(modelId, lineId);
+    const item = modelLinesVertexAttributeItem(modelId, lineId);
+    const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setModelLinesVertexAttributeNoDataColor(modelId, lineIds, no_data_color) {
+    const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
+    const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
+    const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);
+    await setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyVertexAttribute(modelId, lineIds);
+  }
   return {
     modelLinesVertexAttributeName,
     modelLinesVertexAttributeItem,
@@ -179,6 +216,10 @@ function useModelLinesVertexAttribute() {
     setModelLinesVertexAttributeItem,
     setModelLinesVertexAttributeRange,
     setModelLinesVertexAttributeColorMap,
+    modelLinesVertexAttributeNoData,
+    setModelLinesVertexAttributeNoData,
+    modelLinesVertexAttributeNoDataColor,
+    setModelLinesVertexAttributeNoDataColor,
   };
 }
 export { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute };

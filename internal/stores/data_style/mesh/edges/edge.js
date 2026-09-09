@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -37,6 +38,7 @@ function useMeshEdgesEdgeAttributeStyle() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateMeshEdgesEdgeStyle(id, values) {
@@ -70,7 +72,7 @@ function useMeshEdgesEdgeAttributeStyle() {
     const { item, name } = meshEdgesEdgeAttribute(id);
     return item ?? meshEdgesEdgeAttributeLastItem(id, name);
   }
-  function setMeshEdgesEdgeAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false }) {
+  function setMeshEdgesEdgeAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR }) {
     mutateMeshEdgesEdgeStyle(id, {
       name,
       item,
@@ -80,6 +82,7 @@ function useMeshEdgesEdgeAttributeStyle() {
       maximum,
       colorMap,
       no_data,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshEdgesEdgeAttributeSchemas.attribute;
@@ -91,6 +94,7 @@ function useMeshEdgesEdgeAttributeStyle() {
       minimum,
       maximum,
       no_data: no_data ?? false,
+      no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
       schema,
@@ -108,6 +112,7 @@ function useMeshEdgesEdgeAttributeStyle() {
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
       no_data: storedConfig.no_data,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isMeshEdgesEdgeAttributeValid(attribute)) {
       return setMeshEdgesEdgeAttribute(id, attribute);
@@ -156,6 +161,38 @@ function useMeshEdgesEdgeAttributeStyle() {
     });
     return applyEdgeAttribute(id);
   }
+  function meshEdgesEdgeAttributeNoData(id) {
+    const name = meshEdgesEdgeAttributeName(id);
+    const item = meshEdgesEdgeAttributeItem(id);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
+    return storedConfig.no_data ?? false;
+  }
+  async function setMeshEdgesEdgeAttributeNoData(id, no_data) {
+    const name = meshEdgesEdgeAttributeName(id);
+    const item = meshEdgesEdgeAttributeItem(id);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
+    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
+      no_data,
+    });
+    return applyEdgeAttribute(id);
+  }
+  function meshEdgesEdgeAttributeNoDataColor(id) {
+    const name = meshEdgesEdgeAttributeName(id);
+    const item = meshEdgesEdgeAttributeItem(id);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
+    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+  }
+  async function setMeshEdgesEdgeAttributeNoDataColor(id, no_data_color) {
+    const name = meshEdgesEdgeAttributeName(id);
+    const item = meshEdgesEdgeAttributeItem(id);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
+    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyEdgeAttribute(id);
+  }
   return {
     meshEdgesEdgeAttributeName,
     meshEdgesEdgeAttributeItem,
@@ -167,6 +204,10 @@ function useMeshEdgesEdgeAttributeStyle() {
     setMeshEdgesEdgeAttributeItem,
     setMeshEdgesEdgeAttributeRange,
     setMeshEdgesEdgeAttributeColorMap,
+    meshEdgesEdgeAttributeNoData,
+    setMeshEdgesEdgeAttributeNoData,
+    meshEdgesEdgeAttributeNoDataColor,
+    setMeshEdgesEdgeAttributeNoDataColor,
   };
 }
 export { isMeshEdgesEdgeAttributeValid, useMeshEdgesEdgeAttributeStyle };
