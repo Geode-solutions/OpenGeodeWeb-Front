@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    ["vuetify-nuxt-module", { enableRules: false }],
+    "vuetify-nuxt-module",
     ["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }],
     "@vueuse/nuxt",
   ],
@@ -45,10 +45,12 @@ export default defineNuxtConfig({
   },
 
   vuetify: {
-    enableRules: false,
     moduleOptions: {
       prefixComposables: true,
       enableRules: false,
+      rulesConfiguration: {
+        fromLabs: false,
+      },
     },
     vuetifyOptions: {
       defaults: {
