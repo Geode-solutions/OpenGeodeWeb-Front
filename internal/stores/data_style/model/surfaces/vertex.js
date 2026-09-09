@@ -94,7 +94,7 @@ function useModelSurfacesVertexAttribute() {
   async function setModelSurfacesVertexAttribute(
     modelId,
     surfaceIds,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateModelSurfacesVertexStyle(modelId, surfaceIds, {
       name,
@@ -180,7 +180,7 @@ function useModelSurfacesVertexAttribute() {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setModelSurfacesVertexAttributeNoDataColor(modelId, surfaceIds, no_data_color) {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);

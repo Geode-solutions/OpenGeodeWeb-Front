@@ -72,7 +72,7 @@ function useMeshPointsVertexAttributeStyle() {
   }
   function setMeshPointsVertexAttribute(
     id,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateMeshPointsVertexStyle(id, {
       name,
@@ -163,7 +163,7 @@ function useMeshPointsVertexAttributeStyle() {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setMeshPointsVertexAttributeNoDataColor(id, no_data_color) {
     const name = meshPointsVertexAttributeName(id);

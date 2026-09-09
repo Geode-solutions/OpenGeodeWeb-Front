@@ -94,7 +94,7 @@ function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
@@ -180,7 +180,7 @@ function useModelBlocksPolyhedronAttribute() {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setModelBlocksPolyhedronAttributeNoDataColor(modelId, blockIds, no_data_color) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);

@@ -93,7 +93,7 @@ function useModelLinesVertexAttribute() {
   async function setModelLinesVertexAttribute(
     modelId,
     lineIds,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
@@ -174,7 +174,7 @@ function useModelLinesVertexAttribute() {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setModelLinesVertexAttributeNoDataColor(modelId, lineIds, no_data_color) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);

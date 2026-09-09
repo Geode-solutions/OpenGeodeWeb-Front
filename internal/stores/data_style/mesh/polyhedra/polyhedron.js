@@ -75,7 +75,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
   }
   function setMeshPolyhedraPolyhedronAttribute(
     id,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateMeshPolyhedraPolyhedronStyle(id, {
       name,
@@ -166,7 +166,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setMeshPolyhedraPolyhedronAttributeNoDataColor(id, no_data_color) {
     const name = meshPolyhedraPolyhedronAttributeName(id);

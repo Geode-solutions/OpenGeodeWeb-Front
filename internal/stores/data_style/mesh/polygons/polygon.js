@@ -75,7 +75,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
   }
   function setMeshPolygonsPolygonAttribute(
     id,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateMeshPolygonsPolygonStyle(id, {
       name,
@@ -166,7 +166,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setMeshPolygonsPolygonAttributeNoDataColor(id, no_data_color) {
     const name = meshPolygonsPolygonAttributeName(id);

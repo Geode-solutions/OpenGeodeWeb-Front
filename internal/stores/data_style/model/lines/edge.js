@@ -92,7 +92,7 @@ function useModelLinesEdgeAttribute() {
   async function setModelLinesEdgeAttribute(
     modelId,
     lineIds,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateModelLinesEdgeStyle(modelId, lineIds, {
       name,
@@ -173,7 +173,7 @@ function useModelLinesEdgeAttribute() {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
     const item = modelLinesEdgeAttributeItem(modelId, lineId);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setModelLinesEdgeAttributeNoDataColor(modelId, lineIds, no_data_color) {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);

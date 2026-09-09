@@ -93,7 +93,7 @@ function useModelBlocksVertexAttribute() {
   async function setModelBlocksVertexAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateModelBlocksVertexStyle(modelId, blockIds, {
       name,
@@ -174,7 +174,7 @@ function useModelBlocksVertexAttribute() {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setModelBlocksVertexAttributeNoDataColor(modelId, blockIds, no_data_color) {
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);

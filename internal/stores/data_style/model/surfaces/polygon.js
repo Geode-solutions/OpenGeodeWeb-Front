@@ -94,7 +94,7 @@ function useModelSurfacesPolygonAttribute() {
   async function setModelSurfacesPolygonAttribute(
     modelId,
     surfaceIds,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
       name,
@@ -180,7 +180,7 @@ function useModelSurfacesPolygonAttribute() {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setModelSurfacesPolygonAttributeNoDataColor(modelId, surfaceIds, no_data_color) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);

@@ -72,7 +72,7 @@ function useMeshCellsVertexAttributeStyle() {
   }
   function setMeshCellsVertexAttribute(
     id,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color },
   ) {
     mutateMeshCellsVertexStyle(id, {
       name,
@@ -163,7 +163,7 @@ function useMeshCellsVertexAttributeStyle() {
     const name = meshCellsVertexAttributeName(id);
     const item = meshCellsVertexAttributeItem(id);
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data_color ?? DEFAULT_NO_DATA_COLOR;
+    return storedConfig.no_data_color;
   }
   async function setMeshCellsVertexAttributeNoDataColor(id, no_data_color) {
     const name = meshCellsVertexAttributeName(id);
