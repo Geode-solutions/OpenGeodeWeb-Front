@@ -99,9 +99,10 @@ function applyCameraOptions(camera, options) {
     });
   }
 }
+
 function performSetCamera(targetCameraOptions) {
   const hybridViewerStore = useHybridViewerStore();
-  const { genericRenderWindow, syncRemoteCamera } = hybridViewerStore;
+  const { genericRenderWindow } = hybridViewerStore;
   const { is_moving } = storeToRefs(hybridViewerStore);
   const imageStyle = getImageStyle();
   const renderer = genericRenderWindow.value.getRenderer();
@@ -128,7 +129,7 @@ function performSetCamera(targetCameraOptions) {
       const renderWindow = genericRenderWindow.value.getRenderWindow();
       renderWindow.render();
       is_moving.value = false;
-      syncRemoteCamera();
+      performSyncRemoteCamera();
     },
   });
 }
@@ -162,7 +163,7 @@ async function performFocusCameraOnObject(id, block_ids = []) {
 }
 function performCameraOrientation(orientation) {
   const hybridViewerStore = useHybridViewerStore();
-  const { genericRenderWindow, syncRemoteCamera } = hybridViewerStore;
+  const { genericRenderWindow } = hybridViewerStore;
   const { is_moving } = storeToRefs(hybridViewerStore);
   const imageStyle = getImageStyle();
   const config = ORIENTATIONS[orientation.toLowerCase()];
@@ -196,7 +197,7 @@ function performCameraOrientation(orientation) {
     },
     onEnd: () => {
       is_moving.value = false;
-      syncRemoteCamera();
+      performSyncRemoteCamera();
     },
   });
 }

@@ -26,6 +26,7 @@ async function performResize(width, height) {
   renderWindow.render();
   await remoteRender();
 }
+
 function performClickPicking(event, containerElement) {
   const { genericRenderWindow, syncRemoteCamera } = useHybridViewerStore();
   const viewerStore = useViewerStore();
@@ -55,6 +56,7 @@ function performClickPicking(event, containerElement) {
     },
   );
 }
+
 function performSetContainer(container) {
   if (!container || !container.value) {
     return;

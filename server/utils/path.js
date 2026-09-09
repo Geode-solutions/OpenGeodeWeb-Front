@@ -11,6 +11,13 @@ import { v4 as uuidv4 } from "uuid";
 import { appMode } from "@geode/opengeodeweb-front/shared/app_mode.js";
 import { commandExistsSync } from "./scripts.js";
 
+function executableName(execName) {
+  if (process.platform === "win32") {
+    return `${execName}.exe`;
+  }
+  return execName;
+}
+
 function findExecutableInDir(baseDir, execName, osExecutableName) {
   const oneFilePath = path.join(baseDir, osExecutableName);
   if (fs.existsSync(oneFilePath) && fs.statSync(oneFilePath).isFile()) {
@@ -27,24 +34,20 @@ function findExecutableInDir(baseDir, execName, osExecutableName) {
   );
   return undefined;
 }
-function executableName(execName) {
-  if (process.platform === "win32") {
-    return `${execName}.exe`;
-  }
-  return execName;
-}
+
 function executablePath(execPath, execName) {
   const osExecutableName = executableName(execName);
   const resourcesPath = process.env.RESOURCES_PATH;
   const mode = process.env.MODE;
   const nodeEnv = process.env.NODE_ENV;
-  console.log("[executablePath]", {
-    execPath,
-    execName,
-    mode,
-    nodeEnv,
-    resourcesPath,
-  });
+
+  console.log("[executablePath]", { execPath, execName, mode, nodeEnv, resourcesPath });
+
+  if (commandExistsSync(osExecutableName)) {
+    console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
+    return osExecutableName;
+  }
+
   const foundAtExecPath = findExecutableInDir(execPath, execName, osExecutableName);
   if (foundAtExecPath) {
     return foundAtExecPath;
@@ -58,12 +61,10 @@ function executablePath(execPath, execName) {
       `Executable not found in execPath (${execPath}) or resourcesPath (${resourcesPath}): ${osExecutableName}`,
     );
   }
-  if (commandExistsSync(osExecutableName)) {
-    console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
-    return osExecutableName;
-  }
+
   throw new Error(`Executable not found: ${osExecutableName}`);
 }
+
 function createPath(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, {

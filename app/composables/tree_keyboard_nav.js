@@ -23,8 +23,9 @@ export function useTreeKeyboardNav(
   toggleOpen,
   handleItemClick,
   getScrollInfo,
+  externalFocusedIndex,
 ) {
-  const focusedIndex = ref(-1);
+  const focusedIndex = externalFocusedIndex || ref(-1);
 
   function findParentIndex(item, currentIndex) {
     for (let index = currentIndex - 1; index >= 0; index -= 1) {

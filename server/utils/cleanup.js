@@ -134,6 +134,7 @@ async function killMicroservices(microservices) {
 function microservicesMetadatasPath(projectFolderPath) {
   return path.join(projectFolderPath, "microservices.json");
 }
+
 function projectMicroservices(projectFolderPath) {
   console.log("projectMicroservices", {
     projectFolderPath,
@@ -160,6 +161,7 @@ async function cleanupBackend(projectFolderPath) {
 function getMicroserviceByName(microservices, name) {
   return microservices.find((microservice) => microservice.name === name);
 }
+
 export {
   cleanupBackend,
   deleteFolderRecursive,
