@@ -1,6 +1,7 @@
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
 import { registerRunningExtensions } from "@ogw_front/utils/extension";
+import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 
@@ -63,6 +64,7 @@ export const useInfraStore = defineStore("infra", {
               projectFolderPath: appStore.projectFolderPath,
             });
           }
+          await setAppBaseUrl(appStore.base_url);
           const microservices_with_launch = this.microservices.filter((store) => store.launch);
           const launch_promises = microservices_with_launch.map((store) =>
             store.launch({ projectFolderPath: appStore.projectFolderPath }),

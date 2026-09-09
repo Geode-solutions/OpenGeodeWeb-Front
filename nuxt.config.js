@@ -17,7 +17,11 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: [["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }], "@vueuse/nuxt"],
+  modules: [
+    "vuetify-nuxt-module",
+    ["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }],
+    "@vueuse/nuxt",
+  ],
   imports: {
     scan: false,
   },
@@ -33,7 +37,7 @@ export default defineNuxtConfig({
   },
 
   // ** Global CSS
-  css: ["vuetify/lib/styles/main.sass"],
+  css: ["vuetify/lib/styles/main.sass", path.resolve(__dirname, "app/assets/css/main.css")],
 
   // ** Build configuration
   build: {
@@ -43,6 +47,10 @@ export default defineNuxtConfig({
   vuetify: {
     moduleOptions: {
       prefixComposables: true,
+      enableRules: false,
+      rulesConfiguration: {
+        fromLabs: false,
+      },
     },
     vuetifyOptions: {
       defaults: {

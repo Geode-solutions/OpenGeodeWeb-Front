@@ -75,6 +75,7 @@ async function importWorkflow(files, onProgress) {
   for (let i = 0; i < files.length; i += chunk_size) {
     chunks.push(files.slice(i, i + chunk_size));
   }
+
   const results = [];
   let loadedCount = 0;
   async function processChunk(chunkIndex) {
@@ -100,10 +101,9 @@ async function importWorkflow(files, onProgress) {
   hybridViewerStore.remoteRender();
   return results;
 }
+
 async function importWorkflowFromSnapshot(items) {
-  console.log("[importWorkflowFromSnapshot] start", {
-    count: items?.length,
-  });
+  console.log("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
   const chunk_size = 5;
   const chunks = [];

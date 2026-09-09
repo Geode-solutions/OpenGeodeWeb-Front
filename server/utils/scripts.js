@@ -83,27 +83,34 @@ function waitForReady(child, expectedResponse, signal) {
       }
     }
 
+    function becomeReady() {
+      cleanup();
+      readlineStdout.on("line", (line) => {
+        console.log(`[${child.name}] ${line}`);
+      });
+      readlineStderr.on("line", (line) => {
+        console.log(`[${child.name}] ${line}`);
+      });
+      child.once("close", (code) => {
+        console.log(`[${child.name}] exited with code ${code}`);
+      });
+      resolve(child);
+    }
+
     onLine = (lineOutput) => {
       console.log(`[${child.name}] ${lineOutput}`);
       recordOutput(lineOutput);
       if (lineOutput.includes(expectedResponse)) {
-        cleanup();
-        readlineStdout.on("line", (line) => {
-          console.log(`[${child.name}] ${line}`);
-        });
-        readlineStderr.on("line", (line) => {
-          console.log(`[${child.name}] ${line}`);
-        });
-        child.once("close", (code) => {
-          console.log(`[${child.name}] exited with code ${code}`);
-        });
-        resolve(child);
+        becomeReady();
       }
     };
 
     onErrLine = (line) => {
       console.log(`[${child.name}] ${line}`);
       recordOutput(line);
+      if (line.includes(expectedResponse)) {
+        becomeReady();
+      }
     };
 
     onError = (err) => {
