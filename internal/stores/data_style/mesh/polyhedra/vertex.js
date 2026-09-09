@@ -73,7 +73,7 @@ function useMeshPolyhedraVertexAttributeStyle() {
     const { item, name } = meshPolyhedraVertexAttribute(id);
     return item ?? meshPolyhedraVertexAttributeLastItem(id, name);
   }
-  function setMeshPolyhedraVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshPolyhedraVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
     mutateMeshPolyhedraVertexStyle(id, {
       name,
       item,
@@ -82,7 +82,6 @@ function useMeshPolyhedraVertexAttributeStyle() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -94,7 +93,6 @@ function useMeshPolyhedraVertexAttributeStyle() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -112,7 +110,6 @@ function useMeshPolyhedraVertexAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPolyhedraVertexAttributeValid(attribute)) {
@@ -162,22 +159,6 @@ function useMeshPolyhedraVertexAttributeStyle() {
     });
     return applyVertexAttribute(id);
   }
-  function meshPolyhedraVertexAttributeNoData(id) {
-    const name = meshPolyhedraVertexAttributeName(id);
-    const item = meshPolyhedraVertexAttributeItem(id);
-    const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setMeshPolyhedraVertexAttributeNoData(id, no_data) {
-    const name = meshPolyhedraVertexAttributeName(id);
-    const item = meshPolyhedraVertexAttributeItem(id);
-    const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name, item);
-    await setMeshPolyhedraVertexAttributeStoredConfig(id, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyVertexAttribute(id);
-  }
   function meshPolyhedraVertexAttributeNoDataColor(id) {
     const name = meshPolyhedraVertexAttributeName(id);
     const item = meshPolyhedraVertexAttributeItem(id);
@@ -205,8 +186,6 @@ function useMeshPolyhedraVertexAttributeStyle() {
     setMeshPolyhedraVertexAttributeItem,
     setMeshPolyhedraVertexAttributeRange,
     setMeshPolyhedraVertexAttributeColorMap,
-    meshPolyhedraVertexAttributeNoData,
-    setMeshPolyhedraVertexAttributeNoData,
     meshPolyhedraVertexAttributeNoDataColor,
     setMeshPolyhedraVertexAttributeNoDataColor,
   };

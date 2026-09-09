@@ -93,7 +93,7 @@ function useModelBlocksVertexAttribute() {
   async function setModelBlocksVertexAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelBlocksVertexStyle(modelId, blockIds, {
       name,
@@ -103,7 +103,6 @@ function useModelBlocksVertexAttribute() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -116,7 +115,6 @@ function useModelBlocksVertexAttribute() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -134,7 +132,6 @@ function useModelBlocksVertexAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isModelBlocksVertexAttributeValid(attribute)) {
@@ -173,22 +170,6 @@ function useModelBlocksVertexAttribute() {
     });
     return applyVertexAttribute(modelId, blockIds);
   }
-  function modelBlocksVertexAttributeNoData(modelId, blockId) {
-    const name = modelBlocksVertexAttributeName(modelId, blockId);
-    const item = modelBlocksVertexAttributeItem(modelId, blockId);
-    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setModelBlocksVertexAttributeNoData(modelId, blockIds, no_data) {
-    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
-    const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
-    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockIds[0], name, item);
-    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyVertexAttribute(modelId, blockIds);
-  }
   function modelBlocksVertexAttributeNoDataColor(modelId, blockId) {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);
@@ -216,8 +197,6 @@ function useModelBlocksVertexAttribute() {
     setModelBlocksVertexAttributeItem,
     setModelBlocksVertexAttributeRange,
     setModelBlocksVertexAttributeColorMap,
-    modelBlocksVertexAttributeNoData,
-    setModelBlocksVertexAttributeNoData,
     modelBlocksVertexAttributeNoDataColor,
     setModelBlocksVertexAttributeNoDataColor,
   };

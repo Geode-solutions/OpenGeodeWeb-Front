@@ -69,7 +69,7 @@ function useMeshCellsCellAttributeStyle() {
     const { item, name } = meshCellsCellAttribute(id);
     return item ?? meshCellsCellAttributeLastItem(id, name);
   }
-  function setMeshCellsCellAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshCellsCellAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
     mutateMeshCellsCellStyle(id, {
       name,
       item,
@@ -78,7 +78,6 @@ function useMeshCellsCellAttributeStyle() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -90,7 +89,6 @@ function useMeshCellsCellAttributeStyle() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -108,7 +106,6 @@ function useMeshCellsCellAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshCellsCellAttributeValid(attribute)) {
@@ -162,22 +159,6 @@ function useMeshCellsCellAttributeStyle() {
     });
     return applyCellAttribute(id);
   }
-  function meshCellsCellAttributeNoData(id) {
-    const name = meshCellsCellAttributeName(id);
-    const item = meshCellsCellAttributeItem(id);
-    const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setMeshCellsCellAttributeNoData(id, no_data) {
-    const name = meshCellsCellAttributeName(id);
-    const item = meshCellsCellAttributeItem(id);
-    const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
-    await setMeshCellsCellAttributeStoredConfig(id, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyCellAttribute(id);
-  }
   function meshCellsCellAttributeNoDataColor(id) {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
@@ -205,8 +186,6 @@ function useMeshCellsCellAttributeStyle() {
     setMeshCellsCellAttributeItem,
     setMeshCellsCellAttributeRange,
     setMeshCellsCellAttributeColorMap,
-    meshCellsCellAttributeNoData,
-    setMeshCellsCellAttributeNoData,
     meshCellsCellAttributeNoDataColor,
     setMeshCellsCellAttributeNoDataColor,
   };

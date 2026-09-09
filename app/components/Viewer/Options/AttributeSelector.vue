@@ -11,7 +11,6 @@ const attributeName = defineModel("attributeName", { type: String });
 const attributeItem = defineModel("attributeItem", { type: Number });
 const attributeRange = defineModel("attributeRange", { type: Array });
 const attributeColorMap = defineModel("attributeColorMap", { type: String });
-const attributeNoData = defineModel("attributeNoData", { type: Boolean });
 const attributeNoDataColor = defineModel("attributeNoDataColor", { type: Object });
 
 const { id, componentIds, schema } = defineProps({
@@ -107,9 +106,6 @@ watch(
 );
 
 watch([attributeName, attributeItem, currentAttribute], () => {
-  if (currentAttribute.value) {
-    attributeNoData.value = currentAttribute.value.no_data ?? false;
-  }
   if (attributeColorMap.value === undefined) {
     attributeColorMap.value = "batlow";
   }

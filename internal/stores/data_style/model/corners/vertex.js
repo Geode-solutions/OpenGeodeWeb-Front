@@ -93,7 +93,7 @@ function useModelCornersVertexAttribute() {
   async function setModelCornersVertexAttribute(
     modelId,
     cornerIds,
-    { name, item, minimum, maximum, colorMap, no_data = false },
+    { name, item, minimum, maximum, colorMap },
   ) {
     mutateModelCornersVertexStyle(modelId, cornerIds, {
       name,
@@ -103,7 +103,6 @@ function useModelCornersVertexAttribute() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -116,7 +115,6 @@ function useModelCornersVertexAttribute() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -134,7 +132,6 @@ function useModelCornersVertexAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isModelCornersVertexAttributeValid(attribute)) {
@@ -173,22 +170,6 @@ function useModelCornersVertexAttribute() {
     });
     return applyVertexAttribute(modelId, cornerIds);
   }
-  function modelCornersVertexAttributeNoData(modelId, cornerId) {
-    const name = modelCornersVertexAttributeName(modelId, cornerId);
-    const item = modelCornersVertexAttributeItem(modelId, cornerId);
-    const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setModelCornersVertexAttributeNoData(modelId, cornerId, no_data) {
-    const name = modelCornersVertexAttributeName(modelId, cornerId);
-    const item = modelCornersVertexAttributeItem(modelId, cornerId);
-    const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
-    await setModelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyVertexAttribute(modelId, cornerId);
-  }
   function modelCornersVertexAttributeNoDataColor(modelId, cornerId) {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
@@ -216,8 +197,6 @@ function useModelCornersVertexAttribute() {
     setModelCornersVertexAttributeItem,
     setModelCornersVertexAttributeRange,
     setModelCornersVertexAttributeColorMap,
-    modelCornersVertexAttributeNoData,
-    setModelCornersVertexAttributeNoData,
     modelCornersVertexAttributeNoDataColor,
     setModelCornersVertexAttributeNoDataColor,
   };

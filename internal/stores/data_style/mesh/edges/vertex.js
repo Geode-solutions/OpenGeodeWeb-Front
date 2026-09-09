@@ -73,7 +73,7 @@ function useMeshEdgesVertexAttributeStyle() {
     const { item, name } = meshEdgesVertexAttribute(id);
     return item ?? meshEdgesVertexAttributeLastItem(id, name);
   }
-  function setMeshEdgesVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshEdgesVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
     mutateMeshEdgesVertexStyle(id, {
       name,
       item,
@@ -82,7 +82,6 @@ function useMeshEdgesVertexAttributeStyle() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -94,7 +93,6 @@ function useMeshEdgesVertexAttributeStyle() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -112,7 +110,6 @@ function useMeshEdgesVertexAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshEdgesVertexAttributeValid(attribute)) {
@@ -162,22 +159,6 @@ function useMeshEdgesVertexAttributeStyle() {
     });
     return applyVertexAttribute(id);
   }
-  function meshEdgesVertexAttributeNoData(id) {
-    const name = meshEdgesVertexAttributeName(id);
-    const item = meshEdgesVertexAttributeItem(id);
-    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setMeshEdgesVertexAttributeNoData(id, no_data) {
-    const name = meshEdgesVertexAttributeName(id);
-    const item = meshEdgesVertexAttributeItem(id);
-    const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
-    await setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyVertexAttribute(id);
-  }
   function meshEdgesVertexAttributeNoDataColor(id) {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);
@@ -205,8 +186,6 @@ function useMeshEdgesVertexAttributeStyle() {
     setMeshEdgesVertexAttributeItem,
     setMeshEdgesVertexAttributeRange,
     setMeshEdgesVertexAttributeColorMap,
-    meshEdgesVertexAttributeNoData,
-    setMeshEdgesVertexAttributeNoData,
     meshEdgesVertexAttributeNoDataColor,
     setMeshEdgesVertexAttributeNoDataColor,
   };

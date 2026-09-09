@@ -70,7 +70,7 @@ function useMeshPointsVertexAttributeStyle() {
     const { item, name } = meshPointsVertexAttribute(id);
     return item ?? meshPointsVertexAttributeLastItem(id, name);
   }
-  function setMeshPointsVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshPointsVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
     mutateMeshPointsVertexStyle(id, {
       name,
       item,
@@ -79,7 +79,6 @@ function useMeshPointsVertexAttributeStyle() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -91,7 +90,6 @@ function useMeshPointsVertexAttributeStyle() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -109,7 +107,6 @@ function useMeshPointsVertexAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPointsVertexAttributeValid(attribute)) {
@@ -159,22 +156,6 @@ function useMeshPointsVertexAttributeStyle() {
     });
     return applyVertexAttribute(id);
   }
-  function meshPointsVertexAttributeNoData(id) {
-    const name = meshPointsVertexAttributeName(id);
-    const item = meshPointsVertexAttributeItem(id);
-    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setMeshPointsVertexAttributeNoData(id, no_data) {
-    const name = meshPointsVertexAttributeName(id);
-    const item = meshPointsVertexAttributeItem(id);
-    const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
-    await setMeshPointsVertexAttributeStoredConfig(id, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyVertexAttribute(id);
-  }
   function meshPointsVertexAttributeNoDataColor(id) {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
@@ -202,8 +183,6 @@ function useMeshPointsVertexAttributeStyle() {
     setMeshPointsVertexAttributeItem,
     setMeshPointsVertexAttributeRange,
     setMeshPointsVertexAttributeColorMap,
-    meshPointsVertexAttributeNoData,
-    setMeshPointsVertexAttributeNoData,
     meshPointsVertexAttributeNoDataColor,
     setMeshPointsVertexAttributeNoDataColor,
   };

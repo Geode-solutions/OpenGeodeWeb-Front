@@ -92,15 +92,6 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data = computed({
-  get: () => dataStyleStore.meshEdgesVertexAttributeNoData(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesVertexAttributeNoData(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
 const vertex_attribute_no_data_color = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
@@ -146,15 +137,6 @@ const edge_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_no_data = computed({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeNoData(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeNoData(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
 const edge_attribute_no_data_color = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeNoDataColor(id.value),
   set: async (newValue) => {
@@ -193,13 +175,11 @@ const edge_attribute_no_data_color = computed({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:vertex_attribute_no_data="vertex_attribute_no_data"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:edge_attribute_name="edge_attribute_name"
           v-model:edge_attribute_item="edge_attribute_item"
           v-model:edge_attribute_range="edge_attribute_range"
           v-model:edge_attribute_color_map="edge_attribute_color_map"
-          v-model:edge_attribute_no_data="edge_attribute_no_data"
           v-model:edge_attribute_no_data_color="edge_attribute_no_data_color"
         />
       </template>

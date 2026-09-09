@@ -93,7 +93,7 @@ function useModelLinesVertexAttribute() {
   async function setModelLinesVertexAttribute(
     modelId,
     lineIds,
-    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
@@ -103,7 +103,6 @@ function useModelLinesVertexAttribute() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -116,7 +115,6 @@ function useModelLinesVertexAttribute() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -134,7 +132,6 @@ function useModelLinesVertexAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isModelLinesVertexAttributeValid(attribute)) {
@@ -173,22 +170,6 @@ function useModelLinesVertexAttribute() {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function modelLinesVertexAttributeNoData(modelId, lineId) {
-    const name = modelLinesVertexAttributeName(modelId, lineId);
-    const item = modelLinesVertexAttributeItem(modelId, lineId);
-    const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setModelLinesVertexAttributeNoData(modelId, lineIds, no_data) {
-    const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
-    const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
-    const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);
-    await setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyVertexAttribute(modelId, lineIds);
-  }
   function modelLinesVertexAttributeNoDataColor(modelId, lineId) {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
@@ -216,8 +197,6 @@ function useModelLinesVertexAttribute() {
     setModelLinesVertexAttributeItem,
     setModelLinesVertexAttributeRange,
     setModelLinesVertexAttributeColorMap,
-    modelLinesVertexAttributeNoData,
-    setModelLinesVertexAttributeNoData,
     modelLinesVertexAttributeNoDataColor,
     setModelLinesVertexAttributeNoDataColor,
   };

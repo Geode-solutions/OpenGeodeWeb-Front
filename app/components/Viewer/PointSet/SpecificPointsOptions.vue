@@ -91,15 +91,6 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data = computed({
-  get: () => dataStyleStore.meshPointsVertexAttributeNoData(id.value),
-  set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPointsVertexAttributeNoData(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
 const vertex_attribute_no_data_color = computed({
   get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
@@ -133,7 +124,6 @@ const vertex_attribute_no_data_color = computed({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:vertex_attribute_no_data="vertex_attribute_no_data"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           :vertex_has_colormap="true"
         />

@@ -73,7 +73,7 @@ function useMeshPolygonsVertexAttributeStyle() {
     const { item, name } = meshPolygonsVertexAttribute(id);
     return item ?? meshPolygonsVertexAttributeLastItem(id, name);
   }
-  function setMeshPolygonsVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR }) {
+  function setMeshPolygonsVertexAttribute(id, { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }) {
     mutateMeshPolygonsVertexStyle(id, {
       name,
       item,
@@ -82,7 +82,6 @@ function useMeshPolygonsVertexAttributeStyle() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -94,7 +93,6 @@ function useMeshPolygonsVertexAttributeStyle() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -112,7 +110,6 @@ function useMeshPolygonsVertexAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPolygonsVertexAttributeValid(attribute)) {
@@ -162,22 +159,6 @@ function useMeshPolygonsVertexAttributeStyle() {
     });
     return applyVertexAttribute(id);
   }
-  function meshPolygonsVertexAttributeNoData(id) {
-    const name = meshPolygonsVertexAttributeName(id);
-    const item = meshPolygonsVertexAttributeItem(id);
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setMeshPolygonsVertexAttributeNoData(id, no_data) {
-    const name = meshPolygonsVertexAttributeName(id);
-    const item = meshPolygonsVertexAttributeItem(id);
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
-    await setMeshPolygonsVertexAttributeStoredConfig(id, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyVertexAttribute(id);
-  }
   function meshPolygonsVertexAttributeNoDataColor(id) {
     const name = meshPolygonsVertexAttributeName(id);
     const item = meshPolygonsVertexAttributeItem(id);
@@ -205,8 +186,6 @@ function useMeshPolygonsVertexAttributeStyle() {
     setMeshPolygonsVertexAttributeItem,
     setMeshPolygonsVertexAttributeRange,
     setMeshPolygonsVertexAttributeColorMap,
-    meshPolygonsVertexAttributeNoData,
-    setMeshPolygonsVertexAttributeNoData,
     meshPolygonsVertexAttributeNoDataColor,
     setMeshPolygonsVertexAttributeNoDataColor,
   };

@@ -94,7 +94,7 @@ function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttribute(
     modelId,
     blockIds,
-    { name, item, minimum, maximum, colorMap, no_data = false, no_data_color = DEFAULT_NO_DATA_COLOR },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
@@ -104,7 +104,6 @@ function useModelBlocksPolyhedronAttribute() {
       minimum,
       maximum,
       colorMap,
-      no_data,
       no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
@@ -117,7 +116,6 @@ function useModelBlocksPolyhedronAttribute() {
       points,
       minimum,
       maximum,
-      no_data: no_data ?? false,
       no_data_color: no_data_color ?? DEFAULT_NO_DATA_COLOR,
     };
     return viewerStore.request({
@@ -140,7 +138,6 @@ function useModelBlocksPolyhedronAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
-      no_data: storedConfig.no_data,
       no_data_color: storedConfig.no_data_color,
     };
     if (isModelBlocksPolyhedronAttributeValid(attribute)) {
@@ -179,22 +176,6 @@ function useModelBlocksPolyhedronAttribute() {
     });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
-  function modelBlocksPolyhedronAttributeNoData(modelId, blockId) {
-    const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
-    const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
-    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
-    return storedConfig.no_data ?? false;
-  }
-  async function setModelBlocksPolyhedronAttributeNoData(modelId, blockIds, no_data) {
-    const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
-    const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
-    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds[0], name, item);
-    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
-      ...storedConfig,
-      no_data,
-    });
-    return applyPolyhedronAttribute(modelId, blockIds);
-  }
   function modelBlocksPolyhedronAttributeNoDataColor(modelId, blockId) {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
@@ -222,8 +203,6 @@ function useModelBlocksPolyhedronAttribute() {
     setModelBlocksPolyhedronAttributeItem,
     setModelBlocksPolyhedronAttributeRange,
     setModelBlocksPolyhedronAttributeColorMap,
-    modelBlocksPolyhedronAttributeNoData,
-    setModelBlocksPolyhedronAttributeNoData,
     modelBlocksPolyhedronAttributeNoDataColor,
     setModelBlocksPolyhedronAttributeNoDataColor,
   };
