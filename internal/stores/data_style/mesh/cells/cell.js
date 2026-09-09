@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -34,6 +35,7 @@ function useMeshCellsCellAttributeStyle() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateMeshCellsCellStyle(id, values) {
@@ -67,7 +69,10 @@ function useMeshCellsCellAttributeStyle() {
     const { item, name } = meshCellsCellAttribute(id);
     return item ?? meshCellsCellAttributeLastItem(id, name);
   }
-  function setMeshCellsCellAttribute(id, { name, item, minimum, maximum, colorMap }) {
+  function setMeshCellsCellAttribute(
+    id,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+  ) {
     mutateMeshCellsCellStyle(id, {
       name,
       item,
@@ -76,6 +81,7 @@ function useMeshCellsCellAttributeStyle() {
       minimum,
       maximum,
       colorMap,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsCellAttributeSchemas.attribute;
@@ -86,6 +92,7 @@ function useMeshCellsCellAttributeStyle() {
       points,
       minimum,
       maximum,
+      no_data_color,
     };
     return viewerStore.request({
       schema,
@@ -102,6 +109,7 @@ function useMeshCellsCellAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isMeshCellsCellAttributeValid(attribute)) {
       return setMeshCellsCellAttribute(id, attribute);
@@ -130,7 +138,9 @@ function useMeshCellsCellAttributeStyle() {
   async function setMeshCellsCellAttributeRange(id, minimum, maximum) {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
+    const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
     await setMeshCellsCellAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
       minimum,
       maximum,
     });
@@ -145,8 +155,26 @@ function useMeshCellsCellAttributeStyle() {
   async function setMeshCellsCellAttributeColorMap(id, colorMap) {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
+    const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
     await setMeshCellsCellAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
       colorMap,
+    });
+    return applyCellAttribute(id);
+  }
+  function meshCellsCellAttributeNoDataColor(id) {
+    const name = meshCellsCellAttributeName(id);
+    const item = meshCellsCellAttributeItem(id);
+    const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
+    return storedConfig.no_data_color;
+  }
+  async function setMeshCellsCellAttributeNoDataColor(id, no_data_color) {
+    const name = meshCellsCellAttributeName(id);
+    const item = meshCellsCellAttributeItem(id);
+    const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
+    await setMeshCellsCellAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
+      no_data_color,
     });
     return applyCellAttribute(id);
   }
@@ -161,6 +189,8 @@ function useMeshCellsCellAttributeStyle() {
     setMeshCellsCellAttributeItem,
     setMeshCellsCellAttributeRange,
     setMeshCellsCellAttributeColorMap,
+    meshCellsCellAttributeNoDataColor,
+    setMeshCellsCellAttributeNoDataColor,
   };
 }
 export { isMeshCellsCellAttributeValid, useMeshCellsCellAttributeStyle };

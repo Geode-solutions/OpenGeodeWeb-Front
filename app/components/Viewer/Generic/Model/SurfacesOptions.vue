@@ -107,6 +107,18 @@ const surfacesVertexAttributeColorMap = computed({
   },
 });
 
+const surfacesVertexAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesVertexAttributeNoDataColor(
+      modelId,
+      targetSurfaceIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const surfacesPolygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId),
   set: async (newValue) => {
@@ -140,6 +152,18 @@ const surfacesPolygonAttributeColorMap = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
+      modelId,
+      targetSurfaceIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const surfacesPolygonAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesPolygonAttributeNoDataColor(
       modelId,
       targetSurfaceIds,
       newValue,
@@ -186,6 +210,14 @@ const vertexAttributeColorMap = computed({
   },
 });
 
+const vertexAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, surfaceId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesVertexAttributeNoDataColor(modelId, [surfaceId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const polygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
   set: async (newValue) => {
@@ -223,6 +255,18 @@ const polygonAttributeColorMap = computed({
   },
 });
 
+const polygonAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, surfaceId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelSurfacesPolygonAttributeNoDataColor(
+      modelId,
+      [surfaceId],
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const capabilities = {
   color: { available: true },
   textures: { available: false },
@@ -249,10 +293,12 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:vertex_attribute_item="surfacesVertexAttributeItem"
       v-model:vertex_attribute_range="surfacesVertexAttributeRange"
       v-model:vertex_attribute_color_map="surfacesVertexAttributeColorMap"
+      v-model:vertex_attribute_no_data_color="surfacesVertexAttributeNoDataColor"
       v-model:polygon_attribute_name="surfacesPolygonAttributeName"
       v-model:polygon_attribute_item="surfacesPolygonAttributeItem"
       v-model:polygon_attribute_range="surfacesPolygonAttributeRange"
       v-model:polygon_attribute_color_map="surfacesPolygonAttributeColorMap"
+      v-model:polygon_attribute_no_data_color="surfacesPolygonAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
       :allowRandom="true"
@@ -275,10 +321,12 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:vertex_attribute_item="vertexAttributeItem"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+      v-model:vertex_attribute_no_data_color="vertexAttributeNoDataColor"
       v-model:polygon_attribute_name="polygonAttributeName"
       v-model:polygon_attribute_item="polygonAttributeItem"
       v-model:polygon_attribute_range="polygonAttributeRange"
       v-model:polygon_attribute_color_map="polygonAttributeColorMap"
+      v-model:polygon_attribute_no_data_color="polygonAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
       :allowRandom="true"

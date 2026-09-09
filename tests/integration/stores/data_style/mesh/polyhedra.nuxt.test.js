@@ -4,6 +4,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -136,6 +137,7 @@ describe("mesh polyhedra", () => {
         points,
         minimum: vertex_attribute.minimum,
         maximum: vertex_attribute.maximum,
+        no_data_color: DEFAULT_NO_DATA_COLOR,
       };
       expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshPolyhedraVertexAttributeName(id)).toBe(vertex_attribute.name);
@@ -201,6 +203,7 @@ describe("mesh polyhedra", () => {
         points,
         minimum: polyhedron_attribute.minimum,
         maximum: polyhedron_attribute.maximum,
+        no_data_color: DEFAULT_NO_DATA_COLOR,
       };
       expect(spy).toHaveBeenCalledWith({ schema, params });
       expect(dataStyleStore.meshPolyhedraPolyhedronAttributeName(id)).toBe(

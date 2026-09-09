@@ -103,6 +103,18 @@ const cornersVertexAttributeColorMap = computed({
   },
 });
 
+const cornersVertexAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelCornersVertexAttributeNoDataColor(
+      modelId,
+      targetCornerIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
 // Individual Attributes
 const vertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
@@ -141,6 +153,14 @@ const vertexAttributeColorMap = computed({
   },
 });
 
+const vertexAttributeNoDataColor = computed({
+  get: () => dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, cornerId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelCornersVertexAttributeNoDataColor(modelId, [cornerId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const capabilities = {
   color: { available: true },
   textures: { available: false },
@@ -166,6 +186,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       v-model:vertex_attribute_item="cornersVertexAttributeItem"
       v-model:vertex_attribute_range="cornersVertexAttributeRange"
       v-model:vertex_attribute_color_map="cornersVertexAttributeColorMap"
+      v-model:vertex_attribute_no_data_color="cornersVertexAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema }"
       :allowRandom="true"
@@ -188,6 +209,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       v-model:vertex_attribute_item="vertexAttributeItem"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+      v-model:vertex_attribute_no_data_color="vertexAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema }"
       :allowRandom="true"

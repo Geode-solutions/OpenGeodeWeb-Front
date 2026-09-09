@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -36,6 +37,7 @@ function useModelCornersVertexAttribute() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateModelCornersVertexStyle(modelId, cornerIds, values) {
@@ -91,7 +93,7 @@ function useModelCornersVertexAttribute() {
   async function setModelCornersVertexAttribute(
     modelId,
     cornerIds,
-    { name, item, minimum, maximum, colorMap },
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
   ) {
     mutateModelCornersVertexStyle(modelId, cornerIds, {
       name,
@@ -101,6 +103,7 @@ function useModelCornersVertexAttribute() {
       minimum,
       maximum,
       colorMap,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
@@ -112,6 +115,7 @@ function useModelCornersVertexAttribute() {
       points,
       minimum,
       maximum,
+      no_data_color,
     };
     return viewerStore.request({
       schema: attributeSchema,
@@ -128,6 +132,7 @@ function useModelCornersVertexAttribute() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isModelCornersVertexAttributeValid(attribute)) {
       return setModelCornersVertexAttribute(modelId, cornerIds, attribute);
@@ -165,6 +170,22 @@ function useModelCornersVertexAttribute() {
     });
     return applyVertexAttribute(modelId, cornerIds);
   }
+  function modelCornersVertexAttributeNoDataColor(modelId, cornerId) {
+    const name = modelCornersVertexAttributeName(modelId, cornerId);
+    const item = modelCornersVertexAttributeItem(modelId, cornerId);
+    const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
+    return storedConfig.no_data_color;
+  }
+  async function setModelCornersVertexAttributeNoDataColor(modelId, cornerId, no_data_color) {
+    const name = modelCornersVertexAttributeName(modelId, cornerId);
+    const item = modelCornersVertexAttributeItem(modelId, cornerId);
+    const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
+    await setModelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyVertexAttribute(modelId, cornerId);
+  }
   return {
     modelCornersVertexAttributeName,
     modelCornersVertexAttributeItem,
@@ -176,6 +197,8 @@ function useModelCornersVertexAttribute() {
     setModelCornersVertexAttributeItem,
     setModelCornersVertexAttributeRange,
     setModelCornersVertexAttributeColorMap,
+    modelCornersVertexAttributeNoDataColor,
+    setModelCornersVertexAttributeNoDataColor,
   };
 }
 export { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute };
