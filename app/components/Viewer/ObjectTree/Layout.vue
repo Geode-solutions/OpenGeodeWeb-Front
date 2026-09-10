@@ -308,9 +308,8 @@ function onVerticalResizeStart(event, index) {
   position: absolute;
   z-index: 1;
   left: 0;
-  top: 0;
-  height: calc(100vh - 100px);
-  margin-top: 8px;
+  top: 8px;
+  height: calc(100% - 16px);
   pointer-events: auto;
 }
 
