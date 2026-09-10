@@ -1,7 +1,6 @@
 <script setup>
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
-import ModelCollections from "@ogw_front/components/Viewer/ObjectTree/Views/ModelCollections.vue";
-import ModelComponents from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponents.vue";
+import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
@@ -271,11 +270,11 @@ function onVerticalResizeStart(event, index) {
               @dragstart="onDragStart(index + 1)"
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
             >
-              <component
-                :is="view.viewType === 'model_collections' ? ModelCollections : ModelComponents"
+              <ModelTree
                 data-testid="modelComponentsObjectTree"
                 :id="view.modelId || view.id"
                 :view-id="view.id"
+                :view-type="view.viewType"
                 @show-menu="emit('show-menu', $event)"
               />
             </ViewerObjectTreeBox>

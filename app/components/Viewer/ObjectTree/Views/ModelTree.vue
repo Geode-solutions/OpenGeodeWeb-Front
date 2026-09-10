@@ -6,26 +6,35 @@ import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Con
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelCollections } from "@ogw_front/composables/model_collections";
 import { useModelComponents } from "@ogw_front/composables/model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const { id, viewId } = defineProps({
+const { id, viewId, viewType } = defineProps({
   id: { type: String, required: true },
   viewId: { type: String, required: false, default: undefined },
+  viewType: { type: String, required: false, default: "model_components" },
 });
+
 const actualViewId = viewId || id;
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
 const emit = defineEmits(["show-menu"]);
-
 const treeviewStore = useTreeviewStore();
+
+const isCollections = computed(() => viewType === "model_collections");
+
+const composable = isCollections.value ? useModelCollections(id) : useModelComponents(id);
 const {
   items: rawItems,
   componentsCache,
+  collectionsCache,
   localCategories,
   selection: visibleComponents,
   updateVisibility,
-} = useModelComponents(id);
+} = composable;
+
+const cache = computed(() => componentsCache?.value || collectionsCache?.value);
 
 const currentView = computed(() =>
   treeviewStore.opened_views.find((view) => view.id === actualViewId),
@@ -55,11 +64,11 @@ function onUpdateSelection(newSelection) {
 const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
 
 const itemsForTreeView = computed(() => {
-  if (search.value && componentsCache.value) {
+  if (search.value && cache.value) {
     const query = search.value.toLowerCase();
     const result = [];
-    for (const type of Object.keys(componentsCache.value)) {
-      const matches = componentsCache.value[type].filter(
+    for (const type of Object.keys(cache.value)) {
+      const matches = cache.value[type].filter(
         (component) =>
           component.title.toLowerCase().includes(query) ||
           component.id.toLowerCase().includes(query),
@@ -79,7 +88,7 @@ const itemsForTreeView = computed(() => {
   for (const category of filteredCategories.value) {
     result.push({
       ...category,
-      children: sortAndFormatItems(componentsCache.value[category.id], sortType.value),
+      children: sortAndFormatItems(cache.value?.[category.id], sortType.value),
     });
   }
   return result;
@@ -100,6 +109,16 @@ function showContextMenu(event, item) {
   });
 }
 
+function extractIds(node) {
+  if (node.children) {
+    return node.children.flatMap((child) => extractIds(child));
+  }
+  if (Number.isInteger(node.viewer_id)) {
+    return [node.viewer_id];
+  }
+  return [];
+}
+
 function handleHoverEnter({ item, immediate = false }) {
   const actualItem = item.raw || item;
 
@@ -107,15 +126,8 @@ function handleHoverEnter({ item, immediate = false }) {
     return;
   }
 
-  onHoverEnter(
-    id,
-    () =>
-      actualItem.category
-        ? [actualItem.viewer_id]
-        : actualItem.children.map((child) => child.viewer_id),
-    "model",
-    immediate,
-  );
+  const viewerIdsToHover = extractIds(actualItem);
+  onHoverEnter(id, () => viewerIdsToHover, "model", immediate);
 }
 
 function handleHoverLeave() {
@@ -134,6 +146,11 @@ function expandAll() {
   }
   traverse(itemsForTreeView.value);
   opened.value = allIds;
+}
+
+function getLeafViewerIds(item) {
+  const actualItem = item.raw || item;
+  return extractIds(actualItem);
 }
 </script>
 
@@ -183,17 +200,12 @@ function expandAll() {
 
       <template #append="{ item }">
         <v-btn
-          v-if="item.category || (item.children && item.children.length > 0)"
+          v-if="getLeafViewerIds(item).length > 0"
           icon="mdi-target"
           size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"
-          @click.stop="
-            hybridViewerStore.focusCameraOnObject(
-              id,
-              item.category ? [item.viewer_id] : item.children.map((child) => child.viewer_id),
-            )
-          "
+          @click.stop="hybridViewerStore.focusCameraOnObject(id, getLeafViewerIds(item))"
         />
       </template>
     </CommonTreeView>
