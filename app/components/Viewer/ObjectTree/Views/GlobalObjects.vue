@@ -195,6 +195,7 @@ function expandAll() {
             data-testid="expandModelComponentsButton"
             icon
             size="medium"
+            style="height: 22px; width: 22px"
             class="ml-2"
             variant="text"
             v-tooltip="'Model\'s mesh components'"
@@ -207,7 +208,7 @@ function expandAll() {
               )
             "
           >
-            <v-icon size="20">mdi-magnify-expand</v-icon>
+            <v-icon size="18">mdi-magnify-expand</v-icon>
           </v-btn>
           <v-btn
             v-if="isModel(item) && hasCollectionsMap[item.id]"
