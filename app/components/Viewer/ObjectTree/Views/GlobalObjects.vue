@@ -193,7 +193,7 @@ function expandAll() {
           <v-btn
             v-if="isModel(item)"
             data-testid="expandModelComponentsButton"
-            icon="mdi-magnify-expand"
+            icon
             size="medium"
             class="ml-2"
             variant="text"
@@ -206,7 +206,9 @@ function expandAll() {
                 'model_components',
               )
             "
-          />
+          >
+            <v-icon size="20">mdi-magnify-expand</v-icon>
+          </v-btn>
           <v-btn
             v-if="isModel(item) && hasCollectionsMap[item.id]"
             data-testid="expandModelCollectionsButton"

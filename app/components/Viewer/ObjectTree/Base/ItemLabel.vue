@@ -80,26 +80,30 @@ async function copyToClipboard(text, label) {
           <span>{{ actualItem.id }}</span>
           <v-btn
             data-testid="copyIdBtn"
-            icon="mdi-content-copy"
+            icon
             variant="text"
-            size="x-small"
             density="compact"
             class="ml-1 text-white"
+            style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="copyToClipboard(actualItem.id, 'ID')"
-          />
+          >
+            <v-icon size="12">mdi-content-copy</v-icon>
+          </v-btn>
         </span>
         <span v-if="actualItem.title" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">Name:</strong>
           <span>{{ tooltipTitle }}</span>
           <v-btn
             data-testid="copyNameBtn"
-            icon="mdi-content-copy"
+            icon
             variant="text"
-            size="x-small"
             density="compact"
             class="ml-1 text-white"
+            style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="copyToClipboard(actualItem.title, 'Name')"
-          />
+          >
+            <v-icon size="12">mdi-content-copy</v-icon>
+          </v-btn>
         </span>
         <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">Status:</strong>
