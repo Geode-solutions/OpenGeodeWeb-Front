@@ -195,7 +195,7 @@ function expandAll() {
             data-testid="expandModelComponentsButton"
             icon
             size="medium"
-            style="height: 22px; width: 22px"
+            style="height: 23px; width: 23px"
             class="ml-2"
             variant="text"
             v-tooltip="'Model\'s mesh components'"
