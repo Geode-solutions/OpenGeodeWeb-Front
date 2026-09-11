@@ -72,6 +72,7 @@ function requestConfig(parent, image, email, projectName) {
             image,
             ports: [
               {
+                name: "h2c",
                 containerPort: 80,
               },
             ],
