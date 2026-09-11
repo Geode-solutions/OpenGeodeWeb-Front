@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useToggle } from "@vueuse/core";
 
 import CsvSettings from "./CsvSettings.vue";

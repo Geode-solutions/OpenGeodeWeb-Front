@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Status } from "@ogw_front/utils/status";
 import { useInfraStore } from "@ogw_front/stores/infra";
 

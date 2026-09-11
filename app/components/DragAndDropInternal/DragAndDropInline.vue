@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard";
 
 const { isDragging, loading, texts, accept, showExtensions } = defineProps({

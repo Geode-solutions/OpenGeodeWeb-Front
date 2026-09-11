@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
+import geode_objects from "@ogw_front/assets/geode_objects";
 
 const { displayIntermediate, intermediateItems, menuStyle } = defineProps({
   displayIntermediate: { type: Boolean, required: true },

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ToolPanel from "@ogw_front/components/ToolPanel";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useElementSize, useWindowSize } from "@vueuse/core";
 
 import { Status } from "@ogw_front/utils/status";

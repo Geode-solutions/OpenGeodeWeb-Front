@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = defineProps({
   headers: { type: Array, required: true },
   rows: { type: Array, required: true },

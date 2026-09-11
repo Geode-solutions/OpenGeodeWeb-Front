@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
 import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip";
 import ViewToolbar from "@ogw_front/components/ViewToolbar";

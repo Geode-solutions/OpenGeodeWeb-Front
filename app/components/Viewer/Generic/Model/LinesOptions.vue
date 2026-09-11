@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";

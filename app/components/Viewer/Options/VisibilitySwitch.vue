@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import BasicSwitch from "@ogw_front/components/Basic/Switch";
 
 const visibility = defineModel({ type: Boolean });

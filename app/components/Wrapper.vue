@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import Launcher from "@ogw_front/components/Launcher";
 import PackagesVersions from "@ogw_front/components/PackagesVersions";
 import Stepper from "@ogw_front/components/Stepper";

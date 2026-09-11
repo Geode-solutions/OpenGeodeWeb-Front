@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 
 const SCROLL_SYNC_DELAY = 50;

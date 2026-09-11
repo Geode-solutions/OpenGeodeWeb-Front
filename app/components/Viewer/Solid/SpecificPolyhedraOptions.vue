@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import SolidPolyhedra from "@ogw_front/assets/viewer_svgs/solid_polyhedra.svg";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import Step from "@ogw_front/components/Step";
 
 const emit = defineEmits(["reset_values", "close"]);

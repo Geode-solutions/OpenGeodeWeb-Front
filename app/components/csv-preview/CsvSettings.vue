@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const { separator, headerRow, firstRow, xColumn, yColumn, zColumn, headers } = defineProps({
   separator: { type: String, required: true },
   headerRow: { type: Number, required: true },

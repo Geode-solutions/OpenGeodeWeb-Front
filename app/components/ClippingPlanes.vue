@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard";
 import ToolPanel from "@ogw_front/components/ToolPanel";

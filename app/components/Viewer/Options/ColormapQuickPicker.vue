@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import AttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const { title } = defineProps({
   title: { type: String, required: true },
 });

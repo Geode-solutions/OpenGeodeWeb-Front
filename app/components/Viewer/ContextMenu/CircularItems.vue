@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useMenuStore } from "@ogw_front/stores/menu";
 
 const { menuItems, id, metaData, menuItemCount } = defineProps({

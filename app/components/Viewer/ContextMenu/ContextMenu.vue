@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton";
 import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems";
 import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard";

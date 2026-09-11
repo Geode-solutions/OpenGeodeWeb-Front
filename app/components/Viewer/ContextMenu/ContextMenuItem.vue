@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";

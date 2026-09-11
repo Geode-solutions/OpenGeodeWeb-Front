@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const { modelValue, label } = defineProps({
   modelValue: { type: String, default: "" },
   label: { type: String, default: "" },

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ToolPanel from "@ogw_front/components/ToolPanel";
 
 const zScale = defineModel({ type: Number, default: 1 });

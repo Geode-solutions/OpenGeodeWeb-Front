@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ToolPanel from "@ogw_front/components/ToolPanel";
 import fileDownload from "js-file-download";
 import { useClipboardItems } from "@vueuse/core";

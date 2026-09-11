@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const DEFAULT_ICON_SIZE = 28;
 const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize } = defineProps({
   icon: { type: String, required: true },

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useBackStore } from "@ogw_front/stores/back";
 
 import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer";

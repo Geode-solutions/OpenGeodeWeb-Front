@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";

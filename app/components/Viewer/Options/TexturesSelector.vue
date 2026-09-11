@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem";
 
 const textures = defineModel({ type: Array });

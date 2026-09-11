@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import AttributeRangeSelector from "./AttributeRangeSelector.vue";
 import ColorMapPicker from "./ColorMapPicker.vue";
 

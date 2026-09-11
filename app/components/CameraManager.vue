@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import List from "@ogw_front/components/CameraManager/List";
 import Saver from "@ogw_front/components/CameraManager/Saver";
 import ToolPanel from "@ogw_front/components/ToolPanel";

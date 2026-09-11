@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const feedbackStore = useFeedbackStore();

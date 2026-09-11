@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, useAttrs } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 

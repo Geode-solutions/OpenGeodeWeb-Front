@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { drawCanvasForPreset } from "@ogw_front/utils/colormap";
 

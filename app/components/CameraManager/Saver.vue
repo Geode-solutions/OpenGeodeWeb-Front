@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useCameraManagerStore } from "@ogw_front/stores/camera_manager";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ActionButton from "@ogw_front/components/ActionButton";
 import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
 import CameraManager from "@ogw_front/components/CameraManager";

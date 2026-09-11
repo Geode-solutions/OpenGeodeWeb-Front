@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useDataStore } from "@ogw_front/stores/data";
 
 const dataStore = useDataStore();

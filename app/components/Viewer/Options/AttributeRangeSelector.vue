@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const emit = defineEmits(["reset"]);
 
 const minimum = defineModel("minimum", { type: Number });

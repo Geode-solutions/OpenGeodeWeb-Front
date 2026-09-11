@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const { isDragging, showOverlay, fullscreen, loading, texts, multiple, accept, showExtensions } =
   defineProps({
     isDragging: { type: Boolean, required: true },

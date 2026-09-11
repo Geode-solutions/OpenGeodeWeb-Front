@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "./GlassCard.vue";
 
 const { show, item, selectedCount } = defineProps({

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { drawCanvasForPreset, getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import ColorMapList from "./ColorMapList.vue";
 import GlassCard from "@ogw_front/components/GlassCard.vue";

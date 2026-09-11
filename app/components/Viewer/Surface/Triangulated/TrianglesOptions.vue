@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ViewerSpecificPolygonsOptions from "@ogw_front/components/Viewer/Surface/PolygonsOptions";
 
 const { itemProps } = defineProps({

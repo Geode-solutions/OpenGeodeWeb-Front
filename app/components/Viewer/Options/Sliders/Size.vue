@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import Slider from "./Slider";
 
 const size = defineModel({ type: Number });

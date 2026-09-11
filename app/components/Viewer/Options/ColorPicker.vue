@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // oxlint-disable id-length
 defineProps({
   disabledAlpha: {

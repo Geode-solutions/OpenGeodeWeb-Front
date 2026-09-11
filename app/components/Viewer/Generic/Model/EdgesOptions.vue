@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";

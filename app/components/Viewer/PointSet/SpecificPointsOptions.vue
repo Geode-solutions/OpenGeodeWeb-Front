@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import PointSetPoints from "@ogw_front/assets/viewer_svgs/point_set_points.svg";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";

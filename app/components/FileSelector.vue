@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 import FetchingData from "@ogw_front/components/FetchingData";

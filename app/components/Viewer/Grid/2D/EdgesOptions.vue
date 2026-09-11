@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import Grid2D_Edges from "@ogw_front/assets/viewer_svgs/grid_2d_edges.svg";
 import ViewerGenericMeshEdgesOptions from "@ogw_front/components/Viewer/Generic/Mesh/EdgesOptions";
 

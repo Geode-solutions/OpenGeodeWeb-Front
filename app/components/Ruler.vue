@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ToolPanel from "@ogw_front/components/ToolPanel";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 

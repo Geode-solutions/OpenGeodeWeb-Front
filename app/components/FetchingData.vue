@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const DEFAULT_SIZE = 22;
 const DEFAULT_WIDTH = 3;
 

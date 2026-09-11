@@ -1,0 +1,187 @@
+// Node imports
+import fs from "node:fs";
+import path from "node:path";
+import { setTimeout } from "node:timers/promises";
+
+// Third party imports
+import { WebSocket } from "ws";
+import pTimeout from "p-timeout";
+import { rimraf } from "rimraf";
+
+interface Microservice {
+  type: "back" | "viewer";
+  name: string;
+  port: number;
+  url?: string;
+  method?: string;
+}
+
+const MAX_DELETE_FOLDER_RETRIES = 5;
+async function deleteFolderRecursive(folderPath: string): Promise<void> {
+  if (!fs.existsSync(folderPath)) {
+    console.log(`Folder ${folderPath} does not exist.`);
+    return;
+  }
+  for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
+    try {
+      console.log(`Deleting folder: ${folderPath}`);
+      // oxlint-disable-next-line no-await-in-loop
+      await rimraf(folderPath);
+      console.log(`Deleted folder: ${folderPath}`);
+      return;
+    } catch (error) {
+      console.error(`Error deleting folder ${folderPath}:`, error);
+      // Wait before retrying
+      const MILLISECONDS_PER_RETRY = 1000;
+      const DELAY = MILLISECONDS_PER_RETRY * (i + 1);
+      // oxlint-disable-next-line no-await-in-loop
+      await setTimeout(DELAY);
+      console.log("Retrying delete folder");
+    }
+  }
+  throw new Error(
+    `Failed to delete folder ${folderPath} after ${MAX_DELETE_FOLDER_RETRIES} retries`,
+  );
+}
+function killHttpMicroservice(microservice: Microservice): Promise<void> {
+  console.log("killHttpMicroservice", {
+    ...microservice,
+  });
+  const failMessage = `Failed to kill ${microservice.name}`;
+  async function do_kill() {
+    try {
+      await fetch(microservice.url as string, {
+        method: microservice.method,
+      });
+    } catch (error) {
+      console.log(`Expected error during kill of ${microservice.name}:`, (error as Error).message);
+    }
+  }
+  return pTimeout(do_kill(), {
+    milliseconds: 5000,
+    message: failMessage,
+  });
+}
+function killWebsocketMicroservice(microservice: Microservice): Promise<void> {
+  console.log("killWebsocketMicroservice", {
+    ...microservice,
+  });
+  const failMessage = `Failed to kill ${microservice.name}`;
+  const successMessage = `Disconnected from ${microservice.name} WebSocket server`;
+  function do_kill() {
+    // oxlint-disable-next-line promise/avoid-new
+    return new Promise<void>((resolve) => {
+      const socket = new WebSocket(microservice.url as string);
+      socket.on("open", () => {
+        console.log("Connected to WebSocket server");
+        socket.send(
+          JSON.stringify({
+            id: "system:hello",
+            method: "wslink.hello",
+            args: [
+              {
+                secret: "wslink-secret",
+              },
+            ],
+          }),
+        );
+      });
+      socket.on("message", (data) => {
+        const message = data.toString();
+        console.log("Received from server:", message);
+        if (message.includes("hello")) {
+          socket.send(
+            JSON.stringify({
+              id: "application.exit",
+              method: "application.exit",
+            }),
+          );
+          console.log(successMessage);
+          socket.close();
+          resolve();
+        }
+      });
+      socket.on("close", () => {
+        console.log(successMessage);
+        resolve();
+      });
+      socket.on("error", (error) => {
+        console.error("WebSocket error:", error);
+        socket.close();
+        resolve();
+      });
+    });
+  }
+  return pTimeout(do_kill(), {
+    milliseconds: 5000,
+    message: failMessage,
+  });
+}
+async function killMicroservice(microservice: Microservice): Promise<void> {
+  if (microservice.type === "back") {
+    await killHttpMicroservice(microservice);
+  } else if (microservice.type === "viewer") {
+    await killWebsocketMicroservice(microservice);
+  } else {
+    throw new Error(`Unknown microservice type: ${microservice.type}`);
+  }
+}
+async function killMicroservices(microservices: Microservice[]): Promise<void> {
+  console.log("killMicroservices", {
+    microservices,
+  });
+  const results = await Promise.allSettled(
+    microservices.map((microservice) => killMicroservice(microservice)),
+  );
+  const killed = microservices.filter((_, index) => results[index]?.status === "fulfilled");
+  for (let i = 0; i < killed.length; i += 1) {
+    const microservice = microservices[i];
+    if (microservice) {
+      microservices.splice(microservices.indexOf(microservice), 1);
+    }
+  }
+}
+function microservicesMetadatasPath(projectFolderPath: string): string {
+  return path.join(projectFolderPath, "microservices.json");
+}
+
+function projectMicroservices(projectFolderPath: string): Microservice[] {
+  console.log("projectMicroservices", {
+    projectFolderPath,
+  });
+  const filePath = microservicesMetadatasPath(projectFolderPath);
+  if (!fs.existsSync(filePath)) {
+    const microservicesMetadatas = {
+      microservices: [],
+    };
+    fs.writeFileSync(filePath, JSON.stringify(microservicesMetadatas, undefined, 2), "utf8");
+  }
+  const content = JSON.parse(fs.readFileSync(filePath, "utf8")) as {
+    microservices: Microservice[];
+  };
+  return content.microservices;
+}
+async function cleanupBackend(projectFolderPath: string): Promise<void> {
+  if (!fs.existsSync(projectFolderPath)) {
+    console.log(`Folder ${projectFolderPath} does not exist. Skipping cleanup.`);
+    return;
+  }
+  const microservices = projectMicroservices(projectFolderPath);
+  await killMicroservices(microservices);
+  await deleteFolderRecursive(projectFolderPath);
+}
+function getMicroserviceByName(
+  microservices: Microservice[],
+  name: string,
+): Microservice | undefined {
+  return microservices.find((microservice) => microservice.name === name);
+}
+
+export {
+  cleanupBackend,
+  deleteFolderRecursive,
+  killMicroservice,
+  microservicesMetadatasPath,
+  projectMicroservices,
+  getMicroserviceByName,
+};

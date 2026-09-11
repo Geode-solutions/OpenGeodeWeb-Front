@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";

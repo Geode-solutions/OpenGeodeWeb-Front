@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";

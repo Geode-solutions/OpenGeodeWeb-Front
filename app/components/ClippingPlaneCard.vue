@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { getPlaneCssColor } from "@ogw_front/utils/clipping_planes";
 
 const { plane, index } = defineProps({

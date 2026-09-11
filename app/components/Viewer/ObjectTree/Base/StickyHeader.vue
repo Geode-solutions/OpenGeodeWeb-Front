@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 
 const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({

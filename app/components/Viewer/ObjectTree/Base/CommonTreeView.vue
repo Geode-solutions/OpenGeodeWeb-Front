@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
