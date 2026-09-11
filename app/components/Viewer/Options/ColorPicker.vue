@@ -56,9 +56,9 @@ function toggleMode() {
   updateInputTextFromColor(red, green, blue, alpha);
 }
 
-function copyToClipboard() {
+async function copyToClipboard() {
   const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
-  copy(formatColorString({ red, green, blue, alpha }, currentMode.value));
+  await copy(formatColorString({ red, green, blue, alpha }, currentMode.value));
 }
 
 function parseAndApplyText(text) {
@@ -165,6 +165,7 @@ watch(
         </div>
 
         <v-btn
+          data-testid="copyColorBtn"
           icon
           density="compact"
           variant="text"
@@ -181,6 +182,7 @@ watch(
       </div>
 
       <input
+        data-testid="colorInput"
         v-model="colorInputText"
         class="color-input-field"
         type="text"
