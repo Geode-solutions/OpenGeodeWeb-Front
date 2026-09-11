@@ -69,8 +69,7 @@ async function importFile(filename, geode_object_type) {
   });
   return importItem(response);
 }
-
-async function importWorkflow(files) {
+async function importWorkflow(files, onProgress) {
   const chunk_size = 5;
   const chunks = [];
   for (let i = 0; i < files.length; i += chunk_size) {
@@ -78,13 +77,21 @@ async function importWorkflow(files) {
   }
 
   const results = [];
+  let loadedCount = 0;
   async function processChunk(chunkIndex) {
     if (chunkIndex >= chunks.length) {
       return;
     }
     const chunk = chunks[chunkIndex];
     const chunk_results = await Promise.all(
-      chunk.map(({ filename, geode_object_type }) => importFile(filename, geode_object_type)),
+      chunk.map(async ({ filename, geode_object_type }) => {
+        const res = await importFile(filename, geode_object_type);
+        loadedCount += 1;
+        if (typeof onProgress === "function") {
+          onProgress(loadedCount, files.length);
+        }
+        return res;
+      }),
     );
     results.push(...chunk_results);
     await processChunk(chunkIndex + 1);
