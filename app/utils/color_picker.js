@@ -1,35 +1,54 @@
 const RGB_MAX = 255;
 const PERCENT_MAX = 100;
 
-function parseColorString(colorText) {
-  if (!colorText) {
-    return undefined;
+function parseComponent(val, max = RGB_MAX) {
+  if (val.endsWith("%")) {
+    return (Number(val.slice(0, -1)) / PERCENT_MAX) * max;
   }
-  const rgbMatch = colorText
-    .trim()
-    .match(
-      /^(?:rgba?\()?(?<red>\d{1,3})[\s,]+(?<green>\d{1,3})[\s,]+(?<blue>\d{1,3})(?:[\s,/]+(?<alpha>[\d.%]+))?\)?$/iu,
-    );
-  if (!rgbMatch) {
+  return Number(val);
+}
+
+function parseColorString(colorText) {
+  if (!colorText || typeof colorText !== "string") {
     return undefined;
   }
 
-  const { red, green, blue, alpha: rawAlpha } = rgbMatch.groups;
-  let alpha = 1;
-  if (rawAlpha) {
-    alpha = rawAlpha.endsWith("%") ? Number(rawAlpha.slice(0, -1)) / PERCENT_MAX : Number(rawAlpha);
-    if (alpha > 1) {
-      alpha /= RGB_MAX;
-    }
+  const numbersMatch = colorText.match(/[\d.]+%?/gu);
+  if (!numbersMatch || (numbersMatch.length !== 3 && numbersMatch.length !== 4)) {
+    return undefined;
   }
-  return { red: Number(red), green: Number(green), blue: Number(blue), alpha };
+
+  const rawRed = parseComponent(numbersMatch[0]);
+  const rawGreen = parseComponent(numbersMatch[1]);
+  const rawBlue = parseComponent(numbersMatch[2]);
+
+  const red = Math.min(RGB_MAX, Math.max(0, Math.round(rawRed)));
+  const green = Math.min(RGB_MAX, Math.max(0, Math.round(rawGreen)));
+  const blue = Math.min(RGB_MAX, Math.max(0, Math.round(rawBlue)));
+
+  let alpha = 1;
+  if (numbersMatch.length === 4) {
+    const rawAlpha = parseComponent(numbersMatch[3], 1);
+    const calculatedAlpha = rawAlpha > 1 ? rawAlpha / RGB_MAX : rawAlpha;
+    const roundedAlpha = Number(calculatedAlpha.toFixed(2));
+    alpha = Math.min(1, Math.max(0, roundedAlpha));
+  }
+
+  if (Number.isNaN(red) || Number.isNaN(green) || Number.isNaN(blue) || Number.isNaN(alpha)) {
+    return undefined;
+  }
+
+  return { red, green, blue, alpha };
 }
 
 function formatColorString(color, mode) {
   const { red, green, blue, alpha } = color;
+  const roundRed = Math.round(red);
+  const roundGreen = Math.round(green);
+  const roundBlue = Math.round(blue);
   return mode === "rgb"
-    ? `rgb(${red}, ${green}, ${blue})`
-    : `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+    ? `rgb(${roundRed}, ${roundGreen}, ${roundBlue})`
+    : `rgba(${roundRed}, ${roundGreen}, ${roundBlue}, ${alpha})`;
 }
 
 export { parseColorString, formatColorString };

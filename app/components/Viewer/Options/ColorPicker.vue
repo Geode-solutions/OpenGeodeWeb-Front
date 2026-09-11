@@ -1,155 +1,249 @@
 <script setup>
-// oxlint-disable id-length
+// oxlint-disable id-length since vuetify require { r,g,b} format to work
 import { formatColorString, parseColorString } from "@ogw_front/utils/color_picker";
 import { useClipboard } from "@vueuse/core";
 
 const COPIED_TIMEOUT = 1500;
 
-const { disabledAlpha } = defineProps({
+const { disabledAlpha = false } = defineProps({
   disabledAlpha: {
     type: Boolean,
     default: false,
   },
 });
 
-const colorPickerRef = useTemplateRef("colorPickerRef");
-const model = defineModel({ type: Object });
-const { pressed } = useMousePressed({ target: colorPickerRef });
+const model = defineModel({ type: Object, required: true });
 const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
 
+const currentMode = ref(disabledAlpha ? "rgb" : "rgba");
+const colorInputText = ref("");
+
 const vuetifyColor = ref({
-  r: model.value.red,
-  g: model.value.green,
-  b: model.value.blue,
-  a: model.value.alpha,
+  r: model.value?.red ?? 0,
+  g: model.value?.green ?? 0,
+  b: model.value?.blue ?? 0,
+  a: model.value?.alpha ?? 1,
 });
 
-const currentMode = ref(disabledAlpha ? "rgb" : "rgba");
+function updateInputTextFromColor(red, green, blue, alpha) {
+  colorInputText.value =
+    disabledAlpha || currentMode.value === "rgb"
+      ? `${red}, ${green}, ${blue}`
+      : `${red}, ${green}, ${blue}, ${alpha}`;
+}
 
-function updateModel() {
-  const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
-
-  if (
-    model.value.red !== red ||
-    model.value.green !== green ||
-    model.value.blue !== blue ||
-    model.value.alpha !== alpha
-  ) {
-    model.value = { red, green, blue, alpha };
+function onPickerUpdate(val) {
+  if (!val) {
+    return;
   }
+
+  const red = Math.round(val.r ?? 0);
+  const green = Math.round(val.g ?? 0);
+  const blue = Math.round(val.b ?? 0);
+  const alpha = disabledAlpha ? 1 : Number((val.a ?? 1).toFixed(2));
+
+  vuetifyColor.value = { r: red, g: green, b: blue, a: alpha };
+  model.value = { red, green, blue, alpha };
+  updateInputTextFromColor(red, green, blue, alpha);
+}
+
+function toggleMode() {
+  if (disabledAlpha) {
+    return;
+  }
+  currentMode.value = currentMode.value === "rgba" ? "rgb" : "rgba";
+  const { red = 0, green = 0, blue = 0, alpha = 1 } = model.value ?? {};
+  updateInputTextFromColor(red, green, blue, alpha);
 }
 
 function copyToClipboard() {
-  copy(formatColorString(model.value, currentMode.value));
+  const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
+  copy(formatColorString({ red, green, blue, alpha }, currentMode.value));
 }
 
-function handlePaste(event) {
-  const parsedColor = parseColorString(event.clipboardData.getData("text"));
-  if (parsedColor) {
-    event.preventDefault();
-    const { red, green, blue, alpha } = parsedColor;
-    vuetifyColor.value = {
-      r: red,
-      g: green,
-      b: blue,
-      a: disabledAlpha ? 1 : alpha,
-    };
-    updateModel();
+function parseAndApplyText(text) {
+  const parsed = parseColorString(text);
+  if (!parsed) {
+    return false;
+  }
+
+  const { red, green, blue, alpha: rawAlpha } = parsed;
+  const alpha = disabledAlpha ? 1 : rawAlpha;
+
+  if (!disabledAlpha && alpha < 1) {
+    currentMode.value = "rgba";
+  }
+
+  vuetifyColor.value = { r: red, g: green, b: blue, a: alpha };
+  model.value = { red, green, blue, alpha };
+  updateInputTextFromColor(red, green, blue, alpha);
+  return true;
+}
+
+function onInputPaste(event) {
+  event.preventDefault();
+  const text = event.clipboardData?.getData("text/plain") || "";
+  parseAndApplyText(text);
+}
+
+function onInputCommit() {
+  if (!parseAndApplyText(colorInputText.value)) {
+    const { red = 0, green = 0, blue = 0, alpha = 1 } = model.value ?? {};
+    updateInputTextFromColor(red, green, blue, alpha);
   }
 }
 
 watch(
-  model,
-  (newValue) => {
-    if (!newValue) {
+  () => model.value,
+  (newVal) => {
+    if (!newVal) {
       return;
     }
-    const { red, green, blue, alpha } = newValue;
-    const hasChanged =
-      red !== vuetifyColor.value.r ||
-      green !== vuetifyColor.value.g ||
-      blue !== vuetifyColor.value.b ||
-      alpha !== vuetifyColor.value.a;
-    if (hasChanged) {
+    const { red = 0, green = 0, blue = 0, alpha = 1 } = newVal;
+    if (
+      vuetifyColor.value.r !== red ||
+      vuetifyColor.value.g !== green ||
+      vuetifyColor.value.b !== blue ||
+      vuetifyColor.value.a !== alpha
+    ) {
       vuetifyColor.value = { r: red, g: green, b: blue, a: alpha };
     }
+    updateInputTextFromColor(red, green, blue, alpha);
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 watch(
-  [vuetifyColor, pressed],
-  ([, isPressed]) => {
-    if (!isPressed) {
-      updateModel();
+  () => disabledAlpha,
+  (disabled) => {
+    if (disabled) {
+      currentMode.value = "rgb";
+      if (model.value) {
+        model.value = { ...model.value, alpha: 1 };
+      }
     }
   },
-  { deep: true },
 );
 </script>
 
 <template>
-  <div @paste="handlePaste" class="color-picker-container position-relative mx-auto">
+  <div class="color-picker-wrapper mx-auto rounded-lg overflow-hidden border">
     <v-color-picker
-      ref="colorPickerRef"
       data-testid="colorPicker"
-      v-model="vuetifyColor"
-      v-model:mode="currentMode"
+      :model-value="vuetifyColor"
+      @update:model-value="onPickerUpdate"
+      mode="rgba"
       flat
       canvas-height="75"
       hide-eye-dropper
+      hide-inputs
       :disabled-alpha="disabledAlpha"
       width="220"
-      :modes="disabledAlpha ? ['rgb'] : ['rgba', 'rgb']"
-      class="mx-auto"
+      class="mx-auto bg-transparent"
     />
-    <v-btn
-      icon
-      density="compact"
-      variant="text"
-      size="small"
-      class="copy-color-btn"
-      @click="copyToClipboard"
-      v-tooltip="'Copy to clipboard'"
-    >
-      <v-icon
-        :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
-        size="16"
-        :color="copied ? 'success' : undefined"
+
+    <div class="color-picker-controls pa-2 pt-0">
+      <div class="d-flex align-center justify-space-between px-1 mb-1">
+        <div class="d-flex align-center ga-1">
+          <span
+            class="text-caption font-weight-medium text-uppercase text-medium-emphasis"
+            style="font-size: 0.68rem"
+          >
+            {{ currentMode }}
+          </span>
+          <v-btn
+            v-if="!disabledAlpha"
+            icon
+            density="compact"
+            variant="text"
+            size="small"
+            @click="toggleMode"
+            v-tooltip="'Swap mode (RGB / RGBA)'"
+          >
+            <v-icon icon="mdi-swap-horizontal" size="16" />
+          </v-btn>
+        </div>
+
+        <v-btn
+          icon
+          density="compact"
+          variant="text"
+          size="small"
+          @click="copyToClipboard"
+          v-tooltip="'Copy to clipboard'"
+        >
+          <v-icon
+            :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+            size="14"
+            :color="copied ? 'success' : undefined"
+          />
+        </v-btn>
+      </div>
+
+      <input
+        v-model="colorInputText"
+        class="color-input-field"
+        type="text"
+        spellcheck="false"
+        autocomplete="off"
+        @paste="onInputPaste"
+        @change="onInputCommit"
+        @keydown.enter.prevent="onInputCommit"
       />
-    </v-btn>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.color-picker-container {
+.color-picker-wrapper {
   width: 220px;
+  background-color: rgba(33, 33, 33, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  outline: none;
+}
+
+:deep(.v-color-picker) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:deep(.v-color-picker-canvas),
+:deep(.v-color-picker__preview),
+:deep(.v-color-picker__controls) {
+  box-shadow: none !important;
 }
 
 :deep(.v-color-picker__controls) {
-  padding: 0 8px 4px !important;
+  padding: 4px 8px 0 !important;
 }
 
 :deep(.v-color-picker__dot) {
   width: 18px !important;
   height: 18px !important;
+  box-shadow: none !important;
 }
 
 :deep(.v-color-picker__preview) {
   margin-bottom: 0 !important;
 }
 
-:deep(.v-color-picker-edit),
-:deep(.v-color-picker__edit) {
-  margin-top: 0 !important;
-  padding: 1 24px 0 !important;
-  padding-top: 8px;
+.color-input-field {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  outline: none;
+  color: inherit;
+  font-size: 0.82rem;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+  text-align: center;
+  transition: border-color 0.15s ease;
 }
 
-.copy-color-btn {
-  position: absolute;
-  right: 14px;
-  bottom: 7px;
-  z-index: 2;
+.color-input-field:focus {
+  border-color: rgba(255, 255, 255, 0.3);
 }
 </style>
