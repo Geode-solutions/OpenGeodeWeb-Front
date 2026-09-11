@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 // Local imports
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -144,6 +145,7 @@ describe("model lines", () => {
           item: 0,
           minimum: MINIMUM_RANGE,
           maximum: MAXIMUM_RANGE,
+          no_data_color: DEFAULT_NO_DATA_COLOR,
         }),
       );
       expect(viewerStore.status).toBe(Status.CONNECTED);
@@ -254,6 +256,7 @@ describe("model lines", () => {
           item: 0,
           minimum: MINIMUM_RANGE,
           maximum: MAXIMUM_RANGE,
+          no_data_color: DEFAULT_NO_DATA_COLOR,
         }),
       );
       expect(viewerStore.status).toBe(Status.CONNECTED);

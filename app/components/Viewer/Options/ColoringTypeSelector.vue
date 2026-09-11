@@ -13,27 +13,38 @@ const vertex_attribute_name = defineModel("vertex_attribute_name", { type: Strin
 const vertex_attribute_item = defineModel("vertex_attribute_item", { type: Number });
 const vertex_attribute_range = defineModel("vertex_attribute_range", { type: Array });
 const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", { type: String });
+const vertex_attribute_no_data_color = defineModel("vertex_attribute_no_data_color", {
+  type: Object,
+});
 
 const edge_attribute_name = defineModel("edge_attribute_name", { type: String });
 const edge_attribute_item = defineModel("edge_attribute_item", { type: Number });
 const edge_attribute_range = defineModel("edge_attribute_range", { type: Array });
 const edge_attribute_color_map = defineModel("edge_attribute_color_map", { type: String });
+const edge_attribute_no_data_color = defineModel("edge_attribute_no_data_color", { type: Object });
 
 const cell_attribute_name = defineModel("cell_attribute_name", { type: String });
 const cell_attribute_item = defineModel("cell_attribute_item", { type: Number });
 const cell_attribute_range = defineModel("cell_attribute_range", { type: Array });
 const cell_attribute_color_map = defineModel("cell_attribute_color_map", { type: String });
+const cell_attribute_no_data_color = defineModel("cell_attribute_no_data_color", { type: Object });
 
 const polygon_attribute_name = defineModel("polygon_attribute_name", { type: String });
 const polygon_attribute_item = defineModel("polygon_attribute_item", { type: Number });
 const polygon_attribute_range = defineModel("polygon_attribute_range", { type: Array });
 const polygon_attribute_color_map = defineModel("polygon_attribute_color_map", { type: String });
+const polygon_attribute_no_data_color = defineModel("polygon_attribute_no_data_color", {
+  type: Object,
+});
 
 const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", { type: String });
 const polyhedron_attribute_item = defineModel("polyhedron_attribute_item", { type: Number });
 const polyhedron_attribute_range = defineModel("polyhedron_attribute_range", { type: Array });
 const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map", {
   type: String,
+});
+const polyhedron_attribute_no_data_color = defineModel("polyhedron_attribute_no_data_color", {
+  type: Object,
 });
 
 const { id, componentIds, capabilities, schemas, allowRandom } = defineProps({
@@ -214,6 +225,7 @@ watch(
           v-model:attributeItem="vertex_attribute_item"
           v-model:attributeRange="vertex_attribute_range"
           v-model:attributeColorMap="vertex_attribute_color_map"
+          v-model:attributeNoDataColor="vertex_attribute_no_data_color"
           :id="id"
           :componentIds="componentIds"
           :schema="vertexSchema"
@@ -225,6 +237,7 @@ watch(
           v-model:attributeItem="edge_attribute_item"
           v-model:attributeRange="edge_attribute_range"
           v-model:attributeColorMap="edge_attribute_color_map"
+          v-model:attributeNoDataColor="edge_attribute_no_data_color"
           :id="id"
           :componentIds="componentIds"
           :schema="edgeSchema"
@@ -236,6 +249,7 @@ watch(
           v-model:attributeItem="cell_attribute_item"
           v-model:attributeRange="cell_attribute_range"
           v-model:attributeColorMap="cell_attribute_color_map"
+          v-model:attributeNoDataColor="cell_attribute_no_data_color"
           :id="id"
           :componentIds="componentIds"
           :schema="cellSchema"
@@ -247,6 +261,7 @@ watch(
           v-model:attributeItem="polygon_attribute_item"
           v-model:attributeRange="polygon_attribute_range"
           v-model:attributeColorMap="polygon_attribute_color_map"
+          v-model:attributeNoDataColor="polygon_attribute_no_data_color"
           :id="id"
           :componentIds="componentIds"
           :schema="polygonSchema"
@@ -258,6 +273,7 @@ watch(
           v-model:attributeItem="polyhedron_attribute_item"
           v-model:attributeRange="polyhedron_attribute_range"
           v-model:attributeColorMap="polyhedron_attribute_color_map"
+          v-model:attributeNoDataColor="polyhedron_attribute_no_data_color"
           :id="id"
           :componentIds="componentIds"
           :schema="polyhedronSchema"

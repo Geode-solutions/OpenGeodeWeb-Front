@@ -55,5 +55,6 @@ export {
   DEFAULT_MODEL_COMPONENT_TYPE_COLORS,
   MODEL_DEFAULT_COLOR,
   MODEL_DEFAULT_ACTIVE_COLORING,
+  DEFAULT_NO_DATA_COLOR,
 } from "./constants";
 export { getDefaultStyle };

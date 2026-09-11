@@ -1,3 +1,4 @@
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -38,6 +39,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       minimum: undefined,
       maximum: undefined,
       colorMap: undefined,
+      no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
   function mutateMeshPolygonsPolygonStyle(id, values) {
@@ -71,7 +73,10 @@ function useMeshPolygonsPolygonAttributeStyle() {
     const { item, name } = meshPolygonsPolygonAttribute(id);
     return item ?? meshPolygonsPolygonAttributeLastItem(id, name);
   }
-  function setMeshPolygonsPolygonAttribute(id, { name, item, minimum, maximum, colorMap }) {
+  function setMeshPolygonsPolygonAttribute(
+    id,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+  ) {
     mutateMeshPolygonsPolygonStyle(id, {
       name,
       item,
@@ -80,6 +85,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       minimum,
       maximum,
       colorMap,
+      no_data_color,
     });
     const points = getRGBPointsFromPreset(colorMap);
     const schema = meshPolygonsPolygonAttributeSchemas.attribute;
@@ -90,6 +96,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       points,
       minimum,
       maximum,
+      no_data_color,
     };
     return viewerStore.request({
       schema,
@@ -106,6 +113,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       minimum: storedConfig.minimum,
       maximum: storedConfig.maximum,
       colorMap: storedConfig.colorMap,
+      no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPolygonsPolygonAttributeValid(attribute)) {
       return setMeshPolygonsPolygonAttribute(id, attribute);
@@ -154,6 +162,22 @@ function useMeshPolygonsPolygonAttributeStyle() {
     });
     return applyPolygonAttribute(id);
   }
+  function meshPolygonsPolygonAttributeNoDataColor(id) {
+    const name = meshPolygonsPolygonAttributeName(id);
+    const item = meshPolygonsPolygonAttributeItem(id);
+    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
+    return storedConfig.no_data_color;
+  }
+  async function setMeshPolygonsPolygonAttributeNoDataColor(id, no_data_color) {
+    const name = meshPolygonsPolygonAttributeName(id);
+    const item = meshPolygonsPolygonAttributeItem(id);
+    const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
+    await setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
+      ...storedConfig,
+      no_data_color,
+    });
+    return applyPolygonAttribute(id);
+  }
   return {
     meshPolygonsPolygonAttributeName,
     meshPolygonsPolygonAttributeItem,
@@ -165,6 +189,8 @@ function useMeshPolygonsPolygonAttributeStyle() {
     setMeshPolygonsPolygonAttributeItem,
     setMeshPolygonsPolygonAttributeRange,
     setMeshPolygonsPolygonAttributeColorMap,
+    meshPolygonsPolygonAttributeNoDataColor,
+    setMeshPolygonsPolygonAttributeNoDataColor,
   };
 }
 export { isMeshPolygonsPolygonAttributeValid, useMeshPolygonsPolygonAttributeStyle };
